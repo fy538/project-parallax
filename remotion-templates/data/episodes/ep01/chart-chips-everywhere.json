@@ -1,0 +1,35 @@
+{
+  "episode": "EP01",
+  "title": "Chips are everywhere",
+  "subtitle": "Semiconductor content in everyday devices",
+  "variant": "bar",
+  "unit": "",
+  "dataPoints": [
+    {
+      "label": "Modern car",
+      "sublabel": "1,000–3,000 chips",
+      "value": 3000,
+      "color": "#3266AD"
+    },
+    {
+      "label": "Smartphone",
+      "sublabel": "~160 chips",
+      "value": 160,
+      "color": "#E5A544"
+    },
+    {
+      "label": "MRI machine",
+      "sublabel": "~500 chips",
+      "value": 500,
+      "color": "#5DAA68"
+    },
+    {
+      "label": "Data center rack",
+      "sublabel": "~10,000 chips",
+      "value": 10000,
+      "color": "#F5A623"
+    }
+  ],
+  "source": "SIA, IHS Markit semiconductor content estimates",
+  "durationSec": 7
+}

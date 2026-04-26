@@ -1,0 +1,29 @@
+# Dependencies
+remotion-templates/node_modules/
+
+# Build & render output
+remotion-templates/out/
+remotion-templates/dist/
+remotion-templates/.cache/
+remotion-templates/.vite/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# macOS
+.DS_Store
+
+# Test artifacts
+remotion-templates/src/__tests__/.temp-renders/
+remotion-templates/test-results.json
+
+# Skill packages (built from SKILL.md source)
+*.skill
+
+# Skill development workspaces (eval iteration outputs)
+skills/*/research-audit-workspace/

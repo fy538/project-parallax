@@ -1,0 +1,36 @@
+{
+  "episode": "EP01",
+  "leftLabel": "The Triumph",
+  "rightLabel": "The Reality Check",
+  "leftColor": "#5DAA68",
+  "rightColor": "#D64545",
+  "secondsPerEvent": 3,
+  "leftEvents": [
+    {
+      "year": "Jan 2025",
+      "title": "DeepSeek R1 released",
+      "description": "Competitive with leading US models. Built on restricted hardware."
+    },
+    {
+      "year": "Jan 2025",
+      "title": "Chinese tech forums erupt",
+      "description": "Vindication. Proof that ingenuity can route around any restriction."
+    }
+  ],
+  "rightEvents": [
+    {
+      "year": "2025",
+      "title": "DeepSeek attempts R2 on domestic chips",
+      "description": "Huawei Ascend processors — the supposed Nvidia replacement."
+    },
+    {
+      "year": "2025",
+      "title": "Not a single successful training run",
+      "description": "Fell back to the very Nvidia hardware the US was restricting."
+    }
+  ],
+  "connections": [
+    { "leftIndex": 0, "rightIndex": 0, "label": "Same team" },
+    { "leftIndex": 1, "rightIndex": 1, "label": "Both true" }
+  ]
+}

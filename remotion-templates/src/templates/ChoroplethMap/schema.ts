@@ -1,0 +1,37 @@
+/**
+ * Zod schemas for ChoroplethMap template.
+ */
+
+import { z } from "zod";
+
+const CountryDataSchema = z.object({
+  name: z.string(),
+  iso3: z.string().optional(),
+  value: z.number().optional(),
+  fill: z.string().optional(),
+  label: z.string().optional(),
+});
+
+const AnimationPhaseSchema = z.object({
+  title: z.string(),
+  subtitle: z.string().optional(),
+  durationSec: z.number(),
+  countries: z.array(CountryDataSchema),
+  center: z.tuple([z.number(), z.number()]).optional(),
+  scale: z.number().optional(),
+});
+
+export const ChoroplethMapSchema = z.object({
+  data: z.object({
+    episode: z.string(),
+    title: z.string(),
+    projection: z.enum(["geoMercator", "geoNaturalEarth1", "geoEqualEarth"]).optional(),
+    center: z.tuple([z.number(), z.number()]).optional(),
+    scale: z.number().optional(),
+    colorRamp: z.union([
+      z.enum(["blue", "red", "teal", "gray"]),
+      z.array(z.string()),
+    ]).optional(),
+    phases: z.array(AnimationPhaseSchema).min(1),
+  }),
+});

@@ -1,0 +1,46 @@
+{
+  "episode": "EP01",
+  "title": "The reshoring bet",
+  "projection": "geoMercator",
+  "center": [-100, 40],
+  "scale": 400,
+  "phases": [
+    {
+      "title": "TSMC Arizona — $65B investment",
+      "subtitle": "The most expensive FDI project in American history",
+      "durationSec": 4,
+      "countries": [
+        { "name": "United States of America", "fill": "#3266AD", "label": "TSMC Arizona fab" }
+      ],
+      "center": [-100, 40],
+      "scale": 400
+    },
+    {
+      "title": "But 93% of advanced chips still come from here",
+      "subtitle": "Taiwan produces the vast majority of the world's leading-edge semiconductors",
+      "durationSec": 4,
+      "countries": [
+        { "name": "United States of America", "fill": "#3266AD" },
+        { "name": "Taiwan", "fill": "#F5A623", "label": "TSMC HQ" }
+      ],
+      "center": [40, 25],
+      "scale": 180
+    },
+    {
+      "title": "The global scramble to reshore",
+      "subtitle": "Every major power building fabs — but no one can go it alone",
+      "durationSec": 5,
+      "countries": [
+        { "name": "United States of America", "fill": "#3266AD", "label": "$52B CHIPS Act" },
+        { "name": "Taiwan", "fill": "#F5A623" },
+        { "name": "Japan", "fill": "#F5A623", "label": "RAPIDUS" },
+        { "name": "South Korea", "fill": "#F5A623", "label": "Samsung" },
+        { "name": "Germany", "fill": "#F5A623", "label": "Intel Magdeburg" },
+        { "name": "India", "fill": "#F5A623", "label": "Tata + PSMC" },
+        { "name": "China", "fill": "#C23B22", "label": "SMIC + Big Fund" }
+      ],
+      "center": [40, 25],
+      "scale": 150
+    }
+  ]
+}

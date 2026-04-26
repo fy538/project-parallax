@@ -1,0 +1,14 @@
+node_modules
+dist
+.cache
+.vite
+*.log
+
+# Test artifacts (temp renders but keep baselines)
+src/__tests__/.temp-renders/
+test-results.json
+
+# Environment
+.env
+.env.local
+.env.*.local

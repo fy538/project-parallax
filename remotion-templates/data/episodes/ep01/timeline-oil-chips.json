@@ -1,0 +1,57 @@
+{
+  "episode": "EP01",
+  "leftLabel": "1941 — Oil Embargo",
+  "rightLabel": "2022 — Chip Controls",
+  "leftColor": "#888780",
+  "rightColor": "#3266AD",
+  "secondsPerEvent": 2.5,
+  "leftEvents": [
+    {
+      "year": "July 1941",
+      "title": "US freezes Japanese assets, embargoes oil",
+      "description": "Japan imports 80% of its oil from the US. The embargo is total."
+    },
+    {
+      "year": "Aug-Nov 1941",
+      "title": "Japan calculates: 18 months of fuel reserves",
+      "description": "The fleet can operate for 18 months. After that, it rusts."
+    },
+    {
+      "year": "Nov 1941",
+      "title": "Imperial conference: use the fleet or lose it",
+      "description": "The logic of resource denial forces a decision."
+    },
+    {
+      "year": "Dec 7, 1941",
+      "title": "Pearl Harbor",
+      "description": "Denial triggered the exact catastrophe it was meant to prevent."
+    }
+  ],
+  "rightEvents": [
+    {
+      "year": "Oct 2022",
+      "title": "US restricts advanced chip exports to China",
+      "description": "Biden's 'small yard, high fence' — stay as far ahead as possible."
+    },
+    {
+      "year": "2023-2024",
+      "title": "China mobilizes: 举国体制 for semiconductors",
+      "description": "SMIC runs 34 lithography passes. Brute-force workarounds begin."
+    },
+    {
+      "year": "Jan 2025",
+      "title": "DeepSeek R1 trained on restricted hardware",
+      "description": "Innovation routes around constraints. Chinese forums erupt."
+    },
+    {
+      "year": "2025-2026",
+      "title": "Bifurcation accelerates",
+      "description": "Two ecosystems forming. The question: does denial work, or does it trigger what it fears?"
+    }
+  ],
+  "connections": [
+    { "leftIndex": 0, "rightIndex": 0, "label": "Resource denial" },
+    { "leftIndex": 1, "rightIndex": 1, "label": "Mobilization" },
+    { "leftIndex": 3, "rightIndex": 3, "label": "Same logic?" }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "skill_name": "research-audit",
+  "evals": [
+    {
+      "id": 0,
+      "name": "gold-standard-ep01",
+      "prompt": "Please audit this episode research brief and tell me if it's ready for scripting: /Users/feihuyan/content/episodes/EP01-silicon-trap/brief.md",
+      "expected_output": "Verdict should be CONDITIONAL. Should catch 5 unverified claims, note orphan claims (BCG $1T), flag propaganda risk for Chinese-American creator's first episode on US-China topic, score well on rubric (20+/25). Should attempt web verification of key unverified claims.",
+      "files": ["/Users/feihuyan/content/episodes/EP01-silicon-trap/brief.md"]
+    },
+    {
+      "id": 1,
+      "name": "degraded-brief",
+      "prompt": "Please audit this episode research brief and tell me if it's ready for scripting: /Users/feihuyan/content/skills/research-audit/test-briefs/ep01-degraded.md",
+      "expected_output": "Verdict should be NEEDS MORE RESEARCH. Should catch: missing counterarguments section, missing connective tissue section, unhedged thesis ('completely failed', 'winning'), weak parallel analysis (no break-points), 5 unchecked claims, overconfident language about EUV prototype. Should suggest specific Deep Research prompts.",
+      "files": ["/Users/feihuyan/content/skills/research-audit/test-briefs/ep01-degraded.md"]
+    },
+    {
+      "id": 2,
+      "name": "stub-brief-ep02",
+      "prompt": "Please audit this episode research brief and tell me if it's ready for scripting: /Users/feihuyan/content/skills/research-audit/test-briefs/ep02-stub.md",
+      "expected_output": "Verdict should be NEEDS MORE RESEARCH. Should identify: most sections missing or skeletal, no verification table, only one historical parallel with no break-point analysis, no counterarguments, no philosophical framework, no data dashboard, no CN localization notes. Should provide 2-3 specific Deep Research prompts to fill gaps.",
+      "files": ["/Users/feihuyan/content/skills/research-audit/test-briefs/ep02-stub.md"]
+    }
+  ]
+}

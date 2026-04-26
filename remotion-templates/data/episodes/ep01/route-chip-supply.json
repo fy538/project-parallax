@@ -1,0 +1,97 @@
+{
+  "episode": "EP01",
+  "title": "The Semiconductor Supply Chain",
+  "subtitle": "How a chip travels 25,000 miles before it reaches your phone",
+  "center": [60, 20],
+  "scale": 180,
+  "routeColor": "#E5A544",
+
+  "points": [
+    {
+      "name": "San Jose",
+      "coordinates": [-121.89, 37.34],
+      "label": "San Jose",
+      "sublabel": "Design (Nvidia, Apple)",
+      "color": "#3266AD"
+    },
+    {
+      "name": "Hsinchu",
+      "coordinates": [120.97, 24.80],
+      "label": "Hsinchu",
+      "sublabel": "Fabrication (TSMC)",
+      "color": "#E5A544"
+    },
+    {
+      "name": "Veldhoven",
+      "coordinates": [5.40, 51.42],
+      "label": "Veldhoven",
+      "sublabel": "Lithography (ASML)",
+      "color": "#F5A623"
+    },
+    {
+      "name": "Penang",
+      "coordinates": [100.33, 5.41],
+      "label": "Penang",
+      "sublabel": "Assembly & Test",
+      "color": "#888780"
+    },
+    {
+      "name": "Shenzhen",
+      "coordinates": [114.07, 22.54],
+      "label": "Shenzhen",
+      "sublabel": "Integration (Foxconn)",
+      "color": "#C23B22"
+    },
+    {
+      "name": "Shanghai",
+      "coordinates": [121.47, 31.23],
+      "label": "Shanghai",
+      "sublabel": "SMIC (domestic alt.)",
+      "color": "#C23B22"
+    }
+  ],
+
+  "segments": [
+    { "from": 2, "to": 1, "label": "EUV machines", "color": "#F5A623" },
+    { "from": 0, "to": 1, "label": "Chip designs" },
+    { "from": 1, "to": 3, "label": "Wafers" },
+    { "from": 3, "to": 4, "label": "Packaged chips" },
+    { "from": 0, "to": 5, "label": "Blocked", "dashed": true, "color": "#D64545" },
+    { "from": 2, "to": 5, "label": "Blocked", "dashed": true, "color": "#D64545" }
+  ],
+
+  "phases": [
+    {
+      "title": "Design → Fabrication",
+      "subtitle": "Nvidia designs in California, TSMC fabricates in Taiwan",
+      "durationSec": 4,
+      "activeSegments": [1],
+      "activePoints": [0, 1]
+    },
+    {
+      "title": "The Critical Machine",
+      "subtitle": "ASML's EUV lithography — the $350M machine only one company makes",
+      "durationSec": 4,
+      "activeSegments": [0],
+      "activePoints": [2]
+    },
+    {
+      "title": "Assembly & Integration",
+      "subtitle": "Wafers to Penang for packaging, then Shenzhen for final products",
+      "durationSec": 4,
+      "activeSegments": [2, 3],
+      "activePoints": [3, 4]
+    },
+    {
+      "title": "The Blockade",
+      "subtitle": "US export controls cut China off from advanced designs and EUV machines",
+      "durationSec": 5,
+      "activeSegments": [4, 5],
+      "activePoints": [5],
+      "center": [80, 28],
+      "scale": 220
+    }
+  ],
+
+  "source": "SIA, ASML annual reports, Chris Miller 'Chip War'"
+}

@@ -1,0 +1,34 @@
+{
+  "episode": "EP01",
+  "title": "Two Strategic Traditions",
+  "subtitle": "How different games produce different instincts about technology control",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Chess Thinking",
+      "icon": "♟️",
+      "color": "#3266AD",
+      "items": [
+        "Decisive victory — checkmate the opponent",
+        "Control the center, dominate key squares",
+        "Sacrifice pieces for positional advantage",
+        "Clear win condition: the king falls",
+        "US approach: 'small yard, high fence' — deny the critical node"
+      ]
+    },
+    {
+      "title": "Go (围棋) Thinking",
+      "icon": "⚫",
+      "color": "#C23B22",
+      "items": [
+        "Relative advantage — win by more territory",
+        "Surround, influence, build position gradually",
+        "Every stone stays on the board — nothing is wasted",
+        "No single decisive blow; accumulation wins",
+        "China approach: 举国体制 — mobilize everything, route around"
+      ]
+    }
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 12
+}
