@@ -1,0 +1,11 @@
+{
+  "episode": "EP01",
+  "variant": "statistic",
+  "statValue": "20% → 15%",
+  "statLabel": "revenue-sharing deal",
+  "statContext": "Aug 2025 — Jensen Huang negotiated Trump down from 20% to 15%",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "dark",
+  "backgroundTint": "#C23B22",
+  "durationSec": 5
+}

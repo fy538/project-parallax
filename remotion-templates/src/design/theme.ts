@@ -15,8 +15,8 @@
 // Brand DNA — these work across both dark and light modes.
 
 export const palette = {
-  ink: "#1A1A2E",
-  midnight: "#252540",
+  ink: "#1C1814",
+  midnight: "#2A2520",
   amber: "#E5A544",
   rust: "#C23B22",
   bone: "#F0E6D0",
@@ -51,15 +51,15 @@ export const ramps = {
 
 export const dark = {
   bg: {
-    base: "#0D0D1A",
-    surface: "#1A1A2E", // = palette.ink
-    elevated: "#252540", // = palette.midnight
-    map: "#141428",
+    base: "#12100E",
+    surface: "#1C1814", // = palette.ink
+    elevated: "#2A2520", // = palette.midnight
+    map: "#1A1612",
   },
   text: {
     primary: "#F0E6D0", // = palette.bone
     secondary: "#B8AE9C",
-    muted: "#6A6458",
+    muted: "#7A6E60",
     accent: "#E5A544", // = palette.amber
   },
   accent: palette.amber,
@@ -75,9 +75,10 @@ export const light = {
     surface: "#EDE7DB",
     elevated: "#FFFFFF",
     border: "#D4CAB8",
+    map: "#EDE7DB", // light map background (= surface)
   },
   text: {
-    primary: "#1A1A2E", // = palette.ink
+    primary: "#1C1814", // = palette.ink
     secondary: "#4A4538",
     muted: "#8A8070",
     accent: "#6B1D1D", // = palette.oxblood
@@ -118,13 +119,13 @@ export const colors = {
 
   bgDark: dark.bg.base,
   bgLight: light.bg.base,
-  bgMap: dark.bg.map,
+  bgMap: light.bg.map,
   bgMapLight: light.bg.surface,
 
-  textPrimary: dark.text.primary,
-  textSecondary: dark.text.secondary,
+  textPrimary: light.text.primary,
+  textSecondary: light.text.secondary,
   textOnDark: dark.text.primary,
-  textMuted: dark.text.muted,
+  textMuted: light.text.muted,
 } as const;
 
 // ── Typography ─────────────────────────────────────────────────────────────
@@ -265,6 +266,43 @@ export const mapDefaults = {
   strokeWidth: 0.5,
 } as const;
 
+/** Mapbox GL configuration — see NEW_TEMPLATES_SPEC.md Section 0. */
+export const mapConfig = {
+  /** Light mode is primary. Replace with custom Meridian Light style after Mapbox Studio setup. */
+  styleUrl: "mapbox://styles/mapbox/light-v11",
+  /** Dark fallback for optional dark-mode compositions. */
+  darkStyleUrl: "mapbox://styles/mapbox/dark-v11",
+  terrain: {
+    source: "mapbox-dem" as const,
+    exaggeration: 1.5,
+  },
+  defaultCamera: {
+    longitude: 20,
+    latitude: 25,
+    zoom: 1.8,
+    pitch: 30,
+    bearing: 0,
+  },
+  /** Globe projection for wide shots (zoom < 3). */
+  projection: "globe" as const,
+  /** Meridian Light palette mapping for custom Mapbox Studio style. */
+  styleColors: {
+    ocean: "#E4DDD3",
+    land: light.bg.base,
+    landBorder: "#D4CAB8",
+    waterLabel: "#8A8070",
+    countryLabel: palette.ink,
+  },
+  /** Dark palette mapping (secondary). */
+  darkStyleColors: {
+    ocean: "#100E0C",
+    land: palette.ink,
+    landBorder: "#3A3530",
+    waterLabel: "#5A5448",
+    countryLabel: palette.bone,
+  },
+} as const;
+
 // ── Duotone Ramps (Image Treatment Pipeline) ──────────────────────────────
 
 export const duotone = {
@@ -296,6 +334,36 @@ export const depth = {
   }),
 } as const;
 
+// ── Shadow Tokens (POLISH.md V3) ──────────────────────────────────────────
+
+export const shadows = {
+  /** Barely visible lift — default for cards, chart bars, framework nodes */
+  subtle: "0 2px 12px rgba(0,0,0,0.25)",
+  /** Highlighted elements — active states, hovered items */
+  medium: "0 4px 20px rgba(0,0,0,0.35)",
+  /** Colored halo — key data, active map countries. Pass accent color. */
+  accentGlow: (color: string) => `0 0 16px ${color}40`,
+  /** Text lift on dark backgrounds (POLISH.md V7) */
+  textLift: "0 1px 3px rgba(0,0,0,0.5)",
+} as const;
+
+// ── Gradient Helpers (POLISH.md V2, V4) ────────────────────────────────────
+
+export const gradients = {
+  /** Dark mode background vignette (V2) — secondary use */
+  darkVignette: `radial-gradient(ellipse at center, ${dark.bg.surface} 0%, ${dark.bg.base} 100%)`,
+  /** Linear gradient slightly lighter at top (V2 alt for charts) — secondary use */
+  darkLinear: `linear-gradient(180deg, ${dark.bg.surface} 0%, ${dark.bg.base} 100%)`,
+  /** Light mode subtle surface gradient (primary) */
+  lightSurface: `linear-gradient(180deg, ${light.bg.base} 0%, ${light.bg.surface} 100%)`,
+  /** Internal bar gradient — base color at top, 15% darker at bottom (V4) */
+  barFill: (baseColor: string) =>
+    `linear-gradient(180deg, ${baseColor} 0%, ${baseColor}D9 100%)`,
+  /** Divider fade: full opacity center, transparent edges (V5) */
+  dividerFade: (color: string) =>
+    `linear-gradient(90deg, transparent 0%, ${color} 20%, ${color} 80%, transparent 100%)`,
+} as const;
+
 // ── Crosshair Config ───────────────────────────────────────────────────────
 
 export const crosshair = {
@@ -303,4 +371,144 @@ export const crosshair = {
   innerStroke: 0.5,
   hairlineStroke: 0.4,
   springConfig: { damping: 14, mass: 1.0 },
+} as const;
+
+// ── Layout Primitives (POLISH.md enforcement) ─────────────────────────────
+// These helpers make spacing violations hard by computing derived values
+// from the canonical tokens above. Templates consume these instead of
+// inventing their own magic numbers.
+
+/**
+ * Title block height estimate by variant.
+ * Used to compute where content starts below the title.
+ */
+export const titleHeight = {
+  /** Episode title (label + series + title + divider + subtitle) */
+  episode: 220,
+  /** Section title (number + title + underline) */
+  section: 160,
+  /** Chart/diagram title (h2 + optional subtitle) */
+  content: 92,
+  /** Minimal (single line h3) */
+  minimal: 56,
+} as const;
+
+/**
+ * Content area — the usable rectangle after safe area + title gap.
+ * Every template should position its main content within this rect.
+ *
+ * Usage: const area = contentArea("content");
+ *        <div style={{ top: area.top, left: area.left, width: area.width, height: area.height }}>
+ */
+export const contentArea = (
+  titleVariant: keyof typeof titleHeight = "content"
+) => {
+  const top =
+    layout.safeArea.top + titleHeight[titleVariant] + layout.spacing.xl; // 48px title-to-content gap
+  const left = layout.safeArea.left;
+  const right = layout.safeArea.right;
+  const bottom = layout.safeArea.bottom;
+  return {
+    top,
+    left,
+    right,
+    bottom,
+    width: layout.width - left - right,
+    height: layout.height - top - bottom,
+  } as const;
+};
+
+/**
+ * Column layout — computes column widths and gap for N-column layouts.
+ * Gap defaults to layout.spacing.xl (48px). Columns are equal width.
+ *
+ * Usage: const cols = columnLayout(2);
+ *        // cols.columnWidth = 796, cols.gap = 48, cols.columns = 2
+ */
+export const columnLayout = (
+  columns: number,
+  opts?: {
+    /** Override the gap between columns. Default: layout.spacing.xl (48) */
+    gap?: number;
+    /** Title variant to compute available height. Default: "content" */
+    titleVariant?: keyof typeof titleHeight;
+  }
+) => {
+  const gap = opts?.gap ?? layout.spacing.xl;
+  const area = contentArea(opts?.titleVariant ?? "content");
+  const totalGapWidth = gap * (columns - 1);
+  const columnWidth = Math.floor((area.width - totalGapWidth) / columns);
+  return {
+    columns,
+    columnWidth,
+    gap,
+    totalWidth: columnWidth * columns + totalGapWidth,
+    ...area,
+  } as const;
+};
+
+/**
+ * Map camera presets — regional zooms so compositions don't default to
+ * showing two dots on opposite sides of a globe.
+ * Zoom levels: 1.5 = globe, 3 = continent, 4-5 = region, 6+ = country.
+ */
+export const cameraPresets = {
+  globe: { longitude: 20, latitude: 20, zoom: 1.5, pitch: 20, bearing: 0 },
+  eastAsia: { longitude: 116, latitude: 32, zoom: 4, pitch: 30, bearing: 0 },
+  china: { longitude: 104, latitude: 35, zoom: 4.5, pitch: 30, bearing: 0 },
+  taiwan: { longitude: 121, latitude: 23.5, zoom: 7, pitch: 35, bearing: 0 },
+  usPacific: {
+    longitude: -160,
+    latitude: 25,
+    zoom: 2.5,
+    pitch: 25,
+    bearing: 0,
+  },
+  transatlantic: {
+    longitude: -30,
+    latitude: 40,
+    zoom: 2.5,
+    pitch: 20,
+    bearing: 0,
+  },
+  europe: { longitude: 15, latitude: 50, zoom: 4, pitch: 25, bearing: 0 },
+  middleEast: { longitude: 45, latitude: 30, zoom: 4.5, pitch: 30, bearing: 0 },
+  semiconductorBelt: {
+    longitude: 125,
+    latitude: 28,
+    zoom: 3.5,
+    pitch: 30,
+    bearing: 10,
+  },
+} as const;
+
+/**
+ * Text constraints — maxWidth values for text at each tier to prevent
+ * overflow and ensure readability.
+ */
+export const textMaxWidth = {
+  /** Hero title, episode title */
+  h1: 1400,
+  /** Section title, chart title */
+  h2: 1200,
+  /** Subsection, card header */
+  h3: 900,
+  /** Body text, descriptions */
+  body: 1100,
+  /** Labels, captions in constrained containers */
+  label: 600,
+  /** Node/cell text in diagrams */
+  node: 280,
+} as const;
+
+/**
+ * Card padding — consistent inner padding for all card-like containers
+ * (framework nodes, timeline events, chart legends, info panels).
+ * POLISH.md L3: 24px vertical, 28px horizontal.
+ * Rounded to 8px grid: 24 × 32.
+ */
+export const cardPadding = {
+  vertical: layout.spacing.md, // 24
+  horizontal: layout.spacing.lg, // 32
+  css: `${layout.spacing.md}px ${layout.spacing.lg}px`,
 } as const;

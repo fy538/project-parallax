@@ -188,6 +188,9 @@ The channel occupies a specific niche between academic rigor and narrative intri
 - Ambiguous connections: suggestive language ("structural resonances," "echoes"), analogies presented as heuristic lenses not predictions
 - Mystery layer: narrative tension through revelation, strategic information gaps, questions rather than closed conclusions
 
+## Knowledge Density Requirement
+The core product of Parallax is surprising cross-domain connections at high density. Every brief should surface 4-5 genuinely unexpected connections across history, philosophy, game theory, civilizational analysis, economics, literature, and science. "Obvious" connections (empires rise and fall) are not valuable. "Surprising" connections (Venice's Murano glass monopoly shares island-concentration logic with TSMC in Taiwan) are electric. Think across civilizations and centuries — Chinese, Islamic, Roman, Venetian, Ottoman, Mongol. The scriptwriter will select 2-3 for the final script, but the research phase should produce a rich menu of cross-domain links ranked by resonance.
+
 ## Tone Guidelines
 ALWAYS use: "structural resonance," "echoes," "rhymes," "pattern," "what if we consider," "this suggests," "one reading of this is"
 NEVER use: "this proves," "this inevitably leads to," attribution to secret cabals, declarative predictions about specific future events
@@ -206,12 +209,17 @@ Every brief must include ALL of the following sections:
 - Verification status: ✅ CONFIRMED / ⚠️ NOT YET VERIFIED / ❌ DISCONFIRMED
 - Flag anything that needs Tiger to verify independently
 
-### SECTION 3: HISTORICAL PARALLELS
-- For EACH parallel used (typically 2, maximum 3):
-  - Period, resource/technology, controlling actors, mechanism, resolution
+### SECTION 3: CROSS-DOMAIN CONNECTIONS (formerly "Historical Parallels")
+- Surface 4-5 connections across history, philosophy, civilizational analysis, game theory, and other domains. Cast the net wide — not all will make the script, but the research phase should produce surprising cross-domain links the scriptwriter can select from.
+- The knowledge density of the connections IS the product. The viewer should think "I never would have put those two things together." Connections that feel obvious ("empires rise and fall") are not valuable. Connections that create genuine surprise ("Venice's Murano glass monopoly has the same island-concentration logic as TSMC in Taiwan") are.
+- For EACH connection (aim for 4-5, minimum 3):
+  - Domain (history / philosophy / game theory / civilizational / economic / literary / scientific)
+  - Period or source, the structural mechanism, and how it maps to the current topic
   - Where the analogy holds (specific structural similarities)
   - Where it breaks (specific differences — this is mandatory, never skip)
+  - Surprise rating: would an educated viewer find this connection genuinely unexpected?
   - What to emphasize vs. what to acknowledge
+- Rank the connections by resonance. Flag the top 2-3 as script candidates.
 
 ### SECTION 4: PHILOSOPHICAL FRAMEWORKS
 - Which frameworks illuminate this topic and how
@@ -280,6 +288,9 @@ Specific questions I want answered:
 - [Question 1]
 - [Question 2]
 - [Question 3]
+
+IMPORTANT — KNOWLEDGE DENSITY REQUIREMENT:
+The core product of every Parallax episode is surprising cross-domain connections. For Section 3 (Cross-Domain Connections), cast the net wide across history, philosophy, game theory, civilizational analysis, economics, literature, and science. I need 4-5 genuinely surprising connections, not just 1-2 obvious historical parallels. "Obvious" means an educated viewer would already know the connection; "surprising" means they'd think "I never would have put those two things together." Think across civilizations and centuries — if there's a Chinese, Islamic, Roman, Venetian, or Ottoman parallel that shares structural logic with this topic, surface it. Rank by resonance and flag the top 2-3 for the script.
 
 Produce a complete research brief following the standard 8-section structure. Use the EP01 brief as the quality benchmark.
 ```
@@ -365,7 +376,7 @@ For each claim:
 2. Run the Full Episode Research prompt with Deep Research enabled (~5-15 min processing)
 3. Review the output, note any gaps
 4. Run 1-2 supplementary prompts if needed (historical deep dive, framework investigation)
-5. Save the final brief: copy the output, paste into a new file at `content/episodes/EP[XX]-[slug]/brief.md`
+5. Save the final brief: copy the output, paste into a new file at `episodes/EP[XX]-[slug]/brief.md`
 
 **Thursday — Script Development (~45 min total, mostly in Cowork)**
 1. Open Cowork

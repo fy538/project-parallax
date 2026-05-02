@@ -8,6 +8,40 @@
 import { interpolate, spring, Easing } from "remotion";
 import { layout, durations } from "../design/theme";
 
+// ── Reusable interpolation configs (hoisted to avoid per-frame allocation) ─
+// These are the most common interpolation option shapes. Import and pass directly
+// to interpolate() instead of creating inline objects every frame.
+
+/** Clamp both ends, no easing. The most common config. */
+export const CLAMP: { extrapolateLeft: "clamp"; extrapolateRight: "clamp" } = {
+  extrapolateLeft: "clamp",
+  extrapolateRight: "clamp",
+};
+
+/** Clamp + cubic ease-out (default motion). */
+export const CLAMP_CUBIC = { ...CLAMP, easing: Easing.out(Easing.cubic) };
+
+/** Clamp + quartic ease-out (bar growth, color fills). */
+export const CLAMP_QUARTIC = { ...CLAMP, easing: Easing.out(Easing.poly(4)) };
+
+/** Clamp + quintic ease-out (hero elements). */
+export const CLAMP_QUINTIC = { ...CLAMP, easing: Easing.out(Easing.poly(5)) };
+
+/** Clamp + quad ease-out (structure, gridlines, dividers). */
+export const CLAMP_QUAD = { ...CLAMP, easing: Easing.out(Easing.quad) };
+
+/** Clamp + sine ease-out (labels, annotations). */
+export const CLAMP_SINE = { ...CLAMP, easing: Easing.out(Easing.sin) };
+
+/** Clamp + cubic ease-in (exit animations). */
+export const CLAMP_CUBIC_IN = { ...CLAMP, easing: Easing.in(Easing.cubic) };
+
+/** Clamp + cubic ease-in-out (sweeps, symmetric motion). */
+export const CLAMP_CUBIC_INOUT = { ...CLAMP, easing: Easing.inOut(Easing.cubic) };
+
+/** Clamp + quad ease-in-out (Ken Burns drift). */
+export const CLAMP_QUAD_INOUT = { ...CLAMP, easing: Easing.inOut(Easing.quad) };
+
 // ── Fade helpers ────────────────────────────────────────────────────────────
 
 /** Fade in over a given number of frames, starting at `startFrame`. */
@@ -16,10 +50,7 @@ export const fadeIn = (
   startFrame: number = 0,
   duration: number = durations.fadeIn
 ): number =>
-  interpolate(frame, [startFrame, startFrame + duration], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  interpolate(frame, [startFrame, startFrame + duration], [0, 1], CLAMP);
 
 /** Fade out over a given number of frames, ending at `endFrame`. */
 export const fadeOut = (
@@ -27,10 +58,7 @@ export const fadeOut = (
   endFrame: number,
   duration: number = durations.fadeOut
 ): number =>
-  interpolate(frame, [endFrame - duration, endFrame], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  interpolate(frame, [endFrame - duration, endFrame], [1, 0], CLAMP);
 
 /** Fade in then out. Good for elements that appear briefly. */
 export const fadeInOut = (
@@ -54,11 +82,7 @@ export const slideIn = (
   distance: number = 40,
   duration: number = durations.fadeIn
 ): number =>
-  interpolate(frame, [startFrame, startFrame + duration], [distance, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  interpolate(frame, [startFrame, startFrame + duration], [distance, 0], CLAMP_CUBIC);
 
 /** Scale up from 0 to 1. Good for data points appearing on a chart. */
 export const scaleIn = (
@@ -66,11 +90,7 @@ export const scaleIn = (
   startFrame: number,
   duration: number = durations.fadeIn
 ): number =>
-  interpolate(frame, [startFrame, startFrame + duration], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  interpolate(frame, [startFrame, startFrame + duration], [0, 1], CLAMP_CUBIC);
 
 /** Gentle spring — less bouncy than Remotion default. Suitable for UI. */
 export const gentleSpring = (
@@ -192,11 +212,7 @@ export const kenBurnsDrift = (
   totalFrames: number,
   maxScale: number = 1.02
 ): number =>
-  interpolate(frame, [0, totalFrames], [1.0, maxScale], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
+  interpolate(frame, [0, totalFrames], [1.0, maxScale], CLAMP_QUAD_INOUT);
 
 /**
  * Subtle pan drift — slow horizontal or vertical translation.
@@ -207,11 +223,117 @@ export const panDrift = (
   totalFrames: number,
   maxOffset: number = 8
 ): number =>
-  interpolate(frame, [0, totalFrames], [0, maxOffset], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
+  interpolate(frame, [0, totalFrames], [0, maxOffset], CLAMP_QUAD_INOUT);
+
+// ── Cinematic entrance helpers ────────────────────────────────────────────
+
+/**
+ * Scale reveal — element arrives at a larger scale and eases down.
+ * Use for hero stats, titles, key reveals. Returns scale value.
+ * The "arriving with authority" feel vs. timid slide-in.
+ */
+export const scaleReveal = (
+  frame: number,
+  startFrame: number,
+  duration: number = 20,
+  fromScale: number = 1.2,
+  toScale: number = 1.0
+): number =>
+  interpolate(frame, [startFrame, startFrame + duration], [fromScale, toScale], CLAMP_CUBIC);
+
+/**
+ * Bloom intensity — grows from 0 to 1 and then slowly fades to a sustained level.
+ * Use for the light bloom behind accent elements. Returns opacity 0-1.
+ *
+ * Pattern: 0 → 1.0 (flash) → 0.6 (sustain)
+ * The initial flash mimics a light source "turning on" then settling.
+ */
+export const bloomIntensity = (
+  frame: number,
+  startFrame: number,
+  flashDuration: number = 8,
+  sustainLevel: number = 0.6
+): number => {
+  if (frame < startFrame) return 0;
+
+  const flashEnd = startFrame + flashDuration;
+  const settleEnd = flashEnd + flashDuration * 2;
+
+  if (frame <= flashEnd) {
+    // Flash in
+    return interpolate(frame, [startFrame, flashEnd], [0, 1], CLAMP_CUBIC);
+  }
+
+  if (frame <= settleEnd) {
+    // Settle down to sustain
+    return interpolate(frame, [flashEnd, settleEnd], [1, sustainLevel], CLAMP_QUAD_INOUT);
+  }
+
+  return sustainLevel;
+};
+
+// ── Easing presets by role ─────────────────────────────────────────────────
+// Per POLISH.md A1: differentiate motion by visual hierarchy.
+// Hero elements overshoot and settle. Structure fades in linearly. Labels are soft.
+
+export const easings = {
+  /** Hero/highlight bars: fast start, long deceleration tail. */
+  heroBar: Easing.out(Easing.poly(5)), // quintic ease-out
+  /** Normal bars: standard deceleration, slightly snappier than cubic. */
+  bar: Easing.out(Easing.poly(4)), // quartic ease-out
+  /** Labels, source text, annotations: gentle sine curve. */
+  label: Easing.out(Easing.sin),
+  /** Structure elements (gridlines, axes): steady linear-ish reveal. */
+  structure: Easing.out(Easing.quad),
+  /** Reference lines scanning across: ease-in-out for "sweep" feel. */
+  sweep: Easing.inOut(Easing.cubic),
+} as const;
+
+// ── Gridline draw ─────────────────────────────────────────────────────────
+
+/**
+ * Returns a 0→1 progress value for drawing a gridline via stroke-dashoffset.
+ * Lines draw in from left to right with a staggered start per line.
+ */
+export const gridlineDraw = (
+  frame: number,
+  startFrame: number,
+  drawDuration: number = 18,
+  lineIndex: number = 0,
+  staggerPerLine: number = 3
+): number => {
+  const lineStart = startFrame + lineIndex * staggerPerLine;
+  return interpolate(frame, [lineStart, lineStart + drawDuration], [0, 1], CLAMP_QUAD);
+};
+
+// ── Focus pull (camera energy) ────────────────────────────────────────────
+
+/**
+ * Three-phase scale animation simulating a camera focus pull:
+ *   Phase 1: start slightly wide (0.95×) — establishes context
+ *   Phase 2: zoom to highlight (1.08×) — draws attention
+ *   Phase 3: ease back to neutral (1.0×) — settles
+ *
+ * Returns a scale value. Apply via CSS transform on the chart area.
+ * `highlightFrame` is when the hero bar finishes growing.
+ */
+export const focusPull = (
+  frame: number,
+  totalFrames: number,
+  highlightFrame: number,
+  zoomScale: number = 1.08,
+  wideScale: number = 0.96
+): number => {
+  const settleFrame = highlightFrame + 30; // ~1s to hold zoom, then settle
+
+  if (frame <= highlightFrame) {
+    // Phase 1→2: wide → zoom to highlight
+    return interpolate(frame, [0, highlightFrame], [wideScale, zoomScale], CLAMP_CUBIC);
+  }
+
+  // Phase 3: zoom → neutral
+  return interpolate(frame, [highlightFrame, settleFrame + 30], [zoomScale, 1.0], CLAMP_QUAD_INOUT);
+};
 
 // ── Exit animations ────────────────────────────────────────────────────────
 
@@ -229,7 +351,7 @@ export const exitFade = (
     frame,
     [totalFrames - exitDuration, totalFrames],
     [1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.in(Easing.cubic) }
+    CLAMP_CUBIC_IN
   );
 
 // ── Pulse helper ───────────────────────────────────────────────────────────

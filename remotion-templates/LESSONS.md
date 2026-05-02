@@ -86,7 +86,7 @@
 **Gotcha:** Decimals work but animate in integer steps. For "3.5nm", it counts 0, 1, 2, 3, 3.5 — which looks slightly uneven.
 
 ### L13: Chinese text needs explicit font-family
-**Rule:** Any `<span>` or `<div>` rendering Chinese characters must explicitly set `fontFamily: fonts.chinese` ("Noto Sans SC, PingFang SC, sans-serif"). Inter does not contain CJK glyphs and will fall back to system fonts inconsistently across render environments.
+**Rule:** Any `<span>` or `<div>` rendering Chinese characters must explicitly set `fontFamily: fonts.chinese` ("Noto Sans SC, PingFang SC, sans-serif"). The brand fonts (Space Grotesk, IBM Plex Mono, JetBrains Mono) do not contain CJK glyphs and will fall back to system fonts inconsistently across render environments.
 
 ---
 
@@ -141,10 +141,10 @@
 
 ## Skills
 
-### L21: Skill files are zip archives with .skill extension
-**Structure:** A `.skill` zip contains a folder with the skill name, which contains `SKILL.md` (instructions) and optionally `references/` (supporting docs).
-**Installation:** Skills are installed to the Claude skills directory and become available as slash commands.
-**Constraint:** The skills directory in sandbox is read-only. Build skills in the outputs directory, then package as .skill zip.
+### L21: Skill files are SKILL.md in a named directory
+**Structure:** A skill is a directory containing `SKILL.md` (instructions) and optionally `references/`, `scripts/`, `assets/` subdirectories.
+**Installation:** Skills are installed to the Cowork plugins skills directory and trigger automatically based on their description field. The research-audit skill is also version-controlled at `skills/research-audit/SKILL.md`.
+**Constraint:** The plugins skills directory is read-only at runtime. Build and test skills outside the plugins directory, then install manually.
 
 ### L22: Visual-spec skill requires human checkpoint
 **Pattern:** The skill produces a visual breakdown table first, then waits for user approval before generating JSON files. This prevents wasted effort if the visual plan doesn't match the creator's vision. Never skip this checkpoint.

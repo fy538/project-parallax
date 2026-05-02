@@ -1,0 +1,32 @@
+{
+  "episode": "EP01",
+  "title": "CHIPS Act: authorized vs. disbursed",
+  "subtitle": "The gap between promise and delivery",
+  "variant": "bar",
+  "unit": "$B",
+  "dataPoints": [
+    {
+      "label": "Authorized",
+      "value": 52.7,
+      "color": "#3266AD",
+      "sublabel": "2022"
+    },
+    {
+      "label": "Awarded",
+      "value": 30.9,
+      "color": "#E5A544",
+      "sublabel": "By 2025"
+    },
+    {
+      "label": "Disbursed",
+      "value": 6,
+      "color": "#C23B22",
+      "sublabel": "Actually spent"
+    }
+  ],
+  "source": "Congressional Research Service, 2025",
+  "durationSec": 6,
+  "backgroundTint": "#3266AD",
+  "highlightIndex": 2,
+  "contextNote": "In three years, less than 12% of authorized CHIPS Act funding has actually been spent."
+}

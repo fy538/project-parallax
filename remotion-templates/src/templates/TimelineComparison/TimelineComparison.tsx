@@ -12,11 +12,11 @@ import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
+  useVideoConfig,
   interpolate,
-  Easing,
 } from "remotion";
-import { palette, dark, semantic, fonts, fontSizes, layout, sec } from "../../design/theme";
-import { fadeIn, slideIn, stagger } from "../../utils/animation";
+import { palette, light, semantic, fonts, fontSizes, layout, sec, contentArea, cardPadding, shadows } from "../../design/theme";
+import { fadeIn, slideIn, stagger, exitFade, kenBurnsDrift, CLAMP_CUBIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { Background } from "../../components/Background";
 import type { TimelineComparisonData, TimelineEvent } from "./types";
@@ -30,19 +30,21 @@ const EventCard: React.FC<{
   accentColor: string;
   align: "left" | "right";
 }> = React.memo(({ event, frame, startFrame, accentColor, align }) => {
+  const { durationInFrames } = useVideoConfig();
   const opacity = fadeIn(frame, startFrame, sec(0.5));
   const offsetY = slideIn(frame, startFrame, 24, sec(0.5));
+  const exitOpacity = exitFade(frame, durationInFrames, 15);
 
   return (
     <div
       style={{
-        opacity,
+        opacity: opacity * exitOpacity,
         transform: `translateY(${offsetY}px)`,
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
-        gap: 16,
-        marginBottom: 28,
+        gap: layout.spacing.sm,
+        marginBottom: layout.spacing.lg,
       }}
     >
       {/* Timeline dot + line */}
@@ -57,11 +59,12 @@ const EventCard: React.FC<{
       >
         <div
           style={{
-            width: 14,
-            height: 14,
+            width: 16,
+            height: 16,
             borderRadius: "50%",
             backgroundColor: event.color || accentColor,
             border: `2px solid ${event.color || accentColor}`,
+            boxShadow: `0 0 12px ${event.color || accentColor}60, 0 2px 8px rgba(0,0,0,0.3)`,
           }}
         />
         <div
@@ -70,19 +73,31 @@ const EventCard: React.FC<{
             flex: 1,
             minHeight: 40,
             backgroundColor: `${event.color || accentColor}33`,
+            filter: "drop-shadow(0 0 4px rgba(229, 165, 68, 0.3))",
           }}
         />
       </div>
 
-      {/* Content */}
-      <div style={{ flex: 1 }}>
+      {/* Content card — subtle internal gradient */}
+      <div
+        style={{
+          flex: 1,
+          padding: cardPadding.css,
+          borderRadius: 8,
+          background: `linear-gradient(135deg, ${event.color || accentColor}15 0%, ${event.color || accentColor}08 100%)`,
+          border: `1px solid ${event.color || accentColor}20`,
+          borderLeft: `3px solid ${event.color || accentColor}60`,
+          boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+        }}
+      >
         <div
           style={{
             fontSize: fontSizes.label,
             color: event.color || accentColor,
             fontWeight: 600,
-            marginBottom: 4,
+            marginBottom: layout.spacing.xs,
             fontFamily: fonts.mono,
+            textShadow: shadows.textLift,
           }}
         >
           {event.year}
@@ -90,10 +105,11 @@ const EventCard: React.FC<{
         <div
           style={{
             fontSize: fontSizes.body,
-            color: dark.text.primary,
+            color: light.text.primary,
             fontWeight: 500,
             lineHeight: 1.4,
-            marginBottom: event.description ? 6 : 0,
+            marginBottom: event.description ? layout.spacing.xs : 0,
+            textShadow: shadows.textLift,
           }}
         >
           {event.title}
@@ -102,8 +118,9 @@ const EventCard: React.FC<{
           <div
             style={{
               fontSize: fontSizes.caption,
-              color: dark.text.muted,
+              color: light.text.secondary,
               lineHeight: 1.4,
+              textShadow: shadows.textLift,
             }}
           >
             {event.description}
@@ -122,12 +139,14 @@ const ConnectionLine: React.FC<{
   label?: string;
   yPosition: number;
 }> = React.memo(({ frame, startFrame, label, yPosition }) => {
+  const { durationInFrames } = useVideoConfig();
   const opacity = fadeIn(frame, startFrame, sec(0.4));
+  const exitOpacity = exitFade(frame, durationInFrames, 15);
   const dashOffset = interpolate(
     frame,
     [startFrame, startFrame + sec(0.6)],
     [200, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP_CUBIC
   );
 
   return (
@@ -137,7 +156,7 @@ const ConnectionLine: React.FC<{
         top: yPosition,
         left: "47%",
         width: "6%",
-        opacity,
+        opacity: opacity * exitOpacity,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -153,6 +172,7 @@ const ConnectionLine: React.FC<{
           strokeWidth="2"
           strokeDasharray="6 4"
           strokeDashoffset={dashOffset}
+          style={{ filter: "drop-shadow(0 0 4px rgba(229, 165, 68, 0.3))" }}
         />
       </svg>
       {label && (
@@ -160,8 +180,9 @@ const ConnectionLine: React.FC<{
           style={{
             fontSize: fontSizes.small,
             color: semantic.highlight,
-            marginTop: 4,
+            marginTop: layout.spacing.xs / 2,
             whiteSpace: "nowrap",
+            textShadow: shadows.textLift,
           }}
         >
           {label}
@@ -177,6 +198,7 @@ export const TimelineComparison: React.FC<{
   data: TimelineComparisonData;
 }> = ({ data }) => {
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const { style: compStyle } = useCompositionAnimation();
 
   const secsPerEvent = useMemo(() => data.secondsPerEvent || 2, [data.secondsPerEvent]);
@@ -186,9 +208,10 @@ export const TimelineComparison: React.FC<{
     () => Math.max(data.leftEvents.length, data.rightEvents.length),
     [data.leftEvents.length, data.rightEvents.length]
   );
+  const baseDelay = sec(0.8);
 
   return (
-    <Background variant="dark">
+    <Background variant="light" tint={data.backgroundTint}>
       <AbsoluteFill style={compStyle}>
         {/* ── Column headers ───────────────────────────────────────────── */}
         <div
@@ -202,54 +225,68 @@ export const TimelineComparison: React.FC<{
             opacity: fadeIn(frame, 0, sec(0.6)),
           }}
         >
-        <div
-          style={{
-            width: "44%",
-            borderBottom: `3px solid ${leftColor}`,
-            paddingBottom: 12,
-          }}
-        >
+        <div style={{ width: "44%", paddingBottom: layout.spacing.sm }}>
           <div
             style={{
               fontSize: fontSizes.h3,
               fontWeight: 600,
-              color: dark.text.primary,
+              color: light.text.primary,
               fontFamily: fonts.heading,
+              textShadow: shadows.textLift,
+              marginBottom: layout.spacing.sm,
+              transform: `translateY(${slideIn(frame, 0, 16, sec(0.5))}px)`,
             }}
           >
             {data.leftLabel}
           </div>
+          <div
+            style={{
+              height: 3,
+              background: `linear-gradient(90deg, ${leftColor} 0%, ${leftColor}40 80%, transparent 100%)`,
+              borderRadius: 2,
+              transform: `scaleX(${interpolate(frame, [sec(0.2), sec(0.8)], [0, 1], CLAMP_QUAD)})`,
+              transformOrigin: "left center",
+            }}
+          />
         </div>
-        <div
-          style={{
-            width: "44%",
-            borderBottom: `3px solid ${rightColor}`,
-            paddingBottom: 12,
-          }}
-        >
+        <div style={{ width: "44%", paddingBottom: layout.spacing.sm }}>
           <div
             style={{
               fontSize: fontSizes.h3,
               fontWeight: 600,
-              color: dark.text.primary,
+              color: light.text.primary,
               fontFamily: fonts.heading,
+              textShadow: shadows.textLift,
+              marginBottom: layout.spacing.sm,
+              transform: `translateY(${slideIn(frame, sec(0.1), 16, sec(0.5))}px)`,
             }}
           >
             {data.rightLabel}
           </div>
+          <div
+            style={{
+              height: 3,
+              background: `linear-gradient(90deg, ${rightColor} 0%, ${rightColor}40 80%, transparent 100%)`,
+              borderRadius: 2,
+              transform: `scaleX(${interpolate(frame, [sec(0.3), sec(0.9)], [0, 1], CLAMP_QUAD)})`,
+              transformOrigin: "left center",
+            }}
+          />
         </div>
         </div>
 
-        {/* ── Event columns ────────────────────────────────────────────── */}
+        {/* ── Event columns — Ken Burns drift for camera energy ────────── */}
         <div
           style={{
             position: "absolute",
-            top: layout.safeArea.top + 70,
+            top: contentArea("minimal").top,
             left: layout.safeArea.left,
             right: layout.safeArea.right,
             bottom: layout.safeArea.bottom,
             display: "flex",
             justifyContent: "space-between",
+            transform: `scale(${kenBurnsDrift(frame, durationInFrames, 1.02)})`,
+            transformOrigin: "center top",
           }}
         >
         {/* Left column */}
@@ -259,7 +296,7 @@ export const TimelineComparison: React.FC<{
               key={`l-${i}`}
               event={event}
               frame={frame}
-              startFrame={stagger(i, sec(secsPerEvent), sec(0.8))}
+              startFrame={stagger(i, sec(0.1), baseDelay)}
               accentColor={leftColor}
               align="left"
             />
@@ -273,7 +310,7 @@ export const TimelineComparison: React.FC<{
               key={`r-${i}`}
               event={event}
               frame={frame}
-              startFrame={stagger(i, sec(secsPerEvent), sec(0.8) + sec(secsPerEvent * 0.5))}
+              startFrame={stagger(i, sec(0.1), baseDelay + sec(secsPerEvent * 0.5))}
               accentColor={rightColor}
               align="right"
             />
@@ -281,17 +318,18 @@ export const TimelineComparison: React.FC<{
         </div>
         </div>
 
-        {/* ── Episode label ────────────────────────────────────────────── */}
+        {/* ── Episode label — slideIn (no naked fade) ─────────────────── */}
         <div
           style={{
             position: "absolute",
             bottom: layout.safeArea.bottom,
             left: layout.safeArea.left,
             fontSize: fontSizes.label,
-            color: dark.text.muted,
+            color: light.text.muted,
             letterSpacing: 2,
             textTransform: "uppercase",
             opacity: fadeIn(frame, 0, sec(1)),
+            transform: `translateY(${slideIn(frame, 0, 10, sec(0.8))}px)`,
           }}
         >
           {data.episode}

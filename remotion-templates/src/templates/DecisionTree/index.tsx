@@ -12,57 +12,8 @@ import { layout, sec } from "../../design/theme";
 import { DecisionTreeSchema } from "./schema";
 import type { DecisionTreeData } from "./types";
 
-const sampleData: DecisionTreeData = {
-  episode: "EP00",
-  title: "Taiwan Strait Crisis — Decision Tree",
-  subtitle: "What happens if tensions escalate?",
-  rootId: "root",
-  nodes: [
-    {
-      id: "root",
-      label: "Status Quo\nTensions Rise",
-      children: ["blockade", "negotiate"],
-    },
-    {
-      id: "blockade",
-      label: "China Declares\nBlockade",
-      probability: "25%",
-      children: ["us-respond", "us-sanction"],
-      highlighted: true,
-    },
-    {
-      id: "negotiate",
-      label: "Diplomatic\nChannel Opens",
-      probability: "75%",
-      children: ["deal", "stall"],
-    },
-    {
-      id: "us-respond",
-      label: "US Naval\nEscort",
-      probability: "40%",
-      highlighted: true,
-      active: true,
-      marketPrice: "72.5",
-    },
-    {
-      id: "us-sanction",
-      label: "US Sanctions\nOnly",
-      probability: "60%",
-    },
-    {
-      id: "deal",
-      label: "Framework\nAgreement",
-    },
-    {
-      id: "stall",
-      label: "Talks Stall",
-    },
-  ],
-  highlightedPath: ["root", "blockade", "us-respond"],
-  highlightColor: "#E5A544",
-  source: "Scenario analysis — illustrative only",
-  durationSec: 12,
-};
+// EP01 data — AI timeline branching scenario
+import sampleData from "../../../data/episodes/ep01/decisiontree-ai-timeline.json";
 
 export const DecisionTreeComposition = () => (
   <Composition
@@ -75,6 +26,6 @@ export const DecisionTreeComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData }}
+    defaultProps={{ data: sampleData as unknown as DecisionTreeData }}
   />
 );

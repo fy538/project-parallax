@@ -3,7 +3,8 @@
   "variant": "section",
   "sectionNumber": "IV",
   "sectionTitle": "The Trap",
-  "accentColor": "#F5A623",
+  "accentColor": "#E5A544",
   "backgroundVariant": "dark",
-  "durationSec": 3
+  "backgroundTint": "#E5A544",
+  "durationSec": 2
 }

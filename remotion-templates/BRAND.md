@@ -13,11 +13,11 @@
 
 ## Identity
 
-- **Channel name:** Structural Parallels
+- **Channel name:** Parallax
 - **Brand mark:** ∴ (therefore) — the channel's thesis in a single symbol. Used as a visual divider, brand stamp, and recurring motif across both modes.
 - **Tagline:** *The present, examined through the past.*
 - **Tone:** Intellectually rigorous, narratively engaging. Smart friend explaining over drinks — not a lecture, not a rant. Analytical, not polemical.
-- **Visual register:** Two modes — Dark (war room at night) and Light (briefing folder the next morning). Both draw from the same palette, type system, and compositional rules. The mode sets the background plane; everything else is shared.
+- **Visual register:** Two modes — **Light** (briefing folder on a wooden desk — primary, used for all in-video content) and **Dark** (candlelit war room — secondary, available for occasional dramatic compositions). Both draw from the same palette, type system, and compositional rules. The mode sets the background plane; everything else is shared.
 
 ### Episode-Type Variants
 
@@ -41,8 +41,8 @@ These colors work across both dark and light modes. They are the brand's DNA.
 
 | Token | Hex | Role |
 |-------|-----|------|
-| `ink` | `#1A1A2E` | Deepest dark — shadows, dark mode bg base |
-| `midnight` | `#252540` | Dark mode elevated surfaces |
+| `ink` | `#1C1814` | Deepest dark — shadows, dark mode bg base (warm umber) |
+| `midnight` | `#2A2520` | Dark mode elevated surfaces (warm walnut) |
 | `amber` | `#E5A544` | Primary accent — crosshairs, labels, highlights |
 | `rust` | `#C23B22` | Secondary accent — conflict, China, urgency |
 | `bone` | `#F0E6D0` | Primary text on dark, light mode bg base |
@@ -78,16 +78,16 @@ Unchanged from prior system. These override mode colors when encoding geopolitic
 
 | Token | Hex | Use |
 |-------|-----|-----|
-| `bg.dark.base` | `#0D0D1A` | Deepest background (radial gradient edge) |
-| `bg.dark.surface` | `#1A1A2E` | Primary surface (= `ink`) |
-| `bg.dark.elevated` | `#252540` | Cards, panels, raised elements |
-| `bg.dark.map` | `#141428` | Map background (slightly different from surface) |
+| `bg.dark.base` | `#12100E` | Deepest background (radial gradient edge) |
+| `bg.dark.surface` | `#1C1814` | Primary surface (= `ink`) |
+| `bg.dark.elevated` | `#2A2520` | Cards, panels, raised elements |
+| `bg.dark.map` | `#1A1612` | Map background (slightly different from surface) |
 | `text.dark.primary` | `#F0E6D0` | Primary text (= `bone`) |
 | `text.dark.secondary` | `#B8AE9C` | Subtitles, descriptions |
-| `text.dark.muted` | `#6A6458` | Captions, metadata |
+| `text.dark.muted` | `#7A6E60` | Captions, metadata |
 | `text.dark.accent` | `#E5A544` | Labels, crosshair text (= `amber`) |
 
-Background treatment: radial gradient from `ink` (center) to `bg.dark.base` (edges), creating a subtle vignette that focuses attention center-frame.
+Background treatment: radial gradient from `ink` (center) to `bg.dark.base` (edges), creating a warm vignette that focuses attention center-frame. The brown undertone reads as candlelit/archival rather than cold surveillance.
 
 ### Light Mode Palette
 
@@ -97,7 +97,7 @@ Background treatment: radial gradient from `ink` (center) to `bg.dark.base` (edg
 | `bg.light.surface` | `#EDE7DB` | Slightly darker surface for depth |
 | `bg.light.elevated` | `#FFFFFF` | Cards, containers on paper bg |
 | `bg.light.border` | `#D4CAB8` | Subtle borders, divider lines |
-| `text.light.primary` | `#1A1A2E` | Primary text (= `ink`) |
+| `text.light.primary` | `#1C1814` | Primary text (= `ink`) |
 | `text.light.secondary` | `#4A4538` | Subtitles, descriptions |
 | `text.light.muted` | `#8A8070` | Captions, metadata, sources |
 | `text.light.accent` | `#6B1D1D` | Labels, stamps (= `oxblood`) |
@@ -197,8 +197,8 @@ Map the desaturated image to a two-color ramp from the brand palette:
 
 | Ramp name | Shadows | Midtones | Highlights | When to use |
 |-----------|---------|----------|------------|-------------|
-| **Standard** | `ink` #1A1A2E | `bronze` #8B5E2B | `amber` #E5A544 | Default for most content |
-| **Conflict** | `ink` #1A1A2E | `#7A2E1A` | `rust` #C23B22 | China, conflict, danger |
+| **Standard** | `ink` #1C1814 | `bronze` #8B5E2B | `amber` #E5A544 | Default for most content |
+| **Conflict** | `ink` #1C1814 | `#7A2E1A` | `rust` #C23B22 | China, conflict, danger |
 | **Editorial** | `folder` #C8B89A | `bone` #F0E6D0 | `paper` #F5F0E8 | Light mode images |
 
 ### Step 3: Grain & Vignette
@@ -224,13 +224,13 @@ Place the treated image into the layout grid according to one of three placement
 - Technical photography (chip dies, machinery, circuit boards, lab equipment)
 - Documentary photography (street scenes, infrastructure, architecture)
 - Portraits / faces (leaders, engineers, historical figures) — treated equally through the pipeline
-- AI generations: **engraved/etched style only** (woodcut, copperplate, technical illustration)
+- AI-generated SVG: **geometric/diagrammatic only** (network diagrams, flow charts, framework comparisons, data visualizations). Generated via Claude SVG following the visual vocabulary in SVG_ILLUSTRATION_PIPELINE.md. These bypass the image treatment pipeline — they're built in Meridian palette from the start.
 
 **Avoid these:**
 - Photorealistic AI generations (date fast, uncanny, undermine credibility)
 - Stock photography (generic handshake/globe/flag imagery — instant credibility loss)
 - Full-saturation color images (every image must pass through the pipeline)
-- Clip art, icons, or illustration styles that don't match the engraved aesthetic
+- AI illustrations attempting organic/artistic styles (hands, faces, nature, textured art) — reframe as geometric concepts or use stock + treatment instead
 
 ### Face Treatment Rule
 
@@ -378,12 +378,12 @@ Episodes directory: `data/episodes/ep{NN}/`
 
 ---
 
-## Quick Reference: Dark vs Light
+## Quick Reference: Light (Primary) vs Dark (Secondary)
 
-| Element | Dark Mode (Meridian) | Light Mode (Dossier) |
+| Element | Light Mode — PRIMARY (Dossier) | Dark Mode — secondary (Meridian) |
 |---------|---------------------|----------------------|
-| Background | Radial gradient: `ink` → `bg.dark.base` | Flat `paper` with subtle noise |
-| Text primary | `bone` #F0E6D0 | `ink` #1A1A2E |
+| Background | Radial gradient: `ink` → `bg.dark.base` (warm umber) | Flat `paper` with subtle noise |
+| Text primary | `bone` #F0E6D0 | `ink` #1C1814 |
 | Accent color | `amber` #E5A544 | `oxblood` #6B1D1D |
 | Metadata text | `text.dark.muted` | `text.light.muted` |
 | Crosshair | `amber` at 40-60% | `oxblood` at 30-40% |

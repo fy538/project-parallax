@@ -1,0 +1,10 @@
+{
+  "episode": "EP01",
+  "variant": "statistic",
+  "statValue": "92%",
+  "statLabel": "chip yield",
+  "statContext": "TSMC Arizona — 4 points above equivalent Taiwan line",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "dark",
+  "durationSec": 3
+}

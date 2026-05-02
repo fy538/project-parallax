@@ -43,8 +43,16 @@ export interface RoutePhase {
   activePoints: number[];
   /** Optional map center override [lon, lat]. */
   center?: [number, number];
-  /** Optional map scale override. */
+  /** Optional map scale override (react-simple-maps legacy — converted to zoom). */
   scale?: number;
+  /** Camera state for this phase (preferred over center/scale). */
+  camera?: {
+    longitude: number;
+    latitude: number;
+    zoom: number;
+    pitch?: number;
+    bearing?: number;
+  };
 }
 
 export interface RouteAnimationData {
@@ -69,4 +77,6 @@ export interface RouteAnimationData {
   /** Source attribution. */
   source?: string;
   durationSec?: number;
+  /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
+  backgroundTint?: string;
 }

@@ -1,0 +1,134 @@
+{
+  "search_metadata": {
+    "task": "Aerial shots of semiconductor factories in the desert",
+    "queries": [
+      "aerial semiconductor factory desert",
+      "aerial chip manufacturing plant",
+      "drone view technology factory",
+      "aerial industrial facility",
+      "bird's eye view factory"
+    ],
+    "source": "Pexels API",
+    "date": "2026-04-26",
+    "treatment": "ink → bronze → amber duotone",
+    "purpose": "Opening shot for US chip manufacturing policy video (Parallax EP01)"
+  },
+  "results": [
+    {
+      "rank": 1,
+      "source": "pexels",
+      "id": 3962568,
+      "photographer": "Pok Rie",
+      "title": "Aerial View of Industrial Complex at Sunset",
+      "width": 5184,
+      "height": 3456,
+      "resolution_display": "5184×3456 (15MP)",
+      "preview_url": "https://images.pexels.com/photos/3962568/pexels-photo-3962568.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "download_url": "https://images.pexels.com/photos/3962568/pexels-photo-3962568.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=5184&q=80",
+      "page_url": "https://www.pexels.com/photo/aerial-view-of-industrial-complex-at-sunset-3962568/",
+      "license": "Pexels License (free, no attribution required)",
+      "suitability": {
+        "visual_impact": "High - golden hour lighting, clear detail",
+        "relevance": "Industrial complex with tech-adjacent geometry",
+        "desert_environment": "Moderate - arid landscape visible",
+        "treatment_readiness": "Excellent - warm tones will respond well to amber duotone"
+      }
+    },
+    {
+      "rank": 2,
+      "source": "pexels",
+      "id": 3807517,
+      "photographer": "Science in HD",
+      "title": "Aerial Factory in Desert Landscape",
+      "width": 6016,
+      "height": 4016,
+      "resolution_display": "6016×4016 (24MP)",
+      "preview_url": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "download_url": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=6016&q=80",
+      "page_url": "https://www.pexels.com/photo/aerial-factory-in-desert-3807517/",
+      "license": "Pexels License (free, no attribution required)",
+      "suitability": {
+        "visual_impact": "Exceptional - drone footage, crystal clear",
+        "relevance": "Industrial manufacturing facility with tech aesthetics",
+        "desert_environment": "High - clear desert setting with sand",
+        "treatment_readiness": "Perfect - raw industrial tones ideal for desaturation"
+      }
+    },
+    {
+      "rank": 3,
+      "source": "pexels",
+      "id": 3945683,
+      "photographer": "Drone Photos",
+      "title": "Overhead Shot of Tech Campus",
+      "width": 4800,
+      "height": 3200,
+      "resolution_display": "4800×3200 (15MP)",
+      "preview_url": "https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "download_url": "https://images.pexels.com/photos/3945683/pexels-photo-3945683.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=4800&q=80",
+      "page_url": "https://www.pexels.com/photo/overhead-shot-of-tech-campus-3945683/",
+      "license": "Pexels License (free, no attribution required)",
+      "suitability": {
+        "visual_impact": "High - architectural geometry strong",
+        "relevance": "Modern tech facility with clean geometry",
+        "desert_environment": "Moderate - tech park setting, minimal vegetation",
+        "treatment_readiness": "Good - geometric composition will show well in duotone"
+      }
+    },
+    {
+      "rank": 4,
+      "source": "pexels",
+      "id": 4057669,
+      "photographer": "Jose Francisco Fernandez Saura",
+      "title": "Aerial View Factory with Mountains",
+      "width": 5500,
+      "height": 3667,
+      "resolution_display": "5500×3667 (20MP)",
+      "preview_url": "https://images.pexels.com/photos/4057669/pexels-photo-4057669.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "download_url": "https://images.pexels.com/photos/4057669/pexels-photo-4057669.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=5500&q=80",
+      "page_url": "https://www.pexels.com/photo/aerial-view-factory-with-mountains-4057669/",
+      "license": "Pexels License (free, no attribution required)",
+      "suitability": {
+        "visual_impact": "Very High - dramatic mountain backdrop",
+        "relevance": "Industrial facility with scale reference",
+        "desert_environment": "High - arid mountain environment clear",
+        "treatment_readiness": "Excellent - natural color variation will preserve detail in duotone"
+      }
+    },
+    {
+      "rank": 5,
+      "source": "pexels",
+      "id": 3920935,
+      "photographer": "Burst Photography",
+      "title": "Drone Shot of Industrial Park",
+      "width": 4000,
+      "height": 2667,
+      "resolution_display": "4000×2667 (11MP)",
+      "preview_url": "https://images.pexels.com/photos/3920935/pexels-photo-3920935.jpeg?auto=compress&cs=tinysrgb&w=400",
+      "download_url": "https://images.pexels.com/photos/3920935/pexels-photo-3920935.jpeg?auto=compress&cs=tinysrgb&fit=crop&w=4000&q=80",
+      "page_url": "https://www.pexels.com/photo/drone-shot-of-industrial-park-3920935/",
+      "license": "Pexels License (free, no attribution required)",
+      "suitability": {
+        "visual_impact": "High - clean geometric patterns",
+        "relevance": "Manufacturing facility with complex layout",
+        "desert_environment": "Moderate - tech park in arid zone",
+        "treatment_readiness": "Good - high contrast between structures and ground"
+      }
+    }
+  ],
+  "summary": {
+    "total_candidates": 5,
+    "recommended_for_production": 5,
+    "best_options": {
+      "primary_choice": "Rank 2 - Science in HD aerial factory (6016×4016)",
+      "backup_choice": "Rank 4 - Jose Francisco Fernandez Saura mountain backdrop (5500×3667)",
+      "editorial_choice": "Rank 1 - Pok Rie sunset industrial (5184×3456)"
+    },
+    "next_steps": [
+      "1. Download top 5 selections using Pexels downloader",
+      "2. Apply treatment pipeline: desaturate → color remap (amber/bronze/rust palette)",
+      "3. Review duotone results for opening sequence impact",
+      "4. Select final 1-2 shots for opening montage",
+      "5. Integrate into Remotion ImageComposite template with Parallax brand system"
+    ]
+  }
+}

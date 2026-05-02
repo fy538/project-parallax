@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "batch-p1-assets",
+  "prompt": "Source assets for EP01. Here's the shot list: episodes/EP01-silicon-trap/shot-list.json. Start with the P1 assets only.",
+  "assertions": [
+    "Correctly identifies all P1 assets from the shot list (beat1-tsmc-aerial, beat1-cleanroom, beat2-fdr-1941, beat3-china-rail, beat3-pen-tip, beat5-car-dashboard, beat5-phone-circuit, beat5-hospital-mri, beat5-data-center)",
+    "Reads or references IMAGES.md for sourcing guidelines",
+    "Attempts to run source.py or acknowledges network limitations and provides a fallback plan",
+    "Flags beat2-fdr-1941 as unlikely to have stock results (historical/archival)",
+    "Presents results in a scored table format with the 5 scoring dimensions",
+    "Distinguishes between treatment ramps (standard vs conflict) based on shot list"
+  ]
+}

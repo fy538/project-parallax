@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Scores all 5 results on the 5 scoring dimensions",
+      "passed": true,
+      "evidence": "scores.md table shows all 5 photos with Res/Frm/Trt/Rel/Div breakdown. scores.json has detailed per-dimension reasoning for each."
+    },
+    {
+      "text": "Penalizes photo 3861969 (3024x4032) for portrait orientation in framing score",
+      "passed": true,
+      "evidence": "Photo 3861969 scored Frm:2 with note: 'portrait orientation is significant liability. A 3024×4032 source cropped to 16:9 loses substantial vertical content.'"
+    },
+    {
+      "text": "Penalizes photo 4219862 (640x427) for low resolution",
+      "passed": true,
+      "evidence": "Photo 4219862 scored Res:2 with note: '640px width requires aggressive upscaling even for 1080p. Post-treatment, upscaling artifacts will compound duotone banding.'"
+    },
+    {
+      "text": "Ranks photo 2588757 (5472x3648) highest or near-highest due to high resolution + landscape",
+      "passed": true,
+      "evidence": "Ranked #2 at 20/25 (vs #1 at 21/25). Close to highest. Notes: 'Highest absolute resolution but slightly lower confidence on treatment survivability.'"
+    },
+    {
+      "text": "Presents a comparison table with score breakdowns per dimension",
+      "passed": true,
+      "evidence": "scores.md has standardized table: | # | Preview | Source | Resolution | Score | Breakdown |"
+    },
+    {
+      "text": "Includes preview links for each candidate",
+      "passed": true,
+      "evidence": "All 5 candidates have [View](preview_url) links in the table"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

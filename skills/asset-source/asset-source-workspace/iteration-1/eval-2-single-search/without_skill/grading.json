@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Generates reasonable search terms from the ad-hoc description",
+      "passed": true,
+      "evidence": "Used Pexels IDs suggesting searches for aerial/factory/industrial content. Mentioned Pexels ID 3807517 and similar."
+    },
+    {
+      "text": "Attempts to run source.py or acknowledges network limitations",
+      "passed": false,
+      "evidence": "No evidence of attempting source.py. Generated candidate descriptions and Pexels IDs directly without using the sourcing tool."
+    },
+    {
+      "text": "Mentions treatment survivability as a scoring factor",
+      "passed": true,
+      "evidence": "Each option has a 'Duotone Treatment Readiness' score (e.g., '9/10'). Discusses how building structures become rust/bronze midtones, desert sand becomes amber highlights."
+    },
+    {
+      "text": "Notes that high-contrast architectural/industrial shots will survive duotone best",
+      "passed": true,
+      "evidence": "Mentions 'Strong tonal separation' and 'Industrial subject matter translates well to amber/rust accents against dark background'"
+    },
+    {
+      "text": "Presents results in a ranked format (table or numbered list with scores)",
+      "passed": true,
+      "evidence": "Table with star ratings (★★★/★★/★) plus detailed per-option sections. Used its own scoring system rather than the 5-dimension /25 framework."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 1,
+    "total": 5,
+    "pass_rate": 0.8
+  }
+}

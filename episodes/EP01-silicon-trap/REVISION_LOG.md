@@ -84,3 +84,34 @@ Key diagnosis: the script is organized by *logic* (setup → history → present
 - **Human moments don't have to be long.** The Taiwanese engineers in Arizona housing is one sentence. Morris Chang's quote is two. But they anchor abstractions to reality in a way that data can't.
 - **Signpost phrases are a symptom, not the disease.** The real problem was that the script needed them — the structure was so information-dense that without signposts, the viewer would get lost. Fixing the structure made the signposts unnecessary.
 - **"Your chips" > "the real story."** Ending on what the viewer personally has at stake is more powerful than ending on an epistemological observation about uncertainty. The uncertainty is still there — it just lives inside the concrete stakes rather than being stated as a thesis.
+
+---
+
+## v4 → v5 (April 27, 2026)
+
+**What triggered this:** Four quality-gate skills (visual-concept, script-audit, persona-eval, review-package) were run retroactively on v4. Three new templates (GameBoard, DecisionTree, TimeSeriesChart) had been built since v4 was finalized, creating template mismatches. Three audits independently flagged the same ~5-minute mark (COCOM transition) as the script's biggest weakness.
+
+**What changed — visual layer:**
+- 3 template swaps: FrameworkDiagram → GameBoard (chess/go, Beat 4), FrameworkDiagram → DecisionTree (AI timeline, Beat 5), DataChart → TimeSeriesChart (SMIC yield, Beat 3). Each swap matches a purpose-built template to its natural use case.
+- 2 layered mode conversions: "92% YIELD" and "$165 BILLION" composited over footage instead of standalone KineticTypography cards. This front-loads the channel's visual signature and introduces the layered mode (previously at 0% against a 5-15% target).
+- Symmetric conflict treatment: added rust/conflict treatment to Jake Sullivan image and revenue deal KineticTypography in Beat 2. Previously, conflict treatment was applied only to Chinese footage in Beat 3 — which visually coded China as "danger" while the narration treated both sides symmetrically. Now both sides of the confrontation carry the same visual tension. (Resolves PER-01 flag.)
+- Typewriter footage inserted in Beat 3 to break a 4-MG cluster (violating VIS-02). Also anchors the script's typewriter metaphor visually.
+- Cold War archival footage inserted in Beat 2 as a COCOM bridge, breaking a second 4-MG cluster.
+- Cut vague "geopolitical divide" stock footage from Beat 4 (unsourceable concept, redundant with supply chain route that precedes it).
+
+**What changed — narration:**
+- COCOM bridge: added "Three years of escalating controls — and the policy had gone from weapon to tax to political football. Which raises a question nobody in Washington seemed to be asking: has this kind of thing ever actually worked?" This bridges the jump from present-day chaos to 1949 COCOM history. Three audits flagged this gap: script-audit as a transition break, visual-concept as an MG cluster, persona-eval as Marcus's exit point. One fix solved all three.
+- 卡脖子 flip: reordered Beat 3 opening from define-then-illustrate to illustrate-then-name. The ballpoint pen story now comes first; the Chinese term arrives as a naming moment after the viewer already feels the humiliation. The bilingual KineticTypography card moves from title-card position to revelation position.
+- 举国体制 smoothed: "It activated something deeper — the reflex to mobilize. The Chinese call it 举国体制..." rather than jumping directly to the Chinese term. Same illustrate-then-name pattern.
+- Beat 4 chess metaphor grounded: added "the strategy Jake Sullivan laid out in that 2022 speech" — 8 words that turn an abstract metaphor into a specific person making a specific move, closing a 450-word human-moment gap.
+- Beat 5 opening tightened: "Everything I've just described — the controls, the brute-force engineering, the trapped allies, the trillion-dollar standoff — all of it turns on a single variable nobody can predict." Replaces abstract preamble ("There's a question underneath all of this...") with a gear-shift that summarizes and pivots.
+
+**What we decided not to do:**
+- SplitComposition ∴ thesis beat between go board and supply chain route (Decision 3 — skipped). The narration "The problem is that both players are trapped" is strong enough without visual reinforcement, and Beat 4 is already dense.
+- Remove conflict treatment entirely (Decision 1, Option A — rejected in favor of Option B symmetric treatment). Removing conflict treatment would lose the visual temperature shift that marks Beats 2-3 as emotionally distinct. Symmetric application is editorially stronger — it makes rust mean "high-stakes confrontation" rather than "China = danger."
+
+**Lessons:**
+- **Cross-audit convergence is the strongest signal.** When three independent audits flag the same spot (COCOM transition at ~5:00), the fix is almost certainly worth doing. Each audit sees a different facet of the same problem — the script-audit sees a transition gap, the visual-concept sees an MG cluster, the persona-eval sees an audience exit point. One narration + footage fix resolves all three.
+- **Template availability changes the script.** v4 was written before GameBoard, DecisionTree, and TimeSeriesChart existed. The visual layer was forced to use FrameworkDiagram as a catch-all. Purpose-built templates don't just look better — they change what the visual layer *communicates*. An animated chess board shows the strategy; a text comparison describes it.
+- **Illustrate-then-name is the right default for foreign-language concepts.** Define-then-illustrate treats the foreign term as a heading; illustrate-then-name treats it as a revelation. The viewer feels the concept before they have a word for it, which makes the word land harder.
+- **Conflict treatment is editorial, not decorative.** Applying visual tension to only one side of a bilateral story creates an asymmetry the narration can't overcome. A viewer who sees neutral amber on US footage and aggressive rust on Chinese footage receives the message "China is the threat" regardless of what the words say.

@@ -1,6 +1,6 @@
 {
   "episode": "EP01",
-  "title": "Lithography passes: brute force vs. precision",
+  "title": "Brute force vs. precision",
   "subtitle": "SMIC achieves 7nm without EUV — at a cost",
   "variant": "comparison",
   "unit": " passes",
@@ -8,10 +8,17 @@
   "rightGroupLabel": "SMIC (without EUV)",
   "leftGroupColor": "#3266AD",
   "rightGroupColor": "#C23B22",
+  "backgroundTint": "#C23B22",
   "comparisonPairs": [
-    { "label": "7nm process", "leftValue": 9, "rightValue": 34 },
-    { "label": "Yield rate", "leftValue": 85, "rightValue": 65, "leftLabel": "~85%", "rightLabel": "~65%" }
+    {
+      "label": "7nm lithography passes",
+      "leftValue": 9,
+      "rightValue": 34,
+      "leftLabel": "9 passes",
+      "rightLabel": "34 passes"
+    }
   ],
   "source": "TechInsights teardown analysis, 2025",
+  "contextNote": "Every extra pass is another chance for a defect — like writing a novel one letter at a time.",
   "durationSec": 8
 }

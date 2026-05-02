@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Scores all 5 results on the 5 scoring dimensions",
+      "passed": false,
+      "evidence": "Used 6 custom dimensions (resolution, aspect_ratio, subject_relevance, visual_clarity, duotone_compatibility, geopolitical_framing) instead of the standardized 5. Scores are high/medium/low qualitative ratings, not 1-5 numeric. No total /25 score."
+    },
+    {
+      "text": "Penalizes photo 3861969 (3024x4032) for portrait orientation in framing score",
+      "passed": true,
+      "evidence": "Scored 6.1/10 with note about 'heavy cropping waste' from portrait orientation"
+    },
+    {
+      "text": "Penalizes photo 4219862 (640x427) for low resolution",
+      "passed": true,
+      "evidence": "Scored 1.8/10 ('Thumbnail-only quality, reject entirely'). Correctly identified as unusable."
+    },
+    {
+      "text": "Ranks photo 2588757 (5472x3648) highest or near-highest due to high resolution + landscape",
+      "passed": true,
+      "evidence": "Ranked #1 at 9.2/10 with note: 'Excellent resolution for 4K video'"
+    },
+    {
+      "text": "Presents a comparison table with score breakdowns per dimension",
+      "passed": false,
+      "evidence": "Used JSON structure and prose descriptions instead of a scannable comparison table. The quick-reference.txt has a summary table but without per-dimension numeric breakdowns."
+    },
+    {
+      "text": "Includes preview links for each candidate",
+      "passed": false,
+      "evidence": "Preview URLs are in JSON data but not surfaced as clickable links in the user-facing output files"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  }
+}

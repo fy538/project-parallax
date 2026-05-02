@@ -11,11 +11,9 @@ import {
   AbsoluteFill,
   useCurrentFrame,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  dark,
   semantic,
   fonts,
   fontSizes,
@@ -24,6 +22,7 @@ import {
   layout,
   sec,
   durations,
+  light,
 } from "../../design/theme";
 import { fadeIn, slideIn, stagger } from "../../utils/animation";
 import { Background } from "../../components/Background";
@@ -79,6 +78,7 @@ const SideContent: React.FC<{
             textTransform: "uppercase",
             marginBottom: 12,
             opacity: fadeIn(frame, baseDelay, 6),
+            transform: `translateY(${slideIn(frame, baseDelay, 8, 6)}px)`,
           }}
         >
           {side.tag}
@@ -91,7 +91,7 @@ const SideContent: React.FC<{
           fontSize: 32,
           fontFamily: hasChinese(side.title) ? fonts.chinese : fonts.display,
           fontWeight: fontWeights.bold,
-          color: dark.text.primary,
+          color: light.text.primary,
           lineHeight: 1.2,
           opacity: fadeIn(frame, baseDelay + 4, 8),
           transform: `translateY(${slideIn(frame, baseDelay + 4, 15, 8)}px)`,
@@ -107,9 +107,10 @@ const SideContent: React.FC<{
           style={{
             fontSize: 20,
             fontFamily: hasChinese(item) ? fonts.chinese : fonts.body,
-            color: dark.text.secondary,
+            color: light.text.secondary,
             marginTop: i === 0 ? 16 : 10,
             opacity: fadeIn(frame, baseDelay + 12 + i * 5, 6),
+            transform: `translateY(${slideIn(frame, baseDelay + 12 + i * 5, 10, 6)}px)`,
             lineHeight: 1.4,
           }}
         >
@@ -131,7 +132,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
   const dividerLabel = data.dividerLabel || "vs";
 
   return (
-    <Background variant={data.backgroundVariant || "dark"}>
+    <Background variant={data.backgroundVariant || "light"}>
       <AbsoluteFill style={compStyle}>
         {/* Title */}
         {data.title && (
@@ -145,7 +146,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
               fontSize: 28,
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
-              color: dark.text.primary,
+              color: light.text.primary,
               letterSpacing: letterSpacing.h3,
               opacity: fadeIn(frame, 0, 8),
             }}
@@ -190,7 +191,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
                 style={{
                   flex: 1,
                   height: 1,
-                  background: `linear-gradient(to right, transparent, ${dark.text.muted}60)`,
+                  background: `linear-gradient(to right, transparent, ${light.text.muted}60)`,
                   opacity: fadeIn(frame, 25, 8),
                 }}
               />
@@ -201,7 +202,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
                   width: 40,
                   height: 40,
                   borderRadius: "50%",
-                  border: `1px solid ${dark.text.muted}40`,
+                  border: `1px solid ${light.text.muted}40`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -214,7 +215,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
                     fontSize: 14,
                     fontFamily: fonts.body,
                     fontWeight: fontWeights.medium,
-                    color: dark.text.accent,
+                    color: light.text.accent,
                     letterSpacing: 1,
                     textTransform: "uppercase",
                   }}
@@ -228,7 +229,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
                 style={{
                   flex: 1,
                   height: 1,
-                  background: `linear-gradient(to left, transparent, ${dark.text.muted}60)`,
+                  background: `linear-gradient(to left, transparent, ${light.text.muted}60)`,
                   opacity: fadeIn(frame, 25, 8),
                 }}
               />
@@ -255,7 +256,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
               textAlign: "center",
               fontSize: 13,
               fontFamily: fonts.body,
-              color: dark.text.muted,
+              color: light.text.muted,
               opacity: fadeIn(frame, 40, 8),
             }}
           >

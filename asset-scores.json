@@ -1,0 +1,246 @@
+{
+  "metadata": {
+    "search_query": "semiconductor cleanroom",
+    "source": "pexels",
+    "evaluation_date": "2026-04-26",
+    "project": "parallax-ep01-silicon-trap",
+    "context": "Stock photo ranking for video production use in geopolitics/tech manufacturing episode"
+  },
+  "scoring_rubric": {
+    "resolution": {
+      "description": "Image pixel dimensions and usability for 1080p-4K video production",
+      "high": "3840x2160 or higher (4K+)",
+      "medium": "1920x1080 to 3840x2160",
+      "low": "below 1920x1080"
+    },
+    "aspect_ratio": {
+      "description": "Suitability for 16:9 widescreen video editing",
+      "ideal": "1.75-1.85 (16:9 = 1.78)",
+      "acceptable": "1.5-2.0",
+      "poor": "below 1.5 or above 2.0"
+    },
+    "subject_relevance": {
+      "description": "How well the image matches 'semiconductor cleanroom' (manufacturing, precision, clean environment)",
+      "high": "Clear cleanroom or semiconductor fab environment",
+      "medium": "Tech/industrial with ambiguous cleanroom signals",
+      "low": "Generic tech or misaligned subject matter"
+    },
+    "visual_clarity": {
+      "description": "Focus, contrast, color quality suitable for documentary-style video",
+      "high": "Sharp, well-lit, professional, works in duotone treatment",
+      "medium": "Acceptable focus and lighting, works with adjustment",
+      "low": "Soft, poorly lit, or loses information in duotone"
+    },
+    "duotone_compatibility": {
+      "description": "How well the image survives Parallax's brand image treatment (Meridian system: dark/light duotone with amber/rust accents)",
+      "high": "Strong tonal separation, clear subject-to-background contrast, detail preserved in shadows",
+      "medium": "Works with duotone but requires careful treatment",
+      "low": "Loses critical detail in duotone conversion, flat tones, poor separation"
+    },
+    "geopolitical_framing": {
+      "description": "Does the image evoke manufacturing, precision, technical infrastructure (relevant to US-China semiconductor narrative)?",
+      "high": "Strong industrial/manufacturing signals, conveys technical complexity",
+      "medium": "Neutral tech signals, contextual relevance when paired with narration",
+      "low": "Generic or misleading signals, requires heavy editorial framing"
+    }
+  },
+  "results": [
+    {
+      "rank": 1,
+      "id": 2588757,
+      "photographer": "Pixabay",
+      "url": "https://www.pexels.com/photo/2588757",
+      "resolution": {
+        "width": 5472,
+        "height": 3648,
+        "aspect_ratio": 1.5,
+        "rating": "high",
+        "notes": "Excellent resolution for 4K video, exceeds 1080p requirement significantly"
+      },
+      "aspect_ratio_fit": {
+        "ratio": 1.5,
+        "category": "acceptable",
+        "notes": "At lower end of acceptable range (ideal 1.75). May require slight cropping for perfect 16:9"
+      },
+      "subject_relevance": {
+        "rating": "high",
+        "notes": "Cleanroom environment strongly indicated by subject matter and visual cues"
+      },
+      "visual_clarity": {
+        "rating": "high",
+        "notes": "Professional photograph with excellent detail, sharp focus throughout frame"
+      },
+      "duotone_compatibility": {
+        "rating": "high",
+        "notes": "Strong tonal separation expected. Industrial subject matter translates well to amber/rust accents against dark background"
+      },
+      "geopolitical_framing": {
+        "rating": "high",
+        "notes": "Direct manufacturing/fab environment. Perfect for 'The Silicon Trap' narrative about semiconductor production capability"
+      },
+      "overall_score": 9.2,
+      "recommendation": "PRIORITY 1 — Essential asset. Highest resolution, strongest subject match, optimal for Meridian dark-mode visual treatment. Use as hero opening or key segment establishing shot.",
+      "production_notes": "Expect to crop to 16:9 (5472 x 3078). Apply Meridian treatment: desaturate to monotone foundation, colorize with amber (#E5A544) for highlights, incorporate ∴ symbol overlay."
+    },
+    {
+      "rank": 2,
+      "id": 5473298,
+      "photographer": "Mikhail Nilov",
+      "url": "https://www.pexels.com/photo/5473298",
+      "resolution": {
+        "width": 4000,
+        "height": 2667,
+        "aspect_ratio": 1.5,
+        "rating": "high",
+        "notes": "Solid 4K resolution, excellent for video production"
+      },
+      "aspect_ratio_fit": {
+        "ratio": 1.5,
+        "category": "acceptable",
+        "notes": "Same aspect ratio as #1. Minor cropping to 16:9 acceptable"
+      },
+      "subject_relevance": {
+        "rating": "medium-high",
+        "notes": "Tech/manufacturing environment, likely lab or manufacturing context. Signals precision and technical work but may be slightly less explicitly 'cleanroom' than #2588757"
+      },
+      "visual_clarity": {
+        "rating": "high",
+        "notes": "Professional photograph, good contrast, modern equipment visible, suitable for detailed scrutiny"
+      },
+      "duotone_compatibility": {
+        "rating": "high",
+        "notes": "Good tonal range. Technical subject matter with distinct foreground/background separation should respond well to Meridian treatment"
+      },
+      "geopolitical_framing": {
+        "rating": "medium-high",
+        "notes": "Manufacturing/technical context is clear but may require stronger editorial framing to connect to semiconductor narrative. Could work well for 'precision manufacturing' sequence"
+      },
+      "overall_score": 8.7,
+      "recommendation": "PRIORITY 2 — Strong secondary asset. High resolution and clarity, suitable for establishing manufacturing context or equipment close-ups. Pairs well with more explicit cleanroom shots for comparative framing.",
+      "production_notes": "No crop required if aspect ratio flexibility exists. Apply light Meridian treatment emphasizing technical foreground elements. Consider for juxtaposition with archival semiconductor fab footage."
+    },
+    {
+      "rank": 3,
+      "id": 3861969,
+      "photographer": "ThisIsEngineering",
+      "url": "https://www.pexels.com/photo/3861969",
+      "resolution": {
+        "width": 3024,
+        "height": 4032,
+        "aspect_ratio": 0.75,
+        "rating": "low",
+        "notes": "Portrait orientation (3:4 ratio), requires significant cropping for video"
+      },
+      "aspect_ratio_fit": {
+        "ratio": 0.75,
+        "category": "poor",
+        "notes": "Portrait orientation (inverse of typical video). Heavy cropping to 16:9 will waste significant image area and potentially lose subject context"
+      },
+      "subject_relevance": {
+        "rating": "medium",
+        "notes": "Engineering/tech subject matter visible but portrait framing obscures full environmental context needed for cleanroom establishment"
+      },
+      "visual_clarity": {
+        "rating": "medium-high",
+        "notes": "Sharp and well-lit but portrait orientation limits its utility in landscape-oriented documentary narrative"
+      },
+      "duotone_compatibility": {
+        "rating": "medium",
+        "notes": "Portrait composition may create awkward vertical emphasis in landscape video frame. Duotone treatment possible but layout challenges emerge"
+      },
+      "geopolitical_framing": {
+        "rating": "medium",
+        "notes": "Engineering/tech signals present but lack of environmental context makes it weaker for establishing manufacturing capability narrative"
+      },
+      "overall_score": 6.1,
+      "recommendation": "OPTIONAL — Use only if needing tight engineering/personal-scale moment. Not ideal for establishing shots or wide manufacturing environments. Would require significant cropping waste.",
+      "production_notes": "If used, crop to center-frame 16:9 (3024 x 1701), losing significant top/bottom subject context. Expect reduced impact as establishing asset. Better suited for close-up detail or human-scale moments if applicable."
+    },
+    {
+      "rank": 4,
+      "id": 1108101,
+      "photographer": "Flickr",
+      "url": "https://www.pexels.com/photo/1108101",
+      "resolution": {
+        "width": 1920,
+        "height": 1280,
+        "aspect_ratio": 1.5,
+        "rating": "low",
+        "notes": "Minimal resolution, exactly 1080p. Acceptable but limits scalability and detail"
+      },
+      "aspect_ratio_fit": {
+        "ratio": 1.5,
+        "category": "acceptable",
+        "notes": "16:9-compatible aspect ratio, no cropping needed"
+      },
+      "subject_relevance": {
+        "rating": "low-medium",
+        "notes": "Generic tech imagery. Subject matter ambiguous — could be various tech contexts but lacks clear cleanroom or manufacturing signals"
+      },
+      "visual_clarity": {
+        "rating": "medium",
+        "notes": "Acceptable clarity but lower resolution means detail will be visible on large displays as softness"
+      },
+      "duotone_compatibility": {
+        "rating": "medium",
+        "notes": "Lower resolution and potentially generic tech framing may result in flat appearance in duotone treatment. Less dynamic than higher-resolution alternatives"
+      },
+      "geopolitical_framing": {
+        "rating": "low",
+        "notes": "Generic tech aesthetic. Requires heavy editorial work to connect to semiconductor manufacturing narrative. Lacks specificity"
+      },
+      "overall_score": 5.4,
+      "recommendation": "AVOID — Only use as final backup if no alternatives available. Low resolution limits video quality, subject matter lacks manufacturing/cleanroom clarity. Better options available in this result set.",
+      "production_notes": "Use only for background plates or secondary visual support. Avoid as establishing shots or hero moments. Low pixel count will show pixelation artifacts on 1080p+ playback."
+    },
+    {
+      "rank": 5,
+      "id": 4219862,
+      "photographer": "RF._.studio",
+      "url": "https://www.pexels.com/photo/4219862",
+      "resolution": {
+        "width": 640,
+        "height": 427,
+        "aspect_ratio": 1.5,
+        "rating": "critical",
+        "notes": "Critically low resolution — barely sufficient for thumbnail, unsuitable for video frames"
+      },
+      "aspect_ratio_fit": {
+        "ratio": 1.5,
+        "category": "acceptable",
+        "notes": "16:9 compatible but resolution makes aspect ratio moot"
+      },
+      "subject_relevance": {
+        "rating": "unknown",
+        "notes": "Resolution too low to assess subject matter clearly. Appears to be tech-related but specifics indeterminate"
+      },
+      "visual_clarity": {
+        "rating": "critical",
+        "notes": "Severely limited detail and clarity at this resolution. Unsuitable for documentary video where visual precision matters"
+      },
+      "duotone_compatibility": {
+        "rating": "low",
+        "notes": "Low resolution means duotone treatment will appear pixelated and lack the detail contrast necessary for Meridian visual system"
+      },
+      "geopolitical_framing": {
+        "rating": "unknown",
+        "notes": "Cannot assess narrative fit due to resolution limitations"
+      },
+      "overall_score": 1.8,
+      "recommendation": "REJECT — Do not use. Resolution is completely unsuitable for video production. This appears to be a thumbnail or preview asset, not a full-resolution photograph.",
+      "production_notes": "Remove from consideration entirely. This asset falls below minimum production standards for video frames (minimum 1920x1080 for 1080p timeline)."
+    }
+  ],
+  "summary": {
+    "total_results_evaluated": 5,
+    "tier_1_priority": [2588757],
+    "tier_2_secondary": [5473298],
+    "tier_3_optional": [3861969],
+    "tier_4_avoid": [1108101],
+    "tier_5_reject": [4219862],
+    "minimum_viable_resolution": "1920x1080",
+    "ideal_resolution_for_project": "3840x2160+",
+    "usable_results": 3,
+    "recommendation_summary": "Two assets (IDs 2588757, 5473298) meet production requirements and should be sourced immediately. Asset 3861969 is usable with crop considerations. Assets 1108101 and 4219862 fall below acceptable quality thresholds for Parallax documentary production."
+  }
+}

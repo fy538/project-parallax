@@ -28,34 +28,38 @@ const EPISODES = {
     // Opening
     { seq: "01", comp: "TitleTransition", file: "title-episode.json", desc: "Episode title" },
     // Beat 1 — The Paradox
-    { seq: "02", comp: "TitleTransition", file: "title-section-act1.json", desc: "Section I" },
-    { seq: "03", comp: "ChoroplethMap", file: "choropleth-reshoring.json", desc: "Reshoring map" },
-    { seq: "04", comp: "KineticTypography", file: "kinetic-7pct.json", desc: "7% stat" },
+    { seq: "02", comp: "TitleTransition", file: "title-section-paradox.json", desc: "Section I" },
+    { seq: "03", comp: "KineticTypography", file: "kinetic-92-yield.json", desc: "92% yield stat" },
+    { seq: "04", comp: "KineticTypography", file: "kinetic-165b.json", desc: "$165B stat" },
+    { seq: "05", comp: "DataChart", file: "chart-7pct-demand.json", desc: "7% demand bar" },
     // Beat 2 — The Logic of Denial
-    { seq: "05", comp: "TitleTransition", file: "title-section-denial.json", desc: "Section II" },
-    { seq: "06", comp: "TimelineComparison", file: "timeline-oil-chips.json", desc: "Oil vs chips" },
-    { seq: "07", comp: "DataChart", file: "chart-export-controls.json", desc: "Export controls" },
-    { seq: "08", comp: "FrameworkDiagram", file: "framework-cocom-china.json", desc: "COCOM vs China" },
+    { seq: "06", comp: "TitleTransition", file: "title-section-denial.json", desc: "Section II" },
+    { seq: "07", comp: "TimelineComparison", file: "timeline-oil-chips.json", desc: "Oil vs chips" },
+    { seq: "08", comp: "KineticTypography", file: "kinetic-revenue-deal.json", desc: "Revenue deal" },
+    { seq: "09", comp: "DataChart", file: "chart-chips-act.json", desc: "CHIPS Act funnel" },
+    { seq: "10", comp: "ChoroplethMap", file: "choropleth-cocom.json", desc: "COCOM map" },
+    { seq: "11", comp: "FrameworkDiagram", file: "framework-cocom-china.json", desc: "COCOM vs China" },
     // Beat 3 — The Other Side of the Wall
-    { seq: "09", comp: "TitleTransition", file: "title-section-wall.json", desc: "Section III" },
-    { seq: "10", comp: "KineticTypography", file: "kinetic-kabozi.json", desc: "Kabozi" },
-    { seq: "11", comp: "DataChart", file: "chart-pen-contrast.json", desc: "Pen paradox" },
-    { seq: "12", comp: "KineticTypography", file: "kinetic-juguo.json", desc: "Juguo tizhi" },
-    { seq: "13", comp: "DataChart", file: "chart-lithography.json", desc: "Lithography" },
-    { seq: "14", comp: "DataChart", file: "chart-kirin-teardown.json", desc: "Kirin teardown" },
-    { seq: "15", comp: "TimelineComparison", file: "timeline-deepseek.json", desc: "DeepSeek" },
+    { seq: "12", comp: "TitleTransition", file: "title-section-wall.json", desc: "Section III" },
+    { seq: "13", comp: "KineticTypography", file: "kinetic-kabozi.json", desc: "Kabozi" },
+    { seq: "14", comp: "KineticTypography", file: "kinetic-juguo.json", desc: "Juguo tizhi" },
+    { seq: "15", comp: "DataChart", file: "chart-lithography.json", desc: "Lithography passes" },
+    { seq: "16", comp: "DataChart", file: "chart-smic-yield.json", desc: "SMIC yield" },
+    { seq: "17", comp: "FrameworkDiagram", file: "framework-kirin-teardown.json", desc: "Kirin teardown" },
+    { seq: "18", comp: "KineticTypography", file: "kinetic-deepseek-zero.json", desc: "DeepSeek 0 runs" },
     // Beat 4 — The Trap
-    { seq: "16", comp: "TitleTransition", file: "title-section-trap.json", desc: "Section IV" },
-    { seq: "17", comp: "FrameworkDiagram", file: "framework-chess-go.json", desc: "Chess vs Go" },
-    { seq: "18", comp: "RouteAnimation", file: "route-chip-supply.json", desc: "Supply route" },
-    { seq: "19", comp: "ChoroplethMap", file: "choropleth-supply-chain.json", desc: "Supply chain map" },
-    { seq: "20", comp: "KineticTypography", file: "kinetic-morris-chang.json", desc: "Morris Chang" },
-    { seq: "21", comp: "ChoroplethMap", file: "choropleth-bifurcation.json", desc: "Bifurcation" },
+    { seq: "19", comp: "TitleTransition", file: "title-section-trap.json", desc: "Section IV" },
+    { seq: "20", comp: "FrameworkDiagram", file: "framework-chess-go.json", desc: "Chess vs Go" },
+    { seq: "21", comp: "RouteAnimation", file: "route-chip-supply.json", desc: "Supply route" },
+    { seq: "22", comp: "KineticTypography", file: "kinetic-trap.json", desc: "Trap statement" },
+    { seq: "23", comp: "ChoroplethMap", file: "choropleth-caught-between.json", desc: "Caught between" },
+    { seq: "24", comp: "KineticTypography", file: "kinetic-morris-chang.json", desc: "Morris Chang" },
     // Beat 5 — Your Chips
-    { seq: "22", comp: "TitleTransition", file: "title-section-chips.json", desc: "Section V" },
-    { seq: "23", comp: "DataChart", file: "chart-chips-everywhere.json", desc: "Chips everywhere" },
+    { seq: "25", comp: "TitleTransition", file: "title-section-chips.json", desc: "Section V" },
+    { seq: "26", comp: "FrameworkDiagram", file: "framework-ai-timeline.json", desc: "AI timeline" },
+    { seq: "27", comp: "RouteAnimation", file: "route-bifurcation.json", desc: "Bifurcation" },
     // Closing
-    { seq: "24", comp: "TitleTransition", file: "title-endcard.json", desc: "End card" },
+    { seq: "28", comp: "TitleTransition", file: "title-endcard.json", desc: "End card" },
   ],
 };
 
@@ -152,7 +156,7 @@ for (const { seq, comp, file, desc } of sequence) {
 
   const ext = preview ? "png" : "mp4";
   const output = join(outDir, `${seq}-${slug}.${ext}`);
-  const label = `[${seq}/24] ${desc}`;
+  const label = `[${seq}/${sequence.length}] ${desc}`;
 
   process.stdout.write(`  ${label}...`);
 

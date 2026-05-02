@@ -2,10 +2,11 @@
   "episode": "EP01",
   "variant": "definition",
   "term": "举国体制",
-  "termPinyin": "jǔ guó tǐ zhì",
-  "termTranslation": "The whole-nation system",
-  "definitionText": "Total national mobilization for a strategic priority. The same approach that built China's atomic bomb, space program, and high-speed rail network — concentrate resources, tolerate waste, accept short-term inefficiency for long-term sovereignty.",
+  "termPinyin": "jǔguó tǐzhì",
+  "termTranslation": "Whole-nation system",
+  "definitionText": "China's mobilization model — concentrate resources, tolerate waste, accept short-term inefficiency for long-term sovereignty. The same approach that built the atomic bomb program and the rail network.",
   "accentColor": "#C23B22",
+  "backgroundTint": "#C23B22",
   "backgroundVariant": "dark",
-  "durationSec": 8
+  "durationSec": 4
 }

@@ -48,6 +48,8 @@ The brief feeds into a production pipeline: **Deep Research → research-audit (
    - `project/SEO_KEYWORDS.md` — keyword targets for this episode, if defined
    - `project/RESEARCH_WORKFLOW.md` — the 8-section brief structure definition
    - Prior episode briefs in `episodes/` — to check for redundancy or contradiction with past episodes
+   - `episodes/EDITORIAL_PLAYBOOK.md` — channel-level production rules. Read Section 4 (Research & Brief Quality) before auditing. When your findings match a playbook rule, cite it as "Playbook: [rule ID]." If the brief repeats a known weakness from a previous episode, flag it explicitly: "This pattern was identified in EP[XX] — see [rule ID]."
+   - `episodes/LEARNING_LOG.md` — post-publish analytics findings. If available, check whether this episode's topic or structure overlaps with patterns that performed poorly in past episodes.
 
 Find these files relative to the content folder. Read only the ones relevant to the issues you find — don't read everything upfront.
 

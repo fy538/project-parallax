@@ -1,0 +1,137 @@
+PEXELS STOCK PHOTO EVALUATION — "SEMICONDUCTOR CLEANROOM"
+Parallax Project | EP01: "The Silicon Trap"
+Evaluation Date: April 26, 2026
+================================================================================
+
+QUICK RANKING TABLE
+================================================================================
+
+RANK  ID          SCORE  TIER        RECOMMENDATION
+─────────────────────────────────────────────────────────────────────────────
+  1   2588757     9.2    PRIORITY 1  ⭐ SOURCE IMMEDIATELY — Hero establishing shot
+  2   5473298     8.7    PRIORITY 2  ⭐ SOURCE — Supporting manufacturing detail
+  3   3861969     6.1    OPTIONAL    ⚠️  Use only for portrait-scale moments
+  4   1108101     5.4    AVOID       ❌ Below production standards
+  5   4219862     1.8    REJECT      🔴 Thumbnail-only quality; do not use
+
+================================================================================
+
+DETAILED SPECS
+================================================================================
+
+#1: ID 2588757 (Pixabay)
+  Resolution:      5472 × 3648 px (19.9 MP) — 4K+
+  Aspect Ratio:    1.5 (crop to 5472 × 3078 for perfect 16:9)
+  Subject:         Cleanroom environment (explicit fab context)
+  Quality:         Professional; sharp, well-lit
+  Duotone Compat:  Excellent — strong tonal separation
+  Score:           9.2/10
+  Status:          ESSENTIAL ASSET
+
+#2: ID 5473298 (Mikhail Nilov)
+  Resolution:      4000 × 2667 px (10.7 MP) — 4K
+  Aspect Ratio:    1.5 (crop to 4000 × 2250 for perfect 16:9)
+  Subject:         Manufacturing/tech environment (equipment-focused)
+  Quality:         Professional; good contrast, modern equipment
+  Duotone Compat:  Good — responds well to Meridian treatment
+  Score:           8.7/10
+  Status:          STRONG SECONDARY ASSET
+
+#3: ID 3861969 (ThisIsEngineering)
+  Resolution:      3024 × 4032 px (12.2 MP) — portrait orientation
+  Aspect Ratio:    0.75 (requires heavy cropping to 16:9)
+  Subject:         Engineering/tech (ambiguous cleanroom signals)
+  Quality:         Sharp, well-lit, but portrait composition limits utility
+  Duotone Compat:  Awkward — vertical emphasis in landscape video
+  Score:           6.1/10
+  Status:          USE WITH CAUTION
+
+#4: ID 1108101 (Flickr)
+  Resolution:      1920 × 1280 px (2.5 MP) — baseline 1080p only
+  Aspect Ratio:    1.5 (no crop needed but resolution limited)
+  Subject:         Generic tech imagery (no cleanroom signals)
+  Quality:         Acceptable but low resolution shows as softness
+  Duotone Compat:  Poor — generic subject flattens in duotone
+  Score:           5.4/10
+  Status:          AVOID IF POSSIBLE
+
+#5: ID 4219862 (RF._.studio)
+  Resolution:      640 × 427 px (0.27 MP) — thumbnail only
+  Aspect Ratio:    1.5 (resolution moot)
+  Subject:         Indeterminate at this resolution
+  Quality:         Critically insufficient for video frames
+  Duotone Compat:  N/A — too low resolution
+  Score:           1.8/10
+  Status:          REJECT
+
+================================================================================
+
+SOURCING ACTION ITEMS
+================================================================================
+
+IMMEDIATE (DO THIS FIRST):
+  [ ] Download asset #2588757 (5472 × 3648, Pixabay)
+  [ ] Download asset #5473298 (4000 × 2667, Mikhail Nilov)
+  [ ] Apply Meridian duotone treatment via treat.py
+  [ ] Map to visual-spec timeline in script
+
+CONDITIONAL (IF SCRIPT REQUIRES):
+  [ ] Download asset #3861969 only if tight engineering moment needed
+  [ ] Note: Will require significant cropping (3024 × 1701 to 16:9)
+
+SKIP:
+  [ ] Asset #1108101 — resolution/subject insufficient
+  [ ] Asset #4219862 — not a production-grade asset
+
+FOLLOW-UP SEARCHES:
+  Consider additional Pexels queries for complementary coverage:
+    - "semiconductor fab exterior" (building/infrastructure)
+    - "cleanroom entrance" (gowning sequences)
+    - "wafer handling" (close-up detail shots)
+    - "silicon wafer" (archival/comparison imagery)
+
+================================================================================
+
+PRODUCTION INTEGRATION NOTES
+================================================================================
+
+Tier 1 Asset (2588757):
+  • Crop target: 5472 × 3078 px (remove 570 px total from top/bottom)
+  • Duotone treatment: Amber (#E5A544) on highlights, rust (#C23B22) on shadows
+  • Vignette: radial gradient ink → base (Meridian dark mode)
+  • Overlay: ∴ symbol at 15% opacity, upper-right
+  • Best use: Establishing shot, "Inside the Fab" sequence opener
+
+Tier 2 Asset (5473298):
+  • Crop target: 4000 × 2250 px (remove 417 px total from top/bottom)
+  • Duotone treatment: Emphasis on equipment geometry with stronger amber
+  • Opacity baseline: 45% (preserve detail readability)
+  • Best use: Equipment detail, comparative manufacturing sequence, supporting shot
+
+Combined Sequence Strategy:
+  → Asset #1 (establishing) → narration about fab scale/precision
+  → Asset #2 (detail) → narration about equipment sophistication
+  → Creates progression from wide context to technical depth
+
+================================================================================
+
+SCORING RUBRIC SUMMARY
+================================================================================
+
+Each asset evaluated on 6 dimensions (1-10 scale):
+
+1. Resolution       (Pixel headroom for editing, scaling, effects)
+2. Aspect Ratio     (16:9 compatibility, cropping waste)
+3. Subject Match    (Cleanroom authenticity, manufacturing context)
+4. Visual Clarity   (Professional quality, detail preservation)
+5. Duotone Compat   (Tonal separation, Meridian treatment success)
+6. Geopolitical    (Narrative power for US-China semiconductor story)
+
+Overall = Weighted average emphasizing resolution + subject match + duotone
+
+================================================================================
+
+COMPLETED: Asset evaluation and ranking
+NEXT STEP: Source and download Tier 1 + Tier 2 assets, apply treatment,
+           integrate into visual-spec timeline
+================================================================================

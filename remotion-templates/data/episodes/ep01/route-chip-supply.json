@@ -93,5 +93,6 @@
     }
   ],
 
-  "source": "SIA, ASML annual reports, Chris Miller 'Chip War'"
+  "source": "SIA, ASML annual reports, Chris Miller 'Chip War'",
+  "backgroundTint": "#E5A544"
 }

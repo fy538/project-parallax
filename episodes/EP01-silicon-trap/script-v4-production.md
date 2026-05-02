@@ -121,7 +121,7 @@
 | 20 | KineticTypography | Morris Chang quote | P1 |
 | 21 | FrameworkDiagram | AI timeline decision tree | P2 |
 | 22 | RouteAnimation | Supply chain bifurcation | P2 |
-| 23 | TitleTransition | Beat title cards (×5) | P2 |
+| 23 | TitleTransition | Beat title cards (×4: Beats 2–5) | P2 |
 | 24 | TitleTransition | End card with CTA | P1 |
 
 ### Stock Footage Needed

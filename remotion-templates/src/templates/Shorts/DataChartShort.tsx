@@ -12,11 +12,9 @@ import {
   AbsoluteFill,
   useCurrentFrame,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  dark,
   semantic,
   fonts,
   fontSizes,
@@ -25,8 +23,9 @@ import {
   layout,
   sec,
   durations,
+  light,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, CLAMP_CUBIC } from "../../utils/animation";
 import { barGradient } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -51,11 +50,7 @@ const HorizontalBar: React.FC<{
     frame,
     [barStart, barStart + 20],
     [0, 1],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    }
+    CLAMP_CUBIC
   );
 
   const widthPercent = (point.value / maxValue) * 100 * growth;
@@ -76,6 +71,7 @@ const HorizontalBar: React.FC<{
           alignItems: "baseline",
           marginBottom: 10,
           opacity: labelOpacity,
+          transform: `translateY(${slideIn(frame, barStart - 4, 8, 6)}px)`,
         }}
       >
         <span
@@ -83,7 +79,7 @@ const HorizontalBar: React.FC<{
             fontSize: 24,
             fontFamily: fonts.display,
             fontWeight: fontWeights.medium,
-            color: dark.text.primary,
+            color: light.text.primary,
           }}
         >
           {point.label}
@@ -106,7 +102,7 @@ const HorizontalBar: React.FC<{
         style={{
           width: "100%",
           height: 32,
-          backgroundColor: `${dark.text.muted}20`,
+          backgroundColor: `${light.text.muted}20`,
           borderRadius: 4,
           overflow: "hidden",
         }}
@@ -129,7 +125,7 @@ const HorizontalBar: React.FC<{
           style={{
             fontSize: 16,
             fontFamily: fonts.body,
-            color: dark.text.muted,
+            color: light.text.muted,
             marginTop: 6,
             opacity: labelOpacity,
           }}
@@ -153,7 +149,7 @@ export const DataChartShort: React.FC<{ data: DataChartData }> = ({
   const accent = palette.amber;
 
   return (
-    <Background variant={(data as any).backgroundVariant || "dark"}>
+    <Background variant={(data as any).backgroundVariant || "light"}>
       <AbsoluteFill style={compStyle}>
         {/* Title area */}
         <div
@@ -170,9 +166,10 @@ export const DataChartShort: React.FC<{ data: DataChartData }> = ({
               fontSize: 40,
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
-              color: dark.text.primary,
+              color: light.text.primary,
               letterSpacing: letterSpacing.h2,
               opacity: fadeIn(frame, 0, 10),
+              transform: `translateY(${slideIn(frame, 0, 12, 10)}px)`,
               lineHeight: 1.2,
             }}
           >
@@ -183,9 +180,10 @@ export const DataChartShort: React.FC<{ data: DataChartData }> = ({
               style={{
                 fontSize: 22,
                 fontFamily: fonts.body,
-                color: dark.text.secondary,
+                color: light.text.secondary,
                 marginTop: 12,
                 opacity: fadeIn(frame, 5, 8),
+                transform: `translateY(${slideIn(frame, 5, 10, 8)}px)`,
               }}
             >
               {data.subtitle}
@@ -226,8 +224,9 @@ export const DataChartShort: React.FC<{ data: DataChartData }> = ({
               textAlign: "center",
               fontSize: 14,
               fontFamily: fonts.body,
-              color: dark.text.muted,
+              color: light.text.muted,
               opacity: fadeIn(frame, 30, 8),
+              transform: `translateY(${slideIn(frame, 30, 8, 8)}px)`,
             }}
           >
             {data.source}

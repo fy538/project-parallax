@@ -31,5 +31,7 @@ export interface QuoteData {
   // Styling
   accentColor?: string;
   backgroundVariant?: "dark" | "light";
+  /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
+  backgroundTint?: string;
   durationSec?: number;
 }

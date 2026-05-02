@@ -1,7 +1,7 @@
 /**
  * MetadataStrip — branded header + footer chrome for compositions.
  *
- * Header: ∴ STRUCTURAL · PARALLELS | EP.XX — EPISODE TITLE
+ * Header: ∴ PARALLAX | EP.XX — EPISODE TITLE
  * Footer: ● REC | 1:150,000 | FILED 2026-04-25
  *
  * Uses IBM Plex Mono at meta size (11px, tracking 2.5px) per BRAND.md.
@@ -97,7 +97,7 @@ export const MetadataStrip: React.FC<MetadataStripProps> = ({
           }}
         >
           {/* Brand mark + channel name */}
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
                 ...metaStyle,
@@ -108,21 +108,14 @@ export const MetadataStrip: React.FC<MetadataStripProps> = ({
             >
               ∴
             </span>
-            <span style={{ ...metaStyle, color: mode.text.muted }}>
-              STRUCTURAL
-            </span>
             <span
               style={{
                 ...metaStyle,
                 color: mode.text.muted,
-                opacity: 0.4,
-                margin: "0 2px",
+                letterSpacing: letterSpacing.meta + 1, // slightly wider for brand name
               }}
             >
-              ·
-            </span>
-            <span style={{ ...metaStyle, color: mode.text.muted }}>
-              PARALLELS
+              PARALLAX
             </span>
           </div>
 

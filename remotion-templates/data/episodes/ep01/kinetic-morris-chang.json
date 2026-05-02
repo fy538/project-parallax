@@ -1,10 +1,10 @@
 {
   "episode": "EP01",
   "variant": "quote",
-  "text": "Globalization is almost dead. Free trade is almost dead. A lot of people still wish they would come back, but I really don't think they will.",
+  "text": "Globalization is almost dead. Free trade is almost dead.",
   "attribution": "Morris Chang",
-  "attributionContext": "Founder of TSMC, December 2022",
+  "attributionContext": "Founder, TSMC",
   "accentColor": "#E5A544",
   "backgroundVariant": "dark",
-  "durationSec": 7
+  "durationSec": 5
 }

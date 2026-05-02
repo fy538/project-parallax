@@ -1,0 +1,79 @@
+{
+  "episode": "EP01",
+  "title": "SMIC 7nm Yield Improvement",
+  "subtitle": "Brute force is working — slowly",
+
+  "lines": [
+    {
+      "label": "SMIC 7nm yield",
+      "color": "#C23B22",
+      "width": 3,
+      "areaFill": true,
+      "areaOpacity": 0.12,
+      "points": [
+        { "x": "Q1 2024", "y": 38 },
+        { "x": "Q2 2024", "y": 42 },
+        { "x": "Q3 2024", "y": 50 },
+        { "x": "Q4 2024", "y": 57 },
+        { "x": "Q1 2025", "y": 62 },
+        { "x": "Q2 2025", "y": 68 }
+      ]
+    }
+  ],
+
+  "referenceLines": [
+    {
+      "y": 85,
+      "label": "Competitive threshold",
+      "color": "#3266AD",
+      "dashed": true
+    }
+  ],
+
+  "annotations": [
+    {
+      "x": "Q1 2024",
+      "label": "<40%",
+      "sublabel": "Early multi-patterning yields",
+      "color": "#C23B22"
+    },
+    {
+      "x": "Q2 2025",
+      "label": "~68%",
+      "sublabel": "34-pass process maturing",
+      "color": "#E5A544"
+    }
+  ],
+
+  "eras": [
+    {
+      "from": "Q1 2024",
+      "to": "Q3 2024",
+      "label": "Proving phase",
+      "color": "#C23B22",
+      "opacity": 0.06
+    },
+    {
+      "from": "Q4 2024",
+      "to": "Q2 2025",
+      "label": "Scaling",
+      "color": "#E5A544",
+      "opacity": 0.06
+    }
+  ],
+
+  "xLabel": "Quarter",
+  "yLabel": "Yield",
+  "yUnit": "%",
+  "yRange": [0, 100],
+
+  "heroStat": {
+    "value": "68%",
+    "label": "Q2 2025 yield"
+  },
+
+  "source": "TD Cowen analysis, 2025",
+  "backgroundTint": "#C23B22",
+  "backgroundVariant": "dark",
+  "durationSec": 6
+}

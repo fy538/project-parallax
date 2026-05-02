@@ -56,29 +56,39 @@ function parseArgs() {
 // ── EP01 sequence (matches render-episode.mjs) ────────────────────────────
 
 const EP01_SEQUENCE = [
+  // Opening
   { comp: "TitleTransition", file: "title-episode.json" },
-  { comp: "TitleTransition", file: "title-section-act1.json" },
-  { comp: "ChoroplethMap", file: "choropleth-reshoring.json" },
-  { comp: "KineticTypography", file: "kinetic-7pct.json" },
+  // Beat 1 — The Paradox
+  { comp: "TitleTransition", file: "title-section-paradox.json" },
+  { comp: "KineticTypography", file: "kinetic-92-yield.json" },
+  { comp: "KineticTypography", file: "kinetic-165b.json" },
+  { comp: "DataChart", file: "chart-7pct-demand.json" },
+  // Beat 2 — The Logic of Denial
   { comp: "TitleTransition", file: "title-section-denial.json" },
   { comp: "TimelineComparison", file: "timeline-oil-chips.json" },
-  { comp: "DataChart", file: "chart-export-controls.json" },
+  { comp: "KineticTypography", file: "kinetic-revenue-deal.json" },
+  { comp: "DataChart", file: "chart-chips-act.json" },
+  { comp: "ChoroplethMap", file: "choropleth-cocom.json" },
   { comp: "FrameworkDiagram", file: "framework-cocom-china.json" },
+  // Beat 3 — The Other Side of the Wall
   { comp: "TitleTransition", file: "title-section-wall.json" },
   { comp: "KineticTypography", file: "kinetic-kabozi.json" },
-  { comp: "DataChart", file: "chart-pen-contrast.json" },
   { comp: "KineticTypography", file: "kinetic-juguo.json" },
   { comp: "DataChart", file: "chart-lithography.json" },
-  { comp: "DataChart", file: "chart-kirin-teardown.json" },
-  { comp: "TimelineComparison", file: "timeline-deepseek.json" },
+  { comp: "DataChart", file: "chart-smic-yield.json" },
+  { comp: "FrameworkDiagram", file: "framework-kirin-teardown.json" },
+  { comp: "KineticTypography", file: "kinetic-deepseek-zero.json" },
+  // Beat 4 — The Trap
   { comp: "TitleTransition", file: "title-section-trap.json" },
   { comp: "FrameworkDiagram", file: "framework-chess-go.json" },
   { comp: "RouteAnimation", file: "route-chip-supply.json" },
-  { comp: "ChoroplethMap", file: "choropleth-supply-chain.json" },
+  { comp: "KineticTypography", file: "kinetic-trap.json" },
+  { comp: "ChoroplethMap", file: "choropleth-caught-between.json" },
   { comp: "KineticTypography", file: "kinetic-morris-chang.json" },
-  { comp: "ChoroplethMap", file: "choropleth-bifurcation.json" },
+  // Beat 5 — Your Chips
   { comp: "TitleTransition", file: "title-section-chips.json" },
-  { comp: "DataChart", file: "chart-chips-everywhere.json" },
+  { comp: "FrameworkDiagram", file: "framework-ai-timeline.json" },
+  // Closing
   { comp: "TitleTransition", file: "title-endcard.json" },
 ];
 

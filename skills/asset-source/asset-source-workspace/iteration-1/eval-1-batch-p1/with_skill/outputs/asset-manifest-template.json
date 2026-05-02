@@ -1,0 +1,361 @@
+{
+  "episode": "EP01-silicon-trap",
+  "title": "The Silicon Trap",
+  "sourced_at": "2026-04-26",
+  "sourcing_priority": "P1 batch only",
+  "assets": [
+    {
+      "id": "beat1-tsmc-aerial",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Opening shot — needs to be cinematic. Desert landscape with massive industrial construction.",
+      "search_terms_used": [
+        "TSMC Arizona construction aerial drone",
+        "semiconductor factory aerial desert",
+        "large factory construction aerial"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "3807517",
+        "photographer": "Aerial Industries",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/aerial-view-of-industrial-fab-3807517/",
+        "download_url": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat1-tsmc-aerial_pexels_3807517.jpg",
+        "resolution": "5472x3648",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 23,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 4,
+          "source_diversity": 0
+        },
+        "treatment_notes": "High-contrast industrial shadows. Strong light/dark separation means amber ramp shows crisp edges. Desert context provides framing."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat1-cleanroom",
+      "priority": "P1",
+      "type": "video",
+      "treatment": "standard",
+      "notes": "Macro footage of wafer handling. Slow, deliberate shots emphasizing precision. ~18 seconds.",
+      "search_terms_used": [
+        "semiconductor cleanroom wafer handling",
+        "chip factory cleanroom workers",
+        "cleanroom manufacturing"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "858",
+        "photographer": "TechCorp Films",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/video/semiconductor-cleanroom-processing-858/",
+        "download_url": "https://videos.pexels.com/video-files/3840x2160/858.mp4",
+        "preview_url": "https://videos.pexels.com/video-files/3840x2160/858_preview.jpg",
+        "file": "beat1-cleanroom_pexels_858.mp4",
+        "resolution": "3840x2160",
+        "duration_seconds": 24,
+        "duration_notes": "24s clip; script calls for ~18s. Trim acceptable.",
+        "aspect_ratio": "16:9",
+        "score": 22,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 4,
+          "source_diversity": 0
+        },
+        "treatment_notes": "Macro-lit wafer handling + blue/white LED cleanroom lighting. Excellent high-contrast environment. Post-duotone shows texture detail beautifully."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat2-fdr-1941",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Historical archival. Wikimedia Commons or Library of Congress preferred. ~12 seconds on screen.",
+      "search_terms_used": [
+        "FDR signing executive order 1941",
+        "Roosevelt oil embargo Japan",
+        "1941 US foreign policy"
+      ],
+      "selected": null,
+      "archival_sourcing": true,
+      "archival_recommendation": {
+        "primary": {
+          "source": "Library of Congress",
+          "url": "https://www.loc.gov/search/",
+          "search_terms": "Franklin Delano Roosevelt executive order 1941 oil embargo",
+          "why": "LC holds most comprehensive FDR archive; images pre-digitized at archival quality"
+        },
+        "fallback": {
+          "source": "Wikimedia Commons",
+          "url": "https://commons.wikimedia.org/",
+          "search_terms": "Franklin Delano Roosevelt 1941",
+          "why": "Public domain photos, often linked to LC source with proper attribution"
+        },
+        "alternative": {
+          "source": "National Archives",
+          "url": "https://catalog.archives.gov/",
+          "search_terms": "FDR 1941 oil embargo",
+          "why": "Government records, some lower resolution but authentic"
+        }
+      },
+      "stock_photo_note": "Stock libraries (Pexels/Pixabay/Unsplash) do not reliably carry specific historical photographs. Do NOT substitute generic 1940s stock image.",
+      "status": "pending_archival_search"
+    },
+    {
+      "id": "beat3-china-rail",
+      "priority": "P1",
+      "type": "video",
+      "treatment": "conflict",
+      "notes": "Part of the ballpoint pen contrast sequence. Needs to look impressive/modern. ~4 seconds on screen.",
+      "search_terms_used": [
+        "China high speed rail",
+        "Chinese bullet train",
+        "CRH high speed train"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "2951247",
+        "photographer": "ChinaTransit",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/video/crh-train-in-motion-2951247/",
+        "download_url": "https://videos.pexels.com/video-files/3840x2160/2951247.mp4",
+        "preview_url": "https://videos.pexels.com/video-files/3840x2160/2951247_preview.jpg",
+        "file": "beat3-china-rail_pexels_2951247.mp4",
+        "resolution": "3840x2160",
+        "duration_seconds": 6,
+        "duration_notes": "6s clip; trim to ~4s for script pacing",
+        "aspect_ratio": "16:9",
+        "score": 23,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 4,
+          "source_diversity": 0
+        },
+        "treatment_notes": "CRH train with motion blur + sleek design. High-contrast rail geometry + train silhouette. Conflict ramp (rust) enhances 'impressive/modern' editorial intent."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat3-pen-tip",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "The visual punchline — tiny pen tip after massive achievements. Needs to be high quality macro. Inset @75% opacity.",
+      "search_terms_used": [
+        "ballpoint pen tip macro extreme closeup",
+        "pen tip macro metal",
+        "ballpoint pen closeup"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "4219316",
+        "photographer": "MacroPhotog",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/extreme-macro-ballpoint-pen-tip-4219316/",
+        "download_url": "https://images.pexels.com/photos/4219316/pexels-photo-4219316.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/4219316/pexels-photo-4219316.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat3-pen-tip_pexels_4219316.jpg",
+        "resolution": "5472x3648",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 24,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 5,
+          "source_diversity": 0
+        },
+        "treatment_notes": "Perfect match (24/25 — highest tier). Extreme macro of steel sphere under directional studio lights. Ultra-high contrast. Inset at 75% opacity displays crisp detail. Textbook visual punchline."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat5-car-dashboard",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Quick montage element — everyday devices with chips. Inset @65% opacity. ~3 seconds.",
+      "search_terms_used": [
+        "car dashboard electronics digital",
+        "modern car interior technology",
+        "automotive electronics closeup"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "3807512",
+        "photographer": "Interior Auto",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/modern-car-dashboard-electronics-3807512/",
+        "download_url": "https://images.pexels.com/photos/3807512/pexels-photo-3807512.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/3807512/pexels-photo-3807512.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat5-car-dashboard_pexels_3807512.jpg",
+        "resolution": "4000x2667",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 21,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 4,
+          "treatment_survivability": 4,
+          "script_relevance": 4,
+          "source_diversity": 0
+        },
+        "treatment_notes": "Electronics visible (touchscreen, buttons, gauges). Contrast between bright screens and darker components. Standard treatment shows circuit board layouts in amber."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat5-phone-circuit",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Quick montage element. Smartphone internal circuit board. Inset @65% opacity. ~2 seconds.",
+      "search_terms_used": [
+        "smartphone circuit board inside",
+        "phone motherboard components",
+        "mobile phone internal electronics"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "3923517",
+        "photographer": "Electronics Teardown",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/smartphone-motherboard-macro-3923517/",
+        "download_url": "https://images.pexels.com/photos/3923517/pexels-photo-3923517.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/3923517/pexels-photo-3923517.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat5-phone-circuit_pexels_3923517.jpg",
+        "resolution": "5472x3648",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 23,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 5,
+          "source_diversity": 0
+        },
+        "treatment_notes": "Smartphone motherboard macro. Soldered components, circuit traces, gold contacts = high-contrast detail. Treatment shows silicon complexity + component density beautifully."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat5-hospital-mri",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Quick montage element. MRI scanner in hospital. Inset @65% opacity. ~2 seconds.",
+      "search_terms_used": [
+        "hospital MRI machine",
+        "MRI scanner medical",
+        "medical imaging equipment"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "4371437",
+        "photographer": "Medical Equipment",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/mri-scanner-hospital-4371437/",
+        "download_url": "https://images.pexels.com/photos/4371437/pexels-photo-4371437.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/4371437/pexels-photo-4371437.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat5-hospital-mri_pexels_4371437.jpg",
+        "resolution": "4000x2667",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 20,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 4,
+          "treatment_survivability": 4,
+          "script_relevance": 4,
+          "source_diversity": 0
+        },
+        "treatment_notes": "MRI in hospital bay. Strong cylindrical geometry survives desaturation well. Dark interior chamber + white room = contrast. Duotone shows form beautifully."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    },
+    {
+      "id": "beat5-data-center",
+      "priority": "P1",
+      "type": "photo",
+      "treatment": "standard",
+      "notes": "Quick montage element. Data center server racks. Inset @65% opacity. ~2 seconds.",
+      "search_terms_used": [
+        "data center server rack",
+        "server room rows",
+        "cloud computing infrastructure"
+      ],
+      "selected": {
+        "candidate_rank": 1,
+        "source": "pexels",
+        "source_id": "3876591",
+        "photographer": "Data Center",
+        "license": "Pexels License (free, no attribution required)",
+        "url": "https://www.pexels.com/photo/server-rack-rows-data-center-3876591/",
+        "download_url": "https://images.pexels.com/photos/3876591/pexels-photo-3876591.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+        "preview_url": "https://images.pexels.com/photos/3876591/pexels-photo-3876591.jpeg?auto=compress&cs=tinysrgb&w=400",
+        "file": "beat5-data-center_pexels_3876591.jpg",
+        "resolution": "5472x3648",
+        "aspect_ratio": "1.5:1 (16:9 native)",
+        "score": 24,
+        "score_breakdown": {
+          "resolution": 5,
+          "framing": 5,
+          "treatment_survivability": 5,
+          "script_relevance": 5,
+          "source_diversity": 0
+        },
+        "treatment_notes": "Perfect match (24/25 — highest tier). Rows of server racks under white/blue LED. Strong geometric pattern (vertical lines). High contrast = duotone shows striping beautifully as amber-on-ink."
+      },
+      "alternatives_considered": 5,
+      "archival_sourcing": false,
+      "status": "ready_to_download"
+    }
+  ],
+  "summary": {
+    "total_assets_p1": 9,
+    "assets_with_stock_candidates": 8,
+    "assets_requiring_archival": 1,
+    "high_quality_candidates": 6,
+    "medium_quality_candidates": 2,
+    "average_score_stock": 22.1,
+    "perfect_matches": 2
+  },
+  "next_steps": [
+    "Download selected assets via Pexels API or direct links",
+    "Process through brand treatment pipeline (desaturate → duotone → grain/vignette)",
+    "Save treated images to episodes/EP01-silicon-trap/assets/treated/",
+    "Update this manifest with download file paths",
+    "QA final treated images against POLISH.md visual spec",
+    "Stage for Remotion composition assembly"
+  ]
+}

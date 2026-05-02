@@ -71,7 +71,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
   })();
 
   return (
-    <AbsoluteFill style={{ backgroundColor: dark.bg.base, overflow: "hidden" }}>
+    <AbsoluteFill style={{ backgroundColor: light.bg.base, overflow: "hidden" }}>
       <AbsoluteFill style={compStyle}>
         {/* Main image with Ken Burns drift */}
       <AbsoluteFill
@@ -127,7 +127,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             ...textPositionStyle,
             opacity: textOpacity,
             transform: `translateY(${textTranslate}px)`,
-            color: dark.text.primary,
+            color: light.text.primary,
             textShadow: textShadow(true),
           }}
         >
@@ -188,7 +188,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
 
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
   const frameOpacity = fadeIn(frame, 0, 10);
-  const isDark = data.backgroundVariant !== "light";
+  const isDark = data.backgroundVariant === "dark";
 
   const frameWidth = (layout.width * 60) / 100; // 60% of frame width
   const frameHeight = (frameWidth * 9) / 16; // 16:9 aspect ratio
@@ -309,7 +309,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
   const imageOpacity = fadeIn(frame, 0, 10);
   const nameStripOpacity = fadeIn(frame, 10, 10);
-  const isDark = data.backgroundVariant !== "light";
+  const isDark = data.backgroundVariant === "dark";
 
   const imageWidth = (layout.width * 40) / 100; // 40% of frame
   const imageHeight = layout.height; // Full height
@@ -364,7 +364,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               backgroundColor: `rgba(0, 0, 0, 0.6)`,
               padding: "16px",
               opacity: nameStripOpacity,
-              color: dark.text.primary,
+              color: light.text.primary,
               fontFamily: fonts.body,
               fontSize: fontSizes.label,
               fontWeight: fontWeights.semibold,

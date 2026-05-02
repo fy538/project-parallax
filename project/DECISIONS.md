@@ -131,12 +131,36 @@ Last updated: April 26, 2026
 
 ### D30: Research-audit skill — quality gate between research and scripting
 **Date:** April 26, 2026
-**Rationale:** Identified a gap in the production pipeline: Deep Research produces comprehensive briefs, but there was no structured quality check before scripting began. A script built on a weak brief fails at script-audit and wastes Tiger's limited review time. The research-audit skill runs seven lenses (structural completeness, claims verification with web search, historical parallel integrity, counterargument quality, scoring rubric, risk/editorial, arc coherence) and produces a verdict: READY FOR SCRIPTING / CONDITIONAL / NEEDS MORE RESEARCH. Tested against three briefs: EP01 gold standard (correctly: READY), a deliberately degraded version (correctly: NEEDS MORE RESEARCH), and a stub brief (correctly: NEEDS MORE RESEARCH). Key design decision: explicit verdict criteria with hard triggers for NEEDS MORE RESEARCH (missing sections, unverified load-bearing claims, missing counterarguments, overconfident language). Without these criteria, the skill defaulted to CONDITIONAL for everything — the explicit thresholds were essential. Skill location: `content/skills/research-audit/SKILL.md` (needs installation to plugins directory for auto-triggering).
+**Rationale:** Identified a gap in the production pipeline: Deep Research produces comprehensive briefs, but there was no structured quality check before scripting began. A script built on a weak brief fails at script-audit and wastes Tiger's limited review time. The research-audit skill runs seven lenses (structural completeness, claims verification with web search, historical parallel integrity, counterargument quality, scoring rubric, risk/editorial, arc coherence) and produces a verdict: READY FOR SCRIPTING / CONDITIONAL / NEEDS MORE RESEARCH. Tested against three briefs: EP01 gold standard (correctly: READY), a deliberately degraded version (correctly: NEEDS MORE RESEARCH), and a stub brief (correctly: NEEDS MORE RESEARCH). Key design decision: explicit verdict criteria with hard triggers for NEEDS MORE RESEARCH (missing sections, unverified load-bearing claims, missing counterarguments, overconfident language). Without these criteria, the skill defaulted to CONDITIONAL for everything — the explicit thresholds were essential. Skill location: `skills/research-audit/SKILL.md` (also installed in Cowork plugins directory for auto-triggering).
 **Updates pipeline:** Deep Research → **research-audit** → Script Draft → script-audit → persona-eval → visual-spec
 
 ### D31: Two-column production script format + visual asset pipeline
 **Date:** April 26, 2026
 **Rationale:** Identified a gap between "script done" and "video producible." The old script format had `[VISUAL: ...]` cues that were narrative-quality but not production-specific — they didn't specify where assets come from, what treatment to apply, or how to composite them. The new two-column format (SCRIPT_FORMAT.md) puts narration left and visual production specs right, with each visual moment specified by: source type (Remotion template / stock footage / archival / AI), search terms ranked by specificity, brand treatment ramp, composite mode + opacity, duration, and priority tier (P1 hero / P2 supporting / P3 ambient). Three tools built: (1) Python CLI for BRAND.md's 4-step image treatment pipeline (treat.py), (2) Remotion BrandImage component for render-time treatment via SVG filters, (3) asset sourcing tool for batch-searching Pexels/Pixabay/Unsplash from JSON shot lists. EP01 converted to v4 production format as proof of concept: 24 Remotion compositions, 16 stock footage clips, 5 archival images needed. Free stock libraries for launch; paid subscriptions deferred.
+
+### D32: Assembly manifest + full-episode Remotion composition
+**Date:** April 26, 2026
+**Rationale:** Identified assembly as the biggest pipeline bottleneck — 80% of video time (stock footage + narration) had no tooling. Built three things: (1) Assembly manifest JSON schema defining segment types (FOOTAGE, IMAGE, TEMPLATE, TRANSITION, HOLD) with timing, treatment, and layer data. (2) Python generator (`tools/assembly/generate_manifest.py`) that parses the script's right column into the manifest, with two modes: "estimate" (from word count at 150 WPM before narration) and "precise" (from Whisper word-level timestamps after narration). (3) `FullEpisode.tsx` Remotion composition that reads the manifest and renders complete video — `<Audio>` narration + `<Sequence>`-positioned templates + stock footage with BrandImage treatment. EP01 generates 53 segments at 13.1 min estimate (73% of 18-min target, expected compression from WPM without pauses). This turns iteration from NLE editing sessions into manifest JSON edits + re-render.
+
+### D33: Claude SVG as default illustration method — raster APIs tabled
+**Date:** April 26, 2026
+**Rationale:** Evaluated Recraft V4 ($0.08/vector), Flux 2 Pro ($0.055/image), and GPT Image 1.5 (~$0.07/image) as supplementary illustration options. Decision: table all raster APIs for now and default entirely to Claude SVG generation in Cowork. Claude SVG excels at geometric/diagrammatic/information-rich visuals — which is exactly what Parallax needs (network diagrams, flow charts, framework comparisons, data callouts). Organic/artistic illustration that would need raster APIs can be reframed as geometric concepts or covered by stock footage + brand treatment instead. Cost: $0/episode vs $1.50-4/episode. Trigger to revisit: if Claude SVG consistently can't handle a recurring visual need across multiple episodes.
+
+### D34: Visual vocabulary for cross-episode SVG consistency
+**Date:** April 26, 2026
+**Rationale:** Without a shared visual vocabulary, every SVG generation makes ad-hoc decisions about how to represent nations, institutions, flows, and data — leading to visual inconsistency within and across episodes. Built a canonical vocabulary (SVG_ILLUSTRATION_PIPELINE.md Section 2) defining: actor icons (geometric bust, no faces), nation nodes (labeled circles with semantic color), institution shapes (hexagon for industry, pentagon for government, diamond for military), flow lines (straight with arrowheads), chokepoints (inline labeled box), blockages (X mark), data callouts (JetBrains Mono stats), and conflict conventions (rust color, dashed lines, glow effects). Consistency rules: same element = same look everywhere, size encodes importance, color encodes meaning not decoration, labels over cleverness.
+
+### D35: Straight lines over curves in SVG illustrations
+**Date:** April 26, 2026
+**Rationale:** Tested curved bezier paths for supply chain flow diagrams — they consistently caused problems: lines not connecting to node edges, overlapping ambiguously, visual spaghetti. Straight lines are clearer, easier to position precisely, and easier for Claude to generate correctly. If a layout requires a direction change, use a single right-angle elbow, not a curve. This applies to all flow/connection lines in SVG illustrations. Visual vocabulary updated accordingly.
+
+### D36: Mapbox GL + deck.gl for broadcast-quality maps
+**Date:** April 26, 2026
+**Rationale:** Current ChoroplethMap and RouteAnimation use react-simple-maps — flat SVG fills on 2D projections with no terrain, bathymetry, or 3D camera movement. Since maps are the workhorse visual for a geopolitics channel, the amateur look was unacceptable. Three options evaluated: (A) Mapbox GL + deck.gl for full WebGL rendering with 3D terrain, (B) improve react-simple-maps with SVG gradients/textures, (C) pre-rendered static tiles. Chose Option A — highest visual ceiling justifies complexity. Free tier (50K loads/month) sufficient for video rendering. MapLibre GL available as $0 open-source fallback if needed. Spec added to NEW_TEMPLATES_SPEC.md Section 0.
+
+### D37: Three visual modes with footage layer framework
+**Date:** April 26, 2026
+**Rationale:** Motion graphics alone, however cinematic, still feel like a slideshow without a footage layer underneath. The core insight: viewers process footage and motion graphics differently — footage creates *presence* (this is real), MG creates *understanding* (now I see the pattern). A well-paced video alternates between them. Three visual modes formalized: `[FOOTAGE:]` (50-70% screen time), `[MG:]` (20-30%), `[LAYERED:]` (5-15% — footage with MG composited). Three new/updated artifacts: VISUAL_LANGUAGE.md (editorial guide — when to use each mode, pacing rules, decision heuristic), FOOTAGE_SOURCING.md (sourcability map — what footage is actually available for geopolitics, organized by 5 platform tiers), SCRIPT_FORMAT.md updated with mode tags. Skills updated: visual-spec now outputs footage manifest alongside MG JSON; script-audit gained Lens 6 for visual layer quality (mode balance, monotony, unsourceable footage calls). This is a framework, not a one-off fix — every future episode uses the same editorial logic and sourcing knowledge.
 
 ### D19: Project memory compounding system (CLAUDE.md + LESSONS.md + BRAND.md)
 **Date:** April 25, 2026
@@ -149,8 +173,8 @@ Last updated: April 26, 2026
 ### OQ1: ~~Project Name~~ → RESOLVED (see D28)
 **Resolved April 26, 2026.** Channel name = **Parallax**. Viewing the same object from different analytical positions. Candidates considered: Rhyme & Reason, The Echo Chamber, Echoes of Empire, Pattern Language, The Oracle Problem, Cassandra Protocol, The Long Game, Refraction, Azimuth, Oblique, The Parallax Problem. Parallax won on conceptual fit + memorability + search uniqueness in the geopolitics YouTube niche. Next steps: secure handles across platforms, register domain.
 
-### OQ2: ~~Specific Tool Stack for Visual Production~~ → RESOLVED (see D14, D15)
-**Resolved April 25, 2026.** Stack is Remotion (React → MP4) with react-simple-maps for geo. 7 template types built. Stock footage and AI reference tools still TBD for supplementary visuals.
+### OQ2: ~~Specific Tool Stack for Visual Production~~ → RESOLVED (see D14, D15, D36)
+**Resolved April 25, 2026. Updated April 26.** Stack is Remotion (React → MP4). Map rendering migrating from react-simple-maps to Mapbox GL + deck.gl (D36). 7 core templates built, 5 new templates scoped (NEW_TEMPLATES_SPEC.md). Stock footage framework now in place (D37): editorial guide (VISUAL_LANGUAGE.md), sourcability map (FOOTAGE_SOURCING.md), visual mode tags in SCRIPT_FORMAT.md, footage manifest output from visual-spec, source.py for automated sourcing.
 
 ### OQ3: ~~First Episode Topic~~ → RESOLVED (see D16)
 **Resolved April 25, 2026.** EP01 = "The Silicon Trap" (US-China semiconductor geopolitics). Script v3 finalized, 24 visual data files generated.
@@ -166,7 +190,7 @@ Last updated: April 26, 2026
 - ~~Gradient/shadow/depth system~~ → RESOLVED: Dual-mode registers (Dark cinematic for in-video, Light editorial for title cards/social)
 - ~~Image treatment pipeline~~ → RESOLVED: 4-step pipeline (desaturate → duotone remap → grain/vignette → composite)
 - ~~Brand mark~~ → RESOLVED: ∴ (therefore symbol)
-- Logo/wordmark: Meridian wordmark designed, implementation in progress
+- Logo/wordmark: **STALE** — MetadataStrip.tsx and BRAND.md still render "∴ STRUCTURAL · PARALLELS" (old name). Need to decide new wordmark treatment for "Parallax" and update 7 references across BRAND.md, MetadataStrip.tsx, and remotion CLAUDE.md.
 - Thumbnail template system: Updated for Meridian palette, deployed
 - Intro/outro animations: Dark and Light mode versions produced
 
@@ -272,6 +296,43 @@ The positioning matrix confirms the niche is differentiated, but the research do
 - 7 template types with sub-variants cover all visual needs for geopolitics content — validated on EP01's 24 compositions
 - Reorganized project folder: project docs → project/, episodes → episodes/, skills → skills/, orphan files cleaned up
 
+### Session 10 — April 26, 2026 (continued)
+**Topics covered:**
+- Built and benchmarked asset-source skill (100% pass rate vs 60% baseline — 40-point improvement on structured scoring)
+- Explored Claude SVG illustration capabilities — iterated through organic (engraved hand — rejected) → geometric (Sankey flow — approved direction)
+- Built SVG Illustration Pipeline doc (SVG_ILLUSTRATION_PIPELINE.md) — 7 sections covering decision tree, visual vocabulary, prompt template, generation workflow, polish process, Remotion integration, quality examples
+- Added Track D (SVG Illustrations) to PRODUCTION_PIPELINE.md
+- Built visual vocabulary: canonical representations for actors, nations, institutions, flows, chokepoints, data, conflict indicators
+- Tested vocabulary with EP01 supply chain illustration — iterated through 4 versions: v1 (flag icons, curved lines — both failed), v2 (brackets/triangles as chokepoints — too noisy), v3 (curves still disconnecting from nodes), v4 (straight lines, inline control box — clean)
+- Decided: Claude SVG only (raster APIs tabled), straight lines over curves, no flag icons, labeled box for chokepoints
+- Added decisions D33-D35
+- Pivoted to expanding Remotion templates after identifying Claude SVG's fundamental limitation (blind spatial reasoning)
+- Scoped 5 new Remotion templates in NEW_TEMPLATES_SPEC.md: NetworkDiagram, TimeSeriesChart, SankeyFlow, GameBoard, PhotoMontage
+- Designed layout preset system for NetworkDiagram (Claude picks topology, template computes coordinates)
+- Researched and decided on Mapbox GL + deck.gl to replace react-simple-maps for broadcast-quality maps (D36)
+- Added Section 0 (Map Infrastructure Migration) to NEW_TEMPLATES_SPEC.md — custom Meridian Dark style, terrain/bathymetry, deck.gl layers, camera animation patterns, Remotion GPU rendering config
+- Built all 5 new templates (NetworkDiagram, TimeSeriesChart, SankeyFlow, GameBoard, PhotoMontage) + shared utilities (layoutPresets, drawLine, countUp)
+- Installed mapbox-gl v3, react-map-gl v8, deck.gl v9 — completed full Mapbox GL migration
+- Rewrote MapGL component with real react-map-gl implementation (DeckGLOverlay, terrain, delayRender lifecycle)
+- Rewrote ChoroplethMap: Mapbox vector tile country boundaries (country-boundaries-v1 tileset), dynamic Mapbox expressions for per-frame color animation, camera interpolation between phases
+- Rewrote RouteAnimation: deck.gl ArcLayer for 3D great-circle routes, ScatterplotLayer for point glow, react-map-gl Marker for labels, camera interpolation per phase
+- Added scaleToZoom() to mapUtils for backward-compatible center/scale → Mapbox camera conversion
+- Added optional `camera` field to RoutePhase type (preferred over legacy center/scale)
+- TypeScript compiles clean across all 17 templates + shared infrastructure
+
+**Key insights:**
+- Claude SVG's sweet spot is "information that happens to be beautiful" — lean into geometric/diagrammatic strengths, don't push toward organic/artistic
+- Straight lines are dramatically more reliable than curves in Claude-generated SVG — bezier endpoints consistently misalign with node edges
+- Visual vocabulary is more impactful than prompt templates — it defines WHAT things look like (reusable), while prompts define HOW to generate (per-instance)
+- Small decorative elements (flag icons, triangle gates, complex polygons) read as noise at video resolution — simplify to circles, rectangles, hexagons, and lines
+- The asset-source skill's key differentiator is "treatment survivability" scoring — predicting how images survive the duotone pipeline is something baseline Claude doesn't systematize
+- The core Claude SVG problem is spatial reasoning without visual feedback — no prompt template fixes this. Better strategy: separate data generation (Claude's strength) from visual rendering (Remotion's strength)
+- react-simple-maps is fundamentally 2D SVG with flat fills — no terrain, bathymetry, or 3D. For a geopolitics channel where maps are the workhorse visual, the quality floor must be higher
+- Mapbox's country-boundaries-v1 tileset + match expressions is cleaner than loading external GeoJSON — the base map already has the geometry, we just overlay colors via style expressions
+- react-map-gl v8 re-exports from subpath `react-map-gl/mapbox` (not root import) — critical for correct Mapbox GL binding
+- deck.gl ArcLayer `greatCircle: true` gives visually compelling 3D trade route arcs that far exceed the old flat SVG lines
+- scaleToZoom() piecewise interpolation avoids breaking existing data files — old center/scale fields still work, new camera field is opt-in
+
 ### Session 7 — April 26, 2026
 **Topics covered:**
 - Evaluated 18 visual identity directions from Claude Design
@@ -286,3 +347,83 @@ The positioning matrix confirms the niche is differentiated, but the research do
 - Updated project docs (CLAUDE.md, DECISIONS.md, POLISH.md)
 
 **Key insight:** The channel's core mechanic (the "parallel" — juxtaposing historical precedent with present) wasn't visually encoded in any initial direction. This led to incorporating the Dialectic direction's vertical split into the Antipode variant. The dual-mode solution resolved the tension between cinematic in-video feel (dark) and editorial credibility (light) by sharing the same palette DNA across both registers.
+
+### D38: Warm umber palette (replacing cold navy)
+**Date:** April 26, 2026
+**Rationale:** The original dark-mode palette was built on a cold navy base (#1A1A2E ink, #0D0D1A bg). After testing identity directions from the Structural Parallels exploration (18 directions evaluated), Tiger felt the cold blue-black was "way too dark" and wanted a warmer, more sophisticated feel. Evaluated Broadsheet (warm paper), Dossier (intelligence file), and Telemetry (data-forward) directions. Chose a hybrid "warm-dark" approach: shift dark backgrounds from blue undertone to brown/umber undertone while keeping the same darkness level and all accent colors unchanged. This preserves the cinematic feel while evoking "candlelit war room" instead of "cold surveillance center."
+**Decision:** Replace cold navy darks with warm umber equivalents:
+- `ink`: #1A1A2E → #1C1814 (warm espresso)
+- `midnight`: #252540 → #2A2520 (warm walnut)
+- `bg.dark.base`: #0D0D1A → #12100E
+- `bg.dark.map`: #141428 → #1A1612
+- `text.dark.muted`: #6A6458 → #7A6E60
+- Map ocean/border/waterLabel updated to warm equivalents
+- All accents unchanged: amber, rust, bone, paper, oxblood, olive, bronze
+**Scope:** Full rebrand — BRAND.md, theme.ts, Mapbox Studio guide. Templates inherit via theme tokens.
+
+### D39: Light mode as primary visual register
+**Date:** April 27, 2026
+**Rationale:** Tiger wants a lighter, more editorial feel — "i dont like dark tone background and stuff." The original system used Dark as in-video and Light as editorial/social. Flipping to Light-primary gives the channel a distinctive paper-tone Dossier/Broadsheet look that stands out from the sea of dark-mode video essays.
+**Decision:** Light mode is now the primary visual register for all in-video content:
+- Background.tsx defaults to `variant="light"` (paper bg + subtle atmosphere)
+- All 17+ templates reference `light.text.*` and `light.bg.*` as default
+- Mapbox style switched from dark-v11 to light-v11 base
+- Accents: `oxblood` (light mode accent) replaces `amber` (dark mode accent) as primary
+- Dark mode retained as secondary option via `backgroundVariant: "dark"` data prop
+- Templates with dual-mode support (TimeSeriesChart, SplitComposition, ImageComposite) correctly handle both via `isDark` / `bgVariant` ternary logic
+**Scope:** Background.tsx, MapGL, all templates (bulk sed + manual fixes), MAPBOX_STUDIO_GUIDE.md, BRAND.md, theme.ts.
+
+---
+
+### Session 8 — April 26, 2026 (continued)
+**Topics covered:**
+- Built research-audit skill (7 lenses, explicit verdict criteria, tested on 3 briefs)
+- Designed two-column production script format (SCRIPT_FORMAT.md)
+- Built Python CLI image treatment pipeline (tools/brand-treatment/treat.py)
+- Built Remotion BrandImage component (SVG filter chains)
+- Built asset sourcing tool (tools/asset-source/source.py — Pexels/Pixabay/Unsplash)
+- Converted EP01 script to v4 production format (24 Remotion, 16 stock, 5 archival)
+- Generated machine-readable shot-list.json (21 assets)
+- Verified all tools for bugs: treat.py (preview filename collision fixed), source.py (clean), BrandImage.tsx (clean), script-v4 consistency (2 issues fixed: missing DeepSeek asset in shot list, title card count ×5→×4)
+- Rewrote PRODUCTION_PIPELINE.md — replaced aspirational agent descriptions with actual tools, skills, file paths, and handoff steps
+- Created project-level CLAUDE.md for session orientation
+- Fixed stale content across all project docs (remotion CLAUDE.md, LESSONS.md, IDEAS.md, PROJECT_VISION.md, DECISIONS.md)
+
+**Key insights:**
+- Quality-gate skills need explicit verdict criteria with hard triggers — without them, the model defaults to the middle option (CONDITIONAL) for everything
+- The 60-70% "asset gap" in video production (stock footage, B-roll, archival images that templates don't cover) was the critical missing piece between "script done" and "video producible"
+- Documentation drift is a real problem — PRODUCTION_PIPELINE.md described agents that never existed while the actual tools went undocumented. Regular doc audits are essential.
+
+### Session 9 — April 26, 2026 (continued)
+**Topics covered:**
+- Built assembly manifest JSON schema (`assembly-manifest.schema.json`) — segment types, layer model, treatment/asset/template references
+- Built assembly manifest generator (`tools/assembly/generate_manifest.py`) — parses script right column, estimate + Whisper precise modes
+- Built full-episode Remotion composition (`FullEpisode.tsx` + `EP01Full.tsx`) — manifest-driven, renders complete video
+- Generated EP01 assembly manifest: 53 segments (17 footage, 4 image, 24 template, 6 transition, 2 hold), 13.1 min estimate
+- Registered `EP01-Full` composition alongside existing `EP01` in Remotion Studio
+- TypeScript compilation verified (zero errors including --strict mode)
+- Updated CLAUDE.md, PRODUCTION_PIPELINE.md, DECISIONS.md
+
+**Key insights:**
+- The script's two-column format is the right abstraction for the manifest generator — each table row = narration + simultaneous visual, which maps cleanly to the assembly model
+- Timing model matters: visual segments accompany narration (simultaneous), not follow it (sequential). First implementation had 8.9 min because it was summing visual durations; corrected to 13.1 min by using narration word count as the clock
+- Estimate mode runs ~73% of actual duration (150 WPM without pauses vs real narration with dramatic beats). This is consistent and predictable — Whisper precise mode will fix it
+- "THEN" chains in visual specs (multi-part B-roll in one cell) need special handling — split into sub-segments sharing the row's time allocation
+
+### Session 10 — April 26-27, 2026 (continued)
+**Topics covered:**
+- Built 5 new Remotion templates (NetworkDiagram, TimeSeriesChart, SankeyFlow, GameBoard, PhotoMontage)
+- Completed Mapbox GL migration: MapGL shared component (react-map-gl v8 + deck.gl v9), ChoroplethMap (vector tiles), RouteAnimation (ArcLayer + Markers)
+- Built mapUtils (hexToRgba, scaleToZoom, CameraState, cameraPresets, interpolateCamera, cameraMoves)
+- Created Mapbox Studio Meridian Dark style setup guide (MAPBOX_STUDIO_GUIDE.md)
+- Evaluated 18 identity directions from Structural Parallels PDF
+- Executed full palette rebrand: cold navy → warm umber (D38)
+- Updated BRAND.md, theme.ts, MAPBOX_STUDIO_GUIDE.md with new warm palette values
+
+**Key insights:**
+- react-map-gl v8 requires `react-map-gl/mapbox` subpath import (not root)
+- DeckGLOverlay pattern: `useControl<MapboxOverlay>` bridge is the cleanest way to combine Mapbox GL with deck.gl layers
+- Mapbox country-boundaries-v1 vector tileset is superior to deck.gl GeoJsonLayer for country fills (no external GeoJSON needed, sharp at all zooms)
+- scaleToZoom() piecewise interpolation handles legacy react-simple-maps data files without migration
+- Warm palette shift (blue→brown undertone at same darkness) dramatically changes the emotional register without breaking any accent or text contrast relationships
+- Templates don't need individual color updates when dark-mode tokens are defined in theme.ts — everything propagates through the token system

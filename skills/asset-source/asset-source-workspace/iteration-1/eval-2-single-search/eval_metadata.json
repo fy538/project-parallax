@@ -1,0 +1,12 @@
+{
+  "eval_id": 2,
+  "eval_name": "single-search-aerial",
+  "prompt": "Find me 5 options for aerial shots of semiconductor factories in the desert. This is for the opening of a video about US chip manufacturing policy. Treatment will be standard (ink → bronze → amber duotone).",
+  "assertions": [
+    "Generates reasonable search terms from the ad-hoc description",
+    "Attempts to run source.py or acknowledges network limitations",
+    "Mentions treatment survivability as a scoring factor",
+    "Notes that high-contrast architectural/industrial shots will survive duotone best",
+    "Presents results in a ranked format (table or numbered list with scores)"
+  ]
+}

@@ -44,4 +44,19 @@ export interface DataChartData {
   source?: string;
   /** Total duration in seconds. */
   durationSec?: number;
+
+  // ── Information Design (POLISH Layer 1) ────────────────────────────────
+  /** Optional horizontal reference line — e.g. a target, threshold, or comparison baseline. */
+  referenceLine?: {
+    value: number;
+    label: string;
+    /** Defaults to dashed amber. */
+    color?: string;
+  };
+  /** Index of the "hero" bar to visually emphasize (accent glow + larger label). -1 = none. */
+  highlightIndex?: number;
+  /** Context note shown below the chart — one sentence framing what the data means. */
+  contextNote?: string;
+  /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
+  backgroundTint?: string;
 }

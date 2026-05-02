@@ -15,7 +15,7 @@ Last updated: April 26, 2026
 
 | # | Format | Working Title | Thesis / Hook | Status |
 |---|---|---|---|---|
-| EP01 | Detective | The Silicon Trap | America bet $280B it caneli— why the semiconductor war is a trap both sides are walking into with eyes open. | ✅ Script v3 finalized |
+| EP01 | Detective | The Silicon Trap | America bet $280B it caneli— why the semiconductor war is a trap both sides are walking into with eyes open. | ✅ Script v4 (production format), shot list ready, awaiting visual-spec regen + asset sourcing |
 | EP02 | Philosopher's Lens | Why Technological Blockades Always Leak | Tragedy of the commons + COCOM history → export controls are structurally porous, and they always have been. | 💡 Raw idea |
 | EP03 | Dialectic | Is AI the New Nuclear Weapon? | Thesis: winner-take-all strategic asset. Antithesis: diffuses like electricity. Synthesis: the real question is whether AI concentrates or distributes *decision-making power*. | 💡 Raw idea |
 | EP04 | Time Collapse | The Ghosts of COCOM | 1949 and 2024 intercut — the Cold War technology denial regime and its modern echo. How similar are the mechanics? Where does the analogy break? | 💡 Raw idea |

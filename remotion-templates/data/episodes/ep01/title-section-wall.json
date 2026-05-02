@@ -3,7 +3,9 @@
   "variant": "section",
   "sectionNumber": "III",
   "sectionTitle": "The Other Side of the Wall",
+  "subtitle": "卡脖子",
   "accentColor": "#C23B22",
+  "backgroundTint": "#C23B22",
   "backgroundVariant": "dark",
-  "durationSec": 3
+  "durationSec": 2
 }

@@ -26,13 +26,17 @@ import {
 } from "remotion";
 import {
   palette,
-  dark,
   fonts,
   fontSizes,
   fontWeights,
   letterSpacing,
   layout,
   sec,
+  light,
+  shadows,
+  contentArea,
+  cardPadding,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -40,6 +44,9 @@ import {
   stagger,
   exitFade,
   pulse,
+  slideIn,
+  kenBurnsDrift,
+  CLAMP,
 } from "../../utils/animation";
 import { contentShadow, accentGlow } from "../../utils/depth";
 import { Background } from "../../components/Background";
@@ -158,7 +165,7 @@ const TreeNodeComponent: React.FC<TreeNodeComponentProps> = React.memo(({
     frame,
     [startFrame, startFrame + sec(0.4)],
     [0.8, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP
   );
   const exitOp = exitFade(frame, totalFrames, 15);
 
@@ -168,8 +175,8 @@ const TreeNodeComponent: React.FC<TreeNodeComponentProps> = React.memo(({
     : 1.0;
 
   // Choose color
-  const bgColor = node.color || (isHighlighted ? palette.amber : dark.bg.elevated);
-  const textColor = isHighlighted ? dark.text.primary : dark.text.primary;
+  const bgColor = node.color || (isHighlighted ? palette.amber : light.bg.elevated);
+  const textColor = isHighlighted ? light.text.primary : light.text.primary;
 
   return (
     <div
@@ -232,8 +239,8 @@ const TreeNodeComponent: React.FC<TreeNodeComponentProps> = React.memo(({
             fontSize: fontSizes.caption,
             fontFamily: fonts.body,
             fontWeight: fontWeights.medium,
-            color: dark.text.muted,
-            backgroundColor: dark.bg.surface,
+            color: light.text.muted,
+            backgroundColor: light.bg.surface,
             padding: "2px 8px",
             borderRadius: 4,
             whiteSpace: "nowrap",
@@ -255,7 +262,7 @@ const TreeNodeComponent: React.FC<TreeNodeComponentProps> = React.memo(({
             fontFamily: fonts.body,
             fontWeight: fontWeights.medium,
             color: palette.amber,
-            backgroundColor: dark.bg.surface,
+            backgroundColor: light.bg.surface,
             padding: "2px 8px",
             borderRadius: 4,
             whiteSpace: "nowrap",
@@ -292,11 +299,11 @@ const EdgeComponent: React.FC<EdgeComponentProps> = React.memo(({
     frame,
     [startFrame, startFrame + sec(0.5)],
     [200, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP
   );
   const exitOp = exitFade(frame, totalFrames, 15);
 
-  const strokeColor = isHighlighted ? (highlightColor || palette.amber) : dark.text.muted;
+  const strokeColor = isHighlighted ? (highlightColor || palette.amber) : light.text.muted;
   const strokeWidth = isHighlighted ? 3 : 2;
   const strokeOpacity = isHighlighted ? 0.8 : 0.4;
 
@@ -357,16 +364,17 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   );
 
   const highlightColor = data.highlightColor || palette.amber;
-  const backgroundVariant = data.backgroundVariant || "dark";
+  const backgroundVariant = data.backgroundVariant || "light";
 
-  // Title animation
+  // Title animation — slideIn replaces naked fade
   const titleOpacity = fadeIn(frame, 0, sec(0.6));
   const titleScale = interpolate(
     frame,
     [0, sec(0.6)],
     [0.9, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP
   );
+  const titleSlide = slideIn(frame, 0, 20, sec(0.6));
 
   // Build edge list: for each node, create edges to children
   const edges: Array<{
@@ -414,7 +422,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
           left: layout.safeArea.left,
           right: layout.safeArea.right,
           opacity: titleOpacity,
-          transform: `scale(${titleScale})`,
+          transform: `scale(${titleScale}) translateY(${titleSlide}px)`,
           transformOrigin: "top left",
         }}
       >
@@ -423,8 +431,9 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
             fontSize: fontSizes.h2,
             fontFamily: fonts.display,
             fontWeight: fontWeights.bold,
-            color: dark.text.primary,
-            margin: "0 0 8px 0",
+            color: light.text.primary,
+            margin: 0,
+            marginBottom: layout.spacing.xs,
             letterSpacing: letterSpacing.h2,
           }}
         >
@@ -435,7 +444,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
             style={{
               fontSize: fontSizes.body,
               fontFamily: fonts.display,
-              color: dark.text.secondary,
+              color: light.text.secondary,
               margin: 0,
               letterSpacing: letterSpacing.body,
             }}
@@ -445,7 +454,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         )}
       </div>
 
-      {/* ── Tree container (positioned for nodes & edges) ────────── */}
+      {/* ── Tree container — Ken Burns drift for camera energy ───── */}
       <div
         style={{
           position: "absolute",
@@ -453,6 +462,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
           left: layout.safeArea.left,
           right: layout.safeArea.right,
           bottom: layout.safeArea.bottom,
+          transform: `scale(${kenBurnsDrift(frame, totalFrames, 1.02)})`,
+          transformOrigin: "center center",
         }}
       >
         {/* SVG edges layer (behind nodes) */}
@@ -479,7 +490,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 <path
                   key={`edge-${i}`}
                   d={edge.pathData}
-                  stroke={dark.text.muted}
+                  stroke={light.text.muted}
                   strokeWidth={2}
                   fill="none"
                   strokeDasharray="6 4"
@@ -487,7 +498,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     frame,
                     [startFrame, startFrame + sec(0.5)],
                     [200, 0],
-                    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                    CLAMP
                   )}
                   opacity={
                     fadeIn(frame, startFrame, sec(0.3)) *
@@ -531,7 +542,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       frame,
                       [startFrame, startFrame + sec(0.5)],
                       [200, 0],
-                      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                      CLAMP
                     )}
                     opacity={
                       fadeIn(frame, startFrame, sec(0.3)) *
@@ -572,33 +583,35 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         </div>
       </div>
 
-      {/* ── Source attribution ────────────────────────────────────– */}
+      {/* ── Source attribution — slideIn (no naked fade) ───────────– */}
       {data.source && (
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeArea.bottom + 20,
+            bottom: layout.safeArea.bottom + layout.spacing.md,
             left: layout.safeArea.left,
             fontSize: fontSizes.caption,
-            color: dark.text.muted,
+            color: light.text.muted,
             opacity: fadeIn(frame, 0, sec(1)),
+            transform: `translateY(${slideIn(frame, 0, 10, sec(0.8))}px)`,
           }}
         >
           {data.source}
         </div>
       )}
 
-      {/* ── Episode label ───────────────────────────────────────── */}
+      {/* ── Episode label — slideIn (no naked fade) ─────────────── */}
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeArea.bottom + 20,
+          bottom: layout.safeArea.bottom + layout.spacing.md,
           right: layout.safeArea.right,
           fontSize: fontSizes.label,
-          color: dark.text.muted,
+          color: light.text.muted,
           letterSpacing: letterSpacing.label,
           textTransform: "uppercase",
           opacity: fadeIn(frame, 0, sec(1)),
+          transform: `translateY(${slideIn(frame, 0, 10, sec(0.8))}px)`,
         }}
       >
         {data.episode}

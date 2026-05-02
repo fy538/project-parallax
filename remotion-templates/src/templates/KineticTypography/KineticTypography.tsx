@@ -1,12 +1,16 @@
 /**
  * KineticTypography — animated quotes, definitions, bilingual text, and statistics.
  *
- * Four variants:
- * - "quote": Big text with attribution, word-by-word reveal
- * - "definition": Term + pinyin + translation + definition
- * - "bilingual": Chinese text above, English below
- * - "statistic": Large number with label and context
+ * Cinematic overhaul v2:
+ * - Parallax depth layers: elements drift at different rates (quote mark 1.5×, text 1.0×, attribution 0.6×)
+ * - Eased Chinese character stagger (logarithmic fast→slow)
+ * - Dividers: scaleX from center with ease-out
+ * - Count-up overshoot on statistics (102%→100% settle)
+ * - Smooth bloom envelope (no hard seam)
+ * - No naked fades — all elements get slideIn
+ * - Stat numbers use Space Grotesk (warmer editorial feel)
  *
+ * Four variants: quote, definition, bilingual, statistic
  * EP01 use cases: Morris Chang quote, 卡脖子 definition, key statistics.
  */
 
@@ -15,14 +19,61 @@ import {
   AbsoluteFill,
   useCurrentFrame,
   interpolate,
-  Easing,
 } from "remotion";
-import { palette, dark, semantic, fonts, fontSizes, layout, sec } from "../../design/theme";
-import { fadeIn, slideIn } from "../../utils/animation";
+import { palette, light, semantic, fonts, fontSizes, layout, sec, gradients, shadows, textMaxWidth } from "../../design/theme";
+import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, stagger, scaleReveal, bloomIntensity, CLAMP, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { Background } from "../../components/Background";
 import { AnimatedText } from "../../components/AnimatedText";
 import type { QuoteData } from "./types";
+
+// ── Smooth bloom: single 3-point curve ────────────────────────────────────
+
+const smoothBloom = (
+  frame: number,
+  startFrame: number,
+  riseDuration: number,
+  sustainLevel: number = 0.5,
+): number => {
+  const peakFrame = startFrame + riseDuration;
+  const settleFrame = peakFrame + riseDuration * 2;
+  return interpolate(
+    frame,
+    [startFrame, peakFrame, settleFrame],
+    [0, 1, sustainLevel],
+    CLAMP
+  );
+};
+
+// ── Parallax drift: differential Ken Burns per layer ──────────────────────
+// Rate multiplier controls how fast each layer drifts.
+// >1 = foreground (moves more), <1 = background (moves less).
+
+const parallaxDrift = (
+  frame: number,
+  totalFrames: number,
+  rateMultiplier: number = 1.0,
+  maxScale: number = 1.02,
+): number => {
+  const drift = kenBurnsDrift(frame, totalFrames, maxScale);
+  // Scale the drift amount by the rate multiplier
+  const baseAmount = drift - 1.0; // how much above 1.0
+  return 1.0 + baseAmount * rateMultiplier;
+};
+
+// ── Divider scaleX from center ────────────────────────────────────────────
+
+const dividerScale = (
+  frame: number,
+  startFrame: number,
+  duration: number,
+): number =>
+  interpolate(
+    frame,
+    [startFrame, startFrame + duration],
+    [0, 1],
+    CLAMP_QUAD
+  );
 
 // ── Quote variant ──────────────────────────────────────────────────────────
 
@@ -31,54 +82,105 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const accentColor = data.accentColor || palette.amber;
+  const totalFrames = sec(data.durationSec || 5);
+
+  // Cinematic scale reveal for the quote mark
+  const quoteMarkScale = scaleReveal(frame, 0, sec(0.6), 1.4, 1.0);
+  const quoteMarkOpacity = fadeIn(frame, 0, sec(0.3));
+
+  // Hero spring entrance for quote container
+  const heroSpringValue = heroSpring(frame, sec(0.3), sec(0.8));
+  const heroTranslateY = interpolate(heroSpringValue, [0, 1], [60, 0]);
+
+  // Exit fade in last 15 frames
+  const exitOpacity = exitFade(frame, totalFrames, 15);
+
+  // Smooth bloom behind quote mark
+  const quoteBloom = smoothBloom(frame, 0, sec(0.2), 0.4);
+
+  // ── Parallax depth layers ──
+  const quoteMarkDrift = parallaxDrift(frame, totalFrames, 1.5);   // foreground — moves more
+  const textDrift = parallaxDrift(frame, totalFrames, 1.0);        // mid-ground
+  const attributionDrift = parallaxDrift(frame, totalFrames, 0.6); // background — moves less
 
   return (
     <div
       style={{
         position: "absolute",
         top: layout.safeArea.top,
-        left: layout.safeArea.left + 60,
-        right: layout.safeArea.right + 60,
+        left: layout.safeArea.left + layout.spacing.xxl,
+        right: layout.safeArea.right + layout.spacing.xxl,
         bottom: layout.safeArea.bottom,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        opacity: exitOpacity,
       }}
     >
-      {/* Opening quote mark */}
+      {/* Bloom behind quote mark — smooth envelope */}
+      <div
+        style={{
+          position: "absolute",
+          top: "35%",
+          left: layout.safeArea.left,
+          width: 200,
+          height: 200,
+          background: `radial-gradient(circle, ${accentColor}20 0%, transparent 70%)`,
+          opacity: quoteBloom,
+          filter: "blur(40px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Opening quote mark — parallax foreground layer (1.5× drift) */}
       <div
         style={{
           fontSize: 160,
           color: accentColor,
-          opacity: fadeIn(frame, 0, sec(0.3)),
+          opacity: quoteMarkOpacity,
           fontFamily: "Georgia, serif",
           lineHeight: 0.6,
-          marginBottom: 20,
+          marginBottom: layout.spacing.md,
+          transform: `scale(${quoteMarkScale * quoteMarkDrift})`,
+          transformOrigin: "left center",
+          textShadow: `0 0 40px ${accentColor}40`,
         }}
       >
         &ldquo;
       </div>
 
-      {/* Quote text — word-by-word reveal */}
-      <AnimatedText
-        text={data.text || ""}
-        startFrame={sec(0.3)}
-        framesPerUnit={3}
-        mode="word"
-        fontSize={fontSizes.h1}
-        fontFamily={fonts.heading}
-        color={dark.text.primary}
-        fontWeight={500}
-        style={{ lineHeight: 1.4, maxWidth: 1400 }}
-      />
+      {/* Quote text — mid-ground layer (1.0× drift) */}
+      <div
+        style={{
+          transform: `translateY(${heroTranslateY}px) scale(${textDrift})`,
+          transformOrigin: "left center",
+        }}
+      >
+        <AnimatedText
+          text={data.text || ""}
+          startFrame={sec(0.3)}
+          framesPerUnit={3}
+          mode="word"
+          fontSize={fontSizes.h1}
+          fontFamily={fonts.heading}
+          color={light.text.primary}
+          fontWeight={500}
+          style={{
+            lineHeight: 1.4,
+            maxWidth: 1400,
+            textShadow: "0 2px 6px rgba(0,0,0,0.6)",
+          }}
+        />
+      </div>
 
-      {/* Attribution */}
+      {/* Attribution — background layer (0.6× drift) */}
       {data.attribution && (
         <div
           style={{
-            marginTop: 48,
+            marginTop: layout.spacing.xl,
             opacity: fadeIn(frame, sec(2.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(2.5), 16, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, sec(2.5), 30, sec(0.6))}px) scale(${attributionDrift})`,
+            transformOrigin: "left center",
           }}
         >
           <div
@@ -86,6 +188,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
               fontSize: fontSizes.h3,
               color: accentColor,
               fontWeight: 500,
+              textShadow: `0 0 20px ${accentColor}30, 0 1px 3px rgba(0,0,0,0.5)`,
             }}
           >
             — {data.attribution}
@@ -94,8 +197,11 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
             <div
               style={{
                 fontSize: fontSizes.body,
-                color: dark.text.muted,
-                marginTop: 8,
+                color: light.text.muted,
+                marginTop: layout.spacing.xs,
+                opacity: fadeIn(frame, sec(2.8), sec(0.4)),
+                transform: `translateY(${slideIn(frame, sec(2.8), 8, sec(0.4))}px)`,
+                textShadow: shadows.textLift,
               }}
             >
               {data.attributionContext}
@@ -114,89 +220,109 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const accentColor = data.accentColor || semantic.highlight;
+  const totalFrames = sec(data.durationSec || 5.5);
+
+  // Exit fade in last 15 frames
+  const exitOpacity = exitFade(frame, totalFrames, 15);
+
+  // ── Parallax depth layers ──
+  const termDrift = parallaxDrift(frame, totalFrames, 1.3);        // term is dominant
+  const supportDrift = parallaxDrift(frame, totalFrames, 0.7);     // supporting text recedes
 
   return (
     <div
       style={{
         position: "absolute",
         top: layout.safeArea.top,
-        left: layout.safeArea.left + 60,
-        right: layout.safeArea.right + 60,
+        left: layout.safeArea.left + layout.spacing.xxl,
+        right: layout.safeArea.right + layout.spacing.xxl,
         bottom: layout.safeArea.bottom,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
+        opacity: exitOpacity,
       }}
     >
-      {/* Term — large, character-by-character */}
-      <AnimatedText
-        text={data.term || ""}
-        startFrame={sec(0.2)}
-        framesPerUnit={6}
-        mode="character"
-        fontSize={120}
-        fontFamily={fonts.chinese}
-        color={dark.text.primary}
-        fontWeight={700}
-      />
+      {/* Term — large, character-by-character with eased stagger + parallax */}
+      <div style={{ transform: `scale(${termDrift})`, transformOrigin: "left center" }}>
+        <AnimatedText
+          text={data.term || ""}
+          startFrame={sec(0.2)}
+          framesPerUnit={6}
+          mode="character"
+          fontSize={120}
+          fontFamily={fonts.chinese}
+          color={light.text.primary}
+          fontWeight={700}
+          easedStagger
+          style={{
+            textShadow: shadows.textLift,
+          }}
+        />
+      </div>
 
-      {/* Pinyin */}
+      {/* Pinyin — slideIn (was naked fade) + parallax background */}
       {data.termPinyin && (
         <div
           style={{
             fontSize: fontSizes.h3,
-            color: dark.text.muted,
+            color: light.text.muted,
             fontFamily: fonts.mono,
-            marginTop: 12,
+            marginTop: layout.spacing.sm,
             opacity: fadeIn(frame, sec(1), sec(0.4)),
+            transform: `translateY(${slideIn(frame, sec(1), 8, sec(0.4))}px) scale(${supportDrift})`,
+            transformOrigin: "left center",
+            textShadow: shadows.textLift,
           }}
         >
           {data.termPinyin}
         </div>
       )}
 
-      {/* Translation */}
+      {/* Translation — slideIn + parallax */}
       {data.termTranslation && (
         <div
           style={{
             fontSize: fontSizes.h2,
             color: accentColor,
             fontWeight: 600,
-            marginTop: 20,
+            marginTop: layout.spacing.md,
             opacity: fadeIn(frame, sec(1.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px) scale(${supportDrift})`,
+            transformOrigin: "left center",
+            textShadow: shadows.textLift,
           }}
         >
           {data.termTranslation}
         </div>
       )}
 
-      {/* Divider */}
+      {/* Divider — scaleX from center (replaces linear width draw) */}
       <div
         style={{
-          width: interpolate(
-            frame,
-            [sec(2), sec(2.5)],
-            [0, 200],
-            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-          ),
+          width: 200,
           height: 2,
           backgroundColor: accentColor,
-          marginTop: 32,
-          marginBottom: 32,
+          marginTop: layout.spacing.lg,
+          marginBottom: layout.spacing.lg,
+          transform: `scaleX(${dividerScale(frame, sec(2), sec(0.5))})`,
+          transformOrigin: "left center",
+          opacity: fadeIn(frame, sec(2), sec(0.3)),
         }}
       />
 
-      {/* Definition text */}
+      {/* Definition text — slideIn + parallax background */}
       {data.definitionText && (
         <div
           style={{
             fontSize: fontSizes.body,
-            color: dark.text.primary,
+            color: light.text.primary,
             lineHeight: 1.6,
             maxWidth: 1100,
             opacity: fadeIn(frame, sec(2.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(2.5), 20, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, sec(2.5), 20, sec(0.5))}px) scale(${supportDrift})`,
+            transformOrigin: "left center",
+            textShadow: shadows.textLift,
           }}
         >
           {data.definitionText}
@@ -213,63 +339,81 @@ const BilingualVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const accentColor = data.accentColor || palette.amber;
+  const totalFrames = sec(data.durationSec || 5.5);
+
+  // Exit fade in last 15 frames
+  const exitOpacity = exitFade(frame, totalFrames, 15);
+
+  // ── Parallax depth layers (differential drift) ──
+  const chineseDrift = parallaxDrift(frame, totalFrames, 1.3);  // Chinese = primary, drifts more
+  const englishDrift = parallaxDrift(frame, totalFrames, 0.7);  // English = secondary, drifts less
 
   return (
     <div
       style={{
         position: "absolute",
         top: layout.safeArea.top,
-        left: layout.safeArea.left + 60,
-        right: layout.safeArea.right + 60,
+        left: layout.safeArea.left + layout.spacing.xxl,
+        right: layout.safeArea.right + layout.spacing.xxl,
         bottom: layout.safeArea.bottom,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        gap: 40,
+        gap: layout.spacing.xl,
+        opacity: exitOpacity,
       }}
     >
-      {/* Chinese text */}
+      {/* Chinese text — eased stagger + parallax foreground */}
       {data.chineseText && (
-        <AnimatedText
-          text={data.chineseText}
-          startFrame={sec(0.3)}
-          framesPerUnit={5}
-          mode="character"
-          fontSize={fontSizes.h1}
-          fontFamily={fonts.chinese}
-          color={dark.text.primary}
-          fontWeight={600}
-          style={{ lineHeight: 1.5 }}
-        />
+        <div style={{ transform: `scale(${chineseDrift})`, transformOrigin: "left center" }}>
+          <AnimatedText
+            text={data.chineseText}
+            startFrame={sec(0.3)}
+            framesPerUnit={5}
+            mode="character"
+            fontSize={fontSizes.h1}
+            fontFamily={fonts.chinese}
+            color={light.text.primary}
+            fontWeight={600}
+            easedStagger
+            style={{
+              lineHeight: 1.5,
+              textShadow: shadows.textLift,
+            }}
+          />
+        </div>
       )}
 
-      {/* Divider */}
+      {/* Divider — scaleX from center */}
       <div
         style={{
-          width: interpolate(
-            frame,
-            [sec(1.5), sec(2)],
-            [0, 120],
-            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-          ),
+          width: 120,
           height: 2,
           backgroundColor: accentColor,
+          transform: `scaleX(${dividerScale(frame, sec(1.5), sec(0.5))})`,
+          transformOrigin: "left center",
+          opacity: fadeIn(frame, sec(1.5), sec(0.3)),
         }}
       />
 
-      {/* English text */}
+      {/* English text — parallax background layer */}
       {data.englishText && (
-        <AnimatedText
-          text={data.englishText}
-          startFrame={sec(2)}
-          framesPerUnit={3}
-          mode="word"
-          fontSize={fontSizes.h2}
-          fontFamily={fonts.heading}
-          color={dark.text.muted}
-          fontWeight={400}
-          style={{ lineHeight: 1.5 }}
-        />
+        <div style={{ transform: `scale(${englishDrift})`, transformOrigin: "left center" }}>
+          <AnimatedText
+            text={data.englishText}
+            startFrame={sec(2) + sec(0.15)}
+            framesPerUnit={3}
+            mode="word"
+            fontSize={fontSizes.h2}
+            fontFamily={fonts.heading}
+            color={light.text.muted}
+            fontWeight={400}
+            style={{
+              lineHeight: 1.5,
+              textShadow: shadows.textLift,
+            }}
+          />
+        </div>
       )}
     </div>
   );
@@ -282,84 +426,122 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const accentColor = data.accentColor || palette.amber;
+  const totalFrames = sec(data.durationSec || 5);
 
-  // Animate the number if it starts with digits
+  // Animate the number with overshoot-settle
   const rawValue = data.statValue || "0";
   const numericMatch = rawValue.match(/^([\d.]+)(.*)$/);
   let displayValue = rawValue;
+  const countUpEndFrame = sec(1.8);
+  const overshootAmount = 0.03; // 3% overshoot on the count itself
 
   if (numericMatch) {
     const targetNum = parseFloat(numericMatch[1]);
     const suffix = numericMatch[2]; // e.g., "%", "B", "nm"
+
+    // Count-up with overshoot: 0 → 103% → 100%
     const countProgress = interpolate(
       frame,
-      [sec(0.5), sec(1.8)],
-      [0, 1],
+      [sec(0.5), countUpEndFrame, countUpEndFrame + sec(0.3)],
+      [0, 1 + overshootAmount, 1],
       {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
-        easing: Easing.out(Easing.cubic),
       }
     );
+
     const currentNum =
       targetNum % 1 === 0
-        ? Math.round(targetNum * countProgress)
-        : (targetNum * countProgress).toFixed(1);
+        ? Math.round(targetNum * Math.min(countProgress, 1 + overshootAmount))
+        : (targetNum * Math.min(countProgress, 1 + overshootAmount)).toFixed(1);
     displayValue = `${currentNum}${suffix}`;
   }
+
+  // Cinematic scale reveal: number arrives at 130% and eases down
+  const revealScale = scaleReveal(frame, sec(0.2), sec(0.8), 1.3, 1.0);
+  // Micro-settle pulse after count-up — slightly stronger
+  const pulseScale = pulse(frame, countUpEndFrame, 9, 1.04);
+  // Smooth bloom behind the number
+  const bloom = smoothBloom(frame, sec(0.3), sec(0.3), 0.5);
+
+  // Exit fade in last 15 frames
+  const exitOpacity = exitFade(frame, totalFrames, 15);
 
   return (
     <div
       style={{
         position: "absolute",
         top: layout.safeArea.top,
-        left: layout.safeArea.left + 60,
-        right: layout.safeArea.right + 60,
+        left: layout.safeArea.left + layout.spacing.xxl,
+        right: layout.safeArea.right + layout.spacing.xxl,
         bottom: layout.safeArea.bottom,
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        opacity: exitOpacity,
       }}
     >
-      {/* Big number */}
+      {/* Light bloom — smooth radial glow */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: 500,
+          height: 300,
+          transform: "translate(-50%, -60%)",
+          background: `radial-gradient(ellipse at center, ${accentColor}30 0%, ${accentColor}10 40%, transparent 70%)`,
+          opacity: bloom,
+          filter: "blur(30px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Big number — Space Grotesk (warmer editorial feel, was mono) + overshoot + bloom */}
       <div
         style={{
           fontSize: 180,
           fontWeight: 700,
           color: accentColor,
-          fontFamily: fonts.mono,
-          opacity: fadeIn(frame, sec(0.3), sec(0.4)),
+          fontFamily: fonts.heading, // Space Grotesk — warmer than mono at this scale
+          opacity: fadeIn(frame, sec(0.2), sec(0.4)),
           lineHeight: 1,
+          textShadow: `0 0 60px ${accentColor}60, 0 0 120px ${accentColor}20`,
+          transform: `scale(${revealScale * pulseScale})`,
+          transformOrigin: "center",
         }}
       >
         {displayValue}
       </div>
 
-      {/* Label */}
+      {/* Label — slideIn (was always there, keeping consistent) */}
       {data.statLabel && (
         <div
           style={{
             fontSize: fontSizes.h2,
-            color: dark.text.primary,
+            color: light.text.primary,
             fontWeight: 500,
-            marginTop: 24,
+            marginTop: layout.spacing.md,
             opacity: fadeIn(frame, sec(1.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, sec(1.5), 30, sec(0.6))}px)`,
+            textShadow: shadows.textLift,
           }}
         >
           {data.statLabel}
         </div>
       )}
 
-      {/* Context */}
+      {/* Context — slideIn */}
       {data.statContext && (
         <div
           style={{
             fontSize: fontSizes.body,
-            color: dark.text.muted,
-            marginTop: 16,
+            color: light.text.muted,
+            marginTop: layout.spacing.sm,
             opacity: fadeIn(frame, sec(2.2), sec(0.5)),
+            transform: `translateY(${slideIn(frame, sec(2.2), 16, sec(0.5))}px)`,
+            textShadow: shadows.textLift,
           }}
         >
           {data.statContext}
@@ -374,10 +556,10 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
 export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation();
-  const bgVariant = data.backgroundVariant || "dark";
+  const bgVariant = data.backgroundVariant || "light";
 
   return (
-    <Background variant={bgVariant}>
+    <Background variant={bgVariant} tint={data.backgroundTint}>
       <AbsoluteFill style={compStyle}>
         {data.variant === "quote" && <QuoteVariant data={data} frame={frame} />}
         {data.variant === "definition" && (
@@ -390,17 +572,19 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
           <StatisticVariant data={data} frame={frame} />
         )}
 
-        {/* Episode label */}
+        {/* Episode label — slideIn (was naked fade) */}
         <div
           style={{
             position: "absolute",
             bottom: layout.safeArea.bottom,
             left: layout.safeArea.left,
             fontSize: fontSizes.label,
-            color: dark.text.muted,
+            color: light.text.muted,
             letterSpacing: 2,
             textTransform: "uppercase",
             opacity: fadeIn(frame, 0, sec(1)),
+            transform: `translateY(${slideIn(frame, 0, 10, sec(1))}px)`,
+            textShadow: shadows.textLift,
           }}
         >
           {data.episode}

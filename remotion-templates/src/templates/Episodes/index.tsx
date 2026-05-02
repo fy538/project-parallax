@@ -9,6 +9,9 @@ import { Composition } from "remotion";
 import { EP01 } from "./EP01";
 import { layout, sec } from "../../design/theme";
 
+// Re-export the full-episode composition
+export { EP01FullComposition } from "./EP01Full";
+
 // ── Duration calculation ──────────────────────────────────────────────────────
 
 // EP01 has 24 clips with 15-frame overlaps between them.

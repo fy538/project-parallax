@@ -99,6 +99,14 @@
       "notes": "Transition into DeepSeek section."
     },
     {
+      "id": "beat3-deepseek",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["DeepSeek AI logo", "Chinese AI company office", "DeepSeek artificial intelligence"],
+      "treatment": "standard",
+      "notes": "DeepSeek R1/R2 discussion. Logo preferred; fallback to generic Chinese AI lab imagery."
+    },
+    {
       "id": "beat3-wafer-macro",
       "priority": "P3",
       "type": "photo",

@@ -18,10 +18,10 @@
  *   - Left default accent: semantic.us (#3266AD)
  *   - Right default accent: semantic.china (#C23B22)
  *   - Tag color: side's accentColor
- *   - Title: dark.text.primary (bone)
- *   - Items: dark.text.secondary
- *   - Divider: dark.text.muted at 40% opacity
- *   - Divider label: dark.text.accent (amber)
+ *   - Title: light.text.primary (bone)
+ *   - Items: light.text.secondary
+ *   - Divider: light.text.muted at 40% opacity
+ *   - Divider label: light.text.accent (amber)
  *
  * Safe areas: 80px outer edges, 40px near divider
  */
@@ -32,7 +32,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
@@ -53,6 +52,8 @@ import {
   stagger,
   heroSpring,
   exitFade,
+  kenBurnsDrift,
+  CLAMP,
 } from "../../utils/animation";
 import { contentShadow, gradientDivider } from "../../utils/depth";
 import { Background } from "../../components/Background";
@@ -129,6 +130,7 @@ const SplitSideContent: React.FC<{
             marginBottom: layout.spacing.lg,
             fontFamily: fonts.body,
             opacity: fadeIn(frame, tagDelay, sec(0.4)),
+            transform: `translateY(${slideIn(frame, tagDelay, 10, sec(0.4))}px)`,
           }}
         >
           {data.tag}
@@ -148,6 +150,7 @@ const SplitSideContent: React.FC<{
           fontFamily: getFontFamily(data.title),
           lineHeight: lineHeight.h2,
           opacity: fadeIn(frame, titleDelay, sec(0.5)),
+          transform: `translateY(${slideIn(frame, titleDelay, 16, sec(0.5))}px)`,
         }}
       >
         {data.title}
@@ -165,6 +168,7 @@ const SplitSideContent: React.FC<{
             fontFamily: getFontFamily(data.subtitle),
             lineHeight: lineHeight.body,
             opacity: fadeIn(frame, titleDelay + 4, sec(0.4)),
+            transform: `translateY(${slideIn(frame, titleDelay + 4, 12, sec(0.4))}px)`,
           }}
         >
           {data.subtitle}
@@ -219,7 +223,7 @@ export const SplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const { style: compStyle } = useCompositionAnimation({ noExit: true });
   const { durationInFrames: totalFrames } = useVideoConfig();
 
-  const isDark = data.backgroundVariant !== "light";
+  const isDark = data.backgroundVariant === "dark";
   const mode = isDark ? dark : light;
 
   const leftAccent = data.left.accentColor || semantic.us;
@@ -238,7 +242,7 @@ export const SplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [dividerStartFrame, dividerStartFrame + dividerDuration],
     [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP
   );
 
   // Divider label fade-in at frame 35
@@ -253,6 +257,8 @@ export const SplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   return (
     <Background variant={isDark ? "dark" : "light"}>
       <AbsoluteFill style={compStyle}>
+        {/* Ken Burns drift wrapper for camera energy */}
+        <AbsoluteFill style={{ transform: `scale(${kenBurnsDrift(frame, totalFrames, 1.02)})`, transformOrigin: "center center" }}>
         {/* Left half with tint */}
       {!data.noDivider && (
         <div
@@ -361,6 +367,7 @@ export const SplitComposition: React.FC<{ data: SplitCompositionData }> = ({
         </div>
       )}
 
+      </AbsoluteFill>
       {/* Metadata strip (optional) */}
       <MetadataStrip
         episodeNumber={data.episode ? parseInt(data.episode.replace(/\D/g, "")) : undefined}

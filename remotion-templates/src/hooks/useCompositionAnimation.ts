@@ -31,10 +31,28 @@ interface CompositionAnimationOptions {
   exitFrames?: number;
   /** Enter fade duration in frames. Default: 8 */
   enterFrames?: number;
-  /** Max scale for Ken Burns drift. 0 to disable. Default: 1.02 */
+  /**
+   * Max scale for Ken Burns drift. 0 to disable.
+   * Default: 1.06 (cinematic overhaul — was 1.02, now 3× more pronounced).
+   * The 6% zoom is subtle enough to not distort text but visible enough
+   * to make the composition feel like it was filmed with a slowly moving camera.
+   */
   maxScale?: number;
-  /** Max horizontal pan drift in px. 0 to disable. Default: 6 */
+  /**
+   * Max horizontal pan drift in px. 0 to disable.
+   * Default: 18 (cinematic overhaul — was 6, now 3× more pronounced).
+   */
   maxPanX?: number;
+  /**
+   * Max vertical pan drift in px. 0 to disable. Default: 8.
+   * Adds a gentle diagonal feel to the camera movement.
+   */
+  maxPanY?: number;
+  /**
+   * Max rotation drift in degrees. 0 to disable. Default: 0.3.
+   * A barely perceptible tilt that adds organic handheld feel.
+   */
+  maxRotation?: number;
   /** Disable Ken Burns entirely (for maps, interactive compositions) */
   noDrift?: boolean;
   /** Disable exit fade (for compositions that handle their own exit) */
@@ -56,7 +74,11 @@ interface CompositionAnimationResult {
   driftScale: number;
   /** Horizontal pan drift in px. Always 0 if noDrift. */
   driftX: number;
-  /** Combined style: opacity (enter × exit) + transform (scale + translateX) */
+  /** Vertical pan drift in px. Always 0 if noDrift. */
+  driftY: number;
+  /** Rotation drift in degrees. Always 0 if noDrift. */
+  driftRotation: number;
+  /** Combined style: opacity (enter × exit) + transform (scale + translate + rotate) */
   style: React.CSSProperties;
 }
 
@@ -69,8 +91,10 @@ export const useCompositionAnimation = (
   const {
     exitFrames = 15,
     enterFrames = 8,
-    maxScale = 1.02,
-    maxPanX = 6,
+    maxScale = 1.06,
+    maxPanX = 18,
+    maxPanY = 8,
+    maxRotation = 0.3,
     noDrift = false,
     noExit = false,
   } = options;
@@ -95,7 +119,8 @@ export const useCompositionAnimation = (
         }
       );
 
-  // ── Ken Burns drift (POLISH.md A6) ──────────────────────────────────────
+  // ── Cinematic camera drift ─────────────────────────────────────────────
+  // Scale: slow zoom in over the full composition
   const driftScale = noDrift
     ? 1
     : interpolate(frame, [0, totalFrames], [1.0, maxScale], {
@@ -104,9 +129,28 @@ export const useCompositionAnimation = (
         easing: Easing.inOut(Easing.quad),
       });
 
+  // Horizontal pan: slow crawl right (or left for negative maxPanX)
   const driftX = noDrift
     ? 0
     : interpolate(frame, [0, totalFrames], [0, maxPanX], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.inOut(Easing.quad),
+      });
+
+  // Vertical pan: gentle diagonal feel
+  const driftY = noDrift
+    ? 0
+    : interpolate(frame, [0, totalFrames], [0, maxPanY], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.inOut(Easing.quad),
+      });
+
+  // Rotation: barely perceptible tilt — organic handheld quality
+  const driftRotation = noDrift
+    ? 0
+    : interpolate(frame, [0, totalFrames], [0, maxRotation], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
         easing: Easing.inOut(Easing.quad),
@@ -117,11 +161,11 @@ export const useCompositionAnimation = (
   const transform =
     noDrift
       ? undefined
-      : `scale(${driftScale}) translateX(${driftX}px)`;
+      : `scale(${driftScale}) translate(${driftX}px, ${driftY}px) rotate(${driftRotation}deg)`;
 
   const style: React.CSSProperties = {
     opacity,
-    ...(transform ? { transform } : {}),
+    ...(transform ? { transform, transformOrigin: "center center" } : {}),
   };
 
   return {
@@ -132,6 +176,8 @@ export const useCompositionAnimation = (
     enterOpacity,
     driftScale,
     driftX,
+    driftY,
+    driftRotation,
     style,
   };
 };

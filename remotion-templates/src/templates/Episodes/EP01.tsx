@@ -1,12 +1,16 @@
 /**
  * EP01 — The Silicon Trap
- * Master sequence composition that stitches all 24 clips into one continuous video.
+ * Master sequence composition that stitches all 29 clips into one continuous video.
  *
  * Uses Remotion's <Series> component with 15-frame cross-fade overlaps between clips.
  * Each clip loads its JSON data file and renders the appropriate template component.
  *
- * Total motion graphics runtime: ~203 seconds (~3:23)
- * Render timeline is NLE + narration audio + B-roll alongside these compositions.
+ * Regenerated from script-v5-production.md (two-column format).
+ * v4→v5 changes: +2 GameBoard (chess/go), +1 DecisionTree, +1 TimeSeriesChart,
+ *   +1 RouteAnimation (bifurcation), −1 FrameworkDiagram (chess-go),
+ *   −1 FrameworkDiagram (ai-timeline), −1 DataChart (smic-yield)
+ * Total Remotion compositions: 29 (7 title, 8 kinetic, 3 chart, 1 timeseries,
+ *   2 framework, 2 gameboard, 1 decisiontree, 2 choropleth, 1 timeline, 2 route)
  */
 
 import React from "react";
@@ -19,6 +23,9 @@ import { TimelineComparison } from "../TimelineComparison/TimelineComparison";
 import { DataChart } from "../DataChart/DataChart";
 import { FrameworkDiagram } from "../FrameworkDiagram/FrameworkDiagram";
 import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
+import { GameBoard } from "../GameBoard/GameBoard";
+import { DecisionTree } from "../DecisionTree/DecisionTree";
+import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
 
 import type { TitleTransitionData } from "../TitleTransition/types";
 import type { ChoroplethMapData } from "../ChoroplethMap/types";
@@ -27,39 +34,56 @@ import type { TimelineComparisonData } from "../TimelineComparison/types";
 import type { DataChartData } from "../DataChart/types";
 import type { FrameworkDiagramData } from "../FrameworkDiagram/types";
 import type { RouteAnimationData } from "../RouteAnimation/types";
+import type { GameBoardData } from "../GameBoard/types";
+import type { DecisionTreeData } from "../DecisionTree/types";
+import type { TimeSeriesChartData } from "../TimeSeriesChart/types";
 
-// Import all 24 JSON data files in sequence order
+// ── Import all 27 JSON data files in sequence order ─────────────────────────
+
+// Opening
 import titleEpisode from "../../../data/episodes/ep01/title-episode.json";
-import titleSectionAct1 from "../../../data/episodes/ep01/title-section-act1.json";
-import choroplethReshoring from "../../../data/episodes/ep01/choropleth-reshoring.json";
-import kinetic7pct from "../../../data/episodes/ep01/kinetic-7pct.json";
 
+// Beat 1 — The Paradox
+import titleSectionParadox from "../../../data/episodes/ep01/title-section-paradox.json";
+import kinetic92Yield from "../../../data/episodes/ep01/kinetic-92-yield.json";
+import kinetic165b from "../../../data/episodes/ep01/kinetic-165b.json";
+import chart7pctDemand from "../../../data/episodes/ep01/chart-7pct-demand.json";
+
+// Beat 2 — The Logic of Denial
 import titleSectionDenial from "../../../data/episodes/ep01/title-section-denial.json";
 import timelineOilChips from "../../../data/episodes/ep01/timeline-oil-chips.json";
-import chartExportControls from "../../../data/episodes/ep01/chart-export-controls.json";
+import kineticRevenueDeal from "../../../data/episodes/ep01/kinetic-revenue-deal.json";
+import chartChipsAct from "../../../data/episodes/ep01/chart-chips-act.json";
+import choroplethCocom from "../../../data/episodes/ep01/choropleth-cocom.json";
 import frameworkCocomChina from "../../../data/episodes/ep01/framework-cocom-china.json";
 
+// Beat 3 — The Other Side of the Wall
 import titleSectionWall from "../../../data/episodes/ep01/title-section-wall.json";
 import kineticKabozi from "../../../data/episodes/ep01/kinetic-kabozi.json";
-import chartPenContrast from "../../../data/episodes/ep01/chart-pen-contrast.json";
 import kineticJuguo from "../../../data/episodes/ep01/kinetic-juguo.json";
 import chartLithography from "../../../data/episodes/ep01/chart-lithography.json";
-import chartKirinTeardown from "../../../data/episodes/ep01/chart-kirin-teardown.json";
-import timelineDeepseek from "../../../data/episodes/ep01/timeline-deepseek.json";
+import timeseriesSmicYield from "../../../data/episodes/ep01/timeseries-smic-yield.json";
+import frameworkKirinTeardown from "../../../data/episodes/ep01/framework-kirin-teardown.json";
+import kineticDeepseekZero from "../../../data/episodes/ep01/kinetic-deepseek-zero.json";
 
+// Beat 4 — The Trap
 import titleSectionTrap from "../../../data/episodes/ep01/title-section-trap.json";
-import frameworkChessGo from "../../../data/episodes/ep01/framework-chess-go.json";
+import gameboardChess from "../../../data/episodes/ep01/gameboard-chess.json";
+import gameboardGo from "../../../data/episodes/ep01/gameboard-go.json";
 import routeChipSupply from "../../../data/episodes/ep01/route-chip-supply.json";
-import choroplethSupplyChain from "../../../data/episodes/ep01/choropleth-supply-chain.json";
+import kineticTrap from "../../../data/episodes/ep01/kinetic-trap.json";
+import choroplethCaughtBetween from "../../../data/episodes/ep01/choropleth-caught-between.json";
 import kineticMorrisChang from "../../../data/episodes/ep01/kinetic-morris-chang.json";
-import choroplethBifurcation from "../../../data/episodes/ep01/choropleth-bifurcation.json";
 
+// Beat 5 — Your Chips
 import titleSectionChips from "../../../data/episodes/ep01/title-section-chips.json";
-import chartChipsEverywhere from "../../../data/episodes/ep01/chart-chips-everywhere.json";
+import decisiontreeAiTimeline from "../../../data/episodes/ep01/decisiontree-ai-timeline.json";
+import routeBifurcation from "../../../data/episodes/ep01/route-bifurcation.json";
 
+// Closing
 import titleEndcard from "../../../data/episodes/ep01/title-endcard.json";
 
-// ── Helper: Calculate duration for timeline clips (phases-based) ──────────────
+// ── Helper: Calculate duration for timeline clips ───────────────────────────
 
 function getTimelineDuration(data: TimelineComparisonData): number {
   const secsPerEvent = data.secondsPerEvent || 2;
@@ -67,20 +91,20 @@ function getTimelineDuration(data: TimelineComparisonData): number {
   return sec(totalEvents * secsPerEvent + 3);
 }
 
-// ── Helper: Calculate duration for choropleth clips (phases-based) ────────────
+// ── Helper: Calculate duration for choropleth clips (phases-based) ──────────
 
 function getChoroplethDuration(data: ChoroplethMapData): number {
   return data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
 }
 
-// ── Helper: Calculate duration for route clips (phases-based) ────────────────
+// ── Helper: Calculate duration for route clips (phases-based) ───────────────
 
 function getRouteDuration(data: RouteAnimationData): number {
   const phaseDuration = data.phases.reduce((sum, p) => sum + p.durationSec, 0);
   return sec(phaseDuration + 1); // +1s intro delay (matches RouteAnimation/index.tsx)
 }
 
-// ── Clip metadata: filename, component, duration in frames ──────────────────
+// ── Clip metadata ───────────────────────────────────────────────────────────
 
 type ClipMetadata = {
   filename: string;
@@ -91,7 +115,13 @@ type ClipMetadata = {
 
 const OVERLAP_FRAMES = 15; // 15-frame cross-fade between clips
 
-// Build the 24-clip sequence from SEQUENCE.md
+// Helper: Calculate duration for GameBoard clips (phases-based)
+function getGameBoardDuration(data: GameBoardData): number {
+  const phaseDuration = data.phases.reduce((sum, p) => sum + p.durationSec, 0);
+  return sec(phaseDuration);
+}
+
+// Build the 29-clip sequence from script-v5-production.md
 const clips: ClipMetadata[] = [
   // 01 — Opening
   {
@@ -101,27 +131,33 @@ const clips: ClipMetadata[] = [
     durationFrames: sec((titleEpisode as TitleTransitionData).durationSec),
   },
 
-  // 02-04 — Beat 1: The Paradox
+  // 02-05 — Beat 1: The Paradox
   {
-    filename: "title-section-act1.json",
+    filename: "title-section-paradox.json",
     component: TitleTransition,
-    data: titleSectionAct1,
-    durationFrames: sec((titleSectionAct1 as TitleTransitionData).durationSec),
+    data: titleSectionParadox,
+    durationFrames: sec((titleSectionParadox as TitleTransitionData).durationSec),
   },
   {
-    filename: "choropleth-reshoring.json",
-    component: ChoroplethMap,
-    data: choroplethReshoring,
-    durationFrames: getChoroplethDuration(choroplethReshoring as ChoroplethMapData),
-  },
-  {
-    filename: "kinetic-7pct.json",
+    filename: "kinetic-92-yield.json",
     component: KineticTypography,
-    data: kinetic7pct,
-    durationFrames: sec((kinetic7pct as QuoteData).durationSec),
+    data: kinetic92Yield,
+    durationFrames: sec((kinetic92Yield as QuoteData).durationSec),
+  },
+  {
+    filename: "kinetic-165b.json",
+    component: KineticTypography,
+    data: kinetic165b,
+    durationFrames: sec((kinetic165b as QuoteData).durationSec),
+  },
+  {
+    filename: "chart-7pct-demand.json",
+    component: DataChart,
+    data: chart7pctDemand,
+    durationFrames: sec((chart7pctDemand as DataChartData).durationSec),
   },
 
-  // 05-08 — Beat 2: The Logic of Denial
+  // 06-11 — Beat 2: The Logic of Denial
   {
     filename: "title-section-denial.json",
     component: TitleTransition,
@@ -135,10 +171,22 @@ const clips: ClipMetadata[] = [
     durationFrames: getTimelineDuration(timelineOilChips as TimelineComparisonData),
   },
   {
-    filename: "chart-export-controls.json",
+    filename: "kinetic-revenue-deal.json",
+    component: KineticTypography,
+    data: kineticRevenueDeal,
+    durationFrames: sec((kineticRevenueDeal as QuoteData).durationSec),
+  },
+  {
+    filename: "chart-chips-act.json",
     component: DataChart,
-    data: chartExportControls,
-    durationFrames: sec((chartExportControls as DataChartData).durationSec),
+    data: chartChipsAct,
+    durationFrames: sec((chartChipsAct as DataChartData).durationSec),
+  },
+  {
+    filename: "choropleth-cocom.json",
+    component: ChoroplethMap,
+    data: choroplethCocom,
+    durationFrames: getChoroplethDuration(choroplethCocom as ChoroplethMapData),
   },
   {
     filename: "framework-cocom-china.json",
@@ -147,7 +195,7 @@ const clips: ClipMetadata[] = [
     durationFrames: sec((frameworkCocomChina as FrameworkDiagramData).durationSec),
   },
 
-  // 09-15 — Beat 3: The Other Side of the Wall
+  // 12-18 — Beat 3: The Other Side of the Wall
   {
     filename: "title-section-wall.json",
     component: TitleTransition,
@@ -159,12 +207,6 @@ const clips: ClipMetadata[] = [
     component: KineticTypography,
     data: kineticKabozi,
     durationFrames: sec((kineticKabozi as QuoteData).durationSec),
-  },
-  {
-    filename: "chart-pen-contrast.json",
-    component: DataChart,
-    data: chartPenContrast,
-    durationFrames: sec((chartPenContrast as DataChartData).durationSec),
   },
   {
     filename: "kinetic-juguo.json",
@@ -179,19 +221,25 @@ const clips: ClipMetadata[] = [
     durationFrames: sec((chartLithography as DataChartData).durationSec),
   },
   {
-    filename: "chart-kirin-teardown.json",
-    component: DataChart,
-    data: chartKirinTeardown,
-    durationFrames: sec((chartKirinTeardown as DataChartData).durationSec),
+    filename: "timeseries-smic-yield.json",
+    component: TimeSeriesChart,
+    data: timeseriesSmicYield,
+    durationFrames: sec((timeseriesSmicYield as TimeSeriesChartData).durationSec),
   },
   {
-    filename: "timeline-deepseek.json",
-    component: TimelineComparison,
-    data: timelineDeepseek,
-    durationFrames: getTimelineDuration(timelineDeepseek as TimelineComparisonData),
+    filename: "framework-kirin-teardown.json",
+    component: FrameworkDiagram,
+    data: frameworkKirinTeardown,
+    durationFrames: sec((frameworkKirinTeardown as FrameworkDiagramData).durationSec),
+  },
+  {
+    filename: "kinetic-deepseek-zero.json",
+    component: KineticTypography,
+    data: kineticDeepseekZero,
+    durationFrames: sec((kineticDeepseekZero as QuoteData).durationSec),
   },
 
-  // 16-21 — Beat 4: The Trap
+  // 19-24 — Beat 4: The Trap
   {
     filename: "title-section-trap.json",
     component: TitleTransition,
@@ -199,10 +247,16 @@ const clips: ClipMetadata[] = [
     durationFrames: sec((titleSectionTrap as TitleTransitionData).durationSec),
   },
   {
-    filename: "framework-chess-go.json",
-    component: FrameworkDiagram,
-    data: frameworkChessGo,
-    durationFrames: sec((frameworkChessGo as FrameworkDiagramData).durationSec),
+    filename: "gameboard-chess.json",
+    component: GameBoard,
+    data: gameboardChess,
+    durationFrames: getGameBoardDuration(gameboardChess as GameBoardData),
+  },
+  {
+    filename: "gameboard-go.json",
+    component: GameBoard,
+    data: gameboardGo,
+    durationFrames: getGameBoardDuration(gameboardGo as GameBoardData),
   },
   {
     filename: "route-chip-supply.json",
@@ -211,10 +265,16 @@ const clips: ClipMetadata[] = [
     durationFrames: getRouteDuration(routeChipSupply as RouteAnimationData),
   },
   {
-    filename: "choropleth-supply-chain.json",
+    filename: "kinetic-trap.json",
+    component: KineticTypography,
+    data: kineticTrap,
+    durationFrames: sec((kineticTrap as QuoteData).durationSec),
+  },
+  {
+    filename: "choropleth-caught-between.json",
     component: ChoroplethMap,
-    data: choroplethSupplyChain,
-    durationFrames: getChoroplethDuration(choroplethSupplyChain as ChoroplethMapData),
+    data: choroplethCaughtBetween,
+    durationFrames: getChoroplethDuration(choroplethCaughtBetween as ChoroplethMapData),
   },
   {
     filename: "kinetic-morris-chang.json",
@@ -222,14 +282,8 @@ const clips: ClipMetadata[] = [
     data: kineticMorrisChang,
     durationFrames: sec((kineticMorrisChang as QuoteData).durationSec),
   },
-  {
-    filename: "choropleth-bifurcation.json",
-    component: ChoroplethMap,
-    data: choroplethBifurcation,
-    durationFrames: getChoroplethDuration(choroplethBifurcation as ChoroplethMapData),
-  },
 
-  // 22-23 — Beat 5: Your Chips
+  // 25-26 — Beat 5: Your Chips
   {
     filename: "title-section-chips.json",
     component: TitleTransition,
@@ -237,13 +291,19 @@ const clips: ClipMetadata[] = [
     durationFrames: sec((titleSectionChips as TitleTransitionData).durationSec),
   },
   {
-    filename: "chart-chips-everywhere.json",
-    component: DataChart,
-    data: chartChipsEverywhere,
-    durationFrames: sec((chartChipsEverywhere as DataChartData).durationSec),
+    filename: "decisiontree-ai-timeline.json",
+    component: DecisionTree,
+    data: decisiontreeAiTimeline,
+    durationFrames: sec((decisiontreeAiTimeline as DecisionTreeData).durationSec),
+  },
+  {
+    filename: "route-bifurcation.json",
+    component: RouteAnimation,
+    data: routeBifurcation,
+    durationFrames: getRouteDuration(routeBifurcation as RouteAnimationData),
   },
 
-  // 24 — Closing
+  // 29 — Closing
   {
     filename: "title-endcard.json",
     component: TitleTransition,
@@ -252,7 +312,7 @@ const clips: ClipMetadata[] = [
   },
 ];
 
-// ── EP01 Master Composition ──────────────────────────────────────────────────
+// ── EP01 Master Composition ─────────────────────────────────────────────────
 
 export const EP01: React.FC = () => {
   return (

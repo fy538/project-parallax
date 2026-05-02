@@ -1,23 +1,220 @@
 /**
  * Background — layered full-frame background for compositions.
  *
- * Three visual planes per BRAND.md / POLISH.md:
- *   z=0  Background gradient or textured surface (this component)
- *   z=1  Content layer (children)
- *   z=2  Accent elements (handled by individual templates)
+ * Five visual planes (cinematic overhaul):
+ *   z=0  Background gradient or textured surface
+ *   z=1  Film grain + vignette
+ *   z=2  Color temperature tint
+ *   z=3  Atmospheric particles (dust motes + bokeh orbs + light ray)
+ *   z=4  Content layer (children)
  *
+ * The atmospheric layer is what separates "video essay" from "PowerPoint."
+ * Particles are deterministic (seeded by position, animated by frame count)
+ * so they render identically across Remotion's frame-based pipeline.
+ *
+ * Light mode (PRIMARY): flat paper with subtle noise + atmospheric particles + optional ruled border
  * Dark mode:  radial gradient vignette (ink center → bg.dark.base edges)
- * Light mode: flat paper with subtle noise texture + optional ruled border
  * Map mode:   dark map background with slightly different tone
  *
  * Usage:
- *   <Background variant="dark">{children}</Background>
- *   <Background variant="light" border>{children}</Background>
+ *   <Background>{children}</Background>  // light mode (default)
+ *   <Background variant="light" tint="#6B1D1D" atmosphere="subtle">{children}</Background>
+ *   <Background variant="dark" tint="#3266AD" atmosphere="dense">{children}</Background>
  */
 
-import React from "react";
-import { AbsoluteFill, staticFile } from "remotion";
+import React, { useMemo } from "react";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
 import { dark, light, palette, layout } from "../design/theme";
+
+// ── Deterministic pseudo-random (same seed = same output every frame) ────
+
+const seededRandom = (seed: number): number => {
+  const x = Math.sin(seed * 12.9898 + seed * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+// ── Particle types ───────────────────────────────────────────────────────
+
+interface Particle {
+  x: number;      // initial x position (0-1920)
+  y: number;      // initial y position (0-1080)
+  size: number;    // radius in px
+  speed: number;   // drift speed multiplier
+  angle: number;   // drift direction in radians
+  opacity: number; // base opacity
+  phase: number;   // phase offset for pulsing
+}
+
+const generateParticles = (
+  count: number,
+  sizeRange: [number, number],
+  opacityRange: [number, number],
+  seed: number = 0,
+): Particle[] => {
+  const particles: Particle[] = [];
+  for (let i = 0; i < count; i++) {
+    const s = seed + i * 7;
+    particles.push({
+      x: seededRandom(s + 1) * layout.width,
+      y: seededRandom(s + 2) * layout.height,
+      size: sizeRange[0] + seededRandom(s + 3) * (sizeRange[1] - sizeRange[0]),
+      speed: 0.3 + seededRandom(s + 4) * 0.7,
+      angle: seededRandom(s + 5) * Math.PI * 2,
+      opacity: opacityRange[0] + seededRandom(s + 6) * (opacityRange[1] - opacityRange[0]),
+      phase: seededRandom(s + 7) * Math.PI * 2,
+    });
+  }
+  return particles;
+};
+
+// ── Atmosphere component (dust + bokeh + light ray) ──────────────────────
+
+type AtmosphereDensity = "none" | "subtle" | "normal" | "dense";
+
+const ATMOSPHERE_CONFIG = {
+  none: { dustCount: 0, bokehCount: 0, lightRay: false },
+  subtle: { dustCount: 15, bokehCount: 3, lightRay: false },
+  normal: { dustCount: 30, bokehCount: 5, lightRay: true },
+  dense: { dustCount: 50, bokehCount: 8, lightRay: true },
+} as const;
+
+const Atmosphere: React.FC<{
+  density: AtmosphereDensity;
+  tint?: string;
+  isDark?: boolean;
+}> = React.memo(({ density, tint, isDark = false }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames, fps } = useVideoConfig();
+  const config = ATMOSPHERE_CONFIG[density];
+
+  // Pre-compute particle arrays (only once per composition)
+  const dustMotes = useMemo(
+    () => generateParticles(config.dustCount, [1, 3], [0.15, 0.4], 42),
+    [config.dustCount]
+  );
+  const bokehOrbs = useMemo(
+    () => generateParticles(config.bokehCount, [20, 80], [0.03, 0.08], 137),
+    [config.bokehCount]
+  );
+
+  if (density === "none") return null;
+
+  const tintColor = tint || palette.amber;
+
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none", overflow: "hidden" }}>
+      {/* ── Light ray — diagonal gradient sweep ─────────────────────── */}
+      {config.lightRay && (
+        <div
+          style={{
+            position: "absolute",
+            top: -200,
+            right: -200,
+            width: 900,
+            height: 1400,
+            background: `linear-gradient(
+              135deg,
+              transparent 0%,
+              ${tintColor}06 30%,
+              ${tintColor}0A 50%,
+              ${tintColor}06 70%,
+              transparent 100%
+            )`,
+            // Slow drift: the ray moves across the frame over the composition
+            transform: `rotate(-15deg) translateX(${
+              (frame / durationInFrames) * 120 - 60
+            }px) translateY(${
+              (frame / durationInFrames) * 60 - 30
+            }px)`,
+            // Dual-frequency pulse: slow swell + faster shimmer
+            opacity: 0.6 + 0.25 * Math.sin(frame / fps * 0.4) + 0.15 * Math.sin(frame / fps * 1.1 + 1.2),
+            mixBlendMode: isDark ? "screen" : "multiply",
+          }}
+        />
+      )}
+
+      {/* ── Bokeh orbs — large soft blurred circles with breathing size ── */}
+      {bokehOrbs.map((orb, i) => {
+        const t = frame / fps;
+        // Slow sinusoidal drift — each orb moves independently
+        const dx = Math.sin(t * 0.15 * orb.speed + orb.phase) * 60;
+        const dy = Math.cos(t * 0.12 * orb.speed + orb.phase * 1.3) * 40;
+        // Gentle opacity pulse
+        const pulseOpacity = orb.opacity * (0.7 + 0.3 * Math.sin(t * 0.4 + orb.phase));
+        // Breathing size — orbs gently expand/contract (±12%)
+        const breathScale = 1.0 + 0.12 * Math.sin(t * 0.3 + orb.phase * 0.7);
+        const breathSize = orb.size * breathScale;
+
+        return (
+          <div
+            key={`bokeh-${i}`}
+            style={{
+              position: "absolute",
+              left: orb.x + dx - (breathSize - orb.size) / 2,
+              top: orb.y + dy - (breathSize - orb.size) / 2,
+              width: breathSize,
+              height: breathSize,
+              borderRadius: "50%",
+              background: `radial-gradient(circle, ${tintColor}${Math.round(pulseOpacity * 255).toString(16).padStart(2, "0")} 0%, transparent 70%)`,
+              filter: `blur(${breathSize * 0.4}px)`,
+              mixBlendMode: isDark ? "screen" : "multiply",
+            }}
+          />
+        );
+      })}
+
+      {/* ── Dust motes — tiny particles drifting slowly ─────────────── */}
+      <svg
+        width={layout.width}
+        height={layout.height}
+        viewBox={`0 0 ${layout.width} ${layout.height}`}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        {dustMotes.map((mote, i) => {
+          const t = frame / fps;
+          // Constant drift + slight sinusoidal wobble
+          const dx = Math.cos(mote.angle) * mote.speed * t * 12 +
+                     Math.sin(t * 0.8 + mote.phase) * 8;
+          const dy = Math.sin(mote.angle) * mote.speed * t * 12 +
+                     Math.cos(t * 0.6 + mote.phase) * 6;
+          // Wrap positions (modulo) for repositioning
+          const rawX = mote.x + dx;
+          const rawY = mote.y + dy;
+          const px = ((rawX % (layout.width + 40)) + layout.width + 40) % (layout.width + 40) - 20;
+          const py = ((rawY % (layout.height + 40)) + layout.height + 40) % (layout.height + 40) - 20;
+
+          // Edge fade — particles fade out near edges instead of hard-wrapping
+          const edgeMargin = 60;
+          const edgeFadeX = Math.min(
+            px < edgeMargin ? px / edgeMargin : 1,
+            px > layout.width - edgeMargin ? (layout.width - px) / edgeMargin : 1
+          );
+          const edgeFadeY = Math.min(
+            py < edgeMargin ? py / edgeMargin : 1,
+            py > layout.height - edgeMargin ? (layout.height - py) / edgeMargin : 1
+          );
+          const edgeFade = Math.max(0, Math.min(1, edgeFadeX * edgeFadeY));
+
+          // Flicker — slight opacity variation
+          const flicker = mote.opacity * (0.6 + 0.4 * Math.sin(t * 2 + mote.phase)) * edgeFade;
+
+          return (
+            <circle
+              key={`dust-${i}`}
+              cx={px}
+              cy={py}
+              r={mote.size}
+              fill={isDark ? palette.bone : palette.bronze}
+              opacity={flicker}
+            />
+          );
+        })}
+      </svg>
+    </AbsoluteFill>
+  );
+});
+
+// ── Main Background component ────────────────────────────────────────────
 
 interface BackgroundProps {
   color?: string;
@@ -26,17 +223,36 @@ interface BackgroundProps {
   border?: boolean;
   /** Disable grain overlay (default: enabled) */
   noGrain?: boolean;
+  /**
+   * Subtle color tint for emotional temperature (Layer 3 color storytelling).
+   * A hex color overlaid at ~6% opacity to shift the ambient mood.
+   * Use semantic.us (#3266AD) for US-focused analysis, semantic.china (#C23B22)
+   * for China-focused, palette.amber for tension/confrontation, or null for neutral.
+   */
+  tint?: string;
+  /**
+   * Atmospheric particle density. Controls dust motes, bokeh orbs, and light rays.
+   * "none" = clean background (backward compat), "subtle" = light dust,
+   * "normal" = dust + bokeh + light ray, "dense" = heavy atmosphere.
+   * Default: "normal" for dark/map, "none" for light.
+   */
+  atmosphere?: AtmosphereDensity;
   children?: React.ReactNode;
 }
 
 export const Background: React.FC<BackgroundProps> = ({
   color,
-  variant = "dark",
+  variant = "light",
   border = false,
   noGrain = false,
+  tint,
+  atmosphere,
   children,
 }) => {
   const isDark = variant === "dark" || variant === "map";
+
+  // Default atmosphere: normal for dark, subtle for light (cinematic paper feel)
+  const effectiveDensity = atmosphere ?? (isDark ? "normal" : "subtle");
 
   // ── Background gradient ─────────────────────────────────────────────
   const bgStyle: React.CSSProperties = (() => {
@@ -56,7 +272,7 @@ export const Background: React.FC<BackgroundProps> = ({
           backgroundColor: light.bg.base,
         };
       default:
-        return { backgroundColor: dark.bg.base };
+        return { backgroundColor: light.bg.base };
     }
   })();
 
@@ -80,10 +296,25 @@ export const Background: React.FC<BackgroundProps> = ({
       {isDark && (
         <AbsoluteFill
           style={{
-            background: `radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.2) 100%)`,
+            background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.3) 100%)`,
             pointerEvents: "none",
           }}
         />
+      )}
+
+      {/* Color temperature tint — emotional register shift (stronger than before) */}
+      {tint && (
+        <AbsoluteFill
+          style={{
+            background: `radial-gradient(ellipse at 40% 45%, ${tint}18 0%, ${tint}0C 50%, transparent 100%)`,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* Atmospheric particles — the cinematic layer */}
+      {effectiveDensity !== "none" && (
+        <Atmosphere density={effectiveDensity} tint={tint} isDark={isDark} />
       )}
 
       {/* Light mode ruled border — inset 40px, 1px border */}

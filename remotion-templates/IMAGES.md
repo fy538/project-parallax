@@ -1,7 +1,7 @@
 # Image & Photo Processing Guide
 
 > Practical reference for sourcing, treating, and compositing images across
-> the Structural Parallels brand. Companion to BRAND.md § Image Treatment Pipeline.
+> the Parallax brand. Companion to BRAND.md § Image Treatment Pipeline.
 >
 > Rule zero: **every image passes through the pipeline.** No exceptions.
 > The pipeline IS the brand. A raw, full-color photo in a composition breaks

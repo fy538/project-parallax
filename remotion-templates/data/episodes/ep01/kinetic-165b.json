@@ -1,0 +1,10 @@
+{
+  "episode": "EP01",
+  "variant": "statistic",
+  "statValue": "$165B",
+  "statLabel": "total investment",
+  "statContext": "Largest foreign direct investment project in US history",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "dark",
+  "durationSec": 4
+}

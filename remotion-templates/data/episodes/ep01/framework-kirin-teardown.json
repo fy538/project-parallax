@@ -1,0 +1,33 @@
+{
+  "episode": "EP01",
+  "title": "Kirin X90: Marketing vs. Reality",
+  "subtitle": "What Huawei claims vs. what independent teardowns found",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Huawei Marketing",
+      "icon": "📢",
+      "color": "#C23B22",
+      "items": [
+        "Branded as 5nm process",
+        "Positioned as next-gen breakthrough",
+        "Marketed as proof of self-sufficiency",
+        "Implied: export controls have failed"
+      ]
+    },
+    {
+      "title": "TechInsights Teardown",
+      "icon": "🔬",
+      "color": "#3266AD",
+      "items": [
+        "7nm silicon with enhanced packaging",
+        "Multi-patterning workaround (DUV, not EUV)",
+        "Yields improving but below Western benchmark",
+        "The gap between claim and capability is the real metric"
+      ]
+    }
+  ],
+  "backgroundVariant": "dark",
+  "backgroundTint": "#C23B22",
+  "durationSec": 6
+}

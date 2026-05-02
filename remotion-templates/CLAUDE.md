@@ -8,21 +8,22 @@ A Remotion-based template library for producing educational geopolitics YouTube
 videos. Templates are React components that render to MP4. Each template is
 data-driven: feed it a JSON file and it generates the visual segment.
 
-**15 compositions (11 landscape + 3 Shorts + EP01 master sequence) are built and functional.**
+**15 template types (7 core + 4 format-specific + 3 Shorts + EP01 master sequence) are built and functional.**
 All templates use Zod schemas for runtime validation and `calculateMetadata` for dynamic durations.
-EP01 ("The Silicon Trap") has 24 data files covering every visual beat in the
-18-minute script. Templates now cover all 8 content identity directions defined
-in CONTENT_IDENTITY.md.
+EP01 ("The Silicon Trap") has 24 data files (generated from script-v3; need regeneration from v4 production format).
+Templates cover all 8 content identity directions defined in CONTENT_IDENTITY.md.
 
-## Workspace layout (/content/)
+## Workspace layout (/project-parallax/)
 
 ```
-content/
-├── project/                  # Project-level docs (vision, pipeline, decisions, research log, ideas)
+project-parallax/
+├── CLAUDE.md                 # Top-level project overview (read this first for project context)
+├── project/                  # Strategy and planning docs (vision, pipeline, decisions, ideas)
 ├── episodes/                 # Per-episode work (scripts, briefs, research)
-│   └── EP01-silicon-trap/    # Script-v3 finalized, 24 visual data files generated
+│   └── EP01-silicon-trap/    # Script-v4 (production format), shot-list.json, brief.md
 ├── remotion-templates/       # ← YOU ARE HERE — the Remotion project
-├── skills/                   # Packaged .skill files (visual-spec, script-audit, persona-eval)
+├── tools/                    # Python CLI tools (brand-treatment/treat.py, asset-source/source.py)
+├── skills/                   # Production skills (research-audit; others in Cowork plugins dir)
 ├── prompts/                  # Reusable prompt templates
 └── archive/                  # One-off docs, old versions
 ```
@@ -316,11 +317,14 @@ npx remotion still src/index.ts ChoroplethMap --frame=60 \
   --output=frame.png
 ```
 
-## Skills (in /content/skills/ as .skill files)
+## Production Skills
 
-- **visual-spec-v2.skill** — Reads a script, produces visual breakdown table, generates all JSON data files after approval. References BRAND.md and LESSONS.md.
-- **script-audit.skill** — Audits scripts for broken transitions, lecture patterns, pacing, unverified claims
-- **persona-eval.skill** — Evaluates scripts through 5 audience personas for resonance
+Four Cowork skills are used in the production pipeline. They are installed in the Cowork plugins directory and trigger automatically. The research-audit skill is also version-controlled at `skills/research-audit/SKILL.md`.
+
+- **visual-spec** — Reads a script, produces visual breakdown table, generates all JSON data files after approval. References BRAND.md and LESSONS.md.
+- **script-audit** — Audits scripts for broken transitions, lecture patterns, pacing, unverified claims
+- **persona-eval** — Evaluates scripts through 5 audience personas for resonance
+- **research-audit** — 7-lens quality gate for research briefs (READY / CONDITIONAL / NEEDS MORE RESEARCH)
 
 ## Zod schemas + calculateMetadata
 
@@ -367,13 +371,15 @@ npm run test:baseline # Regenerate baselines after intentional changes
 
 ## EP01 status: "The Silicon Trap"
 
-- Script: v3 finalized (episodes/EP01-silicon-trap/script-v3.md)
-- Data files: 24/24 generated and validated
-- Visual QA: 20/24 passed (4 maps need local Remotion Studio for CDN access)
+- Script: v4 production format (episodes/EP01-silicon-trap/script-v4-production.md) — two-column with full visual specs
+- Shot list: 21 assets in shot-list.json (16 stock footage + 5 archival images) — ready for source.py
+- Data files: 24/24 generated from v3 — **need regeneration from v4** (some compositions changed)
+- Visual QA (v3 data): 20/24 passed (4 maps need local Remotion Studio for CDN access)
 - Sequence map: Complete — 24 clips mapped to 5 beats + opening/closing
-- Render pipeline: Two scripts ready (bash + Node)
+- Render pipeline: Two scripts ready (bash + Node) + Lambda deploy script
+- Stock footage: Not yet sourced
 - Narration: Not yet recorded
-- Final assembly: Render clips → import to NLE → place on timeline with narration
+- Final assembly: Render clips → import to NLE → place on timeline with narration + B-roll
 
 ## Known issues and constraints
 
@@ -385,7 +391,7 @@ See **LESSONS.md** for the full technical reference. Key ones:
 
 ## Content context
 
-**Structural Parallels** — Bilingual (EN/CN) YouTube/Bilibili channel analyzing geopolitics through historical
+**Parallax** — English-first YouTube channel analyzing geopolitics through historical
 analogy and philosophical frameworks. Tone: intellectually rigorous but narratively
 engaging. Visual references: CaspianReport (maps), Wendover (infographics), PolyMatter
-(clean data viz).
+(clean data viz). See the top-level CLAUDE.md for full project context.

@@ -30,5 +30,6 @@
     }
   ],
   "backgroundVariant": "dark",
-  "durationSec": 12
+  "backgroundTint": "#3266AD",
+  "durationSec": 8
 }

@@ -1,0 +1,58 @@
+{
+  "episode": "EP01",
+  "title": "US Strategy: Chess",
+  "subtitle": "Target specific companies. Capture specific pieces.",
+  "variant": "chess",
+  "boardSize": 8,
+
+  "initialPieces": [
+    { "position": [4, 7], "label": "US", "color": "#3266AD", "captured": false },
+    { "position": [3, 0], "label": "Huawei", "color": "#C23B22", "captured": false },
+    { "position": [5, 0], "label": "SMIC", "color": "#C23B22", "captured": false },
+    { "position": [2, 1], "label": "YMTC", "color": "#C23B22", "captured": false },
+    { "position": [6, 1], "label": "HiSilicon", "color": "#C23B22", "captured": false },
+    { "position": [4, 2], "label": "Nvidia", "color": "#E5A544", "captured": false },
+    { "position": [1, 2], "label": "ASML", "color": "#E5A544", "captured": false }
+  ],
+
+  "phases": [
+    {
+      "label": "2019: First strike",
+      "sublabel": "Trump bans Huawei from US technology",
+      "durationSec": 2,
+      "pieces": [
+        { "position": [3, 0], "label": "Huawei", "color": "#C23B22", "captured": true }
+      ]
+    },
+    {
+      "label": "2020: Chokepoint control",
+      "sublabel": "ASML blocked from selling EUV to China",
+      "durationSec": 2,
+      "pieces": [
+        { "position": [1, 2], "label": "ASML", "color": "#E5A544", "captured": true }
+      ]
+    },
+    {
+      "label": "2022: Entity List expanded",
+      "sublabel": "Biden's sweeping export controls — maximum lead",
+      "durationSec": 2,
+      "pieces": [
+        { "position": [4, 2], "label": "Nvidia", "color": "#E5A544", "captured": true },
+        { "position": [5, 0], "label": "SMIC", "color": "#C23B22", "captured": true }
+      ]
+    },
+    {
+      "label": "Precise. Aggressive. Chokepoints.",
+      "sublabel": "The strategy Jake Sullivan laid out in 2022",
+      "durationSec": 2,
+      "pieces": [
+        { "position": [2, 1], "label": "YMTC", "color": "#C23B22", "captured": true },
+        { "position": [6, 1], "label": "HiSilicon", "color": "#C23B22", "captured": true }
+      ]
+    }
+  ],
+
+  "source": "US Bureau of Industry and Security entity list",
+  "backgroundTint": "#3266AD",
+  "durationSec": 8
+}

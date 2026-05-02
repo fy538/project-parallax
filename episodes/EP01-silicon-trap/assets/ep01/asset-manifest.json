@@ -1,0 +1,340 @@
+{
+  "episode": "EP01",
+  "generated": "auto",
+  "assets": [
+    {
+      "id": "beat1-tsmc-aerial",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "TSMC Arizona construction aerial drone",
+          "semiconductor factory aerial desert",
+          "large factory construction aerial"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat1-cleanroom",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "semiconductor cleanroom wafer handling",
+          "chip factory cleanroom workers",
+          "cleanroom manufacturing"
+        ],
+        "media_type": "video",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat1-desert-housing",
+      "priority": "P2",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "Arizona desert housing construction workers",
+          "temporary worker housing desert",
+          "Arizona suburban construction"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat1-global-network",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "world map connections network global",
+          "global supply chain visualization"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat2-fdr-1941",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "FDR signing executive order 1941",
+          "Roosevelt oil embargo Japan",
+          "1941 US foreign policy"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat2-jake-sullivan",
+      "priority": "P2",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "Jake Sullivan national security advisor",
+          "Jake Sullivan speaking podium"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat2-chip-macro",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "semiconductor chip macro photography",
+          "computer chip closeup circuit",
+          "microprocessor macro"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-china-rail",
+      "priority": "P1",
+      "treatment": "conflict",
+      "search": {
+        "search_terms": [
+          "China high speed rail",
+          "Chinese bullet train",
+          "CRH high speed train"
+        ],
+        "media_type": "video",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-space-launch",
+      "priority": "P2",
+      "treatment": "conflict",
+      "search": {
+        "search_terms": [
+          "China space launch rocket",
+          "Chinese space program launch",
+          "Shenzhou launch"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-pen-tip",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "ballpoint pen tip macro extreme closeup",
+          "pen tip macro metal",
+          "ballpoint pen closeup"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-shenzhen",
+      "priority": "P3",
+      "treatment": "conflict",
+      "search": {
+        "search_terms": [
+          "Shenzhen skyline technology district",
+          "Chinese city technology night",
+          "Shenzhen aerial night"
+        ],
+        "media_type": "video",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-ai-datacenter",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "artificial intelligence data center servers",
+          "AI computing server room",
+          "GPU server cluster"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-deepseek",
+      "priority": "P2",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "DeepSeek AI logo",
+          "Chinese AI company office",
+          "DeepSeek artificial intelligence"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat3-wafer-macro",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "semiconductor wafer macro",
+          "silicon wafer close up",
+          "chip wafer colorful"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat4-world-divided",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "world map divided",
+          "geopolitical divide concept",
+          "global split east west"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-car-dashboard",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "car dashboard electronics digital",
+          "modern car interior technology",
+          "automotive electronics closeup"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-phone-circuit",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "smartphone circuit board inside",
+          "phone motherboard components",
+          "mobile phone internal electronics"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-hospital-mri",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "hospital MRI machine",
+          "MRI scanner medical",
+          "medical imaging equipment"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-data-center",
+      "priority": "P1",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "data center server rack",
+          "server room rows",
+          "cloud computing infrastructure"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-car-shortage",
+      "priority": "P2",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "empty car dealership lot 2021",
+          "auto factory shutdown chip shortage",
+          "car shortage empty lot"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    },
+    {
+      "id": "beat5-earth-night",
+      "priority": "P3",
+      "treatment": "standard",
+      "search": {
+        "search_terms": [
+          "world map night lights satellite",
+          "earth from space night lights",
+          "satellite view earth night"
+        ],
+        "media_type": "photo",
+        "total_results": 0,
+        "results": []
+      },
+      "downloaded": []
+    }
+  ]
+}

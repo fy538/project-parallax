@@ -1,0 +1,61 @@
+{
+  "episode": "EP01",
+  "title": "China Strategy: Go (围棋)",
+  "subtitle": "Surround territory. Stone by stone, across the entire board.",
+  "variant": "go",
+  "boardSize": 9,
+
+  "initialStones": [],
+
+  "phases": [
+    {
+      "label": "Foundation: domestic fabs",
+      "sublabel": "SMIC, CXMT, YMTC — build the base",
+      "durationSec": 2,
+      "stones": [
+        { "position": [2, 2], "stone": "black", "label": "SMIC" },
+        { "position": [6, 2], "stone": "black", "label": "CXMT" },
+        { "position": [4, 4], "stone": "black", "label": "YMTC" }
+      ]
+    },
+    {
+      "label": "Talent recruitment",
+      "sublabel": "Thousands of engineers from TSMC, Samsung, SK Hynix",
+      "durationSec": 2,
+      "stones": [
+        { "position": [2, 6], "stone": "black", "label": "Talent" },
+        { "position": [6, 6], "stone": "black", "label": "R&D" },
+        { "position": [4, 2], "stone": "black" },
+        { "position": [4, 6], "stone": "black" }
+      ]
+    },
+    {
+      "label": "Supply chain localization",
+      "sublabel": "Rare earths, packaging, EDA alternatives",
+      "durationSec": 2,
+      "stones": [
+        { "position": [1, 4], "stone": "black", "label": "Materials" },
+        { "position": [7, 4], "stone": "black", "label": "Packaging" },
+        { "position": [3, 3], "stone": "black" },
+        { "position": [5, 5], "stone": "black" },
+        { "position": [3, 5], "stone": "black" }
+      ]
+    },
+    {
+      "label": "Territory forming",
+      "sublabel": "Accept losses in one corner to gain advantage elsewhere",
+      "durationSec": 2,
+      "stones": [
+        { "position": [5, 3], "stone": "black" },
+        { "position": [1, 1], "stone": "black" },
+        { "position": [7, 7], "stone": "black" },
+        { "position": [1, 7], "stone": "black" },
+        { "position": [7, 1], "stone": "black" }
+      ]
+    }
+  ],
+
+  "source": "Industry analysis",
+  "backgroundTint": "#C23B22",
+  "durationSec": 8
+}

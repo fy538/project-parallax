@@ -1,0 +1,23 @@
+{
+  "skill_name": "asset-source",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Source assets for EP01. Here's the shot list: episodes/EP01-silicon-trap/shot-list.json. Start with the P1 assets only.",
+      "expected_output": "Should read the shot list, identify P1 assets (beat1-tsmc-aerial, beat1-cleanroom, beat2-fdr-1941, beat3-china-rail, beat3-pen-tip, beat5-car-dashboard, beat5-phone-circuit, beat5-hospital-mri, beat5-data-center), attempt to run source.py or acknowledge network limitations, then present scored/ranked candidates or provide actionable fallback.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Find me 5 options for aerial shots of semiconductor factories in the desert. This is for the opening of a video about US chip manufacturing policy. Treatment will be standard (ink → bronze → amber duotone).",
+      "expected_output": "Should run a single-asset search with good search terms, score results on the 5 dimensions, present a ranked table with preview links, and flag that high-contrast architectural/industrial shots will survive duotone best.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Here are the search results from Pexels for 'semiconductor cleanroom'. Score and rank them for me:\n\n[{\"source\":\"pexels\",\"type\":\"photo\",\"id\":2588757,\"url\":\"https://www.pexels.com/photo/2588757\",\"preview\":\"https://images.pexels.com/photos/2588757/pexels-photo-2588757.jpeg?w=400\",\"download\":\"https://images.pexels.com/photos/2588757/pexels-photo-2588757.jpeg\",\"width\":5472,\"height\":3648,\"photographer\":\"Pixabay\",\"license\":\"Pexels License\"},{\"source\":\"pexels\",\"type\":\"photo\",\"id\":3861969,\"url\":\"https://www.pexels.com/photo/3861969\",\"preview\":\"https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?w=400\",\"download\":\"https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg\",\"width\":3024,\"height\":4032,\"photographer\":\"ThisIsEngineering\",\"license\":\"Pexels License\"},{\"source\":\"pexels\",\"type\":\"photo\",\"id\":1108101,\"url\":\"https://www.pexels.com/photo/1108101\",\"preview\":\"https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?w=400\",\"download\":\"https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg\",\"width\":1920,\"height\":1280,\"photographer\":\"Flickr\",\"license\":\"Pexels License\"},{\"source\":\"pexels\",\"type\":\"photo\",\"id\":4219862,\"url\":\"https://www.pexels.com/photo/4219862\",\"preview\":\"https://images.pexels.com/photos/4219862/pexels-photo-4219862.jpeg?w=400\",\"download\":\"https://images.pexels.com/photos/4219862/pexels-photo-4219862.jpeg\",\"width\":640,\"height\":427,\"photographer\":\"RF._.studio\",\"license\":\"Pexels License\"},{\"source\":\"pexels\",\"type\":\"photo\",\"id\":5473298,\"url\":\"https://www.pexels.com/photo/5473298\",\"preview\":\"https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg?w=400\",\"download\":\"https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg\",\"width\":4000,\"height\":2667,\"photographer\":\"Mikhail Nilov\",\"license\":\"Pexels License\"}]",
+      "expected_output": "Should score all 5 results on the 5 dimensions, correctly penalize the portrait photo (3024x4032) on framing, penalize the low-res photo (640x427) on resolution, rank them in a clear table format, and recommend top picks with reasoning.",
+      "files": []
+    }
+  ]
+}

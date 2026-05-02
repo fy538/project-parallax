@@ -16,11 +16,9 @@ import {
   AbsoluteFill,
   useCurrentFrame,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  dark,
   fonts,
   fontSizes,
   fontWeights,
@@ -28,8 +26,9 @@ import {
   layout,
   sec,
   durations,
+  light,
 } from "../../design/theme";
-import { fadeIn, slideIn } from "../../utils/animation";
+import { fadeIn, slideIn, CLAMP, CLAMP_CUBIC } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import type { QuoteData } from "../KineticTypography/types";
@@ -78,7 +77,7 @@ const QuoteVertical: React.FC<{ data: QuoteData; frame: number }> = ({
           fontSize: 42,
           fontFamily: fonts.display,
           fontWeight: fontWeights.bold,
-          color: dark.text.primary,
+          color: light.text.primary,
           lineHeight: 1.4,
           maxWidth: 900,
         }}
@@ -90,11 +89,7 @@ const QuoteVertical: React.FC<{ data: QuoteData; frame: number }> = ({
             frame,
             [wordStart, wordStart + 4],
             [12, 0],
-            {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-              easing: Easing.out(Easing.cubic),
-            }
+            CLAMP_CUBIC
           );
           return (
             <span
@@ -133,7 +128,7 @@ const QuoteVertical: React.FC<{ data: QuoteData; frame: number }> = ({
             style={{
               fontSize: 24,
               fontFamily: fonts.body,
-              color: dark.text.secondary,
+              color: light.text.secondary,
               letterSpacing: letterSpacing.label,
             }}
           >
@@ -144,7 +139,7 @@ const QuoteVertical: React.FC<{ data: QuoteData; frame: number }> = ({
               style={{
                 fontSize: 18,
                 fontFamily: fonts.body,
-                color: dark.text.muted,
+                color: light.text.muted,
                 marginTop: 8,
               }}
             >
@@ -170,11 +165,7 @@ const StatisticVertical: React.FC<{ data: QuoteData; frame: number }> = ({
   const suffix = numericMatch ? numericMatch[2] : raw;
 
   // Count-up animation
-  const countProgress = interpolate(frame, [8, 35], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  const countProgress = interpolate(frame, [8, 35], [0, 1], CLAMP_CUBIC);
   const displayNum =
     targetNum % 1 === 0
       ? Math.round(targetNum * countProgress)
@@ -199,11 +190,7 @@ const StatisticVertical: React.FC<{ data: QuoteData; frame: number }> = ({
       <div
         style={{
           opacity: fadeIn(frame, 5, 8),
-          transform: `scale(${interpolate(frame, [5, 15], [0.8, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-            easing: Easing.out(Easing.cubic),
-          })})`,
+          transform: `scale(${interpolate(frame, [5, 15], [0.8, 1], CLAMP_CUBIC)})`,
         }}
       >
         <span
@@ -236,7 +223,7 @@ const StatisticVertical: React.FC<{ data: QuoteData; frame: number }> = ({
             fontSize: 32,
             fontFamily: fonts.display,
             fontWeight: fontWeights.medium,
-            color: dark.text.primary,
+            color: light.text.primary,
             marginTop: 32,
             opacity: fadeIn(frame, 20, 8),
             maxWidth: 800,
@@ -253,7 +240,7 @@ const StatisticVertical: React.FC<{ data: QuoteData; frame: number }> = ({
           style={{
             fontSize: 22,
             fontFamily: fonts.body,
-            color: dark.text.secondary,
+            color: light.text.secondary,
             marginTop: 24,
             opacity: fadeIn(frame, 30, 8),
             maxWidth: 700,
@@ -296,7 +283,7 @@ const DefinitionVertical: React.FC<{ data: QuoteData; frame: number }> = ({
             fontSize: 120,
             fontFamily: fonts.chinese,
             fontWeight: fontWeights.bold,
-            color: dark.text.primary,
+            color: light.text.primary,
             opacity: fadeIn(frame, 0, 10),
             letterSpacing: 8,
           }}
@@ -324,7 +311,7 @@ const DefinitionVertical: React.FC<{ data: QuoteData; frame: number }> = ({
           style={{
             fontSize: 28,
             fontFamily: fonts.body,
-            color: dark.text.muted,
+            color: light.text.muted,
             marginTop: 16,
             opacity: fadeIn(frame, 15, 8),
             letterSpacing: 2,
@@ -342,10 +329,7 @@ const DefinitionVertical: React.FC<{ data: QuoteData; frame: number }> = ({
           backgroundColor: accent,
           margin: "32px auto",
           opacity: fadeIn(frame, 20, 6),
-          transform: `scaleX(${interpolate(frame, [20, 28], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          })})`,
+          transform: `scaleX(${interpolate(frame, [20, 28], [0, 1], CLAMP)})`,
         }}
       />
 
@@ -371,7 +355,7 @@ const DefinitionVertical: React.FC<{ data: QuoteData; frame: number }> = ({
           style={{
             fontSize: 24,
             fontFamily: fonts.body,
-            color: dark.text.secondary,
+            color: light.text.secondary,
             marginTop: 24,
             opacity: fadeIn(frame, 35, 8),
             maxWidth: 800,
@@ -391,7 +375,7 @@ export const KineticShort: React.FC<{ data: QuoteData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation({ noDrift: true });
 
-  const bgVariant = data.backgroundVariant || "dark";
+  const bgVariant = data.backgroundVariant || "light";
 
   return (
     <Background variant={bgVariant}>

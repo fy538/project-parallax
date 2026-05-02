@@ -16,11 +16,9 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  dark,
   semantic,
   fonts,
   fontSizes,
@@ -28,8 +26,9 @@ import {
   letterSpacing,
   layout,
   sec,
+  light,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, heroSpring, exitFade } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, heroSpring, exitFade, CLAMP, CLAMP_CUBIC } from "../../utils/animation";
 import { contentShadow, accentGlow, cardStyle } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { MetadataStrip } from "../../components/MetadataStrip";
@@ -55,11 +54,7 @@ const GaugeArc: React.FC<{
     frame,
     [startFrame, startFrame + sec(1.5)],
     [0, value / 100],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    }
+    CLAMP_CUBIC
   );
 
   const strokeDashoffset = circumference * (1 - arcProgress);
@@ -88,14 +83,14 @@ const GaugeArc: React.FC<{
         {/* Background arc (full circle, muted) */}
         <path
           d={`M ${strokeWidth / 2} ${arcRadius + strokeWidth / 2} A ${arcRadius} ${arcRadius} 0 0 1 ${arcRadius * 2 + strokeWidth / 2} ${arcRadius + strokeWidth / 2}`}
-          stroke={dark.text.muted}
+          stroke={light.text.muted}
           strokeWidth={strokeWidth}
           fill="none"
           strokeLinecap="round"
           opacity={0.2}
         />
 
-        {/* Foreground arc (animating) */}
+        {/* Foreground arc (animating) — with accent glow */}
         <path
           d={`M ${strokeWidth / 2} ${arcRadius + strokeWidth / 2} A ${arcRadius} ${arcRadius} 0 0 1 ${arcRadius * 2 + strokeWidth / 2} ${arcRadius + strokeWidth / 2}`}
           stroke={color}
@@ -104,32 +99,33 @@ const GaugeArc: React.FC<{
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          style={{ transition: "none" }}
+          style={{ filter: `drop-shadow(0 0 6px ${color}60)` }}
         />
       </svg>
 
-      {/* Percentage label in center */}
+      {/* Percentage label in center — with accent glow */}
       <div
         style={{
           position: "relative",
           top: -arcRadius - 40,
           fontSize: fontSizes.display,
           fontWeight: fontWeights.bold,
-          color: dark.text.primary,
+          color: light.text.primary,
           fontFamily: fonts.data,
           textAlign: "center",
           lineHeight: 1,
+          textShadow: `0 0 20px ${color}40, 0 0 40px ${color}20`,
         }}
       >
         {displayValue}
-        <span style={{ fontSize: fontSizes.h2, color: dark.text.muted }}>%</span>
+        <span style={{ fontSize: fontSizes.h2, color: light.text.muted }}>%</span>
       </div>
 
       {/* Label */}
       <div
         style={{
           fontSize: fontSizes.body,
-          color: dark.text.primary,
+          color: light.text.primary,
           fontWeight: fontWeights.semibold,
           textAlign: "center",
           maxWidth: 180,
@@ -143,7 +139,7 @@ const GaugeArc: React.FC<{
         <div
           style={{
             fontSize: fontSizes.meta,
-            color: dark.text.muted,
+            color: light.text.muted,
             fontFamily: fonts.mono,
             letterSpacing: letterSpacing.meta,
             textTransform: "uppercase",
@@ -174,18 +170,14 @@ const ShiftBar: React.FC<{
     frame,
     [pauseEnd - sec(0.2), pauseEnd],
     [1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP
   );
 
   const afterProgress = interpolate(
     frame,
     [pauseEnd, afterEnd],
     [0, 1],
-    {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    }
+    CLAMP_CUBIC
   );
 
   const displayAfter = Math.round(item.after * afterProgress);
@@ -212,7 +204,7 @@ const ShiftBar: React.FC<{
         style={{
           fontSize: fontSizes.body,
           fontWeight: fontWeights.semibold,
-          color: dark.text.primary,
+          color: light.text.primary,
         }}
       >
         {item.label}
@@ -231,7 +223,7 @@ const ShiftBar: React.FC<{
           style={{
             fontSize: fontSizes.label,
             fontFamily: fonts.data,
-            color: dark.text.secondary,
+            color: light.text.secondary,
             minWidth: 40,
             opacity: beforeOpacity,
           }}
@@ -250,7 +242,7 @@ const ShiftBar: React.FC<{
             borderRadius: 4,
           }}
         >
-          {/* Progress fill */}
+          {/* Progress fill — Remotion-driven, no CSS transition */}
           <div
             style={{
               position: "absolute",
@@ -260,7 +252,7 @@ const ShiftBar: React.FC<{
               width: `${displayAfter}%`,
               backgroundColor: barColor,
               borderRadius: 4,
-              transition: "width 0.02s linear",
+              boxShadow: `0 0 8px ${barColor}40`,
             }}
           />
 
@@ -286,14 +278,14 @@ const ShiftBar: React.FC<{
           style={{
             fontSize: fontSizes.label,
             fontFamily: fonts.data,
-            color: dark.text.primary,
+            color: light.text.primary,
             fontWeight: fontWeights.semibold,
             minWidth: 40,
             opacity: interpolate(
               frame,
               [pauseEnd - sec(0.1), pauseEnd],
               [0, 1],
-              { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+              CLAMP
             ),
           }}
         >
@@ -306,7 +298,7 @@ const ShiftBar: React.FC<{
         <div
           style={{
             fontSize: fontSizes.caption,
-            color: dark.text.muted,
+            color: light.text.muted,
             fontStyle: "italic",
             maxWidth: barWidth + 100,
           }}
@@ -343,17 +335,17 @@ const Scorecard: React.FC<{
         }}
       >
         <thead>
-          <tr style={{ borderBottom: `1px solid ${dark.text.muted}40` }}>
-            <th style={{ textAlign: "left", padding: "12px 0", color: dark.text.muted }}>
+          <tr style={{ borderBottom: `1px solid ${light.text.muted}40` }}>
+            <th style={{ textAlign: "left", padding: "12px 0", color: light.text.muted }}>
               Prediction
             </th>
-            <th style={{ textAlign: "center", padding: "12px 0", color: dark.text.muted }}>
+            <th style={{ textAlign: "center", padding: "12px 0", color: light.text.muted }}>
               Your Est.
             </th>
-            <th style={{ textAlign: "center", padding: "12px 0", color: dark.text.muted }}>
+            <th style={{ textAlign: "center", padding: "12px 0", color: light.text.muted }}>
               Market
             </th>
-            <th style={{ textAlign: "center", padding: "12px 0", color: dark.text.muted }}>
+            <th style={{ textAlign: "center", padding: "12px 0", color: light.text.muted }}>
               Outcome
             </th>
           </tr>
@@ -367,18 +359,19 @@ const Scorecard: React.FC<{
               <tr
                 key={i}
                 style={{
-                  borderBottom: `1px solid ${dark.text.muted}20`,
+                  borderBottom: `1px solid ${light.text.muted}20`,
                   opacity: rowOpacity,
+                  transform: `translateY(${slideIn(frame, rowStartFrame, 12, sec(0.3))}px)`,
                 }}
               >
-                <td style={{ padding: "12px 0", color: dark.text.primary }}>
+                <td style={{ padding: "12px 0", color: light.text.primary }}>
                   {item.prediction}
                 </td>
                 <td
                   style={{
                     textAlign: "center",
                     padding: "12px 0",
-                    color: dark.text.secondary,
+                    color: light.text.secondary,
                   }}
                 >
                   {item.yourEstimate}%
@@ -387,7 +380,7 @@ const Scorecard: React.FC<{
                   style={{
                     textAlign: "center",
                     padding: "12px 0",
-                    color: dark.text.secondary,
+                    color: light.text.secondary,
                   }}
                 >
                   {item.marketPrice !== undefined ? `${item.marketPrice}%` : "—"}
@@ -406,7 +399,7 @@ const Scorecard: React.FC<{
                     <span style={{ color: semantic.danger }}>✕</span>
                   )}
                   {item.outcome === "pending" && (
-                    <span style={{ color: dark.text.muted }}>◐</span>
+                    <span style={{ color: light.text.muted }}>◐</span>
                   )}
                 </td>
               </tr>
@@ -420,12 +413,12 @@ const Scorecard: React.FC<{
         style={{
           marginTop: 20,
           paddingTop: 12,
-          borderTop: `1px solid ${dark.text.muted}40`,
+          borderTop: `1px solid ${light.text.muted}40`,
           display: "flex",
           justifyContent: "space-between",
           fontSize: fontSizes.body,
           fontWeight: fontWeights.semibold,
-          color: dark.text.primary,
+          color: light.text.primary,
         }}
       >
         <span>
@@ -445,11 +438,12 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation({ noExit: true });
   const { durationInFrames } = useVideoConfig();
-  const bgVariant = data.backgroundVariant || "dark";
+  const bgVariant = data.backgroundVariant || "light";
 
   return (
     <Background variant={bgVariant}>
       <AbsoluteFill style={compStyle}>
+      <AbsoluteFill style={{ opacity: exitFade(frame, durationInFrames, 15) }}>
         {/* Title */}
         <div
           style={{
@@ -463,10 +457,10 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
             style={{
               fontSize: fontSizes.h2,
               fontWeight: fontWeights.bold,
-              color: dark.text.primary,
+              color: light.text.primary,
               fontFamily: fonts.heading,
               opacity: fadeIn(frame, 0, sec(0.5)),
-              transform: `translateY(${slideIn(frame, 0, 20)})px`,
+              transform: `translateY(${slideIn(frame, 0, 20)}px)`,
             }}
           >
             {data.title}
@@ -475,7 +469,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
             <div
               style={{
                 fontSize: fontSizes.body,
-                color: dark.text.muted,
+                color: light.text.muted,
                 marginTop: 8,
                 opacity: fadeIn(frame, sec(0.2), sec(0.4)),
               }}
@@ -574,27 +568,16 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
               bottom: layout.safeArea.bottom,
               right: layout.safeArea.right,
               fontSize: fontSizes.caption,
-              color: dark.text.muted,
+              color: light.text.muted,
               opacity: fadeIn(frame, sec(1), sec(0.5)),
+              transform: `translateY(${slideIn(frame, sec(1), 8, sec(0.5))}px)`,
             }}
           >
             Source: {data.source}
           </div>
         )}
 
-        {/* Exit fade on last 15 frames */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "black",
-            opacity: exitFade(frame, durationInFrames, 15),
-            pointerEvents: "none",
-          }}
-        />
+      </AbsoluteFill>
       </AbsoluteFill>
     </Background>
   );

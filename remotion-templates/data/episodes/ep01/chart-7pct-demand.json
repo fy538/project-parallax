@@ -1,0 +1,25 @@
+{
+  "episode": "EP01",
+  "title": "TSMC Arizona: a drop in the ocean",
+  "subtitle": "Share of US advanced chip demand",
+  "variant": "bar",
+  "unit": "%",
+  "dataPoints": [
+    {
+      "label": "TSMC Arizona",
+      "value": 7,
+      "color": "#3266AD",
+      "sublabel": "$165B invested"
+    },
+    {
+      "label": "Remaining demand",
+      "value": 93,
+      "color": "#888780",
+      "sublabel": "Still imported"
+    }
+  ],
+  "source": "SIA estimates, 2025",
+  "durationSec": 4,
+  "highlightIndex": 0,
+  "contextNote": "The flagship achievement of US reshoring — a technical triumph and a strategic drop in the ocean."
+}

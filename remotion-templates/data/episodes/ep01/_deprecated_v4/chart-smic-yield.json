@@ -1,0 +1,31 @@
+{
+  "episode": "EP01",
+  "title": "SMIC 7nm yield improvement",
+  "subtitle": "Brute force is working — slowly",
+  "variant": "bar",
+  "unit": "%",
+  "backgroundTint": "#C23B22",
+  "dataPoints": [
+    {
+      "label": "Early 2024",
+      "value": 40,
+      "color": "#C23B22",
+      "sublabel": "<40%"
+    },
+    {
+      "label": "Mid-2025",
+      "value": 65,
+      "color": "#E5A544",
+      "sublabel": "~60-70%"
+    }
+  ],
+  "referenceLine": {
+    "value": 85,
+    "label": "Western target",
+    "color": "#3266AD"
+  },
+  "highlightIndex": 1,
+  "source": "Industry estimates; TechInsights",
+  "contextNote": "Yields went from below 40% to 60–70% by mid-2025. The gap is closing — but a ceiling remains.",
+  "durationSec": 5
+}

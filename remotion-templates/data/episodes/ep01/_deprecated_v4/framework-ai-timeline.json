@@ -1,0 +1,42 @@
+{
+  "episode": "EP01",
+  "title": "The AI Timeline Question",
+  "subtitle": "The answer determines whether export controls succeed or backfire",
+  "variant": "flow",
+  "nodes": [
+    {
+      "label": "Transformative AI arrives",
+      "sublabel": "The central unknown",
+      "color": "#E5A544"
+    },
+    {
+      "label": "Fast (2-3 years)",
+      "sublabel": "Controls bought enough time",
+      "color": "#3266AD"
+    },
+    {
+      "label": "Slow (10+ years)",
+      "sublabel": "China builds self-sufficiency",
+      "color": "#C23B22"
+    },
+    {
+      "label": "US keeps decisive lead",
+      "sublabel": "Controls vindicated",
+      "color": "#3266AD"
+    },
+    {
+      "label": "Controls backfire",
+      "sublabel": "Cost billions, motivated China's independence",
+      "color": "#C23B22"
+    }
+  ],
+  "arrowLabels": [
+    "Timeline?",
+    "Then →",
+    "Then →",
+    "Result:",
+    "Result:"
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 10
+}

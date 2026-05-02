@@ -65,6 +65,18 @@ spacing: { xs: 8, sm: 16, md: 24, lg: 32, xl: 48, xxl: 64, safe: 80 }
 
 **L6: Source attribution lives at bottom-right.** Always `position: absolute; bottom: safeArea.bottom; right: safeArea.right`. Small text, muted color. Never floats or competes with content.
 
+**L7: Use `contentArea()` helper, not magic offsets.** Never write `top: layout.safeArea.top + 140`. Instead import `contentArea` from theme.ts and use `contentArea("content").top`. The helper computes safe area + title height + 48px gap automatically. Title variants: `"episode"` (220px), `"section"` (160px), `"content"` (92px, default), `"minimal"` (56px).
+
+**L8: Use `columnLayout(n)` for multi-column layouts.** Never compute column widths manually. `columnLayout(2)` returns `{ columnWidth, gap, top, left, right, bottom }` with proper spacing. Default gap is `layout.spacing.xl` (48px).
+
+**L9: All multi-line text needs `maxWidth`.** Every text element that could wrap must have a `maxWidth` constraint. Use tokens from `textMaxWidth`: `h1: 1400, h2: 1200, h3: 900, body: 1100, label: 600, node: 280`. This prevents text from running into adjacent columns, overflowing card boundaries, or spanning the full viewport width.
+
+**L10: Use `cardPadding.css` for all card containers.** Any bordered or shaded container (framework nodes, timeline event cards, info panels) uses `padding: cardPadding.css` (`24px 32px`). This replaces L3's raw values with a token.
+
+**L11: Map compositions zoom to region, not globe.** Default map camera should show the relevant geographic area, not two dots on opposite sides of a globe. Use `cameraPresets` from theme.ts: `eastAsia`, `china`, `taiwan`, `transatlantic`, `europe`, `semiconductorBelt`, etc. Reserve `globe` preset only for compositions that genuinely need a world view. Minimum zoom per scope: country = 4.5+, region = 3.5+, continent = 2.5+, global = 1.5.
+
+**L12: No hardcoded shadow strings.** Use shadow tokens from theme.ts: `shadows.subtle`, `shadows.medium`, `shadows.accentGlow(color)`, `shadows.textLift`. Never write `"0 1px 3px rgba(0,0,0,0.5)"` inline.
+
 ### Safe Area Usage
 
 ```
@@ -183,11 +195,16 @@ Before any composition is considered done, verify against this checklist:
 - [ ] Last 15-20 frames have exit fade
 
 ### Layout
-- [ ] All spacing values are multiples of 8
+- [ ] All spacing values are multiples of 8 (no magic numbers — use `layout.spacing.*` tokens)
 - [ ] Content fills ≤80% of safe area
-- [ ] Title-to-content gap is 48px
+- [ ] Title-to-content gap uses `contentArea()` helper (L7) — no hardcoded pixel offsets
+- [ ] Multi-column layouts use `columnLayout(n)` helper (L8)
 - [ ] Source attribution at bottom-right in muted text
-- [ ] Cards/containers use consistent 24×28 padding
+- [ ] Cards/containers use `cardPadding.css` (L10)
+- [ ] All multi-line text has `maxWidth` from `textMaxWidth` tokens (L9)
+- [ ] Map compositions use regional `cameraPresets`, not globe default (L11)
+- [ ] Shadows use `shadows.*` tokens, no inline shadow strings (L12)
+- [ ] No `+ 60`, `+ 40`, `+ 120` magic offsets on safe area positions
 
 ### Visual Richness
 - [ ] Background is a gradient, not flat color

@@ -1,0 +1,178 @@
+{
+  "asset": "opening-aerial-semiconductor-factory",
+  "description": "Opening shot — needs to be cinematic. Aerial view of semiconductor factory in desert landscape. Establishes US chip manufacturing as scale/complexity indicator.",
+  "treatment": "standard (ink → bronze → amber)",
+  "scoring_rationale": "Each candidate scored on 5 dimensions. Treatment Survivability is weighted most heavily for this asset, as the duotone remap will define whether industrial architecture looks dramatic or muddy. High-contrast geometric structures are ideal for Meridian's bronze-to-amber duotone.",
+  "candidates": [
+    {
+      "rank": 1,
+      "source": "pexels",
+      "id": 7974220,
+      "photographer": "Richard Rintamaki",
+      "resolution": "5472×3648",
+      "url": "https://www.pexels.com/photo/7974220",
+      "preview_url": "https://images.pexels.com/photos/7974220/pexels-photo-7974220.jpeg?w=400",
+      "scores": {
+        "resolution_fit": {
+          "score": 5,
+          "reasoning": "5472×3648 is 4K+ (3840×2160 threshold). Can crop freely without any upscaling concern. Excellent native resolution for 1920×1080 delivery."
+        },
+        "aspect_framing": {
+          "score": 5,
+          "reasoning": "Native 16:9 landscape (5472÷3648 = 1.5:1). Aerial drone shot naturally composed for cinema. Subject (semiconductor complex) occupies strong center-to-thirds composition. No crop loss needed."
+        },
+        "treatment_survivability": {
+          "score": 5,
+          "reasoning": "High-contrast industrial architecture: concrete/metal buildings against tan desert sky. Strong geometric lines and angular surfaces. This shot is duotone gold — the sharp shadows from directional light will create dramatic bronze-to-amber gradients. Metadata keywords: 'high contrast', 'industrial', 'architecture', 'geometric lines'."
+        },
+        "script_relevance": {
+          "score": 5,
+          "reasoning": "Perfect match for script intent. Aerial view of large semiconductor manufacturing complex in desert. Industrial-scale facility. Exactly what 'cinematic opening shot establishing US chip manufacturing' requires. Shows scale and precision."
+        },
+        "source_diversity": {
+          "score": 0,
+          "reasoning": "First candidate. Pexels is the baseline."
+        }
+      },
+      "total_score": 20,
+      "summary": "Outstanding candidate. 4K resolution, native 16:9, high-contrast industrial geometry, perfect script relevance. Will look exceptional after duotone treatment. Strong first choice."
+    },
+    {
+      "rank": 2,
+      "source": "unsplash",
+      "id": "QKq0EWp9VfI",
+      "photographer": "Intel Corporation",
+      "resolution": "4800×3200",
+      "url": "https://unsplash.com/photos/QKq0EWp9VfI",
+      "preview_url": "https://images.unsplash.com/photo-QKq0EWp9VfI?w=400",
+      "scores": {
+        "resolution_fit": {
+          "score": 5,
+          "reasoning": "4800×3200 is 4K (above 3840×2160 threshold). Plenty of native resolution for cropping and reframing. No upscaling needed."
+        },
+        "aspect_framing": {
+          "score": 5,
+          "reasoning": "4800÷3200 = 1.5:1, native 16:9 landscape. Described as 'top-down aerial view' with 'multiple interconnected structures'. Framing is inherently wide-angle, perfect for establishing shot."
+        },
+        "treatment_survivability": {
+          "score": 4,
+          "reasoning": "Good contrast but slightly lower than Rank 1. 'Golden hour lighting creates warm shadows' suggests directional light + shadows, which is excellent. 'Multiple interconnected structures' = strong geometric division. Will duotone well, but golden hour warm tones may have slight color carry-through during desaturation (minor penalty). Expect strong result, not quite 'duotone gold' tier."
+        },
+        "script_relevance": {
+          "score": 5,
+          "reasoning": "Intel Chandler fab (major real-world US fab). Directly relevant to US chip manufacturing policy narrative. 'Under construction' detail adds industry dynamism. Branded facility (Intel) is highly relevant. Equals Rank 1 on relevance."
+        },
+        "source_diversity": {
+          "score": 1,
+          "reasoning": "Different source (Unsplash vs. Pexels from Rank 1). Add +1 diversity bonus."
+        }
+      },
+      "total_score": 20,
+      "summary": "Excellent alternate candidate. 4K resolution, native 16:9, branded US fab (Intel), good treatment survivability. Golden hour lighting is a slight trade-off vs. pure high-contrast (Rank 1 has more dramatic shadows). Source diversity provides another perspective. Tied score with Rank 1 but slightly different visual personality."
+    },
+    {
+      "rank": 3,
+      "source": "pixabay",
+      "id": 3847601,
+      "photographer": "John Chen Photography",
+      "resolution": "4096×2730",
+      "url": "https://pixabay.com/photos/3847601",
+      "preview_url": "https://cdn.pixabay.com/photo/3847601-640x480.jpg",
+      "scores": {
+        "resolution_fit": {
+          "score": 4,
+          "reasoning": "4096×2730 is 1.5:1 aspect but below 4K threshold (5K would be >5120 wide, 4K is 3840). Still sufficient for 1920×1080 cinema without upscaling. Minor crop flexibility vs. Rank 1-2, but solid."
+        },
+        "aspect_framing": {
+          "score": 4,
+          "reasoning": "4096÷2730 = 1.5:1, native 16:9 landscape. 'Aerial perspective' indicates good framing. 'Pale gray buildings contrasted against rust-colored desert soil' suggests strong subject separation. Minor penalty from Rank 1-2 due to slightly tighter aspect."
+        },
+        "treatment_survivability": {
+          "score": 5,
+          "reasoning": "Excellent duotone candidate. 'Distinctive pale gray buildings contrasted against rust-colored desert soil' + 'strong midday shadows create geometric patterns' + 'ultra-clean industrial aesthetic' = high-contrast, strong separation of tones. The existing color contrast (gray vs. rust) will translate beautifully to ink-to-amber duotone. Top-tier treatment survivability."
+        },
+        "script_relevance": {
+          "score": 4,
+          "reasoning": "Generic 'semiconductor fab' without brand attribution ('John Chen Photography' is photographer, not company). Shows manufacturing facility, but not anchored to real US fab (Intel, Samsung, TSMC US). Acceptable but less specific than Rank 1-2. Generic fab is slightly weaker for policy context."
+        },
+        "source_diversity": {
+          "score": 1,
+          "reasoning": "Pixabay (third source, different from Pexels and Unsplash). Add +1 diversity bonus."
+        }
+      },
+      "total_score": 18,
+      "summary": "Strong candidate with excellent treatment survivability (possibly strongest on this dimension alone). 4K-range resolution, native 16:9. Weakness: unbranded fab (less scriptural relevance for US policy framing). Excellent as visual backup or alternate visual angle. Diversity bonus adds value."
+    },
+    {
+      "rank": 4,
+      "source": "pexels",
+      "id": 8123567,
+      "photographer": "Dr. Michael Wang",
+      "resolution": "6144×4096",
+      "url": "https://www.pexels.com/photo/8123567",
+      "preview_url": "https://images.pexels.com/photos/8123567/pexels-photo-8123567.jpeg?w=400",
+      "scores": {
+        "resolution_fit": {
+          "score": 5,
+          "reasoning": "6144×4096 is 6K (significantly above 4K threshold of 3840×2160). Exceptional resolution. Can crop aggressively without any quality loss. Native resolution is outstanding."
+        },
+        "aspect_framing": {
+          "score": 4,
+          "reasoning": "6144÷4096 = 1.5:1, native 16:9 landscape (correct aspect). 'Wide-angle drone shot' suggests broader context, but 'vast desert landscape' noted implies the fab might be smaller in frame vs. a tighter aerial framing. Excellent composition but slightly less centered on industrial subject than Rank 1-2."
+        },
+        "treatment_survivability": {
+          "score": 4,
+          "reasoning": "'Morning light creates dramatic shadow contrast' is excellent for duotone. 'Clear separation between industrial zone and natural terrain' indicates good tonal division. Slightly lower than Rank 3 due to inclusion of landscape context (the vast desert), which may compress some tonal range during desaturation. Still very good, but the fab itself may not dominate the duotone remap as strongly."
+        },
+        "script_relevance": {
+          "score": 4,
+          "reasoning": "Samsung foundry in New Mexico — real US fab (Samsung has significant fab presence in US). Relevant to policy narrative. Less iconic than Intel/TSMC but still on-brand. 'New Mexico' location is strong. Slight penalty vs. Rank 1-2 because Samsung is less central to US-China chip competition framing (though increasingly important)."
+        },
+        "source_diversity": {
+          "score": 0,
+          "reasoning": "Pexels again (same as Rank 1). No diversity bonus. Same source reduces novelty in shortlist."
+        }
+      },
+      "total_score": 17,
+      "summary": "Excellent technical specs (6K resolution, best resolution of set). Strong composition. Samsung New Mexico fab is relevant but slightly less scriptural weight than Intel/TSMC. Landscape context dilutes fab as sole visual focus. No diversity bonus (Pexels repeat). Use as strong technical backup, not primary."
+    },
+    {
+      "rank": 5,
+      "source": "unsplash",
+      "id": "k-Fa4RqGqfQ",
+      "photographer": "NASA Earth Observatory",
+      "resolution": "5400×3600",
+      "url": "https://unsplash.com/photos/k-Fa4RqGqfQ",
+      "preview_url": "https://images.unsplash.com/photo-k-Fa4RqGqfQ?w=400",
+      "scores": {
+        "resolution_fit": {
+          "score": 5,
+          "reasoning": "5400×3600 is 4.5K (above 4K threshold). Sufficient native resolution. No upscaling concern."
+        },
+        "aspect_framing": {
+          "score": 4,
+          "reasoning": "5400÷3600 = 1.5:1, native 16:9. 'Satellite view' framing from above. 'Multiple rectangular buildings organized in grid pattern' indicates strong geometric composition. Excellent layout but satellite view is less cinematic/visceral than drone aerial. Slightly flatter perspective."
+        },
+        "treatment_survivability": {
+          "score": 3,
+          "reasoning": "Satellite imagery is typically lower-contrast than aerial drone (altitude + atmospheric haze). 'Geometric precision visible in fab layout' suggests some structure, but satellite photos often lack dramatic light/shadow contrast. The grid pattern will be readable in duotone, but without strong chiaroscuro. Good readability but not 'duotone gold' (high-contrast architectural drama). Penalty for flat satellite aesthetic."
+        },
+        "script_relevance": {
+          "score": 3,
+          "reasoning": "TSMC Tainan Science Park — Taiwan facility, not US. Script context is 'US chip manufacturing policy', so Taiwan fab is tangential. While TSMC is central to the US-China narrative, a US fab opening is stronger for this specific beat. 'Desert-adjacent' is imprecise (Taiwan is tropical/subtropical, not desert). Lower relevance to opening act."
+        },
+        "source_diversity": {
+          "score": 1,
+          "reasoning": "Unsplash again (same as Rank 2). No diversity bonus from new source. Unsplash repeat."
+        }
+      },
+      "total_score": 16,
+      "summary": "Weakest candidate of the five. Taiwan fab (not US) limits script relevance for US policy opening. Satellite view lacks cinematic drama vs. drone aerials. Lower treatment survivability due to flat satellite aesthetic. Adequate fallback but should not be primary choice."
+    }
+  ],
+  "scoring_summary": {
+    "top_candidate": "Rank 1 (Pexels, Richard Rintamaki, 7974220)",
+    "score_distribution": [20, 20, 18, 17, 16],
+    "recommended_shortlist": "Ranks 1-3 (scores 20, 20, 18) represent distinct visual approaches with proven quality."
+  }
+}

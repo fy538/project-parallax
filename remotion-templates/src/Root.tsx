@@ -19,18 +19,24 @@ import { DecisionTreeComposition } from "./templates/DecisionTree";
 import { SplitCompositionComposition } from "./templates/SplitComposition";
 import { ProbabilityGaugeComposition } from "./templates/ProbabilityGauge";
 import { ImageCompositeComposition } from "./templates/ImageComposite";
+import { PhotoMontageComposition } from "./templates/PhotoMontage";
+import { NetworkDiagramComposition } from "./templates/NetworkDiagram";
+import { TimeSeriesChartComposition } from "./templates/TimeSeriesChart";
+import { SankeyFlowComposition } from "./templates/SankeyFlow";
+import { GameBoardComposition } from "./templates/GameBoard";
 import {
   KineticShortComposition,
   DataChartShortComposition,
   SplitShortComposition,
 } from "./templates/Shorts";
-import { EP01Composition } from "./templates/Episodes";
+import { EP01Composition, EP01FullComposition } from "./templates/Episodes";
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Folder name="Episodes">
         <EP01Composition />
+        <EP01FullComposition />
       </Folder>
 
       <Folder name="Maps">
@@ -44,6 +50,8 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Data">
         <DataChartComposition />
+        <TimeSeriesChartComposition />
+        <SankeyFlowComposition />
         <ProbabilityGaugeComposition />
       </Folder>
 
@@ -53,11 +61,13 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Diagrams">
         <FrameworkDiagramComposition />
+        <NetworkDiagramComposition />
         <SplitCompositionComposition />
       </Folder>
 
       <Folder name="Scenarios">
         <DecisionTreeComposition />
+        <GameBoardComposition />
       </Folder>
 
       <Folder name="Transitions">
@@ -66,6 +76,7 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Cinematic">
         <ImageCompositeComposition />
+        <PhotoMontageComposition />
       </Folder>
 
       <Folder name="Shorts">

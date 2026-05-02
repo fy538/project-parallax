@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly identifies all P1 assets from the shot list (beat1-tsmc-aerial, beat1-cleanroom, beat2-fdr-1941, beat3-china-rail, beat3-pen-tip, beat5-car-dashboard, beat5-phone-circuit, beat5-hospital-mri, beat5-data-center)",
+      "passed": true,
+      "evidence": "candidates-presentation.md lists all 9 P1 assets as separate sections with correct IDs"
+    },
+    {
+      "text": "Reads or references IMAGES.md for sourcing guidelines",
+      "passed": true,
+      "evidence": "transcript.md Phase 2 mentions reading IMAGES.md and BRAND.md for treatment pipeline context"
+    },
+    {
+      "text": "Attempts to run source.py or acknowledges network limitations and provides a fallback plan",
+      "passed": true,
+      "evidence": "transcript.md documents acknowledging sandbox network limitation and pivoting to metadata-based scoring with manual preview verification"
+    },
+    {
+      "text": "Flags beat2-fdr-1941 as unlikely to have stock results (historical/archival)",
+      "passed": true,
+      "evidence": "candidates-presentation.md has explicit 'SOURCING NOTE' for beat2-fdr-1941 recommending Library of Congress, Wikimedia Commons, and National Archives instead of stock libraries"
+    },
+    {
+      "text": "Presents results in a scored table format with the 5 scoring dimensions",
+      "passed": true,
+      "evidence": "Each asset has a markdown table with columns: #, Preview, Source/Photographer, Resolution, Score (/25), Breakdown (Res:X Frm:X Trt:X Rel:X Div:X)"
+    },
+    {
+      "text": "Distinguishes between treatment ramps (standard vs conflict) based on shot list",
+      "passed": true,
+      "evidence": "beat3-china-rail and beat3-pen-tip correctly show 'Treatment: conflict (ink → rust-mid → rust)' while other assets show 'standard'"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "total": 6,
+    "pass_rate": 1.0
+  }
+}

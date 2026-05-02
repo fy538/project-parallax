@@ -14,3 +14,5 @@ export { useCompositionAnimation } from "./useCompositionAnimation";
 export { useEntrance, useStaggeredEntrance } from "./useEntrance";
 export type { EntranceRole } from "./useEntrance";
 export { useDivider } from "./useDivider";
+export { useThemeMode } from "./useThemeMode";
+export type { ThemeTokens } from "./useThemeMode";

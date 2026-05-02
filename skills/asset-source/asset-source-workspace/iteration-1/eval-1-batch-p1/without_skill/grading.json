@@ -1,0 +1,40 @@
+{
+  "expectations": [
+    {
+      "text": "Correctly identifies all P1 assets from the shot list (beat1-tsmc-aerial, beat1-cleanroom, beat2-fdr-1941, beat3-china-rail, beat3-pen-tip, beat5-car-dashboard, beat5-phone-circuit, beat5-hospital-mri, beat5-data-center)",
+      "passed": true,
+      "evidence": "Summary mentions all 9 P1 assets across 5 beats with correct media types"
+    },
+    {
+      "text": "Reads or references IMAGES.md for sourcing guidelines",
+      "passed": false,
+      "evidence": "No evidence of reading IMAGES.md. The baseline mentioned treatment ramps only because the prompt mentioned duotone, not because it consulted the brand docs"
+    },
+    {
+      "text": "Attempts to run source.py or acknowledges network limitations and provides a fallback plan",
+      "passed": true,
+      "evidence": "Ran source.py, encountered 403 errors, acknowledged sandbox limitation, provided 3 fallback options (local run, hand-pick, hybrid)"
+    },
+    {
+      "text": "Flags beat2-fdr-1941 as unlikely to have stock results (historical/archival)",
+      "passed": true,
+      "evidence": "Option C in recommendations suggests 'manually curate 2 specialized ones (FDR historical, pen tip macro)'"
+    },
+    {
+      "text": "Presents results in a scored table format with the 5 scoring dimensions",
+      "passed": false,
+      "evidence": "No scored table with dimension breakdowns. Results presented as structured JSON and summary text, but without the standardized 5-dimension scoring rubric"
+    },
+    {
+      "text": "Distinguishes between treatment ramps (standard vs conflict) based on shot list",
+      "passed": false,
+      "evidence": "Summary mentions '7 standard treatment + 1 conflict treatment' in aggregate but does not apply treatment-specific scoring or guidance per asset"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6,
+    "pass_rate": 0.5
+  }
+}

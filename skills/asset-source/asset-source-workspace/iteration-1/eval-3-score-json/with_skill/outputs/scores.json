@@ -1,0 +1,217 @@
+{
+  "evaluation": {
+    "search_query": "semiconductor cleanroom",
+    "source": "pexels",
+    "date": "2026-04-26",
+    "asset_id": "beat1-cleanroom-footage",
+    "asset_type": "photo",
+    "asset_priority": "P1",
+    "asset_treatment": "standard",
+    "asset_context": "EP01 Beat 1 — cleanroom wafer handling macro shots (18s), inset @ 70%, standard duotone treatment",
+    "results_count": 5
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "source_id": 5473298,
+      "source_platform": "pexels",
+      "photographer": "Mikhail Nilov",
+      "url": "https://www.pexels.com/photo/5473298",
+      "preview_url": "https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg?w=400",
+      "download_url": "https://images.pexels.com/photos/5473298/pexels-photo-5473298.jpeg",
+      "resolution": {
+        "width": 4000,
+        "height": 2667,
+        "aspect_ratio": "1.498:1",
+        "classification": "4K landscape"
+      },
+      "license": "Pexels License (free, no attribution required)",
+      "scores": {
+        "resolution_fit": 5,
+        "aspect_framing": 5,
+        "treatment_survivability": 4,
+        "script_relevance": 3,
+        "source_diversity_bonus": 0,
+        "total": 21
+      },
+      "score_notes": {
+        "resolution_fit": "Exceeds 4K threshold (4000×2667). Can crop and reframe freely without quality loss.",
+        "aspect_framing": "Native landscape, excellent 16:9 ratio, subject centered. Safe framing.",
+        "treatment_survivability": "Professional photographer, landscape composition suggests good light/dark separation. High confidence on duotone performance.",
+        "script_relevance": "Cannot assess content from metadata alone. Professional source + landscape + 4K suggest meaningful composition, but actual cleanroom relevance unknown.",
+        "diversity": "First Pexels result; no diversity bonus in metadata-only scoring."
+      },
+      "recommendation": "TIER 1 — Production-ready if preview confirms cleanroom/manufacturing content."
+    },
+    {
+      "rank": 2,
+      "source_id": 2588757,
+      "source_platform": "pexels",
+      "photographer": "Pixabay",
+      "url": "https://www.pexels.com/photo/2588757",
+      "preview_url": "https://images.pexels.com/photos/2588757/pexels-photo-2588757.jpeg?w=400",
+      "download_url": "https://images.pexels.com/photos/2588757/pexels-photo-2588757.jpeg",
+      "resolution": {
+        "width": 5472,
+        "height": 3648,
+        "aspect_ratio": "1.5:1",
+        "classification": "4K+ landscape"
+      },
+      "license": "Pexels License (free, no attribution required)",
+      "scores": {
+        "resolution_fit": 5,
+        "aspect_framing": 5,
+        "treatment_survivability": 4,
+        "script_relevance": 3,
+        "source_diversity_bonus": 0,
+        "total": 20
+      },
+      "score_notes": {
+        "resolution_fit": "Exceeds 4K (5472×3648 = 8K source). Extreme headroom for cropping.",
+        "aspect_framing": "Native landscape 16:9, excellent ratio. Very safe framing.",
+        "treatment_survivability": "Pixabay archive = stock photography. Without photographer name/style, estimate assumes mid-range contrast. Treatment survivability likely solid but less predictable than named professional.",
+        "script_relevance": "Unknown content. Pixabay generic stock suggests generic tech/industrial (lower confidence on cleanroom specificity).",
+        "diversity": "Same Pexels source as #1."
+      },
+      "recommendation": "TIER 1 — Marginally lower confidence than #1 due to unknown photographer style, but highest absolute resolution. Select if preview shows superior macro detail."
+    },
+    {
+      "rank": 3,
+      "source_id": 3861969,
+      "source_platform": "pexels",
+      "photographer": "ThisIsEngineering",
+      "url": "https://www.pexels.com/photo/3861969",
+      "preview_url": "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg?w=400",
+      "download_url": "https://images.pexels.com/photos/3861969/pexels-photo-3861969.jpeg",
+      "resolution": {
+        "width": 3024,
+        "height": 4032,
+        "aspect_ratio": "0.75:1",
+        "classification": "Portrait-orientation HD"
+      },
+      "license": "Pexels License (free, no attribution required)",
+      "scores": {
+        "resolution_fit": 4,
+        "aspect_framing": 2,
+        "treatment_survivability": 4,
+        "script_relevance": 4,
+        "source_diversity_bonus": 0,
+        "total": 18
+      },
+      "score_notes": {
+        "resolution_fit": "3024×4032 portrait. Can fill 1080p (2.2x the area needed), but orientation matters more than raw pixels.",
+        "aspect_framing": "STRUCTURAL PROBLEM: Portrait orientation (3:4) cropped to 16:9 loses ~40% of vertical content. Subject placement uncertain without preview. High risk of important details in the crop zone.",
+        "treatment_survivability": "Brand 'ThisIsEngineering' strongly suggests technical/manufacturing photography with good contrast. High confidence on treatment, but...",
+        "script_relevance": "Brand name explicitly references engineering. If this is a cleanroom/manufacturing shot, script fit is excellent (score: 4). BUT portrait orientation undermines entire value.",
+        "diversity": "Same Pexels source."
+      },
+      "recommendation": "TIER 2 — Only select if preview shows cleanroom content with subject safely positioned in 16:9-safe zone. Otherwise skip due to framing liability. Portrait orientation is a structural problem for video insets."
+    },
+    {
+      "rank": 4,
+      "source_id": 1108101,
+      "source_platform": "pexels",
+      "photographer": "Flickr",
+      "url": "https://www.pexels.com/photo/1108101",
+      "preview_url": "https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?w=400",
+      "download_url": "https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg",
+      "resolution": {
+        "width": 1920,
+        "height": 1280,
+        "aspect_ratio": "1.5:1",
+        "classification": "1080p landscape (minimum viable)"
+      },
+      "license": "Pexels License (free, no attribution required)",
+      "scores": {
+        "resolution_fit": 4,
+        "aspect_framing": 5,
+        "treatment_survivability": 3,
+        "script_relevance": 3,
+        "source_diversity_bonus": 0,
+        "total": 15
+      },
+      "score_notes": {
+        "resolution_fit": "Exactly 1920×1080 (1:1 match to target video size). No crop headroom. Cannot enlarge without pixelation.",
+        "aspect_framing": "Native landscape 16:9. Framing likely safe, but zero reframing flexibility.",
+        "treatment_survivability": "Flickr archive = documentary/generalist photography. Tonal range uncertain. Moderate confidence on duotone treatment (may be average contrast).",
+        "script_relevance": "Unknown content. Flickr suggests archival/documentary quality but generic stock film.",
+        "diversity": "Same Pexels source."
+      },
+      "recommendation": "TIER 3 — Meets minimum specs but zero flexibility. Only use if #1, #2, #3 are all unsuitable and deadlines force a pick. No crop ability = no safety margin."
+    },
+    {
+      "rank": 5,
+      "source_id": 4219862,
+      "source_platform": "pexels",
+      "photographer": "RF._.studio",
+      "url": "https://www.pexels.com/photo/4219862",
+      "preview_url": "https://images.pexels.com/photos/4219862/pexels-photo-4219862.jpeg?w=400",
+      "download_url": "https://images.pexels.com/photos/4219862/pexels-photo-4219862.jpeg",
+      "resolution": {
+        "width": 640,
+        "height": 427,
+        "aspect_ratio": "1.5:1",
+        "classification": "SD landscape (unusable)"
+      },
+      "license": "Pexels License (free, no attribution required)",
+      "scores": {
+        "resolution_fit": 2,
+        "aspect_framing": 4,
+        "treatment_survivability": 2,
+        "script_relevance": 3,
+        "source_diversity_bonus": 0,
+        "total": 10
+      },
+      "score_notes": {
+        "resolution_fit": "Below minimum viable threshold. 640px width vs 1920px target = 3x upscaling. Upscaling artifacts will be visible even at small sizes.",
+        "aspect_framing": "Landscape ratio is technically fine, but resolution constraint makes framing irrelevant.",
+        "treatment_survivability": "Low resolution compounds with duotone treatment: upscaling artifacts + reduced tonal gradation = banding and visible noise. Post-treatment will look degraded.",
+        "script_relevance": "Studio credit suggests professional work, but resolution collapse negates any content value.",
+        "diversity": "Same Pexels source."
+      },
+      "recommendation": "DISQUALIFY — Resolution is fatal. Never use SD stock in 1080p+ production, especially after duotone treatment amplifies compression artifacts."
+    }
+  ],
+  "summary": {
+    "tier_1_candidates": [5473298, 2588757],
+    "tier_2_candidates": [3861969],
+    "tier_3_candidates": [1108101],
+    "disqualified_candidates": [4219862],
+    "recommendation": "Select from Tier 1 (#1 or #2) based on preview content assessment. Both are production-ready on technical merits.",
+    "alternative_search_strategy": "If previews show generic/irrelevant content, recommend broadening search to: 'chip fabrication', 'lithography machine', 'TSMC fab interior', 'wafer manufacturing macro', or commissioning a technical macro shot from Unsplash/professional photographer."
+  },
+  "scoring_dimensions": {
+    "1_resolution_fit": {
+      "5": "≥3840×2160 (4K+) — can crop freely",
+      "4": "≥1920×1080 — fits 1080p, some crop room",
+      "3": "≥1280×720 — usable but tight",
+      "2": "≥640×480 — needs upscaling, visible softness",
+      "1": "<640 on any axis — unusable"
+    },
+    "2_aspect_framing": {
+      "5": "Native 16:9 landscape, strong subject placement",
+      "4": "Landscape, may need minor crop but subject is safe",
+      "3": "Square or wide landscape — cropping loses some context",
+      "2": "Portrait — significant content loss in 16:9 crop",
+      "1": "Extreme portrait or panoramic — unusable without severe crop"
+    },
+    "3_treatment_survivability": {
+      "5": "High contrast, strong geometric forms, clear light/dark separation",
+      "4": "Good contrast, recognizable subjects, well-lit",
+      "3": "Medium contrast, some flat areas but overall readable",
+      "2": "Flat lighting, low contrast, pastel/washed-out",
+      "1": "Extremely flat, filtered, or neon-dependent"
+    },
+    "4_script_relevance": {
+      "5": "Exact match — shows precisely what narration describes",
+      "4": "Strong match — right subject, right mood, minor differences",
+      "3": "Acceptable — right category but generic",
+      "2": "Tangential — broadly related but different context",
+      "1": "Wrong subject — off-topic"
+    },
+    "5_diversity_bonus": {
+      "1": "+1 if source differs from top-ranked candidate",
+      "0": "No bonus if same source as rank #1"
+    }
+  }
+}

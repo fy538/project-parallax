@@ -1,0 +1,35 @@
+{
+  "expectations": [
+    {
+      "text": "Generates reasonable search terms from the ad-hoc description",
+      "passed": true,
+      "evidence": "PRESENTATION.md lists 3 search terms: 'semiconductor factory aerial desert', 'chip fab construction drone', 'intel tsmc samsung fab aerial'"
+    },
+    {
+      "text": "Attempts to run source.py or acknowledges network limitations",
+      "passed": true,
+      "evidence": "transcript.md documents attempting source.py, hitting sandbox proxy block, and pivoting to metadata-based candidate generation"
+    },
+    {
+      "text": "Mentions treatment survivability as a scoring factor",
+      "passed": true,
+      "evidence": "Each candidate has a Trt score and detailed treatment survivability analysis. #1 described as 'duotone gold' with keywords 'high contrast, industrial, architecture, geometric lines'"
+    },
+    {
+      "text": "Notes that high-contrast architectural/industrial shots will survive duotone best",
+      "passed": true,
+      "evidence": "#1 scoring: 'High-contrast industrial architecture...strong geometric lines, sharp directional shadows. Will create dramatic bronze-to-amber gradients after treatment'"
+    },
+    {
+      "text": "Presents results in a ranked format (table or numbered list with scores)",
+      "passed": true,
+      "evidence": "Standardized table with #, Preview, Source, Resolution, Score (/25), Breakdown columns. Followed by per-candidate detail sections."
+    }
+  ],
+  "summary": {
+    "passed": 5,
+    "failed": 0,
+    "total": 5,
+    "pass_rate": 1.0
+  }
+}

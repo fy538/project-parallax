@@ -1,0 +1,94 @@
+{
+  "skill_name": "asset-source",
+  "iteration": 1,
+  "generated_at": "2026-04-26",
+  "configurations": [
+    {
+      "name": "with_skill",
+      "label": "With asset-source skill",
+      "evals": [
+        {
+          "eval_name": "batch-p1-assets",
+          "pass_rate": 1.0,
+          "passed": 6,
+          "total": 6,
+          "duration_seconds": 343.3,
+          "total_tokens": 93430
+        },
+        {
+          "eval_name": "single-search-aerial",
+          "pass_rate": 1.0,
+          "passed": 5,
+          "total": 5,
+          "duration_seconds": 245.8,
+          "total_tokens": 88694
+        },
+        {
+          "eval_name": "score-pasted-json",
+          "pass_rate": 1.0,
+          "passed": 6,
+          "total": 6,
+          "duration_seconds": 167.1,
+          "total_tokens": 67366
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_duration_seconds": 252.1,
+        "mean_tokens": 83163
+      }
+    },
+    {
+      "name": "without_skill",
+      "label": "Baseline (no skill)",
+      "evals": [
+        {
+          "eval_name": "batch-p1-assets",
+          "pass_rate": 0.5,
+          "passed": 3,
+          "total": 6,
+          "duration_seconds": 203.9,
+          "total_tokens": 82827
+        },
+        {
+          "eval_name": "single-search-aerial",
+          "pass_rate": 0.8,
+          "passed": 4,
+          "total": 5,
+          "duration_seconds": 241.3,
+          "total_tokens": 64692
+        },
+        {
+          "eval_name": "score-pasted-json",
+          "pass_rate": 0.5,
+          "passed": 3,
+          "total": 6,
+          "duration_seconds": 266.7,
+          "total_tokens": 55728
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.6,
+        "stddev_pass_rate": 0.141,
+        "mean_duration_seconds": 237.3,
+        "mean_tokens": 67749
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate": "+0.40 (1.0 vs 0.6)",
+    "duration": "+14.8s slower (252.1s vs 237.3s)",
+    "tokens": "+15,414 more (83,163 vs 67,749)"
+  },
+  "analyst_notes": [
+    "The skill achieves 100% pass rate vs 60% baseline — a 40-point improvement",
+    "The biggest skill advantage is on structured output: standardized 5-dimension /25 scoring, comparison tables with preview links, consistent presentation format across all modes",
+    "Baseline runs invented ad-hoc scoring systems (star ratings, 10-point scales, qualitative high/medium/low) that vary across evals — inconsistent for a production pipeline",
+    "The skill correctly flags archival assets (FDR 1941) as unsuitable for stock libraries and provides specific alternative sourcing paths — baseline only mentions this in passing",
+    "Treatment survivability scoring (the skill's key differentiator) produces actionable guidance ('duotone gold' vs 'low survivability') that the baseline approximates but doesn't systematize",
+    "Cost: skill runs use ~23% more tokens and ~6% more time. Acceptable overhead for the output quality improvement.",
+    "Baseline eval-1 and eval-2 saved outputs to wrong directories — possible sign that without structured workflow, agents are less disciplined about file organization",
+    "Non-discriminating assertion: 'Generates reasonable search terms' passes trivially in both configurations — consider replacing with a more specific assertion about term specificity/fallback strategy"
+  ]
+}

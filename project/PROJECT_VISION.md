@@ -11,7 +11,7 @@ A solo content venture producing analytical video content at the intersection of
 
 The content leverages agentic AI workflows for research, scripting, and visual production — with human oversight at key creative decision points — to achieve output that would otherwise require a full production team.
 
-**Platform strategy:** English-first. YouTube (long-form 8-15 min) as the credibility anchor, with TikTok/YouTube Shorts (30-90s) as discovery engines. Chinese-language platforms (Bilibili/Douyin) are a future expansion, not launch priority.
+**Platform strategy:** English-first. YouTube (long-form 15-20 min) as the credibility anchor, with TikTok/YouTube Shorts (30-90s) as discovery engines. Chinese-language platforms (Bilibili/Douyin) are a future expansion, not launch priority.
 
 ---
 
@@ -52,9 +52,45 @@ The content occupies a specific niche between academic rigor and narrative intri
 
 **The key differentiation:** Focus on emergent systemic behavior rather than intentional hidden actors. Systems produce outcomes that APPEAR planned but arise from incentive structures. This provides the thrill of "hidden knowledge" while maintaining intellectual integrity.
 
+### The Overclaiming Guardrail
+
+The audience demand Parallax rides — making a chaotic world feel legible — *pulls toward* overclaiming. Viewers who love you for providing coherence will also be the ones most disappointed when you say "I don't know." The temptation is always to provide more structure than the evidence supports. Resist this. The world is genuinely chaotic; frameworks that make it feel fully legible are lying. Educated mysticism means providing *partial* coherence — patterns that illuminate without pretending to explain everything. The honesty about limits is itself a differentiator in this market.
+
+---
+
+## Market Thesis: Chaos Creates Demand for Meaning
+
+Parallax is not betting on "people want to understand semiconductors" or "people want geopolitics content." The macro bet is this: **as the world becomes less orderly, demand for frameworks that provide structure and meaning grows exponentially.**
+
+The world is getting more chaotic — multipolarity replacing unipolar stability, AI disrupting economic assumptions, institutional trust declining, information overload accelerating. When the world feels less legible, people seek out narratives and frameworks that restore coherence. This is the demand that drives Harari (*Sapiens*), Dalio (*Principles for Dealing with the Changing World Order*), Peterson's maps-of-meaning work, and Jiang's "Predictive History." The appetite isn't for information — there's a surplus of information. The appetite is for *coherence*.
+
+This means Parallax competes in the **sense-making market**, not just the geopolitics niche. The addressable audience is everyone who feels overwhelmed by the world and wants tools to make it legible — which is a growing population, not a fixed one. The channel's value proposition is: "Here are frameworks that make the chaos comprehensible, held honestly — we'll show you the patterns and tell you where they break."
+
+**Why this thesis matters for content strategy:**
+- Episode topics should be selected partly for *anxiety resonance* — moments where the audience feels the world is incomprehensible and needs a framework. The "Wait, what?" test in the scoring rubric already captures this, but the emotional driver underneath is "I need this to make sense."
+- The channel grows with chaos. Every major geopolitical disruption — a new conflict, an unexpected election, a technological shock — is a demand spike for what Parallax provides.
+- Competitors who provide false certainty (Zeihan's confident predictions, Jiang's unfalsifiable claims) will capture some of this demand. Parallax's edge is that honest uncertainty, done well, builds deeper trust over time. The viewers who stay are more loyal and more valuable than the ones chasing certainty.
+
 ---
 
 ## The Three Content Pillars
+
+### The Knowledge Density Principle
+
+Before the individual pillars: the core product of every Parallax episode is **surprising cross-domain connections at high density**. Not one historical parallel per episode — 4-5 connections across history, philosophy, game theory, civilizational analysis, and contemporary events, of which 2-3 make the final script. The viewer should regularly think "I never would have put those two things together."
+
+This is the actual substance that makes the decoder posture work. Narrative technique is delivery; knowledge density is the product. Without genuinely surprising connections, the "hidden pattern" framing is empty. With them, it's electric.
+
+Examples of the density target (for a semiconductor episode):
+- 1941 US oil embargo on Japan → 2022 chip export controls (resource denial logic)
+- Venice's Murano glass monopoly → TSMC's geographic concentration (island-based manufacturing secrets)
+- COCOM's 45-year Soviet tech denial → current China controls (when denial works and when it doesn't)
+- Game theory's repeated prisoner's dilemma → the ASML/Netherlands caught-between-superpowers position
+- 卡脖子 as emotional driver → historical "century of humiliation" narrative shaping current Chinese tech policy
+
+Not all of these will make the script. But the research phase should surface this range so the scriptwriter can select the most resonant 2-3.
+
+Tiger's background enables this: math provides structural pattern recognition across domains; philosophy provides the frameworks to articulate *why* patterns recur. Most geopolitics creators have IR credentials or journalism backgrounds and think within one tradition. Parallax thinks across them.
 
 ### Pillar I: Historical Analogy as Prediction Engine
 Content mines deep history (Roman decline, Mongol information networks, Venetian commercial strategy, Cold War signaling) for structural templates applicable to contemporary events.
@@ -94,10 +130,13 @@ Real-time analysis of breaking events through the dual lens of historical patter
 - The Economist readership proxy: 67% earn $100k+, 63% college-educated
 - Estimated addressable audience (English-speaking educated geopolitics): 500K-2M globally
 
+**Underlying demand driver:** The audience is growing because the world is getting less legible. Multipolarity, AI disruption, institutional distrust, and information overload create a secular increase in demand for sense-making frameworks. This isn't a fixed niche — it expands with chaos. Every major geopolitical disruption is a demand spike for what Parallax provides. The viewers Parallax serves aren't just "interested in geopolitics" — they're overwhelmed by the world and seeking frameworks that restore coherence without lying to them.
+
 **Underserved gap this project fills:**
 - Non-Western analytical perspective (Chinese-American creator with genuine cross-cultural fluency)
 - Philosophy applied to geopolitics (philosophy channels are much smaller than geopolitics channels — overlap is underserved)
 - "Structural pattern" analysis that goes beyond event reporting without drifting into conspiracy
+- Honest sense-making in an era of false certainty — the gap between Zeihan's overconfident predictions and CaspianReport's neutral explainers is where Parallax lives
 
 ---
 
@@ -106,13 +145,14 @@ Real-time analysis of breaking events through the dual lens of historical patter
 ### One-Line Positioning Statement
 **Parallax** — the channel that teaches you HOW to think about geopolitics — not WHAT to think — by viewing every event from multiple analytical positions. CaspianReport gives you the answer. Zeihan gives you one model. Spaniel gives you game theory. Parallax gives you the toolkit to evaluate all of them.
 
-### Inspiration: Professor Jiang Xueqin ("Predictive History")
+### Inspiration & Cautionary Case: Professor Jiang Xueqin ("Predictive History")
 - 2M+ subscribers, exploded from viral 2024 "Iran Trap" prediction; Tucker Carlson interview (March 2026) drove 8M+ combined views
-- Core strength: associative range — connecting seemingly distant historical events, philosophy, and game theory to current geopolitics
-- Core weakness: drifted into conspiracy content (Illuminati, Freemasons, "Pax Judaica"), increasingly criticized as CCP-aligned propaganda
-- What to learn: the market appetite for cross-domain pattern recognition is enormous — his rapid ascent from obscurity proves massive unmet demand for framework-based analysis
-- What to avoid: hard predictions (fragile — brand collapses if wrong), conspiracy territory, declarative certainty
-- Our opening: a credible, rigorous version of what Jiang attempts — same demand signal, defensible intellectual foundation
+- Core strength: narrative posture (decoder, not lecturer), serialized frameworks, stakes-first cold opens, named conceptual products. His grabbiness is rhetorical, not visual — production quality is unremarkable.
+- Core weakness: drifted into conspiracy content (Illuminati, Freemasons, "Pax Judaica"), increasingly criticized as CCP-aligned propaganda (Free Press, SCMP, TripleAmpersand). Strategic silence on China's internal problems. Uses "I'm just a teacher" humility as cover for unfalsifiable totalizing claims.
+- **What to adopt:** Insider/decoder posture, numbered serialization, apply-first-name-later framework introductions, checkpoint beats, stakes-shock cold opens, named conceptual products. See JIANG_NARRATIVE_RESEARCH.md for 12 extractable techniques.
+- **What to reject:** Hard predictions without confidence intervals (fragile), conspiracy territory, declarative certainty, historical analogies as proofs rather than hypotheses, hidden-cabal causation, performed humility masking real certainty.
+- **Parallax's opening:** A credible, rigorous version of the *narrative mechanics* Jiang discovered — same demand signal, defensible intellectual foundation. The audience appetite for cross-domain pattern recognition is enormous; his rapid ascent proves massive unmet demand. The opportunity is to deliver the same "decoding" experience with genuine epistemic transparency.
+- **Key insight from research:** Jiang himself titles more soberly than the ecosystem around him — clip channels amplify the conspiracism. The lesson: the core technique (framework-based pattern recognition) is separable from the toxin (hidden-agent causation). See full analysis in `project/JIANG_NARRATIVE_RESEARCH.md`.
 
 ### Head-to-Head Differentiation
 
@@ -151,7 +191,7 @@ The differentiation is intellectual architecture, not format or production value
 
 ## Creator Voice Profile
 
-Extracted from Tiger's communication style in project conversations:
+Extracted from Tiger's communication style in project conversations, refined with narrative posture research (April 2026).
 
 **Characteristics:**
 - Direct and conversational, not formally academic
@@ -162,7 +202,16 @@ Extracted from Tiger's communication style in project conversations:
 - Self-aware about own limitations (e.g., "relatively inexperienced in visuals")
 - Values breadth of knowledge and unexpected connections between domains
 
-**Tone target for content:** Think "smart friend explaining something fascinating over drinks" — not "professor lecturing" and not "news anchor reporting." The audience should feel like they're thinking alongside you, not being talked at.
+**Narrative posture: Decoder, not explainer.** The voice reveals hidden structure in events, not explains known topics. The viewer is a co-investigator being let in on a pattern — not a student being caught up. The difference is subtle but fundamental:
+
+- Explainer: "Here's what happened and why it matters."
+- Parallax: "Here's what's actually going on — and once you see the pattern, you can't unsee it."
+
+This means: open with contradictions and stakes, not context. Introduce frameworks by applying them first and naming them after. Treat the audience as smart people who haven't had time to connect the dots, not as people who need background explained.
+
+**Tone target for content:** Think "smart friend showing you something wild they figured out" — not "professor lecturing" and not "news anchor reporting." The audience should feel like they're discovering something *with* you, not being talked at. The energy is closer to "you're not gonna believe what I found" than "let me walk you through this."
+
+**Guardrail:** The decoder posture must never tip into conspiracy framing. The line is clear: decode *structures and incentives*, never *hidden agents*. "The system produces this outcome because of these incentive structures" — not "these people are secretly coordinating." See JIANG_NARRATIVE_RESEARCH.md toxin-vs-technique table and NAR-13 in EDITORIAL_PLAYBOOK.md.
 
 ---
 
