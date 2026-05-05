@@ -52,14 +52,22 @@ import type { ImageCompositeData } from "./types";
 const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
-  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // L66: image is the only element that drifts in this variant (text stays
+  // fixed). Pass noDrift: true so compStyle provides only enter/exit fade —
+  // the manual kenBurnsDrift below is the SINGLE source of zoom on the image.
+  // Without noDrift, compStyle's 1.06 drift would compound with the 1.03 manual
+  // drift to ~1.09 zoom on the photo, far more than intended.
+  const { style: compStyle } = useCompositionAnimation({
+    ...direction.driftOptions,
+    noDrift: true,
+  });
   const totalFrames = sec(data.durationSec || 6);
   const theme = useThemeMode(data.backgroundVariant || "light");
 
   // Duotone ramp selection
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
 
-  // Ken Burns: subtle zoom drift
+  // Ken Burns: subtle zoom drift on the image itself (text stays fixed).
   const scale = kenBurnsDrift(frame, totalFrames, 1.03);
 
   // Text animation — spring-based entrance

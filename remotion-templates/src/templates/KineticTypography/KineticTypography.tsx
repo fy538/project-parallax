@@ -635,7 +635,16 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
 export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
-  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // L66: each variant uses parallaxDrift() to drive multi-rate parallax across
+  // elements (quoteMark/text/attribution etc. drift at different rates). Pass
+  // noDrift: true so compStyle provides only enter/exit fade — the parallaxDrift
+  // values become the single source of zoom per element. Without noDrift, every
+  // element's drift was compounding with compStyle's 1.06 background drift,
+  // producing ~1.09 zoom instead of the intended ~1.02-1.03.
+  const { style: compStyle } = useCompositionAnimation({
+    ...direction.driftOptions,
+    noDrift: true,
+  });
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
 
