@@ -1,232 +1,68 @@
 # Geopolitics Video Templates — Remotion Project
 
-> Last updated: May 4, 2026
+> Read top-level [`AGENTS.md`](../AGENTS.md) and [`CLAUDE.md`](../CLAUDE.md) first for build commands, dev conventions, and project context. This file is Remotion-specific.
+>
+> Last updated: May 5, 2026
 
 ## What this is
 
-A Remotion-based template library for producing educational geopolitics YouTube
-videos. Templates are React components that render to MP4. Each template is
-data-driven: feed it a JSON file and it generates the visual segment.
+Remotion-based template library for producing educational geopolitics YouTube videos. Templates are React components that render to MP4. Each template is data-driven: feed it a JSON file and it generates the visual segment.
 
-**17 core + 4 format-specific + 9 Shorts + per-episode master sequences are built and functional.**
-All templates use Zod schemas for runtime validation and `calculateMetadata` for dynamic durations.
-"The Silicon Trap" (`silicon-trap`) has 24 data files + assembly manifest with audio. Project uses slug-based naming — episode numbers assigned at publish time.
-Templates cover all 8 content identity directions defined in CONTENT_IDENTITY.md.
+- **17 core + 4 format-specific + 9 Shorts + per-episode master sequences** — all built and functional
+- All templates use **Zod schemas** for runtime validation and **`calculateMetadata`** for dynamic durations
+- Resolution: **1920×1080 @ 30fps** (1080×1920 for Shorts)
+- TypeScript **strict mode** — don't disable
 
-## Workspace layout (/project-parallax/)
-
-```
-project-parallax/
-├── CLAUDE.md                 # Top-level project overview (read this first for project context)
-├── project/                  # Strategy and planning docs (vision, pipeline, decisions, ideas)
-├── episodes/                 # Per-episode work (slug-based — no EP## until publish)
-│   ├── silicon-trap/         # "The Silicon Trap" (draft, queued)
-│   ├── blockades-leak/       # "Why Technological Blockades Always Leak" (draft)
-│   └── prisoners-dilemma/    # Launch candidate
-├── remotion-templates/       # ← YOU ARE HERE — the Remotion project
-├── tools/                    # Python CLI tools (brand-treatment/treat.py, asset-source/source.py)
-├── skills/                   # Production skills (research-audit; others in Cowork plugins dir)
-├── prompts/                  # Reusable prompt templates
-└── archive/                  # One-off docs, old versions
-```
-
-## Remotion project structure
+## Layout
 
 ```
 remotion-templates/
-├── BRAND.md                              # Canonical design system (colors, type, timing)
-├── CLAUDE.md                             # This file — project overview for AI sessions
-├── IMAGES.md                             # Image treatment pipeline (duotone, grain, compositing)
-├── LESSONS.md                            # Technical gotchas and iteration learnings
-├── POLISH.md                             # Visual quality spec — checkable polish rules
-├── package.json
-├── remotion.config.ts
-├── tsconfig.json                         # strict: false, noImplicitAny: false
-├── vitest.config.ts                      # Test config (visual regression tests)
-├── scripts/
-│   ├── render-silicon-trap.sh            # Bash render script (all 24 silicon-trap clips)
-│   ├── render-episode.mjs                # Node render script (universal, with --only/--from)
-│   ├── deploy-lambda.mjs                 # Deploy Remotion Lambda (function + S3 site)
-│   └── render-lambda.mjs                # Render via Lambda (single clip or full episode)
-├── src/
-│   ├── index.ts                          # Entry point (registerRoot)
-│   ├── Root.tsx                          # Registers all 15 compositions in Folder groups
-│   ├── declarations.d.ts                 # Manual types for react-simple-maps
-│   ├── __tests__/                        # Visual regression tests (vitest + @remotion/renderer)
-│   │   ├── setup.ts                      # Browser detection + test helpers
-│   │   ├── render-helper.ts              # renderStill wrapper for snapshot tests
-│   │   └── templates.test.ts             # Per-template frame snapshot tests
-│   ├── design/
-│   │   ├── theme.ts                      # Colors, fonts, layout, timing (as const)
-│   │   └── fonts.ts                      # Font preloading via @remotion/google-fonts
-│   ├── components/
-│   │   ├── FadeIn.tsx                    # Fade + slide wrapper
-│   │   ├── AnimatedText.tsx              # Word/character reveal
-│   │   ├── Background.tsx                # Full-frame bg (gradient vignette + grain + border)
-│   │   ├── MetadataStrip.tsx             # Branded header + footer chrome (∴ STRUCTURAL · PARALLELS)
-│   │   ├── Crosshair.tsx                 # Animated reticle (maps, data emphasis)
-│   │   ├── TitleBlock.tsx                # Shared title + subtitle positioning (all templates)
-│   │   ├── SectionIndicator.tsx          # Beat label overlay for FullEpisode
-│   │   ├── BrandImage.tsx                # SVG-filter image treatment (duotone + grain + border)
-│   │   ├── ShortsWrapper.tsx             # Render-prop shell for 9:16 Shorts (bg + title + safe area)
-│   │   ├── Transitions.tsx               # 9 transition types (cut/fade/dissolve/wipe/blur/color-wash/iris)
-│   │   ├── LayeredComposition.tsx        # [LAYERED:] mode — bg+fg compositing with blend/position/dim
-│   │   ├── HeaderStrip.tsx               # Top brand chrome (∴ PARALLAX wordmark + metadata) — wired into ALL templates
-│   │   ├── FooterStrip.tsx               # Bottom brand chrome (REC dot + runtime + FILED date) — wired into ALL templates
-│   │   ├── StratumSidebar.tsx            # Historical era bands for Stratum episode variant
-│   │   └── AntipodeDivider.tsx           # Vertical ∴ split for Antipode comparison episodes
-│   ├── hooks/
-│   │   ├── index.ts                      # Barrel export for all hooks
-│   │   ├── useCompositionAnimation.ts    # Auto Ken Burns drift + exit fade (wired into ALL templates)
-│   │   ├── useDirection.ts               # Bridge: _direction JSON → atmosphere/drift/hold for templates
-│   │   ├── useEntrance.ts                # Semantic element entrance presets (hero/content/data/label/structure)
-│   │   ├── useDivider.ts                 # Shared gradient divider animation
-│   │   ├── useThemeMode.ts               # Mode-aware color tokens (text, accent, bg, shadow)
-│   │   └── useVerticalLayout.ts          # 9:16 layout tokens for Shorts (spacing, fonts, safe areas)
-│   ├── utils/
-│   │   ├── animation.ts                  # fadeIn, slideIn, stagger, springs, Ken Burns, exit fades
-│   │   └── depth.ts                      # Shadows, accent glows, bar gradients, card styles
-│   └── templates/
-│       ├── ChoroplethMap/                # ✅ Phase-based country highlighting on world map
-│       ├── RouteAnimation/               # ✅ Animated trade/supply routes between points
-│       ├── TimelineComparison/           # ✅ Dual-column historical comparison timeline
-│       ├── DataChart/                    # ✅ Bar charts, comparisons, animated data viz
-│       ├── KineticTypography/            # ✅ Quote, definition, bilingual, statistic variants
-│       ├── FrameworkDiagram/             # ✅ Comparison columns, flow diagrams, matrices
-│       ├── TitleTransition/              # ✅ Episode title, section cards, end cards
-│       ├── DecisionTree/                 # ✅ Branching scenario diagrams (Wargamer format)
-│       ├── SplitComposition/             # ✅ Antipode vertical split (Translator/Dialectician)
-│       ├── ProbabilityGauge/             # ✅ Confidence meters, market prices (Oracle format)
-│       ├── ImageComposite/               # ✅ Duotone photo treatment (Time Collapse cinematic)
-│       ├── Episodes/                     # ✅ Master compositions (silicon-trap — 24-clip Series)
-│       └── Shorts/                       # ✅ Vertical 9:16 variants for TikTok/YouTube Shorts
-│           ├── KineticShort.tsx           #    "Framework in 45 Seconds" series
-│           ├── DataChartShort.tsx         #    "The Market Says..." series
-│           └── SplitShort.tsx            #    "Both Sides Are Wrong" series
-├── data/
-│   └── episodes/
-│       └── silicon-trap/                 # 24 JSON data files for "The Silicon Trap"
-│           ├── SEQUENCE.md               # Canonical render order (24 clips → 5 beats)
-│           ├── title-*.json              # 7 title/section/endcard files
-│           ├── choropleth-*.json         # 3 map compositions
-│           ├── chart-*.json              # 5 data chart compositions
-│           ├── kinetic-*.json            # 4 typography compositions
-│           ├── framework-*.json          # 2 framework diagram compositions
-│           ├── timeline-*.json           # 2 timeline compositions
-│           └── route-*.json              # 1 route animation composition
-└── public/
-    └── geo/                              # Local TopoJSON (if needed for offline)
+├── BRAND.md                  # Canonical design system spec (palette, type, timing)
+├── IMAGES.md                 # Image treatment pipeline (duotone, grain, compositing)
+├── LESSONS.md                # Technical gotchas worth remembering (read on errors)
+├── POLISH.md                 # Visual quality spec — checkable rules, "done" bar
+├── references/               # Schema reference docs (template-schemas.md is canonical)
+├── scripts/                  # Render scripts (local + Lambda) + tooling (lint, snapshot)
+├── data/episodes/<slug>/     # Per-episode JSON data + assembly manifest
+├── public/geo/               # Local TopoJSON (offline fallback)
+└── src/
+    ├── Root.tsx              # Composition registration (all 25+ in <Folder> groups)
+    ├── design/               # theme.ts (BRAND.md in code), fonts.ts (preload)
+    ├── components/           # Background, MetadataStrip, Crosshair, TitleBlock, Transitions, etc.
+    ├── hooks/                # useCompositionAnimation, useDirection, useEntrance, useThemeMode, ...
+    ├── utils/                # animation.ts, depth.ts, dataWarnings.ts, chartLayout.ts, mapUtils
+    └── templates/            # One folder per template; FullEpisode in templates/Episodes/
 ```
 
-## Template reference
+## Templates
 
-### 1. ChoroplethMap
-Phase-based world map with country highlighting. Uses react-simple-maps + world-atlas@2 TopoJSON.
-- **Variants:** Color ramp (value 0-1) or explicit fill colors per country
-- **Data:** phases[] with title, subtitle, durationSec, countries[]
-- **Key constraint:** Country names must exactly match TopoJSON properties ("United States of America", not "USA")
-- **Sample data:** choropleth-supply-chain.json, choropleth-bifurcation.json, choropleth-reshoring.json
+Canonical schemas and field definitions: [`references/template-schemas.md`](./references/template-schemas.md). Read that file when you need to know what JSON fields a template accepts.
 
-### 2. RouteAnimation
-Animated lines between geographic points (trade routes, supply chains). Segments draw in with strokeDashoffset animation. Points pulse on first appearance.
-- **Data:** points[] (with coordinates), segments[] (from/to indices), phases[]
-- **Duration:** Auto-calculated from sum of phase durations
-- **Sample data:** route-chip-supply.json
+Categories:
 
-### 3. TimelineComparison
-Dual-column timeline with left/right event tracks and optional connections between them.
-- **Data:** leftEvents[], rightEvents[], connections[] (leftIndex → rightIndex)
-- **Colors:** Configurable left/right colors (e.g., success green vs danger red)
-- **Sample data:** timeline-oil-chips.json, timeline-deepseek.json
-
-### 4. DataChart
-Animated bar charts and comparison charts with growing bars and value labels.
-- **Variants:** "bar" (standard bars) and "comparison" (side-by-side with vs divider)
-- **Key fix applied:** Value labels use justifyContent: flex-end positioning so they sit directly above each bar's actual height (not floating at top of container)
-- **Sample data:** chart-lithography.json, chart-export-controls.json, chart-kirin-teardown.json, chart-chips-everywhere.json, chart-pen-contrast.json
-
-### 5. KineticTypography
-Text-focused compositions with 4 sub-variants:
-- **quote:** Word-by-word text reveal + attribution line
-- **definition:** Chinese character + pinyin + translation + definition (character-by-character)
-- **bilingual:** Chinese text above divider + English below
-- **statistic:** Animated count-up number + label + context
-- **Sample data:** kinetic-morris-chang.json, kinetic-kabozi.json, kinetic-7pct.json, kinetic-juguo.json
-
-### 6. FrameworkDiagram
-Analytical diagrams with 3 sub-variants:
-- **comparison:** Side-by-side columns (2-column gets "vs" divider). Staggered item animations.
-- **flow:** Sequential nodes connected by SVG arrow lines
-- **matrix:** Grid with row/column headers and highlightable cells
-- **Sample data:** framework-chess-go.json, framework-cocom-china.json
-
-### 7. TitleTransition
-Episode-level and section-level title cards with 3 sub-variants:
-- **episode-title:** Ken Burns scale effect, animated divider, series name + episode label
-- **section:** Large muted section number (I, II, III...) + section title
-- **end-card:** CTA text + next episode teaser
-- **Sample data:** title-episode.json, title-section-*.json, title-endcard.json
-
-### 8. DecisionTree
-Branching scenario/decision tree diagrams for Wargamer format episodes.
-- **Data:** nodes[] (flat array with children refs), rootId, highlightedPath[]
-- **Features:** Level-by-level reveal animation, probability labels, market price annotations, highlighted decision path with glow
-- **Format fit:** Wargamer, Oracle (scenario analysis with Kalshi integration)
-
-### 9. SplitComposition
-Full-bleed vertical split (Antipode brand variant) for side-by-side analytical comparisons.
-- **Data:** left{} and right{} with tag, title, items[], accentColor
-- **Features:** Left-then-right reveal sequence (thesis→antithesis reading rhythm), center divider with label, subtle color tints per side, auto Chinese font detection
-- **Format fit:** Translator, Dialectician
-
-### 10. ProbabilityGauge
-Probability visualizations for Oracle format and Kalshi prediction market layer.
-- **Variants:** "gauge" (semicircular arc meters), "shift" (before/after probability transitions), "scorecard" (prediction track record grid)
-- **Features:** Animated arc fill with spring physics, count-up numbers, market source badges, calibration scoring
-- **Format fit:** Oracle, "Was I Right?" retrospectives, any episode using Kalshi data
-
-### 11. ImageComposite
-Treated photograph rendering with duotone pipeline per IMAGES.md.
-- **Variants:** "background" (full-bleed + Ken Burns), "inset" (bordered frame), "portrait" (person with name strip)
-- **Features:** CSS grayscale + duotone gradient overlay, film grain, vignette, text shadow for legibility
-- **Format fit:** Time Collapse (historical photos), any cinematic moment
-
-### 12. Shorts (vertical 9:16)
-Three vertical compositions for TikTok/YouTube Shorts/Douyin at 1080×1920.
-- **KineticShort:** Vertical quote/stat/definition — maps to "Framework in 45 Seconds" and "History Rhymes" series
-- **DataChartShort:** Horizontal bar chart — maps to "The Market Says..." series
-- **SplitShort:** Horizontal split (top vs bottom) — maps to "Both Sides Are Wrong" series
-- **Shared:** Larger text for mobile, faster animation pace, tighter safe areas, no MetadataStrip
+- **Maps**: ChoroplethMap, RouteAnimation (both via `MapGL` shared component using Mapbox GL + deck.gl)
+- **Data**: DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal
+- **Diagrams**: FrameworkDiagram, NetworkDiagram, DecisionTree, EscalationLadder, GameBoard, SankeyFlow
+- **Typography & layout**: KineticTypography, TitleTransition, SplitComposition, ImageComposite, AnnotatedImage, PhotoMontage
+- **Episodes**: `FullEpisode.tsx` (manifest-driven), `SiliconTrap.tsx` (per-episode `<Series>`)
+- **Shorts (9:16)**: KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort
 
 ## Design system
 
-See **BRAND.md** for the canonical color palette, typography scale, and animation timing.
-See **POLISH.md** for the visual quality specification — concrete, checkable rules for animation, layout, depth, and typography that define the "done" bar.
-See **IMAGES.md** for the image sourcing and treatment pipeline — duotone ramps, grain, compositing modes.
-See **theme.ts** for the code implementation of the design system.
-
-Key values:
-- Resolution: 1920×1080 @ 30fps
-- Safe area: 80px padding on all sides
-- Brand: Meridian dual-mode system (dark: ink/bone/amber, light: paper/ink/oxblood)
-- Shared palette: ink (#1A1A2E), amber (#E5A544), rust (#C23B22), bone (#F0E6D0), paper (#F5F0E8), oxblood (#6B1D1D)
-- Semantic: us (#3266AD), china (#C23B22), neutral (#888780), highlight (#F5A623), success (#5DAA68), danger (#D64545)
-- Fonts: Space Grotesk (display), IBM Plex Mono (body/metadata), JetBrains Mono (data), Noto Sans SC (Chinese)
-- Timing helper: `sec(n)` converts seconds to frames
+- **Source of truth for colors:** [`tools/brand-treatment/palette.json`](../tools/brand-treatment/palette.json) → loaded by `src/design/theme.ts`. Don't hex-hardcode brand colors anywhere.
+- **Animation timing:** import from `src/design/theme.ts` — `timing.entrance.{snap, fast, crisp, medium, slow}`, `timing.exit.*`, `timing.stagger.*`, `timing.hold.*`. Don't reintroduce bare `sec(0.4)` / `sec(0.2)` magic numbers (use `entrance.crisp` and `entrance.snap`).
+- **Animation defaults:** `KEN_BURNS_MAX_SCALE`, `PAN_DRIFT_MAX_OFFSET`, `EXIT_FADE_DURATION` are exported from `src/utils/animation.ts`. The `kenBurnsDrift`/`panDrift`/`exitFade` functions reference them by default.
+- **POLISH.md** defines the visual quality bar (checkable rules); **BRAND.md** is the human-readable design spec.
 
 ## How to create a new template
 
-1. Create a folder under `src/templates/YourTemplate/`
-2. Create: `types.ts` (data interfaces), `YourTemplate.tsx` (component), `index.tsx` (composition registration)
-3. Register in `src/Root.tsx` inside the appropriate `<Folder>`
-4. Add sample data in `data/episodes/<slug>/`
-
-### Component pattern
+1. Create `src/templates/YourTemplate/` with `types.ts`, `YourTemplate.tsx`, `schema.ts`, `index.tsx`.
+2. Register in `src/Root.tsx` inside the appropriate `<Folder>`. Use `calculateMetadata` to derive `durationInFrames` from `data.durationSec`.
+3. Add sample data in `data/episodes/<slug>/`.
+4. Wire `useCompositionAnimation()` for the auto Ken Burns drift + exit fade. Maps need `{ noDrift: true }`; templates with their own exits need `{ noExit: true }`; Shorts need `{ noDrift: true }`.
 
 ```tsx
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { palette, dark, fonts, layout, sec } from "../../design/theme";
-import { fadeIn, stagger } from "../../utils/animation";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import type { YourDataType } from "./types";
@@ -234,184 +70,56 @@ import type { YourDataType } from "./types";
 export const YourTemplate: React.FC<{ data: YourDataType }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation();
-  // Options: { noDrift: true } for maps, { noExit: true } if template has own exit
   return (
-    <Background variant="dark">
+    <Background variant="light">
       <AbsoluteFill style={compStyle}>
-        {/* Content here gets Ken Burns drift + exit fade automatically */}
+        {/* content */}
       </AbsoluteFill>
     </Background>
   );
 };
 ```
 
-## Animation utilities (src/utils/animation.ts)
-
-- `fadeIn(frame, startFrame, duration)` → 0 to 1
-- `fadeOut(frame, endFrame, duration)` → 1 to 0
-- `fadeInOut(frame, start, visible, fadeDuration)` → in, hold, out
-- `slideIn(frame, startFrame, distance, duration)` → offset to 0
-- `scaleIn(frame, startFrame, duration)` → 0 to 1
-- `gentleSpring(frame, fps, config?)` → smooth spring (less bouncy than default)
-- `heroSpring(frame, fps, delay?)` → cinematic spring with more overshoot for hero elements
-- `microSettle(frame, fps, delay?)` → high-damping settle after bar growth / counter finish
-- `stagger(index, delayPerItem, baseDelay)` → start frame for sequential items
-- `layerDelay(layer, baseDelay, gap)` → start frame per reveal layer (0=structure, 1=data, 2=labels)
-- `kenBurnsDrift(frame, totalFrames, maxScale?)` → subtle scale drift (1.0 → 1.02)
-- `panDrift(frame, totalFrames, maxOffset?)` → slow position drift (px)
-- `exitFade(frame, totalFrames, exitDuration?)` → fade out over last N frames
-- `pulse(frame, startFrame, duration?, peakScale?)` → scale pulse 1.0 → peak → 1.0
-
-## Animation hooks (src/hooks/)
-
-Three hooks enforce POLISH.md animation rules by default so templates don't need to remember which utility to call.
-
-### useCompositionAnimation(options?)
-**Wired into all 14 templates.** Provides automatic Ken Burns drift (1.0→1.02 scale + 6px pan) and exit fade (last 15 frames). Returns `{ style, frame, totalFrames, fps, exitOpacity, driftScale }`.
-
-Configuration per template type:
-- Standard templates (DataChart, KineticTypography, etc.): `useCompositionAnimation()` — full drift + exit
-- Map templates (ChoroplethMap, RouteAnimation): `{ noDrift: true }` — exit fade only (maps have their own coordinate systems)
-- Templates with own exits (TitleTransition, DecisionTree, SplitComposition, ProbabilityGauge, ImageComposite): `{ noExit: true }` — drift only
-- Shorts (KineticShort, DataChartShort, SplitShort): `{ noDrift: true }` — exit fade only (too short/mobile for drift)
-
-### useEntrance(role, startFrame?)
-Semantic element entrance presets. Declare the element's *role* and get the right animation character:
-- `"hero"` — spring physics (damping 12), scale 0.92→1.0, translateY 20→0px. For titles, key stats.
-- `"content"` — ease-out 18 frames, translateY 15→0px. For general content blocks.
-- `"data"` — ease-out 15 frames, scale 0.85→1.0. For chart bars, fills.
-- `"label"` — quick 10-frame fade, translateY 6→0px. For captions, value labels.
-- `"structure"` — near-instant 6-frame fade. For axes, grids, dividers.
-
-Returns `{ opacity, scale, translateY, settled, style }`. Also: `useStaggeredEntrance(role, index, baseDelay, staggerFrames)` for lists.
-
-### useDivider(startFrame?, options?)
-Shared gradient divider animation (replaces 6+ duplicated patterns). Gradient line that fades at edges, draws in with eased progress.
-Options: `color`, `width`, `height`, `duration`, `orientation` ("horizontal"|"vertical").
-Returns `{ progress, opacity, lineStyle, animatedSize }`.
-
-## Depth utilities (src/utils/depth.ts)
-
-- `contentShadow(isDark?)` → subtle lift shadow for content-layer elements
-- `mediumShadow(isDark?)` → stronger shadow for highlighted elements
-- `accentGlow(color, spread?)` → colored halo glow for accent-layer elements
-- `highlightShadow(color, isDark?)` → combined content shadow + accent glow
-- `textShadow(isDark?)` → subtle text lift for body text on dark backgrounds
-- `barGradient(baseColor)` → top-to-bottom gradient for chart bars (15% darker at bottom)
-- `gradientDivider(color, widthPercent?)` → centered fade-edge divider styles
-- `cardStyle(isDark?, highlighted?)` → consistent card padding + shadow + border
-- `lightenHex(hex, amount)` / `darkenHex` (internal) → hex color math
-
-## Shared components
-
-- `<FadeIn startFrame={n} direction="up" distance={30}>` — fade + slide wrapper
-- `<AnimatedText text="..." mode="word" startFrame={n} />` — word/character reveal
-- `<Background variant="dark|light|map" border? noGrain?>` — layered background (gradient vignette + film grain + optional ruled border)
-- `<MetadataStrip episodeNumber={1} episodeTitle="..." date="..." scale="..." variant="dark">` — branded header (∴ STRUCTURAL · PARALLELS) + footer (REC + scale + date)
-- `<Crosshair x={960} y={540} startFrame={30} size={64} color? opacity?>` — animated reticle with draw-in sequence (hairlines → outer circle → inner circle → dot pulse)
-- `<Callout annotations={[{type, x, y, ...}]} startFrame={n}>` — arrows, circles, and bracket annotations with staggered SVG draw-in
-- `<TitleBlock title="..." subtitle="..." mode={mode}>` — shared title positioning (all templates must use this)
-- `<TransitionWrapper transitionIn="fade" transitionOut="wipe-left" durationSec={0.6} durationInFrames={n}>` — 9 cinematic transition types for segment boundaries
-- `<LayeredComposition position="lower-third" backgroundDim={0.3} vignette>{{background: ..., foreground: ...}}</LayeredComposition>` — [LAYERED:] visual mode compositing
-- `<ShortsWrapper title="..." mode={mode}>{(vl, theme, frame, exit) => ...}</ShortsWrapper>` — render-prop shell for 9:16 Shorts with vertical layout tokens
+Hooks, utilities, and shared components are documented via JSDoc/TSDoc in the source — read the file when you need to use one. Key hooks: `useCompositionAnimation` (Ken Burns + exit fade, wired into all templates), `useDirection` (`_direction` JSON → atmosphere/drift/hold), `useEntrance` (semantic entrance presets: hero/content/data/label/structure), `useThemeMode` (mode-aware tokens), `useVerticalLayout` (Shorts).
 
 ## Rendering
 
-```bash
-# Preview in Remotion Studio (local machine)
-npm start
+- **Preview:** `npm start` — Remotion Studio at `localhost:3000`.
+- **Single composition:** `npx remotion render src/index.ts ChoroplethMap out/map.mp4`. Override data: `--props='{"data":{...}}'`.
+- **Single still (for QA):** `npx remotion still src/index.ts ChoroplethMap --frame=60 --output=frame.png`.
+- **Episode render:** `node scripts/render-episode.mjs --episode=silicon-trap` (writes props to temp files, supports `--only=05,06` and `--from=16` for partial renders).
+- **Lambda render:** `npm run render:lambda -- --episode=silicon-trap` (after one-time `npm run deploy`).
 
-# Render a composition to MP4
-npx remotion render src/index.ts ChoroplethMap out/map.mp4
-
-# Render a single frame as PNG (for QA)
-npx remotion still src/index.ts ChoroplethMap --frame=60 --output=frame.png
-
-# Override data via props
-npx remotion render src/index.ts ChoroplethMap out/map.mp4 --props='{"data":{...}}'
-
-# In Claude's sandbox, use Playwright's Chromium:
-npx remotion still src/index.ts ChoroplethMap --frame=60 \
-  --browser-executable=$(find ~/.cache/ms-playwright -name "headless_shell" | head -1) \
-  --output=frame.png
-```
-
-## Production Skills
-
-Four Cowork skills are used in the production pipeline. They are installed in the Cowork plugins directory and trigger automatically. The research-audit skill is also version-controlled at `skills/research-audit/SKILL.md`.
-
-- **visual-spec** — Reads a script, produces visual breakdown table, generates all JSON data files after approval. References BRAND.md and LESSONS.md.
-- **script-audit** — Audits scripts for broken transitions, lecture patterns, pacing, unverified claims
-- **persona-eval** — Evaluates scripts through 5 audience personas for resonance
-- **research-audit** — 7-lens quality gate for research briefs (READY / CONDITIONAL / NEEDS MORE RESEARCH)
-
-## Zod schemas + calculateMetadata
-
-Every template has a `schema.ts` file with Zod validation. Schemas are wired into `<Composition schema={...}>` which enables runtime prop validation and visual editing in Remotion Studio. All compositions use `calculateMetadata` to derive `durationInFrames` dynamically from the `durationSec` field in JSON data — no more hardcoded frame counts.
-
-## Font preloading (src/design/fonts.ts)
-
-Uses `@remotion/google-fonts` to preload all four Meridian brand fonts: Space Grotesk, IBM Plex Mono, JetBrains Mono, Noto Sans SC. Imported in Root.tsx so fonts are guaranteed loaded before the first frame renders.
-
-## Performance memoization
-
-Expensive per-frame computations (Math.max, color scale builds, BFS layout, bar width calcs) are wrapped in `useMemo`. Pure sub-components (AnimatedBar, ComparisonBars, TreeNodeComponent, etc.) use `React.memo` to skip re-renders when frame-independent props haven't changed.
-
-## Episode master compositions (src/templates/Episodes/)
-
-A `<Series>` composition that stitches all clips into one continuous video. 15-frame overlaps between clips provide cross-fade transitions. Episode compositions use slug-based IDs (e.g., `silicon-trap`, `silicon-trap-full`). Render with `npx remotion render src/index.ts silicon-trap out/silicon-trap-full.mp4`.
-
-## Rendering & Assembly
-
-Four render scripts live in `scripts/`:
-
-- **`render-silicon-trap.sh`** — Bash version for silicon-trap. `bash scripts/render-silicon-trap.sh` renders all 24 clips.
-- **`render-episode.mjs`** — Node version, more robust (writes props to temp files to avoid shell escaping). Supports `--only=05,06` and `--from=16` for partial renders.
-- **`deploy-lambda.mjs`** — Deploys Remotion Lambda (function + S3 site). Run once, outputs env vars.
-- **`render-lambda.mjs`** — Renders via Lambda. `--comp=DataChart --props=...` for single clips, `--episode=silicon-trap` for all 24.
-
-Local render scripts:
-- Read JSON data files, wrap as `{"data": ...}` props, pass to `npx remotion render`
-- Output numbered MP4s to `out/silicon-trap/` (e.g., `01-title-episode.mp4`)
-- Support `--preview` mode (renders stills at frame 90 instead of MP4)
-- Support `--concat` to concatenate all clips into a preview reel via ffmpeg
-- Auto-detect Playwright Chromium for sandbox rendering
-
-**Sequence map:** `data/episodes/silicon-trap/SEQUENCE.md` defines the canonical render order — which composition plays when, mapped to script beats.
+Sandbox / headless Chromium: `--browser-executable=$(find ~/.cache/ms-playwright -name "headless_shell" | head -1)`.
 
 ## Testing
 
-Visual regression tests in `src/__tests__/` using Vitest + `@remotion/renderer`. Each test renders frame 30 of a composition, saves/compares baseline PNGs. Run with `npm test`. First run creates baselines; subsequent runs detect regressions.
+- **Visual regression:** `npm test` (Vitest + `@remotion/renderer`). Each test renders frame 30 and diffs against a baseline PNG. First run creates baselines; subsequent runs detect drift. Regenerate after intentional changes: `npm run test:baseline`.
+- **TypeScript typecheck:** `npm run typecheck` or from repo root `./scripts/typecheck.sh`.
+- **Convention lint:** `npm run lint`.
 
-```bash
-npm test              # Run all visual regression tests
-npm run test:baseline # Regenerate baselines after intentional changes
-```
+## Performance — what to remember
 
-## silicon-trap status: "The Silicon Trap" (queued)
+Components re-render every frame at 30fps. Cheap stuff is fine; the hot mistakes are:
 
-- Script: v5 production format (episodes/silicon-trap/script-v4-production.md) — two-column with full visual specs
-- Shot list: 21 assets in shot-list.json (16 stock footage + 5 archival images) — ready for source.py
-- Data files: 24/24 generated + assembly manifest with audio (estimate mode, 53 segments)
-- Visual QA (v3 data): 20/24 passed (4 maps need local Remotion Studio for CDN access)
-- Sequence map: Complete — 24 clips mapped to 5 beats + opening/closing
-- Render pipeline: Two scripts ready (bash + Node) + Lambda deploy script
-- Stock footage: Not yet sourced
-- Narration: Not yet recorded
-- Final assembly: Render clips → import to NLE → place on timeline with narration + B-roll
-- **Note:** Now queued behind `prisoners-dilemma` as launch candidate
+- **`Math.max(...arr)` / `Math.min(...arr)` / `arr.sort()` / `arr.filter()` over data props** in render body → wrap in `useMemo`. The codebase has been audited; if you're touching one, follow the existing pattern.
+- **Pure sub-components rendered in a loop** → wrap in `React.memo`.
+- **Hooks (`useMemo`, `useState`, `useId`) after an early `return null`** → Rules of Hooks violation. Move hooks above the conditional return.
+- **`console.warn` in render body** → use `warnIf()` from `utils/dataWarnings.ts`. Otherwise it fires 30× per second.
 
-## Known issues and constraints
+## Known constraints
 
-See **LESSONS.md** for the full technical reference. Key ones:
-- Map templates (ChoroplethMap, RouteAnimation) need network access for TopoJSON CDN — won't render geography in sandboxed environments, but work fine in local Remotion Studio
-- react-simple-maps has no @types package — manual declarations in src/declarations.d.ts
-- theme.ts uses `as const` creating readonly tuples — all code consuming color ramps must use `readonly string[]` types
-- tsconfig.json has strict: false to accommodate third-party library typing gaps
+Full reference: [`LESSONS.md`](./LESSONS.md). Worth knowing without reading it:
 
-## Content context
+- Map templates need network access for vector tile CDN — won't render full geography in fully sandboxed environments, but work fine in local Studio and Lambda.
+- `theme.ts` uses `as const` creating readonly tuples — code consuming color ramps must use `readonly string[]` types.
+- `MapGL` (the shared map component) requires the `delayRender` lifecycle — it's wired correctly; don't bypass it when adding new map templates.
+- Brand chrome (`HeaderStrip` + `FooterStrip`) is wired into all 25 templates by default via `<Background>`. Don't double-wrap.
 
-**Parallax** — English-first YouTube channel analyzing geopolitics through historical
-analogy and philosophical frameworks. Tone: intellectually rigorous but narratively
-engaging. Visual references: CaspianReport (maps), Wendover (infographics), PolyMatter
-(clean data viz). See the top-level CLAUDE.md for full project context.
+## Don't
+
+- Don't reintroduce `react-simple-maps` (replaced by Mapbox GL via `MapGL`).
+- Don't disable TypeScript strict mode.
+- Don't access `data.durationSec` without a `?? 0` fallback (optional in many Zod schemas).
+- Don't paste hex colors when there's a palette token in `theme.ts`.
+- Don't hardcode `1.02`, `8`, or `15` for Ken Burns / pan / exit-fade — use the named constants.
