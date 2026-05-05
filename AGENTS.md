@@ -25,10 +25,22 @@ From repo root:
 Per-stack (when you need granular control):
 
 - Python tests: `pytest tools/assembly/test_generate_manifest.py -q` (76 tests, <1s)
+- Python tests in watch mode: `./scripts/test-watch.sh` (requires `entr`)
 - TS typecheck: `cd remotion-templates && npx tsc --noEmit`
 - TS lint: `cd remotion-templates && npm run lint`
 - TS visual regression: `cd remotion-templates && npm test`
-- Manifest gen: `cd tools/assembly && python3 generate_manifest.py --script <path> --episode <slug> --output <path>`
+- Manifest gen: `python3 tools/assembly/generate_manifest.py --script <path> --episode <slug> --output <path>`
+- JSON validation: `python3 tools/validate-data.py` (or `--files a.json b.json` for a subset)
+- Cost log: `python3 tools/cost-tracker.py summary` and `python3 tools/cost-tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
+- Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
+
+## Slash commands and subagents
+
+The `.claude/commands/` directory has prompt templates for common workflows: `/new-episode`, `/new-template`, `/concept-search`, `/render-preview`, `/audit-script`. The `.claude/agents/` directory has `script-reviewer` and `visual-spec-reviewer` subagents for delegated audit tasks.
+
+## Pipeline state
+
+Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read it on session start to know what's queued and what action is next.
 
 ## Code style
 

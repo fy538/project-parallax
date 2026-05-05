@@ -16,6 +16,9 @@ remotion-templates/.vite/
 CLAUDE.local.md
 .claude/settings.local.json
 
+# Git worktrees for parallel work (created by scripts/worktree.sh)
+worktrees/
+
 # Logs
 *.log
 

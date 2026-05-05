@@ -8,6 +8,7 @@ cd "$(git rev-parse --show-toplevel)"
 
 TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
 PY_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
+JSON_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' | grep -v 'package-lock\.json' || true)
 
 if [ -n "$TS_CHANGED" ]; then
   echo "→ TypeScript typecheck (TS files changed)"
@@ -19,8 +20,14 @@ if [ -n "$PY_CHANGED" ]; then
   python3 -m pytest tools/assembly/test_generate_manifest.py -q
 fi
 
-if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ]; then
-  echo "  (no .ts/.tsx/.py changes, skipping checks)"
+if [ -n "$JSON_CHANGED" ]; then
+  echo "→ JSON validation (JSON files changed)"
+  # shellcheck disable=SC2086
+  python3 tools/validate-data.py --files $JSON_CHANGED
+fi
+
+if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ]; then
+  echo "  (no .ts/.tsx/.py/.json changes, skipping checks)"
 fi
 
 echo "✓ pre-commit checks passed"
