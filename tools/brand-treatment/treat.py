@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image
 
 # === Brand palette — loaded from palette.json (single source of truth) ===
 

@@ -26,7 +26,7 @@ if not api_key:
     print("Error: PEXELS_API_KEY not found in .env", file=sys.stderr)
     sys.exit(1)
 
-print(f"API Key loaded: {api_key[:20]}...")
+print("API key loaded.")
 
 # Search queries
 search_queries = [

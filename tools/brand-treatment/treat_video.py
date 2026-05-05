@@ -193,8 +193,8 @@ def get_video_info(input_path: Path) -> dict:
                 "duration": float(data.get("format", {}).get("duration", 0)),
                 "fps": video_stream.get("r_frame_rate", "30/1"),
             }
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"  ⚠ ffprobe failed ({e}), assuming 1920×1080 @ 30fps", file=sys.stderr)
     return {"width": 1920, "height": 1080, "duration": 0, "fps": "30/1"}
 
 
@@ -287,7 +287,7 @@ def treat_video(
             cmd, capture_output=True, text=True, timeout=300
         )
         if result.returncode != 0:
-            print(f"  ✗ ffmpeg error: {result.stderr[-200:]}", file=sys.stderr)
+            print(f"  ✗ ffmpeg error:\n{result.stderr}", file=sys.stderr)
             return False
         return True
     except subprocess.TimeoutExpired:

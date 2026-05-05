@@ -45,8 +45,16 @@ SCHEMA_PATH = PROJECT_ROOT / "data" / "concept-registry.schema.json"
 
 
 def load_registry(path: Path) -> dict:
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+    if not path.exists():
+        print(f"Error: concept registry not found at {path}", file=sys.stderr)
+        print("  Run from project root, or check that data/concepts.json exists.", file=sys.stderr)
+        sys.exit(1)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error: concept registry is not valid JSON: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 def save_registry(data: dict, path: Path):

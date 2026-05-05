@@ -111,13 +111,14 @@ def search_pixabay(query: str, media_type: str = "photo", count: int = RESULTS_P
     if not PIXABAY_KEY:
         return []
 
-    if media_type == "video":
-        url = f"https://pixabay.com/api/videos/?key={PIXABAY_KEY}&q={quote_plus(query)}&per_page={count}&orientation=horizontal"
-    else:
-        url = f"https://pixabay.com/api/?key={PIXABAY_KEY}&q={quote_plus(query)}&per_page={count}&orientation=horizontal&image_type=photo"
+    # Pixabay requires the key as a query param (no header auth option)
+    base_url = "https://pixabay.com/api/videos/" if media_type == "video" else "https://pixabay.com/api/"
+    params: dict = {"key": PIXABAY_KEY, "q": query, "per_page": count, "orientation": "horizontal"}
+    if media_type != "video":
+        params["image_type"] = "photo"
 
     try:
-        resp = requests.get(url, timeout=10)
+        resp = requests.get(base_url, params=params, timeout=10)
         resp.raise_for_status()
         data = resp.json()
 
@@ -284,8 +285,15 @@ def process_batch(batch_file: Path, output_dir: Path, preview_only: bool = False
       ]
     }
     """
-    with open(batch_file) as f:
-        batch = json.load(f)
+    try:
+        with open(batch_file) as f:
+            batch = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error: batch file is not valid JSON: {e}", file=sys.stderr)
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Error: batch file not found: {batch_file}", file=sys.stderr)
+        sys.exit(1)
 
     episode = batch.get("episode", "unknown")
     assets = batch.get("assets", [])
@@ -321,7 +329,7 @@ def process_batch(batch_file: Path, output_dir: Path, preview_only: bool = False
         }
 
         if not preview_only and search_result["results"]:
-            # Download top result from each source (max 3)
+            # Download top result from each source (max 2)
             sources_downloaded = set()
             for result in search_result["results"]:
                 if result["source"] in sources_downloaded:
@@ -336,7 +344,13 @@ def process_batch(batch_file: Path, output_dir: Path, preview_only: bool = False
                         "url": result["url"],
                     })
                     sources_downloaded.add(result["source"])
-                if len(sources_downloaded) >= 2:  # Top 2 sources is enough
+                else:
+                    entry["downloaded"].append({
+                        "status": "failed",
+                        "source": result["source"],
+                        "url": result.get("url", ""),
+                    })
+                if len(sources_downloaded) >= 2:
                     break
 
         manifest.append(entry)
