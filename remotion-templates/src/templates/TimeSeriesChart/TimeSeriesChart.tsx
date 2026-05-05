@@ -203,49 +203,51 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const chartWidth = cl.chart.width;
   const chartHeight = cl.chart.height;
 
-  // Compute axis ranges
-  const allYValues = data.lines.flatMap((line) =>
-    line.points.map((p) => p.y)
-  );
-  const referenceYValues = data.referenceLines?.map((r) => r.y) || [];
-  const allYWithReferences = [...allYValues, ...referenceYValues];
+  // Compute axis ranges — memoized so flatMap/min/max don't run every frame
+  const { yMin, yMax, xMin, xMax } = useMemo(() => {
+    const allYValues = data.lines.flatMap((line) => line.points.map((p) => p.y));
+    const referenceYValues = data.referenceLines?.map((r) => r.y) || [];
+    const allYWithReferences = [...allYValues, ...referenceYValues];
 
-  let yMin = allYWithReferences.length > 0 ? Math.min(...allYWithReferences) : 0;
-  let yMax = allYWithReferences.length > 0 ? Math.max(...allYWithReferences) : 1;
+    let yMin = allYWithReferences.length > 0 ? Math.min(...allYWithReferences) : 0;
+    let yMax = allYWithReferences.length > 0 ? Math.max(...allYWithReferences) : 1;
 
-  if (data.yRange) {
-    [yMin, yMax] = data.yRange;
-  } else {
-    // Domain inference rules:
-    //   1. If all data is non-negative, clamp yMin at 0 — population
-    //      can't be -325M. Don't pad below zero for inherently
-    //      non-negative quantities.
-    //   2. If all data is non-positive, clamp yMax at 0 (mirror case).
-    //   3. Otherwise (mixed sign), pad both ends so the line breathes.
-    //   4. After clamping, snap the domain to a "nice" range using
-    //      D3-style 1/2/5 × 10ⁿ tick spacing so labels read as round
-    //      numbers (1k, 2k, 3k — not 1051, 2427, 3803).
-    const dataMin = yMin;
-    const dataMax = yMax;
-    const range = dataMax - dataMin || 1;
-    if (dataMin >= 0) {
-      yMin = 0;
-      yMax = dataMax + range * 0.1;
-    } else if (dataMax <= 0) {
-      yMin = dataMin - range * 0.1;
-      yMax = 0;
+    if (data.yRange) {
+      [yMin, yMax] = data.yRange;
     } else {
-      yMin = dataMin - range * 0.1;
-      yMax = dataMax + range * 0.1;
+      // Domain inference rules:
+      //   1. If all data is non-negative, clamp yMin at 0 — population
+      //      can't be -325M. Don't pad below zero for inherently
+      //      non-negative quantities.
+      //   2. If all data is non-positive, clamp yMax at 0 (mirror case).
+      //   3. Otherwise (mixed sign), pad both ends so the line breathes.
+      //   4. After clamping, snap the domain to a "nice" range using
+      //      D3-style 1/2/5 × 10ⁿ tick spacing so labels read as round
+      //      numbers (1k, 2k, 3k — not 1051, 2427, 3803).
+      const dataMin = yMin;
+      const dataMax = yMax;
+      const range = dataMax - dataMin || 1;
+      if (dataMin >= 0) {
+        yMin = 0;
+        yMax = dataMax + range * 0.1;
+      } else if (dataMax <= 0) {
+        yMin = dataMin - range * 0.1;
+        yMax = 0;
+      } else {
+        yMin = dataMin - range * 0.1;
+        yMax = dataMax + range * 0.1;
+      }
+      [yMin, yMax] = niceDomain(yMin, yMax, 5);
     }
-    [yMin, yMax] = niceDomain(yMin, yMax, 5);
-  }
 
-  const allXValues = data.lines.flatMap((line) =>
-    line.points.map((p) => (typeof p.x === "string" ? parseFloat(p.x) : p.x))
-  );
-  const xMin = allXValues.length > 0 ? Math.min(...allXValues) : 0;
-  const xMax = allXValues.length > 0 ? Math.max(...allXValues) : 1;
+    const allXValues = data.lines.flatMap((line) =>
+      line.points.map((p) => (typeof p.x === "string" ? parseFloat(p.x) : p.x))
+    );
+    const xMin = allXValues.length > 0 ? Math.min(...allXValues) : 0;
+    const xMax = allXValues.length > 0 ? Math.max(...allXValues) : 1;
+
+    return { yMin, yMax, xMin, xMax };
+  }, [data.lines, data.referenceLines, data.yRange]);
 
   // Pre-compute pixel coordinates for each data point. We use these for
   // both the polyline string AND for the leading-edge marker — the marker

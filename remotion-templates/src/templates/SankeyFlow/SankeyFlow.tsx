@@ -304,10 +304,13 @@ const FlowParticlesLayer: React.FC<{
   density: number;
 }> = React.memo(({ links, frame, startFrame, speed, density }) => {
   // Only show after links have started drawing
+  const maxLinkValue = useMemo(
+    () => Math.max(...links.map((l) => l.thickness), 1),
+    [links]
+  );
+
   const opacity = fadeIn(frame, startFrame + sec(1.2), sec(0.5));
   if (opacity <= 0) return null;
-
-  const maxLinkValue = Math.max(...links.map((l) => l.thickness), 1);
 
   return (
     <svg
@@ -687,6 +690,15 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
     layoutNodes.filter((n) => n.column === 0).map((n) => n.id)
   );
 
+  const columnCount = useMemo(
+    () => (nodes.length > 0 ? Math.max(...nodes.map((n) => n.column)) + 1 : 1),
+    [nodes]
+  );
+  const lastColumn = useMemo(
+    () => (layoutNodes.length > 0 ? Math.max(...layoutNodes.map((n) => n.column)) : 0),
+    [layoutNodes]
+  );
+
   // Render
 
   return (
@@ -739,7 +751,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
               link={link}
               frame={frame}
               startFrame={linksStart}
-              columnCount={nodes.length > 0 ? Math.max(...nodes.map((n) => n.column)) + 1 : 1}
+              columnCount={columnCount}
               sourceColor={fromNode?.color}
               targetColor={toNode?.color}
             />
@@ -747,40 +759,37 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
         })}
 
         {/* Render nodes */}
-        {(() => {
-          const lastColumn = layoutNodes.length > 0 ? Math.max(...layoutNodes.map((n) => n.column)) : 0;
-          return layoutNodes.map((node, idx) => {
-            const isSourceNode = sourceNodeIds.has(node.id);
-            const nodeStartFrame = isSourceNode ? sourceNodesStart : otherNodesStart;
+        {layoutNodes.map((node, idx) => {
+          const isSourceNode = sourceNodeIds.has(node.id);
+          const nodeStartFrame = isSourceNode ? sourceNodesStart : otherNodesStart;
 
-            // Label/value placement follows D3-Sankey convention:
-            //   first column → text outside-LEFT (open margin)
-            //   last column  → text outside-RIGHT (open margin)
-            //   middle cols  → text INSIDE the box (between ribbons)
-            const nodePosition: "first" | "middle" | "last" =
-              node.column === 0
-                ? "first"
-                : node.column === lastColumn
-                ? "last"
-                : "middle";
+          // Label/value placement follows D3-Sankey convention:
+          //   first column → text outside-LEFT (open margin)
+          //   last column  → text outside-RIGHT (open margin)
+          //   middle cols  → text INSIDE the box (between ribbons)
+          const nodePosition: "first" | "middle" | "last" =
+            node.column === 0
+              ? "first"
+              : node.column === lastColumn
+              ? "last"
+              : "middle";
 
-            return (
-              <SankeyNodeComponent
-                key={`node-${node.id}`}
-                node={node}
-                frame={frame}
-                startFrame={nodeStartFrame}
-                showValue={showValues}
-                valuePrefix={valuePrefix}
-                valueSuffix={valueSuffix}
-                isSource={isSourceNode}
-                nodePosition={nodePosition}
-                defaultColorIndex={idx}
-                mode={(data.backgroundVariant || "light") as "light" | "dark"}
-              />
-            );
-          });
-        })()}
+          return (
+            <SankeyNodeComponent
+              key={`node-${node.id}`}
+              node={node}
+              frame={frame}
+              startFrame={nodeStartFrame}
+              showValue={showValues}
+              valuePrefix={valuePrefix}
+              valueSuffix={valueSuffix}
+              isSource={isSourceNode}
+              nodePosition={nodePosition}
+              defaultColorIndex={idx}
+              mode={(data.backgroundVariant || "light") as "light" | "dark"}
+            />
+          );
+        })}
 
         {/* Flow particles — animated dots along link paths */}
         {data.flowParticles && (

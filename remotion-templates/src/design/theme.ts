@@ -230,7 +230,9 @@ export const EMPHASIS_VALUES = Object.keys(EMPHASIS_MAP) as readonly EpisodeColo
 // replace them when touching a template.
 export const timing = {
   entrance: {
+    snap: 6,       // sec(0.2) — instant micro-reveals, axis ticks, grid lines
     fast: 9,       // sec(0.3) — secondary elements, subtle reveals
+    crisp: 12,     // sec(0.4) — chart bars, labels — crisper than medium
     medium: 15,    // sec(0.5) — default for most chart elements
     slow: 24,      // sec(0.8) — hero moments, dramatic reveals
   },
