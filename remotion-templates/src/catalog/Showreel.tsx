@@ -138,7 +138,7 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogDataData.statHabitable.durationSec ?? 9,
     render: () => <StatReveal data={catalogDataData.statHabitable} />,
   },
-  slateSegment("Data", "DataChart", "mountains-bar"),
+  slateSegment("Data", "DataChart", "speeds-bar"),
   {
     durationSec: catalogDataData.chartMountains.durationSec ?? 8,
     render: () => <DataChart data={catalogDataData.chartMountains} />,
@@ -178,7 +178,7 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogDataData.radarAthletes.durationSec ?? 11,
     render: () => <RadarChart data={catalogDataData.radarAthletes} />,
   },
-  slateSegment("Data", "SankeyFlow", "energy-flows"),
+  slateSegment("Data", "SankeyFlow", "plastic-fate"),
   {
     durationSec: catalogDataData.sankeyEnergy.durationSec ?? 11,
     render: () => <SankeyFlow data={catalogDataData.sankeyEnergy} />,

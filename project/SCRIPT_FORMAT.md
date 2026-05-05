@@ -9,6 +9,7 @@ Updated: May 4, 2026
 **Related docs:**
 - **VISUAL_LANGUAGE.md** — *when* to use footage vs. motion graphics vs. both. Read that first for the editorial logic.
 - **DIRECTING_LANGUAGE.md** — *how* to direct camera, reveals, timing, transitions, and mood via `DIR:` annotations. The complete syntax reference.
+- **PACING_SYSTEM.md** — proportional camera paths, Whisper sync loop, and `PACE:` visual density annotations. The timing coordination spec.
 - **FOOTAGE_SOURCING.md** — *where* to get footage, organized by visual need. Consult when specifying stock footage.
 - **BRAND.md / IMAGES.md** — treatment pipeline that all footage and images pass through before use.
 
@@ -191,6 +192,39 @@ These come from VISUAL_LANGUAGE.md and should be checked by script-audit:
 - `[LAYERED:]` entries should be brief (3-8 seconds) with simple overlays — complex charts need the viewer's full attention and belong in `[MG:]`.
 - `[AI-GEN:]` should account for no more than 10-20% of episode runtime (~60-120 seconds per 13-minute episode).
 - `[ILLUST:]` should account for no more than 10-15% of episode runtime (~50-100 seconds per 13-minute episode).
+
+### Visual density annotations (`PACE:`)
+
+`PACE:` lines control how fast visuals change within a section. They sit in the visual column on their own row (empty narration column, like `DIR:` continuation lines) and apply to all subsequent rows until the next `PACE:` line.
+
+Three profiles are available:
+
+| Profile | Multiplier | Visual change rate | When to use |
+|---------|-----------|-------------------|-------------|
+| `PACE: urgent` | 0.7× | Faster cuts, compressed holds | Crisis escalation, rapid-fire evidence, tension building |
+| `PACE: analytical` | 1.0× | Default rate (~3-5s absorption window) | Data analysis, argument construction, standard narration |
+| `PACE: breathing` | 1.4× | Slower transitions, extended holds | Emotional peaks, reflection moments, philosophical pauses |
+
+**How it works:** When no explicit visual duration is specified (e.g., "match narration"), the PACE multiplier scales how long a visual stays on screen. "Breathing" holds visuals 40% longer; "urgent" cuts 30% faster. Explicit durations (e.g., "8s") are never modified — PACE only affects duration-unspecified segments.
+
+**Format in script:**
+
+```
+|                                      | PACE: breathing |
+| The weight of that number settles... | **P1** · [MG:] StatReveal · "92% Yield" · amber · [ep01/stat-yield.json] |
+|                                      | DIR: reveal(count-up, sync:"ninety-two", pulse) |
+|                                      | DIR: hold(land) |
+| ...three more rows at breathing pace... | ... |
+|                                      | PACE: analytical |
+| But the economics tell a different story. | **P1** · [MG:] DataChart · cost comparison · [ep01/chart-cost.json] · 8s |
+```
+
+**Guidelines:**
+- Default is `analytical` — don't write `PACE: analytical` at the start of every beat.
+- Use 2-4 PACE changes per episode. More than that defeats the purpose — it should mark structural shifts, not individual shots.
+- `PACE: breathing` pairs naturally with `DIR: hold()` and `DIR: mood(dense)` — slow pacing + held visuals + atmospheric mood creates the "let it sink in" effect.
+- `PACE: urgent` pairs with quick cuts and minimal direction — the speed itself is the editorial signal.
+- PACE affects the assembly manifest's duration estimates. In Whisper mode (post-recording), actual narration timing takes precedence but PACE still scales visual holds.
 
 ### Register transition grammar
 

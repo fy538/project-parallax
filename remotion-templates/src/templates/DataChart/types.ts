@@ -44,6 +44,13 @@ export interface DataChartData {
   rightGroupColor?: string;
   /** Domain category labels rendered below the chart (e.g., discipline names grouping bars). */
   domainLabels?: string[];
+  /**
+   * When true, bar values render WITHOUT thousand-separators (e.g. "1958"
+   * instead of "1,958"). Use for year values, postal codes, or any
+   * 4-digit identifier where comma-separation reads as a category error.
+   * Affects bar value labels and y-axis tick labels.
+   */
+  formatAsYear?: boolean;
   /** Source attribution shown at bottom. */
   source?: string;
   /** Total duration in seconds. */

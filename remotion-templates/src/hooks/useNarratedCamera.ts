@@ -35,7 +35,7 @@
  */
 
 import { useMemo } from "react";
-import { useCurrentFrame, interpolate, Easing } from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
 import { sec } from "../design/theme";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -62,7 +62,14 @@ export interface NarratedCameraStep {
   target: { x: number; y: number } | string;
   /** Zoom level (1.0 = 100%, >1 = zoom in, <1 = zoom out) */
   zoom: number;
-  /** Duration of this step in seconds */
+  /**
+   * Duration of this step.
+   * - Absolute: seconds (e.g., 3 = 3 seconds)
+   * - Proportional: fraction of total composition time (e.g., 0.4 = 40%)
+   *
+   * Mode auto-detected: if all step durations sum to ≤1.01, treated as
+   * proportional. Set `proportional: true` in options to force.
+   */
   duration: number;
   /**
    * Which element indices are "in focus" during this step.
@@ -84,6 +91,22 @@ export interface NarratedCameraStep {
   blurAmount?: number;
   /** Scale for non-focused elements (default 0.88) */
   unfocusedScale?: number;
+  /**
+   * Sync word anchor — when Whisper sync points are available,
+   * this step starts when the narrator says this word.
+   * Falls back to proportional/absolute timing when no sync points exist.
+   */
+  syncStart?: string;
+}
+
+/** Resolved sync point from Whisper alignment */
+export interface SyncPoint {
+  word: string;
+  /** Absolute time in seconds from start of composition */
+  timeSec: number;
+  /** Frame number within composition */
+  frame: number;
+  confidence?: number;
 }
 
 export interface UseNarratedCameraOptions {
@@ -98,6 +121,18 @@ export interface UseNarratedCameraOptions {
   transitionSec?: number;
   /** Vertical offset for camera center (default: 0) */
   verticalBias?: number;
+  /**
+   * Force proportional duration mode.
+   * If true, step durations are fractions of total composition time.
+   * If omitted, auto-detected: proportional when durations sum to ≤1.01.
+   */
+  proportional?: boolean;
+  /**
+   * Resolved sync points from Whisper alignment.
+   * When provided, camera steps with matching syncStart words
+   * snap their start boundary to the sync point's frame.
+   */
+  syncPoints?: SyncPoint[];
 }
 
 export interface NarratedCameraState {
@@ -224,22 +259,90 @@ export const useNarratedCamera = (
     canvasHeight,
     transitionSec = 0.8,
     verticalBias = 0,
+    proportional: forceProportional,
+    syncPoints,
   } = opts;
 
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const transitionFrames = sec(transitionSec);
+
+  // ── Detect proportional mode ───────────────────────────────────────
+  // Proportional when: explicitly set, or all step durations sum to ≤1.01
+  const isProportional = useMemo(() => {
+    if (forceProportional !== undefined) return forceProportional;
+    if (cameraPath.length === 0) return false;
+    const total = cameraPath.reduce((sum, s) => sum + s.duration, 0);
+    return total <= 1.01;
+  }, [cameraPath, forceProportional]);
+
+  // ── Build sync point lookup ────────────────────────────────────────
+  const syncLookup = useMemo(() => {
+    if (!syncPoints || syncPoints.length === 0) return null;
+    const lookup = new Map<string, number>();
+    for (const sp of syncPoints) {
+      lookup.set(sp.word.toLowerCase(), sp.frame);
+    }
+    return lookup;
+  }, [syncPoints]);
 
   // ── Build cumulative frame boundaries ──────────────────────────────
   const stepBoundaries = useMemo(() => {
     const boundaries: Array<{ start: number; end: number }> = [];
     let cumulative = 0;
+
     for (const step of cameraPath) {
-      const stepFrames = sec(step.duration);
+      const stepFrames = isProportional
+        ? Math.round(step.duration * durationInFrames) // fraction of total
+        : sec(step.duration); // absolute seconds
       boundaries.push({ start: cumulative, end: cumulative + stepFrames });
       cumulative += stepFrames;
     }
+
+    // Auto-fill: if absolute mode and last step ends before composition,
+    // extend the last step to fill remaining time (camera holds final position)
+    if (!isProportional && boundaries.length > 0) {
+      const last = boundaries[boundaries.length - 1];
+      if (last.end < durationInFrames) {
+        last.end = durationInFrames;
+      }
+    }
+
+    // Sync anchor adjustment: if sync points available, snap step starts
+    // to the frame where the narrator says the sync word
+    if (syncLookup && boundaries.length > 0) {
+      for (let i = 0; i < cameraPath.length; i++) {
+        const syncWord = cameraPath[i].syncStart;
+        if (syncWord) {
+          const syncFrame = syncLookup.get(syncWord.toLowerCase());
+          if (syncFrame !== undefined) {
+            // Snap this step's start to the sync frame
+            boundaries[i].start = syncFrame;
+            // Adjust previous step's end to match
+            if (i > 0) {
+              boundaries[i - 1].end = syncFrame;
+              // Guard: if previous step was squeezed to zero/negative width,
+              // give it a minimum viable duration (0.5s)
+              if (boundaries[i - 1].end <= boundaries[i - 1].start) {
+                boundaries[i - 1].end = boundaries[i - 1].start + sec(0.5);
+                // Push current step start forward to avoid overlap
+                boundaries[i].start = boundaries[i - 1].end;
+              }
+            }
+            // If current step's end is now at or before its start, extend it
+            if (boundaries[i].end <= boundaries[i].start) {
+              boundaries[i].end = Math.min(
+                boundaries[i].start + sec(0.5),
+                i < boundaries.length - 1 ? boundaries[i + 1].start : durationInFrames
+              );
+            }
+          }
+        }
+      }
+    }
+
     return boundaries;
-  }, [cameraPath]);
+  }, [cameraPath, durationInFrames, isProportional, syncLookup]);
 
   // ── Guard: empty cameraPath ─────────────────────────────────────────
   if (cameraPath.length === 0) {

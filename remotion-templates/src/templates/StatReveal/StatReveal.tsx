@@ -24,6 +24,7 @@ import {
   sec,
   shadows,
   radii,
+  getCategoricalColor,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -148,7 +149,9 @@ const BarItem: React.FC<BarItemProps> = ({
 }) => {
   const barFraction = bar.value / maxValue;
   const currentWidth = barWidth * barFraction * progress;
-  const barColor = bar.color || palette.amber;
+  // Multi-bar charts get distinct hues by default — only fall back to a
+  // single color when the data author hasn't decided per-bar colors.
+  const barColor = bar.color || getCategoricalColor(index);
   const barHeight = 56;
   const barGap = layout.spacing.sm;
 

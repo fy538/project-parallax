@@ -35,6 +35,7 @@ import {
   sec,
   radii,
   cardPresets,
+  getCategoricalColor,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -153,6 +154,8 @@ const TreeNodeComponent: React.FC<{
   dimAmount: number;
   /** Scale multiplier from camera focus */
   focusScale: number;
+  /** Stable index for default categorical color when node.color is missing. */
+  defaultColorIndex?: number;
 }> = React.memo(({
   node,
   position,
@@ -162,6 +165,7 @@ const TreeNodeComponent: React.FC<{
   mode,
   dimAmount,
   focusScale,
+  defaultColorIndex = 0,
 }) => {
   const theme = useThemeMode(mode);
   const nodeOpacity = fadeIn(frame, startFrame, sec(0.5));
@@ -173,7 +177,7 @@ const TreeNodeComponent: React.FC<{
   );
   const exitOp = exitFade(frame, totalFrames, sec(0.5));
 
-  const nodeColor = node.color || palette.amber;
+  const nodeColor = node.color || getCategoricalColor(defaultColorIndex);
   const isDark = mode === "dark";
   const isHighlighted = node.highlighted ?? false;
   const isActive = node.active ?? false;
@@ -490,6 +494,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     mode={backgroundVariant as "light" | "dark"}
                     dimAmount={camera.getNodeDim(node.id)}
                     focusScale={camera.getNodeScale(node.id)}
+                    defaultColorIndex={data.nodes.indexOf(node)}
                   />
                 );
               })}

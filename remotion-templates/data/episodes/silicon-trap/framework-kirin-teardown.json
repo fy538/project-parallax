@@ -27,5 +27,8 @@
   ],
   "durationSec": 6,
   "backgroundVariant": "light",
-  "source": "TechInsights, 2025"
+  "source": "TechInsights, 2025",
+  "_direction": {
+    "paceProfile": "breathing"
+  }
 }

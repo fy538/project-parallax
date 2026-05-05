@@ -26,9 +26,11 @@ const fwComparison: FrameworkDiagramData = {
   title: "Two Strategic Game Logics",
   subtitle: "How worldview shapes the moves you can imagine",
   variant: "comparison",
+  // Both column headers carry a CJK parenthetical so their text line-boxes
+  // are the same height and the underlines/items align row-to-row.
   columns: [
     {
-      title: "Chess",
+      title: "Chess (西洋棋)",
       icon: "♔",
       color: "#3266AD",
       items: [

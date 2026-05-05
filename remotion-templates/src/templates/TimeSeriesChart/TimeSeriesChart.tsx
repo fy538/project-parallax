@@ -36,6 +36,7 @@ import {
   cardPresets,
   barStyle,
   dividerStyle,
+  letterSpacing,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -62,8 +63,57 @@ import { useDirection } from "../../hooks/useDirection";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
+import { SourceAttribution } from "../../components/SourceAttribution";
 import { formatNumber } from "../../utils/numberFormat";
+import { niceDomain, formatTick } from "../../utils/niceTicks";
+import { chartLayout } from "../../utils/chartLayout";
+import { computeLabelStacks } from "../../utils/labelStack";
+import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import type { TimeSeriesChartData } from "./types";
+
+// ── Geometry helpers ────────────────────────────────────────────────────────
+
+/**
+ * Walk along a polyline and return the (x, y) point at fractional progress
+ * `t` (0–1) along the total path length. Used by the leading-edge marker
+ * to track the tip of a line as it draws — the dot at the recording stylus.
+ */
+function pointAtProgress(
+  points: { x: number; y: number }[],
+  t: number
+): { x: number; y: number } {
+  if (points.length === 0) return { x: 0, y: 0 };
+  if (points.length === 1 || t <= 0) return points[0];
+  if (t >= 1) return points[points.length - 1];
+
+  // Total path length
+  let total = 0;
+  const segLengths: number[] = [];
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].x - points[i - 1].x;
+    const dy = points[i].y - points[i - 1].y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    segLengths.push(d);
+    total += d;
+  }
+  if (total === 0) return points[0];
+
+  const target = t * total;
+  let walked = 0;
+  for (let i = 0; i < segLengths.length; i++) {
+    if (walked + segLengths[i] >= target) {
+      const segT = (target - walked) / segLengths[i];
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      return {
+        x: p0.x + (p1.x - p0.x) * segT,
+        y: p0.y + (p1.y - p0.y) * segT,
+      };
+    }
+    walked += segLengths[i];
+  }
+  return points[points.length - 1];
+}
 
 // ── Axis calculation helpers ────────────────────────────────────────────────
 
@@ -103,6 +153,20 @@ const getYPosition = (
 export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   data,
 }) => {
+  // Dev-only semantic checks. Once-per-template per session in Studio.
+  checkChartDataCommon("TimeSeriesChart", data);
+  warnIf(
+    data.lines.length === 0,
+    "TimeSeriesChart",
+    "lines array is empty — chart will render blank"
+  );
+  warnIf(
+    data.lines.some((l) => l.points.length < 2),
+    "TimeSeriesChart",
+    "A line has fewer than 2 points — won't draw as a line",
+    { lineCounts: data.lines.map((l) => l.points.length) }
+  );
+
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
@@ -119,17 +183,24 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
 
 
-  // Safe area calculations (80px padding, 140px top for title)
-  const chartPaddingLeft = 100;
-  const chartPaddingRight = 100;
-  const chartPaddingTop = 180;
-  const chartPaddingBottom = 100;
-  const chartLeft = layout.padding + chartPaddingLeft;
-  const chartRight = layout.width - layout.padding - chartPaddingRight;
-  const chartTop = layout.padding + chartPaddingTop;
-  const chartBottom = layout.height - layout.padding - chartPaddingBottom;
-  const chartWidth = chartRight - chartLeft;
-  const chartHeight = chartBottom - chartTop;
+  // Chart region — declarative layout via the shared helper.
+  // Replaces hardcoded chartPaddingTop=180/Bottom=100 magic numbers with
+  // named regions. The helper reserves space for: title block + legend
+  // (when multi-series) + bottom x-axis labels + source line. The chart
+  // gets whatever's left.
+  const cl = chartLayout({
+    hasTitle: true,
+    hasLegend: data.lines.length > 1,
+    hasXAxis: true,
+    hasSource: !!data.source,
+    insets: { left: 100, right: 100 }, // extra room for y-axis labels + legend strip
+  });
+  const chartLeft = cl.chart.left;
+  const chartRight = cl.chart.left + cl.chart.width;
+  const chartTop = cl.chart.top;
+  const chartBottom = cl.chart.top + cl.chart.height;
+  const chartWidth = cl.chart.width;
+  const chartHeight = cl.chart.height;
 
   // Compute axis ranges
   const allYValues = data.lines.flatMap((line) =>
@@ -144,10 +215,29 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   if (data.yRange) {
     [yMin, yMax] = data.yRange;
   } else {
-    // Auto-range with 10% padding
-    const yRange = yMax - yMin || 1;
-    yMin = yMin - yRange * 0.1;
-    yMax = yMax + yRange * 0.1;
+    // Domain inference rules:
+    //   1. If all data is non-negative, clamp yMin at 0 — population
+    //      can't be -325M. Don't pad below zero for inherently
+    //      non-negative quantities.
+    //   2. If all data is non-positive, clamp yMax at 0 (mirror case).
+    //   3. Otherwise (mixed sign), pad both ends so the line breathes.
+    //   4. After clamping, snap the domain to a "nice" range using
+    //      D3-style 1/2/5 × 10ⁿ tick spacing so labels read as round
+    //      numbers (1k, 2k, 3k — not 1051, 2427, 3803).
+    const dataMin = yMin;
+    const dataMax = yMax;
+    const range = dataMax - dataMin || 1;
+    if (dataMin >= 0) {
+      yMin = 0;
+      yMax = dataMax + range * 0.1;
+    } else if (dataMax <= 0) {
+      yMin = dataMin - range * 0.1;
+      yMax = 0;
+    } else {
+      yMin = dataMin - range * 0.1;
+      yMax = dataMax + range * 0.1;
+    }
+    [yMin, yMax] = niceDomain(yMin, yMax, 5);
   }
 
   const allXValues = data.lines.flatMap((line) =>
@@ -156,19 +246,28 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const xMin = allXValues.length > 0 ? Math.min(...allXValues) : 0;
   const xMax = allXValues.length > 0 ? Math.max(...allXValues) : 1;
 
+  // Pre-compute pixel coordinates for each data point. We use these for
+  // both the polyline string AND for the leading-edge marker — the marker
+  // needs to know where the tip of the line is at any draw progress, which
+  // requires walking the polyline segment by segment.
+  const linePixelPoints = useMemo(
+    () =>
+      data.lines.map((line) =>
+        line.points.map((p) => ({
+          x: getXPosition(p.x, xMin, xMax, chartLeft, chartRight),
+          y: getYPosition(p.y, yMin, yMax, chartTop, chartBottom),
+        }))
+      ),
+    [data.lines, xMin, xMax, yMin, yMax, chartLeft, chartRight, chartTop, chartBottom]
+  );
+
   // Generate polyline points string for each line
   const linePointStrings = useMemo(
     () =>
-      data.lines.map((line) =>
-        line.points
-          .map((p) => {
-            const px = getXPosition(p.x, xMin, xMax, chartLeft, chartRight);
-            const py = getYPosition(p.y, yMin, yMax, chartTop, chartBottom);
-            return `${px},${py}`;
-          })
-          .join(" ")
+      linePixelPoints.map((pts) =>
+        pts.map((p) => `${p.x},${p.y}`).join(" ")
       ),
-    [data.lines, xMin, xMax, yMin, yMax]
+    [linePixelPoints]
   );
 
   // Calculate path lengths for stroke animation
@@ -272,6 +371,60 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
       >
         {/* ── Title ──────────────────────────────────────────────────────────*/}
         <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+
+        {/* ── Legend (only when there are multiple series) ──────────────────
+            Positioned above the chart area, right-aligned. Shows a colored
+            line swatch + label for each series so the viewer can identify
+            which line is which without inline labels cluttering the chart. */}
+        {data.lines.length > 1 && (
+          <div
+            style={{
+              position: "absolute",
+              top: chartTop - 56,
+              left: chartLeft,
+              right: layout.width - chartRight,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              flexWrap: "wrap",
+              gap: layout.spacing.lg,
+              opacity: fadeIn(frame, axesStart, sec(0.4)),
+            }}
+          >
+            {data.lines.map((line, idx) => (
+              <div
+                key={`legend-${idx}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <div
+                  style={{
+                    width: 28,
+                    height: 4,
+                    borderRadius: 2,
+                    background: line.color,
+                    boxShadow: `0 1px 2px ${line.color}55`,
+                  }}
+                />
+                <div
+                  style={{
+                    fontSize: fontSizes.label,
+                    fontWeight: 500,
+                    fontFamily: fonts.mono,
+                    color: mutedColor,
+                    textShadow: shadows.textLift,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {line.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── Chart SVG canvas ──────────────────────────────────────────────*/}
         <svg
@@ -458,14 +611,71 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 points={linePointStrings[lineIdx]}
                 fill="none"
                 stroke={line.color}
-                strokeWidth={line.width ?? 3}
+                strokeWidth={line.width ?? 5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray={line.dashed ? "8,4" : undefined}
                 strokeDashoffset={lineStyle.strokeDashoffset as number}
                 opacity={fadeIn(frame, lineDrawStart_frame, sec(0.2)) * exitOpacity}
-                style={{ filter: `drop-shadow(0 1px 2px ${line.color}50)` }}
+                style={{ filter: `drop-shadow(0 2px 3px ${line.color}55)` }}
               />
+            );
+          })}
+
+          {/* ── Leading-edge markers — a glowing dot at the tip of each line
+              while it's drawing. Acts like the stylus of a recording
+              instrument tracing the curve. The dot fades out once the
+              line reaches its endpoint. */}
+          {data.lines.map((line, lineIdx) => {
+            const lineDrawStart_frame = lineStartFrames[lineIdx];
+            const lineProgress = lineDrawProgress(
+              frame,
+              lineDrawStart_frame,
+              lineDrawDuration,
+              easings.structure
+            );
+            // Don't render the dot before the line starts drawing or after
+            // it's safely settled. It's only meaningful while in-flight.
+            if (lineProgress <= 0.001 || lineProgress >= 1) return null;
+
+            const tip = pointAtProgress(linePixelPoints[lineIdx], lineProgress);
+
+            // Fade in quickly at start; fade out as we approach the tail.
+            const dotOpacity =
+              Math.min(1, lineProgress / 0.05) *
+              Math.min(1, (1 - lineProgress) / 0.08) *
+              exitOpacity;
+
+            return (
+              <g key={`leading-edge-${lineIdx}`} opacity={dotOpacity}>
+                {/* Outer halo — large soft glow, color-matched */}
+                <circle
+                  cx={tip.x}
+                  cy={tip.y}
+                  r={14}
+                  fill={line.color}
+                  opacity={0.18}
+                  style={{ filter: `blur(4px)` }}
+                />
+                {/* Mid ring — slight pulse to suggest "live" recording */}
+                <circle
+                  cx={tip.x}
+                  cy={tip.y}
+                  r={9}
+                  fill={line.color}
+                  opacity={0.32}
+                />
+                {/* Dot core — solid, sits at the geometric tip */}
+                <circle
+                  cx={tip.x}
+                  cy={tip.y}
+                  r={5}
+                  fill={line.color}
+                  stroke="#fff"
+                  strokeWidth={1.5}
+                  strokeOpacity={0.7}
+                />
+              </g>
             );
           })}
 
@@ -540,7 +750,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             top: chartTop,
             left: layout.padding + 20,
             height: chartHeight,
-            width: chartPaddingLeft - 20,
+            width: chartLeft - layout.padding - 20,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -555,10 +765,11 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               <div
                 key={`y-label-${i}`}
                 style={{
-                  fontSize: fontSizes.meta - 1,
+                  fontSize: fontSizes.label,
+                  fontWeight: 500,
                   fontFamily: fonts.mono,
                   color: mutedColor,
-                  opacity: 0.7,
+                  opacity: 0.95,
                   textShadow: shadows.textLift,
                   whiteSpace: "nowrap",
                 }}
@@ -592,43 +803,79 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                   position: "absolute",
                   left: labelX,
                   transform: "translateX(-50%)",
-                  fontSize: fontSizes.meta - 1,
+                  fontSize: fontSizes.label,
+                  fontWeight: 500,
                   fontFamily: fonts.mono,
                   color: mutedColor,
-                  opacity: 0.7,
+                  opacity: 0.95,
                   textShadow: shadows.textLift,
                   whiteSpace: "nowrap",
                 }}
               >
-                {Math.round(xValue)}
+                {Math.round(xValue).toString()}
               </div>
             );
           })}
         </div>
 
+        {/* ── X-axis title — appears below the tick labels, centered. */}
+        {data.xLabel && (
+          <div
+            style={{
+              position: "absolute",
+              top: chartBottom + 56,
+              left: chartLeft,
+              width: chartRight - chartLeft,
+              textAlign: "center",
+              fontSize: fontSizes.label,
+              fontWeight: 600,
+              fontFamily: fonts.heading,
+              color: theme.text.secondary,
+              letterSpacing: letterSpacing.label,
+              textTransform: "uppercase",
+              opacity: fadeIn(frame, axesStart + sec(0.2), sec(0.3)) * 0.9,
+            }}
+          >
+            {data.xLabel}
+          </div>
+        )}
+
+        {/* ── Y-axis title — rotated 90° on the left side of the chart. */}
+        {data.yLabel && (
+          <div
+            style={{
+              position: "absolute",
+              top: chartTop + (chartBottom - chartTop) / 2,
+              left: chartLeft - 88,
+              transform: "translateY(-50%) rotate(-90deg)",
+              transformOrigin: "center",
+              fontSize: fontSizes.label,
+              fontWeight: 600,
+              fontFamily: fonts.heading,
+              color: theme.text.secondary,
+              letterSpacing: letterSpacing.label,
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+              opacity: fadeIn(frame, axesStart + sec(0.2), sec(0.3)) * 0.9,
+            }}
+          >
+            {data.yLabel}
+          </div>
+        )}
+
         {/* ── Annotation callouts (text labels) — with collision-avoidance force-layout ──*/}
         {(() => {
           if (!data.annotations) return null;
           // Pre-compute annotation x positions and stack offsets to avoid overlap
+          // Stack annotations vertically so clustered labels don't collide.
+          // The util in `utils/labelStack` is shared with any chart that
+          // needs the same collision-avoidance — keeps the algorithm in
+          // one place instead of inlined per-template.
           const annots = data.annotations.map((annot) => ({
             ...annot,
             xPx: getXPosition(annot.x, xMin, xMax, chartLeft, chartRight),
           }));
-          // Sort by x and assign stack offsets — push down 40px if within 80px of a previous label
-          const sorted = [...annots].sort((a, b) => a.xPx - b.xPx);
-          const stackByIdx: number[] = new Array(annots.length).fill(0);
-          for (let i = 0; i < sorted.length; i++) {
-            const orig = annots.findIndex((a) => a === sorted[i]);
-            // Look back at preceding labels in sorted order to find max stack within 80px
-            let stack = 0;
-            for (let j = 0; j < i; j++) {
-              if (Math.abs(sorted[i].xPx - sorted[j].xPx) < 80) {
-                const jOrig = annots.findIndex((a) => a === sorted[j]);
-                stack = Math.max(stack, stackByIdx[jOrig] + 1);
-              }
-            }
-            stackByIdx[orig] = stack;
-          }
+          const stackByIdx = computeLabelStacks(annots, { collisionThreshold: 80 });
           return data.annotations.map((annot, annotIdx) => {
           const annotX = getXPosition(
             annot.x,
@@ -732,25 +979,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           </div>
         )}
 
-        {/* ── Source attribution ──────────────────────────────────────────────*/}
-        {data.source && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.padding + 20,
-              right: layout.padding + 20,
-              fontSize: fontSizes.meta,
-              fontFamily: fonts.mono,
-              color: mutedColor,
-              textShadow: shadows.textLift,
-              maxWidth: 300,
-              textAlign: "right",
-              opacity: fadeIn(frame, axesStart, sec(0.5)),
-            }}
-          >
-            {data.source}
-          </div>
-        )}
+        {/* ── Source attribution — uses the shared component so position,
+            type, opacity, and fade timing match every other chart. */}
+        <SourceAttribution source={data.source} mode={bgVariant} prefix="Source: " bottomOffset={20} />
       </AbsoluteFill>
       {/* Brand strips */}
       <HeaderStrip mode={bgVariant} metadata={data.episode} />

@@ -32,6 +32,7 @@ export const DataChartSchema = z.object({
     rightGroupLabel: z.string().optional(),
     leftGroupColor: z.string().optional(),
     rightGroupColor: z.string().optional(),
+    formatAsYear: z.boolean().optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
   }),

@@ -6,5 +6,8 @@
   "statContext": "DeepSeek R2 on Huawei Ascend chips",
   "accentColor": "#C23B22",
   "durationSec": 5,
-  "backgroundVariant": "dark"
+  "backgroundVariant": "dark",
+  "_direction": {
+    "paceProfile": "urgent"
+  }
 }

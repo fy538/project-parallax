@@ -68,6 +68,17 @@ PALETTE_COLORS = {
     "oxblood": "#6B1D1D",
 }
 
+# ── PACE: annotation parsing ─────────────────────────────────────────────
+# Matches: PACE: profile
+PACE_LINE_RE = re.compile(r"^\s*PACE:\s*(\w+)\s*$")
+
+# Pacing profiles → duration multiplier
+PACE_MULTIPLIERS = {
+    "urgent": 0.7,       # 30% shorter than analytical default
+    "analytical": 1.0,   # baseline (4-6s per visual change)
+    "breathing": 1.4,    # 40% longer (6-10s per visual change)
+}
+
 
 # ── Data Classes ───────────────────────────────────────────────────────────
 
@@ -440,6 +451,7 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
     beats = []
     rows = []
     current_beat = None
+    current_pace = "analytical"  # default pacing profile
     in_table = False
 
     for line in lines:
@@ -466,6 +478,12 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
             )
             beats.append(current_beat)
             in_table = False
+            # Reset pace to default at beat boundaries — prevents a forgotten
+            # PACE: urgent from infecting the rest of the episode
+            if current_pace != "analytical":
+                print(f"  Note: PACE reset from '{current_pace}' to 'analytical' "
+                      f"at Beat {beat_num} ({beat_title})")
+                current_pace = "analytical"
             continue
 
         # Table header row
@@ -488,6 +506,18 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
                     rows[-1].setdefault("dir_lines", []).append(vis.strip())
                 continue
 
+            # Check if this is a PACE: line (empty narration, PACE: in visual)
+            if not narr:
+                pace_m = PACE_LINE_RE.match(vis.strip())
+                if pace_m:
+                    pace_label = pace_m.group(1).lower()
+                    if pace_label in PACE_MULTIPLIERS:
+                        current_pace = pace_label
+                    else:
+                        print(f"  Warning: unknown PACE profile '{pace_label}' "
+                              f"(valid: {', '.join(PACE_MULTIPLIERS.keys())})")
+                    continue
+
             parsed = parse_visual_spec(vis)
 
             rows.append({
@@ -496,6 +526,7 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
                 "visual_raw": vis,
                 "parsed": parsed,
                 "dir_lines": [],
+                "pace": current_pace,
             })
 
             # Also check if the visual cell itself contains DIR: (inline)
@@ -767,6 +798,26 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
             trans_in = "dissolve"
             dur = 0.3
 
+        # Rule 7: Pace-driven transition adjustments (applied last before write)
+        # Pace context modifies durations and may upgrade/downgrade transition types.
+        # Only applies when no DIR: override (Rule 0) was set.
+        seg_pace = seg.get("paceProfile", "analytical")
+        if not (prev and prev.get("_dirTransitionOut")):
+            if seg_pace == "urgent":
+                # Urgent: compress transition durations, prefer cuts
+                dur = round(dur * 0.6, 2)  # e.g. 0.5s dissolve → 0.3s
+                # Downgrade dissolves to cuts within beats (speed over smoothness)
+                if trans_in == "dissolve" and not beat_changed:
+                    trans_in = "cut"
+                    dur = 0
+            elif seg_pace == "breathing":
+                # Breathing: stretch transitions, upgrade cuts to dissolves
+                dur = round(dur * 1.5, 2)  # e.g. 0.5s → 0.75s
+                # Upgrade within-beat cuts to soft dissolves (let it breathe)
+                if trans_in == "cut" and not is_title and not beat_changed:
+                    trans_in = "dissolve"
+                    dur = 0.4
+
         # Only set transition if non-default
         if trans_in != "cut" or trans_out != "cut":
             seg["transition"] = {
@@ -1025,6 +1076,7 @@ def build_estimate_manifest(
         beat_id = row["beat"]
         vis_raw = row["visual_raw"]
         dir_lines = row.get("dir_lines", [])
+        pace_mult = PACE_MULTIPLIERS.get(row.get("pace", "analytical"), 1.0)
 
         # Parse direction annotations for this row
         direction = parse_dir_lines(dir_lines) if dir_lines else {}
@@ -1055,6 +1107,17 @@ def build_estimate_manifest(
             vis_dur = parsed["durationSec"]
         else:
             vis_dur = narr_dur if narr_dur > 0 else 3.0
+
+        # Apply PACE multiplier to visual duration when not explicitly set.
+        # This stretches "breathing" visuals (1.4x) and compresses "urgent" ones (0.7x).
+        # Narration duration is untouched — pacing affects visual change rate, not speech.
+        # Don't apply to "match narration" mode — those explicitly want vis_dur == narr_dur.
+        _pace_applied = False
+        if (not parsed["durationSec"]
+                and parsed["durationMode"] != "match_narration"
+                and pace_mult != 1.0):
+            vis_dur = vis_dur * pace_mult
+            _pace_applied = True
 
         # Row duration = max of narration and visual.
         # Usually narration drives, but for empty-narration rows (transitions),
@@ -1102,6 +1165,10 @@ def build_estimate_manifest(
                         seg["_dirTransitionDuration"] = direction["transitionDuration"]
                     if direction.get("washColor"):
                         seg["_dirWashColor"] = direction["washColor"]
+                if row.get("pace") and row["pace"] != "analytical":
+                    seg["paceProfile"] = row["pace"]
+                if _pace_applied:
+                    seg["_paceApplied"] = True
                 segments.append(seg)
                 sub_cursor += sub_dur
         else:
@@ -1121,6 +1188,12 @@ def build_estimate_manifest(
             if direction.get("washColor"):
                 seg["_dirWashColor"] = direction["washColor"]
 
+            # Annotate non-default pacing for QA visibility
+            if row.get("pace") and row["pace"] != "analytical":
+                seg["paceProfile"] = row["pace"]
+            if _pace_applied:
+                seg["_paceApplied"] = True
+
             segments.append(seg)
 
         # Advance cursor by row duration + holdAfter (direction extends segment
@@ -1131,9 +1204,29 @@ def build_estimate_manifest(
     # Apply default transitions based on context (direction overrides take priority)
     segments = apply_default_transitions(segments)
 
-    # Clean up temporary direction keys used by transition logic
+    # Compute pace diff data before cleaning up temp keys
+    pace_diffs = []
     for seg in segments:
-        for key in ["_dirTransitionOut", "_dirTransitionDuration", "_dirWashColor"]:
+        if seg.get("_paceApplied") and seg.get("paceProfile"):
+            pace = seg["paceProfile"]
+            mult = PACE_MULTIPLIERS.get(pace, 1.0)
+            actual_dur = seg["endSec"] - seg["startSec"]
+            if mult != 1.0:
+                base_dur = actual_dur / mult
+                pace_diffs.append({
+                    "startSec": seg["startSec"],
+                    "type": seg.get("type", "?"),
+                    "template": seg.get("template", {}),
+                    "baseDur": round(base_dur, 1),
+                    "actualDur": round(actual_dur, 1),
+                    "delta": round(actual_dur - base_dur, 1),
+                    "pace": pace,
+                })
+
+    # Clean up temporary keys used by transition logic
+    for seg in segments:
+        for key in ["_dirTransitionOut", "_dirTransitionDuration", "_dirWashColor",
+                     "_paceApplied"]:
             seg.pop(key, None)
 
     # Apply audio cues (L2 transition SFX + L3 texture hits) based on template type
@@ -1157,6 +1250,14 @@ def build_estimate_manifest(
         "fps": FPS,
         "totalDurationSec": round(total_dur, 2),
         "mode": "estimate",
+        "pacing": {
+            "multipliers": PACE_MULTIPLIERS,
+            "profilesUsed": sorted(set(
+                r["pace"] for r in rows if r.get("pace") and r["pace"] != "analytical"
+            )),
+            "diffs": pace_diffs,
+            "netDeltaSec": round(sum(d["delta"] for d in pace_diffs), 1),
+        },
         "narration": {
             "totalDurationSec": round(total_dur, 2),
             "words": [],
@@ -1175,6 +1276,226 @@ def build_estimate_manifest(
     }
 
     return manifest
+
+
+# ── Pacing Lint ────────────────────────────────────────────────────────
+
+def lint_pacing(manifest: dict) -> list[str]:
+    """
+    Check for problematic pacing patterns.
+    Returns a list of warning strings (empty if clean).
+    """
+    warnings = []
+    segments = manifest.get("segments", [])
+    beats = manifest.get("beats", [])
+    total_dur = manifest.get("totalDurationSec", 0)
+
+    if not segments:
+        return warnings
+
+    # 1. Urgent stretches >45s
+    urgent_run_start = None
+    urgent_run_dur = 0.0
+    for seg in segments:
+        if seg.get("paceProfile") == "urgent":
+            if urgent_run_start is None:
+                urgent_run_start = seg["startSec"]
+            urgent_run_dur = seg["endSec"] - urgent_run_start
+        else:
+            if urgent_run_dur > 45:
+                warnings.append(
+                    f"PACE-LINT: urgent section runs {urgent_run_dur:.0f}s "
+                    f"({urgent_run_start:.0f}s–{urgent_run_start + urgent_run_dur:.0f}s) "
+                    f"— consider >45s exhausting for viewers"
+                )
+            urgent_run_start = None
+            urgent_run_dur = 0.0
+    # Check final run
+    if urgent_run_dur > 45:
+        warnings.append(
+            f"PACE-LINT: urgent section runs {urgent_run_dur:.0f}s "
+            f"({urgent_run_start:.0f}s–{urgent_run_start + urgent_run_dur:.0f}s) "
+            f"— consider >45s exhausting for viewers"
+        )
+
+    # 2. No breathing moments in episodes >15 minutes
+    if total_dur > 900:  # 15 min
+        has_breathing = any(
+            s.get("paceProfile") == "breathing" for s in segments
+        )
+        if not has_breathing:
+            warnings.append(
+                f"PACE-LINT: {total_dur/60:.0f}-minute episode has no breathing "
+                f"moments — consider adding PACE: breathing for emotional peaks"
+            )
+
+    # 3. Three or more pace changes in a single beat
+    beat_ids = [b["id"] for b in beats]
+    for bid in beat_ids:
+        beat_segs = [s for s in segments if s.get("beat") == bid]
+        if not beat_segs:
+            continue
+        # Count distinct pace transitions (not just distinct profiles)
+        changes = 0
+        prev_pace = None
+        for s in beat_segs:
+            p = s.get("paceProfile", "analytical")
+            if prev_pace is not None and p != prev_pace:
+                changes += 1
+            prev_pace = p
+        if changes >= 3:
+            beat_title = next(
+                (b["title"] for b in beats if b["id"] == bid), bid
+            )
+            warnings.append(
+                f"PACE-LINT: Beat '{beat_title}' has {changes} pace transitions "
+                f"— may feel erratic. Consider consolidating."
+            )
+
+    # 4. Breathing immediately after urgent (whiplash)
+    prev_pace = "analytical"
+    for seg in segments:
+        cur_pace = seg.get("paceProfile", "analytical")
+        if prev_pace == "urgent" and cur_pace == "breathing":
+            warnings.append(
+                f"PACE-LINT: whiplash at {seg['startSec']:.0f}s — urgent → breathing "
+                f"with no analytical buffer. Consider a transition segment."
+            )
+        prev_pace = cur_pace
+
+    return warnings
+
+
+# ── Pacing Curve Visualization ──────────────────────────────────────────
+
+def print_pace_map(manifest: dict) -> None:
+    """
+    Print an ASCII pacing curve showing segment durations, pace profiles,
+    and visual change rate across the episode.
+
+    Format:
+      Beat 1: The Architecture of Dependency (0:00-2:30)
+      ████░░░░░░██████░░░░░░████████░░░░░░████  avg: 5.2s/change
+        F 4.5s   MG 8.0s     F 10.0s    MG 5.5s
+        [analytical]
+
+      Beat 2: The Trap Closes (2:30-5:00)
+      ██░░██░░██░░████░░░░░░░░████████████████  avg: 3.1s/change
+        F 2.8s MG 3.2s MG 2.5s  F 6.0s   MG 8.5s
+        [urgent → breathing]
+    """
+    segments = manifest.get("segments", [])
+    beats = manifest.get("beats", [])
+
+    if not segments:
+        print("\n  No segments to visualize.\n")
+        return
+
+    print(f"\n{'=' * 72}")
+    print(f"  PACING MAP — {manifest.get('title', manifest.get('episode', ''))}")
+    print(f"  {len(segments)} segments · {manifest.get('totalDurationSec', 0):.1f}s total")
+    print(f"{'=' * 72}\n")
+
+    # Group segments by beat
+    beat_segments: dict[str, list[dict]] = {}
+    for seg in segments:
+        bid = seg.get("beat", "unknown")
+        beat_segments.setdefault(bid, []).append(seg)
+
+    beat_info = {b["id"]: b for b in beats}
+
+    # Symbols for segment types
+    TYPE_CHAR = {
+        "FOOTAGE": "░",
+        "IMAGE": "░",
+        "TEMPLATE": "█",
+        "TRANSITION": "─",
+        "HOLD": "·",
+    }
+
+    for beat_id, segs in beat_segments.items():
+        bi = beat_info.get(beat_id, {})
+        title = bi.get("title", beat_id)
+        start = bi.get("startSec", segs[0]["startSec"] if segs else 0)
+        end = bi.get("endSec", segs[-1]["endSec"] if segs else 0)
+        start_mm, start_ss = int(start // 60), int(start % 60)
+        end_mm, end_ss = int(end // 60), int(end % 60)
+
+        # Collect pace profiles in order of first appearance (not alphabetical)
+        beat_paces = []
+        seen_paces = set()
+        for s in segs:
+            p = s.get("paceProfile", "analytical")
+            if p not in seen_paces:
+                beat_paces.append(p)
+                seen_paces.add(p)
+
+        # Calculate durations and visual change rate
+        durations = [s["endSec"] - s["startSec"] for s in segs]
+        avg_dur = sum(durations) / len(durations) if durations else 0
+        total_beat_dur = sum(durations)
+
+        print(f"  Beat: {title} ({start_mm}:{start_ss:02d}–{end_mm}:{end_ss:02d})")
+
+        # ASCII bar — each char ≈ 1 second, max width 60
+        scale = min(1.0, 60 / max(total_beat_dur, 1))
+        bar_chars = []
+        labels = []
+        for s in segs:
+            dur = s["endSec"] - s["startSec"]
+            width = max(1, int(dur * scale))
+            char = TYPE_CHAR.get(s.get("type", ""), "?")
+            bar_chars.append(char * width)
+
+            # Short type label
+            stype = s.get("type", "?")[:1]
+            tpl = s.get("template", {}).get("component", "")
+            if tpl:
+                stype = tpl[:6]
+            labels.append(f"{stype} {dur:.0f}s")
+
+        print(f"  {''.join(bar_chars)}")
+        print(f"    {' '.join(labels)}")
+
+        # Pace annotation
+        pace_str = " → ".join(beat_paces)
+        change_rate = f"{avg_dur:.1f}s/change"
+        print(f"    [{pace_str}]  avg: {change_rate}  ({len(segs)} segments)")
+        print()
+
+    # Summary
+    all_paces = set(s.get("paceProfile", "analytical") for s in segments)
+    all_durs = [s["endSec"] - s["startSec"] for s in segments]
+    print(f"  {'─' * 60}")
+    print(f"  Overall: avg {sum(all_durs)/len(all_durs):.1f}s/change  "
+          f"profiles: {', '.join(sorted(all_paces))}")
+    print(f"  Shortest: {min(all_durs):.1f}s  Longest: {max(all_durs):.1f}s")
+    print()
+
+    # Pace diff — show segments whose duration was actually altered by PACE multipliers.
+    pacing = manifest.get("pacing", {})
+    diffs = pacing.get("diffs", [])
+    profiles_used = pacing.get("profilesUsed", [])
+    if not diffs and profiles_used:
+        paced_count = sum(1 for s in segments if s.get("paceProfile"))
+        print(f"  PACE DIFF — {paced_count} segments have pace profiles but all have "
+              f"explicit durations (multiplier not applied)")
+        print()
+    elif diffs:
+        print(f"  PACE DIFF — {len(diffs)} segments affected")
+        print(f"  {'─' * 60}")
+        for d in diffs:
+            tpl = d.get("template", {})
+            comp = tpl.get("component", "") if isinstance(tpl, dict) else ""
+            label = comp[:16] or d.get("type", "?")[:8]
+            print(f"    {d['startSec']:6.1f}s  {label:16s}  "
+                  f"{d['baseDur']:5.1f}s → {d['actualDur']:5.1f}s  "
+                  f"({d['delta']:+.1f}s)  [{d['pace']}]")
+
+        net = pacing.get("netDeltaSec", 0)
+        print(f"  {'─' * 60}")
+        print(f"  Net duration change from pacing: {net:+.1f}s")
+        print()
 
 
 def _build_segment(
@@ -1560,10 +1881,103 @@ def align_to_narration(manifest: dict, audio_path: str, hf_token: Optional[str] 
     if hold_count:
         print(f"  Inserted {hold_count} HOLD segments from detected pauses")
 
+    # Step 5: Resolve sync words to frame-accurate timestamps
+    resolve_all_sync_points(manifest["segments"], words)
+
     # Re-sort segments by start time
     manifest["segments"].sort(key=lambda s: (s["startSec"], 0 if s["layer"] == "background" else 1))
 
     return manifest
+
+
+def resolve_all_sync_points(segments: list[dict], words: list[dict]) -> None:
+    """
+    Resolve syncWords in segments to frame-accurate syncPoints using
+    WhisperX word timestamps. Each syncWord is fuzzy-matched against
+    words in the segment's time range.
+
+    After resolution, segments gain a syncPoints array:
+    [{"word": "Taiwan", "timeSec": 48.3, "frame": 1449, "confidence": 0.94}]
+
+    Templates use these to anchor camera steps and reveal animations
+    to exact narration moments.
+    """
+    resolved_count = 0
+
+    for seg in segments:
+        sync_words = seg.get("syncWords", [])
+        if not sync_words:
+            continue
+
+        seg_start = seg["startSec"]
+        seg_end = seg["endSec"]
+        sync_points = []
+
+        for sw in sync_words:
+            match = _find_sync_word(sw, words, seg_start, seg_end)
+            if match:
+                sync_points.append({
+                    "word": sw,
+                    "timeSec": round(match["start"], 3),
+                    "frame": round(match["start"] * FPS),
+                    "confidence": round(match.get("confidence", 1.0), 2),
+                })
+                resolved_count += 1
+            else:
+                # Word not found in this segment's range — keep as unresolved
+                sync_points.append({
+                    "word": sw,
+                    "timeSec": None,
+                    "frame": None,
+                    "confidence": 0,
+                })
+
+        if sync_points:
+            seg["syncPoints"] = sync_points
+
+    if resolved_count:
+        print(f"  Resolved {resolved_count} sync words to frame-accurate timestamps")
+
+
+def _find_sync_word(
+    sync_word: str, words: list[dict], seg_start: float, seg_end: float
+) -> Optional[dict]:
+    """
+    Find a sync word in the WhisperX word stream within a segment's time range.
+    Uses case-insensitive matching with tolerance for hyphenated/compound words.
+    """
+    sw_lower = sync_word.lower().strip()
+
+    # Try exact single-word match first
+    for w in words:
+        if w["start"] < seg_start - 0.5 or w["start"] > seg_end + 0.5:
+            continue
+        if w["word"].strip().lower() == sw_lower:
+            return w
+
+    # Try multi-word match (sync word might be "ninety-two" or "single island")
+    sw_parts = re.split(r"[\s-]+", sw_lower)
+    if len(sw_parts) > 1:
+        # Sliding window over words in range
+        range_words = [
+            w for w in words
+            if seg_start - 0.5 <= w["start"] <= seg_end + 0.5
+        ]
+        for i in range(len(range_words) - len(sw_parts) + 1):
+            window = [range_words[i + j]["word"].strip().lower() for j in range(len(sw_parts))]
+            if window == sw_parts:
+                return range_words[i]
+
+    # Try partial/fuzzy match as fallback
+    for w in words:
+        if w["start"] < seg_start - 0.5 or w["start"] > seg_end + 0.5:
+            continue
+        w_lower = w["word"].strip().lower()
+        # Partial containment (e.g. sync "Taiwan" matches whisper "taiwan's")
+        if sw_lower in w_lower or w_lower in sw_lower:
+            return w
+
+    return None
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────
@@ -1603,6 +2017,10 @@ def main():
     parser.add_argument(
         "--pretty", action="store_true", default=True,
         help="Pretty-print JSON output (default: true)",
+    )
+    parser.add_argument(
+        "--pace-map", action="store_true",
+        help="Print ASCII pacing curve after manifest generation",
     )
 
     args = parser.parse_args()
@@ -1656,6 +2074,18 @@ def main():
         type_counts[t] = type_counts.get(t, 0) + 1
     for t, c in sorted(type_counts.items()):
         print(f"    {t}: {c}")
+
+    # Pacing lint (always runs)
+    pace_warnings = lint_pacing(manifest)
+    if pace_warnings:
+        print()
+        for w in pace_warnings:
+            print(f"  ⚠  {w}")
+
+    # Pacing curve visualization
+    if args.pace_map:
+        print()
+        print_pace_map(manifest)
 
 
 if __name__ == "__main__":

@@ -82,46 +82,58 @@ const statHabitable: StatRevealData = {
 
 const chartMountains: DataChartData = {
   episode: CATALOG_EPISODE,
-  title: "The World's Highest Peaks",
-  subtitle: "Elevation in meters above sea level",
+  // Short title + highlight on the rightmost bar — keeps the hero number
+  // away from the title's bounding box. Wide value range (cyclist→jet)
+  // so bars actually look distinct.
+  title: "Maximum Speeds",
+  subtitle: "Of various things, in miles per hour",
   variant: "bar",
-  unit: " m",
+  unit: " mph",
   dataPoints: [
-    { label: "Everest", value: 8849, color: "#C23B22" },
-    { label: "K2", value: 8611, color: "#E5A544" },
-    { label: "Kangchenjunga", value: 8586 },
-    { label: "Lhotse", value: 8516 },
-    { label: "Makalu", value: 8485 },
+    { label: "Cyclist", value: 12 },
+    { label: "Cheetah", value: 70 },
+    { label: "Highway car", value: 80 },
+    { label: "Race car", value: 220 },
+    { label: "Bullet train", value: 268, sublabel: "Shanghai Maglev" },
+    { label: "Commercial jet", value: 575 },
+    { label: "F-22 Raptor", value: 1500, color: "#C23B22" },
   ],
-  highlightIndex: 0,
-  contextNote: "Of the 14 peaks above 8,000 m, all are in the Himalayas or Karakoram.",
-  source: "Survey of India, c. 2020",
-  durationSec: 8,
+  highlightIndex: 6,
+  contextNote: "An F-22 covers a mile in under 2.5 seconds — 125× a cyclist.",
+  source: "Manufacturer specs and public records",
+  durationSec: 9,
 };
 
+// Olympic medal counts make a far better comparison demo than year values:
+// real bar-height differences, no thousand-separator number formatting issue,
+// same Cold War subject. Six Summer Games during the bipolar era.
 const chartSpaceRace: DataChartData = {
   episode: CATALOG_EPISODE,
-  title: "The Space Race, 1957–1969",
-  subtitle: "Selected milestones — who got there first",
+  title: "Olympic Medals During the Cold War",
+  subtitle: "Total medal counts at six Summer Games, US vs. USSR",
   variant: "comparison",
   comparisonPairs: [
-    { label: "Satellite in orbit", leftValue: 1958, rightValue: 1957 },
-    { label: "Animal in space", leftValue: 1959, rightValue: 1957 },
-    { label: "Human in space", leftValue: 1961, rightValue: 1961 },
-    { label: "Spacewalk", leftValue: 1965, rightValue: 1965 },
-    { label: "Lunar landing", leftValue: 1969, rightValue: 0 },
+    { label: "Helsinki '52", leftValue: 76, rightValue: 71 },
+    { label: "Melbourne '56", leftValue: 74, rightValue: 98 },
+    { label: "Rome '60", leftValue: 71, rightValue: 103 },
+    { label: "Tokyo '64", leftValue: 90, rightValue: 96 },
+    { label: "Mexico '68", leftValue: 107, rightValue: 91 },
+    { label: "Munich '72", leftValue: 94, rightValue: 99 },
   ],
   leftGroupLabel: "United States",
   leftGroupColor: "#3266AD",
   rightGroupLabel: "Soviet Union",
   rightGroupColor: "#C23B22",
-  contextNote: "The US trailed by 1–4 years on every milestone — except the one that mattered.",
-  source: "NASA, RKK Energia",
+  contextNote: "The lead changes hands at every Games until the boycotts of the 1980s.",
+  source: "International Olympic Committee",
   durationSec: 11,
 };
 
 // ─── TimeSeriesChart × 2 ──────────────────────────────────────────────────
 
+// Simplified: dropped the heroStat (which collided with the top-right annotation)
+// and removed one annotation so the remaining one has room to breathe. The
+// chart now reads as a single accelerating curve with one clear era boundary.
 const tsCarbonDioxide: TimeSeriesChartData = {
   episode: CATALOG_EPISODE,
   title: "Atmospheric CO₂, 1850–2024",
@@ -139,17 +151,14 @@ const tsCarbonDioxide: TimeSeriesChartData = {
     },
   ],
   annotations: [
-    { x: 1958, label: "Keeling begins", sublabel: "Continuous monitoring" },
     { x: 2013, label: "Crosses 400 ppm" },
   ],
   eras: [
-    { from: 1850, to: 1945, label: "Industrial era", color: "#888780", opacity: 0.08 },
     { from: 1945, to: 2024, label: "The great acceleration", color: "#C23B22", opacity: 0.1 },
   ],
   referenceLines: [{ y: 280, label: "Pre-industrial baseline", dashed: true, color: "#5DAA68" }],
   xLabel: "Year",
   yUnit: " ppm",
-  heroStat: { value: "+136", label: "ppm above pre-industrial" },
   source: "NOAA, ice core records",
   durationSec: 12,
 };
@@ -257,45 +266,33 @@ const radarAthletes: RadarChartData = {
 
 // ─── SankeyFlow × 1 ───────────────────────────────────────────────────────
 
+// Three-column cascade: total → use/discard → fate of the discarded.
+// Single dominant flow (4,400 Mt to landfill) makes the editorial point land
+// on first read. Numbers from Geyer, Jambeck & Law, "Production, use, and
+// fate of all plastics ever made," Science Advances (2017).
 const sankeyEnergy: SankeyFlowData = {
   episode: CATALOG_EPISODE,
-  title: "Where America's Energy Goes",
-  subtitle: "Roughly two-thirds is rejected as waste heat",
+  title: "All the Plastic Ever Made",
+  subtitle: "Where 8.3 billion tons ended up, 1950–2017",
   nodes: [
-    { id: "petroleum", label: "Petroleum", value: 36, column: 0, color: "#6B1D1D" },
-    { id: "natgas", label: "Natural Gas", value: 33, column: 0, color: "#E5A544" },
-    { id: "coal", label: "Coal", value: 11, column: 0, color: "#1C1814" },
-    { id: "renewables", label: "Renewables", value: 13, column: 0, color: "#5DAA68" },
-    { id: "nuclear", label: "Nuclear", value: 8, column: 0, color: "#3266AD" },
-    { id: "transport", label: "Transportation", value: 28, column: 1 },
-    { id: "industry", label: "Industry", value: 26, column: 1 },
-    { id: "buildings", label: "Buildings", value: 21, column: 1 },
-    { id: "electricity", label: "Electricity Generation", value: 26, column: 1 },
-    { id: "useful", label: "Useful Energy", value: 33, column: 2, color: "#5DAA68" },
-    { id: "waste", label: "Rejected as Heat", value: 68, column: 2, color: "#888780" },
+    { id: "produced", label: "Plastic produced", value: 8300, column: 0, color: "#6B1D1D" },
+
+    { id: "in-use", label: "Still in use", value: 2500, column: 1, color: "#5DAA68" },
+    { id: "discarded", label: "Discarded", value: 5800, column: 1, color: "#888780" },
+
+    { id: "recycled", label: "Recycled", value: 600, column: 2, color: "#5DAA68" },
+    { id: "incinerated", label: "Incinerated", value: 800, column: 2, color: "#E5A544" },
+    { id: "landfill", label: "Landfill or environment", value: 4400, column: 2, color: "#1C1814" },
   ],
   links: [
-    { from: "petroleum", to: "transport", value: 24 },
-    { from: "petroleum", to: "industry", value: 8 },
-    { from: "petroleum", to: "buildings", value: 4 },
-    { from: "natgas", to: "industry", value: 11 },
-    { from: "natgas", to: "buildings", value: 9 },
-    { from: "natgas", to: "electricity", value: 13 },
-    { from: "coal", to: "electricity", value: 9 },
-    { from: "renewables", to: "electricity", value: 8 },
-    { from: "renewables", to: "buildings", value: 5 },
-    { from: "nuclear", to: "electricity", value: 8 },
-    { from: "transport", to: "useful", value: 6 },
-    { from: "transport", to: "waste", value: 22 },
-    { from: "industry", to: "useful", value: 13 },
-    { from: "industry", to: "waste", value: 13 },
-    { from: "buildings", to: "useful", value: 14 },
-    { from: "buildings", to: "waste", value: 7 },
-    { from: "electricity", to: "useful", value: 8 },
-    { from: "electricity", to: "waste", value: 18 },
+    { from: "produced", to: "in-use", value: 2500 },
+    { from: "produced", to: "discarded", value: 5800 },
+    { from: "discarded", to: "recycled", value: 600 },
+    { from: "discarded", to: "incinerated", value: 800 },
+    { from: "discarded", to: "landfill", value: 4400 },
   ],
-  valueSuffix: " quads",
-  source: "Lawrence Livermore National Laboratory, illustrative",
+  valueSuffix: " Mt",
+  source: "Geyer, Jambeck & Law (2017), Science Advances",
   durationSec: 11,
 };
 
@@ -335,7 +332,7 @@ const dataChartComp = (id: string, data: DataChartData) => (
   />
 );
 
-export const CatalogChartMountains = () => dataChartComp(catalogId("DataChart", "mountains-bar"), chartMountains);
+export const CatalogChartMountains = () => dataChartComp(catalogId("DataChart", "speeds-bar"), chartMountains);
 export const CatalogChartSpaceRace = () => dataChartComp(catalogId("DataChart", "space-race-comparison"), chartSpaceRace);
 
 const tsComp = (id: string, data: TimeSeriesChartData) => (
@@ -406,7 +403,7 @@ export const CatalogRadarAthletes = () => (
 
 export const CatalogSankeyEnergy = () => (
   <Composition
-    id={catalogId("SankeyFlow", "energy-flows")}
+    id={catalogId("SankeyFlow", "plastic-fate")}
     component={SankeyFlow}
     schema={SankeyFlowSchema}
     calculateMetadata={({ props }) => ({

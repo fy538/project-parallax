@@ -52,6 +52,233 @@ export const semantic = {
   danger: paletteData.semantic.china,
 } as const;
 
+// ── Per-Episode Color Emphasis ─────────────────────────────────────────────
+// Mirrors the per-typography palette emphasis architecture in tools/recraft/
+// recraft.py for AI-generated content. The brand palette range stays constant
+// (palette.json above); what varies per episode is which subset of the palette
+// gets foregrounded for chart fills, accent labels, and highlight elements.
+// This creates per-episode visual unity between AI-generated cover illustrations
+// (Registers 2 and 3) and Remotion analytical inside-layout (Register 1).
+//
+// See BRAND.md → "Per-Episode Color Emphasis" section for the editorial
+// rationale, the emphasis values, and which templates consume this.
+//
+// The emphasis is read from the assembly manifest's `episodeColorEmphasis`
+// field (or from episodes/<slug>/visual-identity.json). Templates consume
+// `getEpisodeColorEmphasis(emphasis)` instead of pulling from the full
+// palette directly.
+
+export type EpisodeColorEmphasis =
+  | "neutral"
+  | "soviet"
+  | "american-modernist"
+  | "chinese-state"
+  | "chinese-traditional"
+  | "japanese-showa";
+
+export interface PaletteEmphasis {
+  /** Primary accent — used for highlight elements, key data points, hero callouts. */
+  primaryAccent: string;
+  /** Secondary accent — used for secondary highlights, alternative emphasis. */
+  secondaryAccent: string;
+  /** Dominant text color for accented text elements (overrides default amber/oxblood). */
+  dominantText: string;
+  /** Surface tone for elevated surfaces or filled panels. */
+  surfaceTone: string;
+  /** Sequential color stops for multi-series chart fills (5-stop gradient or categorical sequence). */
+  chartFillSequence: readonly string[];
+}
+
+const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
+  // Default — full palette, channel-wide brand defaults. Backward compatible
+  // with existing data files that don't specify emphasis.
+  neutral: {
+    primaryAccent: palette.gold,           // amber/gold
+    secondaryAccent: palette.umber,
+    dominantText: palette.gold,
+    surfaceTone: palette.bone,
+    chartFillSequence: [
+      semantic.us,
+      semantic.china,
+      palette.gold,
+      palette.umber,
+      palette.walnut,
+      palette.taupe,
+    ],
+  },
+  // Soviet/Russian content — full saturated revolutionary palette
+  // mirrors text_treatment: russian_constructivist (rust + gold + ink + bone)
+  soviet: {
+    primaryAccent: semantic.china,         // rust as primary (revolutionary intensity)
+    secondaryAccent: palette.gold,
+    dominantText: semantic.china,
+    surfaceTone: palette.bone,
+    chartFillSequence: [
+      semantic.china,                      // rust dominant
+      palette.gold,                        // gold accent
+      palette.ink,
+      palette.umber,
+      palette.walnut,
+      palette.taupe,
+    ],
+  },
+  // American mid-century / contemporary tech — softer subset
+  // mirrors text_treatment: english_modernist (walnut + umber + gold + bone)
+  // rust as sparing accent only, NOT dominant. Saul Bass / Push Pin restraint.
+  "american-modernist": {
+    primaryAccent: palette.gold,           // gold/amber as primary, restrained
+    secondaryAccent: palette.walnut,
+    dominantText: palette.walnut,
+    surfaceTone: palette.bone,
+    chartFillSequence: [
+      palette.walnut,                      // walnut + umber dominant
+      palette.umber,
+      palette.gold,
+      palette.taupe,
+      palette.sand,
+      semantic.china,                      // rust ONLY as last/sparing accent
+    ],
+  },
+  // Chinese contemporary state — Chinese vermillion (lacquer-influenced,
+  // distinct from Soviet crimson), more saturated golden-yellow, deep ink
+  // mirrors text_treatment: chinese_propaganda
+  "chinese-state": {
+    primaryAccent: semantic.china,         // vermillion (palette.json's china is closest)
+    secondaryAccent: palette.gold,
+    dominantText: palette.ink,
+    surfaceTone: palette.paper,            // ivory paper background
+    chartFillSequence: [
+      semantic.china,                      // vermillion
+      palette.gold,                        // gold/yellow more prominent
+      palette.ink,                         // calligraphic black
+      palette.umber,
+      palette.walnut,
+      palette.bone,
+    ],
+  },
+  // Pre-revolutionary Chinese / classical — ink wash dominant
+  // mirrors text_treatment: chinese_traditional (literati restraint)
+  "chinese-traditional": {
+    primaryAccent: palette.ink,            // ink dominant
+    secondaryAccent: palette.walnut,       // sparse red seal substitute
+    dominantText: palette.ink,
+    surfaceTone: palette.paper,
+    chartFillSequence: [
+      palette.ink,                         // ink wash dominant
+      palette.walnut,
+      palette.umber,
+      palette.taupe,
+      palette.bone,
+      palette.paper,
+    ],
+  },
+  // Japanese Showa-era (1930s-40s) — minimal palette, 2-3 colors
+  // mirrors text_treatment: japanese_showa
+  "japanese-showa": {
+    primaryAccent: semantic.china,         // bold red (Showa-era red)
+    secondaryAccent: palette.ink,
+    dominantText: palette.ink,
+    surfaceTone: palette.bone,             // cream
+    chartFillSequence: [
+      semantic.china,                      // red
+      palette.ink,                         // black
+      palette.bone,                        // cream
+      palette.umber,                       // single warm tone for variation
+      palette.walnut,
+      palette.taupe,
+    ],
+  },
+};
+
+/**
+ * Returns the palette emphasis for a given episode color emphasis value.
+ * Falls back to "neutral" (full brand palette, amber accents) if emphasis is
+ * unknown or unset. This preserves backward compatibility with existing data
+ * files that don't specify emphasis.
+ *
+ * Templates should consume this via the `useEpisodeColorEmphasis()` hook
+ * (which reads the manifest's `episodeColorEmphasis` field) rather than
+ * calling this function directly with a hardcoded value.
+ */
+export function getEpisodeColorEmphasis(
+  emphasis: EpisodeColorEmphasis | string | undefined | null
+): PaletteEmphasis {
+  if (!emphasis || !(emphasis in EMPHASIS_MAP)) {
+    return EMPHASIS_MAP.neutral;
+  }
+  return EMPHASIS_MAP[emphasis as EpisodeColorEmphasis];
+}
+
+/**
+ * The full set of valid emphasis values. Use for runtime validation or to
+ * iterate (e.g., generating reference renders for each emphasis).
+ */
+export const EMPHASIS_VALUES = Object.keys(EMPHASIS_MAP) as readonly EpisodeColorEmphasis[];
+
+// ── Animation Timing Tokens ────────────────────────────────────────────────
+// Named primitives for entrance, exit, stagger, and hold durations. Use
+// these instead of raw `sec(0.X)` literals so motion stays consistent
+// across templates and is tunable from one place. The `sec()` helper
+// converts seconds to frames at the project's fps; `secValue` is the
+// raw seconds (use this when you need a number, not a frame count).
+//
+// Example migration:
+//   const fadeStart = sec(0.5);    // before
+//   const fadeStart = timing.entrance.medium;  // after — same value, named meaning
+//
+// Adopt incrementally — `sec(0.X)` calls still work, just gradually
+// replace them when touching a template.
+export const timing = {
+  entrance: {
+    fast: 9,       // sec(0.3) — secondary elements, subtle reveals
+    medium: 15,    // sec(0.5) — default for most chart elements
+    slow: 24,      // sec(0.8) — hero moments, dramatic reveals
+  },
+  exit: {
+    quick: 9,      // sec(0.3) — fast fade-out, e.g. for chart segments
+    medium: 15,    // sec(0.5) — default exit
+    slow: 24,      // sec(0.8) — graceful departure
+  },
+  stagger: {
+    tight: 2,      // sec(0.08) — close stagger between sibling elements
+    normal: 5,     // sec(0.15) — default stagger
+    loose: 9,      // sec(0.3) — narrative-paced sibling staggers
+  },
+  hold: {
+    short: 18,     // sec(0.6) — brief settle time
+    medium: 36,    // sec(1.2) — meaningful dwell on a value
+    long: 75,      // sec(2.5) — let viewer absorb
+  },
+} as const;
+
+// ── Categorical Palette ────────────────────────────────────────────────────
+// Distinct hues for multi-series charts when data doesn't specify per-element
+// colors. Kept narrow (6 entries) so individual hues remain memorable rather
+// than blurring into a bouquet. Order chosen so adjacent indices contrast
+// (blue → rust → gold) — sequential indexing produces high-contrast chart
+// visuals instead of degrading to one-color-per-side.
+//
+// Use via `getCategoricalColor(index)` — wraps around for >6 series.
+//
+// This replaces the universal `color || palette.amber` fallback that made
+// undecorated multi-series charts go monochrome.
+export const categorical = [
+  paletteData.semantic.us,        // muted blue
+  paletteData.semantic.china,     // muted rust
+  paletteData.palette.gold,       // gold
+  paletteData.palette.umber,      // earthy brown
+  paletteData.palette.walnut,     // deep brown
+  paletteData.palette.taupe,      // warm tan
+] as const;
+
+/**
+ * Categorical color for series index `i`. Wraps when i exceeds the
+ * sequence length so an arbitrary number of series each get a color.
+ */
+export function getCategoricalColor(i: number): string {
+  return categorical[((i % categorical.length) + categorical.length) % categorical.length];
+}
+
 // ── Sequential Ramps (light → dark) ──────────────────────────────────────
 
 export const ramps = {

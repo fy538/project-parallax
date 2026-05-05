@@ -1,0 +1,32 @@
+{
+  "$schema": "../../data/visual-identity.schema.json",
+  "version": "1.0",
+  "episode": "silicon-trap",
+  "title": "The Silicon Trap",
+  "createdDate": "2026-05-04",
+  "rationale": "The episode covers US-China semiconductor competition with the SMIC fab (Beat 3) as the geographic and emotional center. The dominant cultural register is Chinese-state — China's response to US export controls is the episode's most distinctive content. Episode color emphasis is chinese-state to coordinate the Remotion charts (export-control timeline, chip-shortage data, supply-chain map) with the constructivist Chinese-coded illustrations (SMIC fab interior with chinese_propaganda typography, the trap-encirclement atmospheric backdrop). Per VIS-11, the constructivist illustration style stays constant; the palette emphasis varies to fit the cultural context. Default treatment is standard (warm umber default for present-day reconstructions); the trap-metaphor backdrop uses standard with realism: flat for atmospheric backdrop monumentalism. The episode's named conceptual product 'The Silicon Trap' is the recurring visual motif, evolving from simple net diagram in Beat 1 to fully-closed encirclement in Beat 4.",
+  "episodeColorEmphasis": "chinese-state",
+  "defaultTextTreatment": "chinese_minimal",
+  "defaultRealism": "balanced",
+  "defaultTreatment": "standard",
+  "visualMotif": {
+    "name": "The Silicon Trap",
+    "description": "An interlocking industrial trap formed by factory complexes connected through tangled cable bundles and pipe networks. Begins as a simple net diagram in Beat 1; the network tangles progressively as each beat reveals another constraint; closes fully in Beat 4 as the bifurcation argument lands. The motif's evolution is the episode's emotional spine.",
+    "evolutionStates": [
+      "Beat 1 — simple net diagram, open structure, figures inside but not yet aware of the encirclement",
+      "Beat 3 — partial closure, cable tangles tightening, figures performing 34-pass lithography under increasing constraint",
+      "Beat 4 — full encirclement, the trap closes around all participants (not just the named adversary), low monumentalist angle",
+      "Beat 5 — the trap as personal stakes, your car has 3000 chips inside the closed structure"
+    ],
+    "assetReference": "tools/ai-video/style-references/style-ref_atmospheric_trap-encirclement_v1.png"
+  },
+  "brandMarkPlacement": {
+    "watermarkVariant": "amber",
+    "thumbnailIntegration": "after title as period — '∴ The Silicon Trap.' lockup"
+  },
+  "compositionalEmphasis": "meridian",
+  "transitionSignature": {
+    "analyticalToGroundingDefault": "color-wash-amber",
+    "groundingToAnalyticalDefault": "dissolve-grain-fade"
+  }
+}

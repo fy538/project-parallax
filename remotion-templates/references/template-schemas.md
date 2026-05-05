@@ -1,7 +1,17 @@
 # Template Schemas Reference
 
 > Canonical field definitions for every Remotion template's JSON data file.
-> Visual-spec reads this before generating any JSON. Last updated: May 2, 2026.
+> Visual-spec reads this before generating any JSON. Last updated: May 4, 2026.
+
+## Universal conventions (apply to every cartesian chart)
+
+These behaviors now apply automatically — you don't need to opt in:
+
+- **Y-axis domain inference**: charts using `niceTicks` (TimeSeriesChart, DataChart bar variant) automatically clamp y-axis at 0 for non-negative data, snap min/max to round numbers (1k, 2k, 5k…), and generate ticks at integer multiples of nice spacing. Don't pass `yRange` unless you specifically need to override.
+- **Auto-categorical colors**: SankeyFlow nodes, StatReveal bars, DecisionTree nodes, StrategicLandscape actors auto-assign distinct colors when `color` is omitted on individual items. Sequence: muted blue → rust → gold → umber → walnut → taupe (wraps).
+- **Source attribution**: every chart that has a `source` field renders it consistently bottom-right via the shared `<SourceAttribution>` component. No need to hand-position.
+- **Title overflow**: `<TitleBlock>` auto-shrinks long titles down to h3 size before they overflow. You can still split into title + subtitle for very long headings.
+- **Dev warnings**: when a chart's data is suspect (title > 80 chars, empty series, missing source), Studio will emit a one-time `console.warn` per template per session. Watch the DevTools console.
 
 ## Common Fields
 
@@ -168,6 +178,20 @@ Bar charts, comparisons, horizontal bars. The workhorse data template.
   "rightGroupLabel": "China", "rightGroupColor": "#C23B22"
 }
 ```
+
+**Year-mode (no thousand-separators):**
+```jsonc
+{
+  "variant": "comparison",
+  "formatAsYear": true,                // skip thousand-separator commas
+  "comparisonPairs": [
+    { "label": "Satellite", "leftValue": 1958, "rightValue": 1957 }
+  ]
+}
+```
+Use `formatAsYear: true` when values are years, postal codes, or 4-digit IDs that should not be comma-separated. Affects both bar value labels and y-axis ticks.
+
+**Y-axis behavior:** y-axis ticks are now real data values (e.g. 0 / 2,000 / 4,000 / 6,000 / 8,000) computed via `niceTicks`. Previously the axis was hardcoded 0–100% with the unit appended. Pass `yRange: [min, max]` only if you specifically need to override the inferred domain.
 
 ---
 
@@ -438,9 +462,17 @@ Multi-series line charts with annotations, eras, and reference lines.
 
 **Key fields:**
 - `lines[].points[].x` — can be number (year) or string (date)
+- `lines[].width` — stroke width in px (default: 5 — was 3 before May 2026)
 - `lines[].areaFill` — filled area under the line (default false)
 - `eras[]` — shaded background bands for time periods
+- `xLabel` — RENDERS now (rotated below x-axis ticks). Was a dead schema field before May 2026.
+- `yLabel` — RENDERS now (rotated 90° on left side of chart).
 - `heroStat` — large stat callout in corner
+
+**Behaviors enabled by default:**
+- **Auto-legend**: when `lines.length > 1`, a legend strip renders top-right of chart automatically (colored swatch + label per series). No opt-in needed.
+- **Leading-edge marker**: a glowing dot tracks the tip of each line as it draws, then fades when the line completes. Adds NYT-style "recording instrument" feel without configuration.
+- **Niced y-axis**: clamps at 0 for all-positive data, snaps min/max to round numbers, generates ticks at multiples of nice spacing. Pass `yRange` to override.
 
 ---
 
@@ -469,7 +501,14 @@ Flow and allocation diagrams (trade, resources, budget).
 
 **Key fields:**
 - `nodes[].column` — 0-indexed column position (left to right)
-- `links[].value` — determines visual thickness
+- `nodes[].color` — colors the node's vertical bar. **If omitted, auto-assigns from the categorical sequence** (muted blue → rust → gold → umber → walnut → taupe). Always specify for nodes that need a specific semantic color (e.g. red for waste, green for useful).
+- `links[].value` — determines ribbon thickness, proportional to source-node outflow share × source-node height. (Old behavior: capped at 16px stroke width — fixed May 2026.)
+
+**Render behaviors (no opt-in):**
+- **Thin colored bars**: nodes are 14px-wide colored vertical stripes, not wide translucent boxes. The bar's *height* carries the value; width is purely visual.
+- **Filled bezier ribbons**: links are filled trapezoids stacked along node edges, not stroked lines through node centers. Source/dest endpoints stack proportionally so flows align with the node-edge they touch.
+- **Smart label placement**: labels for first + middle columns sit outside-LEFT of the bar; last-column labels sit outside-RIGHT. Both stacked above the value text. Strong text-shadow halo for readability over crossing ribbons.
+- **Vertical bias**: each column's stack centers vertically with a 35/65 top/bottom bias so the diagram feels anchored to the title rather than floating mid-frame.
 
 ---
 

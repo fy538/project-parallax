@@ -6,5 +6,8 @@
   "nextEpisodeTeaser": "Next: Why Technological Blockades Always Leak",
   "accentColor": "#E5A544",
   "backgroundVariant": "dark",
-  "durationSec": 6
+  "durationSec": 6,
+  "_direction": {
+    "paceProfile": "breathing"
+  }
 }

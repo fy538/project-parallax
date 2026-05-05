@@ -207,20 +207,24 @@
       "priority": "P2",
       "type": "ai-generate",
       "register": "grounding",
-      "description": "Interior of a Chinese semiconductor fabrication facility. Multiple workers in white bunny suits with full-face shields operating wafer-handling equipment, faces completely smooth and featureless behind the visors. Yellow lithography lighting casting amber across white surfaces and stainless steel equipment. Medium shot from hip level, shallow depth of field. FOUP carriers visible on automated tracks in the background. Atmosphere of disciplined precision under constraint.",
-      "context": "Beat 3 — narration about SMIC's 34-pass lithography workaround. Stock footage of Chinese semiconductor facilities is scarce; this is the kind of interior scene that requires AI-GEN reconstruction per AI_VIDEO_PIPELINE.md.",
+      "realism": "balanced",
+      "text_treatment": "chinese_propaganda",
+      "description": "Interior of a Chinese semiconductor fabrication facility. Three workers in white bunny suits with reflective polycarbonate face shields, operating FOUP wafer carriers on automated tracks. Figures rendered with simplified planar features — geometric facets, eyes obscured by visor reflection. Yellow lithography lighting casting amber across white surfaces and stainless steel equipment. Bold heiti propaganda typography integrated with the architecture: '微米 · 纳米' (Micron · Nanometer) and '科技自立' (Technological Self-Reliance) in red and gold, vertical column orientation. Atmosphere of disciplined precision under constraint.",
+      "context": "Beat 3 — narration about SMIC's 34-pass lithography workaround. Stock footage of Chinese semiconductor facilities is scarce; this is the kind of interior scene that requires constructivist reconstruction per AI_VIDEO_PIPELINE.md.",
       "treatment": "standard",
-      "notes": "Photoreal mannequin scene (Register 3 / Grounding). Replaces unsourceable interior. Mannequin faces signal 'editorial reconstruction, not documentary evidence' per the editorial guardrails. If extended to >10s of video, add the '∴ Visualized' on-screen indicator per AI_VIDEO_PIPELINE.md disclosure rules."
+      "notes": "Constructivist figurative scene (Register 3 / Grounding). Replaces unsourceable interior. Planar-face stylization signals 'editorial reconstruction, not documentary evidence' per the editorial guardrails. Chinese propaganda typography is contextual to the scene's geography — part of the analytical content, rendering Chinese state-power rhetoric in its own visual language. Tiger to verify Chinese characters are real and parseable before assembly. If extended to >10s of video, add the '∴ Visualized' on-screen indicator per AI_VIDEO_PIPELINE.md disclosure rules."
     },
     {
       "id": "beat4-trap-encirclement",
       "priority": "P2",
       "type": "ai-generate",
       "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
       "description": "An interlocking industrial trap viewed from a low monumentalist angle: massive factory complexes connected by tangled cable bundles and pipe networks forming a closing net or web. Smaller silhouetted figures stand inside the structure, dwarfed by the scale, unaware of the encirclement. Smokestacks belching ribbons of smoke that twist into the cable network above. Low horizon line, heavy contrast between deep ink-black machinery and burnt amber accents on the smoke and pipes.",
       "context": "Beat 4 — narration arguing the silicon trap closes around all participants, not just the named adversary. Atmospheric background under the bifurcation argument; replaces the generic 'world divided' (beat4-world-divided) currently used for this beat.",
       "treatment": "standard",
-      "notes": "Constructivist illustration (Register 2 / Atmospheric) used as 30-40% opacity background. Gives the 'trap' metaphor a brand-ownable visual identity rather than generic stock wallpaper. Strong candidate for a recurring visual motif (per VISUAL_LANGUAGE.md) — could be rendered in 3-4 evolution states across the episode."
+      "notes": "Constructivist atmospheric backdrop (Register 2). Used as 30-40% opacity background. realism=flat for maximum monumentalist propaganda-poster intensity; text_treatment=none because the trap metaphor is purely visual. Strong candidate for a recurring visual motif (per VIS-07) — could be rendered in 3-4 evolution states across the episode."
     }
   ]
 }

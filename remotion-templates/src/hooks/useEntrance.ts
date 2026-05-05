@@ -44,7 +44,13 @@ interface EntranceResult {
 
 export const useEntrance = (
   role: EntranceRole,
-  startFrame: number = 0
+  startFrame: number = 0,
+  /**
+   * Timing scale multiplier from pacing system (via useDirection).
+   * Values <1 make entrances faster (urgent), >1 make them slower (breathing).
+   * Default 1.0 (analytical pace). Pass direction.paceTimingScale here.
+   */
+  timingScale: number = 1.0
 ): EntranceResult => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -56,14 +62,18 @@ export const useEntrance = (
   let translateY = 0;
   let settled = false;
 
+  // Apply timing scale to durations. Clamp to prevent absurd values.
+  const ts = Math.max(0.4, Math.min(2.0, timingScale));
+
   switch (role) {
     // ── Hero: spring physics, visible overshoot ─────────────────────────
     case "hero": {
+      // Scale spring mass: higher mass = slower spring (breathing), lower = snappier (urgent)
       const springVal = t >= 0
         ? spring({
             frame: t,
             fps,
-            config: { damping: 12, stiffness: 100, mass: 1.0 },
+            config: { damping: 12, stiffness: 100, mass: ts },
           })
         : 0;
       opacity = Math.min(springVal * 1.5, 1); // fade slightly ahead of motion
@@ -75,7 +85,7 @@ export const useEntrance = (
 
     // ── Content: smooth ease-out, moderate ──────────────────────────────
     case "content": {
-      const dur = 18; // ~0.6s at 30fps
+      const dur = Math.round(18 * ts); // ~0.6s at 30fps, scaled by pace
       opacity = t >= 0
         ? interpolate(t, [0, dur], [0, 1], {
             extrapolateLeft: "clamp",
@@ -96,7 +106,7 @@ export const useEntrance = (
 
     // ── Data: cubic out, slightly faster, includes scale ────────────────
     case "data": {
-      const dur = 15; // ~0.5s at 30fps
+      const dur = Math.round(15 * ts); // ~0.5s at 30fps, scaled by pace
       opacity = t >= 0
         ? interpolate(t, [0, dur], [0, 1], {
             extrapolateLeft: "clamp",
@@ -118,7 +128,7 @@ export const useEntrance = (
 
     // ── Label: quick fade, minimal motion ───────────────────────────────
     case "label": {
-      const dur = 10; // ~0.33s at 30fps
+      const dur = Math.round(10 * ts); // ~0.33s at 30fps, scaled by pace
       opacity = t >= 0
         ? interpolate(t, [0, dur], [0, 1], {
             extrapolateLeft: "clamp",
@@ -138,7 +148,7 @@ export const useEntrance = (
 
     // ── Structure: near-instant, just a fade ────────────────────────────
     case "structure": {
-      const dur = 6; // ~0.2s at 30fps
+      const dur = Math.round(6 * ts); // ~0.2s at 30fps, scaled by pace
       opacity = t >= 0
         ? interpolate(t, [0, dur], [0, 1], {
             extrapolateLeft: "clamp",
@@ -182,8 +192,14 @@ export const useStaggeredEntrance = (
   role: EntranceRole,
   index: number,
   baseDelay: number = 0,
-  staggerFrames: number = 5
+  staggerFrames: number = 5,
+  /**
+   * Timing scale from pacing system. Scales both entrance duration
+   * and stagger gap. Pass direction.paceTimingScale here.
+   */
+  timingScale: number = 1.0
 ): EntranceResult => {
-  const startFrame = baseDelay + index * staggerFrames;
-  return useEntrance(role, startFrame);
+  const scaledStagger = Math.round(staggerFrames * timingScale);
+  const startFrame = baseDelay + index * scaledStagger;
+  return useEntrance(role, startFrame, timingScale);
 };

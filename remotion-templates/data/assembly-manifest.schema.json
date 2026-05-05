@@ -33,6 +33,12 @@
       "enum": ["estimate", "precise"],
       "description": "How timing was derived. 'estimate' = from script hints and word count. 'precise' = from Whisper narration timestamps."
     },
+    "episodeColorEmphasis": {
+      "type": "string",
+      "enum": ["neutral", "soviet", "american-modernist", "chinese-state", "chinese-traditional", "japanese-showa"],
+      "default": "neutral",
+      "description": "Per-episode color emphasis for Remotion templates. Mirrors per-typography palette emphasis architecture in tools/recraft/recraft.py. Specifies which subset of the brand palette to foreground in chart fills, accent labels, highlight elements. Creates per-episode visual unity between AI-generated cover illustrations (Registers 2/3) and Remotion analytical inside-layout (Register 1). Consumed by theme.ts via getEpisodeColorEmphasis(). Falls back to 'neutral' if unset, preserving backward compatibility. See BRAND.md 'Per-Episode Color Emphasis' for editorial rationale."
+    },
     "narration": {
       "type": "object",
       "description": "Narration audio track metadata.",

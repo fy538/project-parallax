@@ -7,5 +7,8 @@
   "definitionText": "Concentrate resources. Tolerate waste. Accept short-term inefficiency for long-term sovereignty.",
   "accentColor": "#C23B22",
   "durationSec": 4,
-  "backgroundVariant": "dark"
+  "backgroundVariant": "dark",
+  "_direction": {
+    "paceProfile": "breathing"
+  }
 }

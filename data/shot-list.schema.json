@@ -72,12 +72,34 @@
         "register": {
           "type": "string",
           "enum": ["atmospheric", "grounding", "analytical"],
-          "description": "AI ONLY. Parallax visual register per VISUAL_LANGUAGE.md. atmospheric = constructivist illustration (Soviet/art-deco propaganda). grounding = photoreal mannequin scene (depersonalized humans in real environments). analytical = code-clean diagrammatic illustration (rare; usually belongs in Remotion). Selects the prompt preamble in recraft.py and auto-picks the right Recraft style. Takes precedence over visual_mode. See PROMPT_PREAMBLES.md."
+          "description": "AI ONLY. Parallax visual register per VISUAL_LANGUAGE.md. atmospheric = constructivist backdrop (system-mood, low-opacity background). grounding = constructivist figurative scene (figures in environments). analytical = code-clean diagrammatic illustration (rare; usually belongs in Remotion). Registers 2 and 3 share the same constructivist visual vocabulary post-May 4, 2026 — they differ in role, not in aesthetic. Selects the register-focus block in the recraft.py constructivist preamble. Takes precedence over visual_mode. See PROMPT_PREAMBLES.md."
+        },
+        "realism": {
+          "type": "string",
+          "enum": ["flat", "balanced", "grounded"],
+          "default": "balanced",
+          "description": "AI ONLY (with register). Realism dosage for the constructivist preamble. The figure-vs-environment distinction matters: figures stay fully flat-constructivist (4-5 color-blocked face planes, no skin tonality, no rendered features) at all three dosages — only the environment realism varies. flat = both figure and environment fully color-blocked, no photographic texture; REQUIRED FOR ANIMATED AI-GEN CLIPS since color-blocked forms track reliably across frames whereas photographic textures drift. balanced = figure stays flat-constructivist, environment may have selective material texture (paper grain, light gradients, wood grain); default for stills, works for most scenes. grounded = same flat-constructivist figure standard, but environment rendered with photographic spatial detail; STILLS ONLY — animation drift becomes severe. See AI_VIDEO_PIPELINE.md and PROMPT_PREAMBLES.md."
+        },
+        "text_treatment": {
+          "type": "string",
+          "enum": [
+            "none",
+            "english_minimal",
+            "english_modernist",
+            "russian_constructivist",
+            "chinese_propaganda",
+            "chinese_minimal",
+            "chinese_traditional",
+            "japanese_showa",
+            "mixed"
+          ],
+          "default": "none",
+          "description": "AI ONLY (with register). Typography tradition matched to the scene's geography/era. Per-scene editorial decision: pragmatic (none, *_minimal) for most scenes, contextual-by-episode (chinese_propaganda for Chinese-coded scenes, russian_constructivist for Soviet-bloc, english_modernist for American mid-century, japanese_showa for pre-war Japan) for grounded scenes that establish location, sophisticated (deliberate mismatch as commentary) for peak analytical moments. Decision recorded in angle memo. See TYPOGRAPHY_TRADITIONS.md for full visual grammars and sample phrases."
         },
         "visual_mode": {
           "type": "string",
           "enum": ["illustration", "diagram", "icon", "metaphor"],
-          "description": "AI ONLY (legacy). Pre-register prompt-mode flag; still honored if register is not set. Prefer 'register' for new shots."
+          "description": "AI ONLY (legacy). Pre-register prompt-mode flag; still honored if register is not set. Prefer 'register' + 'realism' + 'text_treatment' for new shots."
         },
         "context": {
           "type": "string",
@@ -85,7 +107,7 @@
         },
         "style": {
           "type": "string",
-          "description": "AI ONLY. Explicit Recraft style override (e.g., 'realistic_image', 'vector_illustration', 'flat_2.0'). When omitted, recraft.py picks the right style from the register. See `recraft.py styles` for the full list."
+          "description": "AI ONLY. Explicit Recraft style override (e.g., 'vector_illustration', 'flat_2.0'). When omitted, recraft.py picks the right style from the register (post-May 4 default: vector_illustration for all registers since the constructivist preamble fights photoreal generation). See `recraft.py styles` for the full list."
         }
       },
       "allOf": [

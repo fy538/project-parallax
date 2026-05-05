@@ -14,9 +14,11 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, semantic, fonts, fontSizes, layout, sec, shadows, gradients, contentArea, radii, barStyle } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, layout, sec, shadows, gradients, contentArea, radii, barStyle, getCategoricalColor } from "../../design/theme";
 import { formatNumber } from "../../utils/numberFormat";
+import { niceDomain, niceTicks, formatTick } from "../../utils/niceTicks";
 import { TitleBlock } from "../../components/TitleBlock";
+import { SourceAttribution } from "../../components/SourceAttribution";
 import { Legend } from "../../components/Legend";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -44,7 +46,9 @@ const AnimatedBar: React.FC<{
   barWidth: number;
   maxHeight: number;
   isHighlighted?: boolean;
-}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false }) => {
+  /** Render value as plain number (no thousand-separators) — for years, IDs, etc. */
+  formatAsYear?: boolean;
+}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false, formatAsYear = false }) => {
   const theme = useThemeMode("light");
   // ── Role-based easing: hero bar gets quintic + overshoot, normal gets quartic ──
   const barEasing = isHighlighted ? easings.heroBar : easings.bar;
@@ -117,10 +121,12 @@ const AnimatedBar: React.FC<{
             : shadows.textLift,
         }}
       >
-        {formatNumber(displayValue, {
-          decimals: 0,
-          style: displayValue >= 10000 ? "abbreviated" : "decimal",
-        })}
+        {formatAsYear
+          ? String(Math.round(displayValue))
+          : formatNumber(displayValue, {
+              decimals: 0,
+              style: displayValue >= 10000 ? "abbreviated" : "decimal",
+            })}
         <span style={{ fontSize: fontSizes.caption, color: theme.text.muted }}>
           {unit}
         </span>
@@ -257,6 +263,7 @@ const ComparisonBars: React.FC<{
   startFrame: number;
   pairWidth: number;
   maxHeight: number;
+  formatAsYear?: boolean;
 }> = React.memo((props) => {
   const theme = useThemeMode("light");
   const barWidth = useMemo(() => props.pairWidth * 0.35, [props.pairWidth]);
@@ -289,6 +296,7 @@ const ComparisonBars: React.FC<{
           startFrame={props.startFrame}
           barWidth={barWidth}
           maxHeight={props.maxHeight}
+          formatAsYear={props.formatAsYear}
         />
         {/* Vertical hairline between left/right bars — gradient fade ends */}
         <div
@@ -313,6 +321,7 @@ const ComparisonBars: React.FC<{
           startFrame={props.startFrame + sec(0.3)}
           barWidth={barWidth}
           maxHeight={props.maxHeight}
+          formatAsYear={props.formatAsYear}
         />
       </div>
       <div
@@ -340,14 +349,32 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const hasSpotlight = !!data.spotlightSequence && data.spotlightSequence.length > 0;
   const showParticles = data.ambientParticles ?? false;
 
-  // Memoize expensive data computations
-  const maxValBar = useMemo(
+  // Memoize expensive data computations.
+  // The y-axis domain is the *nice* range above the largest bar — so
+  // axis ticks land on round numbers (0, 2000, 4000, 6000, 8000) and
+  // bar heights scale against the niced max, not the raw data max.
+  // This is the same domain-inference rule TimeSeriesChart uses; both
+  // share the niceTicks utility.
+  const dataMaxBar = useMemo(
     () => {
       const points = data.dataPoints || [];
       return points.length > 0 ? Math.max(...points.map((d) => d.value)) : 1;
     },
     [data.dataPoints]
   );
+  const [, niceMaxBar] = useMemo(
+    () => niceDomain(0, dataMaxBar, 5),
+    [dataMaxBar]
+  );
+  const yTicks = useMemo(
+    () => niceTicks(0, niceMaxBar, 5),
+    [niceMaxBar]
+  );
+  // maxValBar (kept for downstream consumers) is now the niced ceiling,
+  // not the raw data max. Bars at full data magnitude render at <100%
+  // of the chart height — which is correct: the axis tops out higher
+  // than the tallest bar so the bar doesn't kiss the title.
+  const maxValBar = niceMaxBar;
 
   // Adaptive sizing: scale bar width, gap, and label font based on item count
   const itemCount = data.dataPoints?.length || data.comparisonPairs?.length || 1;
@@ -504,10 +531,16 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
             overflow: "visible",
           }}
         >
-          {Array.from({ length: gridLineCount }).map((_, i) => {
-            const y = (i / (gridLineCount - 1)) * maxHeight;
+          {yTicks.slice().reverse().map((tickValue, i) => {
+            // Place ticks proportionally on the niced y-axis.
+            // i=0 is at the top (highest tickValue), so y=0; i=last is at maxHeight.
+            const y = (i / (yTicks.length - 1)) * maxHeight;
             const progress = gridlineDraw(frame, sec(0.2), sec(0.6), i, sec(0.06));
-            const pctLabel = Math.round(((gridLineCount - 1 - i) / (gridLineCount - 1)) * 100);
+            // formatAsYear bypasses thousand-separator commas — same rule
+            // applied to bar value labels above.
+            const tickLabel = data.formatAsYear
+              ? `${Math.round(tickValue)}${unit || ""}`
+              : formatTick(tickValue, unit);
             // Gridlines recede after bars settle (peaks ~sec 0.8, fades over sec 1.5)
             // Multiplier on stroke-opacity: full when bars draw, ~50% after.
             const recede = interpolate(
@@ -555,7 +588,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                     CLAMP_SINE
                   )}
                 >
-                  {pctLabel}{unit}
+                  {tickLabel}
                 </text>
               </g>
             );
@@ -576,13 +609,14 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                 maxValue={maxValBar}
                 label={dp.label}
                 sublabel={dp.sublabel}
-                color={dp.color || palette.amber}
+                color={dp.color || getCategoricalColor(i)}
                 unit={unit}
                 frame={frame}
                 startFrame={stagger(i, sec(0.15), sec(0.8))}
                 barWidth={barWidth}
                 maxHeight={maxHeight}
                 isHighlighted={data.highlightIndex === i}
+                formatAsYear={data.formatAsYear}
               />
             </div>
           ))}
@@ -708,6 +742,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               startFrame={stagger(i, sec(0.15), sec(0.8))}
               pairWidth={comparisonData.pairWidth}
               maxHeight={maxHeight}
+              formatAsYear={data.formatAsYear}
             />
           ))}
       </div>
@@ -778,28 +813,9 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
         />
       )}
 
-      {/* ── Source attribution — sine easing for softness ─────────────── */}
-      {data.source && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom,
-            right: layout.safeAreaTier.generous.right,
-            fontSize: fontSizes.small,
-            color: theme.text.muted,
-            fontFamily: fonts.mono,
-            textShadow: shadows.textLift,
-            opacity: interpolate(
-              frame,
-              [sec(2), sec(2) + sec(0.6)],
-              [0, 1],
-              CLAMP_SINE
-            ),
-          }}
-        >
-          Source: {data.source}
-        </div>
-      )}
+      {/* ── Source attribution — uses the shared component so position,
+          type, opacity, and fade timing match every other chart. */}
+      <SourceAttribution source={data.source} mode="light" prefix="Source: " startSec={2} />
 
       {/* ── Context note — frames what the data means ─────────────────── */}
       {data.contextNote && (

@@ -28,6 +28,7 @@ export type {
   NarratedCameraState,
   NarratedCameraStep,
   CameraElement,
+  SyncPoint,
 } from "./useNarratedCamera";
 export { useBeatSync } from "./useBeatSync";
 export type { UseBeatSyncOptions, BeatSyncState, BeatMarker } from "./useBeatSync";

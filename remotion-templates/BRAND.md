@@ -157,6 +157,22 @@ Usage:
 - **Minimum size:** 12px (the three dots must remain visually distinct)
 - **Color:** `amber` on dark mode, `oxblood` on light mode
 
+### Cross-Register Placement (the systematic anchor)
+
+The ∴ mark is the channel's most reliable visual unity anchor. It appears across every register and every visual surface in deliberate, consistent placements. Viewers learn the placement unconsciously; cumulative recognition ties Remotion analytical layer to constructivist illustrations to thumbnails to social crops as one channel.
+
+| Surface | Placement | Style | Source |
+|---------|-----------|-------|--------|
+| **Remotion templates** | Header strip (lower-left of strip), part of `∴ PARALLAX` wordmark | IBM Plex Mono uppercase, letter-spacing 2.5px, amber/oxblood per mode | HeaderStrip component |
+| **Remotion templates (footer)** | Footer strip (right side, after FILED date) | Standalone glyph at meta size, muted color | FooterStrip component |
+| **Constructivist illustrations (Register 2/3)** | Lower-right corner, 60-80px from edge | Standalone glyph, brand-treated to match the illustration's palette emphasis | Per AI_VIDEO_PIPELINE.md disclosure rules — also serves as "∴ Visualized" indicator for AI-GEN clips >10s |
+| **Thumbnails** | After channel name in title, or as standalone accent in lower-third | Heavy weight, saturated accent color | thumbnail-concept skill |
+| **Title cards** | Right-third of frame as part of crosshair tracking element | Inherited from Cartograph DNA | TitleTransition template |
+| **Social crops (Shorts)** | Lower-third, scaled to vertical aspect | Standalone glyph at scaled meta size | shorts-adaptation skill |
+| **Section dividers** | Centered as transition element | Standalone glyph, fades in over 200-400ms | Transitions library |
+
+**The unity rule:** every shipped visual surface must contain the ∴ mark in at least one of these placements. render-qa validates that the mark is present and rendered correctly. The cumulative effect — viewers seeing ∴ across illustrations, charts, title cards, thumbnails, and Shorts — is what makes the channel feel like a unified publication despite the texture/style variation across registers.
+
 ### The Crosshair
 
 Inherited from Cartograph. A reticle (concentric circles + crosshair lines) that frames subjects, maps, and key data. It says "we're looking at this closely."
@@ -293,6 +309,37 @@ What to avoid: close-up faces as the dominant thumbnail element (personality-led
 
 ---
 
+## Editorial Magazine Layout Principles
+
+Remotion templates are the channel's *inside layout* — the data, structure, and analytical surface the viewer reads. The compositional discipline that makes Remotion sit naturally next to the constructivist illustrations (Registers 2 and 3) is editorial magazine layout, not SaaS dashboard or generic data-viz. The references that should guide every template review:
+
+**Push Pin Studios** — deliberate white-space discipline, restrained accent usage, geometric typographic confidence. *Push Pin Almanack* layouts as the model for how restraint creates intensity. The anti-pattern: filling space because it's available.
+
+**Saul Bass title sequences** — bold negative space, asymmetric balance, hierarchical clarity through scale and weight rather than color shouting. *Anatomy of a Murder* and *The Man with the Golden Arm* poster discipline applied to data presentation.
+
+**Fortune magazine industrial-modernism (1950s-60s)** — restrained palette anchored to brand colors with one dominant accent per spread, geometric sans-serif paired with monospace for "intelligence briefing" texture, deliberate compositional asymmetry. The benchmark for "magazine inside spread quality."
+
+**Edward Tufte's data-ink ratio** — every pixel that doesn't carry information is a candidate for removal. Maximize signal-to-noise. Charts justify their decoration; chart junk is removed without ceremony.
+
+**Swiss/Bauhaus grid systems** — strict 8px grid (already specified above), deliberate alignment, hierarchy through size and weight rather than color, restraint as the primary aesthetic discipline.
+
+### Compositional Rules (apply to every template)
+
+1. **Negative space is content.** Aim for 30-40% of frame as breathing room around primary elements. Crowded compositions read as dashboard; uncrowded read as editorial spread.
+2. **One dominant accent per composition.** If the chart needs amber, the title doesn't also need amber — pick the hierarchy element that carries it. Multiple accents at equal weight read as decoration.
+3. **Hierarchy through size and weight, not color.** Primary element ≥1.5× secondary in size *or* weight delta ≥200. Don't try to push hierarchy by saturating color — that's dashboard discipline.
+4. **Asymmetric balance over centered symmetry.** Editorial layouts are deliberately off-center; centered symmetry reads as PowerPoint. Use the rule of thirds, not center-line.
+5. **Restrained typography.** Two type tiers visible at once is the default; three is the maximum. Four tiers means the design is too dense.
+6. **Metadata texture earns its place.** The IBM Plex Mono metadata strips, file codes, coordinate strings are texture-as-credibility. They should always feel like they belong to a real briefing — period-appropriate, plausible, never decorative.
+
+### The Magazine-Spread Test (for every template review)
+
+Before approving a Remotion template render, ask: "If I saw this as a half-page in a *Fortune* magazine inside spread, would it look like it belonged?" If yes, the editorial discipline is intact. If it looks like a Mixpanel dashboard, the discipline is missing — diagnose against the rules above.
+
+The reverse test: "If I saw this next to a constructivist illustration cover, would they read as the same publication?" Same answer logic. The relationship between the registers is the relationship between magazine cover and inside spread — different intensities, same publication identity.
+
+---
+
 ## Animation
 
 ### Timing Principles
@@ -326,6 +373,22 @@ What to avoid: close-up faces as the dominant thumbnail element (personality-led
 4. Track to target position (600-800ms, ease-in-out)
 5. Lock-on pulse: inner circle scales 1.0 → 1.1 → 1.0 (200ms, spring)
 
+### Cross-Register Transition Signatures
+
+Crossing between Register 1 (Remotion analytical, clean) and Register 2 / 3 (constructivist illustration, grain-textured) is the largest texture/style gap in any episode's visual layer. Hard cuts across this gap feel jarring. The channel uses signature transitions consistently so viewers learn the motion vocabulary unconsciously — these aren't decisions made per-shot, they're channel signatures.
+
+| Direction | Signature transition | Duration | Why |
+|-----------|---------------------|----------|-----|
+| **Analytical → Grounding/Atmospheric** (Remotion → constructivist illustration or AI-GEN scene) | Amber color-wash with grain-fade-in | 600-800ms | The clean data dissolves into the warm illustrated world it describes. Grain ramps in over the second half of the wash, signaling the texture register shift. |
+| **Grounding/Atmospheric → Analytical** (constructivist → Remotion) | Dissolve with grain-fade-out and ink iris-in | 500-700ms | The illustrated world crystallizes into the precise pattern. Grain fades out, ink-tinted iris contracts to reveal clean Remotion content. |
+| **Grounding ↔ Atmospheric** (within constructivist registers, same visual language) | Cross-dissolve | 300-500ms | Same visual language, different role. Soft transition appropriate. |
+| **Within Analytical** (Remotion → Remotion) | Cut (or wipe at register-defined corner) | Single frame for cut, 200-300ms wipe | Same texture register, no bridge needed. |
+| **Beat boundaries** (any → any) | Fade through bone or ink (mode-dependent) | 400-600ms | Episode structure transitions, not register transitions. |
+
+**Implementation note:** the Transitions library (`src/components/Transitions.tsx`) supports the underlying types (color-wash, blur-through, dissolve, iris, cut, wipe, fade). The signature pairings above are codified as preset transition configurations consumed via `cut()` directives in the script and parsed by `generate_manifest.py`. A `cut()` directive crossing between registers automatically applies the signature transition for that register pair unless overridden.
+
+The unity rule: **never hard-cut across registers without a signature transition**. Hard cuts within a single register are fine (they share visual language); hard cuts across registers create visible seams. render-qa flags any cross-register hard-cut in the assembly manifest as a likely error.
+
 ---
 
 ## Color Assignment Rules
@@ -337,6 +400,56 @@ What to avoid: close-up faces as the dominant thumbnail element (personality-led
 5. **Default accent is `amber`** (dark mode) or **`oxblood`** (light mode). When no semantic meaning applies.
 6. **Never use raw hex in JSON data files.** Always reference a named token from this file.
 7. **Image duotone ramp matches content:** Standard (amber) for neutral analysis, Conflict (rust) for adversarial content.
+
+---
+
+## Per-Episode Color Emphasis
+
+The brand palette range is constant across the channel. What varies per episode is which **subset of the palette gets foregrounded** in Remotion templates, mirroring the per-typography palette emphasis in the AI-generated content (see PROMPT_PREAMBLES.md and TYPOGRAPHY_TRADITIONS.md). This creates per-episode visual unity between the constructivist illustration cover and the Remotion analytical inside-layout — a Soviet-bloc episode's charts pull rust + gold revolutionary intensity to echo the AI-gen scenes; an American mid-century / contemporary tech episode's charts pull walnut + umber + gold restraint to match Saul Bass / Push Pin discipline; a Chinese-state episode incorporates vermillion accents distinct from Soviet crimson.
+
+The episode color emphasis is specified once at the episode level (in `episodes/<slug>/visual-identity.json`) and propagates through `theme.ts`'s `getEpisodeColorEmphasis()` helper to every template. Templates consume the emphasis when choosing accent colors, chart fills, and highlight elements.
+
+### Emphasis values
+
+| Value | Foregrounded tokens | Semantic | Pairs with text_treatment |
+|-------|---------------------|----------|----------------------------|
+| `neutral` (default) | Full brand palette, `amber` accents | Channel default | Mixed-typography episodes, transitional moments |
+| `soviet` | `rust` + `bronze` + `amber` + `ink` + `bone` (full saturated revolutionary) | Russian/Soviet content | `russian_constructivist` |
+| `american-modernist` | `walnut` + `umber` + `bronze` + `bone` + `paper` (softer mid-century, `rust` only as sparing accent) | American mid-century / contemporary tech | `english_modernist` or `english_minimal` |
+| `chinese-state` | Chinese vermillion + `amber` + `ink` + `bone` (lacquer-influenced, distinct from Soviet) | Chinese contemporary state-led content | `chinese_propaganda` or `chinese_minimal` |
+| `chinese-traditional` | `ink` dominant + `bone` + `paper`, sparse `oxblood` for seal accents | Pre-revolutionary Chinese / classical | `chinese_traditional` |
+| `japanese-showa` | `ink` + bold red + `bone` (minimal 2-3 colors) | Pre-1945 Japanese imperial / Showa-era | `japanese_showa` |
+
+### Implementation
+
+The `getEpisodeColorEmphasis(emphasis: EmphasisName)` helper in `theme.ts` returns a `PaletteEmphasis` object with foregrounded tokens for primary, secondary, and accent uses. Templates consume these instead of pulling directly from the full palette:
+
+```typescript
+// Before (pulls full palette regardless of episode)
+<Bar fill={theme.colors.amber} />
+
+// After (consumes episode emphasis)
+const emphasis = useEpisodeColorEmphasis(); // reads from manifest's episodeColorEmphasis
+<Bar fill={emphasis.primaryAccent} />
+```
+
+`emphasis.primaryAccent` returns `amber` for neutral, `rust` for soviet, `walnut` for american-modernist (a softer accent), Chinese vermillion for chinese-state, etc. Same for `secondaryAccent`, `dominantText`, `surfaceTone`, `chartFillSequence`.
+
+### High-impact templates that consume emphasis
+
+The five templates that benefit most from per-episode emphasis (chart fills, accent colors, and highlight elements drive visual identity hardest):
+
+1. **DataChart** — bar fills and accent labels
+2. **ChoroplethMap** — contested-actor highlight color (was always `amber`; now `emphasis.primaryAccent`)
+3. **FrameworkDiagram** — node fills and connection-line colors
+4. **TimelineComparison** — era band fills and event accents
+5. **KineticTypography** — accent words and emphasis underlines
+
+Other templates (TitleTransition, CrosshairOverlay, MetadataStrip, etc.) keep their default channel-wide treatment since the brand mark and metadata texture are unity anchors that should *not* vary per episode.
+
+### Default behavior
+
+If an episode's `visual-identity.json` is missing or `episodeColorEmphasis` is unset, templates fall back to `neutral` (full palette, `amber` accents). This preserves backward compatibility — existing data files render identically until an episode opts in to emphasis.
 
 ---
 

@@ -81,6 +81,14 @@ import {
   CatalogNwChain,
   CatalogSplitMaps,
   CatalogSplitTime,
+  CatalogTimelineComputers,
+  CatalogTimelineDualPandemics,
+  CatalogLadderColdWar,
+  CatalogLadderArms,
+  CatalogTreeChess,
+  CatalogGameChess,
+  CatalogGamePayoff,
+  CatalogBifurcationLatin,
   CatalogShowreel,
 } from "./catalog";
 
@@ -205,6 +213,20 @@ export const RemotionRoot: React.FC = () => {
           <CatalogNwChain />
           <CatalogSplitMaps />
           <CatalogSplitTime />
+        </Folder>
+
+        <Folder name="Timelines">
+          <CatalogTimelineComputers />
+          <CatalogTimelineDualPandemics />
+          <CatalogLadderColdWar />
+          <CatalogLadderArms />
+        </Folder>
+
+        <Folder name="Scenarios">
+          <CatalogTreeChess />
+          <CatalogGameChess />
+          <CatalogGamePayoff />
+          <CatalogBifurcationLatin />
         </Folder>
       </Folder>
     </>

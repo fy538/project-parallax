@@ -757,7 +757,17 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
 
   // ── Curve dimensions ─────────────────────────────────────────────────
   const curveWidth = area.width - 340; // Reserve space for evidence panel
-  const curveHeight = area.height - layout.spacing.xl;
+  // Conservative SVG height — leaves breathing room above (under the
+  // probability display) and below (above the safe-area floor). The
+  // surrounding flex container center-aligns the SVG, so any extra
+  // column space gets distributed evenly above + below the chart rather
+  // than dumping it all at the bottom.
+  const labelStackHeight = 220;
+  const verticalBreath = 60;
+  const curveHeight = Math.max(
+    240,
+    area.height - labelStackHeight - verticalBreath * 2
+  );
 
   // ── Compute distribution states ──────────────────────────────────────
   const prior = data.variant === "single"
@@ -963,12 +973,16 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
           }}
         >
           {/* ── Distribution curve (left) ────────────────────────────── */}
+          {/* Flex-column so the SVG can flex:1 and center vertically in
+              the remaining space below the question + probability labels. */}
           <div
             style={{
               flex: 1,
               opacity: curveEnterOpacity,
               transform: `scale(${curveEnterScale})`,
               transformOrigin: "center bottom",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             {/* Question label */}
@@ -1069,7 +1083,17 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
               </div>
             )}
 
-            {/* SVG distribution curve */}
+            {/* SVG distribution curve — wrapped in a flex:1 centering box
+                so any leftover vertical space splits evenly above and
+                below the chart instead of bottom-anchoring it. */}
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
             <svg
               width={curveWidth}
               height={curveHeight}
@@ -1179,6 +1203,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                 }}
               />
             </svg>
+            </div>
 
             {/* X-axis labels */}
             <AxisLabels width={curveWidth} theme={theme} />

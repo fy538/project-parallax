@@ -6,6 +6,19 @@ Generates the 7 canonical style reference images that define the "Parallax AI-GE
 look" via Flux 2 Pro on fal.ai. These references are used as style anchors for
 Kling 3.0 / Seedance 2.0 / Sora 2 / Runway Gen-4 across all episodes.
 
+Updated May 4, 2026: switched from photoreal-mannequin reference library to
+constructivist library matching the unified post-migration aesthetic. The new
+references draw on Rodchenko / Heartfield / Masereel constructivist tradition
+and span the realism dosage spectrum (flat / balanced / grounded). Each
+includes period-and-region-appropriate typography per TYPOGRAPHY_TRADITIONS.md.
+
+Note: Recraft V3 may produce stronger constructivist outputs than Flux 2 Pro
+for some references, since Recraft has native vector_illustration / digital_
+illustration styles calibrated for graphic illustration. Worth A/B testing
+during Phase 1 generation. The fal.ai integration here remains as the primary
+path for backward compatibility and for hero P1 references where photographic
+spatial detail (realism: grounded) is desired.
+
 Usage:
   # Generate all 7 references
   python generate_style_refs.py --all
@@ -64,162 +77,183 @@ class StyleRef:
     lut_primary: str  # Which LUT treatment this ref is designed for
 
 
+_CONSTRUCTIVIST_ANCHOR = (
+    "Editorial illustration in the Parallax constructivist style — Soviet "
+    "constructivism meets German political photomontage meets industrial "
+    "woodcut tradition, drawing on Alexander Rodchenko, El Lissitzky, "
+    "John Heartfield, and Frans Masereel. Bold compositional confidence, "
+    "color-blocked forms with no soft shading or gradients. Restricted "
+    "warm palette: deep ink (#1C1814), walnut (#5C4A3D), umber (#8B7355), "
+    "burnt amber and gold (#C4A747), rust (#A64D46), bone (#F0E6D0) on "
+    "paper (#F5F0E8) background. No other colors. NOT photorealistic, "
+    "NOT 3D render, NOT cool blue or teal, NOT Adobe stock aesthetic, "
+    "NOT smooth featureless mannequin faces. "
+)
+
+# Updated May 4, 2026: replaced photoreal-mannequin reference library with
+# the constructivist library matching the unified post-migration aesthetic.
+# See PROMPT_PREAMBLES.md, AI_VIDEO_PIPELINE.md, VISUAL_LANGUAGE.md.
 STYLE_REFS = [
     StyleRef(
         number=1,
-        name="mannequin-face",
-        filename="style-ref_face_mannequin-neutral_v1.png",
-        description="Mannequin face close-up — locks the exact level of facial stylization",
+        name="constructivist-face",
+        filename="style-ref_face_planar-neutral_v1.png",
+        description="Planar-face study — locks the exact level of facial stylization for grounded scenes",
         lut_primary="standard",
         prompt=(
-            "Close-up portrait photograph of a realistic department store mannequin "
-            "head on a human body. The face is a smooth, gently convex surface that "
-            "protrudes forward naturally like a real face shape — prominent forehead, "
-            "protruding nose ridge, forward cheekbones, defined jawline — but the "
-            "entire surface is completely smooth with no eyes, no mouth, no nostrils, "
-            "no wrinkles, no pores in the face area. Skin-colored matte plastic or "
-            "ceramic finish on the face only. The rest of the body is a real human: "
-            "warm natural skin on neck and ears, dark short hair with realistic "
-            "texture, crisp white dress shirt with fabric detail. Studio portrait "
-            "lighting from upper left, soft shadows on the smooth facial surface "
-            "revealing its three-dimensional contour. Shot on Canon EOS R5, 85mm "
-            "f/1.4, shallow depth of field, warm gray background. 16:9 aspect ratio."
+            _CONSTRUCTIVIST_ANCHOR +
+            "Close-up portrait of a figure rendered in the constructivist "
+            "vocabulary. Face composed of geometric facets — jaw plane, "
+            "cheekbone plane, brow plane — suggesting facial structure "
+            "without realistic detail. Eyes obscured by lens shadow from "
+            "round eyeglasses or by hair fall — never smooth blank surfaces. "
+            "Hair simplified to color-blocked shapes. Crisp white shirt "
+            "collar visible at the bottom of frame, color-blocked with no "
+            "fabric texture. Subtle ambient backlight rim defining the "
+            "head's silhouette against a neutral umber background. Mood: "
+            "contemplative, intellectually rigorous. 16:9 aspect ratio."
         ),
     ),
     StyleRef(
         number=2,
-        name="cleanroom-warm",
-        filename="style-ref_interior_cleanroom-warm_v1.png",
-        description="Industrial interior (warm) — semiconductor cleanroom with amber lithography light",
+        name="cleanroom-flat",
+        filename="style-ref_industrial_cleanroom-flat_v1.png",
+        description="Flat constructivist cleanroom — monumentalist propaganda-poster aesthetic at maximum graphic flatness",
         lut_primary="standard",
         prompt=(
-            "Interior of an advanced semiconductor fabrication cleanroom with yellow "
-            "lithography lighting casting warm amber glow hex #E5A544 across white "
-            "surfaces and HEPA-filtered ceiling panels. Raised floor with perforated "
-            "tiles, wafer handling equipment in foreground, FOUP carriers on automated "
-            "track receding into background. Two workers in full white bunny suits "
-            "with clear polycarbonate face shields — behind each shield, a smooth "
-            "featureless mannequin-like face with no eyes or mouth, just the blank "
-            "convex shape of a department store mannequin head. Bunny suit fabric is "
-            "crisp and realistic with seam detail. Atmosphere of extreme sterility "
-            "and quiet precision. Shot on Sony A7IV, 35mm f/2.0, medium wide from "
-            "hip level, shallow depth of field softening the background. "
-            "Photorealistic rendering. 16:9 aspect ratio."
+            _CONSTRUCTIVIST_ANCHOR +
+            "Interior of a semiconductor fabrication cleanroom rendered in "
+            "flat constructivist composition. Three workers in white bunny "
+            "suits with reflective polycarbonate face shields, faces composed "
+            "of geometric facets behind the visors, eyes obscured by amber "
+            "visor reflection. FOUP wafer carriers in foreground rendered as "
+            "color-blocked geometric forms. Stacked machinery in background, "
+            "monumentalist scale, low horizon line. Bold heiti propaganda "
+            "typography integrated diagonally: '微米 — 我们的力量' (Micron "
+            "— Our Strength) in red, '工业 · 精度 · 技术' (Industry · "
+            "Precision · Technology) in stacked black/red blocks. Maximum "
+            "graphic flatness, no photographic texture, all surfaces "
+            "suggested through palette planes. 16:9 aspect ratio."
         ),
     ),
     StyleRef(
         number=3,
-        name="command-cool",
-        filename="style-ref_interior_command-cool_v1.png",
-        description="Industrial interior (cool) — military/tech command center with blue screens",
-        lut_primary="conflict",
-        prompt=(
-            "Interior of a military strategic operations room, dark and tense. "
-            "Multiple large display screens casting cool blue light hex #3266AD as "
-            "the primary illumination source, overhead fluorescent panels switched "
-            "off. Three figures in generic military uniforms seated at workstations — "
-            "each has a smooth featureless mannequin-like face with no eyes or mouth, "
-            "the blank convex shape of a department store mannequin head with warm "
-            "skin tone. Uniforms are photorealistic with pressed fabric, epaulettes, "
-            "and generic insignia. Radar displays and situation maps glow on screens, "
-            "cable management and keyboard detail visible at workstations. "
-            "Institutional drop ceiling, rubber floor tiles. Shot on Arri Alexa, "
-            "24mm f/2.8, slight dutch angle for tension, deep focus keeping all "
-            "three figures sharp. Photorealistic rendering. 16:9 aspect ratio."
-        ),
-    ),
-    StyleRef(
-        number=4,
-        name="historical-gov",
-        filename="style-ref_interior_historical-gov_v1.png",
-        description="Historical interior — 1940s government office, editorial LUT target",
-        lut_primary="editorial",
-        prompt=(
-            "Interior of a 1940s American government office or diplomatic meeting "
-            "room. Dark wood paneling on walls, heavy green curtains, brass desk lamp "
-            "casting a warm pool of light on a large mahogany desk. Stacked papers, "
-            "fountain pen, brass ashtray, rotary telephone on the desk surface. Two "
-            "men seated across from each other in period-correct double-breasted "
-            "suits with wide lapels and pocket squares — both have smooth featureless "
-            "mannequin-like faces with no eyes or mouth, the blank convex shape of "
-            "department store mannequin heads with warm skin tones. Hands are "
-            "realistic, resting on the desk. Filing cabinet in the corner, venetian "
-            "blinds casting slats of warm light across the room. Slightly desaturated "
-            "color palette with warm sepia undertone suggesting aged Kodachrome film "
-            "stock. Shot on vintage Leica lens with soft edges, 50mm equivalent, "
-            "medium shot. Documentary framing. Photorealistic rendering. 16:9 "
-            "aspect ratio."
-        ),
-    ),
-    StyleRef(
-        number=5,
-        name="suit-walking",
-        filename="style-ref_figure_suit-walking_v1.png",
-        description="Figure in motion — full body mannequin-face, professional walking",
+        name="cleanroom-grounded",
+        filename="style-ref_industrial_cleanroom-grounded_v1.png",
+        description="Grounded constructivist cleanroom — same scene with photographic spatial detail for you-are-here presence",
         lut_primary="standard",
         prompt=(
-            "Full body photograph of a person in a tailored dark navy suit walking "
-            "through a modern glass-and-steel building lobby, captured mid-stride "
-            "with natural walking posture and subtle arm swing. The figure has a "
-            "smooth featureless mannequin-like face with no eyes or mouth — the "
-            "blank convex shape of a department store mannequin head — with warm "
-            "skin tone and dark short hair in a clean shape. Clothing is "
-            "photorealistic: visible wool fabric texture, horn buttons, proper drape "
-            "and movement in the jacket, crisp white shirt collar visible. Hands are "
-            "realistic with five fingers in a natural mid-swing pose. Modern "
-            "architectural interior with floor-to-ceiling windows, polished stone "
-            "floor showing subtle reflections. Natural daylight streaming from "
-            "windows with soft interior fill light. Shot on Sony A7IV, 50mm f/2.0, "
-            "full body in frame with walking room ahead of the figure, slight motion "
-            "suggestion. Photorealistic rendering. 16:9 aspect ratio."
-        ),
-    ),
-    StyleRef(
-        number=6,
-        name="aerial-urban",
-        filename="style-ref_aerial_urban-development_v1.png",
-        description="Aerial/wide environment — semiconductor campus, no people needed",
-        lut_primary="standard",
-        prompt=(
-            "Aerial photograph of a massive semiconductor fabrication campus under "
-            "construction in arid desert terrain. Multiple large white rectangular "
-            "cleanroom buildings in various stages of completion, yellow construction "
-            "cranes towering above, landscaped earthen berms separating construction "
-            "zones, paved access roads with small white trucks and construction "
-            "vehicles providing scale reference. Surrounding landscape transitions "
-            "from raw desert scrub to graded earth to paved infrastructure. Late "
-            "afternoon golden hour light casting long dramatic shadows from the "
-            "buildings and cranes across the construction site. Sense of enormous "
-            "industrial scale — each building is clearly hundreds of meters long "
-            "based on vehicle sizes. Shot from helicopter at 500 feet altitude, "
-            "70mm equivalent lens, f/5.6, slightly angled down at 30 degrees. "
-            "Clear desert air with mild atmospheric haze softening the distant "
-            "mountains. No people visible at this scale. Photorealistic rendering. "
+            _CONSTRUCTIVIST_ANCHOR +
+            "Interior of a semiconductor fabrication cleanroom rendered in "
+            "grounded constructivist composition: planar figures with "
+            "facial facets and visor-obscured eyes, but environments "
+            "rendered with more photographic spatial detail (atmospheric "
+            "perspective, material texture on FOUP carriers and machinery, "
+            "subtle floor reflections). Three workers in bunny suits "
+            "operating wafer-handling equipment, medium shot from hip "
+            "level, deeper spatial recession into background. Bold heiti "
+            "propaganda typography in red and gold integrated with "
+            "machinery. Constructivist DNA preserved — color-blocked "
+            "figures, restricted palette, graphic composition — but more "
+            "spatial depth and material grounding than the flat variant. "
             "16:9 aspect ratio."
         ),
     ),
     StyleRef(
-        number=7,
-        name="corridor-splitting",
-        filename="style-ref_concept_corridor-splitting_v1.png",
-        description="Conceptual corridor — physical metaphor for bifurcation/choice",
+        number=4,
+        name="atmospheric-trap",
+        filename="style-ref_atmospheric_trap-encirclement_v1.png",
+        description="Atmospheric backdrop — system-mood, civilizational scale, used at low opacity behind narration",
         lut_primary="standard",
         prompt=(
-            "A long modern corridor with polished concrete floors that physically "
-            "splits into two diverging paths ahead. The left path is bathed in warm "
-            "amber light hex #E5A544, and through its glass walls shows a "
-            "collaborative workspace with shared tables and equipment. The right "
-            "path is bathed in cool blue light hex #3266AD, and through its glass "
-            "walls shows isolated workstations separated by frosted glass barriers. "
-            "At the split point stands a single figure in a neutral gray suit with "
-            "a smooth featureless mannequin-like face — the blank convex shape of a "
-            "department store mannequin head — arms slightly raised in a gesture of "
-            "weighing options. Polished concrete floor with subtle expansion joints "
-            "creating directional lines toward each path. Modern industrial ceiling "
-            "with exposed silver ductwork. Shot on Sony A7IV, 24mm f/8, wide shot "
-            "with one-point perspective, vanishing point at the corridor split, deep "
-            "focus keeping everything sharp. Dramatic lighting contrast between the "
-            "warm and cool paths. Photorealistic rendering. 16:9 aspect ratio."
+            _CONSTRUCTIVIST_ANCHOR +
+            "An interlocking industrial trap viewed from a low monumentalist "
+            "angle: massive factory complexes connected by tangled cable "
+            "bundles and pipe networks forming a closing net. Smaller "
+            "silhouetted figures inside the structure, dwarfed by scale. "
+            "Smokestacks belching ribbons of smoke that twist into the "
+            "cable network above. Heavy contrast between deep ink-black "
+            "machinery and burnt amber accents on smoke and pipes. Bold "
+            "geometric forms, color-blocked, no shading. Composition reads "
+            "as background — figures are not the subject, the system is. "
+            "Mood: civilizational stakes, technological dread, industrial "
+            "ambition. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=5,
+        name="domestic-intimate",
+        filename="style-ref_domestic_beijing-apartment_v1.png",
+        description="Intimate domestic scene — locks the constructivist aesthetic at conversational human scale (Beijing apartment, 1980s)",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "Eye-level intimate scene in a 1980s Beijing apartment. A figure "
+            "in a dark wool suit and round eyeglasses seated at a small "
+            "wooden writing desk, reading a document under the warm amber "
+            "light of an Anglepoise-style desk lamp. Face rendered with "
+            "constructivist planar facets — jaw plane, cheekbone plane — "
+            "eyes obscured by the round lens shadow of the glasses. A "
+            "traditional Chinese-style teacup with botanical motif on the "
+            "desk. Books stacked nearby, a fountain pen on an open notebook. "
+            "Window showing dark Beijing rooftop silhouettes. Wall calendar "
+            "with subtle Chinese signage ('北京日报', '一九八四年三月', "
+            "small scale, period-natural — chinese_minimal typography "
+            "treatment). Small framed photograph of Tiananmen on the wall. "
+            "Bookshelf in background. Restrained scale, contemplative "
+            "composition, NOT propaganda-poster monumentalist — this is "
+            "the constructivist tradition turned inward. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=6,
+        name="historical-modernist",
+        filename="style-ref_historical_1941-american_v1.png",
+        description="Historical reconstruction — 1941 American government office with English Modernist typography, editorial LUT target",
+        lut_primary="editorial",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "1941 American government office reconstruction. A figure in a "
+            "double-breasted dark wool suit seated at a heavy wooden desk, "
+            "hand poised over an executive order document. Face rendered "
+            "with constructivist planar facets, eyes obscured by hat brim "
+            "or downturned head. Dark wood paneling, brass desk lamp "
+            "casting warm pool of light, side window with low-angle "
+            "warm tungsten light streaming in, period-accurate fountain pen "
+            "and stacked papers. Other suited figures standing at the edge "
+            "of frame, faces equally simplified. American midcentury "
+            "modernist typography integrated: 'INDUSTRY · INNOVATION · "
+            "ENTERPRISE' or 'THE AMERICAN CENTURY' in geometric sans-serif "
+            "(Push Pin / Saul Bass / Fortune-magazine modernism), bold "
+            "color blocks. Slightly desaturated palette suggesting "
+            "Kodachrome-era film. Mood: civilizational stakes, historical "
+            "gravity, American mid-century industrial confidence. Grounded "
+            "realism dosage. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=7,
+        name="conceptual-corridor",
+        filename="style-ref_conceptual_corridor-splitting_v1.png",
+        description="Conceptual corridor — physical metaphor for bifurcation, atmospheric backdrop usage",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "A long industrial corridor that physically splits into two "
+            "diverging paths ahead, rendered in flat constructivist "
+            "composition. The left path is bathed in warm amber/gold and "
+            "shows collaborative geometric forms (shared tables, "
+            "interconnected machinery) through stylized glass walls. The "
+            "right path is bathed in deep rust/ink and shows isolated "
+            "workstations separated by hard-edged barriers. At the split "
+            "point, a single figure stands in dark wool suit with planar "
+            "constructivist face, eyes obscured by hat brim — the figure "
+            "is in mid-stride, not gestural. Polished floor with directional "
+            "expansion joints converging to vanishing point at the corridor "
+            "split. One-point perspective, deep one-point composition. Bold "
+            "color-blocked forms, no soft shading. Mood: structural choice, "
+            "civilizational bifurcation, the moment before commitment. 16:9 "
+            "aspect ratio."
         ),
     ),
 ]
@@ -256,7 +290,7 @@ def generate_image(prompt: str, api_key: str, width: int = 1920, height: int = 1
             "prompt": prompt,
             "image_size": {"width": width, "height": height},
             "num_images": 1,
-            "safety_tolerance": "5",  # Most permissive (mannequin faces can trip filters)
+            "safety_tolerance": "5",  # Most permissive — kept for backward compat; constructivist illustrations rarely trip filters
         },
         with_logs=False,
     )

@@ -8,6 +8,7 @@ AI-generated video is the **fourth visual mode** (`[AI-GEN:]`), sitting between 
 
 Created: May 2, 2026
 Updated: May 4, 2026 — Cross-linked to three-register visual system and prompt preamble layer.
+Updated: May 4, 2026 — Replaced photoreal-mannequin "Stylized Realism" aesthetic with "Stylized Constructivism." Registers 2 and 3 now share constructivist visual language; differ only in role (background vs. foreground figurative). Added per-scene typography-tradition parameter and realism-dosage sub-mode.
 
 **Related docs:**
 - **VISUAL_LANGUAGE.md** — *when* to use AI-GEN vs. the other three modes. Defines the three visual registers (Analytical / Atmospheric / Grounding); this pipeline produces Register 3.
@@ -33,44 +34,68 @@ The other two registers are produced elsewhere: Register 1 (Analytical) lives in
 
 ---
 
-## The Aesthetic: Stylized Realism
+## The Aesthetic: Stylized Constructivism
 
 ### Philosophy
 
-Parallax AI-generated video occupies a deliberate visual register: **environments and materials are realistic; human figures are stylized with anonymous/mannequin faces.** This isn't a compromise with current AI limitations — it's an editorial choice that signals to the viewer: "this is a visualization of something real but inaccessible, not documentary footage."
+Parallax AI-generated video occupies a deliberate visual register: **everything is rendered in a unified constructivist illustration vocabulary** — environments and figures share the same graphic language, drawing on Soviet constructivism (Rodchenko, Lissitzky, Klutsis), German political photomontage (Heartfield, Höch), and 20th-century industrial woodcut traditions (Frans Masereel, Lynd Ward). This isn't decoration; it's an editorial register. The viewer reads constructivist illustration as "this is interpreted, structured, analytical content" — not documentary footage, not Adobe-stock cleanliness, not the AI-mannequin aesthetic that's become the genre default.
 
-The stylized face serves the same function as The Economist's red-and-white illustrations or Kurzgesagt's simplified characters: it's an honesty marker that says "editorial illustration, not evidence." This aligns with Parallax's epistemic stance — we present analytical lenses, not claims of objective truth.
+The constructivist aesthetic serves the same function as The Economist's red-and-white illustrations or Kurzgesagt's simplified characters — an honesty marker that says "editorial illustration, not evidence." But it goes further: it carries *political-aesthetic gravity* (the constructivist tradition has always been about state power, technology, mobilization) that fits Parallax's analytical subject matter, and it's massively differentiated from the AI-photoreal-mannequin look that's become generic across the geopolitics-explainer space.
+
+This replaces the prior "Stylized Realism" approach (photoreal environments + smooth mannequin faces). The shift was made May 4, 2026, before any episode shipped. Migration rationale: (1) the mannequin convention had become a category marker for AI-channels broadly — viewers were starting to read smooth-face-AI = generic-AI-channel. (2) The constructivist vocabulary unifies Register 2 (atmospheric backgrounds) and Register 3 (grounded scenes) into a single visual language, dramatically simplifying brand-coherence work. (3) The aesthetic has demonstrated range in testing — it holds at monumentalist industrial scale *and* at intimate domestic scale, controlled by a per-scene realism dosage knob.
 
 ### Visual Parameters
 
-**Environments (realistic):**
-- Architectural spaces rendered with accurate lighting, materials, reflections
-- Industrial/technological environments with correct equipment proportions
-- Natural lighting preferred (global illumination, bounce light, soft shadows)
-- Period-appropriate details for historical reconstructions
-- Camera work mimics documentary cinematography (handheld subtle drift, rack focus, slow dolly)
+**Unified visual language across both registers.** Constructivist illustration in the Rodchenko / Heartfield / Masereel tradition. Bold compositional confidence, color-blocked forms with no soft shading or gradients, restricted warm palette (ink, walnut, umber, gold, rust, bone, paper — per palette.json), graphic monumentalism in industrial scenes, intimate restraint in domestic scenes.
 
-**Human figures (stylized):**
-- Clothing, gear, and body proportions are realistic and period/context-appropriate
-- Faces are deliberately featureless — smooth mannequin-like surfaces, no attempt at realistic facial features
-- Skin tone and body type should still convey demographic diversity where relevant
-- Figures move naturally (walking, gesturing, operating equipment) — motion is realistic, only the face is abstracted
-- Hair can be present but simplified — suggests the style without strand-level detail
+**Figures (constructivist-figurative):**
+- Bodies and clothing rendered with constructivist-graphic clarity — color-blocked planes, geometric simplification, period/context-appropriate details (uniforms, suits, bunny suits, etc.)
+- Faces rendered with simplified planar features — geometric facets suggesting facial structure (jaw planes, cheekbone planes), eyes obscured by lens shadow / hat brim / visor reflection / hairfall, no realistic detail
+- The depersonalization signal is *editorial through stylization* rather than uncanny through smoothing. Replaces the prior smooth-mannequin-face convention.
+- Skin tone and body type still convey demographic specificity where relevant (Chinese workers in Chinese-coded scenes, etc.)
+- Figures move naturally in animation (walking, gesturing, operating equipment) — motion is naturalistic, only the rendering is graphic
 
-**The line:** Environments tell the viewer "this place is real." Faces tell the viewer "this person is a stand-in." Both are true — the semiconductor fab exists, but we're not claiming to show you who works there.
+**Environments:**
+- Industrial/technological scenes: monumentalist, propaganda-poster compositions. Stacked geometric machinery, workstations as architectural forms, low horizon lines, heroic angles. Best at `flat` realism dosage.
+- Domestic/intimate scenes: eye-level, restrained scale, period-detail integration (calendars, books, teacups, framed photographs). Best at `balanced` realism dosage.
+- Restricted-facility reconstructions: spatial detail preserved through `grounded` realism dosage — environments rendered with more photographic detail while figures remain stylized planar forms.
+
+### Realism Dosage (per-scene knob)
+
+Grounding scenes accept a `realism` parameter. **The dosage controls environment realism only — figures stay fully flat-constructivist (4-5 color-blocked face planes drawing on Rodchenko's 1924 photomontage portraits and Lissitzky's 1924 Self-Portrait, no continuous skin tonality, no rendered facial features) at all three dosages.** This is the most important refinement in the constructivist spec: realism on figures is the failure mode that produced the unsatisfying May 4 v1 Beijing-apartment generation; realism on environments is fine and often editorially useful.
+
+- **`flat`** — Both figure AND environment fully color-blocked. No photographic texture anywhere, no shading, no gradients. **Required for animated AI-GEN clips** — animation stability needs maximum flatness because color-blocked forms track reliably across frames whereas photographic textures (skin, fabric weave, atmospheric haze) drift severely. Use for monumentalist industrial scenes, propaganda-poster moments, atmospheric backdrops, and any clip that will be animated.
+- **`balanced`** — Figure stays flat-constructivist (same standard as flat). Environment may have selective material texture: paper grain on backgrounds, warm light gradient on a desk lamp's pool, subtle wood grain on furniture, dust haze in industrial spaces. Default dosage for stills; works for most scenes from intimate domestic to industrial.
+- **`grounded`** — Figure stays constructivist (planar planes, no skin tonality, no rendered features) but may carry slightly more anatomical specificity. Environment rendered with photographic spatial detail: atmospheric perspective, material texture on machinery, deeper spatial recession. **Stills only** — animation drift becomes severe because the photographic environment surfaces fail to track consistently across frames. Use for restricted-facility reconstruction stills that will be Ken-Burned in NLE, never sent to Kling/Sora.
+
+**The animation-flat rule** is load-bearing: when an AI-GEN asset will be animated, the shot list `realism` must be `flat`. The visual-spec skill should enforce this when emitting shot lists; render-qa should flag any animated entry with non-flat realism as a likely mistake.
+
+The dosage is decided in the script's visual column or the angle memo, recorded in the shot list as `realism: flat | balanced | grounded`, and consumed by `recraft.py` and the visual-spec skill. Default for stills is `balanced`. Default for animated clips is `flat`.
+
+### Typography Tradition (per-scene parameter)
+
+A defining feature of the constructivist approach: typography is *contextual to the scene's geography and era*, not a fixed channel default. A 1980s Beijing apartment includes Chinese typography of that period; a Soviet-bloc historical episode uses Russian Constructivist typography; a US industrial mobilization scene uses American midcentury modernist typography (Push Pin Studios / Saul Bass / *Fortune* magazine industrial-modernism).
+
+This isn't decoration. The typographic rhetoric of each civilization is part of how that civilization communicates power and identity. Rendering each in its own visual rhetoric makes the visual layer participate in the cross-cultural argument — which is core to Parallax's translator-decoder identity.
+
+The typography decision is recorded as the `text_treatment` field on each shot. Available values, full visual grammars, and editorial guidance: see TYPOGRAPHY_TRADITIONS.md. Default for grounded scenes is contextual-to-the-region; default for atmospheric backgrounds is `none` or minimal.
 
 ### Color and Mood
 
 All AI-generated clips pass through the same `treat_video.py` brand treatment as stock footage:
-- Standard LUT (warm umber shadows → amber highlights) for most content
-- Conflict LUT (ink shadows → rust highlights) for tension/adversarial moments
-- Editorial LUT (desaturated, folder-to-bone tones) for historical/archival feel
+- Standard LUT (warm umber shadows → amber highlights) for most content — present-day reconstructions, default mood
+- Conflict LUT (ink shadows → rust highlights) for adversarial moments — military, sanctions, contested
+- Editorial LUT (desaturated, bone tones) for historical reconstructions — pre-1980s, Cold War, archival feel
 
-Pre-generation, prompts should target a neutral color grade — slightly desaturated, natural lighting — so the LUT pass brings it into Meridian palette cleanly. Avoid generating footage that's already heavily graded (no teal-and-orange, no extreme contrast) since the LUT will fight it.
+The constructivist aesthetic is calibrated to land in the warm-umber palette pre-LUT (the preamble locks the palette explicitly), so the LUT does final 10% polish rather than 60% color rescue. This is the prompt-level half of the brand unification architecture — see PROMPT_PREAMBLES.md.
+
+Per VIS-10, atmospheric register + editorial treatment is forbidden — the editorial ramp's desaturation destroys the constructivist palette. All other register × treatment pairings are valid.
 
 ---
 
 ## Tool Selection (May 2026)
+
+**Note on the constructivist shift:** The May 4, 2026 migration from photoreal-realism to stylized-constructivism changes which tools are best-fit for which step. Recraft V3 becomes the **primary stills tool** because it's strongest at the constructivist illustration aesthetic that's now the channel default. Flux 2 Pro remains useful for the rare scenes that need photographic grounding (`realism: grounded` in grounded scenes), but the bulk of stills work moves to Recraft. Video tools (Kling, Sora, Runway, Seedance) animate the Recraft-generated reference frames; their underlying photorealism strength matters less now that the source frames are constructivist illustrations.
 
 ### Primary: Kling 3.0
 
@@ -180,7 +205,19 @@ When running the visual-spec skill, segments tagged `[AI-GEN:]` in the script ge
 
 ### Step 2: Generate Reference Frames
 
-For each AI-GEN segment, generate a reference frame using Flux 2 Pro (or GPT Image 2 for quick drafts). For lower-stakes shots or rapid iteration, `recraft.py --register grounding` (which uses Recraft's `realistic_image` style) is also viable and applies the canonical Grounding preamble automatically — see PROMPT_PREAMBLES.md. Flux 2 Pro remains preferred for hero P1 reference frames where photorealism quality is critical.
+For each AI-GEN segment, generate a reference frame using **Recraft V3 as the primary tool** for constructivist scenes (the channel default). Invoke via:
+
+```
+python tools/recraft/recraft.py generate "scene description" \
+    --register grounding \
+    --realism balanced \
+    --text-treatment chinese_propaganda \
+    -o reference_frame.png
+```
+
+The `--register`, `--realism`, and `--text-treatment` flags compose the full constructivist preamble per PROMPT_PREAMBLES.md — palette anchoring, typography tradition, dosage, negative prompts. Most scenes work at `--realism balanced`. Use `--realism flat` for monumentalist industrial scenes and `--realism grounded` for restricted-facility reconstructions where spatial presence matters.
+
+**Flux 2 Pro remains the secondary tool**, used specifically for hero P1 reference frames where photographic grounding is critical and the scene benefits from `realism: grounded` more than the constructivist default. After May 4, 2026, expect ~70% of reference frames to come from Recraft and ~30% from Flux 2 Pro (was previously ~100% Flux). Adjust the budget allocation accordingly — Recraft pricing applies via subscription rather than pay-per-image, so heavy Recraft use is essentially free at the channel's volume.
 
 **Flux 2 Pro prompt structure:**
 ```
@@ -333,13 +370,15 @@ Every Parallax video using AI-generated footage includes a disclosure. Two level
 - **Evidence for claims.** AI footage supports the narrative visually — it doesn't constitute evidence for factual claims. The narration carries the truth claims; the visuals illustrate.
 - **Misleading context.** Don't use AI footage of military hardware in a way that implies a specific real military operation. Generic/illustrative only.
 
-### The Mannequin Rule
+### The Planar Face Rule (replaces the prior Mannequin Rule)
 
-The stylized face is a non-negotiable element of the Parallax AI-GEN aesthetic. It serves as both:
-- **An honesty signal** — the viewer immediately knows this isn't documentary footage
-- **A quality safeguard** — removing faces from the generation task means the AI excels at everything else (environment, lighting, clothing, motion)
+The simplified planar face is a non-negotiable element of the Parallax AI-GEN aesthetic post-May 4, 2026. Faces in grounded scenes are rendered with geometric facets (jaw planes, cheekbone planes), eyes obscured by lens shadow / hat brim / visor reflection / hair fall, and no realistic detail. This serves three purposes:
 
-If a clip comes out with faces that look too realistic, it gets re-generated or blurred in post. The mannequin face is a feature, not a limitation.
+- **An honesty signal** — the viewer immediately knows this is editorial illustration, not documentary footage
+- **Depersonalization through stylization** — figures read as roles (The Engineer, The Operator) rather than individuals, without the uncanny smoothness of the prior mannequin convention
+- **A quality safeguard** — graphic faces are something AI handles reliably; realistic faces are the failure mode. The constructivist aesthetic plays to AI's strengths.
+
+If a clip comes out with faces that drift toward photorealism (visible eye detail, realistic skin texture, identifiable individual features), it gets re-generated. The planar face is a feature, not a limitation. The aesthetic was specifically validated on the intimate-domestic test case (Beijing apartment, May 4, 2026) where the planar facets + lens-shadow-eyes combination demonstrated the depersonalization signal holds at conversational human scale.
 
 ### Frequency Budget
 
@@ -394,13 +433,17 @@ A persistent set of reference images that define the "Parallax AI-GEN look." Gen
 
 ### Required References (build before first AI-GEN episode)
 
-1. **Mannequin face close-up** — the exact level of stylization (smooth surface, slight suggestion of eye sockets but no pupils/iris, nose as gentle ridge, no mouth detail)
-2. **Industrial interior (warm)** — semiconductor-adjacent space, warm overhead lighting, ready for standard LUT
-3. **Industrial interior (cool)** — military/tech space, blue-screen ambient, ready for conflict LUT
-4. **Historical interior** — mid-20th century government/institutional space, ready for editorial LUT
-5. **Figure in motion** — full body, mannequin face, realistic professional clothing, natural walking pose
-6. **Aerial/wide environment** — urban development or industrial campus, showing environmental detail level target
-7. **Conceptual corridor** — the "physical metaphor" style for abstract concepts
+Updated May 4, 2026 to reflect the constructivist aesthetic. Each reference locks a specific aspect of the visual language: realism dosage, scale, typography integration, register role.
+
+1. **Constructivist face study (close-up)** — the exact level of facial planar simplification (geometric facets, eyes obscured by lens shadow or visor reflection, no realistic detail). Analogous to the prior mannequin-face reference but in the new constructivist vocabulary.
+2. **Flat industrial scene (monumentalist)** — propaganda-poster cleanroom or factory at `realism: flat` dosage. Locks the maximum-graphic-flatness aesthetic. Image-4-style cleanroom is the canonical example.
+3. **Grounded industrial scene** — same subject as #2 but at `realism: grounded` dosage with photographic spatial detail. Demonstrates the aesthetic's range.
+4. **Atmospheric backdrop** — Register 2 atmospheric illustration (factory complex, supply chain network, or system metaphor) at low-opacity background usage. Locks the Register 2 background language.
+5. **Intimate domestic scene** — eye-level, restrained scale, period detail. Beijing apartment is the canonical example. Locks the constructivist aesthetic at conversational human scale.
+6. **Historical reconstruction** — pre-1980s setting (1941 Oval Office, Cold War situation room, or similar) with editorial-LUT-ready palette. Locks the historical-grounding mode.
+7. **Conceptual metaphor** — abstract idea made physical (corridor splitting, system collapsing, network closing). Locks the metaphor mode for both atmospheric and grounded usage.
+
+Each reference should be generated at multiple typography treatments (`none`, `chinese_propaganda`, `russian_constructivist`, `english_modernist`) so the typography parameter's effect on the same scene is documented.
 
 ### Naming Convention
 
@@ -507,8 +550,10 @@ These would replace 6 segments currently using either hard-to-source footage or 
 
 ## Open Questions
 
-1. **Mannequin face specificity:** How stylized? Full smooth sphere vs. subtle facial structure with no features? Need to test both and see what reads as "intentional" vs. "broken AI."
+1. **Planar face specificity:** How much geometric facet vs. how much smooth-plane suggestion? The Beijing-apartment reference (lens-shadow obscured eyes, jaw-plane facets) sets a target, but the parameter space is large. Worth testing variants on the same subject to see what reads as "intentionally constructivist" vs. "broken AI."
 2. **Audio sync:** Some AI tools (Veo 3.1, Kling 3.0) can generate synchronized audio. Do we want ambient sound from AI-GEN clips, or always replace with designed audio in post?
-3. **Viewer perception study:** After EP01 launches, should we test audience response to AI-GEN segments specifically? (Retention data from publish-retro will show if viewers drop off during these moments.)
-4. **Shorts adaptation:** Do AI-GEN clips work in 9:16? The mannequin aesthetic might be more jarring at phone viewing distance.
-5. **Scaling the style library:** As episodes span different time periods and geographies, the style reference library grows. At what point do we need "era-specific" or "region-specific" sub-libraries?
+3. **Animation of constructivist illustrations:** Kling/Sora/Runway are all calibrated for photoreal source frames. Animating constructivist illustration as the source produces a different challenge — the model has to preserve graphic flatness through motion rather than drift toward photorealism. Worth testing during Phase 1.
+4. **Viewer perception study:** After EP01 launches, should we test audience response to AI-GEN segments specifically? (Retention data from publish-retro will show if viewers drop off during these moments. The register-level analytics added May 4 will surface whether constructivist outperforms the prior mannequin convention would have.)
+5. **Shorts adaptation:** Do AI-GEN clips work in 9:16? The constructivist aesthetic translates better to phone viewing than the mannequin convention did — graphic flatness is more legible at small scale than photorealism. But worth verifying.
+6. **Typography accuracy at scale:** As the channel ships more episodes covering more regions, the typography accuracy bar gets harder. Tiger's bilingual fluency is the quality gate for Chinese; for Russian/Japanese/other languages, what's the verification process? Native-speaker review per episode? Curated phrase library?
+7. **Scaling the style library:** As episodes span different time periods and geographies, the style reference library grows. At what point do we need "era-specific" or "region-specific" sub-libraries?

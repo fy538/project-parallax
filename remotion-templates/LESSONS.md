@@ -537,3 +537,22 @@ const value = (from + t * (overshoot - from)) - (overshoot - target) * settleT;
 ### L57: AmbientParticles density prop, not count
 **Problem:** `<AmbientParticles count={25} />` — component uses `density` prop (particles per viewport area unit), not `count`.
 **Fix:** Use `density={20}` for dark modes, `density={8-12}` for light modes. The component internally derives actual particle count from density × viewport area.
+
+## Pacing System (May 2026)
+
+### L79: useEntrance timingScale — pace-aware animations without template changes
+**Problem:** Templates hardcode animation durations. When pace shifts from analytical to urgent, animations should tighten; when breathing, they should relax. But modifying every template's animation code is impractical.
+**Solution:** `useEntrance(role, startFrame, timingScale)` accepts an optional `timingScale` (default 1.0). For hero elements, it scales spring mass (higher mass = slower spring). For all others, it scales the interpolation duration: `dur = Math.round(baseDur * ts)`. Clamped to [0.4, 2.0] to prevent absurd values. `useStaggeredEntrance` also scales the stagger gap: `scaledStagger = Math.round(staggerFrames * timingScale)`.
+**Usage:** `const entrance = useEntrance("data", 15, direction.paceTimingScale)` — existing calls without the third arg work unchanged.
+
+### L80: Beat-boundary pace reset prevents infection
+**Problem:** A `PACE: urgent` in Beat 3 could infect all of Beat 4 if the writer forgot to reset. Silent bugs — the manifest would show compressed durations in unintended segments.
+**Solution:** `generate_manifest.py` auto-resets `current_pace` to `"analytical"` at each beat header, printing a note when it resets from a non-default value. Writers only need to set pace changes, never worry about cleanup.
+
+### L81: match_narration guard for PACE multiplier
+**Problem:** When `durationMode == "match_narration"`, the visual's purpose is to match narration timing exactly. Applying a 0.7× or 1.4× multiplier would create gaps or overlaps between narration and visuals.
+**Fix:** Skip PACE multiplier when `parsed["durationMode"] != "match_narration"`. The explicit intent to match narration overrides density-based pacing.
+
+### L82: Sync anchor cascading can squeeze previous steps to zero
+**Problem:** In `useNarratedCamera`, when a sync point snaps a step's start boundary backward past the previous step's start, the previous step gets negative width — invisible but it breaks interpolation.
+**Fix:** After snapping, check if `boundaries[i-1].end <= boundaries[i-1].start` and enforce a minimum 0.5s duration, pushing the current step's start forward to compensate.

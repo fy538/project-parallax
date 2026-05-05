@@ -3,45 +3,162 @@
   "title": "The Semiconductor Supply Chain",
   "subtitle": "No country can replicate this alone",
   "points": [
-    { "name": "Japan", "coordinates": [139.69, 35.68], "label": "Photoresists", "sublabel": "70% global share", "color": "#E5A544", "labelPosition": "right" },
-    { "name": "Netherlands", "coordinates": [5.46, 51.44], "label": "ASML", "sublabel": "EUV lithography", "color": "#E5A544", "labelPosition": "above" },
-    { "name": "United States", "coordinates": [-95.71, 37.09], "label": "EDA Software", "sublabel": "Synopsys, Cadence", "color": "#3266AD", "labelPosition": "left" },
-    { "name": "Taiwan", "coordinates": [120.99, 24.78], "label": "TSMC", "sublabel": "Fabrication + packaging", "color": "#E5A544", "labelPosition": "below" },
-    { "name": "China", "coordinates": [108.0, 34.0], "label": "Rare Earths", "sublabel": "Critical minerals", "color": "#C23B22", "labelPosition": "left" },
-    { "name": "South Korea", "coordinates": [127.0, 37.55], "label": "Samsung/SK Hynix", "sublabel": "Memory chips", "color": "#E5A544", "labelPosition": "above" }
+    {
+      "name": "Japan",
+      "coordinates": [
+        139.69,
+        35.68
+      ],
+      "label": "Photoresists",
+      "sublabel": "70% global share",
+      "color": "#E5A544",
+      "labelPosition": "right"
+    },
+    {
+      "name": "Netherlands",
+      "coordinates": [
+        5.46,
+        51.44
+      ],
+      "label": "ASML",
+      "sublabel": "EUV lithography",
+      "color": "#E5A544",
+      "labelPosition": "above"
+    },
+    {
+      "name": "United States",
+      "coordinates": [
+        -95.71,
+        37.09
+      ],
+      "label": "EDA Software",
+      "sublabel": "Synopsys, Cadence",
+      "color": "#3266AD",
+      "labelPosition": "left"
+    },
+    {
+      "name": "Taiwan",
+      "coordinates": [
+        120.99,
+        24.78
+      ],
+      "label": "TSMC",
+      "sublabel": "Fabrication + packaging",
+      "color": "#E5A544",
+      "labelPosition": "below"
+    },
+    {
+      "name": "China",
+      "coordinates": [
+        108.0,
+        34.0
+      ],
+      "label": "Rare Earths",
+      "sublabel": "Critical minerals",
+      "color": "#C23B22",
+      "labelPosition": "left"
+    },
+    {
+      "name": "South Korea",
+      "coordinates": [
+        127.0,
+        37.55
+      ],
+      "label": "Samsung/SK Hynix",
+      "sublabel": "Memory chips",
+      "color": "#E5A544",
+      "labelPosition": "above"
+    }
   ],
   "segments": [
-    { "from": 2, "to": 3, "label": "Chip designs", "color": "#3266AD" },
-    { "from": 1, "to": 3, "label": "EUV machines", "color": "#E5A544" },
-    { "from": 0, "to": 3, "label": "Photoresists", "color": "#E5A544" },
-    { "from": 4, "to": 3, "label": "Rare earths", "color": "#C23B22" },
-    { "from": 3, "to": 5, "label": "Wafers", "color": "#E5A544" }
+    {
+      "from": 2,
+      "to": 3,
+      "label": "Chip designs",
+      "color": "#3266AD"
+    },
+    {
+      "from": 1,
+      "to": 3,
+      "label": "EUV machines",
+      "color": "#E5A544"
+    },
+    {
+      "from": 0,
+      "to": 3,
+      "label": "Photoresists",
+      "color": "#E5A544"
+    },
+    {
+      "from": 4,
+      "to": 3,
+      "label": "Rare earths",
+      "color": "#C23B22"
+    },
+    {
+      "from": 3,
+      "to": 5,
+      "label": "Wafers",
+      "color": "#E5A544"
+    }
   ],
   "phases": [
     {
       "title": "Design",
       "subtitle": "US → Taiwan",
       "durationSec": 4,
-      "activeSegments": [0],
-      "activePoints": [2, 3]
+      "activeSegments": [
+        0
+      ],
+      "activePoints": [
+        2,
+        3
+      ]
     },
     {
       "title": "Equipment & Materials",
       "subtitle": "Japan, Netherlands, China → Taiwan",
       "durationSec": 5,
-      "activeSegments": [0, 1, 2, 3],
-      "activePoints": [0, 1, 2, 3, 4]
+      "activeSegments": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "activePoints": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
     },
     {
       "title": "Complete Chain",
       "subtitle": "No country can replicate this alone",
       "durationSec": 5,
-      "activeSegments": [0, 1, 2, 3, 4],
-      "activePoints": [0, 1, 2, 3, 4, 5]
+      "activeSegments": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "activePoints": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
     }
   ],
   "routeColor": "#E5A544",
   "durationSec": 14,
   "backgroundVariant": "light",
-  "source": "SIA, SEMI, industry data"
+  "source": "SIA, SEMI, industry data",
+  "_direction": {
+    "paceProfile": "urgent"
+  }
 }

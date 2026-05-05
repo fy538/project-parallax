@@ -45,6 +45,8 @@ import { useDirection } from "../../hooks/useDirection";
 import { useNarratedCamera } from "../../hooks/useNarratedCamera";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
+import { SourceAttribution } from "../../components/SourceAttribution";
+import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { AmbientParticles } from "../../components/AmbientParticles";
@@ -124,6 +126,7 @@ const generateEscalationCameraPath = (
 export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   data,
 }) => {
+  checkChartDataCommon("EscalationLadder", data);
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);
@@ -526,28 +529,8 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
           }}
         />
 
-        {/* Source attribution */}
-        {data.source && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              right: layout.safeAreaTier.generous.right,
-              fontSize: fontSizes.caption,
-              color: theme.text.muted,
-              fontFamily: fonts.body,
-              opacity:
-                fadeIn(
-                  frame,
-                  ladderStart + (numRungs - 1) * rungStagger + sec(0.5),
-                  sec(0.4)
-                ) * exit,
-              textShadow: theme.textShadow,
-            }}
-          >
-            {data.source}
-          </div>
-        )}
+        {/* Source attribution — shared component for consistent placement. */}
+        <SourceAttribution source={data.source} mode={data.backgroundVariant || "light"} prefix="Source: " />
       </AbsoluteFill>
     </Background>
   );

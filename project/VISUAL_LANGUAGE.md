@@ -8,6 +8,7 @@ The core insight: viewers process footage and motion graphics differently. Foota
 
 Created: April 26, 2026
 Updated: May 3, 2026 — Added Three-Register Visual System, transition grammar, faceless figure convention
+Updated: May 4, 2026 — Unified Registers 2 and 3 under constructivist aesthetic; replaced photoreal mannequin convention with constructivist-figurative approach. Added realism-dosage sub-mode and per-scene typography-tradition parameter.
 
 ---
 
@@ -27,77 +28,95 @@ Before deciding *which visual mode* to use (footage, MG, layered, AI-GEN), under
 
 **Texture:** No grain, no vignette. Clean surfaces. This is deliberate — the absence of film texture signals "designed information" as distinct from "observed world."
 
-### Register 2: Atmospheric (Constructivist Illustrations)
+### Register 2: Atmospheric (Constructivist Backdrop)
 
-**Aesthetic:** Soviet constructivist meets psychedelic art deco. Dystopian, trippy, propaganda-poster energy. Flowing organic forms (smoke, cables, ribbons) meet brutal industrial geometry (factories, towers, pipes). Warm palette: deep umber, burnt amber, rust, bone. Bold compositional confidence.
+**Aesthetic:** Constructivist illustration in the Parallax house style. Soviet constructivism meets Bauhaus geometry meets art deco propaganda poster — drawing on Alexander Rodchenko, El Lissitzky, John Heartfield, and Frans Masereel's industrial woodcuts. Flowing organic forms (smoke, cables, ribbons) meet brutal industrial geometry (factories, towers, pipes). Bold compositional confidence, monumentalist scale, color-blocked forms with no soft shading or gradients. Restricted warm palette per palette.json — ink, walnut, umber, gold, rust, bone on paper background.
 
-**Narrative function:** Feeling. "This is what the system feels like from inside." These visuals carry the emotional weight of the subject — industrial power, technological dependency, civilizational stakes, systemic threat. They don't communicate data; they communicate dread, ambition, scale, and entrapment.
+**Narrative function:** Feeling. "This is what the system feels like from inside." These visuals carry the emotional weight of the subject — industrial power, technological dependency, civilizational stakes, systemic threat. They don't communicate data; they communicate dread, ambition, scale, and entrapment. The subject is *systems and forces*, not specific people.
 
-**Sources:** Recraft V3 API (`tools/recraft/recraft.py`) with the constructivist style prefix. Generated as static SVG or PNG, then treated.
+**Sources:** Recraft V3 API (`tools/recraft/recraft.py --register atmospheric`) with the unified constructivist preamble. Generated as PNG or SVG, then treated.
 
-**Treatment:** Brand duotone ramp via `treat.py` or the `--treat` flag in `recraft.py`. Three ramps map to narrative tone:
+**Treatment:** Brand duotone ramp via `treat.py` or the `--treat` flag in `recraft.py`. Two ramps are valid for atmospheric (per VIS-10):
 - `standard` (ink → bronze → amber): default warmth, industrial ambition
-- `conflict` (ink → oxblood → rust): threat, tension, antagonism
-- `editorial` (dark bone → light bone): neutral analysis, breathing room
+- `conflict` (ink → oxblood → rust): rare, max 1-2 per episode — high-tension constructivist
+- `editorial`: ✗ FORBIDDEN — desaturates the constructivist palette into mush
 
-Plus grain overlay (0.10-0.12 intensity) and vignette (0.18 strength). The grain is the crucial connector — it gives illustrations the same film-like texture as treated photographs, making them feel like they belong in the same documentary rather than being imported from a different medium.
+Plus grain overlay (0.10-0.12 intensity) and vignette (0.18 strength). The grain connects atmospheric backgrounds to grounded scenes (which share the same texture treatment) and to treated photography.
 
-**In Remotion:** Rendered through ImageComposite (background variant with Ken Burns drift) or PhotoMontage (rapid sequence). The existing duotone SVG filter, KenBurns component, and composition animation pipeline handle these natively. At 30-40% opacity as backgrounds, they replace generic stock footage wallpaper with something visually distinctive and brand-ownable.
+**In Remotion:** Rendered through ImageComposite (background variant with Ken Burns drift) or PhotoMontage (rapid sequence). At 30-40% opacity as backgrounds, they replace generic stock footage wallpaper with something visually distinctive and brand-ownable.
 
-### Register 3: Grounding (Photorealistic AI Scenes)
+### Register 3: Grounding (Constructivist Figurative)
 
-**Aesthetic:** Photorealistic environments and figures with deliberately featureless faces — smooth skin where eyes/nose/mouth would be, hair and body fully rendered. The uncanny valley is the point. These images read as "editorial reconstruction" — clearly not real footage, but immersive enough to create spatial presence. Think mannequins in real rooms.
+**Aesthetic:** The same constructivist illustration vocabulary as Register 2 — Rodchenko, Heartfield, Masereel — but applied to *figurative* subjects: people in environments, scenes with humans navigating systems, situated moments. Figures rendered with simplified planar features (geometric facets suggesting facial structure, eyes obscured by lens shadow or hat brim or visor reflection, no realistic detail). Bodies and clothing rendered with constructivist-graphic clarity. Environments range from monumentalist (industrial, propaganda-poster) to intimate (domestic, eye-level) depending on the realism dosage chosen for the scene.
 
-**Narrative function:** Presence. "There are humans in this system." The faceless figures serve a specific editorial purpose: they depersonalize to universalize. A real person's face invites identification with an individual. A faceless figure invites pattern recognition — "this is The Executive, The Regulator, The Engineer, The Soldier." For geopolitics content about systemic actors rather than individual characters, facelessness is the right editorial choice.
+This replaces the prior photoreal mannequin convention. The depersonalization is now *editorial through stylization* rather than uncanny through smoothing. Same three editorial purposes — honesty signal, depersonalization (role-not-person), AI-face quality safeguard — solved through reduction-to-graphic-form rather than smooth-mannequin-face.
 
-**Sources:** Recraft V3 API (realistic_image style) for stills. For animated clips: Recraft generates reference frame → Kling 3.0 / Sora 2 animates → `treat_video.py` applies brand LUT. See AI_VIDEO_PIPELINE.md.
+**Narrative function:** Presence. "There are humans in this system." The simplified planar figures serve the same depersonalization purpose as the prior mannequin convention: they invite pattern recognition rather than identification with individuals. "This is The Engineer, The Diplomat, The Worker, The Operator." For geopolitics content about systemic actors rather than individual characters, this is the right editorial choice.
 
-**Treatment:** Full 4-step brand pipeline via `treat.py` (stills) or `treat_video.py` + LUT (video clips):
-1. Desaturate (20-30% saturation retained)
-2. Duotone remap through brand ramp
-3. Grain + vignette overlay
-4. Composite at specified opacity
+**Sources:** Recraft V3 API (`tools/recraft/recraft.py --register grounding`) with the unified constructivist preamble. For animated clips: Recraft generates reference frame → Kling 3.0 / Sora 2 animates the constructivist illustration → `treat_video.py` applies brand LUT. See AI_VIDEO_PIPELINE.md.
 
-After treatment, these images share the same tonal DNA as the constructivist illustrations. A rust-tinted military command room and a rust-tinted factory illustration feel like the same editorial eye, even though their source styles are completely different.
+**Realism dosage:** Grounding scenes have a per-scene realism parameter (`realism: flat | balanced | grounded`). Critically, the dosage controls *environment* realism only — figures stay fully flat-constructivist (4-5 color-blocked face planes drawing on Rodchenko's 1924 portrait series and Lissitzky's Self-Portrait, no continuous skin tonality, no rendered features) regardless of dosage. Only the environment varies.
 
-**In Remotion:** Rendered through ImageComposite (all variants — background, inset, portrait) with the existing BrandImage pipeline handling the duotone filter. The `portrait` variant with its name strip is purpose-built for the faceless figure convention: show the figure, label the archetype.
+- `flat` — both figure AND environment fully color-blocked, no photographic texture anywhere. **Required for animated AI-GEN clips** because animation stability needs maximum flatness; color-blocked forms track reliably across frames whereas photographic textures drift. Best for monumentalist industrial scenes, propaganda-poster moments, and any clip that will be animated by Kling / Sora / Runway.
+- `balanced` (default for stills) — figure stays flat-constructivist; environment may have selective material texture (paper grain, light gradients, wood grain on furniture, dust haze in industrial spaces). The figure is never photoreal; the environment may approach photographic detail at the edges.
+- `grounded` — figure remains constructivist (no skin tonality, no rendered features) but with slightly more anatomical specificity; environment rendered with photographic spatial detail. **Stills only** — animation drift is severe at this dosage. Best for restricted-facility reconstructions that get Ken-Burned, never animated.
 
-### Why Three Registers Work Together
+The dosage is an editorial knob the script uses to control how *interpreted* a scene feels and — equally important — whether the asset can be safely animated. Quiet domestic stills often want `balanced` (intimate environment, flat figure). Industrial mobilization clips that will be animated must use `flat`. Restricted-facility reconstruction stills can use `grounded` for spatial presence. The May 4 v1 Beijing-apartment reference produced an under-stylized face at `balanced`; v2 references should validate the tightened figure spec.
 
-The coherence model is **color and motion, not style matching.** This is the principle behind every successful mixed-media video essay (Vox, Adam Curtis, Johnny Harris): wildly different source materials feel unified when they share:
+**Typography tradition:** Grounding scenes typically include period-and-region-appropriate typography per the `text_treatment` field — Chinese propaganda poster typography for Chinese-coded scenes, Russian Constructivist for Soviet-bloc scenes, English Modernist for American mid-century scenes, etc. See TYPOGRAPHY_TRADITIONS.md for the full vocabulary. The typography is part of the analytical content, not decoration — rendering each civilization in its own visual rhetoric is core to Parallax's cross-cultural decoder posture.
 
-1. **A locked color palette.** All three registers pass through the same duotone ramps from `palette.json`. An amber DataChart accent, an amber-tinted factory illustration, and an amber-graded cleanroom scene share tonal DNA even though their styles diverge completely.
+**Treatment:** Same brand pipeline as Register 2 (duotone ramp + grain + vignette). All three treatment ramps are valid for grounding (per VIS-10):
+- `standard` — present-day reconstruction (default for fab interiors, command centers, contemporary scenes)
+- `conflict` — adversarial scene (military, sanctions, contested moments)
+- `editorial` — historical reconstruction (pre-1980s — embargo signings, Cold War, archival feel)
 
-2. **A consistent motion rhythm.** The transition library in FullEpisode.tsx provides the motion language. The same iris, dissolve, and color-wash transitions connect all three registers. Viewers recognize timing and rhythm unconsciously — they don't register style switches when the motion grammar stays consistent.
+**In Remotion:** Rendered through ImageComposite with the existing BrandImage pipeline. The `portrait` variant with name strip remains purpose-built for the depersonalized-figure convention: show the figure, label the archetype.
 
-3. **A deliberate texture hierarchy.** Registers 2 and 3 get grain + vignette treatment. Register 1 does not. This creates a visual hierarchy that viewers learn intuitively: *grainy = the world* (emotional, spatial, atmospheric), *clean = the analysis* (data, structure, argument). The texture difference becomes a signal — when grain appears, the viewer's brain shifts from processing information to experiencing a space.
+### Why Two Constructivist Registers + One Analytical Register Work Together
 
-4. **Visual heterogeneity as editorial posture.** Mixing registers isn't a weakness — it signals intellectual honesty. "This topic is complex enough to require multiple ways of seeing." The analytical register says "here's the data." The grounding register says "here are the humans affected." The atmospheric register says "here's what the system feels like." Each carries a different kind of truth.
+The visual system collapses to two languages: code-clean Remotion (Analytical) and constructivist illustration (everything else). The earlier three-aesthetic system (Analytical / Atmospheric / Photoreal-Grounding) had a structural seam — photoreal scenes carried different DNA than illustrated ones, and unifying them required heavy LUT work. The unified constructivist approach removes that seam entirely. Atmospheric and grounding now differ only in *role* (background-mood vs. foreground-scene), not in *visual language*.
+
+The coherence model:
+
+1. **A locked color palette.** All three registers pass through the same duotone ramps from `palette.json`. An amber DataChart accent, an amber-tinted constructivist factory background, and a constructivist Beijing apartment scene share tonal DNA. This is unchanged.
+
+2. **A unified illustrated grammar.** Registers 2 and 3 now share the same visual vocabulary — Rodchenko/Heartfield/Masereel constructivism — and differ only in subject and role. This dramatically simplifies the brand-coherence work compared to the prior system. There's no longer a stylistic gap between an atmospheric backdrop and a grounded scene; they're the same aesthetic at different scales.
+
+3. **A consistent motion rhythm.** The transition library in FullEpisode.tsx provides the motion language. The same iris, dissolve, and color-wash transitions connect all three registers. Viewers recognize timing and rhythm unconsciously.
+
+4. **A deliberate texture hierarchy.** Registers 2 and 3 get grain + vignette treatment. Register 1 does not. This creates a visual hierarchy: *grainy = the world* (illustrated, emotional, spatial), *clean = the analysis* (data, structure, argument). The texture difference becomes a signal.
+
+5. **Typography as analytical content.** Per-scene typography traditions (Chinese, Russian, English Modernist, Japanese Showa) make the visual rhetoric of each civilization part of the channel's cross-cultural argument. The typography choice IS analysis. See TYPOGRAPHY_TRADITIONS.md.
+
+6. **Editorial posture: decoder, not explainer.** Mixing registers (and typographic traditions within them) signals intellectual honesty. "This topic requires multiple ways of seeing — and the visual rhetoric of each civilization is part of how we read it." Each carries a different kind of truth.
 
 ### Transition Grammar Between Registers
 
 Use these transition types consistently across every episode. Viewers learn the motion vocabulary even if they can't name it.
 
-| Transition | From → To | Feeling |
-|---|---|---|
-| **color-wash** (amber or rust) | Analytical → Grounding | The data dissolves into the world it describes |
-| **color-wash** (amber or rust) | Grounding → Analytical | The world crystallizes into a pattern |
-| **blur-through** | Grounding → Atmospheric | Reality abstracts into feeling |
-| **dissolve** | Atmospheric → Grounding | The feeling condenses into a specific place |
-| **iris** | Atmospheric → Analytical | The emotional zooms into the precise |
-| **cut** or **wipe** | Analytical → Analytical | Between data points (no register shift) |
-| **fade** | Any → Any | Beat boundaries, section transitions |
+**Channel signature transitions (codified in BRAND.md → "Cross-Register Transition Signatures"):**
+
+| Direction | Signature transition | Duration | Feeling |
+|---|---|---|---|
+| **Analytical → Grounding/Atmospheric** | Amber color-wash with grain-fade-in | 600-800ms | The clean data dissolves into the warm illustrated world it describes; grain ramps in over the second half, signaling texture register shift |
+| **Grounding/Atmospheric → Analytical** | Dissolve with grain-fade-out and ink iris-in | 500-700ms | The illustrated world crystallizes into the precise pattern; grain fades out, ink iris contracts to reveal clean Remotion content |
+| **Grounding ↔ Atmospheric** | Cross-dissolve | 300-500ms | Same constructivist visual language, different role (foreground figurative ↔ background mood); soft transition appropriate |
+| **Within Analytical** | Cut (or wipe at register-defined corner) | 1 frame cut, 200-300ms wipe | Same texture register, no bridge needed |
+| **Beat boundaries** | Fade through bone or ink (mode-dependent) | 400-600ms | Episode structure transitions, not register transitions |
 
 Rules:
-- Never hard-cut between Register 2 (atmospheric) and Register 1 (analytical). The style gap is too large without a transitional bridge. Always use color-wash, iris, or blur-through.
-- Hard cuts between Register 3 (grounding) and Register 1 (analytical) are acceptable when the footage is at low opacity (background mode). The cut works because the footage is serving as texture, not carrying narrative weight.
-- Register 2 should never appear more than twice per beat. Its visual intensity is a spice, not a main course.
+- **Never hard-cut across registers.** The texture/style gap between clean Remotion (Register 1) and grain-textured constructivist (Registers 2/3) is large enough that hard cuts feel jarring. Always use the signature transition for that direction — color-wash going down to grain, dissolve+iris coming back up. render-qa flags any cross-register hard-cut as a likely error.
+- **Hard cuts *within* the constructivist registers are valid.** Grounding ↔ Grounding, Atmospheric ↔ Atmospheric, and Grounding ↔ Atmospheric all share visual language post-May 4 unification. This is a meaningful change from the prior system, where photoreal-grounding to constructivist-atmospheric required a transition.
+- **Register 2 in foreground appears max twice per beat.** As background at 30-40% opacity it can appear longer, but visual intensity in the foreground is a spice, not a main course.
+- **Per-episode signature override:** an episode's `visual-identity.json` may override the default signatures (e.g., conflict-treatment episodes use rust color-wash instead of amber). Defaults defined in BRAND.md; per-episode overrides documented in the visual identity card.
 
-### The Faceless Figure Convention
+### The Depersonalized Figure Convention
 
-When depicting systemic actors (not named individuals), use photorealistic AI-generated figures with deliberately blank/smooth faces. This is an editorial choice, not a technical limitation.
+When depicting systemic actors (not named individuals), use constructivist-figurative figures with simplified planar faces — geometric facets suggesting facial structure, eyes obscured by lens shadow or hat brim or visor reflection, no realistic detail. This replaces the prior photoreal mannequin convention; the editorial purpose is identical, but the depersonalization happens through *graphic stylization* rather than uncanny smoothing.
 
-**When to use faceless figures:**
+The shift from mannequin to constructivist-figurative was made May 4, 2026, before any episode shipped. The mannequin convention had become a genre marker for AI-geopolitics-explainer channels broadly; constructivist-figurative is differentiated, brand-coherent (matches Register 2's atmospheric vocabulary), and editorially intentional rather than uncanny-by-default.
+
+**When to use depersonalized figures:**
 - Generic decision-makers, executives, diplomats, military personnel
 - Workers in facilities (cleanrooms, factories, data centers)
 - Crowds, populations, anonymous actors in systems
@@ -107,7 +126,9 @@ When depicting systemic actors (not named individuals), use photorealistic AI-ge
 - The narrator / host (use real footage)
 - When a real person's identity is the point of the narration
 
-**Labeling convention:** When a faceless figure represents a category, use the ImageComposite portrait variant with a name strip labeling the archetype: "The Regulator," "The Engineer," "The Executive." This turns the facelessness from a deficit into a deliberate editorial device — the viewer understands they're seeing a role, not a person.
+**Labeling convention:** When a depersonalized figure represents a category, use the ImageComposite portrait variant with a name strip labeling the archetype: "The Regulator," "The Engineer," "The Executive." This turns the stylization from a deficit into a deliberate editorial device — the viewer understands they're seeing a role, not a person.
+
+**Realism dosage interacts with this convention.** A `flat` rendering produces the most graphically depersonalized figure (image-4-style). A `grounded` rendering preserves the planar facets but adds spatial realism. A `balanced` rendering (default) sits between. Pick the dosage that serves the moment; the depersonalization signal holds across all three.
 
 ---
 
@@ -170,13 +191,13 @@ When depicting systemic actors (not named individuals), use photorealistic AI-ge
 
 ### Mode 4: AI-Generated Video
 
-**What the viewer experiences:** Immersion in an inaccessible space. The brain processes these sequences as "this place is real, but I couldn't normally see it" — a visualization that's more concrete than a motion graphic but more honest than stock footage pretending to be something it isn't. The deliberately stylized (mannequin) faces signal editorial illustration, not documentary evidence.
+**What the viewer experiences:** Immersion in an inaccessible space. The brain processes these sequences as "this place is interpreted but spatially real" — a visualization that's more concrete than a motion graphic but more honest than stock footage pretending to be something it isn't. The constructivist illustration vocabulary (planar-faceted figures, restricted palette, color-blocked forms) signals editorial illustration, not documentary evidence.
 
 **When to use it:**
 
 - **Unsourceable interiors.** When the narration describes a specific facility or space that no stock library covers — TSMC cleanrooms, military command centers, classified research labs. Generic cleanroom stock exists, but AI-GEN can show an *advanced node* fab with contextually accurate equipment.
 - **Historical reconstructions.** Pre-camera events or moments where no footage survives. The 1941 embargo signing, Deng Xiaoping's 1992 Shenzhen visit, closed-door Cold War negotiations. The editorial LUT treatment signals "reconstruction."
-- **Conceptual spaces.** When an abstract idea benefits from being made physical — supply chains as corridors, sanctions as sealed doors, bifurcation as a literally splitting path. More immersive than MG, but the surreal situation + mannequin faces prevent it from being mistaken for reality.
+- **Conceptual spaces.** When an abstract idea benefits from being made physical — supply chains as corridors, sanctions as sealed doors, bifurcation as a literally splitting path. More immersive than MG, but the constructivist illustration vocabulary (planar-faceted figures, restricted palette) prevents it from being mistaken for reality.
 - **Scenario sequences.** "What if" futures and counterfactuals that footage can't capture because they haven't happened. A next-gen facility powering up, an imagined disruption scenario.
 
 **When NOT to use it:**

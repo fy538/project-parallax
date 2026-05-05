@@ -16,5 +16,8 @@
   "rightGroupColor": "#C23B22",
   "contextNote": "Every extra pass is another chance for a defect",
   "durationSec": 8,
-  "backgroundVariant": "light"
+  "backgroundVariant": "light",
+  "_direction": {
+    "paceProfile": "breathing"
+  }
 }

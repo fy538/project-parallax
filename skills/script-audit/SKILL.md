@@ -190,6 +190,13 @@ Beat 3: [F 25s] [F 15s] [F 10s]  ⚠️ 50s footage without MG — analysis feel
 Beat 4: [MG:Chart 8s] [AI-GEN 7s] [ILLUST 5s] [MG:FW 10s]  ✅ register variety
 ```
 
+**Visual density annotations (`PACE:`) check.** If the script uses `PACE:` annotations, verify:
+- Total PACE changes are 2-4 per episode (more than 4 fragments the rhythm rather than shaping it)
+- `PACE: breathing` appears on at least one emotional peak or philosophical pause (if the script has these moments but no breathing pace, flag as a missed opportunity)
+- `PACE: urgent` is only used on genuine tension sequences, not routine analytical sections
+- PACE changes align with narrative structure (e.g., breathing at act breaks, urgent during crisis escalation) rather than being randomly scattered
+- If no PACE annotations exist, note this as informational — they're optional but recommended for scripts with clear tempo shifts
+
 ### Lens 7: Decoder Posture Check
 
 This lens operationalizes the narrative rules NAR-09 through NAR-16 from the Editorial Playbook. The core question: **is this script interesting, bold, and intellectually honest?** Note: "decoder" posture is about *engagement quality*, not about avoiding all context or hedging every claim. Context that creates wonder is good. Strong positions defended with evidence are good. The enemy is boring, not bold.

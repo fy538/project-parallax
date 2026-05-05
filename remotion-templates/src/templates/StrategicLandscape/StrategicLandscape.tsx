@@ -54,13 +54,13 @@ const BUBBLE_RADIUS_BASE = 48;
 const AXIS_LINE_WIDTH = 1.5;
 const PLOT_PADDING = 120; // Padding around plot area for labels
 
-// Default actor color cycle (4 colors)
-const DEFAULT_ACTOR_COLORS = [
-  semantic.us,      // #3266AD
-  semantic.china,   // #C23B22
-  palette.amber,    // #E5A544
-  semantic.success, // #5DAA68
-];
+// Default actor color cycle — delegates to the shared categorical
+// sequence in theme.ts. The local array previously had a bug:
+// semantic.success is a legacy alias for semantic.us, so the cycle had
+// two blue entries. The shared sequence (us → china → gold → umber →
+// walnut → taupe) is genuinely distinct and reusable across templates.
+import { categorical } from "../../design/theme";
+const DEFAULT_ACTOR_COLORS = categorical;
 
 // ── Helper: detect Chinese text ─────────────────────────────────────────────
 

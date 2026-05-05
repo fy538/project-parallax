@@ -40,6 +40,8 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
+import { SourceAttribution } from "../../components/SourceAttribution";
+import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -85,6 +87,7 @@ const lerpValues = (from: number[], to: number[], t: number): number[] =>
 // ── Main component ───────────────────────────────────────────────────────────
 
 export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
+  checkChartDataCommon("RadarChart", data);
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);
@@ -609,23 +612,8 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
         />
       )}
 
-      {/* Source attribution */}
-      {data.source && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom,
-            right: layout.safeAreaTier.generous.right,
-            fontSize: fontSizes.caption,
-            color: theme.text.muted,
-            fontFamily: fonts.body,
-            opacity: legendOpacity,
-            textShadow: theme.textShadow,
-          }}
-        >
-          {data.source}
-        </div>
-      )}
+      {/* Source attribution — shared component for consistent placement. */}
+      <SourceAttribution source={data.source} mode={data.backgroundVariant || "light"} prefix="Source: " />
     </AbsoluteFill>
     </Background>
   );

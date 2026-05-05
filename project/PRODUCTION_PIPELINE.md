@@ -552,9 +552,11 @@ Maintain three planning horizons:
 - **Two-column production script** — SCRIPT_FORMAT.md
 - Narration (left) + visual production specs with mode tags (right): `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`
 - **DIR: annotations** — inline directing language (`cam()`, `reveal()`, `hold()`, `cut()`, `mood()`) embedded in the visual column for P1/P2 moments. Spec: DIRECTING_LANGUAGE.md. Target density: ~25% of compositions directed, ~20-35 DIR: lines per episode
+- **PACE: annotations** — visual density markers (`urgent`/`analytical`/`breathing`) controlling visual change rate via duration multipliers (0.7/1.0/1.4). 2-4 per episode. Spec: PACING_SYSTEM.md
 - Visual mode balance targets: MG 40-55%, FOOTAGE 30-40%, LAYERED 5-15%, AI-GEN/ILLUST as needed
 - Editorial guides: VISUAL_LANGUAGE.md (when to use each mode) + FOOTAGE_SOURCING.md (what's actually available)
-- **Direction pipeline**: script-draft emits DIR: → visual-spec parses to `_direction` JSON → audio-spec reads for SFX/music decisions → generate_manifest.py consumes hold/cut/sync timing
+- **Direction pipeline**: script-draft emits DIR: + PACE: → visual-spec parses DIR: to `_direction` JSON (proportional camera paths) → audio-spec reads DIR: + PACE: for SFX/music decisions → generate_manifest.py consumes hold/cut/sync timing + PACE multipliers + Whisper sync resolution
+- **Pacing system** (PACING_SYSTEM.md): proportional camera paths (rhythm fractions auto-detected in useNarratedCamera), Whisper sync loop (post-recording syncWord→syncPoint resolution), PACE multipliers applied to estimated visual durations
 - Machine-readable shot list (JSON) for asset sourcing
 
 ### Audio

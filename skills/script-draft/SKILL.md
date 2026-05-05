@@ -205,6 +205,8 @@ DIR: hold(until:"but")                                        # hold this visual
 
 **Direction density target:** For a 12-14 minute episode with ~50 visual segments, aim for ~20-35 total `DIR:` lines across ~8-12 segments. That means ~75% of segments use template defaults. If you're writing more than 4 `DIR:` lines on one composition, simplify.
 
+**Visual density annotations (`PACE:`).** Use `PACE:` lines to mark structural pacing shifts. Three profiles: `urgent` (0.7× — fast cuts for crisis/tension), `analytical` (1.0× — default), `breathing` (1.4× — extended holds for emotional peaks). Place on its own row (empty narration column). Aim for 2-4 PACE changes per episode — these mark act-level shifts, not per-shot decisions. Pairs naturally with `DIR:` direction: `PACE: breathing` + `DIR: hold(land)` + `DIR: mood(dense)` creates maximum "let it sink in" effect. See SCRIPT_FORMAT.md "Visual density annotations" for full spec.
+
 **Register transition direction.** When switching between visual registers, use `cut()` to specify the transition type from the register grammar:
 - Analytical → Grounding: `cut(color-wash, ink)`
 - Grounding → Atmospheric: `cut(blur-through)`
@@ -359,6 +361,9 @@ Run through this checklist before handing the script to Tiger:
 - [ ] All `sync:"word"` targets appear in the corresponding narration text
 - [ ] Direction density: ~20-35 DIR: lines across ~8-12 of ~50 segments (~75% use defaults)
 - [ ] Direction summary table filled in
+- [ ] PACE: annotations placed at 2-4 structural pacing shifts (not per-shot)
+- [ ] `PACE: breathing` used on emotional peaks / philosophical pauses
+- [ ] `PACE: urgent` used on crisis escalation / rapid-fire evidence sections
 
 **Format:**
 - [ ] Two-column table format with NARRATION and VISUAL PRODUCTION headers

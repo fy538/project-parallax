@@ -1,0 +1,185 @@
+/**
+ * Catalog — Scenarios category.
+ *
+ * DecisionTree × 1 (branching scenario)
+ * GameBoard × 2 (chess, payoff-matrix)
+ * BifurcationRoute × 1 (network split)
+ */
+
+import { Composition } from "remotion";
+import { DecisionTree } from "../templates/DecisionTree/DecisionTree";
+import { DecisionTreeSchema } from "../templates/DecisionTree/schema";
+import type { DecisionTreeData } from "../templates/DecisionTree/types";
+import { GameBoard } from "../templates/GameBoard/GameBoard";
+import { GameBoardSchema } from "../templates/GameBoard/schema";
+import type { GameBoardData } from "../templates/GameBoard/types";
+import { BifurcationRoute } from "../templates/BifurcationRoute/BifurcationRoute";
+import type { BifurcationRouteData } from "../templates/BifurcationRoute/types";
+import { layout, sec } from "../design/theme";
+import { CATALOG_EPISODE, catalogId } from "./helpers";
+
+// ─── DecisionTree × 1 ─────────────────────────────────────────────────────
+
+const treeChessOpening: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "The Italian Opening",
+  subtitle: "How a 16th-century chess opening branches",
+  nodes: [
+    { id: "root", label: "1. e4 e5 2. Nf3 Nc6 3. Bc4", probability: "100%", children: ["italian", "evans", "two-knights"] },
+    { id: "italian", label: "Bc5 — Giuoco Piano", probability: "Quiet game", color: "#3266AD", children: ["italian-classic", "italian-modern"] },
+    { id: "evans", label: "Bc5 4. b4 — Evans Gambit", probability: "Sharp", color: "#C23B22", children: [] },
+    { id: "two-knights", label: "Nf6 — Two Knights", probability: "Tactical", color: "#E5A544", children: [] },
+    { id: "italian-classic", label: "Classical c3+d3", probability: "Mainline" },
+    { id: "italian-modern", label: "Modern d3 setup", probability: "Modern", highlighted: true },
+  ],
+  rootId: "root",
+  highlightedPath: ["root", "italian", "italian-modern"],
+  highlightColor: "#5DAA68",
+  source: "ECO opening encyclopedia",
+  durationSec: 12,
+};
+
+// ─── GameBoard × 2 ────────────────────────────────────────────────────────
+
+const gameChess: GameBoardData = {
+  episode: CATALOG_EPISODE,
+  title: "An Endgame Study",
+  subtitle: "Réti's 1921 study — the king reaches both targets",
+  variant: "chess",
+  boardSize: 8,
+  initialPieces: [
+    { position: [7, 7], label: "wK", color: "#1C1814" },
+    { position: [0, 5], label: "wP", color: "#1C1814" },
+    { position: [0, 0], label: "bK", color: "#C23B22" },
+    { position: [7, 1], label: "bP", color: "#C23B22" },
+  ],
+  phases: [
+    { label: "1. Kg7", durationSec: 2.5,
+      pieces: [{ position: [6, 6], label: "wK", color: "#1C1814" }] },
+    { label: "2. Kf6 — diagonal pursuit", durationSec: 2.5,
+      pieces: [{ position: [5, 5], label: "wK", color: "#1C1814" }] },
+    { label: "3. Ke5 — both queens reachable", durationSec: 3,
+      pieces: [{ position: [4, 4], label: "wK", color: "#1C1814" }] },
+  ],
+  source: "Richard Réti, 1921",
+  durationSec: 10,
+};
+
+const gamePayoff: GameBoardData = {
+  episode: CATALOG_EPISODE,
+  title: "Stag Hunt",
+  subtitle: "Two hunters, two strategies, four outcomes",
+  variant: "payoff-matrix",
+  rowPlayer: "Hunter A",
+  colPlayer: "Hunter B",
+  rowOptions: ["Stag", "Hare"],
+  colOptions: ["Stag", "Hare"],
+  cells: [
+    { row: 0, col: 0, value: "4, 4", highlight: true, color: "#5DAA68" },
+    { row: 0, col: 1, value: "0, 3" },
+    { row: 1, col: 0, value: "3, 0" },
+    { row: 1, col: 1, value: "3, 3", highlight: true, color: "#E5A544" },
+  ],
+  phases: [
+    { label: "Two equilibria", sublabel: "Both Stag (best) and both Hare (safe) are stable",
+      durationSec: 5, highlights: [0, 3] },
+  ],
+  source: "Rousseau / Skyrms, illustrative",
+  durationSec: 9,
+};
+
+// ─── BifurcationRoute × 1 ─────────────────────────────────────────────────
+
+const bifurcationLatin: BifurcationRouteData = {
+  episode: CATALOG_EPISODE,
+  title: "When Latin Forked",
+  subtitle: "One language splits into the Romance family",
+  nodes: [
+    { id: "latin", label: "Vulgar Latin", x: 50, y: 15, network: "unified" },
+    { id: "ibero", label: "Iberian", x: 20, y: 40, network: "networkA" },
+    { id: "italo", label: "Italo", x: 50, y: 40, network: "networkA" },
+    { id: "gallo", label: "Gallo", x: 80, y: 40, network: "networkB" },
+    { id: "spanish", label: "Spanish", x: 10, y: 75, network: "networkA" },
+    { id: "portuguese", label: "Portuguese", x: 30, y: 75, network: "networkA" },
+    { id: "italian", label: "Italian", x: 50, y: 75, network: "networkA" },
+    { id: "french", label: "French", x: 75, y: 75, network: "networkB" },
+    { id: "occitan", label: "Occitan", x: 88, y: 75, network: "networkB" },
+  ],
+  links: [
+    { from: "latin", to: "ibero", phase: "unified" },
+    { from: "latin", to: "italo", phase: "unified" },
+    { from: "latin", to: "gallo", phase: "unified" },
+    { from: "ibero", to: "spanish", phase: "split", network: "networkA" },
+    { from: "ibero", to: "portuguese", phase: "split", network: "networkA" },
+    { from: "italo", to: "italian", phase: "split", network: "networkA" },
+    { from: "gallo", to: "french", phase: "split", network: "networkB" },
+    { from: "gallo", to: "occitan", phase: "split", network: "networkB" },
+  ],
+  forkNodeId: "latin",
+  networkALabel: "Southern Branch",
+  networkBLabel: "Northern Branch",
+  source: "Standard Romance philology",
+};
+
+// ─── Composition registrations ────────────────────────────────────────────
+
+export const CatalogTreeChess = () => (
+  <Composition
+    id={catalogId("DecisionTree", "chess-opening")}
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 12),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treeChessOpening }}
+  />
+);
+
+export const CatalogGameChess = () => (
+  <Composition
+    id={catalogId("GameBoard", "chess-endgame")}
+    component={GameBoard}
+    schema={GameBoardSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as GameBoardData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: gameChess }}
+  />
+);
+
+export const CatalogGamePayoff = () => (
+  <Composition
+    id={catalogId("GameBoard", "stag-hunt")}
+    component={GameBoard}
+    schema={GameBoardSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as GameBoardData).durationSec || 9),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: gamePayoff }}
+  />
+);
+
+export const CatalogBifurcationLatin = () => (
+  <Composition
+    id={catalogId("BifurcationRoute", "latin-romance")}
+    component={BifurcationRoute}
+    durationInFrames={sec(12)}
+    fps={layout.fps}
+    width={layout.width}
+    height={layout.height}
+    defaultProps={{ data: bifurcationLatin }}
+  />
+);
+
+export const catalogScenariosData = {
+  treeChessOpening, gameChess, gamePayoff, bifurcationLatin,
+};

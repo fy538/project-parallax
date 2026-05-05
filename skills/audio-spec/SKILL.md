@@ -52,6 +52,7 @@ Read the full script. Identify:
 - **Register transitions** — `DIR: cut()` annotations that specify transition type. These are the most reliable audio cue triggers: `cut(color-wash)` = register shift (dramatic audio moment), `cut(iris)` = focal reveal, `cut(blur-through)` = atmospheric softening.
 - **Mood shifts** — `DIR: mood()` changes within or between beats. A shift from `mood(subtle)` to `mood(dense)` signals the music bed should intensify.
 - **The thesis moment** — the single most important argument beat (candidate for dramatic intensity + deliberate silence before it). Often marked with `DIR: hold(land)` or a `DIR: mood(dense, dim:0.5)`.
+- **`PACE:` annotations** — visual density markers that also inform audio decisions. `PACE: urgent` sections pair with faster music tempo and denser SFX; `PACE: breathing` sections pair with sustained pads, reduced SFX, and silence moments. Note PACE changes in the beat map — they signal structural tempo shifts that the music bed should reinforce.
 
 Output a beat map:
 

@@ -9,6 +9,7 @@ Created: May 3, 2026
 **Related docs:**
 - **SCRIPT_FORMAT.md** — The two-column format this extends (direction goes in the right column)
 - **VISUAL_LANGUAGE.md** — Editorial logic for *when* to use each register and transition type
+- **PACING_SYSTEM.md** — The companion pacing system (`PACE:` annotations, proportional camera paths, Whisper sync)
 - **remotion-templates/references/template-schemas.md** — JSON field reference that direction maps to
 
 ---
@@ -702,6 +703,8 @@ Once the vocabulary is proven through manual use, update the script-draft skill 
 
 5. **Human narration is the clock.** All timing is approximate until recording. The system is designed to snap to real audio timing via Whisper timestamps. Write direction for editorial intent, not frame accuracy.
 
-6. **One camera system, one syntax.** The script writer doesn't need to know whether `cam()` becomes a Mapbox viewport state or a useNarratedCamera path. Visual-spec handles the translation based on template type.
+6. **Rhythm over clock.** Camera path durations are proportional fractions (0.4 = 40% of segment time), not absolute seconds. The script author thinks in rhythm — "spend 40% on the overview, 35% zooming in, 25% on the detail" — and the actual seconds resolve at render time. See PACING_SYSTEM.md.
 
-7. **Warn, don't break.** Invalid or unsupported directives produce warnings but never prevent JSON generation. The video can always render — direction just degrades gracefully to defaults.
+7. **One camera system, one syntax.** The script writer doesn't need to know whether `cam()` becomes a Mapbox viewport state or a useNarratedCamera path. Visual-spec handles the translation based on template type.
+
+8. **Warn, don't break.** Invalid or unsupported directives produce warnings but never prevent JSON generation. The video can always render — direction just degrades gracefully to defaults.

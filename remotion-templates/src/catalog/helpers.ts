@@ -11,7 +11,10 @@
  * data.durationSec or data.phases, the catalog comp must do the same.
  */
 
-export const CATALOG_EPISODE = "catalog" as const;
+// Empty string so the metadata strip's "episode" slot stays blank rather than
+// repeating "CATALOG" both top-right and bottom-left of every demo.
+// Schema requires `episode: z.string()` — empty string passes validation.
+export const CATALOG_EPISODE = "" as const;
 
 /**
  * Build a catalog composition id from a template name and variant slug.

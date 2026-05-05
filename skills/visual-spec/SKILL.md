@@ -10,7 +10,7 @@ You are generating the full visual data layer for a bilingual geopolitics video 
 
 1. **Register 1 — Analytical** (Remotion JSON files): Clean, data-driven motion graphics — maps, charts, timelines, frameworks. Where information lives.
 2. **Register 2 — Atmospheric** (Recraft illustration specs): Constructivist, dystopian, propaganda-poster-style art. Creates mood, emotional texture, conceptual weight. NOT data-carrying.
-3. **Register 3 — Grounding** (AI video briefs): Photorealistic scenes with mannequin/faceless figures. Physical presence in spaces cameras can't access.
+3. **Register 3 — Grounding** (AI video briefs): Constructivist figurative scenes drawing on Rodchenko's 1924 portrait series and Lissitzky's Self-Portrait — figures with 4-5 color-blocked face planes, no continuous skin tonality, no rendered facial features. Physical presence in spaces cameras can't access. Post-May 4, 2026 the photoreal-mannequin convention was retired in favor of constructivist-figurative; both Register 2 (atmospheric backdrops) and Register 3 (grounded scenes) now share constructivist visual language and differ only in role.
 
 Plus: **Footage manifest** — structured search specs for every stock footage and archival need.
 
@@ -60,6 +60,7 @@ Read the full script file. Pay attention to:
 
 - **Visual mode tags** — `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]` in the right column. These tell you which entries need Remotion JSON (MG and the MG part of LAYERED), which need Recraft illustration specs (ILLUST), which need footage manifest entries (FOOTAGE and the footage part of LAYERED), and which need AI video generation briefs (AI-GEN).
 - **`DIR:` annotations** — direction lines stacked below visual spec lines. These specify camera movement (`cam()`), reveal choreography (`reveal()`), timing (`hold()`), transitions (`cut()`), and mood (`mood()`). Parse these carefully — they become `_direction` blocks in Remotion JSON, camera/mood language in AI-GEN briefs, treatment hints in ILLUST specs, and tint/treatment hints in footage manifests. See DIRECTING_LANGUAGE.md for the full grammar.
+- **`PACE:` annotations** — visual density markers (`PACE: urgent`, `PACE: analytical`, `PACE: breathing`) that control visual change rate. Track the current pace as you parse (default: `analytical`, resets at each beat header). When the active pace is non-default (`urgent` or `breathing`), include `"paceProfile": "<pace>"` in the composition's `_direction` block. If no `DIR:` annotations exist but pace is non-default, create a minimal `_direction` block with just `paceProfile`. This feeds `useDirection` → `paceTimingScale`/`paceStaggerScale` so template animations respond to pacing intent. Duration scaling is still handled by `generate_manifest.py` — visual-spec only passes the profile name through.
 - **Beat/section structure** — each beat typically needs 3-8 visual segments
 - **`[VISUAL: ...]` cues** (older scripts) — the script author's suggestions for what should appear on screen. These are starting points, not final specs. You may add visuals the author didn't suggest if the content calls for it.
 - **Data points** — any numbers, percentages, comparisons, or statistics mentioned in narration
@@ -200,8 +201,10 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 | `mood()` | `atmosphere`, `ambientParticles`, `driftPreset`, `globalDim`, `backgroundTint` |
 
 6. **Merge** all fields into a single `_direction` object within the data file
+7. **Set `proportional: true`** — camera path durations should be fractions of total composition time (0.0–1.0), not absolute seconds. This makes camera movements duration-adaptive — the same rhythm works whether narration runs 8 or 18 seconds. See PACING_SYSTEM.md.
+8. **Include `paceProfile`** — if the active PACE at this composition's script position is non-default (`urgent` or `breathing`), add `"paceProfile": "<pace>"` to the `_direction` block. This feeds `useDirection` → `paceTimingScale` so template entrance animations scale accordingly (urgent: 0.7× faster, breathing: 1.4× slower). Omit for `analytical` (it's the default).
 
-**Example — ChoroplethMap with direction:**
+**Example — ChoroplethMap with direction (proportional camera):**
 ```json
 {
   "episode": "silicon-trap",
@@ -211,10 +214,13 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
     { "title": "Phase 2", "countries": ["Taiwan"], "color": "#C23B22", "durationSec": 4 }
   ],
   "_direction": {
+    "proportional": true,
     "cameraPath": [
-      { "center": [0, 20], "scale": 150, "duration": 4 },
-      { "center": [121.5, 25.0], "scale": 400, "duration": 4, "syncWord": "single island" }
+      { "center": [0, 20], "scale": 150, "duration": 0.45 },
+      { "center": [121.5, 25.0], "scale": 400, "duration": 0.35, "syncWord": "single island" },
+      { "center": [121.5, 25.0], "scale": 400, "duration": 0.2 }
     ],
+    "syncWords": ["single island"],
     "revealMode": "sequential",
     "phaseStagger": 3.0,
     "revealEasing": "settle",
@@ -227,28 +233,41 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 }
 ```
 
-**Example — DataChart with direction:**
+**Example — DataChart with direction (proportional camera):**
 ```json
 {
   "episode": "silicon-trap",
   "title": "Chip Yield Comparison",
   "bars": [...],
   "_direction": {
+    "proportional": true,
     "revealMode": "stagger",
     "staggerMs": 300,
     "highlightIndex": 0,
     "revealEasing": "pulse",
     "cameraPath": [
-      { "target": "overview", "zoom": 1.0, "duration": 3, "behavior": "track" },
-      { "target": "element:0", "zoom": 1.3, "duration": 3, "behavior": "track", "syncWord": "ninety-two" }
+      { "target": "overview", "zoom": 1.0, "duration": 0.45, "behavior": "track" },
+      { "target": "element:0", "zoom": 1.3, "duration": 0.35, "behavior": "track", "syncStart": "ninety-two" },
+      { "target": "element:0", "zoom": 1.3, "duration": 0.2 }
     ],
+    "syncWords": ["ninety-two"],
     "holdAfter": 1.0,
     "holdBehavior": "land"
   }
 }
 ```
 
-**Fallback rule:** If no `DIR:` annotations exist for a segment, do NOT emit a `_direction` block. The template's built-in defaults apply. This is fully backward compatible — existing scripts without direction work exactly as before.
+**Proportional duration guidelines:**
+- Durations MUST sum to 1.0 (or very close — within ±0.01)
+- Typical rhythm: 40-50% on the opening view, 30-40% on the key movement, 15-25% on the hold/detail
+- Include a final "hold" step at the end position — prevents abrupt camera stops
+- The system auto-detects proportional mode when durations sum ≤1.01, but always set `proportional: true` explicitly for clarity
+
+**Fallback rule:** If no `DIR:` annotations exist for a segment AND pace is `analytical` (default), do NOT emit a `_direction` block. The template's built-in defaults apply. However, if pace is non-default (`urgent` or `breathing`) but there are no `DIR:` annotations, emit a minimal `_direction` block with just `paceProfile`:
+```json
+"_direction": { "paceProfile": "urgent" }
+```
+This ensures template animations respond to pacing intent even without explicit direction.
 
 ### Quality checklist for each file
 
@@ -261,8 +280,9 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 - [ ] Text is concise — these are on-screen labels, not paragraphs
 - [ ] Statistics are accurate to what the script says (don't invent numbers)
 - [ ] Source attributions included where the script mentions sources
-- [ ] `_direction` block present for segments with `DIR:` annotations
+- [ ] `_direction` block present for segments with `DIR:` annotations or non-default PACE
 - [ ] `_direction` fields match the directive syntax exactly (no invented fields)
+- [ ] `paceProfile` included in `_direction` for all compositions in urgent/breathing zones
 - [ ] `syncWord` values appear in the segment's narration text
 - [ ] `cam()` targets are valid for the template's camera system
 - [ ] `reveal()` mode is supported by the template (see template support matrix)
@@ -472,42 +492,47 @@ Each AI video brief specifies everything needed to generate the clip:
   "beat": "Beat 2",
   "priority": "P1",
   "useCase": "unsourceable_space",
+  "register": "grounding",
+  "realism": "flat",
+  "text_treatment": "chinese_propaganda",
   "scene": {
-    "description": "Interior of an advanced semiconductor cleanroom. Yellow lithography lighting. Two workers in full bunny suits operating wafer handling equipment. FOUP carriers on automated track in background.",
+    "description": "Interior of an advanced semiconductor cleanroom. Yellow lithography lighting. Three workers in full bunny suits operating wafer handling equipment. FOUP carriers on automated track in background. Bold heiti propaganda typography integrated diagonally with the architecture.",
     "environment": "Semiconductor fabrication cleanroom, advanced node (sub-5nm implied by equipment density)",
-    "figures": "Two workers in white bunny suits with clear face shields. Faces are smooth and featureless (mannequin aesthetic). Natural body movement — operating equipment with practiced ease.",
+    "figures": "Three workers in white bunny suits with reflective polycarbonate face shields. Faces composed of 4-5 color-blocked planes (jaw, cheekbone, brow, lit, neck), eyes obscured by amber visor reflection. Hands flat color planes only, no individual finger detail. Natural body movement — operating equipment with practiced ease.",
     "period": "contemporary",
     "mood": "Precision, sterility, quiet intensity. The hum of advanced technology."
   },
   "camera": {
     "movement": "Slow forward dolly through the space",
-    "lens": "35mm",
+    "lens": "35mm equivalent (constructivist composition, not photographic lens)",
     "angle": "Medium wide, hip level",
-    "depthOfField": "Shallow — foreground equipment sharp, background slightly soft",
-    "style": "Documentary observational — feels like we have rare access"
+    "depthOfField": "Constructivist depth — foreground subjects in sharp color blocks, background slightly receded through atmospheric perspective",
+    "style": "Constructivist documentary observational — feels like a Rodchenko photomontage of rare access"
   },
   "generation": {
     "tool": "kling-3.0",
     "mode": "image-to-video",
-    "styleReference": "style-ref_interior_cleanroom-warm_v1.png",
+    "styleReference": "style-ref_industrial_cleanroom-flat_v1.png",
     "durationTarget": 7,
     "resolution": "4K",
     "fps": 30,
-    "referenceFramePrompt": "Interior of an advanced semiconductor fabrication cleanroom with yellow lithography lighting casting warm amber glow across white surfaces and HEPA-filtered ceiling. Two workers in full white bunny suits with completely smooth featureless faces behind clear shields, mannequin-like with no facial features. Wafer handling equipment in foreground, FOUP carriers on automated track receding into background. Atmosphere of extreme precision and quiet intensity. Shot on Sony A7IV, 35mm f/2.0, shallow depth of field, medium wide from hip level. Photorealistic rendering. 16:9 aspect ratio."
+    "referenceFramePrompt": "[Composed via tools/recraft/recraft.py with --register grounding --realism flat --text-treatment chinese_propaganda. Reference frames generated by Recraft V3 since the constructivist aesthetic is its strength; Flux 2 Pro only for hero P1 frames needing photographic spatial detail at realism: grounded.]"
   },
   "treatment": "standard",
   "narrationContext": "The narration describes TSMC's fabrication process and the extreme precision required. This visual grounds the abstract discussion in physical reality.",
   "editorialGuardrails": [
     "No identifiable facility branding or signage",
-    "Mannequin faces must remain smooth — reject if features drift",
-    "Equipment should be plausible but not claim to be specific TSMC machinery",
+    "Faces must remain planar color-blocked throughout — reject if continuous skin tonality leaks in or features render photographically",
+    "Equipment should be plausible constructivist abstractions of real fab tools, not claim to be specific TSMC machinery",
+    "Chinese propaganda typography must use real Simplified Chinese characters — Tiger to verify before render",
     "This visualizes 'what a space like this looks like' — not 'this is TSMC Arizona'"
   ],
   "qualityGate": {
-    "faceCheck": "Faces remain featureless throughout clip duration",
+    "faceCheck": "Faces remain planar color-blocked throughout clip duration; no skin tonality drift; eyes stay obscured by visor reflection",
     "environmentCheck": "Equipment and space remain consistent (no morphing)",
     "lightingCheck": "Yellow lithography light maintained without color shifts",
-    "motionCheck": "Camera movement smooth, no jitter or sudden accelerations"
+    "motionCheck": "Camera movement smooth, no jitter or sudden accelerations",
+    "typographyCheck": "Chinese characters remain real and parseable; no mock-script drift"
   }
 }
 ```
@@ -521,9 +546,12 @@ Each AI video brief specifies everything needed to generate the clip:
 | `beat` | Yes | Which beat in the script |
 | `priority` | Yes | P1 (hero visual), P2 (supporting), P3 (ambient) |
 | `useCase` | Yes | One of: `unsourceable_space`, `historical_reconstruction`, `conceptual_scene`, `scenario_sequence` |
+| `register` | Yes | One of: `atmospheric` (background mood), `grounding` (figurative scenes), `analytical` (rare diagrammatic). See VISUAL_LANGUAGE.md. |
+| `realism` | Yes | One of: `flat`, `balanced`, `grounded`. **MUST be `flat` for any clip that will be animated to video** — animation drift is severe at higher realism dosages. Use `grounded` only for stills that will be Ken-Burned. See PROMPT_PREAMBLES.md. |
+| `text_treatment` | Yes | Typography tradition matched to the scene's geography/era. One of: `none`, `english_minimal`, `english_modernist`, `russian_constructivist`, `chinese_propaganda`, `chinese_minimal`, `chinese_traditional`, `japanese_showa`, `mixed`. See TYPOGRAPHY_TRADITIONS.md. |
 | `scene.description` | Yes | Full scene description (what appears on screen) |
 | `scene.environment` | Yes | The space/setting |
-| `scene.figures` | Yes/No | Human figures if present. Always specify mannequin face. Omit if no people. |
+| `scene.figures` | Yes/No | Human figures if present. Always specify constructivist planar features (4-5 color-blocked planes), eyes obscured, hands as flat color planes. Omit if no people. |
 | `scene.period` | Yes | `contemporary`, `1940s`, `1960s`, `1990s`, `near-future`, etc. |
 | `scene.mood` | Yes | Emotional/atmospheric tone |
 | `camera.movement` | Yes | How the camera moves (dolly, pan, static, tracking) |
@@ -634,7 +662,11 @@ Also emit a `_direction` block alongside the brief for assembly manifest consump
 - `conflict` — adversarial content, military, sanctions, confrontation
 - `editorial` — historical, archival feel, pre-1980s reconstructions
 
-**The mannequin face is non-negotiable.** Every brief involving human figures MUST specify featureless/mannequin faces. Every quality gate MUST include a face check. Clips where faces drift toward realism get rejected and re-generated.
+**The constructivist planar face is non-negotiable.** Every brief involving human figures MUST specify the constructivist planar standard: 4-5 color-blocked face planes (jaw, cheekbone, brow, lit, neck), no continuous skin tonality, no rendered facial features (no photographic nose contour, no mouth detail, no realistic eye structure), eyes obscured by lens shadow / hat brim / visor reflection / hair fall. Hands are flat color planes only (palm + finger silhouette, no individual finger detail). Every quality gate MUST include a planar-face check. Clips where faces drift toward realism (continuous skin tonality, rendered features, "realistic-but-blurred" features) get rejected and re-generated.
+
+**The animation-flat rule is load-bearing.** Any AI-GEN brief that will produce an *animated* video clip (sent to Kling/Sora/Runway/Seedance) MUST use `realism: flat` for both figure and environment. This isn't editorial preference — it's a production fact: animation models track color-blocked forms reliably across frames whereas photographic textures drift severely. `realism: balanced` and `realism: grounded` produce environments with material detail (paper grain, wood grain, atmospheric perspective) that fail to track consistently in motion, creating visible morphing. Reserve `balanced` and `grounded` for **stills only** — assets that will be Ken-Burned in NLE rather than animated.
+
+When emitting a brief, check the script's intent for the segment: if the entry is a static beat (Ken Burns over a still) or a long-hold composition shot, `balanced` or `grounded` is fine. If the entry is a moving camera through a space (dolly, pan, orbit, tracking) or any clip that will be sent to a video generation tool, force `realism: flat` regardless of what the script's visual column suggested. Flag the override in the brief's `editorialGuardrails` so render-qa knows to verify.
 
 ## Step 6 — Summary and Render Commands
 
@@ -645,7 +677,7 @@ After generating all files, output:
 4. Footage manifest summary: total entries, breakdown by sourcability (Easy/Moderate/Hard)
 5. AI video brief summary: total clips, breakdown by use case, estimated generation cost (~$0.50-1.00/clip for Kling, $0 for Sora if within ChatGPT Pro limits)
 6. Visual mode balance check: does the final output match the target ranges? Are all three registers present?
-7. **Direction summary** — total segments with `_direction` blocks, breakdown by directive type (cam/reveal/hold/cut/mood), count of narration sync points, list of all `syncWord` values
+7. **Direction summary** — total segments with `_direction` blocks, breakdown by directive type (cam/reveal/hold/cut/mood), count of narration sync points, list of all `syncWord` values, count of pace-only `_direction` blocks (compositions with `paceProfile` but no DIR: directives)
 8. The full file list with paths (grouped by: MG JSON / Recraft specs / footage manifest / AI briefs)
 9. **Concept Registry Update** — list new concepts to add and existing concepts that got a new appearance (from Step 1.5). Format as a ready-to-paste JSON snippet for each new concept.
 10. **Transition map** — compressed visual showing register transitions and which transition type connects them (now explicitly driven by `cut()` directives from the script)

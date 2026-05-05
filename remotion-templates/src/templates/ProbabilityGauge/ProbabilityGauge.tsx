@@ -36,6 +36,8 @@ import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
+import { SourceAttribution } from "../../components/SourceAttribution";
+import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -573,6 +575,7 @@ const Scorecard: React.FC<{
 // ── Main Component ────────────────────────────────────────────────────────
 
 export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ data }) => {
+  checkChartDataCommon("ProbabilityGauge", data);
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
@@ -686,22 +689,8 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
           )}
         </div>
 
-        {/* Source attribution */}
-        {data.source && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: area.bottom,
-              right: area.right,
-              fontSize: fontSizes.caption,
-              color: theme.text.muted,
-              opacity: fadeIn(frame, sec(1), sec(0.5)),
-              transform: `translateY(${slideIn(frame, sec(1), layout.spacing.xs, sec(0.5))}px)`,
-            }}
-          >
-            Source: {data.source}
-          </div>
-        )}
+        {/* Source attribution — shared component for consistent placement. */}
+        <SourceAttribution source={data.source} mode={bgVariant} prefix="Source: " startSec={1} />
 
       </AbsoluteFill>
       </AbsoluteFill>

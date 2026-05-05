@@ -56,6 +56,7 @@ import { lineDrawProgress } from "../../utils/drawLine";
 import { bezierEdge } from "../../utils/edges";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
+import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -311,6 +312,7 @@ const DiamondNode: React.FC<NodeRenderProps> = React.memo(
 export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   data,
 }) => {
+  checkChartDataCommon("NetworkDiagram", data);
   const frame = useCurrentFrame();
   const config = useVideoConfig();
   const { durationInFrames } = config;

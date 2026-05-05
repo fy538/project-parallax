@@ -290,7 +290,8 @@ If the assembly manifest also marks the asset's source as Recraft, run these che
 - [ ] Asset file exists at the path referenced in the assembly manifest
 - [ ] Asset format matches the register's expected output:
       - atmospheric → SVG (vector_illustration) or PNG fallback
-      - grounding → PNG (realistic_image)
+      - grounding → SVG or PNG (vector_illustration is now the default for
+        constructivist; realistic_image only for rare grounded-realism stills)
       - analytical → SVG (vector_illustration)
 - [ ] Treatment field on the shot matches treatment actually applied:
       - For SVG: filename has the `_treated_<ramp>` suffix from apply_duotone_svg
@@ -301,6 +302,27 @@ If the assembly manifest also marks the asset's source as Recraft, run these che
 - [ ] Asset duration on timeline doesn't exceed mode-specific limits per VISUAL_LANGUAGE.md
       (max 30s footage; max 2 consecutive AI-GEN; ILLUST 30-40% opacity for backgrounds)
 ```
+
+### Animation-Flat Rule Check (load-bearing)
+
+For any AI-GEN asset that will be animated to video (sent to Kling / Sora /
+Runway / Seedance — i.e., the assembly manifest segment carries motion via the
+generation tool, not Ken Burns), the `realism` field on the shot list MUST be
+`flat`. This is a production rule: animation models track color-blocked forms
+reliably across frames whereas photographic textures (skin tonality, fabric
+weave, atmospheric haze) drift severely. `balanced` and `grounded` realism
+dosages produce environments with material detail that morph in motion.
+
+```
+- [ ] If the asset is an animated video clip (not a still), shot list realism is "flat"
+- [ ] If the asset is a still that will be Ken-Burned in NLE, balanced or grounded realism is OK
+- [ ] If realism is "grounded", confirm the asset is a still — flag if the assembly
+      manifest sends it through Kling/Sora/Runway as an animated clip
+- [ ] If the AI-GEN brief specifies any camera motion (dolly, pan, orbit, tracking)
+      AND realism != "flat", flag as a likely animation-flat rule violation
+```
+
+Flag any violation as **HIGH PRIORITY** before assembly — animation drift on a non-flat asset is the most expensive failure mode in the AI-GEN pipeline (re-generation cost + timeline shift).
 
 ### Atmospheric Register Checks (constructivist illustration)
 
@@ -317,7 +339,9 @@ These verify the asset behaves like Register 2 in the timeline, not whether the 
       family across beats — not three unrelated illustrations
 ```
 
-### Grounding Register Checks (photoreal mannequin scenes)
+### Grounding Register Checks (constructivist figurative scenes)
+
+Post-May 4, 2026: grounding scenes use constructivist figurative aesthetic, not photoreal mannequin. The figure standard is shared with Register 2 — both registers carry the same constructivist DNA.
 
 ```
 - [ ] If extended segment >10s of video, the assembly manifest includes the "∴ Visualized"
@@ -332,7 +356,14 @@ These verify the asset behaves like Register 2 in the timeline, not whether the 
       for stock footage that could have covered the moment
 - [ ] Register 3 budget within VIS-09 target (5-15% of episode runtime, 10-20% max)
 - [ ] No more than 2 consecutive Grounding clips before a mode switch
+- [ ] Realism field on shot list is consistent with the asset's animation status
+      (see Animation-Flat Rule Check above)
+- [ ] If text_treatment is non-Latin (chinese_propaganda, russian_constructivist,
+      japanese_showa, chinese_traditional), Tiger has verified the rendered text
+      is real and parseable in its source language — no mock-script gibberish
 ```
+
+Visual-judgment checks for grounding (does the planar face actually look constructivist? do figures avoid the realistic-but-blurred uncanny zone?) belong in `visual-qa`, which uses Claude's vision on rendered stills. render-qa's role here is the structured/binary checks above.
 
 ### Analytical Register Checks (rare Recraft fallback)
 

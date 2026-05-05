@@ -23,10 +23,22 @@ import type { CompositionAnimationOptions } from "./useCompositionAnimation";
 type AtmosphereDensity = "none" | "subtle" | "normal" | "dense";
 type DriftPreset = "none" | "slow" | "normal";
 
+/** Resolved sync point from Whisper alignment */
+export interface DirectionSyncPoint {
+  word: string;
+  timeSec: number;
+  frame: number;
+  confidence?: number;
+}
+
 export interface DirectionBlock {
   // Camera (handled by individual templates, not this hook)
   cameraPath?: unknown[];
   cameraNote?: string;
+  /** Force proportional camera path mode */
+  proportional?: boolean;
+  /** Resolved sync points (populated by Whisper mode in generate_manifest.py) */
+  syncPoints?: DirectionSyncPoint[];
 
   // Reveal (handled by individual templates)
   revealMode?: string;
@@ -53,7 +65,12 @@ export interface DirectionBlock {
   driftPreset?: DriftPreset;
   globalDim?: number;
   backgroundTint?: string;
+
+  // Pace (from PACE: annotations — controls animation speed)
+  paceProfile?: PaceProfile;
 }
+
+type PaceProfile = "urgent" | "analytical" | "breathing";
 
 export interface DirectionResult {
   /** Atmosphere density for Background component */
@@ -70,6 +87,23 @@ export interface DirectionResult {
   holdAfter: number | undefined;
   /** Pre-delay in seconds (delay before reveal animation starts) */
   preDelay: number | undefined;
+  /** Whether proportional camera paths are requested */
+  proportional: boolean | undefined;
+  /** Resolved sync points for camera/reveal anchoring */
+  syncPoints: DirectionSyncPoint[] | undefined;
+  /** Pace profile for this composition */
+  paceProfile: PaceProfile | undefined;
+  /**
+   * Timing scale for entrance/reveal animations.
+   * urgent=0.7 (faster animations), analytical=1.0, breathing=1.4 (slower, more deliberate).
+   * Templates can multiply their animation durations by this value.
+   */
+  paceTimingScale: number;
+  /**
+   * Stagger scale for sequential element reveals.
+   * urgent=0.6 (tighter stagger), analytical=1.0, breathing=1.5 (more spread out).
+   */
+  paceStaggerScale: number;
   /** Whether any direction was specified */
   hasDirection: boolean;
 }
@@ -80,6 +114,17 @@ const DRIFT_PRESETS: Record<DriftPreset, Partial<CompositionAnimationOptions>> =
   none: { noDrift: true },
   slow: { maxScale: 1.03, maxPanX: 8, maxPanY: 4, maxRotation: 0.15 },
   normal: { maxScale: 1.06, maxPanX: 18, maxPanY: 8, maxRotation: 0.3 },
+};
+
+// ── Pace → timing scale factors ────────────────────────────────────
+// These control how fast/slow entrance animations and staggers play.
+// Templates multiply their animation durations by timingScale and
+// their stagger delays by staggerScale.
+
+const PACE_TIMING: Record<PaceProfile, { timing: number; stagger: number }> = {
+  urgent: { timing: 0.7, stagger: 0.6 },      // faster reveals, tighter staggers
+  analytical: { timing: 1.0, stagger: 1.0 },  // default
+  breathing: { timing: 1.4, stagger: 1.5 },   // slower, more deliberate
 };
 
 // ── Hook ────────────────────────────────────────────────────────────
@@ -96,6 +141,11 @@ export const useDirection = (
       driftOptions: {},
       holdAfter: undefined,
       preDelay: undefined,
+      proportional: undefined,
+      syncPoints: undefined,
+      paceProfile: undefined,
+      paceTimingScale: 1.0,
+      paceStaggerScale: 1.0,
       hasDirection: false,
     };
   }
@@ -112,6 +162,10 @@ export const useDirection = (
     ? DRIFT_PRESETS[direction.driftPreset] || {}
     : {};
 
+  // Resolve pace profile to timing scales
+  const pace = direction.paceProfile || "analytical";
+  const paceScales = PACE_TIMING[pace] || PACE_TIMING.analytical;
+
   return {
     atmosphere: direction.atmosphere,
     atmosphereIntensity,
@@ -120,6 +174,11 @@ export const useDirection = (
     driftOptions,
     holdAfter: direction.holdAfter,
     preDelay: direction.preDelay,
+    proportional: direction.proportional,
+    syncPoints: direction.syncPoints,
+    paceProfile: direction.paceProfile,
+    paceTimingScale: paceScales.timing,
+    paceStaggerScale: paceScales.stagger,
     hasDirection: true,
   };
 };

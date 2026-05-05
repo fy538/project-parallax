@@ -98,21 +98,40 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
         textAlign: align === "top-center" ? "center" : "left",
       }}
     >
-      {/* Title — h2, heading font, primary text color */}
-      <div
-        style={{
-          fontSize: fontSizes.h2,
-          fontWeight: fontWeights.semibold,
-          color: theme.text.primary,
-          fontFamily: fonts.heading,
-          textShadow: theme.textShadow,
-          maxWidth: textMaxWidth.h2,
-          letterSpacing: letterSpacing.h2,
-          lineHeight: 1.1,
-        }}
-      >
-        {title}
-      </div>
+      {/* Title — h2, heading font, primary text color.
+          Dynamic font size: long titles auto-scale down so they don't
+          overflow the safe area. Estimate width using a 0.55 char-width
+          factor (rough but reliable for English headings) and reduce
+          font-size proportionally. Floor at h3 so headings never become
+          unreadable; titles longer than that should be split into
+          title + subtitle by the data author. */}
+      {(() => {
+        const charWidthFactor = 0.55;
+        const availableWidth = Math.min(
+          textMaxWidth.h2,
+          layout.width - safe.left - safe.right
+        );
+        const estimatedWidth = title.length * fontSizes.h2 * charWidthFactor;
+        const scale = Math.min(1, availableWidth / Math.max(1, estimatedWidth));
+        const minScale = fontSizes.h3 / fontSizes.h2;
+        const finalSize = Math.max(fontSizes.h3, fontSizes.h2 * Math.max(scale, minScale));
+        return (
+          <div
+            style={{
+              fontSize: finalSize,
+              fontWeight: fontWeights.semibold,
+              color: theme.text.primary,
+              fontFamily: fonts.heading,
+              textShadow: theme.textShadow,
+              maxWidth: textMaxWidth.h2,
+              letterSpacing: letterSpacing.h2,
+              lineHeight: 1.1,
+            }}
+          >
+            {title}
+          </div>
+        );
+      })()}
 
       {/* Optional accent underline — gradient-fade signature, draws in left-to-right */}
       {underline && (

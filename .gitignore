@@ -18,6 +18,11 @@ remotion-templates/.vite/
 # macOS
 .DS_Store
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
 # Test artifacts
 remotion-templates/src/__tests__/.temp-renders/
 remotion-templates/test-results.json
