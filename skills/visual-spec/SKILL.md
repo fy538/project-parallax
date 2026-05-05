@@ -72,6 +72,24 @@ Read the full script file. Pay attention to:
 
 If the script uses the older format without mode tags, infer the mode: named Remotion templates → `[MG:]`, `TEMPLATE: FOOTAGE` or `TEMPLATE: IMAGE` → `[FOOTAGE:]`. Flag to the user that mode tags should be added for pacing analysis.
 
+## Step 1.4 — Visual Identity Card Check
+
+Before generating the visual breakdown, check if the episode has a **visual identity card** at `episodes/<slug>/visual-identity.json` (schema: `data/visual-identity.schema.json`). The identity card locks the per-episode cross-register visual decisions in one place — episodeColorEmphasis, default text_treatment, default realism dosage, default treatment ramp, recurring visual motif, transition signature overrides — so that AI-generated content (Registers 2/3) and Remotion analytical layer (Register 1) share coordinated cultural inflection per episode.
+
+**How to use it:**
+
+1. Read `episodes/<slug>/visual-identity.json` if it exists.
+2. When emitting AI video briefs (`[AI-GEN:]`) or Recraft illustration specs (`[ILLUST:]`) for shots that don't explicitly specify `text_treatment`, `realism`, or `treatment` in the script's right column, use the identity card's defaults (`defaultTextTreatment`, `defaultRealism`, `defaultTreatment`).
+3. When emitting the assembly manifest, set the manifest's root-level `episodeColorEmphasis` field to match the identity card's `episodeColorEmphasis`. This propagates through `theme.ts → getEpisodeColorEmphasis()` to every Remotion template (DataChart, ChoroplethMap, FrameworkDiagram, KineticTypography), keeping the analytical layer's color emphasis coordinated with the AI-generated content's typography emphasis.
+4. When emitting AI-GEN briefs that involve animated clips (any shot sent to Kling/Sora/Runway, not Ken-Burned stills), enforce `realism: flat` regardless of the identity card's defaultRealism — the animation-flat rule is load-bearing per VIS-09 and overrides episode defaults for animated content.
+5. If the recurring `visualMotif` is specified in the identity card, ensure visual-spec output references it: motif appears in at least the introduction beat (first 2 minutes) and one return beat, with evolution states matching the card's `visualMotif.evolutionStates` array.
+
+**If no identity card exists for the episode:** Flag this to Tiger as a missing artifact. The angle memo (Stage 5) should produce the visual identity card alongside the visual arc decision. Without it, every shot is making cultural-context decisions independently, and per-episode visual unity becomes ad-hoc rather than coordinated.
+
+**Per-shot overrides:** The identity card provides defaults; shots can still override per-segment in the shot list. The card is "what the episode wants by default"; the shot list is "what each specific moment needs."
+
+See `remotion-templates/BRAND.md` → "Per-Episode Color Emphasis" and `project/PROMPT_PREAMBLES.md` → "Block 4" for the editorial rationale.
+
 ## Step 1.5 — Concept Registry Check
 
 Before creating the visual breakdown, run a concept reuse check against the **Concept Registry** (`data/concepts.json`). This registry tracks every framework, foreign term, named concept, and historical analogy introduced across all Parallax episodes.

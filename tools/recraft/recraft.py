@@ -77,6 +77,9 @@ from xml.etree import ElementTree as ET
 
 import requests
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
+from color_utils import hex_to_rgb as _hex_to_rgb  # noqa: E402
+
 # ── Configuration ────────────────────────────────────────────────────────────
 
 API_KEY = os.environ.get("RECRAFT_API_KEY", "")
@@ -301,11 +304,6 @@ def apply_duotone_svg(svg_path: Path, ramp_name: str = "standard") -> Path:
 
     print(f"  Brand treatment ({ramp_name}): {treated_path.name}")
     return treated_path
-
-
-def _hex_to_rgb(hex_str: str) -> tuple[int, int, int]:
-    h = hex_str.lstrip("#")
-    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
 
 
 # ── Prompt Engineering ───────────────────────────────────────────────────────
@@ -1062,6 +1060,17 @@ def main():
     sty.set_defaults(func=cmd_styles)
 
     args = parser.parse_args()
+
+    # API key required for all commands except `styles` (which is local-only)
+    if args.command != "styles" and not API_KEY:
+        print(
+            "[ERROR] RECRAFT_API_KEY is not set.\n"
+            "  export RECRAFT_API_KEY=your_key\n"
+            "  Get a key at https://www.recraft.ai/profile",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     args.func(args)
 
 

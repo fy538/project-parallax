@@ -29,6 +29,7 @@ import {
   contentArea,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import {
   fadeIn,
   slideIn,
@@ -225,6 +226,9 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   const theme = useThemeMode("light");
   const { durationInFrames } = useVideoConfig();
   const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
+  // Per-episode color emphasis — pulls primaryAccent for contested-actor
+  // highlight color. See remotion-templates/BRAND.md → "Per-Episode Color Emphasis".
+  const emphasis = useEpisodeColorEmphasis();
 
   const colorRamp = useMemo(
     () => getColorRamp(data.colorRamp),
@@ -359,7 +363,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
               mode="dark"
               safeAreaTier="generous"
               startFrame={current.startFrame}
-              accentColor={palette.amber}
+              accentColor={emphasis.primaryAccent}
             />
           </div>
         )}

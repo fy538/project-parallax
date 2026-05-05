@@ -15,6 +15,7 @@ import {
   interpolate,
 } from "remotion";
 import { palette, semantic, fonts, fontSizes, layout, sec, shadows, gradients, contentArea, radii, barStyle, getCategoricalColor } from "../../design/theme";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { formatNumber } from "../../utils/numberFormat";
 import { niceDomain, niceTicks, formatTick } from "../../utils/niceTicks";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -345,6 +346,10 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
+  // Per-episode color emphasis — pulls primaryAccent from the episode's
+  // visual identity (chart fills, reference lines, accent labels). Falls back
+  // to neutral (amber) if no emphasis is set. See remotion-templates/BRAND.md.
+  const emphasis = useEpisodeColorEmphasis();
 
   const hasSpotlight = !!data.spotlightSequence && data.spotlightSequence.length > 0;
   const showParticles = data.ambientParticles ?? false;
@@ -639,7 +644,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
             [0, 1],
             CLAMP_SINE
           );
-          const refColor = data.referenceLine.color || palette.amber;
+          const refColor = data.referenceLine.color || emphasis.primaryAccent;
           return (
             <div
               style={{
@@ -797,8 +802,8 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
       {data.variant === "comparison" && (
         <Legend
           items={[
-            { label: data.leftGroupLabel, color: data.leftGroupColor || semantic.us },
-            { label: data.rightGroupLabel, color: data.rightGroupColor || semantic.china },
+            { label: data.leftGroupLabel ?? "", color: data.leftGroupColor || semantic.us },
+            { label: data.rightGroupLabel ?? "", color: data.rightGroupColor || semantic.china },
           ]}
           frame={frame}
           exit={exitFade(frame, durationInFrames, 15)}

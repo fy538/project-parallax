@@ -35,7 +35,9 @@ DATA_DIR = PROJECT_ROOT / "remotion-templates" / "data" / "episodes"
 
 # Load palette from single source of truth
 sys.path.insert(0, str(PROJECT_ROOT / "tools" / "brand-treatment"))
-from palette_loader import load_palette, get_all_approved_colors
+sys.path.insert(0, str(PROJECT_ROOT / "tools" / "shared"))
+from palette_loader import load_palette, get_all_approved_colors  # noqa: E402
+from color_utils import hex_to_rgb, euclidean_distance  # noqa: E402
 
 _palette_data = load_palette()
 PALETTE = {k: v.upper() for k, v in _palette_data["palette"].items()}
@@ -43,21 +45,6 @@ SEMANTIC = {k: v.upper() for k, v in _palette_data["semantic"].items()}
 
 # Build complete approved color set from palette.json
 APPROVED_COLORS: Set[str] = get_all_approved_colors()
-
-# ── Utilities ────────────────────────────────────────────────────────────────
-
-
-def hex_to_rgb(hex_color: str) -> Tuple[int, int, int]:
-    """Convert hex color to RGB tuple."""
-    hex_color = hex_color.lstrip("#").upper()
-    if len(hex_color) != 6:
-        raise ValueError(f"Invalid hex color: {hex_color}")
-    return tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
-
-
-def euclidean_distance(rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]) -> float:
-    """Calculate Euclidean distance in RGB space."""
-    return sum((a - b) ** 2 for a, b in zip(rgb1, rgb2)) ** 0.5
 
 
 def find_closest_color(hex_color: str, palette_dict: Dict[str, str]) -> Tuple[str, str, float]:

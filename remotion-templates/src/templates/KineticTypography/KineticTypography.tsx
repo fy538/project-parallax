@@ -21,6 +21,7 @@ import {
   interpolate,
 } from "remotion";
 import { palette, semantic, fonts, fontSizes, layout, sec, shadows } from "../../design/theme";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -86,7 +87,8 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
-  const accentColor = data.accentColor || palette.amber;
+  const emphasis = useEpisodeColorEmphasis();
+  const accentColor = data.accentColor || emphasis.primaryAccent;
   const totalFrames = sec(data.durationSec || 5);
 
   // Cinematic scale reveal for the quote mark
@@ -369,7 +371,8 @@ const BilingualVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   frame,
 }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
-  const accentColor = data.accentColor || palette.amber;
+  const emphasis = useEpisodeColorEmphasis();
+  const accentColor = data.accentColor || emphasis.primaryAccent;
   const totalFrames = sec(data.durationSec || 5.5);
 
   // Exit fade in last 15 frames

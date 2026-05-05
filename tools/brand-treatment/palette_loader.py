@@ -13,8 +13,12 @@ Usage:
 """
 
 import json
+import sys
 from pathlib import Path
 from typing import Dict, Tuple
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
+from color_utils import hex_to_rgb as _hex_to_rgb  # noqa: E402
 
 PALETTE_PATH = Path(__file__).resolve().parent / "palette.json"
 
@@ -27,12 +31,6 @@ def load_palette() -> dict:
         with open(PALETTE_PATH, "r", encoding="utf-8") as f:
             _cache.update(json.load(f))
     return _cache
-
-
-def _hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:
-    """Convert '#RRGGBB' to (R, G, B) tuple."""
-    h = hex_str.lstrip("#")
-    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
 
 
 def _resolve_color(name_or_hex: str, palette_colors: dict) -> str:

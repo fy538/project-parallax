@@ -32,3 +32,8 @@ export type {
 } from "./useNarratedCamera";
 export { useBeatSync } from "./useBeatSync";
 export type { UseBeatSyncOptions, BeatSyncState, BeatMarker } from "./useBeatSync";
+export {
+  useEpisodeColorEmphasis,
+  EpisodeColorEmphasisProvider,
+} from "./useEpisodeColorEmphasis";
+export type { EpisodeColorEmphasisProviderProps } from "./useEpisodeColorEmphasis";

@@ -164,7 +164,7 @@ export const FrameworkDiagramShort: React.FC<{ data: FrameworkDiagramData }> = (
                     </div>
 
                     {/* Arrow label between nodes */}
-                    {nodeIdx < data.nodes.length - 1 && data.arrowLabels?.[nodeIdx] && (
+                    {nodeIdx < (data.nodes?.length ?? 0) - 1 && data.arrowLabels?.[nodeIdx] && (
                       <div
                         style={{
                           textAlign: "center",

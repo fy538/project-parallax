@@ -17,6 +17,7 @@ import {
   interpolate,
 } from "remotion";
 import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle } from "../../design/theme";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -35,6 +36,7 @@ const ComparisonVariant: React.FC<{
 }> = React.memo(({ data, frame }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const { durationInFrames } = useVideoConfig();
+  const emphasis = useEpisodeColorEmphasis();
   const columns = data.columns || [];
   const cols = useMemo(
     () => columnLayout(columns.length, { titleVariant: "content", safeAreaTier: "generous" }),
@@ -59,7 +61,7 @@ const ComparisonVariant: React.FC<{
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
         // Cinematic: columns enter with spring overshoot (POLISH A2)
         const colScale = 0.92 + 0.08 * heroSpring(frame, layout.fps, colStart);
-        const colColor = col.color || palette.amber;
+        const colColor = col.color || emphasis.primaryAccent;
 
         return (
           <div
@@ -134,7 +136,7 @@ const ComparisonVariant: React.FC<{
               const itemSlide = slideIn(frame, itemStart, 30, sec(0.5));
               const itemScale = scaleReveal(frame, itemStart, sec(0.4), 1.05, 1.0);
               const itemExit = exitFade(frame, durationInFrames, 15);
-              const itemColor = col.color || palette.amber;
+              const itemColor = col.color || emphasis.primaryAccent;
 
               return (
                 <div
@@ -203,9 +205,10 @@ const FlowVariant: React.FC<{
 }> = React.memo(({ data, frame }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const { durationInFrames } = useVideoConfig();
+  const emphasis = useEpisodeColorEmphasis();
   const nodes = data.nodes || [];
   const arrowLabels = data.arrowLabels || [];
-  const accentColor = data.accentColor || palette.amber;
+  const accentColor = data.accentColor || emphasis.primaryAccent;
   const phases = data.phases || [];
   const eliminatedScenarios = data.eliminatedScenarios || [];
 
@@ -564,10 +567,11 @@ const MatrixVariant: React.FC<{
   frame: number;
 }> = React.memo(({ data, frame }) => {
   const theme = useThemeMode(data.backgroundVariant);
+  const emphasis = useEpisodeColorEmphasis();
   const rowHeaders = data.rowHeaders || [];
   const colHeaders = data.colHeaders || [];
   const cells = data.cells || [];
-  const accentColor = data.accentColor || palette.amber;
+  const accentColor = data.accentColor || emphasis.primaryAccent;
 
   const cellSize = 200;
   const headerWidth = 180;
@@ -705,6 +709,9 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
+  // Per-episode color emphasis — pulls primaryAccent for column accents and
+  // highlight glow. See remotion-templates/BRAND.md → "Per-Episode Color Emphasis".
+  const emphasis = useEpisodeColorEmphasis();
 
   return (
     <Background

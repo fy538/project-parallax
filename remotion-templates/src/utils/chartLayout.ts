@@ -28,8 +28,23 @@ export interface ChartLayoutInput {
   hasXAxis?: boolean;
   /** Does the chart have a source attribution line at the bottom? */
   hasSource?: boolean;
-  /** Override the safe-area inset on each side. Default: `safeArea.{top,...}`. */
+  /**
+   * Override the global safe-area inset on each side. Replaces (not adds to)
+   * the `layout.safeArea` defaults. Use sparingly — when you need a non-
+   * standard outer margin (e.g. full-bleed templates).
+   */
   insets?: { top?: number; right?: number; bottom?: number; left?: number };
+  /**
+   * Additional padding ADDED to the safe area, for chart-specific needs
+   * like y-axis label space or right-side legend strip clearance. Use this
+   * for "I want extra room beyond the brand-standard safe area" — leaves
+   * the global safe area intact and stacks on top.
+   *
+   * Example: `extraPad: { left: 100 }` reserves 100px of room for y-axis
+   * tick labels, on top of the standard 80px safe area, so the chart's
+   * left edge is at frame x=180.
+   */
+  extraPad?: { top?: number; right?: number; bottom?: number; left?: number };
 }
 
 export interface BoundingBox {
@@ -78,12 +93,17 @@ export function chartLayout(opts: ChartLayoutInput = {}): ChartLayoutResult {
     hasXAxis = false,
     hasSource = false,
     insets = {},
+    extraPad = {},
   } = opts;
 
-  const top = insets.top ?? layout.safeArea.top;
-  const right = insets.right ?? layout.safeArea.right;
-  const bottom = insets.bottom ?? layout.safeArea.bottom;
-  const left = insets.left ?? layout.safeArea.left;
+  // safeArea (or its override via `insets`) is the global brand outer margin.
+  // `extraPad` then adds chart-specific room (y-axis tick label width, etc.)
+  // on top — same effect as the legacy `layout.padding + chartPaddingLeft`
+  // pattern, but with declarative semantics.
+  const top = (insets.top ?? layout.safeArea.top) + (extraPad.top ?? 0);
+  const right = (insets.right ?? layout.safeArea.right) + (extraPad.right ?? 0);
+  const bottom = (insets.bottom ?? layout.safeArea.bottom) + (extraPad.bottom ?? 0);
+  const left = (insets.left ?? layout.safeArea.left) + (extraPad.left ?? 0);
 
   const canvasWidth = layout.width - left - right;
 

@@ -22,7 +22,7 @@
  *   4. Ambient particles for depth
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useId } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -109,10 +109,12 @@ interface NodeRenderProps {
   isFocused: boolean;
   /** Subtle fill alpha for stroke shapes (V1.5 — removes wireframe feel) */
   fillAlpha?: number;
+  /** Scoped SVG filter ID resolver — prevents collisions when multiple instances render in the same DOM. */
+  filterId: (name: string) => string;
 }
 
 const CircleNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1 }) => (
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, filterId }) => (
     <g
       opacity={opacity}
       transform={`translate(${x}, ${y}) scale(${scale}) translate(${-x}, ${-y})`}
@@ -146,7 +148,7 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
         fontFamily={fonts.mono}
         fontWeight={600}
         letterSpacing={1}
-        filter="url(#text-shadow)"
+        filter={`url(#${filterId("text-shadow")})`}
       >
         {label}
       </text>
@@ -160,7 +162,7 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
           fontFamily={fonts.mono}
           fontWeight={400}
           letterSpacing={0.5}
-          filter="url(#text-shadow-caption)"
+          filter={`url(#${filterId("text-shadow-caption")})`}
         >
           {sublabel}
         </text>
@@ -176,7 +178,7 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
             fontFamily={fonts.data}
             fontWeight={700}
             letterSpacing={1}
-            filter="url(#text-shadow-stat)"
+            filter={`url(#${filterId("text-shadow-stat")})`}
           >
             {stat.value}
           </text>
@@ -189,7 +191,7 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
             fontFamily={fonts.mono}
             fontWeight={400}
             letterSpacing={0.5}
-            filter="url(#text-shadow-caption)"
+            filter={`url(#${filterId("text-shadow-caption")})`}
           >
             {stat.label}
           </text>
@@ -200,7 +202,7 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
 );
 
 const HexagonNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1 }) => {
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, filterId }) => {
     const points = Array.from({ length: 6 }, (_, i) => {
       const angle = (i * Math.PI) / 3;
       return [x + radius * Math.cos(angle), y + radius * Math.sin(angle)];
@@ -218,18 +220,18 @@ const HexagonNode: React.FC<NodeRenderProps> = React.memo(
         {/* Base subtle fill */}
         <path d={pathD} fill={color} opacity={fillAlpha} />
         <path d={pathD} fill="none" stroke={color} strokeWidth={3} />
-        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter="url(#text-shadow)">
+        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter={`url(#${filterId("text-shadow")})`}>
           {label}
         </text>
         {sublabel && (
-          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">
+          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>
             {sublabel}
           </text>
         )}
         {stat && (
           <>
-            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter="url(#text-shadow-stat)">{stat.value}</text>
-            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">{stat.label}</text>
+            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter={`url(#${filterId("text-shadow-stat")})`}>{stat.value}</text>
+            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>{stat.label}</text>
           </>
         )}
       </g>
@@ -238,7 +240,7 @@ const HexagonNode: React.FC<NodeRenderProps> = React.memo(
 );
 
 const RoundedRectNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1 }) => {
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, filterId }) => {
     const rectWidth = radius * 1.8;
     const rectHeight = radius * 1.4;
 
@@ -256,14 +258,14 @@ const RoundedRectNode: React.FC<NodeRenderProps> = React.memo(
         {isFocused && (
           <rect x={x - rectWidth / 2} y={y - rectHeight / 2} width={rectWidth} height={rectHeight} rx={radii.lg} fill={color} opacity={0.08} />
         )}
-        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter="url(#text-shadow)">{label}</text>
+        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter={`url(#${filterId("text-shadow")})`}>{label}</text>
         {sublabel && (
-          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">{sublabel}</text>
+          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>{sublabel}</text>
         )}
         {stat && (
           <>
-            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter="url(#text-shadow-stat)">{stat.value}</text>
-            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">{stat.label}</text>
+            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter={`url(#${filterId("text-shadow-stat")})`}>{stat.value}</text>
+            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>{stat.label}</text>
           </>
         )}
       </g>
@@ -272,7 +274,7 @@ const RoundedRectNode: React.FC<NodeRenderProps> = React.memo(
 );
 
 const DiamondNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1 }) => {
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, filterId }) => {
     const points = [
       [x, y - radius],
       [x + radius, y],
@@ -292,14 +294,14 @@ const DiamondNode: React.FC<NodeRenderProps> = React.memo(
         {/* Base subtle fill */}
         <path d={pathD} fill={color} opacity={fillAlpha} />
         <path d={pathD} fill="none" stroke={color} strokeWidth={3} />
-        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter="url(#text-shadow)">{label}</text>
+        <text x={x} y={y + radius + 28} textAnchor="middle" fill={textPrimary} fontSize={fontSizes.label} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter={`url(#${filterId("text-shadow")})`}>{label}</text>
         {sublabel && (
-          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">{sublabel}</text>
+          <text x={x} y={y + radius + 50} textAnchor="middle" fill={textSecondary} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>{sublabel}</text>
         )}
         {stat && (
           <>
-            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter="url(#text-shadow-stat)">{stat.value}</text>
-            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter="url(#text-shadow-caption)">{stat.label}</text>
+            <text x={x} y={y + radius + 80} textAnchor="middle" fill={color} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter={`url(#${filterId("text-shadow-stat")})`}>{stat.value}</text>
+            <text x={x} y={y + radius + 100} textAnchor="middle" fill={textMuted} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={400} letterSpacing={0.5} filter={`url(#${filterId("text-shadow-caption")})`}>{stat.label}</text>
           </>
         )}
       </g>
@@ -313,6 +315,8 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   data,
 }) => {
   checkChartDataCommon("NetworkDiagram", data);
+  const uid = useId().replace(/:/g, "");
+  const filterId = (name: string) => `nd-${uid}-${name}`;
   const frame = useCurrentFrame();
   const config = useVideoConfig();
   const { durationInFrames } = config;
@@ -449,15 +453,15 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     >
       <defs>
         {/* Hierarchy-aware text shadows — dy + stdDeviation track text role */}
-        <filter id="text-shadow" x="-10%" y="-10%" width="120%" height="120%">
+        <filter id={filterId("text-shadow")} x="-10%" y="-10%" width="120%" height="120%">
           {/* Default — used by labels (mid hierarchy) */}
           <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(0,0,0,0.5)" />
         </filter>
-        <filter id="text-shadow-caption" x="-10%" y="-10%" width="120%" height="120%">
+        <filter id={filterId("text-shadow-caption")} x="-10%" y="-10%" width="120%" height="120%">
           {/* Caption / sublabel — lighter, smaller */}
           <feDropShadow dx="0" dy="0.5" stdDeviation="1" floodColor="rgba(0,0,0,0.4)" />
         </filter>
-        <filter id="text-shadow-stat" x="-15%" y="-15%" width="130%" height="130%">
+        <filter id={filterId("text-shadow-stat")} x="-15%" y="-15%" width="130%" height="130%">
           {/* Stat / hero data — heavier lift to anchor numbers */}
           <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" floodColor="rgba(0,0,0,0.55)" />
         </filter>
@@ -582,6 +586,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
               textMuted={theme.text.muted}
               isFocused={isFocused}
               fillAlpha={isFocused ? 0.12 : 0.08}
+              filterId={filterId}
             />
           );
         })}
@@ -602,7 +607,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             return (
               <g key={`control-${ctrlIdx}`}>
                 <rect x={midX - 50} y={midY - 20} width={100} height={40} rx={radii.md} fill="none" stroke={ctrlColor} strokeWidth={dividerStyle.thickness} />
-                <text x={midX} y={midY + 8} textAnchor="middle" fill={ctrlColor} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter="url(#text-shadow)">
+                <text x={midX} y={midY + 8} textAnchor="middle" fill={ctrlColor} fontSize={fontSizes.caption} fontFamily={fonts.mono} fontWeight={600} letterSpacing={1} filter={`url(#${filterId("text-shadow")})`}>
                   {control.label}
                 </text>
               </g>
@@ -634,7 +639,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             return (
               <g key={`callout-${callIdx}`}>
                 <rect x={callX} y={callY} width={calloutWidth} height={calloutHeight} rx={radii.md} fill={theme.bg.surface} stroke={theme.text.secondary} strokeWidth={dividerStyle.thickness} opacity={0.9} />
-                <text x={callX + calloutWidth / 2} y={callY + 25} textAnchor="middle" fill={palette.amber} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter="url(#text-shadow-stat)">
+                <text x={callX + calloutWidth / 2} y={callY + 25} textAnchor="middle" fill={palette.amber} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter={`url(#${filterId("text-shadow-stat")})`}>
                   {callout.value}
                 </text>
                 <foreignObject x={callX + 8} y={callY + 35} width={calloutWidth - 16} height={calloutHeight - 40}>
@@ -659,7 +664,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           fontFamily={fonts.mono}
           fontWeight={400}
           letterSpacing={2}
-          filter="url(#text-shadow)"
+          filter={`url(#${filterId("text-shadow")})`}
           opacity={exitOpacity}
         >
           {data.source}

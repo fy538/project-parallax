@@ -183,17 +183,18 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
 
 
-  // Chart region — declarative layout via the shared helper.
-  // Replaces hardcoded chartPaddingTop=180/Bottom=100 magic numbers with
-  // named regions. The helper reserves space for: title block + legend
-  // (when multi-series) + bottom x-axis labels + source line. The chart
-  // gets whatever's left.
+  // Chart region — declarative layout via the shared helper. Replaces
+  // hardcoded chartPaddingTop=180/Bottom=100 magic numbers with named
+  // regions. The helper reserves space for: title block + legend (when
+  // multi-series) + bottom x-axis labels + source line. Chart gets the
+  // remaining bounding box. extraPad adds room for y-axis tick labels
+  // and right-side legend clearance ON TOP OF the standard safe area.
   const cl = chartLayout({
     hasTitle: true,
     hasLegend: data.lines.length > 1,
     hasXAxis: true,
     hasSource: !!data.source,
-    insets: { left: 100, right: 100 }, // extra room for y-axis labels + legend strip
+    extraPad: { left: 100, right: 100 }, // y-axis label space + legend strip clearance
   });
   const chartLeft = cl.chart.left;
   const chartRight = cl.chart.left + cl.chart.width;

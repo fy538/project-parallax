@@ -122,7 +122,7 @@ const clips: ClipMetadata[] = [
     filename: "title-episode.json",
     component: TitleTransition,
     data: titleEpisode,
-    durationFrames: sec((titleEpisode as TitleTransitionData).durationSec),
+    durationFrames: sec((titleEpisode as TitleTransitionData).durationSec ?? 0),
   },
 
   // 02-04 — Beat 1: Opening stats
@@ -130,19 +130,19 @@ const clips: ClipMetadata[] = [
     filename: "kinetic-92-yield.json",
     component: KineticTypography,
     data: kinetic92Yield,
-    durationFrames: sec((kinetic92Yield as QuoteData).durationSec),
+    durationFrames: sec((kinetic92Yield as QuoteData).durationSec ?? 0),
   },
   {
     filename: "kinetic-165b.json",
     component: KineticTypography,
     data: kinetic165b,
-    durationFrames: sec((kinetic165b as QuoteData).durationSec),
+    durationFrames: sec((kinetic165b as QuoteData).durationSec ?? 0),
   },
   {
     filename: "chart-7pct-demand.json",
     component: DataChart,
     data: chart7pctDemand,
-    durationFrames: sec((chart7pctDemand as DataChartData).durationSec),
+    durationFrames: sec((chart7pctDemand as DataChartData).durationSec ?? 0),
   },
 
   // 06-11 — Beat 2: The Logic of Denial
@@ -150,7 +150,7 @@ const clips: ClipMetadata[] = [
     filename: "title-section-denial.json",
     component: TitleTransition,
     data: titleSectionDenial,
-    durationFrames: sec((titleSectionDenial as TitleTransitionData).durationSec),
+    durationFrames: sec((titleSectionDenial as TitleTransitionData).durationSec ?? 0),
   },
   {
     filename: "dual-timeline-oil-chips.json",
@@ -162,13 +162,13 @@ const clips: ClipMetadata[] = [
     filename: "kinetic-revenue-deal.json",
     component: KineticTypography,
     data: kineticRevenueDeal,
-    durationFrames: sec((kineticRevenueDeal as QuoteData).durationSec),
+    durationFrames: sec((kineticRevenueDeal as QuoteData).durationSec ?? 0),
   },
   {
     filename: "chart-chips-act.json",
     component: DataChart,
     data: chartChipsAct,
-    durationFrames: sec((chartChipsAct as DataChartData).durationSec),
+    durationFrames: sec((chartChipsAct as DataChartData).durationSec ?? 0),
   },
   {
     filename: "choropleth-cocom.json",
@@ -180,7 +180,7 @@ const clips: ClipMetadata[] = [
     filename: "framework-cocom-china.json",
     component: FrameworkDiagram,
     data: frameworkCocomChina,
-    durationFrames: sec((frameworkCocomChina as FrameworkDiagramData).durationSec),
+    durationFrames: sec((frameworkCocomChina as FrameworkDiagramData).durationSec ?? 0),
   },
 
   // 12-18 — Beat 3: The Other Side of the Wall
@@ -188,43 +188,43 @@ const clips: ClipMetadata[] = [
     filename: "title-section-wall.json",
     component: TitleTransition,
     data: titleSectionWall,
-    durationFrames: sec((titleSectionWall as TitleTransitionData).durationSec),
+    durationFrames: sec((titleSectionWall as TitleTransitionData).durationSec ?? 0),
   },
   {
     filename: "kinetic-kabozi.json",
     component: KineticTypography,
     data: kineticKabozi,
-    durationFrames: sec((kineticKabozi as QuoteData).durationSec),
+    durationFrames: sec((kineticKabozi as QuoteData).durationSec ?? 0),
   },
   {
     filename: "kinetic-juguo.json",
     component: KineticTypography,
     data: kineticJuguo,
-    durationFrames: sec((kineticJuguo as QuoteData).durationSec),
+    durationFrames: sec((kineticJuguo as QuoteData).durationSec ?? 0),
   },
   {
     filename: "chart-lithography.json",
     component: DataChart,
     data: chartLithography,
-    durationFrames: sec((chartLithography as DataChartData).durationSec),
+    durationFrames: sec((chartLithography as DataChartData).durationSec ?? 0),
   },
   {
     filename: "timeseries-smic-yield.json",
     component: TimeSeriesChart,
     data: timeseriesSmicYield,
-    durationFrames: sec((timeseriesSmicYield as TimeSeriesChartData).durationSec),
+    durationFrames: sec((timeseriesSmicYield as TimeSeriesChartData).durationSec ?? 0),
   },
   {
     filename: "framework-kirin-teardown.json",
     component: FrameworkDiagram,
     data: frameworkKirinTeardown,
-    durationFrames: sec((frameworkKirinTeardown as FrameworkDiagramData).durationSec),
+    durationFrames: sec((frameworkKirinTeardown as FrameworkDiagramData).durationSec ?? 0),
   },
   {
     filename: "kinetic-deepseek-zero.json",
     component: KineticTypography,
     data: kineticDeepseekZero,
-    durationFrames: sec((kineticDeepseekZero as QuoteData).durationSec),
+    durationFrames: sec((kineticDeepseekZero as QuoteData).durationSec ?? 0),
   },
 
   // 19-24 — Beat 4: The Trap
@@ -232,19 +232,19 @@ const clips: ClipMetadata[] = [
     filename: "title-section-trap.json",
     component: TitleTransition,
     data: titleSectionTrap,
-    durationFrames: sec((titleSectionTrap as TitleTransitionData).durationSec),
+    durationFrames: sec((titleSectionTrap as TitleTransitionData).durationSec ?? 0),
   },
   {
     filename: "gameboard-chess.json",
     component: GameBoard,
     data: gameboardChess,
-    durationFrames: getGameBoardDuration(gameboardChess as GameBoardData),
+    durationFrames: getGameBoardDuration(gameboardChess as unknown as GameBoardData),
   },
   {
     filename: "gameboard-go.json",
     component: GameBoard,
     data: gameboardGo,
-    durationFrames: getGameBoardDuration(gameboardGo as GameBoardData),
+    durationFrames: getGameBoardDuration(gameboardGo as unknown as GameBoardData),
   },
   {
     filename: "route-chip-supply.json",
@@ -256,7 +256,7 @@ const clips: ClipMetadata[] = [
     filename: "kinetic-trap.json",
     component: KineticTypography,
     data: kineticTrap,
-    durationFrames: sec((kineticTrap as QuoteData).durationSec),
+    durationFrames: sec((kineticTrap as QuoteData).durationSec ?? 0),
   },
   {
     filename: "choropleth-caught-between.json",
@@ -268,7 +268,7 @@ const clips: ClipMetadata[] = [
     filename: "kinetic-morris-chang.json",
     component: KineticTypography,
     data: kineticMorrisChang,
-    durationFrames: sec((kineticMorrisChang as QuoteData).durationSec),
+    durationFrames: sec((kineticMorrisChang as QuoteData).durationSec ?? 0),
   },
 
   // 25-26 — Beat 5: Your Chips
@@ -276,13 +276,13 @@ const clips: ClipMetadata[] = [
     filename: "title-section-chips.json",
     component: TitleTransition,
     data: titleSectionChips,
-    durationFrames: sec((titleSectionChips as TitleTransitionData).durationSec),
+    durationFrames: sec((titleSectionChips as TitleTransitionData).durationSec ?? 0),
   },
   {
     filename: "decisiontree-ai-timeline.json",
     component: DecisionTree,
     data: decisiontreeAiTimeline,
-    durationFrames: sec((decisiontreeAiTimeline as DecisionTreeData).durationSec),
+    durationFrames: sec((decisiontreeAiTimeline as unknown as DecisionTreeData).durationSec ?? 0),
   },
   {
     filename: "route-bifurcation.json",
@@ -296,7 +296,7 @@ const clips: ClipMetadata[] = [
     filename: "title-endcard.json",
     component: TitleTransition,
     data: titleEndcard,
-    durationFrames: sec((titleEndcard as TitleTransitionData).durationSec),
+    durationFrames: sec((titleEndcard as TitleTransitionData).durationSec ?? 0),
   },
 ];
 

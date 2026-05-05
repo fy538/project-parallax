@@ -56,6 +56,7 @@ import { LayeredComposition } from "../../components/LayeredComposition";
 import { LowerThird } from "../../components/LowerThird";
 import { FilmOverlay } from "../../components/FilmOverlay";
 import { AudioLayer } from "../../components/AudioLayer";
+import { EpisodeColorEmphasisProvider } from "../../hooks/useEpisodeColorEmphasis";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -82,6 +83,7 @@ import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
 import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
 
@@ -224,6 +226,20 @@ interface AssemblyManifest {
   fps: number;
   totalDurationSec: number;
   mode: "estimate" | "precise";
+  /**
+   * Per-episode color emphasis. Mirrors per-typography palette emphasis
+   * architecture in tools/recraft/recraft.py for AI-generated content.
+   * Wraps the full episode in EpisodeColorEmphasisProvider so all templates
+   * inherit the emphasis. Falls back to "neutral" if unset (backward compat).
+   * See remotion-templates/BRAND.md → "Per-Episode Color Emphasis".
+   */
+  episodeColorEmphasis?:
+    | "neutral"
+    | "soviet"
+    | "american-modernist"
+    | "chinese-state"
+    | "chinese-traditional"
+    | "japanese-showa";
   narration: NarrationInfo;
   beats?: BeatInfo[];
   segments: ManifestSegment[];
@@ -299,7 +315,7 @@ function getAtmosphereIntensityAtTime(
       active = t;
     }
   }
-  return MOOD_INTENSITY[active.mood] ?? 1.0;
+  return MOOD_INTENSITY[active.mood ?? "neutral"] ?? 1.0;
 }
 
 // ── Component map ─────────────────────────────────────────────────────────────
@@ -446,17 +462,13 @@ const ForegroundSegment: React.FC<{
 
   const Component = TEMPLATE_COMPONENTS[template.component];
   if (!Component) {
-    console.warn(
-      `FullEpisode: Unknown template component "${template.component}" in segment ${segment.id}`
-    );
+    warnIf(true, "FullEpisode", `Unknown template component "${template.component}" in segment ${segment.id}`);
     return null;
   }
 
   const data = template.dataFile ? templateData[template.dataFile] : null;
   if (!data && template.dataFile) {
-    console.warn(
-      `FullEpisode: Missing template data for "${template.dataFile}" in segment ${segment.id}`
-    );
+    warnIf(true, "FullEpisode", `Missing template data for "${template.dataFile}" in segment ${segment.id}`);
     // Render placeholder
     return (
       <AbsoluteFill
@@ -584,9 +596,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         if (durationFrames <= 0) return null;
 
         // Layered mode: foreground template composited over a background segment
-        const layeredBg = seg.layered?.backgroundSegmentId
-          ? segmentIndex[seg.layered.backgroundSegmentId]
-          : null;
+        const layeredBgId = seg.layered?.backgroundSegmentId;
+        const layeredBg = layeredBgId ? (segmentIndex[layeredBgId] ?? null) : null;
+        warnIf(
+          !!layeredBgId && !layeredBg,
+          "FullEpisode",
+          `Layered segment ${seg.id} references backgroundSegmentId "${layeredBgId}" which was not found in the manifest.`
+        );
 
         return (
           <Sequence
@@ -698,36 +714,38 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
   );
 
   return (
-    <AbsoluteFill style={{ backgroundColor: "#F5F0E8" }}>
-      {filmOverlayConfig ? (
-        <FilmOverlay
-          effects={filmOverlayConfig.effects}
-          intensity={filmOverlayConfig.intensity}
-        >
-          {visualLayers}
-        </FilmOverlay>
-      ) : (
-        visualLayers
-      )}
+    <EpisodeColorEmphasisProvider value={manifest.episodeColorEmphasis}>
+      <AbsoluteFill style={{ backgroundColor: "#F5F0E8" }}>
+        {filmOverlayConfig ? (
+          <FilmOverlay
+            effects={filmOverlayConfig.effects}
+            intensity={filmOverlayConfig.intensity}
+          >
+            {visualLayers}
+          </FilmOverlay>
+        ) : (
+          visualLayers
+        )}
 
-      {/* Audio layers (always outside film overlay — audio isn't visual) */}
+        {/* Audio layers (always outside film overlay — audio isn't visual) */}
 
-      {/* Layer 5: Narration (dominant — -0dB reference) */}
-      {manifest.narration.audioFile && (
-        <Audio
-          src={staticFile(
-            `episodes/${manifest.episode.toLowerCase()}/${manifest.narration.audioFile}`
-          )}
+        {/* Layer 5: Narration (dominant — -0dB reference) */}
+        {manifest.narration.audioFile && (
+          <Audio
+            src={staticFile(
+              `episodes/${manifest.episode.toLowerCase()}/${manifest.narration.audioFile}`
+            )}
+          />
+        )}
+
+        {/* Layers 6-8: Music bed + transition SFX + texture hits */}
+        <AudioLayer
+          episode={manifest.episode.toLowerCase()}
+          musicBedTracks={manifest.musicBed?.tracks}
+          segmentAudio={segmentAudio}
         />
-      )}
-
-      {/* Layers 6-8: Music bed + transition SFX + texture hits */}
-      <AudioLayer
-        episode={manifest.episode.toLowerCase()}
-        musicBedTracks={manifest.musicBed?.tracks}
-        segmentAudio={segmentAudio}
-      />
-    </AbsoluteFill>
+      </AbsoluteFill>
+    </EpisodeColorEmphasisProvider>
   );
 };
 

@@ -22,7 +22,6 @@ Requires: pip install Pillow numpy --break-system-packages
 import argparse
 import sys
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
@@ -37,11 +36,6 @@ _defaults = get_defaults()
 DEFAULT_SATURATION = _defaults.get("saturation", 0.25)
 DEFAULT_GRAIN_INTENSITY = _defaults.get("grain", 0.10)
 DEFAULT_VIGNETTE_STRENGTH = _defaults.get("vignette", 0.18)
-
-
-def hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:
-    hex_str = hex_str.lstrip("#")
-    return tuple(int(hex_str[i:i+2], 16) for i in (0, 2, 4))
 
 
 def step1_desaturate(img: Image.Image, saturation: float = DEFAULT_SATURATION) -> Image.Image:

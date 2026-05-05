@@ -189,10 +189,12 @@ const layoutSankey = (
   const outflowOffset = new Map<string, number>();
   const inflowOffset = new Map<string, number>();
 
-  // Compute ribbon endpoints for each link.
-  const layoutLinks: LayoutLink[] = sortedLinks.map((link) => {
-    const fromNode = nodeIdToLayout.get(link.from)!;
-    const toNode = nodeIdToLayout.get(link.to)!;
+  // Compute ribbon endpoints for each link. Links referencing unknown node IDs
+  // are silently dropped rather than crashing — bad data shouldn't kill the render.
+  const layoutLinks: LayoutLink[] = sortedLinks.flatMap((link) => {
+    const fromNode = nodeIdToLayout.get(link.from);
+    const toNode = nodeIdToLayout.get(link.to);
+    if (!fromNode || !toNode) return [];
 
     const fromTotalOutflow = outflowByNode.get(link.from) || link.value;
     const toTotalInflow = inflowByNode.get(link.to) || link.value;
@@ -737,7 +739,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
               link={link}
               frame={frame}
               startFrame={linksStart}
-              columnCount={Math.max(...nodes.map((n) => n.column)) + 1}
+              columnCount={nodes.length > 0 ? Math.max(...nodes.map((n) => n.column)) + 1 : 1}
               sourceColor={fromNode?.color}
               targetColor={toNode?.color}
             />
@@ -746,7 +748,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
 
         {/* Render nodes */}
         {(() => {
-          const lastColumn = Math.max(...layoutNodes.map((n) => n.column));
+          const lastColumn = layoutNodes.length > 0 ? Math.max(...layoutNodes.map((n) => n.column)) : 0;
           return layoutNodes.map((node, idx) => {
             const isSourceNode = sourceNodeIds.has(node.id);
             const nodeStartFrame = isSourceNode ? sourceNodesStart : otherNodesStart;
