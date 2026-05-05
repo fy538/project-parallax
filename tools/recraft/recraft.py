@@ -80,6 +80,12 @@ import requests
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from color_utils import hex_to_rgb as _hex_to_rgb  # noqa: E402
 
+# Load duotone ramps from palette.json (single source of truth — same path
+# treat.py and treat_video.py use, via palette_loader). Avoids the drift that
+# accumulated when this module hardcoded pre-Direction-A values.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "brand-treatment"))
+from palette_loader import get_ramps_hex as _get_ramps_hex  # noqa: E402
+
 # ── Configuration ────────────────────────────────────────────────────────────
 
 API_KEY = os.environ.get("RECRAFT_API_KEY", "")
@@ -97,12 +103,12 @@ BRAND_PALETTE = {
     "midnight": "#0F1923",
 }
 
-# Duotone ramps matching palette.json
-DUOTONE_RAMPS = {
-    "standard": {"shadows": "#1C1814", "midtones": "#8B6914", "highlights": "#E5A544"},
-    "conflict": {"shadows": "#1C1814", "midtones": "#6B1D1D", "highlights": "#C23B22"},
-    "editorial": {"shadows": "#3A3530", "midtones": "#C4B89A", "highlights": "#F0E6D0"},
-}
+# Duotone ramps loaded from palette.json (Direction A as of May 2026):
+#   standard:  ink → umber → gold        (warm editorial baseline)
+#   conflict:  ink → #7A2E1A → china     (escalation/adversarial framing)
+#   editorial: taupe → bone → paper     (light-mode editorial signatures)
+# To change a ramp: edit `duotone` in palette.json, no code change needed.
+DUOTONE_RAMPS = _get_ramps_hex()
 
 # Default prompt prefix for brand consistency
 BRAND_PREFIX = (
@@ -372,14 +378,27 @@ def build_parallax_prompt(
 # preambles. May 4, 2026 migration. See PROMPT_PREAMBLES.md for design rationale.
 
 CONSTRUCTIVIST_BASE_PREAMBLE = (
-    "Editorial illustration in the Parallax constructivist style. Soviet "
-    "constructivism meets German political photomontage meets industrial "
-    "woodcut tradition — drawing on Alexander Rodchenko, El Lissitzky, "
-    "John Heartfield, and Frans Masereel. Bold compositional confidence, "
-    "color-blocked forms with no soft shading or gradients. "
+    "Editorial illustration in the Parallax 20th-century constructivist "
+    "tradition — drawing on the broader graphic-design family that spans "
+    "the Bauhaus design school (László Moholy-Nagy, Herbert Bayer), "
+    "American mid-century editorial modernism (Saul Bass, Push Pin Studios, "
+    "Charley Harper, Jim Flora, Paul Rand, Fortune magazine industrial-"
+    "modernism), British industrial modernism (E. McKnight Kauffer, "
+    "Edward Bawden), Japanese Showa-era graphic design (Yusaku Kamekura, "
+    "Ikko Tanaka), Soviet Constructivism (Alexander Rodchenko, El Lissitzky), "
+    "German political photomontage (John Heartfield), and 20th-century "
+    "industrial woodcut tradition (Frans Masereel). The base aesthetic is "
+    "the shared graphic discipline this family carries: bold compositional "
+    "confidence, color-blocked forms with no soft shading or gradients, "
+    "geometric clarity, restrained palette, editorial publication weight. "
     "Restricted warm palette: deep ink (#1C1814), walnut (#5C4A3D), "
     "umber (#8B7355), burnt amber and gold (#C4A747), rust (#A64D46), "
-    "and bone (#F0E6D0) on paper (#F5F0E8) background. No other colors."
+    "and bone (#F0E6D0) on paper (#F5F0E8) background. No other colors. "
+    "Cultural specificity (Soviet Constructivist intensity, American "
+    "mid-century restraint, Chinese vermillion, Japanese Showa minimalism, "
+    "literati ink-wash) is supplied by the typography emphasis block per "
+    "scene — this base provides the neutral 20th-century editorial-"
+    "illustration grammar from which the cultural emphasis emerges."
 )
 
 REGISTER_FOCUS_BLOCKS = {

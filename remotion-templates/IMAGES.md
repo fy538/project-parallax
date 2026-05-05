@@ -7,7 +7,7 @@
 > The pipeline IS the brand. A raw, full-color photo in a composition breaks
 > the entire visual system.
 >
-> Last updated: April 26, 2026
+> Last updated: May 5, 2026 (Direction A duotone migration)
 
 ---
 
@@ -76,9 +76,11 @@ Map the desaturated luminance values to a brand color ramp. This is where the im
 
 | Ramp | Shadows → Midtones → Highlights | When to use |
 |------|----------------------------------|-------------|
-| **Standard** | `ink` #1A1A2E → `bronze` #8B5E2B → `amber` #E5A544 | Default for most content. Neutral analysis, maps, infrastructure, history. |
-| **Conflict** | `ink` #1A1A2E → #7A2E1A → `rust` #C23B22 | China-related content, military conflict, trade wars, sanctions, adversarial framing. |
-| **Editorial** | `folder` #C8B89A → `bone` #F0E6D0 → `paper` #F5F0E8 | Light-mode compositions only. Dossier aesthetic — bleached, archival, paper-like. |
+| **Standard** | `ink` #1C1814 → `umber` #8B7355 → `gold` #C4A747 | Default for most content. Neutral analysis, maps, infrastructure, history. |
+| **Conflict** | `ink` #1C1814 → #7A2E1A → `china` #A64D46 | China-related content, military conflict, trade wars, sanctions, adversarial framing. |
+| **Editorial** | `taupe` #B8A189 → `bone` #F0E6D0 → `paper` #F5F0E8 | Light-mode compositions only. Dossier aesthetic — bleached, archival, paper-like. |
+
+> Source of truth: `tools/brand-treatment/palette.json` (the `duotone` block). Both `treat.py` and `recraft.py` read from there via `palette_loader.py` — the table above mirrors that file.
 
 #### Ramp decision tree
 
@@ -131,9 +133,9 @@ Is this a light-mode composition (title card, social, editorial)?
 ```
 
 The `feFuncR/G/B table` values map luminance stops to the RGB channels of your shadow → midtone → highlight colors. Calculate them by converting each hex to 0-1 RGB values:
-- ink #1A1A2E → R:0.102 G:0.102 B:0.180
-- bronze #8B5E2B → R:0.545 G:0.369 B:0.169
-- amber #E5A544 → R:0.898 G:0.647 B:0.267
+- ink #1C1814 → R:0.110 G:0.094 B:0.078
+- umber #8B7355 → R:0.545 G:0.451 B:0.333
+- gold #C4A747 → R:0.769 G:0.655 B:0.278
 
 **Pre-baked approach (recommended for thumbnails/social):**
 Process images in Photoshop/Affinity before importing. Faster, more control, no runtime cost.
@@ -373,9 +375,9 @@ For episodes with multiple images (common — a 15-minute video might use 8-12 i
 ```
 1. Image → Adjustments → Hue/Saturation → Saturation: -75
 2. Image → Adjustments → Gradient Map →
-   Left stop: #1A1A2E (ink)
-   Center stop: #8B5E2B (bronze) at 50%
-   Right stop: #E5A544 (amber)
+   Left stop: #1C1814 (ink)
+   Center stop: #8B7355 (umber) at 50%
+   Right stop: #C4A747 (gold)
 3. New Layer → Fill 50% Gray → Filter → Noise → Add Noise: 10%, Gaussian, Mono
    → Blend: Overlay
 4. New Layer → Gradient: Radial, Foreground to Transparent, Black
@@ -385,12 +387,12 @@ For episodes with multiple images (common — a 15-minute video might use 8-12 i
 
 ### Conflict Ramp — change step 2 to:
 ```
-Left: #1A1A2E | Center: #7A2E1A at 50% | Right: #C23B22
+Left: #1C1814 | Center: #7A2E1A at 50% | Right: #A64D46
 ```
 
 ### Editorial Ramp — change step 2 to:
 ```
-Left: #C8B89A | Center: #F0E6D0 at 50% | Right: #F5F0E8
+Left: #B8A189 | Center: #F0E6D0 at 50% | Right: #F5F0E8
 ```
 
 ---

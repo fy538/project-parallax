@@ -16,7 +16,8 @@
       "@templates/*": ["src/templates/*"],
       "@utils/*": ["src/utils/*"],
       "@data/*": ["data/*"]
-    }
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*", "data/**/*"],
   "exclude": ["node_modules", "dist", "src/__tests__"]

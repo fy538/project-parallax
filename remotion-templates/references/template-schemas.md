@@ -37,11 +37,17 @@ Use these values for any `color` field:
 
 **Semantic tokens:** `#4A7BA7` (US / muted blue), `#A64D46` (China / muted rust), `#888780` (neutral)
 
-**Ramps (5-stop, light→dark):** still pinned to the pre-Direction-A palette inside the recraft.py / treat.py duotone pipeline. Migration TBD — if you need a brand-current ramp, derive it from the palette tokens above instead of using these:
-- Blue: `#E6F1FB`, `#85B7EB`, `#378ADD`, `#185FA5`, `#042C53`
-- Red: `#FCEBEB`, `#F09595`, `#E24B4A`, `#A32D2D`, `#501313`
-- Amber: `#FFF3D6`, `#F5D78E`, `#E5A544`, `#B07A28`, `#5C3F12`
-- Gray: `#F1EFE8`, `#B4B2A9`, `#888780`, `#5F5E5A`, `#2C2C2A`
+**Ramps (light→dark, sequential — for multi-series chart fills, value-encoded heatmaps):** loaded from palette.json's `ramps` block by `theme.ts`. Use `ramps.<name>[i]` rather than the literal hex below.
+- Warm (6-stop): `#F5F0E8`, `#D9C9B0`, `#B8A189`, `#8B7355`, `#5C4A3D`, `#1C1814`
+- Blue (5-stop): `#E8F0F6`, `#9DBDD6`, `#4A7BA7`, `#2E5C82`, `#163048`
+- Red (5-stop): `#F5E8E7`, `#CFA09C`, `#A64D46`, `#7A3530`, `#3D1A18`
+- Gold (5-stop): `#FFF6E0`, `#E8D49A`, `#C4A747`, `#967E30`, `#5C4D1A`
+- Gray (5-stop): `#F1EFE8`, `#B4B2A9`, `#888780`, `#5F5E5A`, `#2C2C2A`
+
+**Duotone (3-stop, shadow→midtone→highlight — for image treatment via treat.py / recraft.py):** loaded from palette.json's `duotone` block.
+- Standard: `#1C1814` ink → `#8B7355` umber → `#C4A747` gold
+- Conflict: `#1C1814` ink → `#7A2E1A` → `#A64D46` china
+- Editorial: `#B8A189` taupe → `#F0E6D0` bone → `#F5F0E8` paper
 
 ---
 
