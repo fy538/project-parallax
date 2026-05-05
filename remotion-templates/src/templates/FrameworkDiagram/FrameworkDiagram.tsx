@@ -264,6 +264,18 @@ const FlowVariant: React.FC<{
     });
   }, [frame, eliminatedScenarios]);
 
+  // Pre-compute lookup: filter index → [{es, originalIdx}]
+  // Replaces O(n) .filter() + .indexOf() calls inside the per-frame render loop
+  const eliminatedByFilter = useMemo(() => {
+    const map = new Map<number, Array<{ es: (typeof eliminatedScenarios)[0]; idx: number }>>();
+    eliminatedScenarios.forEach((es, idx) => {
+      const key = es.filter ?? -1;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push({ es, idx });
+    });
+    return map;
+  }, [eliminatedScenarios]);
+
   // ── SPATIAL LAYOUT MODE ──
   if (isSpatial) {
     const containerWidth = 900;
@@ -531,8 +543,8 @@ const FlowVariant: React.FC<{
                       </div>
                     )}
                     {/* Eliminated scenario beside arrow */}
-                    {eliminatedScenarios.filter((es) => es.filter === i).map((es, ei) => {
-                      const esVisible = eliminatedVisible[eliminatedScenarios.indexOf(es)];
+                    {(eliminatedByFilter.get(i) || []).map(({ es, idx }, ei) => {
+                      const esVisible = eliminatedVisible[idx];
                       const esColor = es.color || "#D64545";
                       return esVisible ? (
                         <div

@@ -225,6 +225,13 @@ export const layerDelay = (
 
 // ── Ken Burns drift ────────────────────────────────────────────────────────
 
+/** Per POLISH.md A6: max scale drift for held compositions (1.00 → KEN_BURNS_MAX_SCALE). */
+export const KEN_BURNS_MAX_SCALE = 1.02;
+/** Per POLISH.md A6: max pan drift in pixels for held compositions. */
+export const PAN_DRIFT_MAX_OFFSET = 8;
+/** Per POLISH.md A7: exit fade duration in frames at 30fps (last 15 frames fade out). */
+export const EXIT_FADE_DURATION = 15;
+
 /**
  * Subtle scale drift for static compositions held >3s.
  * Per POLISH.md A6: 1.00 → 1.02 over full duration.
@@ -233,7 +240,7 @@ export const layerDelay = (
 export const kenBurnsDrift = (
   frame: number,
   totalFrames: number,
-  maxScale: number = 1.02
+  maxScale: number = KEN_BURNS_MAX_SCALE
 ): number =>
   interpolate(frame, [0, totalFrames], [1.0, maxScale], CLAMP_QUAD_INOUT);
 
@@ -244,7 +251,7 @@ export const kenBurnsDrift = (
 export const panDrift = (
   frame: number,
   totalFrames: number,
-  maxOffset: number = 8
+  maxOffset: number = PAN_DRIFT_MAX_OFFSET
 ): number =>
   interpolate(frame, [0, totalFrames], [0, maxOffset], CLAMP_QUAD_INOUT);
 
@@ -368,7 +375,7 @@ export const focusPull = (
 export const exitFade = (
   frame: number,
   totalFrames: number,
-  exitDuration: number = 15
+  exitDuration: number = EXIT_FADE_DURATION
 ): number =>
   interpolate(
     frame,
