@@ -7,6 +7,9 @@ on:
     branches: [main]
 
 jobs:
+  # Primary CI runs on Linux (faster + cheaper). Validates JSON, lint,
+  # typecheck, full Python + Vitest test suites — the things that need to
+  # pass on every commit.
   test:
     runs-on: ubuntu-latest
     steps:
@@ -38,3 +41,38 @@ jobs:
 
       - name: Run all tests
         run: ./scripts/test.sh
+
+  # Smoke-test the macOS render path. The user develops on macOS and renders
+  # locally there; without this job, the macOS-specific browser-detection
+  # code in render-episode.mjs (Playwright cache at ~/Library/Caches/...,
+  # Google Chrome for Testing fallback) is never exercised in CI. Doesn't
+  # run renders — just typecheck + tests so any macOS-specific tooling
+  # breakage surfaces here, not when Tiger first re-renders an episode.
+  macos-smoke:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: remotion-templates/package-lock.json
+
+      - name: Install Python deps
+        run: pip install pytest jsonschema
+
+      - name: Install Node deps
+        run: cd remotion-templates && npm ci
+
+      - name: TypeScript strict check
+        run: ./scripts/typecheck.sh
+
+      - name: Vitest unit tests (Remotion-side, no browser needed)
+        run: cd remotion-templates && npx vitest run src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/lint-conventions.test.ts

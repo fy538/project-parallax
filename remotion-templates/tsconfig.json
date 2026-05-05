@@ -8,16 +8,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "outDir": "./dist",
-    "baseUrl": ".",
-    "paths": {
-      "@design/*": ["src/design/*"],
-      "@components/*": ["src/components/*"],
-      "@templates/*": ["src/templates/*"],
-      "@utils/*": ["src/utils/*"],
-      "@data/*": ["data/*"]
-    },
-    "ignoreDeprecations": "6.0"
+    "outDir": "./dist"
   },
   "include": ["src/**/*", "data/**/*"],
   "exclude": ["node_modules", "dist", "src/__tests__"]

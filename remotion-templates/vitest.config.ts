@@ -1,4 +1,3 @@
-import path from "path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
@@ -25,15 +24,5 @@ export default defineConfig({
     // Include test files
     include: ["src/__tests__/**/*.test.ts"],
     exclude: ["node_modules", "dist"],
-  },
-
-  resolve: {
-    alias: {
-      "@design": path.resolve(__dirname, "./src/design"),
-      "@components": path.resolve(__dirname, "./src/components"),
-      "@templates": path.resolve(__dirname, "./src/templates"),
-      "@utils": path.resolve(__dirname, "./src/utils"),
-      "@data": path.resolve(__dirname, "./data"),
-    },
   },
 });

@@ -673,6 +673,7 @@
       "callbackVisual": "BayesianUpdate template — distribution curve with episode-specific evidence items, amber accent"
     },
     {
+      "_status": "draft",
       "id": "the-blockade-paradox",
       "term": {
         "en": "The Blockade Paradox"
@@ -709,6 +710,7 @@
       "callbackVisual": "3s DataChart — the Blockade Paradox curve (enforcement tightness vs defection incentive), rust accent"
     },
     {
+      "_status": "draft",
       "id": "the-defection-cascade",
       "term": {
         "en": "The Defection Cascade"
@@ -744,6 +746,7 @@
       "callbackVisual": "2s KineticTypography — 'THE DEFECTION CASCADE' in rust, no definition repeat"
     },
     {
+      "_status": "draft",
       "id": "the-escrow-state",
       "term": {
         "en": "The Escrow State"
@@ -781,6 +784,7 @@
       "callbackVisual": "2s KineticTypography — 'THE ESCROW STATE' in rust, with country flags briefly visible"
     },
     {
+      "_status": "draft",
       "id": "tragedy-of-the-commons",
       "term": {
         "en": "tragedy of the commons"
@@ -813,6 +817,7 @@
       "callbackVisual": "2s FrameworkDiagram — pasture with degradation indicator, amber accent"
     },
     {
+      "_status": "draft",
       "id": "prisoners-dilemma-as-pattern",
       "term": {
         "en": "prisoner's dilemma (as structural pattern)"
@@ -845,6 +850,7 @@
       "callbackVisual": "2s FrameworkDiagram — 2x2 payoff matrix with COOPERATE/DEFECT, amber accent"
     },
     {
+      "_status": "draft",
       "id": "ostrom-governance-principles",
       "term": {
         "en": "Ostrom's governance principles"

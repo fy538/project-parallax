@@ -26,45 +26,38 @@ import { DecisionTree } from "../DecisionTree/DecisionTree";
 import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 
-// Data — opening + Beat 1
-import titleEpisode from "../../../data/episodes/silicon-trap/title-episode.json";
-import kinetic92Yield from "../../../data/episodes/silicon-trap/kinetic-92-yield.json";
-import kinetic165b from "../../../data/episodes/silicon-trap/kinetic-165b.json";
-import chart7pctDemand from "../../../data/episodes/silicon-trap/chart-7pct-demand.json";
-
-// Data — Beat 2: The Logic of Denial
-import titleSectionDenial from "../../../data/episodes/silicon-trap/title-section-denial.json";
-import dualTimelineOilChips from "../../../data/episodes/silicon-trap/dual-timeline-oil-chips.json";
-import kineticRevenueDeal from "../../../data/episodes/silicon-trap/kinetic-revenue-deal.json";
-import chartChipsAct from "../../../data/episodes/silicon-trap/chart-chips-act.json";
-import choroplethCocom from "../../../data/episodes/silicon-trap/choropleth-cocom.json";
-import frameworkCocomChina from "../../../data/episodes/silicon-trap/framework-cocom-china.json";
-
-// Data — Beat 3: The Other Side of the Wall
-import titleSectionWall from "../../../data/episodes/silicon-trap/title-section-wall.json";
-import kineticKabozi from "../../../data/episodes/silicon-trap/kinetic-kabozi.json";
-import kineticJuguo from "../../../data/episodes/silicon-trap/kinetic-juguo.json";
-import chartLithography from "../../../data/episodes/silicon-trap/chart-lithography.json";
-import timeseriesSmicYield from "../../../data/episodes/silicon-trap/timeseries-smic-yield.json";
-import frameworkKirinTeardown from "../../../data/episodes/silicon-trap/framework-kirin-teardown.json";
-import kineticDeepseekZero from "../../../data/episodes/silicon-trap/kinetic-deepseek-zero.json";
-
-// Data — Beat 4: The Trap
-import titleSectionTrap from "../../../data/episodes/silicon-trap/title-section-trap.json";
-import gameboardChess from "../../../data/episodes/silicon-trap/gameboard-chess.json";
-import gameboardGo from "../../../data/episodes/silicon-trap/gameboard-go.json";
-import routeChipSupply from "../../../data/episodes/silicon-trap/route-chip-supply.json";
-import kineticTrap from "../../../data/episodes/silicon-trap/kinetic-trap.json";
-import choroplethCaughtBetween from "../../../data/episodes/silicon-trap/choropleth-caught-between.json";
-import kineticMorrisChang from "../../../data/episodes/silicon-trap/kinetic-morris-chang.json";
-
-// Data — Beat 5: Your Chips
-import titleSectionChips from "../../../data/episodes/silicon-trap/title-section-chips.json";
-import decisiontreeAiTimeline from "../../../data/episodes/silicon-trap/decisiontree-ai-timeline.json";
-import routeBifurcation from "../../../data/episodes/silicon-trap/route-bifurcation.json";
-
-// Data — Closing
-import titleEndcard from "../../../data/episodes/silicon-trap/title-endcard.json";
+// All 29 data files come from one source — see silicon-trap-data.ts. Adding a
+// clip means editing that barrel only; this file picks it up automatically.
+import {
+  titleEpisode,
+  kinetic92Yield,
+  kinetic165b,
+  chart7pctDemand,
+  titleSectionDenial,
+  dualTimelineOilChips,
+  kineticRevenueDeal,
+  chartChipsAct,
+  choroplethCocom,
+  frameworkCocomChina,
+  titleSectionWall,
+  kineticKabozi,
+  kineticJuguo,
+  chartLithography,
+  timeseriesSmicYield,
+  frameworkKirinTeardown,
+  kineticDeepseekZero,
+  titleSectionTrap,
+  gameboardChess,
+  gameboardGo,
+  routeChipSupply,
+  kineticTrap,
+  choroplethCaughtBetween,
+  kineticMorrisChang,
+  titleSectionChips,
+  decisiontreeAiTimeline,
+  routeBifurcation,
+  titleEndcard,
+} from "./silicon-trap-data";
 
 // Phase-based templates with a 1-second intro delay (RouteAnimation/index.tsx convention).
 const routeDuration = sumPhasesPlus(1);

@@ -172,10 +172,32 @@ for (const { seq, comp, file, desc } of sequence) {
     rendered++;
   } else {
     console.log(` ✗ FAILED`);
+    // Print the last 3 stderr lines inline for quick triage, but ALSO write
+    // the full stderr (and stdout) to a per-clip error log so post-mortem
+    // diagnosis isn't blocked by terminal-output truncation. Without this,
+    // a multi-clip batch that loses one clip leaves you guessing whether
+    // the failure was a missing data file, network error, or template throw.
     if (result.stderr) {
       const lastLines = result.stderr.split("\n").slice(-3).join("\n");
       console.log(`    ${lastLines}`);
     }
+    const errLog = `${output}.error.log`;
+    const sections = [
+      `=== ${comp} — ${file} ===`,
+      `cmd: ${cmdParts.join(" ")}`,
+      `status: ${result.status}  signal: ${result.signal || "none"}`,
+      "",
+      "─── stdout ───",
+      result.stdout || "(empty)",
+      "",
+      "─── stderr ───",
+      result.stderr || "(empty)",
+      "",
+    ].join("\n");
+    try {
+      writeFileSync(errLog, sections, "utf-8");
+      console.log(`    full stderr → ${errLog}`);
+    } catch { /* ignore */ }
     failed++;
   }
 
