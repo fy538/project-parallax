@@ -45,6 +45,7 @@ import {
   ProbabilityGaugeShortComposition,
 } from "./templates/Shorts";
 import { SiliconTrapComposition, SiliconTrapFullComposition } from "./templates/Episodes";
+import { AudioPreviewComposition } from "./templates/AudioPreview";
 import { PrisonersDilemmaShowcaseComposition } from "./templates/Episodes/PrisonersDilemmaShowcase";
 
 // Catalog — toolkit view (multi-variant demos, never tied to a real episode)
@@ -99,6 +100,7 @@ export const RemotionRoot: React.FC = () => {
         <SiliconTrapComposition />
         <SiliconTrapFullComposition />
         <PrisonersDilemmaShowcaseComposition />
+        <AudioPreviewComposition />
       </Folder>
 
       <Folder name="Maps">

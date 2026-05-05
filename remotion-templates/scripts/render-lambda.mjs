@@ -139,9 +139,19 @@ async function renderSingle(composition, propsFile, { still, frame }) {
     });
 
     if (progress.done) {
+      const cost = progress.costs?.displayCost ?? "unknown";
+      const elapsed = progress.timeToFinish
+        ? `${(progress.timeToFinish / 1000).toFixed(1)}s`
+        : "n/a";
       console.log(`  ✓ Complete: ${progress.outputFile}`);
+      console.log(`    cost: ${cost}  ·  render time: ${elapsed}`);
       done = true;
-      return progress.outputFile;
+      return {
+        outputFile: progress.outputFile,
+        accruedCost: progress.costs?.accruedSoFar ?? 0,
+        displayCost: cost,
+        renderMs: progress.timeToFinish ?? 0,
+      };
     }
 
     if (progress.fatalErrorEncountered) {
@@ -166,13 +176,38 @@ async function renderEpisode(episode) {
     const { comp, file } = SILICON_TRAP_SEQUENCE[i];
     const num = String(i + 1).padStart(2, "0");
     console.log(`[${num}/${SILICON_TRAP_SEQUENCE.length}] ${comp} — ${file}`);
-    const url = await renderSingle(comp, `${dataDir}/${file}`, {});
-    results.push({ num, file, url });
+    const result = await renderSingle(comp, `${dataDir}/${file}`, {});
+    results.push({ num, file, ...result });
   }
 
+  // Aggregate cost + time across the whole episode
+  const totalCost = results.reduce((sum, r) => sum + (r.accruedCost || 0), 0);
+  const totalRenderMs = results.reduce((sum, r) => sum + (r.renderMs || 0), 0);
+  const currency = results[0]?.displayCost?.split(" ")?.[1] || "USD";
+
   console.log("\n━".repeat(50));
-  console.log(`✅ All ${results.length} clips rendered.\n`);
-  results.forEach((r) => console.log(`  ${r.num}. ${r.file} → ${r.url}`));
+  console.log(`✅ All ${results.length} clips rendered.`);
+  console.log(`   Total Lambda cost: $${totalCost.toFixed(4)} ${currency}`);
+  console.log(`   Total render time: ${(totalRenderMs / 1000).toFixed(1)}s wall · ${(totalRenderMs / 60000).toFixed(1)} min\n`);
+  results.forEach((r) =>
+    console.log(`  ${r.num}. ${r.file.padEnd(38)} ${r.displayCost ?? "?"}  ${r.outputFile}`),
+  );
+
+  // Append a one-line summary to episodes/COST_LOG.md if it exists
+  const costLog = path.resolve(__dirname, "../../episodes/COST_LOG.md");
+  if (fs.existsSync(costLog) && totalCost > 0) {
+    const today = new Date().toISOString().slice(0, 10);
+    const note = `${results.length} clips, ${(totalRenderMs / 60000).toFixed(1)}min render`;
+    const row = `| ${today} | ${episode} | lambda | ${totalCost.toFixed(4)} | ${note} |`;
+    const text = fs.readFileSync(costLog, "utf-8");
+    const sepIdx = text.indexOf("|---|---|---|---|---|");
+    if (sepIdx >= 0) {
+      const insertAt = text.indexOf("\n", sepIdx) + 1;
+      const updated = text.slice(0, insertAt) + row + "\n" + text.slice(insertAt);
+      fs.writeFileSync(costLog, updated, "utf-8");
+      console.log(`   → appended to episodes/COST_LOG.md`);
+    }
+  }
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
