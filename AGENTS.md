@@ -24,14 +24,14 @@ From repo root:
 
 Per-stack (when you need granular control):
 
-- Python tests: `pytest tools/assembly/test_generate_manifest.py -q` (76 tests, <1s)
+- Python tests: `pytest tools/ -q` (163 tests across 6 modules, <1s)
 - Python tests in watch mode: `./scripts/test-watch.sh` (requires `entr`)
 - TS typecheck: `cd remotion-templates && npx tsc --noEmit`
 - TS lint: `cd remotion-templates && npm run lint`
 - TS visual regression: `cd remotion-templates && npm test`
 - Manifest gen: `python3 tools/assembly/generate_manifest.py --script <path> --episode <slug> --output <path>`
-- JSON validation: `python3 tools/validate-data.py` (or `--files a.json b.json` for a subset)
-- Cost log: `python3 tools/cost-tracker.py summary` and `python3 tools/cost-tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
+- JSON validation: `python3 tools/validate_data.py` (or `--files a.json b.json` for a subset)
+- Cost log: `python3 tools/cost_tracker.py summary` and `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
 
 ## Slash commands and subagents
@@ -66,7 +66,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 
 ## Testing
 
-- Python tests are <1s. **New manifest/parsing logic must come with a test.** See `tools/assembly/test_generate_manifest.py` for the pattern (76 examples).
+- Python tests are <1s. **New parsing/state logic must come with a test.** Patterns to copy: `tools/assembly/test_generate_manifest.py` (parsing-heavy), `tools/test_cost_tracker.py` (markdown round-trip), `tools/brand-treatment/test_treat.py` (numeric image processing invariants).
 - Visual regression baselines live in `remotion-templates/src/__tests__/baselines/`. After intentional visual changes, regenerate with `npm run test:baseline`.
 - Pre-commit hook runs typecheck on changed `.ts/.tsx` and Python tests on changed `.py`. Don't skip with `--no-verify` unless you have a specific reason worth stating.
 

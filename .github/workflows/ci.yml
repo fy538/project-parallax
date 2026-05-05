@@ -31,7 +31,7 @@ jobs:
         run: cd remotion-templates && npm ci
 
       - name: Validate JSON data
-        run: python3 tools/validate-data.py
+        run: python3 tools/validate_data.py
 
       - name: Run all tests
         run: ./scripts/test.sh

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-validate-data.py — JSON validation for the Parallax repo.
+validate_data.py — JSON validation for the Parallax repo.
 
 Two layers:
   1. Well-formedness — every *.json under data/, episodes/, and remotion-templates/data/
@@ -9,9 +9,9 @@ Two layers:
      registry, and shot lists are checked against their JSON Schemas.
 
 Usage:
-  python3 tools/validate-data.py                      # validate everything
-  python3 tools/validate-data.py --files <a> <b>      # validate specific files (pre-commit)
-  python3 tools/validate-data.py --episode <slug>     # validate one episode
+  python3 tools/validate_data.py                      # validate everything
+  python3 tools/validate_data.py --files <a> <b>      # validate specific files (pre-commit)
+  python3 tools/validate_data.py --episode <slug>     # validate one episode
 
 Exits non-zero on any failure. Designed to be cheap enough for pre-commit.
 """

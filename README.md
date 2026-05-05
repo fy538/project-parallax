@@ -32,7 +32,7 @@ Episode lifecycle: see [`episodes/PIPELINE.md`](./episodes/PIPELINE.md).
 cd remotion-templates && npm start
 
 # Validate JSON data files (manifests, shot lists, concept registry)
-python3 tools/validate-data.py
+python3 tools/validate_data.py
 ```
 
 For everything else (build commands, code conventions, security boundaries, things-not-to-do): see [`AGENTS.md`](./AGENTS.md).

@@ -1,6 +1,6 @@
 # Cost Log
 
-> Per-episode burn. Update after each meaningful spend (research session, asset sourcing, render batch). Aggregated by `tools/cost-tracker.py`.
+> Per-episode burn. Update after each meaningful spend (research session, asset sourcing, render batch). Aggregated by `tools/cost_tracker.py`.
 
 ## Conventions
 

@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-cost-tracker.py — read episodes/COST_LOG.md, aggregate spend per episode and service.
+cost_tracker.py — read episodes/COST_LOG.md, aggregate spend per episode and service.
 
 The ledger is hand-maintained markdown (so it's diff-able and reviewable in PRs).
 This tool reads it and produces summaries.
 
 Usage:
-  python3 tools/cost-tracker.py summary
-  python3 tools/cost-tracker.py summary --episode silicon-trap
-  python3 tools/cost-tracker.py summary --service claude
-  python3 tools/cost-tracker.py add --episode silicon-trap --service claude \
+  python3 tools/cost_tracker.py summary
+  python3 tools/cost_tracker.py summary --episode silicon-trap
+  python3 tools/cost_tracker.py summary --service claude
+  python3 tools/cost_tracker.py add --episode silicon-trap --service claude \
                                     --amount 12.50 --note "deep research, 3 passes"
 """
 

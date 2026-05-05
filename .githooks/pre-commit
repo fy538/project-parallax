@@ -17,7 +17,7 @@ fi
 
 if [ -n "$PY_CHANGED" ]; then
   echo "→ Python tests (Python files changed)"
-  python3 -m pytest tools/assembly/test_generate_manifest.py -q
+  python3 -m pytest tools/ -q
 fi
 
 if [ -n "$JSON_CHANGED" ]; then

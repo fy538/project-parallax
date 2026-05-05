@@ -6,8 +6,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-echo "→ Python tests"
-python3 -m pytest tools/assembly/test_generate_manifest.py -q
+echo "→ Python tests (all tools/)"
+python3 -m pytest tools/ -q
 
 echo "→ TypeScript typecheck (strict)"
 (cd remotion-templates && npx tsc --noEmit)

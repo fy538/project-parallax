@@ -54,7 +54,7 @@ git config core.hooksPath .githooks
 
 # 5. Verify
 ./scripts/test.sh
-python3 tools/validate-data.py
+python3 tools/validate_data.py
 
 # 6. Regenerate Tier 2 as needed
 #    - Renders, AI assets, illustrations, treated images

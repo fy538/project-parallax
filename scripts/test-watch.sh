@@ -13,4 +13,4 @@ if ! command -v entr &>/dev/null; then
 fi
 
 echo "Watching tools/**/*.py — Ctrl-C to stop"
-find tools -name '*.py' | entr -c python3 -m pytest tools/assembly/test_generate_manifest.py -q
+find tools -name '*.py' | entr -c python3 -m pytest tools/ -q
