@@ -53,44 +53,15 @@ function parseArgs() {
   return args;
 }
 
-// ── SILICON_TRAP sequence (matches render-episode.mjs) ────────────────────────────
+// ── Episode sequences ─────────────────────────────────────────────────────
+// Single source of truth: scripts/sequences/<slug>.json. Same file
+// render-episode.mjs uses, so any clip add/remove/reorder lands in one place.
 
-const SILICON_TRAP_SEQUENCE = [
-  // Opening
-  { comp: "TitleTransition", file: "title-episode.json" },
-  // Beat 1 — The Paradox
-  { comp: "TitleTransition", file: "title-section-paradox.json" },
-  { comp: "KineticTypography", file: "kinetic-92-yield.json" },
-  { comp: "KineticTypography", file: "kinetic-165b.json" },
-  { comp: "DataChart", file: "chart-7pct-demand.json" },
-  // Beat 2 — The Logic of Denial
-  { comp: "TitleTransition", file: "title-section-denial.json" },
-  { comp: "TimelineComparison", file: "timeline-oil-chips.json" },
-  { comp: "KineticTypography", file: "kinetic-revenue-deal.json" },
-  { comp: "DataChart", file: "chart-chips-act.json" },
-  { comp: "ChoroplethMap", file: "choropleth-cocom.json" },
-  { comp: "FrameworkDiagram", file: "framework-cocom-china.json" },
-  // Beat 3 — The Other Side of the Wall
-  { comp: "TitleTransition", file: "title-section-wall.json" },
-  { comp: "KineticTypography", file: "kinetic-kabozi.json" },
-  { comp: "KineticTypography", file: "kinetic-juguo.json" },
-  { comp: "DataChart", file: "chart-lithography.json" },
-  { comp: "DataChart", file: "chart-smic-yield.json" },
-  { comp: "FrameworkDiagram", file: "framework-kirin-teardown.json" },
-  { comp: "KineticTypography", file: "kinetic-deepseek-zero.json" },
-  // Beat 4 — The Trap
-  { comp: "TitleTransition", file: "title-section-trap.json" },
-  { comp: "FrameworkDiagram", file: "framework-chess-go.json" },
-  { comp: "RouteAnimation", file: "route-chip-supply.json" },
-  { comp: "KineticTypography", file: "kinetic-trap.json" },
-  { comp: "ChoroplethMap", file: "choropleth-caught-between.json" },
-  { comp: "KineticTypography", file: "kinetic-morris-chang.json" },
-  // Beat 5 — Your Chips
-  { comp: "TitleTransition", file: "title-section-chips.json" },
-  { comp: "FrameworkDiagram", file: "framework-ai-timeline.json" },
-  // Closing
-  { comp: "TitleTransition", file: "title-endcard.json" },
-];
+function loadSequence(slug) {
+  const p = path.join(__dirname, "sequences", `${slug}.json`);
+  if (!fs.existsSync(p)) return null;
+  return JSON.parse(fs.readFileSync(p, "utf-8")).clips;
+}
 
 // ── Render a single composition ────────────────────────────────────────────
 
@@ -168,14 +139,19 @@ async function renderSingle(composition, propsFile, { still, frame }) {
 // ── Render full episode ────────────────────────────────────────────────────
 
 async function renderEpisode(episode) {
+  const sequence = loadSequence(episode);
+  if (!sequence) {
+    console.error(`No sequence found at scripts/sequences/${episode}.json`);
+    process.exit(1);
+  }
   const dataDir = `data/episodes/${episode}`;
-  console.log(`\n🎬 Rendering all ${SILICON_TRAP_SEQUENCE.length} clips for ${episode}...\n`);
+  console.log(`\n🎬 Rendering all ${sequence.length} clips for ${episode}...\n`);
 
   const results = [];
-  for (let i = 0; i < SILICON_TRAP_SEQUENCE.length; i++) {
-    const { comp, file } = SILICON_TRAP_SEQUENCE[i];
+  for (let i = 0; i < sequence.length; i++) {
+    const { comp, file } = sequence[i];
     const num = String(i + 1).padStart(2, "0");
-    console.log(`[${num}/${SILICON_TRAP_SEQUENCE.length}] ${comp} — ${file}`);
+    console.log(`[${num}/${sequence.length}] ${comp} — ${file}`);
     const result = await renderSingle(comp, `${dataDir}/${file}`, {});
     results.push({ num, file, ...result });
   }

@@ -22,54 +22,40 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 
 // ─── Episode Sequences ──────────────────────────────────────────────────────
+// Single source of truth: scripts/sequences/<slug>.json. Loaded lazily so a
+// missing/malformed sequence file produces a clean error message at use time
+// (not import time) and so the script can list available episodes without
+// requiring all of them to exist.
 
-const EPISODES = {
-  silicon-trap: [
-    // Opening
-    { seq: "01", comp: "TitleTransition", file: "title-episode.json", desc: "Episode title" },
-    // Beat 1 — The Paradox
-    { seq: "02", comp: "TitleTransition", file: "title-section-paradox.json", desc: "Section I" },
-    { seq: "03", comp: "KineticTypography", file: "kinetic-92-yield.json", desc: "92% yield stat" },
-    { seq: "04", comp: "KineticTypography", file: "kinetic-165b.json", desc: "$165B stat" },
-    { seq: "05", comp: "DataChart", file: "chart-7pct-demand.json", desc: "7% demand bar" },
-    // Beat 2 — The Logic of Denial
-    { seq: "06", comp: "TitleTransition", file: "title-section-denial.json", desc: "Section II" },
-    { seq: "07", comp: "TimelineComparison", file: "timeline-oil-chips.json", desc: "Oil vs chips" },
-    { seq: "08", comp: "KineticTypography", file: "kinetic-revenue-deal.json", desc: "Revenue deal" },
-    { seq: "09", comp: "DataChart", file: "chart-chips-act.json", desc: "CHIPS Act funnel" },
-    { seq: "10", comp: "ChoroplethMap", file: "choropleth-cocom.json", desc: "COCOM map" },
-    { seq: "11", comp: "FrameworkDiagram", file: "framework-cocom-china.json", desc: "COCOM vs China" },
-    // Beat 3 — The Other Side of the Wall
-    { seq: "12", comp: "TitleTransition", file: "title-section-wall.json", desc: "Section III" },
-    { seq: "13", comp: "KineticTypography", file: "kinetic-kabozi.json", desc: "Kabozi" },
-    { seq: "14", comp: "KineticTypography", file: "kinetic-juguo.json", desc: "Juguo tizhi" },
-    { seq: "15", comp: "DataChart", file: "chart-lithography.json", desc: "Lithography passes" },
-    { seq: "16", comp: "DataChart", file: "chart-smic-yield.json", desc: "SMIC yield" },
-    { seq: "17", comp: "FrameworkDiagram", file: "framework-kirin-teardown.json", desc: "Kirin teardown" },
-    { seq: "18", comp: "KineticTypography", file: "kinetic-deepseek-zero.json", desc: "DeepSeek 0 runs" },
-    // Beat 4 — The Trap
-    { seq: "19", comp: "TitleTransition", file: "title-section-trap.json", desc: "Section IV" },
-    { seq: "20", comp: "FrameworkDiagram", file: "framework-chess-go.json", desc: "Chess vs Go" },
-    { seq: "21", comp: "RouteAnimation", file: "route-chip-supply.json", desc: "Supply route" },
-    { seq: "22", comp: "KineticTypography", file: "kinetic-trap.json", desc: "Trap statement" },
-    { seq: "23", comp: "ChoroplethMap", file: "choropleth-caught-between.json", desc: "Caught between" },
-    { seq: "24", comp: "KineticTypography", file: "kinetic-morris-chang.json", desc: "Morris Chang" },
-    // Beat 5 — Your Chips
-    { seq: "25", comp: "TitleTransition", file: "title-section-chips.json", desc: "Section V" },
-    { seq: "26", comp: "FrameworkDiagram", file: "framework-ai-timeline.json", desc: "AI timeline" },
-    { seq: "27", comp: "RouteAnimation", file: "route-bifurcation.json", desc: "Bifurcation" },
-    // Closing
-    { seq: "28", comp: "TitleTransition", file: "title-endcard.json", desc: "End card" },
-  ],
-};
+const SEQUENCES_DIR = join(__dirname, "sequences");
+
+function loadSequence(slug) {
+  const p = join(SEQUENCES_DIR, `${slug}.json`);
+  if (!existsSync(p)) {
+    return null;
+  }
+  const parsed = JSON.parse(readFileSync(p, "utf-8"));
+  return parsed.clips;
+}
+
+function availableEpisodes() {
+  if (!existsSync(SEQUENCES_DIR)) return [];
+  return execSync(`ls ${SEQUENCES_DIR} 2>/dev/null || true`)
+    .toString()
+    .trim()
+    .split("\n")
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => f.replace(/\.json$/, ""));
+}
 
 // ─── CLI Args ───────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
 const episode = args.find((a) => !a.startsWith("--"));
-if (!episode || !EPISODES[episode]) {
+const sequence = episode ? loadSequence(episode) : null;
+if (!episode || !sequence) {
   console.error(`Usage: node scripts/render-episode.mjs <episode> [--preview] [--concat] [--only=01,02] [--from=16]`);
-  console.error(`Available episodes: ${Object.keys(EPISODES).join(", ")}`);
+  console.error(`Available episodes: ${availableEpisodes().join(", ") || "(none — add scripts/sequences/<slug>.json)"}`);
   process.exit(1);
 }
 
@@ -119,7 +105,6 @@ if (!browserArg) {
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 
-const sequence = EPISODES[episode];
 const dataDir = join(ROOT, "data", "episodes", episode);
 const outDir = join(ROOT, "out", episode);
 mkdirSync(outDir, { recursive: true });

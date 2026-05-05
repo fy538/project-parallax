@@ -1,0 +1,41 @@
+{
+  "episode": "silicon-trap",
+  "version": "v5",
+  "note": "Single source of truth for the silicon-trap clip sequence. Imported by render-episode.mjs, render-lambda.mjs, and render-silicon-trap.sh. SiliconTrap.tsx (the master composition) is built from defineEpisode() with explicit imports — keep the order here in lockstep with that file.",
+  "clips": [
+    { "seq": "01", "comp": "TitleTransition", "file": "title-episode.json", "desc": "Episode title" },
+
+    { "seq": "02", "comp": "KineticTypography", "file": "kinetic-92-yield.json", "desc": "92% yield stat" },
+    { "seq": "03", "comp": "KineticTypography", "file": "kinetic-165b.json", "desc": "$165B stat" },
+    { "seq": "04", "comp": "DataChart", "file": "chart-7pct-demand.json", "desc": "7% demand bar" },
+
+    { "seq": "05", "comp": "TitleTransition", "file": "title-section-denial.json", "desc": "Section II" },
+    { "seq": "06", "comp": "DualTimeline", "file": "dual-timeline-oil-chips.json", "desc": "Oil vs chips dual timeline" },
+    { "seq": "07", "comp": "KineticTypography", "file": "kinetic-revenue-deal.json", "desc": "Revenue deal" },
+    { "seq": "08", "comp": "DataChart", "file": "chart-chips-act.json", "desc": "CHIPS Act funnel" },
+    { "seq": "09", "comp": "ChoroplethMap", "file": "choropleth-cocom.json", "desc": "COCOM map" },
+    { "seq": "10", "comp": "FrameworkDiagram", "file": "framework-cocom-china.json", "desc": "COCOM vs China" },
+
+    { "seq": "11", "comp": "TitleTransition", "file": "title-section-wall.json", "desc": "Section III" },
+    { "seq": "12", "comp": "KineticTypography", "file": "kinetic-kabozi.json", "desc": "Kabozi" },
+    { "seq": "13", "comp": "KineticTypography", "file": "kinetic-juguo.json", "desc": "Juguo tizhi" },
+    { "seq": "14", "comp": "DataChart", "file": "chart-lithography.json", "desc": "Lithography passes" },
+    { "seq": "15", "comp": "TimeSeriesChart", "file": "timeseries-smic-yield.json", "desc": "SMIC yield series" },
+    { "seq": "16", "comp": "FrameworkDiagram", "file": "framework-kirin-teardown.json", "desc": "Kirin teardown" },
+    { "seq": "17", "comp": "KineticTypography", "file": "kinetic-deepseek-zero.json", "desc": "DeepSeek 0 runs" },
+
+    { "seq": "18", "comp": "TitleTransition", "file": "title-section-trap.json", "desc": "Section IV" },
+    { "seq": "19", "comp": "GameBoard", "file": "gameboard-chess.json", "desc": "Chess gameboard" },
+    { "seq": "20", "comp": "GameBoard", "file": "gameboard-go.json", "desc": "Go gameboard" },
+    { "seq": "21", "comp": "RouteAnimation", "file": "route-chip-supply.json", "desc": "Supply route" },
+    { "seq": "22", "comp": "KineticTypography", "file": "kinetic-trap.json", "desc": "Trap statement" },
+    { "seq": "23", "comp": "ChoroplethMap", "file": "choropleth-caught-between.json", "desc": "Caught between" },
+    { "seq": "24", "comp": "KineticTypography", "file": "kinetic-morris-chang.json", "desc": "Morris Chang" },
+
+    { "seq": "25", "comp": "TitleTransition", "file": "title-section-chips.json", "desc": "Section V" },
+    { "seq": "26", "comp": "DecisionTree", "file": "decisiontree-ai-timeline.json", "desc": "AI timeline decision tree" },
+    { "seq": "27", "comp": "RouteAnimation", "file": "route-bifurcation.json", "desc": "Bifurcation route" },
+
+    { "seq": "28", "comp": "TitleTransition", "file": "title-endcard.json", "desc": "End card" }
+  ]
+}

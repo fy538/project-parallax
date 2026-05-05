@@ -9,6 +9,31 @@
  *
  * These hooks enforce POLISH.md rules by default, so templates get
  * the right behavior without having to remember which utility to call.
+ *
+ * ── Camera hooks: which one to use ──────────────────────────────────────────
+ *
+ * Three camera hooks exist because they solve genuinely different geometric
+ * problems. They are NOT redundant — each has its own interface tuned to its
+ * domain. Don't try to unify them.
+ *
+ *   useTreeCamera       Tree / parent-child graphs (DecisionTree).
+ *                       Inputs: node positions + parent map + camera path of
+ *                       node IDs. Output: transform that pans/zooms between
+ *                       nodes with ancestry-aware dimming.
+ *
+ *   useTimelineCamera   Horizontal 1D timelines (HorizontalTimeline).
+ *                       Inputs: events with x-axis positions + camera steps.
+ *                       Output: transform that scrolls horizontally with
+ *                       focus isolation.
+ *
+ *   useNarratedCamera   Arbitrary 2D coordinate animation (DataChart,
+ *                       NetworkDiagram, EscalationLadder).
+ *                       Inputs: cameraPath of (x, y) targets or
+ *                       element indices. Output: transform that zooms to
+ *                       arbitrary points + per-element opacity/scale/blur.
+ *
+ * Decision: tree structure → useTreeCamera; one axis only → useTimelineCamera;
+ * everything else (most cases) → useNarratedCamera.
  */
 
 export { useCompositionAnimation } from "./useCompositionAnimation";

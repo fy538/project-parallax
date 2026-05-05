@@ -23,6 +23,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { fonts, fontSizes, layout, palette } from "../../design/theme";
 import { AudioLayer, type AudioLayerProps } from "../../components/AudioLayer";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 
 export interface AudioPreviewData {
   /** Episode slug used for music-bed file path resolution. */
@@ -47,6 +48,10 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const currentSec = frame / fps;
+  // Audio-only composition. We satisfy the L44 convention by calling the hook
+  // but disable both drift and exit fade — the visible content is just a
+  // scrubber UI that should not animate.
+  useCompositionAnimation({ noDrift: true, noExit: true });
 
   return (
     <AbsoluteFill style={{ backgroundColor: palette.ink, color: palette.bone, fontFamily: fonts.mono }}>

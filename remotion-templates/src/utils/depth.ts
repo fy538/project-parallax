@@ -39,6 +39,38 @@ export const highlightShadow = (
   isDark: boolean = true
 ): string => `${contentShadow(isDark)}, ${accentGlow(accentColor)}`;
 
+/**
+ * Element glow whose intensity scales with a 0–1 weight (e.g. focus/emphasis).
+ * Inline replacement for the `boxShadow: \`0 0 ${8 + w * 4}px ${color}60\``
+ * pattern repeated in HorizontalTimeline, TimelineMorph, EscalationLadder.
+ *
+ *   intensity 0   → no glow
+ *   intensity 1   → strongest (~12px spread, ~38% alpha)
+ */
+export const glow = (
+  color: string,
+  intensity: number = 1,
+  baseSpreadPx: number = 8,
+  scaleSpreadPx: number = 4,
+): string => {
+  if (intensity <= 0) return "none";
+  const spread = baseSpreadPx + scaleSpreadPx * intensity;
+  // 0x60 ≈ 38% alpha. Fades with intensity so a half-emphasized element reads
+  // as a softer halo, not a half-bright halo.
+  const alphaHex = Math.round(0x60 * intensity).toString(16).padStart(2, "0");
+  return `0 0 ${spread}px ${color}${alphaHex}`;
+};
+
+/**
+ * Stack multiple shadows in one CSS string. Replaces the inline
+ * `[contentShadow, glow, mediumShadow].filter(Boolean).join(", ")` pattern.
+ * Skip falsy/empty entries. Order matters: top-most shadow is rendered LAST.
+ */
+export const layeredShadow = (...layers: (string | null | undefined | false)[]): string => {
+  const real = layers.filter((s): s is string => Boolean(s) && s !== "none");
+  return real.length === 0 ? "none" : real.join(", ");
+};
+
 /** Text shadow for body text over dark backgrounds. Per POLISH.md V7. */
 export const textShadow = (isDark: boolean = true): string =>
   isDark ? "0 1px 3px rgba(0, 0, 0, 0.5)" : "none";

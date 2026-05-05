@@ -19,6 +19,7 @@ import {
 import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
+import { AnimatedArrow } from "../../components/AnimatedArrow";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, CLAMP_QUAD } from "../../utils/animation";
@@ -498,14 +499,7 @@ const FlowVariant: React.FC<{
               {/* Arrow between nodes */}
               {i < nodes.length - 1 && (() => {
                 const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
-                const arrowDraw = interpolate(
-                  frame,
-                  [arrowStart, arrowStart + sec(0.5)],
-                  [65, 0],
-                  CLAMP_QUAD
-                );
                 const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3));
-                const headOpacity = fadeIn(frame, arrowStart + sec(0.4), sec(0.2));
                 return (
                   <div
                     style={{
@@ -517,31 +511,13 @@ const FlowVariant: React.FC<{
                       opacity: arrowOpacity * exitOp,
                     }}
                   >
-                    <svg width="80" height="24" viewBox="0 0 80 24">
-                      <line
-                        x1="0" y1="12" x2="65" y2="12"
-                        stroke={accentColor} strokeWidth="2"
-                        strokeDasharray="65" strokeDashoffset={arrowDraw}
-                      />
-                      <polygon
-                        points="65,6 77,12 65,18"
-                        fill={accentColor} opacity={headOpacity}
-                      />
-                    </svg>
-                    {arrowLabels[i] && (
-                      <div
-                        style={{
-                          fontSize: fontSizes.small,
-                          color: theme.text.muted,
-                          marginTop: 4,
-                          whiteSpace: "nowrap",
-                          opacity: fadeIn(frame, arrowStart + sec(0.3), sec(0.3)),
-                          transform: `translateY(${slideIn(frame, arrowStart + sec(0.3), 8, sec(0.3))}px)`,
-                        }}
-                      >
-                        {arrowLabels[i]}
-                      </div>
-                    )}
+                    <AnimatedArrow
+                      startFrame={arrowStart}
+                      color={accentColor}
+                      label={arrowLabels[i]}
+                      labelColor={theme.text.muted}
+                    />
+
                     {/* Eliminated scenario beside arrow */}
                     {(eliminatedByFilter.get(i) || []).map(({ es, idx }, ei) => {
                       const esVisible = eliminatedVisible[idx];
