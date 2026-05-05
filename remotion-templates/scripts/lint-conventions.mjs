@@ -64,18 +64,6 @@ const rules = [
       if (!basename.endsWith(".tsx")) return []; // Only check TSX (React components)
       if (content.includes("@deprecated")) return []; // Skip deprecated templates
 
-      // Grandfathered: pre-existing templates that roll their own animation
-      // lifecycle (manual kenBurnsDrift + exitFade calls). These violate L44
-      // but rewriting them is a visual-regression sprint of its own. New
-      // templates must NOT be added here — fix them to use the hook instead.
-      // TODO(L44-cleanup): migrate these to useCompositionAnimation.
-      const grandfathered = [
-        "GameBoard/GameBoard.tsx",
-        "StrategicLandscape/StrategicLandscape.tsx",
-        "TimeSeriesChart/TimeSeriesChart.tsx",
-      ];
-      if (grandfathered.some((g) => filePath.endsWith(g))) return [];
-
       // Accept the hook directly OR any of the canonical wrappers that call it.
       // ShortsWrapper applies the hook to its render-prop children; EpisodeSeries
       // is for master compositions where each clip has its own hook call.

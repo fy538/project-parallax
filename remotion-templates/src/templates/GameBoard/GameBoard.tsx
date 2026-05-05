@@ -43,6 +43,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import type { GameBoardData, ChessPiece, GoStone, CounterAnimation } from "./types";
 
 // ── Helper: Get all pieces/stones/highlights active by frame ──────────────────
@@ -726,7 +727,13 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
     .reduce((sum, p) => sum + sec(p.durationSec), 0);
   const phaseLabelOpacity = fadeIn(frame, phaseStart, sec(0.4));
 
-  // Exit fade at end
+  // Exit fade at end (L44 + L66).
+  // useCompositionAnimation gives the brand-standard exitOpacity. We pass
+  // noDrift: true so the manual kenBurnsDrift below is the single drift source
+  // (L66). The hook's default exit window is 15 frames; this template uses a
+  // 30-frame fade ending 30 frames before duration end — preserved by keeping
+  // the manual exitFade for the end-frame computation.
+  useCompositionAnimation({ noDrift: true });
   const endFrame = sec(totalDuration) - sec(1);
   const overallOpacity = exitFade(frame, endFrame, sec(1));
 

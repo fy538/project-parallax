@@ -60,12 +60,15 @@ describe("lint rule: missing-composition-animation (L44)", () => {
     expect(hasRule(issues, "missing-composition-animation")).toBe(false);
   });
 
-  it("ignores grandfathered templates (TimeSeriesChart)", () => {
+  it("flags any template missing the hook — no grandfathering", () => {
+    // The previously-grandfathered templates (GameBoard, StrategicLandscape,
+    // TimeSeriesChart) have all been migrated to call useCompositionAnimation.
+    // The rule is now uniform: every template needs the hook.
     const issues = lint(
       `export const Foo = () => <div />;`,
       "src/templates/TimeSeriesChart/TimeSeriesChart.tsx",
     );
-    expect(hasRule(issues, "missing-composition-animation")).toBe(false);
+    expect(hasRule(issues, "missing-composition-animation")).toBe(true);
   });
 
   it("does not check non-.tsx files", () => {

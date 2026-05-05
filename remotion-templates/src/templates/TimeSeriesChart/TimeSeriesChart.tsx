@@ -39,6 +39,7 @@ import {
   letterSpacing,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import {
   fadeIn,
   stagger,
@@ -352,9 +353,12 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
     });
   }
 
-  // ── Ken Burns drift + exit ──────────────────────────────────────────────
+  // ── Ken Burns drift + exit (L44 + L66) ─────────────────────────────────
+  // useCompositionAnimation provides exitOpacity (matches manual exitFade at
+  // 15 frames default). noDrift: true means we keep the manual kenBurnsDrift
+  // below at 1.01 — much subtler than the hook's default 1.06.
+  const { exitOpacity } = useCompositionAnimation({ noDrift: true });
   const driftScale = kenBurnsDrift(frame, durationInFrames, 1.01);
-  const exitOpacity = exitFade(frame, durationInFrames, sec(0.5));
 
   const contentOpacity = Math.min(exitOpacity, 1);
 

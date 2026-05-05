@@ -192,3 +192,136 @@ def test_find_json_files_returns_sorted(tmp_path, monkeypatch):
     found = vd.find_json_files()
     names = [p.name for p in found]
     assert names == sorted(names)
+
+
+# ── Layer 3 — palette compliance ──────────────────────────────────────────
+
+
+def test_load_palette_hex_set_extracts_all_hex(tmp_path, monkeypatch):
+    palette = tmp_path / "palette.json"
+    palette.write_text(json.dumps({
+        "palette": {"ink": "#1C1814", "gold": "#C4A747"},
+        "semantic": {"us": "#4A7BA7", "china": "#A64D46"},
+    }), encoding="utf-8")
+    monkeypatch.setattr(vd, "PALETTE_PATH", palette)
+    s = vd.load_palette_hex_set()
+    assert s == {"#1c1814", "#c4a747", "#4a7ba7", "#a64d46"}
+
+
+def test_load_palette_hex_set_handles_nested_arrays(tmp_path, monkeypatch):
+    palette = tmp_path / "palette.json"
+    palette.write_text(json.dumps({
+        "ramps": {"standard": {"shadows": ["#1C1814"], "highlights": ["#F5F0E8"]}},
+    }), encoding="utf-8")
+    monkeypatch.setattr(vd, "PALETTE_PATH", palette)
+    s = vd.load_palette_hex_set()
+    assert "#1c1814" in s
+    assert "#f5f0e8" in s
+
+
+def test_load_palette_hex_set_returns_empty_when_missing(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "PALETTE_PATH", tmp_path / "ghost.json")
+    assert vd.load_palette_hex_set() == set()
+
+
+def test_load_palette_hex_set_returns_empty_on_malformed(tmp_path, monkeypatch):
+    palette = tmp_path / "palette.json"
+    palette.write_text("{ not valid json", encoding="utf-8")
+    monkeypatch.setattr(vd, "PALETTE_PATH", palette)
+    assert vd.load_palette_hex_set() == set()
+
+
+def test_validate_palette_passes_compliant_hex(tmp_path):
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({"color": "#1C1814"}), encoding="utf-8")
+    err = vd.validate_palette(data, {"#1c1814", "#c4a747"})
+    assert err is None
+
+
+def test_validate_palette_flags_off_palette_hex(tmp_path):
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({"color": "#FF00FF"}), encoding="utf-8")
+    err = vd.validate_palette(data, {"#1c1814", "#c4a747"})
+    assert err is not None
+    assert "#ff00ff" in err
+
+
+def test_validate_palette_allows_pure_black_and_white(tmp_path):
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({
+        "stroke": "#000000",
+        "fill": "#FFFFFF",
+    }), encoding="utf-8")
+    err = vd.validate_palette(data, {"#1c1814"})
+    assert err is None  # black/white always allowed
+
+
+def test_validate_palette_accepts_rgba_when_rgb_in_palette(tmp_path):
+    """8-char hex like #1C1814AA (with alpha) should pass if the RGB part is in the palette."""
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({"color": "#1C181480"}), encoding="utf-8")
+    err = vd.validate_palette(data, {"#1c1814"})
+    assert err is None
+
+
+def test_validate_palette_dedupes_repeated_offenders(tmp_path):
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({
+        "a": "#FF00FF",
+        "b": "#FF00FF",
+        "c": "#FF00FF",
+    }), encoding="utf-8")
+    err = vd.validate_palette(data, {"#1c1814"})
+    assert err is not None
+    # Same off-palette hex used 3 times should be reported once
+    assert err.count("#ff00ff") == 1
+
+
+def test_validate_palette_returns_none_when_palette_empty(tmp_path):
+    """If palette didn't load (empty allowed set), skip Layer 3 silently rather than fail."""
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps({"color": "#FF00FF"}), encoding="utf-8")
+    assert vd.validate_palette(data, set()) is None
+
+
+# ── is_template_data_file — which files Layer 3 applies to ─────────────────
+
+
+def test_template_data_file_recognized(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    p = tmp_path / "remotion-templates/data/episodes/foo/bar.json"
+    p.parent.mkdir(parents=True)
+    p.write_text("{}")
+    assert vd.is_template_data_file(p) is True
+
+
+def test_template_data_file_skips_assembly_manifest(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    p = tmp_path / "remotion-templates/data/episodes/foo/assembly-manifest.json"
+    p.parent.mkdir(parents=True)
+    p.write_text("{}")
+    assert vd.is_template_data_file(p) is False
+
+
+def test_template_data_file_skips_deprecated_paths(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    p = tmp_path / "remotion-templates/data/episodes/foo/_deprecated_v4/old.json"
+    p.parent.mkdir(parents=True)
+    p.write_text("{}")
+    assert vd.is_template_data_file(p) is False
+
+
+def test_template_data_file_skips_concepts_registry(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    p = tmp_path / "data/concepts.json"
+    p.parent.mkdir(parents=True)
+    p.write_text("{}")
+    assert vd.is_template_data_file(p) is False
+
+
+def test_template_data_file_skips_schema_files(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    p = tmp_path / "remotion-templates/data/episodes/foo.schema.json"
+    p.parent.mkdir(parents=True)
+    p.write_text("{}")
+    assert vd.is_template_data_file(p) is False

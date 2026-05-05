@@ -36,6 +36,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { usePhase } from "../../hooks/usePhase";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 // Ken Burns handled via kenBurnsDrift utility, exit via exitFade
 import {
   fadeIn,
@@ -271,8 +272,11 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
     { name: "hold", duration: sec(2) },
     { name: "exit", duration: sec(0.5) },
   ]);
-  // Exit fade for last frames
-  const exitOpacity = exitFade(frame, durationInFrames, 15);
+  // Exit fade for last frames (L44 + L66).
+  // useCompositionAnimation supplies the brand-standard exitOpacity.
+  // noDrift: true keeps the manual kenBurnsDrift below at 1.01 (subtler than
+  // the hook's default 1.06) as the single drift source.
+  const { exitOpacity } = useCompositionAnimation({ noDrift: true });
 
   // ── Layout calculations ─────────────────────────────────────────────────
   const area = contentArea("minimal", "generous");
