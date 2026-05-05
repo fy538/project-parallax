@@ -163,42 +163,38 @@ def test_linear_interpolation_allows_inline_easing_object():
 
 
 # ── check_magic_safe_area_offsets (L7) ─────────────────────────────────────
-# IMPORTANT: this rule still patterns on the legacy `safeArea.top + N` form.
-# After the L69 default-tier flip the codebase uses `safeAreaTier.generous.top
-# + N` — which this regex does NOT match. The rule is effectively a no-op for
-# current code. Worth widening its pattern in a follow-up. Tests below pin
-# the current behavior.
+# Rule covers BOTH legacy `safeArea.top + N` and current `safeAreaTier.X.top + N`
+# patterns. Behavior: allows on-grid values ≤ 48 (normal spacing); flags
+# off-grid values OR on-grid values > 48 (likely title-height misuse).
 
 
-def test_safe_area_offset_flags_off_grid_value():
-    # 100 isn't on the 8px grid → flagged as a magic offset.
-    src = "  top: layout.safeArea.top + 100,"
+def test_safe_area_offset_flags_off_grid_legacy_pattern():
+    src = "  top: layout.safeArea.top + 100,"  # 100 not on 8px grid
     vs = _check(pl.check_magic_safe_area_offsets, src)
     assert _has_rule(vs, "L7")
 
 
-def test_safe_area_offset_flags_likely_title_height():
+def test_safe_area_offset_flags_off_grid_safeAreaTier_pattern():
+    """Current style after the L69 default-tier flip — rule must catch this form too."""
+    src = "  top: layout.safeAreaTier.generous.top + 100,"
+    vs = _check(pl.check_magic_safe_area_offsets, src)
+    assert _has_rule(vs, "L7")
+
+
+def test_safe_area_offset_flags_likely_title_height_either_pattern():
     # 56 IS on the grid but > 48 → looks like a title offset; the rule
-    # nudges toward contentArea() helper instead.
-    src = "  top: layout.safeArea.top + 56,"
-    vs = _check(pl.check_magic_safe_area_offsets, src)
-    assert _has_rule(vs, "L7")
+    # nudges toward contentArea() helper instead. Both patterns flagged.
+    legacy = _check(pl.check_magic_safe_area_offsets, "  top: layout.safeArea.top + 56,")
+    current = _check(pl.check_magic_safe_area_offsets, "  top: layout.safeAreaTier.generous.top + 56,")
+    assert _has_rule(legacy, "L7")
+    assert _has_rule(current, "L7")
 
 
 def test_safe_area_offset_allows_small_grid_value():
     # 16 is on the 8px grid AND ≤ 48 → rule allows it as a normal spacing offset.
-    src = "  top: layout.safeArea.top + 16,"
+    src = "  top: layout.safeAreaTier.generous.top + 16,"
     vs = _check(pl.check_magic_safe_area_offsets, src)
     assert not _has_rule(vs, "L7")
-
-
-def test_safe_area_offset_misses_new_safeAreaTier_pattern():
-    """KNOWN GAP: the rule's regex doesn't match safeAreaTier.* paths.
-    Documenting this so the next person who edits polish_lint.py knows the
-    rule needs to widen its pattern to catch current-style offsets too."""
-    src = "  top: layout.safeAreaTier.generous.top + 40,"
-    vs = _check(pl.check_magic_safe_area_offsets, src)
-    assert not _has_rule(vs, "L7"), "rule pattern should be widened to cover safeAreaTier — see comment above"
 
 
 # ── check_hardcoded_padding (L10) ──────────────────────────────────────────

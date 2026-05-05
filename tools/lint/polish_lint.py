@@ -241,10 +241,14 @@ def check_linear_interpolation(lines: list[str], relpath: str) -> list[Violation
 
 
 def check_magic_safe_area_offsets(lines: list[str], relpath: str) -> list[Violation]:
-    """L7: No magic offsets on safeArea positions — use contentArea() helper."""
+    """L7: No magic offsets on safeArea / safeAreaTier positions — use contentArea() helper."""
     violations = []
-    # Match patterns like safeArea.top + 140, safeArea.left + 60
-    pattern = re.compile(r'safeArea\.\w+\s*\+\s*(\d+)')
+    # Match BOTH:
+    #   - legacy:   layout.safeArea.top + 140
+    #   - current:  layout.safeAreaTier.generous.top + 60
+    # The (?:Tier\.\w+)? makes the tier segment optional; the trailing \.\w+
+    # captures the side ("top" / "bottom" / "left" / "right").
+    pattern = re.compile(r'safeArea(?:Tier\.\w+)?\.\w+\s*\+\s*(\d+)')
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
         if stripped.startswith("//") or stripped.startswith("*"):

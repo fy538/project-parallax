@@ -115,10 +115,10 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeAreaTier.standard.bottom + 80,
+          bottom: layout.safeAreaTier.standard.bottom + layout.spacing.xxxl,
           left: layout.safeAreaTier.standard.left,
           right: layout.safeAreaTier.standard.right,
-          height: 24,
+          height: layout.spacing.md,
         }}
       >
         {(data.beats ?? []).map((beat) => {
@@ -154,7 +154,7 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeAreaTier.standard.bottom + 40,
+          bottom: layout.safeAreaTier.standard.bottom + layout.spacing.lg + layout.spacing.xs,
           left: layout.safeAreaTier.standard.left,
           right: layout.safeAreaTier.standard.right,
           height: 18,
@@ -201,7 +201,7 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeAreaTier.standard.bottom + 24,
+          bottom: layout.safeAreaTier.standard.bottom + layout.spacing.md,
           left: `calc(${layout.safeAreaTier.standard.left}px + ${(currentSec / data.totalDurationSec) * (layout.width - layout.safeAreaTier.standard.left - layout.safeAreaTier.standard.right)}px)`,
           width: 2,
           height: 80,
