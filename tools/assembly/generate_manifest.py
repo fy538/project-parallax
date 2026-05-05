@@ -192,14 +192,17 @@ COMPOSITE_RE = re.compile(
     r"(background|inset|antipode)\s*@?\s*(\d+)%?", re.IGNORECASE
 )
 
-# All Remotion template component names — keep in sync with FullEpisode TEMPLATE_COMPONENTS
+# All Remotion template component names — keep in sync with:
+#   - FullEpisode TEMPLATE_COMPONENTS map
+#   - assembly-manifest.schema.json segment.template.component enum
 ALL_TEMPLATES = [
     "TitleTransition", "KineticTypography", "DataChart", "TimelineComparison",
     "FrameworkDiagram", "ChoroplethMap", "RouteAnimation", "DecisionTree",
     "SplitComposition", "ProbabilityGauge", "ImageComposite", "PhotoMontage",
     "NetworkDiagram", "TimeSeriesChart", "SankeyFlow", "GameBoard",
     "BayesianUpdate", "StatReveal", "RadarChart", "AnnotatedImage",
-    "EscalationLadder",
+    "EscalationLadder", "HorizontalTimeline", "BifurcationRoute",
+    "DualTimeline", "DuelingFrameworks", "StrategicLandscape", "TimelineMorph",
 ]
 _TEMPLATE_NAMES = "|".join(ALL_TEMPLATES)
 

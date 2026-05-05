@@ -261,11 +261,11 @@
               "description": "Fallback search terms from the script, in priority order."
             },
             "source": {
-              "type": "string",
-              "description": "Expected source: 'pexels', 'pixabay', 'unsplash', 'wikimedia', 'archive'."
+              "type": ["string", "null"],
+              "description": "Expected source: 'pexels', 'pixabay', 'unsplash', 'wikimedia', 'archive'. Null until asset sourcing has selected one."
             },
             "file": {
-              "type": "string",
+              "type": ["string", "null"],
               "description": "Resolved file path after sourcing. Null until asset is sourced."
             },
             "status": {
@@ -337,7 +337,13 @@
                 "StatReveal",
                 "RadarChart",
                 "AnnotatedImage",
-                "EscalationLadder"
+                "EscalationLadder",
+                "HorizontalTimeline",
+                "BifurcationRoute",
+                "DualTimeline",
+                "DuelingFrameworks",
+                "StrategicLandscape",
+                "TimelineMorph"
               ],
               "description": "Remotion template component name."
             },

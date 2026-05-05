@@ -181,16 +181,16 @@
           "description": "Episode ID (e.g., 'EP01')."
         },
         "beat": {
-          "type": "integer",
-          "description": "Beat number where the concept is first introduced."
+          "type": ["integer", "null"],
+          "description": "Beat number where the concept is first introduced. Null when registered before its host episode is finalized (e.g. cross-episode frameworks)."
         },
         "timestamp": {
-          "type": "string",
-          "description": "Approximate timestamp range (e.g., '3:00-3:30')."
+          "type": ["string", "null"],
+          "description": "Approximate timestamp range (e.g., '3:00-3:30'). Null until the episode publishes."
         },
         "template": {
-          "type": "string",
-          "description": "Remotion template used for the introduction visual (e.g., 'KineticTypography', 'FrameworkDiagram')."
+          "type": ["string", "null"],
+          "description": "Remotion template used for the introduction visual (e.g., 'KineticTypography', 'FrameworkDiagram'). Null when treatment is 'organic' (no dedicated visual)."
         },
         "treatment": {
           "type": "string",
@@ -198,8 +198,8 @@
           "description": "cold-intro = dedicated visual moment to introduce. organic = woven into narration without a dedicated visual. callback = referencing a concept introduced in a prior episode."
         },
         "accentColor": {
-          "type": "string",
-          "description": "Hex color used for this concept's introduction (for visual consistency in callbacks)."
+          "type": ["string", "null"],
+          "description": "Hex color used for this concept's introduction (for visual consistency in callbacks). Null when treatment is 'organic' (no dedicated visual moment)."
         }
       }
     },
@@ -212,7 +212,8 @@
           "description": "Episode ID."
         },
         "beat": {
-          "type": "integer"
+          "type": ["integer", "null"],
+          "description": "Beat number where the concept appears. Null when the appearance isn't pinned to a specific beat (e.g. running motif)."
         },
         "role": {
           "type": "string",
@@ -220,8 +221,8 @@
           "description": "callback = brief visual reference to prior intro. deepened = concept is explored further with new facets. central = concept is the main subject of this episode. passing = mentioned in narration without visual treatment."
         },
         "template": {
-          "type": "string",
-          "description": "Template used (if any visual treatment)."
+          "type": ["string", "null"],
+          "description": "Template used (if any visual treatment). Null when role is 'passing' or callback uses no dedicated template."
         },
         "notes": {
           "type": "string",
