@@ -228,8 +228,8 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
   "episode": "silicon-trap",
   "title": "Supply Chain Concentration",
   "phases": [
-    { "title": "Phase 1", "countries": ["United States"], "color": "#3266AD", "durationSec": 4 },
-    { "title": "Phase 2", "countries": ["Taiwan"], "color": "#C23B22", "durationSec": 4 }
+    { "title": "Phase 1", "countries": ["United States"], "color": "#4A7BA7", "durationSec": 4 },
+    { "title": "Phase 2", "countries": ["Taiwan"], "color": "#A64D46", "durationSec": 4 }
   ],
   "_direction": {
     "proportional": true,
@@ -311,11 +311,11 @@ This ensures template animations respond to pacing intent even without explicit 
 **Accuracy over aesthetics.** Every number, every quote, every claim in the JSON must match what the script says. If the script says "roughly eighty percent," the visual can say "~80%" but not "78%" unless that specific number is sourced.
 
 **Semantic color coding.** Use the design system colors consistently:
-- US/Western actions → blue (#3266AD)
-- China/Eastern actions → red (#C23B22)  
+- US/Western actions → blue (#4A7BA7)
+- China/Eastern actions → red (#A64D46)  
 - Neutral/structural → gray (#888780)
 - Emphasis/call-out → amber (#F5A623)
-- Blocked/denied → danger red (#D64545)
+- Blocked/denied → danger red (#A64D46)
 
 **Bilingual awareness.** This is a bilingual channel. When Chinese terms appear in the script, create definition cards with pinyin and translation. When a concept has both English and Chinese framing, consider a bilingual typography card.
 

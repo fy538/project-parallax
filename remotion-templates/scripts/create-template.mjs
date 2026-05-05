@@ -14,12 +14,12 @@
  *   └── index.tsx          — Composition wrapper with calculateMetadata
  *
  * All generated code uses:
- *   - useCompositionAnimation() for Ken Burns + exit fade
- *   - TitleBlock with safeAreaTier="generous"
+ *   - useCompositionAnimation() — single source of drift + enter/exit fade (L44, L66)
+ *   - TitleBlock — uses generous safe area by default (L69)
  *   - Background with atmosphere
- *   - layout.safeAreaTier.generous for all positioning
- *   - exitFade for consistent composition endings
- *   - Proper TypeScript types
+ *   - layout.safeAreaTier.generous for positioning
+ *   - palette tokens from theme.ts — never hardcoded hex (L19)
+ *   - ?? fallbacks for optional fields (TS strict)
  *
  * After generating, you still need to:
  *   1. Add to Root.tsx (import + <Composition /> in appropriate folder)
@@ -127,28 +127,10 @@ const componentContent = `/**
  */
 
 import React from "react";
-import {
-  AbsoluteFill,
-  useCurrentFrame,
-  useVideoConfig,
-  interpolate,
-} from "remotion";
-import {
-  fonts,
-  fontSizes,
-  layout,
-  sec,
-  shadows,
-  cardPresets,
-} from "../../design/theme";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { fonts, fontSizes, layout, palette, sec } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import {
-  fadeIn,
-  slideIn,
-  exitFade,
-  CLAMP,
-  CLAMP_QUAD,
-} from "../../utils/animation";
+import { fadeIn, slideIn } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -158,14 +140,15 @@ export const ${templateName}: React.FC<{
   data: ${templateName}Data;
 }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { durationInFrames } = useVideoConfig();
-  const mode = (data.backgroundVariant || "${defaultMode}") as "light" | "dark";
+  const mode = (data.backgroundVariant ?? "${defaultMode}") as "light" | "dark";
   const theme = useThemeMode(mode);
+  // L44/L66: useCompositionAnimation is the single source of drift + enter/exit fade.
+  // Spread compStyle onto the outer wrapper; don't override its opacity or transform.
   const { style: compStyle } = useCompositionAnimation();
 
   // ── Derived values ───────────────────────────────────────────────────
-  const accentColor = data.accentColor || "#E5A544"; // brand amber
-  const exitOpacity = exitFade(frame, durationInFrames, 15);
+  // Default accent uses the palette token; data files override per episode.
+  const accentColor = data.accentColor ?? palette.gold;
 
   return (
     <Background
@@ -173,14 +156,9 @@ export const ${templateName}: React.FC<{
       tint={data.backgroundTint}
       atmosphere={mode === "dark" ? "normal" : "subtle"}
     >
-      <AbsoluteFill style={{ ...compStyle, opacity: exitOpacity }}>
-        {/* ── Title ─────────────────────────────────────────────────── */}
-        <TitleBlock
-          title={data.title}
-          subtitle={data.subtitle}
-          mode={mode}
-          safeAreaTier="generous"
-        />
+      <AbsoluteFill style={compStyle}>
+        {/* ── Title (safeAreaTier defaults to "generous" per L69) ─────── */}
+        <TitleBlock title={data.title} subtitle={data.subtitle} mode={mode} />
 
         {/* ── Main content area ─────────────────────────────────────── */}
         <div
@@ -192,7 +170,7 @@ export const ${templateName}: React.FC<{
             bottom: layout.safeAreaTier.generous.bottom + layout.spacing.lg,
           }}
         >
-          {/* TODO: Your template content here */}
+          {/* TODO: Your template content here. Use accentColor + theme.text.* tokens. */}
         </div>
 
         {/* ── Episode label ─────────────────────────────────────────── */}
@@ -206,6 +184,7 @@ export const ${templateName}: React.FC<{
               color: theme.text.muted,
               letterSpacing: 2,
               textTransform: "uppercase",
+              fontFamily: fonts.mono,
               opacity: fadeIn(frame, 0, sec(1)),
               transform: \`translateY(\${slideIn(frame, 0, 10, sec(0.8))}px)\`,
             }}
@@ -244,7 +223,7 @@ export const ${templateName}Composition = () => (
     id="${templateName}"
     component={${templateName}}
     calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as ${templateName}Data).durationSec || 10),
+      durationInFrames: sec((props.data as ${templateName}Data).durationSec ?? 10),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,

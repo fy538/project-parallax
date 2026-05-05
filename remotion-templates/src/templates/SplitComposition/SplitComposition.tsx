@@ -235,9 +235,9 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           <div
             style={{
               position: "absolute",
-              left: layout.safeArea.left,
+              left: layout.safeAreaTier.generous.left,
               top: layout.safeAreaTier.generous.top,
-              width: splitPosition - layout.safeArea.left - 40,
+              width: splitPosition - layout.safeAreaTier.generous.left - 40,
               opacity: leftOpacity * exitOpacity,
               filter: leftBlur > 0.5 ? `blur(${leftBlur}px)` : undefined,
             }}

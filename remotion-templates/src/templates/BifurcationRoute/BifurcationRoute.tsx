@@ -720,7 +720,7 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
 
       <svg width={canvasWidth} height={canvasHeight} style={{ position: "absolute" }}>
         {/* Title */}
-        <g opacity={titleOpacity} transform={`translate(${canvasWidth / 2}, ${layout.safeArea.top}) scale(${titleScale})`}>
+        <g opacity={titleOpacity} transform={`translate(${canvasWidth / 2}, ${layout.safeAreaTier.generous.top}) scale(${titleScale})`}>
           <text
             x={0} y={0} textAnchor="middle"
             fill={theme.text.primary}
@@ -854,12 +854,12 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
 
         {/* Network labels */}
         <g opacity={labelOpacity}>
-          <text x={canvasWidth * 0.25} y={canvasHeight - layout.safeArea.bottom}
+          <text x={canvasWidth * 0.25} y={canvasHeight - layout.safeAreaTier.generous.bottom}
             textAnchor="middle" fill={networkAColor}
             fontSize={fontSizes.body} fontFamily={fonts.display} fontWeight={fontWeights.bold}>
             {data.networkALabel}
           </text>
-          <text x={canvasWidth * 0.75} y={canvasHeight - layout.safeArea.bottom}
+          <text x={canvasWidth * 0.75} y={canvasHeight - layout.safeAreaTier.generous.bottom}
             textAnchor="middle" fill={networkBColor}
             fontSize={fontSizes.body} fontFamily={fonts.display} fontWeight={fontWeights.bold}>
             {data.networkBLabel}
@@ -868,7 +868,7 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
 
         {/* Source */}
         {data.source && (
-          <text x={canvasWidth - layout.safeArea.right} y={canvasHeight - layout.safeArea.bottom}
+          <text x={canvasWidth - layout.safeAreaTier.generous.right} y={canvasHeight - layout.safeAreaTier.generous.bottom}
             textAnchor="end" fill={theme.text.muted}
             fontSize={fontSizes.caption} fontFamily={fonts.mono} opacity={0.6}>
             {data.source}

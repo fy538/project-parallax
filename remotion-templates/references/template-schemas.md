@@ -31,11 +31,13 @@ Every template data object includes these fields:
 
 Use these values for any `color` field:
 
-**Palette tokens:** `#1C1814` (ink), `#2A2520` (midnight), `#E5A544` (amber), `#C23B22` (rust), `#F0E6D0` (bone), `#F5F0E8` (paper), `#6B1D1D` (oxblood), `#4A5A24` (olive), `#8B5E2B` (bronze)
+> **Source of truth:** [`tools/brand-treatment/palette.json`](../../tools/brand-treatment/palette.json). The values below mirror the Direction A palette as of May 2026 — re-check palette.json if anything below looks off.
 
-**Semantic tokens:** `#3266AD` (US/blue), `#C23B22` (China/red), `#888780` (neutral), `#F5A623` (highlight), `#5DAA68` (success), `#D64545` (danger)
+**Palette tokens:** `#1C1814` (ink), `#2A2520` (midnight), `#5C4A3D` (walnut), `#8B7355` (umber), `#B8A189` (taupe), `#D9C9B0` (sand), `#F0E6D0` (bone), `#F5F0E8` (paper), `#C4A747` (gold)
 
-**Ramps (5-stop, light→dark):**
+**Semantic tokens:** `#4A7BA7` (US / muted blue), `#A64D46` (China / muted rust), `#888780` (neutral)
+
+**Ramps (5-stop, light→dark):** still pinned to the pre-Direction-A palette inside the recraft.py / treat.py duotone pipeline. Migration TBD — if you need a brand-current ramp, derive it from the palette tokens above instead of using these:
 - Blue: `#E6F1FB`, `#85B7EB`, `#378ADD`, `#185FA5`, `#042C53`
 - Red: `#FCEBEB`, `#F09595`, `#E24B4A`, `#A32D2D`, `#501313`
 - Amber: `#FFF3D6`, `#F5D78E`, `#E5A544`, `#B07A28`, `#5C3F12`
@@ -61,8 +63,8 @@ Country highlighting, alliances, trade blocs. Multi-phase animation with map cam
       "subtitle": "October 2022",
       "durationSec": 4,
       "countries": [
-        { "name": "United States", "iso3": "USA", "fill": "#3266AD", "label": "US" },
-        { "name": "China", "iso3": "CHN", "fill": "#C23B22" }
+        { "name": "United States", "iso3": "USA", "fill": "#4A7BA7", "label": "US" },
+        { "name": "China", "iso3": "CHN", "fill": "#A64D46" }
       ],
       "center": [100, 35],           // optional per-phase camera
       "scale": 300
@@ -92,7 +94,7 @@ Supply chains, trade routes, resource flows. Phased segment reveal with map came
     { "name": "ASML", "coordinates": [5.46, 51.44], "sublabel": "Netherlands" }
   ],
   "segments": [
-    { "from": 0, "to": 1, "label": "EUV machines", "color": "#E5A544" }
+    { "from": 0, "to": 1, "label": "EUV machines", "color": "#C4A747" }
   ],
   "phases": [
     {
@@ -103,7 +105,7 @@ Supply chains, trade routes, resource flows. Phased segment reveal with map came
       "camera": { "longitude": 60, "latitude": 35, "zoom": 2.5, "pitch": 25 }
     }
   ],
-  "routeColor": "#E5A544"
+  "routeColor": "#C4A747"
 }
 ```
 
@@ -123,8 +125,8 @@ Historical parallels, before/after dual-track timelines.
   "episode": "silicon-trap",
   "leftLabel": "Oil Embargo 1941",
   "rightLabel": "Chip Controls 2022",
-  "leftColor": "#3266AD",
-  "rightColor": "#C23B22",
+  "leftColor": "#4A7BA7",
+  "rightColor": "#A64D46",
   "leftEvents": [
     { "year": "1939", "title": "US-Japan trade friction begins", "icon": "⚡" }
   ],
@@ -156,8 +158,8 @@ Bar charts, comparisons, horizontal bars. The workhorse data template.
   "variant": "bar",                    // "bar"|"comparison"|"horizontal"
   "unit": "%",
   "dataPoints": [
-    { "label": "Taiwan", "value": 92, "color": "#C23B22" },
-    { "label": "South Korea", "value": 5, "color": "#3266AD" },
+    { "label": "Taiwan", "value": 92, "color": "#A64D46" },
+    { "label": "South Korea", "value": 5, "color": "#4A7BA7" },
     { "label": "US", "value": 2 }
   ],
   "highlightIndex": 0,                // hero bar with accent glow
@@ -174,8 +176,8 @@ Bar charts, comparisons, horizontal bars. The workhorse data template.
   "comparisonPairs": [
     { "label": "R&D Spending", "leftValue": 45, "rightValue": 38 }
   ],
-  "leftGroupLabel": "US", "leftGroupColor": "#3266AD",
-  "rightGroupLabel": "China", "rightGroupColor": "#C23B22"
+  "leftGroupLabel": "US", "leftGroupColor": "#4A7BA7",
+  "rightGroupLabel": "China", "rightGroupColor": "#A64D46"
 }
 ```
 
@@ -207,7 +209,7 @@ Quotes, definitions, bilingual text, key statistics. Full-screen typography mome
   "text": "We are in a chip war.",
   "attribution": "Morris Chang",
   "attributionContext": "Founder of TSMC, 2024",
-  "accentColor": "#E5A544"
+  "accentColor": "#C4A747"
 }
 
 // Definition variant
@@ -248,8 +250,8 @@ Conceptual models, comparisons, matrix layouts, process flows.
   "title": "Chess vs. Go",
   "variant": "comparison",
   "columns": [
-    { "title": "Chess", "icon": "♔", "items": ["Capture the king", "Open information"], "color": "#3266AD" },
-    { "title": "Go (围棋)", "icon": "⚫", "items": ["Control territory", "Encirclement"], "color": "#C23B22" }
+    { "title": "Chess", "icon": "♔", "items": ["Capture the king", "Open information"], "color": "#4A7BA7" },
+    { "title": "Go (围棋)", "icon": "⚫", "items": ["Control territory", "Encirclement"], "color": "#A64D46" }
   ]
 }
 
@@ -257,8 +259,8 @@ Conceptual models, comparisons, matrix layouts, process flows.
 {
   "variant": "flow",
   "nodes": [
-    { "label": "Design", "sublabel": "US", "color": "#3266AD" },
-    { "label": "Fabrication", "sublabel": "Taiwan", "color": "#C23B22" }
+    { "label": "Design", "sublabel": "US", "color": "#4A7BA7" },
+    { "label": "Fabrication", "sublabel": "Taiwan", "color": "#A64D46" }
   ],
   "arrowLabels": ["IP license"]
 }
@@ -319,11 +321,11 @@ Branching scenarios, decision points. Tree structure via flat array + ID referen
   "nodes": [
     { "id": "root", "label": "Current Policy", "children": ["success", "backfire"] },
     { "id": "success", "label": "Controls Succeed", "probability": "35%", "color": "#5DAA68" },
-    { "id": "backfire", "label": "Controls Backfire", "probability": "45%", "color": "#D64545", "highlighted": true }
+    { "id": "backfire", "label": "Controls Backfire", "probability": "45%", "color": "#A64D46", "highlighted": true }
   ],
   "rootId": "root",
   "highlightedPath": ["root", "backfire"],
-  "highlightColor": "#C23B22"
+  "highlightColor": "#A64D46"
 }
 ```
 
@@ -347,13 +349,13 @@ Side-by-side comparisons with divider.
     "tag": "WESTERN LENS",
     "title": "Technology Denial",
     "items": ["National security priority", "Protecting IP"],
-    "accentColor": "#3266AD"
+    "accentColor": "#4A7BA7"
   },
   "right": {
     "tag": "CHINESE LENS",
     "title": "Technology Blockade",
     "items": ["Containment strategy", "卡脖子 — stranglehold"],
-    "accentColor": "#C23B22"
+    "accentColor": "#A64D46"
   },
   "dividerLabel": "vs"
 }
@@ -372,7 +374,7 @@ Probability readouts, shifts, scorecard tracking.
   "title": "Will Export Controls Succeed?",
   "variant": "gauge",
   "gauges": [
-    { "label": "P(lasting tech advantage)", "value": 42, "color": "#E5A544", "marketSource": "Kalshi" }
+    { "label": "P(lasting tech advantage)", "value": 42, "color": "#C4A747", "marketSource": "Kalshi" }
   ]
 }
 
@@ -405,15 +407,15 @@ Relationship webs, alliance structures, supply chain networks.
   "title": "Semiconductor Alliance Network",
   "layout": "hub-spoke",              // "horizontal-chain"|"hub-spoke"|"grid"|"vertical-chain"
   "nodes": [
-    { "id": "us", "label": "United States", "type": "nation", "color": "#3266AD", "importance": "primary" },
-    { "id": "asml", "label": "ASML", "type": "institution", "color": "#E5A544", "importance": "secondary",
+    { "id": "us", "label": "United States", "type": "nation", "color": "#4A7BA7", "importance": "primary" },
+    { "id": "asml", "label": "ASML", "type": "institution", "color": "#C4A747", "importance": "secondary",
       "stat": { "value": "100%", "label": "EUV monopoly" } }
   ],
   "edges": [
     { "from": "us", "to": "asml", "style": "solid", "label": "Export controls" }
   ],
   "controls": [
-    { "edge": ["us", "asml"], "label": "FDPR", "color": "#C23B22" }
+    { "edge": ["us", "asml"], "label": "FDPR", "color": "#A64D46" }
   ],
   "callouts": [
     { "value": "$1T", "label": "Estimated cost of full self-sufficiency", "position": "bottom-right" }
@@ -439,7 +441,7 @@ Multi-series line charts with annotations, eras, and reference lines.
   "lines": [
     {
       "label": "TSMC",
-      "color": "#C23B22",
+      "color": "#A64D46",
       "points": [{ "x": 2015, "y": 10 }, { "x": 2020, "y": 17 }, { "x": 2025, "y": 36 }],
       "areaFill": true
     }
@@ -448,7 +450,7 @@ Multi-series line charts with annotations, eras, and reference lines.
     { "x": 2022, "label": "October 7 controls", "sublabel": "Full-spectrum restrictions" }
   ],
   "eras": [
-    { "from": 2018, "to": 2022, "label": "Escalation period", "color": "#C23B22" }
+    { "from": 2018, "to": 2022, "label": "Escalation period", "color": "#A64D46" }
   ],
   "referenceLines": [
     { "y": 25, "label": "Breakeven threshold", "dashed": true }
@@ -485,7 +487,7 @@ Flow and allocation diagrams (trade, resources, budget).
   "episode": "silicon-trap",
   "title": "CHIPS Act Funding Flow",
   "nodes": [
-    { "id": "chips", "label": "CHIPS Act", "value": 280, "color": "#3266AD", "column": 0 },
+    { "id": "chips", "label": "CHIPS Act", "value": 280, "color": "#4A7BA7", "column": 0 },
     { "id": "fab", "label": "Fabrication", "value": 200, "column": 1 },
     { "id": "rd", "label": "R&D", "value": 50, "column": 1 }
   ],
@@ -524,11 +526,11 @@ Strategic game theory: chess, go, payoff matrix.
   "variant": "chess",
   "boardSize": 8,
   "initialPieces": [
-    { "position": [4, 0], "label": "TSMC", "color": "#C23B22" }
+    { "position": [4, 0], "label": "TSMC", "color": "#A64D46" }
   ],
   "phases": [
     { "label": "Opening Move", "durationSec": 3,
-      "pieces": [{ "position": [3, 2], "label": "ASML", "color": "#E5A544" }] }
+      "pieces": [{ "position": [3, 2], "label": "ASML", "color": "#C4A747" }] }
   ]
 }
 
@@ -585,8 +587,8 @@ Animated probability distribution curve shifting with sequential evidence.
 {
   "variant": "compare",
   "hypotheses": [
-    { "label": "Controls succeed", "prior": 55, "color": "#3266AD" },
-    { "label": "Controls backfire", "prior": 45, "color": "#C23B22" }
+    { "label": "Controls succeed", "prior": 55, "color": "#4A7BA7" },
+    { "label": "Controls backfire", "prior": 45, "color": "#A64D46" }
   ],
   "evidence": [
     { "label": "SMIC 7nm breakthrough", "direction": "down", "magnitude": 3 }
@@ -618,9 +620,9 @@ Dramatic single-statistic reveal with comparison bars.
     "decimals": 0
   },
   "comparisons": [
-    { "label": "Apollo Program (adj.)", "value": 194, "color": "#3266AD" },
+    { "label": "Apollo Program (adj.)", "value": 194, "color": "#4A7BA7" },
     { "label": "Marshall Plan (adj.)", "value": 173, "color": "#5DAA68" },
-    { "label": "Manhattan Project (adj.)", "value": 30, "color": "#C23B22" }
+    { "label": "Manhattan Project (adj.)", "value": 30, "color": "#A64D46" }
   ],
   "heroIsMax": true
 }
@@ -647,12 +649,12 @@ Multi-axis polygon capability comparison.
     { "label": "Technological", "short": "TECH" }
   ],
   "subjects": [
-    { "name": "United States", "values": [95, 85, 92], "color": "#3266AD", "fillOpacity": 0.15 },
-    { "name": "China", "values": [70, 78, 75], "color": "#C23B22", "fillOpacity": 0.15 }
+    { "name": "United States", "values": [95, 85, 92], "color": "#4A7BA7", "fillOpacity": 0.15 },
+    { "name": "China", "values": [70, 78, 75], "color": "#A64D46", "fillOpacity": 0.15 }
   ],
   "morphFrom": [
-    { "name": "United States", "values": [90, 90, 80], "color": "#3266AD" },
-    { "name": "China", "values": [50, 60, 45], "color": "#C23B22" }
+    { "name": "United States", "values": [90, 90, 80], "color": "#4A7BA7" },
+    { "name": "China", "values": [50, 60, 45], "color": "#A64D46" }
   ],
   "gridLevels": [25, 50, 75, 100]
 }
@@ -678,7 +680,7 @@ Image with animated callout labels.
   "duotoneRamp": "standard",          // "standard"|"conflict"|"editorial"
   "callouts": [
     { "x": 30, "y": 35, "label": "Tin Droplet Generator", "detail": "50,000 droplets/second", "placement": "left" },
-    { "x": 50, "y": 50, "label": "CO₂ Laser", "detail": "20kW", "placement": "right", "color": "#E5A544" }
+    { "x": 50, "y": 50, "label": "CO₂ Laser", "detail": "20kW", "placement": "right", "color": "#C4A747" }
   ]
 }
 ```

@@ -31,7 +31,7 @@ These principles come from what works in analytical/geopolitics YouTube and what
 
 3. **Text: 3-5 words maximum.** YouTube data consistently shows that thumbnails with less text outperform. The text should be a provocation or a number, not the full title. Think of it as the hook within the hook.
 
-4. **Warm palette, high contrast.** Use the Meridian palette but push contrast higher than in-video. Amber (#E5A544) on ink (#1C1814) reads well at all sizes. Avoid rust on dark backgrounds — too low contrast at thumbnail scale.
+4. **Warm palette, high contrast.** Use the Meridian palette but push contrast higher than in-video. Amber (#C4A747) on ink (#1C1814) reads well at all sizes. Avoid rust on dark backgrounds — too low contrast at thumbnail scale.
 
 5. **No clickbait aesthetics.** No red arrows, no shocked faces, no ALL CAPS IMPACT font. Parallax's visual identity is "serious analytical publication" — think Foreign Affairs cover, not MrBeast thumbnail. The provocation comes from the idea, not the formatting.
 

@@ -483,8 +483,8 @@ npx remotion still src/index.ts [CompositionId] --frame=[strategic-frame] --outp
 - Check each composition's frame count: frames / 30fps = actual duration. Compare against JSON.
 
 **Color consistency between templates:**
-- Dark mode compositions should use `ink` (#1A1A2E) or `bg.dark.surface`, not pure black.
-- Semantic colors must be consistent: US = `us` (#3266AD), China = `china` / `rust` (#C23B22), neutral = `neutral` (#888780).
+- Dark mode compositions should use `ink` (#1C1814) or `bg.dark.surface`, not pure black.
+- Semantic colors must be consistent: US = `us` (#4A7BA7), China = `china` / `rust` (#A64D46), neutral = `neutral` (#888780).
 - If a composition renders with unexpected colors, check the JSON color tokens against BRAND.md.
 
 **Text clipping and safe areas:**

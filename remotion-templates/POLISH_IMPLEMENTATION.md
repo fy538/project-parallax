@@ -1,8 +1,8 @@
-# Visual Polish V2 — Comprehensive Quality Spec
+# Polish Implementation Reference
 
-> Extends POLISH.md with the full 4-layer quality framework. This document captures everything implemented across the polish pass and serves as the ongoing quality standard for all Parallax visual production.
+> The 4-layer architecture spec — *how* the codebase is organized to make every rule in [`POLISH.md`](./POLISH.md) cheap to follow. Read POLISH.md for the rule list (what must pass); read this file for the infrastructure (shadow tokens, card presets, hooks, layout helpers, etc.) you should reach for when building or polishing a template.
 >
-> Last updated: April 26, 2026
+> Last updated: May 5, 2026
 
 ---
 

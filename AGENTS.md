@@ -33,6 +33,7 @@ Per-stack (when you need granular control):
 - JSON validation: `python3 tools/validate_data.py` (or `--files a.json b.json` for a subset)
 - Cost log: `python3 tools/cost_tracker.py summary` and `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
+- Clean regenerable artifacts (renders, caches, coverage): `./scripts/clean.sh`
 
 ## Slash commands and subagents
 

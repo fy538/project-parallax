@@ -5,7 +5,9 @@
 > Grounded in reference analysis of CaspianReport (cinematic maps), Wendover Productions (data reveals),
 > and PolyMatter (clean data viz). Every rule is concrete and checkable — no subjective "make it look good."
 >
-> Last updated: April 26, 2026
+> **Companion doc:** [`POLISH_IMPLEMENTATION.md`](./POLISH_IMPLEMENTATION.md) — the 4-layer architecture spec (per-element / animation / composition / brand) showing *which infrastructure* makes each rule below cheap to follow. Read this file for *what* must pass; read implementation for *how* the system is built to make it easy.
+>
+> Last updated: May 5, 2026
 
 ---
 
