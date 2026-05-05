@@ -68,7 +68,11 @@ RAMPS_HEX = get_ramps_hex()  # Used for LUT file headers
 
 _defaults = get_defaults()
 DEFAULT_SATURATION = _defaults.get("saturation", 0.25)
-DEFAULT_GRAIN_INTENSITY = _defaults.get("grain", 0.10)
+# Grain intensity is on a 0–1 scale; multiplied by 100 to feed ffmpeg's
+# `noise` filter (which uses 0–100). Default chosen so that the resulting
+# noise strength (~25) matches the historical look from the prior incorrect
+# 0.10 × 255 calibration that landed at the same value by coincidence.
+DEFAULT_GRAIN_INTENSITY = _defaults.get("grain", 0.25)
 DEFAULT_VIGNETTE_STRENGTH = _defaults.get("vignette", 0.18)
 
 LUT_SIZE = 64  # 64³ = 262,144 entries — good balance of accuracy vs file size
@@ -222,10 +226,11 @@ def build_filter_chain(
     filters.append(f"lut3d='{lut_path}'")
 
     if not lut_only:
-        # Step 3: Film grain
-        # noise filter: monochromatic (allf flag), intensity maps to 0-100 range
-        # treat.py uses 10% intensity on 0-255 scale ≈ noise strength of ~25
-        noise_strength = int(grain_intensity * 255)
+        # Step 3: Film grain.
+        # ffmpeg's `noise` filter uses a 0–100 strength scale. We accept
+        # grain_intensity on a normalized 0–1 scale and rescale here.
+        # `allf=t` = temporal (per-frame) noise, which reads as live grain.
+        noise_strength = max(0, min(100, int(grain_intensity * 100)))
         filters.append(
             f"noise=alls={noise_strength}:allf=t"
         )

@@ -60,5 +60,6 @@ export const NetworkDiagramSchema = z.object({
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
+    _direction: z.unknown().optional(),
   }),
 });

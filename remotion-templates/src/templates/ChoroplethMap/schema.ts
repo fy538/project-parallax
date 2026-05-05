@@ -33,5 +33,8 @@ export const ChoroplethMapSchema = z.object({
       z.array(z.string()),
     ]).optional(),
     phases: z.array(AnimationPhaseSchema).min(1),
+    backgroundVariant: z.enum(["light", "dark"]).optional(),
+    _direction: z.unknown().optional(),
+    backgroundTint: z.string().optional(),
   }),
 });

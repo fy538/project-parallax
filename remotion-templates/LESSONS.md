@@ -48,15 +48,14 @@ When building a new template or polishing an existing one, prefer these shared b
 **Fix:** Any code consuming color ramps must declare parameters as `readonly string[]`, not `string[]`. Applied to `rampLookup` (type `Record<string, readonly string[]>`), `getColorRamp` (return type `readonly string[]`), and `getCountryFill` (parameter type `readonly string[]`) in ChoroplethMap.
 **Rule:** When adding new functions that accept theme colors, always use `readonly` array types.
 
-### L2: react-simple-maps has no @types package
-**Problem:** `npm install @types/react-simple-maps` fails — the package doesn't exist.
-**Fix:** Created `src/declarations.d.ts` with manual type declarations for ComposableMap, Geographies, Geography, Marker, and Line components with their prop interfaces.
-**Rule:** If adding new react-simple-maps components (e.g., Annotation, Sphere), add their types to declarations.d.ts.
-
-### L3: tsconfig strict mode disabled for pragmatism
-**Problem:** Multiple third-party libraries (react-simple-maps, Remotion internals) produced implicit `any` errors under strict mode that couldn't be resolved without excessive type gymnastics.
-**Fix:** Set `strict: false` and `noImplicitAny: false` in tsconfig.json. This is a deliberate trade-off — we get faster iteration at the cost of some type safety.
-**Rule:** Don't re-enable strict mode unless all third-party type issues are resolved first.
+### L2: TypeScript strict mode is enabled — patterns to maintain
+**History:** Strict mode was previously disabled to work around third-party type gaps (notably `react-simple-maps`, since removed in favor of Mapbox GL). As of Sprint A (May 2026), `tsconfig.json` has `"strict": true` and the codebase is clean under it.
+**Patterns that made it work:**
+- Optional fields on data props (`durationSec?: number`) need `?? 0` fallbacks at use site, not access bypass. JSON-imported data often lacks fields the runtime code expects.
+- Cast through `unknown` for shape mismatches between JSON and types: `data as unknown as MyType`. Used in `SiliconTrap.tsx` for episodes of-hand JSON imports that don't match Zod-validated shapes.
+- React hooks (`useMemo`, `useState`, `useId`) must be called **before** any conditional `return` (Rules of Hooks). Common trap when adding memoization to a component with an early-return guard.
+- Use named animation constants from `src/utils/animation.ts` (`KEN_BURNS_MAX_SCALE`, `EXIT_FADE_DURATION`, `PAN_DRIFT_MAX_OFFSET`) and `src/design/theme.ts` (`timing.entrance.*`) — don't reintroduce hardcoded `1.02`, `15`, `sec(0.4)`.
+**Rule:** Don't disable strict mode. Add `?? fallback`, narrow with type guards, or cast through `unknown` — never widen types to `any`.
 
 ### L4: Composition duration must be calculated, not hardcoded
 **Pattern:** For templates with phases (maps, routes, timelines), calculate `durationInFrames` from the sum of phase durations in the JSON data: `sec(data.phases.reduce((sum, p) => sum + p.durationSec, 0) + 1)`. The `+1` adds a 1-second buffer for fade-out.

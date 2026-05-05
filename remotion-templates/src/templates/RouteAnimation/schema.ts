@@ -44,5 +44,7 @@ export const RouteAnimationSchema = z.object({
     routeColor: z.string().optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
+    _direction: z.unknown().optional(),
+    backgroundTint: z.string().optional(),
   }),
 });

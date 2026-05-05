@@ -19,5 +19,7 @@ export const TitleTransitionSchema = z.object({
     accentColor: z.string().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     durationSec: z.number().optional(),
+    _direction: z.unknown().optional(),
+    backgroundTint: z.string().optional(),
   }),
 });

@@ -29,5 +29,7 @@ export const TimelineComparisonSchema = z.object({
     rightEvents: z.array(TimelineEventSchema).min(1),
     connections: z.array(ConnectionSchema).optional(),
     secondsPerEvent: z.number().optional(),
+    _direction: z.unknown().optional(),
+    backgroundTint: z.string().optional(),
   }),
 });

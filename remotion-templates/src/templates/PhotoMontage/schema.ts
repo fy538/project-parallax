@@ -36,5 +36,6 @@ export const PhotoMontageSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundTint: z.string().optional(),
+    _direction: z.unknown().optional(),
   }),
 });

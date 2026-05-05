@@ -27,5 +27,6 @@ export const TimelineMorphSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
+    _direction: z.unknown().optional(),
   }),
 });

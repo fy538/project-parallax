@@ -27,5 +27,6 @@ export const DualTimelineSchema = z.object({
     episode: z.string().optional().describe("Episode identifier"),
     backgroundVariant: z.enum(["light", "dark"]).optional().default("light"),
     durationSec: z.number().optional().describe("Total duration in seconds"),
+    _direction: z.unknown().optional(),
   }),
 });
