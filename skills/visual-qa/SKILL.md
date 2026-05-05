@@ -10,7 +10,7 @@ You are performing a visual quality assurance pass on rendered Remotion composit
 
 ## Why This Exists
 
-`polish-lint.py` catches code-level violations (magic numbers, missing tokens). But some problems are only visible in the rendered output: text that's technically positioned correctly but visually collides, backgrounds that are technically gradients but read as flat, spacing that passes the 8px grid but looks cramped at 1920×1080. This skill closes the gap between "code looks right" and "output looks right."
+`polish_lint.py` catches code-level violations (magic numbers, missing tokens). But some problems are only visible in the rendered output: text that's technically positioned correctly but visually collides, backgrounds that are technically gradients but read as flat, spacing that passes the 8px grid but looks cramped at 1920×1080. This skill closes the gap between "code looks right" and "output looks right."
 
 ## Prerequisites
 
@@ -133,7 +133,7 @@ Produce a markdown report saved to the episode folder or the project root:
 1. [Most impactful fix] — affects [compositions]
 2. ...
 
-## Comparison with polish-lint.py
+## Comparison with polish_lint.py
 - Lint violations that are visible in renders: ...
 - Render issues NOT caught by lint: ...
 ```
@@ -143,7 +143,7 @@ Produce a markdown report saved to the episode folder or the project root:
 - **Be specific.** "The title is too close to the content" is useless. "Title block bottom edge is ~20px from the first chart bar; POLISH.md L5 requires 48px minimum" is useful.
 - **Reference POLISH.md rules.** Every finding should cite the rule it violates (A1, L7, T3, V2, etc.).
 - **Compare frame 0 and midpoint.** The entrance state reveals animation sequencing; the midpoint reveals the final layout.
-- **Cross-reference with lint.** If polish-lint.py found violations in a template, mention whether those violations are visually apparent in the render.
+- **Cross-reference with lint.** If polish_lint.py found violations in a template, mention whether those violations are visually apparent in the render.
 - **Don't over-report.** A score of 4 means "basically fine with nitpicks." Reserve scores of 1-2 for real problems that would be visible to viewers.
 
 ## Context Files

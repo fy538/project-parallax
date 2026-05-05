@@ -34,6 +34,7 @@ Per-stack (when you need granular control):
 - Cost log: `python3 tools/cost_tracker.py summary` and `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
 - Clean regenerable artifacts (renders, caches, coverage): `./scripts/clean.sh`
+- Regenerate visual regression baselines (after intentional visual changes): `./scripts/regen-baselines.sh`
 
 ## Slash commands and subagents
 
@@ -68,6 +69,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 ## Testing
 
 - Python tests are <1s. **New parsing/state logic must come with a test.** Patterns to copy: `tools/assembly/test_generate_manifest.py` (parsing-heavy), `tools/test_cost_tracker.py` (markdown round-trip), `tools/brand-treatment/test_treat.py` (numeric image processing invariants).
+- **Visual regression baselines** live in `remotion-templates/src/__tests__/baselines/`. Run `./scripts/regen-baselines.sh` after any intentional visual change (palette, animation timing, template refactor) and commit the resulting PNGs. `cd remotion-templates && npm test` then catches future drift via 5% file-size tolerance.
 - Visual regression baselines live in `remotion-templates/src/__tests__/baselines/`. After intentional visual changes, regenerate with `npm run test:baseline`.
 - Pre-commit hook runs typecheck on changed `.ts/.tsx` and Python tests on changed `.py`. Don't skip with `--no-verify` unless you have a specific reason worth stating.
 

@@ -35,7 +35,7 @@
  *     18 min @ 1080p30 renders in ~2-5 min, well within the 5 GB file limit.
  */
 
-import React, { useMemo, memo } from "react";
+import React, { useMemo, memo, Component, type ReactNode, type ErrorInfo } from "react";
 import {
   AbsoluteFill,
   Audio,
@@ -450,6 +450,74 @@ const BackgroundSegment: React.FC<{
 
 // ── Foreground segment renderer ──��───────────────────────────────────────────
 
+// Per-segment error boundary. React boundaries must be class components.
+// Without this, a single segment that throws at render (malformed data
+// passing Zod, off-by-one in template internals, missing dependency) crashes
+// the whole 18-min episode render. With it, the broken segment shows a
+// visible placeholder and the rest of the episode keeps rendering.
+
+interface SegmentErrorBoundaryProps {
+  segmentId: string;
+  componentName: string;
+  children: ReactNode;
+}
+
+class SegmentErrorBoundary extends Component<
+  SegmentErrorBoundaryProps,
+  { hasError: boolean; message: string }
+> {
+  constructor(props: SegmentErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, message: "" };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, message: error.message };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[FullEpisode] segment ${this.props.segmentId} (${this.props.componentName}) threw at render:`,
+      error,
+      info.componentStack,
+    );
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      return (
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#1C1814",
+          }}
+        >
+          <div
+            style={{
+              color: "#A64D46",
+              fontFamily: "IBM Plex Mono, monospace",
+              fontSize: 18,
+              textAlign: "center",
+              padding: 24,
+              maxWidth: 900,
+            }}
+          >
+            ⚠️ {this.props.componentName} threw
+            <br />
+            <span style={{ fontSize: 13, color: "#888780" }}>
+              segment {this.props.segmentId}: {this.state.message}
+            </span>
+          </div>
+        </AbsoluteFill>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 const ForegroundSegment: React.FC<{
   segment: ManifestSegment;
   templateData: Record<string, any>;
@@ -492,9 +560,14 @@ const ForegroundSegment: React.FC<{
   }
 
   return (
-    <AbsoluteFill>
-      <Component data={data} />
-    </AbsoluteFill>
+    <SegmentErrorBoundary
+      segmentId={segment.id}
+      componentName={template.component}
+    >
+      <AbsoluteFill>
+        <Component data={data} />
+      </AbsoluteFill>
+    </SegmentErrorBoundary>
   );
 });
 

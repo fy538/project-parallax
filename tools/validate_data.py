@@ -2,7 +2,7 @@
 """
 validate_data.py — JSON validation for the Parallax repo.
 
-Three layers:
+Three hard layers (failures exit non-zero):
   1. Well-formedness — every *.json under data/, episodes/, and remotion-templates/data/
      parses as valid JSON.
   2. Schema validation (when jsonschema is installed) — assembly manifests, the concept
@@ -11,13 +11,21 @@ Three layers:
      value that appears in tools/brand-treatment/palette.json. Catches off-brand hex
      values pasted into JSON before they make it into a render.
 
+Plus one soft layer (warnings, do not fail the run):
+  4. Audio asset existence — for every assembly-manifest.json, check that referenced
+     music-bed / SFX / texture audio files exist under remotion-templates/public/.
+     Reports missing files so a render doesn't hang waiting for an asset that was
+     never sourced. Soft because audio assets are typically pre-launch work-in-progress.
+
 Usage:
-  python3 tools/validate_data.py                      # validate everything
+  python3 tools/validate_data.py                      # validate everything (Layers 1-3 + soft 4)
   python3 tools/validate_data.py --files <a> <b>      # validate specific files (pre-commit)
   python3 tools/validate_data.py --episode <slug>     # validate one episode
   python3 tools/validate_data.py --no-palette         # skip palette check (Layer 3)
+  python3 tools/validate_data.py --no-audio           # skip audio existence check (Layer 4)
+  python3 tools/validate_data.py --audio-strict       # fail on missing audio files
 
-Exits non-zero on any failure. Designed to be cheap enough for pre-commit.
+Exits non-zero on hard-layer failure. Designed to be cheap enough for pre-commit.
 """
 
 import argparse
@@ -47,6 +55,7 @@ SCHEMAS = [
 
 # Palette source of truth (L19). Hex values here are normalized lowercase.
 PALETTE_PATH = ROOT / "tools" / "brand-treatment" / "palette.json"
+PUBLIC_DIR = ROOT / "remotion-templates" / "public"
 
 # Hex values always allowed: pure black, pure white, fully transparent.
 HEX_ALLOWED_ALWAYS = {"#000000", "#ffffff", "#00000000", "#ffffffff"}
@@ -186,6 +195,55 @@ def validate_palette(path: Path, allowed: set[str]) -> Optional[str]:
     return f"off-palette hex value(s): {', '.join(sorted(bad))}"
 
 
+# ── Layer 4: Audio asset existence ──────────────────────────────────────────
+
+
+def _expected_audio_files(manifest: dict, episode_slug: str) -> set[str]:
+    """Compute every audio file path the AudioLayer would request for this manifest.
+
+    Returns a set of paths relative to public/ — the same shape staticFile()
+    receives in AudioLayer.tsx (music beds, transition SFX, texture hits).
+    """
+    paths: set[str] = set()
+    music = manifest.get("musicBed", {}) or {}
+    for track in music.get("tracks", []) or []:
+        f = track.get("file")
+        if f:
+            paths.add(f"episodes/{episode_slug}/{f}")
+    for seg in manifest.get("segments", []) or []:
+        for cue_key in ("soundCue", "soundCueSecondary"):
+            cue = seg.get(cue_key)
+            if not cue:
+                continue
+            cue_type = cue.get("type")
+            intensity = cue.get("intensity", "normal")
+            if cue_type:
+                paths.add(f"audio/sfx/transitions/{cue_type}-{intensity}.wav")
+        for hit in seg.get("textureCues", []) or []:
+            t = hit.get("type")
+            if t:
+                paths.add(f"audio/sfx/textures/{t}.wav")
+    return paths
+
+
+def check_audio_assets(manifest_path: Path) -> tuple[int, list[str]]:
+    """Layer 4 — soft check that referenced audio files exist on disk.
+
+    Returns (count_referenced, list_of_missing_paths). The caller decides
+    whether to surface as a warning or fail the validation run.
+    """
+    if not PUBLIC_DIR.exists():
+        return (0, [])
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return (0, [])
+    slug = manifest.get("episode", manifest_path.parent.name)
+    referenced = _expected_audio_files(manifest, slug)
+    missing = sorted(p for p in referenced if not (PUBLIC_DIR / p).exists())
+    return (len(referenced), missing)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate Parallax JSON data files.")
     parser.add_argument(
@@ -202,6 +260,16 @@ def main() -> int:
         "--no-palette",
         action="store_true",
         help="Skip Layer 3 (palette compliance) check.",
+    )
+    parser.add_argument(
+        "--no-audio",
+        action="store_true",
+        help="Skip Layer 4 (audio asset existence) check.",
+    )
+    parser.add_argument(
+        "--audio-strict",
+        action="store_true",
+        help="Treat missing audio files as failures (default: soft warnings).",
     )
     args = parser.parse_args()
 
@@ -254,11 +322,47 @@ def main() -> int:
                 print(f"✗ {rel}: {err}", file=sys.stderr)
                 failures += 1
 
+    # Layer 4 (soft): audio asset existence on assembly manifests
+    audio_warnings = 0
+    audio_referenced_total = 0
+    audio_missing_total = 0
+    if not args.no_audio:
+        for path in files:
+            if path.name != "assembly-manifest.json":
+                continue
+            referenced, missing = check_audio_assets(path)
+            audio_referenced_total += referenced
+            audio_missing_total += len(missing)
+            if missing:
+                rel = path.relative_to(ROOT)
+                marker = "✗" if args.audio_strict else "⚠"
+                print(
+                    f"{marker} {rel}: {len(missing)}/{referenced} audio file(s) missing",
+                    file=sys.stderr,
+                )
+                for m in missing[:5]:  # cap noise; first 5 is enough to act on
+                    print(f"    – public/{m}", file=sys.stderr)
+                if len(missing) > 5:
+                    print(f"    … and {len(missing) - 5} more", file=sys.stderr)
+                if args.audio_strict:
+                    failures += 1
+                else:
+                    audio_warnings += 1
+
     if failures:
         print(f"\n{failures} file(s) failed validation.", file=sys.stderr)
         return 1
-    extra = f" (palette: {palette_files_checked})" if palette_files_checked else ""
-    print(f"✓ {len(files)} JSON file(s) validated{extra}.")
+    extras = []
+    if palette_files_checked:
+        extras.append(f"palette: {palette_files_checked}")
+    if audio_referenced_total:
+        present = audio_referenced_total - audio_missing_total
+        extras.append(f"audio: {present}/{audio_referenced_total}")
+    extra_str = f" ({', '.join(extras)})" if extras else ""
+    msg = f"✓ {len(files)} JSON file(s) validated{extra_str}."
+    if audio_warnings:
+        msg += f"  [{audio_warnings} manifest(s) reference missing audio — see warnings above]"
+    print(msg)
     return 0
 
 

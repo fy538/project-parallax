@@ -59,6 +59,24 @@ export const MAP_CONFIG = {
   projection: mapConfig.projection,
 } as const;
 
+/**
+ * Validate Mapbox access token presence. Call before rendering map components.
+ * Without this, an unset MAPBOX_ACCESS_TOKEN silently produces an empty
+ * token, every tile request 401s, and the render hangs for the 30-second
+ * tile-load timeout before falling back. Far better to fail fast here with
+ * an actionable message.
+ */
+export const assertMapboxToken = (): void => {
+  if (!MAP_CONFIG.accessToken) {
+    throw new Error(
+      "MAPBOX_ACCESS_TOKEN is not set. Map templates require a Mapbox access " +
+        "token in remotion-templates/.env (and as a Lambda env var for Lambda " +
+        "renders). Get one at https://account.mapbox.com/access-tokens/. " +
+        "Set MAPBOX_ACCESS_TOKEN=pk.... and re-run the render.",
+    );
+  }
+};
+
 // ── Props ─────────────────────────────────────────────────────────────
 
 export interface MapGLProps {
@@ -104,6 +122,10 @@ export const MapGL: React.FC<MapGLProps> = ({
   styleUrl,
   children,
 }) => {
+  // Fail fast if the Mapbox token isn't configured — without this, every
+  // tile request 401s and the render hangs for the delayRender timeout.
+  assertMapboxToken();
+
   // ── Delay render until map tiles are loaded ─────────────────────────
   const [handle] = useState(() => delayRender("Loading map tiles..."));
   const [loaded, setLoaded] = useState(false);
