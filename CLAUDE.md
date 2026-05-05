@@ -1,6 +1,8 @@
 # Parallax — Project Overview
 
-> Last updated: May 4, 2026
+> **For build/test/lint commands and dev conventions, read [AGENTS.md](./AGENTS.md) first.** This file is the project context (what Parallax is, how the pipeline is organized, what's built).
+>
+> Last updated: May 5, 2026
 
 ## What this is
 

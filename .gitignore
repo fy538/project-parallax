@@ -12,6 +12,10 @@ remotion-templates/.vite/
 .env.local
 .env.*.local
 
+# AI agent local overrides (personal, not team-shared)
+CLAUDE.local.md
+.claude/settings.local.json
+
 # Logs
 *.log
 

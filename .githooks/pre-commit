@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Pre-commit gate: typecheck on changed *.ts/*.tsx, pytest on changed *.py.
+# Activate once with:
+#   git config core.hooksPath .githooks
+set -euo pipefail
+
+cd "$(git rev-parse --show-toplevel)"
+
+TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+PY_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
+
+if [ -n "$TS_CHANGED" ]; then
+  echo "→ TypeScript typecheck (TS files changed)"
+  (cd remotion-templates && npx tsc --noEmit)
+fi
+
+if [ -n "$PY_CHANGED" ]; then
+  echo "→ Python tests (Python files changed)"
+  python3 -m pytest tools/assembly/test_generate_manifest.py -q
+fi
+
+if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ]; then
+  echo "  (no .ts/.tsx/.py changes, skipping checks)"
+fi
+
+echo "✓ pre-commit checks passed"
