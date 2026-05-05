@@ -3,8 +3,8 @@
   "backgroundVariant": "light",
   "title": "The Bifurcation",
   "subtitle": "Two parallel ecosystems — one American, one Chinese",
-  "routeColor": "#E5A544",
-  "backgroundTint": "#D64545",
+  "routeColor": "#C4A747",
+  "backgroundTint": "#A64D46",
 
   "points": [
     {
@@ -12,59 +12,59 @@
       "coordinates": [-121.89, 37.34],
       "label": "San Jose",
       "sublabel": "US chip design",
-      "color": "#3266AD"
+      "color": "#4A7BA7"
     },
     {
       "name": "Hsinchu",
       "coordinates": [120.97, 24.80],
       "label": "Hsinchu",
       "sublabel": "TSMC (US-allied)",
-      "color": "#3266AD"
+      "color": "#4A7BA7"
     },
     {
       "name": "Veldhoven",
       "coordinates": [5.40, 51.42],
       "label": "Veldhoven",
       "sublabel": "ASML (restricted)",
-      "color": "#3266AD"
+      "color": "#4A7BA7"
     },
     {
       "name": "Seoul",
       "coordinates": [126.98, 37.57],
       "label": "Seoul",
       "sublabel": "Samsung / SK Hynix",
-      "color": "#E5A544"
+      "color": "#C4A747"
     },
     {
       "name": "Shanghai",
       "coordinates": [121.47, 31.23],
       "label": "Shanghai",
       "sublabel": "SMIC (China fab)",
-      "color": "#C23B22"
+      "color": "#A64D46"
     },
     {
       "name": "Shenzhen",
       "coordinates": [114.07, 22.54],
       "label": "Shenzhen",
       "sublabel": "Huawei / HiSilicon",
-      "color": "#C23B22"
+      "color": "#A64D46"
     },
     {
       "name": "Wuhan",
       "coordinates": [114.30, 30.59],
       "label": "Wuhan",
       "sublabel": "YMTC (memory)",
-      "color": "#C23B22"
+      "color": "#A64D46"
     }
   ],
 
   "segments": [
-    { "from": 0, "to": 1, "label": "US-allied", "color": "#3266AD" },
-    { "from": 2, "to": 1, "label": "EUV supply", "color": "#3266AD" },
-    { "from": 3, "to": 1, "label": "Memory", "color": "#E5A544" },
-    { "from": 5, "to": 4, "label": "China design", "color": "#C23B22" },
-    { "from": 4, "to": 6, "label": "Domestic memory", "color": "#C23B22" },
-    { "from": 3, "to": 4, "label": "Caught between", "color": "#E5A544", "dashed": true }
+    { "from": 0, "to": 1, "label": "US-allied", "color": "#4A7BA7" },
+    { "from": 2, "to": 1, "label": "EUV supply", "color": "#4A7BA7" },
+    { "from": 3, "to": 1, "label": "Memory", "color": "#C4A747" },
+    { "from": 5, "to": 4, "label": "China design", "color": "#A64D46" },
+    { "from": 4, "to": 6, "label": "Domestic memory", "color": "#A64D46" },
+    { "from": 3, "to": 4, "label": "Caught between", "color": "#C4A747", "dashed": true }
   ],
 
   "phases": [

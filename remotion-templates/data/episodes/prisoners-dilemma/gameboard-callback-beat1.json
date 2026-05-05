@@ -21,7 +21,7 @@
       "counterAnimation": {
         "cooperate": 60,
         "defect": 14,
-        "cooperateColor": "#E5A544",
+        "cooperateColor": "#C4A747",
         "defectColor": "#888780"
       },
       "annotation": "Because they could see each other. Because they had a future. Because they were human."
@@ -29,5 +29,5 @@
   ],
   "durationSec": 5,
   "backgroundVariant": "dark",
-  "backgroundTint": "#E5A544"
+  "backgroundTint": "#C4A747"
 }

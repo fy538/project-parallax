@@ -11,9 +11,9 @@
     }
   ],
   "leftGroupLabel": "With EUV",
-  "leftGroupColor": "#E5A544",
+  "leftGroupColor": "#C4A747",
   "rightGroupLabel": "SMIC (without EUV)",
-  "rightGroupColor": "#C23B22",
+  "rightGroupColor": "#A64D46",
   "contextNote": "Every extra pass is another chance for a defect",
   "durationSec": 8,
   "backgroundVariant": "light",

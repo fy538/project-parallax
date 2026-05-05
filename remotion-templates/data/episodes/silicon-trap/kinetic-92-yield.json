@@ -4,7 +4,7 @@
   "statValue": "92%",
   "statLabel": "chip yield at TSMC Arizona",
   "statContext": "4 points above the equivalent line in Taiwan",
-  "accentColor": "#E5A544",
+  "accentColor": "#C4A747",
   "durationSec": 3,
   "backgroundVariant": "light"
 }

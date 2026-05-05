@@ -8,7 +8,7 @@
     { "label": "Post-crash", "leftValue": 100, "rightValue": 65 }
   ],
   "leftGroupLabel": "Model prediction",
-  "leftGroupColor": "#E5A544",
+  "leftGroupColor": "#C4A747",
   "rightGroupLabel": "Market reality",
   "rightGroupColor": "#888780",
   "contextNote": "The model didn't describe reality. Reality rearranged itself to match the model — until it couldn't.",

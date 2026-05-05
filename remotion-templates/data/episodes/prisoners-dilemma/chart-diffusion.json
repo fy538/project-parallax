@@ -5,12 +5,12 @@
   "variant": "bar",
   "unit": "",
   "dataPoints": [
-    { "label": "1950", "value": 1, "color": "#E5A544" },
-    { "label": "1955", "value": 12, "color": "#E5A544" },
-    { "label": "1960", "value": 50, "color": "#E5A544" },
-    { "label": "1965", "value": 200, "color": "#E5A544" },
-    { "label": "1970", "value": 800, "color": "#E5A544" },
-    { "label": "1975", "value": 2000, "color": "#E5A544" }
+    { "label": "1950", "value": 1, "color": "#C4A747" },
+    { "label": "1955", "value": 12, "color": "#C4A747" },
+    { "label": "1960", "value": 50, "color": "#C4A747" },
+    { "label": "1965", "value": 200, "color": "#C4A747" },
+    { "label": "1970", "value": 800, "color": "#C4A747" },
+    { "label": "1975", "value": 2000, "color": "#C4A747" }
   ],
   "highlightIndex": 5,
   "contextNote": "2,000+ articles for a model that failed its first experiment",

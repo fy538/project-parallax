@@ -8,7 +8,7 @@
     {
       "id": "root",
       "label": "AI arrival timeline",
-      "color": "#E5A544",
+      "color": "#C4A747",
       "children": ["fast", "slow"],
       "active": true
     },
@@ -16,7 +16,7 @@
       "id": "fast",
       "label": "Fast (2-3 years)",
       "probability": "Uncertain",
-      "color": "#5B8DB8",
+      "color": "#4A7BA7",
       "children": ["controls-succeed"],
       "highlighted": false
     },
@@ -24,7 +24,7 @@
       "id": "slow",
       "label": "Slow (10+ years)",
       "probability": "Uncertain",
-      "color": "#9B4D3A",
+      "color": "#A64D46",
       "children": ["controls-backfire"],
       "highlighted": false
     },
@@ -32,25 +32,25 @@
       "id": "controls-succeed",
       "label": "Controls succeeded",
       "probability": null,
-      "color": "#5B8DB8",
+      "color": "#4A7BA7",
       "children": ["us-lead"]
     },
     {
       "id": "controls-backfire",
       "label": "Controls backfired",
       "probability": null,
-      "color": "#9B4D3A",
+      "color": "#A64D46",
       "children": ["china-independent"]
     },
     {
       "id": "us-lead",
       "label": "US keeps decisive lead",
-      "color": "#5B8DB8"
+      "color": "#4A7BA7"
     },
     {
       "id": "china-independent",
       "label": "China achieved self-sufficiency",
-      "color": "#9B4D3A"
+      "color": "#A64D46"
     }
   ],
 
@@ -63,7 +63,7 @@
   ],
 
   "highlightedPath": null,
-  "highlightColor": "#E5A544",
+  "highlightColor": "#C4A747",
   "source": "Parallax analysis",
   "backgroundVariant": "dark",
   "durationSec": 12

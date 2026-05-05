@@ -11,10 +11,10 @@
       "subtitle": "Centuries of successful cooperation",
       "durationSec": 6,
       "countries": [
-        { "name": "Spain", "iso3": "ESP", "fill": "#E5A544", "label": "Huertas (600+ yrs)" },
-        { "name": "Switzerland", "iso3": "CHE", "fill": "#E5A544", "label": "Alpine grazing (13th c.)" },
-        { "name": "Japan", "iso3": "JPN", "fill": "#E5A544", "label": "Iriaichi forests" },
-        { "name": "United States", "iso3": "USA", "fill": "#E5A544", "label": "Maine lobster" }
+        { "name": "Spain", "iso3": "ESP", "fill": "#C4A747", "label": "Huertas (600+ yrs)" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#C4A747", "label": "Alpine grazing (13th c.)" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#C4A747", "label": "Iriaichi forests" },
+        { "name": "United States", "iso3": "USA", "fill": "#C4A747", "label": "Maine lobster" }
       ]
     },
     {
@@ -22,21 +22,21 @@
       "subtitle": "Communities managing shared resources without privatization or state control",
       "durationSec": 6,
       "countries": [
-        { "name": "Spain", "iso3": "ESP", "fill": "#E5A544" },
-        { "name": "Switzerland", "iso3": "CHE", "fill": "#E5A544" },
-        { "name": "Japan", "iso3": "JPN", "fill": "#E5A544" },
-        { "name": "United States", "iso3": "USA", "fill": "#E5A544" },
-        { "name": "Nepal", "iso3": "NPL", "fill": "#E5A544" },
-        { "name": "Philippines", "iso3": "PHL", "fill": "#E5A544" },
-        { "name": "Turkey", "iso3": "TUR", "fill": "#E5A544" },
-        { "name": "Kenya", "iso3": "KEN", "fill": "#E5A544" },
-        { "name": "Brazil", "iso3": "BRA", "fill": "#E5A544" },
-        { "name": "India", "iso3": "IND", "fill": "#E5A544" },
-        { "name": "Mexico", "iso3": "MEX", "fill": "#E5A544" },
-        { "name": "Indonesia", "iso3": "IDN", "fill": "#E5A544" },
-        { "name": "Canada", "iso3": "CAN", "fill": "#E5A544" },
-        { "name": "Sri Lanka", "iso3": "LKA", "fill": "#E5A544" },
-        { "name": "Thailand", "iso3": "THA", "fill": "#E5A544" }
+        { "name": "Spain", "iso3": "ESP", "fill": "#C4A747" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#C4A747" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#C4A747" },
+        { "name": "United States", "iso3": "USA", "fill": "#C4A747" },
+        { "name": "Nepal", "iso3": "NPL", "fill": "#C4A747" },
+        { "name": "Philippines", "iso3": "PHL", "fill": "#C4A747" },
+        { "name": "Turkey", "iso3": "TUR", "fill": "#C4A747" },
+        { "name": "Kenya", "iso3": "KEN", "fill": "#C4A747" },
+        { "name": "Brazil", "iso3": "BRA", "fill": "#C4A747" },
+        { "name": "India", "iso3": "IND", "fill": "#C4A747" },
+        { "name": "Mexico", "iso3": "MEX", "fill": "#C4A747" },
+        { "name": "Indonesia", "iso3": "IDN", "fill": "#C4A747" },
+        { "name": "Canada", "iso3": "CAN", "fill": "#C4A747" },
+        { "name": "Sri Lanka", "iso3": "LKA", "fill": "#C4A747" },
+        { "name": "Thailand", "iso3": "THA", "fill": "#C4A747" }
       ]
     }
   ],

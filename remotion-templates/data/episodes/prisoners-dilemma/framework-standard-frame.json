@@ -5,7 +5,7 @@
   "nodes": [
     { "label": "Prisoner's Dilemma", "sublabel": "The model", "color": "#888780" },
     { "label": "Rational self-interest", "sublabel": "The assumption", "color": "#888780" },
-    { "label": "Mutual defection", "sublabel": "The prediction", "color": "#C23B22" }
+    { "label": "Mutual defection", "sublabel": "The prediction", "color": "#A64D46" }
   ],
   "arrowLabels": ["reveals", "leads to"],
   "durationSec": 6,

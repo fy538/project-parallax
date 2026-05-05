@@ -3,8 +3,8 @@
   "title": "Resource Denial: Then and Now",
   "eraATitle": "Oil Embargo 1941",
   "eraBTitle": "Chip Controls 2019–2025",
-  "eraAColor": "#3266AD",
-  "eraBColor": "#C23B22",
+  "eraAColor": "#4A7BA7",
+  "eraBColor": "#A64D46",
   "pairs": [
     {
       "eraA": { "label": "1939", "text": "US-Japan trade friction escalates" },

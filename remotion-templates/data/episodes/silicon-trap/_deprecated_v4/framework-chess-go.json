@@ -7,7 +7,7 @@
     {
       "title": "Chess ♟️",
       "icon": "♟️",
-      "color": "#3266AD",
+      "color": "#4A7BA7",
       "items": [
         "Target specific pieces — Nvidia, ASML, Entity List",
         "Control chokepoints, dominate key nodes",
@@ -19,7 +19,7 @@
     {
       "title": "Go (围棋) ⚫",
       "icon": "⚫",
-      "color": "#C23B22",
+      "color": "#A64D46",
       "items": [
         "Surround territory, not capture pieces",
         "Stone by stone, across the entire board",
@@ -30,6 +30,6 @@
     }
   ],
   "backgroundVariant": "dark",
-  "backgroundTint": "#E5A544",
+  "backgroundTint": "#C4A747",
   "durationSec": 16
 }

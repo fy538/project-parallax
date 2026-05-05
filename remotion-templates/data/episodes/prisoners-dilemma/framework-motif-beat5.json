@@ -3,10 +3,10 @@
   "title": "Synchronized Assumptions",
   "variant": "flow",
   "nodes": [
-    { "label": "Washington", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.2, "y": 0.2 } },
-    { "label": "Beijing", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.8, "y": 0.2 } },
-    { "label": "Geneva", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.2, "y": 0.8 } },
-    { "label": "Brussels", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.8, "y": 0.8 } }
+    { "label": "Washington", "sublabel": "● (defect)", "color": "#A64D46", "position": { "x": 0.2, "y": 0.2 } },
+    { "label": "Beijing", "sublabel": "● (defect)", "color": "#A64D46", "position": { "x": 0.8, "y": 0.2 } },
+    { "label": "Geneva", "sublabel": "● (defect)", "color": "#A64D46", "position": { "x": 0.2, "y": 0.8 } },
+    { "label": "Brussels", "sublabel": "● (defect)", "color": "#A64D46", "position": { "x": 0.8, "y": 0.8 } }
   ],
   "arrowLabels": [],
   "phases": [

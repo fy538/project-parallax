@@ -23,7 +23,7 @@ fi
 if [ -n "$JSON_CHANGED" ]; then
   echo "→ JSON validation (JSON files changed)"
   # shellcheck disable=SC2086
-  python3 tools/validate-data.py --files $JSON_CHANGED
+  python3 tools/validate_data.py --files $JSON_CHANGED
 fi
 
 if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ]; then

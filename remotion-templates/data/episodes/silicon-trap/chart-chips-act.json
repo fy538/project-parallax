@@ -5,9 +5,9 @@
   "variant": "bar",
   "unit": "$B",
   "dataPoints": [
-    { "label": "Authorized", "value": 52.7, "color": "#3266AD" },
-    { "label": "Awarded", "value": 30.9, "color": "#E5A544" },
-    { "label": "Disbursed", "value": 6, "color": "#C23B22" }
+    { "label": "Authorized", "value": 52.7, "color": "#4A7BA7" },
+    { "label": "Awarded", "value": 30.9, "color": "#C4A747" },
+    { "label": "Disbursed", "value": 6, "color": "#A64D46" }
   ],
   "highlightIndex": 2,
   "contextNote": "Trump called the program 'horrible'",

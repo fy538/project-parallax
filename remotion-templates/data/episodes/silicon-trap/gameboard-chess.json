@@ -5,32 +5,32 @@
   "variant": "chess",
   "boardSize": 8,
   "initialPieces": [
-    { "position": [4, 7], "label": "US", "color": "#3266AD" },
-    { "position": [3, 0], "label": "Nvidia", "color": "#C23B22" },
-    { "position": [5, 0], "label": "ASML", "color": "#C23B22" },
-    { "position": [4, 1], "label": "TSMC", "color": "#C23B22" }
+    { "position": [4, 7], "label": "US", "color": "#4A7BA7" },
+    { "position": [3, 0], "label": "Nvidia", "color": "#A64D46" },
+    { "position": [5, 0], "label": "ASML", "color": "#A64D46" },
+    { "position": [4, 1], "label": "TSMC", "color": "#A64D46" }
   ],
   "phases": [
     {
       "label": "Entity List: Huawei",
       "durationSec": 2,
       "pieces": [
-        { "position": [3, 0], "label": "Nvidia", "color": "#C23B22", "captured": true },
-        { "position": [3, 5], "label": "US", "color": "#3266AD" }
+        { "position": [3, 0], "label": "Nvidia", "color": "#A64D46", "captured": true },
+        { "position": [3, 5], "label": "US", "color": "#4A7BA7" }
       ]
     },
     {
       "label": "Export Controls: ASML",
       "durationSec": 2,
       "pieces": [
-        { "position": [5, 0], "label": "ASML", "color": "#C23B22", "captured": true },
-        { "position": [5, 3], "label": "US", "color": "#3266AD" }
+        { "position": [5, 0], "label": "ASML", "color": "#A64D46", "captured": true },
+        { "position": [5, 3], "label": "US", "color": "#4A7BA7" }
       ]
     },
     {
       "label": "Revenue Deal: Nvidia",
       "durationSec": 2,
-      "pieces": [{ "position": [4, 3], "label": "US", "color": "#3266AD" }]
+      "pieces": [{ "position": [4, 3], "label": "US", "color": "#4A7BA7" }]
     }
   ],
   "durationSec": 8,

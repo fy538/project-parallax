@@ -11,10 +11,12 @@
  *
  * Conventions enforced:
  *   1. No direct layout.safeArea.* in templates (use layout.safeAreaTier.generous.*)
- *   2. No contentArea(...) without "generous" tier
- *   3. All templates must use TitleBlock (not manual title positioning)
- *   4. No hardcoded 80/108 pixel safe area values
- *   5. Templates must import useCompositionAnimation
+ *   2. All templates must use TitleBlock (not manual title positioning)
+ *   3. No hardcoded 80/108 pixel safe area values
+ *   4. Templates must import useCompositionAnimation
+ *   5. No nested Ken Burns drift inside compStyle (L66 — silent compounding bug)
+ *   6. Chinese text must explicitly set fontFamily: fonts.chinese (L13)
+ *   7. Composition IDs in Root.tsx must be unique (L20)
  */
 
 import fs from "fs";
@@ -23,6 +25,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "../src/templates");
+const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
 const EXCLUDE_DIRS = ["Episodes", "__tests__"];
@@ -39,13 +42,15 @@ const rules = [
     severity: "warn",
     fix: "Replace layout.safeArea.X with layout.safeAreaTier.generous.X",
   },
+  // L69 default-flip: contentArea() and TitleBlock now default to "generous".
+  // Passing it explicitly is no longer required — only flag if a template
+  // uses a clearly-wrong tier without intent (e.g. literal "standard").
   {
-    id: "content-area-tier",
-    description: 'contentArea() must specify "generous" tier',
-    pattern: /contentArea\([^)]*\)/g,
-    validate: (match) => !match.includes('"generous"') && !match.includes("'generous'"),
+    id: "explicit-standard-tier",
+    description: 'Avoid explicit "standard" tier — it bypasses the channel-wide generous default (L69)',
+    pattern: /safeAreaTier:\s*["']standard["']|safeAreaTier=["']standard["']|contentArea\([^)]*["']standard["']/g,
     severity: "warn",
-    fix: 'Add "generous" as second argument: contentArea("content", "generous")',
+    fix: 'Drop the explicit tier (defaults to "generous"), or change to "tight"/"broadcast" if intentional',
   },
   {
     id: "missing-composition-animation",
@@ -97,6 +102,76 @@ const rules = [
     pattern: /(?:top|left|right|bottom|padding):\s*(80|108)(?!\d)/g,
     severity: "info",
     fix: "Use layout.safeAreaTier.generous.* or layout.spacing.* tokens instead",
+  },
+  // ── L66: Nested Ken Burns drift (silent compounding bug) ─────────────────
+  // Two drift layers in the same composition compound their transforms — content
+  // appears to slide into the title even though static positions are correct.
+  // useCompositionAnimation already provides drift; never wrap content in another.
+  {
+    id: "nested-ken-burns",
+    description: "Nested Ken Burns drift detected (L66) — useCompositionAnimation is the single source of drift",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (!basename.endsWith(".tsx")) return [];
+      if (basename === "useCompositionAnimation.ts") return [];
+
+      const usesHook = content.includes("useCompositionAnimation");
+      if (!usesHook) return [];
+
+      // Skip files that explicitly opt out of automatic drift via { noDrift: true }
+      // — those CAN legitimately use kenBurnsDrift to apply drift manually.
+      if (/useCompositionAnimation\s*\(\s*\{[^}]*noDrift:\s*true/.test(content)) return [];
+
+      const issues = [];
+      const lines = content.split("\n");
+      lines.forEach((line, i) => {
+        if (/kenBurnsDrift\s*\(/.test(line)) {
+          issues.push({ line: i + 1, message: "kenBurnsDrift() call alongside useCompositionAnimation — drifts compound" });
+        }
+      });
+      return issues;
+    },
+    severity: "warn",
+    fix: "Either remove the manual kenBurnsDrift() (the hook already drifts), or pass { noDrift: true } to useCompositionAnimation and drive drift manually for ALL elements from the same origin.",
+  },
+  // ── L13: Chinese text must be paired with fonts.chinese ────────────────────
+  // Brand fonts (Space Grotesk, IBM Plex Mono, JetBrains Mono) lack CJK glyphs;
+  // without an explicit Chinese font, system fallback differs across renderers.
+  // File-level check: flag if a .tsx renders CJK content but never references
+  // fonts.chinese / hasChinese / hasCJK anywhere.
+  {
+    id: "cjk-without-chinese-font",
+    description: "Component contains CJK display text but never references fonts.chinese (L13)",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (!basename.endsWith(".tsx")) return [];
+      // Sample data files (index.tsx with defaultProps) don't render — the
+      // companion component is responsible for font wiring.
+      if (basename.startsWith("index")) return [];
+
+      // Strip JS regex literals and string-class CJK ranges before scanning,
+      // so character-class patterns like /[一-鿿]/ don't trip the check.
+      const stripped = content
+        .replace(/\/\*[\s\S]*?\*\//g, "")               // /* block comments */
+        .replace(/(^|\s)\/\/[^\n]*/g, "$1")              // // line comments
+        .replace(/\/\[[^\]]*\]\/[gimsuy]*/g, "")         // regex with char class
+        .replace(/\\u[0-9a-fA-F]{4}/g, "");              // unicode escapes
+
+      const cjk = /[一-鿿㐀-䶿]/;
+      if (!cjk.test(stripped)) return [];
+
+      // CJK is present in non-pattern context; require an opt-in.
+      if (/fonts\.chinese|hasChinese\s*\(|hasCJK\s*\(/.test(content)) return [];
+
+      return [{
+        line: 1,
+        message: "CJK display text present but no fonts.chinese / hasChinese / hasCJK reference in this file",
+      }];
+    },
+    severity: "warn",
+    fix: 'Set fontFamily: fonts.chinese on the CJK span, or use hasChinese()/hasCJK() to detect and switch fonts conditionally.',
   },
 ];
 
@@ -186,6 +261,29 @@ let allIssues = [];
 for (const file of files) {
   const issues = lintFile(file);
   allIssues.push(...issues);
+}
+
+// ── Repo-wide check: duplicate composition IDs in Root.tsx (L20) ────────────
+if (fs.existsSync(ROOT_TSX)) {
+  const rootContent = fs.readFileSync(ROOT_TSX, "utf-8");
+  const idRe = /<Composition[^>]*\bid=["']([^"']+)["']/g;
+  const seen = new Map();
+  for (const m of rootContent.matchAll(idRe)) {
+    const id = m[1];
+    const lineNum = rootContent.slice(0, m.index).split("\n").length;
+    if (seen.has(id)) {
+      allIssues.push({
+        file: "src/Root.tsx",
+        line: lineNum,
+        rule: "duplicate-composition-id",
+        severity: "error",
+        message: `Duplicate composition id="${id}" (first defined at line ${seen.get(id)}) — Remotion requires unique IDs`,
+        fix: "Rename one of the duplicates to a unique slug (e.g. append the variant or episode name).",
+      });
+    } else {
+      seen.set(id, lineNum);
+    }
+  }
 }
 
 // ── Output ─────────────────────────────────────────────────────────────────

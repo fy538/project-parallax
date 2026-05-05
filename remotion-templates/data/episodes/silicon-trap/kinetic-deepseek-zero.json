@@ -4,7 +4,7 @@
   "statValue": "0",
   "statLabel": "successful training runs",
   "statContext": "DeepSeek R2 on Huawei Ascend chips",
-  "accentColor": "#C23B22",
+  "accentColor": "#A64D46",
   "durationSec": 5,
   "backgroundVariant": "dark",
   "_direction": {

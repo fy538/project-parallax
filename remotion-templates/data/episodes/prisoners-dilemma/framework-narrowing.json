@@ -3,12 +3,12 @@
   "title": "Where Does It Actually Apply?",
   "variant": "flow",
   "nodes": [
-    { "label": "Anonymous", "sublabel": "FILTER 1", "color": "#E5A544" },
-    { "label": "One-shot", "sublabel": "FILTER 2", "color": "#E5A544" },
-    { "label": "No communication", "sublabel": "FILTER 3", "color": "#E5A544" },
-    { "label": "No reputation", "sublabel": "FILTER 4", "color": "#E5A544" },
-    { "label": "No institutions", "sublabel": "FILTER 5", "color": "#E5A544" },
-    { "label": "No commitment", "sublabel": "FILTER 6", "color": "#E5A544" },
+    { "label": "Anonymous", "sublabel": "FILTER 1", "color": "#C4A747" },
+    { "label": "One-shot", "sublabel": "FILTER 2", "color": "#C4A747" },
+    { "label": "No communication", "sublabel": "FILTER 3", "color": "#C4A747" },
+    { "label": "No reputation", "sublabel": "FILTER 4", "color": "#C4A747" },
+    { "label": "No institutions", "sublabel": "FILTER 5", "color": "#C4A747" },
+    { "label": "No commitment", "sublabel": "FILTER 6", "color": "#C4A747" },
     { "label": "OPEC quota meeting, maybe", "sublabel": "What remains", "color": "#888780" }
   ],
   "arrowLabels": ["eliminates: diplomacy", "eliminates: trade", "eliminates: alliances", "eliminates: markets", "eliminates: treaties", "→"],
@@ -17,12 +17,12 @@
     { "label": "Almost nothing remains", "durationSec": 5, "activeNodes": [6] }
   ],
   "eliminatedScenarios": [
-    { "filter": 0, "scenario": "Diplomacy", "color": "#D64545" },
-    { "filter": 1, "scenario": "Trade relationships", "color": "#D64545" },
-    { "filter": 2, "scenario": "Alliance negotiation", "color": "#D64545" },
-    { "filter": 3, "scenario": "Market competition", "color": "#D64545" },
-    { "filter": 4, "scenario": "Treaty frameworks", "color": "#D64545" },
-    { "filter": 5, "scenario": "Arms control", "color": "#D64545" }
+    { "filter": 0, "scenario": "Diplomacy", "color": "#A64D46" },
+    { "filter": 1, "scenario": "Trade relationships", "color": "#A64D46" },
+    { "filter": 2, "scenario": "Alliance negotiation", "color": "#A64D46" },
+    { "filter": 3, "scenario": "Market competition", "color": "#A64D46" },
+    { "filter": 4, "scenario": "Treaty frameworks", "color": "#A64D46" },
+    { "filter": 5, "scenario": "Arms control", "color": "#A64D46" }
   ],
   "durationSec": 15,
   "backgroundVariant": "light"

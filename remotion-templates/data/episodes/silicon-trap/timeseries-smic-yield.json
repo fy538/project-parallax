@@ -5,7 +5,7 @@
   "lines": [
     {
       "label": "SMIC 7nm yield",
-      "color": "#C23B22",
+      "color": "#A64D46",
       "points": [
         { "x": "2023 Q1", "y": 15 },
         { "x": "2023 Q3", "y": 25 },

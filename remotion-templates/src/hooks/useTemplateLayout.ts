@@ -155,7 +155,9 @@ export const useTemplateLayout = (
   const {
     title: titleVariant = "content",
     customTitleHeight,
-    safeArea: safeAreaTier = "standard",
+    // L69: generous (120px) is the channel-wide default. Templates that need
+    // a different tier (e.g. centered-only → "tight") opt in explicitly.
+    safeArea: safeAreaTier = "generous",
     split = false,
     splitGap = layout.spacing.xl,
     footerHeight = 40,

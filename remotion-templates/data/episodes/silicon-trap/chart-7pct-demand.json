@@ -7,12 +7,12 @@
     {
       "label": "TSMC Arizona",
       "value": 7,
-      "color": "#E5A544"
+      "color": "#C4A747"
     },
     {
       "label": "Remaining US demand",
       "value": 93,
-      "color": "#C23B22"
+      "color": "#A64D46"
     }
   ],
   "highlightIndex": 0,

@@ -4,7 +4,7 @@
   "leftLabel": "Oil Embargo 1941",
   "rightLabel": "Chip Controls 2022",
   "leftColor": "#888780",
-  "rightColor": "#C23B22",
+  "rightColor": "#A64D46",
   "leftEvents": [
     { "year": "Jul 1941", "title": "US freezes Japan's assets", "icon": "🏦" },
     { "year": "Aug 1941", "title": "Full oil embargo", "icon": "🛢️" },

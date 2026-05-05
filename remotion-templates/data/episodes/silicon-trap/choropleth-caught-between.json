@@ -7,8 +7,8 @@
       "title": "The Supply Chain Powers",
       "durationSec": 3,
       "countries": [
-        { "name": "United States", "iso3": "USA", "fill": "#3266AD", "label": "US" },
-        { "name": "China", "iso3": "CHN", "fill": "#C23B22", "label": "China" }
+        { "name": "United States", "iso3": "USA", "fill": "#4A7BA7", "label": "US" },
+        { "name": "China", "iso3": "CHN", "fill": "#A64D46", "label": "China" }
       ],
       "center": [80, 30],
       "scale": 160
@@ -17,12 +17,12 @@
       "title": "Caught in Between",
       "durationSec": 4,
       "countries": [
-        { "name": "United States", "iso3": "USA", "fill": "#3266AD" },
-        { "name": "China", "iso3": "CHN", "fill": "#C23B22" },
-        { "name": "Netherlands", "iso3": "NLD", "fill": "#E5A544", "label": "ASML: China was 36% → 20% of revenue" },
-        { "name": "South Korea", "iso3": "KOR", "fill": "#E5A544", "label": "$40B in Chinese fabs" },
-        { "name": "Japan", "iso3": "JPN", "fill": "#E5A544", "label": "70% of global photoresist" },
-        { "name": "Taiwan", "iso3": "TWN", "fill": "#E5A544", "label": "TSMC: irreplaceable foundry" }
+        { "name": "United States", "iso3": "USA", "fill": "#4A7BA7" },
+        { "name": "China", "iso3": "CHN", "fill": "#A64D46" },
+        { "name": "Netherlands", "iso3": "NLD", "fill": "#C4A747", "label": "ASML: China was 36% → 20% of revenue" },
+        { "name": "South Korea", "iso3": "KOR", "fill": "#C4A747", "label": "$40B in Chinese fabs" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#C4A747", "label": "70% of global photoresist" },
+        { "name": "Taiwan", "iso3": "TWN", "fill": "#C4A747", "label": "TSMC: irreplaceable foundry" }
       ],
       "center": [80, 35],
       "scale": 200

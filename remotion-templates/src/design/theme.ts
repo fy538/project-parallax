@@ -90,20 +90,30 @@ export interface PaletteEmphasis {
 }
 
 const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
-  // Default — full palette, channel-wide brand defaults. Backward compatible
-  // with existing data files that don't specify emphasis.
+  // Default — channel-wide American/British/Bauhaus-leaning soft modernist
+  // baseline. Backward compatible with existing data files that don't
+  // specify emphasis. Bilateral US/China content that needs explicit actor
+  // colors should pull from `semantic.us` / `semantic.china` directly per
+  // BRAND.md Color Assignment Rule 1; this chartFillSequence is for
+  // non-bilateral multi-series content where actor coloring is not the
+  // editorial point. Leads with soft amber/umber/walnut palette so that
+  // episodes without specific cultural geography don't pull rust prominently
+  // by default. Per VIS-11 and the May 4 risk-mitigation calibration: the
+  // channel default should NOT lean Soviet revolutionary-rust intensity
+  // when no cultural context warrants it.
   neutral: {
-    primaryAccent: palette.gold,           // amber/gold
+    primaryAccent: palette.gold,           // amber/gold (channel default accent)
     secondaryAccent: palette.umber,
     dominantText: palette.gold,
     surfaceTone: palette.bone,
     chartFillSequence: [
-      semantic.us,
-      semantic.china,
-      palette.gold,
-      palette.umber,
-      palette.walnut,
-      palette.taupe,
+      palette.gold,                        // soft amber primary
+      palette.umber,                       // earthy brown
+      palette.walnut,                      // deep brown
+      palette.taupe,                       // warm tan
+      palette.sand,                        // soft cream
+      semantic.us,                         // US blue (only when explicitly bilateral)
+      semantic.china,                      // rust (only when explicitly bilateral)
     ],
   },
   // Soviet/Russian content — full saturated revolutionary palette
@@ -813,7 +823,9 @@ export const titleHeight = {
  */
 export const contentArea = (
   titleVariant: keyof typeof titleHeight = "content",
-  safeAreaTier: keyof typeof layout.safeAreaTier = "standard"
+  // L69: generous (120px) is the channel-wide default. Templates that need
+  // a different tier must opt in explicitly (centered-only → "tight", etc.).
+  safeAreaTier: keyof typeof layout.safeAreaTier = "generous"
 ) => {
   const safe = layout.safeAreaTier[safeAreaTier];
   const top =
@@ -845,12 +857,12 @@ export const columnLayout = (
     gap?: number;
     /** Title variant to compute available height. Default: "content" */
     titleVariant?: keyof typeof titleHeight;
-    /** Safe area tier — MUST match TitleBlock's safeAreaTier to avoid overlap. Default: "standard" */
+    /** Safe area tier — MUST match TitleBlock's safeAreaTier to avoid overlap. Default: "generous" (channel-wide standard per L69). */
     safeAreaTier?: keyof typeof layout.safeAreaTier;
   }
 ) => {
   const gap = opts?.gap ?? layout.spacing.xl;
-  const area = contentArea(opts?.titleVariant ?? "content", opts?.safeAreaTier ?? "standard");
+  const area = contentArea(opts?.titleVariant ?? "content", opts?.safeAreaTier ?? "generous");
   const totalGapWidth = gap * (columns - 1);
   const columnWidth = Math.floor((area.width - totalGapWidth) / columns);
   return {

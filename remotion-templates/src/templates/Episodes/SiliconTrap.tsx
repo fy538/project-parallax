@@ -14,7 +14,7 @@
  */
 
 import React from "react";
-import { Series, AbsoluteFill } from "remotion";
+import { EpisodeSeries } from "../../components/EpisodeSeries";
 import { sec } from "../../design/theme";
 import { TitleTransition } from "../TitleTransition/TitleTransition";
 import { ChoroplethMap } from "../ChoroplethMap/ChoroplethMap";
@@ -102,7 +102,7 @@ type ClipMetadata = {
   durationFrames: number;
 };
 
-const OVERLAP_FRAMES = 15; // 15-frame cross-fade between clips
+// Cross-fade overlap is the EpisodeSeries default (15 frames, matches EXIT_FADE_DURATION).
 
 // Helper: Calculate duration for DualTimeline clips
 function getDualTimelineDuration(data: DualTimelineData): number {
@@ -304,21 +304,13 @@ const clips: ClipMetadata[] = [
 
 export const SiliconTrap: React.FC = () => {
   return (
-    <AbsoluteFill>
-      <Series>
-        {clips.map((clip, index) => {
-          const Comp = clip.component;
-          return (
-            <Series.Sequence
-              key={`${index}-${clip.filename}`}
-              durationInFrames={clip.durationFrames}
-              offset={index > 0 ? -OVERLAP_FRAMES : 0}
-            >
-              <Comp data={clip.data} />
-            </Series.Sequence>
-          );
-        })}
-      </Series>
-    </AbsoluteFill>
+    <EpisodeSeries
+      clips={clips.map((c, i) => ({
+        key: `${i}-${c.filename}`,
+        component: c.component,
+        data: c.data,
+        durationFrames: c.durationFrames,
+      }))}
+    />
   );
 };

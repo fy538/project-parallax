@@ -11,7 +11,7 @@
       ],
       "label": "Photoresists",
       "sublabel": "70% global share",
-      "color": "#E5A544",
+      "color": "#C4A747",
       "labelPosition": "right"
     },
     {
@@ -22,7 +22,7 @@
       ],
       "label": "ASML",
       "sublabel": "EUV lithography",
-      "color": "#E5A544",
+      "color": "#C4A747",
       "labelPosition": "above"
     },
     {
@@ -33,7 +33,7 @@
       ],
       "label": "EDA Software",
       "sublabel": "Synopsys, Cadence",
-      "color": "#3266AD",
+      "color": "#4A7BA7",
       "labelPosition": "left"
     },
     {
@@ -44,7 +44,7 @@
       ],
       "label": "TSMC",
       "sublabel": "Fabrication + packaging",
-      "color": "#E5A544",
+      "color": "#C4A747",
       "labelPosition": "below"
     },
     {
@@ -55,7 +55,7 @@
       ],
       "label": "Rare Earths",
       "sublabel": "Critical minerals",
-      "color": "#C23B22",
+      "color": "#A64D46",
       "labelPosition": "left"
     },
     {
@@ -66,7 +66,7 @@
       ],
       "label": "Samsung/SK Hynix",
       "sublabel": "Memory chips",
-      "color": "#E5A544",
+      "color": "#C4A747",
       "labelPosition": "above"
     }
   ],
@@ -75,31 +75,31 @@
       "from": 2,
       "to": 3,
       "label": "Chip designs",
-      "color": "#3266AD"
+      "color": "#4A7BA7"
     },
     {
       "from": 1,
       "to": 3,
       "label": "EUV machines",
-      "color": "#E5A544"
+      "color": "#C4A747"
     },
     {
       "from": 0,
       "to": 3,
       "label": "Photoresists",
-      "color": "#E5A544"
+      "color": "#C4A747"
     },
     {
       "from": 4,
       "to": 3,
       "label": "Rare earths",
-      "color": "#C23B22"
+      "color": "#A64D46"
     },
     {
       "from": 3,
       "to": 5,
       "label": "Wafers",
-      "color": "#E5A544"
+      "color": "#C4A747"
     }
   ],
   "phases": [
@@ -154,7 +154,7 @@
       ]
     }
   ],
-  "routeColor": "#E5A544",
+  "routeColor": "#C4A747",
   "durationSec": 14,
   "backgroundVariant": "light",
   "source": "SIA, SEMI, industry data",

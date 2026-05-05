@@ -50,8 +50,8 @@ interface TitleBlockProps {
   accentColor?: string;
   /** Position alignment. Default: "top-left" (standard data template position) */
   align?: "top-left" | "top-center";
-  /** Safe area tier — controls distance from edges. Default: "standard" (80px).
-   *  Use "generous" for data-dense templates, "tight" for centered compositions. */
+  /** Safe area tier — controls distance from edges. Default: "generous" (120px), per L69.
+   *  Override to "tight" for centered single-element compositions, "broadcast" for TV-style padding. */
   safeAreaTier?: keyof typeof layout.safeAreaTier;
   /** Override the FadeIn start frame. Default: 0 */
   startFrame?: number;
@@ -69,7 +69,7 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   mode,
   accentColor,
   align = "top-left",
-  safeAreaTier = "standard",
+  safeAreaTier = "generous",
   startFrame = 0,
   noAnimation = false,
   underline = false,

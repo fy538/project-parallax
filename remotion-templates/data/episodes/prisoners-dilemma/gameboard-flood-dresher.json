@@ -28,7 +28,7 @@
       "counterAnimation": {
         "cooperate": 60,
         "defect": 14,
-        "cooperateColor": "#E5A544",
+        "cooperateColor": "#C4A747",
         "defectColor": "#888780"
       }
     }
