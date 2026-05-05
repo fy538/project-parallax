@@ -3,7 +3,7 @@
 > Every hard-won lesson from building and iterating on templates.
 > Read this before making changes — it prevents re-discovering known issues.
 >
-> Last updated: May 4, 2026
+> Last updated: May 5, 2026
 
 ## Shared infrastructure (use these — don't reinvent)
 
@@ -57,7 +57,7 @@ When building a new template or polishing an existing one, prefer these shared b
 - Use named animation constants from `src/utils/animation.ts` (`KEN_BURNS_MAX_SCALE`, `EXIT_FADE_DURATION`, `PAN_DRIFT_MAX_OFFSET`) and `src/design/theme.ts` (`timing.entrance.*`) — don't reintroduce hardcoded `1.02`, `15`, `sec(0.4)`.
 **Rule:** Don't disable strict mode. Add `?? fallback`, narrow with type guards, or cast through `unknown` — never widen types to `any`.
 
-### L4: Composition duration must be calculated, not hardcoded
+### L3: Composition duration must be calculated, not hardcoded
 **Pattern:** For templates with phases (maps, routes, timelines), calculate `durationInFrames` from the sum of phase durations in the JSON data: `sec(data.phases.reduce((sum, p) => sum + p.durationSec, 0) + 1)`. The `+1` adds a 1-second buffer for fade-out.
 **Why:** Hardcoded durations desync when phase durations change in the JSON.
 
@@ -65,17 +65,17 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## Rendering & Self-QA
 
-### L5: Remotion ignores PUPPETEER_EXECUTABLE_PATH env var
+### L4: Remotion ignores PUPPETEER_EXECUTABLE_PATH env var
 **Problem:** Setting `PUPPETEER_EXECUTABLE_PATH` or `REMOTION_CHROME_EXECUTABLE` environment variables does nothing. Remotion tries to download its own Chrome from `remotion.media`, which fails in sandboxed environments.
 **Fix:** Use the CLI flag `--browser-executable=/path/to/chrome` on every `remotion still` or `remotion render` command.
 **Setup:** Install Playwright's Chromium with `npx playwright install chromium`, then find the binary with `find ~/.cache/ms-playwright -name "headless_shell" | head -1`.
 
-### L6: Map templates won't render geography in sandboxed environments
+### L5: Map templates won't render geography in sandboxed environments
 **Problem:** ChoroplethMap and RouteAnimation fetch TopoJSON from `cdn.jsdelivr.net` at render time. Sandboxed environments (Claude's Linux shell) can't reach this CDN, so maps render with no country outlines.
 **Workaround:** Maps render correctly in local Remotion Studio (`npm start`). For QA in sandbox, test non-map templates (charts, typography, titles, frameworks) which don't need external data.
 **Future fix:** Bundle TopoJSON in `public/geo/` for fully offline rendering.
 
-### L7: Self-render QA loop
+### L6: Self-render QA loop
 **Process:** `npx remotion still` renders a single frame as PNG → Read the PNG with Claude's image tool → critique against BRAND.md rules → edit code → re-render. This loop works for all non-map templates in sandbox.
 **Key frames to check:** frame 0 (initial state), frame at ~40% (mid-animation), final frame -1 (completed state).
 **Validated on:** DataChart (frame 60 + frame 180), confirming bar growth and label positioning.
@@ -84,19 +84,19 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## DataChart
 
-### L8: Bar value labels must use flex-end positioning, not absolute/fixed
+### L7: Bar value labels must use flex-end positioning, not absolute/fixed
 **Problem (original):** Value labels (e.g., "93%") were positioned at the top of a fixed-height container column. For short bars, labels floated far above the bar, looking disconnected.
 **Fix:** Restructured `AnimatedBar` component to use a column with `justifyContent: "flex-end"`. The value label and bar rect are direct children of this column. Labels naturally sit directly above whatever height the bar has reached.
 **Lesson:** Never position data labels relative to the container ceiling. Position them relative to the data element they annotate.
 
-### L9: Chart comparison variant needs explicit "vs" visual
+### L8: Chart comparison variant needs explicit "vs" visual
 **Pattern:** The "comparison" variant of DataChart places two bar groups side by side with a "vs" divider in the center. Each side has its own accentColor. This is used for fact-check style visuals (e.g., Kirin chip "marketing 5nm" vs "actual 7nm").
 
 ---
 
 ## ChoroplethMap
 
-### L10: Country names must exactly match TopoJSON properties
+### L9: Country names must exactly match TopoJSON properties
 **Problem:** Using "USA" or "US" won't match. The world-atlas@2 TopoJSON uses full names from Natural Earth data.
 **Required names (common ones):**
 - "United States of America" (not USA/US)
@@ -107,26 +107,26 @@ When building a new template or polishing an existing one, prefer these shared b
 - "Iran" (not Islamic Republic of Iran)
 **Rule:** Always check against the actual TopoJSON feature names. When in doubt, fetch and inspect the topology.
 
-### L11: Phase transitions need overlapping fade
+### L10: Phase transitions need overlapping fade
 **Pattern:** When a country changes color between phases, the transition is a hard cut by default. For smoother transitions, use `interpolateColors` with a brief overlap window at phase boundaries. Currently not implemented — add if visual QA reveals jarring cuts.
 
 ---
 
 ## KineticTypography
 
-### L12: Statistic variant parses numeric prefix
+### L11: Statistic variant parses numeric prefix
 **Pattern:** The statistic variant extracts the numeric portion from `statValue` (e.g., "7%" → 7, "93%" → 93) and animates a count-up. The suffix (%, B, M, etc.) is preserved. If the value starts with a non-numeric character, it displays as static text.
 **Gotcha:** Decimals work but animate in integer steps. For "3.5nm", it counts 0, 1, 2, 3, 3.5 — which looks slightly uneven.
 
-### L13: Chinese text needs explicit font-family
+### L12: Chinese text needs explicit font-family
 **Rule:** Any `<span>` or `<div>` rendering Chinese characters must explicitly set `fontFamily: fonts.chinese` ("Noto Sans SC, PingFang SC, sans-serif"). The brand fonts (Space Grotesk, IBM Plex Mono, JetBrains Mono) do not contain CJK glyphs and will fall back to system fonts inconsistently across render environments.
 
 ---
 
 ## RouteAnimation
 
-### L14: Coordinates are [longitude, latitude], not [lat, lng]
-**Convention:** react-simple-maps and D3 use `[longitude, latitude]` (x, y) order. Google Maps uses `[latitude, longitude]`. This is a common source of points appearing in the wrong ocean.
+### L13: Coordinates are [longitude, latitude], not [lat, lng]
+**Convention:** Mapbox GL, deck.gl, and D3 use `[longitude, latitude]` (x, y) order. Google Maps uses `[latitude, longitude]`. This is a common source of points appearing in the wrong ocean.
 **Common coordinates:**
 - Washington DC: [-77.0, 38.9]
 - Beijing: [116.4, 39.9]
@@ -136,57 +136,55 @@ When building a new template or polishing an existing one, prefer these shared b
 - Amsterdam: [4.9, 52.4]
 - Singapore: [103.8, 1.4]
 
-### L15: Segment stroke animation accumulates across phases
+### L14: Segment stroke animation accumulates across phases
 **Pattern:** `activeSegments` and `activePoints` accumulate — once drawn in a phase, they remain visible in subsequent phases. This is deliberate: routes build up over time rather than disappearing between phases.
 
 ---
 
 ## FrameworkDiagram
 
-### L16: Comparison column width depends on column count
+### L15: Comparison column width depends on column count
 **Pattern:** 2-column comparisons get a "vs" divider between them. 3+ columns share space equally without a divider. The layout adjusts automatically, but content should be written accordingly — 2-column items can be slightly longer.
 
 ---
 
 ## TitleTransition
 
-### L17: Ken Burns effect on episode titles
+### L16: Ken Burns effect on episode titles
 **Pattern:** Episode title variant applies a subtle scale animation (1.02 → 1.0 via Easing.out) creating a cinematic "settling" feel. This is small enough to not be distracting but adds production value.
 
-### L18: Section number uses large muted style
+### L17: Section number uses large muted style
 **Pattern:** Section numbers (I, II, III, IV, V) render at 120px in muted color as background texture, with the section title at normal heading size in front. The number provides visual weight without competing with the title text.
 
 ---
 
 ## Data Pipeline
 
-### L19: JSON data file naming convention
+### L18: JSON data file naming convention
 **Format:** `{template-type}-{descriptive-slug}.json`
 **Examples:** `choropleth-bifurcation.json`, `kinetic-juguo.json`, `chart-export-controls.json`, `title-section-denial.json`
 **Rule:** Slugs should be descriptive enough to identify the content without opening the file. Use lowercase, hyphens only.
 
-### L20: Color values in JSON should match BRAND.md tokens
-**Rule:** Never invent new hex colors in data files. Always use values from BRAND.md's semantic palette or sequential ramps. This allows global retheming by updating BRAND.md + theme.ts.
-**Shared palette:** #1A1A2E (ink), #E5A544 (amber), #C23B22 (rust), #F0E6D0 (bone), #F5F0E8 (paper), #6B1D1D (oxblood)
-**Semantic colors:** #3266AD (us), #C23B22 (china), #888780 (neutral), #F5A623 (highlight), #5DAA68 (success), #D64545 (danger)
+### L19: Color values in JSON should match BRAND.md tokens
+**Rule:** Never invent new hex colors in data files. The single source of truth is `tools/brand-treatment/palette.json` — `theme.ts` imports it directly, and Python tools (`treat.py`, `treat_video.py`) read the same file via `palette_loader.py`. To change a brand color: edit palette.json → regenerate LUTs → done; both stacks pick it up. Do not paste hex values; use palette tokens (`palette.gold`, `palette.umber`, `semantic.us`, `semantic.china`, etc.) from `theme.ts` instead.
 
 ---
 
 ## Skills
 
-### L21: Skill files are SKILL.md in a named directory
+### L20: Skill files are SKILL.md in a named directory
 **Structure:** A skill is a directory containing `SKILL.md` (instructions) and optionally `references/`, `scripts/`, `assets/` subdirectories.
 **Installation:** Skills are installed to the Cowork plugins skills directory and trigger automatically based on their description field. The research-audit skill is also version-controlled at `skills/research-audit/SKILL.md`.
 **Constraint:** The plugins skills directory is read-only at runtime. Build and test skills outside the plugins directory, then install manually.
 
-### L22: Visual-spec skill requires human checkpoint
+### L21: Visual-spec skill requires human checkpoint
 **Pattern:** The skill produces a visual breakdown table first, then waits for user approval before generating JSON files. This prevents wasted effort if the visual plan doesn't match the creator's vision. Never skip this checkpoint.
 
 ---
 
 ## General
 
-### L23: Duration calibration rule of thumb
+### L22: Duration calibration rule of thumb
 - Simple title card: 3 seconds
 - Section header: 3 seconds
 - Single data point or quote: 4-5 seconds
@@ -195,45 +193,45 @@ When building a new template or polishing an existing one, prefer these shared b
 - End card with CTA: 5 seconds
 **Rule:** Viewer needs ~2 seconds to read a subtitle + 1 second per complex element on screen. When in doubt, add time — too fast loses viewers, too slow just gets skipped.
 
-### L24: QA render frame selection matters
+### L23: QA render frame selection matters
 **Context:** When rendering single frames for QA, elements with staggered fade-ins may not be visible at early frames.
 **Rule of thumb:** Render at frame 45 (1.5s) for initial state, frame 90 (3s) for mid-state with most elements visible, and frame at `durationInFrames - 30` for final state. For the episode title, the subtitle doesn't appear until ~frame 60. For end cards, the next-episode teaser fades in at frame 45. Always render at least two frames to catch animation timing issues.
 
-### L25: Sample data files may not match episode data
+### L24: Sample data files may not match episode data
 **Problem (caught in QA):** `title-episode.json` still contained old sample data ("The Chip War") from when the template was first built, not the actual silicon-trap title ("The Silicon Trap"). The visual-spec skill generated section titles and new compositions but didn't update the original sample file.
 **Rule:** After running visual-spec, always diff the generated files against any pre-existing sample data files in the episode directory. Sample data created during template development may be stale.
 
-### L26: Composition IDs in Root.tsx must be unique
+### L25: Composition IDs in Root.tsx must be unique
 **Pattern:** Each `<Composition id="...">` in Root.tsx must be globally unique. Convention: use the template name for the default composition (e.g., "ChoroplethMap") or add a suffix for multiple compositions of the same type (e.g., "ChoroplethMap-bifurcation"). Currently, each template registers one default composition; episode-specific overrides use `--props`.
 
-### L27: silicon-trap visual QA results (April 25, 2026)
-**Status:** All non-map templates rendered and reviewed. Zero template code bugs found. One data issue fixed (L25).
+### L26: silicon-trap visual QA results (April 25, 2026)
+**Status:** All non-map templates rendered and reviewed. Zero template code bugs found. One data issue fixed (L24).
 **Templates verified:** TitleTransition (7 compositions), KineticTypography (4), DataChart (5), FrameworkDiagram (2), TimelineComparison (2). Total: 20/24 compositions rendered. Remaining 4 are maps (ChoroplethMap ×3, RouteAnimation ×1) which require CDN access — verified working in local Remotion Studio previously.
 
 ---
 
 ## Assembly & Render Pipeline
 
-### L28: Props must be passed via temp file, not inline JSON
+### L27: Props must be passed via temp file, not inline JSON
 **Problem:** Complex JSON data (especially with quotes, special characters, or nested objects) breaks when passed as inline `--props='...'` in shell commands. Bash escaping is fragile and error-prone.
 **Fix:** Write props to a temp file (`_props-XX.json`), pass `--props=path/to/file.json` to Remotion. Both render scripts use this pattern.
 **Rule:** Never inline props JSON for data files with quotes, Chinese characters, or deeply nested objects.
 
-### L29: Render scripts output numbered clips, not a single video
+### L28: Render scripts output numbered clips, not a single video
 **Pattern:** Each composition renders to its own MP4: `01-title-episode.mp4`, `02-title-section-act1.mp4`, etc. These are NLE-ready assets placed on a timeline alongside narration audio and B-roll. The `--concat` flag produces an optional preview reel (all clips back-to-back) for quick review, but the real assembly happens in the NLE.
 **Why:** Motion graphics total ~3.5 minutes across an ~18-minute episode. They overlay narration — they don't replace it. Concatenation alone can't produce the final video.
 
-### L30: Sequence map is the source of truth for render order
+### L29: Sequence map is the source of truth for render order
 **Pattern:** `data/episodes/epXX/SEQUENCE.md` defines the canonical order. Both render scripts mirror this sequence exactly. When adding or reordering compositions, update SEQUENCE.md first, then update the scripts.
 **Rule:** Never change render order in scripts without updating SEQUENCE.md, and vice versa.
 
-### L31: Playwright cache path differs between macOS and Linux
+### L30: Playwright cache path differs between macOS and Linux
 **Problem:** Render scripts used `~/.cache/ms-playwright` (Linux path). On macOS, Playwright installs to `~/Library/Caches/ms-playwright`. Combined with `set -euo pipefail`, the `find` on a nonexistent directory caused the entire script to exit silently with no output.
 **Fix:** Search both paths. Also removed `set -e` from render scripts — errors are handled per-command instead. On macOS, the Chrome binary may be named `Google Chrome for Testing` rather than `headless_shell`.
 **Fallback chain:** Playwright Chromium → system Chrome (`/Applications/Google Chrome.app/...`) → Remotion default.
 **Rule:** Always test render scripts on the actual target OS. Silent failures from `set -e` are the worst kind of bug.
 
-### L32: First render in a batch hits Remotion cold-start race condition
+### L31: First render in a batch hits Remotion cold-start race condition
 **Problem:** The first `npx remotion render` in a batch frequently fails with "Visited http://localhost:3000/index.html but got no response." Subsequent renders succeed because the internal server is warm.
 **Fix:** Added retry logic (2 attempts per clip) and a 1-second cooldown between renders in the bash script. The Node script can re-run failed clips with `--only=01`.
 **Rule:** Always include retry logic in batch render scripts. Remotion's internal server needs a moment to spin up on the first render.
@@ -242,23 +240,23 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## Polish Components (April 26, 2026)
 
-### L33: Background.tsx layers must be pointer-events: none
+### L32: Background.tsx layers must be pointer-events: none
 **Pattern:** Background overlays (grain, vignette, ruled border) all set `pointerEvents: "none"` so they don't intercept clicks in Remotion Studio. Only the children layer receives events.
 **Grain setup:** noise-512.png is a 512×512 monochromatic Gaussian noise PNG tiled via CSS `backgroundRepeat`. Mix-blend-mode: `overlay` at 12% (dark) or `multiply` at 4% (light).
 
-### L34: MetadataStrip positions within safe area, not at edge
+### L33: MetadataStrip positions within safe area, not at edge
 **Pattern:** Header sits at `top: safeArea.top - 40` (40px, halfway into the 80px safe margin). Footer at `bottom: safeArea.bottom - 40`. This keeps metadata visible but clearly subordinate to content, which lives inside the full 80px safe area.
 **Typography:** All metadata text uses IBM Plex Mono at 11px, weight 400, letter-spacing 2.5px, uppercase. This is the smallest text tier in the system.
 
-### L35: Crosshair animation phases overlap for fluidity
+### L34: Crosshair animation phases overlap for fluidity
 **Pattern:** The crosshair draw-in is NOT strictly sequential. Outer circle starts drawing at 30% through the hairline extension, inner circle appears at 60% through the outer circle draw. This overlap prevents a "step by step" robotic feel. The center dot appears last and pulses once (scale 1 → 1.3 → 1) for the "lock-on" moment.
 **Sizing:** Default 64px diameter outer circle. For maps, use 48-80px depending on the geographic area being targeted.
 
-### L36: depth.ts barGradient darkens by 15% — matches POLISH.md V4
+### L35: depth.ts barGradient darkens by 15% — matches POLISH.md V4
 **Pattern:** `barGradient(baseColor)` creates a `linear-gradient(to bottom, base, darkenHex(base, 0.15))`. This simulates overhead lighting on chart bars. The darken function is channel-wise multiplication, not HSL shift — fast and predictable for hex colors.
 **Rule:** Never use flat `backgroundColor` for chart bars. Always wrap in `barGradient()`.
 
-### L37: Animation system has three spring configs for different purposes
+### L36: Animation system has three spring configs for different purposes
 **Configs:**
 - `gentleSpring` — damping 15, stiffness 80, mass 0.8 → smooth, no visible bounce. For UI elements.
 - `heroSpring` — damping 12, stiffness 100, mass 1.0 → slight overshoot, cinematic feel. For titles, key stats.
@@ -269,26 +267,26 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## New Templates (April 26, 2026)
 
-### L38: DecisionTree layout is level-based, not recursive render
+### L37: DecisionTree layout is level-based, not recursive render
 **Pattern:** Tree nodes are positioned by computing levels first (BFS from root), then spreading siblings horizontally within each level. This is simpler than recursive rendering and avoids React re-render issues with deeply nested trees.
 **Sizing:** Default node is ~160×60px. For trees wider than 5 leaves, nodes shrink automatically. Keep trees shallow (3-4 levels max) for readability — deeper trees should be split into multiple compositions.
 
-### L39: SplitComposition uses auto Chinese font detection
+### L38: SplitComposition uses auto Chinese font detection
 **Pattern:** A `hasChinese(text)` helper checks for CJK characters via regex (`/[一-鿿]/`). When detected, `fontFamily` switches from `fonts.display` to `fonts.chinese`. This runs per text element, so mixed content (English title, Chinese items) works correctly.
 **Rule:** Always use this pattern when text comes from JSON data that might contain Chinese. Don't assume language based on the template variant.
 
-### L40: ProbabilityGauge arc animation uses strokeDasharray
+### L39: ProbabilityGauge arc animation uses strokeDasharray
 **Pattern:** Semi-circular gauges are SVG circles with `strokeDasharray` set to half the circumference (180° arc). The fill animates by interpolating `strokeDashoffset` from full to the target percentage. This is more reliable than SVG arc paths for animation because dashoffset is a single numeric value.
 **Gotcha:** The arc's visual "start" position depends on `transform: rotate(-90deg)` on the circle element. Without this, the arc starts at 3 o'clock instead of 12 o'clock.
 
-### L41: ImageComposite duotone is CSS-based, not pixel-level
+### L40: ImageComposite duotone is CSS-based, not pixel-level
 **Pattern:** True duotone (per-pixel remap) requires canvas or WebGL, which is heavy in Remotion. The template approximates duotone with: `filter: grayscale(100%) contrast(1.1)` + a gradient overlay using the duotone ramp colors at 40-60% opacity. This looks 80% as good at 1% of the complexity. For pixel-perfect duotone, preprocess images outside Remotion per IMAGES.md.
 
-### L42: Shorts vertical layout uses shortsLayout constants, not layout
+### L41: Shorts vertical layout uses shortsLayout constants, not layout
 **Pattern:** The `shortsLayout` object in `Shorts/types.ts` defines 1080×1920 dimensions with tighter safe areas (48px sides, 100px top, 120px bottom). The larger bottom safe area accounts for mobile UI overlaps (share button, comments). Templates import `shortsLayout` instead of `layout` for all positioning.
 **Rule:** Never use `layout.safeArea` in Shorts components — those are for 1920×1080 landscape.
 
-### L43: Shorts data schemas reuse landscape types
+### L42: Shorts data schemas reuse landscape types
 **Pattern:** Vertical Shorts use the exact same JSON data schemas as their landscape counterparts. `KineticShort` accepts `QuoteData`, `DataChartShort` accepts `DataChartData`, etc. This means the same JSON file can render in both landscape and vertical — just change which composition renders it.
 **Benefit:** No schema duplication. The visual-spec skill doesn't need separate Shorts logic — it generates one JSON, and you choose the composition at render time.
 
@@ -296,21 +294,21 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## Animation Hooks Architecture
 
-### L44: useCompositionAnimation enforces Ken Burns + exit fade by default
+### L43: useCompositionAnimation enforces Ken Burns + exit fade by default
 **Pattern:** Every template calls `useCompositionAnimation()` and wraps its content in `<AbsoluteFill style={compStyle}>`. The hook auto-applies Ken Burns drift (1.0→1.02 scale + 6px pan) and exit fade (last 15 frames opacity ramp). Templates that need exceptions use options: `{ noDrift: true }` for maps/Shorts, `{ noExit: true }` for templates with custom exit logic.
 **Rule:** New templates MUST call this hook. Never implement Ken Burns or exit fade manually — that's the hook's job.
 **Convention:** Standard = `()`, Maps = `{ noDrift: true }`, Own-exit = `{ noExit: true }`, Shorts = `{ noDrift: true }`.
 
-### L45: useEntrance separates animation character from animation timing
+### L44: useEntrance separates animation character from animation timing
 **Pattern:** Templates declare an element's semantic *role* (`"hero"`, `"content"`, `"data"`, `"label"`, `"structure"`) and get the correct animation physics without choosing between `fadeIn`, `heroSpring`, `slideIn`, or `interpolate`. The hook maps roles to animation parameters: hero gets spring physics with overshoot, data gets scale-in, labels get quick fades, structure is near-instant.
 **Rule:** Use `useEntrance` for individual element animations. Use `useStaggeredEntrance(role, index, baseDelay)` for lists. Control ordering via `startFrame`, not by choosing different animation functions.
 **Gotcha:** Hooks can't be called conditionally or in loops (React rules). For dynamic lists, compute the startFrame outside and pass it to `useEntrance` — or use the raw `interpolate`/`spring` functions from animation.ts.
 
-### L46: useDivider replaces 6+ duplicated gradient divider patterns
+### L45: useDivider replaces 6+ duplicated gradient divider patterns
 **Pattern:** The "gradient line that fades at edges" appeared in TitleTransition (3×), KineticTypography (2×), and SplitComposition (1×) — each with slightly different animation code. `useDivider(startFrame, options)` standardizes this into one hook returning `{ lineStyle }` ready to spread onto a `<div>`.
 **Rule:** For any decorative divider line, use `useDivider`. For structural dividers that are part of the layout (like SplitComposition's center column), it's fine to keep custom code.
 
-### L47: Hook wiring pattern — compStyle wraps inside Background
+### L46: Hook wiring pattern — compStyle wraps inside Background
 **Pattern:** The correct nesting is `<Background> → <AbsoluteFill style={compStyle}> → content`. Background stays static (no drift/fade) while all content inside the compStyle wrapper animates together. Don't apply compStyle to the Background itself — it would cause the vignette and grain to drift/fade.
 **Gotcha:** Some templates (ImageComposite's BackgroundVariant) use `backgroundColor` on an outer AbsoluteFill instead of Background component. In these cases, compStyle wraps an inner AbsoluteFill, not the outermost one.
 
@@ -318,67 +316,67 @@ When building a new template or polishing an existing one, prefer these shared b
 
 ## Prop Validation & Dynamic Durations
 
-### L48: Zod schemas enable runtime validation + Studio visual editing
+### L47: Zod schemas enable runtime validation + Studio visual editing
 **Pattern:** Each template has a `schema.ts` file with a Zod schema matching its TypeScript interface. The schema is wired into `<Composition schema={SchemaName}>`. This gives two benefits: (1) invalid JSON data throws clear errors at render time instead of silently rendering garbage, and (2) Remotion Studio shows a visual prop editor.
 **Convention:** Schema wraps `data` in an outer object: `z.object({ data: z.object({ ... }) })`. This matches how props flow: `defaultProps={{ data: jsonData }}`.
 **Rule:** When adding new fields to a template's types.ts, also update its schema.ts.
 
-### L49: calculateMetadata replaces hardcoded durationInFrames
+### L48: calculateMetadata replaces hardcoded durationInFrames
 **Pattern:** Instead of `durationInFrames={sec(8)}` on the Composition, use `calculateMetadata={({ props }) => ({ durationInFrames: sec(props.data.durationSec || 8), fps, width, height })}`. The composition auto-sizes to its data — if the JSON says 12 seconds, it gets 12 seconds.
 **Gotcha:** Phase-based templates (ChoroplethMap, RouteAnimation, TimelineComparison) need helper functions that sum phase durations. These helpers are kept in the index.tsx and called inside calculateMetadata.
 
-### L50: @remotion/google-fonts loadFont() takes style name, not weight options
+### L49: @remotion/google-fonts loadFont() takes style name, not weight options
 **Problem:** Initial attempt passed `{ weights: [400, 500, 600, 700] }` to `loadFont()` — TS error because the first param is a style name ("normal" | "italic"), not an options object.
 **Fix:** Call `loadFont()` with no arguments to load all weights and styles. The return value `{ fontFamily }` gives the CSS font-family string.
 **Rule:** Import in Root.tsx with `import "./design/fonts"` — side-effect import triggers preloading.
 
 ## Performance
 
-### L51: useMemo for data-derived values, React.memo for sub-components
+### L50: useMemo for data-derived values, React.memo for sub-components
 **Pattern:** Any computation that depends only on `data` (not `frame`) should be memoized: `useMemo(() => Math.max(...data.dataPoints.map(d => d.value)), [data.dataPoints])`. Pure sub-components that receive data + frame-derived values get `React.memo`.
 **Gotcha:** `React.memo` wrapping changes the component definition syntax: `const Foo: React.FC<Props> = React.memo(({ ... }) => { ... })` — the closing needs `});` not `};`.
 **Key targets:** Math.max in DataChart, BFS layout in DecisionTree, color scale in ChoroplethMap, arc geometry in ProbabilityGauge, cell lookup Maps in FrameworkDiagram.
 
 ## Master Compositions
 
-### L52: Series composition with overlap for cross-fade transitions
+### L51: Series composition with overlap for cross-fade transitions
 **Pattern:** silicon-trap uses `<Series>` with `<Series.Sequence offset={-15}>` on all clips after the first. This creates 15-frame overlaps where the exit fade of clip N and the enter fade of clip N+1 blend. Total duration = sum of all clip durations - (23 × 15 frames).
 **Gotcha:** The KineticTypography type is `QuoteData`, not `KineticTypographyData`. Import names must match the actual exports in types.ts.
 
 ## Spatial Consistency & Border Safety (May 2026)
 
-### L54: Background.tsx enforces hard clipping on ALL templates
+### L52: Background.tsx enforces hard clipping on ALL templates
 **Change:** Added `overflow: hidden` to Background's outermost AbsoluteFill.
 **Why:** Text, labels, and map markers could previously render partially off-screen. Now anything beyond 1920×1080 is cleanly clipped at the frame boundary.
 **Rule:** Never remove this. If content is being clipped unexpectedly, the fix is to move the content inward — not to remove overflow:hidden.
 
-### L55: MapGL clips projected content
+### L53: MapGL clips projected content
 **Change:** Added `overflow: hidden` to MapGL's container.
 **Why:** Map Markers (city labels, sublabels) are geo-projected and can extend beyond the viewport when cities are near frame edges. Clipping prevents half-visible text at edges.
 **Rule:** If a label is being clipped, fix it by adjusting camera center/zoom or label position — not by removing the clip.
 
-### L56: Content must wait for camera to settle
+### L54: Content must wait for camera to settle
 **Problem:** In animated camera templates (RouteAnimation, ChoroplethMap), text and labels appeared simultaneously with camera movement — creating a desync where you'd read "US → Taiwan" while looking at the mid-Atlantic.
 **Fix:** Introduced `CONTENT_DELAY` pattern: camera begins moving first, content (labels, phase titles) fades in 0.8s later when camera is ~75% settled.
 **Rule:** Any template with animated camera must stagger: camera moves → visual elements draw → text labels appear. Never show text while the view is still in transit.
 **Sequence:** camera (t+0) → arcs/shapes (t+0.4s) → labels/titles (t+0.8s)
 
-### L57: Auto-centering for widely-separated geographic points
+### L55: Auto-centering for widely-separated geographic points
 **Problem:** Averaging longitude of US (-95°) and Taiwan (+121°) gives centroid at +13° (mid-Atlantic) — useless.
 **Fix:** When point spread > 100° longitude, center on the DESTINATION of active route segments rather than computing centroid. Narrative logic: "US → Taiwan" should show Taiwan.
 **Rule:** For map templates, never naively average coordinates when spread > 100°. Use segment destination logic or pick the last/primary point.
 
-### L58: Title positioning uses exactly two patterns
+### L56: Title positioning uses exactly two patterns
 **Pattern A — Data templates:** Use `<TitleBlock>` (shared component). Positions at `layout.safeArea.top/left`, enforces maxWidth, handles mode-aware colors.
 **Pattern B — Full-bleed templates:** (RouteAnimation, ChoroplethMap, KineticTypography, TitleTransition). Position title using `contentArea("content")` — which accounts for safeArea + title height gap.
 **Rule:** Never hardcode pixel positions for titles. Use TitleBlock (preferred) or contentArea(). If a title looks too close to the edge, it's because the template isn't using either system.
 **Audit (May 2026):** 13/26 templates use TitleBlock, 12 use contentArea/safeArea, 1 (TitleTransition) uses centered flex. No templates should hardcode raw pixel values for title position.
 
-### L59: textSafe utilities prevent text overflow
+### L57: textSafe utilities prevent text overflow
 **Added:** `textSafe` object in theme.ts with: `.ellipsis` (single-line), `.wrap` (multi-line word-break), `.clamp(N)` (N-line limit), `.bounded` (maxWidth within safe area).
 **Rule:** Any text element that could grow unbounded (data-driven labels, dynamic titles, long subtitles) must use one of these. Prefer `.clamp(2)` for subtitles, `.ellipsis` for single-line metadata.
 
-### L60: Tiered safe areas — not all templates need the same padding
+### L58: Tiered safe areas — not all templates need the same padding
 **Problem:** 80px (7.4%) is tighter than broadcast standard (10%). Data-dense templates with titles, bars, labels, and source text feel cramped. But centered compositions (KineticTypography) waste space with wide margins.
 **Fix:** Added `layout.safeAreaTier` with four levels:
 - `tight` (48px) — centered compositions: KineticTypography, TitleTransition
@@ -388,7 +386,7 @@ When building a new template or polishing an existing one, prefer these shared b
 `contentArea()` now accepts a second argument: `contentArea("content", "generous")`.
 **Rule:** When a template feels cramped near edges, don't patch individual positions — switch to a higher safe area tier. When it feels wastefully padded, drop to tight. This compounds: the decision lives in one place and affects all positioning derived from contentArea().
 
-### L61: Cards — hierarchy-aware containers, not uniform boxes
+### L59: Cards — hierarchy-aware containers, not uniform boxes
 **Problem:** Every template used `cardPresets.outlined` — `1px border + 8px radius + transparent bg`. This reads as PowerPoint: the visible border announces "I am a UI container." Cinematic motion graphics never show container edges. The uniform treatment also means hero events and supporting events have identical visual weight.
 **Fix:** Redesigned `cardPresets` with hierarchy tiers:
 - **Hero** (`accentEdge`): Left accent line + tinted background. Signals "this matters." Used for highlighted events, key moments.
@@ -399,23 +397,23 @@ Border radius reduced from 8px to 2px (editorial, not UI-kit). Legacy `outlined`
 All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word"` — text can never escape its container.
 **Rule:** Container treatment scales with content importance. The most important card gets the strongest treatment. Some content deserves no container at all. If every card looks the same, you have no hierarchy.
 
-### L62: NetworkDiagram edges connect at node borders, not centers
+### L60: NetworkDiagram edges connect at node borders, not centers
 **Problem:** Edge lines drew from node center to node center, visually passing through the node circles.
 **Fix:** Added `edgeEndpoints()` helper that offsets start/end coordinates by `nodeRadius + 2px` along the line direction. All three edge styles (solid, dashed, blocked) now terminate cleanly at the node border.
 **Rule:** When connecting geometric shapes with lines, always offset endpoints by the shape's radius plus a small gap.
 
-### L63: Absolute-positioned elements overlap when `top` ignores preceding element height
+### L61: Absolute-positioned elements overlap when `top` ignores preceding element height
 **Problem:** In DuelingFrameworks, the title (h1, 64px × 1.1 lineHeight = 70px) positioned at `top: safeArea.top` (80px) extended to 150px. Framework panel names started at `top: safeArea.top + spacing.xl` = 128px — 22px INSIDE the title. Same bug in DualTimeline: era headers used `contentArea("minimal").top - spacing.lg`, pulling them 11px into the subtitle.
 **Root cause:** When two elements are both absolutely positioned, the second element's `top` must account for the first element's **rendered height** (font size × line height + margins), not just add a fixed spacing offset. This is easy to miss because the overlap only shows at runtime, not in code review.
 **Fix:** Compute title area height explicitly: `Math.ceil(fontSizes.h1 * lineHeight.h1) + spacing.xl`. Or use `contentArea()` helper which already encodes title heights for standard variants (episode: 220px, section: 160px, content: 92px, minimal: 56px). Never subtract from `contentArea().top` — that erases the gap it provides.
 **Rule:** Every absolutely-positioned element below another must reference the preceding element's computed height, not guess with spacing constants. Use `contentArea()` whenever possible. If bypassing it, calculate: `safeArea.top + ceil(fontSize × lineHeight) + gap`.
 
-### L66: Never nest Ken Burns drift — one transform context per composition
+### L62: Never nest Ken Burns drift — one transform context per composition
 **Problem:** DuelingFrameworks had TWO drift layers: `compStyle` from `useCompositionAnimation()` (scale 1.06 + translate + rotate) AND an inner `AbsoluteFill` with `kenBurnsDrift(frame, totalFrames, 1.02)`. They compound to 1.08 total zoom. Worse: the title was OUTSIDE the inner wrapper while panels were INSIDE, so they drifted at different rates — making the panels visually slide into the title over time even though their static positions were correct.
 **Fix:** Removed the inner Ken Burns wrapper. `useCompositionAnimation()` is the single source of drift. All content lives in one `<AbsoluteFill style={compStyle}>` — same transform context, no relative drift.
 **Rule:** Never add a second `kenBurnsDrift` or `scale()` wrapper inside `compStyle`. One drift layer per composition. If you need different drift rates for different elements, use the hook's `noDrift` option and apply drift manually to ALL elements from the same origin.
 
-### L67: TitleBlock safeAreaTier must match contentArea/columnLayout safeAreaTier
+### L63: TitleBlock safeAreaTier must match contentArea/columnLayout safeAreaTier
 **Problem:** FrameworkDiagram, DecisionTree, EscalationLadder, and BayesianUpdate all used `safeAreaTier="generous"` (120px) on TitleBlock but default `"standard"` (80px) in `contentArea()`/`columnLayout()`. The title started at 120px and extended to ~203px. Content started at `80 + 92 + 48 = 220px` — only 17px gap. Visually the column headers touched the subtitle.
 **Fix:** Added `safeAreaTier` option to `columnLayout()`. All templates now pass the same tier to both TitleBlock and content positioning helpers. With generous tier: `120 + 92 + 48 = 260px` — a comfortable 57px gap below the title.
 **Rule:** When a template uses a non-default safeAreaTier on TitleBlock, it MUST pass the same tier to `contentArea()`, `columnLayout()`, or `useTemplateLayout()`. Mismatched tiers silently eat title-to-content spacing.
@@ -430,64 +428,64 @@ All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word
 ## Lambda & Cloud Rendering
 
 ### L65: useTemplateLayout — zone-based positioning replaces manual arithmetic
-**Problem:** Templates hand-computed `top: safeArea.top + spacing.xl` for every element, leading to overlap bugs when the offset didn't account for preceding elements' rendered height (L63). Each template was its own source of truth for positioning math.
+**Problem:** Templates hand-computed `top: safeArea.top + spacing.xl` for every element, leading to overlap bugs when the offset didn't account for preceding elements' rendered height (L61). Each template was its own source of truth for positioning math.
 **Fix:** `useTemplateLayout` hook returns pre-computed zone rects (title, content, footer, left, right) with ready-to-spread `style` objects and raw `rect` numbers. Templates spread `zones.content.style` instead of writing position math. Supports title variants (none/minimal/content/section/episode/custom), safe area tiers, split mode, and configurable gaps.
 **Migration pattern:** Replace `contentArea("content")` with `const { zones } = useTemplateLayout({ title: "content" }); const area = zones.content.rect;` — minimal diff, same data shape. For split layouts, add `split: true` and use `zones.left.style` / `zones.right.style`. For custom h1 titles, use `title: "custom", customTitleHeight: Math.ceil(fontSizes.h1 * lineHeight.h1)`.
 **Rule:** New templates MUST use `useTemplateLayout` for all positioning. Never write `top: layout.safeArea.top + ...` manually. The hook exists specifically to make overlap bugs impossible.
 
-### L68: Virtual camera for tree/graph templates — move the camera, not the nodes
+### L66: Virtual camera for tree/graph templates — move the camera, not the nodes
 **Problem:** DecisionTree rendered all nodes into a fixed viewport with tiny stagger delays. Result: cramped layout, dead space, no narrative pacing. The tree was a static diagram, not a cinematic moment.
 **Fix:** `useTreeCamera()` hook implements a virtual camera system. The full tree is rendered at natural scale; a viewport container animates `transform: scale() + translate()` to zoom/pan between nodes. Each `CameraStep` targets a node ID with zoom level, duration, and optional dimming. Camera transitions use `Easing.bezier(0.25, 0.1, 0.25, 1)` for cinematic feel, with zoom settling ~200ms before pan completes.
 **Key details:** (1) `transform-origin: 0 0` with manual translate math — don't use center origin with scale or the offset doubles. (2) Title and source overlays render OUTSIDE the camera viewport so they stay fixed on screen. (3) `getNodeDim()` returns per-node dimming factor (0–0.75) based on path ancestry to the focus node. (4) `getNodeScale()` adds 1.0→1.08 spring-settle on the focused node. (5) `generateDefaultCameraPath()` auto-generates root→branch→leaves→pullback if no cameraPath is in JSON. (6) `buildParentMap()` inverts children→parent for ancestry lookups.
 **Data contract:** `cameraPath: [{ focus: "nodeId", zoom: 2.2, duration: 2, dimOthers: true, label: "..." }]` in the JSON data file. Optional — auto-generates from tree structure if omitted.
 **Reuse potential:** This hook works for any node/graph visualization (NetworkDiagram, EscalationLadder) — not DecisionTree-specific.
 
-### L53: Lambda deploy is a two-step process: function + site
+### L67: Lambda deploy is a two-step process: function + site
 **Pattern:** `deploy-lambda.mjs` first bundles the project with `@remotion/bundler`, then uploads to S3 via `deploySite()`, then creates the Lambda function via `deployFunction()`. The output env vars (function name, serve URL, bucket) are needed by `render-lambda.mjs`.
 **Config:** 2048MB memory, 240s timeout, 2048MB disk. Good balance for 1080p@30fps renders. Increase memory for 4K or complex compositions.
 
-### L69: Standardize ALL templates on generous safe area (120px)
+### L68: Standardize ALL templates on generous safe area (120px)
 **Problem:** Templates used a mix of "standard" (80px) and "generous" (120px) safe areas for title positioning, causing a visible 40px jump when cutting between compositions. Some templates used manual title JSX at `layout.safeArea.top` (80px) while others used TitleBlock at 120px.
 **Fix:** Every template now uses `safeAreaTier="generous"` on TitleBlock and `contentArea(..., "generous")` / `layout.safeAreaTier.generous.*` for content positioning. This ensures titles sit at a consistent 120px top offset across all compositions.
 **Gotcha:** RouteAnimation's type has `backgroundTint` (a color string), not `backgroundVariant` — TitleBlock mode must be hardcoded "light" there. StatReveal's `useTemplateLayout` option is `safeArea`, not `safeAreaTier`.
 
-### L70: Horizontal timeline camera > vertical list for cinematic timelines
+### L69: Horizontal timeline camera > vertical list for cinematic timelines
 **Problem:** Vertical dot-line-card timelines look like web UI components, not documentary graphics. The brain pattern-matches "scrolling a list" rather than "watching a film."
 **Solution:** HorizontalTimeline template uses a wide canvas (events distributed along x-axis at 480px spacing) with a virtual camera that tracks horizontally between events. `useTimelineCamera()` hook handles pan/zoom interpolation, focus isolation (dim + blur + scale), and step transitions.
 **Key insight:** What separates "cinematic" from "UI": (1) camera moves through SPACE, (2) focus isolation via depth-of-field blur, (3) scale encodes importance, (4) atmosphere between elements (grain, glow, particles), (5) transitions have physics (easing, overshoot). The Vox/documentary standard is horizontal camera tracking between "stations."
 **Architecture:** Single configurable template with 3 modes (single/dual/morph) replaces TimelineComparison + DualTimeline + TimelineMorph. Camera path is data-driven (auto-generated if omitted). Glowing spine with animated gradient pulse.
 **File:** `index.tsx` (not `index.ts`) because composition wrappers contain JSX.
 
-### L71: useNarratedCamera — generalized 2D virtual camera for all data templates
+### L70: useNarratedCamera — generalized 2D virtual camera for all data templates
 **Problem:** useTimelineCamera is 1D (x-axis only), useTreeCamera is tree-specific. Other templates (NetworkDiagram, EscalationLadder, DataChart, RadarChart) needed cinematic camera but had no shared hook.
 **Solution:** `useNarratedCamera()` — 2D camera that pans to arbitrary (x,y) coordinates, zooms, and applies focus isolation. Targets can be: explicit coordinates, element indices (`element:N`), groups (`group:name`), or `overview`. All five data templates now support optional `cameraPath` field for narrated camera mode while maintaining backward compatibility (static mode when no path provided).
 **Pattern:** Camera features are opt-in via data. When `cameraPath` is absent, template renders exactly as before. When present, wraps content in viewport+content divs with camera transform. Per-element effects (opacity, scale, blur) applied via camera's getter functions.
 
-### L72: Ambient particles add depth without distraction
+### L71: Ambient particles add depth without distraction
 **Problem:** Static compositions feel flat — they lack the "living" quality of real footage.
 **Solution:** `AmbientParticles` component — deterministic floating particles (SVG circles) with seeded pseudo-random positions, slow drift, and gentle opacity pulse. Key constraints: max opacity 0.15, max radius 2.5px, slow speed (0.3-0.4). Uses `seededRandom()` for reproducible renders (no Math.random). Theme-aware default colors.
 **Rule:** Particles should NEVER be noticeable on first viewing. If someone says "I see particles," they're too dense/fast/bright.
 
-### L73: Flow particles for SankeyFlow bring data to life
+### L72: Flow particles for SankeyFlow bring data to life
 **Problem:** Static Sankey links are just colored ribbons — they don't communicate "flow."
 **Solution:** `FlowParticlesLayer` renders dots that travel along cubic bezier paths. Particle count proportional to flow value. Uses `bezierPoint()` to evaluate position at parameter t. Edge-fading at endpoints prevents pop-in/out.
 **Key:** Particle speed must be slow enough to track visually but fast enough to suggest motion. Speed 0.008 per frame at 30fps = ~4 seconds per full traversal.
 
-### L74: Axis rotation for RadarChart creates guided narration
+### L73: Axis rotation for RadarChart creates guided narration
 **Problem:** Radar charts show all dimensions at once — no way to guide viewer through each dimension sequentially.
 **Solution:** `axisFocusSequence` rotates the chart so each focused axis is at 12 o'clock position. Counter-rotates text labels to keep them upright. Pulsing vertex highlight draws the eye. Value callout appears at focused vertex.
 **Gotcha:** SVG rotation via CSS transform on the `<svg>` element; must set `transformOrigin: "center center"`. Text counter-rotation uses SVG `transform` attribute per-element.
 
-### L75: useBeatSync for audio-reactive timing
+### L74: useBeatSync for audio-reactive timing
 **Problem:** Camera moves feel disconnected from narration rhythm. Zoom pulses would feel better if synced to audio emphasis points.
 **Solution:** `useBeatSync()` hook accepts beat marker timestamps and returns exponentially-decaying pulse (0-1), isOnBeat boolean, and timing data. Beat markers can come from assembly manifest or be manually placed in JSON data. Anticipation offset (default 2 frames) makes visuals lead audio slightly for perceived sync.
 **Usage:** `const zoomBoost = 1 + beat.pulse * 0.05` adds 5% zoom on each beat. Degrades gracefully (returns 0 pulse) when no markers provided.
 
-### L76: spatial-zoom transition for inter-composition continuity
+### L75: spatial-zoom transition for inter-composition continuity
 **Problem:** Cut/fade between compositions breaks spatial continuity. When camera-driven templates end zoomed into a detail, the next composition should feel like emerging from that depth.
 **Solution:** `spatial-zoom` transition type: exit zooms to 2.5x (pushing through), entry zooms from 2.5x to 1x (emerging). Combined with 8px blur at peak for depth-of-field. Creates illusion of continuous camera movement through a 3D space between compositions.
 
-### L77: AudioLayer — 3-layer sound rendering in FullEpisode
+### L76: AudioLayer — 3-layer sound rendering in FullEpisode
 **Problem:** Assembly manifest defines a complete 3-layer audio system (musicBed, soundCue, textureCues) but FullEpisode rendered only narration. Sound design required a separate NLE step.
 **Solution:** `AudioLayer` component handles all three layers via Remotion's `<Audio>` + `<Sequence>`:
 - **Layer 1 (Music Bed):** Each track is a `<Sequence>` with a volume callback that implements fade-in/fade-out envelope. Overlapping tracks naturally crossfade.
@@ -497,7 +495,7 @@ All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word
 **Gotcha:** Audio components must be OUTSIDE `<FilmOverlay>` — FilmOverlay wraps children in visual effect layers, and nesting `<Audio>` inside can cause rendering artifacts. Keep all `<Audio>` as direct children of the root `<AbsoluteFill>`.
 **File convention:** SFX at `audio/sfx/transitions/{type}-{intensity}.wav`, textures at `audio/sfx/textures/{type}.wav`, music beds at `audio/music/{episode}/{file}`.
 
-### L78: cinematicMode flag for progressive template modernization
+### L77: cinematicMode flag for progressive template modernization
 **Problem:** Templates like DuelingFrameworks and SplitComposition feel like "PowerPoint slides" — static layouts with staggered fade-ins, no spatial camera movement, no depth-of-field. But rewriting them entirely would break existing data files.
 **Solution:** Add `cinematicMode?: boolean` to data types. When true, renders through a cinematic alternate path (horizontal camera tracking + focus isolation + ambient particles). When false/absent, renders through the original static path. This allows gradual migration: new episodes use cinematicMode: true, old data files render exactly as before.
 **Pattern for cinematic comparison templates:**
@@ -508,12 +506,12 @@ All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word
 5. Pull back to overview (scale → 1.0, translateX → 0) for verdict/scoring
 **Key insight:** The "PowerPoint" feeling comes from: (1) everything visible simultaneously, (2) no spatial depth hierarchy, (3) all items at same visual weight. The fix is temporal sequencing (build items one by one) + spatial focus (dim/blur non-active) + camera motion (simulate physical tracking). You don't need useNarratedCamera for every template — simple interpolate() on scale/translateX with opacity/blur on inactive zones achieves 80% of the cinematic effect.
 
-### L53: Progressive focus pattern for sequential templates
+### L78: Progressive focus pattern for sequential templates
 **Problem:** Flow/timeline templates feel flat because all nodes have equal visual weight once appeared. The eye has nowhere to rest.
 **Fix:** Track `activeNodeIndex` (most recently appeared node). Nodes *before* active dim based on distance: `dimAmount = interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], CLAMP)`. Apply as both opacity reduction AND subtle CSS `blur(${dimAmount * 1.5}px)` — opacity alone doesn't create enough separation.
 **Rule:** Any template with sequentially-appearing elements (FlowVariant, EscalationLadder, timeline) should dim earlier elements. The blur threshold should be > 0.1 to avoid sub-pixel rendering cost on nodes with zero dim.
 
-### L54: Overshoot-settle pattern for animated values
+### L79: Overshoot-settle pattern for animated values
 **Problem:** Linear or cubic interpolation between two values (probability gauge arcs, Bayesian curve means) feels mechanical and weightless.
 **Fix:** Two-phase interpolation: (1) Rush to 103% of target in first 50% of time using CLAMP_CUBIC_INOUT, (2) Settle back from overshoot to true target in next 30% of time. Combined with a `pulse(frame, settleFrame, 9, 1.04)` on the numeric display for tactile feedback when the value "lands."
 **Pattern:**
@@ -524,34 +522,34 @@ const settleT = evidenceT > 0.5 ? interp(evidenceT, [0.5, 0.8], [0, 1]) : 0;
 const value = (from + t * (overshoot - from)) - (overshoot - target) * settleT;
 ```
 
-### L55: SVG duotone filters — slope/intercept, not feDisplacementMap
+### L80: SVG duotone filters — slope/intercept, not feDisplacementMap
 **Problem:** PhotoMontage's duotone used `feDisplacementMap` (pixel displacement — wrong effect entirely) with only shadow color in intercept (flat tint instead of ramp).
 **Fix:** Proper duotone maps luminance to a two-color ramp via `feComponentTransfer` with linear functions: `slope = highlight[channel] - shadow[channel]`, `intercept = shadow[channel]`. Preceded by `feColorMatrix type="saturate" values="0.25"` for partial desaturation, then luminance conversion matrix, then the component transfer.
 **Rule:** Never use `feDisplacementMap` for color treatment — it's a geometric distortion filter. Duotone = luminance → linear color ramp.
 
-### L56: Background atmosphere prop expects AtmosphereDensity string, not boolean
+### L81: Background atmosphere prop expects AtmosphereDensity string, not boolean
 **Problem:** Using `atmosphere` as bare prop (shorthand for `={true}`) fails TS — the type is `"none" | "subtle" | "normal" | "dense"`.
 **Fix:** Always use `atmosphere="subtle"` (data-viz templates) or `atmosphere="normal"` (hero/cinematic). Never use bare boolean shorthand.
 
-### L57: AmbientParticles density prop, not count
+### L82: AmbientParticles density prop, not count
 **Problem:** `<AmbientParticles count={25} />` — component uses `density` prop (particles per viewport area unit), not `count`.
 **Fix:** Use `density={20}` for dark modes, `density={8-12}` for light modes. The component internally derives actual particle count from density × viewport area.
 
 ## Pacing System (May 2026)
 
-### L79: useEntrance timingScale — pace-aware animations without template changes
+### L83: useEntrance timingScale — pace-aware animations without template changes
 **Problem:** Templates hardcode animation durations. When pace shifts from analytical to urgent, animations should tighten; when breathing, they should relax. But modifying every template's animation code is impractical.
 **Solution:** `useEntrance(role, startFrame, timingScale)` accepts an optional `timingScale` (default 1.0). For hero elements, it scales spring mass (higher mass = slower spring). For all others, it scales the interpolation duration: `dur = Math.round(baseDur * ts)`. Clamped to [0.4, 2.0] to prevent absurd values. `useStaggeredEntrance` also scales the stagger gap: `scaledStagger = Math.round(staggerFrames * timingScale)`.
 **Usage:** `const entrance = useEntrance("data", 15, direction.paceTimingScale)` — existing calls without the third arg work unchanged.
 
-### L80: Beat-boundary pace reset prevents infection
+### L84: Beat-boundary pace reset prevents infection
 **Problem:** A `PACE: urgent` in Beat 3 could infect all of Beat 4 if the writer forgot to reset. Silent bugs — the manifest would show compressed durations in unintended segments.
 **Solution:** `generate_manifest.py` auto-resets `current_pace` to `"analytical"` at each beat header, printing a note when it resets from a non-default value. Writers only need to set pace changes, never worry about cleanup.
 
-### L81: match_narration guard for PACE multiplier
+### L85: match_narration guard for PACE multiplier
 **Problem:** When `durationMode == "match_narration"`, the visual's purpose is to match narration timing exactly. Applying a 0.7× or 1.4× multiplier would create gaps or overlaps between narration and visuals.
 **Fix:** Skip PACE multiplier when `parsed["durationMode"] != "match_narration"`. The explicit intent to match narration overrides density-based pacing.
 
-### L82: Sync anchor cascading can squeeze previous steps to zero
+### L86: Sync anchor cascading can squeeze previous steps to zero
 **Problem:** In `useNarratedCamera`, when a sync point snaps a step's start boundary backward past the previous step's start, the previous step gets negative width — invisible but it breaks interpolation.
 **Fix:** After snapping, check if `boundaries[i-1].end <= boundaries[i-1].start` and enforce a minimum 0.5s duration, pushing the current step's start forward to compensate.
