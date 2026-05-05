@@ -3,7 +3,7 @@ import { TitleTransition } from "./TitleTransition";
 import { layout, sec } from "../../design/theme";
 import { TitleTransitionSchema } from "./schema";
 import type { TitleTransitionData } from "./types";
-import sampleData from "../../../data/episodes/ep01/title-episode.json";
+import sampleData from "../../../data/episodes/silicon-trap/title-episode.json";
 
 export const TitleTransitionComposition = () => (
   <Composition

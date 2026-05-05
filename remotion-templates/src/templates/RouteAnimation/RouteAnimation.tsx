@@ -10,7 +10,7 @@
  * RoutePhase for full Mapbox camera control (backward-compatible).
  */
 
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -25,18 +25,16 @@ import {
   fontSizes,
   layout,
   sec,
-  light,
   shadows,
   contentArea,
-  cardPadding,
-  textMaxWidth,
 } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   slideIn,
   exitFade,
   scaleIn,
-  pulse,
+  lockOnPulse,
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
@@ -44,9 +42,12 @@ import {
 import { hexToRgba, scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
 import { MapGL } from "../../components/MapGL";
-import { FadeIn } from "../../components/FadeIn";
+import { TitleBlock } from "../../components/TitleBlock";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import type { RouteAnimationData, RoutePhase } from "./types";
 
 // ── Phase time calculator ──────────────────────────────────────────────────
@@ -77,31 +78,165 @@ function getCurrentPhaseIndex(
 
 // ── Camera conversion ───────────────────────────────────────────────────────
 
+/**
+ * Compute the ideal camera for a set of points.
+ *
+ * Strategy:
+ * - If only new points exist, center on their centroid (tight focus)
+ * - If new + existing, center on the DESTINATION of new segments (narrative focus)
+ * - For widely-separated points (>100° lon span), use the LAST new point
+ *   as center (avoids mid-ocean centroids when showing US→Taiwan routes)
+ * - Progressive bearing rotation between phases for globe turning effect
+ */
+function computeAutoCamera(
+  data: RouteAnimationData,
+  activePointIndices: number[],
+  newPointIndices: number[],
+  phaseIndex: number
+): CameraState {
+  // If there are newly-active points this phase, center on THOSE specifically
+  const targetIndices =
+    newPointIndices.length > 0 ? newPointIndices : activePointIndices;
+
+  if (targetIndices.length === 0) {
+    return { longitude: 60, latitude: 25, zoom: 2.5, pitch: 35, bearing: 0 };
+  }
+
+  // Compute bounds
+  let lonMin = Infinity, lonMax = -Infinity;
+  let latMin = Infinity, latMax = -Infinity;
+
+  for (const idx of targetIndices) {
+    const [lon, lat] = data.points[idx].coordinates;
+    lonMin = Math.min(lonMin, lon);
+    lonMax = Math.max(lonMax, lon);
+    latMin = Math.min(latMin, lat);
+    latMax = Math.max(latMax, lat);
+  }
+
+  const lonSpread = lonMax - lonMin;
+  const latSpread = latMax - latMin;
+  const maxSpread = Math.max(lonSpread, latSpread);
+
+  // Determine center point
+  let centerLon: number;
+  let centerLat: number;
+
+  if (maxSpread > 100) {
+    // Points span more than 100° — DON'T average (gives mid-ocean nonsense).
+    // Instead: find the DESTINATION of segments activated in this phase.
+    // Narrative logic: "US → Taiwan" should center on Taiwan (the destination).
+    const phase = data.phases[phaseIndex];
+    const destinationPoints = new Set<number>();
+    for (const segIdx of phase.activeSegments) {
+      destinationPoints.add(data.segments[segIdx].to);
+    }
+    // Filter to only destination points that are newly active
+    const newDestinations = targetIndices.filter((idx) =>
+      destinationPoints.has(idx)
+    );
+
+    if (newDestinations.length > 0) {
+      // Center on destination(s)
+      let dLon = 0, dLat = 0;
+      for (const idx of newDestinations) {
+        dLon += data.points[idx].coordinates[0];
+        dLat += data.points[idx].coordinates[1];
+      }
+      centerLon = dLon / newDestinations.length;
+      centerLat = dLat / newDestinations.length;
+    } else {
+      // Fallback: use the last point in the target list
+      const lastIdx = targetIndices[targetIndices.length - 1];
+      centerLon = data.points[lastIdx].coordinates[0];
+      centerLat = data.points[lastIdx].coordinates[1];
+    }
+  } else {
+    // Normal centroid
+    let lonSum = 0, latSum = 0;
+    for (const idx of targetIndices) {
+      lonSum += data.points[idx].coordinates[0];
+      latSum += data.points[idx].coordinates[1];
+    }
+    centerLon = lonSum / targetIndices.length;
+    centerLat = latSum / targetIndices.length;
+  }
+
+  // Compute zoom based on geographic spread
+  let zoom: number;
+  if (targetIndices.length === 1) {
+    zoom = 4.5; // Single city — close
+  } else if (maxSpread > 100) {
+    zoom = 2.0; // Global spread — wide view showing the route
+  } else if (maxSpread > 60) {
+    zoom = 2.5;
+  } else if (maxSpread < 15) {
+    zoom = 4.0; // Tight cluster
+  } else if (maxSpread < 40) {
+    zoom = 3.2; // Regional
+  } else {
+    zoom = 2.8; // Continental
+  }
+
+  // Progressive bearing rotation: globe turns between phases
+  const bearing = phaseIndex * 15;
+
+  // Pitch: more dramatic when zoomed in
+  const pitch = zoom > 4 ? 42 : zoom > 3 ? 35 : 25;
+
+  return { longitude: centerLon, latitude: centerLat, zoom, pitch, bearing };
+}
+
+/**
+ * Determine which points are newly activated in this phase
+ * (not active in any previous phase).
+ */
+function getNewPointsInPhase(
+  phases: RoutePhase[],
+  phaseIndex: number
+): number[] {
+  const previouslyActive = new Set<number>();
+  for (let i = 0; i < phaseIndex; i++) {
+    phases[i].activePoints.forEach((p) => previouslyActive.add(p));
+  }
+  return phases[phaseIndex].activePoints.filter(
+    (p) => !previouslyActive.has(p)
+  );
+}
+
 function phaseToCamera(
   phase: RoutePhase,
-  defaults: { center?: [number, number]; scale?: number }
+  phaseIndex: number,
+  data: RouteAnimationData
 ): CameraState {
-  // New camera field takes priority (full Mapbox camera control)
+  // Explicit camera field takes priority (full Mapbox camera control)
   if (phase.camera) {
+    // Still apply progressive bearing if not explicitly set
     return {
       longitude: phase.camera.longitude,
       latitude: phase.camera.latitude,
       zoom: phase.camera.zoom,
       pitch: phase.camera.pitch ?? 35,
-      bearing: phase.camera.bearing ?? 0,
+      bearing: phase.camera.bearing ?? phaseIndex * 12,
     };
   }
 
-  // Legacy center/scale fallback
-  const center = phase.center || defaults.center || [60, 25];
-  const scale = phase.scale || defaults.scale || 200;
-  return {
-    longitude: center[0],
-    latitude: center[1],
-    zoom: scaleToZoom(scale),
-    pitch: 35,
-    bearing: 0,
-  };
+  // Legacy center/scale — convert but apply auto-centering bearing
+  if (phase.center || phase.scale) {
+    const center = phase.center || data.center || [60, 25];
+    const scale = phase.scale || data.scale || 200;
+    return {
+      longitude: center[0],
+      latitude: center[1],
+      zoom: scaleToZoom(scale),
+      pitch: 35,
+      bearing: phaseIndex * 12,
+    };
+  }
+
+  // Auto-compute: center on newly-highlighted cities
+  const newPoints = getNewPointsInPhase(data.phases, phaseIndex);
+  return computeAutoCamera(data, phase.activePoints, newPoints, phaseIndex);
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
@@ -111,7 +246,9 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const { style: compStyle } = useCompositionAnimation({ noDrift: true });
+  const direction = useDirection(data._direction);
+  const theme = useThemeMode("light");
+  const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
   const routeColor = data.routeColor || palette.amber;
 
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
@@ -139,25 +276,61 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   const newSegments = new Set(data.phases[currentPhaseIdx].activeSegments);
 
   // ── Camera ────────────────────────────────────────────────────────────
+  // Camera LEADS content: it starts transitioning 0.3s before the phase
+  // boundary and settles in 1.2s, so by the time labels fade in (0.4s into
+  // the phase), the camera is already 60%+ settled on the target city.
 
-  const currentCamera = phaseToCamera(currentPhase, data);
+  const currentCamera = phaseToCamera(currentPhase, currentPhaseIdx, data);
 
   let camera: CameraState;
   if (currentPhaseIdx > 0) {
-    const prevCamera = phaseToCamera(data.phases[currentPhaseIdx - 1], data);
+    const prevCamera = phaseToCamera(
+      data.phases[currentPhaseIdx - 1],
+      currentPhaseIdx - 1,
+      data
+    );
+    // Camera transition: starts 0.3s before phase start, finishes 1.2s into phase
+    const camLeadFrames = sec(0.3);
+    const camDuration = sec(1.5);
     const camT = interpolate(
       frame,
-      [phaseWindow.start, phaseWindow.start + sec(1.5)],
+      [phaseWindow.start - camLeadFrames, phaseWindow.start - camLeadFrames + camDuration],
       [0, 1],
       CLAMP_CUBIC_INOUT
     );
     camera = interpolateCamera(prevCamera, currentCamera, camT);
   } else {
-    camera = currentCamera;
+    // First phase: gentle zoom-in from a pulled-back view
+    const initialCamera: CameraState = {
+      longitude: currentCamera.longitude,
+      latitude: currentCamera.latitude,
+      zoom: currentCamera.zoom - 0.8,
+      pitch: currentCamera.pitch - 10,
+      bearing: currentCamera.bearing - 5,
+    };
+    const introT = interpolate(
+      frame,
+      [0, sec(1.5)],
+      [0, 1],
+      CLAMP_CUBIC_INOUT
+    );
+    camera = interpolateCamera(initialCamera, currentCamera, introT);
   }
 
-  // Subtle bearing drift
-  const bearingDrift = interpolate(frame, [0, durationInFrames], [0, 6], CLAMP);
+  // Continuous slow bearing drift within each phase (globe "breathes")
+  const intraPhaseProgress = interpolate(
+    frame,
+    [phaseWindow.start, phaseWindow.end],
+    [0, 1],
+    CLAMP
+  );
+  const bearingDrift = intraPhaseProgress * 3; // 3° drift per phase hold
+
+  // ── Content timing ───────────────────────────────────────────────────
+  // Content (labels, phase title) waits for the camera to mostly settle.
+  // Camera takes ~1.2s to reach destination; content appears at 0.8s in.
+  const CONTENT_DELAY = currentPhaseIdx > 0 ? sec(0.8) : sec(1.0);
+  const contentStart = phaseWindow.start + CONTENT_DELAY;
 
   // ── deck.gl layers ────────────────────────────────────────────────────
 
@@ -165,7 +338,8 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     const arcs: Array<{
       from: [number, number];
       to: [number, number];
-      color: string;
+      sourceColor: string;
+      targetColor: string;
       isNew: boolean;
       dashed: boolean;
       index: number;
@@ -175,10 +349,15 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       if (!allActiveSegments.has(i)) return;
       const fromPt = data.points[seg.from];
       const toPt = data.points[seg.to];
+      // Gradient arcs: blend from source point's color (or seg.color) into
+      // destination point's color (or seg.color). Falls back to seg.color
+      // for both ends when endpoint colors aren't specified.
+      const baseColor = seg.color || routeColor;
       arcs.push({
         from: fromPt.coordinates,
         to: toPt.coordinates,
-        color: seg.color || routeColor,
+        sourceColor: fromPt.color || baseColor,
+        targetColor: toPt.color || baseColor,
         isNew: newSegments.has(i),
         dashed: !!seg.dashed,
         index: i,
@@ -188,10 +367,12 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     return arcs;
   }, [data.segments, data.points, allActiveSegments, newSegments, routeColor]);
 
-  // Animate new arcs: fade in + grow width
+  // Animate new arcs: start slightly after camera begins moving,
+  // finish just as labels appear (visual sequence: camera moves → arcs draw → labels pop)
+  const arcDelay = currentPhaseIdx > 0 ? sec(0.4) : sec(0.6);
   const newArcProgress = interpolate(
     frame,
-    [phaseWindow.start, phaseWindow.start + sec(1)],
+    [phaseWindow.start + arcDelay, phaseWindow.start + arcDelay + sec(1)],
     [0, 1],
     CLAMP_CUBIC
   );
@@ -203,11 +384,11 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     getTargetPosition: (d: any) => d.to,
     getSourceColor: (d: any) => {
       const alpha = d.isNew ? Math.round(newArcProgress * 200) : 200;
-      return hexToRgba(d.color, alpha);
+      return hexToRgba(d.sourceColor, alpha);
     },
     getTargetColor: (d: any) => {
       const alpha = d.isNew ? Math.round(newArcProgress * 200) : 200;
-      return hexToRgba(d.color, alpha);
+      return hexToRgba(d.targetColor, alpha);
     },
     getWidth: (d: any) => {
       const base = d.dashed ? 1.5 : 3;
@@ -220,6 +401,55 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       getSourceColor: [newArcProgress],
       getTargetColor: [newArcProgress],
       getWidth: [newArcProgress],
+    },
+  });
+
+  // ── Trailing flow particles — small dots traveling along each great-circle arc ──
+  // Sample bezier-equivalent positions using deck.gl's great-circle parameter t,
+  // approximated here as a linear-spherical interpolation. Each arc gets 2-4
+  // particles depending on arc length.
+  const flowParticles = useMemo(() => {
+    const parts: Array<{ position: [number, number, number]; color: string; t: number; arcIdx: number }> = [];
+    arcData.forEach((arc, arcIdx) => {
+      if (arc.isNew && newArcProgress < 0.6) return; // wait until arc is mostly drawn
+      // 3 particles per arc, phase-offset, traveling at frame * speed
+      const speed = 0.0035; // cycles per frame
+      const particleCount = 3;
+      for (let p = 0; p < particleCount; p++) {
+        const phase = p / particleCount;
+        const rawT = ((frame * speed) + phase) % 1;
+        // Simple linear-spherical interpolation along the great circle
+        const [lon1, lat1] = arc.from;
+        const [lon2, lat2] = arc.to;
+        const lon = lon1 + (lon2 - lon1) * rawT;
+        const lat = lat1 + (lat2 - lat1) * rawT;
+        // Lift toward arc apex for 3D feel — sin-based parabola, matches getHeight: 0.3
+        const altitude = Math.sin(rawT * Math.PI) * 80000; // meters
+        // Edge fade — particles fade in at start, out near end
+        const edgeFade = Math.min(rawT * 8, (1 - rawT) * 8, 1);
+        // Color interpolates between source and target
+        const color = rawT < 0.5 ? arc.sourceColor : arc.targetColor;
+        parts.push({
+          position: [lon, lat, altitude] as [number, number, number],
+          color,
+          t: edgeFade,
+          arcIdx,
+        });
+      }
+    });
+    return parts;
+  }, [arcData, frame, newArcProgress]);
+
+  const flowParticleLayer = new ScatterplotLayer({
+    id: "flow-particles",
+    data: flowParticles,
+    getPosition: (d: any) => d.position,
+    getRadius: 3,
+    getFillColor: (d: any) => hexToRgba(d.color, Math.round(220 * d.t)),
+    radiusUnits: "pixels" as const,
+    updateTriggers: {
+      getPosition: [frame],
+      getFillColor: [frame],
     },
   });
 
@@ -242,13 +472,28 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     },
   });
 
-  const layers = [arcLayer, scatterLayer];
+  const layers = [arcLayer, flowParticleLayer, scatterLayer];
 
   // ── Render ────────────────────────────────────────────────────────────
 
   return (
-    <Background variant="light" tint={data.backgroundTint}>
+    <Background
+      variant="light"
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
+        {/* Brand strips */}
+        <HeaderStrip
+          metadata={`${data.episode || ""} · ${camera.latitude.toFixed(1)}°${camera.latitude >= 0 ? "N" : "S"} ${Math.abs(camera.longitude).toFixed(1)}°${camera.longitude >= 0 ? "E" : "W"}`.trim()}
+          mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+        />
+        <FooterStrip
+          scale={`Z${camera.zoom.toFixed(1)}`}
+          mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+        />
+
         <MapGL
           longitude={camera.longitude}
           latitude={camera.latitude}
@@ -256,6 +501,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           pitch={camera.pitch}
           bearing={camera.bearing + bearingDrift}
           layers={layers}
+          dark={data.backgroundVariant === "dark"}
         >
           {/* Point labels — rendered as Markers for proper geo projection */}
           {pointData.map((pt) => {
@@ -269,17 +515,21 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             }
             const ptWindow = getPhaseWindow(data.phases, activatedPhase);
             const ptColor = pt.color || routeColor;
-            const ptOpacity = fadeIn(frame, ptWindow.start, sec(0.4));
-            const ptScale = scaleIn(frame, ptWindow.start, sec(0.5));
+            // Labels appear AFTER camera settles (CONTENT_DELAY into phase)
+            const ptDelay = activatedPhase > 0 ? sec(0.8) : sec(1.0);
+            const ptAppearFrame = ptWindow.start + ptDelay;
+            const ptOpacity = fadeIn(frame, ptAppearFrame, sec(0.4));
+            const ptScale = scaleIn(frame, ptAppearFrame, sec(0.5));
 
+            // Brand lock-on pulse on first appearance — replaces ad-hoc pulse
             const isNewPoint = activatedPhase === currentPhaseIdx;
             const pulseScale = isNewPoint
-              ? pulse(frame, ptWindow.start + sec(0.5), sec(0.4), 1.15)
+              ? lockOnPulse(frame, ptAppearFrame + sec(0.3), layout.fps, 1.15, 240)
               : 1;
 
             const contentOpacity = Math.min(
               ptOpacity,
-              exitFade(frame, durationInFrames)
+              exitFade(frame, durationInFrames, 15)
             );
             const combinedScale = ptScale * pulseScale;
 
@@ -306,44 +556,83 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                       height: 12,
                       borderRadius: "50%",
                       backgroundColor: ptColor,
-                      border: `2px solid ${light.bg.map}`,
+                      border: `2px solid ${theme.bg.surface}`,
                       boxShadow: `0 0 8px ${ptColor}80`,
                     }}
                   />
-                  {/* Label */}
-                  {pt.label && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: "100%",
-                        marginBottom: layout.spacing.xs,
-                        fontSize: 16,
-                        fontFamily: fonts.heading,
-                        fontWeight: 600,
-                        color: light.text.primary,
-                        whiteSpace: "nowrap",
-                        textShadow: shadows.textLift,
-                      }}
-                    >
-                      {pt.label}
-                    </div>
-                  )}
-                  {pt.sublabel && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        marginTop: layout.spacing.xs,
-                        fontSize: 11,
-                        fontFamily: fonts.body,
-                        color: light.text.muted,
-                        whiteSpace: "nowrap",
-                        textShadow: shadows.textLift,
-                      }}
-                    >
-                      {pt.sublabel}
-                    </div>
-                  )}
+                  {/* Labels container — positioned based on labelPosition */}
+                  {(pt.label || pt.sublabel) && (() => {
+                    const pos = pt.labelPosition || "above";
+                    const isVertical = pos === "above" || pos === "below";
+                    const isLeft = pos === "left";
+                    const isRight = pos === "right";
+
+                    const containerStyle: React.CSSProperties = {
+                      position: "absolute",
+                      display: "flex",
+                      flexDirection: "column",
+                      whiteSpace: "nowrap",
+                      ...(pos === "above"
+                        ? {
+                            bottom: "100%",
+                            marginBottom: layout.spacing.xs,
+                            alignItems: "center",
+                          }
+                        : pos === "below"
+                        ? {
+                            top: "100%",
+                            marginTop: layout.spacing.xs,
+                            alignItems: "center",
+                          }
+                        : isLeft
+                        ? {
+                            right: "100%",
+                            marginRight: layout.spacing.sm,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            alignItems: "flex-end",
+                          }
+                        : {
+                            left: "100%",
+                            marginLeft: layout.spacing.sm,
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            alignItems: "flex-start",
+                          }),
+                    };
+
+                    return (
+                      <div style={containerStyle}>
+                        {pt.label && (
+                          <div
+                            style={{
+                              fontSize: fontSizes.h3,
+                              fontFamily: fonts.heading,
+                              fontWeight: 600,
+                              color: theme.text.primary,
+                              textShadow: shadows.textLift,
+                              textAlign: isVertical ? "center" : isLeft ? "right" : "left",
+                            }}
+                          >
+                            {pt.label}
+                          </div>
+                        )}
+                        {pt.sublabel && (
+                          <div
+                            style={{
+                              fontSize: fontSizes.body,
+                              fontFamily: fonts.body,
+                              color: theme.text.muted,
+                              textShadow: shadows.textLift,
+                              textAlign: isVertical ? "center" : isLeft ? "right" : "left",
+                            }}
+                          >
+                            {pt.sublabel}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </Marker>
             );
@@ -351,56 +640,28 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
         </MapGL>
 
         {/* Title */}
-        <FadeIn startFrame={0} direction="up" distance={20}>
-          <div
-            style={{
-              position: "absolute",
-              top: layout.safeArea.top,
-              left: layout.safeArea.left,
-              opacity: exitFade(frame, durationInFrames),
-            }}
-          >
-            <div
-              style={{
-                fontSize: fontSizes.h2,
-                fontWeight: 600,
-                color: light.text.primary,
-                fontFamily: fonts.heading,
-                textShadow: shadows.textLift,
-              }}
-            >
-              {data.title}
-            </div>
-            {data.subtitle && (
-              <div
-                style={{
-                  fontSize: fontSizes.body,
-                  color: light.text.muted,
-                  marginTop: layout.spacing.xs,
-                  textShadow: shadows.textLift,
-                }}
-              >
-                {data.subtitle}
-              </div>
-            )}
-          </div>
-        </FadeIn>
+        <TitleBlock
+          title={data.title}
+          subtitle={data.subtitle}
+          mode="light"
+          safeAreaTier="generous"
+        />
 
-        {/* Phase title overlay */}
+        {/* Phase title overlay — appears after camera settles */}
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeArea.bottom + layout.spacing.md,
-            left: layout.safeArea.left,
-            right: layout.safeArea.right,
+            bottom: contentArea("content", "generous").bottom + layout.spacing.md,
+            left: contentArea("content", "generous").left,
+            right: contentArea("content", "generous").right,
             display: "flex",
             alignItems: "center",
             gap: layout.spacing.sm,
             opacity: Math.min(
-              fadeIn(frame, phaseWindow.start, sec(0.4)),
-              exitFade(frame, durationInFrames)
+              fadeIn(frame, contentStart, sec(0.4)),
+              exitFade(frame, durationInFrames, 15)
             ),
-            transform: `translateY(${slideIn(frame, phaseWindow.start, 20, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, contentStart, 20, sec(0.5))}px)`,
           }}
         >
           <div
@@ -416,7 +677,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
               style={{
                 fontSize: fontSizes.h3,
                 fontWeight: 600,
-                color: light.text.primary,
+                color: theme.text.primary,
                 textShadow: shadows.textLift,
               }}
             >
@@ -425,8 +686,8 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             {currentPhase.subtitle && (
               <div
                 style={{
-                  fontSize: fontSizes.caption,
-                  color: light.text.muted,
+                  fontSize: fontSizes.body,
+                  color: theme.text.muted,
                   marginTop: layout.spacing.xs,
                   textShadow: shadows.textLift,
                 }}
@@ -438,38 +699,20 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
         </div>
 
         {/* Episode label */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: layout.safeArea.bottom,
-            left: layout.safeArea.left,
-            fontSize: fontSizes.label,
-            color: light.text.muted,
-            letterSpacing: 2,
-            textTransform: "uppercase",
-            opacity: Math.min(
-              fadeIn(frame, 0, sec(1)),
-              exitFade(frame, durationInFrames)
-            ),
-            transform: `translateY(${slideIn(frame, 0, 10, sec(0.8))}px)`,
-            textShadow: shadows.textLift,
-          }}
-        >
-          {data.episode}
-        </div>
+        {/* Episode label now lives in HeaderStrip — no longer duplicated here */}
 
         {/* Source */}
         {data.source && (
           <div
             style={{
               position: "absolute",
-              bottom: layout.safeArea.bottom,
-              right: layout.safeArea.right,
+              bottom: contentArea("content", "generous").bottom,
+              right: contentArea("content", "generous").right,
               fontSize: fontSizes.small,
-              color: light.text.muted,
+              color: theme.text.muted,
               opacity: Math.min(
                 fadeIn(frame, sec(2), sec(0.5)),
-                exitFade(frame, durationInFrames)
+                exitFade(frame, durationInFrames, 15)
               ),
               textShadow: shadows.textLift,
             }}

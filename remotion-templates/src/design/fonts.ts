@@ -21,7 +21,11 @@ import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
 const { fontFamily: spaceGrotesk } = loadSpaceGrotesk();
 const { fontFamily: ibmPlexMono } = loadIBMPlexMono();
 const { fontFamily: jetBrainsMono } = loadJetBrainsMono();
-const { fontFamily: notoSansSC } = loadNotoSansSC();
+const { fontFamily: notoSansSC } = loadNotoSansSC("normal", {
+  subsets: ["latin", "chinese-simplified"],
+  weights: ["400", "700"],
+  ignoreTooManyRequestsWarning: true,
+});
 
 /**
  * Loaded font family strings — use these if you need the exact

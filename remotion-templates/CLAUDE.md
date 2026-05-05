@@ -1,6 +1,6 @@
 # Geopolitics Video Templates — Remotion Project
 
-> Last updated: April 26, 2026
+> Last updated: May 4, 2026
 
 ## What this is
 
@@ -8,9 +8,9 @@ A Remotion-based template library for producing educational geopolitics YouTube
 videos. Templates are React components that render to MP4. Each template is
 data-driven: feed it a JSON file and it generates the visual segment.
 
-**15 template types (7 core + 4 format-specific + 3 Shorts + EP01 master sequence) are built and functional.**
+**17 core + 4 format-specific + 9 Shorts + per-episode master sequences are built and functional.**
 All templates use Zod schemas for runtime validation and `calculateMetadata` for dynamic durations.
-EP01 ("The Silicon Trap") has 24 data files (generated from script-v3; need regeneration from v4 production format).
+"The Silicon Trap" (`silicon-trap`) has 24 data files + assembly manifest with audio. Project uses slug-based naming — episode numbers assigned at publish time.
 Templates cover all 8 content identity directions defined in CONTENT_IDENTITY.md.
 
 ## Workspace layout (/project-parallax/)
@@ -19,8 +19,10 @@ Templates cover all 8 content identity directions defined in CONTENT_IDENTITY.md
 project-parallax/
 ├── CLAUDE.md                 # Top-level project overview (read this first for project context)
 ├── project/                  # Strategy and planning docs (vision, pipeline, decisions, ideas)
-├── episodes/                 # Per-episode work (scripts, briefs, research)
-│   └── EP01-silicon-trap/    # Script-v4 (production format), shot-list.json, brief.md
+├── episodes/                 # Per-episode work (slug-based — no EP## until publish)
+│   ├── silicon-trap/         # "The Silicon Trap" (draft, queued)
+│   ├── blockades-leak/       # "Why Technological Blockades Always Leak" (draft)
+│   └── prisoners-dilemma/    # Launch candidate
 ├── remotion-templates/       # ← YOU ARE HERE — the Remotion project
 ├── tools/                    # Python CLI tools (brand-treatment/treat.py, asset-source/source.py)
 ├── skills/                   # Production skills (research-audit; others in Cowork plugins dir)
@@ -42,7 +44,7 @@ remotion-templates/
 ├── tsconfig.json                         # strict: false, noImplicitAny: false
 ├── vitest.config.ts                      # Test config (visual regression tests)
 ├── scripts/
-│   ├── render-ep01.sh                    # Bash render script (all 24 EP01 clips)
+│   ├── render-silicon-trap.sh            # Bash render script (all 24 silicon-trap clips)
 │   ├── render-episode.mjs                # Node render script (universal, with --only/--from)
 │   ├── deploy-lambda.mjs                 # Deploy Remotion Lambda (function + S3 site)
 │   └── render-lambda.mjs                # Render via Lambda (single clip or full episode)
@@ -62,12 +64,25 @@ remotion-templates/
 │   │   ├── AnimatedText.tsx              # Word/character reveal
 │   │   ├── Background.tsx                # Full-frame bg (gradient vignette + grain + border)
 │   │   ├── MetadataStrip.tsx             # Branded header + footer chrome (∴ STRUCTURAL · PARALLELS)
-│   │   └── Crosshair.tsx                 # Animated reticle (maps, data emphasis)
+│   │   ├── Crosshair.tsx                 # Animated reticle (maps, data emphasis)
+│   │   ├── TitleBlock.tsx                # Shared title + subtitle positioning (all templates)
+│   │   ├── SectionIndicator.tsx          # Beat label overlay for FullEpisode
+│   │   ├── BrandImage.tsx                # SVG-filter image treatment (duotone + grain + border)
+│   │   ├── ShortsWrapper.tsx             # Render-prop shell for 9:16 Shorts (bg + title + safe area)
+│   │   ├── Transitions.tsx               # 9 transition types (cut/fade/dissolve/wipe/blur/color-wash/iris)
+│   │   ├── LayeredComposition.tsx        # [LAYERED:] mode — bg+fg compositing with blend/position/dim
+│   │   ├── HeaderStrip.tsx               # Top brand chrome (∴ PARALLAX wordmark + metadata) — wired into ALL templates
+│   │   ├── FooterStrip.tsx               # Bottom brand chrome (REC dot + runtime + FILED date) — wired into ALL templates
+│   │   ├── StratumSidebar.tsx            # Historical era bands for Stratum episode variant
+│   │   └── AntipodeDivider.tsx           # Vertical ∴ split for Antipode comparison episodes
 │   ├── hooks/
 │   │   ├── index.ts                      # Barrel export for all hooks
 │   │   ├── useCompositionAnimation.ts    # Auto Ken Burns drift + exit fade (wired into ALL templates)
+│   │   ├── useDirection.ts               # Bridge: _direction JSON → atmosphere/drift/hold for templates
 │   │   ├── useEntrance.ts                # Semantic element entrance presets (hero/content/data/label/structure)
-│   │   └── useDivider.ts                # Shared gradient divider animation
+│   │   ├── useDivider.ts                 # Shared gradient divider animation
+│   │   ├── useThemeMode.ts               # Mode-aware color tokens (text, accent, bg, shadow)
+│   │   └── useVerticalLayout.ts          # 9:16 layout tokens for Shorts (spacing, fonts, safe areas)
 │   ├── utils/
 │   │   ├── animation.ts                  # fadeIn, slideIn, stagger, springs, Ken Burns, exit fades
 │   │   └── depth.ts                      # Shadows, accent glows, bar gradients, card styles
@@ -83,14 +98,14 @@ remotion-templates/
 │       ├── SplitComposition/             # ✅ Antipode vertical split (Translator/Dialectician)
 │       ├── ProbabilityGauge/             # ✅ Confidence meters, market prices (Oracle format)
 │       ├── ImageComposite/               # ✅ Duotone photo treatment (Time Collapse cinematic)
-│       ├── Episodes/                     # ✅ Master compositions (EP01 — 24-clip Series)
+│       ├── Episodes/                     # ✅ Master compositions (silicon-trap — 24-clip Series)
 │       └── Shorts/                       # ✅ Vertical 9:16 variants for TikTok/YouTube Shorts
 │           ├── KineticShort.tsx           #    "Framework in 45 Seconds" series
 │           ├── DataChartShort.tsx         #    "The Market Says..." series
 │           └── SplitShort.tsx            #    "Both Sides Are Wrong" series
 ├── data/
 │   └── episodes/
-│       └── ep01/                         # 24 JSON data files for "The Silicon Trap"
+│       └── silicon-trap/                 # 24 JSON data files for "The Silicon Trap"
 │           ├── SEQUENCE.md               # Canonical render order (24 clips → 5 beats)
 │           ├── title-*.json              # 7 title/section/endcard files
 │           ├── choropleth-*.json         # 3 map compositions
@@ -204,7 +219,7 @@ Key values:
 1. Create a folder under `src/templates/YourTemplate/`
 2. Create: `types.ts` (data interfaces), `YourTemplate.tsx` (component), `index.tsx` (composition registration)
 3. Register in `src/Root.tsx` inside the appropriate `<Folder>`
-4. Add sample data in `data/episodes/ep01/`
+4. Add sample data in `data/episodes/<slug>/`
 
 ### Component pattern
 
@@ -295,6 +310,10 @@ Returns `{ progress, opacity, lineStyle, animatedSize }`.
 - `<MetadataStrip episodeNumber={1} episodeTitle="..." date="..." scale="..." variant="dark">` — branded header (∴ STRUCTURAL · PARALLELS) + footer (REC + scale + date)
 - `<Crosshair x={960} y={540} startFrame={30} size={64} color? opacity?>` — animated reticle with draw-in sequence (hairlines → outer circle → inner circle → dot pulse)
 - `<Callout annotations={[{type, x, y, ...}]} startFrame={n}>` — arrows, circles, and bracket annotations with staggered SVG draw-in
+- `<TitleBlock title="..." subtitle="..." mode={mode}>` — shared title positioning (all templates must use this)
+- `<TransitionWrapper transitionIn="fade" transitionOut="wipe-left" durationSec={0.6} durationInFrames={n}>` — 9 cinematic transition types for segment boundaries
+- `<LayeredComposition position="lower-third" backgroundDim={0.3} vignette>{{background: ..., foreground: ...}}</LayeredComposition>` — [LAYERED:] visual mode compositing
+- `<ShortsWrapper title="..." mode={mode}>{(vl, theme, frame, exit) => ...}</ShortsWrapper>` — render-prop shell for 9:16 Shorts with vertical layout tokens
 
 ## Rendering
 
@@ -338,27 +357,27 @@ Uses `@remotion/google-fonts` to preload all four Meridian brand fonts: Space Gr
 
 Expensive per-frame computations (Math.max, color scale builds, BFS layout, bar width calcs) are wrapped in `useMemo`. Pure sub-components (AnimatedBar, ComparisonBars, TreeNodeComponent, etc.) use `React.memo` to skip re-renders when frame-independent props haven't changed.
 
-## EP01 master composition (src/templates/Episodes/)
+## Episode master compositions (src/templates/Episodes/)
 
-A `<Series>` composition that stitches all 24 EP01 clips into one continuous ~191s video. 15-frame overlaps between clips provide cross-fade transitions. Render with `npx remotion render src/index.ts EP01 out/ep01-full.mp4`.
+A `<Series>` composition that stitches all clips into one continuous video. 15-frame overlaps between clips provide cross-fade transitions. Episode compositions use slug-based IDs (e.g., `silicon-trap`, `silicon-trap-full`). Render with `npx remotion render src/index.ts silicon-trap out/silicon-trap-full.mp4`.
 
 ## Rendering & Assembly
 
 Four render scripts live in `scripts/`:
 
-- **`render-ep01.sh`** — Bash version, straightforward. `bash scripts/render-ep01.sh` renders all 24 clips.
+- **`render-silicon-trap.sh`** — Bash version for silicon-trap. `bash scripts/render-silicon-trap.sh` renders all 24 clips.
 - **`render-episode.mjs`** — Node version, more robust (writes props to temp files to avoid shell escaping). Supports `--only=05,06` and `--from=16` for partial renders.
 - **`deploy-lambda.mjs`** — Deploys Remotion Lambda (function + S3 site). Run once, outputs env vars.
-- **`render-lambda.mjs`** — Renders via Lambda. `--comp=DataChart --props=...` for single clips, `--episode=ep01` for all 24.
+- **`render-lambda.mjs`** — Renders via Lambda. `--comp=DataChart --props=...` for single clips, `--episode=silicon-trap` for all 24.
 
 Local render scripts:
 - Read JSON data files, wrap as `{"data": ...}` props, pass to `npx remotion render`
-- Output numbered MP4s to `out/ep01/` (e.g., `01-title-episode.mp4`)
+- Output numbered MP4s to `out/silicon-trap/` (e.g., `01-title-episode.mp4`)
 - Support `--preview` mode (renders stills at frame 90 instead of MP4)
 - Support `--concat` to concatenate all clips into a preview reel via ffmpeg
 - Auto-detect Playwright Chromium for sandbox rendering
 
-**Sequence map:** `data/episodes/ep01/SEQUENCE.md` defines the canonical render order — which composition plays when, mapped to script beats.
+**Sequence map:** `data/episodes/silicon-trap/SEQUENCE.md` defines the canonical render order — which composition plays when, mapped to script beats.
 
 ## Testing
 
@@ -369,17 +388,18 @@ npm test              # Run all visual regression tests
 npm run test:baseline # Regenerate baselines after intentional changes
 ```
 
-## EP01 status: "The Silicon Trap"
+## silicon-trap status: "The Silicon Trap" (queued)
 
-- Script: v4 production format (episodes/EP01-silicon-trap/script-v4-production.md) — two-column with full visual specs
+- Script: v5 production format (episodes/silicon-trap/script-v4-production.md) — two-column with full visual specs
 - Shot list: 21 assets in shot-list.json (16 stock footage + 5 archival images) — ready for source.py
-- Data files: 24/24 generated from v3 — **need regeneration from v4** (some compositions changed)
+- Data files: 24/24 generated + assembly manifest with audio (estimate mode, 53 segments)
 - Visual QA (v3 data): 20/24 passed (4 maps need local Remotion Studio for CDN access)
 - Sequence map: Complete — 24 clips mapped to 5 beats + opening/closing
 - Render pipeline: Two scripts ready (bash + Node) + Lambda deploy script
 - Stock footage: Not yet sourced
 - Narration: Not yet recorded
 - Final assembly: Render clips → import to NLE → place on timeline with narration + B-roll
+- **Note:** Now queued behind `prisoners-dilemma` as launch candidate
 
 ## Known issues and constraints
 

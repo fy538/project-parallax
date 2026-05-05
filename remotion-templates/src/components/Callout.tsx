@@ -75,7 +75,6 @@ const estimatePathLength = (annotation: AnnotationItem): number => {
  */
 const bracketPath = (x: number, y: number, height: number): string => {
   const cornerWidth = 20;
-  const bracketWidth = 20;
   return `
     M ${x + cornerWidth} ${y}
     L ${x} ${y}

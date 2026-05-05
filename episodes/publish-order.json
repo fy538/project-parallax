@@ -1,0 +1,21 @@
+{
+  "$comment": "Episode numbers assigned at publish time. During development, use slugs only.",
+  "published": [],
+  "queue": [
+    {
+      "slug": "prisoners-dilemma",
+      "title": "The Prisoner's Dilemma Is Wrong About Almost Everything",
+      "state": "draft"
+    },
+    {
+      "slug": "silicon-trap",
+      "title": "The Silicon Trap",
+      "state": "draft"
+    },
+    {
+      "slug": "blockades-leak",
+      "title": "Why Technological Blockades Always Leak",
+      "state": "draft"
+    }
+  ]
+}

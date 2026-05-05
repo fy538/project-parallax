@@ -5,6 +5,8 @@
  * and pass it as inputProps to the composition.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 /** A single country's data for one phase of the animation. */
 export interface CountryData {
   /** Country name — must match the name in the TopoJSON file. */
@@ -37,7 +39,7 @@ export interface AnimationPhase {
 
 /** Full data input for the ChoroplethMap composition. */
 export interface ChoroplethMapData {
-  /** Episode identifier (e.g., "EP01"). */
+  /** Episode identifier (e.g., "silicon-trap"). */
   episode: string;
   /** Segment title. */
   title: string;
@@ -53,4 +55,10 @@ export interface ChoroplethMapData {
   phases: AnimationPhase[];
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
   backgroundTint?: string;
+  /** Map style mode — selects Mapbox style (Meridian Light or Meridian Dark). Default "light". */
+  backgroundVariant?: "light" | "dark";
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

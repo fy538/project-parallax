@@ -5,7 +5,7 @@ import { SankeyFlowSchema } from "./schema";
 import type { SankeyFlowData } from "./types";
 
 const sampleData: SankeyFlowData = {
-  episode: "EP01",
+  episode: "silicon-trap",
   title: "CHIPS ACT FUNDING FLOW",
   subtitle: "From authorization to disbursement",
   nodes: [

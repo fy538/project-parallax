@@ -6,6 +6,8 @@
  * shifts, spending timelines, etc.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface TimeSeriesPoint {
   /** X-axis value (year, date string, or number) */
   x: number | string;
@@ -86,4 +88,8 @@ export interface TimeSeriesChartData {
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
   backgroundTint?: string;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

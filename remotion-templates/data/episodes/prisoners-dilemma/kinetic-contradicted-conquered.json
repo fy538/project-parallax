@@ -1,0 +1,9 @@
+{
+  "episode": "prisoners-dilemma",
+  "variant": "statistic",
+  "statValue": "Contradicted by its own first experiment.",
+  "statLabel": "Conquered the world anyway.",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "light",
+  "durationSec": 4
+}

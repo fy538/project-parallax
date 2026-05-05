@@ -55,16 +55,28 @@ Created: April 26, 2026
 
 **Budget rule:** Avoid premium archival unless the moment is load-bearing (P1 visual at an emotional climax). Most Parallax episodes should cost $0-50 in footage beyond the Storyblocks subscription.
 
-### Tier 5 — AI-Generated (Supplementary)
+### Tier 5 — AI-Generated Video (Fourth Visual Mode)
 
-| Tool | Strength | Limitation |
-|---|---|---|
-| **Runway Gen-3/4** | Best quality, good motion | $12-76/month, ~10s clips |
-| **Kling** | Good for cinematic establishing shots | Quality varies, longer gen times |
-| **Sora** | High quality when available | Limited access |
-| **Pika** | Quick, stylized | Less photorealistic |
+AI-generated video is now a full production mode (`[AI-GEN:]`) for Parallax, not just supplementary filler. See **AI_VIDEO_PIPELINE.md** for the complete specification. The approach: realistic environments + stylized mannequin-face figures, clearly signaling "editorial visualization, not documentary footage."
 
-**When to use AI footage:** Abstract establishing shots where photorealism isn't critical — "circuit board landscape at dawn," "abstract data flowing through networks," atmospheric backgrounds behind MG overlays. Not for anything that needs to look like a real place or person.
+| Tool | Strength | Best For | Cost (May 2026) |
+|---|---|---|---|
+| **Kling 3.0** (primary) | Native 4K, multi-shot consistency, 3D subject anchoring | Environments, facilities, industrial spaces | ~$4/min ($37/mo pro) |
+| **Sora 2 Pro** (secondary) | Director Mode (re-shoot angles), storyboard (5 keyframes) | Multi-angle sequences of same space | Included in ChatGPT Pro ($200/mo) |
+| **Runway Gen-4** (tertiary) | 95% character identity lock, best camera control | Sequences with same figure across shots | Mid-tier |
+| **Midjourney v7 / Flux 2** (reference) | Reference frame generation | Style-locking the first frame before animation | $30/mo |
+
+**Workflow:** Generate a reference frame (Midjourney/Flux 2) → animate with Kling 3.0 image-to-video → brand treatment via `treat_video.py` → NLE timeline.
+
+**When to use AI-GEN footage:**
+- Facilities/interiors that can't be filmed (TSMC fabs, military command, classified labs)
+- Historical reconstructions (pre-camera events, closed-door meetings)
+- Conceptual scenes made physical (supply chains as corridors, sanctions as barriers)
+- Scenario/counterfactual sequences ("what if" futures)
+
+**When NOT to use it:** When stock footage exists and works, for named real individuals, as evidence for factual claims, when MG would communicate the point more precisely.
+
+**Budget:** ~$8-10/episode for 60-90 seconds of AI-GEN content (10-15 clips). The true incremental monthly cost is ~$37 (Kling sub) since Midjourney and ChatGPT Pro are already in the stack.
 
 ---
 
@@ -112,37 +124,44 @@ These require archival purchases, creative workarounds, or acceptance of imperfe
 | Visual Need | Challenge | Workaround |
 |---|---|---|
 | **Named individuals** (Morris Chang, Jake Sullivan, Xi Jinping) | Likeness rights, editorial use only | Wikimedia Commons press photos + Ken Burns pan. Accept still images instead of video. |
-| **Specific facilities** (TSMC Arizona, SMIC Shanghai) | Not publicly accessible, no stock footage exists | Company press photos + brand treatment. Generic cleanroom footage as stand-in. Satellite imagery from Google Earth (check ToS). |
-| **Specific historical events** (1941 embargo signing, Pearl Harbor) | Need period-accurate archival | Library of Congress, National Archives, Archive.org. Accept black-and-white stills with treatment. |
-| **Classified/restricted tech** (EUV machine interior, Kirin chip die) | Doesn't exist in stock libraries | Published teardown photos (TechInsights, iFixit) for chips. ASML press photos for EUV machines. Diagrams as MG alternative. |
+| **Specific facilities** (TSMC Arizona, SMIC Shanghai) | Not publicly accessible, no stock footage exists | Company press photos + brand treatment. Generic cleanroom footage as stand-in. Satellite imagery from Google Earth (check ToS). **Or: AI-GEN interior walkthrough (preferred for immersion).** |
+| **Specific historical events** (1941 embargo signing, Pearl Harbor) | Need period-accurate archival | Library of Congress, National Archives, Archive.org. Accept black-and-white stills with treatment. **Or: AI-GEN reconstruction with editorial LUT (for pre-camera events).** |
+| **Classified/restricted tech** (EUV machine interior, Kirin chip die) | Doesn't exist in stock libraries | Published teardown photos (TechInsights, iFixit) for chips. ASML press photos for EUV machines. Diagrams as MG alternative. **Or: AI-GEN interior visualization (conceptual, not claiming accuracy).** |
 | **Corporate logos/branding** (TSMC, Huawei, NVIDIA, DeepSeek) | Trademark restrictions | Press kit logos for editorial use. Screen recordings of company websites. Avoid prominent display. |
 | **Branded products** (specific phones, chips, hardware) | Product placement concerns | Macro shots that don't show logos. Generic "smartphone internals" instead of "iPhone 16 board." |
 | **Conflict zones / sanctions imagery** | Sensitive, potentially misleading | Avoid. Use maps (MG) to show geographic conflict. Footage of conflict areas risks emotional manipulation. |
 
-### Unsourceable (Use MG Instead)
+### Unsourceable (Use MG or AI-GEN)
 
-Some things the script might call for simply can't be photographed. These are motion graphic moments in disguise.
+Some things the script might call for simply can't be photographed. These are either motion graphic moments (when the concept is structural/data-driven) or AI-GEN moments (when the concept benefits from physical/spatial visualization).
 
-| Visual Need | Why It's Unsourceable | MG Alternative |
-|---|---|---|
-| "Supply chain complexity" | Abstract concept, not a physical thing | RouteAnimation with multi-phase reveal |
-| "Technology denial" | Policy concept | ChoroplethMap or FrameworkDiagram |
-| "Economic integration" | Structural relationship | FrameworkDiagram comparison |
-| "The trap" | Metaphor | KineticTypography dramatic reveal |
-| "Bifurcation of standards" | Future/hypothetical | RouteAnimation splitting into two paths |
-| "Revenue sharing deal" | Financial abstraction | KineticTypography or DataChart |
+| Visual Need | Why It's Unsourceable | MG Alternative | AI-GEN Alternative |
+|---|---|---|---|
+| "Supply chain complexity" | Abstract concept, not a physical thing | RouteAnimation with multi-phase reveal | Corridor/warehouse with branching paths (conceptual scene) |
+| "Technology denial" | Policy concept | ChoroplethMap or FrameworkDiagram | Sealed door / barrier scene with figure approaching |
+| "Economic integration" | Structural relationship | FrameworkDiagram comparison | Buildings/infrastructure physically merging |
+| "The trap" | Metaphor | KineticTypography dramatic reveal | MG still better (pure abstraction) |
+| "Bifurcation of standards" | Future/hypothetical | RouteAnimation splitting into two paths | Physical corridor splitting into two divergent paths |
+| "Revenue sharing deal" | Financial abstraction | KineticTypography or DataChart | MG still better (numbers-driven) |
+| "Restricted facility interior" | Access denied, no stock exists | Diagrams or generic stock stand-in | **AI-GEN primary choice** — realistic interior walkthrough |
+| "Historical closed-door event" | Pre-camera or no footage survives | Archival photos + Ken Burns | **AI-GEN primary choice** — period reconstruction with editorial LUT |
+| "Future scenario" | Hasn't happened yet | FrameworkDiagram or timeline | **AI-GEN primary choice** — visualized future state |
+
+**Decision rule:** If the concept is *structural* (data, relationships, comparisons) → MG. If the concept is *spatial/physical* (a place, a scene, a moment) → AI-GEN. If it's purely abstract with no spatial metaphor → MG.
 
 ---
 
 ## The Source-Check Habit
 
-When writing a script, every `[FOOTAGE:]` tag should pass this quick mental check:
+When writing a script, every `[FOOTAGE:]` and `[AI-GEN:]` tag should pass this quick mental check:
 
-1. **Does this physically exist as something a camera could capture?** If not → MG.
-2. **Is it generic (any cleanroom) or specific (TSMC's Arizona cleanroom)?** Generic → Storyblocks/free. Specific → check "Hard to Source" table.
-3. **Does it involve a named person?** → Wikimedia Commons press photo, accept a still image with Ken Burns.
-4. **Is it historical?** → Library of Congress, National Archives, Archive.org first. Check public domain status.
-5. **Is it Chinese-specific?** → Pexels and Storyblocks have growing libraries of Chinese city footage. Named Chinese facilities and individuals are the hardest to source.
+1. **Does this physically exist as something a camera could capture?** If not → MG (for structural concepts) or AI-GEN (for spatial/physical concepts).
+2. **Can it be sourced?** Check the sourcability tiers above. If "Hard to Source" or "Unsourceable" → consider AI-GEN as the primary approach.
+3. **Is it generic (any cleanroom) or specific (TSMC's Arizona cleanroom)?** Generic → Storyblocks/free. Specific and unsourceable → AI-GEN.
+4. **Does it involve a named person?** → Wikimedia Commons press photo, accept a still image with Ken Burns. Never AI-GEN for named individuals.
+5. **Is it historical?** → Library of Congress, National Archives, Archive.org first. If no footage/photos exist for the event → AI-GEN with editorial LUT.
+6. **Is it Chinese-specific?** → Pexels and Storyblocks have growing libraries of Chinese city footage. Named Chinese facilities (SMIC interiors, etc.) → AI-GEN.
+7. **Would AI-GEN add immersion beyond what stock provides?** If generic stock adequately covers it, don't reach for AI-GEN. Use AI-GEN when it provides specificity and immersion that stock can't match.
 
 ---
 
@@ -156,11 +175,12 @@ For a typical 18-minute Parallax episode:
 | Subject-specific B-roll (cleanrooms, factories) | 3-5 clips | Storyblocks + company press | $0 (subscription) |
 | Archival photos (historical, named people) | 3-6 stills | Wikimedia, Library of Congress, National Archives | $0 (public domain) |
 | Premium archival (specific news footage) | 0-2 clips | AP Archive, Getty, Reuters | $0-400 |
-| AI-generated establishing shots | 0-3 clips | Runway, Kling | $0-15 |
-| **Total per episode** | | | **$0-415** |
+| AI-generated video ([AI-GEN:] mode) | 8-15 clips | Kling 3.0 + Sora 2 + Midjourney refs | $8-10 |
+| **Total per episode** | | | **$8-425** |
 | **Storyblocks annual subscription** | | | **$200/year** |
+| **Kling 3.0 Pro** | | | **$37/month** |
 
-Most episodes should be $0-50 beyond the subscription. Save the premium archival budget for 1-2 hero moments per episode that absolutely need authentic footage.
+Most episodes should be $8-50 beyond the subscriptions. The AI-GEN clips often *replace* what would have been expensive premium archival purchases — a $8 AI-GEN reconstruction is usually better than a $200 AP Archive clip that doesn't quite match what you need. Save the premium archival budget for moments where authentic real-world footage is irreplaceable (named people, specific public events).
 
 ---
 

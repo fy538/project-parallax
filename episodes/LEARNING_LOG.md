@@ -23,7 +23,7 @@ After 3+ episodes, look for the "Cumulative Patterns" section at the bottom — 
 <!--
 Template for each episode entry (publish-retro generates this):
 
-## EP[XX]: [Title]
+## [episode-slug]: [Title]
 **Publish Date:** [date]
 **Analysis Date:** [date]
 **Days Live:** [X days at analysis]

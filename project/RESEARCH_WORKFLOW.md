@@ -1,9 +1,10 @@
 # Parallax — Research Workflow
 
 ## Purpose
-The complete research-to-production workflow using Claude.ai Deep Research + Cowork as a hybrid pipeline. This document defines the Claude.ai Projects to create, the custom instructions and files for each, the prompt templates for every research stage, and the handoff points between tools.
+The complete research-to-production workflow using Claude.ai Deep Research + Cowork as a hybrid pipeline. This document defines the Claude.ai Projects to create, the custom instructions and files for each, the prompt templates for every research stage (including 3-pass research and cross-domain connection hunting), signal monitoring workflow, and the handoff points between tools.
 
 Created: April 26, 2026
+Updated: May 1, 2026
 
 ---
 
@@ -192,8 +193,9 @@ The channel occupies a specific niche between academic rigor and narrative intri
 The core product of Parallax is surprising cross-domain connections at high density. Every brief should surface 4-5 genuinely unexpected connections across history, philosophy, game theory, civilizational analysis, economics, literature, and science. "Obvious" connections (empires rise and fall) are not valuable. "Surprising" connections (Venice's Murano glass monopoly shares island-concentration logic with TSMC in Taiwan) are electric. Think across civilizations and centuries — Chinese, Islamic, Roman, Venetian, Ottoman, Mongol. The scriptwriter will select 2-3 for the final script, but the research phase should produce a rich menu of cross-domain links ranked by resonance.
 
 ## Tone Guidelines
-ALWAYS use: "structural resonance," "echoes," "rhymes," "pattern," "what if we consider," "this suggests," "one reading of this is"
-NEVER use: "this proves," "this inevitably leads to," attribution to secret cabals, declarative predictions about specific future events
+ALWAYS use: "structural resonance," "echoes," "rhymes," "pattern," "what if we consider," "this suggests," "one reading of this is," "if this pattern holds," "the structural logic points toward," "here's what I'm watching for"
+NEVER use: "this proves," "this inevitably leads to," attribution to secret cabals
+NOTE: Forward-looking claims are encouraged when framed as structural analysis with named uncertainty. "The structural incentives suggest X within 18 months (roughly 60% confidence) — but if Y happens, this thesis breaks" is good speculation. "X will inevitably happen" is bad. The line is between transparent reasoning under uncertainty and false certainty.
 
 ## Research Brief Structure
 Every brief must include ALL of the following sections:
@@ -248,6 +250,14 @@ Every brief must include ALL of the following sections:
 - CN localization notes (key Chinese terms, framing differences for eventual Bilibili adaptation)
 - SEO-relevant title suggestions (3-4 options)
 
+### SECTION 9: SPECULATIVE IMPLICATIONS
+The research should not end at "here's what happened and why." Push into "if this pattern holds, here's what to watch for." This section operationalizes the Oracle identity direction.
+
+- **Named scenarios (2-3):** Each scenario should have a memorable name, a rough probability estimate (gut feel is fine — the point is forcing you to quantify uncertainty), a structural rationale (why this scenario follows from the episode's analysis), and a timeframe. Example: "The Murano Scenario (40%, 2-3 years): TSMC's geographic concentration follows the same vulnerability trajectory as Venice's glass monopoly — a single event could shatter the supply chain."
+- **Falsifiable prediction (1-2):** A concrete, testable claim the episode makes that could be checked in 6-24 months. "If X happens by Y date, this thesis is strengthened/weakened." These become the raw material for future "Was I Right?" episodes.
+- **"What would change my mind" (1-2):** The strongest evidence that would contradict the episode's thesis. This is the ultimate credibility signal — it shows the audience you're reasoning, not advocating.
+- **Watch signals:** 2-3 specific, observable things (policy announcements, market movements, data releases) the audience can track themselves. This turns passive viewers into active pattern-watchers.
+
 ## Quality Standards
 - Every historical claim must have a source
 - Every analogy must include where it breaks down
@@ -262,7 +272,7 @@ Every brief must include ALL of the following sections:
 1. **PROJECT_VISION.md** — full document (content philosophy, pillars, competitive positioning, voice profile)
 2. **CONTENT_RISK_PLAYBOOK.md** — full document (editorial red lines, historical analogy shield, monetization triggers)
 3. **SEO_KEYWORDS.md** — full document (keyword strategy, title patterns)
-4. **EP01 brief.md** — upload the EP01-silicon-trap/brief.md as a **gold-standard example** of what a good research brief looks like. This is the single most valuable upload — it shows the AI what "good" looks like for your specific channel.
+4. **silicon-trap brief.md** — upload the silicon-trap/brief.md as a **gold-standard example** of what a good research brief looks like. This is the single most valuable upload — it shows the AI what "good" looks like for your specific channel.
 
 **Per-episode additions:** When starting research for a new episode, upload any relevant prior research, the topic candidate output from the Topic Radar, and any specific sources you want investigated.
 
@@ -292,7 +302,7 @@ Specific questions I want answered:
 IMPORTANT — KNOWLEDGE DENSITY REQUIREMENT:
 The core product of every Parallax episode is surprising cross-domain connections. For Section 3 (Cross-Domain Connections), cast the net wide across history, philosophy, game theory, civilizational analysis, economics, literature, and science. I need 4-5 genuinely surprising connections, not just 1-2 obvious historical parallels. "Obvious" means an educated viewer would already know the connection; "surprising" means they'd think "I never would have put those two things together." Think across civilizations and centuries — if there's a Chinese, Islamic, Roman, Venetian, or Ottoman parallel that shares structural logic with this topic, surface it. Rank by resonance and flag the top 2-3 for the script.
 
-Produce a complete research brief following the standard 8-section structure. Use the EP01 brief as the quality benchmark.
+Produce a complete research brief following the standard 9-section structure (including Section 9: Speculative Implications — named scenarios, falsifiable predictions, "what would change my mind"). Use the EP01 brief as the quality benchmark.
 ```
 
 **Historical Deep Dive (supplementary — when you need more depth on a specific parallel):**
@@ -347,6 +357,91 @@ Specifically check:
 Flag anything that requires script revision. Distinguish between minor updates (add to description/footnotes) and major updates (requires structural changes to the argument).
 ```
 
+**Pass 2 — Cross-Domain Connection Hunt (NEW — run after the foundation sweep):**
+```
+I have a foundation research brief for Parallax Episode [NUMBER]: "[WORKING TITLE]"
+
+The brief identified these structural concepts at the core of the topic:
+- [CONCEPT 1, e.g., "monopoly through geographic concentration"]
+- [CONCEPT 2, e.g., "technology denial as geopolitical leverage"]
+- [CONCEPT 3, e.g., "the trap of weaponizing interdependence"]
+
+I need you to hunt for surprising cross-domain connections that the initial
+research didn't surface. For EACH structural concept above, search across
+these domains for cases where the SAME structural mechanism operated:
+
+Domains to search:
+- Chinese imperial history (Han, Tang, Song, Ming, Qing dynasties)
+- Islamic golden age and Ottoman Empire
+- Roman Republic and Empire
+- Venetian Republic and Italian city-states
+- Mongol Empire and steppe confederations
+- British Empire and colonial economics
+- Game theory and mechanism design
+- Philosophy of science and epistemology
+- Ecology and complex systems
+- Literature and mythology
+
+For each connection you find:
+1. Name the domain, period, and specific case
+2. Identify the shared structural mechanism (not just surface similarity)
+3. Rate surprise level: would an educated viewer find this genuinely unexpected?
+4. Note where the analogy breaks (mandatory — never skip this)
+5. Assess source quality: can this be verified with academic/primary sources?
+
+I'm looking for 3-5 NEW connections beyond what the initial brief found.
+Rank by resonance (surprise × structural depth × source quality).
+The best connections are ones where the viewer thinks "I never would have
+put those two things together" — and then realizes the structural logic
+is undeniable.
+
+[Paste the brief's Section 3 so the AI knows what was already found]
+```
+
+**Pass 3 — Verification + Depth (run on the strongest connections):**
+```
+I'm finalizing the research brief for Parallax Episode [NUMBER].
+
+These are the top 3 cross-domain connections from Passes 1 and 2:
+
+Connection 1: [BRIEF DESCRIPTION]
+Connection 2: [BRIEF DESCRIPTION]
+Connection 3: [BRIEF DESCRIPTION]
+
+For each connection, I need:
+1. PRIMARY SOURCES: Find the actual academic papers, historical records,
+   or scholarly analysis that support this structural parallel. News articles
+   are not sufficient — I need sources a historian or philosopher would accept.
+2. MECHANISM VERIFICATION: Confirm that the structural mechanism is genuinely
+   the same, not just superficially similar. Map the specific actors, incentives,
+   and dynamics in both cases.
+3. BREAK-POINT ANALYSIS: Give me 2-3 specific, substantive ways each analogy
+   fails. Not "different time period" — structural differences that change
+   the expected outcome.
+4. SCHOLARLY PRECEDENT: Has anyone drawn this parallel before in academic
+   writing? If yes, what did they get right and wrong? If no, that's interesting
+   — note it as a novel connection.
+5. TOXIN-LINE CHECK: Could presenting this connection be read as conspiracy
+   thinking? Where's the line between "structural resonance" (legitimate)
+   and "causal proof" (overclaiming)?
+
+Also verify these load-bearing claims from the brief:
+[Paste the top 5 unverified claims that anchor key narrative beats]
+
+Finally, produce SECTION 9 — SPECULATIVE IMPLICATIONS:
+1. Name 2-3 scenarios for how this situation evolves over the next 1-3 years.
+   Give each a memorable name, a rough probability, and a structural rationale
+   grounded in the episode's analysis. The scenarios should follow from the
+   cross-domain connections — if the Venice parallel holds, what does that predict?
+2. State 1-2 falsifiable predictions the episode can make. Concrete enough to
+   check in 6-24 months. "If [observable event] happens by [date], this thesis
+   is [strengthened/weakened]."
+3. Identify 1-2 "what would change my mind" factors — the strongest evidence
+   that would undermine the thesis.
+4. List 2-3 watch signals the audience can track themselves (specific data
+   releases, policy announcements, market indicators).
+```
+
 **Fact-Check Pass (supplementary — run before finalizing script):**
 ```
 Fact-check the following claims from the Episode [NUMBER] brief/script.
@@ -361,33 +456,83 @@ For each claim:
 
 ---
 
+## Signal Monitoring Workflow
+
+### Purpose
+Feed the topic pipeline (IDEAS.md → Signal Watch List) with a lightweight weekly scanning habit. This is not a research session — it's pattern detection.
+
+### Weekly Scan (~30 min)
+
+**Step 1: Check primary sources (15 min)**
+Scan 5-7 sources relevant to your active arcs. You don't need to read everything — scan headlines, abstracts, and opening paragraphs for patterns.
+
+Recommended source stack (customize per active arcs):
+- **Geopolitical analysis:** Foreign Affairs, The Economist (leaders + briefings), Financial Times (geopolitics + tech sections)
+- **Think tanks:** CSIS, Council on Foreign Relations, Brookings (skim latest publications)
+- **Prediction markets:** Kalshi, Polymarket, Metaculus — check for new contracts, price movements, and volume spikes on topics adjacent to your arcs
+- **Academic preprints:** SSRN (political science, economics), arXiv (AI/tech policy) — skim new papers relevant to active arcs
+- **Competitor channels:** Check latest uploads from CaspianReport, PolyMatter, RealLifeLore, Wendover — note what they're covering and what questions their comment sections are asking
+
+**Step 2: Apply the 3-point signal test (5 min)**
+For anything interesting, ask:
+1. Does this appear in 3+ independent, credible sources?
+2. Are the signals clustering temporally (same month/quarter)?
+3. Can I articulate a causal mechanism for why this is happening?
+
+If 2/3 pass → add to Signal Watch List in IDEAS.md with source notes.
+If 3/3 pass → consider promoting to 📡 SIGNAL on a specific arc topic.
+
+**Step 3: Check incubating topics (10 min)**
+Review topics in 🔄 INCUBATING state. Has anything changed? Has a trigger event occurred? Has new research been published that confirms or denies depth? Update "Last Checked" dates.
+
+### Monthly Review (~15 min)
+- Which signals have strengthened? Promote any that now pass the viability check.
+- Which signals have faded? Archive or demote.
+- Are any arcs running low on viable topics? Seed the Topic Radar with targeted prompts.
+- Update Google Trends for 8-12 core keywords. Flag any with rising 90-day trajectories.
+
+---
+
 ## The Handoff: Deep Research → Cowork
 
 ### Step-by-step per-episode workflow
 
-**Monday — Topic Selection (~10 min total)**
-1. Open Claude.ai → "Parallax — Topic Radar" project
-2. Run the Weekly Scan prompt with Deep Research enabled
-3. Review 3-5 candidates, pick one
-4. Optionally add a one-line angle
+**Monday — Signal Monitoring + Topic Selection (~15 min total)**
+1. Weekly signal scan (see Signal Monitoring Workflow above)
+2. Open Claude.ai → "Parallax — Topic Radar" project (if new topics needed)
+3. Run the Weekly Scan prompt with Deep Research enabled
+4. Review 3-5 candidates against IDEAS.md pipeline
+5. Pick next topic from VIABLE pipeline, or promote a new candidate
+6. Optionally add a one-line angle
 
-**Tuesday/Wednesday — Deep Research (~30 min total)**
+**Monday — Viability Check (~5 min)**
+1. For the selected topic, write the 5-question viability brief (see PRODUCTION_PIPELINE.md → Stage 2)
+2. If VIABLE → proceed to research. If INCUBATING → pick another topic from pipeline.
+3. Run competitive landscape check: search YouTube for the topic, scan top 3-5 videos and their comment sections, identify the angle gap
+
+**Tuesday/Wednesday — Deep Research, 3-pass (~30 min total)**
 1. Open Claude.ai → "Parallax — Episode Research" project
-2. Run the Full Episode Research prompt with Deep Research enabled (~5-15 min processing)
-3. Review the output, note any gaps
-4. Run 1-2 supplementary prompts if needed (historical deep dive, framework investigation)
-5. Save the final brief: copy the output, paste into a new file at `episodes/EP[XX]-[slug]/brief.md`
+2. **Pass 1 — Foundation Sweep:** Run the Full Episode Research prompt with Deep Research enabled (~5-15 min processing). Review the output.
+3. **Bridge step (Cowork):** Save/paste the Pass 1 output into Cowork. Say "bridge" or "generate pass 2" — the `research-bridge` skill reads the brief, extracts structural concepts and connections, and generates ready-to-paste Pass 2 and Pass 3 prompts. No manual editing needed.
+4. **Pass 2 — Cross-Domain Connection Hunt:** Paste the generated Pass 2 prompt into Claude.ai. This is where the genuinely surprising connections get surfaced.
+5. **Pass 3 — Verification + Depth:** Paste the generated Pass 3 prompt (update top connections if Pass 2 surfaced better ones). Confirm primary sources exist and break-point analysis is substantive.
+6. Merge all passes into the final brief: save to `episodes/<slug>/brief.md`
 
-**Thursday — Script Development (~45 min total, mostly in Cowork)**
-1. Open Cowork
-2. Ask Cowork to read the brief and draft a script following the narrative arc
-3. Run script-audit skill on the draft
-4. Run persona-eval skill on the draft
-5. Human review and rewrite (~30 min) — this is the most important human checkpoint
+**Wednesday — Research Audit + Angle Memo (~15 min)**
+1. Open Cowork, run research-audit skill on the brief
+2. If READY FOR SCRIPTING → run angle memo step
+3. Tiger reviews angle memo (~5 min)
+
+**Wednesday–Thursday — Script Development (~45 min total, mostly in Cowork)**
+1. Script draft from brief + angle memo
+2. Radio edit test (narration-only read)
+3. visual-concept → script-audit → persona-eval → review-package
+4. Human review and rewrite (~30 min)
+5. Title/hook workshop → Tiger approves (~5 min)
 
 **Friday/Saturday — Production (Cowork + Human)**
 1. Run visual-spec skill to generate JSON data files from the approved script
-2. Render Remotion templates
+2. Asset sourcing → source-feedback → image treatment → Remotion render → render-qa
 3. Record narration
 4. Assembly
 
@@ -401,17 +546,21 @@ For each claim:
 ## Maintenance
 
 ### Weekly
-- Update IDEAS.md in the Topic Radar project (so arc status stays current)
+- Signal monitoring scan (see Signal Monitoring Workflow)
+- Update IDEAS.md pipeline states and "Last Checked" dates
 - Save successful briefs as examples (the more gold-standard examples the Episode Research project has, the better its output gets)
 
 ### Monthly
+- Monthly signal review (see Signal Monitoring Workflow → Monthly Review)
 - Review which prompt templates are working well vs. needing revision
 - Check if custom instructions need updating based on lessons learned
 - Update SEO_KEYWORDS.md with new keyword data from YouTube Studio analytics
+- Review 90-day rolling calendar and sequencing (see PRODUCTION_PIPELINE.md → Episode Sequencing)
 
 ### Per-Arc
 - When starting a new arc, upload any arc-specific research to the Episode Research project
 - Update the Topic Radar with the new arc's macro question
+- Seed the Signal Watch List with relevant keywords and sources for the new arc
 
 ---
 
@@ -440,4 +589,4 @@ This is the long-term vision from PRODUCTION_PIPELINE.md. The manual workflow ab
 - IDEAS.md — active arcs and topic backlog
 - SEO_KEYWORDS.md — keyword strategy for titling
 - CONTENT_RISK_PLAYBOOK.md — editorial guidelines the research must respect
-- EP01-silicon-trap/brief.md — gold-standard example of a research brief
+- silicon-trap/brief.md — gold-standard example of a research brief

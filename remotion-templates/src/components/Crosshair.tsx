@@ -20,7 +20,6 @@ import { useCurrentFrame } from "remotion";
 import { interpolate, Easing } from "remotion";
 import {
   dark,
-  palette,
   durations,
   crosshair as crosshairConfig,
 } from "../design/theme";

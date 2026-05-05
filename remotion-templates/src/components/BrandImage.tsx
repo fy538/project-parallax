@@ -12,8 +12,8 @@
  * for preview/batch processing outside Remotion.
  *
  * Usage:
- *   <BrandImage src={staticFile("assets/ep01/tsmc-aerial.jpg")} />
- *   <BrandImage src={staticFile("assets/ep01/pearl-harbor.jpg")} ramp="conflict" />
+ *   <BrandImage src={staticFile("assets/silicon-trap/tsmc-aerial.jpg")} />
+ *   <BrandImage src={staticFile("assets/silicon-trap/pearl-harbor.jpg")} ramp="conflict" />
  *   <BrandImage src={url} ramp="editorial" composite="inset" opacity={0.7} />
  *
  * Composite modes:
@@ -24,8 +24,9 @@
  */
 
 import React, { useMemo } from "react";
-import { AbsoluteFill, Img, staticFile } from "remotion";
-import { duotone, palette } from "../design/theme";
+import { AbsoluteFill, Img, staticFile, random, useCurrentFrame, interpolate } from "remotion";
+import { duotone } from "../design/theme";
+import { CLAMP } from "../utils/animation";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -52,6 +53,20 @@ interface BrandImageProps {
   noGrain?: boolean;
   /** Disable vignette */
   noVignette?: boolean;
+  /**
+   * Animated saturation transition. If provided, the saturation value
+   * animates from `animateSaturation.from` to `animateSaturation.to`
+   * over the specified frame range. Useful for:
+   *   - Concept callbacks: full color → grayscale (exit emphasis)
+   *   - Re-introductions: grayscale → color (enter emphasis)
+   *   - Progressive desaturation during analytical segments
+   */
+  animateSaturation?: {
+    from: number;
+    to: number;
+    startFrame: number;
+    endFrame: number;
+  };
   /** CSS object-fit (default: "cover") */
   fit?: React.CSSProperties["objectFit"];
   /** CSS object-position (default: "center") */
@@ -96,13 +111,25 @@ export const BrandImage: React.FC<BrandImageProps> = ({
   vignetteStrength = 0.18,
   noGrain = false,
   noVignette = false,
+  animateSaturation,
   fit = "cover",
   position = "center",
   alt = "",
   style,
   children,
 }) => {
+  const frame = useCurrentFrame();
   const finalOpacity = opacity ?? COMPOSITE_OPACITY[composite];
+
+  // Animated saturation — interpolate between from/to over frame range
+  const effectiveSaturation = animateSaturation
+    ? interpolate(
+        frame,
+        [animateSaturation.startFrame, animateSaturation.endFrame],
+        [animateSaturation.from, animateSaturation.to],
+        CLAMP
+      )
+    : saturation;
 
   // Get duotone colors
   const rampColors = duotone[ramp];
@@ -112,7 +139,7 @@ export const BrandImage: React.FC<BrandImageProps> = ({
 
   // Unique filter ID to avoid collisions when multiple BrandImages are on screen
   const filterId = useMemo(
-    () => `brand-treatment-${ramp}-${Math.random().toString(36).slice(2, 8)}`,
+    () => `brand-treatment-${ramp}-${random(`brand-${ramp}`).toString(36).slice(2, 8)}`,
     [ramp]
   );
 
@@ -138,8 +165,8 @@ export const BrandImage: React.FC<BrandImageProps> = ({
       >
         <defs>
           <filter id={filterId} colorInterpolationFilters="sRGB">
-            {/* Step 1: Desaturate */}
-            <feColorMatrix type="saturate" values={String(saturation)} />
+            {/* Step 1: Desaturate (uses animated value when animateSaturation provided) */}
+            <feColorMatrix type="saturate" values={String(effectiveSaturation)} />
 
             {/* Convert to luminance for duotone mapping */}
             <feColorMatrix

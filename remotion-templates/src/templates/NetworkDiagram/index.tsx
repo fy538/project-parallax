@@ -6,7 +6,7 @@ import type { NetworkDiagramData } from "./types";
 
 // Sample data for Remotion Studio preview
 const sampleData: NetworkDiagramData = {
-  episode: "EP01",
+  episode: "silicon-trap",
   title: "SEMICONDUCTOR SUPPLY CHAIN",
   subtitle: "No country can replicate this alone",
   layout: "horizontal-chain",

@@ -10,4 +10,4 @@ Key quotes and definitions appearing on screen with animation. Supports:
 
 **Data input:** Quote text, attribution, optional Chinese/pinyin pair.
 
-**EP01 use case:** Morris Chang: "Globalization is almost dead."
+**silicon-trap use case:** Morris Chang: "Globalization is almost dead."

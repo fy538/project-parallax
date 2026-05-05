@@ -1,0 +1,35 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Building What PD Assumes Away",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Ostrom's Principles",
+      "icon": "✓",
+      "items": [
+        "Clear boundaries → Identity",
+        "Graduated sanctions → Reputation",
+        "Collective decisions → Communication",
+        "Monitoring → Repeated interaction",
+        "Right to self-organize → Institutional context",
+        "Nested governance → Commitment capacity"
+      ],
+      "color": "#E5A544"
+    },
+    {
+      "title": "PD Assumptions Resolved",
+      "icon": "✗",
+      "items": [
+        "Anonymous → Known members",
+        "No reputation → Graduated consequences",
+        "No communication → Collective voice",
+        "One-shot → Ongoing",
+        "No institutions → Self-governed",
+        "No commitment → Nested structure"
+      ],
+      "color": "#888780"
+    }
+  ],
+  "durationSec": 10,
+  "backgroundVariant": "light"
+}

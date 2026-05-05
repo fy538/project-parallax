@@ -1,0 +1,974 @@
+{
+  "_comment": "Template Decision Registry — maps narrative moments and use cases to templates. Used by visual-spec skill, script writers, and human review. Last updated: May 2, 2026",
+  "useCases": [
+    {
+      "category": "COMPARISONS",
+      "id": "comparison-two-sided",
+      "question": "Comparing two opposing concepts, strategies, or entities side by side?",
+      "keywords": ["vs", "compare", "contrast", "versus", "difference", "paradigm", "two sides"],
+      "primary": {
+        "template": "SplitComposition",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "FrameworkDiagram",
+          "variant": "comparison",
+          "when": "When you want to compare attributes, strengths, or characteristics in columnar format instead of stark left/right division"
+        },
+        {
+          "template": "DataChart",
+          "variant": "comparison",
+          "when": "When the comparison is quantitative (value pairs) rather than qualitative"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for the thesis statement or dividing label)",
+        "ImageComposite (for visual weight on each side)"
+      ],
+      "examples": [
+        "Chess vs Go strategic paradigms",
+        "US vs China trade policy philosophies",
+        "Containment vs Engagement approaches",
+        "Western lens vs Chinese lens on the same event"
+      ]
+    },
+    {
+      "category": "COMPARISONS",
+      "id": "comparison-multi-factor",
+      "question": "Comparing 3+ options or factors on multiple dimensions?",
+      "keywords": ["multi-way", "rating", "scoring", "evaluation", "capability", "axis"],
+      "primary": {
+        "template": "RadarChart",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "DataChart",
+          "variant": "bar",
+          "when": "When comparing on a single axis (easier to read than radar for simple comparisons)"
+        },
+        {
+          "template": "FrameworkDiagram",
+          "variant": "matrix",
+          "when": "When dimensions are qualitative (high/low, strong/weak) rather than numeric"
+        }
+      ],
+      "combinesWith": [
+        "NetworkDiagram (to show relational context before introducing radar)",
+        "KineticTypography (for the category being assessed)"
+      ],
+      "examples": [
+        "US vs China capability comparison (military, economic, tech)",
+        "Competing futures (three scenarios scored on plausibility, impact, timeline)",
+        "Strategic positions of allied nations across multiple dimensions"
+      ]
+    },
+    {
+      "category": "COMPARISONS",
+      "id": "comparison-before-after",
+      "question": "Showing transformation, shift, or before/after state?",
+      "keywords": ["before", "after", "shift", "transformation", "evolution", "then now"],
+      "primary": {
+        "template": "TimelineComparison",
+        "variant": "dual-track"
+      },
+      "alternatives": [
+        {
+          "template": "BayesianUpdate",
+          "variant": "shift",
+          "when": "When the before/after is a probability or belief shift, not a timeline"
+        },
+        {
+          "template": "StrategicLandscape",
+          "variant": "default",
+          "when": "When the before/after involves multiple actors and relationships"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (era-specific images for each side)",
+        "KineticTypography (for era labels)"
+      ],
+      "examples": [
+        "1941 oil embargo vs 2022 chip controls (structural parallels)",
+        "COCOM era Soviet containment vs modern China policy",
+        "Pre-2018 chip market vs post-October-7-controls market"
+      ]
+    },
+    {
+      "category": "COMPARISONS",
+      "id": "comparison-scoring-rating",
+      "question": "Scoring or rating different scenarios, outcomes, or entities?",
+      "keywords": ["score", "rating", "rank", "probability", "likelihood", "estimate"],
+      "primary": {
+        "template": "ProbabilityGauge",
+        "variant": "scorecard"
+      },
+      "alternatives": [
+        {
+          "template": "DataChart",
+          "variant": "bar",
+          "when": "When ratings are static (not predictions), use simpler bar chart"
+        },
+        {
+          "template": "BayesianUpdate",
+          "variant": "compare",
+          "when": "When showing competing hypotheses with probability shifts"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for the prediction or question being scored)",
+        "FrameworkDiagram (for context about what the scores mean)"
+      ],
+      "examples": [
+        "Market predictions vs actual outcomes (Kalshi scorecard)",
+        "Estimated success probabilities for different export control scenarios",
+        "Your prior estimate vs market price vs resolution"
+      ]
+    },
+    {
+      "category": "PROGRESSIONS",
+      "id": "progression-historical-timeline",
+      "question": "Tracing events in chronological order (single timeline)?",
+      "keywords": ["timeline", "history", "chronological", "sequence", "events over time", "era"],
+      "primary": {
+        "template": "EscalationLadder",
+        "variant": "escalation"
+      },
+      "alternatives": [
+        {
+          "template": "TimeSeriesChart",
+          "variant": "with-annotations",
+          "when": "When the timeline has numeric data (chip yields, spending, market share) attached"
+        },
+        {
+          "template": "NetworkDiagram",
+          "variant": "horizontal-chain",
+          "when": "When events are causally connected (A leads to B leads to C)"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite or PhotoMontage (era-specific images for key events)",
+        "KineticTypography (for quotes or key decisions at timeline points)"
+      ],
+      "examples": [
+        "Entity List additions 2019→2022→2024 (escalation ladder)",
+        "Semiconductor technology node progression (14nm → 7nm → 5nm)",
+        "Policy announcements from 2018 to present"
+      ]
+    },
+    {
+      "category": "PROGRESSIONS",
+      "id": "progression-parallel-timelines",
+      "question": "Showing two parallel historical tracks that converge or diverge?",
+      "keywords": ["parallel", "dual timeline", "two tracks", "echo", "parallel history"],
+      "primary": {
+        "template": "TimelineComparison",
+        "variant": "dual-track"
+      },
+      "alternatives": [
+        {
+          "template": "DualTimeline",
+          "variant": "default",
+          "when": "A custom version designed specifically for side-by-side event comparison"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (period imagery for each track)",
+        "KineticTypography (for connecting labels or annotations)"
+      ],
+      "examples": [
+        "1941 Pearl Harbor path to war vs 2018-2022 chip war escalation",
+        "Murano glassblowing decline vs China's manufacturing squeeze",
+        "COCOM Soviet containment vs current China export controls"
+      ]
+    },
+    {
+      "category": "PROGRESSIONS",
+      "id": "progression-escalation-intensity",
+      "question": "Showing increasing severity, intensity, or stakes rising?",
+      "keywords": ["escalation", "severity", "intensity", "stakes", "crisis", "heightening"],
+      "primary": {
+        "template": "EscalationLadder",
+        "variant": "escalation"
+      },
+      "alternatives": [
+        {
+          "template": "TimeSeriesChart",
+          "variant": "with-reference-lines",
+          "when": "When escalation is measured numerically (restrictions tightening, costs rising)"
+        }
+      ],
+      "combinesWith": [
+        "NetworkDiagram (showing who's caught in the escalation)",
+        "KineticTypography (for severity labels at each rung)"
+      ],
+      "examples": [
+        "TSMC dominance crisis from strategic asset to bottleneck to geopolitical flashpoint",
+        "Chip control restrictions: targeted additions → sector-wide → full-spectrum",
+        "Semiconductor self-sufficiency goal from nice-to-have to existential"
+      ]
+    },
+    {
+      "category": "PROGRESSIONS",
+      "id": "progression-cause-effect-chain",
+      "question": "Showing causation or logical consequence (A leads to B leads to C)?",
+      "keywords": ["cause", "effect", "consequence", "leads to", "results in", "chain"],
+      "primary": {
+        "template": "FrameworkDiagram",
+        "variant": "flow"
+      },
+      "alternatives": [
+        {
+          "template": "NetworkDiagram",
+          "variant": "horizontal-chain",
+          "when": "When the chain is more relational (nodes with edges) than purely sequential"
+        },
+        {
+          "template": "DecisionTree",
+          "variant": "simple-path",
+          "when": "When each step has multiple possible outcomes"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for causal language like 'therefore', 'thus')",
+        "DataChart (for data supporting each causal link)"
+      ],
+      "examples": [
+        "Chip concentration in Taiwan → supply chain vulnerability → export control opportunity",
+        "ASML EUV dominance → Netherlands in geopolitical crossfire → COCOM negotiations",
+        "SMIC breakthrough → export controls weakened → US narrative falters"
+      ]
+    },
+    {
+      "category": "PROGRESSIONS",
+      "id": "progression-decision-branching",
+      "question": "Showing if/then scenarios or decision branches?",
+      "keywords": ["if then", "scenario", "branching", "decision tree", "paths", "possibilities"],
+      "primary": {
+        "template": "DecisionTree",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "GameBoard",
+          "variant": "payoff-matrix",
+          "when": "When scenarios are strategic choices with payoffs (game theory)"
+        },
+        {
+          "template": "FrameworkDiagram",
+          "variant": "matrix",
+          "when": "When organizing scenarios in a 2×2 grid by two dimensions"
+        }
+      ],
+      "combinesWith": [
+        "ProbabilityGauge (for probability estimates on each branch)",
+        "KineticTypography (for scenario names)"
+      ],
+      "examples": [
+        "If SMIC breaches 7nm: exports controls hold (35%) vs backfire (45%) vs mutual containment (20%)",
+        "If US maintains controls: China self-sufficient (50%) vs market fragmentation (40%)",
+        "Netherlands policy decision: enforce, loosen, or seek exemption"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-single-hero-stat",
+      "question": "Revealing one powerful statistic or number?",
+      "keywords": ["stat", "statistic", "number", "hero", "scale", "dramatic"],
+      "primary": {
+        "template": "StatReveal",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "KineticTypography",
+          "variant": "statistic",
+          "when": "When the stat is shorter and needs less contextual comparison"
+        },
+        {
+          "template": "DataChart",
+          "variant": "bar",
+          "when": "When you need to compare the hero stat to others (use StatReveal's comparison bars)"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (feature a relevant image, let the stat overlay it)",
+        "LayeredComposition (stat floats over footage of what the stat represents)"
+      ],
+      "examples": [
+        "92% — TSMC's advanced chip production global share",
+        "7% — US domestic chip demand met by domestic fabs",
+        "$280B — CHIPS Act + private commitment total",
+        "45 years — COCOM duration (contrast to expected China controls duration)"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-bar-chart",
+      "question": "Comparing discrete values as bars (simple comparison)?",
+      "keywords": ["bar chart", "bars", "categories", "values", "production", "spending"],
+      "primary": {
+        "template": "DataChart",
+        "variant": "bar"
+      },
+      "alternatives": [
+        {
+          "template": "DataChart",
+          "variant": "horizontal",
+          "when": "When category labels are long (use horizontal bars for readability)"
+        },
+        {
+          "template": "SankeyFlow",
+          "variant": "default",
+          "when": "When the data flows or allocates (spending, manufacturing capacity)"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for context or category title)",
+        "LayeredComposition (stat as inset overlay on related footage)"
+      ],
+      "examples": [
+        "Chip production by nation (Taiwan, South Korea, US, Japan)",
+        "TSMC vs Samsung vs Intel capex spending",
+        "EUV lithography machine sales by customer (TSMC, Samsung, Intel)"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-time-series-trend",
+      "question": "Showing change over time with a line chart?",
+      "keywords": ["trend", "time series", "over time", "trajectory", "growth", "decline"],
+      "primary": {
+        "template": "TimeSeriesChart",
+        "variant": "multi-series"
+      },
+      "alternatives": [
+        {
+          "template": "DataChart",
+          "variant": "bar",
+          "when": "When you have discrete time points (2018, 2020, 2024) with no continuity between"
+        }
+      ],
+      "combinesWith": [
+        "AnnotatedImage or KineticTypography (for key turning points)",
+        "LayeredComposition (hero stat floating above the curve)"
+      ],
+      "examples": [
+        "TSMC capex 2015→2025 (single line with area fill)",
+        "Chip yield rates over time at Taiwan vs Arizona fabs",
+        "SMIC technology node advancement vs industry projections",
+        "US chip manufacturing share 1990→2026"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-probability-prediction",
+      "question": "Showing probability estimates or prediction markets?",
+      "keywords": ["probability", "prediction", "market", "Kalshi", "odds", "likelihood"],
+      "primary": {
+        "template": "BayesianUpdate",
+        "variant": "single"
+      },
+      "alternatives": [
+        {
+          "template": "ProbabilityGauge",
+          "variant": "gauge",
+          "when": "When you want a speedometer-style visual (simpler, less analytical)"
+        },
+        {
+          "template": "ProbabilityGauge",
+          "variant": "shift",
+          "when": "When showing how a probability changed based on new evidence"
+        }
+      ],
+      "combinesWith": [
+        "DataChart (for supporting evidence or context)",
+        "KineticTypography (for the question or hypothesis)"
+      ],
+      "examples": [
+        "P(Export controls achieve lasting tech advantage) = 42% (Kalshi market price)",
+        "Bayesian update: prior 55% → evidence → posterior 42%",
+        "Will SMIC reach 7nm by 2025? Market: 32%, Your estimate: 25%"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-distribution-bayesian",
+      "question": "Showing probability distributions or Bayesian updating?",
+      "keywords": ["distribution", "Bayesian", "evidence", "update", "posterior", "prior"],
+      "primary": {
+        "template": "BayesianUpdate",
+        "variant": "compare"
+      },
+      "alternatives": [
+        {
+          "template": "ProbabilityGauge",
+          "variant": "gauge",
+          "when": "When you want a simpler gauge visualization"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for hypothesis names)",
+        "NetworkDiagram (for showing competing scenarios in context)"
+      ],
+      "examples": [
+        "Controls succeed (55%) vs backfire (45%) — competing hypotheses",
+        "Evidence: SMIC 7nm breakthrough → shifts distribution down 3%",
+        "Prior beliefs about China's self-sufficiency vs evidence vs market estimate"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-flow-allocation",
+      "question": "Showing where money, resources, or capacity flows?",
+      "keywords": ["flow", "allocation", "distribution", "spending", "resources", "budget"],
+      "primary": {
+        "template": "SankeyFlow",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "FrameworkDiagram",
+          "variant": "flow",
+          "when": "When the flow is more conceptual (less quantitative)"
+        },
+        {
+          "template": "NetworkDiagram",
+          "variant": "hub-spoke",
+          "when": "When showing distribution from one source to many destinations"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for category labels)",
+        "DataChart (for totals at each stage)"
+      ],
+      "examples": [
+        "CHIPS Act $280B → Fabrication, R&D, Equipment supply, Infrastructure",
+        "Semiconductor supply chain: Design (US) → Manufacturing (Taiwan) → Assembly (SE Asia)",
+        "TSMC capex allocation: Taiwan fabs, Arizona fab, equipment, R&D"
+      ]
+    },
+    {
+      "category": "DATA & STATISTICS",
+      "id": "data-multi-axis-comparison",
+      "question": "Comparing on multiple axes or dimensions at once?",
+      "keywords": ["axis", "dimensions", "multi-axis", "capabilities", "profile"],
+      "primary": {
+        "template": "RadarChart",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "FrameworkDiagram",
+          "variant": "matrix",
+          "when": "When you want a grid layout instead of radial"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for what's being compared)",
+        "AnnotatedImage (showing the subjects being compared)"
+      ],
+      "examples": [
+        "US vs China strategic capability: Military, Economic, Technological power",
+        "Competing control regimes scored on enforcement, durability, side effects"
+      ]
+    },
+    {
+      "category": "GEOGRAPHIC",
+      "id": "geographic-country-highlight",
+      "question": "Highlighting specific countries or regions on a world map?",
+      "keywords": ["map", "country", "region", "geography", "highlight", "nation"],
+      "primary": {
+        "template": "ChoroplethMap",
+        "variant": "phase-animation"
+      },
+      "alternatives": [
+        {
+          "template": "RouteAnimation",
+          "variant": "with-map",
+          "when": "When the geographic point is part of a larger supply chain or route"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for country labels or context)",
+        "NetworkDiagram (for showing relationships between countries)"
+      ],
+      "examples": [
+        "US allies (blue) vs China allies (red) vs contested (amber) in chip supply chain",
+        "COCOM member nations highlighted by era (Cold War vs post-Soviet)",
+        "Phase animation: Step 1 - Taiwan, Step 2 - add allied suppliers, Step 3 - show blockade"
+      ]
+    },
+    {
+      "category": "GEOGRAPHIC",
+      "id": "geographic-supply-chain-route",
+      "question": "Showing a supply chain, trade route, or resource flow on a map?",
+      "keywords": ["supply chain", "trade route", "logistics", "flow", "shipping", "route"],
+      "primary": {
+        "template": "RouteAnimation",
+        "variant": "phased-segments"
+      },
+      "alternatives": [
+        {
+          "template": "NetworkDiagram",
+          "variant": "default",
+          "when": "When you want to show relationships more than geographic paths"
+        },
+        {
+          "template": "SankeyFlow",
+          "variant": "default",
+          "when": "When showing allocation or split at each node"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for route segment labels)",
+        "AnnotatedImage (for key facilities or ports)"
+      ],
+      "examples": [
+        "Semiconductor supply chain: Taiwan design → ASML lithography (Netherlands) → TSMC fab → South Korean assembly → US distribution",
+        "Chip import/export routes: TSMC Taiwan → Japan → South Korea → US vs China",
+        "Rare earth supply: China mining → processing → Taiwan → global distribution"
+      ]
+    },
+    {
+      "category": "GEOGRAPHIC",
+      "id": "geographic-regional-zoom",
+      "question": "Zooming into a specific region with detailed annotations?",
+      "keywords": ["region", "zoom", "local", "detail", "city", "province"],
+      "primary": {
+        "template": "AnnotatedImage",
+        "variant": "map-callouts"
+      },
+      "alternatives": [
+        {
+          "template": "ChoroplethMap",
+          "variant": "zoomed-phase",
+          "when": "When showing color-coded regions"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for region or city name)",
+        "PhotoMontage (for aerial or satellite images of key sites)"
+      ],
+      "examples": [
+        "Taiwan: Hsinchu (TSMC HQ), Tainan (Fab 18), Kaohsiung (advanced fab)",
+        "Netherlands: ASML locations, ports, export control hubs",
+        "Arizona: Phoenix metro, fab construction sites, supply chain endpoints"
+      ]
+    },
+    {
+      "category": "GEOGRAPHIC",
+      "id": "geographic-bifurcation",
+      "question": "Showing a diverging path or split geography (two futures)?",
+      "keywords": ["bifurcation", "split", "diverge", "two paths", "fork", "diverging"],
+      "primary": {
+        "template": "BifurcationRoute",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "RouteAnimation",
+          "variant": "branching",
+          "when": "Custom branching route visualization"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for path labels)",
+        "DecisionTree (for decision context)"
+      ],
+      "examples": [
+        "Chinese semiconductor self-sufficiency path A (success) vs path B (stalled)",
+        "Supply chain bifurcation: US-allied source vs China-adjacent source",
+        "Two possible US policy futures: maintain controls vs negotiate"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-key-quote",
+      "question": "Emphasizing a key quote or statement from a named person?",
+      "keywords": ["quote", "statement", "person", "attribution", "speaker"],
+      "primary": {
+        "template": "KineticTypography",
+        "variant": "quote"
+      },
+      "alternatives": [
+        {
+          "template": "ImageComposite",
+          "variant": "portrait",
+          "when": "When the speaker's face is equally important to the quote"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (portrait of speaker)",
+        "LayeredComposition (quote floats over relevant footage)"
+      ],
+      "examples": [
+        "\"We are in a chip war.\" — Morris Chang, TSMC founder, 2024",
+        "\"Globalization is almost dead.\" — (analysis) — 2023",
+        "\"卡脖子\" — strangulation, a chokehold technology"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-bilingual-term",
+      "question": "Introducing a foreign (especially Chinese) term or concept?",
+      "keywords": ["bilingual", "Chinese", "term", "definition", "pinyin", "translation"],
+      "primary": {
+        "template": "KineticTypography",
+        "variant": "bilingual"
+      },
+      "alternatives": [
+        {
+          "template": "KineticTypography",
+          "variant": "definition",
+          "when": "When you need more definitional space"
+        }
+      ],
+      "combinesWith": [
+        "FrameworkDiagram (for context of the concept)",
+        "ImageComposite (for relevant historical/cultural imagery)"
+      ],
+      "examples": [
+        "卡脖子 (kǎ bózi) = Stranglehold — foreign technology chokepoint",
+        "举国体制 (jǔguó tǐzhì) = Whole-nation system — centralized mobilization",
+        "芯片 (xīnpiàn) = Chip — literal and metaphorical"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-big-number-callout",
+      "question": "Calling out a single big statistic without comparison?",
+      "keywords": ["big", "number", "callout", "stat", "statistic", "reveal"],
+      "primary": {
+        "template": "KineticTypography",
+        "variant": "statistic"
+      },
+      "alternatives": [
+        {
+          "template": "StatReveal",
+          "variant": "default",
+          "when": "When you want comparison bars alongside the hero stat"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (number overlays relevant imagery)",
+        "LayeredComposition (stat floats over footage)"
+      ],
+      "examples": [
+        "92%",
+        "7%",
+        "$280 Billion",
+        "45 years"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-section-title",
+      "question": "Introducing a new section or major beat of the episode?",
+      "keywords": ["section", "title", "beat", "chapter", "break", "transition"],
+      "primary": {
+        "template": "TitleTransition",
+        "variant": "section"
+      },
+      "alternatives": [
+        {
+          "template": "KineticTypography",
+          "variant": "definition",
+          "when": "When the section title is a concept that needs defining"
+        }
+      ],
+      "combinesWith": [
+        "TRANSITION to next visual (fade, wipe, dissolve)"
+      ],
+      "examples": [
+        "THE SUPPLY CHAIN TRAP",
+        "THE LOGIC OF DENIAL",
+        "COCOM AND ITS GHOSTS",
+        "Part II: The Bifurcation"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-episode-title-card",
+      "question": "Opening the episode with title, episode number, and context?",
+      "keywords": ["episode title", "cold open", "opening", "title card", "teaser"],
+      "primary": {
+        "template": "TitleTransition",
+        "variant": "episode-title"
+      },
+      "alternatives": [
+        {
+          "template": "ImageComposite",
+          "variant": "background",
+          "when": "When you want to layer the title over thematic imagery"
+        }
+      ],
+      "combinesWith": [
+        "PhotoMontage (follow with hero images of the episode's subject)"
+      ],
+      "examples": [
+        "EPISODE 01 — The Silicon Trap — When America Tried to Strangle China's AI"
+      ]
+    },
+    {
+      "category": "TYPOGRAPHY & EMPHASIS",
+      "id": "typography-end-card-cta",
+      "question": "Closing the episode with call-to-action or next episode teaser?",
+      "keywords": ["end card", "outro", "subscribe", "next episode", "closing"],
+      "primary": {
+        "template": "TitleTransition",
+        "variant": "end-card"
+      },
+      "alternatives": [
+        {
+          "template": "KineticTypography",
+          "variant": "quote",
+          "when": "When the closing is a reflective statement rather than a CTA"
+        }
+      ],
+      "combinesWith": [
+        "ImageComposite (thematic background)"
+      ],
+      "examples": [
+        "Next: The Rare Earth Gambit | Subscribe for more"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-network-relationships",
+      "question": "Showing relationships, alliances, or dependencies in a network?",
+      "keywords": ["network", "relationships", "alliance", "dependencies", "connections", "web"],
+      "primary": {
+        "template": "NetworkDiagram",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "FrameworkDiagram",
+          "variant": "flow",
+          "when": "When the network is more linear (sequential connections)"
+        },
+        {
+          "template": "RouteAnimation",
+          "variant": "with-map",
+          "when": "When the network has a geographic dimension"
+        }
+      ],
+      "combinesWith": [
+        "LayeredComposition (network overlaid on geography)",
+        "KineticTypography (for context)"
+      ],
+      "examples": [
+        "Semiconductor alliance network: US (hub) → TSMC, Samsung, ASML, Intel, etc.",
+        "Blocked routes: SMIC → EUV equipment → ASML → Dutch government → US pressure",
+        "Strategic dependencies: US relies on TSMC, TSMC relies on ASML, ASML restricted by COCOM"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-matrix-framework",
+      "question": "Organizing information in a 2×2 or grid matrix?",
+      "keywords": ["matrix", "2x2", "grid", "framework", "quadrants", "taxonomy"],
+      "primary": {
+        "template": "FrameworkDiagram",
+        "variant": "matrix"
+      },
+      "alternatives": [
+        {
+          "template": "GameBoard",
+          "variant": "payoff-matrix",
+          "when": "When the matrix is a game theory payoff table"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for axis labels)",
+        "DataChart (for population counts in each cell)"
+      ],
+      "examples": [
+        "Success/Failure × Short-term/Long-term strategic options",
+        "Allied/Neutral/Adversarial × Technology leader/Follower/Blocked"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-flow-process",
+      "question": "Showing a process, workflow, or logical sequence?",
+      "keywords": ["flow", "process", "steps", "workflow", "sequence", "stages"],
+      "primary": {
+        "template": "FrameworkDiagram",
+        "variant": "flow"
+      },
+      "alternatives": [
+        {
+          "template": "SankeyFlow",
+          "variant": "default",
+          "when": "When the flow has allocation/splitting"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for step labels)",
+        "ImageComposite (for visual examples of each step)"
+      ],
+      "examples": [
+        "Chip design → FAB selection → Wafer production → Packaging → Distribution",
+        "Research → Development → Manufacturing → Export → Customer"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-game-theory-payoff",
+      "question": "Showing strategic game theory with payoff matrices?",
+      "keywords": ["game theory", "payoff", "nash equilibrium", "prisoner's dilemma", "strategy"],
+      "primary": {
+        "template": "GameBoard",
+        "variant": "payoff-matrix"
+      },
+      "alternatives": [
+        {
+          "template": "FrameworkDiagram",
+          "variant": "matrix",
+          "when": "When you want a simpler matrix without strategic context"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for strategic labels)",
+        "DecisionTree (for decision context)"
+      ],
+      "examples": [
+        "US vs China: Restrict/Engage × Cooperate/Self-develop payoff matrix",
+        "Taiwan's position: Align with US/China × Maintain independence payoff",
+        "ASML's position: Enforce controls/Loosen controls × Market share/Compliance"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-chess-go-board",
+      "question": "Using a chess or go board as strategic metaphor?",
+      "keywords": ["chess", "go", "board", "strategy", "game", "pieces"],
+      "primary": {
+        "template": "GameBoard",
+        "variant": "chess"
+      },
+      "alternatives": [
+        {
+          "template": "GameBoard",
+          "variant": "go",
+          "when": "When the strategy is about territorial encirclement rather than linear capture"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for strategic commentary)",
+        "FrameworkDiagram (for comparing chess vs go paradigms)"
+      ],
+      "examples": [
+        "Chess board showing piece positions of key actors in chip war",
+        "Go board showing territorial control and encirclement strategies"
+      ]
+    },
+    {
+      "category": "STRUCTURAL",
+      "id": "structural-annotated-image",
+      "question": "Pointing out details in an image or diagram with callouts?",
+      "keywords": ["annotate", "label", "callout", "detail", "technical", "component"],
+      "primary": {
+        "template": "AnnotatedImage",
+        "variant": "default"
+      },
+      "alternatives": [
+        {
+          "template": "LayeredComposition",
+          "variant": "default",
+          "when": "When the annotation is simpler (single label or stat)"
+        }
+      ],
+      "combinesWith": [
+        "KineticTypography (for context before/after)",
+        "PhotoMontage (for related images)"
+      ],
+      "examples": [
+        "ASML EUV machine cross-section with callouts: tin droplet generator, CO₂ laser, mirror array",
+        "TSMC fab floor with callouts: clean room, wafer handler, lithography station",
+        "Chip die cross-section with callouts: transistors, interconnects, packaging"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-reveal-then-explain",
+      "question": "Revealing a big stat then explaining it with a framework?",
+      "keywords": ["reveal", "explain", "stat then framework", "number then context"],
+      "primary": {
+        "template": "StatReveal + FrameworkDiagram"
+      },
+      "notes": "Two sequential Remotion compositions: StatReveal (3-5s hold) → dissolve transition → FrameworkDiagram",
+      "examples": [
+        "StatReveal: 92% (TSMC yield) → pause for impact → FrameworkDiagram: Why this concentration happened"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-show-then-zoom",
+      "question": "Showing a map overview then zooming into detail?",
+      "keywords": ["overview", "zoom", "detail", "context then specifics"],
+      "primary": {
+        "template": "ChoroplethMap + AnnotatedImage"
+      },
+      "notes": "ChoroplethMap wide shot → zoom/pan → AnnotatedImage or RouteAnimation zoomed detail",
+      "examples": [
+        "ChoroplethMap: Global semiconductor supply network → zoom to Taiwan/Arizona → AnnotatedImage: TSMC Fab 18"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-claim-then-evidence",
+      "question": "Making a claim in typography then supporting with data?",
+      "keywords": ["claim", "evidence", "support", "thesis then proof"],
+      "primary": {
+        "template": "KineticTypography + DataChart"
+      },
+      "notes": "KineticTypography statement (3-4s) → transition → DataChart or TimeSeriesChart with evidence",
+      "examples": [
+        "KineticTypography: 'Taiwan is the world's semiconductor bottleneck' → DataChart: Market concentration stats"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-timeline-with-images",
+      "question": "Showing a timeline with period-specific images attached?",
+      "keywords": ["timeline", "images", "era", "period", "photomontage"],
+      "primary": {
+        "template": "EscalationLadder + PhotoMontage"
+      },
+      "notes": "EscalationLadder timeline → at key rungs, PhotoMontage images appear",
+      "examples": [
+        "Escalation ladder of sanctions → at each rung, PhotoMontage reveals images from that era"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-network-then-detailed-route",
+      "question": "Showing a network overview then drilling into one route?",
+      "keywords": ["network", "detail", "overview", "specifics", "supply chain"],
+      "primary": {
+        "template": "NetworkDiagram + RouteAnimation"
+      },
+      "notes": "NetworkDiagram shows all relationships → zoom/focus → RouteAnimation shows detailed single path",
+      "examples": [
+        "NetworkDiagram: Semiconductor ecosystem → RouteAnimation: TSMC→ASML→US specific supply chain"
+      ]
+    },
+    {
+      "category": "COMBINATIONS",
+      "id": "combination-prediction-then-update",
+      "question": "Showing an initial prediction then Bayesian updating it?",
+      "keywords": ["prediction", "update", "before after", "evidence", "learning"],
+      "primary": {
+        "template": "ProbabilityGauge (gauge) + BayesianUpdate"
+      },
+      "notes": "Initial ProbabilityGauge → evidence reveals → BayesianUpdate shows distribution shift",
+      "examples": [
+        "ProbabilityGauge: Prior estimate 55% → sequence of evidence → BayesianUpdate: Posterior 42%"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "episode": "silicon-trap",
+  "title": "Kirin X90: Marketing vs. Reality",
+  "subtitle": "Independent teardown findings",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Huawei Claims",
+      "icon": "📢",
+      "items": [
+        "5nm process node",
+        "Next-generation architecture",
+        "Competitive with Snapdragon"
+      ],
+      "color": "#C23B22"
+    },
+    {
+      "title": "TechInsights Teardown",
+      "icon": "🔬",
+      "items": [
+        "7nm silicon (SMIC N+2)",
+        "Relabeled existing process",
+        "Performance gap remains"
+      ],
+      "color": "#E5A544"
+    }
+  ],
+  "durationSec": 6,
+  "backgroundVariant": "light",
+  "source": "TechInsights, 2025"
+}

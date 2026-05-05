@@ -18,7 +18,7 @@
 
 import { useCurrentFrame } from "remotion";
 import { interpolate, Easing } from "remotion";
-import { dark, light, palette, durations } from "../design/theme";
+import { palette, durations } from "../design/theme";
 
 interface DividerOptions {
   /** Color of the divider line. Default: palette.amber */

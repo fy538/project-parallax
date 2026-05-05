@@ -3,7 +3,7 @@ import { FrameworkDiagram } from "./FrameworkDiagram";
 import { layout, sec } from "../../design/theme";
 import { FrameworkDiagramSchema } from "./schema";
 import type { FrameworkDiagramData } from "./types";
-import sampleData from "../../../data/episodes/ep01/framework-cocom-china.json";
+import sampleData from "../../../data/episodes/silicon-trap/framework-cocom-china.json";
 
 export const FrameworkDiagramComposition = () => (
   <Composition

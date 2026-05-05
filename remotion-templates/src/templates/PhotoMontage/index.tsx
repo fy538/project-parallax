@@ -5,14 +5,14 @@ import { PhotoMontageSchema } from "./schema";
 import type { PhotoMontageData } from "./types";
 
 /**
- * Sample data: chip count montage from EP01.
+ * Sample data: chip count montage from silicon-trap.
  * Four images showing chip counts in different devices, rapid-fire sequence.
  */
 const sampleData: PhotoMontageData = {
-  episode: "EP01",
+  episode: "silicon-trap",
   images: [
     {
-      src: "footage/ep01/car-dashboard.jpg",
+      src: "footage/silicon-trap/car-dashboard.jpg",
       durationSec: 3,
       treatment: "standard",
       compositeMode: "inset",
@@ -24,7 +24,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/ep01/smartphone-circuit.jpg",
+      src: "footage/silicon-trap/smartphone-circuit.jpg",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",
@@ -36,7 +36,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/ep01/mri-machine.jpg",
+      src: "footage/silicon-trap/mri-machine.jpg",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",
@@ -48,7 +48,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/ep01/data-center-rack.jpg",
+      src: "footage/silicon-trap/data-center-rack.jpg",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",

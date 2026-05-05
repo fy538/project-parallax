@@ -1,0 +1,23 @@
+{
+  "episode": "silicon-trap",
+  "title": "TSMC Arizona's Share of US Chip Demand",
+  "variant": "bar",
+  "unit": "%",
+  "dataPoints": [
+    {
+      "label": "TSMC Arizona",
+      "value": 7,
+      "color": "#E5A544"
+    },
+    {
+      "label": "Remaining US demand",
+      "value": 93,
+      "color": "#C23B22"
+    }
+  ],
+  "highlightIndex": 0,
+  "contextNote": "Chips cost 50% more than equivalent production in Taiwan",
+  "source": "Industry estimates, 2025",
+  "durationSec": 4,
+  "backgroundVariant": "light"
+}

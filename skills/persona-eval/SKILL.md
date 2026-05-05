@@ -1,6 +1,7 @@
 ---
 name: persona-eval
-description: "Evaluate a video script through the eyes of 5 target audience personas to assess resonance, engagement, and subscriber potential. Use this skill whenever someone asks 'would this land with our audience', 'who is this for', 'persona check', 'audience test', 'would people watch this', or wants to understand how different viewer types would react to a script. Also use after a script-audit pass to add an audience-resonance layer, or when comparing two versions of a script to see which one resonates better with which audience segments."
+description: >
+  Simulate how 5 target audience personas would experience a video script — assess resonance, engagement, and subscriber potential per persona. Use whenever someone asks 'would this land with our audience', 'who is this for', 'persona check', 'audience test', 'would people watch this', 'which audience does this serve', or wants to compare how different viewer types react to a script. Also use after script-audit to add an audience-resonance layer, or when comparing two script versions. This evaluates audience fit, not craft quality (that's script-audit) or visual feasibility (that's visual-concept). Visual-aware: considers how the visual layer affects each persona's experience.
 ---
 
 # Persona Evaluation

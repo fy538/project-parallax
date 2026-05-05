@@ -1,0 +1,11 @@
+{
+  "skill_name": "topic-viability",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run a viability check on this topic idea for Parallax EP02: 'Why Technological Blockades Always Leak' — the thesis is that export controls are structurally porous and always have been, looking at it through a tragedy of the commons + COCOM history lens. It's a Philosopher's Lens format candidate for Arc 1.",
+      "expected_output": "A viability brief answering all 5 questions (structural resonance, historical parallel, decoder framing, quick rubric, angle gap) with a clear VIABLE/INCUBATING/REJECT verdict, format recommendation, and arc fit assessment.",
+      "files": []
+    }
+  ]
+}

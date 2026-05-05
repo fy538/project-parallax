@@ -6,8 +6,14 @@
  *
  * Nodes form a tree structure via parent→children references.
  * Tree layout positions nodes by depth level (top-to-bottom).
- * Highlighted path draws over nodes, showing a particular decision sequence.
+ *
+ * Virtual camera system: the tree is rendered at full internal scale and
+ * a viewport animates scale + translate to zoom/pan between nodes.
+ * Camera path is data-driven via cameraPath[]. If omitted, a default
+ * sequence is auto-generated from the tree structure.
  */
+
+import type { DirectionBlock } from "../../hooks/useDirection";
 
 export interface TreeNode {
   id: string;
@@ -26,6 +32,20 @@ export interface TreeNode {
   marketPrice?: string;
 }
 
+/** A single camera keyframe — where to look and how close. */
+export interface CameraStep {
+  /** Node ID to center the camera on */
+  focus: string;
+  /** Zoom level (1.0 = full tree visible, 2.5 = tight close-up) */
+  zoom: number;
+  /** Duration of this step in seconds */
+  duration: number;
+  /** Dim nodes NOT on the path from root to focus node (default: false) */
+  dimOthers?: boolean;
+  /** Optional label text overlaid during this step (e.g., "Scenario A") */
+  label?: string;
+}
+
 export interface DecisionTreeData {
   episode: string;
   title: string;
@@ -38,7 +58,16 @@ export interface DecisionTreeData {
   highlightedPath?: string[];
   /** Color for highlighted path */
   highlightColor?: string;
+  /**
+   * Camera path — sequence of zoom/pan keyframes.
+   * If omitted, auto-generates: root close-up → branch reveal → each leaf path → full pullback.
+   */
+  cameraPath?: CameraStep[];
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

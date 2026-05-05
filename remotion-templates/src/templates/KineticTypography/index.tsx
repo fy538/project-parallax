@@ -3,7 +3,7 @@ import { KineticTypography } from "./KineticTypography";
 import { layout, sec } from "../../design/theme";
 import { QuoteDataSchema } from "./schema";
 import type { QuoteData } from "./types";
-import sampleData from "../../../data/episodes/ep01/kinetic-morris-chang.json";
+import sampleData from "../../../data/episodes/silicon-trap/kinetic-morris-chang.json";
 
 export const KineticTypographyComposition = () => (
   <Composition

@@ -6,11 +6,11 @@
  * and calls `npx remotion render` (or `still`) for each composition.
  *
  * Usage:
- *   node scripts/render-episode.mjs ep01                    # Render all MP4s
- *   node scripts/render-episode.mjs ep01 --preview          # Render stills at frame 90
- *   node scripts/render-episode.mjs ep01 --concat           # Also make preview reel
- *   node scripts/render-episode.mjs ep01 --only=05,06,07    # Render specific clips
- *   node scripts/render-episode.mjs ep01 --from=16          # Render from clip 16 onward
+ *   node scripts/render-episode.mjs silicon-trap                    # Render all MP4s
+ *   node scripts/render-episode.mjs silicon-trap --preview          # Render stills at frame 90
+ *   node scripts/render-episode.mjs silicon-trap --concat           # Also make preview reel
+ *   node scripts/render-episode.mjs silicon-trap --only=05,06,07    # Render specific clips
+ *   node scripts/render-episode.mjs silicon-trap --from=16          # Render from clip 16 onward
  */
 
 import { execSync, spawnSync } from "child_process";
@@ -24,7 +24,7 @@ const ROOT = join(__dirname, "..");
 // ─── Episode Sequences ──────────────────────────────────────────────────────
 
 const EPISODES = {
-  ep01: [
+  silicon-trap: [
     // Opening
     { seq: "01", comp: "TitleTransition", file: "title-episode.json", desc: "Episode title" },
     // Beat 1 — The Paradox

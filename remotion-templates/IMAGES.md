@@ -420,7 +420,7 @@ assets/
 │   ├── noise-512.png          # Grain overlay tile
 │   ├── vignette-1920x1080.png # Pre-rendered vignette overlay
 │   └── brand/                 # Brand mark, wordmark, reticle SVGs
-├── ep01/
+├── silicon-trap/
 │   ├── raw/                   # Original source images (untouched)
 │   ├── treated/               # Pipeline-processed images (ready to use)
 │   └── sources.md             # Image credits and licenses

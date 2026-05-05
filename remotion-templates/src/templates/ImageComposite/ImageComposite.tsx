@@ -14,12 +14,11 @@ import React from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
+  interpolate,
   Img,
   staticFile,
 } from "remotion";
 import {
-  dark,
-  light,
   fonts,
   fontSizes,
   fontWeights,
@@ -27,6 +26,7 @@ import {
   layout,
   sec,
   duotone as duotoneRamps,
+  palette,
 } from "../../design/theme";
 import { textShadow } from "../../utils/depth";
 import {
@@ -34,9 +34,16 @@ import {
   slideIn,
   kenBurnsDrift,
   exitFade,
+  heroSpring,
+  scaleReveal,
+  CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import type { ImageCompositeData } from "./types";
 
 /**
@@ -44,8 +51,10 @@ import type { ImageCompositeData } from "./types";
  */
 const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation({ noExit: true });
+  const direction = useDirection(data._direction);
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const totalFrames = sec(data.durationSec || 6);
+  const theme = useThemeMode(data.backgroundVariant || "light");
 
   // Duotone ramp selection
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
@@ -53,58 +62,87 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
   // Ken Burns: subtle zoom drift
   const scale = kenBurnsDrift(frame, totalFrames, 1.03);
 
-  // Text animation
-  const textOpacity = fadeIn(frame, 0, 10) * exitFade(frame, totalFrames, 15);
-  const textTranslate = slideIn(frame, 0, 30, 20);
+  // Text animation — spring-based entrance
+  const textOpacity = fadeIn(frame, 0, sec(0.4)) * exitFade(frame, totalFrames, sec(0.5));
+  const textTranslate = slideIn(frame, 0, 30, sec(0.7));
+  const textScale = scaleReveal(frame, 0, sec(0.6), 1.05, 1.0);
 
   // Text position styles
   const textPositionStyle = (() => {
     switch (data.textPosition) {
       case "bottom-right":
-        return { bottom: 80, right: 80 };
+        return { bottom: layout.safeAreaTier.generous.bottom, right: layout.safeAreaTier.generous.right };
       case "center":
         return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
       case "bottom-left":
       default:
-        return { bottom: 80, left: 80 };
+        return { bottom: layout.safeAreaTier.generous.bottom, left: layout.safeAreaTier.generous.left };
     }
   })();
 
+  // ── Real SVG duotone — feColorMatrix → feFuncR/G/B chain ──
+  // Builds an inline SVG filter that desaturates → maps luminance → remaps to brand ramp.
+  const filterId = `imgcomp-duotone-${data.duotone || "standard"}`;
+  const hexToRgb = (hex: string): [number, number, number] => {
+    const h = hex.replace("#", "");
+    return [
+      parseInt(h.substring(0, 2), 16) / 255,
+      parseInt(h.substring(2, 4), 16) / 255,
+      parseInt(h.substring(4, 6), 16) / 255,
+    ];
+  };
+  const shadowRgb = hexToRgb(duotoneRamp.shadows);
+  const highlightRgb = hexToRgb(duotoneRamp.highlights);
+  const slopeR = highlightRgb[0] - shadowRgb[0];
+  const slopeG = highlightRgb[1] - shadowRgb[1];
+  const slopeB = highlightRgb[2] - shadowRgb[2];
+
+  // ── Crawling grain — backgroundPosition shifts deterministically per frame ──
+  const grainOffsetX = (frame * 1.5) % 512;
+  const grainOffsetY = (frame * 0.85) % 512;
+
   return (
-    <AbsoluteFill style={{ backgroundColor: light.bg.base, overflow: "hidden" }}>
+    <AbsoluteFill style={{ backgroundColor: theme.bg.base, overflow: "hidden" }}>
+      {/* Real SVG duotone filter (proper ramp remap, not gradient overlay) */}
+      <svg width="0" height="0" style={{ position: "absolute", pointerEvents: "none" }}>
+        <defs>
+          <filter id={filterId} colorInterpolationFilters="sRGB">
+            <feColorMatrix type="saturate" values="0.25" />
+            <feColorMatrix
+              type="matrix"
+              values="0.2126 0.7152 0.0722 0 0
+                      0.2126 0.7152 0.0722 0 0
+                      0.2126 0.7152 0.0722 0 0
+                      0      0      0      1 0"
+            />
+            <feComponentTransfer>
+              <feFuncR type="linear" slope={String(slopeR)} intercept={String(shadowRgb[0])} />
+              <feFuncG type="linear" slope={String(slopeG)} intercept={String(shadowRgb[1])} />
+              <feFuncB type="linear" slope={String(slopeB)} intercept={String(shadowRgb[2])} />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+      </svg>
+
       <AbsoluteFill style={compStyle}>
-        {/* Main image with Ken Burns drift */}
+        {/* Main image with Ken Burns drift + real duotone filter */}
       <AbsoluteFill
         style={{
           transform: `scale(${scale})`,
           transformOrigin: "center",
-          filter: "grayscale(100%) contrast(1.1)",
+          filter: `url(#${filterId})`,
         }}
       >
         <Img src={staticFile(data.imagePath)} style={{ width: "100%", height: "100%" }} />
       </AbsoluteFill>
 
-      {/* Duotone gradient overlay */}
-      <AbsoluteFill
-        style={{
-          background: `
-            linear-gradient(180deg,
-              transparent 0%,
-              ${duotoneRamp.highlights}33 20%,
-              ${duotoneRamp.midtones}40 50%,
-              ${duotoneRamp.shadows}60 100%
-            )
-          `,
-          pointerEvents: "none",
-        }}
-      />
-
-      {/* Film grain overlay */}
+      {/* Crawling film grain — backgroundPosition drifts per frame */}
       <AbsoluteFill
         style={{
           backgroundImage: `url(${staticFile("assets/noise-512.png")})`,
           backgroundRepeat: "repeat",
           backgroundSize: "512px 512px",
+          backgroundPosition: `${grainOffsetX}px ${grainOffsetY}px`,
           mixBlendMode: "overlay",
           opacity: data.grainOpacity ?? 0.12,
           pointerEvents: "none",
@@ -114,7 +152,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
       {/* Vignette overlay */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%)`,
+          background: `radial-gradient(ellipse at center, transparent 40%, ${palette.ink}66 100%)`,
           pointerEvents: "none",
         }}
       />
@@ -126,8 +164,9 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             position: "absolute",
             ...textPositionStyle,
             opacity: textOpacity,
-            transform: `translateY(${textTranslate}px)`,
-            color: light.text.primary,
+            transform: `translateY(${textTranslate}px) scale(${textScale})`,
+            transformOrigin: "left bottom",
+            color: theme.text.primary,
             textShadow: textShadow(true),
           }}
         >
@@ -135,11 +174,11 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             <div
               style={{
                 fontFamily: fonts.display,
-                fontSize: 48,
+                fontSize: fontSizes.h2,
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
                 lineHeight: 1.2,
-                marginBottom: 12,
+                marginBottom: layout.spacing.sm,
               }}
             >
               {data.title}
@@ -152,7 +191,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
                 fontSize: fontSizes.body,
                 fontWeight: fontWeights.regular,
                 letterSpacing: letterSpacing.body,
-                marginBottom: 8,
+                marginBottom: layout.spacing.xs,
               }}
             >
               {data.subtitle}
@@ -183,11 +222,13 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
  */
 const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation({ noExit: true });
-  const totalFrames = sec(data.durationSec || 6);
+  const direction = useDirection(data._direction);
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  const theme = useThemeMode(data.backgroundVariant || "light");
 
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
-  const frameOpacity = fadeIn(frame, 0, 10);
+  const frameOpacity = fadeIn(frame, 0, sec(0.4));
+  const frameScale = scaleReveal(frame, 0, sec(0.7), 1.06, 1.0);
   const isDark = data.backgroundVariant === "dark";
 
   const frameWidth = (layout.width * 60) / 100; // 60% of frame width
@@ -195,11 +236,16 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frameX = (layout.width - frameWidth) / 2;
   const frameY = (layout.height - frameHeight) / 2;
 
-  const borderColor = isDark ? dark.text.muted : light.text.muted;
-  const bgColor = isDark ? dark.bg.surface : light.bg.surface;
+  const borderColor = theme.text.muted;
+  const bgColor = theme.bg.surface;
 
   return (
-    <Background variant={isDark ? "dark" : "light"}>
+    <Background
+      variant={isDark ? "dark" : "light"}
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
         {/* Frame */}
       <div
@@ -210,9 +256,11 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           width: frameWidth,
           height: frameHeight,
           border: `2px solid ${borderColor}`,
-          padding: 8,
+          padding: layout.spacing.xs,
           overflow: "hidden",
           opacity: frameOpacity,
+          transform: `scale(${frameScale})`,
+          transformOrigin: "center",
         }}
       >
         <div
@@ -223,30 +271,64 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
             position: "relative",
           }}
         >
-          {/* Image with grayscale + duotone */}
+          {/* SVG duotone filter (proper feColorMatrix → ramp remap) */}
+          <svg width="0" height="0" style={{ position: "absolute" }}>
+            <defs>
+              <filter id="imgcomp-inset-duotone" colorInterpolationFilters="sRGB">
+                <feColorMatrix type="saturate" values="0.25" />
+                <feColorMatrix
+                  type="matrix"
+                  values="0.2126 0.7152 0.0722 0 0
+                          0.2126 0.7152 0.0722 0 0
+                          0.2126 0.7152 0.0722 0 0
+                          0      0      0      1 0"
+                />
+                <feComponentTransfer>
+                  <feFuncR
+                    type="linear"
+                    slope={String(
+                      (parseInt(duotoneRamp.highlights.replace("#", "").slice(0, 2), 16) -
+                        parseInt(duotoneRamp.shadows.replace("#", "").slice(0, 2), 16)) /
+                        255
+                    )}
+                    intercept={String(
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(0, 2), 16) / 255
+                    )}
+                  />
+                  <feFuncG
+                    type="linear"
+                    slope={String(
+                      (parseInt(duotoneRamp.highlights.replace("#", "").slice(2, 4), 16) -
+                        parseInt(duotoneRamp.shadows.replace("#", "").slice(2, 4), 16)) /
+                        255
+                    )}
+                    intercept={String(
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(2, 4), 16) / 255
+                    )}
+                  />
+                  <feFuncB
+                    type="linear"
+                    slope={String(
+                      (parseInt(duotoneRamp.highlights.replace("#", "").slice(4, 6), 16) -
+                        parseInt(duotoneRamp.shadows.replace("#", "").slice(4, 6), 16)) /
+                        255
+                    )}
+                    intercept={String(
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(4, 6), 16) / 255
+                    )}
+                  />
+                </feComponentTransfer>
+              </filter>
+            </defs>
+          </svg>
+          {/* Image with proper SVG duotone */}
           <Img
             src={staticFile(data.imagePath)}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              filter: "grayscale(100%) contrast(1.1)",
-            }}
-          />
-
-          {/* Duotone overlay */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              background: `linear-gradient(135deg,
-                ${duotoneRamp.shadows}40 0%,
-                ${duotoneRamp.midtones}30 50%,
-                ${duotoneRamp.highlights}20 100%)`,
-              pointerEvents: "none",
+              filter: "url(#imgcomp-inset-duotone)",
             }}
           />
         </div>
@@ -261,7 +343,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
             top: frameY - 60,
             width: frameWidth,
             opacity: frameOpacity,
-            color: isDark ? dark.text.primary : light.text.primary,
+            color: theme.text.primary,
             fontFamily: fonts.display,
             fontSize: fontSizes.h3,
             fontWeight: fontWeights.semibold,
@@ -278,10 +360,10 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           style={{
             position: "absolute",
             left: frameX,
-            top: frameY + frameHeight + 24,
+            top: frameY + frameHeight + layout.spacing.md,
             width: frameWidth,
             opacity: frameOpacity,
-            color: isDark ? dark.text.secondary : light.text.secondary,
+            color: theme.text.secondary,
             fontFamily: fonts.body,
             fontSize: fontSizes.caption,
             fontWeight: fontWeights.regular,
@@ -294,6 +376,9 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
         </div>
       )}
       </AbsoluteFill>
+      {/* Brand strips */}
+      <HeaderStrip mode={data.backgroundVariant || "light"} metadata={data.episode} />
+      <FooterStrip mode={data.backgroundVariant || "light"} />
     </Background>
   );
 };
@@ -303,20 +388,28 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
  */
 const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation({ noExit: true });
-  const totalFrames = sec(data.durationSec || 6);
+  const direction = useDirection(data._direction);
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  const theme = useThemeMode(data.backgroundVariant || "light");
 
+  const totalFrames = sec(data.durationSec || 6);
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
-  const imageOpacity = fadeIn(frame, 0, 10);
-  const nameStripOpacity = fadeIn(frame, 10, 10);
-  const isDark = data.backgroundVariant === "dark";
+  const imageOpacity = fadeIn(frame, 0, sec(0.4));
+  const imageScale = scaleReveal(frame, 0, sec(0.8), 1.04, 1.0);
+  const nameStripOpacity = fadeIn(frame, sec(0.5), sec(0.4));
+  // Parallax: text drifts slightly faster than image
+  const textDriftY = interpolate(frame, [0, totalFrames], [8, -8], CLAMP);
 
   const imageWidth = (layout.width * 40) / 100; // 40% of frame
-  const imageHeight = layout.height; // Full height
   const imageX = 0; // Left side (can be changed to right side if needed)
 
   return (
-    <Background variant={data.backgroundVariant === "light" ? "light" : "dark"}>
+    <Background
+      variant={data.backgroundVariant === "light" ? "light" : "dark"}
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
         {/* Image container */}
       <AbsoluteFill
@@ -325,31 +418,67 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           width: imageWidth,
           overflow: "hidden",
           opacity: imageOpacity,
+          transform: `scale(${imageScale})`,
+          transformOrigin: "center",
         }}
       >
+        {/* SVG duotone filter — proper feColorMatrix ramp remap */}
+        <svg width="0" height="0" style={{ position: "absolute" }}>
+          <defs>
+            <filter id="imgcomp-portrait-duotone" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="saturate" values="0.25" />
+              <feColorMatrix
+                type="matrix"
+                values="0.2126 0.7152 0.0722 0 0
+                        0.2126 0.7152 0.0722 0 0
+                        0.2126 0.7152 0.0722 0 0
+                        0      0      0      1 0"
+              />
+              <feComponentTransfer>
+                <feFuncR
+                  type="linear"
+                  slope={String(
+                    (parseInt(duotoneRamp.highlights.replace("#", "").slice(0, 2), 16) -
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(0, 2), 16)) /
+                      255
+                  )}
+                  intercept={String(
+                    parseInt(duotoneRamp.shadows.replace("#", "").slice(0, 2), 16) / 255
+                  )}
+                />
+                <feFuncG
+                  type="linear"
+                  slope={String(
+                    (parseInt(duotoneRamp.highlights.replace("#", "").slice(2, 4), 16) -
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(2, 4), 16)) /
+                      255
+                  )}
+                  intercept={String(
+                    parseInt(duotoneRamp.shadows.replace("#", "").slice(2, 4), 16) / 255
+                  )}
+                />
+                <feFuncB
+                  type="linear"
+                  slope={String(
+                    (parseInt(duotoneRamp.highlights.replace("#", "").slice(4, 6), 16) -
+                      parseInt(duotoneRamp.shadows.replace("#", "").slice(4, 6), 16)) /
+                      255
+                  )}
+                  intercept={String(
+                    parseInt(duotoneRamp.shadows.replace("#", "").slice(4, 6), 16) / 255
+                  )}
+                />
+              </feComponentTransfer>
+            </filter>
+          </defs>
+        </svg>
         <Img
           src={staticFile(data.imagePath)}
           style={{
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "grayscale(100%) contrast(1.1)",
-          }}
-        />
-
-        {/* Duotone overlay */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            background: `linear-gradient(90deg,
-              ${duotoneRamp.shadows}30 0%,
-              ${duotoneRamp.midtones}25 50%,
-              ${duotoneRamp.highlights}15 100%)`,
-            pointerEvents: "none",
+            filter: "url(#imgcomp-portrait-duotone)",
           }}
         />
 
@@ -361,10 +490,10 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               bottom: 0,
               left: 0,
               width: "100%",
-              backgroundColor: `rgba(0, 0, 0, 0.6)`,
-              padding: "16px",
+              backgroundColor: `${palette.ink}99`,
+              padding: layout.spacing.xs,
               opacity: nameStripOpacity,
-              color: light.text.primary,
+              color: theme.text.primary,
               fontFamily: fonts.body,
               fontSize: fontSizes.label,
               fontWeight: fontWeights.semibold,
@@ -377,7 +506,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
                 style={{
                   fontSize: fontSizes.caption,
                   fontWeight: fontWeights.regular,
-                  marginTop: 4,
+                  marginTop: layout.spacing.xs,
                   opacity: 0.8,
                 }}
               >
@@ -388,15 +517,16 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
         )}
       </AbsoluteFill>
 
-      {/* Text content on right side */}
+      {/* Text content on right side — parallax drift */}
       <div
         style={{
           position: "absolute",
-          left: imageWidth + 60,
-          top: 80,
-          width: layout.width - imageWidth - 140,
+          left: imageWidth + layout.spacing.xl,
+          top: layout.safeAreaTier.generous.top,
+          width: layout.width - imageWidth - layout.spacing.xxxl - layout.spacing.xl,
           opacity: imageOpacity,
-          color: isDark ? dark.text.primary : light.text.primary,
+          color: theme.text.primary,
+          transform: `translateY(${textDriftY}px)`,
         }}
       >
         {data.title && (
@@ -407,7 +537,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               fontWeight: fontWeights.bold,
               letterSpacing: letterSpacing.h1,
               lineHeight: 1.2,
-              marginBottom: 24,
+              marginBottom: layout.spacing.md,
             }}
           >
             {data.title}
@@ -421,7 +551,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               fontWeight: fontWeights.regular,
               letterSpacing: letterSpacing.body,
               lineHeight: 1.5,
-              marginBottom: 16,
+              marginBottom: layout.spacing.sm,
             }}
           >
             {data.subtitle}

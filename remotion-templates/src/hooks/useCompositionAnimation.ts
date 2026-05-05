@@ -26,7 +26,7 @@
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { interpolate, Easing } from "remotion";
 
-interface CompositionAnimationOptions {
+export interface CompositionAnimationOptions {
   /** Exit fade duration in frames. Default: 15 (POLISH.md A7) */
   exitFrames?: number;
   /** Enter fade duration in frames. Default: 8 */

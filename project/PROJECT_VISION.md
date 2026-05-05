@@ -230,3 +230,11 @@ Note: Layer 3 is long-term. Near-term focus is audience building (0 to 1K subscr
 **Content:** Completion rate (>60% target), engagement rate (>2%), cross-platform migration rate
 **Growth:** Subscriber velocity, watch time accumulation toward YouTube monetization threshold (1K subs + 4K watch hours)
 **Business:** Revenue per mille, subscriber conversion rate, retention coefficient (all post-monetization)
+
+---
+
+## Current State (May 2026)
+
+**Pre-launch.** No episodes published yet. The launch candidate is "The Prisoner's Dilemma Is Wrong About Almost Everything" (Philosopher's Lens format, Arc 3). A full production pipeline exists (17 Remotion templates, 17 Cowork skills, AI-assisted research workflow) but has only been tested on one episode (silicon-trap, which is now queued as non-launch). The channel identity, visual system, and editorial processes are production-ready; the missing piece is the first published video.
+
+**Why this matters for research:** Deep Research output should be calibrated for a channel with zero existing audience and zero published videos. Title suggestions should balance discoverability (critical for a new channel) with intellectual integrity (critical for brand identity). The launch episode must simultaneously: showcase the Parallax analytical method, be genuinely evergreen, demonstrate the "decoder not explainer" voice, and generate enough search-driven traffic to bootstrap an audience from zero.

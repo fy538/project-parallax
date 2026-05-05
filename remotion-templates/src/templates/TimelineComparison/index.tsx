@@ -1,9 +1,26 @@
+// DEPRECATED: Use HorizontalTimeline instead. This template is kept for backward compatibility.
+
 import { Composition } from "remotion";
 import { TimelineComparison } from "./TimelineComparison";
 import { layout, sec } from "../../design/theme";
 import { TimelineComparisonSchema } from "./schema";
 import type { TimelineComparisonData } from "./types";
-import sampleData from "../../../data/episodes/ep01/timeline-oil-chips.json";
+
+// Inline sample data — timeline-oil-chips.json was deprecated in favor of DualTimeline.
+const sampleData: TimelineComparisonData = {
+  episode: "silicon-trap",
+  leftLabel: "Historical",
+  rightLabel: "Modern",
+  secondsPerEvent: 2,
+  leftEvents: [
+    { year: "1941", title: "Oil embargo imposed on Japan", color: "#3266AD" },
+    { year: "1941", title: "Pearl Harbor attack", color: "#3266AD" },
+  ],
+  rightEvents: [
+    { year: "2022", title: "Chip export controls on China", color: "#C23B22" },
+    { year: "2024", title: "Huawei Kirin breakthrough", color: "#C23B22" },
+  ],
+};
 
 function totalDuration(data: TimelineComparisonData): number {
   const secsPerEvent = data.secondsPerEvent || 2;
@@ -22,6 +39,6 @@ export const TimelineComparisonComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as TimelineComparisonData }}
+    defaultProps={{ data: sampleData }}
   />
 );

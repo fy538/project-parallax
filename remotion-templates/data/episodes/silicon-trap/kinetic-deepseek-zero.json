@@ -1,0 +1,10 @@
+{
+  "episode": "silicon-trap",
+  "variant": "statistic",
+  "statValue": "0",
+  "statLabel": "successful training runs",
+  "statContext": "DeepSeek R2 on Huawei Ascend chips",
+  "accentColor": "#C23B22",
+  "durationSec": 5,
+  "backgroundVariant": "dark"
+}

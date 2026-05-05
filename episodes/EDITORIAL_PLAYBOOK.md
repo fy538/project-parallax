@@ -4,12 +4,12 @@
 >
 > **Format:** Each rule is a pattern (what to do), an anti-pattern (what to avoid), the evidence (where we learned this), and the episode(s) that generated the insight. Rules are organized by production domain. New rules are appended at the end of each section; stale rules are marked `[RETIRED]` with a note about what replaced them.
 >
-> **Who reads this:** research-audit, script-audit, visual-concept, persona-eval, review-package, and the script drafting process. Each skill reads the sections relevant to its domain.
+> **Who reads this:** research-audit, script-audit, visual-concept, persona-eval, review-package, thumbnail-concept, shorts-adaptation, and the script drafting process. Each skill reads the sections relevant to its domain.
 >
 > **Who writes this:** publish-retro (appends evidence-backed rules after analytics validate them) and Tiger (approves candidate rules flagged by review-package, adds manual edits after rewrite sessions). review-package reads the playbook and flags candidate rules, but does not write to it. Nothing gets added without evidence and Tiger's approval.
 >
 > Created: April 27, 2026
-> Last updated: April 30, 2026
+> Last updated: May 1, 2026
 
 ---
 
@@ -118,11 +118,47 @@ Rules about how scripts are built — story architecture, pacing, voice, and the
 **Evidence:** Jiang narrative research — "Checkpoint Beat" technique. Recurring "Keep it simple. Checkpoint." beats every 3-5 minutes across Jiang's long-form content. Rare in geopolitics content and directly transferable.
 **Source:** JIANG_NARRATIVE_RESEARCH.md, technique #8.
 
-### NAR-13: The toxin line — structural resonance, never causal proof
-**Pattern:** Historical analogies are hypothesis generators ("this resembles X — if the pattern holds, watch for Y"). Always name at least one way the analogy breaks. Use: "this resembles," "structural resonance," "an under-discussed factor," "what doesn't fit the standard frame."
-**Anti-pattern:** Treating analogies as conclusions ("this IS X happening again"). Naming hidden agents instead of structural incentives. Using "what they don't want you to know" or "the real reason." Making unfalsifiable totalizing claims hedged with performed humility. If more than ~10% of "decoding" claims require believing in coordinated hidden actors, restructure.
+### NAR-13: The toxin line — honesty test, not percentage cap
+**Pattern:** Historical analogies are hypothesis generators ("this resembles X — if the pattern holds, watch for Y"). Always name at least one way the analogy breaks. Use: "this resembles," "structural resonance," "an under-discussed factor," "what doesn't fit the standard frame." The test for whether analysis has crossed the toxin line is *intellectual honesty*, not a word-count ratio. Ask three questions: (1) Does the claim identify structural incentives, or does it require believing specific people coordinated in secret? (2) Is the claim falsifiable — what evidence would change your mind? (3) Would a well-informed skeptic say "I disagree but that's a fair reading" or "that's conspiratorial"? If any answer points toward conspiracy, restructure.
+**Anti-pattern:** Treating analogies as conclusions ("this IS X happening again"). Naming hidden agents instead of structural incentives. Using "what they don't want you to know" or "the real reason." Making unfalsifiable totalizing claims hedged with performed humility. But note: strong analytical positions defended with evidence are *not* toxin. Saying "the export controls are structurally likely to fail because..." is analysis. Saying "they designed the controls to fail because..." is conspiracy. The line is between structural reasoning and imputed secret intent.
 **Evidence:** Jiang narrative research — toxin analysis. Critics (Free Press, SCMP, TripleAmpersand) converge on the same diagnosis: the tip from analysis to conspiracy happens when structural resonance is presented as causal proof and when named hidden agents replace incentive analysis. This is the line Parallax must never cross.
 **Source:** JIANG_NARRATIVE_RESEARCH.md section 6, Parallax content philosophy ("educated mysticism").
+
+### NAR-14: Take positions — hedged analysis is not the same as neutral analysis
+**Pattern:** The episode should arrive at a defensible analytical position, not split the difference between sides. "Both sides have a point" is the weakest possible conclusion. Strong positions sound like: "The structural incentives point toward X, and here's why the counterargument — while reasonable — underweights Y." Present the steelman, then explain why your reading is different. The viewer came for a perspective they can't get from a news summary.
+**Anti-pattern:** Ending every analysis with "it's complicated" or "only time will tell." These are true but useless — the viewer already knew that. Also: conflating neutrality with intellectual honesty. Intellectual honesty means showing your reasoning transparently, not refusing to reason to a conclusion.
+**Evidence:** Editorial rebalancing review (May 2, 2026). The pipeline had accumulated caution-oriented rules (NAR-09 through NAR-13) without counterweighting boldness. The priority is interesting, rigorous analysis — caution should serve that goal, not constrain it.
+**Source:** Editorial rebalancing, May 2026.
+
+### NAR-15: Mystery and withholding are narrative tools, not evasion
+**Pattern:** Sometimes the most engaging move is to show the audience a pattern and let them sit with it before you name it. Withholding your thesis for 60-90 seconds while building the evidence creates productive tension. Opening with a question rather than a thesis can be more compelling than a thesis statement — if the question genuinely organizes the analysis. Use mystery when the payoff is insight; avoid it when the payoff is "I told you so."
+**Anti-pattern:** Stating everything upfront because you're worried about being accused of manipulation. Also: withholding that goes nowhere (building mystery without a structural payoff is just vague). The test: does the withholding serve the viewer's understanding, or the creator's ego?
+**Evidence:** Jiang narrative research — opening hooks, decoder posture. The most effective openers create a micro-mystery ("here's a $165 billion puzzle") that the episode then solves. This is fundamentally different from clickbait, which withholds to extract clicks without delivering insight.
+**Source:** JIANG_NARRATIVE_RESEARCH.md, editorial rebalancing May 2026.
+
+### NAR-16: Your cross-cultural identity is an analytical asset, not a liability
+**Pattern:** Tiger's native fluency in both Chinese and Western intellectual traditions is the channel's hardest-to-copy differentiator. Use it. Introduce Chinese strategic frameworks (Shi/势, Tianxia, Legalist thought) as genuine analytical tools alongside Western ones. Present both traditions' internal logic. The Translator identity direction exists because this is genuinely rare and valuable — lean into it when the topic calls for it.
+**Anti-pattern:** Avoiding all identity-adjacent analysis out of fear it "becomes the story." The test is whether identity *serves* the analysis or *replaces* it. "Here's how the concept of 势 (shi) reveals something about chip supply chains that balance-of-power theory misses" is analysis. "As a Chinese-American, I feel torn about..." is memoir. The first is the channel's superpower; the second is a different show.
+**Evidence:** Content Identity Direction 4 (The Translator) — identified as the strongest moat and most differentiated position. Competitive gap analysis confirms no credible English-language channel occupies this space. Editorial rebalancing found that negative filter 2 ("identity never becomes the story") was overcorrecting against this strength.
+**Source:** CONTENT_IDENTITY.md Direction 4, editorial rebalancing May 2026.
+
+### NAR-17: Every episode should make a forward-looking claim
+**Pattern:** The episode should not end at "here's what happened and here's the pattern." Push into "if this pattern holds, here's what to watch for." This can be a named scenario with a probability, a single falsifiable prediction with a timeframe, or a set of watch signals the audience can track. The form is decided in the angle memo's speculation budget. The prediction gets registered in `data/concepts.json` as a prediction-type concept — this creates the infrastructure for future "Was I Right?" episodes (Oracle identity direction).
+**Anti-pattern:** Ending every episode with "only time will tell" or "the situation remains fluid." These are true but useless — the viewer already knew that. Also: making predictions without falsification criteria. If you can't name what would prove you wrong, you're not predicting — you're performing confidence.
+**Evidence:** Oracle identity direction in CONTENT_IDENTITY.md. Competitive analysis: channels that make falsifiable predictions and track their record (Zeihan's hit rate, Good Judgment Project's calibration) build deeper trust than channels that only analyze the past. The prediction tracking infrastructure (concept registry + lookup CLI) was built to operationalize this.
+**Source:** CONTENT_IDENTITY.md Direction 2, editorial rebalancing May 2026.
+
+### NAR-18: Scenario analysis beats hedging
+**Pattern:** When the analysis reveals genuine uncertainty, present 2-3 named scenarios with rough probability estimates rather than hedging. "There are three ways this plays out: the Murano Scenario (40%), the Boomerang Scenario (35%), and the wildcard (25%)" is more interesting, more honest, and more useful than "it's complicated." Each scenario should be structurally grounded — it should follow from the episode's cross-domain connections, not be invented from thin air. Name the scenarios memorably (they're conceptual products too).
+**Anti-pattern:** "It could go either way." "Both outcomes are possible." "The situation is complex." These are hedges disguised as analysis. If you genuinely can't distinguish scenarios, you haven't analyzed deeply enough. Also: scenarios without structural rationale. Each scenario should connect back to a specific cross-domain parallel or structural mechanism from the episode.
+**Evidence:** Superforecasting research (Tetlock) shows that people who think in scenarios and assign probabilities outperform those who think in narratives. Named scenarios with probabilities are simultaneously more engaging (narrative) and more rigorous (quantified uncertainty). The prediction registry makes these trackable.
+**Source:** CONTENT_IDENTITY.md Direction 2, Tetlock superforecasting framework, editorial rebalancing May 2026.
+
+### NAR-19: "What would change my mind" is the strongest credibility signal
+**Pattern:** Every episode should include at least one moment where Tiger names the strongest evidence against the thesis. "Here's what would make me wrong: if SMIC demonstrates consistent sub-7nm yields at scale by Q4 2027, the entire export control thesis collapses." This is the ultimate decoder move — it shows the viewer you're reasoning transparently, not advocating for a conclusion. Place it in the scenario/prediction beat or the closing.
+**Anti-pattern:** Presenting counterarguments without genuinely engaging them. "Some people say X, but actually Y" is not intellectual honesty — it's a rhetorical move. The test: would a smart advocate for the opposing view feel their argument was represented fairly? Also: never naming what would change your mind, which signals you've already decided and are building the case backward.
+**Evidence:** Bayesian epistemology (updating beliefs on evidence) is one of the channel's three philosophical pillars. Naming falsification criteria operationalizes it. Competitive analysis: this is extremely rare in geopolitics content and would be a strong differentiator.
+**Source:** Content philosophy ("educated mysticism"), Bayesian updating framework, editorial rebalancing May 2026.
 
 ---
 
@@ -130,11 +166,11 @@ Rules about how scripts are built — story architecture, pacing, voice, and the
 
 Rules about visual pacing, tool assignment, mode balance, and the relationship between what's seen and what's heard.
 
-### VIS-01: Footage 50-70%, MG 20-30%, Layered 5-15%
-**Pattern:** The visual mode breakdown should stay within these ranges. If MG exceeds 35%, the episode feels like a slideshow. If footage exceeds 75%, analysis feels unsupported.
-**Anti-pattern:** All-MG scripts (data visualization after data visualization) or all-footage scripts (stock footage with narration over it).
-**Evidence:** Channel design principle from VISUAL_LANGUAGE.md. Based on competitive analysis of Wendover, Johnny Harris, Vox, CaspianReport visual approaches.
-**Source:** VISUAL_LANGUAGE.md, D37.
+### VIS-01: MG 40-55%, Footage 30-40%, Layered 5-15%, Transitions 5-10%
+**Pattern:** The visual mode breakdown should stay within these ranges. Analytical video essays are naturally MG-dominant — maps, charts, framework diagrams, and typography carry the intellectual weight. Footage provides emotional grounding, breathing room, and real-world anchoring. If MG exceeds 60%, the episode feels like a slideshow. If footage drops below 25%, the analysis feels disconnected from reality. Every beat should open with footage (establish) before moving to MG (analyze), then return to footage (breathe) before the next analytical push.
+**Anti-pattern:** All-MG scripts (data visualization after data visualization with no footage breaks) or footage-dominant scripts that underserve the analytical content. Also: the old 50-70% footage target, which was calibrated for documentary rather than video essay and caused visual columns to fight the natural MG demands of analytical content.
+**Evidence:** Research into top analytical channels (May 2, 2026): Wendover, Vox, and PolyMatter are MG-dominant (50-60% MG); Johnny Harris is more footage-heavy but covers travel/personal content. Kurzgesagt is 100% custom illustration. The original 50-70% footage target was based on broad competitive analysis but didn't account for the MG demands of decoder-style analytical content. EP01 v4 naturally landed at ~57% MG / ~23% footage — the format wants to be MG-heavy. EP02 stress test confirmed: Philosopher's Lens format hit 33% MG even with deliberate footage anchoring.
+**Source:** VISUAL_LANGUAGE.md, D37, EP01 v4 production analysis, EP02 stress test, competitive research (Wendover, Vox, Johnny Harris, Kurzgesagt, PolyMatter).
 
 ### VIS-02: Max 3 consecutive MG entries without a footage break
 **Pattern:** After 3 motion graphics in a row, cut to footage for breathing room. The viewer's analytical attention needs a reset.
@@ -159,6 +195,47 @@ Rules about visual pacing, tool assignment, mode balance, and the relationship b
 **Anti-pattern:** Bezier curves for supply chain flows, trade routes, or connection diagrams. Endpoints consistently misalign with node edges.
 **Evidence:** EP01 supply chain illustration — 4 iterations. v1 (curved lines — failed), v3 (curves still disconnecting), v4 (straight lines — clean).
 **Source:** D35, Session 10.
+
+### VIS-06: Break synchronization at turning points — use visual-first or counterpoint
+**Pattern:** At key turning points (thesis complications, surprise reveals, emotional pivots), break the default synchronized timing. Either let the visual arrive 3-5 seconds before narration explains it (visual-first — creates micro-mystery) or show something that tensions with the narration (counterpoint — creates productive unease). Plan 2-3 visual-first and 1-2 counterpoint moments per episode in the angle memo's visual arc.
+**Anti-pattern:** Every visual illustrating the narration in lockstep for the entire episode. Synchronized mode is the correct default (~70% of runtime), but an episode with zero timing breaks feels like a slideshow with voiceover.
+**Evidence:** Research into video essayist techniques (Johnny Harris visual-first maps, Adam Curtis archival counterpoint, Errol Morris visual irony). The highest-engagement moments in successful video essays consistently break visual-audio synchronization.
+**Source:** Visual-narrative integration research, April 30, 2026.
+
+### VIS-07: One visual motif per episode, introduced early, evolved across beats
+**Pattern:** Each episode's named concept should have a visual motif — a simple geometric/diagrammatic element that appears in the first 2 minutes and returns at least twice, evolving to track the emotional arc. The motif gives the concept a visual identity that accumulates meaning.
+**Anti-pattern:** Introducing a cool visual element once and never returning to it. Or having no recurring visual thread — each beat's visuals are isolated from every other beat's.
+**Evidence:** Kurzgesagt recurring elements, CaspianReport evolving map styles, The Pudding's transforming data visualizations. Recurring visual elements create memory and tracking engagement.
+**Source:** Visual-narrative integration research, April 30, 2026.
+
+### VIS-08: Radio edit test before visual planning — narration must stand alone
+**Pattern:** After drafting the script, read the narration column as a podcast script (no visuals). If the argument is clear, transitions work, and pacing holds, the visual layer can be additive. If not, fix the narration first.
+**Anti-pattern:** Designing visuals to compensate for weak narration. "This transition is confusing but the map will make it clear" means the transition is broken — fix the words.
+**Evidence:** Documentary radio edit workflow (industry standard practice). Ensures the visual layer deepens rather than props up.
+**Source:** Visual-narrative integration research, April 30, 2026.
+
+### VIS-09: Three registers present, each serving its cognitive function
+**Pattern:** Every episode 8+ minutes should use all three visual registers: Analytical (Remotion templates — where the viewer reads data), Atmospheric (Recraft constructivist illustrations — where the viewer feels emotion), and Grounding (AI-generated photorealistic scenes — where the viewer inhabits a space). All three pass through the same brand treatment ramps (palette.json), giving them shared tonal DNA. Target proportions: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN 5-15%. Max 3 consecutive same-register entries without a break. Transition grammar between registers: Analytical→Grounding = color-wash, Grounding→Atmospheric = blur-through, Atmospheric→Analytical = iris, Analytical→Atmospheric = dissolve. Texture hierarchy signals function: Registers 2+3 get grain+vignette (signaling "the world"), Register 1 stays clean (signaling "the analysis").
+**Anti-pattern:** All-MG episodes (pure analytical slideshow), or atmospheric-dominant sequences (2+ ILLUST in a row — viewer fatigue from sustained mood without data resolution). Also: using atmospheric illustrations for data-carrying visuals (anything the viewer needs to *read* belongs in MG), or using AI-GEN for spaces that stock footage can adequately cover (AI-GEN is for genuinely unsourceable physical spaces only). Hard cuts between stylistically distant registers (constructivist art directly to photorealistic AI) without a transition are jarring.
+**Evidence:** Three-register visual system design (May 3, 2026). Research confirmed mixed-media visual language works when unified by color (shared duotone ramps), motion (transition grammar), and texture (grain hierarchy), not by style matching. Constructivist illustration fills the emotional-texture role that generic B-roll previously occupied — much higher editorial value at similar cost. AI video fills the physical-grounding role for restricted/historical spaces.
+**Source:** VISUAL_LANGUAGE.md "Three Visual Registers" section, Recraft tool testing, AI video pipeline research, May 2026.
+
+### VIS-10: Treatment ramp must pair sensibly with register — atmospheric + editorial is forbidden
+**Pattern:** The `treatment` field on a shot list entry (`standard` / `conflict` / `editorial`) is not independent of `register`. Each register has a default ramp and a small set of valid alternates; mismatched pairings either undercut the register's editorial purpose or destroy its palette. Use the matrix:
+
+| Register | standard | conflict | editorial |
+|---|---|---|---|
+| **atmospheric** | ✓ default — civilizational mood, industrial ambition | ✓ rare (max 1-2/ep) — high-tension constructivist | ✗ AVOID — desaturates the constructivist palette into mush |
+| **grounding** | ✓ default — present-day reconstruction (fab interiors, command centers) | ✓ adversarial reconstruction (military, sanctions, contested) | ✓ historical reconstruction (pre-1980s — embargo signings, Cold War) |
+| **analytical** | ✓ omit or `standard` — code-clean default | ✗ rarely meaningful — analytical doesn't carry tonal mood | ✗ rarely meaningful |
+
+The render-qa skill validates this matrix per shot before assembly; visual-spec should pre-validate it when emitting shot lists. Atmospheric + editorial is the most common error mode — the editorial ramp is calibrated for archival/desaturated grounding scenes, and applying it to constructivist illustration kills the saturated umber/amber/rust palette the register depends on.
+
+**Anti-pattern:** Letting `treatment` default to `standard` everywhere without thinking about register pairing. Also: assuming the LUT can rescue a mismatched pairing — it can't. The treatment ramp is a duotone remap, not a stylistic translator. Atmospheric content with editorial treatment doesn't become "softer atmospheric"; it becomes muddy.
+
+**Evidence:** Three-register implementation work (May 4, 2026). The treatment field and register field were originally independent in the shot-list schema. Walking through the 9-cell pairing matrix surfaced three forbidden combinations and three rare-but-valid ones; the rest are defaults. Without this rule, shot lists drift toward `treatment: standard` everywhere, which works for grounding but flattens grounding × historical (should be editorial) and grounding × adversarial (should be conflict) into the same tonal register — destroying the visual differentiation those treatments were designed to carry.
+
+**Source:** PROMPT_PREAMBLES.md (two-stage brand unification), `data/shot-list.schema.json` (where the fields live), `tools/brand-treatment/palette.json` (where the ramps are defined), May 2026 register integration work.
 
 ---
 
@@ -209,6 +286,24 @@ Rules about what makes a research brief script-ready and what causes downstream 
 **Evidence:** research-audit skill design, claim verification tag system in SCRIPT_FORMAT.md.
 **Source:** D30, SCRIPT_FORMAT.md claim verification section.
 
+### RES-03: Viability check before committing research time
+**Pattern:** Before running Deep Research (~30 min), write a 5-question viability brief: structural resonance, named historical parallel, decoder framing, quick rubric gut check, angle gap. If you can't fill this page without handwaving, the topic stays in incubation.
+**Anti-pattern:** Going straight from "interesting idea" to a full Deep Research session. Some topics fail at research-audit because the historical depth was never there — the viability check catches this in 5 minutes instead of 30+.
+**Evidence:** Documentary production "treatment" workflow (viability gate before committing production resources). EP01 went through 4 script versions partly because narrative decisions were discovered late; earlier viability testing would surface structural weaknesses sooner.
+**Source:** Visual-narrative + editorial pipeline research, May 1, 2026.
+
+### RES-04: Multi-pass research for knowledge density — don't rely on a single sweep
+**Pattern:** Structure Deep Research as three passes: (1) foundation sweep (the current approach), (2) targeted cross-domain connection hunt using the bisociation method (list core structural concepts, then deliberately search across adjacent civilizations and domains), (3) verification and depth on the strongest 2-3 connections. The knowledge density requirement (4-5 surprising connections) demands this.
+**Anti-pattern:** Running one big Deep Research query and hoping it surfaces genuinely surprising cross-domain connections. A single pass finds the obvious parallels; the surprising ones (Venice's Murano glass → TSMC) require deliberate cross-domain searching.
+**Evidence:** Research into bisociation methodology (Koestler) and cross-domain synthesis practices. The knowledge density requirement added in NAR-09/Jiang research demands connections that won't surface from a broad sweep alone.
+**Source:** Editorial pipeline research, May 1, 2026.
+
+### RES-05: Competitive landscape check before research — find the angle gap
+**Pattern:** Before committing to a topic, spend 10 minutes checking what exists on YouTube: search the topic, watch top 3-5 video intros, scan comment sections for repeated questions. The angle gap is what Parallax says that nobody else is saying. If you can't state the gap in one sentence, the topic needs a different angle.
+**Anti-pattern:** Researching and scripting a topic without checking whether the exact same angle has already been covered well. The goal isn't to avoid covered topics — it's to ensure the Parallax angle (cross-domain connections, decoder framing, structural resonance) is genuinely differentiated.
+**Evidence:** Competitive intelligence practices from successful video essayists. Comment sections on competitor videos are direct demand signals for underserved angles.
+**Source:** Editorial pipeline research, May 1, 2026.
+
 ---
 
 ## 5. Production & Technical
@@ -237,7 +332,29 @@ Rules about the Remotion pipeline, asset sourcing, and production workflow.
 
 ## 6. Analytics & Performance
 
-*This section is populated by publish-retro after episodes go live. Empty until EP01 analytics are available.*
+*This section is populated by publish-retro after episodes go live. No published episodes yet — hypotheses and candidate rules below await validation.*
+
+### Candidate Rules from EP02 Stress Test
+
+These emerged from the EP02 end-to-end pipeline stress test (May 2, 2026). All three audit skills (visual-concept, script-audit, persona-eval) converged on the same structural issues, giving high confidence. Awaiting Tiger's approval to promote to active rules.
+
+#### CANDIDATE NAR-14: Cap detailed cross-domain parallels at 3 per episode
+**Pattern:** Develop at most 3 cross-domain connections as full parallels (each with setup, resonance, and named breakage — typically 150-250 words). Additional connections should appear as brief evidence callouts (one sentence, e.g., "The same defection logic shows up in Atlantic fishing quotas").
+**Anti-pattern:** Four or more fully developed parallels in a single episode. Each detailed parallel requires 4-5 MG compositions and 150-250 words. Beyond three, they compress pacing, create visual monotony (consecutive MG blocks), and fatigue the viewer — even when individually excellent.
+**Evidence:** EP02 script-v1 had 4 detailed parallels in Beat 5 (Venice, COCOM, Atlantic fisheries, Cold War). All three audits independently flagged this: visual-concept found 6 consecutive MGs, script-audit found pacing compression, persona-eval found Marcus fading. Review-package elevated it as the #1 priority fix.
+**Source:** EP02 pipeline-retrospective.md, review-package.md. Rule already added to script-draft SKILL.md.
+
+#### CANDIDATE VIS-09: Framework-heavy formats need deliberate footage anchoring
+**Pattern:** The Philosopher's Lens format (framework-primary, geopolitics-illustrative) is inherently MG-heavy because frameworks are abstract. To stay within VIS-01 targets (MG 40-55%, FOOTAGE 30-40%), deliberately plan footage anchoring: open each beat with establishing footage before the framework analysis, and insert footage breathing room between framework diagrams.
+**Anti-pattern:** Letting framework episodes drift to 35%+ MG by default. The Philosopher's Lens format creates structural tension with visual pacing rules — every framework needs a diagram, and the format has more frameworks than other formats. Without deliberate planning, MG density accumulates.
+**Evidence:** EP02 (Philosopher's Lens format) hit MG 33% at aggregate level — within tolerance but above the 30% soft cap. Beats 3-5 exceeded the max-3 consecutive MG rule. The format itself, not the script quality, drives the MG pressure.
+**Source:** EP02 visual-concept-audit.md, pipeline-retrospective.md.
+
+#### CANDIDATE PROD-04: Convergent audit findings are high-confidence signals
+**Pattern:** When visual-concept, script-audit, and persona-eval independently flag the same issue through different analytical paths, treat it as a confirmed problem — not a maybe. Review-package should elevate convergent findings to highest priority regardless of individual severity ratings.
+**Anti-pattern:** Treating each audit's findings independently and averaging severity. If all three audits flag Beat 4-5 rhythm (visual-concept via MG density, script-audit via pacing compression, persona-eval via Marcus fading), that's not three minor issues — it's one major issue seen from three angles.
+**Evidence:** EP02 stress test. Beat 4-5 MG monotony was flagged by all three audits through completely different lenses. Review-package correctly elevated it to #1 priority. The parallel audit design produces this convergent signal by construction.
+**Source:** EP02 pipeline-retrospective.md Finding 2.
 
 ### Hypotheses awaiting EP01 validation
 
@@ -275,3 +392,8 @@ RETIRED:    Contradicted by new evidence. Kept in the doc (struck through)
 |------|--------|--------|
 | April 27, 2026 | Initial playbook created. 8 NAR rules, 5 VIS rules, 4 PER rules, 2 RES rules, 3 PROD rules seeded from EP01 REVISION_LOG and skill designs. | EP01 REVISION_LOG, skill definitions, DECISIONS.md |
 | April 30, 2026 | Added NAR-09 through NAR-13: narrative posture (insider/decoder), stakes-first opens, named conceptual products, checkpoint beats, toxin line. All derived from Jiang narrative research. | JIANG_NARRATIVE_RESEARCH.md |
+| April 30, 2026 | Pipeline structural update: added script angle memo step (Stage 4), title/hook workshop (post-review), script-audit expanded to 8 lenses (Lens 7: decoder posture, Lens 8: connection density), review-package now generates cold-open alternatives. | Pipeline gap analysis session |
+| May 1, 2026 | Added VIS-06 through VIS-08: visual-narrative timing (visual-first + counterpoint), visual motifs, radio edit test. Added visual arc to angle memo (item 9). Updated VISUAL_LANGUAGE.md with timing framework section. Added radio edit checkpoint to pipeline Stage 6. | Visual-narrative integration research |
+| May 1, 2026 | Added RES-03 through RES-05: viability check before research, multi-pass research for knowledge density, competitive landscape check. Restructured IDEAS.md into topic lifecycle funnel. Added signal monitoring, viability check (Stage 2), and sequencing intelligence to PRODUCTION_PIPELINE.md. Updated RESEARCH_WORKFLOW.md with 3-pass research, cross-domain connection hunt prompt, and signal monitoring workflow. Pipeline now has 10 stages. | Editorial pipeline research |
+| May 2, 2026 | Added 3 CANDIDATE rules from EP02 stress test: NAR-14 (cross-domain parallel cap at 3), VIS-09 (framework-heavy format footage anchoring), PROD-04 (convergent audit signals). All supported by convergent findings across 3 audit skills. Awaiting Tiger approval. | EP02 pipeline-retrospective.md |
+| May 4, 2026 | Added VIS-10: treatment-ramp × register pairing matrix. Forbids atmospheric+editorial; documents 3 valid grounding × treatment combinations and 1 rare-but-valid atmospheric+conflict. Closes the second cosmetic gap from the register integration audit. Note: existing playbook has a numbering collision — both an active VIS-09 ("three registers present") and a CANDIDATE VIS-09 ("framework-heavy formats need footage anchoring"). The candidate should be renumbered VIS-11 if/when promoted. | Register integration gap closure, May 2026 |

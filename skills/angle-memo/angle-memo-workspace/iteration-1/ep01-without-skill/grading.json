@@ -1,0 +1,64 @@
+{
+  "expectations": [
+    {
+      "text": "named-concept-with-breakage",
+      "passed": true,
+      "evidence": "Named concept: True, Breakage defined: True"
+    },
+    {
+      "text": "cold-open-with-drafts",
+      "passed": true,
+      "evidence": "Cold open section: True, Draft openers: True"
+    },
+    {
+      "text": "connections-with-breakage",
+      "passed": false,
+      "evidence": "Connections: 3, Breakages: 0"
+    },
+    {
+      "text": "emotional-arc-complete",
+      "passed": true,
+      "evidence": "Beats in arc: 5 (Disorientation, Recognition, Complexity Palpable, Intellectual Humility, Thoughtful Uncertainty), Last beat personal: True. Original regex under-counted due to format variation."
+    },
+    {
+      "text": "stakes-sentence-concrete",
+      "passed": true,
+      "evidence": "Stakes section: True, Concrete objects: True"
+    },
+    {
+      "text": "decoder-framing-with-gap",
+      "passed": true,
+      "evidence": "Decoder section: True, Gap articulated: True"
+    },
+    {
+      "text": "visual-motif-evolving",
+      "passed": true,
+      "evidence": "Motif described: True, Evolution planned: True"
+    },
+    {
+      "text": "visual-first-moments",
+      "passed": true,
+      "evidence": "Visual-first references: 3"
+    },
+    {
+      "text": "counterpoint-moment",
+      "passed": true,
+      "evidence": "Counterpoint references: 2"
+    },
+    {
+      "text": "title-options",
+      "passed": true,
+      "evidence": "Title options: 5"
+    },
+    {
+      "text": "toxin-line-clean",
+      "passed": true,
+      "evidence": "'Proves' language: False, Hedging language: True"
+    },
+    {
+      "text": "reasonable-length",
+      "passed": true,
+      "evidence": "Word count: 1463"
+    }
+  ]
+}

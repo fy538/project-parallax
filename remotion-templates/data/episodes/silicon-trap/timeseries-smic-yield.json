@@ -1,0 +1,44 @@
+{
+  "episode": "silicon-trap",
+  "title": "SMIC 7nm Yield Trajectory",
+  "subtitle": "Without EUV lithography",
+  "lines": [
+    {
+      "label": "SMIC 7nm yield",
+      "color": "#C23B22",
+      "points": [
+        { "x": "2023 Q1", "y": 15 },
+        { "x": "2023 Q3", "y": 25 },
+        { "x": "2024 Q1", "y": 38 },
+        { "x": "2024 Q3", "y": 50 },
+        { "x": "2025 Q1", "y": 60 },
+        { "x": "2025 Q3", "y": 68 }
+      ],
+      "areaFill": true
+    }
+  ],
+  "annotations": [
+    {
+      "x": "2023 Q3",
+      "label": "Huawei Mate 60 launch",
+      "sublabel": "First SMIC 7nm in consumer device"
+    }
+  ],
+  "referenceLines": [
+    {
+      "y": 80,
+      "label": "Industry standard yield",
+      "dashed": true
+    }
+  ],
+  "xLabel": "Quarter",
+  "yLabel": "Yield",
+  "yUnit": "%",
+  "heroStat": {
+    "value": "~65%",
+    "label": "Current SMIC 7nm yield"
+  },
+  "durationSec": 5,
+  "backgroundVariant": "light",
+  "source": "TechInsights, SemiAnalysis estimates"
+}

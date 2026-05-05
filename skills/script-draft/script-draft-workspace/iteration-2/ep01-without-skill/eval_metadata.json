@@ -1,0 +1,92 @@
+{
+  "eval_id": 1,
+  "eval_name": "ep01-silicon-trap-baseline",
+  "prompt": "Draft a production script for EP01 — The Silicon Trap using the research brief, angle memo, and format spec only (no skill).",
+  "assertions": [
+    {
+      "id": "format-two-column",
+      "text": "Script uses two-column table format with NARRATION and VISUAL PRODUCTION headers",
+      "type": "format"
+    },
+    {
+      "id": "format-beat-structure",
+      "text": "Script has 5 beats with titles and time ranges",
+      "type": "format"
+    },
+    {
+      "id": "format-mode-tags",
+      "text": "Every visual entry has a mode tag ([FOOTAGE:], [MG:], or [LAYERED:])",
+      "type": "format"
+    },
+    {
+      "id": "format-priority-tiers",
+      "text": "Every visual entry has a priority tier (P1, P2, or P3)",
+      "type": "format"
+    },
+    {
+      "id": "format-claim-tags",
+      "text": "Factual claims are tagged with {✅}, {⚠️}, or {NEW}",
+      "type": "format"
+    },
+    {
+      "id": "format-asset-summary",
+      "text": "Asset summary includes mode breakdown table, Remotion compositions, stock footage, images/archival tables",
+      "type": "format"
+    },
+    {
+      "id": "nar-01-tension-order",
+      "text": "Beats are organized by escalating tension, not by logic/topic order",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-05-personal-stakes-ending",
+      "text": "Final beat closes on concrete personal stakes (your car, your phone, your life), not epistemological observation",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-09-decoder-posture",
+      "text": "No 'let me explain' or 'to understand this first' explainer moves; uses decoder framing throughout",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-10-stakes-first-30s",
+      "text": "Viewer feels personally implicated or encounters a contradiction/stakes within first ~30 seconds",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-11-named-concept",
+      "text": "Named concept ('The Silicon Trap') appears 3+ times with accumulating meaning",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-12-checkpoints",
+      "text": "Checkpoint beats appear every 3-5 minutes (consolidation moments)",
+      "type": "narrative"
+    },
+    {
+      "id": "nar-06-bilateral-balance",
+      "text": "Both US and China perspectives shown with internal logic on their own terms (including Chinese emotional framing like 卡脖子)",
+      "type": "narrative"
+    },
+    {
+      "id": "vis-06-timing-breaks",
+      "text": "Script includes [VISUAL-FIRST] or [COUNTERPOINT] annotations at turning points",
+      "type": "visual"
+    },
+    {
+      "id": "vis-07-visual-motif",
+      "text": "A visual motif is planned that appears early and evolves across beats",
+      "type": "visual"
+    },
+    {
+      "id": "vis-mode-balance",
+      "text": "Mode balance within targets: FOOTAGE 50-70%, MG 20-30%, LAYERED 5-15%",
+      "type": "visual"
+    },
+    {
+      "id": "vis-no-abstract-footage",
+      "text": "No [FOOTAGE:] specs for abstract concepts that cameras can't capture",
+      "type": "visual"
+    }
+  ]
+}

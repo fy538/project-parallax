@@ -1,51 +1,42 @@
 /**
  * DataChartShort — vertical 9:16 bar chart for Shorts.
  *
- * Optimized for "The Market Says..." and "Was I Right?" series.
- * Horizontal bars (easier to read on mobile) with large labels.
+ * Uses ShortsWrapper + useVerticalLayout for systematic vertical
+ * adaptation. Horizontal bars with large labels for mobile readability.
+ * Same data schema as landscape DataChart.
  *
- * Usage: Feed the same JSON as landscape DataChart.
+ * Series: "The Market Says...", "Was I Right?"
  */
 
-import React from "react";
-import {
-  AbsoluteFill,
-  useCurrentFrame,
-  interpolate,
-} from "remotion";
+import React, { useMemo } from "react";
+import { interpolate } from "remotion";
 import {
   palette,
-  semantic,
   fonts,
-  fontSizes,
   fontWeights,
-  letterSpacing,
-  layout,
-  sec,
-  durations,
-  light,
+  shadows,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, CLAMP_CUBIC } from "../../utils/animation";
 import { barGradient } from "../../utils/depth";
-import { Background } from "../../components/Background";
-import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { ShortsWrapper } from "../../components/ShortsWrapper";
 import type { DataChartData, DataPoint } from "../DataChart/types";
-import { shortsLayout } from "./types";
 
-// ── Animated horizontal bar ───────────────────────────────────────────────
+// ── Animated horizontal bar ─────────────────────────────────────────────
 
 const HorizontalBar: React.FC<{
   point: DataPoint;
   index: number;
   maxValue: number;
   frame: number;
+  exit: number;
   unit: string;
   defaultColor: string;
-}> = ({ point, index, maxValue, frame, unit, defaultColor }) => {
-  const barStart = 15 + index * 8; // Stagger per bar
+  vl: any;
+  theme: any;
+}> = ({ point, index, maxValue, frame, exit, unit, defaultColor, vl, theme }) => {
+  const barStart = 15 + index * 8;
   const color = point.color || defaultColor;
 
-  // Bar growth
   const growth = interpolate(
     frame,
     [barStart, barStart + 20],
@@ -54,39 +45,36 @@ const HorizontalBar: React.FC<{
   );
 
   const widthPercent = (point.value / maxValue) * 100 * growth;
-
-  // Value count-up
   const displayValue = Math.round(point.value * growth);
-
-  // Label fade
-  const labelOpacity = fadeIn(frame, barStart - 4, 6);
+  const labelOpacity = fadeIn(frame, barStart - 4, 6) * exit;
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div style={{ marginBottom: vl.spacing.lg }}>
       {/* Label row */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
-          marginBottom: 10,
+          marginBottom: vl.spacing.sm,
           opacity: labelOpacity,
           transform: `translateY(${slideIn(frame, barStart - 4, 8, 6)}px)`,
         }}
       >
         <span
           style={{
-            fontSize: 24,
+            fontSize: vl.fontSizes.body,
             fontFamily: fonts.display,
             fontWeight: fontWeights.medium,
-            color: light.text.primary,
+            color: theme.text.primary,
+            textShadow: theme.textShadow,
           }}
         >
           {point.label}
         </span>
         <span
           style={{
-            fontSize: 28,
+            fontSize: vl.fontSizes.body + 4,
             fontFamily: fonts.data,
             fontWeight: fontWeights.bold,
             color,
@@ -102,19 +90,18 @@ const HorizontalBar: React.FC<{
         style={{
           width: "100%",
           height: 32,
-          backgroundColor: `${light.text.muted}20`,
+          backgroundColor: `${theme.text.muted}20`,
           borderRadius: 4,
           overflow: "hidden",
         }}
       >
-        {/* Bar fill */}
         <div
           style={{
             width: `${widthPercent}%`,
             height: "100%",
             background: barGradient(color),
             borderRadius: 4,
-            boxShadow: `0 2px 8px ${color}30`,
+            boxShadow: shadows.subtle,
           }}
         />
       </div>
@@ -123,11 +110,12 @@ const HorizontalBar: React.FC<{
       {point.sublabel && (
         <div
           style={{
-            fontSize: 16,
+            fontSize: vl.fontSizes.caption,
             fontFamily: fonts.body,
-            color: light.text.muted,
-            marginTop: 6,
+            color: theme.text.muted,
+            marginTop: 4,
             opacity: labelOpacity,
+            textShadow: theme.textShadow,
           }}
         >
           {point.sublabel}
@@ -137,102 +125,71 @@ const HorizontalBar: React.FC<{
   );
 };
 
-// ── Main component ────────────────────────────────────────────────────────
+// ── Main component ──────────────────────────────────────────────────────
 
 export const DataChartShort: React.FC<{ data: DataChartData }> = ({
   data,
 }) => {
-  const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation({ noDrift: true });
   const points = data.dataPoints || [];
-  const maxValue = Math.max(...points.map((p) => p.value), 1);
-  const accent = palette.amber;
+  const maxValue = useMemo(
+    () => Math.max(...points.map((p) => p.value), 1),
+    [points]
+  );
 
   return (
-    <Background variant={(data as any).backgroundVariant || "light"}>
-      <AbsoluteFill style={compStyle}>
-        {/* Title area */}
-        <div
-          style={{
-            position: "absolute",
-            top: shortsLayout.titleTop,
-            left: shortsLayout.safeArea.left,
-            right: shortsLayout.safeArea.right,
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 40,
-              fontFamily: fonts.display,
-              fontWeight: fontWeights.bold,
-              color: light.text.primary,
-              letterSpacing: letterSpacing.h2,
-              opacity: fadeIn(frame, 0, 10),
-              transform: `translateY(${slideIn(frame, 0, 12, 10)}px)`,
-              lineHeight: 1.2,
-            }}
-          >
-            {data.title}
-          </div>
-          {data.subtitle && (
-            <div
-              style={{
-                fontSize: 22,
-                fontFamily: fonts.body,
-                color: light.text.secondary,
-                marginTop: 12,
-                opacity: fadeIn(frame, 5, 8),
-                transform: `translateY(${slideIn(frame, 5, 10, 8)}px)`,
-              }}
-            >
-              {data.subtitle}
-            </div>
-          )}
-        </div>
-
-        {/* Bars area */}
-        <div
-          style={{
-            position: "absolute",
-            top: shortsLayout.contentTop + 40,
-            left: shortsLayout.safeArea.left + 16,
-            right: shortsLayout.safeArea.right + 16,
-          }}
-        >
-          {points.map((point, i) => (
-            <HorizontalBar
-              key={i}
-              point={point}
-              index={i}
-              maxValue={maxValue}
-              frame={frame}
-              unit={data.unit || ""}
-              defaultColor={accent}
-            />
-          ))}
-        </div>
-
-        {/* Source */}
-        {data.source && (
+    <ShortsWrapper
+      title={data.title}
+      subtitle={data.subtitle}
+      mode={(data as any).backgroundVariant}
+    >
+      {(vl, theme, frame, exit) => (
+        <>
+          {/* Bars area */}
           <div
             style={{
               position: "absolute",
-              bottom: shortsLayout.safeArea.bottom,
-              left: shortsLayout.safeArea.left,
-              right: shortsLayout.safeArea.right,
-              textAlign: "center",
-              fontSize: 14,
-              fontFamily: fonts.body,
-              color: light.text.muted,
-              opacity: fadeIn(frame, 30, 8),
-              transform: `translateY(${slideIn(frame, 30, 8, 8)}px)`,
+              top: vl.contentTop + 40,
+              left: vl.safeArea.left + 16,
+              right: vl.safeArea.right + 16,
             }}
           >
-            {data.source}
+            {points.map((point, i) => (
+              <HorizontalBar
+                key={i}
+                point={point}
+                index={i}
+                maxValue={maxValue}
+                frame={frame}
+                exit={exit}
+                unit={data.unit || ""}
+                defaultColor={palette.amber}
+                vl={vl}
+                theme={theme}
+              />
+            ))}
           </div>
-        )}
-      </AbsoluteFill>
-    </Background>
+
+          {/* Source */}
+          {data.source && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: vl.safeArea.bottom,
+                left: vl.safeArea.left,
+                right: vl.safeArea.right,
+                textAlign: "center",
+                fontSize: vl.fontSizes.caption,
+                fontFamily: fonts.body,
+                color: theme.text.muted,
+                opacity: fadeIn(frame, 30, 8) * exit,
+                textShadow: theme.textShadow,
+              }}
+            >
+              {data.source}
+            </div>
+          )}
+        </>
+      )}
+    </ShortsWrapper>
   );
 };

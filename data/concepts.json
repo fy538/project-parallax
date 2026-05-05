@@ -1,0 +1,879 @@
+{
+  "version": "1.0.0",
+  "concepts": [
+    {
+      "id": "ka-bozi",
+      "term": {
+        "en": "stranglehold technology",
+        "cn": "卡脖子",
+        "pinyin": "kǎ bózi"
+      },
+      "type": "foreign-term",
+      "definition": "Technologies where a foreign power has you by the throat — critical dependencies that can be weaponized.",
+      "insight": "In Chinese public discourse this isn't abstract policy language — it's visceral. The ballpoint pen parable (a space-faring nation that couldn't make a pen tip) turned it into a national humiliation narrative that drives trillion-dollar investment decisions.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 3,
+        "timestamp": "7:00-7:30",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "juguo-tizhi",
+        "technology-denial",
+        "cocom",
+        "supply-chain-fragility"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "china",
+        "semiconductors",
+        "industrial-policy"
+      ],
+      "callbackVisual": "2s KineticTypography flash — 卡脖子 in rust with brief pinyin, no definition repeat"
+    },
+    {
+      "id": "juguo-tizhi",
+      "term": {
+        "en": "whole-nation system",
+        "cn": "举国体制",
+        "pinyin": "jǔguó tǐzhì"
+      },
+      "type": "foreign-term",
+      "definition": "China's mobilization model — concentrate national resources, tolerate waste, accept short-term inefficiency for long-term sovereignty.",
+      "insight": "The same mindset that built the atomic bomb program, the space program, and the rail network. The question is whether it works for semiconductors, where the complexity is distributed across a global network rather than containable within a single national system.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 3,
+        "timestamp": "8:30-9:00",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ka-bozi",
+        "technology-denial",
+        "chess-vs-go"
+      ],
+      "pillar": [
+        "geopolitics",
+        "historical-analogy"
+      ],
+      "tags": [
+        "arc-1",
+        "china",
+        "industrial-policy",
+        "mobilization"
+      ],
+      "callbackVisual": "2s KineticTypography — 举国体制 in rust, subtitle 'whole-nation system'"
+    },
+    {
+      "id": "technology-denial",
+      "term": {
+        "en": "technology denial",
+        "short": "tech denial"
+      },
+      "type": "named-concept",
+      "definition": "Using export controls and supply chain leverage to prevent a rival from accessing critical technologies.",
+      "insight": "Two historical precedents point in opposite directions — the 1941 oil embargo triggered the catastrophe it was meant to prevent, while COCOM kept the USSR 5-10 years behind for four decades. The country being denied this time resembles neither precedent.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "3:00-4:00",
+        "template": "TimelineComparison",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [
+        {
+          "episode": "blockades-leak",
+          "beat": 2,
+          "role": "central",
+          "template": "FrameworkDiagram",
+          "notes": "Technology denial reframed as a tragedy-of-the-commons problem — the denial mechanism itself creates defection incentives"
+        }
+      ],
+      "relatedConcepts": [
+        "oil-embargo-1941",
+        "cocom",
+        "small-yard-high-fence",
+        "supply-chain-fragility"
+      ],
+      "pillar": [
+        "historical-analogy",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "export-controls",
+        "us-china"
+      ],
+      "callbackVisual": "3s TimelineComparison callback — 1941 and 2022 timelines briefly flash with key dates highlighted"
+    },
+    {
+      "id": "oil-embargo-1941",
+      "term": {
+        "en": "1941 US oil embargo on Japan"
+      },
+      "type": "historical-analogy",
+      "definition": "The US froze Japan's assets and cut off 80% of its oil supply to constrain military expansion — 134 days later, Japan attacked Pearl Harbor.",
+      "insight": "Resource denial designed to prevent war triggered the exact catastrophe it was meant to avoid. The structural parallel to modern chip controls: constraining a rival's access to a critical resource can accelerate rather than prevent escalation.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "3:00-3:45",
+        "template": "TimelineComparison",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "cocom",
+        "supply-chain-fragility"
+      ],
+      "pillar": [
+        "historical-analogy"
+      ],
+      "tags": [
+        "arc-1",
+        "japan",
+        "wwii",
+        "resource-denial"
+      ],
+      "callbackVisual": "2s TimelineComparison left-column flash — '1941: 134 days' in amber"
+    },
+    {
+      "id": "cocom",
+      "term": {
+        "en": "COCOM",
+        "short": "COCOM"
+      },
+      "type": "entity",
+      "definition": "The Coordinating Committee for Multilateral Export Controls — 17 Western nations that restricted computing and advanced manufacturing to the Soviet Bloc for 45 years.",
+      "insight": "The only precedent where technology denial worked for decades. But it worked because the USSR was economically isolated, technologically stagnant, and systemically dysfunctional — China is none of those things.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "5:30-6:00",
+        "template": "ChoroplethMap",
+        "treatment": "cold-intro",
+        "accentColor": "#3266AD"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "oil-embargo-1941",
+        "ussr-vs-china-comparison"
+      ],
+      "pillar": [
+        "historical-analogy",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "cold-war",
+        "export-controls"
+      ],
+      "callbackVisual": "3s ChoroplethMap callback — 17 COCOM nations flash blue, then fade to present-day map"
+    },
+    {
+      "id": "ussr-vs-china-comparison",
+      "term": {
+        "en": "USSR vs China denial comparison"
+      },
+      "type": "named-concept",
+      "definition": "A four-dimension comparison showing why technology denial worked against the USSR but faces structural obstacles against China.",
+      "insight": "Across economic integration, talent recruitment, retaliatory leverage, and indigenous capability, China scores dramatically higher than the USSR — making the COCOM precedent misleading as a guide to modern export controls.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "6:00-6:30",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "cocom",
+        "technology-denial",
+        "ka-bozi"
+      ],
+      "pillar": [
+        "historical-analogy",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "cold-war",
+        "us-china"
+      ],
+      "callbackVisual": "2s FrameworkDiagram — 4-dim comparison, highlight the dimension most relevant to current context"
+    },
+    {
+      "id": "small-yard-high-fence",
+      "term": {
+        "en": "small yard, high fence"
+      },
+      "type": "named-concept",
+      "definition": "Jake Sullivan's framing for US export controls — narrowly targeted restrictions with maximum enforcement. In practice, the yard kept expanding and the fence kept getting taller.",
+      "insight": "The phrase reveals the internal contradiction of targeted denial: once you accept the logic of maintaining maximum technological lead, there's no principled place to stop expanding the scope of controls.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "4:30-5:00",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "revenue-share-deal",
+        "cocom"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "us-china",
+        "export-controls",
+        "policy"
+      ],
+      "callbackVisual": "2s KineticTypography — 'small yard, high fence' in amber with yard-expansion animation"
+    },
+    {
+      "id": "revenue-share-deal",
+      "term": {
+        "en": "Nvidia revenue-sharing deal",
+        "short": "15% deal"
+      },
+      "type": "named-concept",
+      "definition": "Trump's August 2025 deal allowing Nvidia and AMD to sell AI chips to China in exchange for 15% of revenue going to the US government.",
+      "insight": "Export controls — a national security instrument — became a tax. In three years, policy went from 'deny China access' to 'let China have access, but take a cut.' The trajectory reveals that economic incentives eventually overwhelm security logic.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "4:45-5:15",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "small-yard-high-fence",
+        "technology-denial",
+        "chips-act"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "us-china",
+        "semiconductors",
+        "policy"
+      ],
+      "callbackVisual": "2s KineticTypography — '20% → 15%' in amber"
+    },
+    {
+      "id": "chips-act",
+      "term": {
+        "en": "CHIPS Act",
+        "short": "CHIPS"
+      },
+      "type": "entity",
+      "definition": "$52.7 billion authorized to rebuild American semiconductor manufacturing — the largest industrial policy investment since the Interstate Highway System.",
+      "insight": "The gap between authorized ($52.7B), awarded ($30.9B), and disbursed ($6B) reveals the structural difficulty of translating legislative ambition into manufacturing capacity. Trump called the program 'horrible.'",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 2,
+        "timestamp": "5:15-5:30",
+        "template": "DataChart",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "revenue-share-deal",
+        "supply-chain-fragility"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "us",
+        "semiconductors",
+        "industrial-policy"
+      ],
+      "callbackVisual": "2s DataChart — funding funnel bars ($52.7B → $6B disbursed)"
+    },
+    {
+      "id": "chess-vs-go",
+      "term": {
+        "en": "chess vs go (wéiqí) strategic metaphor",
+        "cn": "围棋",
+        "pinyin": "wéiqí"
+      },
+      "type": "framework",
+      "definition": "The US plays chess — targeting specific pieces (companies, chokepoints). China plays go — surrounding territory stone by stone, accepting local losses for positional advantage.",
+      "insight": "Both metaphors reveal strategic style, but the deeper insight is that both players are trapped. The extreme globalization that made chips cheap is exactly what makes them strategically vulnerable — and every attempt to reduce vulnerability undermines the efficiency that made chips matter.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "12:30-13:30",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "supply-chain-fragility",
+        "technology-denial",
+        "bifurcation"
+      ],
+      "pillar": [
+        "philosophical-framework",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "game-theory",
+        "us-china",
+        "strategy"
+      ],
+      "callbackVisual": "3s split — chess board (left, US-blue) and go board (right, China-rust), pieces frozen mid-game"
+    },
+    {
+      "id": "supply-chain-fragility",
+      "term": {
+        "en": "semiconductor supply chain fragility",
+        "short": "the trap"
+      },
+      "type": "named-concept",
+      "definition": "The most complex supply chain humans have ever built — a single chip touches photoresists from Japan, lithography from the Netherlands, design software from California, packaging from Taiwan, rare earths from China. No country can replicate this alone.",
+      "insight": "Full self-sufficiency would cost an estimated $1 trillion. The extreme globalization that made chips cheap, ubiquitous, and transformative is exactly what makes them strategically vulnerable. Every attempt to reduce that vulnerability undermines the efficiency that made chips matter. That's the trap — not for one side, for everyone.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "13:30-14:30",
+        "template": "RouteAnimation",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [
+        {
+          "episode": "blockades-leak",
+          "beat": 4,
+          "role": "callback",
+          "template": null,
+          "notes": "Referenced when discussing the Escrow State problem — ASML, SK Hynix, Samsung caught between US enforcement and Chinese market access"
+        }
+      ],
+      "relatedConcepts": [
+        "chess-vs-go",
+        "bifurcation",
+        "caught-in-between-nations",
+        "technology-denial"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "globalization",
+        "supply-chain"
+      ],
+      "callbackVisual": "3s RouteAnimation — 6-country supply chain lines pulse, then one link flashes red"
+    },
+    {
+      "id": "caught-in-between-nations",
+      "term": {
+        "en": "caught-in-between nations",
+        "short": "the squeezed"
+      },
+      "type": "named-concept",
+      "definition": "Countries like the Netherlands (ASML), South Korea (Samsung/SK Hynix), and Japan (photoresist) that are being forced to pick sides in a conflict where either choice costs them enormously.",
+      "insight": "ASML saw China drop from 36% to 20% of revenue. South Korea has $40B sunk in Chinese fabs. Japan controls 70% of global photoresist. These aren't bystanders — they're the load-bearing pillars of the supply chain, and they're being asked to choose which half of their business to sacrifice.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "14:30-15:00",
+        "template": "ChoroplethMap",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [
+        {
+          "episode": "blockades-leak",
+          "beat": 4,
+          "role": "deepened",
+          "template": "KineticTypography",
+          "notes": "Deepened into 'The Escrow State' — nations holding restricted technology with inherent defection incentives. Korea's Lee quote: 'can no longer maintain balance'"
+        }
+      ],
+      "relatedConcepts": [
+        "supply-chain-fragility",
+        "chess-vs-go",
+        "bifurcation"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "netherlands",
+        "south-korea",
+        "japan",
+        "semiconductors"
+      ],
+      "callbackVisual": "2s ChoroplethMap — Netherlands, South Korea, Japan highlighted amber"
+    },
+    {
+      "id": "bifurcation",
+      "term": {
+        "en": "technological bifurcation"
+      },
+      "type": "named-concept",
+      "definition": "The splitting of the technological world into two partially overlapping, partially incompatible ecosystems — one built on American architecture, one on Chinese alternatives.",
+      "insight": "Chris Miller's 2022 prediction that looked most prescient by 2025. Not victory for either side — a splitting. Both ecosystems less efficient than the integrated system they replaced. Your next phone might not run the same apps as your colleague's in Shanghai.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "15:00-15:30",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "supply-chain-fragility",
+        "chess-vs-go",
+        "caught-in-between-nations"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "us-china",
+        "semiconductors",
+        "globalization"
+      ],
+      "callbackVisual": "3s RouteAnimation — supply chain map splitting into two diverging networks"
+    },
+    {
+      "id": "deepseek-paradox",
+      "term": {
+        "en": "DeepSeek paradox"
+      },
+      "type": "named-concept",
+      "definition": "DeepSeek R1 proved Chinese AI could compete on inferior hardware. DeepSeek R2 couldn't complete a single training run on domestic chips. Both truths coexist.",
+      "insight": "China can innovate brilliantly around constraints, and the constraints are real. The question that determines whether export controls succeed or fail is which of those truths has the longer half-life.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 3,
+        "timestamp": "10:30-12:00",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ka-bozi",
+        "juguo-tizhi",
+        "technology-denial",
+        "smic-multi-patterning"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "china",
+        "ai",
+        "semiconductors"
+      ],
+      "callbackVisual": "2s KineticTypography — 'R1: competitive. R2: 0 successful runs.' in rust"
+    },
+    {
+      "id": "smic-multi-patterning",
+      "term": {
+        "en": "SMIC multi-patterning workaround",
+        "short": "34 vs 9"
+      },
+      "type": "named-concept",
+      "definition": "SMIC achieves 7nm chips without EUV lithography by running 34 lithography passes where a Western fab uses 9 — more expensive, slower, and it works.",
+      "insight": "The novel-by-typewriter analogy. Every extra pass is another defect chance, another cost multiplier. But yields went from below 40% to 60-70% by mid-2025. The ceiling is real (Kirin X90 was relabeled 7nm, not true 5nm) but the progress is also real.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 3,
+        "timestamp": "9:00-10:00",
+        "template": "DataChart",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ka-bozi",
+        "juguo-tizhi",
+        "deepseek-paradox",
+        "technology-denial"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "china",
+        "semiconductors",
+        "manufacturing"
+      ],
+      "callbackVisual": "2s DataChart — '34 vs 9 passes' bars in rust/amber"
+    },
+    {
+      "id": "morris-chang-eulogy",
+      "term": {
+        "en": "Morris Chang's globalization eulogy"
+      },
+      "type": "named-concept",
+      "definition": "The founder of TSMC — who built the globalized semiconductor supply chain — declaring that 'Globalization is almost dead. Free trade is almost dead.'",
+      "insight": "The person who built the system being torn apart is the one saying it's over. This carries weight no analyst's opinion can match — it's the architect watching the demolition.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "15:00-15:15",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "supply-chain-fragility",
+        "bifurcation",
+        "caught-in-between-nations"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "globalization"
+      ],
+      "callbackVisual": "3s KineticTypography — Chang quote in bone on ink, amber attribution"
+    },
+    {
+      "id": "ai-timeline-uncertainty",
+      "term": {
+        "en": "AI timeline uncertainty",
+        "short": "fast vs slow AI"
+      },
+      "type": "framework",
+      "definition": "The unanswerable question that changes everything: if transformative AI arrives in 2-3 years, controls bought time; if it takes a decade, controls accomplished nothing except motivating Chinese self-sufficiency.",
+      "insight": "This is the meta-uncertainty underneath the entire chip war debate. Most analysis assumes a fixed technology trajectory, but the value of export controls is entirely conditional on a timeline nobody can predict.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 5,
+        "timestamp": "15:30-16:30",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "bifurcation",
+        "deepseek-paradox"
+      ],
+      "pillar": [
+        "geopolitics",
+        "philosophical-framework"
+      ],
+      "tags": [
+        "arc-1",
+        "ai",
+        "uncertainty",
+        "export-controls"
+      ],
+      "callbackVisual": "3s FrameworkDiagram — decision tree with 'Fast AI' and 'Slow AI' branches, uncertainty bars"
+    },
+    {
+      "id": "ballpoint-pen-parable",
+      "term": {
+        "en": "ballpoint pen parable"
+      },
+      "type": "historical-analogy",
+      "definition": "Until 2017, China could launch astronauts and build supercomputers but couldn't manufacture the steel ball at a pen tip — the symbol of humiliating technological dependence.",
+      "insight": "When state media reported this, it crystallized everything about 卡脖子 into a single image. Chips are that story at civilizational scale — the contrast between massive achievement and tiny dependency.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 3,
+        "timestamp": "7:30-8:15",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ka-bozi",
+        "juguo-tizhi"
+      ],
+      "pillar": [
+        "historical-analogy"
+      ],
+      "tags": [
+        "arc-1",
+        "china",
+        "industrial-policy"
+      ],
+      "callbackVisual": "1s image flash — pen tip macro with '2017' date stamp"
+    },
+    {
+      "id": "bayesian-updating",
+      "term": {
+        "en": "Bayesian updating",
+        "cn": "贝叶斯更新",
+        "pinyin": "bèiyèsī gēngxīn"
+      },
+      "type": "framework",
+      "definition": "A formal method for revising probability estimates as new evidence arrives — starting with a prior belief, then systematically adjusting it with each new data point to produce a posterior.",
+      "insight": "Most geopolitical commentary treats each new development as either confirming or refuting a thesis. Bayesian updating makes the *degree* of belief shift visible — some evidence barely moves the needle, other evidence is transformative. This turns prediction from binary to calibrated.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": null,
+        "timestamp": null,
+        "template": "BayesianUpdate",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ai-timeline-uncertainty"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "epistemology",
+        "prediction",
+        "honest-oracle",
+        "recurring-tool"
+      ],
+      "callbackVisual": "BayesianUpdate template — distribution curve with episode-specific evidence items, amber accent"
+    },
+    {
+      "id": "the-blockade-paradox",
+      "term": {
+        "en": "The Blockade Paradox"
+      },
+      "type": "named-concept",
+      "definition": "When you tighten restrictions on a scarce resource, you increase the profit margin for breaking those restrictions — the enforcement mechanism creates the conditions for its own failure.",
+      "insight": "This isn't a policy failure but a structural inevitability. The same mechanism shows up in COCOM (1949-1994), Venice's Murano glass monopoly (14th-17th c.), OPEC production quotas (1983-present), Atlantic fishing quotas, and nuclear non-proliferation. In every case, tighter enforcement increased defection incentives rather than reducing them.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 2,
+        "timestamp": "4:30-5:00",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "the-defection-cascade",
+        "the-escrow-state",
+        "tragedy-of-the-commons",
+        "prisoners-dilemma-as-pattern"
+      ],
+      "pillar": [
+        "philosophical-framework",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "export-controls",
+        "game-theory",
+        "structural-pattern"
+      ],
+      "callbackVisual": "3s DataChart — the Blockade Paradox curve (enforcement tightness vs defection incentive), rust accent"
+    },
+    {
+      "id": "the-defection-cascade",
+      "term": {
+        "en": "The Defection Cascade"
+      },
+      "type": "named-concept",
+      "definition": "When individual rational defections from a cooperative regime accumulate — each one destabilizes the regime slightly, triggering tighter enforcement, which creates higher payoff for the next defection.",
+      "insight": "The cascade isn't coordinated. It's thousands of individual actors — chip brokers, logistics companies, traders — each making a rational expected-value calculation. If even 60-70% of smuggled shipments get through, defection is profitable. The regime tightens; the cascade accelerates.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 4,
+        "timestamp": "13:00-13:30",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-blockade-paradox",
+        "the-escrow-state",
+        "prisoners-dilemma-as-pattern",
+        "tragedy-of-the-commons"
+      ],
+      "pillar": [
+        "philosophical-framework",
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "export-controls",
+        "game-theory",
+        "smuggling"
+      ],
+      "callbackVisual": "2s KineticTypography — 'THE DEFECTION CASCADE' in rust, no definition repeat"
+    },
+    {
+      "id": "the-escrow-state",
+      "term": {
+        "en": "The Escrow State"
+      },
+      "type": "named-concept",
+      "definition": "A nation or company that holds restricted technology on behalf of an enforcement coalition — with inherent economic incentives to defect if the arrangement becomes painful enough.",
+      "insight": "ASML, South Korea, Japan aren't US agents — they're escrow holders with their own interests. SK Hynix and Samsung have ~$40B invested in Chinese fabs. When the cost of cooperation exceeds the benefit, the escrow holder defects. This is the alliance-level version of the individual smuggler's calculus.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 4,
+        "timestamp": "14:00-14:30",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#C23B22"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-blockade-paradox",
+        "the-defection-cascade",
+        "caught-in-between-nations",
+        "supply-chain-fragility"
+      ],
+      "pillar": [
+        "geopolitics",
+        "philosophical-framework"
+      ],
+      "tags": [
+        "arc-1",
+        "export-controls",
+        "alliances",
+        "netherlands",
+        "south-korea",
+        "japan"
+      ],
+      "callbackVisual": "2s KineticTypography — 'THE ESCROW STATE' in rust, with country flags briefly visible"
+    },
+    {
+      "id": "tragedy-of-the-commons",
+      "term": {
+        "en": "tragedy of the commons"
+      },
+      "type": "framework",
+      "definition": "When individuals sharing a common resource each act in their own rational self-interest, the resource is depleted — individually rational, collectively catastrophic.",
+      "insight": "Garrett Hardin named it in 1968 thinking about pastures, but the mechanism is the structural foundation of every technology-denial failure in history. The 'commons' in export controls is the cooperative regime itself — each defection degrades it, but each defector profits.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 2,
+        "timestamp": "2:30-3:30",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-blockade-paradox",
+        "prisoners-dilemma-as-pattern",
+        "ostrom-governance-principles"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "game-theory",
+        "economics",
+        "structural-pattern"
+      ],
+      "callbackVisual": "2s FrameworkDiagram — pasture with degradation indicator, amber accent"
+    },
+    {
+      "id": "prisoners-dilemma-as-pattern",
+      "term": {
+        "en": "prisoner's dilemma (as structural pattern)"
+      },
+      "type": "framework",
+      "definition": "A situation where two or more actors each have incentive to defect from cooperation, even though mutual cooperation would produce a better outcome for all.",
+      "insight": "Not just a game-theory abstraction — it's the operational reality of every export control regime. The payoff matrix (cooperate and fall behind vs. defect and gain advantage) explains why COCOM leaked, why OPEC overproduces, why fishing quotas are exceeded, and why chip smuggling industrializes.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 2,
+        "timestamp": "3:30-4:30",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "tragedy-of-the-commons",
+        "the-blockade-paradox",
+        "the-defection-cascade",
+        "chess-vs-go"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "game-theory",
+        "structural-pattern"
+      ],
+      "callbackVisual": "2s FrameworkDiagram — 2x2 payoff matrix with COOPERATE/DEFECT, amber accent"
+    },
+    {
+      "id": "ostrom-governance-principles",
+      "term": {
+        "en": "Ostrom's governance principles"
+      },
+      "type": "framework",
+      "definition": "Elinor Ostrom's research showing commons can be managed with clearly defined boundaries, monitoring, graduated sanctions, and legitimate dispute resolution where all members have voice.",
+      "insight": "The path-not-taken for export controls. Ostrom showed commons governance *can* work — but it requires all members to have voice and formal dispute resolution. US export controls are unilateral; allies have no complaint mechanism. This structural gap explains why Ostrom's solution can't scale to great-power competition.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 6,
+        "timestamp": "17:30-18:00",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "tragedy-of-the-commons",
+        "the-blockade-paradox"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "governance",
+        "game-theory",
+        "institutional-design"
+      ],
+      "callbackVisual": "3s FrameworkDiagram — Ostrom's 8 principles with export control violations highlighted in rust"
+    }
+  ]
+}

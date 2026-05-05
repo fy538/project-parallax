@@ -1,0 +1,9 @@
+{
+  "episode": "prisoners-dilemma",
+  "variant": "statistic",
+  "statValue": "2,000 articles.",
+  "statLabel": "14 applications.",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "dark",
+  "durationSec": 4
+}

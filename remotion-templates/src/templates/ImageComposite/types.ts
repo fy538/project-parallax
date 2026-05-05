@@ -5,6 +5,8 @@
  * Used for Time Collapse cinematic moments and historical photo segments.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface ImageCompositeData {
   episode: string;
   title?: string;
@@ -27,4 +29,8 @@ export interface ImageCompositeData {
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

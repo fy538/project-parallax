@@ -1,13 +1,7 @@
 ---
 name: review-package
 description: >
-  Synthesize three separate audit reports (visual-concept, script-audit, persona-eval) into a
-  single prioritized review document for Tiger's 30-minute human review session. This is the
-  ONLY document he needs to read before making final editorial decisions. Use this skill whenever
-  the three audits have been run and someone says 'review package', 'prep for review', 'ready for
-  Tiger', 'consolidate the audits', 'what do I need to read', 'review session prep', or when
-  all three source audits exist and the next step is human review. This is the capstone before
-  visual-spec and production.
+  Synthesize visual-concept, script-audit, and persona-eval reports into one prioritized review document with cold-open variants for Tiger's 30-minute human review session. This is the ONLY document Tiger reads before making final editorial decisions. Use whenever someone says 'review package', 'prep for review', 'ready for Tiger', 'consolidate the audits', 'what do I need to read', 'review session prep', or when all three source audits exist and the next step is human review. Also generates candidate EDITORIAL_PLAYBOOK rules. This is the capstone between audits and visual-spec/production.
 ---
 
 # Review Package
@@ -18,7 +12,7 @@ You are synthesizing three separate audit reports into a single, prioritized rev
 
 The production pipeline generates three parallel audits:
 - **visual-concept** (5 lenses) — feasibility, tool fit, rhythm, treatment alignment
-- **script-audit** (5 lenses) — transitions, lecture patterns, human moments, pacing, claims
+- **script-audit** (8 lenses) — transitions, lecture patterns, human moments, pacing, claims, visual layer, decoder posture, connection density
 - **persona-eval** (5 personas) — engagement, resonance, subscribe/share potential per viewer segment
 
 Each audit is thorough but separate. Tiger needs a single document that:
@@ -127,7 +121,49 @@ This is analysis that only happens at review-package stage. For each of the 5 pe
 
 Keep these brief but specific. The goal is to surface persona-specific visual tensions that weren't apparent in the individual audits.
 
-### 5. Decision Points (2-3 items)
+### 5. Cold-Open Alternatives (2-3 variants)
+
+The opening 30 seconds is the highest-leverage part of the entire script. This section presents 2-3 alternative cold opens for Tiger to choose from or riff on during his review session.
+
+**Inputs:**
+- The current script's opening paragraph
+- The angle memo's draft openers (if available)
+- The script-audit Lens 7 assessment of the current opener
+- The persona-eval engagement predictions for the opening beat
+- The 6-type opening taxonomy from JIANG_NARRATIVE_RESEARCH.md: stakes-shock, diaristic, news-anchor + assumed prep, framework-promise, track-record callback, provocation/dare
+
+**For each variant, provide:**
+- **Type** — which of the 6 opener types this follows
+- **The actual opening paragraph** — written out in full, ready to use. Not a description — the actual words Tiger would read aloud.
+- **Stakes sentence** — where in this opener does the viewer feel personally implicated?
+- **Persona fit** — which personas does this opener serve best/worst?
+
+**Rules:**
+- Each variant must be a *different* opener type from the 6-type taxonomy. Don't present three variations on the same approach.
+- One variant should be the current script's opener (labeled "Current"), even if it's weak — Tiger needs to see what he's comparing against.
+- Variants must be genuinely different in emotional register, not just word-level variations of the same idea.
+- If the current opener is context-setting or explainer-posture (flagged by script-audit Lens 7), at least one alternative must use decoder posture.
+
+Example format:
+
+```
+**Variant A: Stakes-Shock (Current)**
+"In December 2025, TSMC's first Arizona fab hit a 92% chip yield..."
+Stakes: delayed to paragraph 3 (~word 200)
+Persona fit: James (loves the specificity), Sofia (trusts the rigor). Weak for Marcus (no hook).
+
+**Variant B: Provocation/Dare**
+"The United States just spent $165 billion to solve a problem — and made it worse. Here's the pattern nobody in Washington is talking about."
+Stakes: immediate (word 1)
+Persona fit: Marcus (instant hook), Priya (promises structural insight). Risk for James (wants the number to be precise and sourced before you lead with it).
+
+**Variant C: Framework-Promise**
+"There's a pattern in how empires weaponize technology. It's happened three times in the last century. Every time, the weapon backfires. And right now, it's happening again — with the chips inside your phone."
+Stakes: personal by end of paragraph ("your phone")
+Persona fit: Sofia (framework promise), Wei (respects the multi-civilizational framing). Slower start for Marcus.
+```
+
+### 6. Decision Points (2-3 items)
 
 These are the 2-3 places where Tiger needs to make an editorial call that AI cannot make. Frame each as a trade-off, not a recommendation.
 
@@ -153,7 +189,7 @@ Example format:
 
 2-3 items max. If there are more, the script needs rethinking, not decision points.
 
-### 6. Verdict
+### 7. Verdict
 
 One of three:
 
@@ -180,10 +216,11 @@ Verdict: return to script drafting or narrative redesign before audit again.
 2. **Map cross-audit themes** — identify issues that appear in multiple audits (these rank higher)
 3. **Identify persona tensions** — synthesize persona-eval findings with visual-concept rhythm analysis
 4. **Consolidate the fix list** — merge issues, rank by impact, write concrete fixes (not advice)
-5. **Identify decision points** — find the 2-3 places where Tiger has a genuine trade-off to make
-6. **Write the verdict** — decide READY / NEEDS REVISION / NEEDS RETHINK and justify in 2-3 sentences
-7. **Produce the document** — in markdown, structured as above
-8. **Format for readability** — make it scannable (big headings, bold key phrases, short paragraphs)
+5. **Generate cold-open alternatives** — read the current opener, the angle memo (if available), and script-audit Lens 7's decoder-posture assessment. Write 2-3 alternative openers using different types from the 6-type taxonomy. This is where the opening gets workshopped — the highest-leverage 30 seconds of the video.
+6. **Identify decision points** — find the 2-3 places where Tiger has a genuine trade-off to make
+7. **Write the verdict** — decide READY / NEEDS REVISION / NEEDS RETHINK and justify in 2-3 sentences
+8. **Produce the document** — in markdown, structured as above
+9. **Format for readability** — make it scannable (big headings, bold key phrases, short paragraphs)
 
 ## Important Notes
 

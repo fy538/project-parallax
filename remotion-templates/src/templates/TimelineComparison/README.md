@@ -11,4 +11,4 @@ title, description, and duration.
 
 **Visual reference:** Wendover Productions timeline sequences.
 
-**EP01 use case:** 1941 oil embargo timeline vs. 2022 chip controls timeline.
+**silicon-trap use case:** 1941 oil embargo timeline vs. 2022 chip controls timeline.

@@ -1,0 +1,27 @@
+{
+  "skill_name": "script-draft",
+  "evals": [
+    {
+      "id": 1,
+      "name": "ep01-silicon-trap-full",
+      "prompt": "Draft a production script for EP01 — The Silicon Trap. Use the research brief at /episodes/EP01-silicon-trap/brief.md and the angle memo at /skills/script-draft/test-fixtures/ep01-angle-memo.md. Follow the script-draft skill instructions. The episode should be ~18 minutes (2,700 words), 5 beats, in the two-column production format.",
+      "expected_output": "A complete two-column production script with: 5 beats organized by tension not logic, decoder posture throughout, stakes in first 30 seconds, claim verification tags, visual motif (supply chain web) evolving across beats, 2-3 visual-first moments, mode balance within targets, asset summary tables. Quality comparable to the existing EP01 v4 script.",
+      "files": [
+        "/episodes/EP01-silicon-trap/brief.md",
+        "/skills/script-draft/test-fixtures/ep01-angle-memo.md"
+      ],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "ep01-format-compliance",
+      "prompt": "Draft a production script for EP01 — The Silicon Trap. Use the research brief at /episodes/EP01-silicon-trap/brief.md and the angle memo at /skills/script-draft/test-fixtures/ep01-angle-memo.md. Follow the script-draft skill instructions. The episode should be ~18 minutes (2,700 words), 5 beats, in the two-column production format.",
+      "expected_output": "Same as eval 1 but graded on format compliance: correct table structure, mode tags on every visual entry, priority tiers on every visual, claim tags on factual claims, asset summary with mode breakdown table, sourcability-appropriate footage specs.",
+      "files": [
+        "/episodes/EP01-silicon-trap/brief.md",
+        "/skills/script-draft/test-fixtures/ep01-angle-memo.md"
+      ],
+      "assertions": []
+    }
+  ]
+}

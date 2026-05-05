@@ -1,0 +1,39 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The First Experiment",
+  "subtitle": "Flood & Dresher, RAND Corporation, 1950",
+  "variant": "payoff-matrix",
+  "rowPlayer": "Alchian",
+  "colPlayer": "Williams",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3", "highlight": false },
+    { "row": 0, "col": 1, "value": "0, 5", "highlight": false },
+    { "row": 1, "col": 0, "value": "5, 0", "highlight": false },
+    { "row": 1, "col": 1, "value": "1, 1", "highlight": true }
+  ],
+  "phases": [
+    {
+      "label": "100 rounds played",
+      "durationSec": 4,
+      "highlights": [3],
+      "annotation": "Nash equilibrium predicts: mutual defection"
+    },
+    {
+      "label": "Actual result",
+      "durationSec": 6,
+      "highlights": [0],
+      "annotation": "60 rounds: mutual cooperation",
+      "counterAnimation": {
+        "cooperate": 60,
+        "defect": 14,
+        "cooperateColor": "#E5A544",
+        "defectColor": "#888780"
+      }
+    }
+  ],
+  "durationSec": 10,
+  "backgroundVariant": "light",
+  "source": "Flood (1958); Poundstone (1992)"
+}

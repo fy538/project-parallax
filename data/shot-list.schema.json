@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parallax Episode Shot List",
+  "description": "Per-episode asset manifest. Lists every visual element the episode needs, with sourcing instructions. Consumed by tools/asset-source/source.py (stock photo/video sourcing for type: photo|video|archival) and tools/recraft/recraft.py (AI-generated illustrations and photoreal scenes for type: ai-generate|ai-gen|svg). Produced by the visual-spec skill from a two-column production script.",
+  "type": "object",
+  "required": ["assets"],
+  "properties": {
+    "episode": {
+      "type": "string",
+      "description": "Episode number once assigned at publish time (e.g., 'EP01'). Optional during draft."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Episode slug used during draft phase (e.g., 'silicon-trap')."
+    },
+    "title": {
+      "type": "string",
+      "description": "Working title for the episode."
+    },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Asset" },
+      "description": "All visual assets for the episode. May include both stock and AI-generated entries; tools filter by type."
+    }
+  },
+  "$defs": {
+    "Asset": {
+      "type": "object",
+      "required": ["id", "type"],
+      "description": "A single visual asset. Required fields beyond id/type depend on type — stock entries need search_terms, AI entries need description (enforced by allOf below).",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Kebab-case unique identifier within the episode (e.g., 'beat2-1941-embargo-signing'). Used as filename stem for downloaded/generated assets."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["photo", "video", "archival", "ai-generate", "ai-gen", "svg"],
+          "description": "Asset class. photo/video = stock library (Pexels, Pixabay, Unsplash). archival = historical photo from Wikimedia/LoC/etc. ai-generate (or alias ai-gen) = full AI generation via recraft.py (raster). svg = vector illustration via recraft.py."
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["P1", "P2", "P3"],
+          "description": "Production priority. P1 = hero asset, must be high quality; P2 = supporting, matters but flexible; P3 = ambient/background, generic stock acceptable. Used by render-qa to weight verification effort."
+        },
+        "treatment": {
+          "type": "string",
+          "enum": ["standard", "conflict", "editorial"],
+          "description": "Brand treatment LUT to apply post-source/post-generation. standard = warm umber→amber default. conflict = ink→rust (tension/adversarial). editorial = desaturated bone tones (historical/archival)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Editorial notes for the sourcer or generator — what this asset needs to convey, framing guidance, fallback strategy."
+        },
+        "search_terms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "STOCK ONLY. Ranked list of search queries for source.py. First term gets searched first; later terms used as fallbacks if early searches return zero or low-quality results."
+        },
+        "fallback_terms": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional second-tier search terms when search_terms underperforms. Used by source-feedback skill."
+        },
+        "description": {
+          "type": "string",
+          "description": "AI ONLY. Full natural-language description of what to generate. The recraft.py preamble (per register) is automatically prepended; this field carries the scene-specific content."
+        },
+        "register": {
+          "type": "string",
+          "enum": ["atmospheric", "grounding", "analytical"],
+          "description": "AI ONLY. Parallax visual register per VISUAL_LANGUAGE.md. atmospheric = constructivist illustration (Soviet/art-deco propaganda). grounding = photoreal mannequin scene (depersonalized humans in real environments). analytical = code-clean diagrammatic illustration (rare; usually belongs in Remotion). Selects the prompt preamble in recraft.py and auto-picks the right Recraft style. Takes precedence over visual_mode. See PROMPT_PREAMBLES.md."
+        },
+        "visual_mode": {
+          "type": "string",
+          "enum": ["illustration", "diagram", "icon", "metaphor"],
+          "description": "AI ONLY (legacy). Pre-register prompt-mode flag; still honored if register is not set. Prefer 'register' for new shots."
+        },
+        "context": {
+          "type": "string",
+          "description": "AI ONLY. Narration context surrounding this asset — helps Recraft understand the editorial intent (e.g., 'Beat 4, narration about how the trap closes around all participants')."
+        },
+        "style": {
+          "type": "string",
+          "description": "AI ONLY. Explicit Recraft style override (e.g., 'realistic_image', 'vector_illustration', 'flat_2.0'). When omitted, recraft.py picks the right style from the register. See `recraft.py styles` for the full list."
+        }
+      },
+      "allOf": [
+        {
+          "description": "Stock entries (photo, video, archival) require at least one search term.",
+          "if": {
+            "required": ["type"],
+            "properties": {
+              "type": { "enum": ["photo", "video", "archival"] }
+            }
+          },
+          "then": {
+            "required": ["search_terms"]
+          }
+        },
+        {
+          "description": "AI entries (ai-generate, ai-gen, svg) require a description.",
+          "if": {
+            "required": ["type"],
+            "properties": {
+              "type": { "enum": ["ai-generate", "ai-gen", "svg"] }
+            }
+          },
+          "then": {
+            "required": ["description"]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Ostrom's Design Principles",
+  "subtitle": "What successful commons have in common",
+  "variant": "flow",
+  "nodes": [
+    { "label": "Clear boundaries", "sublabel": "Who's in, who's out", "color": "#E5A544" },
+    { "label": "Rules match local conditions", "sublabel": "", "color": "#888780" },
+    { "label": "Collective decision-making", "sublabel": "", "color": "#888780" },
+    { "label": "Monitoring", "sublabel": "", "color": "#888780" },
+    { "label": "Graduated sanctions", "sublabel": "First offense ≠ death sentence", "color": "#E5A544" },
+    { "label": "Cheap conflict resolution", "sublabel": "", "color": "#888780" },
+    { "label": "Right to self-organize", "sublabel": "No imposed rules", "color": "#E5A544" },
+    { "label": "Nested governance", "sublabel": "", "color": "#888780" }
+  ],
+  "arrowLabels": [],
+  "phases": [
+    { "label": "Eight principles", "durationSec": 10, "activeNodes": [0, 1, 2, 3, 4, 5, 6, 7] }
+  ],
+  "durationSec": 10,
+  "backgroundVariant": "light",
+  "source": "Ostrom (1990)"
+}

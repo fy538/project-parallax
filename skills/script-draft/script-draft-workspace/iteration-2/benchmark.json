@@ -1,0 +1,32 @@
+{
+  "skill_name": "script-draft",
+  "iteration": 2,
+  "configs": [
+    {
+      "name": "with_skill",
+      "evals": [{"eval_name": "ep01-silicon-trap", "pass_rate": 1.0, "passed": 13, "total": 13, "tokens": 86179, "duration_seconds": 123.5, "failures": []}],
+      "aggregate": {"mean_pass_rate": 1.0, "mean_tokens": 86179, "mean_duration_seconds": 123.5}
+    },
+    {
+      "name": "without_skill",
+      "evals": [{"eval_name": "ep01-silicon-trap", "pass_rate": 0.615, "passed": 8, "total": 13, "tokens": 53534, "duration_seconds": 101.9, "failures": ["nar-11-named-concept", "nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance", "nar-05-personal-stakes-ending"]}],
+      "aggregate": {"mean_pass_rate": 0.615, "mean_tokens": 53534, "mean_duration_seconds": 101.9}
+    }
+  ],
+  "delta": {"pass_rate": "+38.5pp", "tokens": "+61.0%", "duration": "+21.2%"},
+  "previous_iteration": {
+    "with_skill_pass_rate": 0.917,
+    "improvement": "+8.3pp (11/12 → 13/13)"
+  },
+  "analysis": {
+    "discriminating_assertions": ["nar-11-named-concept", "nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance", "nar-05-personal-stakes-ending"],
+    "non_discriminating": ["format-two-column", "format-beat-structure", "format-mode-tags", "format-priority-tiers", "format-claim-tags", "format-asset-summary", "nar-10-stakes-first-30s", "nar-09-decoder-posture"],
+    "observations": [
+      "Iteration 2 fixes resolved both iteration 1 failures: named concept now appears 3x in body (was 1x), and [COUNTERPOINT] annotation is present.",
+      "New assertion nar-05 (personal stakes ending) also passes — the stronger instruction about 'your car, your phone' worked.",
+      "5 discriminating assertions now separate with-skill from baseline — all editorial quality, not format.",
+      "The skill's value is entirely in editorial guidance, not format compliance. Format is handled well by SCRIPT_FORMAT.md alone.",
+      "Token cost remains ~61% higher — the 7 reference files are the main driver. This is acceptable given the quality delta."
+    ]
+  }
+}

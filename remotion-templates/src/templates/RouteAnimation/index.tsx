@@ -3,7 +3,7 @@ import { RouteAnimation } from "./RouteAnimation";
 import { layout, sec } from "../../design/theme";
 import { RouteAnimationSchema } from "./schema";
 import type { RouteAnimationData } from "./types";
-import sampleData from "../../../data/episodes/ep01/route-chip-supply.json";
+import sampleData from "../../../data/episodes/silicon-trap/route-chip-supply.json";
 
 function totalDuration(data: RouteAnimationData): number {
   const phaseDuration = data.phases.reduce(
@@ -24,6 +24,6 @@ export const RouteAnimationComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as RouteAnimationData }}
+    defaultProps={{ data: sampleData as unknown as RouteAnimationData }}
   />
 );

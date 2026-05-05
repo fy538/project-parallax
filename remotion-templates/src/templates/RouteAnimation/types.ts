@@ -5,6 +5,8 @@
  * or movement of resources/technology between locations.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface RoutePoint {
   /** Display name. */
   name: string;
@@ -16,6 +18,8 @@ export interface RoutePoint {
   color?: string;
   /** Secondary info shown below the label. */
   sublabel?: string;
+  /** Where to position the label relative to the dot. Default "above". */
+  labelPosition?: "above" | "below" | "left" | "right";
 }
 
 export interface RouteSegment {
@@ -79,4 +83,10 @@ export interface RouteAnimationData {
   durationSec?: number;
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
   backgroundTint?: string;
+  /** Map style mode — selects Mapbox style (Meridian Light or Meridian Dark). Default "light". */
+  backgroundVariant?: "light" | "dark";
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

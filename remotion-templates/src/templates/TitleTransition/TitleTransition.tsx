@@ -8,19 +8,24 @@
  * - Bloom uses smooth 3-point envelope (no hard seam at peak)
  *
  * Designed for ~2-5 second transitions between video sections.
- * EP01 use cases: Episode title card, "Act I / Act II" dividers, end CTA.
+ * silicon-trap use cases: Episode title card, "Act I / Act II" dividers, end CTA.
  */
 
 import React from "react";
 import {
-  AbsoluteFill,
   useCurrentFrame,
   interpolate,
+  Easing,
 } from "remotion";
-import { palette, light, semantic, fonts, fontSizes, layout, sec, shadows, gradients, textMaxWidth } from "../../design/theme";
-import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, bloomIntensity, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
+import { palette, fonts, fontSizes, layout, sec, shadows, gradients, durations } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
+import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
+import { Crosshair } from "../../components/Crosshair";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import type { TitleTransitionData } from "./types";
 
 // ── Smooth bloom: single 3-point curve (no hard seam at peak) ─────────────
@@ -78,8 +83,10 @@ const EpisodeTitleVariant: React.FC<{
   frame: number;
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
+  const theme = useThemeMode(data.backgroundVariant || "light");
   const accentColor = data.accentColor || palette.amber;
-  const { style: compStyle } = useCompositionAnimation({ noExit: true });
+  const direction = useDirection(data._direction);
+  const { style: compStyle } = useCompositionAnimation({ noExit: true, ...direction.driftOptions });
 
   // Fade out near end
   const outOpacity = fadeOut(frame, totalFrames, sec(0.5));
@@ -119,6 +126,47 @@ const EpisodeTitleVariant: React.FC<{
         opacity: outOpacity,
       }}
     >
+      {/* Crosshair reticle — tracks from center to right-third, locks on after title lands */}
+      {(() => {
+        // Crosshair appears after title has landed (~1.8s), tracks to right-third of frame
+        const crosshairStartSec = 1.8;
+        const crosshairStart = sec(crosshairStartSec);
+        // Track from center to right-third (BRAND.md: "Right-third of frame for title cards")
+        const startX = layout.width / 2;
+        const startY = layout.height / 2;
+        const endX = layout.width * 0.72; // right-third
+        const endY = layout.height * 0.42; // slightly above center
+        // Smooth tracking movement (600-800ms as per BRAND.md)
+        const trackDuration = durations.crosshairTrack;
+        // Total draw-in time before tracking begins
+        const drawInTime = durations.hairlinesExtend + durations.outerCircleDraw;
+        const trackStart = crosshairStart + drawInTime;
+        const trackProgress = interpolate(
+          frame,
+          [trackStart, trackStart + trackDuration],
+          [0, 1],
+          { ...CLAMP, easing: Easing.inOut(Easing.cubic) }
+        );
+        const cx = startX + (endX - startX) * trackProgress;
+        const cy = startY + (endY - startY) * trackProgress;
+
+        const mode = data.backgroundVariant || "light";
+        const crosshairColor = mode === "dark" ? palette.amber : palette.oxblood;
+        const crosshairOpacity = mode === "dark" ? 0.5 : 0.35;
+
+        return (
+          <Crosshair
+            x={cx}
+            y={cy}
+            startFrame={crosshairStart}
+            size={72}
+            color={crosshairColor}
+            opacity={crosshairOpacity}
+            hairlineExtension={24}
+          />
+        );
+      })()}
+
       {/* Title bloom glow — smooth 3-point envelope */}
       <div
         style={{
@@ -128,10 +176,27 @@ const EpisodeTitleVariant: React.FC<{
           width: 700,
           height: 200,
           transform: "translate(-50%, -50%)",
-          background: `radial-gradient(ellipse at center, ${accentColor}25 0%, ${accentColor}08 50%, transparent 80%)`,
+          background: `radial-gradient(ellipse at center, ${accentColor}25 0%, ${accentColor}18 50%, transparent 80%)`,
           opacity: titleBloom,
           filter: "blur(40px)",
           pointerEvents: "none",
+        }}
+      />
+
+      {/* Anamorphic streak — horizontal lens flare across the bloom (J.J. Abrams flourish) */}
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "10%",
+          width: "80%",
+          height: 1.5,
+          transform: "translateY(-50%)",
+          background: `linear-gradient(90deg, transparent 0%, ${accentColor}80 30%, ${accentColor} 50%, ${accentColor}80 70%, transparent 100%)`,
+          opacity: titleBloom * 0.45,
+          filter: "blur(0.5px)",
+          pointerEvents: "none",
+          mixBlendMode: "screen",
         }}
       />
 
@@ -168,7 +233,7 @@ const EpisodeTitleVariant: React.FC<{
           <div
             style={{
               fontSize: fontSizes.caption,
-              color: light.text.muted,
+              color: theme.text.muted,
               letterSpacing: 4,
               textTransform: "uppercase",
               marginBottom: layout.spacing.sm,
@@ -185,7 +250,7 @@ const EpisodeTitleVariant: React.FC<{
           style={{
             fontSize: fontSizes.title,
             fontWeight: 700,
-            color: light.text.primary,
+            color: theme.text.primary,
             fontFamily: fonts.heading,
             textAlign: "center",
             maxWidth: 1400,
@@ -203,7 +268,7 @@ const EpisodeTitleVariant: React.FC<{
         {/* Gradient divider — scaleX from center (replaces linear width draw) */}
         <div
           style={{
-            width: 180,
+            width: 280,
             height: 2,
             background: gradients.dividerFade(accentColor),
             marginTop: layout.spacing.lg,
@@ -215,18 +280,19 @@ const EpisodeTitleVariant: React.FC<{
           }}
         />
 
-        {/* Subtitle — dramatic slide-in */}
+        {/* Subtitle — dramatic slide-in + 1.02→1.0 scale settle */}
         {data.subtitle && (
           <div
             style={{
               fontSize: fontSizes.h3,
-              color: light.text.muted,
+              color: theme.text.muted,
               fontWeight: 400,
               textAlign: "center",
               maxWidth: 1100,
               lineHeight: 1.4,
               opacity: fadeIn(frame, sec(1.5), sec(0.5)),
-              transform: `translateY(${slideIn(frame, sec(1.5), 30, sec(0.6))}px)`,
+              transform: `translateY(${slideIn(frame, sec(1.5), 30, sec(0.6))}px) scale(${scaleReveal(frame, sec(1.5), sec(0.7), 1.02, 1.0)})`,
+              transformOrigin: "center center",
               textShadow: shadows.textLift,
             }}
           >
@@ -245,6 +311,7 @@ const SectionVariant: React.FC<{
   frame: number;
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
+  const theme = useThemeMode(data.backgroundVariant || "light");
   const accentColor = data.accentColor || palette.amber;
   const outOpacity = fadeOut(frame, totalFrames, sec(0.4));
 
@@ -314,7 +381,7 @@ const SectionVariant: React.FC<{
           <div
             style={{
               fontSize: 120,
-              fontWeight: 200,
+              fontWeight: 400,
               color: `${accentColor}40`,
               fontFamily: fonts.mono,
               lineHeight: 1,
@@ -333,7 +400,7 @@ const SectionVariant: React.FC<{
             style={{
               fontSize: fontSizes.h1,
               fontWeight: 600,
-              color: light.text.primary,
+              color: theme.text.primary,
               fontFamily: fonts.heading,
               marginTop: layout.spacing.sm,
               letterSpacing: titleLetterSpacing,
@@ -350,7 +417,7 @@ const SectionVariant: React.FC<{
         {/* Gradient underline — scaleX from center */}
         <div
           style={{
-            width: 120,
+            width: 180,
             height: 2,
             background: gradients.dividerFade(accentColor),
             marginTop: layout.spacing.md,
@@ -372,6 +439,7 @@ const EndCardVariant: React.FC<{
   frame: number;
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
+  const theme = useThemeMode(data.backgroundVariant || "light");
   const accentColor = data.accentColor || palette.amber;
 
   // Spring-based entrance for CTA (A2 physics)
@@ -413,12 +481,12 @@ const EndCardVariant: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h2,
-              color: light.text.primary,
+              color: theme.text.primary,
               fontWeight: 500,
               textAlign: "center",
               opacity: fadeIn(frame, sec(0.5), sec(0.5)),
               transform: `translateY(${ctaSpringY}px)`,
-              textShadow: "0 0 40px rgba(229, 165, 68, 0.3)",
+              textShadow: shadows.textLift,
             }}
           >
             {data.ctaText}
@@ -444,7 +512,7 @@ const EndCardVariant: React.FC<{
           <div
             style={{
               fontSize: fontSizes.body,
-              color: light.text.muted,
+              color: theme.text.muted,
               textAlign: "center",
               maxWidth: 900,
               lineHeight: 1.5,
@@ -462,9 +530,9 @@ const EndCardVariant: React.FC<{
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeArea.bottom,
+          bottom: layout.safeAreaTier.generous.bottom,
           fontSize: fontSizes.label,
-          color: light.text.muted,
+          color: theme.text.muted,
           letterSpacing: 2,
           textTransform: "uppercase",
           opacity: fadeIn(frame, sec(0.3), sec(0.5)),
@@ -484,11 +552,17 @@ export const TitleTransition: React.FC<{ data: TitleTransitionData }> = ({
   data,
 }) => {
   const frame = useCurrentFrame();
+  const direction = useDirection(data._direction);
   const bgVariant = data.backgroundVariant || "light";
   const totalFrames = sec(data.durationSec || 4);
 
   return (
-    <Background variant={bgVariant} tint={data.backgroundTint}>
+    <Background
+      variant={bgVariant}
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       {data.variant === "episode-title" && (
         <EpisodeTitleVariant data={data} frame={frame} totalFrames={totalFrames} />
       )}
@@ -498,6 +572,17 @@ export const TitleTransition: React.FC<{ data: TitleTransitionData }> = ({
       {data.variant === "end-card" && (
         <EndCardVariant data={data} frame={frame} totalFrames={totalFrames} />
       )}
+      {/* Brand chrome — intelligence briefing texture */}
+      <HeaderStrip
+        mode={bgVariant}
+        metadata={data.episodeLabel || data.episode}
+        startSec={0.2}
+      />
+      <FooterStrip
+        mode={bgVariant}
+        hideRec={data.variant === "end-card"}
+        startSec={0.2}
+      />
     </Background>
   );
 };

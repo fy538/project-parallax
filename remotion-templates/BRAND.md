@@ -151,7 +151,7 @@ Space Grotesk is the voice of the channel — geometric, confident, modern but n
 The "therefore" symbol (∴) is the channel's brand mark. It represents the logical conclusion that structural parallels reveal — *this happened before, therefore expect this pattern.*
 
 Usage:
-- **Wordmark:** `STRUCT ∴ PARALLELS` or `STRUCTURAL · PARALLELS` with ∴ as a divider
+- **Wordmark:** `∴ PARALLAX` in IBM Plex Mono, uppercase, letter-spacing 2.5px
 - **Standalone:** The ∴ can appear alone as a section divider, loading indicator, or watermark
 - **Antipode variant:** The ∴ sits at the center of the thesis/antithesis split
 - **Minimum size:** 12px (the three dots must remain visually distinct)
@@ -279,7 +279,7 @@ What to avoid: close-up faces as the dominant thumbnail element (personality-led
 
 - Size: **1280 × 720**
 - Max text: **6 words**, minimum **48px equivalent**
-- Channel wordmark (∴ or `STRUCTURAL · PARALLELS` in IBM Plex Mono) in header strip
+- Channel wordmark (`∴ PARALLAX` in IBM Plex Mono) in header strip
 - Episode number in top-right corner
 - Treated image as background (Mode A) or inset panel (Mode B)
 - Title in Space Grotesk 700, lower-left quadrant
@@ -350,9 +350,9 @@ Dark mode: `amber` text on transparent
 Light mode: `text.light.muted` text on transparent
 
 Content varies by variant:
-- **Meridian:** `■ STRUCTURAL · PARALLELS` (left) + `EP XX · coordinates` (right)
-- **Antipode:** `PARALLEL` (left) + `ROUNDUP` or `BRIEFING №` (right)
-- **Stratum:** `STRUCTURAL · PARALLELS` (left) + `SURVEY XXX` (right)
+- **Meridian:** `∴ PARALLAX` (left) + `EP XX · coordinates` (right)
+- **Antipode:** `∴ PARALLAX` (left) + `ROUNDUP` or `BRIEFING №` (right)
+- **Stratum:** `∴ PARALLAX` (left) + `SURVEY XXX` (right)
 
 ### Footer strip (bottom of frame, inside safe area)
 
@@ -365,7 +365,7 @@ Content: `● REC · runtime` (left) + `scale or subject` (center) + `FILED date
 
 - Rubber stamp element (EPISODE XX) in `oxblood`, rotated 2-3°, top-right area
 - Thin ruled border inset 40px, 1px `bg.light.border`
-- Classification-style label: `STRUCTURAL // FILE XXX` in IBM Plex Mono
+- Classification-style label: `PARALLAX // FILE XXX` in IBM Plex Mono
 
 ---
 

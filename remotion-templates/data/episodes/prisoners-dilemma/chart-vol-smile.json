@@ -1,0 +1,18 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Black-Scholes Parallel",
+  "subtitle": "Implied volatility before and after October 1987",
+  "variant": "comparison",
+  "comparisonPairs": [
+    { "label": "1976–1987", "leftValue": 100, "rightValue": 100 },
+    { "label": "Post-crash", "leftValue": 100, "rightValue": 65 }
+  ],
+  "leftGroupLabel": "Model prediction",
+  "leftGroupColor": "#E5A544",
+  "rightGroupLabel": "Market reality",
+  "rightGroupColor": "#888780",
+  "contextNote": "The model didn't describe reality. Reality rearranged itself to match the model — until it couldn't.",
+  "durationSec": 8,
+  "backgroundVariant": "light",
+  "source": "MacKenzie (2006)"
+}

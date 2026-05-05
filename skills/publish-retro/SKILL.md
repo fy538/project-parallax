@@ -1,6 +1,7 @@
 ---
 name: publish-retro
-description: "Close the post-publish learning loop for Parallax episodes. After 7-14 days live (when analytics stabilize), parse YouTube Studio data and compare against production pipeline predictions to generate a retrospective report and update the cumulative learning log. Use this skill whenever someone says 'retro', 'retrospective', 'how did it perform', 'what worked', 'post-publish review', 'analytics review', 'what did we learn', 'did the predictions hold up', or when Tiger pastes YouTube Studio screenshots or data. Handles both manual paste and structured data (CSV/JSON/table) input modes."
+description: >
+  Close the post-publish learning loop. Parse YouTube Studio analytics (7-14 days post-launch), compare against persona-eval predictions and production decisions, generate a retrospective report, and update LEARNING_LOG.md and EDITORIAL_PLAYBOOK.md with validated rules. Use whenever someone says 'retro', 'retrospective', 'how did it perform', 'what worked', 'post-publish review', 'analytics review', 'what did we learn', 'did the predictions hold up', or when Tiger pastes YouTube Studio screenshots or analytics data. Handles manual paste and structured data (CSV/JSON/table). This is the only skill that writes back to EDITORIAL_PLAYBOOK.md — it's how the pipeline gets smarter over time.
 ---
 
 # Publish Retrospective
@@ -52,7 +53,7 @@ If Tiger provides a CSV, JSON export, or well-formatted table, parse it directly
 
 ## Pipeline Prediction Artifacts to Reference
 
-Before analyzing, you'll need the production artifacts from the episode's pipeline. Check the episode folder (`episodes/EP[XX]-[slug]/`) for:
+Before analyzing, you'll need the production artifacts from the episode's pipeline. Check the episode folder (`episodes/<slug>/`) for:
 
 1. **Persona-eval report** — Look for a file named `persona-eval-report.md` or similar. Extract:
    - Each persona's predicted engagement score (1-10)
@@ -143,35 +144,53 @@ If prediction artifacts are missing, note that fact and proceed with what you ha
 
 **Which visual types moved the needle?**
 
-Using the visual rhythm map and retention data, analyze:
+Using the visual rhythm map and retention data, analyze at three levels of granularity. Each is a separate cut of the same data and answers a different question.
 
-1. **Visual type performance:**
-   - For each visual template type (Map, DataChart, FrameworkDiagram, Timeline, Typography, Footage, Title), extract the segments where it appears.
-   - Compare retention during those segments to overall average.
-   - Calculate delta: "DataChart segments averaged 52% retention vs. 48% overall = +4% boost."
+#### 4a. Visual type performance (template-level)
 
-2. **Visual transition effectiveness:**
-   - Did transitions between visual types impact retention? (E.g., "Transition from stock footage to framework diagram recovered 6% retention.")
-   - Were there visual monotony zones (3+ segments of the same type in a row) that correlated with drops?
+For each visual template type (Map, DataChart, FrameworkDiagram, Timeline, Typography, Footage, Title, Atmospheric Illustration, Grounding AI-GEN), extract the segments where it appears and compare retention during those segments to overall average. Calculate delta: "DataChart segments averaged 52% retention vs. 48% overall = +4% boost."
 
-3. **Hold time validation:**
-   - If persona-eval flagged that Sofia needs FrameworkDiagrams to hold for 12+ seconds, did actual retention during those moments support that?
-   - Did fast cuts (4-5 second holds) cause retention dips for any visual type?
+Note: Atmospheric Illustration (Recraft constructivist) and Grounding AI-GEN are visual types in their own right and should appear as rows in the performance table even if they only show up in 1-2 segments per episode. With few episodes shipped, every data point matters.
 
-4. **Treatment effectiveness:**
-   - Did conflict treatment (ink → rust) usage impact retention differently for different visuals? (E.g., "conflict treatment on China map didn't hurt retention, but conflict treatment on stock footage caused a 5% drop — suggests conflict framing works for data/geography but not for human presence.")
-   - Did the tone shift between visual treatments align with script tone shifts?
+#### 4b. Register-level performance (the bigger question)
 
-5. **Specific evidence format:**
-   ```
-   [Visual Type]: Average retention [X]% (vs. [Y]% overall)
-   - Appeared in segments at minutes: [list]
-   - Strongest moment: [minute range, specific performance]
-   - Weakest moment: [minute range, specific performance]
-   - Hypothesis for next episode: [testable prediction]
-   ```
+Per VIS-09, every episode has three registers (Analytical, Atmospheric, Grounding). Analyzing retention by register answers questions the template-level cut can't:
+- Do Atmospheric backgrounds outperform generic stock footage at the wallpaper role they replace?
+- Do Grounding scenes carry more emotional weight than Analytical-only beats?
+- Does the register-pacing rule (max 3 consecutive same-register, transition grammar) hold up under retention data?
 
-**Building the visual effectiveness database:** Over multiple episodes, this creates a production playbook. E.g., "FrameworkDiagrams holding 12+ seconds perform +7% retention vs. <6 seconds. Maps with route animations perform +3% retention vs. static maps. Consecutive stock footage segments >2 min cause 8% retention drop with Marcus-type viewers."
+For each register, sum the segment-level retention and compare to episode average. Cross-reference the rhythm map's register sequence to find moments where the register *changed* — those are the points where the transition grammar (color-wash, blur-through, iris) gets validated or contradicted by retention behavior.
+
+#### 4c. Treatment × register pairing performance (validates VIS-10)
+
+VIS-10 prescribes which treatment ramps pair with which registers. After 3-5 episodes, this analysis cut tests whether the prescriptions are correct empirically:
+- Does grounding+editorial (historical reconstruction) actually outperform grounding+standard for pre-1980s scenes?
+- Does atmospheric+conflict (high-tension constructivist) actually carry the dread it's supposed to, or does it confuse viewers?
+- Are there register×treatment cells that VIS-10 calls "rare but valid" but that data shows are actually problematic?
+
+For the first 1-2 episodes this section will be data-thin. Note the limitation and capture what you can — even one observation per pairing starts building the empirical foundation.
+
+#### 4d. Visual transition effectiveness
+
+Did transitions between visual types impact retention? (E.g., "Transition from stock footage to framework diagram recovered 6% retention.") Were there visual monotony zones (3+ segments of the same type in a row, or same register in a row) that correlated with drops? If the script used the prescribed register transition grammar (color-wash for Analytical→Grounding, blur-through for Grounding→Atmospheric, etc.), did those transitions hold attention better than ad-hoc cuts?
+
+#### 4e. Hold time validation
+
+If persona-eval flagged that Sofia needs FrameworkDiagrams to hold for 12+ seconds, did actual retention during those moments support that? Did fast cuts (4-5 second holds) cause retention dips for any visual type?
+
+#### 4f. Specific evidence format
+
+```
+[Visual Type / Register / Pairing]: Average retention [X]% (vs. [Y]% overall)
+- Appeared in segments at minutes: [list]
+- Register: [Analytical / Atmospheric / Grounding]
+- Treatment: [standard / conflict / editorial / n/a]
+- Strongest moment: [minute range, specific performance]
+- Weakest moment: [minute range, specific performance]
+- Hypothesis for next episode: [testable prediction]
+```
+
+**Building the visual effectiveness database:** Over multiple episodes, this creates a production playbook at three levels. Template level: "FrameworkDiagrams holding 12+ seconds perform +7% retention vs. <6 seconds." Register level: "Atmospheric backgrounds at 30% opacity hold attention +4% over generic stock footage — confirms the Register 2 hypothesis." Pairing level: "Grounding+editorial (historical reconstructions) outperform grounding+standard for pre-1980s content by 6%, validating VIS-10's prescription."
 
 ### 6. Comment Sentiment Mining
 
@@ -298,17 +317,46 @@ Produce a comprehensive retrospective report:
 
 ### Visual Type Performance
 
-| Template Type | Avg. Retention | Delta vs. Overall | Segments | Notes |
-|---|---|---|---|---|
-| Map | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| DataChart | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| FrameworkDiagram | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| Timeline | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| Typography | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| Stock Footage | [X]% | [±Y]% | minutes [list] | [performance notes] |
-| Title/Opening | [X]% | [±Y]% | [opening] | [performance notes] |
+| Template / Visual Type | Register | Avg. Retention | Delta vs. Overall | Segments | Notes |
+|---|---|---|---|---|---|
+| Map | Analytical | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| DataChart | Analytical | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| FrameworkDiagram | Analytical | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| Timeline | Analytical | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| Typography | Analytical | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| Stock Footage | (mode-only) | [X]% | [±Y]% | minutes [list] | [performance notes] |
+| Atmospheric Illustration | Atmospheric | [X]% | [±Y]% | minutes [list] | [Recraft constructivist — track separately] |
+| Grounding AI-GEN | Grounding | [X]% | [±Y]% | minutes [list] | [photoreal mannequin — track separately] |
+| Title/Opening | Analytical | [X]% | [±Y]% | [opening] | [performance notes] |
 
 **Key Visual Finding:** [Which visual type performed best? Worst? Why?]
+
+### Register-Level Performance (validates VIS-09)
+
+| Register | Total Runtime | % of Episode | Avg. Retention | Delta vs. Overall |
+|---|---|---|---|---|
+| Analytical (Register 1) | [Xs] | [Y%] | [X]% | [±Y]% |
+| Atmospheric (Register 2) | [Xs] | [Y%] | [X]% | [±Y]% |
+| Grounding (Register 3) | [Xs] | [Y%] | [X]% | [±Y]% |
+
+- **Proportion check:** Did the actual breakdown hit VIS-09's targets (MG 40-55%, ILLUST 5-15%, AI-GEN 5-15%)? If not, did over/under-allocation correlate with retention?
+- **Sequencing check:** Did register transitions follow the prescribed grammar (color-wash, blur-through, iris)? Did ad-hoc transitions perform worse?
+- **Atmospheric hypothesis:** Atmospheric backgrounds were introduced to replace generic stock-footage wallpaper. Did Register 2 segments outperform stock-footage segments at the same opacity/role?
+- **Grounding hypothesis:** Grounding scenes (mannequin reconstructions) were introduced for unsourceable spaces. Did they carry more retention than Analytical-only equivalents would have?
+
+### Treatment × Register Pairing (validates VIS-10)
+
+VIS-10 prescribes which treatment ramps pair with which registers. With 1-2 episodes of data, this section is data-thin — capture what's available and flag the gap.
+
+| Pairing | Predicted Use | Episodes Used In | Avg. Retention | VIS-10 Verdict |
+|---|---|---|---|---|
+| atmospheric × standard | default constructivist | [list] | [X]% | [confirmed/inconclusive/contradicted] |
+| atmospheric × conflict | high-tension (rare) | [list or "none yet"] | [X]% | [verdict] |
+| grounding × standard | present-day reconstruction | [list] | [X]% | [verdict] |
+| grounding × conflict | adversarial scene | [list or "none yet"] | [X]% | [verdict] |
+| grounding × editorial | historical reconstruction | [list or "none yet"] | [X]% | [verdict] |
+
+After 5+ episodes, retire any pairing the data contradicts and add candidate rules for any pattern the data reveals.
 
 ### Visual Transitions & Monotony
 
@@ -362,7 +410,7 @@ Format:
 ```
 **Hypothesis [N]:** [Testable prediction based on this episode's data]
 - Evidence: [specific data point from this retrospective]
-- Test in next episode: [how you'll validate this in EP[XX]]
+- Test in next episode: [how you'll validate this in the next episode]
 - Expected impact: [what you predict will happen if the hypothesis is correct]
 ```
 
@@ -436,7 +484,7 @@ After you produce the retrospective report, append the key findings to `episodes
 **Format for each episode entry:**
 
 ```
-## EP[XX]: [Title]
+## [episode-slug]: [Title]
 **Publish Date:** [date]
 **Analysis Date:** [date]
 **Days Live:** [X days at analysis]
@@ -458,6 +506,13 @@ After you produce the retrospective report, append the key findings to `episodes
 - [Visual type 1]: +X% retention [specific moment]
 - [Visual type 2]: −X% retention [specific moment]
 - **Recommended visual type for next episode:** [...]
+
+### Register Performance (validates VIS-09 / VIS-10)
+- **Analytical (Register 1):** [X]% avg retention, [Y%] of runtime — [verdict vs. VIS-09 target]
+- **Atmospheric (Register 2):** [X]% avg retention, [Y%] of runtime — [verdict; especially: did backgrounds outperform stock?]
+- **Grounding (Register 3):** [X]% avg retention, [Y%] of runtime — [verdict; especially: did mannequin scenes carry weight?]
+- **Treatment×register pairings observed:** [list each pairing used + retention; flag any VIS-10-forbidden pairing that snuck through]
+- **Cumulative pairing data (3+ episodes):** [populate after EP03 — until then, note "data-thin"]
 
 ### Retention Profile
 - **Hook strength (minute 3):** [X]% [assessment]

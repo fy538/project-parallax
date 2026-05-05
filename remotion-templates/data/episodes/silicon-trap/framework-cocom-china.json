@@ -1,0 +1,32 @@
+{
+  "episode": "silicon-trap",
+  "title": "Why China ≠ USSR",
+  "subtitle": "The denial target is fundamentally different",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Soviet Union",
+      "icon": "☭",
+      "items": [
+        "Economically isolated",
+        "Technologically stagnant",
+        "Minimal retaliatory leverage",
+        "No indigenous chip capability"
+      ],
+      "color": "#888780"
+    },
+    {
+      "title": "China",
+      "icon": "🇨🇳",
+      "items": [
+        "Deeply integrated into global economy",
+        "Aggressive talent recruitment",
+        "Major retaliatory leverage (rare earths)",
+        "Already producing 7nm chips"
+      ],
+      "color": "#C23B22"
+    }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "light"
+}

@@ -33,7 +33,7 @@ SUNDAY      → (Publish manually)
 **Your time:** ~10 min to review the verdict and decide whether to proceed or send back for more research.
 
 ```
-I've saved the research brief for EP[XX] at episodes/EP[XX]-[slug]/brief.md.
+I've saved the research brief for [episode-slug] at episodes/<slug>/brief.md.
 
 Run the research-audit skill on this brief. Give me the full audit report
 with verdict. If it's CONDITIONAL, tell me exactly what's missing and whether
@@ -50,7 +50,7 @@ I can work around it during scripting or need another research pass first.
 **Your time:** ~30 min to read the review package and rewrite.
 
 ```
-The research brief for EP[XX] is at episodes/EP[XX]-[slug]/brief.md.
+The research brief for [episode-slug] is at episodes/<slug>/brief.md.
 
 Here's what I need you to do, in this order:
 
@@ -60,7 +60,7 @@ Here's what I need you to do, in this order:
    anti-patterns to avoid. Then draft a two-column production script
    following SCRIPT_FORMAT.md. Include claim verification tags
    ({✅}/{⚠️}/{NEW}) inherited from the brief's verification table.
-   Save it to episodes/EP[XX]-[slug]/script-v1-production.md.
+   Save it to episodes/<slug>/script-v1-production.md.
 
 2. Run visual-concept on the draft. Don't show me the full report —
    just fix any NEEDS VISUAL REVISION issues directly in the script
@@ -73,8 +73,8 @@ Here's what I need you to do, in this order:
 5. Run review-package to synthesize all three audits into a single
    review document. THIS is what I want to read.
 
-Save the review package to episodes/EP[XX]-[slug]/review-package.md.
-Save the script to episodes/EP[XX]-[slug]/script-v1-production.md.
+Save the review package to episodes/<slug>/review-package.md.
+Save the script to episodes/<slug>/script-v1-production.md.
 
 I only need to see the review package and the script. Don't show me
 the intermediate audit reports — fold everything into the review package.
@@ -83,7 +83,7 @@ the intermediate audit reports — fold everything into the review package.
 ### Variant: Audit an existing script (skip drafting)
 
 ```
-I've written a script at episodes/EP[XX]-[slug]/script-v[N]-production.md.
+I've written a script at episodes/<slug>/script-v[N]-production.md.
 
 Run the full audit chain on it:
 1. visual-concept (fix any obvious issues directly, note what you changed)
@@ -91,7 +91,7 @@ Run the full audit chain on it:
 3. persona-eval
 4. review-package (synthesize all three)
 
-Save the review package to episodes/EP[XX]-[slug]/review-package.md.
+Save the review package to episodes/<slug>/review-package.md.
 Show me only the review package.
 ```
 
@@ -105,7 +105,7 @@ Show me only the review package.
 
 ```
 I've finished my rewrite. The updated script is at
-episodes/EP[XX]-[slug]/script-v[N]-production.md.
+episodes/<slug>/script-v[N]-production.md.
 
 Here's what I need:
 
@@ -114,10 +114,10 @@ Here's what I need:
 
 2. If re-validation passes (ALIGNED): run visual-spec to generate all
    Remotion JSON data files. Save them to
-   remotion-templates/data/episodes/ep[XX]/.
+   remotion-templates/data/episodes/<slug>/.
 
 3. Generate the shot-list.json from the script's asset summary table.
-   Save to episodes/EP[XX]-[slug]/shot-list.json.
+   Save to episodes/<slug>/shot-list.json.
 
 4. Give me the source.py batch command to run for asset sourcing.
 
@@ -134,11 +134,11 @@ before generating any production files.
 **What you get back:** A gap report (what didn't source + alternatives) and a QA checklist with npx remotion still commands.
 
 ```
-I've run source.py and Remotion for EP[XX]. Files are at:
-- Asset manifest: episodes/EP[XX]-[slug]/asset-manifest.json
-- Shot list: episodes/EP[XX]-[slug]/shot-list.json
-- Remotion data: remotion-templates/data/episodes/ep[XX]/
-- Assembly manifest: remotion-templates/data/episodes/ep[XX]/assembly-manifest.json
+I've run source.py and Remotion for [episode-slug]. Files are at:
+- Asset manifest: episodes/<slug>/asset-manifest.json
+- Shot list: episodes/<slug>/shot-list.json
+- Remotion data: remotion-templates/data/episodes/<slug>/
+- Assembly manifest: remotion-templates/data/episodes/<slug>/assembly-manifest.json
 
 Run these in order:
 
@@ -162,16 +162,16 @@ I record narration.
 **What you get back:** A retrospective with prediction validation, visual effectiveness analysis, and hypotheses for the next episode.
 
 ```
-EP[XX] has been live for [N] days. Here's the YouTube Studio data:
+[episode-slug] has been live for [N] days. Here's the YouTube Studio data:
 
 [Paste: retention curve description, views, CTR, avg view duration,
 top 10 comments, traffic sources, audience demographics — whatever
 you have from YouTube Studio]
 
-The persona-eval report is at episodes/EP[XX]-[slug]/review-package.md
+The persona-eval report is at episodes/<slug>/review-package.md
 (or in a previous conversation if not saved).
 
-The script is at episodes/EP[XX]-[slug]/script-v[N]-production.md.
+The script is at episodes/<slug>/script-v[N]-production.md.
 
 Run publish-retro. Compare the analytics against our persona predictions
 and visual choices. Append the key findings to episodes/LEARNING_LOG.md.

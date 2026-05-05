@@ -1,11 +1,7 @@
 ---
 name: source-feedback
 description: >
-  Audit asset sourcing results and close the feedback loop. After source.py produces an asset-manifest.json,
-  read the results, identify search terms that returned zero or low-quality results, and suggest alternative
-  visual approaches for each gap. Use this skill whenever someone asks 'check sourcing results', 'what didn't source',
-  'source feedback', 'asset gaps', 'any sourcing problems', or 'what do we do about [shot]'.
-  Also trigger proactively when asset-manifest.json appears after a batch sourcing run.
+  Audit asset-manifest.json after sourcing runs: identify shots with zero or low-quality results, diagnose why search terms failed, and suggest alternative visual approaches for each gap (different search terms, different visual mode, SVG illustration, etc.). Use whenever someone asks 'check sourcing results', 'what didn't source', 'source feedback', 'asset gaps', 'any sourcing problems', 'what do we do about [shot]', or when asset-manifest.json appears after a batch sourcing run. This is the post-sourcing gap analysis — distinct from asset-source (which does the actual searching) and visual-concept (which audits the script's visual layer before sourcing).
 ---
 
 # Source Feedback & Gap Resolution

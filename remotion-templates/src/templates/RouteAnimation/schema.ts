@@ -10,6 +10,7 @@ const RoutePointSchema = z.object({
   label: z.string().optional(),
   color: z.string().optional(),
   sublabel: z.string().optional(),
+  labelPosition: z.enum(["above", "below", "left", "right"]).optional(),
 });
 
 const RouteSegmentSchema = z.object({

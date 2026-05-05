@@ -1,13 +1,7 @@
 ---
 name: asset-source
 description: >
-  Search stock libraries for production assets, score and rank candidates, and present a shortlist
-  for human selection. Use this skill whenever someone asks to 'source assets', 'find stock footage',
-  'get photos for the episode', 'run the shot list', 'find B-roll', or any request to search for
-  images or video clips for production. Also trigger when a shot-list.json exists and the next
-  pipeline step is asset sourcing, or when someone says 'what visuals do we still need',
-  'asset check', or 'source the remaining shots'. Works for both batch mode (full shot list)
-  and single-asset searches.
+  Search Pexels, Pixabay, and Unsplash for stock footage and archival images, score candidates across 5 dimensions, and present a ranked shortlist for human selection. Use whenever someone asks to 'source assets', 'find stock footage', 'find B-roll', 'get photos for the episode', 'run the shot list', 'source the remaining shots', or any request to search for production images or video clips. Also trigger when shot-list.json exists and the next pipeline step is asset sourcing, or when someone says 'what visuals do we still need'. Handles both batch mode (full shot list) and single-asset searches. This is distinct from source-feedback (which audits results after sourcing).
 ---
 
 # Asset Source & Rank
@@ -49,7 +43,7 @@ source tools/asset-source/.env && export PEXELS_API_KEY
 python tools/asset-source/source.py "semiconductor cleanroom" --type photo --preview
 
 # Batch mode (full shot list)
-python tools/asset-source/source.py --batch episodes/EP01-silicon-trap/shot-list.json --output assets/ --preview
+python tools/asset-source/source.py --batch episodes/silicon-trap/shot-list.json --output assets/ --preview
 ```
 
 **If the sandbox blocks API calls** (403 proxy errors), tell Tiger and suggest:

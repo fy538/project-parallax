@@ -1,11 +1,12 @@
 ---
 name: research-audit
-description: "Audit an episode research brief for completeness, intellectual rigor, and script-readiness. Use this skill whenever a new research brief has been pasted or saved from Deep Research, or when someone asks 'is this brief ready', 'audit the research', 'check the brief', 'what's missing from the research', 'ready for scripting?', 'research review', or any request to evaluate whether an episode's research is sufficient to begin script development. Also trigger proactively when a new brief.md file appears in an episode folder and the next step is script drafting."
+description: >
+  Audit a completed research brief across 8 lenses (thesis, evidence, sourcing, counterarguments, narrative potential, knowledge density, cross-domain connections, connection density/quality) and produce a READY/CONDITIONAL/NEEDS MORE RESEARCH verdict. Use whenever someone asks 'is this brief ready', 'audit the research', 'check the brief', 'what's missing from the research', 'ready for scripting?', 'research review', or when a new brief.md arrives from Deep Research and the next step is angle-memo. This evaluates research completeness — distinct from topic-viability (which is a quick 5-question pre-research gate). Also attempts to verify unconfirmed claims via web search.
 ---
 
 # Research Audit
 
-You are auditing an episode research brief to determine whether it's ready for script development. Your job is to run seven independent audit lenses, attempt to verify unconfirmed claims, and produce a verdict.
+You are auditing an episode research brief to determine whether it's ready for script development. Your job is to run eight independent audit lenses, attempt to verify unconfirmed claims, and produce a verdict.
 
 ## Verdict Criteria
 
@@ -48,12 +49,12 @@ The brief feeds into a production pipeline: **Deep Research → research-audit (
    - `project/SEO_KEYWORDS.md` — keyword targets for this episode, if defined
    - `project/RESEARCH_WORKFLOW.md` — the 8-section brief structure definition
    - Prior episode briefs in `episodes/` — to check for redundancy or contradiction with past episodes
-   - `episodes/EDITORIAL_PLAYBOOK.md` — channel-level production rules. Read Section 4 (Research & Brief Quality) before auditing. When your findings match a playbook rule, cite it as "Playbook: [rule ID]." If the brief repeats a known weakness from a previous episode, flag it explicitly: "This pattern was identified in EP[XX] — see [rule ID]."
+   - `episodes/EDITORIAL_PLAYBOOK.md` — channel-level production rules. Read Section 4 (Research & Brief Quality) before auditing. When your findings match a playbook rule, cite it as "Playbook: [rule ID]." If the brief repeats a known weakness from a previous episode, flag it explicitly: "This pattern was identified in [episode-slug] — see [rule ID]."
    - `episodes/LEARNING_LOG.md` — post-publish analytics findings. If available, check whether this episode's topic or structure overlaps with patterns that performed poorly in past episodes.
 
 Find these files relative to the content folder. Read only the ones relevant to the issues you find — don't read everything upfront.
 
-## The Seven Lenses
+## The Eight Lenses
 
 Run each lens independently. For each issue found, provide the section reference, the specific problem, and a concrete action (not vague advice).
 
@@ -69,11 +70,18 @@ Check whether the brief has all expected sections with substantive content. The 
 6. **Counterarguments + Steelman** — strongest case for each side, the episode's own position, epistemic notes
 7. **Production Notes** — visual opportunities, B-roll, graphics specs, CN localization
 8. **Connective Tissue** — unifying metaphor, core tension, closing question
+9. **Speculative Implications** — 2-3 named scenarios with probabilities, 1-2 falsifiable predictions, "what would change my mind" criteria, watch signals
 
 For each section:
 - **Present and substantive?** A section that exists but contains only a few bullet points is effectively missing.
-- **Missing entirely?** Note that Section 4 (Philosophical Frameworks) is sometimes folded into the Narrative Arc — that's fine as long as the frameworks are there *somewhere*.
+- **Missing entirely?** Note that Section 4 (Philosophical Frameworks) is sometimes folded into the Narrative Arc — that's fine as long as the frameworks are there *somewhere*. Section 9 (Speculative Implications) is new — for briefs produced before this section was added, note the absence but don't penalize severely. For new briefs, this section is required.
 - **Proportional to its narrative importance?** If the episode's thesis hinges on a historical parallel but that parallel gets only a paragraph, that's a gap even if the section "exists."
+
+**Section 9 quality checks (when present):**
+- Are the scenarios structurally grounded in the episode's analysis, or just generic? A scenario named "Things Get Worse" with no structural mechanism is useless. "The Murano Scenario" with a specific parallel to Venice's glass monopoly and a falsifiable trigger event is good.
+- Are probability estimates present? They don't need to be precise — rough gut-feel percentages are fine. The point is forcing the researcher to quantify uncertainty rather than hide behind "it's hard to say."
+- Do the falsifiable predictions have timeframes? "X will happen eventually" is unfalsifiable. "If X hasn't happened by Q2 2028, this thesis is weakened" is useful.
+- Is there at least one genuine "what would change my mind"? This is the strongest credibility signal in the entire brief.
 
 ### Lens 2: Claims Verification
 
@@ -138,6 +146,29 @@ Check against IDEAS.md and any prior episode briefs:
 3. **Prediction market check:** Any prior probability estimates to update? Any Kalshi questions relevant?
 4. **Compounding assets:** Does this episode create or extend reusable metaphors, frameworks, or concepts? Note them explicitly — these are valuable brand assets.
 
+### Lens 8: Connection Density and Quality
+
+The core product of Parallax is surprising cross-domain connections at high density. This lens evaluates whether the brief's connections menu gives the scriptwriter enough material to work with — and whether the connections are genuinely surprising rather than obvious.
+
+1. **Count:** Does the brief contain at least 4 cross-domain connections? (The research workflow targets 4-5, the scriptwriter selects 2-3.) Fewer than 3 is a gap — the scriptwriter has no selection margin and the episode risks feeling thin.
+
+2. **Domain diversity:** Do the connections span at least 3 different domains (history, philosophy, game theory, civilizational analysis, economics, literature, science)? A brief with 4 connections all from European political history has quantity but not diversity. The most memorable Parallax connections come from unexpected domain pairings — a biological metaphor applied to geopolitics, or a game-theoretic lens on a historical event.
+
+3. **Surprise rating:** For each connection, apply the "educated viewer" test: would someone who reads Foreign Affairs and The Economist already know this connection? If yes, it's not surprising enough for Parallax. "Empires rise and fall" is obvious. "Venice's Murano glass monopoly shares island-concentration logic with TSMC in Taiwan" is surprising. Rate each connection: **Novel** (genuinely unexpected pairing), **Interesting** (known to specialists but not general audiences), or **Obvious** (common knowledge among educated viewers). A brief needs at least 2 Novel or Interesting connections among its top 3.
+
+4. **Structural mechanism:** For each connection, check whether the brief identifies the shared *structural mechanism* — not just surface similarity ("both involved trade") but the underlying dynamic ("both cases show how geographic concentration of a critical resource creates leverage that the concentrating party initially benefits from but ultimately can't control"). If the mechanism is vague or missing, the connection is underdeveloped and will feel forced in the script.
+
+5. **Break-point analysis:** Does every connection include explicit, substantive breakage — where the analogy fails? This is mandatory per NAR-13. "Of course the situations are different" doesn't count. The brief should identify which specific structural features differ and how those differences change the expected outcome. Missing breakage is the single most common connection quality failure.
+
+6. **Concept registry check:** Run `tools/concepts/lookup.py reuse-check` against the brief (or manually check `data/concepts.json`) to see if any connections reference concepts already registered from *prior* episodes. At this stage, the current episode's concepts haven't been registered yet — that happens after script finalization. You're checking whether the brief references frameworks, terms, or analogies that returning viewers already know (e.g., "tragedy of the commons" if EP02 established it, then EP05 references it). Callbacks to existing concepts are more powerful than cold intros — flag reuse opportunities. For EP01 or early episodes with few registered concepts, this sub-check will naturally be thin; that's fine.
+
+**Scoring guidance:**
+- 4+ connections with 3+ domains, 2+ Novel/Interesting, all with mechanisms and breakage → **Strong**
+- 3 connections or 2 domains or 1 missing breakage → **Adequate** (note the specific gaps)
+- <3 connections or all obvious or multiple missing mechanisms/breakage → **Weak** (triggers CONDITIONAL or NEEDS MORE RESEARCH depending on severity)
+
+A Weak connection density score by itself should trigger at minimum a CONDITIONAL verdict with a suggested Pass 2 cross-domain connection hunt prompt. If the brief has fewer than 3 connections total, it's NEEDS MORE RESEARCH — the scriptwriter literally doesn't have enough material.
+
 ## Output Format
 
 ```
@@ -179,6 +210,14 @@ Check against IDEAS.md and any prior episode briefs:
 
 ## Arc Coherence
 [Arc fit, redundancy, prediction market connections, compounding assets.]
+
+## Connection Density
+### Count: [X] connections across [Y] domains
+### Surprise ratings: [per-connection ratings]
+### Mechanism quality: [per-connection assessment]
+### Breakage completeness: [which connections have/lack substantive breakage]
+### Reuse opportunities: [any callbacks to existing concepts in the registry]
+### Overall: [Strong / Adequate / Weak]
 
 ## Gap List
 [Numbered list of every gap/issue, ranked by impact on script quality. Each item actionable.]

@@ -1,12 +1,7 @@
 ---
 name: render-qa
 description: >
-  Perform visual QA on Remotion-rendered compositions before final assembly. After visual-spec generates
-  JSON data files and Remotion renders compositions, this skill generates frame-check commands and a
-  verification checklist for each composition, prioritized by visual impact tier (P1 hero, P2 supporting,
-  P3 ambient). Use this skill whenever someone asks 'QA the renders', 'check the compositions', 'visual QA',
-  'render check', 'do the stills look right', 'verify renders', or proactively when Remotion render
-  completes and assembly is the next step.
+  Generate frame-check commands and a structured verification checklist for Remotion-rendered compositions and Recraft-generated assets before final assembly. Prioritizes by visual impact tier (P1 hero, P2 supporting, P3 ambient) and checks data accuracy, layout correctness, animation states, and (for Recraft outputs) register/treatment pairings against the shot-list and assembly manifest. Use whenever someone asks 'QA the renders', 'check the compositions', 'render check', 'verify renders', 'are the compositions correct', or when Remotion render completes and assembly is the next pipeline step. This is the code-level/data-level QA (checklist-based, including the structured register-aware checks for Recraft assets). For pixel-level visual judgment using Claude's vision on rendered stills — including whether mannequin faces actually look featureless or constructivist style holds — use visual-qa instead.
 ---
 
 # Render QA — Remotion Composition Verification
@@ -49,12 +44,12 @@ Remotion renders individual frames via: `npx remotion still src/index.ts <Compos
 ## Inputs
 
 1. **Episode folder path** — the directory containing the episode's data and render outputs
-   - Look for `remotion-templates/data/episodes/EP[XX]-[slug]/`
+   - Look for `remotion-templates/data/episodes/<slug>/`
    - Should contain: assembly-manifest.json, JSON data files for each composition
 2. **Assembly manifest** (required) — `assembly-manifest.json` maps the timeline to compositions
-   - Location: `remotion-templates/data/episodes/EP[XX]-[slug]/assembly-manifest.json`
+   - Location: `remotion-templates/data/episodes/<slug>/assembly-manifest.json`
 3. **Production script** (read as needed) — to verify data accuracy and visual intent
-   - Location: `episodes/EP[XX]-[slug]/script-vX-*.md` (current production script)
+   - Location: `episodes/<slug>/script-vX-*.md` (current production script)
 4. **Project reference files** (read as needed):
    - `remotion-templates/BRAND.md` — color palette, semantic colors, dark/light mode specs
    - `remotion-templates/LESSONS.md` — known rendering issues and workarounds
@@ -64,7 +59,7 @@ Remotion renders individual frames via: `npx remotion still src/index.ts <Compos
 
 ### Step 1: Read Episode Data
 
-1. Request the episode path from the user (e.g., "EP01-silicon-trap")
+1. Request the episode path from the user (e.g., "silicon-trap")
 2. Read `assembly-manifest.json` to see what compositions exist, their IDs, and their frame counts
 3. Read the corresponding JSON data files (one per composition) to understand what data is being rendered
 4. Read the production script to establish what each composition should visually contain
@@ -274,6 +269,94 @@ For each template type, generate a checklist that Tiger can check off as he revi
 - [ ] Attribution/credit line visible (if required)
 - [ ] Composite dimensions match composition spec (aspect ratio intact)
 ```
+
+## Register-Aware Verification (Recraft + Brand Treatment Outputs)
+
+ImageComposite assets in Parallax episodes increasingly originate from `tools/recraft/recraft.py` and pass through `tools/brand-treatment/treat.py` (raster) or `treat_video.py` (clips) before landing in the timeline. These assets carry a `register` field per `data/shot-list.schema.json` — `atmospheric`, `grounding`, or (rarely) `analytical`. Each register has different failure modes the template checklists above don't catch.
+
+This section adds **structured/binary checks** for register-tagged assets — does the manifest match what was generated, was treatment applied, are the right files present. **Visual judgment of register fidelity** (does the mannequin face actually look featureless? does the constructivist style hold?) belongs in `visual-qa`, which runs Claude's vision on rendered stills. Both passes should run before assembly.
+
+### When This Applies
+
+Any asset where the source shot list entry has:
+- `type: ai-generate | ai-gen | svg`, AND
+- `register: atmospheric | grounding | analytical` (per shot-list.schema.json)
+
+If the assembly manifest also marks the asset's source as Recraft, run these checks in addition to the ImageComposite template checklist.
+
+### Cross-Register Checks (every Recraft asset)
+
+```
+- [ ] Asset file exists at the path referenced in the assembly manifest
+- [ ] Asset format matches the register's expected output:
+      - atmospheric → SVG (vector_illustration) or PNG fallback
+      - grounding → PNG (realistic_image)
+      - analytical → SVG (vector_illustration)
+- [ ] Treatment field on the shot matches treatment actually applied:
+      - For SVG: filename has the `_treated_<ramp>` suffix from apply_duotone_svg
+      - For PNG: filename or sidecar metadata reflects treat.py invocation
+- [ ] Treatment ramp aligns with VIS-10 (treatment × register pairings, see EDITORIAL_PLAYBOOK.md)
+      — flag any atmospheric+editorial pairing as a likely mistake
+- [ ] Source prompt is logged somewhere reproducible (recraft-manifest.json or shot-list 'description' field)
+- [ ] Asset duration on timeline doesn't exceed mode-specific limits per VISUAL_LANGUAGE.md
+      (max 30s footage; max 2 consecutive AI-GEN; ILLUST 30-40% opacity for backgrounds)
+```
+
+### Atmospheric Register Checks (constructivist illustration)
+
+These verify the asset behaves like Register 2 in the timeline, not whether the constructivist style itself succeeded — that's visual-qa's job.
+
+```
+- [ ] Asset is used as a background or atmospheric texture, NOT as a data-carrying visual
+      (anything the viewer needs to *read* belongs in MG / Register 1)
+- [ ] Composition opacity in the assembly manifest is in the 30-40% range when used as wallpaper
+- [ ] No more than 2 consecutive ILLUST entries before a register switch (per VIS-09)
+- [ ] Treatment ramp is `standard` or (rarely) `conflict`, NEVER `editorial`
+      — atmospheric + editorial desaturates the constructivist palette into mush; flag as VIS-10 violation
+- [ ] If used as a recurring motif (per VIS-07), the manifest references the same asset
+      family across beats — not three unrelated illustrations
+```
+
+### Grounding Register Checks (photoreal mannequin scenes)
+
+```
+- [ ] If extended segment >10s of video, the assembly manifest includes the "∴ Visualized"
+      on-screen disclosure indicator (per AI_VIDEO_PIPELINE.md editorial guardrails)
+- [ ] No identifiable real person depicted — caption or alt text references a *role*
+      ("The Regulator," "The Engineer"), not a name
+- [ ] Treatment ramp matches the editorial intent:
+      - present-day reconstructions → standard (warm umber default)
+      - adversarial/contested scenes → conflict (ink → rust)
+      - historical (pre-1980s) reconstructions → editorial (desaturated bone tones)
+- [ ] Used for a genuinely unsourceable interior or restricted facility — NOT as a substitute
+      for stock footage that could have covered the moment
+- [ ] Register 3 budget within VIS-09 target (5-15% of episode runtime, 10-20% max)
+- [ ] No more than 2 consecutive Grounding clips before a mode switch
+```
+
+### Analytical Register Checks (rare Recraft fallback)
+
+Most analytical content lives in code-locked Remotion templates and uses the template checklists above. The Recraft analytical path exists only for hand-drawn diagram fallbacks where Remotion isn't appropriate.
+
+```
+- [ ] Confirm this content actually needed Recraft — most analytical content should be Remotion
+      (FrameworkDiagram, NetworkDiagram, etc.). Flag if a Remotion equivalent exists and wasn't used.
+- [ ] No grain or vignette overlay applied (analytical register stays clean per VIS-09)
+- [ ] Palette is restricted to ink + paper background with amber/rust accents only
+- [ ] Treatment field omitted or set to `standard` (analytical register doesn't carry tonal mood)
+```
+
+### Treatment-Pairing Validation (ties to VIS-10)
+
+Run this matrix check for every Recraft asset before assembly:
+
+| Register | standard | conflict | editorial |
+|---|---|---|---|
+| atmospheric | ✓ default | ✓ rare (max 1-2/ep) | ✗ AVOID — flag |
+| grounding | ✓ default | ✓ adversarial | ✓ historical |
+| analytical | ✓ omit/default | ✗ rarely meaningful | ✗ rarely meaningful |
+
+Any cell marked ✗ in the asset's actual pairing is a VIS-10 violation — flag for Tiger before assembly.
 
 ## Prioritization by Visual Impact Tier
 

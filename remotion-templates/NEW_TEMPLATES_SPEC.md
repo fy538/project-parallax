@@ -1,6 +1,6 @@
 # New Remotion Templates — Specification
 
-> Design spec for 5 new templates + map infrastructure migration. Each template section defines: purpose, data schema (TypeScript types), animation behavior, variants, and EP01 usage. Follows existing patterns: types in `types.ts`, component in `TemplateName.tsx`, barrel export in `index.tsx`.
+> Design spec for 5 new templates + map infrastructure migration. Each template section defines: purpose, data schema (TypeScript types), animation behavior, variants, and silicon-trap usage. Follows existing patterns: types in `types.ts`, component in `TemplateName.tsx`, barrel export in `index.tsx`.
 >
 > All templates share existing infrastructure: `theme.ts` (palette, fonts, spacing), `animation.ts` (fadeIn, stagger, exitFade, spring), `Background` component, `FadeIn` component, `MetadataStrip`.
 
@@ -432,17 +432,17 @@ Small rounded rectangle (80×20) inline on the edge line, splitting it into two 
 7. **Ken Burns hold**: 1.00→1.02 scale drift.
 8. **Exit**: last 15 frames fade.
 
-### EP01 Usage
+### silicon-trap Usage
 
 - **Beat 4**: Semiconductor supply chain (Japan → Netherlands → USA → [CTRL] → Taiwan → Chip, China below)
 - **Beat 2**: COCOM regime network (could augment the ChoroplethMap)
 - **Beat 4**: "Caught-in-between" nations (ASML, SK Hynix, Japan photoresist)
 
-### EP01 Example Data
+### silicon-trap Example Data
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "title": "THE SEMICONDUCTOR SUPPLY CHAIN",
   "subtitle": "Five countries, one chip — no nation can replicate this alone",
   "layout": "horizontal-chain",
@@ -587,17 +587,17 @@ export interface TimeSeriesChartData {
 7. **Hero stat** (frames 70-85): Large stat counts up with spring.
 8. **Ken Burns + exit.**
 
-### EP01 Usage
+### silicon-trap Usage
 
 - **Beat 3**: SMIC 7nm yield improvement (<40% → 60-70% over 2023-2025)
 - **Beat 4**: ASML revenue from China (36% → 20% decline)
 - Future: prediction market price histories, multi-metric dashboards
 
-### EP01 Example Data
+### silicon-trap Example Data
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "title": "SMIC 7nm YIELD IMPROVEMENT",
   "subtitle": "Without EUV lithography — multi-pass workaround",
   "xAxis": { "label": "Year", "range": [2023, 2026], "format": "year" },
@@ -701,16 +701,16 @@ Nodes are arranged in columns (left-to-right) or rows (top-to-bottom) based on g
 5. **Labels & stats** (frames 55-75): Value labels count up. Flow labels fade in.
 6. **Ken Burns + exit.**
 
-### EP01 Usage
+### silicon-trap Usage
 
 - **Beat 2**: CHIPS Act funding funnel ($52.7B authorized → $30.9B awarded → $6B disbursed)
 - **EP02**: Export control leakage (restrictions → third-party workarounds → black market)
 
-### EP01 Example Data
+### silicon-trap Example Data
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "title": "CHIPS ACT FUNDING FLOW",
   "subtitle": "From authorization to actual disbursement",
   "direction": "left-to-right",
@@ -838,17 +838,17 @@ export interface GameBoardData {
 3. **Highlights** (frames 35-55): Focus cells get accent glow.
 4. **Labels** (frames 50-70): Explanation labels fade in.
 
-### EP01 Usage
+### silicon-trap Usage
 
 - **Beat 4**: Chess board (US strategy — targeting Huawei, SMIC, ASML)
 - **Beat 4**: Go board (China strategy — surrounding territory with domestic capacity)
 - Future: Prisoner's dilemma for export controls, payoff matrices for trade negotiations
 
-### EP01 Example Data (Chess)
+### silicon-trap Example Data (Chess)
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "title": "US STRATEGY: CHESS",
   "subtitle": "Target specific companies, capture specific pieces",
   "variant": "chess",
@@ -957,18 +957,18 @@ Each image gets the full BrandImage treatment (4-step pipeline via SVG filters),
 
 Total duration = sum of all `image.durationSec` + transitions between them.
 
-### EP01 Usage
+### silicon-trap Usage
 
 - **Beat 5**: "Every modern car has between a thousand and three thousand chips" — car (3s) → phone (2s) → MRI (2s) → data center (2s) with chip count overlays.
 
-### EP01 Example Data
+### silicon-trap Example Data
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "images": [
     {
-      "src": "footage/ep01/car-dashboard.jpg",
+      "src": "footage/silicon-trap/car-dashboard.jpg",
       "durationSec": 3,
       "treatment": "standard",
       "compositeMode": "inset",
@@ -976,7 +976,7 @@ Total duration = sum of all `image.durationSec` + transitions between them.
       "overlay": { "text": "1,000–3,000 chips", "position": "bottom-left", "style": "stat" }
     },
     {
-      "src": "footage/ep01/smartphone-circuit.jpg",
+      "src": "footage/silicon-trap/smartphone-circuit.jpg",
       "durationSec": 2,
       "treatment": "standard",
       "compositeMode": "inset",
@@ -984,7 +984,7 @@ Total duration = sum of all `image.durationSec` + transitions between them.
       "overlay": { "text": "~160 chips", "position": "bottom-left", "style": "stat" }
     },
     {
-      "src": "footage/ep01/mri-machine.jpg",
+      "src": "footage/silicon-trap/mri-machine.jpg",
       "durationSec": 2,
       "treatment": "standard",
       "compositeMode": "inset",
@@ -992,7 +992,7 @@ Total duration = sum of all `image.durationSec` + transitions between them.
       "overlay": { "text": "~1,200 chips", "position": "bottom-left", "style": "stat" }
     },
     {
-      "src": "footage/ep01/data-center-rack.jpg",
+      "src": "footage/silicon-trap/data-center-rack.jpg",
       "durationSec": 2,
       "treatment": "standard",
       "compositeMode": "inset",
@@ -1010,7 +1010,7 @@ Total duration = sum of all `image.durationSec` + transitions between them.
 
 ## Build Order
 
-| Priority | Item | Complexity | EP01 Need | Reuse Across Episodes |
+| Priority | Item | Complexity | silicon-trap Need | Reuse Across Episodes |
 |----------|------|------------|-----------|----------------------|
 | 0 | **Map Infrastructure Migration** | High | ChoroplethMap + RouteAnimation used in Beats 1, 3, 4 | Every episode |
 | 1 | **NetworkDiagram** | High | Beat 4 supply chain | Every episode |
@@ -1019,7 +1019,7 @@ Total duration = sum of all `image.durationSec` + transitions between them.
 | 4 | **GameBoard** | Medium | Beat 4 chess/go | Arc 3 game theory |
 | 5 | **PhotoMontage** | Low | Beat 5 chip montage | Occasional |
 
-Map migration comes first — it upgrades two existing templates used heavily in EP01 and establishes the shared `MapGL` component that new templates may compose with.
+Map migration comes first — it upgrades two existing templates used heavily in silicon-trap and establishes the shared `MapGL` component that new templates may compose with.
 
 Estimated build time: Map migration is high complexity (Mapbox style setup, WebGL rendering pipeline, two template rewrites). NetworkDiagram is the heaviest new template (layout algorithm + multiple node types + edge routing). TimeSeriesChart and SankeyFlow are medium (coordinate math + line rendering). GameBoard is medium (grid rendering + phased state). PhotoMontage is lightest (sequence wrapper around existing BrandImage).
 

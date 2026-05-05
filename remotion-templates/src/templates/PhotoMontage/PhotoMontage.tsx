@@ -18,20 +18,17 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Easing,
-  Img,
   staticFile,
 } from "remotion";
 import {
-  palette,
   fonts,
   fontSizes,
   layout,
   sec,
-  shadows,
   duotone,
-  light,
+  contentArea,
 } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   fadeOut,
@@ -41,8 +38,11 @@ import {
   CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
-import { FadeIn } from "../../components/FadeIn";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
+import { KenBurns } from "../../components/KenBurns";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
 import type { PhotoMontageData, MontageImage } from "./types";
 
 // ── Helper: Compute frame ranges for each image accounting for transitions ──
@@ -94,27 +94,33 @@ function DuotoneFilter({
 }) {
   const rampColors = duotone[treatment];
 
-  // Convert hex to RGB normalized
-  const hexToRgbNormalized = (hex: string): string => {
+  // Convert hex to RGB normalized (0-1)
+  const hexToRgb = (hex: string): [number, number, number] => {
     const h = hex.replace("#", "");
-    const r = parseInt(h.substring(0, 2), 16);
-    const g = parseInt(h.substring(2, 4), 16);
-    const b = parseInt(h.substring(4, 6), 16);
-    return `${r / 255} ${g / 255} ${b / 255}`;
+    return [
+      parseInt(h.substring(0, 2), 16) / 255,
+      parseInt(h.substring(2, 4), 16) / 255,
+      parseInt(h.substring(4, 6), 16) / 255,
+    ];
   };
 
-  const shadows = hexToRgbNormalized(rampColors.shadows);
-  const midtones = hexToRgbNormalized(rampColors.midtones);
-  const highlights = hexToRgbNormalized(rampColors.highlights);
+  const shadowRgb = hexToRgb(rampColors.shadows);
+  const highlightRgb = hexToRgb(rampColors.highlights);
+
+  // Proper duotone: slope maps luminance range to color range
+  // At luminance 0 → shadow color, at luminance 1 → highlight color
+  const slopeR = highlightRgb[0] - shadowRgb[0];
+  const slopeG = highlightRgb[1] - shadowRgb[1];
+  const slopeB = highlightRgb[2] - shadowRgb[2];
 
   return (
     <svg width="0" height="0" style={{ position: "absolute", pointerEvents: "none" }}>
       <defs>
         <filter id={filterId} colorInterpolationFilters="sRGB">
-          {/* Step 1: Desaturate */}
+          {/* Step 1: Partial desaturation */}
           <feColorMatrix type="saturate" values={String(saturation)} />
 
-          {/* Convert to luminance */}
+          {/* Step 2: Convert to luminance */}
           <feColorMatrix
             type="matrix"
             values="0.2126 0.7152 0.0722 0 0
@@ -123,40 +129,12 @@ function DuotoneFilter({
                     0      0      0      1 0"
           />
 
-          {/* Step 2: Apply duotone ramp via component transfer */}
+          {/* Step 3: Map luminance to duotone ramp (shadow → highlight) */}
           <feComponentTransfer>
-            <feFuncR
-              type="linear"
-              slope="0"
-              intercept={String(parseFloat(shadows.split(" ")[0]))}
-            />
-            <feFuncG
-              type="linear"
-              slope="0"
-              intercept={String(parseFloat(shadows.split(" ")[1]))}
-            />
-            <feFuncB
-              type="linear"
-              slope="0"
-              intercept={String(parseFloat(shadows.split(" ")[2]))}
-            />
+            <feFuncR type="linear" slope={String(slopeR)} intercept={String(shadowRgb[0])} />
+            <feFuncG type="linear" slope={String(slopeG)} intercept={String(shadowRgb[1])} />
+            <feFuncB type="linear" slope={String(slopeB)} intercept={String(shadowRgb[2])} />
           </feComponentTransfer>
-
-          {/* Step 3: Grain (turb) + vignette effect */}
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.8"
-            numOctaves="4"
-            result="noise"
-            seed="2"
-          />
-          <feDisplacementMap
-            in="SourceGraphic"
-            in2="noise"
-            scale="2"
-            xChannelSelector="R"
-            yChannelSelector="G"
-          />
         </filter>
       </defs>
     </svg>
@@ -173,6 +151,7 @@ const ImageOverlay: React.FC<{
   imageStartFrame: number;
   transitionStartFrame: number;
 }> = ({ text, position, style: overlayStyle, frame, imageStartFrame, transitionStartFrame }) => {
+  const theme = useThemeMode("light");
   // Overlay springs in 0.3s after image enters
   const overlayStartFrame = imageStartFrame + sec(0.3);
 
@@ -188,15 +167,16 @@ const ImageOverlay: React.FC<{
 
   const finalOpacity = overlayOpacity * exitOpacity;
 
-  // Position map
+  // Position map using contentArea for safety
+  const area = contentArea("content", "generous");
   const positionStyle: React.CSSProperties = {
     position: "absolute",
     ...{
-      "bottom-left": { bottom: layout.safeArea.bottom, left: layout.safeArea.left },
-      "bottom-right": { bottom: layout.safeArea.bottom, right: layout.safeArea.right },
+      "bottom-left": { bottom: area.bottom, left: area.left },
+      "bottom-right": { bottom: area.bottom, right: area.right },
       "center": { top: "50%", left: "50%", transform: "translate(-50%, -50%)" },
-      "top-right": { top: layout.safeArea.top, right: layout.safeArea.right },
-      "top-left": { top: layout.safeArea.top, left: layout.safeArea.left },
+      "top-right": { top: area.top, right: area.right },
+      "top-left": { top: area.top, left: area.left },
     }[position],
   };
 
@@ -206,7 +186,7 @@ const ImageOverlay: React.FC<{
       fontFamily: fonts.data,
       fontSize: fontSizes.h2,
       fontWeight: 700,
-      color: light.text.primary,
+      color: theme.text.primary,
       textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`,
       lineHeight: 1.0,
       letterSpacing: 0,
@@ -215,7 +195,7 @@ const ImageOverlay: React.FC<{
       fontFamily: fonts.body,
       fontSize: fontSizes.label,
       fontWeight: 600,
-      color: light.text.primary,
+      color: theme.text.primary,
       textTransform: "uppercase",
       letterSpacing: 2,
       textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`,
@@ -224,7 +204,7 @@ const ImageOverlay: React.FC<{
       fontFamily: fonts.body,
       fontSize: fontSizes.caption,
       fontWeight: 400,
-      color: light.text.secondary,
+      color: theme.text.secondary,
       textShadow: `0 1px 3px rgba(0, 0, 0, 0.4)`,
     },
   }[overlayStyle];
@@ -249,8 +229,10 @@ const ImageOverlay: React.FC<{
 
 export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => {
   const frame = useCurrentFrame();
+  const theme = useThemeMode("light");
   const { durationInFrames } = useVideoConfig();
-  const { style: compositionStyle } = useCompositionAnimation();
+  const direction = useDirection(data._direction);
+  const { style: compositionStyle } = useCompositionAnimation(direction.driftOptions);
 
   const transitionDurationFrames = sec(data.transitionDurationSec ?? 0.3);
 
@@ -260,44 +242,28 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
     [data.images, transitionDurationFrames]
   );
 
-  // Determine which image(s) are visible at current frame
-  const getActiveImages = (): {
-    current: { index: number; image: MontageImage; range: ImageFrameRange; progress: number } | null;
-    next: { index: number; image: MontageImage; range: ImageFrameRange; progress: number } | null;
-  } => {
-    let current = null;
-    let next = null;
+  // Determine which image(s) are visible at current frame (memoized)
+  const { current, next } = useMemo(() => {
+    let currentResult: { index: number; image: MontageImage; range: ImageFrameRange; progress: number } | null = null;
+    let nextResult: { index: number; image: MontageImage; range: ImageFrameRange; progress: number } | null = null;
 
     for (let i = 0; i < imageRanges.length; i++) {
       const range = imageRanges[i];
       if (frame >= range.startFrame && frame < range.endFrame) {
         const progress = (frame - range.startFrame) / (range.endFrame - range.startFrame);
-        current = {
-          index: i,
-          image: data.images[i],
-          range,
-          progress,
-        };
+        currentResult = { index: i, image: data.images[i], range, progress };
 
-        // Check if we're in transition
         if (frame >= range.transitionStartFrame && i + 1 < imageRanges.length) {
           const nextRange = imageRanges[i + 1];
           const transitionProgress = (frame - range.transitionStartFrame) / transitionDurationFrames;
-          next = {
-            index: i + 1,
-            image: data.images[i + 1],
-            range: nextRange,
-            progress: transitionProgress,
-          };
+          nextResult = { index: i + 1, image: data.images[i + 1], range: nextRange, progress: transitionProgress };
         }
         break;
       }
     }
 
-    return { current, next };
-  };
-
-  const { current, next } = getActiveImages();
+    return { current: currentResult, next: nextResult };
+  }, [frame, imageRanges, data.images, transitionDurationFrames]);
 
   // Render a single image with treatment
   const renderImage = (
@@ -310,14 +276,22 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
     const finalOpacity = isTransitioningOut ? 1 - transitionProgress : 1;
 
     // Background tint
-    const bgTint = data.backgroundTint || light.bg.base;
-
-    // Ken Burns drift during image hold
-    const imageDuration = range.endFrame - range.startFrame;
-    const driftScale = kenBurnsDrift(frame - range.startFrame, imageDuration, 1.02);
+    const bgTint = data.backgroundTint || theme.bg.base;
 
     // Image dimensions based on composite mode
     const isBgMode = image.compositeMode === "background";
+
+    // KenBurns is opt-in (default true unless explicitly disabled)
+    const enableKenBurns = image.kenBurns !== false;
+
+    // Alternate directions for visual variety
+    const kenBurnsDirections: Array<"zoom-in" | "zoom-out" | "pan-left" | "pan-right"> = [
+      "zoom-in",
+      "pan-left",
+      "zoom-out",
+      "pan-right",
+    ];
+    const kenBurnsDirection = kenBurnsDirections[range.imageIndex % kenBurnsDirections.length];
 
     return (
       <div
@@ -352,25 +326,52 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
           }}
         />
 
-        {/* Actual image with treatment */}
-        <img
-          src={staticFile(image.src)}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: isBgMode ? "cover" : "contain",
-            objectPosition: "center",
-            opacity: image.compositeOpacity ?? (isBgMode ? 0.35 : 0.7),
-            filter: `url(#${filterId})`,
-            transform: `scale(${driftScale})`,
-            transformOrigin: "center",
-            zIndex: 2,
-          }}
-          alt=""
-        />
+        {/* Actual image with treatment, wrapped in KenBurns if enabled */}
+        {enableKenBurns ? (
+          <KenBurns
+            direction={kenBurnsDirection}
+            intensity={3}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <img
+              src={staticFile(image.src)}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                objectFit: isBgMode ? "cover" : "contain",
+                objectPosition: "center",
+                opacity: image.compositeOpacity ?? (isBgMode ? 0.35 : 0.7),
+                filter: `url(#${filterId})`,
+              }}
+              alt=""
+            />
+          </KenBurns>
+        ) : (
+          <img
+            src={staticFile(image.src)}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: isBgMode ? "cover" : "contain",
+              objectPosition: "center",
+              opacity: image.compositeOpacity ?? (isBgMode ? 0.35 : 0.7),
+              filter: `url(#${filterId})`,
+            }}
+            alt=""
+          />
+        )}
       </div>
     );
   };
@@ -419,8 +420,32 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
     );
   };
 
+  // ── Color-wash flash at cut points (documentary "found-footage" punctuation) ──
+  // Fires for 2 frames at the boundary between images. Amber overlay at 30% opacity.
+  // Only when transition === "cut" and we're within 1 frame of a cut.
+  const cutFlashOpacity = useMemo(() => {
+    if (data.transition !== "cut" && data.transition !== undefined) return 0;
+    for (const range of imageRanges) {
+      if (range.imageIndex === 0) continue; // no flash on first image
+      const cutFrame = range.startFrame;
+      if (frame >= cutFrame && frame < cutFrame + 2) {
+        return interpolate(frame, [cutFrame, cutFrame + 2], [0.30, 0], CLAMP);
+      }
+    }
+    return 0;
+  }, [data.transition, frame, imageRanges]);
+
+  // ── Crawling grain — backgroundPosition shifts deterministically per frame ──
+  const grainOffsetX = (frame * 1.7) % 512;
+  const grainOffsetY = (frame * 0.9) % 512;
+
   return (
-    <Background variant="light" tint={data.backgroundTint}>
+    <Background
+      variant="light"
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compositionStyle}>
         {/* Render images with transitions */}
         {current && (
@@ -459,15 +484,42 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
           </div>
         )}
 
+        {/* Crawling grain — drifts per frame for film-stock breathing */}
+        <AbsoluteFill
+          style={{
+            backgroundImage: `url(${staticFile("assets/noise-512.png")})`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "512px 512px",
+            backgroundPosition: `${grainOffsetX}px ${grainOffsetY}px`,
+            mixBlendMode: "overlay",
+            opacity: 0.08,
+            pointerEvents: "none",
+            zIndex: 6,
+          }}
+        />
+
+        {/* Color-wash flash at cuts — 2-frame amber overlay */}
+        {cutFlashOpacity > 0 && (
+          <AbsoluteFill
+            style={{
+              backgroundColor: "#E5A544",
+              opacity: cutFlashOpacity,
+              mixBlendMode: "screen",
+              pointerEvents: "none",
+              zIndex: 7,
+            }}
+          />
+        )}
+
         {/* Source attribution (if provided) */}
         {data.source && (
           <div
             style={{
               position: "absolute",
-              bottom: layout.safeArea.bottom,
-              left: layout.safeArea.left,
+              bottom: contentArea("content", "generous").bottom,
+              left: contentArea("content", "generous").left,
               fontSize: fontSizes.meta,
-              color: light.text.muted,
+              color: theme.text.muted,
               fontFamily: fonts.body,
               zIndex: 5,
               opacity: exitFade(frame, durationInFrames, 15),
@@ -477,6 +529,9 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
           </div>
         )}
       </AbsoluteFill>
+      {/* Brand strips */}
+      <HeaderStrip mode="light" metadata={data.episode} />
+      <FooterStrip mode="light" />
     </Background>
   );
 };

@@ -23,15 +23,14 @@
  */
 
 import React, { useMemo } from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile } from "remotion";
-import { dark, light, palette, layout } from "../design/theme";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile, random } from "remotion";
+import { dark, light, palette, layout, fonts, fontSizes } from "../design/theme";
 
-// ── Deterministic pseudo-random (same seed = same output every frame) ────
+// ── Deterministic random via Remotion's seeded random() ────────────────
+// Remotion's random(seed) is deterministic per composition — same seed
+// always produces the same value, no matter how many times the frame rerenders.
 
-const seededRandom = (seed: number): number => {
-  const x = Math.sin(seed * 12.9898 + seed * 78.233) * 43758.5453;
-  return x - Math.floor(x);
-};
+const seededRandom = (seed: number): number => random(`bg-particle-${seed}`);
 
 // ── Particle types ───────────────────────────────────────────────────────
 
@@ -82,19 +81,28 @@ const Atmosphere: React.FC<{
   density: AtmosphereDensity;
   tint?: string;
   isDark?: boolean;
-}> = React.memo(({ density, tint, isDark = false }) => {
+  /** Intensity multiplier (0-2). Scales particle count and opacity. */
+  intensity?: number;
+  /** Skip CSS blur on bokeh orbs (for Lambda/CPU-only renders). Bokeh renders as soft gradients only. */
+  noBlur?: boolean;
+}> = React.memo(({ density, tint, isDark = false, intensity = 1.0, noBlur = false }) => {
   const frame = useCurrentFrame();
   const { durationInFrames, fps } = useVideoConfig();
   const config = ATMOSPHERE_CONFIG[density];
 
-  // Pre-compute particle arrays (only once per composition)
+  // Scale particle counts by intensity (clamped to reasonable range)
+  const intensityClamped = Math.max(0, Math.min(2, intensity));
+  const dustCount = Math.round(config.dustCount * intensityClamped);
+  const bokehCount = Math.round(config.bokehCount * intensityClamped);
+
+  // Pre-compute particle arrays (only once per composition + intensity)
   const dustMotes = useMemo(
-    () => generateParticles(config.dustCount, [1, 3], [0.15, 0.4], 42),
-    [config.dustCount]
+    () => generateParticles(dustCount, [1, 3], [0.15, 0.4], 42),
+    [dustCount]
   );
   const bokehOrbs = useMemo(
-    () => generateParticles(config.bokehCount, [20, 80], [0.03, 0.08], 137),
-    [config.bokehCount]
+    () => generateParticles(bokehCount, [20, 80], [0.03, 0.08], 137),
+    [bokehCount]
   );
 
   if (density === "none") return null;
@@ -126,8 +134,8 @@ const Atmosphere: React.FC<{
             }px) translateY(${
               (frame / durationInFrames) * 60 - 30
             }px)`,
-            // Dual-frequency pulse: slow swell + faster shimmer
-            opacity: 0.6 + 0.25 * Math.sin(frame / fps * 0.4) + 0.15 * Math.sin(frame / fps * 1.1 + 1.2),
+            // Dual-frequency pulse: slow swell + faster shimmer, scaled by intensity
+            opacity: (0.6 + 0.25 * Math.sin(frame / fps * 0.4) + 0.15 * Math.sin(frame / fps * 1.1 + 1.2)) * intensityClamped,
             mixBlendMode: isDark ? "screen" : "multiply",
           }}
         />
@@ -156,7 +164,7 @@ const Atmosphere: React.FC<{
               height: breathSize,
               borderRadius: "50%",
               background: `radial-gradient(circle, ${tintColor}${Math.round(pulseOpacity * 255).toString(16).padStart(2, "0")} 0%, transparent 70%)`,
-              filter: `blur(${breathSize * 0.4}px)`,
+              ...(noBlur ? {} : { filter: `blur(${breathSize * 0.4}px)` }),
               mixBlendMode: isDark ? "screen" : "multiply",
             }}
           />
@@ -219,8 +227,11 @@ const Atmosphere: React.FC<{
 interface BackgroundProps {
   color?: string;
   variant?: "dark" | "light" | "map";
-  /** Show ruled border inset 40px (light mode only, per BRAND.md) */
+  /** Show ruled border inset 40px (light mode only, per BRAND.md). Default: true for light. */
   border?: boolean;
+  /** Episode label for the rubber stamp element (light mode only, per BRAND.md).
+   *  Shows rotated "EPISODE XX" stamp in oxblood, top-right area. */
+  stampLabel?: string;
   /** Disable grain overlay (default: enabled) */
   noGrain?: boolean;
   /**
@@ -237,19 +248,39 @@ interface BackgroundProps {
    * Default: "normal" for dark/map, "none" for light.
    */
   atmosphere?: AtmosphereDensity;
+  /**
+   * Atmosphere intensity multiplier (0-2, default 1.0).
+   * Scales particle count and opacity without changing the density tier.
+   * Use to tie atmosphere to narrative tension:
+   *   0.3 = calm analysis, 1.0 = normal, 1.8 = high tension/escalation.
+   * Assembly manifest can drive this per-segment.
+   */
+  atmosphereIntensity?: number;
+  /**
+   * Skip CSS blur on bokeh orbs for faster CPU-only rendering (Lambda).
+   * Bokeh still renders as soft radial gradients — just without the expensive
+   * Gaussian blur filter that causes 2-3x slowdown on non-GPU renderers.
+   */
+  noBlur?: boolean;
   children?: React.ReactNode;
 }
 
 export const Background: React.FC<BackgroundProps> = ({
   color,
   variant = "light",
-  border = false,
+  border,
   noGrain = false,
   tint,
   atmosphere,
+  atmosphereIntensity = 1.0,
+  noBlur = false,
+  stampLabel,
   children,
 }) => {
   const isDark = variant === "dark" || variant === "map";
+
+  // Light mode gets ruled border by default (BRAND.md editorial briefing feel)
+  const effectiveBorder = border ?? (variant === "light");
 
   // Default atmosphere: normal for dark, subtle for light (cinematic paper feel)
   const effectiveDensity = atmosphere ?? (isDark ? "normal" : "subtle");
@@ -277,7 +308,7 @@ export const Background: React.FC<BackgroundProps> = ({
   })();
 
   return (
-    <AbsoluteFill style={bgStyle}>
+    <AbsoluteFill style={{ ...bgStyle, overflow: "hidden" }}>
       {/* Grain overlay — subtle film texture */}
       {!noGrain && (
         <AbsoluteFill
@@ -314,11 +345,11 @@ export const Background: React.FC<BackgroundProps> = ({
 
       {/* Atmospheric particles — the cinematic layer */}
       {effectiveDensity !== "none" && (
-        <Atmosphere density={effectiveDensity} tint={tint} isDark={isDark} />
+        <Atmosphere density={effectiveDensity} tint={tint} isDark={isDark} intensity={atmosphereIntensity} noBlur={noBlur} />
       )}
 
-      {/* Light mode ruled border — inset 40px, 1px border */}
-      {variant === "light" && border && (
+      {/* Light mode ruled border — inset 40px, 1px border (BRAND.md: editorial briefing) */}
+      {effectiveBorder && (
         <div
           style={{
             position: "absolute",
@@ -330,6 +361,33 @@ export const Background: React.FC<BackgroundProps> = ({
             pointerEvents: "none",
           }}
         />
+      )}
+
+      {/* Light mode rubber stamp — BRAND.md: rotated 2-3° in oxblood, top-right area */}
+      {variant === "light" && stampLabel && (
+        <div
+          style={{
+            position: "absolute",
+            top: layout.safeArea.top + 8,
+            right: layout.safeArea.right + 8,
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.caption,
+            fontWeight: 600,
+            letterSpacing: 3,
+            textTransform: "uppercase",
+            color: palette.walnut,
+            opacity: 0.35,
+            transform: "rotate(-2.5deg)",
+            transformOrigin: "top right",
+            border: `1.5px solid ${palette.walnut}50`,
+            borderRadius: 2,
+            padding: "4px 12px",
+            pointerEvents: "none",
+            zIndex: 15,
+          }}
+        >
+          {stampLabel}
+        </div>
       )}
 
       {/* Content layer */}

@@ -156,7 +156,7 @@ All 7 core templates expose `backgroundTint` in their data types.
 | Neutral / Structural | None | — |
 | Danger / Escalation | Deep red | `#D64545` |
 
-Full spec with EP01 color arc: `references/color-storytelling.md`
+Full spec with silicon-trap color arc: `references/color-storytelling.md`
 
 ### 3C. Pacing Principles
 
@@ -175,7 +175,7 @@ Full spec with EP01 color arc: `references/color-storytelling.md`
 
 ### 4B. MetadataStrip
 
-Header: `∴ PARALLAX | EP.01 — THE SILICON TRAP`
+Header: `∴ PARALLAX | silicon-trap — THE SILICON TRAP`
 Footer: `● REC | 1:150,000 | FILED 2026-04-25`
 
 Uses IBM Plex Mono at meta size (11px, tracking 2.5px). Positioned in the 80px safe area.

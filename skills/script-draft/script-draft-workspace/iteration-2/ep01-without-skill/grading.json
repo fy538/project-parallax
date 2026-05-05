@@ -1,0 +1,69 @@
+{
+  "expectations": [
+    {
+      "text": "format-two-column",
+      "passed": true,
+      "evidence": "Two-column headers: True"
+    },
+    {
+      "text": "format-beat-structure",
+      "passed": true,
+      "evidence": "Found 5 beats"
+    },
+    {
+      "text": "format-mode-tags",
+      "passed": true,
+      "evidence": "73 mode tags / 50 entries (146%)"
+    },
+    {
+      "text": "format-priority-tiers",
+      "passed": true,
+      "evidence": "P1:12 P2:29 P3:9"
+    },
+    {
+      "text": "format-claim-tags",
+      "passed": true,
+      "evidence": "35 claim tags"
+    },
+    {
+      "text": "format-asset-summary",
+      "passed": true,
+      "evidence": "4/4 summary tables"
+    },
+    {
+      "text": "nar-10-stakes-first-30s",
+      "passed": true,
+      "evidence": "Beat 1 contradiction: True"
+    },
+    {
+      "text": "nar-11-named-concept",
+      "passed": false,
+      "evidence": "'Silicon Trap' in narration body: 0 (total: 1, headers: 1)"
+    },
+    {
+      "text": "nar-06-bilateral-balance",
+      "passed": false,
+      "evidence": "Chinese terms: False"
+    },
+    {
+      "text": "vis-06-timing-breaks",
+      "passed": false,
+      "evidence": "VISUAL-FIRST: False, COUNTERPOINT: False"
+    },
+    {
+      "text": "vis-mode-balance",
+      "passed": false,
+      "evidence": "FOOTAGE: 53%, MG: 36%"
+    },
+    {
+      "text": "nar-09-decoder-posture",
+      "passed": true,
+      "evidence": "Explainer anti-patterns: 0"
+    },
+    {
+      "text": "nar-05-personal-stakes-ending",
+      "passed": false,
+      "evidence": "Personal stakes in Beat 5: False"
+    }
+  ]
+}

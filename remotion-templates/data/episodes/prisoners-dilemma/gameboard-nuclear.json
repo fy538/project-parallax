@@ -1,0 +1,26 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Nuclear Strategy in Miniature",
+  "subtitle": "RAND's premise",
+  "variant": "payoff-matrix",
+  "rowPlayer": "USA",
+  "colPlayer": "USSR",
+  "rowOptions": ["Restrain", "Strike"],
+  "colOptions": ["Restrain", "Strike"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "Peace", "highlight": false },
+    { "row": 0, "col": 1, "value": "Destroyed", "highlight": false },
+    { "row": 1, "col": 0, "value": "Dominance", "highlight": false },
+    { "row": 1, "col": 1, "value": "MAD", "highlight": true }
+  ],
+  "phases": [
+    {
+      "label": "The Cold War Game",
+      "durationSec": 8,
+      "highlights": [3],
+      "annotation": "Two players. No communication. No trust. No future."
+    }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "dark"
+}

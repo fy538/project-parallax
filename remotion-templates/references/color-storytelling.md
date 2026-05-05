@@ -23,14 +23,14 @@ The effect is subliminal: viewers won't consciously see "the background turned b
 
 ```json
 {
-  "episode": "EP01",
+  "episode": "silicon-trap",
   "title": "SMIC's 7nm Breakthrough",
   "backgroundTint": "#C23B22",
   ...
 }
 ```
 
-## EP01 Color Arc
+## silicon-trap Color Arc
 
 The Silicon Trap's emotional journey:
 

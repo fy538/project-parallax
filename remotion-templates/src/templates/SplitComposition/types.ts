@@ -10,6 +10,8 @@
  * Center divider with optional label creates the "vs" visual metaphor.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface SplitSide {
   title: string;
   subtitle?: string;
@@ -35,4 +37,12 @@ export interface SplitCompositionData {
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
+  /** Cinematic mode: progressive spotlight with camera focus per side */
+  cinematicMode?: boolean;
+  /** Enable ambient particles for depth */
+  ambientParticles?: boolean;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

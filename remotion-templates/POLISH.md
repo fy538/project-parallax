@@ -77,6 +77,10 @@ spacing: { xs: 8, sm: 16, md: 24, lg: 32, xl: 48, xxl: 64, safe: 80 }
 
 **L12: No hardcoded shadow strings.** Use shadow tokens from theme.ts: `shadows.subtle`, `shadows.medium`, `shadows.accentGlow(color)`, `shadows.textLift`. Never write `"0 1px 3px rgba(0,0,0,0.5)"` inline.
 
+**L13: Use `<TitleBlock>`, don't hand-build title blocks.** Every data template (DataChart, FrameworkDiagram, TimeSeriesChart, GameBoard, DecisionTree, SankeyFlow, ProbabilityGauge) uses the shared `TitleBlock` component from `../../components/TitleBlock`. It enforces L5 (48px gap), L9 (maxWidth), T1-T3 (typography hierarchy), and L14 (mode-aware colors) in a single import. Props: `title`, `subtitle`, `mode` (pass `backgroundVariant`). Exceptions: KineticTypography (IS the text), TitleTransition (full-screen), ChoroplethMap (overlay-style), TimelineComparison (dual column headers), NetworkDiagram (SVG text).
+
+**L14: Use `useThemeMode()`, never reference `light.text.*` or `dark.text.*` directly.** Import `useThemeMode` from `../../hooks/useThemeMode`. Pass `data.backgroundVariant` and destructure `{ text, accent, bg }`. This prevents contrast bugs when a dark-tinted composition uses light-mode text colors. TitleBlock uses this internally — templates only need the hook for their own content elements.
+
 ### Safe Area Usage
 
 ```
@@ -205,6 +209,16 @@ Before any composition is considered done, verify against this checklist:
 - [ ] Map compositions use regional `cameraPresets`, not globe default (L11)
 - [ ] Shadows use `shadows.*` tokens, no inline shadow strings (L12)
 - [ ] No `+ 60`, `+ 40`, `+ 120` magic offsets on safe area positions
+- [ ] Title block uses `<TitleBlock>` component, not hand-built (L13)
+- [ ] Colors come from `useThemeMode()`, not `light.text.*` / `dark.text.*` directly (L14)
+
+### Border Safety & Clipping
+- [ ] No text partially visible at frame edges (Background.tsx clips, but content should be inward)
+- [ ] Dynamic/data-driven text uses `textSafe.*` utilities (ellipsis, wrap, clamp, bounded)
+- [ ] Map labels don't cluster at viewport edges (adjust camera center or label positions)
+- [ ] Animated camera templates stagger: camera → shapes → labels (L56 timing sequence)
+- [ ] Long labels (city names, data values) have overflow protection
+- [ ] All content respects 80px safe area — verify at frame 0 AND mid-animation AND final frame
 
 ### Visual Richness
 - [ ] Background is a gradient, not flat color

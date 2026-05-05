@@ -1,7 +1,7 @@
 /**
  * FullEpisode — Assembly-manifest-driven episode composition.
  *
- * Replaces the manual EP01.tsx approach (27-clip Series) with a data-driven
+ * Replaces the manual SiliconTrap.tsx approach (27-clip Series) with a data-driven
  * composition that renders the COMPLETE video: narration audio, motion graphics,
  * stock footage with brand treatment, and transitions — all from one JSON file.
  *
@@ -16,14 +16,14 @@
  *   Register as a Composition with the manifest as defaultProps or inputProps:
  *
  *   <Composition
- *     id="EP01-Full"
+ *     id="silicon-trap-full"
  *     component={FullEpisode}
  *     calculateMetadata={calculateFullEpisodeMetadata}
- *     defaultProps={{ manifestPath: "episodes/ep01/assembly-manifest.json" }}
+ *     defaultProps={{ manifestPath: "episodes/silicon-trap/assembly-manifest.json" }}
  *   />
  *
  * Then render:
- *   npx remotion render EP01-Full out/ep01-full.mp4
+ *   npx remotion render silicon-trap-full out/silicon-trap-full.mp4
  *
  * Render performance notes (from research):
  *   - Uses <OffthreadVideo> instead of <Video> for stock footage segments.
@@ -39,18 +39,23 @@ import React, { useMemo, memo } from "react";
 import {
   AbsoluteFill,
   Audio,
-  Img,
   OffthreadVideo,
   Sequence,
   staticFile,
-  useCurrentFrame,
   useVideoConfig,
-  interpolate,
 } from "remotion";
-import { layout, sec, durations } from "../../design/theme";
-import { CLAMP } from "../../utils/animation";
+import { LightLeak } from "@remotion/light-leaks";
+import { layout } from "../../design/theme";
 import { BrandImage } from "../../components/BrandImage";
 import { SectionIndicator } from "../../components/SectionIndicator";
+import {
+  TransitionWrapper,
+  type TransitionType,
+} from "../../components/Transitions";
+import { LayeredComposition } from "../../components/LayeredComposition";
+import { LowerThird } from "../../components/LowerThird";
+import { FilmOverlay } from "../../components/FilmOverlay";
+import { AudioLayer } from "../../components/AudioLayer";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -61,6 +66,22 @@ import { TimelineComparison } from "../TimelineComparison/TimelineComparison";
 import { DataChart } from "../DataChart/DataChart";
 import { FrameworkDiagram } from "../FrameworkDiagram/FrameworkDiagram";
 import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
+import { DecisionTree } from "../DecisionTree/DecisionTree";
+import { SplitComposition } from "../SplitComposition/SplitComposition";
+import { ProbabilityGauge } from "../ProbabilityGauge/ProbabilityGauge";
+import { ImageComposite } from "../ImageComposite/ImageComposite";
+import { PhotoMontage } from "../PhotoMontage/PhotoMontage";
+import { NetworkDiagram } from "../NetworkDiagram/NetworkDiagram";
+import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
+import { SankeyFlow } from "../SankeyFlow/SankeyFlow";
+import { GameBoard } from "../GameBoard/GameBoard";
+import { BayesianUpdate } from "../BayesianUpdate/BayesianUpdate";
+import { StatReveal } from "../StatReveal/StatReveal";
+import { RadarChart } from "../RadarChart/RadarChart";
+import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
+import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
+import { DualTimeline } from "../DualTimeline/DualTimeline";
+import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
 
@@ -68,7 +89,7 @@ type SegmentType = "FOOTAGE" | "IMAGE" | "TEMPLATE" | "TRANSITION" | "HOLD";
 type LayerType = "background" | "foreground";
 type DuotoneRamp = "standard" | "conflict" | "editorial";
 type CompositeMode = "background" | "inset" | "antipode" | "raw";
-type TransitionType = "cut" | "dissolve" | "fade";
+// TransitionType imported from ../../components/Transitions
 
 interface AssetInfo {
   shotListId?: string;
@@ -101,6 +122,51 @@ interface TransitionInfo {
   durationSec?: number;
 }
 
+interface LayeredInfo {
+  /** ID of the background segment this foreground composites over */
+  backgroundSegmentId: string;
+  /** Foreground position preset */
+  position?: "full" | "lower-third" | "upper-third" | "center-inset" | "bottom-bar";
+  /** Blend mode for the foreground */
+  blendMode?: "normal" | "multiply" | "screen" | "overlay" | "soft-light";
+  /** Foreground opacity 0-1 */
+  foregroundOpacity?: number;
+  /** Background dim amount 0-1 */
+  backgroundDim?: number;
+  /** Foreground fade-in duration in seconds */
+  foregroundFadeInSec?: number;
+  /** Show vignette overlay */
+  vignette?: boolean;
+}
+
+interface SoundCue {
+  type:
+    | "beat-transition"
+    | "stat-reveal"
+    | "tension-rise"
+    | "tension-resolve"
+    | "map-whoosh"
+    | "quote-bell"
+    | "section-open"
+    | "end-stinger";
+  offsetSec?: number;
+  intensity?: "subtle" | "normal" | "dramatic";
+}
+
+interface TextureCue {
+  type:
+    | "dot-click"
+    | "card-settle"
+    | "line-draw"
+    | "region-glow"
+    | "bar-grow"
+    | "node-pop"
+    | "page-turn";
+  offsetSec: number;
+  volume?: number;
+  label?: string;
+}
+
 interface ManifestSegment {
   id: string;
   type: SegmentType;
@@ -115,7 +181,11 @@ interface ManifestSegment {
   template?: TemplateInfo;
   hold?: HoldInfo;
   transition?: TransitionInfo;
+  layered?: LayeredInfo;
   notes?: string;
+  soundCue?: SoundCue;
+  soundCueSecondary?: SoundCue;
+  textureCues?: TextureCue[];
 }
 
 interface NarrationInfo {
@@ -131,6 +201,22 @@ interface BeatInfo {
   endSec?: number;
 }
 
+interface MusicBedTrack {
+  id: string;
+  file: string;
+  startSec: number;
+  endSec: number;
+  fadeInSec?: number;
+  fadeOutSec?: number;
+  volume: number;
+  mood?: "contemplative" | "analytical" | "tension" | "resolution" | "neutral";
+  beat?: string;
+}
+
+interface MusicBedConfig {
+  tracks: MusicBedTrack[];
+}
+
 interface AssemblyManifest {
   version: string;
   episode: string;
@@ -141,6 +227,26 @@ interface AssemblyManifest {
   narration: NarrationInfo;
   beats?: BeatInfo[];
   segments: ManifestSegment[];
+  /** Episode-level music bed (Layer 1 — continuous ambient tracks). */
+  musicBed?: MusicBedConfig;
+  /** Episode-level film overlay config. Wraps all visual layers. */
+  filmOverlay?: {
+    effects?: Array<"grain" | "vignette" | "light-leak" | "dust" | "scratch" | "flicker">;
+    intensity?: number;
+  };
+  /** Episode-level lower-third config. If present, renders LowerThird per beat. */
+  lowerThird?: {
+    /** Label shown on all lower-thirds, e.g. "∴ PARALLAX · EP.01" */
+    label?: string;
+    /** Accent color (default: gold) */
+    accentColor?: string;
+    /** Mode override (default: follows segment bg mode) */
+    mode?: "dark" | "light";
+    /** Seconds after beat start to show lower-third (default: 0.5) */
+    enterDelaySec?: number;
+    /** Seconds to show before hiding (default: 4) */
+    displayDurationSec?: number;
+  };
 }
 
 // ── Props ────────────────────────────���────────────────────────────────────────
@@ -161,6 +267,41 @@ interface FullEpisodeProps {
   assetBasePath?: string;
 }
 
+// ── Mood → atmosphere intensity mapping ──────────────────────────────────────
+
+/**
+ * Maps the active music bed mood (Layer 1) to a Background atmosphere intensity
+ * multiplier. This drives a tension-aware atmospheric overlay so escalation
+ * beats feel denser than contemplative beats — without per-template overrides.
+ */
+const MOOD_INTENSITY: Record<string, number> = {
+  contemplative: 0.6,
+  analytical: 1.0,
+  tension: 1.5,
+  resolution: 0.7,
+  neutral: 1.0,
+};
+
+/**
+ * Look up the active music bed track at a given absolute time and return its
+ * mood-derived atmosphere intensity. Returns 1.0 if no track is active.
+ */
+function getAtmosphereIntensityAtTime(
+  manifest: AssemblyManifest,
+  timeSec: number
+): number {
+  const tracks = manifest.musicBed?.tracks;
+  if (!tracks || tracks.length === 0) return 1.0;
+  // Find the latest-starting track that contains this timestamp
+  let active = tracks[0];
+  for (const t of tracks) {
+    if (t.startSec <= timeSec && timeSec <= t.endSec && t.startSec >= active.startSec) {
+      active = t;
+    }
+  }
+  return MOOD_INTENSITY[active.mood] ?? 1.0;
+}
+
 // ── Component map ─────────────────────────────────────────────────────────────
 
 // Composite mode opacity defaults (mirrors BrandImage.tsx COMPOSITE_OPACITY)
@@ -179,72 +320,22 @@ const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = 
   DataChart,
   FrameworkDiagram,
   RouteAnimation,
-};
-
-// ── Fade wrapper ──────────────────────────────────────────────────────────────
-
-const FadeWrapper: React.FC<{
-  children: React.ReactNode;
-  transitionIn?: TransitionType;
-  transitionOut?: TransitionType;
-  transitionDurationSec?: number;
-  durationInFrames: number;
-}> = ({
-  children,
-  transitionIn = "cut",
-  transitionOut = "cut",
-  transitionDurationSec = 0.5,
-  durationInFrames,
-}) => {
-  const frame = useCurrentFrame();
-  const fadeDur = sec(transitionDurationSec);
-
-  let opacity = 1;
-  let scale = 1;
-
-  // Fade/dissolve in
-  if (transitionIn === "fade" || transitionIn === "dissolve") {
-    const inProgress = interpolate(frame, [0, fadeDur], [0, 1], CLAMP);
-    opacity = Math.min(opacity, inProgress);
-    // Dissolve gets a subtle zoom-in (1.02 → 1.0) for depth
-    if (transitionIn === "dissolve") {
-      scale = interpolate(inProgress, [0, 1], [1.02, 1], CLAMP);
-    }
-  }
-
-  // Fade/dissolve out
-  if (transitionOut === "fade" || transitionOut === "dissolve") {
-    const outProgress = interpolate(
-      frame,
-      [durationInFrames - fadeDur, durationInFrames],
-      [1, 0],
-      CLAMP
-    );
-    opacity = Math.min(opacity, outProgress);
-    // Dissolve out: subtle zoom-out (1.0 → 0.98) — receding
-    if (transitionOut === "dissolve") {
-      scale = Math.min(
-        scale,
-        interpolate(outProgress, [1, 0], [1, 0.98], CLAMP)
-      );
-    }
-  }
-
-  const needsTransform = scale !== 1;
-
-  return (
-    <AbsoluteFill
-      style={{
-        opacity,
-        ...(needsTransform && {
-          transform: `scale(${scale})`,
-          transformOrigin: "center center",
-        }),
-      }}
-    >
-      {children}
-    </AbsoluteFill>
-  );
+  DecisionTree,
+  SplitComposition,
+  ProbabilityGauge,
+  ImageComposite,
+  PhotoMontage,
+  NetworkDiagram,
+  TimeSeriesChart,
+  SankeyFlow,
+  GameBoard,
+  BayesianUpdate,
+  StatReveal,
+  RadarChart,
+  AnnotatedImage,
+  EscalationLadder,
+  DualTimeline,
+  HorizontalTimeline,
 };
 
 // ── Background segment renderer ──────────────────────────────────────────────
@@ -283,7 +374,7 @@ const BackgroundSegment: React.FC<{
             fontFamily: "IBM Plex Mono, monospace",
             fontSize: 16,
             textAlign: "center",
-            padding: 40,
+            padding: layout.spacing.xl,
             maxWidth: 600,
           }}
         >
@@ -404,12 +495,14 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
 }) => {
   const { fps } = useVideoConfig();
 
-  // Split segments into layers
-  const { backgroundSegs, foregroundSegs } = useMemo(() => {
+  // Split segments into layers + build index for layered lookups
+  const { backgroundSegs, foregroundSegs, segmentIndex } = useMemo(() => {
     const bg: ManifestSegment[] = [];
     const fg: ManifestSegment[] = [];
+    const idx: Record<string, ManifestSegment> = {};
 
     for (const seg of manifest.segments) {
+      idx[seg.id] = seg;
       if (seg.layer === "foreground") {
         fg.push(seg);
       } else {
@@ -417,13 +510,43 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       }
     }
 
-    return { backgroundSegs: bg, foregroundSegs: fg };
+    // Identify background segments claimed by layered foregrounds —
+    // these are rendered inside LayeredComposition, not standalone.
+    const claimedBgIds = new Set<string>();
+    for (const seg of fg) {
+      if (seg.layered?.backgroundSegmentId) {
+        claimedBgIds.add(seg.layered.backgroundSegmentId);
+      }
+    }
+
+    const standaloneBg = bg.filter((s) => !claimedBgIds.has(s.id));
+
+    return {
+      backgroundSegs: standaloneBg,
+      foregroundSegs: fg,
+      segmentIndex: idx,
+    };
   }, [manifest.segments]);
 
-  return (
-    <AbsoluteFill style={{ backgroundColor: "#F5F0E8" }}>
-      {/* Layer 0: Dark background base */}
+  // Extract audio cues from all segments for AudioLayer
+  const segmentAudio = useMemo(() => {
+    return manifest.segments
+      .filter((seg) => seg.soundCue || seg.soundCueSecondary || (seg.textureCues && seg.textureCues.length > 0))
+      .map((seg) => ({
+        segmentId: seg.id,
+        startSec: seg.startSec,
+        soundCue: seg.soundCue,
+        soundCueSecondary: seg.soundCueSecondary,
+        textureCues: seg.textureCues,
+      }));
+  }, [manifest.segments]);
 
+  const filmOverlayConfig = manifest.filmOverlay;
+  const lowerThirdConfig = manifest.lowerThird;
+
+  // Build visual layers (shared between overlay and non-overlay paths)
+  const visualLayers = (
+    <>
       {/* Layer 1: Background segments (footage, images) */}
       {backgroundSegs.map((seg) => {
         const startFrame = Math.round(seg.startSec * fps);
@@ -438,46 +561,77 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
             durationInFrames={durationFrames}
             name={`bg-${seg.id}`}
           >
-            <FadeWrapper
+            <TransitionWrapper
               transitionIn={seg.transition?.in}
               transitionOut={seg.transition?.out}
-              transitionDurationSec={seg.transition?.durationSec}
+              durationSec={seg.transition?.durationSec}
               durationInFrames={durationFrames}
             >
               <BackgroundSegment
                 segment={seg}
                 assetBasePath={assetBasePath}
               />
-            </FadeWrapper>
+            </TransitionWrapper>
           </Sequence>
         );
       })}
 
-      {/* Layer 2: Foreground segments (templates, transitions) */}
+      {/* Layer 2: Foreground segments (templates, transitions, layered) */}
       {foregroundSegs.map((seg) => {
         const startFrame = Math.round(seg.startSec * fps);
         const durationFrames = Math.round((seg.endSec - seg.startSec) * fps);
 
         if (durationFrames <= 0) return null;
 
+        // Layered mode: foreground template composited over a background segment
+        const layeredBg = seg.layered?.backgroundSegmentId
+          ? segmentIndex[seg.layered.backgroundSegmentId]
+          : null;
+
         return (
           <Sequence
             key={seg.id}
             from={startFrame}
             durationInFrames={durationFrames}
-            name={`fg-${seg.id}`}
+            name={layeredBg ? `layered-${seg.id}` : `fg-${seg.id}`}
           >
-            <FadeWrapper
+            <TransitionWrapper
               transitionIn={seg.transition?.in}
               transitionOut={seg.transition?.out}
-              transitionDurationSec={seg.transition?.durationSec}
+              durationSec={seg.transition?.durationSec}
               durationInFrames={durationFrames}
             >
-              <ForegroundSegment
-                segment={seg}
-                templateData={templateData}
-              />
-            </FadeWrapper>
+              {layeredBg ? (
+                <LayeredComposition
+                  position={seg.layered?.position}
+                  blendMode={seg.layered?.blendMode}
+                  foregroundOpacity={seg.layered?.foregroundOpacity}
+                  backgroundDim={seg.layered?.backgroundDim}
+                  foregroundFadeInSec={seg.layered?.foregroundFadeInSec}
+                  vignette={seg.layered?.vignette}
+                >
+                  {{
+                    background: (
+                      <BackgroundSegment
+                        segment={layeredBg}
+                        assetBasePath={assetBasePath}
+                      />
+                    ),
+                    foreground: (
+                      <ForegroundSegment
+                        segment={seg}
+                        templateData={templateData}
+                      />
+                    ),
+                  }}
+                </LayeredComposition>
+              ) : (
+                <ForegroundSegment
+                  segment={seg}
+                  templateData={templateData}
+                />
+              )}
+            </TransitionWrapper>
           </Sequence>
         );
       })}
@@ -487,7 +641,78 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         <SectionIndicator beats={manifest.beats} />
       )}
 
-      {/* Layer 4: Narration audio */}
+      {/* Layer 4: Lower-thirds (one per beat, driven by manifest) */}
+      {lowerThirdConfig && manifest.beats && manifest.beats.map((beat) => {
+        const enterDelay = lowerThirdConfig.enterDelaySec ?? 0.5;
+        const displayDuration = lowerThirdConfig.displayDurationSec ?? 4;
+        const enterFrame = Math.round((beat.startSec + enterDelay) * fps);
+        const exitFrame = Math.round((beat.startSec + enterDelay + displayDuration) * fps);
+
+        return (
+          <Sequence
+            key={`lt-${beat.id}`}
+            from={0}
+            durationInFrames={Math.round(manifest.totalDurationSec * fps)}
+            name={`lower-third-${beat.id}`}
+          >
+            <LowerThird
+              label={lowerThirdConfig.label}
+              title={beat.title}
+              mode={lowerThirdConfig.mode || "dark"}
+              accentColor={lowerThirdConfig.accentColor}
+              enterFrame={enterFrame}
+              exitFrame={exitFrame}
+            />
+          </Sequence>
+        );
+      })}
+
+      {/* Layer 4b: Light leaks at beat boundaries — subtle film-burn flash for cinematic transitions.
+          One LightLeak per beat (skipping the first), 1.0s duration starting at beat boundary.
+          Hue shifts gently per beat for variety; uses Remotion's built-in light-leaks effect. */}
+      {manifest.beats && manifest.beats.slice(1).map((beat, idx) => {
+        const burnDurationSec = 1.0;
+        const startFrame = Math.round((beat.startSec - burnDurationSec * 0.3) * fps);
+        const durationInFrames = Math.round(burnDurationSec * fps);
+        // Rotate hue per beat: amber-warm → rose → cyan-cool → amber
+        const hueShifts = [0, -25, 30, -10];
+        const hueShift = hueShifts[idx % hueShifts.length];
+        return (
+          <Sequence
+            key={`leak-${beat.id}`}
+            from={Math.max(0, startFrame)}
+            durationInFrames={durationInFrames}
+            name={`light-leak-${beat.id}`}
+          >
+            <AbsoluteFill style={{ opacity: 0.4, mixBlendMode: "screen", pointerEvents: "none" }}>
+              <LightLeak
+                durationInFrames={durationInFrames}
+                hueShift={hueShift}
+                seed={beat.startSec * 1000}
+              />
+            </AbsoluteFill>
+          </Sequence>
+        );
+      })}
+    </>
+  );
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#F5F0E8" }}>
+      {filmOverlayConfig ? (
+        <FilmOverlay
+          effects={filmOverlayConfig.effects}
+          intensity={filmOverlayConfig.intensity}
+        >
+          {visualLayers}
+        </FilmOverlay>
+      ) : (
+        visualLayers
+      )}
+
+      {/* Audio layers (always outside film overlay — audio isn't visual) */}
+
+      {/* Layer 5: Narration (dominant — -0dB reference) */}
       {manifest.narration.audioFile && (
         <Audio
           src={staticFile(
@@ -495,6 +720,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
           )}
         />
       )}
+
+      {/* Layers 6-8: Music bed + transition SFX + texture hits */}
+      <AudioLayer
+        episode={manifest.episode.toLowerCase()}
+        musicBedTracks={manifest.musicBed?.tracks}
+        segmentAudio={segmentAudio}
+      />
     </AbsoluteFill>
   );
 };

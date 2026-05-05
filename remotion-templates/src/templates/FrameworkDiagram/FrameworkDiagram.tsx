@@ -6,7 +6,7 @@
  * - "flow": Sequential nodes with arrows (e.g., escalation ladder)
  * - "matrix": Grid with highlighted cells (e.g., 2×2 strategy matrix)
  *
- * EP01 use case: Chess vs Go — Western vs Chinese strategic thinking.
+ * silicon-trap use case: Chess vs Go — Western vs Chinese strategic thinking.
  */
 
 import React, { useMemo } from "react";
@@ -16,13 +16,16 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, light, semantic, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows } from "../../design/theme";
+import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle } from "../../design/theme";
 import { TitleBlock } from "../../components/TitleBlock";
-import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, CLAMP_QUAD } from "../../utils/animation";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
+import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
-import { FadeIn } from "../../components/FadeIn";
-import type { FrameworkDiagramData, ComparisonColumn, FlowNode } from "./types";
+import type { FrameworkDiagramData, FrameworkPhase, EliminatedScenario } from "./types";
 
 // ── Comparison variant ─────────────────────────────────────────────────────
 
@@ -30,10 +33,11 @@ const ComparisonVariant: React.FC<{
   data: FrameworkDiagramData;
   frame: number;
 }> = React.memo(({ data, frame }) => {
+  const theme = useThemeMode(data.backgroundVariant);
   const { durationInFrames } = useVideoConfig();
   const columns = data.columns || [];
   const cols = useMemo(
-    () => columnLayout(columns.length, { titleVariant: "content" }),
+    () => columnLayout(columns.length, { titleVariant: "content", safeAreaTier: "generous" }),
     [columns.length]
   );
 
@@ -53,8 +57,8 @@ const ComparisonVariant: React.FC<{
       {columns.map((col, ci) => {
         const colStart = stagger(ci, sec(0.6), sec(0.5));
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
-        // Cinematic: columns scale in from 110%
-        const colScale = scaleReveal(frame, colStart, sec(0.6), 1.1, 1.0);
+        // Cinematic: columns enter with spring overshoot (POLISH A2)
+        const colScale = 0.92 + 0.08 * heroSpring(frame, layout.fps, colStart);
         const colColor = col.color || palette.amber;
 
         return (
@@ -107,15 +111,15 @@ const ComparisonVariant: React.FC<{
                 }}
               />
               {col.icon && (
-                <span style={{ fontSize: 36 }}>{col.icon}</span>
+                <span style={{ fontSize: fontSizes.h3 }}>{col.icon}</span>
               )}
               <div
                 style={{
                   fontSize: fontSizes.h2,
                   fontWeight: 600,
-                  color: light.text.primary,
+                  color: theme.text.primary,
                   fontFamily: fonts.heading,
-                  textShadow: `0 0 20px ${colColor}25`,
+                  textShadow: `0 0 20px ${colColor}30`,
                   maxWidth: textMaxWidth.h2,
                 }}
               >
@@ -140,20 +144,16 @@ const ComparisonVariant: React.FC<{
                     transform: `translateY(${itemSlide}px) scale(${itemScale})`,
                     transformOrigin: "left center",
                     marginBottom: layout.spacing.sm,
-                    padding: cardPadding.css,
-                    borderRadius: 8,
-                    backgroundColor: `${itemColor}12`,
-                    border: `1px solid ${itemColor}25`,
-                    borderLeft: `3px solid ${itemColor}80`,
-                    boxShadow: "0 2px 12px rgba(0,0,0,0.25)",
+                    // Editorial letterhead — accent left edge in column color
+                    ...cardPresets.accentEdge(itemColor, data.backgroundVariant === "dark"),
                   }}
                 >
                   <div
                     style={{
                       fontSize: fontSizes.body,
-                      color: light.text.primary,
+                      color: theme.text.primary,
                       lineHeight: 1.5,
-                      textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+                      textShadow: shadows.textLift,
                     }}
                   >
                     {item}
@@ -165,50 +165,30 @@ const ComparisonVariant: React.FC<{
         );
       })}
 
-      {/* VS divider for 2-column comparisons — cinematic scale entrance */}
+      {/* VS divider for 2-column comparisons — quiet typographic moment with glow */}
       {columns.length === 2 && (() => {
-        const vsScale = scaleReveal(frame, sec(1.0), sec(0.5), 1.3, 1.0);
-        const vsBloom = bloomIntensity(frame, sec(1.0), sec(0.3), 0.4);
+        const vsOpacity = fadeIn(frame, sec(1.0), sec(0.5));
+        const exit = exitFade(frame, durationInFrames, 15);
+        const glowPulse = 0.3 + 0.15 * Math.sin(frame * 0.025);
         return (
-          <>
-            {/* Bloom behind VS badge */}
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                width: 120,
-                height: 120,
-                transform: "translate(-50%, -50%)",
-                background: `radial-gradient(circle, ${palette.amber}30 0%, transparent 70%)`,
-                opacity: vsBloom,
-                filter: "blur(20px)",
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: `translate(-50%, -50%) scale(${vsScale})`,
-                fontSize: fontSizes.h3,
-                color: light.text.accent,
-                fontWeight: 700,
-                fontFamily: fonts.mono,
-                opacity: fadeIn(frame, sec(1.0), sec(0.4)),
-                backgroundColor: light.bg.elevated,
-                border: `1px solid ${palette.amber}30`,
-                boxShadow: `0 0 30px ${palette.amber}30, 0 4px 20px rgba(0,0,0,0.4)`,
-                padding: cardPadding.css,
-                borderRadius: 8,
-                letterSpacing: 3,
-                textTransform: "uppercase",
-              }}
-            >
-              vs
-            </div>
-          </>
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              fontSize: fontSizes.h3,
+              color: theme.text.muted,
+              fontWeight: 500,
+              fontFamily: fonts.mono,
+              opacity: vsOpacity * exit,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+              textShadow: `0 0 12px ${palette.amber}${Math.round(glowPulse * 255).toString(16).padStart(2, "0")}`,
+            }}
+          >
+            vs
+          </div>
         );
       })()}
     </div>
@@ -221,18 +201,190 @@ const FlowVariant: React.FC<{
   data: FrameworkDiagramData;
   frame: number;
 }> = React.memo(({ data, frame }) => {
+  const theme = useThemeMode(data.backgroundVariant);
+  const { durationInFrames } = useVideoConfig();
   const nodes = data.nodes || [];
   const arrowLabels = data.arrowLabels || [];
   const accentColor = data.accentColor || palette.amber;
+  const phases = data.phases || [];
+  const eliminatedScenarios = data.eliminatedScenarios || [];
 
-  const area = contentArea("content");
+  const area = contentArea("content", "generous");
   const nodeWidth = textMaxWidth.node;
   const arrowGap = layout.spacing.xxxl;
-  const flowLayout = useMemo(() => {
-    const totalWidth = nodes.length * nodeWidth + (nodes.length - 1) * arrowGap;
-    const startX = (layout.width - totalWidth) / 2;
-    return { totalWidth, startX };
-  }, [nodes.length]);
+
+  // Detect spatial layout mode: if any node has a position field, use spatial rendering
+  const isSpatial = nodes.some((n) => n.position != null);
+
+  // ── Phase-based visibility ──
+  // Determine which nodes are currently visible based on phases
+  const visibleNodeIndices = useMemo(() => {
+    if (phases.length === 0) {
+      // No phases: all nodes visible (legacy behavior)
+      return nodes.map((_, i) => i);
+    }
+    let cumulativeFrames = 0;
+    const visible = new Set<number>();
+    for (const phase of phases) {
+      const phaseEnd = cumulativeFrames + sec(phase.durationSec);
+      if (frame >= cumulativeFrames) {
+        // Add this phase's active nodes
+        if (phase.activeNodes) {
+          phase.activeNodes.forEach((idx) => visible.add(idx));
+        }
+      }
+      cumulativeFrames = phaseEnd;
+    }
+    return Array.from(visible);
+  }, [frame, phases, nodes]);
+
+  // Current phase label
+  const currentPhaseLabel = useMemo(() => {
+    if (phases.length === 0) return "";
+    let cumulativeFrames = 0;
+    for (const phase of phases) {
+      const phaseEnd = cumulativeFrames + sec(phase.durationSec);
+      if (frame >= cumulativeFrames && frame < phaseEnd) {
+        return phase.label;
+      }
+      cumulativeFrames = phaseEnd;
+    }
+    return phases[phases.length - 1]?.label || "";
+  }, [frame, phases]);
+
+  // ── Eliminated scenarios timing ──
+  const eliminatedVisible = useMemo(() => {
+    return eliminatedScenarios.map((es, i) => {
+      // Show eliminated scenario after corresponding filter node appears
+      const filterNodeStart = stagger(es.filter, sec(0.8), sec(0.5));
+      return frame >= filterNodeStart + sec(1.0);
+    });
+  }, [frame, eliminatedScenarios]);
+
+  // ── SPATIAL LAYOUT MODE ──
+  if (isSpatial) {
+    const containerWidth = 900;
+    const containerHeight = 500;
+
+    return (
+      <div
+        style={{
+          position: "absolute",
+          top: area.top,
+          left: area.left,
+          right: area.right,
+          bottom: area.bottom,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ position: "relative", width: containerWidth, height: containerHeight }}>
+          {/* Connection lines between spatial nodes */}
+          <svg
+            style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+            width={containerWidth}
+            height={containerHeight}
+          >
+            {nodes.map((node, i) => {
+              if (i >= nodes.length - 1) return null;
+              if (!node.position || !nodes[i + 1]?.position) return null;
+              const x1 = node.position.x * containerWidth;
+              const y1 = node.position.y * containerHeight;
+              const x2 = nodes[i + 1].position!.x * containerWidth;
+              const y2 = nodes[i + 1].position!.y * containerHeight;
+              const lineStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
+              const lineOpacity = fadeIn(frame, lineStart, sec(0.5));
+              const isVisible = visibleNodeIndices.includes(i) && visibleNodeIndices.includes(i + 1);
+              if (!isVisible) return null;
+              return (
+                <line
+                  key={`line-${i}`}
+                  x1={x1} y1={y1} x2={x2} y2={y2}
+                  stroke={accentColor}
+                  strokeWidth="1.5"
+                  strokeDasharray="4 4"
+                  opacity={lineOpacity * 0.5}
+                />
+              );
+            })}
+          </svg>
+
+          {/* Spatial nodes */}
+          {nodes.map((node, i) => {
+            if (!node.position) return null;
+            const isVisible = visibleNodeIndices.includes(i);
+            const nodeStart = stagger(i, sec(0.6), sec(0.3));
+            const nodeOpacity = isVisible ? fadeIn(frame, nodeStart, sec(0.5)) : 0;
+            const nodeScale = scaleReveal(frame, nodeStart, sec(0.5), 1.15, 1.0);
+            const nodeColor = node.color || accentColor;
+
+            return (
+              <div
+                key={i}
+                style={{
+                  position: "absolute",
+                  left: node.position.x * containerWidth,
+                  top: node.position.y * containerHeight,
+                  transform: `translate(-50%, -50%) scale(${nodeScale})`,
+                  opacity: nodeOpacity,
+                  ...cardPresets.inset(data.backgroundVariant === "dark"),
+                  textAlign: "center",
+                  width: nodeWidth * 0.8,
+                  padding: `${layout.spacing.md}px ${layout.spacing.lg}px`,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: fontSizes.h3,
+                    color: theme.text.primary,
+                    fontWeight: 600,
+                    textShadow: shadows.textLift,
+                  }}
+                >
+                  {node.label}
+                </div>
+                {node.sublabel && (
+                  <div
+                    style={{
+                      fontSize: fontSizes.caption,
+                      color: nodeColor,
+                      marginTop: layout.spacing.xs,
+                      textShadow: `0 0 12px ${nodeColor}40`,
+                    }}
+                  >
+                    {node.sublabel}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── SEQUENTIAL (LINEAR) LAYOUT MODE ──
+
+  // Progressive focus: determine which node is "active" (most recently appeared)
+  const activeNodeIndex = useMemo(() => {
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const nodeStart = stagger(i, sec(0.8), sec(0.5));
+      if (frame >= nodeStart + sec(0.4)) return i;
+    }
+    return 0;
+  }, [frame, nodes.length]);
+
+  // Camera-like horizontal pan: translate container to follow active node
+  const panProgress = nodes.length > 1
+    ? interpolate(activeNodeIndex, [0, nodes.length - 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+    : 0;
+  const panOffset = interpolate(
+    frame,
+    [0, durationInFrames * 0.8],
+    [40, -40 * panProgress],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
 
   return (
     <div
@@ -243,119 +395,164 @@ const FlowVariant: React.FC<{
         right: area.right,
         bottom: area.bottom,
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        gap: 0,
       }}
     >
-      {nodes.map((node, i) => {
-        const nodeStart = stagger(i, sec(0.8), sec(0.5));
-        const nodeOpacity = fadeIn(frame, nodeStart, sec(0.4));
-        const nodeSlide = slideIn(frame, nodeStart, 30, sec(0.4));
-        const nodeColor = node.color || accentColor;
+      {/* Phase label */}
+      {currentPhaseLabel && (
+        <div
+          style={{
+            marginBottom: layout.spacing.lg,
+            fontSize: fontSizes.caption,
+            fontFamily: fonts.body,
+            color: theme.text.muted,
+            letterSpacing: 1.5,
+            textTransform: "uppercase",
+            opacity: fadeIn(frame, sec(0.5), sec(0.5)),
+          }}
+        >
+          {currentPhaseLabel}
+        </div>
+      )}
 
-        return (
-          <React.Fragment key={i}>
-            {/* Node — cinematic scale + slide entrance */}
-            <div
-              style={{
-                opacity: nodeOpacity,
-                transform: `translateX(${nodeSlide}px) scale(${scaleReveal(frame, nodeStart, sec(0.5), 1.1, 1.0)})`,
-                transformOrigin: "center center",
-                width: nodeWidth,
-                padding: cardPadding.css,
-                borderRadius: 8,
-                border: `2px solid ${nodeColor}`,
-                backgroundColor: `${nodeColor}15`,
-                textAlign: "center",
-                flexShrink: 0,
-                boxShadow: `${shadows.subtle}, 0 0 20px ${nodeColor}15`,
-              }}
-            >
+      {/* Nodes row */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 0,
+          transform: `translateX(${panOffset}px)`,
+        }}
+      >
+        {nodes.map((node, i) => {
+          const isVisible = visibleNodeIndices.includes(i);
+          const nodeStart = stagger(i, sec(0.8), sec(0.5));
+          const nodeOpacity = isVisible ? fadeIn(frame, nodeStart, sec(0.4)) : 0;
+          const nodeSlide = slideIn(frame, nodeStart, 30, sec(0.4));
+          const nodeColor = node.color || accentColor;
+
+          // Progressive focus: dim earlier nodes as later ones appear
+          const dimAmount = i < activeNodeIndex
+            ? interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+            : 0;
+          const focusOpacity = 1 - dimAmount;
+          const exitOp = exitFade(frame, durationInFrames, 15);
+
+          return (
+            <React.Fragment key={i}>
+              {/* Node */}
               <div
                 style={{
-                  fontSize: fontSizes.h3,
-                  color: light.text.primary,
-                  fontWeight: 600,
-                  textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+                  opacity: nodeOpacity * focusOpacity * exitOp,
+                  transform: `translateX(${nodeSlide}px) scale(${scaleReveal(frame, nodeStart, sec(0.5), 1.1, 1.0)}) perspective(1200px) rotateY(${i % 2 === 0 ? -3 : 3}deg)`,
+                  transformOrigin: "center center",
+                  width: nodeWidth,
+                  ...cardPresets.inset(data.backgroundVariant === "dark"),
+                  textAlign: "center",
+                  flexShrink: 0,
+                  filter: dimAmount > 0.1 ? `blur(${dimAmount * 1.5}px)` : undefined,
                 }}
               >
-                {node.label}
+                <div
+                  style={{
+                    fontSize: fontSizes.h3,
+                    color: theme.text.primary,
+                    fontWeight: 600,
+                    textShadow: shadows.textLift,
+                  }}
+                >
+                  {node.label}
+                </div>
+                {node.sublabel && (
+                  <div
+                    style={{
+                      fontSize: fontSizes.caption,
+                      color: theme.text.muted,
+                      marginTop: layout.spacing.xs,
+                      textShadow: shadows.textLift,
+                    }}
+                  >
+                    {node.sublabel}
+                  </div>
+                )}
               </div>
-              {node.sublabel && (
-                <div
-                  style={{
-                    fontSize: fontSizes.caption,
-                    color: light.text.muted,
-                    marginTop: layout.spacing.xs,
-                    textShadow: "0 1px 3px rgba(0,0,0,0.5)",
-                  }}
-                >
-                  {node.sublabel}
-                </div>
-              )}
-            </div>
 
-            {/* Arrow between nodes — animated line draw + arrowhead */}
-            {i < nodes.length - 1 && (() => {
-              const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
-              const arrowDraw = interpolate(
-                frame,
-                [arrowStart, arrowStart + sec(0.5)],
-                [65, 0],
-                CLAMP_QUAD
-              );
-              const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3));
-              // Arrowhead fades in after line finishes drawing
-              const headOpacity = fadeIn(frame, arrowStart + sec(0.4), sec(0.2));
-              return (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    width: arrowGap,
-                    flexShrink: 0,
-                    opacity: arrowOpacity,
-                  }}
-                >
-                  <svg width="80" height="24" viewBox="0 0 80 24">
-                    <line
-                      x1="0"
-                      y1="12"
-                      x2="65"
-                      y2="12"
-                      stroke={accentColor}
-                      strokeWidth="2"
-                      strokeDasharray="65"
-                      strokeDashoffset={arrowDraw}
-                    />
-                    <polygon
-                      points="65,6 77,12 65,18"
-                      fill={accentColor}
-                      opacity={headOpacity}
-                    />
-                  </svg>
-                  {arrowLabels[i] && (
-                    <div
-                      style={{
-                        fontSize: fontSizes.small,
-                        color: light.text.muted,
-                        marginTop: 4,
-                        whiteSpace: "nowrap",
-                        opacity: fadeIn(frame, arrowStart + sec(0.3), sec(0.3)),
-                        transform: `translateY(${slideIn(frame, arrowStart + sec(0.3), 8, sec(0.3))}px)`,
-                      }}
-                    >
-                      {arrowLabels[i]}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </React.Fragment>
-        );
-      })}
+              {/* Arrow between nodes */}
+              {i < nodes.length - 1 && (() => {
+                const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
+                const arrowDraw = interpolate(
+                  frame,
+                  [arrowStart, arrowStart + sec(0.5)],
+                  [65, 0],
+                  CLAMP_QUAD
+                );
+                const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3));
+                const headOpacity = fadeIn(frame, arrowStart + sec(0.4), sec(0.2));
+                return (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      width: arrowGap,
+                      flexShrink: 0,
+                      opacity: arrowOpacity * exitOp,
+                    }}
+                  >
+                    <svg width="80" height="24" viewBox="0 0 80 24">
+                      <line
+                        x1="0" y1="12" x2="65" y2="12"
+                        stroke={accentColor} strokeWidth="2"
+                        strokeDasharray="65" strokeDashoffset={arrowDraw}
+                      />
+                      <polygon
+                        points="65,6 77,12 65,18"
+                        fill={accentColor} opacity={headOpacity}
+                      />
+                    </svg>
+                    {arrowLabels[i] && (
+                      <div
+                        style={{
+                          fontSize: fontSizes.small,
+                          color: theme.text.muted,
+                          marginTop: 4,
+                          whiteSpace: "nowrap",
+                          opacity: fadeIn(frame, arrowStart + sec(0.3), sec(0.3)),
+                          transform: `translateY(${slideIn(frame, arrowStart + sec(0.3), 8, sec(0.3))}px)`,
+                        }}
+                      >
+                        {arrowLabels[i]}
+                      </div>
+                    )}
+                    {/* Eliminated scenario beside arrow */}
+                    {eliminatedScenarios.filter((es) => es.filter === i).map((es, ei) => {
+                      const esVisible = eliminatedVisible[eliminatedScenarios.indexOf(es)];
+                      const esColor = es.color || "#D64545";
+                      return esVisible ? (
+                        <div
+                          key={ei}
+                          style={{
+                            fontSize: fontSizes.small,
+                            color: esColor,
+                            marginTop: 2,
+                            textDecoration: "line-through",
+                            opacity: fadeIn(frame, stagger(i, sec(0.8), sec(0.5)) + sec(1.2), sec(0.3)),
+                          }}
+                        >
+                          {es.scenario}
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                );
+              })()}
+            </React.Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 });
@@ -366,6 +563,7 @@ const MatrixVariant: React.FC<{
   data: FrameworkDiagramData;
   frame: number;
 }> = React.memo(({ data, frame }) => {
+  const theme = useThemeMode(data.backgroundVariant);
   const rowHeaders = data.rowHeaders || [];
   const colHeaders = data.colHeaders || [];
   const cells = data.cells || [];
@@ -386,9 +584,9 @@ const MatrixVariant: React.FC<{
     <div
       style={{
         position: "absolute",
-        top: contentArea("content").top,
-        left: contentArea("content").left,
-        right: contentArea("content").right,
+        top: contentArea("content", "generous").top,
+        left: contentArea("content", "generous").left,
+        right: contentArea("content", "generous").right,
         display: "flex",
         justifyContent: "center",
       }}
@@ -403,7 +601,7 @@ const MatrixVariant: React.FC<{
                 width: cellSize,
                 textAlign: "center",
                 fontSize: fontSizes.caption,
-                color: light.text.muted,
+                color: theme.text.muted,
                 fontWeight: 600,
                 padding: `${layout.spacing.sm}px ${layout.spacing.xs}px`,
                 opacity: fadeIn(frame, stagger(ci, sec(0.3), sec(0.5)), sec(0.3)),
@@ -422,7 +620,7 @@ const MatrixVariant: React.FC<{
               style={{
                 width: headerWidth,
                 fontSize: fontSizes.caption,
-                color: light.text.muted,
+                color: theme.text.muted,
                 fontWeight: 600,
                 textAlign: "right",
                 paddingRight: layout.spacing.md,
@@ -457,31 +655,32 @@ const MatrixVariant: React.FC<{
                     width: cellSize,
                     height: cellSize * 0.6,
                     margin: layout.spacing.xs / 2,
-                    borderRadius: 6,
-                    border: `2px solid ${isHighlight ? accentColor : cellColor}44`,
+                    borderRadius: radii.md,
+                    border: `1px solid ${isHighlight ? accentColor : cellColor}${isHighlight ? "60" : "28"}`,
                     backgroundColor: isHighlight
-                      ? `${accentColor}20`
-                      : `${cellColor}15`,
+                      ? `${accentColor}1F`
+                      : `${cellColor}08`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     opacity: cellOpacity,
-                    transform: `translateY(${cellSlideY}px) scale(${cellScale})`,
+                    // Perspective tilt — subtle, alternates row to row for depth
+                    transform: `translateY(${cellSlideY}px) scale(${cellScale}) perspective(1400px) rotateX(${ri % 2 === 0 ? -2 : 2}deg)`,
                     transformOrigin: "center center",
                     padding: cardPadding.css,
                     boxShadow: isHighlight
-                      ? `0 2px 12px rgba(0,0,0,0.25), 0 0 16px ${accentColor}30`
-                      : "0 2px 12px rgba(0,0,0,0.25)",
+                      ? `${shadows.medium}, 0 0 24px ${accentColor}50, inset 0 1px 0 rgba(255,255,255,0.08)`
+                      : `${shadows.subtle}, inset 0 1px 0 rgba(255,255,255,0.04)`,
                   }}
                 >
                   <div
                     style={{
                       fontSize: fontSizes.caption,
-                      color: isHighlight ? accentColor : light.text.primary,
+                      color: isHighlight ? accentColor : theme.text.primary,
                       textAlign: "center",
                       fontWeight: isHighlight ? 600 : 400,
                       lineHeight: 1.4,
-                      textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+                      textShadow: shadows.textLift,
                     }}
                   >
                     {cell?.label || ""}
@@ -502,16 +701,28 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
   data,
 }) => {
   const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation();
+  const direction = useDirection(data._direction);
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
+  const theme = useThemeMode(bgVariant);
 
   return (
-    <Background variant={bgVariant} tint={data.backgroundTint}>
+    <Background
+      variant={bgVariant}
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
+        {/* Brand strips */}
+        <HeaderStrip metadata={data.episode} mode={bgVariant} />
+        <FooterStrip mode={bgVariant} />
+
         <TitleBlock
           title={data.title}
           subtitle={data.subtitle}
           mode={bgVariant}
+          safeAreaTier="generous"
         />
 
         {/* Diagram content */}
@@ -529,10 +740,10 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeArea.bottom,
-            left: layout.safeArea.left,
+            bottom: layout.safeAreaTier.generous.bottom,
+            left: layout.safeAreaTier.generous.left,
             fontSize: fontSizes.label,
-            color: light.text.muted,
+            color: theme.text.muted,
             letterSpacing: 2,
             textTransform: "uppercase",
             opacity: fadeIn(frame, 0, sec(1)),

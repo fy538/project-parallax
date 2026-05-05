@@ -1,0 +1,64 @@
+{
+  "expectations": [
+    {
+      "text": "format-two-column",
+      "passed": true,
+      "evidence": "Found yes two-column table headers"
+    },
+    {
+      "text": "format-beat-structure",
+      "passed": true,
+      "evidence": "Found 5 beats"
+    },
+    {
+      "text": "format-mode-tags",
+      "passed": true,
+      "evidence": "68 mode tags across 45 visual entries (151%)"
+    },
+    {
+      "text": "format-priority-tiers",
+      "passed": true,
+      "evidence": "P1: 19, P2: 17, P3: 9"
+    },
+    {
+      "text": "format-claim-tags",
+      "passed": true,
+      "evidence": "\u2705: 14, \u26a0\ufe0f: 15, NEW: 15 (total: 44)"
+    },
+    {
+      "text": "format-asset-summary",
+      "passed": true,
+      "evidence": "Mode breakdown: True, Remotion: True, Footage: True, Images: True"
+    },
+    {
+      "text": "nar-10-stakes-first-30s",
+      "passed": true,
+      "evidence": "Beat 1 contains contradiction/reversal: True"
+    },
+    {
+      "text": "nar-11-named-concept",
+      "passed": false,
+      "evidence": "'Silicon Trap' appears 1 times in narration"
+    },
+    {
+      "text": "nar-06-bilateral-balance",
+      "passed": true,
+      "evidence": "Contains Chinese perspective terms: True"
+    },
+    {
+      "text": "vis-06-timing-breaks",
+      "passed": true,
+      "evidence": "VISUAL-FIRST: True, COUNTERPOINT: False"
+    },
+    {
+      "text": "vis-mode-balance",
+      "passed": true,
+      "evidence": "FOOTAGE: 58%, MG: 29% (parsed from summary table \u2014 within targets)"
+    },
+    {
+      "text": "nar-09-decoder-posture",
+      "passed": true,
+      "evidence": "Explainer anti-patterns found: 0 \u2014 []"
+    }
+  ]
+}

@@ -1,0 +1,1615 @@
+{
+  "version": "1.0",
+  "episode": "silicon-trap",
+  "title": "The Silicon Trap",
+  "fps": 30,
+  "totalDurationSec": 812.8,
+  "mode": "estimate",
+  "narration": {
+    "totalDurationSec": 812.8,
+    "words": []
+  },
+  "musicBed": {
+    "tracks": [
+      {
+        "id": "contemplative-1",
+        "file": "audio/music/silicon-trap/bed-contemplative-1.wav",
+        "startSec": 0,
+        "endSec": 182.0,
+        "fadeInSec": 2.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.15,
+        "mood": "contemplative",
+        "beat": "beat1"
+      },
+      {
+        "id": "analytical-2",
+        "file": "audio/music/silicon-trap/bed-analytical-2.wav",
+        "startSec": 177.0,
+        "endSec": 422.0,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.12,
+        "mood": "analytical",
+        "beat": "beat2"
+      },
+      {
+        "id": "tension-3",
+        "file": "audio/music/silicon-trap/bed-tension-3.wav",
+        "startSec": 417.0,
+        "endSec": 752.0,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.12,
+        "mood": "tension",
+        "beat": "beat3"
+      },
+      {
+        "id": "resolution-4",
+        "file": "audio/music/silicon-trap/bed-resolution-4.wav",
+        "startSec": 747.0,
+        "endSec": 812.8,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 0.0,
+        "volume": 0.12,
+        "mood": "resolution",
+        "beat": "beat4"
+      }
+    ]
+  },
+  "beats": [
+    {
+      "id": "beat1",
+      "title": "THE PARADOX",
+      "startSec": 0,
+      "endSec": 180
+    },
+    {
+      "id": "beat2",
+      "title": "THE LOGIC OF DENIAL",
+      "startSec": 180,
+      "endSec": 420
+    },
+    {
+      "id": "beat3",
+      "title": "THE OTHER SIDE OF THE WALL",
+      "startSec": 420,
+      "endSec": 750
+    },
+    {
+      "id": "beat4",
+      "title": "THE TRAP",
+      "startSec": 750,
+      "endSec": 930
+    },
+    {
+      "id": "beat5",
+      "title": "YOUR CHIPS",
+      "startSec": 930,
+      "endSec": 1050
+    }
+  ],
+  "segments": [
+    {
+      "id": "beat1-seg01",
+      "type": "FOOTAGE",
+      "startSec": 0.0,
+      "endSec": 6.0,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P1",
+      "asset": {
+        "searchTerms": [
+          "TSMC Arizona construction site aerial drone",
+          "semiconductor factory aerial desert",
+          "large factory construction aerial"
+        ],
+        "source": "pexels",
+        "shotListId": "beat1-tsmc-aerial"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.4
+      },
+      "notes": "· \"TSMC Arizona construction site aerial drone\" > \"semiconductor factory aerial desert\" > \"large factory construction aerial\" · Pexels · standard · background @ 40% · 6s ·"
+    },
+    {
+      "id": "beat1-seg02",
+      "type": "TEMPLATE",
+      "startSec": 6.0,
+      "endSec": 9.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "In December 2025, TSMC's first Arizona fab hit a 92% chip yield — four percentag",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-92-yield.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 0.8,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg03",
+      "type": "FOOTAGE",
+      "startSec": 15.2,
+      "endSec": 33.2,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P1",
+      "narrationRef": "A fab — a fabrication plant — is where chips are physically made. Not designed, ",
+      "asset": {
+        "searchTerms": [
+          "semiconductor cleanroom wafer handling",
+          "chip factory cleanroom workers",
+          "cleanroom manufacturing"
+        ],
+        "source": "pexels",
+        "shotListId": "beat1-cleanroom"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.7
+      },
+      "notes": "· \"semiconductor cleanroom wafer handling\" > \"chip factory cleanroom workers\" > \"cleanroom manufacturing\" · Pexels · standard · inset @ 70% · match narration (~18s) ·"
+    },
+    {
+      "id": "beat1-seg04",
+      "type": "TEMPLATE",
+      "startSec": 47.6,
+      "endSec": 51.6,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "One hundred and sixty-five billion dollars in total investment. The most expensi",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-165b.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg05",
+      "type": "FOOTAGE",
+      "startSec": 58.4,
+      "endSec": 78.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "By every strategic metric, it was a rounding error. That fab covers about seven ",
+      "asset": {
+        "searchTerms": [
+          "Arizona desert housing construction workers",
+          "temporary worker housing desert",
+          "Arizona suburban construction"
+        ],
+        "source": "pexels",
+        "shotListId": "beat1-arizona-housing"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      },
+      "notes": "· \"Arizona desert housing construction workers\" > \"temporary worker housing desert\" > \"Arizona suburban construction\" · Pexels · standard · background @ 35% · match narration (~20s) ·"
+    },
+    {
+      "id": "beat1-seg06",
+      "type": "TEMPLATE",
+      "startSec": 88.4,
+      "endSec": 92.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P1",
+      "template": {
+        "component": "DataChart",
+        "dataFile": "chart-7pct-demand.json"
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 2.4,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 1.6,
+          "volume": 0.08
+        },
+        {
+          "type": "bar-grow",
+          "offsetSec": 2.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg07",
+      "type": "FOOTAGE",
+      "startSec": 92.4,
+      "endSec": 102.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3",
+      "narrationRef": "The flagship achievement of American semiconductor reshoring is both a technical",
+      "asset": {
+        "searchTerms": [
+          "world map connections network global",
+          "global supply chain visualization"
+        ],
+        "source": "pexels",
+        "shotListId": "beat1-global-supply"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.3
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat2-seg08",
+      "type": "TRANSITION",
+      "startSec": 112.0,
+      "endSec": 114.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-denial.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat2-seg09",
+      "type": "IMAGE",
+      "startSec": 114.0,
+      "endSec": 126.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P1",
+      "narrationRef": "In the summer of 1941, the United States froze Japan's assets and cut off its oi",
+      "asset": {
+        "searchTerms": [
+          "1941 FDR signing executive order",
+          "1941 US oil embargo Japan"
+        ],
+        "source": "wikimedia-commons",
+        "shotListId": "beat2-fdr-embargo"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.65
+      }
+    },
+    {
+      "id": "beat2-seg10",
+      "type": "TEMPLATE",
+      "startSec": 130.8,
+      "endSec": 140.8,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P1",
+      "narrationRef": "Japan's navy had about eighteen months of fuel reserves. That created a terrifyi",
+      "template": {
+        "component": "HorizontalTimeline",
+        "dataFile": "horizontal-timeline-oil-chip.json"
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 1.5,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 3.5,
+          "volume": 0.06
+        },
+        {
+          "type": "line-draw",
+          "offsetSec": 6.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg11",
+      "type": "TRANSITION",
+      "startSec": 150.4,
+      "endSec": 151.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "template": {
+        "component": "TitleTransition"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat2-seg12",
+      "type": "TEMPLATE",
+      "startSec": 151.4,
+      "endSec": 159.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P1",
+      "narrationRef": "That was 1941. In 2022, the United States tried it again. Not with oil — with th",
+      "template": {
+        "component": "HorizontalTimeline",
+        "dataFile": "horizontal-timeline-oil-chip.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 1.2,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 2.8,
+          "volume": 0.06
+        },
+        {
+          "type": "line-draw",
+          "offsetSec": 4.8,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg13",
+      "type": "IMAGE",
+      "startSec": 162.2,
+      "endSec": 187.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "The first Huawei restrictions came under Trump. Then Biden's team made the intel",
+      "asset": {
+        "searchTerms": [
+          "Jake Sullivan national security advisor speaking"
+        ],
+        "source": "wikimedia-commons",
+        "shotListId": "beat2-jake-sullivan"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      }
+    },
+    {
+      "id": "beat2-seg14",
+      "type": "TEMPLATE",
+      "startSec": 187.0,
+      "endSec": 192.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Then Trump came back and did something nobody predicted. In August 2025, he let ",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-revenue-deal.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg15",
+      "type": "TEMPLATE",
+      "startSec": 207.0,
+      "endSec": 213.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Export controls — a national security instrument — had become a tax. Possibly an",
+      "template": {
+        "component": "DataChart",
+        "dataFile": "chart-chips-act.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 3.6,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 2.4,
+          "volume": 0.08
+        },
+        {
+          "type": "bar-grow",
+          "offsetSec": 3.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg16",
+      "type": "FOOTAGE",
+      "startSec": 232.6,
+      "endSec": 238.6,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3",
+      "asset": {
+        "searchTerms": [
+          "Cold War era government building Washington",
+          "1950s government archive footage",
+          "diplomatic meeting Cold War"
+        ],
+        "source": "wikimedia-commons"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      },
+      "notes": "· \"Cold War era government building Washington\" > \"1950s government archive footage\" > \"diplomatic meeting Cold War\" · Wikimedia Commons / Pexels · standard · background @ 35% · 6s ·"
+    },
+    {
+      "id": "beat2-seg17",
+      "type": "TEMPLATE",
+      "startSec": 238.6,
+      "endSec": 246.6,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "So — does technology denial ever actually work? Once. For forty-five years, seve",
+      "template": {
+        "component": "ChoroplethMap",
+        "dataFile": "choropleth-cocom.json"
+      },
+      "soundCue": {
+        "type": "map-whoosh",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "region-glow",
+          "offsetSec": 2.0,
+          "volume": 0.08
+        },
+        {
+          "type": "region-glow",
+          "offsetSec": 4.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg18",
+      "type": "TEMPLATE",
+      "startSec": 257.4,
+      "endSec": 265.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "But the Soviets were economically isolated, technologically stagnant, and system",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-cocom-china.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.4,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg19",
+      "type": "IMAGE",
+      "startSec": 281.0,
+      "endSec": 287.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3",
+      "narrationRef": "So one precedent says denial triggers catastrophe. Another says it can work for ",
+      "asset": {
+        "searchTerms": [
+          "semiconductor chip macro photography",
+          "computer chip closeup"
+        ],
+        "source": "pexels",
+        "shotListId": "beat2-chip-macro"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.3
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat3-seg20",
+      "type": "TRANSITION",
+      "startSec": 291.8,
+      "endSec": 293.8,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "kinetic-kabozi.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat3-seg21",
+      "type": "TEMPLATE",
+      "startSec": 293.8,
+      "endSec": 298.8,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P1",
+      "narrationRef": "To understand how China experiences all of this, you need to know a phrase: 卡脖子 ",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-kabozi.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg22",
+      "type": "FOOTAGE",
+      "startSec": 307.4,
+      "endSec": 311.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P1",
+      "narrationRef": "In Chinese public discourse, this isn't abstract policy language. It's visceral.",
+      "asset": {
+        "searchTerms": [
+          "China high speed rail",
+          "Chinese bullet train"
+        ],
+        "source": "pexels",
+        "shotListId": "beat3-highspeed-rail"
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background",
+        "opacity": 0.35
+      }
+    },
+    {
+      "id": "beat3-seg23",
+      "type": "FOOTAGE",
+      "startSec": 311.4,
+      "endSec": 314.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "In Chinese public discourse, this isn't abstract policy language. It's visceral.",
+      "asset": {
+        "searchTerms": [
+          "space launch China"
+        ],
+        "source": null,
+        "shotListId": "beat3-space-launch"
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat3-seg24",
+      "type": "FOOTAGE",
+      "startSec": 314.4,
+      "endSec": 318.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "In Chinese public discourse, this isn't abstract policy language. It's visceral.",
+      "asset": {
+        "searchTerms": [
+          "ballpoint pen tip macro"
+        ],
+        "source": null,
+        "shotListId": "beat3-pen-tip"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.75
+      },
+      "notes": "· \"ballpoint pen tip macro\" · standard · inset @ 75% · 4s ·"
+    },
+    {
+      "id": "beat3-seg25",
+      "type": "FOOTAGE",
+      "startSec": 334.2,
+      "endSec": 347.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3",
+      "narrationRef": "When state media reported this, it became a symbol of everything humiliating abo",
+      "asset": {
+        "searchTerms": [
+          "Shenzhen skyline technology district",
+          "Chinese city technology night"
+        ],
+        "source": "pexels",
+        "shotListId": "beat3-shenzhen"
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background",
+        "opacity": 0.3
+      }
+    },
+    {
+      "id": "beat3-seg26",
+      "type": "TEMPLATE",
+      "startSec": 347.4,
+      "endSec": 351.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "So when the US imposed export controls, it didn't just threaten China's tech ind",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-juguo.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg27",
+      "type": "TEMPLATE",
+      "startSec": 375.4,
+      "endSec": 383.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P1",
+      "narrationRef": "Consider what SMIC's engineers are doing every day. To make a seven-nanometer ch",
+      "template": {
+        "component": "DataChart",
+        "dataFile": "chart-lithography.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 4.8,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 3.2,
+          "volume": 0.08
+        },
+        {
+          "type": "bar-grow",
+          "offsetSec": 4.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg28",
+      "type": "TEMPLATE",
+      "startSec": 409.8,
+      "endSec": 414.8,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "It's more expensive. It's slower. And it works. Yields went from below forty per",
+      "template": {
+        "component": "DataChart",
+        "dataFile": "chart-smic-yield.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 3.0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 2.0,
+          "volume": 0.08
+        },
+        {
+          "type": "bar-grow",
+          "offsetSec": 2.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg29",
+      "type": "FOOTAGE",
+      "startSec": 418.2,
+      "endSec": 423.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3",
+      "asset": {
+        "searchTerms": [
+          "typewriter typing closeup",
+          "manual precision work hands",
+          "vintage printing press"
+        ],
+        "source": "pexels"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.65
+      },
+      "notes": "· \"typewriter typing closeup\" > \"manual precision work hands\" > \"vintage printing press\" · Pexels · standard · inset @ 65% · 5s ·"
+    },
+    {
+      "id": "beat3-seg30",
+      "type": "TEMPLATE",
+      "startSec": 423.2,
+      "endSec": 429.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P1",
+      "narrationRef": "But there's a ceiling — and the evidence of that ceiling is written on the chip ",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-kirin-teardown.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.8,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 3.3,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg31",
+      "type": "FOOTAGE",
+      "startSec": 448.0,
+      "endSec": 452.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3",
+      "narrationRef": "You can see that same gap — ambition running ahead of capability, then capabilit",
+      "asset": {
+        "searchTerms": [
+          "artificial intelligence data center servers",
+          "AI computing server room"
+        ],
+        "source": "pexels",
+        "shotListId": "beat5-datacenter"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.3
+      }
+    },
+    {
+      "id": "beat3-seg32",
+      "type": "IMAGE",
+      "startSec": 458.4,
+      "endSec": 480.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "In early 2025, a Chinese AI lab called DeepSeek released a model called R1 that ",
+      "asset": {
+        "searchTerms": [
+          "DeepSeek AI logo",
+          "Chinese AI company office"
+        ],
+        "source": null,
+        "shotListId": "beat3-deepseek"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.65
+      }
+    },
+    {
+      "id": "beat3-seg33",
+      "type": "TEMPLATE",
+      "startSec": 480.4,
+      "endSec": 485.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "Then DeepSeek tried to train their next model, R2, on domestic chips — Huawei's ",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-deepseek-zero.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg34",
+      "type": "HOLD",
+      "startSec": 500.4,
+      "endSec": 502.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "hold": {
+        "freeze": true
+      }
+    },
+    {
+      "id": "beat3-seg35",
+      "type": "FOOTAGE",
+      "startSec": 502.4,
+      "endSec": 522.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3",
+      "narrationRef": "Both of those things are true at the same time. China can innovate brilliantly a",
+      "asset": {
+        "searchTerms": [
+          "semiconductor chip wafer macro",
+          "silicon wafer close up"
+        ],
+        "source": "pexels",
+        "shotListId": "beat3-wafer-macro"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat4-seg36",
+      "type": "TRANSITION",
+      "startSec": 522.0,
+      "endSec": 524.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-trap.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat4-seg37",
+      "type": "TEMPLATE",
+      "startSec": 524.0,
+      "endSec": 532.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "narrationRef": "There's a metaphor that keeps pulling me back. The US plays chess — targeting sp",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-chess-go.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.4,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg38",
+      "type": "TEMPLATE",
+      "startSec": 536.4,
+      "endSec": 544.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "narrationRef": "China plays go — wéiqí. And if you haven't played go, the difference matters. Yo",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-chess-go.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "fade",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.4,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg39",
+      "type": "TRANSITION",
+      "startSec": 556.8,
+      "endSec": 557.8,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "The problem is that both players are trapped.",
+      "template": {
+        "component": "TitleTransition"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat4-seg40",
+      "type": "FOOTAGE",
+      "startSec": 560.0,
+      "endSec": 568.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "asset": {
+        "searchTerms": [
+          "ASML lithography machine factory",
+          "semiconductor manufacturing equipment cleanroom",
+          "high tech factory interior",
+          "board"
+        ],
+        "source": "pexels"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.7
+      },
+      "notes": "· \"ASML lithography machine factory\" > \"semiconductor manufacturing equipment cleanroom\" > \"high tech factory interior\" · Pexels · standard · inset @ 70% · 8s ·"
+    },
+    {
+      "id": "beat4-seg41",
+      "type": "TEMPLATE",
+      "startSec": 568.0,
+      "endSec": 580.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "narrationRef": "A single advanced chip touches photoresists from Japan, lithography from the Net",
+      "template": {
+        "component": "RouteAnimation",
+        "dataFile": "route-chip-supply.json"
+      },
+      "soundCue": {
+        "type": "map-whoosh",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "line-draw",
+          "offsetSec": 3.0,
+          "volume": 0.08
+        },
+        {
+          "type": "line-draw",
+          "offsetSec": 6.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg42",
+      "type": "TEMPLATE",
+      "startSec": 600.4,
+      "endSec": 603.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "That's the trap. Not a trap for one side. A trap for everyone.",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-trap.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 0.8,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg43",
+      "type": "FOOTAGE",
+      "startSec": 605.6,
+      "endSec": 611.6,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3",
+      "asset": {
+        "searchTerms": [
+          "Netherlands Veldhoven aerial",
+          "South Korea Samsung factory",
+          "industrial facility exterior modern"
+        ],
+        "source": "pexels"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      },
+      "notes": "· \"Netherlands Veldhoven aerial\" > \"South Korea Samsung factory\" > \"industrial facility exterior modern\" · Pexels · standard · background @ 35% · 6s ·"
+    },
+    {
+      "id": "beat4-seg44",
+      "type": "TEMPLATE",
+      "startSec": 611.6,
+      "endSec": 621.6,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "And the countries caught inside the trap are the ones who built it. ASML — the o",
+      "template": {
+        "component": "ChoroplethMap",
+        "dataFile": "choropleth-caught-between.json"
+      },
+      "soundCue": {
+        "type": "map-whoosh",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "region-glow",
+          "offsetSec": 2.5,
+          "volume": 0.08
+        },
+        {
+          "type": "region-glow",
+          "offsetSec": 5.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg45",
+      "type": "TEMPLATE",
+      "startSec": 641.6,
+      "endSec": 646.6,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "narrationRef": "Morris Chang understands this better than anyone alive. He founded TSMC. He buil",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-morris-chang.json"
+      },
+      "notes": "· Quote: \"Globalization is almost dead. Free trade is almost dead.\" — Morris Chang, TSMC Founder · bone text, amber attribution · 5s hold ·",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg46",
+      "type": "FOOTAGE",
+      "startSec": 660.8,
+      "endSec": 683.6,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3",
+      "narrationRef": "If Miller is right — Chris Miller, who wrote  in 2022 — then what comes next isn",
+      "asset": {
+        "searchTerms": [
+          "world map divided split",
+          "geopolitical divide concept"
+        ],
+        "source": "pexels",
+        "shotListId": "beat4-world-divided"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.3
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat5-seg47",
+      "type": "TRANSITION",
+      "startSec": 683.6,
+      "endSec": 685.6,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-chips.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
+      "id": "beat5-seg48",
+      "type": "TEMPLATE",
+      "startSec": 685.6,
+      "endSec": 695.6,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "There's a question underneath all of this that nobody can answer, and it changes",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-ai-timeline.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.0,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 5.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg49",
+      "type": "FOOTAGE",
+      "startSec": 728.4,
+      "endSec": 731.4,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P1",
+      "narrationRef": "Every modern car has between a thousand and three thousand chips. Your phone. Yo",
+      "asset": {
+        "searchTerms": [
+          "car dashboard electronics"
+        ],
+        "source": "pexels",
+        "shotListId": "beat5-car-electronics"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "inset",
+        "opacity": 0.65
+      }
+    },
+    {
+      "id": "beat5-seg50",
+      "type": "FOOTAGE",
+      "startSec": 731.4,
+      "endSec": 733.4,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Every modern car has between a thousand and three thousand chips. Your phone. Yo",
+      "asset": {
+        "searchTerms": [
+          "smartphone circuit board"
+        ],
+        "source": null,
+        "shotListId": "beat5-smartphone"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat5-seg51",
+      "type": "FOOTAGE",
+      "startSec": 733.4,
+      "endSec": 735.4,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Every modern car has between a thousand and three thousand chips. Your phone. Yo",
+      "asset": {
+        "searchTerms": [
+          "hospital MRI machine"
+        ],
+        "source": null,
+        "shotListId": "beat5-mri"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat5-seg52",
+      "type": "FOOTAGE",
+      "startSec": 735.4,
+      "endSec": 737.4,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Every modern car has between a thousand and three thousand chips. Your phone. Yo",
+      "asset": {
+        "searchTerms": [
+          "data center server rack"
+        ],
+        "source": null,
+        "shotListId": "beat5-datacenter"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "notes": "Each briefly flashes a chip count overlay"
+    },
+    {
+      "id": "beat5-seg53",
+      "type": "FOOTAGE",
+      "startSec": 738.0,
+      "endSec": 752.8,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "In 2021, the COVID chip shortage shut down auto factories, delayed medical equip",
+      "asset": {
+        "searchTerms": [
+          "empty car dealership lot 2021",
+          "auto factory shutdown",
+          "car shortage"
+        ],
+        "source": "pexels",
+        "shotListId": "beat5-car-shortage"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.35
+      }
+    },
+    {
+      "id": "beat5-seg54",
+      "type": "TEMPLATE",
+      "startSec": 752.8,
+      "endSec": 762.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "What we're watching now isn't a hiccup. It's a rewiring. Two parallel technologi",
+      "template": {
+        "component": "RouteAnimation",
+        "dataFile": "route-chip-supply.json"
+      },
+      "soundCue": {
+        "type": "map-whoosh",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "line-draw",
+          "offsetSec": 2.5,
+          "volume": 0.08
+        },
+        {
+          "type": "line-draw",
+          "offsetSec": 5.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg55",
+      "type": "FOOTAGE",
+      "startSec": 786.0,
+      "endSec": 803.6,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3",
+      "narrationRef": "The semiconductor supply chain is the most complex thing humans have ever built.",
+      "asset": {
+        "searchTerms": [
+          "world map night lights satellite",
+          "earth from space night"
+        ],
+        "source": "pexels",
+        "shotListId": "beat5-earth-night"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 0.3
+      }
+    },
+    {
+      "id": "beat5-seg56",
+      "type": "HOLD",
+      "startSec": 803.6,
+      "endSec": 806.6,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "You're already inside this story. You just might not have known it yet.",
+      "hold": {
+        "freeze": true
+      }
+    },
+    {
+      "id": "beat5-seg57",
+      "type": "TEMPLATE",
+      "startSec": 808.8,
+      "endSec": 812.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-endcard.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.8
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    }
+  ]
+}

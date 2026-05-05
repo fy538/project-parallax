@@ -24,26 +24,26 @@ import {
   layout,
   sec,
   shadows,
-  durations,
-  light,
-  contentArea,
-  cardPadding,
-  textMaxWidth,
+  radii,
 } from "../../design/theme";
 import {
   fadeIn,
   slideIn,
-  stagger,
   scaleIn,
-  gentleSpring,
   exitFade,
   kenBurnsDrift,
-  CLAMP,
+  heroSpring,
   CLAMP_CUBIC,
+  CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
-import { FadeIn } from "../../components/FadeIn";
-import type { GameBoardData, ChessPiece, GoStone, PayoffCell } from "./types";
+import { TitleBlock } from "../../components/TitleBlock";
+import { AmbientParticles } from "../../components/AmbientParticles";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
+import { useThemeMode } from "../../hooks/useThemeMode";
+import { useDirection } from "../../hooks/useDirection";
+import type { GameBoardData, ChessPiece, GoStone, CounterAnimation } from "./types";
 
 // ── Helper: Get all pieces/stones/highlights active by frame ──────────────────
 
@@ -100,10 +100,11 @@ const ChessBoard: React.FC<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
-}> = ({ data, frame, state }) => {
+  mode: "light" | "dark";
+}> = ({ data, frame, state, mode }) => {
+  const theme = useThemeMode(mode);
   const boardSize = data.boardSize || 8;
   const squareSize = 600 / boardSize; // 75px per square for 8x8
-  const boardStart = sec(0.5);
 
   // Grid draw: lines appear quickly (frames 0-20)
   const gridOpacity = fadeIn(frame, 0, sec(0.4));
@@ -117,8 +118,9 @@ const ChessBoard: React.FC<{
         position: "relative",
         width: 600,
         height: 600,
-        background: light.bg.surface,
-        border: `2px solid ${palette.amber}`,
+        background: theme.bg.surface,
+        border: `${radii.sm}px solid ${palette.amber}`,
+        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`,
       }}
     >
       {/* Grid lines */}
@@ -158,7 +160,7 @@ const ChessBoard: React.FC<{
         ))}
       </svg>
 
-      {/* Alternating squares */}
+      {/* Alternating squares — warm wood-board palette */}
       {Array.from({ length: boardSize * boardSize }).map((_, idx) => {
         const row = Math.floor(idx / boardSize);
         const col = idx % boardSize;
@@ -173,10 +175,9 @@ const ChessBoard: React.FC<{
               top: row * squareSize,
               width: squareSize,
               height: squareSize,
-              backgroundColor: isLight
-                ? light.bg.elevated
-                : light.bg.surface,
-              opacity: 0.5,
+              // Light squares = paper, dark squares = bronze (wood feel)
+              backgroundColor: isLight ? palette.paper : palette.bronze,
+              opacity: isLight ? 0.85 : 0.7,
             }}
           />
         );
@@ -188,12 +189,10 @@ const ChessBoard: React.FC<{
         const left = col * squareSize + squareSize / 2;
         const top = row * squareSize + squareSize / 2;
 
-        // Initial pieces: spring in
-        const isInitial = data.initialPieces?.includes(piece) || false;
-        const pieceStart = isInitial
-          ? initialPiecesStart + idx * sec(0.15)
-          : frame; // Incoming pieces mid-phase
-        const pieceScale = scaleIn(frame, pieceStart, sec(0.6));
+        // Initial pieces: spring physics for weighted landing
+        const pieceStart = initialPiecesStart + idx * sec(0.15);
+        const springVal = heroSpring(frame, 30, pieceStart);
+        const pieceScale = 0.4 + 0.6 * springVal;
         const pieceOpacity = fadeIn(frame, pieceStart, sec(0.3));
 
         // Captured pieces: fade out and slide down
@@ -224,7 +223,7 @@ const ChessBoard: React.FC<{
                 opacity: pieceOpacity * captureOpacity,
               }}
             >
-              <PieceCircle label={piece.label} color={piece.color} />
+              <PieceCircle label={piece.label} color={piece.color} mode={mode} />
             </div>
           );
         }
@@ -240,7 +239,7 @@ const ChessBoard: React.FC<{
               opacity: pieceOpacity,
             }}
           >
-            <PieceCircle label={piece.label} color={piece.color} />
+            <PieceCircle label={piece.label} color={piece.color} mode={mode} />
           </div>
         );
       })}
@@ -254,10 +253,11 @@ const GoBoard: React.FC<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
-}> = ({ data, frame, state }) => {
+  mode: "light" | "dark";
+}> = ({ data, frame, state, mode }) => {
+  const theme = useThemeMode(mode);
   const boardSize = data.boardSize || 9;
   const gridSize = 500; // 500x500 grid
-  const intersectionSpacing = gridSize / (boardSize - 1);
 
   // Standard hoshi positions for 9x9: [2,2], [2,6], [6,2], [6,6], [4,4]
   const hoshiPositions: [number, number][] =
@@ -279,15 +279,15 @@ const GoBoard: React.FC<{
         position: "relative",
         width: gridSize + 40,
         height: gridSize + 40,
-        padding: 20,
-        background: light.bg.surface,
+        padding: layout.spacing.md,
+        background: theme.bg.surface,
       }}
     >
       {/* Grid lines */}
       <svg
         style={{
           position: "absolute",
-          inset: 20,
+          inset: layout.spacing.md,
           opacity: gridOpacity,
         }}
         width={gridSize}
@@ -346,17 +346,22 @@ const GoBoard: React.FC<{
       {/* Stones */}
       {state.stones.map((stone, idx) => {
         const [col, row] = stone.position;
-        const x = (col / (boardSize - 1)) * gridSize + 20;
-        const y = (row / (boardSize - 1)) * gridSize + 20;
+        const x = (col / (boardSize - 1)) * gridSize + layout.spacing.md;
+        const y = (row / (boardSize - 1)) * gridSize + layout.spacing.md;
 
         const isInitial = data.initialStones?.includes(stone) || false;
         const stoneStart = isInitial
           ? sec(0.5) + idx * sec(0.15)
           : frame;
-        const stoneScale = scaleIn(frame, stoneStart, sec(0.6));
+        const stoneSpring = heroSpring(frame, 30, stoneStart);
+        const stoneScale = 0.4 + 0.6 * stoneSpring;
         const stoneOpacity = fadeIn(frame, stoneStart, sec(0.3));
 
-        const stoneColor = stone.stone === "black" ? palette.ink : palette.bone;
+        const isBlack = stone.stone === "black";
+        // Radial gradient — specular highlight upper-left, shadow lower-right (real stone feel)
+        const stoneGradient = isBlack
+          ? `radial-gradient(circle at 35% 30%, #3a3530 0%, ${palette.ink} 50%, #0a0807 100%)`
+          : `radial-gradient(circle at 35% 30%, #ffffff 0%, ${palette.bone} 60%, #c8bb9e 100%)`;
 
         return (
           <div
@@ -374,12 +379,9 @@ const GoBoard: React.FC<{
                 width: 24,
                 height: 24,
                 borderRadius: "50%",
-                backgroundColor: stoneColor,
-                border:
-                  stone.stone === "black"
-                    ? "none"
-                    : `1px solid ${palette.ink}`,
-                boxShadow: shadows.subtle,
+                background: stoneGradient,
+                border: isBlack ? "none" : `1px solid rgba(28,24,20,0.4)`,
+                boxShadow: `${shadows.subtle}, inset -1px -1px 2px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,${isBlack ? 0.08 : 0.4})`,
               }}
             />
             {stone.label && (
@@ -388,9 +390,9 @@ const GoBoard: React.FC<{
                   position: "absolute",
                   top: "100%",
                   marginTop: layout.spacing.xs,
-                  fontSize: 11,
+                  fontSize: fontSizes.meta,
                   fontFamily: fonts.body,
-                  color: light.text.secondary,
+                  color: theme.text.secondary,
                   whiteSpace: "nowrap",
                 }}
               >
@@ -410,14 +412,14 @@ const PayoffMatrix: React.FC<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
-}> = ({ data, frame, state }) => {
-  const rows = data.rowOptions?.length || 2;
+  mode: "light" | "dark";
+}> = ({ data, frame, state, mode }) => {
+  const theme = useThemeMode(mode);
   const cols = data.colOptions?.length || 2;
   const cellSize = 140;
   const labelWidth = 120;
   const headerHeight = 60;
 
-  const gridOpacity = fadeIn(frame, 0, sec(0.4));
   const cells = data.cells || [];
 
   return (
@@ -425,7 +427,7 @@ const PayoffMatrix: React.FC<{
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: 20,
+        gap: layout.spacing.md,
       }}
     >
       {/* Header row (column options) */}
@@ -442,7 +444,7 @@ const PayoffMatrix: React.FC<{
               justifyContent: "center",
               fontSize: fontSizes.label,
               fontFamily: fonts.body,
-              color: light.text.primary,
+              color: theme.text.primary,
               opacity: fadeIn(frame, sec(0.8) + i * sec(0.2), sec(0.4)),
             }}
           >
@@ -462,10 +464,10 @@ const PayoffMatrix: React.FC<{
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-end",
-              paddingRight: 12,
+              paddingRight: layout.spacing.sm,
               fontSize: fontSizes.label,
               fontFamily: fonts.body,
-              color: light.text.primary,
+              color: theme.text.primary,
               opacity: fadeIn(frame, sec(0.8) + rowIdx * sec(0.2), sec(0.4)),
             }}
           >
@@ -481,14 +483,11 @@ const PayoffMatrix: React.FC<{
 
             const cellStartFrame = sec(1) + cellIdx * sec(0.15);
             const cellOpacity = fadeIn(frame, cellStartFrame, sec(0.4));
-            const highlightStart = sec(2.5);
-            const highlightProgress = interpolate(
-              frame,
-              [highlightStart, highlightStart + sec(1)],
-              [0, 1],
-              CLAMP
-            );
-            const glowOpacity = isHighlighted ? highlightProgress : 0;
+
+            // Cell entrance scale for highlighted cells (subtle pop)
+            const cellPopScale = isHighlighted
+              ? 0.96 + 0.04 * heroSpring(frame, layout.fps, cellStartFrame)
+              : 1;
 
             return (
               <div
@@ -497,27 +496,32 @@ const PayoffMatrix: React.FC<{
                   position: "relative",
                   width: cellSize,
                   height: cellSize,
-                  border: `1px solid ${palette.amber}50`,
+                  borderRadius: radii.sm,
+                  border: `1px solid ${isHighlighted ? palette.amber : palette.amber + "28"}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   backgroundColor: isHighlighted
-                    ? `${palette.amber}20`
-                    : "transparent",
+                    ? `${palette.amber}1F`
+                    : `${palette.amber}06`,
                   opacity: cellOpacity,
+                  transform: `scale(${cellPopScale})`,
+                  transformOrigin: "center center",
                   boxShadow: isHighlighted
-                    ? `${shadows.accentGlow(palette.amber)}, ${shadows.accentGlow(
-                        palette.rust
-                      )}`
-                    : "none",
+                    ? `${shadows.medium}, 0 0 24px ${palette.amber}50, inset 0 1px 0 rgba(255,255,255,0.08)`
+                    : `${shadows.subtle}, inset 0 1px 0 rgba(255,255,255,0.04)`,
                 }}
               >
                 <div
                   style={{
-                    fontSize: fontSizes.body,
+                    fontSize: isHighlighted ? fontSizes.h3 : fontSizes.body,
                     fontFamily: fonts.data,
-                    color: light.text.primary,
+                    fontWeight: isHighlighted ? 700 : 500,
+                    color: isHighlighted ? palette.amber : theme.text.primary,
                     textAlign: "center",
+                    textShadow: isHighlighted
+                      ? `0 0 12px ${palette.amber}80, ${shadows.textLift}`
+                      : shadows.textLift,
                   }}
                 >
                   {cell?.value || "—"}
@@ -531,45 +535,179 @@ const PayoffMatrix: React.FC<{
   );
 };
 
+// ── Unicode chess glyph map ─────────────────────────────────────────────────
+// Map data labels (case-insensitive) to filled chess Unicode glyphs.
+// Filled glyphs read better at video scale than outline ones.
+
+const CHESS_GLYPHS: Record<string, string> = {
+  king: "♚",
+  queen: "♛",
+  rook: "♜",
+  bishop: "♝",
+  knight: "♞",
+  pawn: "♟",
+  k: "♚",
+  q: "♛",
+  r: "♜",
+  b: "♝",
+  n: "♞",
+  p: "♟",
+};
+
+const toChessGlyph = (label: string): string => {
+  const norm = label.trim().toLowerCase();
+  return CHESS_GLYPHS[norm] || label;
+};
+
 // ── Piece Circle Component ───────────────────────────────────────────────────
 
 const PieceCircle: React.FC<{
   label: string;
   color: string;
-}> = ({ label, color }) => (
+  mode?: "light" | "dark";
+}> = ({ label, color, mode = "light" }) => {
+  const theme = useThemeMode(mode);
+  const glyph = toChessGlyph(label);
+  // Determine if this is a recognized chess glyph (vs raw text fallback)
+  const isGlyph = glyph !== label;
+  // White-piece logic: dark color on bone bg; black-piece: bone color on ink bg.
+  // Detect via color luminance heuristic.
+  const isLightPiece = color.toLowerCase() === palette.bone.toLowerCase()
+    || color.toLowerCase() === "#f0e6d0"
+    || color.toLowerCase() === "#f5f0e8";
+  const glyphColor = isLightPiece ? palette.ink : palette.bone;
+  const bgColor = isLightPiece ? palette.bone : palette.ink;
+  return (
   <div
     style={{
       width: 56,
       height: 56,
       borderRadius: "50%",
-      backgroundColor: color,
+      // Subtle radial gradient for ceramic-stone feel: highlight upper-left → shadow lower-right
+      background: isGlyph
+        ? `radial-gradient(circle at 35% 30%, ${bgColor} 0%, ${bgColor} 55%, ${isLightPiece ? "#D8CDB6" : "#0E0B09"} 100%)`
+        : color,
       border: `2px solid ${palette.amber}`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      boxShadow: shadows.subtle,
+      boxShadow: `${shadows.subtle}, inset -2px -2px 6px rgba(0,0,0,0.18), inset 2px 2px 4px rgba(255,255,255,0.12)`,
     }}
   >
     <div
       style={{
-        fontSize: fontSizes.caption,
-        fontFamily: fonts.body,
-        color: light.text.primary,
+        fontSize: isGlyph ? 36 : fontSizes.label,
+        fontFamily: isGlyph ? "'DejaVu Sans', 'Segoe UI Symbol', sans-serif" : fonts.body,
+        color: isGlyph ? glyphColor : theme.text.primary,
         textAlign: "center",
         fontWeight: 600,
+        lineHeight: 1,
         maxWidth: "90%",
+        textShadow: isGlyph ? "0 1px 2px rgba(0,0,0,0.3)" : undefined,
       }}
     >
-      {label}
+      {glyph}
     </div>
   </div>
 );
+};
+
+// ── Counter Animation Component ─────────────────────────────────────────────
+
+const CounterDisplay: React.FC<{
+  counter: CounterAnimation;
+  frame: number;
+  phaseStart: number;
+  phaseDuration: number;
+  mode: "light" | "dark";
+}> = ({ counter, frame, phaseStart, phaseDuration, mode }) => {
+  const theme = useThemeMode(mode);
+  const progress = interpolate(
+    frame,
+    [phaseStart + sec(0.5), phaseStart + phaseDuration - sec(1)],
+    [0, 1],
+    CLAMP
+  );
+
+  const cooperateVal = Math.round((counter.cooperate || 0) * progress);
+  const defectVal = Math.round((counter.defect || 0) * progress);
+  const cooperateColor = counter.cooperateColor || palette.amber;
+  const defectColor = counter.defectColor || palette.bronze;
+
+  const counterOpacity = fadeIn(frame, phaseStart + sec(0.3), sec(0.4));
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: layout.spacing.xxl,
+        opacity: counterOpacity,
+        marginTop: layout.spacing.md,
+      }}
+    >
+      {counter.cooperate !== undefined && (
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: fontSizes.display,
+              fontFamily: fonts.data,
+              color: cooperateColor,
+              fontWeight: 700,
+              lineHeight: 1,
+              textShadow: `0 0 20px ${cooperateColor}40`,
+            }}
+          >
+            {cooperateVal}
+          </div>
+          <div
+            style={{
+              fontSize: fontSizes.caption,
+              fontFamily: fonts.body,
+              color: theme.text.secondary,
+              marginTop: layout.spacing.xs,
+            }}
+          >
+            Cooperate
+          </div>
+        </div>
+      )}
+      {counter.defect !== undefined && (
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              fontSize: fontSizes.display,
+              fontFamily: fonts.data,
+              color: defectColor,
+              fontWeight: 700,
+              lineHeight: 1,
+            }}
+          >
+            {defectVal}
+          </div>
+          <div
+            style={{
+              fontSize: fontSizes.caption,
+              fontFamily: fonts.body,
+              color: theme.text.secondary,
+              marginTop: layout.spacing.xs,
+            }}
+          >
+            Defect
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ── Main Component ───────────────────────────────────────────────────────────
 
 export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
+  const mode = data.backgroundVariant || "light";
+  const theme = useThemeMode(mode);
+  const direction = useDirection(data._direction);
 
   const state = useMemo(() => getStateAtFrame(data, frame, fps), [data, frame, fps]);
 
@@ -592,14 +730,45 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
   const endFrame = sec(totalDuration) - sec(1);
   const overallOpacity = exitFade(frame, endFrame, sec(1));
 
+  // ── Cinematic camera zoom to active region ──
+  const isCinematic = data.cinematicMode === true;
+  const cinematicZoom = useMemo(() => {
+    if (!isCinematic) return 1;
+    // During phases, zoom in slightly; between phases, ease back
+    if (state.currentPhaseIndex < 0) return 1;
+    const phaseProgress = (frame - phaseStart) / sec(data.phases[state.currentPhaseIndex]?.durationSec || 2);
+    // Zoom in at phase start, hold, ease out near phase end
+    if (phaseProgress < 0.2) {
+      return interpolate(phaseProgress, [0, 0.2], [1.0, 1.12], CLAMP_CUBIC);
+    }
+    if (phaseProgress > 0.8) {
+      return interpolate(phaseProgress, [0.8, 1.0], [1.12, 1.0], CLAMP_CUBIC);
+    }
+    return 1.12;
+  }, [isCinematic, state.currentPhaseIndex, frame, phaseStart, data.phases]);
+
   return (
-    <AbsoluteFill style={{ backgroundColor: light.bg.base }}>
+    <AbsoluteFill>
       <Background
-        variant="light"
-        tint={data.backgroundTint}
+        variant={mode}
+        tint={direction.backgroundTint ?? data.backgroundTint}
+        atmosphere={direction.atmosphere}
+        atmosphereIntensity={direction.atmosphereIntensity}
       />
 
-      {/* Main content — Ken Burns drift for camera energy */}
+      {/* Brand strips */}
+      <HeaderStrip mode={mode} metadata={data.episode} />
+      <FooterStrip mode={mode} />
+
+      {/* Ambient particles */}
+      {(data.ambientParticles !== false) && (
+        <AmbientParticles
+          density={mode === "dark" ? 20 : 10}
+          mode={mode as "dark" | "light"}
+        />
+      )}
+
+      {/* Main content — cinematic zoom or Ken Burns drift */}
       <div
         style={{
           display: "flex",
@@ -610,65 +779,41 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
           height: "100%",
           padding: layout.spacing.xxxl,
           opacity: overallOpacity,
-          transform: `scale(${kenBurnsDrift(frame, durationInFrames, 1.02)})`,
+          transform: `scale(${isCinematic ? cinematicZoom : kenBurnsDrift(frame, durationInFrames, 1.02)})`,
           transformOrigin: "center center",
         }}
       >
         {/* Title */}
-        <FadeIn
-          duration={sec(0.6)}
-          startFrame={0}
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: layout.spacing.lg,
+          }}
         >
-          <h1
-            style={{
-              fontSize: fontSizes.h2,
-              fontFamily: fonts.display,
-              color: light.text.primary,
-              textAlign: "center",
-              margin: 0,
-              marginBottom: layout.spacing.lg,
-              letterSpacing: 1,
-            }}
-          >
-            {data.title}
-          </h1>
-        </FadeIn>
-
-        {/* Subtitle */}
-        {data.subtitle && (
-          <FadeIn
-            duration={sec(0.6)}
-            startFrame={sec(0.2)}
-          >
-            <p
-              style={{
-                fontSize: fontSizes.body,
-                fontFamily: fonts.body,
-                color: light.text.secondary,
-                textAlign: "center",
-                margin: 0,
-                marginBottom: layout.spacing.xxl,
-              }}
-            >
-              {data.subtitle}
-            </p>
-          </FadeIn>
-        )}
+          <TitleBlock
+            title={data.title}
+            subtitle={data.subtitle}
+            mode={mode}
+            align="top-center"
+            noAnimation
+            safeAreaTier="generous"
+          />
+        </div>
 
         {/* Board variants */}
         <div style={{ marginBottom: layout.spacing.xxl }}>
           {data.variant === "chess" && (
-            <ChessBoard data={data} frame={frame} state={state} />
+            <ChessBoard data={data} frame={frame} state={state} mode={mode} />
           )}
           {data.variant === "go" && (
-            <GoBoard data={data} frame={frame} state={state} />
+            <GoBoard data={data} frame={frame} state={state} mode={mode} />
           )}
           {data.variant === "payoff-matrix" && (
-            <PayoffMatrix data={data} frame={frame} state={state} />
+            <PayoffMatrix data={data} frame={frame} state={state} mode={mode} />
           )}
         </div>
 
-        {/* Phase label — slideIn (no naked fade) */}
+        {/* Phase label + annotation + counter — slideIn (no naked fade) */}
         {currentPhaseLabel && (
           <div
             style={{
@@ -693,7 +838,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
                 style={{
                   fontSize: fontSizes.caption,
                   fontFamily: fonts.body,
-                  color: light.text.secondary,
+                  color: theme.text.secondary,
                   margin: 0,
                   marginTop: layout.spacing.xs,
                 }}
@@ -701,6 +846,33 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
                 {currentPhaseSublabel}
               </p>
             )}
+            {/* Annotation text */}
+            {state.currentPhaseIndex >= 0 &&
+              data.phases[state.currentPhaseIndex]?.annotation && (
+                <p
+                  style={{
+                    fontSize: fontSizes.body,
+                    fontFamily: fonts.body,
+                    color: theme.text.primary,
+                    margin: 0,
+                    marginTop: layout.spacing.sm,
+                    opacity: fadeIn(frame, phaseStart + sec(0.5), sec(0.4)),
+                  }}
+                >
+                  {data.phases[state.currentPhaseIndex].annotation}
+                </p>
+              )}
+            {/* Counter animation */}
+            {state.currentPhaseIndex >= 0 &&
+              data.phases[state.currentPhaseIndex]?.counterAnimation && (
+                <CounterDisplay
+                  counter={data.phases[state.currentPhaseIndex].counterAnimation!}
+                  frame={frame}
+                  phaseStart={phaseStart}
+                  phaseDuration={sec(data.phases[state.currentPhaseIndex].durationSec)}
+                  mode={mode}
+                />
+              )}
           </div>
         )}
 
@@ -710,7 +882,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
             style={{
               fontSize: fontSizes.meta,
               fontFamily: fonts.body,
-              color: light.text.muted,
+              color: theme.text.muted,
               position: "absolute",
               bottom: layout.spacing.lg,
               margin: 0,

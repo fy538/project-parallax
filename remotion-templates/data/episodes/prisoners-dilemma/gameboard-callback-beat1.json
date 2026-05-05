@@ -1,0 +1,33 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The First Experiment",
+  "subtitle": "Alchian & Williams, 1950",
+  "variant": "payoff-matrix",
+  "rowPlayer": "Alchian",
+  "colPlayer": "Williams",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3", "highlight": true },
+    { "row": 0, "col": 1, "value": "0, 5", "highlight": false },
+    { "row": 1, "col": 0, "value": "5, 0", "highlight": false },
+    { "row": 1, "col": 1, "value": "1, 1", "highlight": false }
+  ],
+  "phases": [
+    {
+      "label": "They cooperated",
+      "durationSec": 5,
+      "highlights": [0],
+      "counterAnimation": {
+        "cooperate": 60,
+        "defect": 14,
+        "cooperateColor": "#E5A544",
+        "defectColor": "#888780"
+      },
+      "annotation": "Because they could see each other. Because they had a future. Because they were human."
+    }
+  ],
+  "durationSec": 5,
+  "backgroundVariant": "dark",
+  "backgroundTint": "#E5A544"
+}

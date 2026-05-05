@@ -1,0 +1,54 @@
+{
+  "expectations": [
+    {
+      "text": "has-clear-verdict",
+      "passed": true,
+      "evidence": "Verdict found: True"
+    },
+    {
+      "text": "structural-resonance-substantive",
+      "passed": true,
+      "evidence": "Section: True, Substantive: True"
+    },
+    {
+      "text": "historical-parallel-named",
+      "passed": true,
+      "evidence": "Section: True, Named COCOM: True"
+    },
+    {
+      "text": "decoder-framing-dual",
+      "passed": true,
+      "evidence": "Standard frame: True, Parallax frame: True"
+    },
+    {
+      "text": "rubric-with-scores",
+      "passed": true,
+      "evidence": "Rubric: True, Scores: True"
+    },
+    {
+      "text": "angle-gap-with-competitive-check",
+      "passed": true,
+      "evidence": "Angle section: True, YouTube check: True"
+    },
+    {
+      "text": "format-recommendation",
+      "passed": true,
+      "evidence": "Format mentioned: True"
+    },
+    {
+      "text": "arc-fit-assessment",
+      "passed": true,
+      "evidence": "Arc fit: True"
+    },
+    {
+      "text": "next-steps-provided",
+      "passed": true,
+      "evidence": "Next steps: True"
+    },
+    {
+      "text": "structured-5-question-format",
+      "passed": true,
+      "evidence": "Numbered sections: 5"
+    }
+  ]
+}

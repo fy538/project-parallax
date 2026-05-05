@@ -1,0 +1,10 @@
+{
+  "episode": "silicon-trap",
+  "variant": "statistic",
+  "statValue": "$165B",
+  "statLabel": "total semiconductor investment",
+  "statContext": "Largest FDI greenfield project in US history",
+  "accentColor": "#E5A544",
+  "durationSec": 4,
+  "backgroundVariant": "light"
+}

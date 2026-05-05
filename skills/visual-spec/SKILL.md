@@ -1,31 +1,30 @@
 ---
 name: visual-spec
 description: >
-  Generate Remotion template JSON data files AND a footage manifest from a video script. This skill
-  reads a narration script and produces two outputs: (1) motion graphic specs as JSON files for Remotion,
-  and (2) a structured footage manifest listing every stock footage and archival image need with search
-  terms, platform recommendations, sourcability ratings, and compositing notes. Use this skill whenever
-  someone says 'generate visuals', 'visual spec', 'create the data files', 'footage manifest',
-  'what visuals does this script need', 'spec out the graphics', or any request to turn a script
-  into renderable video assets and a footage sourcing plan. Also trigger when a new script version is
-  finalized and needs visual planning, or when someone asks 'what templates do I need for this episode'.
+  Generate four outputs from a finalized script: (1) Remotion template JSON data files for every [MG:] composition (Register 1: Analytical), (2) Recraft illustration prompt specs for every [ILLUST:] segment (Register 2: Atmospheric), (3) AI video generation briefs for every [AI-GEN:] segment (Register 3: Grounding), and (4) a structured footage manifest with search terms and sourcability ratings for every stock/archival shot. Checks concept registry for callback opportunities and validates three-register balance before generating. Use whenever someone says 'generate visuals', 'visual spec', 'create the data files', 'footage manifest', 'spec out the graphics', 'what templates do I need', or when a script is finalized and needs visual production planning.
 ---
 
 # Visual Spec Generator
 
-You are generating the full visual data layer for a bilingual geopolitics video channel. This means two things:
+You are generating the full visual data layer for a bilingual geopolitics video channel. The channel uses a **three-register visual system** (see `project/VISUAL_LANGUAGE.md`):
 
-1. **Remotion JSON files** — data files that drive each motion graphic composition (maps, charts, typography, etc.)
-2. **Footage manifest** — a structured JSON file listing every stock footage and archival image need, ready for the `source.py` tool and manual sourcing
+1. **Register 1 — Analytical** (Remotion JSON files): Clean, data-driven motion graphics — maps, charts, timelines, frameworks. Where information lives.
+2. **Register 2 — Atmospheric** (Recraft illustration specs): Constructivist, dystopian, propaganda-poster-style art. Creates mood, emotional texture, conceptual weight. NOT data-carrying.
+3. **Register 3 — Grounding** (AI video briefs): Photorealistic scenes with mannequin/faceless figures. Physical presence in spaces cameras can't access.
 
-The Remotion project at `remotion-templates/` contains React components that render animated video segments. Each component reads from a JSON data file — change the data, get a different video. But motion graphics are only part of the picture: a typical episode is ~55% footage, ~30% MG, ~8% layered (footage + MG composited), and ~7% transitions. Your output covers both the MG and footage layers.
+Plus: **Footage manifest** — structured search specs for every stock footage and archival need.
+
+A typical episode: ~40-55% MG, ~25-40% footage, ~5-15% ILLUST, ~5-15% AI-GEN, ~5-10% layered, ~3-7% transitions. Your output covers all four layers. All three registers pass through the same brand treatment ramps from `palette.json` (standard/conflict/editorial), giving them shared tonal DNA despite stylistic variety.
 
 ## Reference Docs
 
 Before starting, familiarize yourself with:
 - **`project/VISUAL_LANGUAGE.md`** — editorial logic for when to use footage vs. MG vs. layered. This is the "why" behind visual decisions.
+- **`project/DIRECTING_LANGUAGE.md`** — the `DIR:` annotation syntax. This is the "how" — camera movement, reveal choreography, timing, transitions, and mood. You will parse these and translate them into `_direction` blocks in JSON files, camera/mood language in AI-GEN briefs, treatment selection in ILLUST specs, and tint hints in footage manifests.
 - **`project/FOOTAGE_SOURCING.md`** — what footage is actually available for geopolitics content, organized by sourcability tier. This is the reality check.
-- **`project/SCRIPT_FORMAT.md`** — the visual mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`) and how they work in the two-column format.
+- **`project/SCRIPT_FORMAT.md`** — the visual mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), `DIR:` annotations, and how they work in the two-column format.
+- **`project/AI_VIDEO_PIPELINE.md`** — the fourth visual mode specification: aesthetic philosophy (mannequin faces + realistic environments), tool selection, prompting patterns by use case, and editorial guardrails.
+- **`tools/ai-video/style-references/PROMPTS.md`** — the 7 style reference images that anchor the AI-GEN aesthetic. Reference these by filename when writing briefs.
 
 ## How This Works
 
@@ -40,12 +39,27 @@ The templates cover the MG layer of visual needs:
 | KineticTypography | ~10% | Quotes, definitions, bilingual text, key stats |
 | FrameworkDiagram | ~8% | Conceptual models, comparisons, flows |
 | TitleTransition | ~7% | Episode/section titles, end cards |
+| BayesianUpdate | as needed | Probability estimates updated by sequential evidence |
+| ProbabilityGauge | as needed | Single probability readout with gauge arc |
+| DecisionTree | as needed | Branching scenarios, decision points |
+| NetworkDiagram | as needed | Relationship webs, alliance structures |
+| TimeSeriesChart | as needed | Multi-series line charts over time |
+| SankeyFlow | as needed | Flow/allocation diagrams (trade, resources) |
+| GameBoard | as needed | Strategic game theory visualizations |
+| SplitComposition | as needed | Side-by-side comparisons |
+| ImageComposite | as needed | Brand-treated photo with overlay text |
+| PhotoMontage | as needed | Multi-photo grid with reveal animation |
+| StatReveal | as needed | Dramatic single-statistic with comparison bars |
+| RadarChart | as needed | Multi-axis polygon capability comparison |
+| AnnotatedImage | as needed | Image with animated callout labels |
+| EscalationLadder | as needed | Vertical event sequence with severity indicators |
 
 ## Step 1 — Read the Script
 
 Read the full script file. Pay attention to:
 
-- **Visual mode tags** — `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]` in the right column. These tell you which entries need Remotion JSON (MG and the MG part of LAYERED) and which need footage manifest entries (FOOTAGE and the footage part of LAYERED).
+- **Visual mode tags** — `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]` in the right column. These tell you which entries need Remotion JSON (MG and the MG part of LAYERED), which need Recraft illustration specs (ILLUST), which need footage manifest entries (FOOTAGE and the footage part of LAYERED), and which need AI video generation briefs (AI-GEN).
+- **`DIR:` annotations** — direction lines stacked below visual spec lines. These specify camera movement (`cam()`), reveal choreography (`reveal()`), timing (`hold()`), transitions (`cut()`), and mood (`mood()`). Parse these carefully — they become `_direction` blocks in Remotion JSON, camera/mood language in AI-GEN briefs, treatment hints in ILLUST specs, and tint/treatment hints in footage manifests. See DIRECTING_LANGUAGE.md for the full grammar.
 - **Beat/section structure** — each beat typically needs 3-8 visual segments
 - **`[VISUAL: ...]` cues** (older scripts) — the script author's suggestions for what should appear on screen. These are starting points, not final specs. You may add visuals the author didn't suggest if the content calls for it.
 - **Data points** — any numbers, percentages, comparisons, or statistics mentioned in narration
@@ -57,6 +71,33 @@ Read the full script file. Pay attention to:
 
 If the script uses the older format without mode tags, infer the mode: named Remotion templates → `[MG:]`, `TEMPLATE: FOOTAGE` or `TEMPLATE: IMAGE` → `[FOOTAGE:]`. Flag to the user that mode tags should be added for pacing analysis.
 
+## Step 1.5 — Concept Registry Check
+
+Before creating the visual breakdown, run a concept reuse check against the **Concept Registry** (`data/concepts.json`). This registry tracks every framework, foreign term, named concept, and historical analogy introduced across all Parallax episodes.
+
+**How to check:**
+1. Read `data/concepts.json`
+2. Scan the script for any term, concept, or framework that already exists in the registry but was introduced in a *prior* episode
+3. For each match, note the concept's `callbackVisual` field — this is the suggested visual treatment for a reference (not a re-introduction)
+
+**Why this matters:** The channel's compounding value depends on returning viewers recognizing recurring concepts. When a concept was introduced with a cold-intro in a prior episode, re-introducing it from scratch wastes time and insults returning viewers. Instead, use a **callback** — a brief (2-3s) visual flash that reminds viewers of the concept without re-explaining it. New viewers still get enough context from the narration.
+
+**Three outcomes per concept:**
+
+| Situation | Action |
+|-----------|--------|
+| Concept is NEW (not in registry) | Generate a full cold-intro visual. After generating, note it as a candidate to add to the registry. |
+| Concept was introduced in a PRIOR episode | Use the `callbackVisual` treatment from the registry. Flag it in the breakdown table with a 🔄 marker. |
+| Concept was introduced in THIS episode (earlier beat) | No callback needed — just ensure visual consistency with the introduction. |
+
+**After generating files**, output a "Registry Update" section listing:
+- New concepts that should be added to `data/concepts.json` (with suggested fields)
+- Existing concepts that got a new appearance (with the episode, beat, and role)
+
+The human or a follow-up tool call will update the registry.
+
+**CLI shortcut:** If available, you can run `python tools/concepts/lookup.py reuse-check <EPID> --script <path> --json` to get a machine-readable list of prior concepts detected in the script.
+
 ## Step 2 — Create the Visual Breakdown
 
 Before writing any JSON or footage manifest, produce a visual breakdown table. This is the planning step — it maps every visual moment in the script to a mode, a tool, and an output file.
@@ -64,25 +105,37 @@ Before writing any JSON or footage manifest, produce a visual breakdown table. T
 Format it as a markdown table:
 
 ```
-| Timecode | Script Moment | Mode | Template/Type | Output File | Notes |
-|----------|--------------|------|---------------|-------------|-------|
-| 0:00 | Episode open | MG | TitleTransition | title-episode.json | episode-title variant |
-| 0:10 | Arizona desert | FOOTAGE | Stock video | footage-manifest.json #1 | "Arizona desert aerial" · Pexels · P3 |
-| 0:25 | TSMC Arizona fab | MG | ChoroplethMap | choropleth-reshoring.json | US highlighted |
-| 0:45 | "7% of US demand" | LAYERED | Stock + KineticTypo | footage-manifest.json #2 + kinetic-7pct.json | stat over desert footage |
-| 1:10 | Cleanroom context | FOOTAGE | Stock video | footage-manifest.json #3 | "cleanroom wafer" · P2 |
-| ... | ... | ... | ... | ... | ... |
+| Timecode | Script Moment | Mode | Register | Template/Tool | Output File | Direction | Notes |
+|----------|--------------|------|----------|---------------|-------------|-----------|-------|
+| 0:00 | Episode open | MG | Analytical | TitleTransition | title-episode.json | hold(2s) | episode-title variant |
+| 0:10 | Arizona desert | FOOTAGE | — | Stock video | footage-manifest.json #1 | mood(subtle, drift:slow) | "Arizona desert aerial" · P3 |
+| 0:25 | TSMC Arizona fab | MG | Analytical | ChoroplethMap | choropleth-reshoring.json | cam(wide→tight:Taiwan, sync:"single island") reveal(sequential) hold(breathe) cut(color-wash, ink) | US highlighted · P1 |
+| 0:45 | "7% of US demand" | LAYERED | Mixed | Stock + KineticTypo | footage-manifest.json #2 + kinetic-7pct.json | reveal(count-up, sync:"seven percent") | stat over desert footage |
+| 1:10 | Cleanroom interior | AI-GEN | Grounding | Kling 3.0 | ai-brief-fab-walkthrough.json | cam(push-in, over:7s) mood(dense, particles:15) cut(blur-through) | mannequin workers |
+| 1:30 | The trap tightens | ILLUST | Atmospheric | Recraft | illust-dependency-vise.json | mood(dense, dim:0.4) hold(2s) cut(iris) | metaphor mode · conflict |
+| ... | ... | ... | ... | ... | ... | ... | ... |
 ```
 
-After the table, include a **visual mode summary**:
+The **Direction** column captures all `DIR:` annotations for each segment. Segments without `DIR:` lines get an empty direction column — they'll use template defaults. The breakdown table is where you verify that direction density is appropriate (~25% of segments directed).
+
+After the table, include a **visual mode summary** with register annotations:
 ```
-FOOTAGE: 18 entries (~55% screen time)
-MG: 14 entries (~30% screen time)
-LAYERED: 5 entries (~8% screen time)
-TRANSITION: 6 entries (~7% screen time)
+MG: 14 entries (~42% screen time) [Register 1: Analytical]
+FOOTAGE: 10 entries (~30% screen time) [register-neutral]
+ILLUST: 4 entries (~10% screen time) [Register 2: Atmospheric]
+AI-GEN: 3 entries (~8% screen time) [Register 3: Grounding]
+LAYERED: 3 entries (~5% screen time) [mixed]
+TRANSITION: 5 entries (~5% screen time)
 ```
 
-Check against target ranges from SCRIPT_FORMAT.md: FOOTAGE 50-70%, MG 20-30%, LAYERED 5-15%. If the balance is off, flag it before proceeding.
+Check against target ranges from SCRIPT_FORMAT.md: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN 5-15%, LAYERED 5-10%. Also check:
+- All three registers are represented (Analytical, Atmospheric, Grounding)
+- No more than 3 consecutive same-register entries without a break
+- AI-GEN > 15% → too much photorealistic content, some may work as footage
+- ILLUST > 15% → too much atmospheric art, viewer fatigue
+- Either register completely absent → visual texture flattens
+- More than 2 consecutive AI-GEN or ILLUST entries → pacing violation, insert mode switch
+- Register transitions follow the grammar from SCRIPT_FORMAT.md (color-wash, blur-through, iris, dissolve)
 
 Guidelines for the breakdown:
 - Every beat should start with a section title card (TitleTransition, section variant)
@@ -90,10 +143,15 @@ Guidelines for the breakdown:
 - A visual segment typically covers 15-45 seconds of narration
 - The episode should open with an episode-title card and close with an end-card
 - Aim for 30-45 total visual segments per 15-20 minute episode (this includes footage, not just MG)
-- No more than 3 consecutive MG entries without a FOOTAGE break
+- No more than 3 consecutive MG entries without a non-MG break (FOOTAGE, ILLUST, or AI-GEN)
+- No more than 2 consecutive AI-GEN or ILLUST entries without a mode switch
 - No more than 30 seconds of continuous FOOTAGE without a visual change
 - LAYERED entries should be brief (3-8s) with simple MG overlays
+- AI-GEN entries should be 5-10 seconds each (consistency degrades past 12s)
+- ILLUST entries should be 4-8 seconds (atmospheric moments don't need long holds)
 - Prioritize the visual that best serves comprehension, not the most impressive one
+- AI-GEN is for unsourceable physical spaces — if stock footage exists, use FOOTAGE
+- ILLUST is for emotional/conceptual texture — if the viewer needs to *read* information, use MG
 
 Present the breakdown to the user and ask for approval before generating files. This is the checkpoint — it's much easier to restructure the plan now than to rewrite JSON files and re-source footage later.
 
@@ -117,6 +175,81 @@ Examples:
 - `framework-chess-go.json`
 - `route-chip-supply.json`
 
+### Generating `_direction` blocks from `DIR:` annotations
+
+When a visual segment has `DIR:` annotations in the script, translate them into a `_direction` namespace within the JSON data file. This is the bridge between the script's directing intent and the Remotion `useDirection` hook.
+
+**Translation process:**
+
+1. **Parse** each `DIR:` line into directive type + parameters using the formal grammar from DIRECTING_LANGUAGE.md
+2. **Identify the camera system** based on template type:
+   - ChoroplethMap, RouteAnimation → **geographic** (center/scale/duration)
+   - NetworkDiagram, EscalationLadder, DataChart, GameBoard, DecisionTree → **canvas** (cameraPath array)
+   - HorizontalTimeline → **scroll** (scrollTo offset)
+   - [AI-GEN:] entries → **scene brief** (natural language camera note — handled in Step 5)
+3. **Validate** that the template supports the directive (see DIRECTING_LANGUAGE.md template support matrix). Unsupported directives → emit a `// DIR-WARN` comment and omit from `_direction`
+4. **Resolve conflicts** — if `cam()` provides camera positions, remove per-phase camera fields from the content data (direction overrides content)
+5. **Translate** shorthand to JSON fields:
+
+| Directive | JSON fields |
+|-----------|------------|
+| `cam()` | `cameraPath[]` (canvas), phase center/scale (geographic) |
+| `reveal()` | `revealMode`, `staggerMs`, `spotlightSequence`, `highlightIndex`, `progressive`, `revealEasing` |
+| `hold()` | `holdAfter`, `holdBehavior`, `preDelay`, `narrationGate` |
+| `cut()` | `transitionOut`, `washColor`, `transitionDuration` |
+| `mood()` | `atmosphere`, `ambientParticles`, `driftPreset`, `globalDim`, `backgroundTint` |
+
+6. **Merge** all fields into a single `_direction` object within the data file
+
+**Example — ChoroplethMap with direction:**
+```json
+{
+  "episode": "silicon-trap",
+  "title": "Supply Chain Concentration",
+  "phases": [
+    { "title": "Phase 1", "countries": ["United States"], "color": "#3266AD", "durationSec": 4 },
+    { "title": "Phase 2", "countries": ["Taiwan"], "color": "#C23B22", "durationSec": 4 }
+  ],
+  "_direction": {
+    "cameraPath": [
+      { "center": [0, 20], "scale": 150, "duration": 4 },
+      { "center": [121.5, 25.0], "scale": 400, "duration": 4, "syncWord": "single island" }
+    ],
+    "revealMode": "sequential",
+    "phaseStagger": 3.0,
+    "revealEasing": "settle",
+    "holdAfter": 2.0,
+    "holdBehavior": "breathe",
+    "atmosphere": "subtle",
+    "transitionOut": "color-wash",
+    "washColor": "#1C1814"
+  }
+}
+```
+
+**Example — DataChart with direction:**
+```json
+{
+  "episode": "silicon-trap",
+  "title": "Chip Yield Comparison",
+  "bars": [...],
+  "_direction": {
+    "revealMode": "stagger",
+    "staggerMs": 300,
+    "highlightIndex": 0,
+    "revealEasing": "pulse",
+    "cameraPath": [
+      { "target": "overview", "zoom": 1.0, "duration": 3, "behavior": "track" },
+      { "target": "element:0", "zoom": 1.3, "duration": 3, "behavior": "track", "syncWord": "ninety-two" }
+    ],
+    "holdAfter": 1.0,
+    "holdBehavior": "land"
+  }
+}
+```
+
+**Fallback rule:** If no `DIR:` annotations exist for a segment, do NOT emit a `_direction` block. The template's built-in defaults apply. This is fully backward compatible — existing scripts without direction work exactly as before.
+
 ### Quality checklist for each file
 
 - [ ] Valid JSON (no trailing commas, proper quoting)
@@ -128,6 +261,12 @@ Examples:
 - [ ] Text is concise — these are on-screen labels, not paragraphs
 - [ ] Statistics are accurate to what the script says (don't invent numbers)
 - [ ] Source attributions included where the script mentions sources
+- [ ] `_direction` block present for segments with `DIR:` annotations
+- [ ] `_direction` fields match the directive syntax exactly (no invented fields)
+- [ ] `syncWord` values appear in the segment's narration text
+- [ ] `cam()` targets are valid for the template's camera system
+- [ ] `reveal()` mode is supported by the template (see template support matrix)
+- [ ] No conflicting camera data between content fields and `_direction.cameraPath`
 
 ### Content principles
 
@@ -145,6 +284,95 @@ Examples:
 **Phase design for maps.** Don't dump all countries into one phase. Build the story: start with the key players, then expand to show allies, then show countries caught in between. Each phase should have a clear narrative beat that matches the narration.
 
 **Duration calibration.** Read the section of narration that accompanies each visual and estimate how long it takes to speak at ~150 words per minute. The visual's `durationSec` should roughly match the narration time for that segment, plus 1-2 seconds of breathing room.
+
+## Step 3.5 — Generate Recraft Illustration Specs (Register 2: Atmospheric)
+
+For every `[ILLUST:]` entry in the breakdown, produce a prompt spec. These drive `tools/recraft/recraft.py`.
+
+### File naming convention
+```
+data/episodes/<slug>/illust-<descriptive-slug>.json
+```
+
+### Prompt spec format
+```json
+{
+  "id": "illust-dependency-vise",
+  "episode": "silicon-trap",
+  "beat": 2,
+  "mode": "metaphor",
+  "prompt": "Technological dependency as a tightening mechanical vise — factory skyline trapped in industrial jaws, workers as anonymous silhouettes streaming through narrow passage, constructivist poster composition with strong diagonal tension",
+  "style": "vector_illustration",
+  "treatment": "conflict",
+  "durationSec": 6,
+  "composite": "background @ 40%",
+  "narrative_context": "Narration describes how cheap technology creates invisible lock-in",
+  "emotional_target": "claustrophobia, inevitability, systemic pressure",
+  "transition_in": "dissolve from MG",
+  "transition_out": "iris to next MG",
+  "_direction": {
+    "atmosphere": "dense",
+    "globalDim": 0.4,
+    "holdAfter": 2.0,
+    "transitionOut": "iris"
+  }
+}
+```
+
+**Direction integration for ILLUST specs:** When the script has `DIR:` lines on an `[ILLUST:]` entry, the relevant directives flow into the spec:
+- `mood()` → `atmosphere` and `globalDim` in `_direction` (also influences `treatment` selection — `mood(dense)` pairs naturally with `conflict` treatment)
+- `hold()` → `holdAfter` in `_direction`
+- `cut()` → `transition_out` field AND `transitionOut` in `_direction`
+- `cam()` and `reveal()` are not supported on ILLUST (static images) — emit a DIR-WARN if present
+```
+
+### Recraft prompt principles
+
+**Emotion over information.** These illustrations create *feeling*, not data. The viewer should sense dread, grandeur, tension, or awe — not read labels or numbers. If you catch yourself putting text or specific data in the prompt, it belongs in `[MG:]` instead.
+
+**Constructivist DNA.** The brand aesthetic for atmospheric illustrations draws from Soviet constructivism + cyberpunk + propaganda posters. Key elements: strong diagonals, anonymous figures, industrial/mechanical metaphors, geometric compression, stark light/shadow contrast.
+
+**Available modes** (maps to `recraft.py --mode`):
+- `metaphor` — Abstract concepts made visual through physical metaphors (trap, vise, maze, flood)
+- `illustration` — Editorial scenes, geopolitical landscapes, architectural dystopia
+- `diagram` — Stylized system schematics (use sparingly — most diagrams belong in Remotion)
+- `icon` — Symbolic representations for sequences
+
+**Available styles** (maps to `recraft.py --style`):
+- `vector_illustration` — Default for metaphor and illustration modes
+- `flat_2.0` — Cleaner, more geometric, good for diagram mode
+- `pictogram` — Icon style, minimal detail
+
+**Treatment selection** (maps to `recraft.py --treat`):
+- `standard` (ink → bronze → amber) — Default. Analytical tension, controlled unease.
+- `conflict` (ink → oxblood → rust) — Geopolitical friction, danger, high stakes.
+- `editorial` (dark bone → light bone) — Reflective, institutional, archival mood.
+
+**Prompt length:** 30-60 words. Be specific about composition and mood, not fine detail.
+
+### Quality checklist for illustration specs
+
+- [ ] Prompt describes mood/composition, NOT data or text
+- [ ] Mode matches the visual intention
+- [ ] Treatment matches the emotional register of the accompanying narration
+- [ ] Duration is 4-8 seconds (atmospheric moments don't need long holds)
+- [ ] Transitions respect the register grammar (color-wash, blur-through, iris, dissolve)
+- [ ] The illustration adds something footage and MG cannot — if a stock aerial shot would work equally well, use footage instead
+
+### Batch output
+
+After generating all individual specs, also compile an `illust-manifest.json` that lists all illustration specs for batch generation:
+```json
+{
+  "episode": "silicon-trap",
+  "illustrations": [
+    { "$ref": "illust-dependency-vise.json" },
+    { "$ref": "illust-surveillance-panopticon.json" }
+  ]
+}
+```
+
+This feeds into: `python tools/recraft/recraft.py batch data/episodes/<slug>/illust-manifest.json --output assets/ --treat standard`
 
 ## Step 4 — Generate Footage Manifest
 
@@ -173,8 +401,21 @@ The footage manifest is an array of footage needs, each with:
   "composite": "background @ 35%",
   "durationSec": 10,
   "notes": "Slow zoom. Ambient texture under narration about TSMC Arizona.",
-  "layeredWith": null
+  "layeredWith": null,
+  "_direction": {
+    "atmosphere": "subtle",
+    "driftPreset": "slow",
+    "holdAfter": 0,
+    "transitionOut": "cut"
+  }
 }
+```
+
+**Direction integration for footage:** When the script has `DIR:` lines on a `[FOOTAGE:]` entry:
+- `mood()` → `_direction.atmosphere`, `_direction.driftPreset`, `_direction.globalDim`, `_direction.backgroundTint` (tint influences `treatment` selection — `tint:oxblood` suggests `conflict` treatment)
+- `hold()` → `_direction.holdAfter` (extra time the footage holds before the next segment)
+- `cut()` → `_direction.transitionOut` (how this footage ends)
+- `cam()` and `reveal()` are not supported on footage — emit DIR-WARN if present
 ```
 
 For `[LAYERED:]` entries, fill in `layeredWith` with the corresponding MG JSON filename:
@@ -215,21 +456,216 @@ Search terms should be ranked most specific → most generic. The sourcing tool 
 - Manual sourcing (archival, premium) uses it as a shopping list
 - The assembly manifest generator uses it to map footage to timeline positions
 
-## Step 5 — Summary and Render Commands
+## Step 5 — Generate AI Video Briefs
+
+For every `[AI-GEN:]` entry in the breakdown, produce individual brief files at:
+```
+tools/ai-video/briefs/epXX/<slug>.json
+```
+
+Each AI video brief specifies everything needed to generate the clip:
+
+```json
+{
+  "id": "ep01_beat2_fab_walkthrough",
+  "episode": "EP01",
+  "beat": "Beat 2",
+  "priority": "P1",
+  "useCase": "unsourceable_space",
+  "scene": {
+    "description": "Interior of an advanced semiconductor cleanroom. Yellow lithography lighting. Two workers in full bunny suits operating wafer handling equipment. FOUP carriers on automated track in background.",
+    "environment": "Semiconductor fabrication cleanroom, advanced node (sub-5nm implied by equipment density)",
+    "figures": "Two workers in white bunny suits with clear face shields. Faces are smooth and featureless (mannequin aesthetic). Natural body movement — operating equipment with practiced ease.",
+    "period": "contemporary",
+    "mood": "Precision, sterility, quiet intensity. The hum of advanced technology."
+  },
+  "camera": {
+    "movement": "Slow forward dolly through the space",
+    "lens": "35mm",
+    "angle": "Medium wide, hip level",
+    "depthOfField": "Shallow — foreground equipment sharp, background slightly soft",
+    "style": "Documentary observational — feels like we have rare access"
+  },
+  "generation": {
+    "tool": "kling-3.0",
+    "mode": "image-to-video",
+    "styleReference": "style-ref_interior_cleanroom-warm_v1.png",
+    "durationTarget": 7,
+    "resolution": "4K",
+    "fps": 30,
+    "referenceFramePrompt": "Interior of an advanced semiconductor fabrication cleanroom with yellow lithography lighting casting warm amber glow across white surfaces and HEPA-filtered ceiling. Two workers in full white bunny suits with completely smooth featureless faces behind clear shields, mannequin-like with no facial features. Wafer handling equipment in foreground, FOUP carriers on automated track receding into background. Atmosphere of extreme precision and quiet intensity. Shot on Sony A7IV, 35mm f/2.0, shallow depth of field, medium wide from hip level. Photorealistic rendering. 16:9 aspect ratio."
+  },
+  "treatment": "standard",
+  "narrationContext": "The narration describes TSMC's fabrication process and the extreme precision required. This visual grounds the abstract discussion in physical reality.",
+  "editorialGuardrails": [
+    "No identifiable facility branding or signage",
+    "Mannequin faces must remain smooth — reject if features drift",
+    "Equipment should be plausible but not claim to be specific TSMC machinery",
+    "This visualizes 'what a space like this looks like' — not 'this is TSMC Arizona'"
+  ],
+  "qualityGate": {
+    "faceCheck": "Faces remain featureless throughout clip duration",
+    "environmentCheck": "Equipment and space remain consistent (no morphing)",
+    "lightingCheck": "Yellow lithography light maintained without color shifts",
+    "motionCheck": "Camera movement smooth, no jitter or sudden accelerations"
+  }
+}
+```
+
+### AI Brief Field Reference
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `id` | Yes | Unique slug: `epXX_beatN_description` |
+| `episode` | Yes | Episode ID |
+| `beat` | Yes | Which beat in the script |
+| `priority` | Yes | P1 (hero visual), P2 (supporting), P3 (ambient) |
+| `useCase` | Yes | One of: `unsourceable_space`, `historical_reconstruction`, `conceptual_scene`, `scenario_sequence` |
+| `scene.description` | Yes | Full scene description (what appears on screen) |
+| `scene.environment` | Yes | The space/setting |
+| `scene.figures` | Yes/No | Human figures if present. Always specify mannequin face. Omit if no people. |
+| `scene.period` | Yes | `contemporary`, `1940s`, `1960s`, `1990s`, `near-future`, etc. |
+| `scene.mood` | Yes | Emotional/atmospheric tone |
+| `camera.movement` | Yes | How the camera moves (dolly, pan, static, tracking) |
+| `camera.lens` | Yes | Focal length equivalent (24mm wide → 85mm portrait) |
+| `camera.angle` | Yes | Shot type and height |
+| `camera.depthOfField` | Yes | Shallow / deep / medium |
+| `camera.style` | Yes | Documentary, cinematic, surveillance, observational |
+| `generation.tool` | Yes | `kling-3.0` (default), `seedance-2.0` (budget/narrative), `sora-2` (multi-angle), `runway-gen4` (character consistency) |
+| `generation.mode` | Yes | `image-to-video` (default), `storyboard` (Sora multi-shot), `text-to-video` |
+| `generation.styleReference` | Yes | Filename from `tools/ai-video/style-references/` |
+| `generation.durationTarget` | Yes | Seconds (5-10 recommended) |
+| `generation.resolution` | Yes | `4K` or `1080p` |
+| `generation.fps` | Yes | 30 (default) or 60 (slow-motion source) |
+| `generation.referenceFramePrompt` | Yes | Auto-generated Flux 2 Pro prompt following `tools/ai-video/PROMPT_SYSTEM.md` best practices (front-loaded subject, natural prose, camera specs, specific lighting, 50-70 words, positive phrasing only) |
+| `treatment` | Yes | `standard`, `conflict`, or `editorial` |
+| `narrationContext` | Yes | What the viewer is hearing during this clip (helps with mood calibration) |
+| `editorialGuardrails` | Yes | Array of constraints specific to this scene |
+| `qualityGate` | Yes | Verification checks for render-qa to apply |
+
+### Use Case → Tool Selection Guide
+
+| Use Case | Default Tool | Reason |
+|----------|-------------|--------|
+| `unsourceable_space` | Kling 3.0 (image-to-video) | Best environment quality, native 4K |
+| `historical_reconstruction` | Kling 3.0 (image-to-video) | Period details + editorial LUT treatment |
+| `conceptual_scene` | Kling 3.0 (image-to-video) | Conceptual metaphors need strong environment rendering |
+| `scenario_sequence` | Sora 2 (storyboard) | Future scenarios often need multiple angles of same space |
+| Multi-angle sequence | Sora 2 (Director Mode) | Re-shoot same scene from different angles |
+| Same figure, multiple shots | Runway Gen-4 | Best character identity lock across clips |
+| Budget/volume clips (P3) | Seedance 2.0 (image-to-video) | 5x cheaper than Kling, good for ambient/supporting shots |
+| Narrative sequence w/ audio | Seedance 2.0 | Native audio sync, 12-input consistency anchoring |
+
+### Use Case → Style Reference Guide
+
+| Use Case | Primary Reference | Notes |
+|----------|------------------|-------|
+| Tech/semiconductor facility | `style-ref_interior_cleanroom-warm_v1.png` | Warm yellow lighting |
+| Military/adversarial space | `style-ref_interior_command-cool_v1.png` | Cool blue, conflict LUT |
+| Historical government/diplomatic | `style-ref_interior_historical-gov_v1.png` | Period furnishings, editorial LUT |
+| Figure-centric scene | `style-ref_figure_suit-walking_v1.png` | Body/motion quality |
+| Wide establishing/aerial | `style-ref_aerial_urban-development_v1.png` | Scale + environment |
+| Conceptual/metaphor space | `style-ref_concept_corridor-splitting_v1.png` | Surreal-but-plausible |
+
+### Sora 2 Storyboard Brief (multi-shot variant)
+
+When a segment needs multiple angles of the same space (e.g., wide → medium → detail), use the storyboard format:
+
+```json
+{
+  "id": "ep01_beat5_smic_facility",
+  "generation": {
+    "tool": "sora-2",
+    "mode": "storyboard",
+    "styleReference": "style-ref_interior_cleanroom-warm_v1.png",
+    "durationTarget": 15,
+    "frames": [
+      {
+        "keyframe": 1,
+        "description": "Wide shot of semiconductor facility exterior — modern white buildings, construction cranes, desert landscape",
+        "camera": "Aerial, slowly descending"
+      },
+      {
+        "keyframe": 2,
+        "description": "Medium shot of facility entrance — glass doors, security checkpoint, figure in lab coat approaching",
+        "camera": "Eye level, static"
+      },
+      {
+        "keyframe": 3,
+        "description": "Interior cleanroom — yellow light, workers at stations, wafer equipment in foreground",
+        "camera": "Slow dolly forward, hip level"
+      }
+    ]
+  }
+}
+```
+
+### Quality Principles for AI Briefs
+
+**Specificity wins.** Vague prompts produce generic clips. Describe exact lighting direction, equipment types, architectural details, figure positioning. The more specific the brief, the fewer re-generations needed.
+
+**Direction integration for AI-GEN briefs:** When the script has `DIR:` lines on an `[AI-GEN:]` entry, translate them into the brief's natural-language fields:
+- `cam()` → `camera.movement` field. `cam(push-in, over:7s)` → `"Slow forward dolly over 7 seconds"`. `cam(static)` → `"Locked-off static frame"`. `cam(orbit)` → `"Slow orbital tracking around subject"`.
+- `mood()` → `scene.mood` field. `mood(dense, particles:15)` → add "heavy atmosphere, particulate haze in light beams" to mood description. `mood(dim:0.5)` → "low ambient lighting, isolated pool of light on subject".
+- `hold()` → `generation.durationTarget`. `hold(2s)` adds 2s to the target duration.
+- `cut()` → `_direction.transitionOut` in a separate direction block (consumed by assembly manifest, not the generation tool).
+
+Also emit a `_direction` block alongside the brief for assembly manifest consumption:
+```json
+{
+  "_direction": {
+    "cameraNote": "Slow push-in over 7 seconds",
+    "atmosphere": "dense",
+    "ambientParticles": 15,
+    "holdAfter": 0,
+    "transitionOut": "blur-through"
+  }
+}
+```
+
+**Camera movement serves narrative.** Don't default to "slow dolly" for everything. Match the camera to the content:
+- Revealing a space → dolly forward (discovery)
+- Surveying a situation → pan left-to-right (observation)
+- Tension/decision → static with subtle drift (unease)
+- Transition/passage of time → tracking shot following movement (flow)
+
+**Treatment alignment.** Match the treatment to the editorial context:
+- `standard` — neutral/positive content, present-day
+- `conflict` — adversarial content, military, sanctions, confrontation
+- `editorial` — historical, archival feel, pre-1980s reconstructions
+
+**The mannequin face is non-negotiable.** Every brief involving human figures MUST specify featureless/mannequin faces. Every quality gate MUST include a face check. Clips where faces drift toward realism get rejected and re-generated.
+
+## Step 6 — Summary and Render Commands
 
 After generating all files, output:
-1. A count of Remotion JSON files generated per template type
-2. Footage manifest summary: total entries, breakdown by sourcability (Easy/Moderate/Hard), estimated footage cost
-3. Visual mode balance check: does the final output match the target ranges?
-4. The full file list with paths
-5. Render commands for previewing key MG frames:
+1. **Register distribution** — count and percentage by register (Analytical, Atmospheric, Grounding) plus footage
+2. A count of Remotion JSON files generated per template type
+3. **Recraft illustration summary**: total illustrations, breakdown by mode (metaphor/illustration/diagram/icon), estimated cost (~$0.08/SVG)
+4. Footage manifest summary: total entries, breakdown by sourcability (Easy/Moderate/Hard)
+5. AI video brief summary: total clips, breakdown by use case, estimated generation cost (~$0.50-1.00/clip for Kling, $0 for Sora if within ChatGPT Pro limits)
+6. Visual mode balance check: does the final output match the target ranges? Are all three registers present?
+7. **Direction summary** — total segments with `_direction` blocks, breakdown by directive type (cam/reveal/hold/cut/mood), count of narration sync points, list of all `syncWord` values
+8. The full file list with paths (grouped by: MG JSON / Recraft specs / footage manifest / AI briefs)
+9. **Concept Registry Update** — list new concepts to add and existing concepts that got a new appearance (from Step 1.5). Format as a ready-to-paste JSON snippet for each new concept.
+10. **Transition map** — compressed visual showing register transitions and which transition type connects them (now explicitly driven by `cut()` directives from the script)
+11. Render/generation commands:
 
 ```bash
-# Preview a specific composition
+# Preview a specific Remotion composition
 npx remotion still src/index.ts <CompositionId> \
   --frame=<frame_number> \
   --browser-executable=<path> \
   --output=preview-<name>.png
+
+# Generate atmospheric illustrations (batch)
+python tools/recraft/recraft.py batch data/episodes/<slug>/illust-manifest.json --output assets/ --treat standard
+
+# Source stock footage
+python tools/asset-source/source.py data/episodes/<slug>/footage-manifest.json --output assets/
 ```
 
-Remind the user that maps (ChoroplethMap, RouteAnimation) require internet access to load the TopoJSON world data, so they render fully only in Remotion Studio on their local machine or when the sandbox has CDN access.
+Remind the user that:
+- Maps (ChoroplethMap, RouteAnimation) require internet access for TopoJSON world data
+- Recraft requires `RECRAFT_API_KEY` environment variable
+- AI video briefs are generated manually through Kling/Sora/Runway interfaces (not automated)

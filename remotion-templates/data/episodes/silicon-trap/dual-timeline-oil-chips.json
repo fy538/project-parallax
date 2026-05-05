@@ -1,0 +1,27 @@
+{
+  "episode": "silicon-trap",
+  "title": "Resource Denial: Then and Now",
+  "eraATitle": "Oil Embargo 1941",
+  "eraBTitle": "Chip Controls 2019–2025",
+  "eraAColor": "#3266AD",
+  "eraBColor": "#C23B22",
+  "pairs": [
+    {
+      "eraA": { "label": "1939", "text": "US-Japan trade friction escalates" },
+      "eraB": { "label": "2019", "text": "Huawei placed on Entity List" },
+      "connection": "Escalating trade friction"
+    },
+    {
+      "eraA": { "label": "Jul 1941", "text": "Asset freeze + full oil embargo" },
+      "eraB": { "label": "Oct 2022", "text": "Full-spectrum export controls" },
+      "connection": "Full denial imposed"
+    },
+    {
+      "eraA": { "label": "Dec 1941", "text": "Pearl Harbor — 134 days later" },
+      "eraB": { "label": "2022–25", "text": "CHIPS Act + revenue-sharing deal" },
+      "connection": "Strategic response"
+    }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "light"
+}

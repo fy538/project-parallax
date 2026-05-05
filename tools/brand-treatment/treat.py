@@ -27,29 +27,16 @@ from typing import Tuple
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
-# === Brand palette from BRAND.md ===
+# === Brand palette — loaded from palette.json (single source of truth) ===
 
-RAMPS = {
-    "standard": {
-        "shadows":    (0x1A, 0x1A, 0x2E),  # ink
-        "midtones":   (0x8B, 0x5E, 0x2B),  # bronze
-        "highlights": (0xE5, 0xA5, 0x44),  # amber
-    },
-    "conflict": {
-        "shadows":    (0x1A, 0x1A, 0x2E),  # ink
-        "midtones":   (0x7A, 0x2E, 0x1A),  # rust-mid
-        "highlights": (0xC2, 0x3B, 0x22),  # rust
-    },
-    "editorial": {
-        "shadows":    (0xC8, 0xB8, 0x9A),  # folder
-        "midtones":   (0xF0, 0xE6, 0xD0),  # bone
-        "highlights": (0xF5, 0xF0, 0xE8),  # paper
-    },
-}
+from palette_loader import get_ramps_rgb, get_defaults
 
-DEFAULT_SATURATION = 0.25       # 25% of original (BRAND.md: 20-30%)
-DEFAULT_GRAIN_INTENSITY = 0.10  # 10% opacity (BRAND.md: 8-12%)
-DEFAULT_VIGNETTE_STRENGTH = 0.18  # 18% edge darkening (BRAND.md: 15-20%)
+RAMPS = get_ramps_rgb()
+
+_defaults = get_defaults()
+DEFAULT_SATURATION = _defaults.get("saturation", 0.25)
+DEFAULT_GRAIN_INTENSITY = _defaults.get("grain", 0.10)
+DEFAULT_VIGNETTE_STRENGTH = _defaults.get("vignette", 0.18)
 
 
 def hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:

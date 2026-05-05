@@ -20,7 +20,6 @@
 
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { interpolate, spring, Easing } from "remotion";
-import { durations, staggers, layout } from "../design/theme";
 
 /** Element role determines animation character */
 export type EntranceRole =

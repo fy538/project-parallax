@@ -1,0 +1,131 @@
+{
+  "_comment": "Meridian Dark — paint overrides snippet. Paste into Mapbox Studio's Style Editor → Document, merging into the layers array of a fresh dark-v11 fork. Hillshade and DEM source must still be added manually (Step D3 in MAPBOX_STUDIO_GUIDE.md).",
+  "_meridianTokens": {
+    "ocean": "#100E0C",
+    "land": "#1C1814",
+    "landBorder": "#3A3530",
+    "stateBorder": "#2C2823",
+    "countryLabel": "#F0E6D0",
+    "labelHalo": "#1C1814",
+    "waterLabel": "#5A5448",
+    "cityLabel": "#8A8070"
+  },
+  "layerPaintOverrides": [
+    {
+      "id": "background",
+      "paint": {
+        "background-color": "#100E0C"
+      }
+    },
+    {
+      "id": "land",
+      "paint": {
+        "background-color": "#1C1814"
+      }
+    },
+    {
+      "id": "water",
+      "paint": {
+        "fill-color": "#100E0C"
+      }
+    },
+    {
+      "id": "admin-0-boundary",
+      "paint": {
+        "line-color": "#3A3530",
+        "line-width": ["interpolate", ["linear"], ["zoom"], 0, 0.4, 8, 0.6]
+      }
+    },
+    {
+      "id": "admin-0-boundary-disputed",
+      "paint": {
+        "line-color": "#3A3530",
+        "line-dasharray": [3, 2],
+        "line-width": 0.5
+      }
+    },
+    {
+      "id": "admin-1-boundary",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "country-label",
+      "paint": {
+        "text-color": "#F0E6D0",
+        "text-halo-color": "#1C1814",
+        "text-halo-width": 1.5,
+        "text-opacity": 0.85
+      },
+      "layout": {
+        "text-font": ["DIN Pro Medium", "Arial Unicode MS Regular"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 1, 10, 6, 16]
+      }
+    },
+    {
+      "id": "place-city-label",
+      "paint": {
+        "text-color": "#8A8070",
+        "text-halo-color": "#1C1814",
+        "text-halo-width": 1
+      },
+      "layout": {
+        "text-font": ["DIN Pro Regular", "Arial Unicode MS Regular"],
+        "minzoom": 6
+      }
+    },
+    {
+      "id": "water-label",
+      "paint": {
+        "text-color": "#5A5448",
+        "text-halo-color": "#100E0C",
+        "text-halo-width": 1
+      },
+      "layout": {
+        "text-font": ["DIN Pro Italic", "Arial Unicode MS Regular"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 1, 9, 6, 12]
+      }
+    },
+    {
+      "id": "road-motorway",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "road-primary",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "road-secondary-tertiary",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "road-street",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "road-minor",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "road-rail",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "building",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "poi-label",
+      "layout": { "visibility": "none" }
+    },
+    {
+      "id": "transit-label",
+      "layout": { "visibility": "none" }
+    }
+  ],
+  "_postImportSteps": [
+    "1. Add Hillshade layer per MAPBOX_STUDIO_GUIDE.md Step D3 (raster-dem source: mapbox-terrain-dem-v1, exaggeration 0.45, shadow #000 50%, highlight #3A3530 12%, illumination 315°).",
+    "2. Layer ordering: background → water → land → hillshade → admin-0-boundary → country-label → place-city-label → water-label.",
+    "3. Publish and copy the resulting style URL into theme.ts → mapConfig.darkStyleUrl.",
+    "4. Test render: any RouteAnimation/ChoroplethMap composition with backgroundVariant='dark' should now use Meridian Dark."
+  ]
+}

@@ -8,7 +8,7 @@
  * This module provides both the raw progress calculator and SVG style helpers.
  */
 
-import { interpolate, Easing } from "remotion";
+import { interpolate } from "remotion";
 import { easings } from "./animation";
 
 // ── Progress calculator ────────────────────────────────────────────────

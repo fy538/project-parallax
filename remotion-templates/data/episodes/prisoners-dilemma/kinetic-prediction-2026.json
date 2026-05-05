@@ -1,0 +1,10 @@
+{
+  "episode": "prisoners-dilemma",
+  "variant": "statistic",
+  "statValue": "By December 2026:",
+  "statLabel": "Joint US-China AI safety communiqué with shared technical vocabulary?",
+  "statContext": "Check: January 2027",
+  "accentColor": "#E5A544",
+  "backgroundVariant": "dark",
+  "durationSec": 8
+}

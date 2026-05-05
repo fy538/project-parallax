@@ -1,0 +1,37 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Self-Confirming Mechanism",
+  "variant": "payoff-matrix",
+  "rowPlayer": "You",
+  "colPlayer": "Counterpart",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3", "highlight": false },
+    { "row": 0, "col": 1, "value": "0, 5", "highlight": false },
+    { "row": 1, "col": 0, "value": "5, 0", "highlight": false },
+    { "row": 1, "col": 1, "value": "1, 1", "highlight": true }
+  ],
+  "phases": [
+    {
+      "label": "You assume defection",
+      "durationSec": 4,
+      "highlights": [3],
+      "annotation": "Training says: they will defect"
+    },
+    {
+      "label": "So you defect first",
+      "durationSec": 2,
+      "highlights": [2, 3],
+      "annotation": "Your move → defect"
+    },
+    {
+      "label": "They see your defection and confirm",
+      "durationSec": 2,
+      "highlights": [3],
+      "annotation": "\"Model confirmed\" — they defect too"
+    }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "dark"
+}

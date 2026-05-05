@@ -1,0 +1,26 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Your Game",
+  "variant": "payoff-matrix",
+  "rowPlayer": "You",
+  "colPlayer": "Them",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "●", "highlight": true },
+    { "row": 0, "col": 1, "value": "", "highlight": false },
+    { "row": 1, "col": 0, "value": "", "highlight": false },
+    { "row": 1, "col": 1, "value": "●", "highlight": true }
+  ],
+  "phases": [
+    {
+      "label": "Both available",
+      "durationSec": 5,
+      "highlights": [0, 3],
+      "annotation": "Now you can see it."
+    }
+  ],
+  "durationSec": 5,
+  "backgroundVariant": "dark",
+  "backgroundTint": "#E5A544"
+}

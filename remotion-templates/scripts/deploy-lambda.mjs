@@ -82,7 +82,7 @@ async function deploy() {
   console.log(`  REMOTION_SERVE_URL=${serveUrl}`);
   console.log(`  REMOTION_BUCKET=${bucketName}`);
   console.log("\nRender with:");
-  console.log(`  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/ep01/chart-lithography.json`);
+  console.log(`  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/silicon-trap/chart-lithography.json`);
 }
 
 async function teardown() {

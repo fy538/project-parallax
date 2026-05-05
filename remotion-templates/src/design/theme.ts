@@ -12,39 +12,56 @@
  */
 
 // ── Shared Palette ─────────────────────────────────────────────────────────
-// Brand DNA — these work across both dark and light modes.
+// Loaded from palette.json (single source of truth for all color tooling).
+// Direction A: Monochrome Warm ramp + muted semantics + gold accent.
+// Python tools (treat.py, treat_video.py, check.py) read the same file.
+// To change a color: edit palette.json → regenerate LUTs → Remotion picks it up automatically.
+
+import paletteData from "../../../tools/brand-treatment/palette.json";
 
 export const palette = {
-  ink: "#1C1814",
-  midnight: "#2A2520",
-  amber: "#E5A544",
-  rust: "#C23B22",
-  bone: "#F0E6D0",
-  paper: "#F5F0E8",
-  folder: "#C8B89A",
-  oxblood: "#6B1D1D",
-  olive: "#4A5A24",
-  bronze: "#8B5E2B",
+  ink: paletteData.palette.ink,
+  midnight: paletteData.palette.midnight,
+  walnut: paletteData.palette.walnut,
+  umber: paletteData.palette.umber,
+  taupe: paletteData.palette.taupe,
+  sand: paletteData.palette.sand,
+  bone: paletteData.palette.bone,
+  paper: paletteData.palette.paper,
+  gold: paletteData.palette.gold,
+  // Legacy aliases — keep for backward compat during migration
+  amber: paletteData.palette.gold,
+  rust: paletteData.semantic.china,
+  folder: paletteData.palette.sand,
+  oxblood: paletteData.palette.walnut,
+  olive: paletteData.palette.umber,
+  bronze: paletteData.palette.umber,
 } as const;
 
 // ── Semantic Colors (Geopolitical) ─────────────────────────────────────────
+// Direction A: 3 colors only. All at matched muted saturation (~40-50%).
+// Hierarchy comes from size/position, not color intensity.
 
 export const semantic = {
-  us: "#3266AD",
-  china: "#C23B22", // = palette.rust
-  neutral: "#888780",
-  highlight: "#F5A623", // close to amber
-  success: "#5DAA68",
-  danger: "#D64545",
+  us: paletteData.semantic.us,        // #4A7BA7 — muted blue
+  china: paletteData.semantic.china,   // #A64D46 — muted rust-red
+  neutral: paletteData.semantic.neutral, // #888780
+  // Legacy aliases — map to closest Direction A equivalent
+  highlight: paletteData.palette.gold,
+  success: paletteData.semantic.us,
+  danger: paletteData.semantic.china,
 } as const;
 
-// ── Sequential Ramps (5-stop, light → dark) ───────────────────────────────
+// ── Sequential Ramps (light → dark) ──────────────────────────────────────
 
 export const ramps = {
-  blue: ["#E6F1FB", "#85B7EB", "#378ADD", "#185FA5", "#042C53"] as const,
-  red: ["#FCEBEB", "#F09595", "#E24B4A", "#A32D2D", "#501313"] as const,
-  amber: ["#FFF3D6", "#F5D78E", "#E5A544", "#B07A28", "#5C3F12"] as const,
-  gray: ["#F1EFE8", "#B4B2A9", "#888780", "#5F5E5A", "#2C2C2A"] as const,
+  warm: paletteData.ramps.warm as readonly string[],
+  blue: paletteData.ramps.blue as readonly string[],
+  red: paletteData.ramps.red as readonly string[],
+  gold: paletteData.ramps.gold as readonly string[],
+  gray: paletteData.ramps.gray as readonly string[],
+  // Legacy alias
+  amber: paletteData.ramps.gold as readonly string[],
 } as const;
 
 // ── Mode Tokens ────────────────────────────────────────────────────────────
@@ -52,81 +69,46 @@ export const ramps = {
 export const dark = {
   bg: {
     base: "#12100E",
-    surface: "#1C1814", // = palette.ink
-    elevated: "#2A2520", // = palette.midnight
+    surface: palette.ink,      // #1C1814
+    elevated: palette.midnight, // #2A2520
     map: "#1A1612",
   },
   text: {
-    primary: "#F0E6D0", // = palette.bone
-    secondary: "#B8AE9C",
-    muted: "#7A6E60",
-    accent: "#E5A544", // = palette.amber
+    primary: palette.sand,     // #D9C9B0 — warm, readable
+    secondary: palette.taupe,  // #B8A189
+    muted: palette.umber,      // #8B7355
+    accent: palette.gold,      // #C4A747 — hero moments only
   },
-  accent: palette.amber,
-  mark: palette.amber, // ∴ brand mark
-  crosshair: palette.amber,
-  crosshairOpacity: 0.5, // 40-60% range
+  accent: palette.gold,
+  mark: palette.gold,          // ∴ brand mark
+  crosshair: palette.gold,
+  crosshairOpacity: 0.5,
   shadow: "0 2px 12px rgba(0,0,0,0.25)",
 } as const;
 
 export const light = {
   bg: {
-    base: "#F5F0E8", // = palette.paper
+    base: palette.paper,       // #F5F0E8
     surface: "#EDE7DB",
     elevated: "#FFFFFF",
-    border: "#D4CAB8",
-    map: "#EDE7DB", // light map background (= surface)
+    border: palette.sand,      // #D9C9B0
+    map: "#EDE7DB",
   },
   text: {
-    primary: "#1C1814", // = palette.ink
-    secondary: "#4A4538",
-    muted: "#8A8070",
-    accent: "#6B1D1D", // = palette.oxblood
+    primary: palette.ink,      // #1C1814
+    secondary: palette.walnut, // #5C4A3D
+    muted: palette.umber,      // #8B7355
+    accent: palette.walnut,    // #5C4A3D — warm, restrained
   },
-  accent: palette.oxblood,
-  mark: palette.oxblood, // ∴ brand mark
-  crosshair: palette.oxblood,
-  crosshairOpacity: 0.35, // 30-40% range
+  accent: palette.walnut,
+  mark: palette.umber,         // ∴ brand mark — warm brown
+  crosshair: palette.walnut,
+  crosshairOpacity: 0.35,
   shadow: "0 1px 8px rgba(0,0,0,0.08)",
 } as const;
 
 // Convenience type for templates that accept either mode
 export type Mode = "dark" | "light";
-export const modes = { dark, light } as const;
-
-// ── Backward Compat ────────────────────────────────────────────────────────
-// Old token names → new. Keeps existing templates running while we migrate.
-// TODO: remove once all templates reference palette/dark/light directly.
-
-export const colors = {
-  navy: palette.ink,
-  teal: palette.amber, // closest accent replacement
-  slate: palette.midnight,
-  warmGray: palette.bone,
-  white: "#FFFFFF",
-
-  us: semantic.us,
-  china: semantic.china,
-  neutral: semantic.neutral,
-  highlight: semantic.highlight,
-  success: semantic.success,
-  danger: semantic.danger,
-
-  rampBlue: [...ramps.blue],
-  rampRed: [...ramps.red],
-  rampTeal: [...ramps.amber], // replaced teal ramp with amber
-  rampGray: [...ramps.gray],
-
-  bgDark: dark.bg.base,
-  bgLight: light.bg.base,
-  bgMap: light.bg.map,
-  bgMapLight: light.bg.surface,
-
-  textPrimary: light.text.primary,
-  textSecondary: light.text.secondary,
-  textOnDark: dark.text.primary,
-  textMuted: light.text.muted,
-} as const;
 
 // ── Typography ─────────────────────────────────────────────────────────────
 
@@ -182,6 +164,43 @@ export const lineHeight = {
   meta: 1.0,
 } as const;
 
+// ── Bilingual Typography ──────────────────────────────────────────────────
+// CJK text needs looser line height and slightly larger sizes for readability.
+// Use these when rendering Chinese text alongside English.
+
+export const cjk = {
+  /** CJK font sizes — 10-15% larger than EN equivalents for optical balance */
+  fontSizes: {
+    display: 108,
+    h1: 72,
+    h2: 54,
+    h3: 40,
+    body: 24,
+    label: 20,
+    caption: 16,
+  },
+  /** CJK line heights — looser than EN for stroke clarity */
+  lineHeight: {
+    display: 1.1,
+    h1: 1.2,
+    h2: 1.2,
+    h3: 1.3,
+    body: 1.7,
+    label: 1.3,
+    caption: 1.5,
+  },
+  /** CJK letter spacing — tighter than EN (characters are self-spacing) */
+  letterSpacing: {
+    display: 4,
+    h1: 3,
+    h2: 2,
+    h3: 1,
+    body: 0,
+    label: 0.5,
+    caption: 0,
+  },
+} as const;
+
 // ── Layout ─────────────────────────────────────────────────────────────────
 
 export const layout = {
@@ -190,6 +209,22 @@ export const layout = {
   fps: 30,
   padding: 80,
   safeArea: { top: 80, right: 80, bottom: 80, left: 80 },
+  /**
+   * Tiered safe areas for different template densities.
+   * Templates that feel cramped should use safeAreaTier.generous.
+   * Templates with centered single-element layouts can use safeAreaTier.tight.
+   *
+   * "standard" (80px)  — default, matches existing safeArea
+   * "generous" (120px) — data-dense templates, many labels near edges
+   * "tight" (48px)     — centered compositions (KineticTypography, TitleTransition)
+   * "broadcast" (108px) — matches TV broadcast safe (10% inset)
+   */
+  safeAreaTier: {
+    tight:     { top: 48, right: 48, bottom: 48, left: 48 },
+    standard:  { top: 80, right: 80, bottom: 80, left: 80 },
+    broadcast: { top: 108, right: 108, bottom: 108, left: 108 },
+    generous:  { top: 120, right: 120, bottom: 120, left: 120 },
+  },
   // 8px spacing grid
   spacing: {
     xs: 8,
@@ -252,20 +287,6 @@ export const staggers = {
   route: 200, // route segments
 } as const;
 
-// ── Map Defaults ───────────────────────────────────────────────────────────
-
-export const mapDefaults = {
-  projection: "geoMercator" as const,
-  projectionConfig: {
-    scale: 150,
-    center: [0, 20] as [number, number],
-  },
-  defaultFill: ramps.gray[1],
-  hoverFill: ramps.gray[2],
-  strokeColor: dark.bg.map,
-  strokeWidth: 0.5,
-} as const;
-
 /** Mapbox GL configuration — see NEW_TEMPLATES_SPEC.md Section 0. */
 export const mapConfig = {
   /** Light mode is primary. Replace with custom Meridian Light style after Mapbox Studio setup. */
@@ -308,19 +329,180 @@ export const mapConfig = {
 export const duotone = {
   standard: {
     shadows: palette.ink,
-    midtones: palette.bronze,
-    highlights: palette.amber,
+    midtones: palette.umber,
+    highlights: palette.gold,
   },
   conflict: {
     shadows: palette.ink,
     midtones: "#7A2E1A",
-    highlights: palette.rust,
+    highlights: semantic.china,
   },
   editorial: {
-    shadows: palette.folder,
+    shadows: palette.taupe,
     midtones: palette.bone,
     highlights: palette.paper,
   },
+} as const;
+
+// ── Border Radius Scale ──────────────────────────────────────────────────
+export const radii = {
+  xs: 2,    // bar chart top corners, progress bars
+  sm: 4,    // small UI elements, chart axis ticks
+  md: 6,    // matrix cells, sankey nodes
+  lg: 8,    // cards, panels, decision nodes (default)
+  pill: 20, // badges, status pills
+} as const;
+
+// ── Card Style Presets ───────────────────────────────────────────────────
+// Hierarchy-aware card system. Container treatment scales with content importance:
+//   hero → standard → supporting → bare text (no container)
+//
+// Principle: cinema uses shadows, tints, and negative space to define
+// composition. Visible border-radius boxes = PowerPoint. Earn your edges.
+//
+// Default for most content: "inset" (pressed-into-paper, editorial).
+// Hero moments: "accentEdge" (left accent line + tint).
+// Floating overlays: "shadowFloat" (depth without edges).
+
+export const cardPresets = {
+  // ── Hierarchy tier: HERO ────────────────────────────────────────────────
+  // For highlighted events, key moments, active states.
+  // Accent edge + warm tint = strongest visual weight.
+
+  /** Accent edge — left line + tinted background. Hero treatment.
+   *  The accent line signals "this matters." No full border. */
+  accentEdge: (color: string, isDark: boolean = false) => ({
+    backgroundColor: isDark ? `${color}12` : `${color}0A`,  // 7% / 4%
+    border: "none",
+    borderLeft: `2px solid ${color}80`,  // 50% opacity
+    borderRadius: radii.xs,  // 2px — editorial, not UI-kit
+    padding: cardPadding.css,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  // ── Hierarchy tier: STANDARD ────────────────────────────────────────────
+  // For most content cards. Subtle, non-competing, editorial.
+
+  /** Inset — pressed-into-paper effect. Default card style.
+   *  Tinted background + border + inner shadow = clear containment.
+   *  Body cards must have EQUAL or MORE visual definition than titles. */
+  inset: (isDark: boolean) => ({
+    backgroundColor: isDark ? "rgba(0,0,0,0.10)" : "rgba(0,0,0,0.04)",
+    border: isDark
+      ? "0.5px solid rgba(255,255,255,0.08)"
+      : "0.5px solid rgba(0,0,0,0.10)",
+    borderRadius: radii.xs,  // 2px
+    padding: cardPadding.css,
+    boxShadow: isDark
+      ? "inset 0 1px 4px rgba(0,0,0,0.35), inset 0 0 1px rgba(0,0,0,0.20)"
+      : "inset 0 1px 3px rgba(0,0,0,0.06), inset 0 0 1px rgba(0,0,0,0.03)",
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  /** Shadow float — depth without edges. No border at all.
+   *  Layered soft shadows create presence. Modern, Apple-esque.
+   *  Best for: floating data cards, tooltips, stat callouts. */
+  shadowFloat: (isDark: boolean) => ({
+    backgroundColor: isDark ? "rgba(42,37,32,0.85)" : "rgba(255,255,255,0.75)",
+    border: "none",
+    borderRadius: radii.sm,  // 4px
+    padding: cardPadding.css,
+    boxShadow: isDark
+      ? "0 8px 24px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.2)"
+      : "0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)",
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  // ── Hierarchy tier: SUPPORTING ──────────────────────────────────────────
+  // For secondary content. Barely-there containers.
+
+  /** Minimal — bottom separator only. Lightest possible container.
+   *  Content earns its space through typography, not boxing. */
+  minimal: (color: string) => ({
+    backgroundColor: "transparent",
+    border: "none",
+    borderBottom: `0.5px solid ${color}14`, // 8% opacity
+    borderRadius: 0,
+    padding: cardPadding.css,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  /** Ruled — horizontal top/bottom lines only. Editorial, print-inspired.
+   *  For lists and secondary information. */
+  ruled: (color: string) => ({
+    backgroundColor: "transparent",
+    border: "none",
+    borderTop: `0.5px solid ${color}20`,    // 12% opacity
+    borderBottom: `0.5px solid ${color}20`,
+    borderRadius: 0,
+    padding: cardPadding.css,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  // ── Special purpose ─────────────────────────────────────────────────────
+
+  /** Glass — semi-transparent backdrop. For overlays on imagery/maps.
+   *  Subtle border provides edge definition against busy backgrounds. */
+  glass: (bgColor: string, isDark: boolean) => ({
+    backgroundColor: isDark ? `${bgColor}26` : `${bgColor}99`,
+    border: `0.5px solid ${isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)"}`,
+    borderRadius: radii.sm,  // 4px
+    padding: cardPadding.css,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  /** Elevated panel — floating container with background fill + shadow.
+   *  For: tooltips, popovers, stat panels that need separation. */
+  elevated: (modeTokens: typeof dark | typeof light) => ({
+    backgroundColor: modeTokens.bg.elevated,
+    border: `0.5px solid rgba(128,128,128,0.04)`,
+    borderRadius: radii.sm,  // 4px
+    padding: cardPadding.css,
+    boxShadow: modeTokens.shadow,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+
+  // ── Legacy (backward compat) ────────────────────────────────────────────
+
+  /** Outlined — DEPRECATED. Thin border + transparent bg.
+   *  Reads as PowerPoint. Use inset or accentEdge instead.
+   *  Kept for backward compatibility during migration. */
+  outlined: (color: string) => ({
+    backgroundColor: "transparent",
+    border: `0.5px solid ${color}14`,  // reduced from 1px/16% to 0.5px/8%
+    borderRadius: radii.xs,  // reduced from 8px to 2px
+    padding: cardPadding.css,
+    overflow: "hidden" as const,
+    overflowWrap: "break-word" as const,
+  }),
+} as const;
+
+// ── Bar Style ────────────────────────────────────────────────────────────
+export const barStyle = {
+  borderRadius: `${radii.sm}px ${radii.sm}px 0 0`,
+  labelOffset: 8,  // px above bar for value label
+  gap: 12,         // px between bars
+} as const;
+
+// ── Badge Style ──────────────────────────────────────────────────────────
+export const badgeStyle = {
+  borderRadius: radii.pill,
+  paddingH: 14,
+  paddingV: 6,
+  borderOpacity: 0.2,  // subtle border, no colored fill
+} as const;
+
+// ── Divider Style ────────────────────────────────────────────────────────
+export const dividerStyle = {
+  thickness: 1,
+  opacity: 0.2,
 } as const;
 
 // ── Depth System ───────────────────────────────────────────────────────────
@@ -401,13 +583,15 @@ export const titleHeight = {
  *        <div style={{ top: area.top, left: area.left, width: area.width, height: area.height }}>
  */
 export const contentArea = (
-  titleVariant: keyof typeof titleHeight = "content"
+  titleVariant: keyof typeof titleHeight = "content",
+  safeAreaTier: keyof typeof layout.safeAreaTier = "standard"
 ) => {
+  const safe = layout.safeAreaTier[safeAreaTier];
   const top =
-    layout.safeArea.top + titleHeight[titleVariant] + layout.spacing.xl; // 48px title-to-content gap
-  const left = layout.safeArea.left;
-  const right = layout.safeArea.right;
-  const bottom = layout.safeArea.bottom;
+    safe.top + titleHeight[titleVariant] + layout.spacing.xl; // 48px title-to-content gap
+  const left = safe.left;
+  const right = safe.right;
+  const bottom = safe.bottom;
   return {
     top,
     left,
@@ -432,10 +616,12 @@ export const columnLayout = (
     gap?: number;
     /** Title variant to compute available height. Default: "content" */
     titleVariant?: keyof typeof titleHeight;
+    /** Safe area tier — MUST match TitleBlock's safeAreaTier to avoid overlap. Default: "standard" */
+    safeAreaTier?: keyof typeof layout.safeAreaTier;
   }
 ) => {
   const gap = opts?.gap ?? layout.spacing.xl;
-  const area = contentArea(opts?.titleVariant ?? "content");
+  const area = contentArea(opts?.titleVariant ?? "content", opts?.safeAreaTier ?? "standard");
   const totalGapWidth = gap * (columns - 1);
   const columnWidth = Math.floor((area.width - totalGapWidth) / columns);
   return {
@@ -446,6 +632,45 @@ export const columnLayout = (
     ...area,
   } as const;
 };
+
+/**
+ * Text safety — CSS properties to prevent text from being cut off at edges.
+ * Apply these to any text container that might grow beyond its allocated space.
+ *
+ * Usage:
+ *   <div style={{ ...textSafe.clamp(2) }}>Long text here</div>
+ *   <div style={{ ...textSafe.ellipsis }}>Single line that might overflow</div>
+ *   <div style={{ ...textSafe.wrap }}>Multi-line text in a bounded box</div>
+ */
+export const textSafe = {
+  /** Single-line ellipsis truncation */
+  ellipsis: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  } as React.CSSProperties,
+
+  /** Multi-line wrap with word-break safety */
+  wrap: {
+    overflow: "hidden",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+  } as React.CSSProperties,
+
+  /** Line-clamped text (N visible lines, then ellipsis) */
+  clamp: (lines: number): React.CSSProperties => ({
+    overflow: "hidden",
+    display: "-webkit-box",
+    WebkitLineClamp: lines,
+    WebkitBoxOrient: "vertical",
+  }),
+
+  /** Ensure element stays within safe area regardless of content */
+  bounded: {
+    maxWidth: `calc(100% - ${layout.safeArea.left + layout.safeArea.right}px)`,
+    overflow: "hidden",
+  } as React.CSSProperties,
+} as const;
 
 /**
  * Map camera presets — regional zooms so compositions don't default to

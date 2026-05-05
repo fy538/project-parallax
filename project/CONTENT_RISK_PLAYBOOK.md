@@ -40,7 +40,7 @@ This is good news for Parallax. Educational analysis of geopolitics is exactly t
 **Low-risk (generally safe with educational framing):**
 
 9. **Historical analysis of past conflicts.** Historical content is almost always Green.
-10. **Philosophical and theoretical frameworks.** Game theory, Stoicism, systems theory — zero monetization risk.
+10. **Philosophical and theoretical frameworks.** Game theory, Stoicism, systems theory — zero monetization risk. The Philosopher's Lens format is inherently the safest format in the repertoire — abstract frameworks as primary subject with geopolitics as illustration, not the reverse.
 11. **Economic and trade analysis.** Sanctions, export controls, trade wars — low risk unless tied to active sensitive events.
 
 ### Tactical Mitigations

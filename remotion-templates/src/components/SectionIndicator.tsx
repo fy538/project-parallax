@@ -74,12 +74,23 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
 
   const isTop = position === "top-left";
 
+  // Title letter-spacing: tightens slightly on entrance ("focus pull")
+  const titleTracking = interpolate(
+    frame,
+    [beatStartFrame + entryDelay, beatStartFrame + entryDelay + sec(0.6)],
+    [3, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }
+  );
+
+  // Lift bottom indicator above FooterStrip (~40px) so they don't collide
+  const bottomLift = isTop ? 0 : 40;
+
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
       <div
         style={{
           position: "absolute",
-          [isTop ? "top" : "bottom"]: layout.safeArea[isTop ? "top" : "bottom"],
+          [isTop ? "top" : "bottom"]: layout.safeArea[isTop ? "top" : "bottom"] + bottomLift,
           left: layout.safeArea.left,
           opacity: Math.min(opacity, exitOpacity),
           display: "flex",
@@ -101,7 +112,7 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
           {currentBeat.id.replace(/beat/i, "SECTION ")}
         </div>
 
-        {/* Beat title */}
+        {/* Beat title — letter-spacing focus pull on entrance */}
         <div
           style={{
             fontFamily: fonts.heading,
@@ -109,14 +120,14 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
             fontWeight: 600,
             color: dark.text.secondary,
             textShadow: "0 1px 3px rgba(0,0,0,0.5)",
-            letterSpacing: 1,
+            letterSpacing: titleTracking,
             textTransform: "uppercase",
           }}
         >
           {currentBeat.title}
         </div>
 
-        {/* Animated underline accent */}
+        {/* Animated underline accent — gradient + glow */}
         <div
           style={{
             height: 2,
@@ -125,6 +136,7 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
             background: `linear-gradient(90deg, ${palette.amber} 0%, ${palette.amber}40 80%, transparent 100%)`,
             borderRadius: 1,
             marginTop: 2,
+            boxShadow: `0 0 6px ${palette.amber}50`,
           }}
         />
       </div>

@@ -1,0 +1,149 @@
+{
+  "skill_name": "topic-viability",
+  "iteration": 1,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "label": "With Skill",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "ep02-tech-blockades-viability",
+          "pass_rate": 1.0,
+          "passed": 10,
+          "total": 10,
+          "assertions": [
+            {
+              "text": "has-clear-verdict",
+              "passed": true
+            },
+            {
+              "text": "structural-resonance-substantive",
+              "passed": true
+            },
+            {
+              "text": "historical-parallel-named",
+              "passed": true
+            },
+            {
+              "text": "decoder-framing-dual",
+              "passed": true
+            },
+            {
+              "text": "rubric-with-scores",
+              "passed": true
+            },
+            {
+              "text": "angle-gap-with-competitive-check",
+              "passed": true
+            },
+            {
+              "text": "format-recommendation",
+              "passed": true
+            },
+            {
+              "text": "arc-fit-assessment",
+              "passed": true
+            },
+            {
+              "text": "next-steps-provided",
+              "passed": true
+            },
+            {
+              "text": "structured-5-question-format",
+              "passed": true
+            }
+          ],
+          "timing": {
+            "total_tokens": 64900,
+            "duration_ms": 90875,
+            "total_duration_seconds": 90.9
+          }
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 64900,
+        "mean_duration_seconds": 90.9
+      }
+    },
+    {
+      "name": "without_skill",
+      "label": "Without Skill (Baseline)",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "ep02-tech-blockades-viability",
+          "pass_rate": 1.0,
+          "passed": 10,
+          "total": 10,
+          "assertions": [
+            {
+              "text": "has-clear-verdict",
+              "passed": true
+            },
+            {
+              "text": "structural-resonance-substantive",
+              "passed": true
+            },
+            {
+              "text": "historical-parallel-named",
+              "passed": true
+            },
+            {
+              "text": "decoder-framing-dual",
+              "passed": true
+            },
+            {
+              "text": "rubric-with-scores",
+              "passed": true
+            },
+            {
+              "text": "angle-gap-with-competitive-check",
+              "passed": true
+            },
+            {
+              "text": "format-recommendation",
+              "passed": true
+            },
+            {
+              "text": "arc-fit-assessment",
+              "passed": true
+            },
+            {
+              "text": "next-steps-provided",
+              "passed": true
+            },
+            {
+              "text": "structured-5-question-format",
+              "passed": true
+            }
+          ],
+          "timing": {
+            "total_tokens": 79490,
+            "duration_ms": 163064,
+            "total_duration_seconds": 163.1
+          }
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 79490,
+        "mean_duration_seconds": 163.1
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate_diff": 0.0,
+    "token_diff": -14590,
+    "duration_diff_seconds": -72.19999999999999
+  },
+  "analyst_observations": [
+    "Both versions score 10/10 on format assertions. The topic-viability skill's value is structural discipline rather than content quality: it enforces the exact 5-question framework, ensures the self-check is completed, and produces output in a pipeline-compatible format.",
+    "The with-skill version is actually faster (91s vs 163s) and uses fewer tokens (65K vs 79K). The skill focuses the agent on the 5 questions rather than generating exhaustive supplementary analysis (risk assessment, depth assessment, appendix) that the baseline produces.",
+    "Qualitative difference: the with-skill output is 111 lines vs 266 lines for the baseline. The skill produces a focused memo; the baseline produces a mini-research report. For a 5-minute triage decision, the shorter format is more actionable.",
+    "Both versions independently reached VIABLE with 5/5 rubric scores and identified the same core angle (tragedy of the commons + COCOM + structural inevitability). The topic's viability is clear enough that skill guidance doesn't change the verdict \u2014 but the skill ensures the analysis is structured for pipeline consumption."
+  ]
+}

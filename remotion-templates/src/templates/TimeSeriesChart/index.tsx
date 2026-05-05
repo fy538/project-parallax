@@ -4,8 +4,8 @@ import { layout, sec } from "../../design/theme";
 import { TimeSeriesChartSchema } from "./schema";
 import type { TimeSeriesChartData } from "./types";
 
-// EP01 data — SMIC 7nm yield improvement curve
-import sampleData from "../../../data/episodes/ep01/timeseries-smic-yield.json";
+// silicon-trap data — SMIC 7nm yield improvement curve
+import sampleData from "../../../data/episodes/silicon-trap/timeseries-smic-yield.json";
 
 export const TimeSeriesChartComposition = () => (
   <Composition

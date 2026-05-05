@@ -52,5 +52,6 @@ export const GameBoardSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundTint: z.string().optional(),
+    backgroundVariant: z.enum(["light", "dark"]).optional(),
   }),
 });

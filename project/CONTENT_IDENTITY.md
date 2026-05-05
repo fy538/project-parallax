@@ -189,7 +189,7 @@ The content pillars are unique within geopolitics. The narrative craft should ai
 
 ## Part 6: Topic Discovery Framework
 
-How to find topics and match them to the right format. There are two entry points — event-first and framework-first — and a universal scoring rubric that applies to both.
+How to find topics and match them to the right format. There are three entry points — event-first, framework-first, and interrogative — plus a universal scoring rubric that applies to all three.
 
 ### Entry Point 1: Event-First ("Something just happened — which format serves it best?")
 
@@ -222,6 +222,104 @@ You encounter a concept, historical pattern, or philosophical framework and ask:
 - **Time Collapse:** The parallel must be structurally deep, not just superficial resemblance. The *mechanics* must rhyme (e.g., declining hegemon accommodating rising power through sphere-of-influence agreements), not just the vibes. If you can't articulate at least 3 structural parallels AND at least 1 place the analogy breaks down, it's not ready.
 - **Philosopher's Lens:** Can you state the insight in one surprising sentence? "Stoic indifference explains why Singapore thrives between great powers" = surprising and worth a video. "Game theory applies to international relations" = obvious and not worth a video.
 - **Translator:** The two traditions must genuinely disagree or emphasize different variables, not just use different vocabulary for the same analysis. 势 (shi/strategic momentum) vs. Western material balance of power = genuine divergence. Both traditions agreeing that "alliances matter" in different languages = not a video.
+
+### Entry Point 3: Interrogative Discovery ("What question, asked systematically, reveals hidden topics?")
+
+Entry Points 1 and 2 are *responsive* — the world hands you an event or a framework catches your eye. Interrogative discovery is *generative* — you ask a specific type of question against the current geopolitical landscape and it reliably produces topic candidates that responsive discovery would never surface. These six questions can be run periodically (the weekly signal scan should rotate through them) and each produces a distinct shape of insight.
+
+#### Shape 1: Actor-Constraint — "Who is trapped, and why can't they see the exit?"
+
+Look for actors whose behavior appears irrational until you map the structural constraints on their decision space. The insight is always that hidden constraints make apparently irrational behavior rational.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Is an important actor behaving in a way that seems irrational from the outside? | **Detective** (the trap is the puzzle) |
+| Can you map the decision tree showing why every exit is worse than continuing? | **Wargame** (the constraint is the scenario) |
+| Does a philosophical framework explain *why* the trap exists structurally? | **Philosopher's Lens** (commitment traps, audience costs, gamble for resurrection) |
+
+**How to spot these:** Leaders who can't negotiate, countries that can't de-escalate, institutions that can't reform. The tell is a gap between what *rational actor theory* predicts (they should cut their losses) and what *structural analysis* reveals (cutting losses is more dangerous than continuing). Examples: Putin can't lose the war (regime survival makes losing existentially worse than a war of attrition). Zelensky can't accept territorial concessions (his legitimacy was built on not surrendering). South Korea can't fully trust the US nuclear umbrella but also can't openly pursue its own bomb.
+
+**Quality test:** Can you name the specific structural constraint that makes the "rational" exit impossible? If you can only say "they don't want to lose," the analysis isn't deep enough. The constraint should be structural (regime type, domestic political incentives, alliance architecture), not just preferential.
+
+#### Shape 2: Mechanism — "How does X actually work, and why does everyone misunderstand the plumbing?"
+
+Look for geopolitical processes where the standard mental model is wrong — where the *mechanism* is more interesting, more fragile, or more counterintuitive than the textbook version.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Is there a hidden mechanism that contradicts the popular understanding? | **Detective** (the plumbing is the puzzle) |
+| Does the mechanism embody or break a known framework? | **Philosopher's Lens** (the framework meets reality) |
+| Would showing the mechanism through a historical case illuminate the present? | **Time Collapse** (the plumbing worked differently then) |
+
+**How to spot these:** Ask "how does [X] *actually* work?" about any major geopolitical concept — sanctions, deterrence, reserve currency status, export controls, sovereign default, drone warfare economics. If the one-sentence answer most educated people would give is wrong or dangerously incomplete, you have a topic. The tell is a gap between the *textbook mechanism* and the *operational mechanism*.
+
+**Quality test:** Can you describe the mechanism step by step in a way that would surprise someone who reads The Economist? If the real mechanism is basically what the standard model says, there's no episode. The surprise must be in the plumbing, not just the outcome.
+
+#### Shape 3: Convergent Drift — "Why are multiple independent actors doing the same thing simultaneously?"
+
+Look for patterns across independent actors — countries, institutions, or leaders independently converging on the same behavior without coordination. The structural explanation for the convergence is the episode.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Is the convergence itself the puzzle? | **Detective** (why are they all doing this?) |
+| Does the convergence prove or break a known model? | **Philosopher's Lens** or **Dialectic** |
+| Did the same convergence happen before in a different era? | **Time Collapse** |
+
+**How to spot these:** Look for the phrase "X is happening everywhere" — industrial policy, border walls, democratic backsliding, nuclear proliferation interest, simultaneous regional conflicts. The key test: are these actors responding to each other (which is just a chain reaction, not a convergence) or are they independently responding to the same structural pressure (which is genuine convergent drift)? The latter is far more interesting because the structural pressure is the hidden subject.
+
+**Quality test:** Can you name the shared structural force driving the convergence? "Countries are doing X because it's popular" isn't structural. "Countries are doing X because the same game-theoretic incentive structure applies in each case" is structural. The force should be identifiable, debatable, and surprising.
+
+#### Shape 4: Inversion — "What do educated people confidently believe that's actually wrong?"
+
+Look for widely-held models, theories, or assumptions about how geopolitics works that break when stress-tested against real cases. The episode inverts the conventional wisdom and shows what the corrected model reveals.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Can you name the specific model and show where it breaks? | **Philosopher's Lens** (the framework IS the subject) |
+| Are smart people split on whether the model is broken? | **Dialectic** (thesis: the model works; antithesis: it doesn't; synthesis: here's what actually happens) |
+| Does the model's failure explain a current puzzle? | **Detective** (the broken model is the clue) |
+
+**How to spot these:** Scan standard IR/geopolitics/economics models: democratic peace theory, economic interdependence prevents war, sanctions coerce behavior, nuclear deterrence keeps us safe, the free market allocates strategic resources efficiently. For each, ask: "Does the track record actually support this?" The most fertile inversions are models that are *partially* wrong — they work in some conditions and fail in others, and the boundary conditions are the interesting part.
+
+**Quality test:** The inversion must be genuinely surprising to an educated audience, not just contrarian. "Democracy is bad" isn't an inversion — it's an edgy take. "Democratic peace theory breaks in a specific, structurally predictable way when X condition holds" is an inversion. The corrected model should be *more* useful than the original, not just skeptical.
+
+#### Shape 5: Conspicuous Silence — "What is everyone carefully not talking about, and why?"
+
+Look for strategic absences in public discourse — important questions that aren't being asked, scenarios that aren't being discussed, or realities that everyone can see but nobody names. The silence itself is the signal, and explaining *why* the silence exists is the episode.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Is the silence itself structurally interesting? | **Detective** (why is nobody saying this?) |
+| Does a framework explain why the silence is rational? | **Philosopher's Lens** (taboo as structural force, Overton window mechanics) |
+| Would naming the silence reframe a current debate? | **Dialectic** or **Advisor Briefing** |
+
+**How to spot these:** Look for topics where the policy establishment talks *around* but never *about* the core issue. The rules-based international order being already gone (everyone talks about threats to it, nobody says it's over). What actually happens if nuclear deterrence fails. Whether Taiwan's status quo is sustainable. US debt trajectory as a geopolitical constraint. The tell is a topic where you can find thousands of words written about adjacent issues but almost nothing about the central question.
+
+**Quality test:** The silence must be *strategic*, not just neglected. If nobody's talking about it because it's genuinely boring, there's no episode. If nobody's talking about it because naming it would be uncomfortable, destabilizing, or would undermine a useful fiction — that's conspicuous silence. Can you explain *why* the silence is maintained? The structural explanation for the silence is often more interesting than the thing being silenced.
+
+#### Shape 6: Second-Order Consequence — "If the obvious thing happens, what's the non-obvious thing that follows?"
+
+Look for first-order events that everyone is analyzing, then trace the consequence chain one step further to a second-order effect that nobody is optimizing for. The second-order effect is often more important than the first-order event.
+
+| Diagnostic Question | If Yes → Format |
+|---|---|
+| Does the second-order consequence create a structural transformation? | **Detective** (the hidden consequence is the puzzle) |
+| Can you walk through the decision tree from first-order to second-order? | **Wargame** (the consequence chain is the scenario) |
+| Has a historical first-order event produced a surprising second-order transformation? | **Time Collapse** |
+
+**How to spot these:** Take any major ongoing situation (Russia-Ukraine frozen conflict, US-China tech decoupling, dollar reserve share decline, AI capability diffusion) and ask: "Everyone is analyzing the obvious consequence. What's the consequence of the consequence?" If Russia-Ukraine freezes, the first-order effect is European defense spending increases. The second-order effect: Europe is forced to define itself as a strategic actor for the first time since 1945, fundamentally changing what the EU is. The second-order effect is almost always more interesting because it crosses domain boundaries — a military event producing an identity transformation, an economic shift producing a military constraint.
+
+**Quality test:** The second-order consequence must be *structurally connected* to the first-order event, not just temporally correlated. You should be able to trace the causal chain: A causes B, B causes C, and C is the non-obvious insight. If the connection requires speculation without structural logic, it's not ready. The strongest second-order topics have a *feedback loop* — where C reinforces A, creating a cycle nobody is mapping.
+
+#### Using the Six Shapes
+
+**Periodic scanning:** The weekly signal scan should rotate through these questions. Not all six every week — cycle through them so each gets asked at least monthly against the current landscape.
+
+**Convergence signals:** When the same topic appears from multiple shapes (e.g., nuclear deterrence emerges from Mechanism, Inversion, AND Conspicuous Silence), treat that as a strong signal that the topic is high-value and analytically rich.
+
+**Format assignment:** Each shape suggests natural formats (shown in the tables above), but the final format decision should still run through Entry Points 1 and 2's diagnostic questions. The shape finds the topic; the format diagnostics find the best container for it.
+
+**Relationship to responsive discovery:** Interrogative discovery doesn't replace event-first and framework-first — it complements them. Event-first catches timely opportunities. Framework-first catches intellectual inspiration. Interrogative catches the topics that are *structurally present in the landscape but invisible to reactive scanning*.
 
 ### Universal Scoring Rubric
 
@@ -287,17 +385,17 @@ Even if a topic is timely or tempting, avoid it if:
 **1. The "both sides" are actually one side being clearly wrong.**
 The Dialectic format requires genuine intellectual substance on both sides. Forcing balance where there isn't any (e.g., flat earth–level debates) destroys credibility. If you can't write a sincere steelman of both positions, it's not a Dialectic topic.
 
-**2. Your identity becomes the story.**
-The channel's value is structural analysis. If a topic would inevitably become "what does a Chinese-American think about X," it puts you in a culture-war frame that undermines the intellectual brand. You can *use* your cross-cultural fluency as an analytical tool — but the topic should never be *about* you.
+**2. Your identity replaces the analysis.**
+The channel's value is structural analysis. If a topic would inevitably become "what does a Chinese-American think about X" — memoir instead of analysis — it puts you in a culture-war frame. But cross-cultural fluency *as an analytical tool* is the channel's strongest differentiator (see Direction 4: The Translator). The test: does your identity serve the analysis ("here's what 势/shi reveals about supply chain leverage") or replace it ("as a Chinese-American, I feel...")? The first is your superpower. The second is a different show.
 
-**3. The framework application is a stretch.**
-Not everything is a prisoner's dilemma. The epistemological discipline that makes your content trustworthy means sometimes acknowledging "I don't have a useful framework for this one." Forced analogies are worse than no analogy — they train the audience to distrust your pattern-recognition.
+**3. The framework application is forced rather than illuminating.**
+Not everything is a prisoner's dilemma — but surprising framework applications are the channel's core product. The test isn't whether the application is "a stretch" (surprising connections *should* stretch); it's whether the framework genuinely illuminates something new about the topic, or whether you're pattern-matching surface features. A framework application that makes the viewer see the topic differently is good craft, even if it's unexpected. A framework application where you have to squint to see the fit is forced. When uncertain, include the connection but flag the breakage honestly — let the viewer decide.
 
 **4. The topic is pure news cycle with no structural depth.**
 If the "historical parallel" would just be decoration on top of current-events reporting, pass. Other channels will cover the news faster. Your value is the depth that takes a few extra days.
 
-**5. The topic requires taking a strong geopolitical side.**
-You can present the strongest case for each side (Dialectic). You can show what each tradition sees (Translator). You can quantify your uncertainty (Oracle). But if a topic demands you declare "X country is right and Y country is wrong," it compromises the epistemological brand and invites culture-war audience capture.
+**5. The topic demands moral judgment instead of structural analysis.**
+You can — and should — take strong analytical positions ("the structural incentives suggest X will happen because Y"). You can present the strongest case for each side (Dialectic), show what each tradition sees (Translator), and quantify your uncertainty (Oracle). What to avoid: topics where the only interesting thing to say is "X country is right and Y country is wrong" — moral verdicts rather than structural analysis. But don't confuse analytical boldness with partisanship. Saying "export controls are structurally likely to fail because of X, Y, Z" is a strong analytical position, not taking sides.
 
 ---
 

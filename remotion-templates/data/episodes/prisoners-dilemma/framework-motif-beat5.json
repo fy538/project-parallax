@@ -1,0 +1,17 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Synchronized Assumptions",
+  "variant": "flow",
+  "nodes": [
+    { "label": "Washington", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.2, "y": 0.2 } },
+    { "label": "Beijing", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.8, "y": 0.2 } },
+    { "label": "Geneva", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.2, "y": 0.8 } },
+    { "label": "Brussels", "sublabel": "● (defect)", "color": "#C23B22", "position": { "x": 0.8, "y": 0.8 } }
+  ],
+  "arrowLabels": [],
+  "phases": [
+    { "label": "Same game everywhere — defection expected", "durationSec": 8, "activeNodes": [0, 1, 2, 3] }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "dark"
+}

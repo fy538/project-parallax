@@ -18,7 +18,7 @@
  */
 
 import { useMemo } from "react";
-import { light, dark, palette, shadows, type Mode } from "../design/theme";
+import { light, dark, shadows, type Mode } from "../design/theme";
 
 export interface ThemeTokens {
   /** Mode being used */

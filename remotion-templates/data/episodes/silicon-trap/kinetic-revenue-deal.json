@@ -1,0 +1,10 @@
+{
+  "episode": "silicon-trap",
+  "variant": "statistic",
+  "statValue": "20% → 15%",
+  "statLabel": "Revenue-sharing rate on AI chip exports to China",
+  "statContext": "Jensen Huang negotiated Trump down from 20%",
+  "accentColor": "#E5A544",
+  "durationSec": 5,
+  "backgroundVariant": "dark"
+}

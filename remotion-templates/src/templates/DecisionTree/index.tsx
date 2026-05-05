@@ -12,8 +12,8 @@ import { layout, sec } from "../../design/theme";
 import { DecisionTreeSchema } from "./schema";
 import type { DecisionTreeData } from "./types";
 
-// EP01 data — AI timeline branching scenario
-import sampleData from "../../../data/episodes/ep01/decisiontree-ai-timeline.json";
+// silicon-trap data — AI timeline branching scenario
+import sampleData from "../../../data/episodes/silicon-trap/decisiontree-ai-timeline.json";
 
 export const DecisionTreeComposition = () => (
   <Composition

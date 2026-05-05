@@ -1,0 +1,17 @@
+{
+  "episode": "silicon-trap",
+  "title": "CHIPS Act Funding Pipeline",
+  "subtitle": "Authorized vs. awarded vs. disbursed",
+  "variant": "bar",
+  "unit": "$B",
+  "dataPoints": [
+    { "label": "Authorized", "value": 52.7, "color": "#3266AD" },
+    { "label": "Awarded", "value": 30.9, "color": "#E5A544" },
+    { "label": "Disbursed", "value": 6, "color": "#C23B22" }
+  ],
+  "highlightIndex": 2,
+  "contextNote": "Trump called the program 'horrible'",
+  "source": "CHIPS for America, 2025",
+  "durationSec": 6,
+  "backgroundVariant": "light"
+}

@@ -12,8 +12,8 @@ import { layout, sec } from "../../design/theme";
 import { GameBoardSchema } from "./schema";
 import type { GameBoardData } from "./types";
 
-// EP01 data — chess variant (US strategy)
-import sampleData from "../../../data/episodes/ep01/gameboard-chess.json";
+// silicon-trap data — chess variant (US strategy)
+import sampleData from "../../../data/episodes/silicon-trap/gameboard-chess.json";
 
 export const GameBoardComposition = () => (
   <Composition

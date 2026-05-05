@@ -1,0 +1,13 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "What Would Change My Mind",
+  "variant": "flow",
+  "nodes": [
+    { "label": "Reframe PD → coordination", "sublabel": "Adopt stag-hunt language", "color": "#E5A544" },
+    { "label": "Build institutional scaffolding", "sublabel": "Design principles applied", "color": "#E5A544" },
+    { "label": "No outcome change", "sublabel": "→ Model is descriptive, not constructive", "color": "#888780" }
+  ],
+  "arrowLabels": ["then", "and if"],
+  "durationSec": 8,
+  "backgroundVariant": "light"
+}

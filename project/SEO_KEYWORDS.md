@@ -1,9 +1,10 @@
 # Parallax — SEO Keyword Research
 
 ## Purpose
-Keyword strategy for the first arc ("Great Power Technology Competition") and associated Shorts. This document maps search intent, suggests title/description keywords, and provides a framework for ongoing keyword research as new arcs launch.
+Channel-wide keyword strategy: title architecture, description templates, tag principles, and Shorts formatting. Arc-specific keyword research lives in per-arc appendices (Part 2+). Upload Part 1 to the Claude.ai Episode Research project; arc appendices are reference-only.
 
 Created: April 26, 2026
+Updated: May 2, 2026
 
 ---
 
@@ -85,7 +86,13 @@ Tags have diminished SEO weight in 2026 (YouTube has confirmed they're a minor s
 
 ---
 
-## Part 2: Arc 1 — "Great Power Technology Competition" Keywords
+## Part 2: Per-Arc Keyword Research
+
+> Each arc gets its own keyword section below. These are research artifacts — they inform title decisions but don't need to be uploaded to the Episode Research project. Part 1 (principles) is sufficient for Deep Research to generate good title suggestions.
+
+---
+
+### Arc 1: "Great Power Technology Competition" Keywords
 
 ### EP01: "The Silicon Trap" (Detective format)
 
@@ -189,31 +196,71 @@ Tags have diminished SEO weight in 2026 (YouTube has confirmed they're a minor s
 2. "1949 and 2024: The Same Technology War, 75 Years Apart" — Time Collapse format in the title
 3. "COCOM: How the Cold War Tried to Stop Technology Transfer (And Failed)" — owns the keyword + narrative hook
 
----
+### Shorts Keyword Strategy
 
-## Part 3: Shorts Keyword Strategy
+Shorts are discovery-driven (recommended feed) more than search-driven, but titles and hashtags still matter for topical association.
 
-Shorts have a different SEO dynamic — they're discovery-driven (recommended feed) more than search-driven, but titles and hashtags still matter for topical association.
+**Framework in 45 Seconds series:**
+Hashtags: #gametheory #philosophy #geopolitics #explained #strategy
+Title patterns: "The Prisoner's Dilemma in 45 Seconds" / "What Stoicism Actually Means (For Geopolitics)" / "Game Theory Explains Why Trade Wars Escalate"
 
-### Framework in 45 Seconds series
-**Hashtags:** #gametheory #philosophy #geopolitics #explained #strategy
-**Title patterns:** "The Prisoner's Dilemma in 45 Seconds" / "What Stoicism Actually Means (For Geopolitics)" / "Game Theory Explains Why Trade Wars Escalate"
+**History Rhymes series:**
+Hashtags: #history #geopolitics #parallels #pattern #didyouknow
+Title patterns: "1907 and 2026: Spot the Difference" / "This Happened Before (And We Didn't Learn)"
 
-### History Rhymes series
-**Hashtags:** #history #geopolitics #parallels #pattern #didyouknow
-**Title patterns:** "1907 and 2026: Spot the Difference" / "This Happened Before (And We Didn't Learn)"
+**The Market Says... series:**
+Hashtags: #predictions #kalshi #geopolitics #probability #analysis
+Title patterns: "Kalshi Says 8% Chance of Taiwan Conflict. Are They Right?" / "The Market Thinks [X] — Here's What They're Missing"
 
-### The Market Says... series
-**Hashtags:** #predictions #kalshi #geopolitics #probability #analysis
-**Title patterns:** "Kalshi Says 8% Chance of Taiwan Conflict. Are They Right?" / "The Market Thinks [X] — Here's What They're Missing"
-
-### Both Sides Are Wrong series
-**Hashtags:** #debate #geopolitics #analysis #truth #reframe
-**Title patterns:** "Both Sides Are Wrong About the Chip War" / "The China Debate Everyone Gets Wrong"
+**Both Sides Are Wrong series:**
+Hashtags: #debate #geopolitics #analysis #truth #reframe
+Title patterns: "Both Sides Are Wrong About the Chip War" / "The China Debate Everyone Gets Wrong"
 
 ---
 
-## Part 4: Channel-Level SEO
+### Arc 3: "The Diplomacy of Deception" Keywords
+
+#### Launch Episode: "The Prisoner's Dilemma Is Wrong About Almost Everything" (Philosopher's Lens)
+
+**Primary keywords (high volume, moderate-high competition):**
+- "prisoner's dilemma" — massive evergreen search volume, driven by students + intellectually curious viewers
+- "game theory" — perennial high volume, extremely competitive but broad enough to rank long-tail
+- "cooperation" / "why cooperation fails" — moderate search, educational intent
+- "prisoner's dilemma explained" — high volume, explicit educational intent, competitive (Veritasium owns top spot)
+
+**Secondary keywords (moderate volume, lower competition):**
+- "prisoner's dilemma real world" / "prisoner's dilemma examples" — application-focused, closer to Parallax's angle
+- "game theory geopolitics" — niche but precisely our audience
+- "why nations cooperate" — lower volume, high intent, almost zero YouTube competition
+- "Elinor Ostrom" / "tragedy of the commons solution" — niche academic audience, low competition
+- "iterated prisoner's dilemma" / "Axelrod tournament" — searched by informed audience
+
+**Long-tail keywords (low competition, high intent):**
+- "prisoner's dilemma wrong" / "problems with game theory" — our exact angle, near-zero competition
+- "cooperation international relations" — academic but precise audience
+- "game theory doesn't work" — counterintuitive framing, strong click-through potential
+- "Concert of Europe cooperation" — historical angle, extremely low competition, ownable
+- "Hobbes vs Rousseau cooperation" — philosophy audience crossover
+
+**Suggested title options (in preference order):**
+1. "The Prisoner's Dilemma Is Wrong About Almost Everything" — direct, counterintuitive, primary keyword front-loaded, survives 50-char truncation
+2. "Why Game Theory Gets Cooperation Wrong" — broader keyword, arguable thesis, curiosity gap
+3. "The Most Famous Model in Social Science (And Why It's Broken)" — Veritasium-adjacent framing with differentiator
+4. "What the Prisoner's Dilemma Can't Explain About the Real World" — question-format variant, educational intent
+
+#### Future Arc 3 Episodes
+
+**"The Treaty Nobody Believes" (Wargame):**
+- Primary: "arms control," "nuclear treaty," "trust in diplomacy"
+- Angle keywords: "game theory treaty," "why treaties fail," "arms control game theory"
+
+**"Why Did Nixon Go to China?" (Detective):**
+- Primary: "Nixon China" — moderate volume, historical
+- Angle keywords: "engaging your enemy," "diplomatic surprise," "counterintuitive diplomacy"
+
+---
+
+## Part 3: Channel-Level SEO
 
 ### Channel Description (draft)
 ```
@@ -239,7 +286,7 @@ Create playlists that double as keyword-rich containers:
 
 ---
 
-## Part 5: Ongoing Keyword Research Process
+## Part 4: Ongoing Keyword Research Process
 
 ### Monthly Routine
 1. **Check YouTube search suggestions.** Type your topic keywords into YouTube search and note autocomplete suggestions — these are real user searches.

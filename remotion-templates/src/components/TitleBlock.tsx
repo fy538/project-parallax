@@ -23,17 +23,21 @@
  */
 
 import React from "react";
+import { useCurrentFrame, interpolate, Easing } from "remotion";
 import {
   fonts,
   fontSizes,
   fontWeights,
+  letterSpacing,
   layout,
+  palette,
+  sec,
   textMaxWidth,
-  shadows,
   type Mode,
 } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { FadeIn } from "./FadeIn";
+import { CLAMP } from "../utils/animation";
 
 interface TitleBlockProps {
   /** Main title text */
@@ -46,10 +50,15 @@ interface TitleBlockProps {
   accentColor?: string;
   /** Position alignment. Default: "top-left" (standard data template position) */
   align?: "top-left" | "top-center";
+  /** Safe area tier — controls distance from edges. Default: "standard" (80px).
+   *  Use "generous" for data-dense templates, "tight" for centered compositions. */
+  safeAreaTier?: keyof typeof layout.safeAreaTier;
   /** Override the FadeIn start frame. Default: 0 */
   startFrame?: number;
   /** Skip the cinematic entrance animation */
   noAnimation?: boolean;
+  /** Show an accent underline that draws in beneath the title (brand signature). Default: false. */
+  underline?: boolean;
   /** Additional content rendered below subtitle (e.g., legend) */
   children?: React.ReactNode;
 }
@@ -60,19 +69,32 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   mode,
   accentColor,
   align = "top-left",
+  safeAreaTier = "standard",
   startFrame = 0,
   noAnimation = false,
+  underline = false,
   children,
 }) => {
   const theme = useThemeMode(mode);
+  const safe = layout.safeAreaTier[safeAreaTier];
+  const frame = useCurrentFrame();
+  const accent =
+    accentColor || (mode === "dark" ? palette.amber : palette.oxblood);
+  // Underline scale-in animation (after title fade-in completes)
+  const underlineProgress = interpolate(
+    frame,
+    [startFrame + sec(0.4), startFrame + sec(1.0)],
+    [0, 1],
+    { ...CLAMP, easing: Easing.out(Easing.cubic) }
+  );
 
   const content = (
     <div
       style={{
         position: "absolute",
-        top: layout.safeArea.top,
-        left: layout.safeArea.left,
-        right: align === "top-center" ? layout.safeArea.right : undefined,
+        top: safe.top,
+        left: safe.left,
+        right: align === "top-center" ? safe.right : undefined,
         textAlign: align === "top-center" ? "center" : "left",
       }}
     >
@@ -85,12 +107,30 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
           fontFamily: fonts.heading,
           textShadow: theme.textShadow,
           maxWidth: textMaxWidth.h2,
-          letterSpacing: 2,
+          letterSpacing: letterSpacing.h2,
           lineHeight: 1.1,
         }}
       >
         {title}
       </div>
+
+      {/* Optional accent underline — gradient-fade signature, draws in left-to-right */}
+      {underline && (
+        <div
+          style={{
+            height: 2,
+            width: 88,
+            background: `linear-gradient(${align === "top-center" ? "90deg" : "90deg"}, ${accent} 0%, ${accent}80 70%, transparent 100%)`,
+            marginTop: layout.spacing.xs,
+            marginLeft: align === "top-center" ? "auto" : 0,
+            marginRight: align === "top-center" ? "auto" : 0,
+            transform: `scaleX(${underlineProgress})`,
+            transformOrigin: align === "top-center" ? "center" : "left center",
+            boxShadow: `0 0 6px ${accent}50`,
+            opacity: underlineProgress,
+          }}
+        />
+      )}
 
       {/* Subtitle — body, muted text color */}
       {subtitle && (

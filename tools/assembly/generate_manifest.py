@@ -15,16 +15,16 @@ Two modes:
 Usage:
   # Estimate mode (no audio needed)
   python generate_manifest.py \\
-    --script ../../episodes/EP01-silicon-trap/script-v4-production.md \\
-    --episode EP01 \\
-    --output ../../remotion-templates/data/episodes/ep01/assembly-manifest.json
+    --script ../../episodes/silicon-trap/script-v5-production.md \\
+    --episode silicon-trap \\
+    --output ../../remotion-templates/data/episodes/silicon-trap/assembly-manifest.json
 
   # Precise mode (with narration audio)
   python generate_manifest.py \\
-    --script ../../episodes/EP01-silicon-trap/script-v4-production.md \\
-    --episode EP01 \\
-    --audio ../../episodes/EP01-silicon-trap/narration.wav \\
-    --output ../../remotion-templates/data/episodes/ep01/assembly-manifest.json
+    --script ../../episodes/silicon-trap/script-v5-production.md \\
+    --episode silicon-trap \\
+    --audio ../../episodes/silicon-trap/narration.wav \\
+    --output ../../remotion-templates/data/episodes/silicon-trap/assembly-manifest.json
 """
 
 import argparse
@@ -41,6 +41,32 @@ from typing import Optional
 WPM = 150  # analytical narration pace (from PRODUCTION_NOTES)
 FPS = 30
 DEFAULT_BROLL_INTERVAL = 4.0  # seconds per visual change for auto-fill gaps
+
+# ── DIR: annotation parsing ───────────────────────────────────────────────
+# Matches: DIR: type(params)
+DIR_LINE_RE = re.compile(r"^\s*DIR:\s*(\w+)\((.+?)\)\s*$")
+
+# Hold presets → (holdAfter, holdBehavior)
+HOLD_PRESETS = {
+    "breathe": (2.0, "breathe"),
+    "land": (1.0, "land"),
+    "linger": (3.0, "linger"),
+}
+
+# Transition type mappings for cut()
+VALID_CUT_TYPES = {
+    "cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up",
+    "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom",
+}
+
+# Palette name → hex for color-wash
+PALETTE_COLORS = {
+    "ink": "#1C1814",
+    "amber": "#E5A544",
+    "rust": "#C23B22",
+    "bone": "#F0E6D0",
+    "oxblood": "#6B1D1D",
+}
 
 
 # ── Data Classes ───────────────────────────────────────────────────────────
@@ -155,15 +181,26 @@ COMPOSITE_RE = re.compile(
     r"(background|inset|antipode)\s*@?\s*(\d+)%?", re.IGNORECASE
 )
 
+# All Remotion template component names — keep in sync with FullEpisode TEMPLATE_COMPONENTS
+ALL_TEMPLATES = [
+    "TitleTransition", "KineticTypography", "DataChart", "TimelineComparison",
+    "FrameworkDiagram", "ChoroplethMap", "RouteAnimation", "DecisionTree",
+    "SplitComposition", "ProbabilityGauge", "ImageComposite", "PhotoMontage",
+    "NetworkDiagram", "TimeSeriesChart", "SankeyFlow", "GameBoard",
+    "BayesianUpdate", "StatReveal", "RadarChart", "AnnotatedImage",
+    "EscalationLadder",
+]
+_TEMPLATE_NAMES = "|".join(ALL_TEMPLATES)
+
 # Template type
 TEMPLATE_RE = re.compile(
-    r"\*\*(P\d)?\s*[—–-]?\s*(TitleTransition|KineticTypography|DataChart|TimelineComparison|FrameworkDiagram|ChoroplethMap|RouteAnimation)\*\*",
+    rf"\*\*(P\d)?\s*[—–-]?\s*({_TEMPLATE_NAMES})\*\*",
     re.IGNORECASE,
 )
 
 # Also match simpler template references
 TEMPLATE_SIMPLE_RE = re.compile(
-    r"(TitleTransition|KineticTypography|DataChart|TimelineComparison|FrameworkDiagram|ChoroplethMap|RouteAnimation)",
+    rf"({_TEMPLATE_NAMES})",
     re.IGNORECASE,
 )
 
@@ -298,6 +335,97 @@ def parse_visual_spec(spec: str):
     return result
 
 
+def parse_dir_lines(dir_lines: list[str]) -> dict:
+    """
+    Parse DIR: annotation lines into a direction dict for assembly manifest use.
+
+    Only extracts hold(), cut(), and mood() — these affect timing and transitions.
+    cam() and reveal() are consumed by Remotion templates via _direction in JSON
+    data files, not by the assembly manifest.
+
+    Returns dict with keys: holdAfter, holdBehavior, preDelay, transitionOut,
+    transitionDuration, washColor, narrationGate, syncWords.
+    """
+    result = {}
+
+    for line in dir_lines:
+        m = DIR_LINE_RE.match(line)
+        if not m:
+            continue
+
+        dtype = m.group(1).lower()
+        params_str = m.group(2).strip()
+
+        if dtype == "hold":
+            # Parse hold() — affects segment timing
+            # Examples: hold(2s), hold(breathe), hold(land), hold(pre:1s),
+            #           hold(pre:1s, breathe), hold(until:"word")
+            for token in re.split(r",\s*", params_str):
+                token = token.strip()
+
+                # hold(until:"word")
+                until_m = re.match(r'until:\s*"([^"]+)"', token)
+                if until_m:
+                    result["narrationGate"] = {"word": until_m.group(1)}
+                    continue
+
+                # hold(pre:Xs)
+                pre_m = re.match(r"pre:\s*(\d+(?:\.\d+)?)s?", token)
+                if pre_m:
+                    result["preDelay"] = float(pre_m.group(1))
+                    continue
+
+                # hold(Xs) — explicit seconds
+                sec_m = re.match(r"^(\d+(?:\.\d+)?)s?$", token)
+                if sec_m:
+                    result["holdAfter"] = float(sec_m.group(1))
+                    continue
+
+                # hold(preset) — breathe, land, linger
+                if token in HOLD_PRESETS:
+                    hold_after, hold_behavior = HOLD_PRESETS[token]
+                    result["holdAfter"] = hold_after
+                    result["holdBehavior"] = hold_behavior
+
+        elif dtype == "cut":
+            # Parse cut() — affects transition out
+            # Examples: cut(iris, origin:center, 0.6s), cut(color-wash, ink, 0.7s)
+            tokens = [t.strip() for t in re.split(r",\s*", params_str)]
+
+            # First token is always the transition type
+            if tokens:
+                cut_type = tokens[0].lower()
+                if cut_type in VALID_CUT_TYPES:
+                    result["transitionOut"] = cut_type
+
+            # Look for duration and color in remaining tokens
+            for token in tokens[1:]:
+                # Duration: 0.5s, 0.7s
+                dur_m = re.match(r"^(\d+(?:\.\d+)?)s$", token.strip())
+                if dur_m:
+                    result["transitionDuration"] = float(dur_m.group(1))
+                    continue
+
+                # Palette color name (for color-wash)
+                color_name = token.strip().lower()
+                if color_name in PALETTE_COLORS:
+                    result["washColor"] = PALETTE_COLORS[color_name]
+
+        elif dtype == "cam":
+            # Extract sync words for Whisper alignment
+            sync_m = re.search(r'sync:\s*"([^"]+)"', params_str)
+            if sync_m:
+                result.setdefault("syncWords", []).append(sync_m.group(1))
+
+        elif dtype == "reveal":
+            # Extract sync words from reveal() too
+            sync_m = re.search(r'sync:\s*"([^"]+)"', params_str)
+            if sync_m:
+                result.setdefault("syncWords", []).append(sync_m.group(1))
+
+    return result
+
+
 def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
     """
     Parse a two-column production script into beats and raw visual specs.
@@ -353,6 +481,13 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
             if narr.startswith("---"):
                 continue
 
+            # Check if this is a DIR: continuation line (empty narration, DIR: in visual)
+            if not narr and vis.strip().startswith("DIR:"):
+                # Attach to the previous row's direction lines
+                if rows:
+                    rows[-1].setdefault("dir_lines", []).append(vis.strip())
+                continue
+
             parsed = parse_visual_spec(vis)
 
             rows.append({
@@ -360,15 +495,30 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
                 "narration": narr,
                 "visual_raw": vis,
                 "parsed": parsed,
+                "dir_lines": [],
             })
+
+            # Also check if the visual cell itself contains DIR: (inline)
+            if "DIR:" in vis and not vis.strip().startswith("DIR:"):
+                # DIR: might be on the same line after a visual spec — rare but handle it
+                pass
 
     return beats, rows
 
 
 # ── Manifest Builder (Estimate Mode) ──────────────────────────────────────
 
-# Known data file mappings for EP01 (from SEQUENCE.md / EP01.tsx)
-EP01_DATA_FILES = {
+# ── Per-episode data mappings ────────────────────────────────────────────
+#
+# These maps are silicon-trap-specific. For other episodes, provide an
+# episode config JSON (e.g. episodes/prisoners-dilemma/manifest-config.json)
+# with keys "dataFiles" and "shotIds" to override these defaults.
+#
+# The build_estimate_manifest function accepts optional data_files and
+# shot_ids parameters. The CLI loads them from --config if provided.
+
+# Known data file mappings for silicon-trap (from EP01.tsx)
+SILICON_TRAP_DATA_FILES = {
     # Opening
     "title-episode": "title-episode.json",
     # Beat 1
@@ -406,7 +556,7 @@ EP01_DATA_FILES = {
 }
 
 # Shot list ID mapping (search terms → shot list IDs from shot-list.json)
-EP01_SHOT_IDS = {
+SILICON_TRAP_SHOT_IDS = {
     "TSMC Arizona": "beat1-tsmc-aerial",
     "semiconductor cleanroom": "beat1-cleanroom",
     "Arizona desert housing": "beat1-arizona-housing",
@@ -433,20 +583,22 @@ EP01_SHOT_IDS = {
 }
 
 
-def resolve_shot_id(search_terms: list[str]) -> Optional[str]:
+def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> Optional[str]:
     """Try to match search terms to a known shot list ID."""
+    lookup = shot_ids or SILICON_TRAP_SHOT_IDS
     for term in search_terms:
-        for key, sid in EP01_SHOT_IDS.items():
+        for key, sid in lookup.items():
             if key.lower() in term.lower():
                 return sid
     return None
 
 
-def resolve_data_file(component: str, search_terms: list[str], vis_raw: str) -> Optional[str]:
+def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict = None) -> Optional[str]:
     """Try to resolve which Remotion data file a template segment references."""
     vis_lower = vis_raw.lower()
+    lookup = data_files or SILICON_TRAP_DATA_FILES
 
-    for slug, filename in EP01_DATA_FILES.items():
+    for slug, filename in lookup.items():
         # Match on slug keywords in the visual spec
         slug_words = slug.replace("-", " ")
         if slug_words in vis_lower:
@@ -575,8 +727,23 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
         trans_out = "cut"
         dur = 0.5
 
+        # Rule 0 (highest priority): Direction-specified transition on PREVIOUS segment
+        # If the previous segment has a direction-specified transitionOut, use it.
+        if prev is not None and prev.get("_dirTransitionOut"):
+            prev_trans = prev.get("transition", {})
+            prev_trans["out"] = prev["_dirTransitionOut"]
+            if prev.get("_dirTransitionDuration"):
+                prev_trans["durationSec"] = prev["_dirTransitionDuration"]
+            if prev.get("_dirWashColor"):
+                prev_trans["washColor"] = prev["_dirWashColor"]
+            prev["transition"] = prev_trans
+            # The current segment's transition-in should match
+            trans_in = prev["_dirTransitionOut"]
+            if prev.get("_dirTransitionDuration"):
+                dur = prev["_dirTransitionDuration"]
+
         # Rule 1: Beat boundaries → dissolve
-        if beat_changed and not is_title:
+        if beat_changed and not is_title and not (prev and prev.get("_dirTransitionOut")):
             trans_in = "dissolve"
             dur = 0.5
 
@@ -621,10 +788,214 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
     return segments
 
 
+# ── Audio Cue Mappings (from AUDIO_DESIGN.md) ──────────────────────────────
+
+# Template → default soundCue at segment entrance or key moment
+# Format: (entrance_type, entrance_intensity, key_moment_type, key_moment_intensity)
+# None means no cue for that slot
+TEMPLATE_AUDIO_MAP = {
+    "TitleTransition": ("section-open", "normal", None, None),
+    "KineticTypography": ("quote-bell", "normal", None, None),  # default; statistic variant overridden below
+    "DataChart": (None, None, "stat-reveal", "normal"),
+    "TimelineComparison": ("beat-transition", "normal", None, None),
+    "FrameworkDiagram": ("beat-transition", "normal", None, None),
+    "ChoroplethMap": ("map-whoosh", "normal", None, None),
+    "RouteAnimation": ("map-whoosh", "normal", None, None),
+    "DecisionTree": ("beat-transition", "normal", "stat-reveal", "normal"),
+    "SplitComposition": ("beat-transition", "normal", None, None),
+    "ProbabilityGauge": (None, None, "stat-reveal", "normal"),
+    "ImageComposite": (None, None, None, None),
+    "PhotoMontage": (None, None, None, None),
+    "NetworkDiagram": ("beat-transition", "normal", None, None),
+    "TimeSeriesChart": (None, None, "stat-reveal", "normal"),
+    "SankeyFlow": ("beat-transition", "normal", "stat-reveal", "subtle"),
+    "GameBoard": ("beat-transition", "normal", None, None),
+    "BayesianUpdate": (None, None, "stat-reveal", "normal"),
+    "StatReveal": (None, None, "stat-reveal", "dramatic"),
+    "RadarChart": ("beat-transition", "normal", None, None),
+    "AnnotatedImage": (None, None, None, None),
+    "EscalationLadder": ("tension-rise", "normal", None, None),
+    "StrategicLandscape": ("beat-transition", "normal", None, None),
+    "DuelingFrameworks": ("beat-transition", "normal", "tension-resolve", "normal"),
+    "DualTimeline": ("beat-transition", "normal", None, None),
+}
+
+# Template → texture hit patterns
+# Each entry: list of (texture_type, offset_fraction, volume)
+# offset_fraction is 0.0-1.0 relative to segment duration
+TEMPLATE_TEXTURE_MAP = {
+    "DataChart": [("bar-grow", 0.40, 0.08), ("bar-grow", 0.50, 0.06)],
+    "TimelineComparison": [("dot-click", 0.15, 0.08), ("dot-click", 0.35, 0.06), ("line-draw", 0.60, 0.06)],
+    "FrameworkDiagram": [("card-settle", 0.30, 0.06), ("card-settle", 0.55, 0.06)],
+    "ChoroplethMap": [("region-glow", 0.25, 0.08), ("region-glow", 0.50, 0.06)],
+    "RouteAnimation": [("line-draw", 0.25, 0.08), ("line-draw", 0.50, 0.06)],
+    "DecisionTree": [("node-pop", 0.20, 0.08), ("line-draw", 0.40, 0.06)],
+    "SplitComposition": [("card-settle", 0.30, 0.06), ("card-settle", 0.60, 0.06)],
+    "ProbabilityGauge": [("bar-grow", 0.40, 0.08)],
+    "NetworkDiagram": [("node-pop", 0.20, 0.08), ("node-pop", 0.35, 0.06)],
+    "TimeSeriesChart": [("line-draw", 0.30, 0.08)],
+    "SankeyFlow": [("line-draw", 0.30, 0.08), ("card-settle", 0.60, 0.06)],
+    "GameBoard": [("dot-click", 0.25, 0.08), ("dot-click", 0.40, 0.06)],
+    "BayesianUpdate": [("bar-grow", 0.35, 0.08), ("line-draw", 0.70, 0.06)],
+    "StatReveal": [("bar-grow", 0.60, 0.06)],
+    "RadarChart": [("line-draw", 0.30, 0.08)],
+    "AnnotatedImage": [("card-settle", 0.30, 0.06), ("line-draw", 0.35, 0.06)],
+    "EscalationLadder": [("dot-click", 0.20, 0.08), ("dot-click", 0.40, 0.06)],
+    "StrategicLandscape": [("node-pop", 0.25, 0.08), ("node-pop", 0.45, 0.06)],
+    "KineticTypography": [("card-settle", 0.25, 0.06)],  # quote/bilingual only
+    "PhotoMontage": [("page-turn", 0.50, 0.06)],
+}
+
+# Mood mapping for beats based on common keywords/patterns
+BEAT_MOOD_KEYWORDS = {
+    "contemplative": ["opening", "paradox", "introduction", "prologue"],
+    "analytical": ["logic", "denial", "history", "context", "evidence", "analysis"],
+    "tension": ["wall", "other side", "escalation", "crisis", "confrontation", "stranglehold"],
+    "resolution": ["your", "conclusion", "closing", "future", "what now", "chips"],
+}
+
+
+def infer_music_mood(beat_title: str) -> str:
+    """Infer music bed mood from beat title keywords."""
+    title_lower = beat_title.lower()
+    for mood, keywords in BEAT_MOOD_KEYWORDS.items():
+        for kw in keywords:
+            if kw in title_lower:
+                return mood
+    return "analytical"  # safe default
+
+
+def build_music_bed(beats: list, total_duration: float, episode_slug: str = "episode") -> dict:
+    """
+    Generate a musicBed object with tracks for each beat.
+
+    Tracks crossfade at beat boundaries (overlap by fade durations).
+    Beats whose start exceeds total_duration are skipped (estimate mode
+    may produce beat boundaries beyond actual content duration).
+    """
+    # Filter to beats that actually fall within estimated content duration
+    active_beats = [b for b in beats if b["startSec"] < total_duration]
+    if not active_beats:
+        return {"tracks": []}
+
+    tracks = []
+    for i, beat in enumerate(active_beats):
+        mood = infer_music_mood(beat["title"])
+
+        # First beat: contemplative opening
+        if i == 0:
+            mood = "contemplative"
+
+        # Last active beat: resolution (takes priority over keyword matching)
+        is_last = i == len(active_beats) - 1
+
+        # Keyword-based mood for middle beats only
+        if not is_last and i > 0:
+            if any(kw in beat["title"].lower() for kw in ["trap", "wall", "other side", "stranglehold"]):
+                mood = "tension"
+
+        if is_last and i > 0:
+            mood = "resolution"
+
+        start = beat["startSec"]
+        end = min(beat.get("endSec", total_duration), total_duration)
+
+        # Crossfade overlap: start 3s before beat boundary, end 2s after
+        fade_in = 3.0 if i > 0 else 2.0
+        fade_out = 3.0 if not is_last else 0.0
+
+        adjusted_start = max(0, start - fade_in) if i > 0 else 0
+        adjusted_end = min(end + 2.0, total_duration) if not is_last else total_duration
+
+        track = {
+            "id": f"{mood}-{i+1}",
+            "file": f"audio/music/{episode_slug}/bed-{mood}-{i+1}.wav",
+            "startSec": round(adjusted_start, 1),
+            "endSec": round(adjusted_end, 1),
+            "fadeInSec": fade_in,
+            "fadeOutSec": fade_out,
+            "volume": 0.12 if i > 0 else 0.15,
+            "mood": mood,
+            "beat": beat["id"],
+        }
+        tracks.append(track)
+
+    return {"tracks": tracks}
+
+
+def apply_audio_cues(segments: list[dict]) -> list[dict]:
+    """
+    Apply default audio cues (soundCue + textureCues) to segments based on
+    template type mappings from AUDIO_DESIGN.md.
+
+    Rules:
+    - FOOTAGE and IMAGE segments get no audio cues (footage breathes)
+    - HOLD segments get no audio cues
+    - TEMPLATE/TRANSITION segments get cues based on TEMPLATE_AUDIO_MAP
+    - Texture hits are limited to ≤3 per 10-second window
+    """
+    for seg in segments:
+        seg_type = seg.get("type", "")
+        component = seg.get("template", {}).get("component", "")
+
+        # Skip non-template segments
+        if seg_type not in ("TEMPLATE", "TRANSITION") or not component:
+            continue
+
+        # Look up audio mapping
+        audio = TEMPLATE_AUDIO_MAP.get(component)
+        if not audio:
+            continue
+
+        entrance_type, entrance_int, key_type, key_int = audio
+        dur = seg["endSec"] - seg["startSec"]
+
+        # Apply entrance soundCue
+        if entrance_type:
+            seg["soundCue"] = {
+                "type": entrance_type,
+                "offsetSec": 0,
+                "intensity": entrance_int,
+            }
+
+        # Apply key moment as secondary soundCue
+        if key_type:
+            offset = round(dur * 0.6, 1)  # key moment typically at ~60% of duration
+            if entrance_type:
+                seg["soundCueSecondary"] = {
+                    "type": key_type,
+                    "offsetSec": offset,
+                    "intensity": key_int,
+                }
+            else:
+                seg["soundCue"] = {
+                    "type": key_type,
+                    "offsetSec": offset,
+                    "intensity": key_int,
+                }
+
+        # Apply texture hits
+        textures = TEMPLATE_TEXTURE_MAP.get(component, [])
+        if textures:
+            cues = []
+            for tex_type, offset_frac, vol in textures:
+                cues.append({
+                    "type": tex_type,
+                    "offsetSec": round(dur * offset_frac, 1),
+                    "volume": vol,
+                })
+            if cues:
+                seg["textureCues"] = cues
+
+    return segments
+
+
 def build_estimate_manifest(
     script_path: str,
     episode: str,
     title: str = "",
+    data_files: dict = None,
+    shot_ids: dict = None,
 ) -> dict:
     """
     Build an assembly manifest in estimate mode from script parsing.
@@ -653,6 +1024,10 @@ def build_estimate_manifest(
         parsed = row["parsed"]
         beat_id = row["beat"]
         vis_raw = row["visual_raw"]
+        dir_lines = row.get("dir_lines", [])
+
+        # Parse direction annotations for this row
+        direction = parse_dir_lines(dir_lines) if dir_lines else {}
 
         # Clean narration text for word-count estimation
         clean_narr = ""
@@ -712,27 +1087,67 @@ def build_estimate_manifest(
                 else:
                     sub_dur = row_dur / len(vis_parts)
 
+                is_last_part = i == len(vis_parts) - 1
+                part_direction = direction if is_last_part else {}
                 seg = _build_segment(
                     seg_counter, ps or parsed, seg_type, sub_cursor, sub_dur,
-                    beat_id, clean_narr, part_raw, vis_raw
+                    beat_id, clean_narr, part_raw, vis_raw,
+                    data_files=data_files, shot_ids=shot_ids,
+                    direction=part_direction,
                 )
+                # Stash direction transition on the last part of a THEN chain
+                if is_last_part and direction.get("transitionOut"):
+                    seg["_dirTransitionOut"] = direction["transitionOut"]
+                    if direction.get("transitionDuration"):
+                        seg["_dirTransitionDuration"] = direction["transitionDuration"]
+                    if direction.get("washColor"):
+                        seg["_dirWashColor"] = direction["washColor"]
                 segments.append(seg)
                 sub_cursor += sub_dur
         else:
             seg_counter += 1
             seg = _build_segment(
                 seg_counter, parsed, seg_type, cursor, vis_dur,
-                beat_id, clean_narr, vis_raw, vis_raw
+                beat_id, clean_narr, vis_raw, vis_raw,
+                data_files=data_files, shot_ids=shot_ids,
+                direction=direction,
             )
+
+            # Stash direction transition info for apply_default_transitions
+            if direction.get("transitionOut"):
+                seg["_dirTransitionOut"] = direction["transitionOut"]
+            if direction.get("transitionDuration"):
+                seg["_dirTransitionDuration"] = direction["transitionDuration"]
+            if direction.get("washColor"):
+                seg["_dirWashColor"] = direction["washColor"]
+
             segments.append(seg)
 
-        cursor += row_dur
+        # Advance cursor by row duration + holdAfter (direction extends segment
+        # but also pushes all subsequent timing forward)
+        hold_extra = direction.get("holdAfter", 0)
+        cursor += row_dur + hold_extra
 
-    # Apply default transitions based on context
+    # Apply default transitions based on context (direction overrides take priority)
     segments = apply_default_transitions(segments)
+
+    # Clean up temporary direction keys used by transition logic
+    for seg in segments:
+        for key in ["_dirTransitionOut", "_dirTransitionDuration", "_dirWashColor"]:
+            seg.pop(key, None)
+
+    # Apply audio cues (L2 transition SFX + L3 texture hits) based on template type
+    segments = apply_audio_cues(segments)
 
     # Compute total duration
     total_dur = max(s["endSec"] for s in segments) if segments else 0
+
+    # Build music bed (L1) from beat structure
+    beat_dicts = [
+        {"id": b.id, "title": b.title, "startSec": b.startSec, "endSec": b.endSec}
+        for b in beats
+    ]
+    music_bed = build_music_bed(beat_dicts, total_dur, episode_slug=episode)
 
     # Build manifest
     manifest = {
@@ -746,6 +1161,7 @@ def build_estimate_manifest(
             "totalDurationSec": round(total_dur, 2),
             "words": [],
         },
+        "musicBed": music_bed,
         "beats": [
             {
                 "id": b.id,
@@ -771,17 +1187,40 @@ def _build_segment(
     clean_narr: str,
     part_raw: str,
     vis_raw: str,
+    data_files: dict = None,
+    shot_ids: dict = None,
+    direction: dict = None,
 ) -> dict:
     """Build a single segment dict from parsed visual spec data."""
+    direction = direction or {}
+
+    # Apply preDelay: shift the visual start later (but don't change the cursor)
+    pre_delay = direction.get("preDelay", 0)
+
+    # Apply holdAfter: extend the visual end time
+    hold_after = direction.get("holdAfter", 0)
+
     seg = {
         "id": f"{beat_id}-seg{seg_counter:02d}",
         "type": seg_type,
-        "startSec": round(start, 2),
-        "endSec": round(start + dur, 2),
+        "startSec": round(start + pre_delay, 2),
+        "endSec": round(start + dur + hold_after, 2),
         "layer": "foreground" if seg_type in ("TEMPLATE", "TRANSITION") else "background",
         "beat": beat_id,
         "priority": parsed["priority"],
     }
+
+    # Add direction timing metadata if present
+    if pre_delay > 0:
+        seg["preDelay"] = pre_delay
+    if hold_after > 0:
+        seg["holdAfter"] = hold_after
+        if "holdBehavior" in direction:
+            seg["holdBehavior"] = direction["holdBehavior"]
+    if "narrationGate" in direction:
+        seg["narrationGate"] = direction["narrationGate"]
+    if direction.get("syncWords"):
+        seg["syncWords"] = direction["syncWords"]
 
     # Narration reference
     if clean_narr:
@@ -789,7 +1228,7 @@ def _build_segment(
 
     # Asset info for FOOTAGE / IMAGE
     if seg_type in ("FOOTAGE", "IMAGE"):
-        shot_id = resolve_shot_id(parsed["searchTerms"])
+        shot_id = resolve_shot_id(parsed["searchTerms"], shot_ids)
         seg["asset"] = {
             "searchTerms": parsed["searchTerms"],
             "source": parsed["source"],
@@ -806,7 +1245,7 @@ def _build_segment(
 
     # Template info for TEMPLATE / TRANSITION
     if seg_type in ("TEMPLATE", "TRANSITION") and parsed["component"]:
-        data_file = resolve_data_file(parsed["component"], parsed["searchTerms"], vis_raw)
+        data_file = resolve_data_file(parsed["component"], parsed["searchTerms"], vis_raw, data_files)
         seg["template"] = {
             "component": parsed["component"],
         }
@@ -1139,7 +1578,7 @@ def main():
     )
     parser.add_argument(
         "--episode", required=True,
-        help="Episode ID (e.g. EP01)",
+        help="Episode slug (e.g. silicon-trap, prisoners-dilemma)",
     )
     parser.add_argument(
         "--title", default="",
@@ -1158,15 +1597,38 @@ def main():
         help="Output path for assembly manifest JSON",
     )
     parser.add_argument(
+        "--config",
+        help="Path to episode config JSON with 'dataFiles' and 'shotIds' maps (optional — defaults to silicon-trap maps)",
+    )
+    parser.add_argument(
         "--pretty", action="store_true", default=True,
         help="Pretty-print JSON output (default: true)",
     )
 
     args = parser.parse_args()
 
+    # Load per-episode config if provided
+    ep_data_files = None
+    ep_shot_ids = None
+    if args.config:
+        config = json.loads(Path(args.config).read_text(encoding="utf-8"))
+        ep_data_files = config.get("dataFiles")
+        ep_shot_ids = config.get("shotIds")
+        print(f"Loaded episode config: {args.config}")
+    elif args.episode != "silicon-trap":
+        # For new episodes without a config, use empty maps instead of
+        # silicon-trap defaults. Template segments will get dataFile=null
+        # and shotId=null, which is correct — data files don't exist yet.
+        ep_data_files = {}
+        ep_shot_ids = {}
+        print(f"No --config provided for '{args.episode}' — using empty maps (dataFile/shotId will be null)")
+
     # Build estimate manifest
     print(f"Parsing script: {args.script}")
-    manifest = build_estimate_manifest(args.script, args.episode, args.title)
+    manifest = build_estimate_manifest(
+        args.script, args.episode, args.title,
+        data_files=ep_data_files, shot_ids=ep_shot_ids,
+    )
     print(f"  Found {len(manifest['beats'])} beats, {len(manifest['segments'])} segments")
     print(f"  Estimated duration: {manifest['totalDurationSec']:.1f}s ({manifest['totalDurationSec']/60:.1f} min)")
 

@@ -1,0 +1,226 @@
+{
+  "episode": "EP01",
+  "title": "The Silicon Trap",
+  "assets": [
+    {
+      "id": "beat1-tsmc-aerial",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["TSMC Arizona construction aerial drone", "semiconductor factory aerial desert", "large factory construction aerial"],
+      "treatment": "standard",
+      "notes": "Opening shot — needs to be cinematic. Desert landscape with massive industrial construction."
+    },
+    {
+      "id": "beat1-cleanroom",
+      "priority": "P1",
+      "type": "video",
+      "search_terms": ["semiconductor cleanroom wafer handling", "chip factory cleanroom workers", "cleanroom manufacturing"],
+      "treatment": "standard",
+      "notes": "Macro footage of wafer handling. Slow, deliberate shots emphasizing precision."
+    },
+    {
+      "id": "beat1-desert-housing",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["Arizona desert housing construction workers", "temporary worker housing desert", "Arizona suburban construction"],
+      "treatment": "standard",
+      "notes": "Contrast with high-tech cleanroom — mundane temporary housing in desert heat."
+    },
+    {
+      "id": "beat1-global-network",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["world map connections network global", "global supply chain visualization"],
+      "treatment": "standard",
+      "notes": "Ambient texture under narration about supply chain complexity."
+    },
+    {
+      "id": "beat2-fdr-1941",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["FDR signing executive order 1941", "Roosevelt oil embargo Japan", "1941 US foreign policy"],
+      "treatment": "standard",
+      "notes": "Historical archival. Wikimedia Commons or Library of Congress preferred."
+    },
+    {
+      "id": "beat2-jake-sullivan",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["Jake Sullivan national security advisor", "Jake Sullivan speaking podium"],
+      "treatment": "standard",
+      "notes": "Background under narration about Sullivan's 2022 speech."
+    },
+    {
+      "id": "beat2-chip-macro",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["semiconductor chip macro photography", "computer chip closeup circuit", "microprocessor macro"],
+      "treatment": "standard",
+      "notes": "Generic chip imagery for transitions."
+    },
+    {
+      "id": "beat3-china-rail",
+      "priority": "P1",
+      "type": "video",
+      "search_terms": ["China high speed rail", "Chinese bullet train", "CRH high speed train"],
+      "treatment": "conflict",
+      "notes": "Part of the ballpoint pen contrast sequence. Needs to look impressive/modern."
+    },
+    {
+      "id": "beat3-space-launch",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["China space launch rocket", "Chinese space program launch", "Shenzhou launch"],
+      "treatment": "conflict",
+      "notes": "Part of the ballpoint pen contrast sequence."
+    },
+    {
+      "id": "beat3-pen-tip",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["ballpoint pen tip macro extreme closeup", "pen tip macro metal", "ballpoint pen closeup"],
+      "treatment": "standard",
+      "notes": "The visual punchline — tiny pen tip after massive achievements. Needs to be high quality macro."
+    },
+    {
+      "id": "beat3-shenzhen",
+      "priority": "P3",
+      "type": "video",
+      "search_terms": ["Shenzhen skyline technology district", "Chinese city technology night", "Shenzhen aerial night"],
+      "treatment": "conflict",
+      "notes": "Ambient establishing shot for China segment."
+    },
+    {
+      "id": "beat3-ai-datacenter",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["artificial intelligence data center servers", "AI computing server room", "GPU server cluster"],
+      "treatment": "standard",
+      "notes": "Transition into DeepSeek section."
+    },
+    {
+      "id": "beat3-deepseek",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["DeepSeek AI logo", "Chinese AI company office", "DeepSeek artificial intelligence"],
+      "treatment": "standard",
+      "notes": "DeepSeek R1/R2 discussion. Logo preferred; fallback to generic Chinese AI lab imagery."
+    },
+    {
+      "id": "beat3-wafer-macro",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["semiconductor wafer macro", "silicon wafer close up", "chip wafer colorful"],
+      "treatment": "standard",
+      "notes": "Ambient closing texture for Beat 3."
+    },
+    {
+      "id": "beat4-world-divided",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["world map divided", "geopolitical divide concept", "global split east west"],
+      "treatment": "standard",
+      "notes": "Background for bifurcation discussion."
+    },
+    {
+      "id": "beat5-car-dashboard",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["car dashboard electronics digital", "modern car interior technology", "automotive electronics closeup"],
+      "treatment": "standard",
+      "notes": "Quick montage element — everyday devices with chips."
+    },
+    {
+      "id": "beat5-phone-circuit",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["smartphone circuit board inside", "phone motherboard components", "mobile phone internal electronics"],
+      "treatment": "standard",
+      "notes": "Quick montage element."
+    },
+    {
+      "id": "beat5-hospital-mri",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["hospital MRI machine", "MRI scanner medical", "medical imaging equipment"],
+      "treatment": "standard",
+      "notes": "Quick montage element."
+    },
+    {
+      "id": "beat5-data-center",
+      "priority": "P1",
+      "type": "photo",
+      "search_terms": ["data center server rack", "server room rows", "cloud computing infrastructure"],
+      "treatment": "standard",
+      "notes": "Quick montage element."
+    },
+    {
+      "id": "beat5-car-shortage",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["empty car dealership lot 2021", "auto factory shutdown chip shortage", "car shortage empty lot"],
+      "treatment": "standard",
+      "notes": "COVID chip shortage reference — empty lots, shut factories."
+    },
+    {
+      "id": "beat5-earth-night",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["world map night lights satellite", "earth from space night lights", "satellite view earth night"],
+      "treatment": "standard",
+      "notes": "Closing ambient shot — the connected world at risk."
+    },
+    {
+      "id": "beat2-cold-war-bridge",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["Cold War era government building Washington", "1950s government archive footage", "diplomatic meeting Cold War"],
+      "treatment": "standard",
+      "notes": "Visual bridge from modern policy to COCOM history. Breaks 4-MG run in Beat 2."
+    },
+    {
+      "id": "beat3-typewriter",
+      "priority": "P3",
+      "type": "video",
+      "search_terms": ["typewriter typing closeup", "manual precision work hands", "vintage printing press"],
+      "treatment": "standard",
+      "notes": "Typewriter metaphor for SMIC's 34-pass lithography. Breathing room between data charts."
+    },
+    {
+      "id": "beat4-asml-factory",
+      "priority": "P2",
+      "type": "photo",
+      "search_terms": ["ASML lithography machine factory", "semiconductor manufacturing equipment cleanroom", "high tech factory interior"],
+      "treatment": "standard",
+      "notes": "Ground abstract chess/go metaphor in physical reality. The machines are real, massive, irreplaceable."
+    },
+    {
+      "id": "beat4-caught-nations",
+      "priority": "P3",
+      "type": "photo",
+      "search_terms": ["Netherlands Veldhoven aerial", "South Korea Samsung factory exterior", "industrial facility exterior modern"],
+      "treatment": "standard",
+      "notes": "Quick footage of caught-in-between nations before ChoroplethMap appears. Grounds the map in real places."
+    },
+    {
+      "id": "beat3-smic-fab-interior",
+      "priority": "P2",
+      "type": "ai-generate",
+      "register": "grounding",
+      "description": "Interior of a Chinese semiconductor fabrication facility. Multiple workers in white bunny suits with full-face shields operating wafer-handling equipment, faces completely smooth and featureless behind the visors. Yellow lithography lighting casting amber across white surfaces and stainless steel equipment. Medium shot from hip level, shallow depth of field. FOUP carriers visible on automated tracks in the background. Atmosphere of disciplined precision under constraint.",
+      "context": "Beat 3 — narration about SMIC's 34-pass lithography workaround. Stock footage of Chinese semiconductor facilities is scarce; this is the kind of interior scene that requires AI-GEN reconstruction per AI_VIDEO_PIPELINE.md.",
+      "treatment": "standard",
+      "notes": "Photoreal mannequin scene (Register 3 / Grounding). Replaces unsourceable interior. Mannequin faces signal 'editorial reconstruction, not documentary evidence' per the editorial guardrails. If extended to >10s of video, add the '∴ Visualized' on-screen indicator per AI_VIDEO_PIPELINE.md disclosure rules."
+    },
+    {
+      "id": "beat4-trap-encirclement",
+      "priority": "P2",
+      "type": "ai-generate",
+      "register": "atmospheric",
+      "description": "An interlocking industrial trap viewed from a low monumentalist angle: massive factory complexes connected by tangled cable bundles and pipe networks forming a closing net or web. Smaller silhouetted figures stand inside the structure, dwarfed by the scale, unaware of the encirclement. Smokestacks belching ribbons of smoke that twist into the cable network above. Low horizon line, heavy contrast between deep ink-black machinery and burnt amber accents on the smoke and pipes.",
+      "context": "Beat 4 — narration arguing the silicon trap closes around all participants, not just the named adversary. Atmospheric background under the bifurcation argument; replaces the generic 'world divided' (beat4-world-divided) currently used for this beat.",
+      "treatment": "standard",
+      "notes": "Constructivist illustration (Register 2 / Atmospheric) used as 30-40% opacity background. Gives the 'trap' metaphor a brand-ownable visual identity rather than generic stock wallpaper. Strong candidate for a recurring visual motif (per VISUAL_LANGUAGE.md) — could be rendered in 3-4 evolution states across the episode."
+    }
+  ]
+}

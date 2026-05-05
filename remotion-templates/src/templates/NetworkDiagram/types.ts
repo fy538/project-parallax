@@ -3,7 +3,13 @@
  *
  * Nodes connected by edges with labels, data callouts, and control points.
  * Replaces Claude SVG "network/flow" illustrations with deterministic rendering.
+ *
+ * Supports optional cameraPath for cinematic narrated camera that pans between
+ * node clusters, zooms into relationships, and uses focus isolation.
  */
+
+import type { NarratedCameraStep } from "../../hooks/useNarratedCamera";
+import type { DirectionBlock } from "../../hooks/useDirection";
 
 export interface NetworkNode {
   id: string;
@@ -19,6 +25,8 @@ export interface NetworkNode {
   stat?: { value: string; label: string };
   /** Override computed position (0-1 normalized coordinates) */
   position?: { x: number; y: number };
+  /** Group tag for multi-node camera focus (e.g., "us-allies", "china-bloc") */
+  group?: string;
 }
 
 export interface NetworkEdge {
@@ -58,8 +66,23 @@ export interface NetworkDiagramData {
   controls?: NetworkControl[];
   callouts?: NetworkCallout[];
 
+  /**
+   * Optional camera path for cinematic narrated movement.
+   * When provided, enables the virtual camera system that pans/zooms
+   * between nodes and applies focus isolation (dim + blur + scale).
+   * When omitted, falls back to the static animation sequence.
+   */
+  cameraPath?: NarratedCameraStep[];
+
+  /** Show ambient particles for depth (default: true when cameraPath present) */
+  ambientParticles?: boolean;
+
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
   backgroundTint?: string;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

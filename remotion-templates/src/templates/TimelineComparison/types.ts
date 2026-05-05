@@ -5,6 +5,8 @@
  * Events fade in sequentially, visually drawing the parallel.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface TimelineEvent {
   /** Year or date label. */
   year: string;
@@ -38,4 +40,8 @@ export interface TimelineComparisonData {
   secondsPerEvent?: number;
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
   backgroundTint?: string;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

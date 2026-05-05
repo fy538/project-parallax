@@ -1,0 +1,70 @@
+{
+  "episode": "silicon-trap",
+  "title": "The AI Timeline Question",
+  "subtitle": "Everything turns on a single variable nobody can predict",
+
+  "rootId": "root",
+  "nodes": [
+    {
+      "id": "root",
+      "label": "AI arrival timeline",
+      "color": "#E5A544",
+      "children": ["fast", "slow"],
+      "active": true
+    },
+    {
+      "id": "fast",
+      "label": "Fast (2-3 years)",
+      "probability": "Uncertain",
+      "color": "#5B8DB8",
+      "children": ["controls-succeed"],
+      "highlighted": false
+    },
+    {
+      "id": "slow",
+      "label": "Slow (10+ years)",
+      "probability": "Uncertain",
+      "color": "#9B4D3A",
+      "children": ["controls-backfire"],
+      "highlighted": false
+    },
+    {
+      "id": "controls-succeed",
+      "label": "Controls succeeded",
+      "probability": null,
+      "color": "#5B8DB8",
+      "children": ["us-lead"]
+    },
+    {
+      "id": "controls-backfire",
+      "label": "Controls backfired",
+      "probability": null,
+      "color": "#9B4D3A",
+      "children": ["china-independent"]
+    },
+    {
+      "id": "us-lead",
+      "label": "US keeps decisive lead",
+      "color": "#5B8DB8"
+    },
+    {
+      "id": "china-independent",
+      "label": "China achieved self-sufficiency",
+      "color": "#9B4D3A"
+    }
+  ],
+
+  "cameraPath": [
+    { "focus": "root",              "zoom": 2.2, "duration": 2 },
+    { "focus": "root",              "zoom": 1.4, "duration": 1.5 },
+    { "focus": "us-lead",           "zoom": 1.6, "duration": 3,   "dimOthers": true, "label": "Scenario A: Controls hold" },
+    { "focus": "china-independent", "zoom": 1.6, "duration": 3,   "dimOthers": true, "label": "Scenario B: Controls backfire" },
+    { "focus": "root",              "zoom": 1.0, "duration": 2.5 }
+  ],
+
+  "highlightedPath": null,
+  "highlightColor": "#E5A544",
+  "source": "Parallax analysis",
+  "backgroundVariant": "dark",
+  "durationSec": 12
+}

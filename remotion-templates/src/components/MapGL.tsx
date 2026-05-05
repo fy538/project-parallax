@@ -49,8 +49,10 @@ const DeckGLOverlay: React.FC<{ layers: any[] }> = ({ layers }) => {
 // ── Configuration ─────────────────────────────────────────────────────
 
 export const MAP_CONFIG = {
-  /** Mapbox Studio style — replace with custom Meridian Dark style ID. */
+  /** Default Mapbox style — Meridian Light if configured, else mapbox light-v11. */
   styleUrl: mapConfig.styleUrl,
+  /** Dark variant — Meridian Dark if configured, else mapbox dark-v11. */
+  darkStyleUrl: mapConfig.darkStyleUrl,
   /** Read from .env at build time. Never commit this token. */
   accessToken: process.env.MAPBOX_ACCESS_TOKEN || "",
   terrain: mapConfig.terrain,
@@ -78,6 +80,10 @@ export interface MapGLProps {
   globe?: boolean;
   /** Enable terrain hillshading (default: true) */
   terrain?: boolean;
+  /** Use the dark Meridian style instead of light (default: false). Templates pass this when the episode is in dark mode. */
+  dark?: boolean;
+  /** Override the Mapbox style URL entirely (bypasses dark/light selection). */
+  styleUrl?: string;
   /** Additional React children — Marker, Source, Layer from react-map-gl */
   children?: React.ReactNode;
 }
@@ -94,6 +100,8 @@ export const MapGL: React.FC<MapGLProps> = ({
   onLoad,
   globe,
   terrain = true,
+  dark = false,
+  styleUrl,
   children,
 }) => {
   // ── Delay render until map tiles are loaded ─────────────────────────
@@ -121,11 +129,11 @@ export const MapGL: React.FC<MapGLProps> = ({
   const useGlobe = globe ?? zoom < 3;
 
   return (
-    <AbsoluteFill>
+    <AbsoluteFill style={{ overflow: "hidden" }}>
       <Map
         ref={mapRef}
         mapboxAccessToken={MAP_CONFIG.accessToken}
-        mapStyle={MAP_CONFIG.styleUrl}
+        mapStyle={styleUrl ?? (dark ? MAP_CONFIG.darkStyleUrl : MAP_CONFIG.styleUrl)}
         longitude={longitude}
         latitude={latitude}
         zoom={zoom}

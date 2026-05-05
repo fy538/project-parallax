@@ -1,47 +1,37 @@
 /**
  * SplitShort — vertical 9:16 split comparison for Shorts.
  *
- * Optimized for "Both Sides Are Wrong" series.
- * Horizontal split (top vs bottom) instead of vertical split.
+ * Uses ShortsWrapper + useVerticalLayout for systematic vertical
+ * adaptation. Horizontal split (top vs bottom) instead of vertical.
  * Same data schema as SplitComposition.
+ *
+ * Series: "Both Sides Are Wrong"
  */
 
 import React from "react";
 import {
-  AbsoluteFill,
-  useCurrentFrame,
-  interpolate,
-} from "remotion";
-import {
   palette,
-  semantic,
   fonts,
-  fontSizes,
   fontWeights,
-  letterSpacing,
-  layout,
-  sec,
-  durations,
-  light,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger } from "../../utils/animation";
-import { Background } from "../../components/Background";
-import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { fadeIn, slideIn } from "../../utils/animation";
+import { ShortsWrapper } from "../../components/ShortsWrapper";
 import type { SplitCompositionData, SplitSide } from "../SplitComposition/types";
-import { shortsLayout } from "./types";
 
-// ── Helper: detect Chinese characters ─────────────────────────────────────
+// ── Helper ──────────────────────────────────────────────────────────────
 
 const hasChinese = (text: string): boolean => /[一-鿿]/.test(text);
 
-// ── Side renderer ─────────────────────────────────────────────────────────
+// ── Side renderer ───────────────────────────────────────────────────────
 
 const SideContent: React.FC<{
   side: SplitSide;
   frame: number;
+  exit: number;
   baseDelay: number;
-  position: "top" | "bottom";
-}> = ({ side, frame, baseDelay, position }) => {
+  vl: any;
+  theme: any;
+}> = ({ side, frame, exit, baseDelay, vl, theme }) => {
   const accent = side.accentColor || palette.amber;
 
   return (
@@ -51,7 +41,7 @@ const SideContent: React.FC<{
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        padding: `32px ${shortsLayout.safeArea.left}px`,
+        padding: `${vl.spacing.xl}px ${vl.safeArea.left}px`,
         position: "relative",
       }}
     >
@@ -70,14 +60,14 @@ const SideContent: React.FC<{
       {side.tag && (
         <div
           style={{
-            fontSize: 14,
+            fontSize: vl.fontSizes.caption,
             fontFamily: fonts.body,
             fontWeight: fontWeights.medium,
             color: accent,
             letterSpacing: 3,
             textTransform: "uppercase",
-            marginBottom: 12,
-            opacity: fadeIn(frame, baseDelay, 6),
+            marginBottom: vl.spacing.sm,
+            opacity: fadeIn(frame, baseDelay, 6) * exit,
             transform: `translateY(${slideIn(frame, baseDelay, 8, 6)}px)`,
           }}
         >
@@ -88,13 +78,14 @@ const SideContent: React.FC<{
       {/* Title */}
       <div
         style={{
-          fontSize: 32,
+          fontSize: vl.fontSizes.h2,
           fontFamily: hasChinese(side.title) ? fonts.chinese : fonts.display,
           fontWeight: fontWeights.bold,
-          color: light.text.primary,
+          color: theme.text.primary,
           lineHeight: 1.2,
-          opacity: fadeIn(frame, baseDelay + 4, 8),
+          opacity: fadeIn(frame, baseDelay + 4, 8) * exit,
           transform: `translateY(${slideIn(frame, baseDelay + 4, 15, 8)}px)`,
+          textShadow: theme.textShadow,
         }}
       >
         {side.title}
@@ -105,13 +96,14 @@ const SideContent: React.FC<{
         <div
           key={i}
           style={{
-            fontSize: 20,
+            fontSize: vl.fontSizes.label,
             fontFamily: hasChinese(item) ? fonts.chinese : fonts.body,
-            color: light.text.secondary,
-            marginTop: i === 0 ? 16 : 10,
-            opacity: fadeIn(frame, baseDelay + 12 + i * 5, 6),
+            color: theme.text.secondary,
+            marginTop: i === 0 ? vl.spacing.md : vl.spacing.sm,
+            opacity: fadeIn(frame, baseDelay + 12 + i * 5, 6) * exit,
             transform: `translateY(${slideIn(frame, baseDelay + 12 + i * 5, 10, 6)}px)`,
             lineHeight: 1.4,
+            textShadow: theme.textShadow,
           }}
         >
           {item}
@@ -121,149 +113,130 @@ const SideContent: React.FC<{
   );
 };
 
-// ── Main component ────────────────────────────────────────────────────────
+// ── Main component ──────────────────────────────────────────────────────
 
 export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
   data,
 }) => {
-  const frame = useCurrentFrame();
-  const { style: compStyle } = useCompositionAnimation({ noDrift: true });
-
   const dividerLabel = data.dividerLabel || "vs";
 
   return (
-    <Background variant={data.backgroundVariant || "light"}>
-      <AbsoluteFill style={compStyle}>
-        {/* Title */}
-        {data.title && (
+    <ShortsWrapper
+      title={data.title}
+      mode={data.backgroundVariant}
+    >
+      {(vl, theme, frame, exit) => (
+        <>
+          {/* Split content area */}
           <div
             style={{
               position: "absolute",
-              top: shortsLayout.safeArea.top,
-              left: shortsLayout.safeArea.left,
-              right: shortsLayout.safeArea.right,
-              textAlign: "center",
-              fontSize: 28,
-              fontFamily: fonts.display,
-              fontWeight: fontWeights.bold,
-              color: light.text.primary,
-              letterSpacing: letterSpacing.h3,
-              opacity: fadeIn(frame, 0, 8),
+              top: vl.contentTop - 40,
+              left: 0,
+              right: 0,
+              bottom: vl.safeArea.bottom + 20,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            {data.title}
-          </div>
-        )}
+            {/* Top side */}
+            <SideContent
+              side={data.left}
+              frame={frame}
+              exit={exit}
+              baseDelay={8}
+              vl={vl}
+              theme={theme}
+            />
 
-        {/* Split content area */}
-        <div
-          style={{
-            position: "absolute",
-            top: shortsLayout.contentTop - 40,
-            left: 0,
-            right: 0,
-            bottom: shortsLayout.safeArea.bottom + 20,
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          {/* Top side */}
-          <SideContent
-            side={data.left}
-            frame={frame}
-            baseDelay={8}
-            position="top"
-          />
-
-          {/* Horizontal divider */}
-          {!data.noDivider && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "8px 48px",
-                position: "relative",
-              }}
-            >
-              {/* Left line */}
+            {/* Horizontal divider */}
+            {!data.noDivider && (
               <div
                 style={{
-                  flex: 1,
-                  height: 1,
-                  background: `linear-gradient(to right, transparent, ${light.text.muted}60)`,
-                  opacity: fadeIn(frame, 25, 8),
-                }}
-              />
-
-              {/* Label circle */}
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  border: `1px solid ${light.text.muted}40`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  margin: "0 16px",
-                  opacity: fadeIn(frame, 28, 6),
+                  padding: `${vl.spacing.sm}px ${vl.spacing.xxl}px`,
+                  position: "relative",
                 }}
               >
-                <span
+                <div
                   style={{
-                    fontSize: 14,
-                    fontFamily: fonts.body,
-                    fontWeight: fontWeights.medium,
-                    color: light.text.accent,
-                    letterSpacing: 1,
-                    textTransform: "uppercase",
+                    flex: 1,
+                    height: 1,
+                    background: `linear-gradient(to right, transparent, ${theme.text.muted}60)`,
+                    opacity: fadeIn(frame, 25, 8) * exit,
+                  }}
+                />
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    border: `1px solid ${theme.text.muted}40`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: `0 ${vl.spacing.md}px`,
+                    opacity: fadeIn(frame, 28, 6) * exit,
                   }}
                 >
-                  {dividerLabel}
-                </span>
+                  <span
+                    style={{
+                      fontSize: vl.fontSizes.caption,
+                      fontFamily: fonts.body,
+                      fontWeight: fontWeights.medium,
+                      color: theme.text.accent,
+                      letterSpacing: 1,
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {dividerLabel}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    flex: 1,
+                    height: 1,
+                    background: `linear-gradient(to left, transparent, ${theme.text.muted}60)`,
+                    opacity: fadeIn(frame, 25, 8) * exit,
+                  }}
+                />
               </div>
+            )}
 
-              {/* Right line */}
-              <div
-                style={{
-                  flex: 1,
-                  height: 1,
-                  background: `linear-gradient(to left, transparent, ${light.text.muted}60)`,
-                  opacity: fadeIn(frame, 25, 8),
-                }}
-              />
+            {/* Bottom side */}
+            <SideContent
+              side={data.right}
+              frame={frame}
+              exit={exit}
+              baseDelay={32}
+              vl={vl}
+              theme={theme}
+            />
+          </div>
+
+          {/* Source */}
+          {data.source && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: vl.safeArea.bottom - 20,
+                left: vl.safeArea.left,
+                right: vl.safeArea.right,
+                textAlign: "center",
+                fontSize: vl.fontSizes.caption,
+                fontFamily: fonts.body,
+                color: theme.text.muted,
+                opacity: fadeIn(frame, 40, 8) * exit,
+                textShadow: theme.textShadow,
+              }}
+            >
+              {data.source}
             </div>
           )}
-
-          {/* Bottom side */}
-          <SideContent
-            side={data.right}
-            frame={frame}
-            baseDelay={32}
-            position="bottom"
-          />
-        </div>
-
-        {/* Source */}
-        {data.source && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: shortsLayout.safeArea.bottom - 20,
-              left: shortsLayout.safeArea.left,
-              right: shortsLayout.safeArea.right,
-              textAlign: "center",
-              fontSize: 13,
-              fontFamily: fonts.body,
-              color: light.text.muted,
-              opacity: fadeIn(frame, 40, 8),
-            }}
-          >
-            {data.source}
-          </div>
-        )}
-      </AbsoluteFill>
-    </Background>
+        </>
+      )}
+    </ShortsWrapper>
   );
 };

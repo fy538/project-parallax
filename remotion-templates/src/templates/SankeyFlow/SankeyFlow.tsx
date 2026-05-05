@@ -5,7 +5,7 @@
  * Nodes display as rounded rectangles (height ∝ value), links as curved paths
  * (thickness ∝ value). Links draw in left-to-right, values count up on arrival.
  *
- * EP01 use case: CHIPS Act funding flow (authorized → awarded → disbursed).
+ * silicon-trap use case: CHIPS Act funding flow (authorized → awarded → disbursed).
  */
 
 import React, { useMemo } from "react";
@@ -14,34 +14,36 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  semantic,
   fonts,
   fontSizes,
   layout,
   sec,
   shadows,
-  gradients,
-  light,
+  contentArea,
+  radii,
+  cardPresets,
 } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   slideIn,
-  stagger,
-  kenBurnsDrift,
   exitFade,
-  bloomIntensity,
   easings,
   CLAMP_SINE,
 } from "../../utils/animation";
 import { lineDrawProgress } from "../../utils/drawLine";
-import { countUpValue, formatValue } from "../../utils/countUp";
+import { countUpValue } from "../../utils/countUp";
+import { formatNumber } from "../../utils/numberFormat";
 import { Background } from "../../components/Background";
-import { FadeIn } from "../../components/FadeIn";
+import { TitleBlock } from "../../components/TitleBlock";
+import { AmbientParticles } from "../../components/AmbientParticles";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
 import type { SankeyFlowData, SankeyNode, SankeyLink } from "./types";
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -123,7 +125,7 @@ const layoutSankey = (
 
       layoutNodes.push(layoutNode);
       nodeIdToLayout.set(node.id, layoutNode);
-      y += nodeHeight + 20; // spacing between nodes
+      y += nodeHeight + layout.spacing.md; // spacing between nodes
     });
   });
 
@@ -177,15 +179,89 @@ const cubicBezierPath = (
   return `M ${x1} ${y1} C ${cx1} ${cy1} ${cx2} ${cy2} ${x2} ${y2}`;
 };
 
-// ── Path length estimator (for dash animation) ──────────────────────────
+// ── Flow particles along bezier paths ────────────────────────────────────
 
-const estimatePathLength = (x1: number, y1: number, x2: number, y2: number): number => {
-  const dx = x2 - x1;
-  const dy = y2 - y1;
-  const straightDist = Math.sqrt(dx * dx + dy * dy);
-  // Bezier curves are ~1.1x the straight-line distance
-  return straightDist * 1.15;
+/** Evaluate a cubic bezier at parameter t (0-1) */
+const bezierPoint = (
+  x1: number, y1: number, x2: number, y2: number, t: number
+): { x: number; y: number } => {
+  const cx1 = x1 + (x2 - x1) * 0.3;
+  const cy1 = y1;
+  const cx2 = x1 + (x2 - x1) * 0.7;
+  const cy2 = y2;
+
+  const u = 1 - t;
+  const x = u * u * u * x1 + 3 * u * u * t * cx1 + 3 * u * t * t * cx2 + t * t * t * x2;
+  const y = u * u * u * y1 + 3 * u * u * t * cy1 + 3 * u * t * t * cy2 + t * t * t * y2;
+  return { x, y };
 };
+
+const FlowParticlesLayer: React.FC<{
+  links: LayoutLink[];
+  frame: number;
+  startFrame: number;
+  speed: number;
+  density: number;
+}> = React.memo(({ links, frame, startFrame, speed, density }) => {
+  // Only show after links have started drawing
+  const opacity = fadeIn(frame, startFrame + sec(1.2), sec(0.5));
+  if (opacity <= 0) return null;
+
+  const maxLinkValue = Math.max(...links.map((l) => l.thickness), 1);
+
+  return (
+    <svg
+      style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+      viewBox={`0 0 ${layout.width} ${layout.height}`}
+      width={layout.width}
+      height={layout.height}
+    >
+      <g opacity={opacity}>
+        {links.map((link, linkIdx) => {
+          // Number of particles proportional to flow thickness
+          const particleCount = Math.max(2, Math.round((link.thickness / maxLinkValue) * 6 * density));
+          const color = link.color || palette.amber;
+
+          return Array.from({ length: particleCount }, (_, pIdx) => {
+            // Each particle has a phase offset for even distribution
+            const phaseOffset = pIdx / particleCount;
+            // Speed varies slightly per particle for natural feel
+            const particleSpeed = speed * (0.8 + (pIdx % 3) * 0.2);
+            // T position along the curve (wrapping 0-1)
+            const rawT = ((frame * particleSpeed * 0.008) + phaseOffset) % 1;
+            const pos = bezierPoint(link.x1, link.y1, link.x2, link.y2, rawT);
+            // Tangent direction — sample slightly ahead to compute angle
+            const ahead = bezierPoint(link.x1, link.y1, link.x2, link.y2, Math.min(0.99, rawT + 0.01));
+            const angleDeg = (Math.atan2(ahead.y - pos.y, ahead.x - pos.x) * 180) / Math.PI;
+
+            // Particle size proportional to link thickness
+            const baseSize = 1.5 + (link.thickness / maxLinkValue) * 2;
+            // 3:1 elongated oval
+            const rx = baseSize * 1.8;
+            const ry = baseSize * 0.6;
+            // Fade at endpoints
+            const edgeFade = Math.min(rawT * 5, (1 - rawT) * 5, 1);
+
+            return (
+              <ellipse
+                key={`particle-${linkIdx}-${pIdx}`}
+                cx={pos.x}
+                cy={pos.y}
+                rx={rx}
+                ry={ry}
+                fill={color}
+                opacity={0.65 * edgeFade}
+                transform={`rotate(${angleDeg} ${pos.x} ${pos.y})`}
+              />
+            );
+          });
+        })}
+      </g>
+    </svg>
+  );
+});
+
+FlowParticlesLayer.displayName = "FlowParticlesLayer";
 
 // ── Animated sankey node ─────────────────────────────────────────────────
 
@@ -197,8 +273,10 @@ const SankeyNodeComponent: React.FC<{
   valuePrefix: string;
   valueSuffix: string;
   isSource: boolean;
+  mode: "light" | "dark";
 }> = React.memo(
-  ({ node, frame, startFrame, showValue, valuePrefix, valueSuffix, isSource }) => {
+  ({ node, frame, startFrame, showValue, valuePrefix, valueSuffix, isSource, mode }) => {
+    const theme = useThemeMode(mode);
     // Fade in + slide
     const slideDir = isSource ? -40 : 40;
     const slideProgress = fadeIn(frame, startFrame, sec(0.4));
@@ -237,15 +315,13 @@ const SankeyNodeComponent: React.FC<{
           opacity,
         }}
       >
-        {/* Node box — rounded rect with gradient */}
+        {/* Node box — inset style (pressed-into-paper, editorial) */}
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: `linear-gradient(135deg, ${nodeColor}cc 0%, ${nodeColor}99 100%)`,
-            borderRadius: 6,
-            boxShadow: `0 4px 12px ${nodeColor}40, ${shadows.textLift}`,
-            border: `1px solid ${nodeColor}60`,
+            ...cardPresets.inset(mode === "dark"),
+            padding: 0,  // override preset padding — node uses absolute positioning
           }}
         />
 
@@ -257,11 +333,11 @@ const SankeyNodeComponent: React.FC<{
               right: "100%",
               top: "50%",
               transform: "translateY(-50%)",
-              marginRight: 12,
+              marginRight: layout.spacing.sm,
               fontSize: fontSizes.caption,
               fontWeight: 600,
               fontFamily: fonts.heading,
-              color: light.text.primary,
+              color: theme.text.primary,
               whiteSpace: "nowrap",
               textShadow: shadows.textLift,
               opacity: fadeIn(frame, startFrame + sec(0.1), sec(0.2)),
@@ -271,7 +347,7 @@ const SankeyNodeComponent: React.FC<{
           </div>
         )}
 
-        {/* Value label */}
+        {/* Value label — prominent with larger text and enhanced shadow */}
         {showValue && (
           <div
             style={{
@@ -285,17 +361,18 @@ const SankeyNodeComponent: React.FC<{
           >
             <div
               style={{
-                fontSize: fontSizes.body,
+                fontSize: fontSizes.h3,
                 fontWeight: 700,
                 fontFamily: fonts.mono,
-                color: "white",
-                textShadow: `0 2px 8px ${nodeColor}80`,
+                color: nodeColor,
+                textShadow: `0 2px 8px ${nodeColor}40, 0 4px 12px rgba(0,0,0,0.15)`,
               }}
             >
-              {formatValue(displayValue, {
+              {formatNumber(displayValue, {
                 decimals: displayValue >= 1 ? 1 : 2,
+                style: displayValue >= 1000 ? "abbreviated" : "decimal",
               })}
-              <span style={{ fontSize: fontSizes.caption, marginLeft: 2 }}>
+              <span style={{ fontSize: fontSizes.label, marginLeft: 4 }}>
                 {valuePrefix}
                 {valueSuffix}
               </span>
@@ -316,9 +393,9 @@ const SankeyLinkComponent: React.FC<{
   frame: number;
   startFrame: number;
   columnCount: number;
-}> = React.memo(({ link, frame, startFrame, columnCount }) => {
-  const pathLength = estimatePathLength(link.x1, link.y1, link.x2, link.y2);
-
+  sourceColor?: string;
+  targetColor?: string;
+}> = React.memo(({ link, frame, startFrame, columnCount, sourceColor, targetColor }) => {
   // Stagger link draws by column distance
   const colDistance = Math.abs(link.from.charCodeAt(0) - link.to.charCodeAt(0));
   const linkStartFrame = startFrame + sec(0.2 + colDistance * 0.15);
@@ -333,6 +410,8 @@ const SankeyLinkComponent: React.FC<{
   const opacity = fadeIn(frame, linkStartFrame, sec(0.2));
 
   const linkColor = link.color || palette.amber;
+  const fromColor = sourceColor || linkColor;
+  const toColor = targetColor || linkColor;
 
   // Blur and glow effect during draw
   const glowOpacity = Math.max(0, 1 - drawProgress * 1.5) * opacity;
@@ -352,6 +431,11 @@ const SankeyLinkComponent: React.FC<{
         <filter id={`link-glow-${link.from}-${link.to}`}>
           <feGaussianBlur stdDeviation="2" />
         </filter>
+        {/* Color-blend gradient: source color at start, destination color at end */}
+        <linearGradient id={`link-opacity-${link.from}-${link.to}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={fromColor} stopOpacity={0.65} />
+          <stop offset="100%" stopColor={toColor} stopOpacity={0.45} />
+        </linearGradient>
       </defs>
 
       {/* Glow layer */}
@@ -366,7 +450,7 @@ const SankeyLinkComponent: React.FC<{
         />
       )}
 
-      {/* Main link — filled with gradient, drawn via clip-path */}
+      {/* Main link — elegant gradient opacity (60% → 40%), drawn via clip-path */}
       <g
         style={{
           clipPath: `inset(0 ${100 * (1 - drawProgress)}% 0 0)`,
@@ -374,20 +458,20 @@ const SankeyLinkComponent: React.FC<{
       >
         <path
           d={cubicBezierPath(link.x1, link.y1, link.x2, link.y2)}
-          stroke={linkColor}
+          stroke={`url(#link-opacity-${link.from}-${link.to})`}
           strokeWidth={link.thickness}
           fill="none"
-          opacity={opacity * 0.6}
+          opacity={opacity}
         />
       </g>
 
-      {/* Outline stroke */}
+      {/* Outline stroke — elegant separator */}
       <path
         d={cubicBezierPath(link.x1, link.y1, link.x2, link.y2)}
         stroke={linkColor}
-        strokeWidth={1}
+        strokeWidth={0.5}
         fill="none"
-        opacity={opacity * 0.4}
+        opacity={opacity * 0.3}
       />
     </svg>
   );
@@ -399,7 +483,9 @@ SankeyLinkComponent.displayName = "SankeyLinkComponent";
 
 export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height, durationInFrames } = useVideoConfig();
+  const theme = useThemeMode(data.backgroundVariant || "light");
+  const { width, height, durationInFrames } = useVideoConfig();
+  const direction = useDirection(data._direction);
 
   const {
     title,
@@ -414,11 +500,12 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
     backgroundTint,
   } = data;
 
-  const { style: compStyle } = useCompositionAnimation();
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
   // Layout
-  const chartWidth = width - layout.safeArea.left - layout.safeArea.right;
-  const chartHeight = height - layout.safeArea.top - layout.safeArea.bottom - fontSizes.h1 - 40;
+  const area = contentArea("content", "generous");
+  const chartWidth = area.width;
+  const chartHeight = area.height - fontSizes.h1 - layout.spacing.xl;
 
   const { nodes: layoutNodes, links: layoutLinks } = useMemo(
     () => layoutSankey(nodes, links, chartWidth, chartHeight),
@@ -426,7 +513,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   );
 
   // Animation timeline
-  const titleFrameStart = 0;
+  // titleFrameStart = 0 (implicit)
   const titleFrameEnd = sec(0.8);
   const sourceNodesStart = sec(0.3);
   const linksStart = sec(1.2);
@@ -441,70 +528,56 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   // Render
 
   return (
-    <AbsoluteFill style={{ background: light.bg.base, ...compStyle }}>
-      <Background tint={backgroundTint} />
+    <Background
+      variant={data.backgroundVariant || "light"}
+      tint={direction.backgroundTint ?? backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
+      <AbsoluteFill style={compStyle}>
+        {/* Brand strips */}
+        <HeaderStrip mode={data.backgroundVariant || "light"} metadata={data.episode} />
+        <FooterStrip mode={data.backgroundVariant || "light"} />
+
+        {/* Opt-in extra particles — Background already provides default atmosphere */}
+        {data.ambientParticles && (
+          <AmbientParticles
+            mode={(data.backgroundVariant || "light") as "light" | "dark"}
+            density={18}
+            speed={0.25}
+            maxOpacity={0.08}
+          />
+        )}
 
       {/* Title */}
-      <FadeIn startFrame={titleFrameStart} duration={sec(0.5)}>
-        <div
-          style={{
-            position: "absolute",
-            left: layout.safeArea.left,
-            top: layout.safeArea.top,
-            zIndex: 10,
-          }}
-        >
-          <h1
-            style={{
-              fontSize: fontSizes.h1,
-              fontFamily: fonts.display,
-              fontWeight: 700,
-              color: light.text.primary,
-              margin: 0,
-              marginBottom: 8,
-              textShadow: shadows.textLift,
-            }}
-          >
-            {title}
-          </h1>
-          {subtitle && (
-            <p
-              style={{
-                fontSize: fontSizes.body,
-                fontFamily: fonts.heading,
-                color: light.text.muted,
-                margin: 0,
-                textShadow: shadows.textLift,
-              }}
-            >
-              {subtitle}
-            </p>
-          )}
-        </div>
-      </FadeIn>
+      <TitleBlock title={title} subtitle={subtitle} mode="light" safeAreaTier="generous" />
 
-      {/* Chart area — Ken Burns drift for camera energy */}
+      {/* Chart area */}
       <div
         style={{
           position: "absolute",
-          left: layout.safeArea.left,
-          top: layout.safeArea.top + fontSizes.h1 + 40,
+          left: area.left,
+          top: area.top + fontSizes.h1 + layout.spacing.xl,
           width: chartWidth,
           height: chartHeight,
-          transform: `scale(${kenBurnsDrift(frame, durationInFrames, 1.02)})`,
-          transformOrigin: "center center",
         }}
       >
-        {/* Render links first (behind nodes) */}
-        {layoutLinks.map((link) => (
-          <SankeyLinkComponent
-            key={`link-${link.from}-${link.to}`}
-            link={link}
-            frame={frame}
-            startFrame={linksStart}
-            columnCount={Math.max(...nodes.map((n) => n.column)) + 1}
-          />
-        ))}
+        {/* Render links first (behind nodes) — source/target node colors blend along path */}
+        {layoutLinks.map((link) => {
+          const fromNode = layoutNodes.find((n) => n.id === link.from);
+          const toNode = layoutNodes.find((n) => n.id === link.to);
+          return (
+            <SankeyLinkComponent
+              key={`link-${link.from}-${link.to}`}
+              link={link}
+              frame={frame}
+              startFrame={linksStart}
+              columnCount={Math.max(...nodes.map((n) => n.column)) + 1}
+              sourceColor={fromNode?.color}
+              targetColor={toNode?.color}
+            />
+          );
+        })}
 
         {/* Render nodes */}
         {layoutNodes.map((node) => {
@@ -521,9 +594,21 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
               valuePrefix={valuePrefix}
               valueSuffix={valueSuffix}
               isSource={isSourceNode}
+              mode={(data.backgroundVariant || "light") as "light" | "dark"}
             />
           );
         })}
+
+        {/* Flow particles — animated dots along link paths */}
+        {data.flowParticles && (
+          <FlowParticlesLayer
+            links={layoutLinks}
+            frame={frame}
+            startFrame={linksStart}
+            speed={data.particleSpeed ?? 1.0}
+            density={data.particleDensity ?? 1.0}
+          />
+        )}
       </div>
 
       {/* Source attribution — slideIn (no naked fade) */}
@@ -531,13 +616,13 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeArea.bottom,
-            left: layout.safeArea.left,
+            bottom: area.bottom,
+            left: area.left,
             fontSize: fontSizes.caption,
             fontFamily: fonts.mono,
-            color: light.text.muted,
+            color: theme.text.muted,
             opacity: fadeIn(frame, titleFrameEnd, sec(0.4)),
-            transform: `translateY(${slideIn(frame, titleFrameEnd, 10, sec(0.5))}px)`,
+            transform: `translateY(${slideIn(frame, titleFrameEnd, layout.spacing.xs, sec(0.5))}px)`,
             textShadow: shadows.textLift,
           }}
         >
@@ -554,6 +639,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
           opacity: exitFade(frame, exitStart, sec(1)),
         }}
       />
-    </AbsoluteFill>
+      </AbsoluteFill>
+    </Background>
   );
 };

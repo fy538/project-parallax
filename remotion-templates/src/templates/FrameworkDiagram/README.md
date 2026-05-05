@@ -10,4 +10,4 @@ animate in sequence. Supports:
 
 **Data input:** Nodes with positions and labels, edges with connections.
 
-**EP01 use case:** Chess vs. go strategic comparison diagram.
+**silicon-trap use case:** Chess vs. go strategic comparison diagram.

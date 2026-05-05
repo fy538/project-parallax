@@ -7,6 +7,8 @@
  * - Payoff Matrix: game theory outcomes (Nash equilibria)
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface ChessPiece {
   /** Board position [col, row] (0-indexed) */
   position: [number, number];
@@ -35,6 +37,14 @@ export interface PayoffCell {
   color?: string;
 }
 
+export interface CounterAnimation {
+  /** Value to count up to (e.g., cooperate: 60) */
+  cooperate?: number;
+  defect?: number;
+  cooperateColor?: string;
+  defectColor?: string;
+}
+
 export interface GamePhase {
   /** Phase title shown as overlay */
   label: string;
@@ -47,6 +57,10 @@ export interface GamePhase {
   stones?: GoStone[];
   /** Payoff cells to highlight */
   highlights?: number[]; // indices into cells array
+  /** Text annotation shown below the phase label */
+  annotation?: string;
+  /** Animated counter display (e.g., counting up cooperation vs defection rounds) */
+  counterAnimation?: CounterAnimation;
 }
 
 export interface GameBoardData {
@@ -77,4 +91,13 @@ export interface GameBoardData {
   source?: string;
   durationSec?: number;
   backgroundTint?: string;
+  backgroundVariant?: "light" | "dark";
+  /** Cinematic mode: camera zooms to active board region per phase */
+  cinematicMode?: boolean;
+  /** Enable ambient particles for depth */
+  ambientParticles?: boolean;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

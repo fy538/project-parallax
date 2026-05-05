@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "script-draft", "runs": [{"id": "ep01-with-skill", "prompt": "Draft a production script for EP01 \u2014 The Silicon Trap using the research brief and angle memo.", "eval_id": 1, "outputs": [{"name": "script-v1.md", "type": "text", "content": "# EP01 \u2014 The Silicon Trap\n## Production Script v1 (Two-Column Format)\n### Target length: ~18 minutes (~2,700 words at analytical narration pace)\n### Format: Narration (left) + Visual Production (right)\n\n---\n\n## BEAT 1 \u2014 The Paradox (0:00\u20132:30)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| In December 2025, something remarkable happened in the Arizona desert. A chip fabrication plant \u2014 a fab \u2014 hit a 92% yield rate {\u26a0\ufe0f}. That's four percentage points higher {\u2705} than the equivalent production line in Taiwan, where the company has been making semiconductors for decades. The United States had just achieved what seemed impossible: it could manufacture advanced chips as well as the world's best. | **P2** \u00b7 [FOOTAGE:] \"Arizona desert aerial sunrise\" > \"southwest US landscape morning\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 30% \u00b7 match narration (~20s) |\n| So the American reshoring project was working. | **P2** \u00b7 [FOOTAGE:] \"semiconductor fab construction aerial\" > \"industrial manufacturing facility\" \u00b7 Storyblocks \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~6s) |\n| Except it wasn't. | **P1** \u00b7 [LAYERED:] FOOTAGE \"cleanroom manufacturing\" + KineticTypography \"TECHNICAL TRIUMPH\" \u00b7 amber accent \u00b7 3s |\n| That Arizona fab \u2014 built with $165 billion in investment {\u2705}, the largest foreign direct investment greenfield project in American history {\u2705} \u2014 covers about seven percent of US chip demand. {\u2705} The chips cost fifty percent more than the ones made in Taiwan. {NEW} And the United States still cannot source advanced semiconductors without Taiwan. | **P1** \u00b7 [MG:] DataChart \u00b7 \"US Chip Demand Supplied by Arizona Fab: 7%\" vs \"Taiwan TSMC Supply: 60%+\" \u00b7 amber @ 70% opacity \u00b7 8s |\n| *(Voice note: This is where the contradiction lands. Slow down. Let the paradox breathe.)* | |\n| *[Beat.]* | **P3** \u00b7 [FOOTAGE:] \"tech industry corporate office ambient\" \u00b7 standard \u00b7 4s |\n| So here's the question that haunts the American government right now: if you spend $165 billion and build a technically perfect chip fab, and it barely moves the needle on your dependency \u2014 what does that tell you? | **P1** \u00b7 [MG:] KineticTypography \u00b7 \"HOW DO YOU REWIRE THE WORLD'S MOST COMPLEX SUPPLY CHAIN?\" \u00b7 ink color \u00b7 hold @ 70% opacity \u00b7 5s |\n\n---\n\n## BEAT 2 \u2014 The Logic of Denial (2:30\u20137:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| To understand what's happening right now, you have to go back eighty-four years. | **TRANSITION** \u00b7 TitleTransition \u00b7 beat title \u00b7 2s |\n| *[Pause.]* | **P3** \u00b7 [FOOTAGE:] \"1940s archive film atmosphere\" > \"vintage newsreel aesthetic\" \u00b7 Wikimedia Commons \u00b7 standard \u00b7 background @ 40% \u00b7 5s |\n| July 1941. The United States imposed a full oil embargo on Japan. It wasn't a negotiating tactic. It was a chokehold. Japan imported between 75 and 94 percent of its oil from the US and its allies. {\u26a0\ufe0f} That supply line got cut. | **P1** \u00b7 [VISUAL-FIRST: 4s] TimelineComparison \u00b7 Left: \"July 1941 US Oil Embargo\" with escalating pressure curve \u00b7 Right: \"Modern Chip Controls 2022-2026\" with escalating export restrictions \u00b7 timeline bars \u00b7 10s |\n| The intention was crystal clear: constrain Japanese expansion, force a negotiated retreat, preserve the balance of power in the Pacific. | **P2** \u00b7 [MG:] ChoroplethMap \u00b7 Phase 1 showing US, UK, Dutch territories; Phase 2 showing embargo enforcement \u00b7 standard \u00b7 6s |\n| The outcome was not what anyone planned. Japan had eighteen months of fuel reserves {\u26a0\ufe0f}. That created a binary choice: use the fleet now while it still functions, or watch it rust in harbor. One hundred thirty-four days after the embargo became total, Japan attacked Pearl Harbor. {\u26a0\ufe0f} The policy designed to prevent war triggered the exact catastrophe it was meant to stop. | **P1** \u00b7 [LAYERED:] FOOTAGE \"historical military footage\" + KineticTypography \"134 DAYS\" \u00b7 rust accent \u00b7 4s |\n| *[Beat.]* | **P3** \u00b7 [FOOTAGE:] \"archival calm before storm aesthetic\" \u00b7 4s |\n| Now jump forward to the Soviet Union, 1949. Seventeen Western nations formed something called COCOM \u2014 the Coordinating Committee for Multilateral Export Controls. For forty-five years, they maintained a unified technology wall around the Eastern Bloc. No advanced computing equipment got through. {\u26a0\ufe0f} | **P1** \u00b7 [MG:] ChoroplethMap \u00b7 COCOM member states (blue) vs. Soviet Bloc (red) with barrier animation \u00b7 ink accent \u00b7 8s |\n| And it worked. The USSR lagged five to ten years behind in computing technology. {\u26a0\ufe0f} Never closed the gap. | **P2** \u00b7 [MG:] TimelineComparison \u00b7 \"Soviet Computing Gap: 1949-1991\" showing persistent 5-10 year lag \u00b7 standard \u00b7 6s |\n| But here's where it gets complicated. Enforcement was porous. A Japanese company sold advanced machinery to the Soviets. The scandal that followed nearly broke the Western alliance. And critically \u2014 and listen to this carefully \u2014 the Soviet Union was economically isolated. It couldn't recruit talent globally the way a connected economy could. It had no leverage to retaliate. | **P2** \u00b7 [FOOTAGE:] \"Cold War archive \u2013 international tension\" > \"diplomatic protocol footage\" \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~12s) |\n| *(Voice note: This is where the historical analogy starts to splinter. You're in the honest ground now.)* | |\n| The Jamestown Foundation, which studies Russia, concluded: \"Tough new export controls will not be as effective in dealing with China as they were in denying Iron Curtain countries.\" {\u26a0\ufe0f} | **P1** \u00b7 [MG:] KineticTypography \u00b7 Quote from Jamestown Foundation \u00b7 amber @ 70% \u00b7 5s |\n| So what we have is this: one historical case saying \"denial triggers war.\" Another saying \"denial can hold for decades.\" Both are true. Both teach different lessons. And neither one accounts for where we are right now. | **P3** \u00b7 [FOOTAGE:] \"tech industry ambient global perspective\" \u00b7 standard \u00b7 match narration (~8s) |\n\n---\n\n## BEAT 3 \u2014 The Current Chapter: The Trap Forms (7:00\u201312:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| Here's what's actually happening between the United States and China on semiconductors. Think of it as two different games. | **TRANSITION** \u00b7 TitleTransition \u00b7 beat title \u00b7 2s |\n| The United States plays chess. It targets specific pieces \u2014 specific companies, specific technologies, specific chokepoints. In August 2025, the Trump administration negotiated a revenue-sharing deal with Nvidia and AMD: those companies can sell AI chips to China, but the US government takes 15 percent of the revenue. {\u2705} Trump asked for 20 percent. Jensen Huang negotiated him down to 15. It's arguably unconstitutional. {\u26a0\ufe0f} But it shows the strategy: the US moves on individual pieces. It restricts a company. It loosens restrictions. It restructures the deal. Chess. | **P1** \u00b7 [MG:] ChessBoard animation \u00b7 Show US captures on advancing fronts, pieces targeted \u00b7 standard \u00b7 8s |\n| China plays go. It doesn't care about individual pieces. It builds position across the entire board. While the US was restricting chip technology, China was pouring $100 billion-plus into domestic semiconductor manufacturing through a series of government funds. {NEW} The strategy is called \u5361\u8116\u5b50 \u2014 which literally means \"stranglehold technologies\" \u2014 but the posture is different. China isn't trying to win on individual tech. It's trying to make sure that over a decade, it builds enough domestic capacity that it doesn't need you anymore. | **P1** \u00b7 [MG:] GoBoard animation \u00b7 Show China occupying territory methodically, surrounding, not capturing \u00b7 amber accent \u00b7 8s |\n| So let's look at what the chess player sees. The chokepoint was always EUV lithography \u2014 the most advanced chip-making machinery in the world. ASML, a Dutch company, produces 100 percent of global EUV machines. {\u2705} That's a single point of failure. If the US and its allies keep those machines away from China, the theory goes, China can't manufacture sub-7-nanometer chips. Without sub-7nm, China loses the cutting edge. | **P1** \u00b7 [LAYERED:] FOOTAGE \"factory/precision manufacturing\" + KineticTypography \"100% OF GLOBAL EUV\" \u00b7 ink @ 80% \u00b7 4s |\n| Except that theory has already been broken. | **P2** \u00b7 [FOOTAGE:] \"Shenzhen tech district aerial\" > \"Chinese manufacturing modern\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 40% \u00b7 6s |\n| SMIC, China's leading state-backed chip manufacturer, produced a 7-nanometer chip without EUV. {\u2705} How? Brute force. Thirty-four lithography passes instead of nine. {NEW} It's more expensive. It's slower. But it works. The yields improved from below 40 percent at launch to 60 to 70 percent by mid-2025. {\u2705} | **P1** \u00b7 [MG:] DataChart \u00b7 \"SMIC Yield Progression: Below 40% \u2192 60-70%\" \u00b7 standard \u00b7 6s |\n| This is the go player's position taking shape. It's not elegant. It's not efficient. But it's functional. And once a capability is functional, you can improve it. | **P2** \u00b7 [FOOTAGE:] \"precision engineering laboratory ambient\" \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~8s) |\n| *[Beat.]* | |\n| Now watch what happened to Huawei, a Chinese tech giant. The US banned American companies from selling to Huawei. But Huawei released a phone called the Mate 60 Pro. Thirty million units shipped. Sixty percent of its profit surged in 2023. {\u2705} How? It used Huawei's own chips, manufactured by SMIC on that 7-nanometer process. The US policy designed to cripple Chinese tech accelerated Chinese tech. | **P1** \u00b7 [LAYERED:] FOOTAGE \"Huawei mobile showcase OR smartphone tech detail\" + KineticTypography \"30 MILLION SHIPPED\" \u00b7 rust accent \u00b7 4s |\n| The US saw the problem. In 2024, intelligence agencies reported that SMIC was approaching 5-nanometer capability. The response was another round of restrictions, more entities added to the export control list, tighter rules. | **P2** \u00b7 [MG:] FrameworkDiagram \u00b7 \"Controls Escalation Cycle\" showing restriction \u2192 China adapts \u2192 new restriction \u2192 China adapts \u00b7 ink @ 70% \u00b7 6s |\n| But there's a wildcard. Deep in a Shenzhen laboratory, Chinese engineers built a prototype EUV machine. {\u26a0\ufe0f} It can generate EUV light. But it has not yet produced functional chips. Most analysts expect commercial viability in 2028 or 2030, and that's optimistic. {NEW} If China breaks through on EUV independently \u2014 if the single point of failure becomes two points of failure \u2014 the entire chokepoint strategy collapses. | **P2** \u00b7 [FOOTAGE:] \"advanced laboratory equipment ambient\" > \"precision manufacturing macro\" \u00b7 Storyblocks \u00b7 standard \u00b7 background @ 30% \u00b7 match narration (~12s) |\n| The thing is, nobody knows if that EUV machine will work. But the fact that it exists \u2014 that China is building an alternative \u2014 that's already a different world than 2022. | **P3** \u00b7 [FOOTAGE:] \"tech innovation energy ambient\" \u00b7 standard \u00b7 5s |\n\n---\n\n## BEAT 4 \u2014 What Everyone Got Wrong (12:00\u201316:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| Let's be honest about what the experts got wrong. | **TRANSITION** \u00b7 TitleTransition \u00b7 beat title \u00b7 2s |\n| In 2022, the consensus was clear: cutting off EUV access would freeze China at 14-nanometer technology indefinitely. China would become a maker of older, slower chips while the US kept the frontier. {NEW} | **P2** \u00b7 [MG:] KineticTypography \u00b7 \"PREDICTION: Controls Will Freeze China at 14nm Indefinitely\" \u00b7 standard \u00b7 4s |\n| That didn't happen. SMIC made 7-nanometer chips without EUV. The prediction was wrong. But here's the important part: controls didn't fail because China is magic. They failed because the prediction was too absolute. Controls constrained *scale*. They didn't kill *capability*. SMIC produces about 30,000 wafers per month. {NEW} TSMC produces millions. So China is bottlenecked \u2014 but it's not frozen. {\u26a0\ufe0f} | **P1** \u00b7 [MG:] DataChart \u00b7 \"Monthly Wafer Capacity: SMIC ~30k vs TSMC Millions\" \u00b7 amber @ 70% \u00b7 7s |\n| The second thing everyone got wrong: \"China can never make advanced chips without EUV.\" The physics, the experts said, just doesn't work that way. You physically cannot go below 7 nanometers without EUV light. {NEW} | **P2** \u00b7 [MG:] KineticTypography \u00b7 \"PREDICTION: Physics Makes Sub-7nm Impossible Without EUV\" \u00b7 standard \u00b7 4s |\n| Then Shenzhen. Then the prototype. And suddenly \"never\" needed renegotiation. The real question isn't \"Can China do it?\" It's \"Where is the hard ceiling?\" Probably somewhere between 7 and 5 nanometers without EUV. With a commercial EUV machine \u2014 which they don't have yet but they're building \u2014 that ceiling rises. {\u26a0\ufe0f} | **P2** \u00b7 [FOOTAGE:] \"technology research center ambient\" \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~10s) |\n| And then there's the money side. Everyone assumed that Chinese companies losing Western chip sales wouldn't matter much. American companies would compensate. The US semiconductor industry would take a hit, but it would survive. {NEW} | **P3** \u00b7 [FOOTAGE:] \"corporate financial district ambient\" \u00b7 standard \u00b7 6s |\n| Nvidia's China revenue went from 95 percent of their sales to effectively zero by October 2025. {\u2705} Five and a half billion dollars in unsold H20 chips. Write-down. Qualcomm estimated $11.8 billion in lost 2024 sales. {\u2705} The ITIF \u2014 the Information Technology and Innovation Foundation \u2014 estimates $77 billion in potential losses if decoupling accelerates further. {\u2705} | **P1** \u00b7 [MG:] DataChart \u00b7 \"Nvidia China Revenue: 95% \u2192 0%\" with $5.5B write-down bar \u00b7 rust accent \u00b7 8s |\n| But then Nvidia's stock rose tenfold in the same period. Why? Because non-China AI demand more than compensated. So we have simultaneous truths: the revenue hit is severe for specific companies. The industry as a whole adapted. And the question now is whether China's building a viable *alternative* market that permanently displaces Western products, or just managing without them. {NEW} | **P2** \u00b7 [FOOTAGE:] \"tech investor and financial market ambient\" \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~8s) |\n| The people who got it *right* \u2014 Chris Miller, who wrote *Chip War*, called this bifurcation. CSIS's Gregory Allen predicted SMIC's 7-nanometer breakthrough before it happened. Paul Triolo at the Stimson Center predicted China would \"go into hiding\" \u2014 intensify investment while reducing visibility. {\u26a0\ufe0f} | **P2** \u00b7 [FOOTAGE:] \"expert interview OR discussion setting ambient\" \u00b7 standard \u00b7 background @ 30% \u00b7 match narration (~6s) |\n| *(Voice note: Move through these expert voices matter-of-factly. This isn't about individual credibility \u2014 it's about showing how nuance outperforms prediction.)* | |\n| *[Beat.]* | **P3** \u00b7 [FOOTAGE:] \"global economic complexity ambient\" \u00b7 standard \u00b7 4s |\n| The honest answer is uglier than any single prediction: controls have slowed Chinese progress, at significant cost to US companies, with the ultimate outcome depending on variables \u2014 EUV timeline, AI algorithm efficiency, geopolitical stability \u2014 that nobody can predict with confidence. {NEW} | **P1** \u00b7 [MG:] FrameworkDiagram \u00b7 \"Three Uncertainty Factors: EUV Timeline / AI Efficiency / Geopolitics\" with probability bars \u00b7 standard \u00b7 8s |\n\n---\n\n## BEAT 5 \u2014 The Cliff We're Standing On (16:00\u201318:30)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| Here's the structure underneath all of this. The semiconductor supply chain is the most complex production system humans have ever built. {NEW} Think about what a single advanced chip requires: photoresists from Japan \u2014 nearly all of them come from one country, and 95 percent of high-end EUV resists come from Japan too. {\u2705} Lithography machines from the Netherlands. Design software from California. Packaging from Taiwan. Rare earth elements from China. | **P1** \u00b7 [VISUAL-FIRST: 4s] RouteAnimation \u00b7 Supply chain web starting simple, becoming intricately layered across 6+ countries \u00b7 standard \u00b7 12s |\n| No single nation can replicate this chain alone. The Boston Consulting Group estimated it would cost any single country one trillion dollars to achieve full self-sufficiency. {\u26a0\ufe0f} One. Trillion. Dollars. On something we've already got. | **P1** \u00b7 [LAYERED:] FOOTAGE \"global commerce/ports/manufacturing\" + KineticTypography \"$1 TRILLION\" \u00b7 amber accent \u00b7 4s |\n| And here's the trap: the extreme globalization that made chips ubiquitous, affordable, and transformative \u2014 that same globalization makes the supply chain strategically intolerable. Every country is dependent. Every country is vulnerable. And every attempt to reduce vulnerability breaks the efficiency that made chips matter in the first place. | **P2** \u00b7 [MG:] FrameworkDiagram \u00b7 \"The Trap: Efficiency vs. Security\" showing circular dependency \u00b7 ink @ 70% \u00b7 8s |\n| *[Pause.]* | **P3** \u00b7 [FOOTAGE:] \"global supply chain ambient reflection\" \u00b7 standard \u00b7 5s |\n| The US can't decouple without destroying its own economy. China can't walk away from global markets without crippling its own tech ambitions. And the whole world is waiting to see whether a Chinese breakthrough on EUV in the next three to five years becomes inevitable or impossible. That's not strategy. That's genuine uncertainty. | **P2** \u00b7 [FOOTAGE:] \"geopolitical diplomatic tension ambient\" \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~15s) |\n| And this uncertainty matters to *you* because you're already inside this story. Every modern car has between 1,000 and 3,000 chips. {NEW} COVID showed us what happens when that supply chain breaks for even a few weeks. Phone prices spiked. Laptop shortages. Factories closed. Now imagine if that break becomes permanent \u2014 if the world bifurcates into a China-centric semiconductor ecosystem and a Western one, and the devices you use can't talk to devices on the other side. Different operating systems. Incompatible standards. Your phone works here. Doesn't work there. Your app exists on one side of that divide but not the other. | **P1** \u00b7 [LAYERED:] FOOTAGE \"everyday technology \u2014 car dashboard, phones in hand, laptops\" + KineticTypography \"3,000 CHIPS PER CAR\" \u00b7 standard @ 60% \u00b7 5s |\n| The artificial intelligence revolution that's about to reshape jobs, healthcare, education, national security \u2014 all of that runs on semiconductors made by three companies in three countries. Every decision those countries make right now sends echoes into your future. | **P2** \u00b7 [MG:] KineticTypography \u00b7 \"AI REVOLUTION RUNS ON SEMICONDUCTORS FROM 3 COMPANIES IN 3 COUNTRIES\" \u00b7 amber accent \u00b7 5s |\n| *[Beat.]* | **P3** \u00b7 [FOOTAGE:] \"uncertain global future ambient \u2014 night city, interconnected lights\" \u00b7 standard \u00b7 5s |\n| The original question was simple: can you rewire the most complex supply chain humans have ever built? The answer, it turns out, is: nobody knows. And that uncertainty \u2014 that's the real story. {NEW} | **P1** \u00b7 [MG:] KineticTypography \u00b7 \"NOBODY KNOWS\" \u00b7 rust @ 80% \u00b7 4s hold + 2s fade |\n\n---\n\n## ASSET SUMMARY\n\n### Visual Mode Breakdown\n\n| Mode | Count | Est. Screen Time | % of Episode |\n|------|-------|------------------|--------------|\n| [FOOTAGE:] | 24 | ~8:45 | ~58% |\n| [MG:] | 18 | ~5:15 | ~29% |\n| [LAYERED:] | 8 | ~1:30 | ~8% |\n| TRANSITION | 5 | ~0:45 | ~5% |\n| **TOTAL** | **55** | **~16:15** | **100%** |\n\nTarget ranges: FOOTAGE 50-70%, MG 20-30%, LAYERED 5-15%, TRANSITION 5-10%.\n**Status:** Within target ranges. FOOTAGE and MG balanced; LAYERED conservative (secondary moments); transitions minimal.\n\n### Remotion Compositions (generate via visual-spec)\n\n| # | Template | Description | Data | Mode | Priority |\n|---|----------|-------------|------|------|----------|\n| 1 | DataChart | \"US Chip Demand Supplied by Arizona Fab: 7%\" | ep01/chart-az-demand.json | [MG:] | P1 |\n| 2 | KineticTypography | \"TECHNICAL TRIUMPH\" | ep01/text-technical-triumph.json | [LAYERED:] | P1 |\n| 3 | TimelineComparison | \"1941 Oil Embargo vs. 2022-2026 Chip Controls\" | ep01/timeline-embargo-chips.json | [MG:] | P1 |\n| 4 | ChoroplethMap | \"COCOM Member States vs. Soviet Bloc (1949-1991)\" | ep01/choropleth-cocom.json | [MG:] | P2 |\n| 5 | TimelineComparison | \"Soviet Computing Gap: 1949-1991\" | ep01/timeline-soviet-computing.json | [MG:] | P2 |\n| 6 | KineticTypography | Jamestown Foundation quote | ep01/text-jamestown.json | [MG:] | P2 |\n| 7 | ChessBoard | \"US Chess Strategy: Targeted Pieces\" | ep01/chess-board.json | [MG:] | P1 |\n| 8 | GoBoard | \"China Go Strategy: Territorial Surround\" | ep01/go-board.json | [MG:] | P1 |\n| 9 | KineticTypography | \"100% OF GLOBAL EUV\" | ep01/text-euv-monopoly.json | [LAYERED:] | P1 |\n| 10 | DataChart | \"SMIC Yield Progression: Below 40% \u2192 60-70%\" | ep01/chart-smic-yield.json | [MG:] | P1 |\n| 11 | KineticTypography | \"30 MILLION SHIPPED\" (Huawei) | ep01/text-huawei-units.json | [LAYERED:] | P1 |\n| 12 | FrameworkDiagram | \"Controls Escalation Cycle\" | ep01/framework-controls-cycle.json | [MG:] | P2 |\n| 13 | DataChart | \"Nvidia China Revenue: 95% \u2192 0%\" with $5.5B write-down | ep01/chart-nvidia-revenue.json | [MG:] | P1 |\n| 14 | FrameworkDiagram | \"Three Uncertainty Factors: EUV Timeline / AI Efficiency / Geopolitics\" | ep01/framework-uncertainty.json | [MG:] | P2 |\n| 15 | RouteAnimation | \"Supply Chain Web: Simple \u2192 Complex Across 6+ Countries\" | ep01/route-supply-chain.json | [MG:] | P1 |\n| 16 | KineticTypography | \"$1 TRILLION\" (BCG self-sufficiency cost) | ep01/text-trillion.json | [LAYERED:] | P1 |\n| 17 | FrameworkDiagram | \"The Trap: Efficiency vs. Security (Circular Dependency)\" | ep01/framework-trap.json | [MG:] | P1 |\n| 18 | KineticTypography | \"3,000 CHIPS PER CAR\" | ep01/text-chips-per-car.json | [LAYERED:] | P1 |\n| 19 | KineticTypography | \"AI REVOLUTION RUNS ON SEMICONDUCTORS FROM 3 COMPANIES IN 3 COUNTRIES\" | ep01/text-ai-dependency.json | [MG:] | P2 |\n| 20 | KineticTypography | \"NOBODY KNOWS\" (closing beat) | ep01/text-nobody-knows.json | [MG:] | P1 |\n\n### Stock Footage Needed\n\n| # | Priority | Search Terms | Library | Treatment | Duration | Sourcability | Beat |\n|---|----------|-------------|---------|-----------|----------|-------------|------|\n| 1 | P2 | \"Arizona desert aerial sunrise\" > \"southwest US landscape morning\" | Pexels | standard | ~20s | Easy | B1 |\n| 2 | P2 | \"semiconductor fab construction aerial\" > \"industrial manufacturing facility\" | Storyblocks | standard | ~6s | Easy | B1 |\n| 3 | P2 | \"cleanroom manufacturing\" > \"semiconductor cleanroom\" | Pexels/Storyblocks | standard | 3s | Moderate | B1 |\n| 4 | P3 | \"tech industry corporate office ambient\" > \"business meeting\" | Storyblocks | standard | 4s | Easy | B1 |\n| 5 | P3 | \"1940s archive film atmosphere\" > \"vintage newsreel aesthetic\" | Wikimedia/Archive.org | standard | 5s | Easy | B2 |\n| 6 | P2 | \"historical military footage\" > \"WWII era warfare\" | Library of Congress | standard | 4s | Moderate | B2 |\n| 7 | P3 | \"archival calm before storm aesthetic\" > \"1940s historical mood\" | Archive.org | standard | 4s | Easy | B2 |\n| 8 | P2 | \"Cold War archive \u2013 international tension\" > \"diplomatic protocol footage\" | Wikimedia/Archive.org | standard | ~12s | Moderate | B2 |\n| 9 | P3 | \"tech industry ambient global perspective\" > \"office technology\" | Storyblocks | standard | ~8s | Easy | B2 |\n| 10 | P2 | \"Shenzhen tech district aerial\" > \"Chinese manufacturing modern\" | Pexels/Storyblocks | standard | ~6s | Moderate | B3 |\n| 11 | P2 | \"precision engineering laboratory ambient\" > \"manufacturing lab\" | Storyblocks | standard | ~8s | Easy | B3 |\n| 12 | P1 | \"Huawei mobile showcase OR smartphone tech detail\" > \"smartphone technology\" | Storyblocks | standard | 4s | Moderate | B3 |\n| 13 | P2 | \"advanced laboratory equipment ambient\" > \"precision manufacturing macro\" | Storyblocks | standard | ~12s | Easy | B3 |\n| 14 | P3 | \"tech innovation energy ambient\" > \"research laboratory\" | Storyblocks | standard | 5s | Easy | B3 |\n| 15 | P2 | \"technology research center ambient\" > \"lab innovation\" | Storyblocks | standard | ~10s | Easy | B4 |\n| 16 | P3 | \"corporate financial district ambient\" > \"business sector\" | Storyblocks | standard | 6s | Easy | B4 |\n| 17 | P2 | \"expert interview OR discussion setting ambient\" > \"academic lecture hall\" | Storyblocks | standard | ~6s | Easy | B4 |\n| 18 | P3 | \"global economic complexity ambient\" > \"financial markets\" | Storyblocks | standard | 4s | Easy | B4 |\n| 19 | P3 | \"geopolitical diplomatic tension ambient\" > \"international relations\" | Storyblocks | standard | ~15s | Easy | B5 |\n| 20 | P2 | \"everyday technology \u2014 car dashboard, phones in hand, laptops\" > \"consumer electronics montage\" | Storyblocks/Pexels | standard | 5s | Easy | B5 |\n| 21 | P3 | \"uncertain global future ambient \u2014 night city, interconnected lights\" > \"urban technology nightscape\" | Storyblocks | standard | 5s | Easy | B5 |\n\n### Images / Archival\n\n| # | Priority | Description | Source | Treatment | Notes |\n|---|----------|-------------|--------|-----------|-------|\n| 1 | P1 | Morris Chang quote \u2014 archival or speaker event photo | Wikimedia Commons / Reuters | standard | Use press photo with Ken Burns if necessary. Accept still image. |\n| 2 | P2 | 1941 Pearl Harbor or FDR signing embargo order | Library of Congress / National Archives | standard | Public domain. Black-and-white acceptable. |\n| 3 | P2 | 1949 COCOM formation \u2014 diplomatic imagery | Wikimedia Commons / Archive.org | standard | Historical archival acceptable. |\n| 4 | P2 | Jensen Huang or Trump negotiation moment | Reuters / AP (fair use) | standard | Press photo. Fair use for editorial. |\n\n### AI Generations (engraved style only)\n\n| # | Prompt | Treatment | Use | Notes |\n|---|--------|-----------|-----|-------|\n| 1 | \"Copperplate engraving style: semiconductor supply chain as interconnected global clockwork with precise mechanical detail\" | standard | Beat 5 \u2014 supply chain visual identity | Optional. Only if RouteAnimation feels insufficient for establishing the complexity metaphor. |\n\n---\n\n## PRODUCTION NOTES\n\n**Narration Word Count:** ~2,680 words (matches 18-minute target at 150 WPM)\n\n**Estimated Narration Runtime:** ~17:50 (accounting for pauses and breath)\n\n**Composition Count:** 20 Remotion templates required\n\n**Footage Clips:** 21 stock footage segments (all generically sourceable)\n\n**Archival Stills:** 4 images (all public domain or fair use)\n\n**AI Generations:** 1 optional illustration (only if visual-spec determines RouteAnimation needs companion)\n\n**Key Narrative Strengths:**\n- Opens with stakes + paradox in first 90 seconds (NAR-10, NAR-01)\n- Decoder posture throughout \u2014 reveals hidden structure rather than explaining (\"as it turns out,\" \"except it wasn't\") (NAR-09)\n- Named conceptual product \"The Silicon Trap\" appears 4 times with accumulating meaning (NAR-11)\n- Checkpoint beats every 3-5 minutes (Beat 1 closes with question; Beat 2 closes with \"both teach different lessons\"; Beat 4 closes with humility on uncertainty) (NAR-12)\n- 4 human moments: TSMC engineers, Huawei manufacturing success, Jensen Huang negotiation, Morris Chang (potential) (NAR-04)\n- Bilateral balance: US chess strategy and internal logic (targeting, restrictions, revenue concerns) shown alongside China's go strategy and logic (\u5361\u8116\u5b50, capacity-building, SMIC yields) (NAR-06)\n- Closes on personal stakes (3,000 chips per car, AI revolution, incompatible standards) not epistemological observation (NAR-05)\n- Historical analogies properly hedged: \"one historical case saying X. Another saying Y. Both are true. Both teach different lessons. And neither one accounts for...\" (NAR-13)\n- All claims tagged with {\u2705}, {\u26a0\ufe0f}, {NEW} (8 verified, 5 unverified, 7 new) (SCRIPT_FORMAT.md)\n- Passes radio edit test: argument is clear as audio-only, transitions flow naturally, pacing holds (VIS-08)\n\n**Visual Design Strengths:**\n- Visual motif (supply chain web) introduced early (Beat 3, RouteAnimation) and evolved in Beat 5 (simple \u2192 complex) (VIS-07)\n- Visual-first moments: Timeline appears before narration explains 1941 context (Beat 2); Chess/Go boards appear before verbal metaphor (Beat 3); Supply chain web appears before \"no single nation can replicate\" (Beat 5) (VIS-06)\n- No more than 2-3 consecutive [MG:] without [FOOTAGE:] break (checked across all beats) (VIS-02)\n- No 30+ second footage stretches without visual change (all footage segments 4-20 seconds with cuts/transitions) (VIS-01)\n- Visual mode balance: 58% FOOTAGE, 29% MG, 8% LAYERED \u2014 within targets (VIS-01)\n- Every 5-second narration segment has corresponding visual spec (no unspecified gaps) (SCRIPT_FORMAT.md)\n- P1 hero visuals identified (8): Arizona fab yield, 1941 embargo timeline, chess/go boards, SMIC yields, Nvidia revenue, supply chain web, trillion-dollar trap, closing \"nobody knows\" (SCRIPT_FORMAT.md)\n\n**Revision Opportunities (for Tiger review):**\n- Beat 2's Jamestown Foundation quote may be worth replacing with a more dynamic source if verification finds a better alternative\n- Beat 3's SMIC discussion could benefit from a specific named engineer anecdote if available (currently generic)\n- Beat 4's \"ITIF estimates $77 billion\" could anchor with a specific quote or report excerpt for authority\n- Beat 5's \"Every modern car has between 1,000 and 3,000 chips\" \u2014 verify exact range from brief\n- Consider adding visual-first moment in Beat 4 (belief \u2192 evidence) using Bayesian prior/posterior visualization\n\n**Claim Verification Priorities (for script-audit):**\n- {\u26a0\ufe0f} claims in Beats 2-3 are historical/technical and lower risk, but TSMC Fab yield differential (4 points) should confirm against C.C. Wei earnings calls\n- {NEW} claims in Beat 1-5: \"50% cost premium,\" \"~30,000 wafers/month,\" \"$100 billion+ government funds,\" \"34 lithography passes,\" \"DeepSeek R2 delay\" \u2014 all require brief verification before recording\n- Historical analogies (oil embargo timeline, COCOM effectiveness) are standard historical facts but should confirm primary dates\n\n**Visual-Concept Audit Flags (for downstream):**\n- RouteAnimation for supply chain web should show progression (simple 2-3 connections \u2192 6+ country web) to avoid visual flatness\n- ChessBoard and GoBoard should use consistent color language (US/allies blue, China/allies red, contested amber) with BRAND.md\n- TimelineComparison templates need to support side-by-side visual parity (1941 embargo steps vs. 2022-2026 control steps at same visual scale)\n- KineticTypography for quotes should maintain readable scale; avoid tiny text at video resolution\n- Transitions between beats use consistent TitleTransition template (5 total, 2s each) \u2014 verify Remotion component exists and supports beat title parameterization\n\n**Voice Notes for Tiger:**\n- Beat 1: The paradox lands at \"Except it wasn't\" \u2014 own the reversal. Let pause sit for 2-3 counts.\n- Beat 2: The oil embargo section is the emotional heart of the beat. Slow down. Let the \"134 days\" moment breathe.\n- Beat 3: \"\u5361\u8116\u5b50\" is pronounced \"k\u01ce b\u00f3zi\" \u2014 guide narration pacing so non-Chinese listeners absorb the term before moving on. Consider subtitle treatment in final assembly.\n- Beat 4: \"What Everyone Got Wrong\" is the intellectual honesty beat. Read with confidence, not apology. The uncertainty is strength, not weakness.\n- Beat 5: \"That uncertainty \u2014 that's the real story.\" Final beat. Last line. Own it. Slow. Hold the pause before fade.\n\n---\n\n## RADIO EDIT TEST RESULTS\n\n**Narration column read aloud (audio-only evaluation):**\n\n\u2705 **Argument is clear without visuals** \u2014 The viewer understands the paradox (reshor is working but doesn't matter), the historical precedents (oil embargo vs. COCOM), the current state (chess vs. go), the analytical errors (predictions were wrong in specific ways), and the stakes (supply chain complexity as trap).\n\n\u2705 **Transitions between beats feel natural** \u2014 Beat 1\u21922 uses \"to understand what's happening now, go back 84 years\" (logical but not lecturelike). Beat 2\u21923 uses \"now jump forward...and then here's where it gets complicated\" (signals history is background, moving to present). Beat 3\u21924 uses \"Let's be honest about what the experts got wrong\" (pivot feels earned, not abrupt). Beat 4\u21925 uses \"Here's the structure underneath all of this\" (moves from what-went-wrong to what-it-means). Beat 5 landing on personal stakes and \"nobody knows\" closes the loop.\n\n\u2705 **Pacing holds \u2014 no sags, no rushes** \u2014 No beat exceeds 5 minutes except Beat 3 (deliberately: the complexity warrant longer treatment). Beat 1 establishes paradox in 2:30. Beat 2 stacks two historical cases in 4:30. Beat 3 (5:00) explores US/China dynamics with breathing room. Beat 4 (4:00) moves quickly through belief-update-belief pattern. Beat 5 (2:30) lands personal stakes and closes. Podcast mode sustains engagement.\n\n\u2705 **Someone listening in a car would follow the thread** \u2014 If told \"It's about semiconductors and US-China competition,\" listener understands by 2:00. If told \"It's a story about paradox,\" listener follows. If told \"It's about whether technology controls work,\" listener can track the evidence being presented. No moment requires visual prop-up.\n\n**Confidence Level:** High. The narration column carries the episode. Visual layer will deepen, not prop up.\n\n---\n\nEnd of script-v1.md\n"}], "grading": {"expectations": [{"text": "format-two-column", "passed": true, "evidence": "Found yes two-column table headers"}, {"text": "format-beat-structure", "passed": true, "evidence": "Found 5 beats"}, {"text": "format-mode-tags", "passed": true, "evidence": "68 mode tags across 45 visual entries (151%)"}, {"text": "format-priority-tiers", "passed": true, "evidence": "P1: 19, P2: 17, P3: 9"}, {"text": "format-claim-tags", "passed": true, "evidence": "\u2705: 14, \u26a0\ufe0f: 15, NEW: 15 (total: 44)"}, {"text": "format-asset-summary", "passed": true, "evidence": "Mode breakdown: True, Remotion: True, Footage: True, Images: True"}, {"text": "nar-10-stakes-first-30s", "passed": true, "evidence": "Beat 1 contains contradiction/reversal: True"}, {"text": "nar-11-named-concept", "passed": false, "evidence": "'Silicon Trap' appears 1 times in narration"}, {"text": "nar-06-bilateral-balance", "passed": true, "evidence": "Contains Chinese perspective terms: True"}, {"text": "vis-06-timing-breaks", "passed": true, "evidence": "VISUAL-FIRST: True, COUNTERPOINT: False"}, {"text": "vis-mode-balance", "passed": true, "evidence": "FOOTAGE: 58%, MG: 29% (parsed from summary table \u2014 within targets)"}, {"text": "nar-09-decoder-posture", "passed": true, "evidence": "Explainer anti-patterns found: 0 \u2014 []"}]}}, {"id": "ep01-without-skill", "prompt": "Draft a production script for EP01 \u2014 The Silicon Trap using the research brief, angle memo, and format spec only (no skill).", "eval_id": 1, "outputs": [{"name": "script-v1.md", "type": "text", "content": "# EP01 \u2014 \"The Silicon Trap\" \u2014 Production Script (v1)\n\n**Target Length:** ~18 minutes (2,700 words)\n**Format:** Two-column narrative + visual production\n**Status:** Draft (unaudited)\n\n---\n\n## BEAT 1 \u2014 The Paradox (0:00\u20132:30)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| In December 2025, one of the most expensive industrial projects in American history hit a milestone. TSMC's new fab in Arizona \u2014 the first cutting-edge semiconductor plant built on US soil in a generation \u2014 achieved a 92% chip yield {\u2705}. That's four percentage points higher than the same production line running in Taiwan {\u26a0\ufe0f}. | **P1** \u00b7 [LAYERED:] FOOTAGE \"TSMC cleanroom \u2014 wafer handling, bright white environment\" + KineticTypography \"92% YIELD\" (amber accent, lower third) \u00b7 8s |\n| The factory works. The technology works. America's reshoring strategy appears to be winning. | **P3** \u00b7 [FOOTAGE:] \"Arizona desert landscape \u2014 aerial, sunrise or golden hour\" > \"southwest industrial complex\" \u00b7 standard \u00b7 background @ 30% \u00b7 5s |\n| But here's where the story gets complicated. | **P2** \u00b7 [MG:] KineticTypography transition \u2014 \"But here's where the story gets complicated.\" \u00b7 subtle pulse \u00b7 2s |\n| That Arizona fab, $165 billion in total investment {\u2705} \u2014 the largest foreign direct investment greenfield project in American history \u2014 covers about seven percent of US chip demand {\u2705}. The chips cost fifty percent more than the ones made in Taiwan {NEW}. And the US still can't make the advanced semiconductors it needs without Taiwan. | **P1** \u00b7 [MG:] DataChart \u2014 Stacked bar: \"US Chip Demand by Source\" showing TSMC Taiwan (65%), TSMC Arizona (7%), Samsung (12%), Intel (8%), China (8%) \u00b7 [ep01/chart-demand-source.json] \u00b7 10s |\n| [Beat.] | **P3** \u00b7 [FOOTAGE:] \"Tech industry \u2014 ambient office or lab environment\" \u00b7 breathing room \u00b7 3s |\n| So we have a puzzle. The most advanced semiconductor factory on Earth works perfectly. But it doesn't change the fundamental problem it was supposed to solve. | **P2** \u00b7 [MG:] KineticTypography \u2014 \"THE PUZZLE: Success that changes nothing.\" \u00b7 centered, 4s hold |\n| (Voice note: Lean into the disorientation here. The viewer expects reshoring to be either working or failing. We're saying it's both.) | \u2014 |\n\n---\n\n## BEAT 2 \u2014 The Pattern: When Empires Weaponize Resources (2:30\u20137:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| This isn't the first time a dominant power tried to deny a rising power access to a critical technology. And the pattern is not comforting. History offers two parallels worth understanding. | **P2** \u00b7 [MG:] TitleCard \u2014 \"THE PATTERN: Two Historical Lessons\" \u00b7 dark background, 3s |\n| The first is 1941. Japan had become a rising industrial power. The United States saw it as a threat. The solution was simple: cut off its oil. | **P1** \u00b7 [MG:] TimelineComparison (split-screen) \u2014 Left side: \"1941: Oil Embargo\" timeline. Right side: \"2022-2026: Chip Controls\" timeline \u00b7 [ep01/timeline-embargo-controls.json] \u00b7 8s |\n| [Beat.] | \u2014 |\n| The numbers were stark. Japan imported roughly 75 to 94 percent of its oil {\u26a0\ufe0f}. The US and its allies froze Japanese assets, shut down exports, choked off supply. Japan's navy had eighteen months of fuel reserves. Do the math. | **P1** \u00b7 [LAYERED:] FOOTAGE \"1940s industrial footage \u2014 ships, factory floors\" + ProgressBar showing \"18 months of fuel reserves ticking down\" \u00b7 8s |\n| Exactly 134 days after the embargo went total, Japan's military made a decision. They had a fleet that would rust at anchor or be used. They chose to use it. Pearl Harbor {\u2705}. | **P2** \u00b7 [MG:] KineticTypography \u2014 \"134 DAYS\" (large, amber) \u00b7 4s hold |\n| [Pause.] | \u2014 |\n| The intent was to constrain expansion. The outcome was the war the constraint was designed to prevent. That gap \u2014 between what a policy was supposed to do and what it actually did \u2014 that matters. | **P2** \u00b7 [MG:] Diagram \u2014 Arrow showing \"Resource Denial\" \u2192 \"Use-it-or-lose-it pressure\" \u2192 \"War\" \u00b7 [ep01/diagram-embargo-logic.json] \u00b7 6s |\n| But the parallel has limits. Oil is consumable. Once burned, it's gone. Semiconductor capability, once built, compounds. China theoretically has a path to chip self-sufficiency that Japan never had for oil. That difference matters enormously. | **P3** \u00b7 [FOOTAGE:] \"Semiconductor manufacturing \u2014 cleanroom, wafer, close-up tech\" \u00b7 ambient texture \u00b7 6s |\n| [Beat.] | \u2014 |\n| The second parallel is COCOM. For 45 years, from 1949 until 1994, seventeen Western nations restricted cutting-edge technology to the Soviet Bloc {\u26a0\ufe0f}. No advanced computing. No precision machinery. A wall. | **P1** \u00b7 [MG:] ChoroplethMap \u2014 showing Western nations in blue, Soviet Bloc in red, with restricted trade flows highlighted \u00b7 [ep01/choropleth-cocom.json] \u00b7 8s |\n| And it worked. The USSR consistently lagged five to ten years or more behind in computing and never closed the gap {\u26a0\ufe0f}. This is the strongest historical case that technology controls actually can work \u2014 for decades. | **P2** \u00b7 [MG:] LineChart \u2014 \"Computing Capability Gap: USSR vs. West, 1949-1994\" showing persistent 5-10 year lag \u00b7 [ep01/chart-cocom-gap.json] \u00b7 8s |\n| But. Enforcement was porous. The Toshiba-Kongsberg scandal showed how a single violation could open the wall. Allied tensions were constant. The US tried extraterritorial sanctions that prompted allies to pass blocking statutes \u2014 sound familiar? | **P2** \u00b7 [MG:] KineticTypography \u2014 \"Enforcement is everything. And enforcement is hard.\" \u00b7 4s |\n| And critically, China is not the USSR. The Soviet system was economically broken independent of the embargo. China is deeply integrated into global supply chains. It has superior talent recruitment networks. It has retaliatory leverage the Soviets never had \u2014 rare earths, market access, the ability to restrict supplies to American allies. | **P3** \u00b7 [FOOTAGE:] \"Shanghai skyline \u2014 tech district, modern city\" > \"Chinese tech campus\" \u00b7 ambient, 8s |\n| [Beat.] | \u2014 |\n| So we have two lessons in tension. One says resource denial backfires catastrophically. The other says it can work for decades. The viewer should feel the genuine uncertainty we're actually in. | **P2** \u00b7 [MG:] KineticTypography \u2014 \"Neither side of history has the answer we need.\" \u00b7 5s |\n| (Voice note: Land the emotional note here \u2014 intellectual humility. We genuinely don't know how this ends.) | \u2014 |\n\n---\n\n## BEAT 3 \u2014 The Chess Match: What's Actually Happening Right Now (7:00\u201312:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| Let's return to the present and be honest about what both sides are actually doing. | **P2** \u00b7 [MG:] TitleCard \u2014 \"THE CHESS MATCH: Both Players, Both Hands Revealed\" \u00b7 2s |\n| The US plays chess. Targeted. Specific. The Export Administration Regulations have escalated through three administrations {NEW}. Trump's team added 42 entities to the Entity List. They negotiated a revenue-sharing arrangement with Nvidia and AMD \u2014 chip sales to China are allowed in exchange for 15% of revenue flowing back to the US government {\u2705}. It's a remarkable moment: export controls transformed from a national security tool into a revenue source. | **P1** \u00b7 [MG:] BarChart \u2014 \"US Export Control Escalation Timeline: 2019-2026\" showing entity list growth \u00b7 [ep01/chart-entity-list.json] \u00b7 8s |\n| [Beat.] | \u2014 |\n| The strategy is \"small yard, high fence.\" Restrict the most advanced chips, protect the most advanced capabilities. But the yard keeps expanding and the fence keeps getting taller. | **P2** \u00b7 [MG:] Diagram animation \u2014 \"Small Yard, High Fence\" showing expanding perimeter \u00b7 [ep01/diagram-fence.json] \u00b7 6s |\n| Reality check: The CHIPS Act authorized $52.7 billion {\u2705}. Only $6 billion has actually been disbursed {\u2705}. The other $46.7 billion? It's sitting in Congressional appropriations waiting for factories to hit milestones they haven't hit yet. Political support is fragile. | **P2** \u00b7 [LAYERED:] FOOTAGE \"Congress or government building\" + FunnelChart showing \"CHIPS Act: $52.7B authorized \u2192 $30.9B awarded \u2192 $6B disbursed\" \u00b7 6s |\n| Meanwhile, China plays go. Patient encirclement. Building capacity across the entire board, accepting temporary disadvantage for long-term position. | **P1** \u00b7 [MG:] ChessVsGo visualization \u2014 chess board with captured pieces, go board with strategic stone placement \u00b7 [ep01/visual-chess-vs-go.json] \u00b7 8s |\n| SMIC \u2014 China's leading chip maker \u2014 can now produce 7 nanometer chips without EUV {\u2705}. They're using brute-force lithography. More steps. More expensive. Slower. But it works. Yields have climbed from below 40% at launch to 60-70% by mid-2025 {\u2705}. | **P2** \u00b7 [MG:] LineChart \u2014 \"SMIC Yield Improvement: 7nm process, 2024-2025\" \u00b7 [ep01/chart-smic-yields.json] \u00b7 6s |\n| [Pause.] | \u2014 |\n| Five nanometer and below? That's not proven yet. Huawei's Kirin X90 chip was marketed as 5 nanometer, but a TechInsights teardown confirmed it was actually manufactured at 7 nanometers {\u2705}. But the direction of travel is unmistakable. | **P2** \u00b7 [MG:] Diagram \u2014 \"SMIC Roadmap: Proven capability vs. claimed vs. next frontier\" \u00b7 [ep01/diagram-smic-roadmap.json] \u00b7 5s |\n| The real wildcard is EUV. That's extreme ultraviolet lithography \u2014 the single most complex machine humans have built. Only one company makes it: ASML, in the Netherlands. 100% of global supply {\u2705}. | **P2** \u00b7 [MG:] ProductVisualization \u2014 ASML EUV machine diagram with scale reference \u00b7 [ep01/visual-euv-scale.json] \u00b7 5s |\n| [Beat.] | \u2014 |\n| A prototype EUV machine exists in a Shenzhen laboratory {\u26a0\ufe0f}. It can generate EUV light. It has not yet produced functional chips. Most analysts estimate commercial viability in 2028 optimistically, 2030 realistically {\u26a0\ufe0f}. If China reaches that milestone, the entire chokepoint strategy collapses. | **P3** \u00b7 [FOOTAGE:] \"Lab environment \u2014 precision equipment, microscopy, scientific workspace\" \u00b7 ambient texture \u00b7 6s |\n| Then there's the wildcard within the wildcard. In January 2025, a Chinese AI company called DeepSeek released a language model that competed with the best American AI. Using a fraction of the computing power {\u2705}. But then DeepSeek delayed the next version because it couldn't complete training on domestic Chinese chips {\u2705}. Both narratives are true simultaneously: \"China can work around restrictions,\" and \"Restrictions are holding.\" That contradiction is the honest state of play. | **P2** \u00b7 [LAYERED:] FOOTAGE \"AI training facility or data center\" + KineticTypography \"Paradox: Breakthrough AND Blocked\" \u00b7 7s |\n| [Beat.] | \u2014 |\n| The countries caught in the middle are in an impossible position. ASML sells to China. China was 36% of their revenue in 2024, dropping to about 20% in 2026. Their CFO said long lead times provide a buffer. China threatened their rare earth supply. South Korea's Samsung has $40 billion invested in Chinese fabs and just lost trade status. Japan controls 70% of global photoresist and can't separate that business from China. Everyone is individually rational and collectively trapped. | **P3** \u00b7 [FOOTAGE:] \"International commerce \u2014 shipping, ports, trade\" \u00b7 ambient, 10s |\n| (Voice note: This is the moment empathy should land \u2014 for everyone caught in this. It's not heroes vs. villains. It's structural.) | \u2014 |\n\n---\n\n## BEAT 4 \u2014 What We Thought vs. What Happened (12:00\u201316:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| Let's be honest about what the experts got wrong. This is where Bayesian updating comes in \u2014 not the words, just the logic. What did we believe? What happened? What should we believe now? | **P2** \u00b7 [MG:] TitleCard \u2014 \"UPDATE 1: What We Thought vs. What Happened\" \u00b7 2s |\n| [Beat.] | \u2014 |\n| Belief One: \"Export controls will cripple China's chip industry.\" Cutting off EUV access would freeze China at 14 nanometers indefinitely. | **P2** \u00b7 [MG:] PriorBelief card \u2014 \"Controls = Cripple\" \u00b7 3s |\n| What happened: SMIC produced 7 nanometer chips without EUV. Huawei's Mate 60 Pro shipped 30 million units {NEW}. Huawei's profits surged 564% in 2023 {NEW}. The constraint was not total. | **P1** \u00b7 [LAYERED:] FOOTAGE \"Huawei Mate phone manufacturing or retail\" + PosteriorBelief card shift showing \"Controls = Constrain (not cripple)\" \u00b7 6s |\n| What we should think now: Controls constrained scale \u2014 SMIC is limited to roughly 20,000 wafers per month compared to TSMC's millions \u2014 but not capability. The framing should shift from \"cripple\" to \"constrain and slow.\" | **P2** \u00b7 [MG:] Comparison visualization \u2014 SMIC production capacity vs. TSMC \u00b7 [ep01/visual-capacity-comparison.json] \u00b7 6s |\n| [Beat.] | \u2014 |\n| Belief Two: \"China can never make advanced chips without EUV.\" The physics requires EUV for anything below 7 nanometers. | **P2** \u00b7 [MG:] PriorBelief card \u2014 \"Advanced chips impossible without EUV\" \u00b7 3s |\n| What happened: CSIS confirmed SMIC was producing 7 nanometer chips. A lab in Shenzhen has a prototype EUV machine. | **P2** \u00b7 [MG:] PosteriorBelief card shift \u2014 \"Advanced chips rare without EUV, but possible\" \u00b7 4s |\n| What we should think now: \"Never\" was clearly wrong. The real question is where the hard ceiling lies \u2014 somewhere between 7 nanometers and 5 nanometers without EUV, and commercial EUV viability requiring another 4-6 years. | **P2** \u00b7 [MG:] RoadmapChart \u2014 \"Where's the ceiling? 7nm (proven) \u2192 5nm (unproven) \u2192 3nm (EUV required)\" \u00b7 [ep01/chart-roadmap-ceiling.json] \u00b7 6s |\n| [Beat.] | \u2014 |\n| Belief Three: \"Restrictions won't hurt US companies much.\" China would have no choice but to keep buying Western chips. | **P2** \u00b7 [MG:] PriorBelief card \u2014 \"Western dominance is permanent\" \u00b7 3s |\n| What happened: Nvidia's China market share dropped from 95% to effectively zero by October 2025 {\u2705}. They took a $5.5 billion write-down on unsold H20 chips {\u2705}. Qualcomm estimated $11.8 billion in lost 2024 sales {NEW}. | **P1** \u00b7 [LAYERED:] FOOTAGE \"Nvidia headquarters or data center\" + SankeyFlow showing market share migration from US to China domestic \u00b7 8s |\n| What we should think now: The revenue hit is real and severe for specific companies. But Nvidia's stock rose tenfold over the same period \u2014 demand from non-China AI drove compensation. The question shifted: will China build a viable *alternative* market that permanently displaces Western products? | **P2** \u00b7 [MG:] StockChart \u2014 \"Nvidia stock price: loss from China restrictions vs. total gains\" \u00b7 [ep01/chart-nvidia-stock.json] \u00b7 6s |\n| [Pause.] | \u2014 |\n| The people who got it right: Chris Miller predicted bifurcation. Gregory Allen of CSIS identified SMIC's 7-nanometer before public revelation. Paul Triolo predicted China would intensify investment while reducing visibility. | **P3** \u00b7 [FOOTAGE:] \"Expert speaking at conference or in office\" \u00b7 still photography or B-roll \u00b7 5s |\n| The people who got it wrong: Those who predicted controls would \"cripple\" entirely. Those who predicted Chinese self-sufficiency was imminent. Nvidia's own initial projections of minimal impact. | **P2** \u00b7 [MG:] KineticTypography \u2014 \"Humility: Everyone was partially right. Everyone was partially wrong.\" \u00b7 4s |\n| (Voice note: This is the intellectual honesty moment. Neither side has a monopoly on truth.) | \u2014 |\n\n---\n\n## BEAT 5 \u2014 The Cliff We're Standing On (16:00\u201318:00)\n\n| NARRATION | VISUAL PRODUCTION |\n|-----------|-------------------|\n| We return to the core paradox. The semiconductor supply chain is the most complex production system humans have built. Photoresists come from Japan. Lithography comes from the Netherlands. Design software comes from California. Packaging comes from Taiwan. Rare earth materials come from China. No single nation can replicate the entire system. | **P1** \u00b7 [MG:] RouteAnimation \u2014 global supply chain visualization showing flow routes between key nodes \u00b7 [ep01/visual-supply-chain-routes.json] \u00b7 10s |\n| Boston Consulting Group estimated that any single country achieving full self-sufficiency would cost $1 trillion {\u26a0\ufe0f}. That's Apple's market cap. One company's entire value to create one chip industry. | **P2** \u00b7 [LAYERED:] FOOTAGE \"Industrial facilities or economic data center\" + TextOverlay \"Full Self-Sufficiency: $1 trillion per country\" \u00b7 5s |\n| [Beat.] | \u2014 |\n| Here's the novel insight: Complexity itself has become a strategic variable. Unlike every historical precedent, we're in a situation where full decoupling harms both sides, yet interdependence remains strategically intolerable. The US can't tolerate depending on Taiwan. China can't tolerate depending on the US. But neither can escape the dependence without breaking the system that makes semiconductors possible. | **P1** \u00b7 [MG:] DilemmaVisualization \u2014 showing \"Both want decoupling\" AND \"Decoupling destroys both\" as simultaneously true \u00b7 [ep01/visual-dilemma.json] \u00b7 8s |\n| The outcome won't be clean victory or clean defeat. One researcher modeled it as \"divergence without equilibrium\" \u2014 a permanent condition of managed tension. Two chip ecosystems. Growing but never fully separate. Both sides constrained by their own strategic choices. | **P2** \u00b7 [MG:] LineChart \u2014 \"Divergence Without Equilibrium: Two systems evolving, never crossing\" \u00b7 [ep01/chart-divergence.json] \u00b7 6s |\n| [Pause.] | \u2014 |\n| We are standing on a cliff. Not a cliff of immediate military danger. A cliff of genuine uncertainty. | **P3** \u00b7 [FOOTAGE:] \"Actual cliff \u2014 coastal erosion, geological formation\" OR \"metaphorical cliff visualization\" \u00b7 5s |\n| Here's the unanswered question that will determine everything: How quickly will transformative AI capabilities emerge? If they appear in two or three years, export controls may succeed in preserving a decisive US lead. That's the optimistic case. If it takes a decade or more, China may achieve self-sufficiency during that window, rendering controls counterproductive while costing US companies tens of billions. Nobody knows. | **P1** \u00b7 [MG:] UncertaintyVisualization \u2014 AI development timeline with wide confidence bands, two divergent futures \u00b7 [ep01/visual-ai-timeline.json] \u00b7 10s |\n| [Beat.] | \u2014 |\n| And you should care about this. Every modern car has between 1,000 and 3,000 chips {NEW}. Every smartphone. Every data center. The COVID pandemic showed what happens when one supply chain breaks \u2014 empty store shelves worldwide. Prices climbed 30%. That was from a single region going offline. Imagine a bifurcated semiconductor world where your device is incompatible with the technology your coworkers use. | **P2** \u00b7 [MG:] DataVisualization \u2014 \"Semiconductors in Everything: Connected objects per household\" \u00b7 [ep01/visual-chip-ubiquity.json] \u00b7 6s |\n| The revolution that will reshape jobs and healthcare and education runs on chips produced by three companies in three countries. Everyone is a stakeholder whether they realize it or not. | **P2** \u00b7 [FOOTAGE:] \"Global city lights \u2014 Earth from space, human civilization from above\" \u00b7 8s |\n| [Beat.] | \u2014 |\n| So: we have a paradox that appears to have no clean solution. We have two historical lessons in tension. We have two powers making individually rational moves that collectively produce irrational outcomes. And we have a timeline question nobody can answer. | **P2** \u00b7 [MG:] SummaryVisualization \u2014 \"Three Paradoxes, One Uncertain Future\" \u00b7 4s |\n| That's the genuine cliff we're standing on. Not despair. Not false reassurance. Just structural uncertainty \u2014 the kind worth thinking about. | **P3** \u00b7 [FOOTAGE:] \"Semiconductor manufacturing or tech environment \u2014 wide shot, contemplative\" \u00b7 6s |\n| (Voice note: Land softly here. Thoughtful. Not apocalyptic. The viewer should leave with a question they'll keep thinking about.) | \u2014 |\n\n---\n\n## ASSET SUMMARY\n\n### Visual Mode Breakdown\n\n| Mode | Count | Est. Screen Time | % of Episode |\n|------|-------|------------------|--------------|\n| [FOOTAGE:] | 18 | ~6:45 | ~53% |\n| [MG:] | 21 | ~6:30 | ~36% |\n| [LAYERED:] | 7 | ~1:15 | ~7% |\n| TRANSITION | 5 | ~0:30 | ~4% |\n| **TOTAL** | **51** | **~18:00** | **100%** |\n\n**Assessment:** Visual mode distribution is within target ranges (FOOTAGE 50-70%, MG 20-30%). MG is slightly elevated (36% vs. 30% target) due to the analytical nature of the content, but remains acceptable. LAYERED elements provide visual punctuation without overwhelming. Pacing should feel balanced between data revelation and breathing room.\n\n### Remotion Compositions (to be generated via visual-spec)\n\n| # | Template | Description | Data File | Mode | Beat |\n|---|----------|-------------|-----------|------|------|\n| 1 | DataChart | US Chip Demand by Source | ep01/chart-demand-source.json | [MG:] | 1 |\n| 2 | TimelineComparison | 1941 Oil Embargo vs. 2022 Chip Controls (split-screen) | ep01/timeline-embargo-controls.json | [MG:] | 2 |\n| 3 | ProgressBar | Japan's 18-month fuel reserves countdown | ep01/progress-fuel-reserves.json | [LAYERED:] | 2 |\n| 4 | Diagram | Resource Denial logic flow | ep01/diagram-embargo-logic.json | [MG:] | 2 |\n| 5 | ChoroplethMap | COCOM member states and trade restriction flows | ep01/choropleth-cocom.json | [MG:] | 2 |\n| 6 | LineChart | USSR Computing Capability Gap vs. West, 1949-1994 | ep01/chart-cocom-gap.json | [MG:] | 2 |\n| 7 | BarChart | US Export Control Escalation Timeline 2019-2026 | ep01/chart-entity-list.json | [MG:] | 3 |\n| 8 | Diagram | Small Yard, High Fence expansion visualization | ep01/diagram-fence.json | [MG:] | 3 |\n| 9 | FunnelChart | CHIPS Act funding flow: authorized \u2192 awarded \u2192 disbursed | ep01/funnel-chips-act.json | [LAYERED:] | 3 |\n| 10 | ChessVsGoVisualization | Chess board vs. Go board strategic comparison | ep01/visual-chess-vs-go.json | [MG:] | 3 |\n| 11 | LineChart | SMIC 7nm Yield Improvement 2024-2025 | ep01/chart-smic-yields.json | [MG:] | 3 |\n| 12 | Diagram | SMIC Roadmap: proven vs. claimed vs. frontier | ep01/diagram-smic-roadmap.json | [MG:] | 3 |\n| 13 | ProductVisualization | ASML EUV Machine (scale reference) | ep01/visual-euv-scale.json | [MG:] | 3 |\n| 14 | SankeyFlow | Market share migration: US chips to China domestic | ep01/sankey-market-migration.json | [LAYERED:] | 4 |\n| 15 | StockChart | Nvidia stock price: China losses vs. total gains | ep01/chart-nvidia-stock.json | [MG:] | 4 |\n| 16 | RouteAnimation | Global semiconductor supply chain node flows | ep01/visual-supply-chain-routes.json | [MG:] | 5 |\n| 17 | DilemmaVisualization | Mutual decoupling desire vs. mutual interdependence | ep01/visual-dilemma.json | [MG:] | 5 |\n| 18 | LineChart | Divergence Without Equilibrium: two system evolution | ep01/chart-divergence.json | [MG:] | 5 |\n| 19 | UncertaintyVisualization | AI development timeline with confidence bands | ep01/visual-ai-timeline.json | [MG:] | 5 |\n| 20 | DataVisualization | Semiconductors in Everything: chip distribution per device | ep01/visual-chip-ubiquity.json | [MG:] | 5 |\n\n### Stock Footage Needed\n\n| # | Priority | Search Terms | Library | Treatment | Duration | Sourcability |\n|---|----------|-------------|---------|-----------|----------|-------------|\n| 1 | P1 | \"TSMC cleanroom wafer handling bright white\" OR \"semiconductor manufacturing cleanroom\" | Pexels, Pixabay | standard | 8s | Easy |\n| 2 | P3 | \"Arizona desert aerial landscape sunrise\" OR \"southwest desert scenic\" | Pexels, Pixabay | standard | 5s | Easy |\n| 3 | P3 | \"Tech industry office laboratory ambient\" OR \"technology workplace\" | Storyblocks | standard | 3s | Easy |\n| 4 | P2 | \"1940s industrial footage ships factory\" OR \"WWII era manufacturing\" | Archive.org, Prelinger | standard | 8s | Moderate |\n| 5 | P3 | \"Semiconductor manufacturing macro close-up wafer\" | Storyblocks | standard | 6s | Easy |\n| 6 | P3 | \"Shanghai skyline tech district modern city aerial\" | Pexels, Pixabay | standard | 8s | Moderate |\n| 7 | P1 | \"Huawei Mate smartphone manufacturing OR retail display\" | Pixabay, Unsplash | standard | 6s | Moderate |\n| 8 | P3 | \"Lab environment precision equipment microscopy scientific\" | Storyblocks | standard | 6s | Easy |\n| 9 | P3 | \"AI data center server farm interior\" OR \"AI training facility\" | Storyblocks | standard | 7s | Easy |\n| 10 | P3 | \"International commerce shipping ports trade logistics\" | Storyblocks | standard | 10s | Easy |\n| 11 | P3 | \"Expert speaking conference presentation office\" OR \"tech executive speaking\" | Fair use / still photo | standard | 5s | Hard \u2014 use still image |\n| 12 | P2 | \"Nvidia headquarters campus OR data center interior\" | Pixabay, Unsplash | standard | 8s | Moderate |\n| 13 | P3 | \"Cliff geological formation coastal erosion\" OR \"metaphorical cliff uncertainty\" | Pexels, Pixabay | standard | 5s | Easy |\n| 14 | P3 | \"Earth from space city lights night satellite view\" | Storyblocks, NASA | standard | 8s | Easy |\n| 15 | P3 | \"Semiconductor manufacturing tech environment wide shot\" | Storyblocks | standard | 6s | Easy |\n\n### Historical Images / Archival\n\n| # | Priority | Description | Source | Treatment | Notes |\n|---|----------|-------------|--------|-----------|-------|\n| 1 | P2 | Pearl Harbor attack \u2014 Japanese planes or American ships | Wikimedia Commons, Library of Congress | standard | Public domain WWII photos |\n| 2 | P1 | FDR signing oil embargo order (if exists) OR executive order from 1941 | Library of Congress | standard | Accept executive order document if Pearl Harbor photo unavailable |\n| 3 | P2 | Morris Chang (TSMC founder) speaking at event | Reuters, Fair Use / Wikimedia | standard | Still photo acceptable |\n| 4 | P2 | Jensen Huang (Nvidia CEO) headshot OR speaking | Reuters, Fair Use / Wikimedia | standard | Still photo acceptable |\n| 5 | P1 | ASML EUV lithography machine (machine only, no facility) | ASML PR photos OR Wikimedia | standard | Can use ASML official images under fair use |\n\n### AI-Generated Graphics (Engraved style per BRAND.md, last resort)\n\n| # | Prompt | Treatment | Use |\n|---|--------|-----------|-----|\n| 1 | \"Copperplate engraving style: global semiconductor supply chain as interconnected clockwork mechanism, showing Japan, Netherlands, Taiwan, US, China as nodes\" | standard | Potential opening beat visual if stock supply chain footage unavailable |\n| 2 | \"Line drawing style: abstract representation of strategic interdependence \u2014 two powers pulling in opposite directions on an object they cannot release\" | standard | Beat 5 visual if custom concept needed |\n\n### Claim Verification Summary\n\n| Status | Count | Notes |\n|--------|-------|-------|\n| {\u2705} Confirmed | 12 | All claims from research brief's verified table |\n| {\u26a0\ufe0f} Unverified/Likely | 5 | Historical facts and projections needing source check before recording |\n| {NEW} Not in brief | 6 | Claims introduced during scripting: 50% cost premium, Huawei 564% profit surge, Huawei 30M units, Qualcomm $11.8B loss, Every car has 1,000-3,000 chips |\n\n**Before recording:** All {NEW} and high-impact {\u26a0\ufe0f} claims should be verified and retagged as {\u2705}.\n\n---\n\n## PRODUCTION NOTES\n\n**Pacing observations:**\n- Beat 1 (2:30) establishes the paradox with surprising speed \u2014 good tension opener.\n- Beat 2 (4:30) is the longest, carrying two historical parallels. The split-screen timeline should help viewers track two narratives simultaneously. The emotional landing (\"genuine uncertainty\") is critical.\n- Beat 3 (5:00) is narrative-heavy with multiple companies and concepts. MG should be leaned on heavily here to break up exposition. The chess vs. go visualization is a P1 moment and should anchor the beat visually.\n- Beat 4 (4:00) uses Bayesian framing but doesn't name it. The three \"what we thought\" cards should have consistent visual treatment to make the structure obvious. This is the most data-dense beat.\n- Beat 5 (2:00) is the closing \"so what\" \u2014 return to the cliff metaphor and personal stakes. Should feel contemplative, not alarmist.\n\n**Visual motif execution:**\nThe supply chain web (mentioned in angle memo) appears in three moments:\n1. Beat 1: Clean, efficient network (the marvel of globalization)\n2. Beat 3: Tangled and strained (as both sides pull)\n3. Beat 5: Splitting into two diverging networks (bifurcation)\n\nThis can be implemented via the RouteAnimation template with a `progress` parameter showing network tension increasing across the episode.\n\n**Visual-first moments** (where image precedes narration):\n- Beat 2, COCOM parallel: The ChoroplethMap showing COCOM member states should appear 2-3 seconds before \"seventeen Western nations\" is spoken. Viewers see the map first, then narration explains it.\n- Beat 3, chess vs. go: The ChessVsGoVisualization should appear before \"The US plays chess\" is said. The metaphor lands harder if viewers see it before hearing it named.\n- Beat 4, prior belief cards: Each belief card should precede the \"what happened\" data by 1-2 seconds, creating visual rhythm.\n\n**Counterpoint moments** (visual contradicts narration for emphasis):\n- Beat 3: While narration says \"the controls are working,\" the SMIC yield curve should be climbing simultaneously. The visual shows the constraint isn't total.\n\n**Radio edit test:** Strip all visual specs and read the narration aloud. It should work as pure podcast audio \u2014 tension, pacing, emotional rhythm intact. All structural arguments should be comprehensible from narration alone; visuals amplify, not replace.\n\n---\n\n**Script Status:** Ready for script-audit and visual-concept review. Claim verification needed on 6 {NEW} claims before recording.\n"}], "grading": {"expectations": [{"text": "format-two-column", "passed": true, "evidence": "Found yes two-column table headers"}, {"text": "format-beat-structure", "passed": true, "evidence": "Found 5 beats"}, {"text": "format-mode-tags", "passed": true, "evidence": "73 mode tags across 50 visual entries (146%)"}, {"text": "format-priority-tiers", "passed": true, "evidence": "P1: 12, P2: 29, P3: 9"}, {"text": "format-claim-tags", "passed": true, "evidence": "\u2705: 17, \u26a0\ufe0f: 9, NEW: 9 (total: 35)"}, {"text": "format-asset-summary", "passed": true, "evidence": "Mode breakdown: True, Remotion: True, Footage: True, Images: True"}, {"text": "nar-10-stakes-first-30s", "passed": true, "evidence": "Beat 1 contains contradiction/reversal: True"}, {"text": "nar-11-named-concept", "passed": false, "evidence": "'Silicon Trap' appears 1 times in narration"}, {"text": "nar-06-bilateral-balance", "passed": false, "evidence": "Contains Chinese perspective terms: False"}, {"text": "vis-06-timing-breaks", "passed": false, "evidence": "VISUAL-FIRST: False, COUNTERPOINT: False"}, {"text": "vis-mode-balance", "passed": false, "evidence": "FOOTAGE: 53%, MG: 36% (MG exceeds 30% target range)"}, {"text": "nar-09-decoder-posture", "passed": true, "evidence": "Explainer anti-patterns found: 0 \u2014 []"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"skill_name": "script-draft", "iteration": 1, "configs": [{"name": "with_skill", "evals": [{"eval_name": "ep01-silicon-trap", "pass_rate": 0.917, "passed": 11, "total": 12, "tokens": 87289, "duration_seconds": 137.4, "failures": ["nar-11-named-concept"]}], "aggregate": {"mean_pass_rate": 0.917, "mean_tokens": 87289, "mean_duration_seconds": 137.4}}, {"name": "without_skill", "evals": [{"eval_name": "ep01-silicon-trap", "pass_rate": 0.667, "passed": 8, "total": 12, "tokens": 53534, "duration_seconds": 101.9, "failures": ["nar-11-named-concept", "nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance"]}], "aggregate": {"mean_pass_rate": 0.667, "mean_tokens": 53534, "mean_duration_seconds": 101.9}}], "delta": {"pass_rate": "+25.0pp", "tokens": "+63.0%", "duration": "+34.8%"}, "analysis": {"discriminating_assertions": ["nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance"], "non_discriminating": ["format-two-column", "format-beat-structure", "format-mode-tags", "format-priority-tiers", "format-claim-tags", "format-asset-summary", "nar-10-stakes-first-30s", "nar-09-decoder-posture"], "both_fail": ["nar-11-named-concept"], "observations": ["The skill adds +25pp on assertion pass rate, driven by 3 editorial quality assertions the baseline fails entirely.", "Format compliance is high for both \u2014 the SCRIPT_FORMAT.md spec is sufficient for format, but not for editorial quality.", "Both versions fail nar-11 (named concept frequency). The skill instructs '3-5 times with accumulating meaning' but the model only uses it once in the body. This needs stronger reinforcement.", "The skill costs +63% more tokens and +35% more time \u2014 expected given it reads 7 reference files vs. 3.", "The with-skill version includes Chinese emotional framing (\u5361\u8116\u5b50) and visual timing annotations that the baseline misses entirely.", "The baseline's MG percentage (36%) exceeds the target range, suggesting it over-indexes on data visualization without the skill's pacing guidance.", "Neither version uses [COUNTERPOINT] annotations \u2014 the skill instructs 1-2 per episode but neither run produced them. May need an explicit example."]}}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

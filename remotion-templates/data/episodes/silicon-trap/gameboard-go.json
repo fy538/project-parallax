@@ -1,0 +1,38 @@
+{
+  "episode": "silicon-trap",
+  "title": "China Strategy: Go (围棋)",
+  "subtitle": "Surrounding territory, stone by stone",
+  "variant": "go",
+  "boardSize": 9,
+  "initialStones": [],
+  "phases": [
+    {
+      "label": "Domestic fabs",
+      "durationSec": 2,
+      "stones": [
+        { "position": [2, 2], "stone": "black", "label": "SMIC" },
+        { "position": [6, 2], "stone": "black", "label": "CXMT" }
+      ]
+    },
+    {
+      "label": "Talent programs",
+      "durationSec": 2,
+      "stones": [
+        { "position": [4, 4], "stone": "black", "label": "Talent" },
+        { "position": [2, 6], "stone": "black", "label": "Big Fund" }
+      ]
+    },
+    {
+      "label": "Full encirclement",
+      "durationSec": 2,
+      "stones": [
+        { "position": [6, 6], "stone": "black", "label": "DeepSeek" },
+        { "position": [4, 2], "stone": "black", "label": "Huawei" },
+        { "position": [2, 4], "stone": "black", "label": "Rare earths" },
+        { "position": [6, 4], "stone": "black", "label": "Domestic EDA" }
+      ]
+    }
+  ],
+  "durationSec": 8,
+  "backgroundVariant": "light"
+}

@@ -21,27 +21,31 @@ import { Source, Layer } from "react-map-gl/mapbox";
 import {
   palette,
   ramps,
+  fonts,
   fontSizes,
   layout,
   sec,
-  light,
   shadows,
-  cardPadding,
-  textMaxWidth,
+  contentArea,
 } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   slideIn,
   exitFade,
+  CLAMP,
   CLAMP_QUARTIC,
   CLAMP_CUBIC_INOUT,
 } from "../../utils/animation";
 import { scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
 import { MapGL } from "../../components/MapGL";
-import { FadeIn } from "../../components/FadeIn";
+import { TitleBlock } from "../../components/TitleBlock";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import type { ChoroplethMapData, AnimationPhase, CountryData } from "./types";
 
 // ── Color ramp lookup ───────────────────────────────────────────────────────
@@ -217,8 +221,10 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   data,
 }) => {
   const frame = useCurrentFrame();
+  const direction = useDirection(data._direction);
+  const theme = useThemeMode("light");
   const { durationInFrames } = useVideoConfig();
-  const { style: compStyle } = useCompositionAnimation({ noDrift: true });
+  const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
 
   const colorRamp = useMemo(
     () => getColorRamp(data.colorRamp),
@@ -249,9 +255,8 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
     camera = currentCamera;
   }
 
-  const bearingDrift = interpolate(frame, [0, durationInFrames], [0, 8], {
-    extrapolateRight: "clamp",
-  });
+  // Linear intentional — constant-speed drift for bearing (easing: none)
+  const bearingDrift = interpolate(frame, [0, durationInFrames], [0, 8], CLAMP);
 
   // ── Country highlight expressions ─────────────────────────────────────
 
@@ -269,14 +274,30 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   );
 
   return (
-    <Background variant="light" tint={data.backgroundTint}>
+    <Background
+      variant="light"
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
+        {/* Brand strips */}
+        <HeaderStrip
+          metadata={`${data.episode || ""} · ${camera.latitude.toFixed(1)}°${camera.latitude >= 0 ? "N" : "S"} ${Math.abs(camera.longitude).toFixed(1)}°${camera.longitude >= 0 ? "E" : "W"}`.trim()}
+          mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+        />
+        <FooterStrip
+          scale={`Z${camera.zoom.toFixed(1)}`}
+          mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+        />
+
         <MapGL
           longitude={camera.longitude}
           latitude={camera.latitude}
           zoom={camera.zoom}
           pitch={camera.pitch}
           bearing={camera.bearing + bearingDrift}
+          dark={data.backgroundVariant === "dark"}
         >
           <Source
             id="country-boundaries"
@@ -290,6 +311,23 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
               paint={{
                 "fill-color": fillExpression as any,
                 "fill-opacity": opacityExpression as any,
+              }}
+            />
+            {/* Fill-extrusion — Nat Geo signature: highlighted countries push up subtly */}
+            <Layer
+              id="country-highlight-extrude"
+              type="fill-extrusion"
+              source-layer="country_boundaries"
+              paint={{
+                "fill-extrusion-color": fillExpression as any,
+                "fill-extrusion-opacity": 0.35,
+                "fill-extrusion-height": [
+                  "case",
+                  ["==", ["typeof", opacityExpression], "number"],
+                  ["*", ["literal", 30000], opacityExpression],
+                  30000,
+                ] as any,
+                "fill-extrusion-base": 0,
               }}
             />
             <Layer
@@ -306,109 +344,27 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
           </Source>
         </MapGL>
 
-        {/* Phase title overlay */}
+        {/* Coordinate metadata now lives in HeaderStrip (top-right) */}
+
+        {/* Phase title overlay — now using TitleBlock component */}
         {current && (
           <div
             style={{
-              position: "absolute",
-              bottom: layout.safeArea.bottom,
-              left: layout.safeArea.left,
-              right: layout.safeArea.right,
-              opacity: exitFade(frame, durationInFrames),
+              opacity: exitFade(frame, durationInFrames, 15),
             }}
           >
-            <FadeIn
+            <TitleBlock
+              title={current.phase.title}
+              subtitle={current.phase.subtitle}
+              mode="dark"
+              safeAreaTier="generous"
               startFrame={current.startFrame}
-              direction="up"
-              distance={20}
-            >
-              <div
-                style={{
-                  backgroundColor: `${palette.ink}D9`,
-                  padding: cardPadding.css,
-                  borderRadius: 4,
-                  maxWidth: 700,
-                  boxShadow: `0 2px 12px rgba(0,0,0,0.25), 0 0 20px ${palette.amber}15`,
-                  position: "relative",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 4,
-                    background: `linear-gradient(180deg, ${palette.amber}, ${palette.amber}40)`,
-                    borderRadius: "4px 0 0 4px",
-                  }}
-                />
-                <div
-                  style={{
-                    fontSize: fontSizes.h3,
-                    fontWeight: 600,
-                    color: light.text.primary,
-                    marginBottom: current.phase.subtitle ? layout.spacing.xs : 0,
-                    textShadow: shadows.textLift,
-                    maxWidth: textMaxWidth.h2,
-                  }}
-                >
-                  {current.phase.title}
-                </div>
-                {current.phase.subtitle && (
-                  <div
-                    style={{
-                      fontSize: fontSizes.caption,
-                      color: light.text.muted,
-                      textShadow: shadows.textLift,
-                      maxWidth: textMaxWidth.body,
-                    }}
-                  >
-                    {current.phase.subtitle}
-                  </div>
-                )}
-              </div>
-            </FadeIn>
+              accentColor={palette.amber}
+            />
           </div>
         )}
 
-        {/* Episode label (top left) */}
-        <div
-          style={{
-            position: "absolute",
-            top: layout.safeArea.top,
-            left: layout.safeArea.left,
-            opacity: Math.min(
-              fadeIn(frame, 0, sec(1)),
-              exitFade(frame, durationInFrames)
-            ),
-            transform: `translateY(${slideIn(frame, 0, 12, sec(0.8))}px)`,
-          }}
-        >
-          <div
-            style={{
-              fontSize: fontSizes.label,
-              color: light.text.muted,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-              textShadow: shadows.textLift,
-            }}
-          >
-            {data.episode}
-          </div>
-          <div
-            style={{
-              fontSize: fontSizes.body,
-              color: light.text.primary,
-              fontWeight: 500,
-              marginTop: layout.spacing.xs / 2,
-              textShadow: shadows.textLift,
-            }}
-          >
-            {data.title}
-          </div>
-        </div>
+        {/* Episode info now consolidated into HeaderStrip (top) */}
       </AbsoluteFill>
     </Background>
   );

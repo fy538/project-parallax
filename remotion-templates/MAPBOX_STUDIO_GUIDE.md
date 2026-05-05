@@ -213,6 +213,95 @@ export const mapConfig = {
 
 ---
 
+## Building "Meridian Dark" (Secondary Style)
+
+Most Parallax compositions use Light, but dramatic compositions (escalation episodes,
+night-coded geopolitical events, archival war-room sequences) call for Dark. Build
+this style the same way as Light, starting from `dark-v11` instead of `light-v11`.
+Once published, set its URL on `mapConfig.darkStyleUrl` in `theme.ts` and any map
+template will use it when passed `dark={true}` (RouteAnimation/ChoroplethMap inherit
+this from the episode's `backgroundVariant`).
+
+### Step D1: Create the Dark Style
+
+1. Mapbox Studio → **New style** → **Dark** (this is `dark-v11`)
+2. Click **"Customize Dark"**
+3. Rename to **"Meridian Dark"**
+
+### Step D2: Override Colors
+
+Apply these overrides — each maps to a token in `mapConfig.darkStyleColors`:
+
+| Layer | Color | Notes |
+|-------|-------|-------|
+| `background` | `#100E0C` | Deeper than ink; ocean shows through here. Warm umber undertone, not cold black. |
+| `land` (and any `landuse_*`) | `#1C1814` (= `ink`) | Hide all `landuse_*` sublayers — geopolitics doesn't care about parks. |
+| `water` | `#100E0C` | Same as background — ocean and water blend. Optionally `#0E0B09` for subtle distinction. |
+| `admin-0` (country borders) | `#3A3530` at 0.5px | Borders exist but don't compete. |
+| `admin-1` (state/province) | hide, or `#2C2823` at 0.3px | Hide for most episodes. |
+| `country-label` | text color `#F0E6D0` (= `bone`), halo `#1C1814` at 1.5px, opacity 0.85 | DIN Pro Medium. |
+| `place-city-label` (zoom < 5) | hide | Noise. |
+| `place-city-label` (zoom ≥ 6) | `#8A8070` (= `text.dark.muted`) | Activate only for city-level shots. |
+| `water-label` | `#5A5448`, halo `#100E0C` at 1px, DIN Pro Italic | Subtle ocean names. |
+| All `road-*`, `railway`, `building`, `poi`, `transit` | hide | Same as Light — not needed. |
+
+### Step D3: Hillshading (Dark)
+
+The dark style benefits from stronger hillshading because terrain is the only
+texture in a flat-color frame. Add a hillshade layer (same as Light Step 8) but with:
+
+- **Exaggeration:** `0.45` (slightly stronger than Light's 0.3)
+- **Shadow color:** `#000000` at 50% opacity
+- **Highlight color:** `#3A3530` at 12% opacity (warm — not pure white, which reads cold on dark land)
+- **Illumination direction:** `315`
+
+### Step D4: Bathymetry (Dark)
+
+Dark style benefits more from ocean depth lines than Light does:
+
+1. Search **"depth"** or **"bathymetry"**
+2. Set line color to `#1C1814` (= `ink`) at 0.4px stroke
+3. If no layer exists, optionally add a `fill-extrusion` of nothing — the dark-v11
+   base already provides subtle ocean shading.
+
+### Step D5: Publish & Wire Up
+
+1. Publish — note the Dark style URL: `mapbox://styles/98flyingtiger/yyyyyyyyyyy`
+2. Edit `remotion-templates/src/design/theme.ts`:
+   ```typescript
+   export const mapConfig = {
+     styleUrl: "mapbox://styles/98flyingtiger/xxxxxxxxxx",     // Meridian Light
+     darkStyleUrl: "mapbox://styles/98flyingtiger/yyyyyyyyyyy", // Meridian Dark
+     // ... rest unchanged
+   };
+   ```
+3. Templates already wire this up via `MapGL`'s `dark` prop. To use Dark in a
+   composition, the parent template passes `<MapGL dark={data.backgroundVariant === "dark"} ...>`.
+   ChoroplethMap and RouteAnimation will pick it up on the next render.
+
+### Verification (Dark)
+
+After publishing:
+
+- [ ] Ocean reads as deep warm umber, not cold black
+- [ ] Land (`ink`) is just barely separable from water — country borders carry the distinction
+- [ ] Country labels in `bone` are readable but feel "found", not announced
+- [ ] Hillshading is felt on Himalayas/Andes/Alps without being seen as 3D
+- [ ] ChoroplethMap highlight fills (rust, amber) glow visibly against the dark land
+- [ ] RouteAnimation arcs in `amber` are luminous on the dark frame
+- [ ] No road/POI clutter visible at any zoom
+
+### Preset JSON (Optional)
+
+If you'd rather skip the manual layer editing and import the style as a JSON file
+(faster but less flexible), there's a starter `meridian-dark-preset.json` snippet in
+this directory that you can paste into Mapbox Studio's "Style Editor → Document".
+It contains all the color overrides above as a base. After import, you'll still
+need to manually add the hillshade layer (Step D3) since terrain DEM sources require
+account-level config.
+
+---
+
 ## Verification Checklist
 
 After publishing, open Remotion Studio (`npx remotion studio --gl=angle`) and check:

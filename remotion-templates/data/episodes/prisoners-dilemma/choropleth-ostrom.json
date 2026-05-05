@@ -1,0 +1,46 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Cooperation Is Designed",
+  "subtitle": "Ostrom's documented commons governance cases",
+  "projection": "geoNaturalEarth1",
+  "center": [20, 20],
+  "scale": 130,
+  "phases": [
+    {
+      "title": "Key Cases",
+      "subtitle": "Centuries of successful cooperation",
+      "durationSec": 6,
+      "countries": [
+        { "name": "Spain", "iso3": "ESP", "fill": "#E5A544", "label": "Huertas (600+ yrs)" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#E5A544", "label": "Alpine grazing (13th c.)" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#E5A544", "label": "Iriaichi forests" },
+        { "name": "United States", "iso3": "USA", "fill": "#E5A544", "label": "Maine lobster" }
+      ]
+    },
+    {
+      "title": "800+ Documented Cases",
+      "subtitle": "Communities managing shared resources without privatization or state control",
+      "durationSec": 6,
+      "countries": [
+        { "name": "Spain", "iso3": "ESP", "fill": "#E5A544" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#E5A544" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#E5A544" },
+        { "name": "United States", "iso3": "USA", "fill": "#E5A544" },
+        { "name": "Nepal", "iso3": "NPL", "fill": "#E5A544" },
+        { "name": "Philippines", "iso3": "PHL", "fill": "#E5A544" },
+        { "name": "Turkey", "iso3": "TUR", "fill": "#E5A544" },
+        { "name": "Kenya", "iso3": "KEN", "fill": "#E5A544" },
+        { "name": "Brazil", "iso3": "BRA", "fill": "#E5A544" },
+        { "name": "India", "iso3": "IND", "fill": "#E5A544" },
+        { "name": "Mexico", "iso3": "MEX", "fill": "#E5A544" },
+        { "name": "Indonesia", "iso3": "IDN", "fill": "#E5A544" },
+        { "name": "Canada", "iso3": "CAN", "fill": "#E5A544" },
+        { "name": "Sri Lanka", "iso3": "LKA", "fill": "#E5A544" },
+        { "name": "Thailand", "iso3": "THA", "fill": "#E5A544" }
+      ]
+    }
+  ],
+  "durationSec": 12,
+  "backgroundVariant": "light",
+  "source": "Ostrom (1990); Cox et al. (2010)"
+}

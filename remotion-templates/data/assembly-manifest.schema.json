@@ -13,7 +13,7 @@
     },
     "episode": {
       "type": "string",
-      "description": "Episode identifier, e.g. 'EP01'."
+      "description": "Episode slug identifier, e.g. 'silicon-trap'."
     },
     "title": {
       "type": "string",
@@ -75,6 +75,118 @@
           "title": { "type": "string" },
           "startSec": { "type": "number" },
           "endSec": { "type": "number" }
+        }
+      }
+    },
+    "filmOverlay": {
+      "type": "object",
+      "description": "Episode-level film overlay config. Wraps all visual layers with cinematic texture effects (grain, vignette, light-leak, etc.).",
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "type": "string",
+          "enum": ["clean", "documentary", "cinematic", "dramatic", "archival"],
+          "description": "Named preset from FilmOverlayPresets.ts. If specified, effects and intensity are derived from the preset."
+        },
+        "effects": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["grain", "vignette", "light-leak", "dust", "scratch", "flicker"] },
+          "description": "Which effects to enable. Overrides preset if both specified."
+        },
+        "intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall intensity (0-1). Overrides preset if both specified."
+        }
+      }
+    },
+    "lowerThird": {
+      "type": "object",
+      "description": "Episode-level lower-third config. When present, renders a LowerThird per beat with the specified label and timing.",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Label shown on all lower-thirds, e.g. '∴ PARALLAX · EP.01'."
+        },
+        "accentColor": {
+          "type": "string",
+          "description": "Accent color for the vertical line (default: gold #C4A747)."
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["dark", "light"],
+          "description": "Color mode override (default: dark)."
+        },
+        "enterDelaySec": {
+          "type": "number",
+          "default": 0.5,
+          "description": "Seconds after beat start to show lower-third."
+        },
+        "displayDurationSec": {
+          "type": "number",
+          "default": 4,
+          "description": "Seconds to display before hiding."
+        }
+      }
+    },
+    "musicBed": {
+      "type": "object",
+      "description": "Episode-level music bed definition (Layer 1). Continuous ambient music tracks with crossfade transitions at beat boundaries.",
+      "additionalProperties": false,
+      "properties": {
+        "tracks": {
+          "type": "array",
+          "description": "Ordered list of music bed tracks. Tracks may overlap by their fade durations to create crossfade transitions.",
+          "items": {
+            "type": "object",
+            "required": ["id", "file", "startSec", "endSec", "volume", "mood"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique track identifier, e.g. 'opening', 'analytical-1', 'tension-2'."
+              },
+              "file": {
+                "type": "string",
+                "description": "Path to audio file relative to episode data directory."
+              },
+              "startSec": {
+                "type": "number",
+                "description": "Start time in seconds from episode start."
+              },
+              "endSec": {
+                "type": "number",
+                "description": "End time in seconds from episode start."
+              },
+              "fadeInSec": {
+                "type": "number",
+                "default": 2,
+                "description": "Fade-in duration in seconds."
+              },
+              "fadeOutSec": {
+                "type": "number",
+                "default": 3,
+                "description": "Fade-out duration in seconds."
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Base volume (0-1). Typically 0.10-0.15 under narration, 0.20-0.30 during visual-only moments."
+              },
+              "mood": {
+                "type": "string",
+                "enum": ["contemplative", "analytical", "tension", "resolution", "neutral"],
+                "description": "Mood category for sourcing reference. See AUDIO_DESIGN.md for mood → tempo/key mapping."
+              },
+              "beat": {
+                "type": "string",
+                "description": "Which narrative beat this track covers, e.g. 'opening', 'beat1', 'closing'."
+              }
+            }
+          }
         }
       }
     },
@@ -205,13 +317,27 @@
                 "TimelineComparison",
                 "FrameworkDiagram",
                 "ChoroplethMap",
-                "RouteAnimation"
+                "RouteAnimation",
+                "DecisionTree",
+                "SplitComposition",
+                "ProbabilityGauge",
+                "ImageComposite",
+                "PhotoMontage",
+                "NetworkDiagram",
+                "TimeSeriesChart",
+                "SankeyFlow",
+                "GameBoard",
+                "BayesianUpdate",
+                "StatReveal",
+                "RadarChart",
+                "AnnotatedImage",
+                "EscalationLadder"
               ],
               "description": "Remotion template component name."
             },
             "dataFile": {
               "type": "string",
-              "description": "JSON data file path relative to data/episodes/ep01/, e.g. 'kinetic-92-yield.json'."
+              "description": "JSON data file path relative to data/episodes/<slug>/, e.g. 'kinetic-92-yield.json'."
             }
           }
         },
@@ -234,20 +360,65 @@
           "properties": {
             "in": {
               "type": "string",
-              "enum": ["cut", "dissolve", "fade"],
+              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },
             "out": {
               "type": "string",
-              "enum": ["cut", "dissolve", "fade"],
+              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },
             "durationSec": {
               "type": "number",
               "default": 0.5,
-              "description": "Transition duration in seconds. Only applies to dissolve/fade."
+              "description": "Transition duration in seconds. Ignored for cut transitions."
             }
           }
+        },
+        "layered": {
+          "type": "object",
+          "description": "Layered composition config — composites this foreground segment over a background segment. Implements the [LAYERED:] visual mode.",
+          "additionalProperties": false,
+          "properties": {
+            "backgroundSegmentId": {
+              "type": "string",
+              "description": "ID of the background segment to composite under this foreground."
+            },
+            "position": {
+              "type": "string",
+              "enum": ["full", "lower-third", "upper-third", "center-inset", "bottom-bar"],
+              "default": "full",
+              "description": "Spatial positioning of the foreground layer."
+            },
+            "blendMode": {
+              "type": "string",
+              "enum": ["normal", "multiply", "screen", "overlay", "soft-light"],
+              "default": "normal"
+            },
+            "foregroundOpacity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.95
+            },
+            "backgroundDim": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "default": 0.2,
+              "description": "Darken the background so foreground text pops. 0 = no dim."
+            },
+            "foregroundFadeInSec": {
+              "type": "number",
+              "default": 0.3
+            },
+            "vignette": {
+              "type": "boolean",
+              "default": false,
+              "description": "Add a subtle vignette overlay for depth."
+            }
+          },
+          "required": ["backgroundSegmentId"]
         },
         "notes": {
           "type": "string",
@@ -255,13 +426,13 @@
         },
         "soundCue": {
           "type": "object",
-          "description": "Sound design marker for NLE editor. Specifies which sound event should accompany this segment's entrance or key moment.",
+          "description": "Primary sound design marker for NLE editor (Layer 2 — transition SFX). Specifies which sound event should accompany this segment's entrance or key moment.",
           "additionalProperties": false,
           "properties": {
             "type": {
               "type": "string",
               "enum": ["beat-transition", "stat-reveal", "tension-rise", "tension-resolve", "map-whoosh", "quote-bell", "section-open", "end-stinger"],
-              "description": "Sound event type. See references/sound-design.md for the full palette."
+              "description": "Sound event type. See AUDIO_DESIGN.md for the full palette."
             },
             "offsetSec": {
               "type": "number",
@@ -273,6 +444,57 @@
               "enum": ["subtle", "normal", "dramatic"],
               "default": "normal",
               "description": "Mix level. 'subtle' = barely audible texture, 'dramatic' = momentary foreground."
+            }
+          }
+        },
+        "soundCueSecondary": {
+          "type": "object",
+          "description": "Secondary transition SFX for segments with two distinct audio moments (e.g. entrance + key moment). Same schema as soundCue.",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["beat-transition", "stat-reveal", "tension-rise", "tension-resolve", "map-whoosh", "quote-bell", "section-open", "end-stinger"]
+            },
+            "offsetSec": {
+              "type": "number",
+              "default": 0
+            },
+            "intensity": {
+              "type": "string",
+              "enum": ["subtle", "normal", "dramatic"],
+              "default": "normal"
+            }
+          }
+        },
+        "textureCues": {
+          "type": "array",
+          "description": "Micro-SFX markers for template animation events (Layer 3 — texture hits). Each cue fires at a specific offset from segment start. Max 3 hits per 10-second window.",
+          "items": {
+            "type": "object",
+            "required": ["type", "offsetSec"],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["dot-click", "card-settle", "line-draw", "region-glow", "bar-grow", "node-pop", "page-turn"],
+                "description": "Texture hit type. See AUDIO_DESIGN.md for descriptions."
+              },
+              "offsetSec": {
+                "type": "number",
+                "description": "Offset from segment start in seconds. Texture hits should be timed to match template animation events."
+              },
+              "volume": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 0.2,
+                "default": 0.08,
+                "description": "Volume (0-0.2). Default 0.08. Texture hits should be 15-20dB below narration."
+              },
+              "label": {
+                "type": "string",
+                "description": "Human-readable label for cue sheet, e.g. 'first bar grows', 'Taiwan fills'. Optional."
+              }
             }
           }
         }

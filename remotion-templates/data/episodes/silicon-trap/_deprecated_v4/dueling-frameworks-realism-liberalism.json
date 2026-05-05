@@ -1,0 +1,59 @@
+{
+  "data": {
+    "title": "Two Lenses on the Chip War",
+    "titleCn": "芯片战争的两个视角",
+    "subtitle": "How different frameworks explain US-China semiconductor competition",
+    "subtitleCn": "不同框架如何解释美中芯片竞争",
+    "phenomenon": "US-China Semiconductor Competition",
+    "phenomenonCn": "美中半导体竞争",
+    "frameworkA": {
+      "name": "Realism",
+      "nameCn": "现实主义",
+      "color": "#3266AD",
+      "tenets": [
+        {
+          "text": "States are primary actors in world politics"
+        },
+        {
+          "text": "Power is zero-sum—gains for one nation are losses for another"
+        },
+        {
+          "text": "Security drives policy more than economics"
+        },
+        {
+          "text": "Cooperation is fragile without enforcement mechanisms"
+        }
+      ],
+      "score": 78,
+      "verdict": "Explains escalation logic and strategic decoupling",
+      "verdictCn": "解释升级逻辑和战略脱钩"
+    },
+    "frameworkB": {
+      "name": "Liberalism",
+      "nameCn": "自由主义",
+      "color": "#5DAA68",
+      "tenets": [
+        {
+          "text": "International institutions constrain state behavior"
+        },
+        {
+          "text": "Trade creates mutual dependence and incentive for cooperation"
+        },
+        {
+          "text": "Democratic states rarely fight each other"
+        },
+        {
+          "text": "Norms and law shape outcomes as much as material interests"
+        }
+      ],
+      "score": 45,
+      "verdict": "Better explains pre-2020 interdependence",
+      "verdictCn": "更好地解释2020年前的相互依赖"
+    },
+    "verdictLabel": "Which framework fits better? The evidence is mixed.",
+    "verdictLabelCn": "哪个框架更合适?证据是混合的。",
+    "episode": "EP01 — The Silicon Trap",
+    "backgroundVariant": "dark",
+    "durationSec": 12
+  }
+}

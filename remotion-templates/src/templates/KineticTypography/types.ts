@@ -4,6 +4,8 @@
  * Animated quotes, definitions, and bilingual text displays.
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface QuoteData {
   episode: string;
   variant: "quote" | "definition" | "bilingual" | "statistic";
@@ -34,4 +36,8 @@ export interface QuoteData {
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
   backgroundTint?: string;
   durationSec?: number;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

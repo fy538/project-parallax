@@ -1,11 +1,12 @@
 ---
 name: script-audit
-description: "Audit a video script for narrative quality across six lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, and visual layer quality (footage/MG balance, mode monotony, unsourceable footage calls). Use this skill whenever someone asks to review, audit, critique, or check a video script — or whenever a new script version is produced and quality should be verified before moving on. Also trigger when someone mentions 'script review', 'does this flow', 'is this engaging', 'check my script', 'what's wrong with this draft', or any request to evaluate narration/video writing quality."
+description: >
+  Audit a video script for narrative quality across 8 lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, visual layer quality, decoder posture, and connection density. Produces specific issues with locations and suggested rewrites. Use whenever someone asks to 'review the script', 'audit the script', 'check my script', 'does this flow', 'is this engaging', 'what's wrong with this draft', or when a new script version needs quality verification. This evaluates craft quality — distinct from persona-eval (audience fit) and visual-concept (visual feasibility). Always run after script-draft, before review-package.
 ---
 
 # Script Audit
 
-You are auditing a video narration script for narrative quality and visual layer health. Your job is to read the script carefully and run six independent audit lenses, then produce a consolidated report with specific issues, locations, and suggested rewrites.
+You are auditing a video narration script for narrative quality and visual layer health. Your job is to read the script carefully and run eight independent audit lenses, then produce a consolidated report with specific issues, locations, and suggested rewrites.
 
 ## Context
 
@@ -136,17 +137,39 @@ This lens applies only to two-column production scripts (with a right-column vis
 
 The visual layer has its own editorial logic, documented in `project/VISUAL_LANGUAGE.md` and `project/FOOTAGE_SOURCING.md`. This lens checks whether the script follows that logic. Read those docs if you haven't already.
 
-**Visual mode balance.** Count the `[FOOTAGE:]`, `[MG:]`, and `[LAYERED:]` entries across the full script. Calculate approximate screen time percentages. Check against target ranges:
-- FOOTAGE: 50-70% (if below 50%, the episode will feel like a slideshow; if above 75%, analysis feels unsupported)
-- MG: 20-30% (if above 35%, it's a slideshow)
-- LAYERED: 5-15% (if above 15%, the technique loses punch; if 0%, a missed opportunity)
+**Visual mode balance.** Count all mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`) across the full script. Calculate approximate screen time percentages. Check against target ranges:
+- MG: 40-55% (analytical video essays are naturally MG-dominant; if above 60%, it's a slideshow)
+- FOOTAGE: 25-40% (if below 25%, the analysis feels disconnected from reality)
+- ILLUST: 5-15% (atmospheric illustrations for emotional texture; if 0% in a 10+ min episode, flag as opportunity)
+- AI-GEN: 5-15% (photorealistic grounding; if above 15%, too expensive and fatiguing)
+- LAYERED: 5-10% (if above 15%, the technique loses punch)
+
+**Three-register check.** The channel uses three visual registers (see VISUAL_LANGUAGE.md):
+- Register 1 (Analytical): `[MG:]` entries — where the viewer reads information
+- Register 2 (Atmospheric): `[ILLUST:]` entries — where the viewer feels emotion
+- Register 3 (Grounding): `[AI-GEN:]` entries — where the viewer inhabits a space
+
+All three registers should be present in any episode longer than 8 minutes. If a register is completely absent, flag it with a suggestion for where it could be inserted. Common gaps:
+- Missing Atmospheric → the episode is all-data, all the time. Suggest 3-5 moments where constructivist illustrations would add emotional weight (typically at turning points, trap-closing moments, or dystopian implications).
+- Missing Grounding → the viewer never physically enters the spaces being discussed. Suggest 2-3 moments where a photorealistic AI scene would make the abstract concrete.
+
+**Register transition grammar.** When the script switches between registers, check that transitions respect the grammar from SCRIPT_FORMAT.md:
+- Analytical → Grounding: color-wash
+- Grounding → Atmospheric: blur-through
+- Atmospheric → Analytical: iris
+- Analytical → Atmospheric: dissolve
+- Hard cuts between stylistically distant registers (e.g., constructivist art directly to photorealistic AI) should be flagged as jarring.
 
 **Mode monotony.** Walk the visual column sequentially and flag:
-- More than 3 consecutive `[MG:]` entries without a `[FOOTAGE:]` break — this is the "lecture slideshow" pattern. The viewer's analytical brain fatigues. Suggest inserting 5-10 seconds of breathing footage between MG clusters.
+- More than 3 consecutive `[MG:]` entries without a non-MG break — this is the "lecture slideshow" pattern. The viewer's analytical brain fatigues. Suggest inserting breathing footage, an atmospheric illustration, or a grounding AI scene between MG clusters.
+- More than 2 consecutive `[ILLUST:]` or `[AI-GEN:]` entries — these registers fatigue faster than MG because their stylized quality is more demanding on attention.
 - More than 30 seconds of continuous `[FOOTAGE:]` without a visual change — the viewer starts watching footage instead of listening to narration. Suggest a cut, an overlay, or an MG insert.
 - Beats that are all one mode — a beat entirely in `[MG:]` feels like a presentation; a beat entirely in `[FOOTAGE:]` feels like a documentary without analysis. Flag single-mode beats and suggest where to introduce contrast.
 
-**Unsourceable footage calls.** For every `[FOOTAGE:]` entry, apply the "would a stock photographer have filmed this?" test from FOOTAGE_SOURCING.md. Flag entries that describe abstract concepts as footage — "footage of supply chain complexity," "footage of technology denial," "footage of economic integration" — these are motion graphic moments disguised as footage calls. Suggest the appropriate MG template instead.
+**Unsourceable footage calls.** For every `[FOOTAGE:]` entry, apply the "would a stock photographer have filmed this?" test from FOOTAGE_SOURCING.md. Flag entries that describe abstract concepts as footage — "footage of supply chain complexity," "footage of technology denial," "footage of economic integration." For each, suggest the appropriate alternative:
+- If the concept needs the viewer to *understand data* → `[MG:]` with the right Remotion template
+- If the concept needs the viewer to *feel something* → `[ILLUST:]` atmospheric illustration
+- If the concept describes a physical space cameras can't access → `[AI-GEN:]`
 
 **Sourcability warnings.** Flag `[FOOTAGE:]` entries that fall into the "Hard to Source" category from FOOTAGE_SOURCING.md (named individuals, specific facilities, classified tech, corporate branding). These aren't wrong — they just need the producer to know they'll require extra effort. Note the difficulty and suggest a fallback if the footage can't be found.
 
@@ -156,13 +179,77 @@ The visual layer has its own editorial logic, documented in `project/VISUAL_LANG
 
 **Beat cadence check.** For each beat, check whether it roughly follows the establish-analyze-breathe-climax-land pattern from VISUAL_LANGUAGE.md. Not every beat must follow this exactly, but flag beats that are strikingly unvaried — all footage or all MG from start to finish.
 
-Present this lens as a **visual rhythm map** — a compressed timeline showing mode, duration, and template type for every visual entry. This makes patterns visible at a glance:
+**Visual rhythm map.** If a visual-concept audit already exists for this script (check the episode folder for `visual-concept-audit.md`), reference its rhythm map rather than re-deriving one — visual-concept is the authoritative source for visual rhythm analysis. In that case, summarize the key rhythm findings from visual-concept and note any *new* rhythm issues created by narration patterns that visual-concept wouldn't catch (e.g., a narration-level pacing sag that makes an already-dense MG section feel even longer).
+
+If no visual-concept audit exists, generate the rhythm map yourself using this format:
 
 ```
-Beat 1: [F 10s] [MG:Title 3s] [F 15s] [MG:Chart 8s] [F 5s] [L 5s] [F 8s]  ✅ varied
-Beat 2: [MG:Map 12s] [MG:Chart 8s] [MG:FW 10s] [MG:Typo 4s]  ⚠️ all MG — needs footage break
+Beat 1: [F 10s] [MG:Title 3s] [F 15s] [MG:Chart 8s] [ILLUST 6s] [F 8s]  ✅ varied, 3 registers
+Beat 2: [MG:Map 12s] [MG:Chart 8s] [MG:FW 10s] [MG:Typo 4s]  ⚠️ all Analytical — needs register break
 Beat 3: [F 25s] [F 15s] [F 10s]  ⚠️ 50s footage without MG — analysis feels absent
+Beat 4: [MG:Chart 8s] [AI-GEN 7s] [ILLUST 5s] [MG:FW 10s]  ✅ register variety
 ```
+
+### Lens 7: Decoder Posture Check
+
+This lens operationalizes the narrative rules NAR-09 through NAR-16 from the Editorial Playbook. The core question: **is this script interesting, bold, and intellectually honest?** Note: "decoder" posture is about *engagement quality*, not about avoiding all context or hedging every claim. Context that creates wonder is good. Strong positions defended with evidence are good. The enemy is boring, not bold.
+
+**Explainer signals to flag:**
+- Context-setting that *lectures* rather than *creates curiosity*. The problem isn't context per se — it's context delivered as "let me catch you up" rather than "here's something remarkable." "A fab — a fabrication plant — is where chips are physically made" is lecture. "Buildings that cost tens of billions of dollars, where the air is a thousand times cleaner than a hospital operating room" is context-as-wonder. Flag the former, praise the latter. (Playbook: NAR-09)
+- Any opening that doesn't establish stakes or tension within the first ~150 words (~60 seconds). Stakes can be intellectual ("here's a puzzle no one is asking"), personal ("this affects the phone in your pocket"), or provocative ("$165 billion, and it made the problem worse"). Check: by word 150, does the viewer have a reason to keep watching? (Playbook: NAR-10)
+- Framework introductions that define-then-apply rather than apply-then-name. Deductive framing ("Let's look at this through game theory...") is lecture; inductive framing (walk through the analysis, name the framework after the viewer has already done it with you) is decoder. (Playbook: NAR-09)
+- Missing checkpoint beats. If the script goes longer than ~750 words (~5 minutes) without a consolidation moment, flag it. (Playbook: NAR-12)
+- Wishy-washy conclusions. If the episode ends at "it's complicated" or "only time will tell" without a defensible analytical position, flag it. The viewer came for a perspective. (Playbook: NAR-14)
+
+**Boldness signals to validate (good — note when present):**
+- Strong analytical positions defended with evidence and transparent reasoning — the script arrives at a conclusion, not a shrug (Playbook: NAR-14)
+- Productive mystery or withholding — showing a pattern before naming it, using tension to make the payoff land harder (Playbook: NAR-15)
+- Cross-cultural analytical fluency — Chinese frameworks (势/shi, Tianxia, Legalist thought) deployed as genuine analytical tools alongside Western ones, not as decoration (Playbook: NAR-16)
+- Cold open that uses one of the 6 hook types: stakes-shock, diaristic, news-anchor + assumed prep, framework-promise, track-record callback, provocation/dare
+- Named conceptual product — a 2-3 word portable idea the viewer can carry away (Playbook: NAR-11)
+- "Hidden structure" framing — the script promises to reveal a pattern, not explain a topic
+- Viewer positioned as co-investigator ("once you see this pattern...") rather than student ("to understand this, we need to...")
+
+**Toxin-line check (Playbook: NAR-13):**
+The toxin line is an *honesty test*, not a boldness limiter. Scan for:
+- Historical analogies used as conclusions rather than hypotheses (missing "where this analogy breaks" for any major parallel)
+- Hidden-agent causation — "what they don't want you to know" / "the real reason" / claims that require believing specific people coordinated in secret
+- Unfalsifiable totalizing claims, even if hedged with performed humility
+- Analogy without named breakdown: every historical parallel must have at least one explicit way it could fail
+But do NOT flag: strong structural arguments ("export controls are likely to fail because X, Y, Z"), surprising framework applications that are well-defended, or analytical boldness that names its reasoning transparently. The line is between structural analysis and imputed secret intent.
+
+For each flagged item, provide the specific text, whether it's an explainer signal or a toxin-line issue, and a concrete rewrite.
+
+### Lens 8: Connection Density
+
+This lens checks whether the script delivers on the knowledge-density promise from the research brief. Cross-domain connections are the core product; this lens verifies they're present, surprising, and well-distributed.
+
+**What to count:**
+- Identify every cross-domain connection in the script — a moment where the narration links the current topic to a different domain (historical period, philosophical framework, civilization, scientific concept, literary reference, game-theoretic model).
+- For each connection, note: (a) the domain, (b) whether it's genuinely surprising to an educated viewer or obvious, (c) how much script space it gets (a passing mention vs. a developed parallel).
+
+**What to check:**
+- **Count:** Are there at least 2-3 developed cross-domain connections? If the script relies on a single parallel (even a good one), it lacks the knowledge density that makes the content feel electric. Flag scripts with fewer than 2 developed connections.
+- **Surprise level:** For each connection, apply the "would an educated viewer already know this?" test. Connections like "empires rise and fall" are obvious. Connections like "Venice's Murano glass monopoly has the same island-concentration logic as TSMC" are surprising. Flag connections where the surprise level is low and suggest more unexpected alternatives if the brief provides them.
+- **Distribution:** Are the connections clustered in one beat or spread across the script? A script that front-loads all its historical parallels in Beat 2 and then runs on pure analysis for 10 minutes has a distribution problem. Connections should reward the viewer throughout.
+- **Brief utilization:** If the research brief surfaced 4-5 connections and the script only uses 1, flag the unused connections and ask whether any of the dropped ones would strengthen weak beats.
+
+**Output format:**
+```
+Connection map:
+1. [connection] — domain: [X] — surprise: HIGH/MED/LOW — developed/passing — Beat [N]
+2. [connection] — domain: [X] — surprise: HIGH/MED/LOW — developed/passing — Beat [N]
+...
+
+Total: [N] connections ([N] developed, [N] passing)
+Distribution: [even / front-loaded / clustered in Beat X]
+Brief utilization: [N] of [N] brief connections used
+Verdict: DENSE / ADEQUATE / THIN
+```
+
+If the verdict is THIN, suggest specific connections from the brief that could be woven into weak beats, with a concrete placement suggestion for each.
+
+---
 
 ## Output Format
 
@@ -194,6 +281,12 @@ Structure the report as follows:
 ## Lens 6: Visual Layer
 [Visual rhythm map. Mode balance check. Monotony flags. Unsourceable footage calls. Sourcability warnings.]
 (Skip this section if auditing a narration-only script.)
+
+## Lens 7: Decoder Posture
+[Explainer signals flagged. Decoder signals validated. Toxin-line check. Cold-open type assessment.]
+
+## Lens 8: Connection Density
+[Connection map. Count, surprise level, distribution, brief utilization. Verdict.]
 
 ## Priority Fixes
 [Top 3-5 issues ranked by impact on viewer engagement. Each with:

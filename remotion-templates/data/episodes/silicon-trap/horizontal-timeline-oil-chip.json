@@ -1,0 +1,82 @@
+{
+  "template": "HorizontalTimeline",
+  "title": "The Oil-Chip Parallel",
+  "subtitle": "Two resource denials, eight decades apart",
+  "mode": "dual",
+  "eraATitle": "1940s PACIFIC",
+  "eraBTitle": "2020s SEMICONDUCTORS",
+  "eraAColor": "#3266AD",
+  "eraBColor": "#C23B22",
+  "backgroundVariant": "dark",
+  "pairs": [
+    {
+      "eraA": {
+        "year": "1939",
+        "title": "Growing dependence",
+        "description": "Japan imports 80% of oil from U.S. — critical vulnerability.",
+        "weight": 1
+      },
+      "eraB": {
+        "year": "2015",
+        "title": "Growing dependence",
+        "description": "China imports 90% of advanced chips. TSMC concentration risk.",
+        "weight": 1
+      },
+      "connection": "Resource concentration"
+    },
+    {
+      "eraA": {
+        "year": "Jul 1941",
+        "title": "Asset freeze & oil embargo",
+        "description": "U.S. freezes Japanese assets, cuts oil supply entirely. 18-month reserves begin counting down.",
+        "weight": 3
+      },
+      "eraB": {
+        "year": "Oct 2022",
+        "title": "Export controls",
+        "description": "Biden chip controls cut China off from advanced semiconductors. Existing inventory begins depleting.",
+        "weight": 3
+      },
+      "connection": "Denial trigger"
+    },
+    {
+      "eraA": {
+        "year": "Nov 1941",
+        "title": "Diplomatic failure",
+        "description": "Hull Note demands full withdrawal. Japan sees no path to negotiated access.",
+        "weight": 2
+      },
+      "eraB": {
+        "year": "2023",
+        "title": "Escalation spiral",
+        "description": "Netherlands & Japan join restrictions. China sees coordinated containment.",
+        "weight": 2
+      },
+      "connection": "Multilateral lock"
+    },
+    {
+      "eraA": {
+        "year": "Dec 1941",
+        "title": "Pearl Harbor",
+        "description": "Calculated gamble: seize resources by force before reserves run out.",
+        "weight": 3
+      },
+      "eraB": {
+        "year": "202?",
+        "title": "?",
+        "description": "The structural pressure remains. The parallel asks: what is China's Pearl Harbor?",
+        "weight": 3
+      },
+      "connection": "Forced decision"
+    }
+  ],
+  "cameraPath": [
+    { "focus": 0, "zoom": 1.3, "duration": 3, "behavior": "track", "dimOthers": true, "label": "DEPENDENCE" },
+    { "focus": 1, "zoom": 1.5, "duration": 4, "behavior": "track", "dimOthers": true, "label": "DENIAL" },
+    { "focus": 2, "zoom": 1.3, "duration": 3, "behavior": "track", "dimOthers": true, "label": "ESCALATION" },
+    { "focus": 3, "zoom": 1.5, "duration": 4, "behavior": "snap", "dimOthers": true, "label": "FORCED DECISION" },
+    { "focus": "pullback", "zoom": 0.6, "duration": 3, "behavior": "track", "dimOthers": false }
+  ],
+  "episode": "silicon-trap",
+  "durationSec": 17
+}

@@ -24,32 +24,30 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  Easing,
 } from "remotion";
 import {
   palette,
-  dark,
-  light,
-  semantic,
   fonts,
   fontSizes,
   layout,
   sec,
   shadows,
-  contentArea,
-  cardPadding,
-  textMaxWidth,
+  radii,
+  cardPresets,
+  barStyle,
+  dividerStyle,
 } from "../../design/theme";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   stagger,
   exitFade,
-  bloomIntensity,
   easings,
   gridlineDraw,
   kenBurnsDrift,
+  heroSpring,
   CLAMP,
-  scaleReveal,
+  CLAMP_CUBIC,
 } from "../../utils/animation";
 import {
   lineDrawProgress,
@@ -58,12 +56,14 @@ import {
 } from "../../utils/drawLine";
 import {
   countUpValue,
-  formatValue,
 } from "../../utils/countUp";
 import { Background } from "../../components/Background";
-import { FadeIn } from "../../components/FadeIn";
+import { useDirection } from "../../hooks/useDirection";
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
-import type { TimeSeriesChartData, TimeSeriesPoint } from "./types";
+import { formatNumber } from "../../utils/numberFormat";
+import type { TimeSeriesChartData } from "./types";
 
 // ── Axis calculation helpers ────────────────────────────────────────────────
 
@@ -105,14 +105,14 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
+  const direction = useDirection(data._direction);
 
-  // Extract colors from theme or use semantic defaults
+  // Extract colors from theme via hook
   const bgVariant = data.backgroundVariant || "light";
-  const mode = bgVariant === "dark" ? dark : light;
-  const bgColor = mode.bg.base;
-  const textColor = mode.text.primary;
-  const mutedColor = mode.text.muted;
-  const accentColor = mode.text.accent;
+  const theme = useThemeMode(bgVariant);
+  // theme.bg.base and theme.text.primary available via `theme` directly
+  const mutedColor = theme.text.muted;
+  const accentColor = theme.text.accent;
 
 
 
@@ -138,8 +138,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const referenceYValues = data.referenceLines?.map((r) => r.y) || [];
   const allYWithReferences = [...allYValues, ...referenceYValues];
 
-  let yMin = Math.min(...allYWithReferences);
-  let yMax = Math.max(...allYWithReferences);
+  let yMin = allYWithReferences.length > 0 ? Math.min(...allYWithReferences) : 0;
+  let yMax = allYWithReferences.length > 0 ? Math.max(...allYWithReferences) : 1;
 
   if (data.yRange) {
     [yMin, yMax] = data.yRange;
@@ -153,8 +153,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const allXValues = data.lines.flatMap((line) =>
     line.points.map((p) => (typeof p.x === "string" ? parseFloat(p.x) : p.x))
   );
-  const xMin = Math.min(...allXValues);
-  const xMax = Math.max(...allXValues);
+  const xMin = allXValues.length > 0 ? Math.min(...allXValues) : 0;
+  const xMax = allXValues.length > 0 ? Math.max(...allXValues) : 1;
 
   // Generate polyline points string for each line
   const linePointStrings = useMemo(
@@ -191,7 +191,6 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   );
 
   // Animation frame markers
-  const titleStart = 0;
   const axesStart = sec(0.2);
   const eraStart = sec(0.5);
   const lineDrawStart = sec(0.8);
@@ -199,10 +198,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const areaFillStart = sec(1.8);
   const annotationStart = sec(2);
   const heroStatStart = sec(2.3);
-  const exitStart = durationInFrames - sec(0.5);
-
-  // ── Title animation ────────────────────────────────────────────────────────
-  const titleOpacity = fadeIn(frame, titleStart, sec(0.5));
+  // exitStart and titleOpacity available for future use
 
   // ── Gridlines (5 horizontal lines across the chart) ──────────────────────
   const gridlineCount = 5;
@@ -218,15 +214,29 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   );
 
   // ── Annotations ────────────────────────────────────────────────────────────
-  const annotationOpacity = fadeIn(frame, annotationStart, sec(0.4));
+  const annotationOpacity = fadeIn(frame, annotationStart, sec(0.4)) * exitFade(frame, durationInFrames, sec(0.5));
 
   // ── Hero stat (large corner statistic) ──────────────────────────────────
   let heroStatValue = 0;
+  let heroStatPrefix = "";
+  let heroStatSuffix = "";
   if (data.heroStat) {
-    // Parse the numeric part of the value string (e.g., "65%" → 65)
-    const numericStr = data.heroStat.value.replace(/[^\d.]/g, "");
-    const parsed = parseFloat(numericStr);
-    heroStatValue = isNaN(parsed) ? 0 : parsed;
+    // Parse the value string to extract prefix, number, and suffix
+    // e.g., "~65%" → prefix="~", number="65", suffix="%"
+    const match = data.heroStat.value.match(/^([^\d.]*)(\d+\.?\d*)(.*)$/);
+    if (match) {
+      heroStatPrefix = match[1];
+      const numericStr = match[2];
+      heroStatSuffix = match[3];
+      const parsed = parseFloat(numericStr);
+      heroStatValue = isNaN(parsed) ? 0 : parsed;
+    } else {
+      // Fallback for non-standard format
+      const numericStr = data.heroStat.value.replace(/[^\d.]/g, "");
+      const parsed = parseFloat(numericStr);
+      heroStatValue = isNaN(parsed) ? 0 : parsed;
+      heroStatSuffix = data.heroStat.value.replace(/[\d.]/g, "");
+    }
 
     const countStart = heroStatStart;
     const countDuration = sec(0.8);
@@ -249,8 +259,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   return (
     <Background
       variant={bgVariant}
-      tint={data.backgroundTint}
-      atmosphere="normal"
+      tint={direction.backgroundTint ?? data.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
     >
       <AbsoluteFill
         style={{
@@ -260,47 +271,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
         }}
       >
         {/* ── Title ──────────────────────────────────────────────────────────*/}
-        <FadeIn startFrame={titleStart} direction="down" duration={sec(0.5)}>
-          <div
-            style={{
-              position: "absolute",
-              top: layout.padding + 20,
-              left: layout.padding + 20,
-              right: layout.padding + 20,
-              textAlign: "left",
-              opacity: titleOpacity,
-            }}
-          >
-            <h1
-              style={{
-                fontSize: fontSizes.h2,
-                fontFamily: fonts.heading,
-                fontWeight: 700,
-                color: textColor,
-                margin: 0,
-                marginBottom: layout.spacing.xs,
-                textShadow: shadows.textLift,
-                letterSpacing: 2,
-              }}
-            >
-              {data.title}
-            </h1>
-            {data.subtitle && (
-              <p
-                style={{
-                  fontSize: fontSizes.label,
-                  fontFamily: fonts.mono,
-                  color: mutedColor,
-                  margin: 0,
-                  marginTop: layout.spacing.xs,
-                  textShadow: shadows.textLift,
-                }}
-              >
-                {data.subtitle}
-              </p>
-            )}
-          </div>
-        </FadeIn>
+        <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
 
         {/* ── Chart SVG canvas ──────────────────────────────────────────────*/}
         <svg
@@ -314,7 +285,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             overflow: "visible",
           }}
         >
-          {/* ── Era bands (background) ──────────────────────────────────────*/}
+          {/* ── Era bands (background) — fill + thin dashed top/bottom borders ──*/}
           {data.eras?.map((era, eraIdx) => {
             const eraFromX = getXPosition(
               era.from,
@@ -330,18 +301,42 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               chartLeft,
               chartRight
             );
-            const eraOpacity = (era.opacity ?? 0.08) * eraFadeOpacity;
+            const eraOpacity = Math.min(era.opacity ?? 0.08, 0.08) * eraFadeOpacity;
+            const borderOpacity = eraFadeOpacity * 0.4;
 
             return (
-              <rect
-                key={`era-${eraIdx}`}
-                x={eraFromX}
-                y={chartTop}
-                width={eraToX - eraFromX}
-                height={chartHeight}
-                fill={era.color}
-                opacity={eraOpacity}
-              />
+              <g key={`era-${eraIdx}`}>
+                <rect
+                  x={eraFromX}
+                  y={chartTop}
+                  width={eraToX - eraFromX}
+                  height={chartHeight}
+                  fill={era.color}
+                  opacity={eraOpacity}
+                />
+                {/* Top border — thin dashed line */}
+                <line
+                  x1={eraFromX}
+                  y1={chartTop}
+                  x2={eraToX}
+                  y2={chartTop}
+                  stroke={era.color}
+                  strokeWidth={1}
+                  strokeDasharray="4 3"
+                  opacity={borderOpacity}
+                />
+                {/* Bottom border — thin dashed line */}
+                <line
+                  x1={eraFromX}
+                  y1={chartBottom}
+                  x2={eraToX}
+                  y2={chartBottom}
+                  stroke={era.color}
+                  strokeWidth={1}
+                  strokeDasharray="4 3"
+                  opacity={borderOpacity}
+                />
+              </g>
             );
           })}
 
@@ -365,8 +360,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 x2={chartRight}
                 y2={gridY}
                 stroke={mutedColor}
-                strokeWidth={0.5}
-                opacity={0.2}
+                strokeWidth={1}
+                opacity={0.12}
                 strokeDasharray={gridStrokeStyle.strokeDasharray as number}
                 strokeDashoffset={gridStrokeStyle.strokeDashoffset as number}
               />
@@ -439,8 +434,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                   }
                   fill={line.color}
                   opacity={
-                    (line.areaOpacity ?? 0.15) *
-                    interpolate(frame, [areaFillStart + sec(lineIdx * 0.1), areaFillStart + sec(0.4)], [0, 1], CLAMP)
+                    (line.areaOpacity ?? 0.08) *
+                    interpolate(frame, [areaFillStart + sec(lineIdx * 0.1), areaFillStart + sec(0.4)], [0, 1], CLAMP_CUBIC)
                   }
                 />
               )
@@ -468,7 +463,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 strokeLinejoin="round"
                 strokeDasharray={line.dashed ? "8,4" : undefined}
                 strokeDashoffset={lineStyle.strokeDashoffset as number}
-                opacity={fadeIn(frame, lineDrawStart_frame, sec(0.2))}
+                opacity={fadeIn(frame, lineDrawStart_frame, sec(0.2)) * exitOpacity}
+                style={{ filter: `drop-shadow(0 1px 2px ${line.color}50)` }}
               />
             );
           })}
@@ -511,15 +507,26 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                     opacity={annotLineOpacity}
                   />
                 )}
-                {/* Dot marker */}
+                {/* Dot marker with glow */}
                 {annot.dot !== false && (
-                  <circle
-                    cx={annotX}
-                    cy={annotY}
-                    r={4}
-                    fill={annotColor}
-                    opacity={annotDotOpacity}
-                  />
+                  <>
+                    {/* Outer glow (larger, softer) */}
+                    <circle
+                      cx={annotX}
+                      cy={annotY}
+                      r={10}
+                      fill={annotColor}
+                      opacity={annotDotOpacity * 0.15}
+                    />
+                    {/* Main dot */}
+                    <circle
+                      cx={annotX}
+                      cy={annotY}
+                      r={6}
+                      fill={annotColor}
+                      opacity={annotDotOpacity}
+                    />
+                  </>
                 )}
               </g>
             );
@@ -532,13 +539,13 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             position: "absolute",
             top: chartTop,
             left: layout.padding + 20,
-            bottom: chartPaddingBottom,
+            height: chartHeight,
             width: chartPaddingLeft - 20,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "flex-end",
-            paddingRight: 8,
+            paddingRight: layout.spacing.xs,
             opacity: fadeIn(frame, axesStart + sec(0.1), sec(0.3)),
           }}
         >
@@ -548,13 +555,15 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               <div
                 key={`y-label-${i}`}
                 style={{
-                  fontSize: fontSizes.meta,
+                  fontSize: fontSizes.meta - 1,
                   fontFamily: fonts.mono,
                   color: mutedColor,
+                  opacity: 0.7,
                   textShadow: shadows.textLift,
+                  whiteSpace: "nowrap",
                 }}
               >
-                {Math.round(yValue)}
+                {formatNumber(yValue, { decimals: yValue >= 100 ? 0 : 1 })}
                 {data.yUnit && <span style={{ marginLeft: 2 }}>{data.yUnit}</span>}
               </div>
             );
@@ -566,26 +575,29 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           style={{
             position: "absolute",
             top: chartBottom + 12,
-            left: chartLeft,
-            right: chartRight,
+            left: 0,
+            width: layout.width,
             height: 40,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
             opacity: fadeIn(frame, axesStart + sec(0.1), sec(0.3)),
           }}
         >
           {/* Sample x-axis labels: first, middle, last */}
           {[0, 0.5, 1].map((progress, i) => {
             const xValue = xMin + progress * (xMax - xMin);
+            const labelX = getXPosition(xValue, xMin, xMax, chartLeft, chartRight);
             return (
               <div
                 key={`x-label-${i}`}
                 style={{
-                  fontSize: fontSizes.meta,
+                  position: "absolute",
+                  left: labelX,
+                  transform: "translateX(-50%)",
+                  fontSize: fontSizes.meta - 1,
                   fontFamily: fonts.mono,
                   color: mutedColor,
+                  opacity: 0.7,
                   textShadow: shadows.textLift,
+                  whiteSpace: "nowrap",
                 }}
               >
                 {Math.round(xValue)}
@@ -594,8 +606,30 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           })}
         </div>
 
-        {/* ── Annotation callouts (text labels) ──────────────────────────────*/}
-        {data.annotations?.map((annot, annotIdx) => {
+        {/* ── Annotation callouts (text labels) — with collision-avoidance force-layout ──*/}
+        {(() => {
+          if (!data.annotations) return null;
+          // Pre-compute annotation x positions and stack offsets to avoid overlap
+          const annots = data.annotations.map((annot) => ({
+            ...annot,
+            xPx: getXPosition(annot.x, xMin, xMax, chartLeft, chartRight),
+          }));
+          // Sort by x and assign stack offsets — push down 40px if within 80px of a previous label
+          const sorted = [...annots].sort((a, b) => a.xPx - b.xPx);
+          const stackByIdx: number[] = new Array(annots.length).fill(0);
+          for (let i = 0; i < sorted.length; i++) {
+            const orig = annots.findIndex((a) => a === sorted[i]);
+            // Look back at preceding labels in sorted order to find max stack within 80px
+            let stack = 0;
+            for (let j = 0; j < i; j++) {
+              if (Math.abs(sorted[i].xPx - sorted[j].xPx) < 80) {
+                const jOrig = annots.findIndex((a) => a === sorted[j]);
+                stack = Math.max(stack, stackByIdx[jOrig] + 1);
+              }
+            }
+            stackByIdx[orig] = stack;
+          }
+          return data.annotations.map((annot, annotIdx) => {
           const annotX = getXPosition(
             annot.x,
             xMin,
@@ -605,6 +639,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           );
           const offsetX = annotX < layout.width / 2 ? 16 : -16;
           const textAnchor = annotX < layout.width / 2 ? "left" : "right";
+          const stackOffsetY = stackByIdx[annotIdx] * 40;
 
           return (
             <div
@@ -612,7 +647,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               style={{
                 position: "absolute",
                 left: annotX + offsetX,
-                top: chartTop - 60,
+                top: chartTop - 60 + stackOffsetY,
                 textAlign: textAnchor,
                 opacity: annotationOpacity,
               }}
@@ -643,7 +678,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               )}
             </div>
           );
-        })}
+        });
+        })()}
 
         {/* ── Hero stat (large corner statistic) ──────────────────────────────*/}
         {data.heroStat && (
@@ -654,12 +690,14 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               right: layout.padding + 20,
               textAlign: "right",
               opacity: fadeIn(frame, heroStatStart, sec(0.5)),
+              transform: `scale(${0.92 + 0.08 * heroSpring(frame, layout.fps, heroStatStart)})`,
+              transformOrigin: "top right",
             }}
           >
             <div
               style={{
-                fontSize: 72,
-                fontFamily: fonts.mono,
+                fontSize: fontSizes.h1,
+                fontFamily: fonts.heading,
                 fontWeight: 700,
                 color: accentColor,
                 margin: 0,
@@ -667,10 +705,17 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 textShadow: `0 0 12px ${accentColor}60, ${shadows.textLift}`,
               }}
             >
+              {heroStatPrefix && (
+                <span style={{ fontSize: fontSizes.h3, marginRight: 2 }}>
+                  {heroStatPrefix}
+                </span>
+              )}
               {Math.round(heroStatValue)}
-              <span style={{ fontSize: 32, marginLeft: 4 }}>
-                {data.heroStat.value.replace(/[\d.]/g, "")}
-              </span>
+              {heroStatSuffix && (
+                <span style={{ fontSize: fontSizes.h3, marginLeft: 4 }}>
+                  {heroStatSuffix}
+                </span>
+              )}
             </div>
             <div
               style={{
@@ -707,6 +752,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           </div>
         )}
       </AbsoluteFill>
+      {/* Brand strips */}
+      <HeaderStrip mode={bgVariant} metadata={data.episode} />
+      <FooterStrip mode={bgVariant} />
     </Background>
   );
 };

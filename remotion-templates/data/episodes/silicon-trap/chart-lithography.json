@@ -1,0 +1,20 @@
+{
+  "episode": "silicon-trap",
+  "title": "The Lithography Gap",
+  "subtitle": "Passes required for 7nm chip production",
+  "variant": "comparison",
+  "comparisonPairs": [
+    {
+      "label": "Lithography passes per wafer",
+      "leftValue": 9,
+      "rightValue": 34
+    }
+  ],
+  "leftGroupLabel": "With EUV",
+  "leftGroupColor": "#E5A544",
+  "rightGroupLabel": "SMIC (without EUV)",
+  "rightGroupColor": "#C23B22",
+  "contextNote": "Every extra pass is another chance for a defect",
+  "durationSec": 8,
+  "backgroundVariant": "light"
+}

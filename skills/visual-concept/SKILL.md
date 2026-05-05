@@ -1,14 +1,7 @@
 ---
 name: visual-concept
 description: >
-  Audit a two-column production script's visual layer for feasibility, tool fit, variety, and
-  narrative alignment BEFORE committing to visual-spec generation. Use this skill after a script
-  draft exists but before running script-audit or visual-spec — it catches visual problems when
-  they're cheap to fix (by reshaping the script) rather than expensive to fix (by reworking rendered
-  assets). Trigger whenever someone says 'visual check', 'can we actually make this', 'visual
-  feasibility', 'check the visuals', 'are these visuals doable', 'visual concept pass', or any
-  request to evaluate whether a script's visual ambitions match the production toolkit. Also trigger
-  proactively when a new two-column script draft is produced and the next step would be visual-spec.
+  Audit a production script's visual layer for feasibility, tool fit, variety, and narrative alignment BEFORE committing to visual-spec. Catches visual problems when they're cheap to fix (by reshaping the script). Use whenever someone says 'visual check', 'can we actually make this', 'visual feasibility', 'check the visuals', 'are these visuals doable', or when a new script draft exists and the next step would be visual-spec. Supports re-validation mode (quick check after script revisions). This evaluates whether the visual layer is buildable — distinct from visual-spec (which generates the actual data files) and visual-qa (which checks rendered output).
 ---
 
 # Visual Concept Audit
@@ -89,18 +82,37 @@ Plus 4 format-specific templates: **DecisionTree** (branching choice visualizati
 
 **The decision rule from SVG_ILLUSTRATION_PIPELINE.md:** If the concept is "information that happens to be beautiful" → Claude SVG. If it's "beauty that happens to contain information" → look elsewhere.
 
-### Tool 4: AI Image Generation APIs (Recraft V4, Flux 2 Pro — $0.04-0.08/image)
+### Tool 4: Recraft Atmospheric Illustrations (Register 2 — $0.08/SVG)
 
-**Strengths:** Organic shapes, artistic styles, scene composition, textured illustrations, copperplate engraving style (the Parallax house style for AI art). Higher visual fidelity than Claude SVG for non-geometric concepts.
+**Strengths:** Constructivist/dystopian illustrations with professional composition, negative space, and visual hierarchy. The Parallax "atmospheric register" — propaganda-poster aesthetic, strong diagonals, anonymous figures, industrial metaphors. Generated via `tools/recraft/recraft.py` with integrated brand treatment (duotone ramps from palette.json). Four visual modes (metaphor, illustration, diagram, icon). Output is native SVG.
 
 **Weaknesses:**
-- Costs money (small but nonzero per image)
-- Requires API integration
-- Less precise control than Claude SVG for data-carrying visuals
-- Brand compliance not guaranteed — needs manual treatment pass
-- The Parallax house rule: **AI generations are last resort** (stock footage > archival > AI). Use only for abstract concepts with no photographic equivalent.
+- Costs money (~$0.08 per generation, ~$0.50-0.65 per episode)
+- NOT data-carrying — cannot replace charts, maps, or labeled diagrams
+- Requires clear emotional/conceptual target in the prompt
+- Quality depends on prompt specificity (30-60 words, composition + mood, not fine detail)
+- Can produce 2-4 variations per prompt for selection
 
-### Tool 5: Screen Captures / Direct Sources
+**The decision rule:** If the viewer needs to *read* something → Remotion template. If the viewer needs to *feel* something → Recraft illustration. If neither → stock footage.
+
+**When to assign `[ILLUST:]`:**
+- Emotional turning points (the trap closes, the system breaks, the pressure builds)
+- Conceptual metaphors that are too abstract for footage but too emotional for clean MG
+- Transitions between analytical sections where the viewer needs an emotional reset
+- Moments where the narration carries mood/dread/grandeur that would be undersold by generic B-roll
+
+### Tool 5: AI-Generated Video (Register 3 — $0.50-1.00/clip)
+
+**Strengths:** Photorealistic scenes in spaces cameras can't access (restricted facilities, historical reconstructions, conceptual scenes made literal). Mannequin/faceless figures depersonalize to universalize. Physical grounding for abstract analysis. Generated via Kling 3.0 (primary) / Sora 2 (multi-angle) / Runway Gen-4 (character consistency). Passed through `treat_video.py` brand treatment.
+
+**Weaknesses:**
+- Most expensive visual tool in the pipeline
+- 5-10 second clips only (consistency degrades past 12s)
+- Mannequin faces can drift toward realism (requires quality gate)
+- Never for named individuals or claimed specific events
+- Can't be stock-footage-equivalent — only for genuinely unsourceable physical spaces
+
+### Tool 6: Screen Captures / Direct Sources
 
 **Strengths:** Prediction market interfaces (Kalshi, Polymarket), specific data visualizations from reports, document excerpts, website UIs. Highest credibility for "look at this real thing."
 
@@ -156,7 +168,7 @@ Map the full sequence of visual types across the entire script. Then check:
 
 1. **Same-type sequences.** Three or more consecutive visual moments of the same template type (three maps in a row, three charts back-to-back). The viewer's eye adapts and stops registering new information. Suggest interspersing with a different type.
 
-2. **Same-mode sequences.** The script uses three visual modes: `[FOOTAGE:]`, `[MG:]`, and `[LAYERED:]`. Long stretches of nothing but one mode flatten the visual texture. Per VISUAL_LANGUAGE.md: no more than 3 consecutive `[MG:]` without a `[FOOTAGE:]` break, no more than 30 seconds of continuous `[FOOTAGE:]` without a visual change. Good episodes alternate between footage (grounding in reality), templates (analytical clarity), and layered moments (bridging both). Check the overall mode balance against targets: FOOTAGE 50-70%, MG 20-30%, LAYERED 5-15%.
+2. **Same-mode sequences.** The script uses three visual modes: `[FOOTAGE:]`, `[MG:]`, and `[LAYERED:]`. Long stretches of nothing but one mode flatten the visual texture. Per VISUAL_LANGUAGE.md: no more than 3 consecutive `[MG:]` without a `[FOOTAGE:]` break, no more than 30 seconds of continuous `[FOOTAGE:]` without a visual change. Good episodes alternate between footage (grounding in reality), templates (analytical clarity), and layered moments (bridging both). Check the overall mode balance against targets: MG 40-55%, FOOTAGE 30-40%, LAYERED 5-15%.
 
 3. **Treatment monotony.** If every image uses `standard` treatment for 10+ consecutive minutes, the color palette gets monotonous. Check whether narrative tone shifts (conflict, reflection, revelation) are reflected in treatment changes.
 
@@ -215,6 +227,61 @@ For each visual moment, ask: **is this assigned to the right tool?** This is the
 
 5. **Reuse opportunities.** Can any visual moment reuse or adapt an asset from a prior episode? Can a single Remotion composition serve multiple beats with different data? Flag opportunities to reduce production effort through smart reuse.
 
+### Lens 6: Register Balance & Transition Grammar
+
+The channel uses a three-register visual system (see `project/VISUAL_LANGUAGE.md`). Each register serves a different cognitive function:
+
+- **Register 1 — Analytical** (`[MG:]`): Clean data. Where the viewer *reads* information. Remotion templates.
+- **Register 2 — Atmospheric** (`[ILLUST:]`): Constructivist mood art. Where the viewer *feels* something. Recraft illustrations.
+- **Register 3 — Grounding** (`[AI-GEN:]`): Photorealistic scenes. Where the viewer *inhabits* a space. AI video.
+
+Check the script for:
+
+1. **Register presence.** All three registers should be represented in any episode longer than 8 minutes. If one is completely absent, the visual texture flattens. Flag and suggest where it could be inserted.
+
+2. **Register proportion.** Target ranges:
+   - Analytical (MG): 40-55% of visual time
+   - Atmospheric (ILLUST): 5-15%
+   - Grounding (AI-GEN): 5-15%
+   - Footage: 25-40% (register-neutral — provides real-world anchoring)
+   
+   Flag if any register exceeds or falls below its range. Common issues:
+   - All-MG scripts → "slideshow" effect. Suggest 3-5 atmospheric moments for emotional texture.
+   - Over-atmospheric → viewer fatigue from sustained mood without data resolution. Reduce to 4-5 key moments.
+   - Over-grounding → expensive and the stylized quality fatigues. Keep to 3-4 clips per episode.
+
+3. **Register pacing.** Map the register sequence across the full script:
+   ```
+   Beat 1: [MG] [FOOTAGE] [ILLUST] [MG]  ← good: register variety
+   Beat 2: [MG] [MG] [MG] [MG]  ← ⚠️ all-analytical, needs break
+   Beat 3: [ILLUST] [ILLUST] [AI-GEN]  ← ⚠️ too much non-analytical in sequence
+   ```
+   
+   Rules:
+   - No more than 3 consecutive Analytical entries without a non-Analytical break
+   - No more than 2 consecutive Atmospheric or Grounding entries
+   - Atmospheric and Grounding should be interspersed among Analytical and Footage, not clustered
+
+4. **Transition grammar compliance.** When the script switches between registers, check that the implied transition makes sense:
+   - Analytical → Grounding: color-wash (clean space bleeds into textured world)
+   - Grounding → Atmospheric: blur-through (photorealistic dissolves into stylized)
+   - Atmospheric → Analytical: iris (illustration contracts to focal point, data opens from it)
+   - Analytical → Atmospheric: dissolve (data fades into mood)
+   - Grounding → Analytical: color-wash or cut
+   
+   Flag any transition that would feel jarring (e.g., a hard cut from constructivist illustration directly to photorealistic AI video — these are too stylistically different for a cut).
+
+5. **Register-mode mismatch.** The most common error: assigning a visual moment to the wrong register.
+   - Data the viewer needs to read → MUST be Analytical (MG), NOT Atmospheric
+   - Mood/feeling/emotional weight → should be Atmospheric (ILLUST), NOT MG
+   - Physical space the viewer should feel present in → should be Grounding (AI-GEN), NOT footage of a different space
+   - Generic establishing shot → should be Footage, NOT AI-GEN (save AI-GEN for unsourceable spaces)
+
+6. **Atmospheric register editorial fit.** For each `[ILLUST:]` entry, verify:
+   - Does this narration moment carry enough emotional weight to warrant atmospheric treatment?
+   - Is the illustration adding something footage and MG cannot? (If a stock city aerial would work just as well, use footage)
+   - Is the mood aligned with the treatment ramp? (Constructivist dystopia + standard treatment = controlled unease; + conflict treatment = active danger)
+
 ## Output Format
 
 ```
@@ -243,6 +310,9 @@ For each visual moment, ask: **is this assigned to the right tool?** This is the
 ## Lens 5: Tool Assignment
 [Mismatch flags, underuse opportunities, overreach warnings, cost optimization, reuse opportunities.]
 
+## Lens 6: Register Balance
+[Register distribution (%), pacing sequence map, transition grammar compliance, register-mode mismatches, atmospheric editorial fit check.]
+
 ## Script Reshaping Suggestions
 [This is the most important section. For each issue that can't be solved by just changing the right column — where the narration itself should adapt to visual reality — provide:
 - The current narration moment and its visual spec
@@ -250,6 +320,15 @@ For each visual moment, ask: **is this assigned to the right tool?** This is the
 - How the narration could shift to enable a better visual
 - The proposed new visual approach
 Keep suggestions grounded in what the toolkit can actually do.]
+
+## Fixes for Visual-Spec (Structured Handoff)
+
+This section exists so visual-spec can consume actionable items directly instead of parsing the prose sections above. Include one row for every template reassignment, complexity warning, or sourcing risk that visual-spec needs to know about. If there are no issues, write "No fixes needed — all specs are visual-spec ready."
+
+| Comp # | Beat | Current Spec | Recommended Change | Reason |
+|--------|------|-------------|-------------------|--------|
+| [e.g. 18] | [4] | [ChoroplethMap] | [→ RouteAnimation] | [Need to show flows, not just highlighted countries] |
+| ... | | | | |
 
 ## Verdict
 

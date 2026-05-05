@@ -6,6 +6,8 @@
  * Each image gets the full BrandImage treatment (4-step pipeline).
  */
 
+import type { DirectionBlock } from "../../hooks/useDirection";
+
 export interface MontageImage {
   /** Path to image file (relative to public/) */
   src: string;
@@ -17,6 +19,8 @@ export interface MontageImage {
   compositeMode: "background" | "inset";
   /** Image opacity */
   compositeOpacity?: number;
+  /** Enable Ken Burns effect for this image (default: true) */
+  kenBurns?: boolean;
   /** Text overlay */
   overlay?: {
     text: string;
@@ -46,4 +50,8 @@ export interface PhotoMontageData {
   source?: string;
   durationSec?: number;
   backgroundTint?: string;
+
+  // ── Directing language overrides ──────────────────────────────────────
+  /** Per-composition direction block from visual-spec _direction namespace. */
+  _direction?: DirectionBlock;
 }

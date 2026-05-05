@@ -1,0 +1,94 @@
+{
+  "skill_name": "angle-memo",
+  "iteration": 1,
+  "configurations": [
+    {
+      "name": "with_skill",
+      "label": "With Skill",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "ep01-angle-memo",
+          "pass_rate": 1.0,
+          "passed": 12,
+          "total": 12,
+          "assertions": [
+            {"text": "named-concept-with-breakage", "passed": true},
+            {"text": "cold-open-with-drafts", "passed": true},
+            {"text": "connections-with-breakage", "passed": true},
+            {"text": "emotional-arc-complete", "passed": true},
+            {"text": "stakes-sentence-concrete", "passed": true},
+            {"text": "decoder-framing-with-gap", "passed": true},
+            {"text": "visual-motif-evolving", "passed": true},
+            {"text": "visual-first-moments", "passed": true},
+            {"text": "counterpoint-moment", "passed": true},
+            {"text": "title-options", "passed": true},
+            {"text": "toxin-line-clean", "passed": true},
+            {"text": "reasonable-length", "passed": true}
+          ],
+          "timing": {
+            "total_tokens": 84359,
+            "duration_ms": 113084,
+            "total_duration_seconds": 113.1
+          }
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 1.0,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 84359,
+        "mean_duration_seconds": 113.1
+      }
+    },
+    {
+      "name": "without_skill",
+      "label": "Without Skill (Baseline)",
+      "evals": [
+        {
+          "eval_id": 1,
+          "eval_name": "ep01-angle-memo",
+          "pass_rate": 0.917,
+          "passed": 11,
+          "total": 12,
+          "assertions": [
+            {"text": "named-concept-with-breakage", "passed": true},
+            {"text": "cold-open-with-drafts", "passed": true},
+            {"text": "connections-with-breakage", "passed": false},
+            {"text": "emotional-arc-complete", "passed": true},
+            {"text": "stakes-sentence-concrete", "passed": true},
+            {"text": "decoder-framing-with-gap", "passed": true},
+            {"text": "visual-motif-evolving", "passed": true},
+            {"text": "visual-first-moments", "passed": true},
+            {"text": "counterpoint-moment", "passed": true},
+            {"text": "title-options", "passed": true},
+            {"text": "toxin-line-clean", "passed": true},
+            {"text": "reasonable-length", "passed": true}
+          ],
+          "timing": {
+            "total_tokens": 51623,
+            "duration_ms": 43969,
+            "total_duration_seconds": 44.0
+          }
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.917,
+        "stddev_pass_rate": 0.0,
+        "mean_tokens": 51623,
+        "mean_duration_seconds": 44.0
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate_diff": 0.083,
+    "token_diff": 32736,
+    "duration_diff_seconds": 69.1
+  },
+  "analyst_observations": [
+    "The with-skill version scores 12/12 vs baseline 11/12. The discriminating assertion is connections-with-breakage: the skill teaches the structured 'Where it breaks:' format that makes analogy limitations explicit (NAR-13 toxin line). The baseline includes implicit breakage in prose but doesn't use the structured format.",
+    "Most assertions (11/12) pass for both versions, suggesting the research brief itself and CLAUDE.md provide strong baseline context. The skill's marginal value is in format discipline (structured breakage) rather than content generation.",
+    "The with-skill version is significantly longer (1,824 words vs 1,463) and more detailed, particularly in the visual arc section. It uses ~63% more tokens and takes ~2.6x longer. The extra detail is valuable for downstream pipeline consumers (visual-spec, script-draft) but exceeds the skill's own 300-500 word target.",
+    "Both versions independently coined 'The Silicon Trap' as the named concept — strong signal that the brief's thesis is clear enough to drive concept naming without skill guidance.",
+    "Qualitative difference: the with-skill output includes Episode Format selection and Production Notes sections not present in the baseline — these are pipeline-critical decisions that the 9-decision framework ensures don't get skipped."
+  ]
+}

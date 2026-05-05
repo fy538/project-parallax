@@ -7,10 +7,10 @@
  *
  * Usage:
  *   # Render a single composition
- *   node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/ep01/chart-lithography.json
+ *   node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/silicon-trap/chart-lithography.json
  *
- *   # Render all EP01 clips
- *   node scripts/render-lambda.mjs --episode=ep01
+ *   # Render all SILICON_TRAP clips
+ *   node scripts/render-lambda.mjs --episode=silicon-trap
  *
  *   # Render a still (single frame)
  *   node scripts/render-lambda.mjs --comp=DataChart --props=chart-lithography.json --still --frame=60
@@ -53,9 +53,9 @@ function parseArgs() {
   return args;
 }
 
-// ── EP01 sequence (matches render-episode.mjs) ────────────────────────────
+// ── SILICON_TRAP sequence (matches render-episode.mjs) ────────────────────────────
 
-const EP01_SEQUENCE = [
+const SILICON_TRAP_SEQUENCE = [
   // Opening
   { comp: "TitleTransition", file: "title-episode.json" },
   // Beat 1 — The Paradox
@@ -159,13 +159,13 @@ async function renderSingle(composition, propsFile, { still, frame }) {
 
 async function renderEpisode(episode) {
   const dataDir = `data/episodes/${episode}`;
-  console.log(`\n🎬 Rendering all ${EP01_SEQUENCE.length} clips for ${episode}...\n`);
+  console.log(`\n🎬 Rendering all ${SILICON_TRAP_SEQUENCE.length} clips for ${episode}...\n`);
 
   const results = [];
-  for (let i = 0; i < EP01_SEQUENCE.length; i++) {
-    const { comp, file } = EP01_SEQUENCE[i];
+  for (let i = 0; i < SILICON_TRAP_SEQUENCE.length; i++) {
+    const { comp, file } = SILICON_TRAP_SEQUENCE[i];
     const num = String(i + 1).padStart(2, "0");
-    console.log(`[${num}/${EP01_SEQUENCE.length}] ${comp} — ${file}`);
+    console.log(`[${num}/${SILICON_TRAP_SEQUENCE.length}] ${comp} — ${file}`);
     const url = await renderSingle(comp, `${dataDir}/${file}`, {});
     results.push({ num, file, url });
   }
@@ -188,7 +188,7 @@ if (args.episode) {
   }).catch(console.error);
 } else {
   console.log("Usage:");
-  console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/ep01/chart-lithography.json");
-  console.log("  node scripts/render-lambda.mjs --episode=ep01");
+  console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/silicon-trap/chart-lithography.json");
+  console.log("  node scripts/render-lambda.mjs --episode=silicon-trap");
   console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=... --still --frame=60");
 }

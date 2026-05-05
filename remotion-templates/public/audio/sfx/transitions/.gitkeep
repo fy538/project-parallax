@@ -1,0 +1,3 @@
+# Layer 2 — Transition SFX
+# Drop {cue-type}-{intensity}.wav files here per ../README.md.
+# AudioLayer.tsx loads via staticFile("audio/sfx/transitions/{type}-{intensity}.wav").

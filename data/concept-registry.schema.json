@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parallax Concept Registry",
+  "description": "Tracks every framework, foreign term, named concept, historical analogy, and strategic entity introduced across Parallax episodes. Enables cross-episode callbacks, visual consistency, and compounding knowledge.",
+  "type": "object",
+  "required": ["version", "concepts"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version (semver)."
+    },
+    "concepts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Concept" }
+    }
+  },
+  "$defs": {
+    "Concept": {
+      "type": "object",
+      "required": ["id", "term", "type", "definition", "introduced"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Kebab-case unique identifier (e.g., 'prisoners-dilemma', 'ka-bozi')."
+        },
+        "term": {
+          "$ref": "#/$defs/BilingualTerm"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "framework",
+            "foreign-term",
+            "named-concept",
+            "historical-analogy",
+            "entity",
+            "mental-model",
+            "prediction"
+          ],
+          "description": "Concept category. framework = analytical tool (game theory, Bayesian). foreign-term = non-English term with cultural weight (卡脖子). named-concept = a coined or established term (bifurcation, small yard high fence). historical-analogy = a specific historical episode used as a lens. entity = a company, organization, or regime relevant across episodes. mental-model = a reusable reasoning pattern (steelmanning, base rates). prediction = a falsifiable forward-looking claim with a timeframe (Oracle direction)."
+        },
+        "definition": {
+          "type": "string",
+          "description": "One-sentence definition as it would appear in a concept card. Written for the audience, not for internal reference."
+        },
+        "insight": {
+          "type": "string",
+          "description": "The key non-obvious takeaway — what makes this concept worth introducing. The 'Wait, What?' moment."
+        },
+        "introduced": {
+          "$ref": "#/$defs/Introduction",
+          "description": "Where and how this concept was first introduced to the audience."
+        },
+        "appearances": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Appearance" },
+          "description": "Subsequent episodes that reference, deepen, or callback this concept."
+        },
+        "relatedConcepts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of concepts that are intellectually connected. Used for suggesting cross-references in future scripts."
+        },
+        "pillar": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["historical-analogy", "philosophical-framework", "geopolitics"]
+          },
+          "description": "Which content pillar(s) this concept serves."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Free-form tags for filtering (arc names, regions, disciplines)."
+        },
+        "callbackVisual": {
+          "type": "string",
+          "description": "Suggested visual treatment when this concept is referenced in a later episode (not re-introduced). E.g., '2s KineticTypography flash with original accent color' or 'brief FrameworkDiagram callback with dimmed detail'."
+        },
+        "prediction": {
+          "$ref": "#/$defs/Prediction",
+          "description": "Prediction-specific fields. Required when type = 'prediction', omit for other types."
+        }
+      }
+    },
+    "Prediction": {
+      "type": "object",
+      "required": ["claim", "probability", "timeframe", "falsification", "status"],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The falsifiable prediction in plain language. E.g., 'China will not achieve sub-7nm chip production at scale by Q4 2027.'"
+        },
+        "probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Rough probability estimate at time of publication (0-1). E.g., 0.6 for 60%."
+        },
+        "timeframe": {
+          "type": "string",
+          "description": "When to check this prediction. ISO date or quarter (e.g., '2027-Q4', '2028-06-30')."
+        },
+        "falsification": {
+          "type": "string",
+          "description": "What specific observable event would prove this prediction wrong."
+        },
+        "whatWouldChangeMyMind": {
+          "type": "string",
+          "description": "The strongest evidence against the thesis that generated this prediction."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["open", "confirmed", "falsified", "partially-confirmed", "expired", "revised"],
+          "description": "Current status. open = not yet checkable. confirmed/falsified = resolved by evidence. partially-confirmed = directionally right but details differ. expired = timeframe passed without clear resolution. revised = probability updated in a later episode."
+        },
+        "resolution": {
+          "type": "object",
+          "properties": {
+            "date": {
+              "type": "string",
+              "description": "When the prediction was resolved (ISO date)."
+            },
+            "evidence": {
+              "type": "string",
+              "description": "What evidence confirmed or falsified the prediction."
+            },
+            "episode": {
+              "type": "string",
+              "description": "Episode where the resolution was discussed (e.g., 'EP12' or a 'Was I Right?' special)."
+            },
+            "updatedProbability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Revised probability if the prediction was updated rather than resolved."
+            }
+          }
+        },
+        "scenarioName": {
+          "type": "string",
+          "description": "If this prediction is part of a named scenario, the scenario name (e.g., 'The Murano Scenario')."
+        },
+        "watchSignals": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific observables the audience can track. E.g., 'ASML Q3 earnings — China revenue share', 'Kalshi contract on Taiwan strait conflict'."
+        }
+      }
+    },
+    "BilingualTerm": {
+      "type": "object",
+      "required": ["en"],
+      "properties": {
+        "en": {
+          "type": "string",
+          "description": "English term or phrase."
+        },
+        "cn": {
+          "type": "string",
+          "description": "Chinese term (characters). Omit if not applicable."
+        },
+        "pinyin": {
+          "type": "string",
+          "description": "Pinyin romanization. Omit if not applicable."
+        },
+        "short": {
+          "type": "string",
+          "description": "Abbreviated form for UI labels or lower-thirds (e.g., 'P.D.' for Prisoner's Dilemma)."
+        }
+      }
+    },
+    "Introduction": {
+      "type": "object",
+      "required": ["episode", "beat"],
+      "properties": {
+        "episode": {
+          "type": "string",
+          "description": "Episode ID (e.g., 'EP01')."
+        },
+        "beat": {
+          "type": "integer",
+          "description": "Beat number where the concept is first introduced."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Approximate timestamp range (e.g., '3:00-3:30')."
+        },
+        "template": {
+          "type": "string",
+          "description": "Remotion template used for the introduction visual (e.g., 'KineticTypography', 'FrameworkDiagram')."
+        },
+        "treatment": {
+          "type": "string",
+          "enum": ["cold-intro", "organic", "callback"],
+          "description": "cold-intro = dedicated visual moment to introduce. organic = woven into narration without a dedicated visual. callback = referencing a concept introduced in a prior episode."
+        },
+        "accentColor": {
+          "type": "string",
+          "description": "Hex color used for this concept's introduction (for visual consistency in callbacks)."
+        }
+      }
+    },
+    "Appearance": {
+      "type": "object",
+      "required": ["episode", "role"],
+      "properties": {
+        "episode": {
+          "type": "string",
+          "description": "Episode ID."
+        },
+        "beat": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["callback", "deepened", "central", "passing"],
+          "description": "callback = brief visual reference to prior intro. deepened = concept is explored further with new facets. central = concept is the main subject of this episode. passing = mentioned in narration without visual treatment."
+        },
+        "template": {
+          "type": "string",
+          "description": "Template used (if any visual treatment)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "What new angle or context this appearance adds."
+        }
+      }
+    }
+  }
+}

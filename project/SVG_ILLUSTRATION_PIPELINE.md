@@ -338,7 +338,7 @@ These come up in almost every first draft:
 
 ### Option A: Static SVG Frame (simplest)
 
-Save the SVG to `remotion-templates/public/illustrations/ep[XX]/` and reference it as a static image in a composition.
+Save the SVG to `remotion-templates/public/illustrations/<slug>/` and reference it as a static image in a composition.
 
 ```tsx
 import { Img, staticFile } from 'remotion';

@@ -1,0 +1,33 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Stag Hunt",
+  "subtitle": "Rousseau (1755)",
+  "variant": "payoff-matrix",
+  "rowPlayer": "Hunter A",
+  "colPlayer": "Hunter B",
+  "rowOptions": ["Stag", "Hare"],
+  "colOptions": ["Stag", "Hare"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "4, 4", "highlight": true },
+    { "row": 0, "col": 1, "value": "0, 3", "highlight": false },
+    { "row": 1, "col": 0, "value": "3, 0", "highlight": false },
+    { "row": 1, "col": 1, "value": "3, 3", "highlight": true }
+  ],
+  "phases": [
+    {
+      "label": "Two equilibria",
+      "durationSec": 6,
+      "highlights": [0, 3],
+      "annotation": "Cooperation IS rational — if you trust the other will cooperate"
+    },
+    {
+      "label": "The cooperative equilibrium",
+      "durationSec": 6,
+      "highlights": [0],
+      "annotation": "The puzzle isn't domination. It's coordination."
+    }
+  ],
+  "durationSec": 12,
+  "backgroundVariant": "dark",
+  "backgroundTint": "#E5A544"
+}

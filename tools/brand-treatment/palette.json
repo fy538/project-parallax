@@ -1,0 +1,85 @@
+{
+  "_comment": "Parallax Meridian brand palette — SINGLE SOURCE OF TRUTH for all color tooling. Direction A: Monochrome Warm + muted semantics + gold accent. Consumed by: theme.ts (Remotion), treat.py (image treatment), treat_video.py (video treatment), check.py (consistency validator). If you change a color here, regenerate LUTs: python treat_video.py --all-luts -o luts/",
+
+  "palette": {
+    "ink":      "#1C1814",
+    "midnight": "#2A2520",
+    "walnut":   "#5C4A3D",
+    "umber":    "#8B7355",
+    "taupe":    "#B8A189",
+    "sand":     "#D9C9B0",
+    "bone":     "#F0E6D0",
+    "paper":    "#F5F0E8",
+    "gold":     "#C4A747"
+  },
+
+  "semantic": {
+    "us":      "#4A7BA7",
+    "china":   "#A64D46",
+    "neutral": "#888780"
+  },
+
+  "ramps": {
+    "warm":  ["#F5F0E8", "#D9C9B0", "#B8A189", "#8B7355", "#5C4A3D", "#1C1814"],
+    "blue":  ["#E8F0F6", "#9DBDD6", "#4A7BA7", "#2E5C82", "#163048"],
+    "red":   ["#F5E8E7", "#CFA09C", "#A64D46", "#7A3530", "#3D1A18"],
+    "gold":  ["#FFF6E0", "#E8D49A", "#C4A747", "#967E30", "#5C4D1A"],
+    "gray":  ["#F1EFE8", "#B4B2A9", "#888780", "#5F5E5A", "#2C2C2A"]
+  },
+
+  "duotone": {
+    "standard": {
+      "shadows":    "ink",
+      "midtones":   "umber",
+      "highlights": "gold"
+    },
+    "conflict": {
+      "shadows":    "ink",
+      "midtones":   "#7A2E1A",
+      "highlights": "#A64D46"
+    },
+    "editorial": {
+      "shadows":    "taupe",
+      "midtones":   "bone",
+      "highlights": "paper"
+    }
+  },
+
+  "modes": {
+    "dark": {
+      "bg": {
+        "base":     "#12100E",
+        "surface":  "ink",
+        "elevated": "midnight",
+        "map":      "#1A1612"
+      },
+      "text": {
+        "primary":   "sand",
+        "secondary": "taupe",
+        "muted":     "umber",
+        "accent":    "gold"
+      }
+    },
+    "light": {
+      "bg": {
+        "base":     "paper",
+        "surface":  "#EDE7DB",
+        "elevated": "#FFFFFF",
+        "border":   "sand",
+        "map":      "#EDE7DB"
+      },
+      "text": {
+        "primary":   "ink",
+        "secondary": "walnut",
+        "muted":     "umber",
+        "accent":    "walnut"
+      }
+    }
+  },
+
+  "treatment": {
+    "saturation": 0.25,
+    "grain": 0.10,
+    "vignette": 0.18
+  }
+}

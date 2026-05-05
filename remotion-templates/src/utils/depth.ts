@@ -13,7 +13,7 @@
  */
 
 import React from "react";
-import { dark, light, palette } from "../design/theme";
+import { dark, light } from "../design/theme";
 
 // ── Shadow Presets ─────────────────────────────────────────────────────────
 

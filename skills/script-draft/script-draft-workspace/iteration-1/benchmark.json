@@ -1,0 +1,63 @@
+{
+  "skill_name": "script-draft",
+  "iteration": 1,
+  "configs": [
+    {
+      "name": "with_skill",
+      "evals": [
+        {
+          "eval_name": "ep01-silicon-trap",
+          "pass_rate": 0.917,
+          "passed": 11,
+          "total": 12,
+          "tokens": 87289,
+          "duration_seconds": 137.4,
+          "failures": ["nar-11-named-concept"]
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.917,
+        "mean_tokens": 87289,
+        "mean_duration_seconds": 137.4
+      }
+    },
+    {
+      "name": "without_skill",
+      "evals": [
+        {
+          "eval_name": "ep01-silicon-trap",
+          "pass_rate": 0.667,
+          "passed": 8,
+          "total": 12,
+          "tokens": 53534,
+          "duration_seconds": 101.9,
+          "failures": ["nar-11-named-concept", "nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance"]
+        }
+      ],
+      "aggregate": {
+        "mean_pass_rate": 0.667,
+        "mean_tokens": 53534,
+        "mean_duration_seconds": 101.9
+      }
+    }
+  ],
+  "delta": {
+    "pass_rate": "+25.0pp",
+    "tokens": "+63.0%",
+    "duration": "+34.8%"
+  },
+  "analysis": {
+    "discriminating_assertions": ["nar-06-bilateral-balance", "vis-06-timing-breaks", "vis-mode-balance"],
+    "non_discriminating": ["format-two-column", "format-beat-structure", "format-mode-tags", "format-priority-tiers", "format-claim-tags", "format-asset-summary", "nar-10-stakes-first-30s", "nar-09-decoder-posture"],
+    "both_fail": ["nar-11-named-concept"],
+    "observations": [
+      "The skill adds +25pp on assertion pass rate, driven by 3 editorial quality assertions the baseline fails entirely.",
+      "Format compliance is high for both — the SCRIPT_FORMAT.md spec is sufficient for format, but not for editorial quality.",
+      "Both versions fail nar-11 (named concept frequency). The skill instructs '3-5 times with accumulating meaning' but the model only uses it once in the body. This needs stronger reinforcement.",
+      "The skill costs +63% more tokens and +35% more time — expected given it reads 7 reference files vs. 3.",
+      "The with-skill version includes Chinese emotional framing (卡脖子) and visual timing annotations that the baseline misses entirely.",
+      "The baseline's MG percentage (36%) exceeds the target range, suggesting it over-indexes on data visualization without the skill's pacing guidance.",
+      "Neither version uses [COUNTERPOINT] annotations — the skill instructs 1-2 per episode but neither run produced them. May need an explicit example."
+    ]
+  }
+}

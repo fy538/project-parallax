@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "topic-viability", "runs": [{"id": "ep02-with-skill", "prompt": "(No prompt found)", "eval_id": 1, "outputs": [{"name": "viability-check.md", "type": "text", "content": "# VIABILITY CHECK\n## Topic: Why Technological Blockades Always Leak\n## Date: May 1, 2026\n\n## Verdict: VIABLE\nThis topic passes all five questions substantively. It has genuine structural depth (tragedy of the commons as an analytical lens for technology denial), a specific historical parallel (COCOM 1949-1994), a clear decoder framing that reframes the conventional debate from \"policy effectiveness\" to \"structural inevitability,\" scores 5/5 on the rubric, and identifies a clear angle gap on YouTube where no existing coverage connects historical export control collapse to commons theory to contemporary semiconductor controls. Ready for Deep Research.\n\n---\n\n## The 5 Questions\n\n### 1. Structural Resonance\n**Pattern:** Technology-denial regimes structurally fail because they create a tragedy of the commons: participants have individual incentives to circumvent (higher profits, national security advantage, competitive positioning) while the costs of enforcement are diffused across all members. When controls restrict access to X, rational actors develop workarounds (smuggling, dummy corporations, espionage, indigenous development). These workarounds gradually degrade the control regime's effectiveness, forcing more draconian measures, which accelerates circumvention, until the regime becomes unenforceable and collapses. The problem isn't implementation \u2014 it's structural.\n\nThis pattern reframes the entire debate from \"can we make export controls work better\" to \"why do all such regimes follow the same tragic arc.\"\n\n### 2. Historical Parallel\n**Named case:** COCOM (Coordinating Committee for Multilateral Export Controls), 1949-1994.\n\n**Shared mechanism:** COCOM was established to deny the Soviet bloc access to Western computing and dual-use military technologies. For 45 years, Western nations enforced controls on semiconductors, computer equipment, and advanced manufacturing tools. By the 1980s, the Soviet Union systematically circumvented controls through KGB/GRU operations (thousands of \"technology collection officers\" deployed across Western Europe and North America). Dummy corporations were established. Smuggling networks proliferated. A British parliamentary review labeled the incidents a \"horror story of illegal exports.\" COCOM's effectiveness degraded year by year \u2014 participants had individual incentives to cheat (sell to intermediaries, turn a blind eye, compete with each other). Enforcement costs were high; benefits were dispersed. The regime collapsed quietly in 1994 with the Wassenaar Arrangement replacing it (tacitly acknowledging that strict controls on the scale COCOM attempted were unworkable).\n\n**Structural parallel to modern chip controls:** The US/Japan/South Korea consortium restricting semiconductor and advanced computing exports to China follows identical logic. Participants have incentives to cheat (TSMC's Taiwan operations, indirect routes through intermediaries, competitors undercutting restrictions). Enforcement costs are high. The regime is showing signs of stress (China's indigenous advances despite controls, reports of failed enforcement, the White House itself admitting in December 2025 that the strategy \"may be failing\"). The structural arc is the same: initial confidence \u2192 slow degradation \u2192 eventual admission of failure.\n\n**Verification:** COCOM is well-documented in academic literature (National Academies, RAND, CSIS, Jamestown Foundation). The tragedy of the commons logic is explicitly identified in recent analysis (e.g., Texas National Security Review \"Hard Then, Harder Now: CoCom's Lessons and the Challenge of Crafting Effective Export Controls Against China,\" September 2025, notes that COCOM's lessons are being ignored and new controls may face the same structural problems).\n\n### 3. Decoder Framing\n**Standard frame:** \"Are US/Western export controls on China's semiconductor industry working? Are they effective at slowing China's tech development?\"\n\nThis is the frame of policy effectiveness. It asks an empirical question: do the controls achieve their stated goal? Media, think tanks, and policy analysis all orbit this question.\n\n**Parallax frame:** \"Why do all technology-denial regimes fail \u2014 and what does history reveal about the structural logic that makes them fail regardless of enforcement intensity?\"\n\nThis reframes from \"policy effectiveness\" (an engineering problem: can we enforce better?) to \"structural inevitability\" (a tragedy of the commons problem: the structure itself is the issue). The viewer doesn't just learn whether the controls are working; they learn *why* they can't work, and why 80 years of trying different enforcement methods haven't changed the outcome.\n\n**Gap assessment:** This is a significant reframe. The standard conversation assumes that tighter controls or better enforcement could solve the problem. The Parallax frame reveals that the problem is *structural*, not technical. This shifts the viewer's understanding of what's actually at stake \u2014 not \"will the controls work,\" but \"what does it mean that all attempts to build technology denial regimes fail in the same way.\"\n\n### 4. Quick Rubric\n\n| Criterion | Pass/Fail | Notes |\n|-----------|-----------|-------|\n| Wait, what? | **PASS** | Counterintuitive core claim: \"all tech-denial regimes fail the same way, and we knew this in 1994 but we're doing it again.\" Viewers familiar with current export controls will feel a jolt. |\n| Arguable thesis | **PASS** | Defenders of export controls would argue that stricter enforcement, better international coordination, or technological countermeasures could break the commons tragedy. The thesis is genuinely disputable \u2014 there's intellectual substance on both sides. |\n| Two-pillar test | **PASS** | Connects three pillars simultaneously: (1) philosophical framework (tragedy of the commons), (2) historical analogy (COCOM + Soviet circumvention), (3) contemporary geopolitics (US-China semiconductor controls, current debates about effectiveness). |\n| Timely-or-timeless | **BOTH** | Timely: current US policy debates hinge on whether export controls can work. Evergreen: the tragedy of the commons is a fundamental structure that applies to any technology denial regime, any era. Will generate views in 2030 when people are asking \"why didn't the current controls work.\" |\n| Compounding | **PASS** | Introduces tragedy of the commons as a recurring analytical lens. Future episodes can apply it to arms control (nonproliferation treaties), AI governance, intelligence sharing protocols, supply chain security. Builds the audience's toolkit for analyzing *why* collective action fails. |\n| **Total** | **5/5** | All criteria met. |\n\n### 5. Angle Gap\n\n**Existing coverage:** YouTube hosts multiple videos on export control effectiveness (\"Why US Chip Export Controls Are Failing,\" \"White House Admits Export Strategy Failing,\" \"China Rejects US AI Chips,\" etc.). Most treat the question as empirical: do they work yes/no, are they effective yes/no. Some note that controls have not achieved their full goal (China continues advancing in semiconductors). A few hint at structural problems (SemiAnalysis: \"very short-sighted\"; FPRI analysis: \"limits of export controls\"). One video (\"Cold War Lessons for Export Controls Against China\") mentions COCOM but does not connect it to commons theory or to the systemic inevitability of failure.\n\n**Parallax angle:** Nobody connects COCOM's documented 45-year collapse to tragedy of the commons to modern semiconductor controls as a unified historical + philosophical pattern. No existing coverage makes the argument \"this failure was *inevitable* because of how commons tragedies work, and we already learned this lesson in 1994.\" This is the angle gap.\n\nThe reframe is both historical (COCOM as a detailed precedent) and philosophical (commons theory as the explanatory structure). Existing coverage lacks one or the other; Parallax supplies both.\n\n---\n\n## Format Recommendation\n\n**Philosopher's Lens** \u2014 This format inverts the standard approach. The primary subject is the tragedy of the commons *as a framework*, not \"do export controls work.\" The geopolitics (COCOM history, modern controls) is the case study that makes the framework urgent and concrete. The structure would be:\n\n- Cold open: A current-moment hook (White House admission, 2025, that controls are failing)\n- Introduce the tragedy of the commons as a framework (what it is, classic examples)\n- Apply it to COCOM: show how the framework predicts COCOM's actual historical arc\n- Apply it to modern controls: show the same structural conditions recurring\n- Decoder moment: the realization that this isn't about policy implementation; it's about structure\n- Close: what this means for the future (not \"controls won't work,\" but \"this structure will reproduce the same outcome unless the fundamental incentives change\")\n\nAlternative format considered: **Time Collapse** (COCOM 1949 intercut with 2024-2026 modern controls, showing structural rhymes). This would emphasize the parallel more visually. But Philosopher's Lens is stronger because the primary subject is the *framework*, not the historical narrative. The framework is the insight; the history is the evidence.\n\n---\n\n## Arc Fit\n\n**Arc 1: Great Power Technology Competition** \u2014 Macro question: \"Who really wins when great powers weaponize technology \u2014 and what does history say about how these contests end?\"\n\n**Position:** This topic fits as **EP02**, immediately after EP01 (The Silicon Trap). \n\n- EP01 (Detective) asks: \"Why is the US betting $280B on semiconductor sovereignty when every incentive says the strategy is flawed?\" Answer: structural trap.\n- EP02 (Philosopher's Lens) asks: \"But if all technology-denial regimes fail structurally, why do we keep trying them?\" Answer: commons tragedy.\n\nEP02 answers the meta-question that drives the entire arc: not just \"what's the trap,\" but \"why do great powers keep walking into the same trap.\" This makes it a natural follow-up. EP03 and EP04 can then explore specific mechanisms (AI's winner-take-all dynamics, COCOM's detailed history) knowing the audience understands the underlying structural pattern.\n\n---\n\n## Next Steps\n\n**For Deep Research:**\n\n1. **COCOM Deep Dive** \u2014 Primary sources on COCOM's establishment (1949), membership, control lists, and documented circumvention incidents. Focus on the commons-tragedy dynamics: who had incentives to cheat, why, and what the costs of enforcement were. Archival sources (British parliamentary reviews, declassified intelligence assessments).\n\n2. **Tragedy of the Commons Application** \u2014 Define the framework precisely (shared resource, individual incentives, diffused costs, nonexcludable benefits of cheating). Find 2-3 other historical cases where commons logic explains failure (arms control, intelligence sharing, fishing quotas) to ensure the framework is portable and not cherry-picked for this one case.\n\n3. **Modern Export Controls Mechanics** \u2014 Current state of US/Japan/South Korea/Netherlands controls on semiconductors and advanced computing. Track documented circumvention attempts, enforcement costs, and early signs of regime degradation. Distinguish between \"controls are failing\" and \"controls were designed to fail structurally.\"\n\n4. **Decoder Framing Verification** \u2014 Confirm that existing media coverage treats this as an effectiveness question, not a structural one. Map the gap explicitly.\n\n5. **Cross-Domain Connection Hunt** \u2014 Does the commons-tragedy framework illuminate other geopolitical puzzles in Arc 1? (e.g., does it explain technology transfer dynamics, IP theft incentives, or alliance defection on controls?)\n\n---\n\n## Self-Check\n\n- [x] All 5 questions answered substantively (not \"probably\" or \"likely\")\n- [x] Historical parallel names COCOM specifically, articulates shared mechanism (commons tragedy dynamic)\n- [x] Decoder framing shows clear gap between standard (effectiveness question) and Parallax frame (structural inevitability)\n- [x] Rubric scores are honest gut checks, not inflated (5/5 earned across all criteria)\n- [x] Angle gap based on actual competitive check (YouTube search confirms no coverage connects COCOM to commons to modern controls)\n- [x] Verdict matches evidence (VIABLE is justified by all 5 substantive answers)\n- [x] Format recommendation considers alternatives (Time Collapse noted as option; Philosopher's Lens chosen because framework is primary subject)\n"}], "grading": {"expectations": [{"text": "has-clear-verdict", "passed": true, "evidence": "Verdict found: True"}, {"text": "structural-resonance-substantive", "passed": true, "evidence": "Section: True, Substantive: True"}, {"text": "historical-parallel-named", "passed": true, "evidence": "Section: True, Named COCOM: True"}, {"text": "decoder-framing-dual", "passed": true, "evidence": "Standard frame: True, Parallax frame: True"}, {"text": "rubric-with-scores", "passed": true, "evidence": "Rubric: True, Scores: True"}, {"text": "angle-gap-with-competitive-check", "passed": true, "evidence": "Angle section: True, YouTube check: True"}, {"text": "format-recommendation", "passed": true, "evidence": "Format mentioned: True"}, {"text": "arc-fit-assessment", "passed": true, "evidence": "Arc fit: True"}, {"text": "next-steps-provided", "passed": true, "evidence": "Next steps: True"}, {"text": "structured-5-question-format", "passed": true, "evidence": "Numbered sections: 5"}]}}, {"id": "ep02-without-skill", "prompt": "(No prompt found)", "eval_id": 1, "outputs": [{"name": "viability-check.md", "type": "text", "content": "# Viability Check: \"Why Technological Blockades Always Leak\"\n\n**Topic:** Why Technological Blockades Always Leak  \n**Format:** Philosopher's Lens  \n**Arc:** Arc 1 (Great Power Technology Competition)  \n**Date of Check:** May 1, 2026  \n**Evaluator:** AI Agent (manual viability check without skill automation)\n\n---\n\n## Executive Summary\n\n**VERDICT: VIABLE** \u2705\n\nThis topic passes all five viability gates and is ready for commitment to Deep Research. The thesis contains genuine structural insight, a well-documented historical parallel (COCOM), clear decoder framing, and occupies a defensible angle gap vs. existing coverage. The topic will anchor the Philosopher's Lens position within Arc 1 and compounds value for future episodes.\n\n---\n\n## Viability Check (All 5 Gates)\n\n### 1. Structural Resonance (Hidden Pattern Being Revealed)\n\n**Thesis:** Technological blockades are structurally porous because the tragedy of the commons creates a Nash equilibrium where individual incentives override collective enforcement. When a technology matters to defense, every country wants it regardless of the embargo \u2014 and at least one country will defect.\n\n**The structural insight:** Export controls create a repeated prisoner's dilemma at the state level. Unlike binding treaties (no defection possible), export controls depend on continuous, unanimous cooperation. The moment one country sees strategic advantage in breaking ranks \u2014 or faces domestic pressure from its tech industry to gain market access \u2014 the entire regime becomes porous. Technology denial works as a *delay mechanism*, not as an absolute barrier. The system produces predictable leakage as an emergent property of the incentive structure, not as a failure of enforcement.\n\n**Why it's structural (not just descriptive):** The porousness isn't because governments are incompetent or corrupt \u2014 it's because the incentive structure of security competition makes continued compliance irrational over time. This is what makes it compelling: the viewer realizes \"oh, the system is *designed* to leak, structurally speaking.\"\n\n---\n\n### 2. Historical Parallel (Named, Not Vague)\n\n**Primary parallel: COCOM (Coordinating Committee for Multilateral Export Controls, 1949-1994)**\n\nCOCOM is the canonical historical case for this thesis. Operating for 45 years, COCOM attempted to prevent advanced technology from reaching the Soviet Union through coordinated export restrictions among Western nations. The mechanism was strict: members needed unanimous consent to approve exceptions.\n\n**Evidence of structural porousness:**\n- Despite comprehensive controls, the Soviet Union acquired Western microchips, computing technology, and manufacturing equipment through multiple pathways: direct espionage, third-country transshipment (via neutral countries like Singapore, Sweden, Switzerland), front companies, and deliberate violations by member nations' companies seeking profit.\n- The regime achieved only partial effectiveness. As one British parliamentary review labeled it: a \"horror story\" of illegal exports. The Soviet threat persisted for 40 years despite the embargo.\n- The Wassenaar Arrangement (COCOM's replacement, 1996) explicitly acknowledges the previous system's limitations and operates under the assumption of managed leakage rather than absolute denial.\n- Member countries regularly undermined the regime: France violated controls to sell advanced equipment; Finland maintained trade relationships; companies exploited loopholes. The incentive to defect (economic gain + security advantage) outweighed incentive to comply, especially as Cold War tensions fluctuated.\n\n**Secondary parallels worth researching:**\n- Japan's MITI-era chip restrictions (Oki, NEC) \u2014 attempted but failed to maintain monopoly vs. Korean competitors\n- Venice's Murano glass monopoly (13th-16th centuries) \u2014 island-based manufacturing secret that leaked once competitors had incentive to acquire it\n- Uranium enrichment technology denial post-JCPOA \u2014 current example of leakage happening in real-time\n\n**Structural mechanism confirmed:** COCOM's historical record directly validates the thesis. It shows that even with:\n- Ideological alignment (Western bloc)\n- Formal institutional structure\n- High stakes (existential Cold War competition)\n- Intelligence-gathering capability\n\n...the system still leaked continuously. This is what makes the analogy load-bearing: COCOM is proof-of-concept that technology denial regimes are inherently porous.\n\n---\n\n### 3. Decoder Framing (Surface vs. Hidden Structure)\n\n**Surface reading (what the viewer thinks):**\n\"Export controls are a security tool governments use to maintain technological advantage over adversaries. The US controls semiconductor exports to China to prevent them from catching up on advanced chips. The question is: how effective are they?\"\n\n**Hidden structure (what the episode reveals):**\n\"Export controls work at a structural level like a traffic jam \u2014 slowing down progress but inevitable to leak. The real game isn't whether controls work; it's *how long before someone breaks ranks*. Once you see it as a prisoner's dilemma, you realize the apparent 'security tool' is actually a temporary delay mechanism. The structure guarantees leakage over sufficient time.\"\n\n**The reframe:** The viewer discovers that the question isn't \"do export controls work?\" (binary, static) but rather \"what conditions accelerate or delay leakage in a system structurally designed to leak?\" This reframing explains:\n- Why every technology denial regime fails eventually (not due to incompetence, but incentive structure)\n- Why countries rationally invest in export control violations (Bayesian updating on risk/reward)\n- Why the US accepts that TSMC will eventually be copied (no control can prevent it forever)\n\n**Decoder posture test:** \u2705 The episode decodes *structural incentives*, not hidden conspirators. It's \"here's how the system produces this outcome\" not \"here's who's secretly coordinating to undermine controls.\"\n\n---\n\n### 4. Quick Rubric Check (3 of 5 Required)\n\nEvaluating against CONTENT_IDENTITY.md rubric:\n\n| Criterion | Passes? | Evidence |\n|-----------|---------|----------|\n| **\"Wait, what?\" moment** | \u2705 YES | \"The system is designed to leak.\" \u2014 Most viewers don't think about export controls as inevitably porous. The prisoner's dilemma framing + the COCOM history creates genuine surprise. |\n| **Arguable thesis** | \u2705 YES | Debatable: \"Blockades leak because of tragedy of the commons\" invites counterargument: \"No, they work if countries align incentives\" or \"The leakage is intentional, not structural.\" Smart people will want to argue this. |\n| **Two-pillar test** | \u2705 YES | (1) Philosophical framework: tragedy of the commons + prisoner's dilemma + game theory. (2) Contemporary geopolitics: current US-China semiconductor controls, the stakes, the leak rate. Missing pure historical pillar, but philosophy + geopolitics is sufficient. |\n| **Timely or timeless** | \u2705 YES | Timeless. Export controls have existed since COCOM; they'll persist for centuries. The framework applies to any technology denial regime (semiconductors, AI, biotech, synthetic biology). Also timely: current US-China chip controls make this urgent to understand. |\n| **Compounding** | \u2705 YES | Future episodes will reference tragedy of the commons (AI alignment, climate treaties, ocean fishing), prisoner's dilemma (literally core game theory framework), and the \"structural inevitability\" concept. Returns viewers gain toolkit for analyzing similar problems. |\n\n**Result: 5 of 5 criteria pass.** This topic is exceptionally strong on the rubric.\n\n---\n\n### 5. Angle Gap (What Parallax Says That Nobody Else Is)\n\n**Competitive landscape check:**\n\nSearching for existing YouTube content on export controls, technology sanctions, and blockades, I found:\n\n- **Defense News, Think Tank reports:** Detailed analysis of *whether* export controls work and *how* they're enforced. Often policy-focused. Missing: philosophical framework + structural insight.\n- **China tech journalism:** Reporting on specific leaks, violations, workarounds (e.g., chip designs reaching China through third parties). Missing: the *why* \u2014 the structural explanation underneath.\n- **Economics channels:** Some coverage of supply chain disruption and trade policy. Missing: the game-theoretic + philosophical depth.\n- **International relations videos:** Discussion of COCOM as historical precedent. Missing: the direct structural parallel to *today's* export controls; the tragedy-of-the-commons reframe.\n\n**The angle gap (Parallax's unique angle):**\n\"Technology denial regimes fail not because enforcement is weak, but because the incentive structure guarantees leakage. Here's the game theory that explains why this happened to COCOM, why it's happening to US-China controls today, and why *every* future blockade will leak \u2014 and what that means for strategy.\"\n\nThis combines:\n- **Philosophical framework** (tragedy of the commons, prisoner's dilemma)\n- **Historical depth** (COCOM as proof-of-concept)\n- **Contemporary application** (current chip controls through structural lens)\n- **Strategic implications** (what countries *actually* expect from their export controls)\n\n**Comparison to nearest competitor:** CaspianReport could cover the geopolitics of export controls (what countries do); Parallax explains the *underlying structure* that makes those actions inevitable. Different entry points, different depth.\n\n**Verdict on angle gap:** \u2705 Parallax has a defensible, clear angle that nobody else is making.\n\n---\n\n## Depth Assessment\n\n### Research Availability: CONFIRMED\n\nThis topic has sufficient research depth to justify 30+ minutes of Deep Research:\n\n1. **COCOM documentation:** Declassified materials, official histories, parliamentary reviews, academic case studies. Abundant primary and secondary sources.\n\n2. **Game theory literature:** Tragedy of the commons (Hardin, Olson), prisoner's dilemma (Axelrod, Trivers), repeated games theory. Well-established frameworks applicable to export control regimes.\n\n3. **Contemporary sourcing:** Current US export control policy, Chinese chip programs, Dutch ASML restrictions, intelligence reports on leakage rates. Real-time data available.\n\n4. **Cross-domain connections:** The framework applies to climate treaties, fishing treaties, nuclear non-proliferation, NATO burden-sharing \u2014 enabling the \"surprising connections\" that support knowledge density.\n\n### Knowledge Density Potential: HIGH\n\nThe three-pass research can surface 4-5 cross-domain connections:\n- **Historical:** COCOM \u2192 Venice glass monopoly \u2192 other monopoly attempts\n- **Philosophical:** Tragedy of the commons (Hardin) vs. commons management solutions (Ostrom)\n- **Game theory:** Prisoner's dilemma vs. repeated games (tit-for-tat vs. mutual defection)\n- **Contemporary geopolitics:** Chip controls \u2192 AI export controls \u2192 biotech \u2192 synthetic biology\n- **Chinese strategic tradition:** Could invoke long-term thinking vs. Western quarterly optimization as explanation for different compliance rates\n\nThis density supports the Philosopher's Lens format: the framework (tragedy of the commons) should be *primary*, geopolitics *secondary* for illustration.\n\n---\n\n## Format-Fit Analysis\n\n**Why Philosopher's Lens is the right format:**\n\n1. **Philosophy first:** The episode's engine is the philosophical framework (tragedy of the commons + prisoner's dilemma). Geopolitics provides the concrete case study.\n2. **Evergreen hook:** \"Why blockades leak\" is timeless. \"Current US-China chip controls\" is timely. Title should lead with the framework: \"Why Technological Blockades Always Leak (And What History Says About Taiwan)\" \u2014 the structure first, application second.\n3. **Visual feasibility:** The concept lends itself to animation:\n   - Diagram of prisoner's dilemma payoff matrix\n   - COCOM member countries map over time, showing defection points\n   - Flow chart of leakage pathways (espionage, third-country, corporate violation)\n   - Animated comparison: absolute barrier vs. delay mechanism (visual metaphor)\n4. **Narrative arc:** Cold open: \"The US just announced new chip export controls on China. But here's what history says will happen next...\" \u2192 Introduce tragedy of the commons \u2192 Show COCOM's failure \u2192 Reveal the structural lesson \u2192 Apply to today.\n\n---\n\n## Risk Assessment\n\n### Potential Pitfalls\n\n1. **Risk: Philosophy feels too abstract**\n   - **Mitigation:** Anchor every framework point in COCOM examples. Avoid pure theory; always pair with historical evidence. Use visual metaphors (dam with controlled leaks, queue with inevitable defection).\n\n2. **Risk: The analogy oversimplifies (COCOM \u2260 today's controls in some ways)**\n   - **Mitigation:** The script must explicitly note where the analogy breaks. COCOM had USSR as unified target; today has multiple targets (China, Russia, Iran). COCOM had fewer digital enforcement mechanisms. Include 1-2 breakdown points in the brief.\n\n3. **Risk: Feels too deterministic (\"blockades *always* leak\")**\n   - **Mitigation:** Reframe to \"structural porousness makes leakage inevitable *over sufficient time*.\" Add probability framework: \"Not if but when.\" Avoid \"this proves\" language; use \"this suggests\" per content philosophy.\n\n4. **Risk: Audience confusion between \"leakage is inevitable\" and \"export controls are useless\"**\n   - **Mitigation:** Be explicit: controls don't eliminate access, they dramatically increase cost and delay. A 5-year delay is valuable strategically. The episode explains the mechanism, not that controls are worthless.\n\n### Editorial Red Lines: CLEAR\n\n- \u2705 No conspiracy framing (\"powerful countries secretly want controls to fail\")\n- \u2705 No determinism (\"technology always flows, free will is illusion\") \u2014 frame as incentive structure, not destiny\n- \u2705 No geopolitical side-taking (China vs. US) \u2014 the structure applies to all regimes\n\n---\n\n## Connection to Arc 1\n\nThis episode strengthens Arc 1 (\"Great Power Technology Competition\") by:\n\n1. **Complementing EP01 \"The Silicon Trap\":** EP01 investigates the specific semiconductor puzzle (why did this happen?). EP02 explains the *structural lesson* (why do all technology denial regimes leak?). Together they teach both specific + general.\n\n2. **Setting up EP03 \"Is AI the New Nuclear Weapon?\":** If blockades inevitably leak, then export controls on AI can't create permanent advantage. This reframes the AI arms race as *acceleration race* (who can catch up fastest) vs. *denial race* (permanent separation). EP03 can build on this structural foundation.\n\n3. **Enabling EP04 \"The Ghosts of COCOM\":** EP02 introduces COCOM's history. EP04 can then do a deep Time Collapse between 1949-1994 Cold War controls and 2024 controls, with EP02's framework providing the analytical spine.\n\n**Arc coherence:** \u2705 STRONG. The episode has clear narrative purpose within the arc structure.\n\n---\n\n## Viability Verdict\n\n| Gate | Status | Evidence |\n|------|--------|----------|\n| **Structural resonance** | \u2705 PASS | Tragedy of the commons + prisoner's dilemma = export control porousness |\n| **Historical parallel** | \u2705 PASS | COCOM (45-year empirical case study of structural leakage) |\n| **Decoder framing** | \u2705 PASS | Surface: \"Controls work?\" \u2192 Hidden: \"System is designed to leak\" |\n| **Rubric (3/5)** | \u2705 PASS | 5 of 5 criteria met (Wait-what, Arguable, Two-pillar, Timeless, Compounds) |\n| **Angle gap** | \u2705 PASS | Structural/philosophical frame nobody else is making |\n\n**OVERALL: VIABLE \u2705**\n\nThis topic is ready to advance to Stage 3 (Deep Research, 3-pass). The thesis has depth, the historical parallel is well-documented, the philosophical framework is robust, and the angle is defensible. Estimated Deep Research time: 4-5 hours (foundation sweep + cross-domain hunt + verification on load-bearing claims about COCOM and game theory).\n\n---\n\n## Next Steps (If Approved for Research)\n\n1. **Claude.ai Deep Research \u2014 Pass 1 (Foundation Sweep):**\n   - COCOM official histories, declassified documents\n   - Game theory of repeated prisoner's dilemma\n   - Quantified leakage data (espionage cases, illicit exports, third-party transfers)\n   - US-China chip export controls current status\n\n2. **Pass 2 (Cross-Domain Connection Hunt):**\n   - Tragedy of the commons solutions (Ostrom on managing commons)\n   - Climate treaty defection patterns (similar prisoner's dilemma)\n   - Nuclear non-proliferation regimes (NPT history, violations)\n   - Venetian/Ming manufacturing secrets (historical monopoly breakdown)\n\n3. **Pass 3 (Verification + Depth):**\n   - COCOM effectiveness: Was it a \"horror story\" as claimed? Verify specific incidents.\n   - Game theory: Confirm that prisoner's dilemma is the right model vs. public goods game or asymmetric game.\n   - Strategic implications: What do US policymakers *expect* from export controls? (Should be \"delay, not denial\")\n\n4. **Script Angle Memo:** After research, define:\n   - Named conceptual product (\"The Delay Regime\" or \"Structural Porousness\"?)\n   - Cold open type (stakes-shock? framework-promise? e.g., \"The US just announced new chip controls. But here's what happened every single time...\")\n   - Emotional arc: disorientation (controls don't work?) \u2192 recognition (oh, it's the incentive structure) \u2192 resignation (we always knew this was coming)\n   - Visual motif: maybe a dam with controlled leaks, progressively more water escaping?\n\n---\n\n## Appendix: Competitive Research Summary\n\n**Query 1:** \"export controls leak technology sanctions failure YouTube\"\n- Result: Multiple enforcement cases (Intel $140M fine, EDA software to China) confirm active leakage. Russian acquisition of Western chips post-2022 invasion despite \"unprecedented\" coordination.\n- Insight: Real-world evidence supports the \"inevitability of leakage\" thesis.\n\n**Query 2:** \"tragedy of the commons international cooperation sanctions\"\n- Result: Framework is well-established in literature. International cooperation literature emphasizes that without enforcement mechanisms, defection is rational. Graduated punishment (not extreme sanctions) maintains cooperation.\n- Insight: The philosophical framework is academically solid; apply it to export controls is the novel angle.\n\n**Query 3:** \"COCOM technology denial regime history effectiveness\"\n- Result: COCOM is recognized as mixed-to-poor effectiveness. British parliamentary review called it \"horror story.\" Replaced by Wassenaar Arrangement acknowledging managed leakage.\n- Insight: Historical case is well-documented and defensible.\n\n**Sources:**\n- [Coordinating Committee for Multilateral Export Controls - Wikipedia](https://en.wikipedia.org/wiki/Coordinating_Committee_for_Multilateral_Export_Controls)\n- [The Cold War History of Export Controls - Lily Ottinger, China Talk](https://www.chinatalk.media/p/learning-from-cocom)\n- [Hard Then, Harder Now: CoCom's Lessons and the Challenge of Crafting Effective Export Controls Against China - Texas National Security Review](https://tnsr.org/2025/09/hard-then-harder-now-cocoms-lessons-and-the-challenge-of-crafting-effective-export-controls-against-china/)\n- [Tragedy of the Commons - Wikipedia](https://en.wikipedia.org/wiki/Tragedy_of_the_commons)\n- [The Parched Earth of Cooperation: How to Solve the Tragedy of the Commons in International Environmental Governance - Duke Journal of Comparative & International Law](https://djcil.law.duke.edu/article/the-parched-earth-of-cooperation-druzin-vol27-iss1/)\n- [Export Control Penalty Cases - Visual Compliance](https://www.visualcompliance.com/blog/140m-export-control-penalty-how-denied-party-screening-software-could-have-prevented-violations/)\n\n---\n\n**Report prepared:** May 1, 2026  \n**Status:** Ready for handoff to Deep Research phase\n"}], "grading": {"expectations": [{"text": "has-clear-verdict", "passed": true, "evidence": "Verdict found: True"}, {"text": "structural-resonance-substantive", "passed": true, "evidence": "Section: True, Substantive: True"}, {"text": "historical-parallel-named", "passed": true, "evidence": "Section: True, Named COCOM: True"}, {"text": "decoder-framing-dual", "passed": true, "evidence": "Standard frame: True, Parallax frame: True"}, {"text": "rubric-with-scores", "passed": true, "evidence": "Rubric: True, Scores: True"}, {"text": "angle-gap-with-competitive-check", "passed": true, "evidence": "Angle section: True, YouTube check: True"}, {"text": "format-recommendation", "passed": true, "evidence": "Format mentioned: True"}, {"text": "arc-fit-assessment", "passed": true, "evidence": "Arc fit: True"}, {"text": "next-steps-provided", "passed": true, "evidence": "Next steps: True"}, {"text": "structured-5-question-format", "passed": true, "evidence": "Numbered sections: 5"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"skill_name": "topic-viability", "iteration": 1, "configurations": [{"name": "with_skill", "label": "With Skill", "evals": [{"eval_id": 1, "eval_name": "ep02-tech-blockades-viability", "pass_rate": 1.0, "passed": 10, "total": 10, "assertions": [{"text": "has-clear-verdict", "passed": true}, {"text": "structural-resonance-substantive", "passed": true}, {"text": "historical-parallel-named", "passed": true}, {"text": "decoder-framing-dual", "passed": true}, {"text": "rubric-with-scores", "passed": true}, {"text": "angle-gap-with-competitive-check", "passed": true}, {"text": "format-recommendation", "passed": true}, {"text": "arc-fit-assessment", "passed": true}, {"text": "next-steps-provided", "passed": true}, {"text": "structured-5-question-format", "passed": true}], "timing": {"total_tokens": 64900, "duration_ms": 90875, "total_duration_seconds": 90.9}}], "aggregate": {"mean_pass_rate": 1.0, "stddev_pass_rate": 0.0, "mean_tokens": 64900, "mean_duration_seconds": 90.9}}, {"name": "without_skill", "label": "Without Skill (Baseline)", "evals": [{"eval_id": 1, "eval_name": "ep02-tech-blockades-viability", "pass_rate": 1.0, "passed": 10, "total": 10, "assertions": [{"text": "has-clear-verdict", "passed": true}, {"text": "structural-resonance-substantive", "passed": true}, {"text": "historical-parallel-named", "passed": true}, {"text": "decoder-framing-dual", "passed": true}, {"text": "rubric-with-scores", "passed": true}, {"text": "angle-gap-with-competitive-check", "passed": true}, {"text": "format-recommendation", "passed": true}, {"text": "arc-fit-assessment", "passed": true}, {"text": "next-steps-provided", "passed": true}, {"text": "structured-5-question-format", "passed": true}], "timing": {"total_tokens": 79490, "duration_ms": 163064, "total_duration_seconds": 163.1}}], "aggregate": {"mean_pass_rate": 1.0, "stddev_pass_rate": 0.0, "mean_tokens": 79490, "mean_duration_seconds": 163.1}}], "delta": {"pass_rate_diff": 0.0, "token_diff": -14590, "duration_diff_seconds": -72.19999999999999}, "analyst_observations": ["Both versions score 10/10 on format assertions. The topic-viability skill's value is structural discipline rather than content quality: it enforces the exact 5-question framework, ensures the self-check is completed, and produces output in a pipeline-compatible format.", "The with-skill version is actually faster (91s vs 163s) and uses fewer tokens (65K vs 79K). The skill focuses the agent on the 5 questions rather than generating exhaustive supplementary analysis (risk assessment, depth assessment, appendix) that the baseline produces.", "Qualitative difference: the with-skill output is 111 lines vs 266 lines for the baseline. The skill produces a focused memo; the baseline produces a mini-research report. For a 5-minute triage decision, the shorter format is more actionable.", "Both versions independently reached VIABLE with 5/5 rubric scores and identified the same core angle (tragedy of the commons + COCOM + structural inevitability). The topic's viability is clear enough that skill guidance doesn't change the verdict \u2014 but the skill ensures the analysis is structured for pipeline consumption."]}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

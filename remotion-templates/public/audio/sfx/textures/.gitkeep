@@ -1,0 +1,3 @@
+# Layer 3 — Texture Hits
+# Drop {type}.wav files here per ../README.md.
+# AudioLayer.tsx loads via staticFile("audio/sfx/textures/{type}.wav").

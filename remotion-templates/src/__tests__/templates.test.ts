@@ -1,25 +1,21 @@
 /**
- * Visual Regression Tests — All 14 Remotion Compositions
+ * Visual Regression Tests — All Remotion Compositions
  *
  * Tests render frame 30 of each composition and compare against baseline PNGs.
  * On the FIRST run, baselines are created.
- * On subsequent runs, renders are compared pixel-by-pixel with tolerance.
+ * On subsequent runs, renders are compared with file-size tolerance (5%).
  *
- * Compositions tested:
- * 1. ChoroplethMap
- * 2. RouteAnimation
- * 3. TimelineComparison
- * 4. DataChart
- * 5. KineticTypography
- * 6. FrameworkDiagram
- * 7. TitleTransition
- * 8. DecisionTree
- * 9. SplitComposition
- * 10. ProbabilityGauge
- * 11. ImageComposite
- * 12. KineticShort
- * 13. DataChartShort
- * 14. SplitShort
+ * Landscape compositions (22):
+ *   ChoroplethMap, RouteAnimation, TimelineComparison, DataChart,
+ *   KineticTypography, FrameworkDiagram, TitleTransition, DecisionTree,
+ *   SplitComposition, ProbabilityGauge, ImageComposite, PhotoMontage,
+ *   NetworkDiagram, TimeSeriesChart, SankeyFlow, GameBoard, BayesianUpdate,
+ *   StatReveal, RadarChart, AnnotatedImage, EscalationLadder, DualTimeline,
+ *   HorizontalTimeline, DuelingFrameworks, StrategicLandscape
+ *
+ * Shorts (6):
+ *   KineticShort, DataChartShort, SplitShort, StatRevealShort,
+ *   FrameworkDiagramShort, TimelineComparisonShort
  */
 
 import { describe, it, beforeAll, afterAll, expect } from "vitest";
@@ -40,23 +36,56 @@ const TEST_FRAME = 30;
 const BASELINE_DIR = path.resolve(__dirname, "baselines");
 const TEMP_DIR = path.resolve(__dirname, ".temp-renders");
 
-// All 14 compositions
+// All landscape compositions (must match Root.tsx registration IDs)
 const COMPOSITIONS = [
+  // Timelines
+  "HorizontalTimeline",
+  "TimelineComparison",    // deprecated, kept for regression
+  "TimelineMorph",         // deprecated, kept for regression
+  "DualTimeline",          // deprecated, kept for regression
+  "EscalationLadder",
+  // Data
+  "DataChart",
+  "TimeSeriesChart",
+  "SankeyFlow",
+  "StatReveal",
+  "RadarChart",
+  "BayesianUpdate",
+  // Frameworks
+  "FrameworkDiagram",
+  "DuelingFrameworks",
+  "NetworkDiagram",
+  // Scenarios
+  "DecisionTree",
+  "GameBoard",
+  // Maps
   "ChoroplethMap",
   "RouteAnimation",
-  "TimelineComparison",
-  "DataChart",
+  "StrategicLandscape",
+  // Cinematic
+  "ImageComposite",
+  "PhotoMontage",
+  "AnnotatedImage",
+  // Typography
   "KineticTypography",
-  "FrameworkDiagram",
   "TitleTransition",
-  "DecisionTree",
+  // Multi-segment
   "SplitComposition",
   "ProbabilityGauge",
-  "ImageComposite",
+];
+
+// Shorts compositions
+const SHORTS_COMPOSITIONS = [
   "KineticShort",
   "DataChartShort",
   "SplitShort",
+  "StatRevealShort",
+  "FrameworkDiagramShort",
+  "TimelineComparisonShort",
 ];
+
+// Combined list for testing
+const ALL_COMPOSITIONS = [...COMPOSITIONS, ...SHORTS_COMPOSITIONS];
 
 describe("Visual Regression Tests", () => {
   // Set test timeout high (60 seconds) because rendering is slow
@@ -95,7 +124,7 @@ describe("Visual Regression Tests", () => {
    * 3. If baseline exists, compare current render against it
    * 4. Report result (match/diff)
    */
-  COMPOSITIONS.forEach((compositionId) => {
+  ALL_COMPOSITIONS.forEach((compositionId) => {
     it(
       `${compositionId}: render and compare baseline`,
       async () => {

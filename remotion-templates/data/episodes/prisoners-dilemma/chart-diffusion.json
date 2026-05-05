@@ -1,0 +1,21 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Spread of a Failed Model",
+  "subtitle": "Prisoner's Dilemma scholarly publications",
+  "variant": "bar",
+  "unit": "",
+  "dataPoints": [
+    { "label": "1950", "value": 1, "color": "#E5A544" },
+    { "label": "1955", "value": 12, "color": "#E5A544" },
+    { "label": "1960", "value": 50, "color": "#E5A544" },
+    { "label": "1965", "value": 200, "color": "#E5A544" },
+    { "label": "1970", "value": 800, "color": "#E5A544" },
+    { "label": "1975", "value": 2000, "color": "#E5A544" }
+  ],
+  "highlightIndex": 5,
+  "contextNote": "2,000+ articles for a model that failed its first experiment",
+  "domainLabels": ["Strategy", "Biology", "Economics", "Law", "Psychology"],
+  "durationSec": 12,
+  "backgroundVariant": "light",
+  "source": "Grofman & Pool (1975)"
+}
