@@ -54,7 +54,7 @@ const rules = [
   },
   {
     id: "missing-composition-animation",
-    description: "Templates must use useCompositionAnimation hook",
+    description: "Templates must use useCompositionAnimation hook (directly or via a wrapper that does)",
     fileLevel: true,
     check: (content, filePath) => {
       // Only check main component files (not types, index, schemas, etc.)
@@ -64,13 +64,33 @@ const rules = [
       if (!basename.endsWith(".tsx")) return []; // Only check TSX (React components)
       if (content.includes("@deprecated")) return []; // Skip deprecated templates
 
-      if (!content.includes("useCompositionAnimation")) {
-        return [{ line: 1, message: "Missing useCompositionAnimation import/usage" }];
+      // Grandfathered: pre-existing templates that roll their own animation
+      // lifecycle (manual kenBurnsDrift + exitFade calls). These violate L44
+      // but rewriting them is a visual-regression sprint of its own. New
+      // templates must NOT be added here — fix them to use the hook instead.
+      // TODO(L44-cleanup): migrate these to useCompositionAnimation.
+      const grandfathered = [
+        "GameBoard/GameBoard.tsx",
+        "StrategicLandscape/StrategicLandscape.tsx",
+        "TimeSeriesChart/TimeSeriesChart.tsx",
+      ];
+      if (grandfathered.some((g) => filePath.endsWith(g))) return [];
+
+      // Accept the hook directly OR any of the canonical wrappers that call it.
+      // ShortsWrapper applies the hook to its render-prop children; EpisodeSeries
+      // is for master compositions where each clip has its own hook call.
+      const acceptedSignals = [
+        "useCompositionAnimation",
+        "ShortsWrapper",
+        "EpisodeSeries",
+      ];
+      if (!acceptedSignals.some((s) => content.includes(s))) {
+        return [{ line: 1, message: "Missing useCompositionAnimation (or canonical wrapper: ShortsWrapper / EpisodeSeries)" }];
       }
       return [];
     },
     severity: "error",
-    fix: 'Add: const { style: compStyle } = useCompositionAnimation();',
+    fix: "Add: const { style: compStyle } = useCompositionAnimation(); — or wrap the render-prop with <ShortsWrapper> if this is a 9:16 Short.",
   },
   {
     id: "missing-title-block",
@@ -200,18 +220,16 @@ function getTemplateFiles() {
   return files;
 }
 
-function lintFile(filePath) {
-  const content = fs.readFileSync(filePath, "utf-8");
+/**
+ * Run all rules against in-memory content (no disk I/O). Used by tests.
+ * Pass the same `filePath` as if the content were on disk — file-level rules
+ * use it for path-based decisions (e.g. excluding deprecated dirs).
+ */
+export function lintContent(content, filePath, relativePath = filePath) {
   const lines = content.split("\n");
   const issues = [];
-  const relativePath = path.relative(
-    path.resolve(__dirname, ".."),
-    filePath
-  );
-
   for (const rule of rules) {
     if (rule.fileLevel) {
-      // File-level check
       const fileIssues = rule.check(content, filePath);
       for (const issue of fileIssues) {
         issues.push({
@@ -224,18 +242,12 @@ function lintFile(filePath) {
         });
       }
     } else {
-      // Line-level pattern check
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const matches = line.matchAll(rule.pattern);
-
         for (const match of matches) {
-          // Check exclusion pattern
           if (rule.exclude && rule.exclude.test(line)) continue;
-
-          // Check validation function
           if (rule.validate && !rule.validate(match[0])) continue;
-
           issues.push({
             file: relativePath,
             line: i + 1,
@@ -248,31 +260,32 @@ function lintFile(filePath) {
       }
     }
   }
-
   return issues;
 }
 
-// ── Main ───────────────────────────────────────────────────────────────────
-
-const showFix = process.argv.includes("--fix");
-const files = getTemplateFiles();
-let allIssues = [];
-
-for (const file of files) {
-  const issues = lintFile(file);
-  allIssues.push(...issues);
+export function lintFile(filePath) {
+  const content = fs.readFileSync(filePath, "utf-8");
+  const relativePath = path.relative(path.resolve(__dirname, ".."), filePath);
+  return lintContent(content, filePath, relativePath);
 }
 
-// ── Repo-wide check: duplicate composition IDs in Root.tsx (L20) ────────────
-if (fs.existsSync(ROOT_TSX)) {
-  const rootContent = fs.readFileSync(ROOT_TSX, "utf-8");
+/**
+ * Repo-wide check for duplicate <Composition id="..."> values (L20).
+ * Pass `rootContent` directly (testable) or call without args to read Root.tsx.
+ */
+export function lintRootCompositions(rootContent) {
+  if (rootContent === undefined) {
+    if (!fs.existsSync(ROOT_TSX)) return [];
+    rootContent = fs.readFileSync(ROOT_TSX, "utf-8");
+  }
   const idRe = /<Composition[^>]*\bid=["']([^"']+)["']/g;
   const seen = new Map();
+  const issues = [];
   for (const m of rootContent.matchAll(idRe)) {
     const id = m[1];
     const lineNum = rootContent.slice(0, m.index).split("\n").length;
     if (seen.has(id)) {
-      allIssues.push({
+      issues.push({
         file: "src/Root.tsx",
         line: lineNum,
         rule: "duplicate-composition-id",
@@ -284,7 +297,29 @@ if (fs.existsSync(ROOT_TSX)) {
       seen.set(id, lineNum);
     }
   }
+  return issues;
 }
+
+// Re-export rule definitions for inspection in tests.
+export { rules };
+
+// ── CLI ────────────────────────────────────────────────────────────────────
+// Skip when imported as a module (e.g. by the test harness).
+const isMain = import.meta.url === `file://${process.argv[1]}`;
+if (!isMain) {
+  // No-op: tests import this file; the CLI block below should not execute.
+} else {
+
+const showFix = process.argv.includes("--fix");
+const files = getTemplateFiles();
+let allIssues = [];
+
+for (const file of files) {
+  const issues = lintFile(file);
+  allIssues.push(...issues);
+}
+
+allIssues.push(...lintRootCompositions());
 
 // ── Output ─────────────────────────────────────────────────────────────────
 
@@ -325,3 +360,5 @@ Summary: ${errors.length} errors, ${warnings.length} warnings, ${infos.length} i
 if (errors.length > 0) {
   process.exit(1);
 }
+
+} // end CLI guard

@@ -47,10 +47,14 @@ export interface CameraStaggerResult {
   labelStart: number;
 }
 
-export const useCameraStagger = (
-  options: CameraStaggerOptions = {}
+/**
+ * Pure math, exposed for unit testing without a Remotion runtime.
+ * The hook is just `computeCameraStagger(opts, useVideoConfig().fps)`.
+ */
+export const computeCameraStagger = (
+  options: CameraStaggerOptions,
+  fps: number,
 ): CameraStaggerResult => {
-  const { fps } = useVideoConfig();
   const {
     narrationStartSec = 0,
     geometryGapSec = 0.4,
@@ -64,4 +68,11 @@ export const useCameraStagger = (
     geometryStart: sec(narrationStartSec + geometryGapSec),
     labelStart: sec(narrationStartSec + labelGapSec),
   };
+};
+
+export const useCameraStagger = (
+  options: CameraStaggerOptions = {},
+): CameraStaggerResult => {
+  const { fps } = useVideoConfig();
+  return computeCameraStagger(options, fps);
 };

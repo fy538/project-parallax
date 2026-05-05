@@ -25,13 +25,16 @@ jobs:
           cache-dependency-path: remotion-templates/package-lock.json
 
       - name: Install Python deps
-        run: pip install pytest jsonschema
+        run: pip install pytest pytest-cov jsonschema
 
       - name: Install Node deps
         run: cd remotion-templates && npm ci
 
       - name: Validate JSON data
         run: python3 tools/validate_data.py
+
+      - name: Run convention lint
+        run: ./scripts/lint.sh
 
       - name: Run all tests
         run: ./scripts/test.sh

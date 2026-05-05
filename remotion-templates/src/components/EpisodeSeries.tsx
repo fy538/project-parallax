@@ -42,20 +42,47 @@ export interface EpisodeSeriesProps {
   crossfadeFrames?: number;
 }
 
+/**
+ * Pure mapping: clips → Series.Sequence-ready props (no JSX, no Remotion runtime).
+ * Exposed for unit testing — the component below just renders the result.
+ *
+ * Rule: first clip has offset 0; every subsequent clip offsets backwards by
+ * `crossfadeFrames` so its enter-fade overlaps the previous clip's exit-fade.
+ */
+export interface SequenceProps {
+  key: string;
+  durationInFrames: number;
+  offset: number;
+}
+
+export const computeSequenceProps = (
+  clips: EpisodeClip[],
+  crossfadeFrames: number = DEFAULT_CROSSFADE_FRAMES,
+): SequenceProps[] =>
+  clips.map((clip, index) => ({
+    key: clip.key ?? `clip-${index}`,
+    durationInFrames: clip.durationFrames,
+    // `index > 0 && crossfadeFrames > 0` avoids producing -0 when the caller
+    // disables the crossfade (clearer in test assertions and downstream consumers).
+    offset: index > 0 && crossfadeFrames > 0 ? -crossfadeFrames : 0,
+  }));
+
 export const EpisodeSeries: React.FC<EpisodeSeriesProps> = ({
   clips,
   crossfadeFrames = DEFAULT_CROSSFADE_FRAMES,
 }) => {
+  const seqProps = computeSequenceProps(clips, crossfadeFrames);
   return (
     <AbsoluteFill>
       <Series>
         {clips.map((clip, index) => {
           const Comp = clip.component;
+          const { key, durationInFrames, offset } = seqProps[index];
           return (
             <Series.Sequence
-              key={clip.key ?? `clip-${index}`}
-              durationInFrames={clip.durationFrames}
-              offset={index > 0 ? -crossfadeFrames : 0}
+              key={key}
+              durationInFrames={durationInFrames}
+              offset={offset}
             >
               <Comp data={clip.data} />
             </Series.Sequence>

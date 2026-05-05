@@ -29,6 +29,9 @@ worktrees/
 __pycache__/
 *.pyc
 *.pyo
+.coverage
+coverage.xml
+htmlcov/
 
 # Test artifacts
 remotion-templates/src/__tests__/.temp-renders/
