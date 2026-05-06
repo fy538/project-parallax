@@ -34,6 +34,7 @@ import React, { createContext, useContext, useMemo, type ReactNode } from "react
 import {
   type EpisodeColorEmphasis,
   type PaletteEmphasis,
+  EMPHASIS_VALUES,
   getEpisodeColorEmphasis,
 } from "../design/theme";
 
@@ -73,13 +74,23 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
   value,
   children,
 }) => {
-  const ctx = useMemo<EpisodeColorEmphasisContextValue>(
-    () => ({
+  const ctx = useMemo<EpisodeColorEmphasisContextValue>(() => {
+    // Validate against the canonical list rather than trusting any
+    // string. Invalid emphases (typos, stale config, future values) fall
+    // back to "neutral" — which keeps `name` consistent with what
+    // getEpisodeColorEmphasis(value) actually resolves to. Without this
+    // guard, an invalid value would resolve to neutral palette but be
+    // tagged as "non-neutral" by name, causing Background to apply an
+    // (unintended) atmospheric tint.
+    const validName: EpisodeColorEmphasis =
+      typeof value === "string" && (EMPHASIS_VALUES as readonly string[]).includes(value)
+        ? (value as EpisodeColorEmphasis)
+        : "neutral";
+    return {
       palette: getEpisodeColorEmphasis(value),
-      name: (value && typeof value === "string" ? value : "neutral") as EpisodeColorEmphasis,
-    }),
-    [value],
-  );
+      name: validName,
+    };
+  }, [value]);
   return (
     <EpisodeColorEmphasisContext.Provider value={ctx}>
       {children}

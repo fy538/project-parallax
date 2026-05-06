@@ -32,11 +32,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const COMPOSITION_ID = "catalog-emphasis-showcase-all-six";
 
-// Six emphases, sequential at 4s each. Render the FRAME at the settled
-// moment of each window — frame 60 (= 2s in) is well past the bar
-// entrance (~1.5s) and inside the steady-state hold.
-const PER_EMPHASIS_FRAMES = 4 * 30; // 4s × 30fps
-const SETTLE_OFFSET_FRAMES = 60;     // 2s into each window
+// Six emphases, sequential at 4s each in the showcase. Render at the
+// settled moment of each window — 2s in is past the bar entrance
+// (~1.5s) and inside the steady-state hold. Frame math derives from
+// the actual composition.fps below so this stays correct if the
+// project's fps changes.
+const PER_EMPHASIS_SEC = 4;
+const SETTLE_OFFSET_SEC = 2;
 const EMPHASES = [
   "neutral",
   "soviet",
@@ -62,6 +64,9 @@ async function main() {
     `  ${composition.width}×${composition.height} @ ${composition.fps}fps, ${composition.durationInFrames} frames`,
   );
 
+  const perEmphasisFrames = Math.round(PER_EMPHASIS_SEC * composition.fps);
+  const settleOffsetFrames = Math.round(SETTLE_OFFSET_SEC * composition.fps);
+
   const outDir = join(ROOT, "out", "emphasis-reference");
   if (!existsSync(outDir)) {
     mkdirSync(outDir, { recursive: true });
@@ -69,7 +74,7 @@ async function main() {
 
   for (let i = 0; i < EMPHASES.length; i++) {
     const name = EMPHASES[i];
-    const frame = i * PER_EMPHASIS_FRAMES + SETTLE_OFFSET_FRAMES;
+    const frame = i * perEmphasisFrames + settleOffsetFrames;
     const output = join(outDir, `${name}.png`);
     process.stdout.write(`  [${i + 1}/${EMPHASES.length}] ${name.padEnd(20)} frame ${frame}...`);
     try {
