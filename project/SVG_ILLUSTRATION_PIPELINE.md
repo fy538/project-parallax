@@ -1,10 +1,22 @@
 # SVG Illustration Pipeline
 
+> ⚠️ **DEPRECATED — May 4, 2026.** The Claude SVG generation path documented in this file is retired in favor of `tools/recraft/recraft.py` (Recraft V3 API). Recraft's `vector_illustration` style covers analytical/diagrammatic content this pipeline previously served, integrates with the per-typography palette emphasis architecture (see PROMPT_PREAMBLES.md and TYPOGRAPHY_TRADITIONS.md), AND handles atmospheric backdrops + grounded scenes that Claude SVG never could.
+>
+> **Where to go instead:**
+> - Analytical/diagrammatic illustrations → `python tools/recraft/recraft.py generate "..." --register analytical`
+> - Atmospheric backdrops → `--register atmospheric` (see AI_VIDEO_PIPELINE.md)
+> - Grounded figurative scenes → `--register grounding` (see AI_VIDEO_PIPELINE.md)
+> - Production workflow → tools/ai-video/GENERATION_WORKFLOW.md
+>
+> This file is kept for reference but should not drive new production. The original pre-May 4 content follows.
+>
+> ---
+>
 > How to identify, generate, polish, and integrate SVG illustrations into Parallax video production using Claude. Companion to IMAGES.md (stock photography) and BRAND.md (design system). Together, these three documents cover all visual sourcing.
 >
 > SVG illustrations fill gaps that stock footage and Remotion templates cannot: conceptual metaphors, abstract information design, data-narrative hybrids, and structural visualizations that don't exist as photographs. All SVG generation uses Claude directly — no external APIs required.
 >
-> Last updated: April 2026
+> Last updated: April 2026 (deprecated May 4, 2026)
 
 ---
 

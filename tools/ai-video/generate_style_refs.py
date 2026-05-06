@@ -2,15 +2,28 @@
 """
 Parallax — AI Video Style Reference Generator
 
-Generates the 7 canonical style reference images that define the "Parallax AI-GEN
-look" via Flux 2 Pro on fal.ai. These references are used as style anchors for
-Kling 3.0 / Seedance 2.0 / Sora 2 / Runway Gen-4 across all episodes.
+Generates the 15 canonical style reference images that define the "Parallax
+AI-GEN look" via Flux 2 Pro on fal.ai. These references are used as style
+anchors for Kling 3.0 / Seedance 2.0 / Sora 2 / Runway Gen-4 across all
+episodes.
 
 Updated May 4, 2026: switched from photoreal-mannequin reference library to
-constructivist library matching the unified post-migration aesthetic. The new
-references draw on Rodchenko / Heartfield / Masereel constructivist tradition
-and span the realism dosage spectrum (flat / balanced / grounded). Each
-includes period-and-region-appropriate typography per TYPOGRAPHY_TRADITIONS.md.
+constructivist library matching the unified post-migration aesthetic. The
+broadened constructivist anchor draws on the whole 20th-century editorial-
+design family (Bauhaus, American mid-century modernism via Saul Bass / Push
+Pin / Fortune magazine, British industrial modernism, Japanese Showa-era
+graphic design, Soviet Constructivism, German political photomontage,
+industrial woodcut tradition). Cultural specificity is supplied per scene by
+the typography emphasis — see TYPOGRAPHY_TRADITIONS.md.
+
+Library expanded May 4-5, 2026 from 7 → 11 → 15 references. The 15 cover
+all major content types the channel will encounter in EP01-EP10:
+  Phase 1 (refs 1-7): foundational anchors (face, cleanroom, atmospheric,
+    domestic, historical, conceptual)
+  Phase 2 (refs 8-11): broader-family cultural anchors (Bauhaus, American
+    Modernist, Japanese Showa, Russian Constructivist canonical)
+  Phase 3 (refs 12-15): coverage completion (Chinese traditional,
+    adversarial war room, multi-figure boardroom, neutral channel default)
 
 Note: Recraft V3 may produce stronger constructivist outputs than Flux 2 Pro
 for some references, since Recraft has native vector_illustration / digital_
@@ -20,14 +33,14 @@ path for backward compatibility and for hero P1 references where photographic
 spatial detail (realism: grounded) is desired.
 
 Usage:
-  # Generate all 7 references
+  # Generate all 15 references
   python generate_style_refs.py --all
 
-  # Generate a specific reference by number (1-7)
+  # Generate a specific reference by number (1-15)
   python generate_style_refs.py --ref 1
 
   # Generate a specific reference by name
-  python generate_style_refs.py --ref mannequin-face
+  python generate_style_refs.py --ref constructivist-face
 
   # Re-generate with a modified prompt (iterating)
   python generate_style_refs.py --ref 1 --prompt "your custom prompt override"
@@ -78,16 +91,29 @@ class StyleRef:
 
 
 _CONSTRUCTIVIST_ANCHOR = (
-    "Editorial illustration in the Parallax constructivist style — Soviet "
-    "constructivism meets German political photomontage meets industrial "
-    "woodcut tradition, drawing on Alexander Rodchenko, El Lissitzky, "
-    "John Heartfield, and Frans Masereel. Bold compositional confidence, "
-    "color-blocked forms with no soft shading or gradients. Restricted "
-    "warm palette: deep ink (#1C1814), walnut (#5C4A3D), umber (#8B7355), "
-    "burnt amber and gold (#C4A747), rust (#A64D46), bone (#F0E6D0) on "
-    "paper (#F5F0E8) background. No other colors. NOT photorealistic, "
-    "NOT 3D render, NOT cool blue or teal, NOT Adobe stock aesthetic, "
-    "NOT smooth featureless mannequin faces. "
+    "Editorial illustration in the Parallax 20th-century constructivist "
+    "tradition — drawing on the broader graphic-design family that spans "
+    "the Bauhaus design school (László Moholy-Nagy, Herbert Bayer), "
+    "American mid-century editorial modernism (Saul Bass, Push Pin Studios, "
+    "Charley Harper, Jim Flora, Paul Rand, Fortune magazine industrial-"
+    "modernism), British industrial modernism (E. McKnight Kauffer, "
+    "Edward Bawden), Japanese Showa-era graphic design (Yusaku Kamekura, "
+    "Ikko Tanaka), Soviet Constructivism (Alexander Rodchenko, El Lissitzky), "
+    "German political photomontage (John Heartfield), and 20th-century "
+    "industrial woodcut tradition (Frans Masereel). The base aesthetic is "
+    "the shared graphic discipline this family carries: bold compositional "
+    "confidence, color-blocked forms with no soft shading or gradients, "
+    "geometric clarity, restrained palette, editorial publication weight. "
+    "Restricted warm palette: deep ink (#1C1814), walnut (#5C4A3D), "
+    "umber (#8B7355), burnt amber and gold (#C4A747), rust (#A64D46), "
+    "and bone (#F0E6D0) on paper (#F5F0E8) background. No other colors. "
+    "Cultural specificity (Soviet Constructivist intensity, American "
+    "mid-century restraint, Chinese vermillion, Japanese Showa minimalism, "
+    "literati ink-wash) is supplied by the per-scene typography emphasis — "
+    "this base provides the neutral 20th-century editorial-illustration "
+    "grammar from which the cultural emphasis emerges. "
+    "NOT photorealistic, NOT 3D render, NOT cool blue or teal, NOT Adobe "
+    "stock aesthetic, NOT smooth featureless mannequin faces. "
 )
 
 # Updated May 4, 2026: replaced photoreal-mannequin reference library with
@@ -97,7 +123,7 @@ STYLE_REFS = [
     StyleRef(
         number=1,
         name="constructivist-face",
-        filename="style-ref_face_planar-neutral_v1.png",
+        filename="r1_constructivist_face.png",
         description="Planar-face study — locks the exact level of facial stylization for grounded scenes",
         lut_primary="standard",
         prompt=(
@@ -117,7 +143,7 @@ STYLE_REFS = [
     StyleRef(
         number=2,
         name="cleanroom-flat",
-        filename="style-ref_industrial_cleanroom-flat_v1.png",
+        filename="r2_cleanroom_flat.png",
         description="Flat constructivist cleanroom — monumentalist propaganda-poster aesthetic at maximum graphic flatness",
         lut_primary="standard",
         prompt=(
@@ -139,7 +165,7 @@ STYLE_REFS = [
     StyleRef(
         number=3,
         name="cleanroom-grounded",
-        filename="style-ref_industrial_cleanroom-grounded_v1.png",
+        filename="r3_cleanroom_grounded.png",
         description="Grounded constructivist cleanroom — same scene with photographic spatial detail for you-are-here presence",
         lut_primary="standard",
         prompt=(
@@ -162,7 +188,7 @@ STYLE_REFS = [
     StyleRef(
         number=4,
         name="atmospheric-trap",
-        filename="style-ref_atmospheric_trap-encirclement_v1.png",
+        filename="r4_atmospheric_trap.png",
         description="Atmospheric backdrop — system-mood, civilizational scale, used at low opacity behind narration",
         lut_primary="standard",
         prompt=(
@@ -183,7 +209,7 @@ STYLE_REFS = [
     StyleRef(
         number=5,
         name="domestic-intimate",
-        filename="style-ref_domestic_beijing-apartment_v1.png",
+        filename="r5_domestic_intimate.png",
         description="Intimate domestic scene — locks the constructivist aesthetic at conversational human scale (Beijing apartment, 1980s)",
         lut_primary="standard",
         prompt=(
@@ -208,7 +234,7 @@ STYLE_REFS = [
     StyleRef(
         number=6,
         name="historical-modernist",
-        filename="style-ref_historical_1941-american_v1.png",
+        filename="r6_historical_modernist.png",
         description="Historical reconstruction — 1941 American government office with English Modernist typography, editorial LUT target",
         lut_primary="editorial",
         prompt=(
@@ -234,7 +260,7 @@ STYLE_REFS = [
     StyleRef(
         number=7,
         name="conceptual-corridor",
-        filename="style-ref_conceptual_corridor-splitting_v1.png",
+        filename="r7_conceptual_corridor.png",
         description="Conceptual corridor — physical metaphor for bifurcation, atmospheric backdrop usage",
         lut_primary="standard",
         prompt=(
@@ -256,6 +282,281 @@ STYLE_REFS = [
             "aspect ratio."
         ),
     ),
+    # ── Broader 20th-century constructivist family references (May 4) ──
+    # Added during the May 4 risk-mitigation calibration. The first 7
+    # references skewed toward Soviet/Chinese cultural emphasis; these 4
+    # canonicalize the American/Bauhaus/Japanese/British modernist branches
+    # of the broader 20th-century editorial-illustration family. The
+    # CONSTRUCTIVIST_BASE_PREAMBLE in tools/recraft/recraft.py was broadened
+    # at the same time so the channel default reads as "20th-century
+    # editorial design tradition" rather than "Soviet propaganda."
+    StyleRef(
+        number=8,
+        name="bauhaus-educational",
+        filename="r8_bauhaus_educational.png",
+        description="Bauhaus educational discipline — Moholy-Nagy / Bayer compositional rigor, framework/educational scenes",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "Bauhaus educational scene in the visual tradition of László "
+            "Moholy-Nagy and Herbert Bayer. A 1930s design studio interior: "
+            "two figures at large drafting tables examining geometric design "
+            "exercises. Faces composed of 4-5 color-blocked planes, eyes "
+            "obscured by lowered head reading or by round wire-rim glasses "
+            "casting shadow. Hands as flat color planes holding drafting "
+            "tools. Walls feature pinned geometric studies in primary "
+            "color-blocks (red, yellow, blue rendered as walnut/gold/umber "
+            "in the Parallax warm-palette translation), grid systems, "
+            "typographic exercises. Restrained Bauhaus-tradition palette "
+            "PALETTE EMPHASIS: walnut (#5C4A3D), umber (#8B7355), gold "
+            "(#C4A747), bone (#F0E6D0), paper (#F5F0E8) — restrained "
+            "educational discipline, NOT propaganda intensity. COMPOSITIONAL "
+            "EMPHASIS: orthogonal grid alignment, balanced asymmetric layout, "
+            "deliberate negative space, hierarchy through size and placement. "
+            "Mood: design-school discipline, geometric universalism, "
+            "20th-century European modernism. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=9,
+        name="american-modernist-fortune",
+        filename="r9_american_modernist_fortune.png",
+        description="American mid-century editorial — Fortune magazine industrial-modernism, Saul Bass / Push Pin discipline",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "American mid-century editorial illustration in the tradition "
+            "of Fortune magazine industrial-modernism (1950s-60s), Saul "
+            "Bass title-sequence aesthetic, Push Pin Studios layout "
+            "discipline, Charley Harper geometric wildlife illustration, "
+            "Jim Flora RCA covers. A 1958 Detroit auto plant or American "
+            "industrial-corporate scene: three figures in business attire "
+            "(suits, ties, white shirts) gathered around a planning table "
+            "with industrial blueprints. Faces composed of color-blocked "
+            "planes, eyes obscured by hair fall or downturned head. PALETTE "
+            "EMPHASIS: walnut, umber, gold, bone, paper — softer mid-century "
+            "American optimism palette with rust as SINGLE sparing accent "
+            "only (never dominant). NOT Soviet revolutionary red. "
+            "COMPOSITIONAL EMPHASIS: balanced asymmetric editorial layout, "
+            "deliberate white-space discipline, hierarchy through size and "
+            "weight rather than color saturation, NOT diagonal monumentalist "
+            "Soviet axis. Mood: American mid-century industrial optimism, "
+            "post-war corporate confidence, magazine-spread quality. "
+            "Typography integrated as Push Pin / Bass geometric sans-serif "
+            "block lettering: 'INDUSTRY · INNOVATION · ENTERPRISE' or "
+            "'PROGRESS' in walnut and gold. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=10,
+        name="japanese-showa-modernist",
+        filename="r10_japanese_showa.png",
+        description="Japanese Showa-era post-war graphic design — Kamekura / Tanaka discipline, NOT pre-war propaganda",
+        lut_primary="editorial",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "Japanese Showa-era post-war graphic design in the tradition of "
+            "Yusaku Kamekura (1964 Tokyo Olympics identity), Ikko Tanaka, "
+            "Tadanori Yokoo. A 1964 Japanese industrial-modernist scene: "
+            "two figures in business attire at a Tokyo office overlooking "
+            "the city skyline at dusk. Faces composed of color-blocked "
+            "planes, eyes obscured by lowered head reading. PALETTE EMPHASIS: "
+            "extremely minimal — black/deep ink, single bold red (Japanese "
+            "red, slightly orange-leaning), cream/bone, paper. Often just "
+            "2-3 colors total. NOT Soviet rust dominance. COMPOSITIONAL "
+            "EMPHASIS: vertical orientation strongly preferred, geometric "
+            "discipline, bold kanji typography integration ('技術 · 産業 · "
+            "進歩' — Technology · Industry · Progress). Real Japanese, not "
+            "mock-script. Restrained scale, intentional negative space, "
+            "Showa-era post-war modernist confidence (NOT pre-1945 imperial "
+            "propaganda — this is the post-war reconstruction Japan that "
+            "became the Olympics-era / industrial-rise visual tradition). "
+            "16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=11,
+        name="russian-constructivist-canonical",
+        filename="r11_russian_constructivist.png",
+        description="Soviet Constructivist canonical reference — Rodchenko/Klutsis intensity, deployed only when content explicitly engages Soviet state power",
+        lut_primary="conflict",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "Soviet Constructivist propaganda in the canonical Rodchenko / "
+            "Klutsis / Lissitzky tradition. A 1930 Soviet industrial scene: "
+            "three workers in dark blue overalls and protective goggles "
+            "operating massive machinery. Faces composed of color-blocked "
+            "planes, eyes obscured by goggle shadow. PALETTE EMPHASIS: full "
+            "saturated revolutionary palette — heavy red (rust dominant), "
+            "gold accents, deep ink structural elements, bone highlights. "
+            "Revolutionary intensity is the goal here. COMPOSITIONAL EMPHASIS: "
+            "diagonal compositional axis (signature Soviet Constructivist "
+            "move), monumentalist scale, low horizon line, propaganda-poster "
+            "dynamism. Bold Russian Cyrillic typography: 'ИНДУСТРИАЛИЗАЦИЯ' "
+            "(Industrialization), 'ПЯТИЛЕТКА В ЧЕТЫРЕ ГОДА' (Five-Year Plan "
+            "in Four Years), 'ПОБЕДА' (Victory) — real Russian, not mock-"
+            "script. Mood: Soviet revolutionary mobilization, full agitprop "
+            "intensity. EDITORIAL NOTE: this reference exists for episodes "
+            "that explicitly cover Soviet-bloc state-power content. The "
+            "channel deploys this aesthetic deliberately and analytically, "
+            "not as default. 16:9 aspect ratio."
+        ),
+    ),
+    # ── Coverage-completion references (May 4 calibration round 3) ──
+    # Added so the canonical library covers all major content types the
+    # channel will encounter in EP01-EP10 — chinese_traditional, non-Soviet
+    # adversarial scenes, multi-figure group dynamics, and the neutral
+    # channel-default visual identity. After this addition the library is
+    # complete for foreseeable production demand.
+    StyleRef(
+        number=12,
+        name="chinese-traditional-scholar",
+        filename="r12_chinese_traditional.png",
+        description="Pre-revolutionary Chinese / classical scholarly content — literati ink-wash discipline, scrolls, contemplative restraint",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "A 1923 Shanghai scholar's study, intimate eye-level composition. "
+            "A figure in traditional changshan robe seated at a low wooden "
+            "desk, brush in hand, pausing over a long calligraphy scroll. "
+            "Face composed of 4-5 distinct color-blocked planes (jaw, "
+            "cheekbone, brow, lit, neck), no continuous skin tonality, no "
+            "rendered facial features. Eyes obscured by lowered head "
+            "reading position and round wire-rim eyeglasses casting shadow. "
+            "Hands as flat color planes holding the brush. Wooden desk with "
+            "stacked classical texts, small inkstone, teacup with botanical "
+            "motif. Behind: hanging scroll with vertical Traditional Chinese "
+            "calligraphy ('學而時習之' or similar real classical Chinese "
+            "phrase) in brush-ink style on bone background. Window showing "
+            "Shanghai rooftops at dusk as flat ink silhouettes. "
+            "PALETTE EMPHASIS: ink wash dominant — deep ink (#1C1814) on "
+            "paper (#F5F0E8) background, walnut and umber as material-"
+            "grounding neutrals, sparse rust (#A64D46) only as red seal "
+            "accent on the scroll or signature stamp. NOT propaganda "
+            "intensity; literati restraint. "
+            "COMPOSITIONAL EMPHASIS: vertical orientation (text columns "
+            "right-to-left), restrained scale, contemplative composition, "
+            "extensive negative space as deliberate aesthetic choice. "
+            "Classical scholar's-study aesthetic, not industrial-modernist. "
+            "Mood: scholarly contemplation, classical Chinese intellectual "
+            "tradition, pre-revolutionary intellectual gravity. Realism: "
+            "balanced (figure stays planar-constructivist, environment has "
+            "subtle paper grain and material texture on books and scroll). "
+            "16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=13,
+        name="adversarial-warroom",
+        filename="r13_adversarial_warroom.png",
+        description="Non-Soviet adversarial scene — military command center / intelligence operations, conflict-treatment palette without Soviet revolutionary coding",
+        lut_primary="conflict",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "Interior of a contemporary American military strategic "
+            "operations center, dark and tense. Five figures in tactical "
+            "uniforms gathered around a central display table — two seated "
+            "examining maps, two standing in discussion, one pointing at a "
+            "screen on the back wall. Faces composed of 4-5 distinct color-"
+            "blocked planes, eyes obscured by helmet brim shadow or hat "
+            "brim shadow. Hands as flat color planes pointing or holding "
+            "documents. Multiple display screens in background showing "
+            "radar, maps, and stylized data graphics — flat ink-and-rust "
+            "panels. Composition shows clear group dynamic with lines of "
+            "attention between figures. "
+            "PALETTE EMPHASIS: conflict treatment palette — heavy contrast "
+            "deep ink (#1C1814) shadows, oxblood (#7A2E1A) and rust "
+            "(#A64D46) accents from displays, bone (#F0E6D0) highlights. "
+            "Cool-blue display glow at secondary level only (NOT dominant; "
+            "this is conflict-treatment, not generic-military-blue). "
+            "Adversarial-American visual rhetoric, NOT Soviet revolutionary "
+            "palette. "
+            "COMPOSITIONAL EMPHASIS: balanced asymmetric editorial layout "
+            "(Push Pin / Saul Bass discipline applied to military scene). "
+            "Tension through deep shadow and rim-light isolation, NOT "
+            "through Soviet diagonal monumentalist axis. Composition feels "
+            "intentional and architectural. "
+            "Mood: tension, contained adversarial weight, contemporary "
+            "American military intelligence operations. NOT Cold War Soviet "
+            "rocket factory. Realism: balanced. 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=14,
+        name="multi-figure-boardroom",
+        filename="r14_multifigure_boardroom.png",
+        description="Multi-figure group dynamics — diplomatic summit / corporate negotiation / panel discussion at 4-6 figure scale",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "A 2026 international trade negotiation in a wood-paneled "
+            "conference room with warm tungsten lighting from a side "
+            "window. Six figures in business attire seated around a large "
+            "rectangular conference table, mid-discussion. Two figures "
+            "gesturing across the table; one figure referring to documents; "
+            "one figure typing on a laptop; two figures in side-"
+            "conversation. Faces composed of 4-5 distinct color-blocked "
+            "planes, eyes obscured by hair fall, lowered head, or hand-"
+            "raised gesture. Hands as flat color planes (palm + finger "
+            "silhouette only, no individual finger detail) holding pens, "
+            "pointing, or resting on documents. The composition reads as "
+            "6-figure group dynamic with lines of attention establishing "
+            "who's engaged with whom. "
+            "PALETTE EMPHASIS: American mid-century editorial restraint — "
+            "walnut (#5C4A3D), umber (#8B7355), gold (#C4A747), bone "
+            "(#F0E6D0), paper (#F5F0E8). Rust as single sparing accent "
+            "(one document folder, one chair, one tie). NOT Soviet "
+            "revolutionary intensity. Saul Bass / Push Pin / Fortune-"
+            "magazine palette discipline. "
+            "COMPOSITIONAL EMPHASIS: balanced asymmetric editorial layout, "
+            "Push Pin Studios' deliberate white-space discipline. The 6 "
+            "figures arranged so that lines of attention between them are "
+            "readable; NOT symmetric centered layout (PowerPoint-coded), "
+            "NOT diagonal monumentalist (Soviet-coded). Editorial-magazine "
+            "spread quality. "
+            "Mood: contemporary diplomatic / corporate institutional "
+            "discussion, intentional and architectural. Realism: balanced "
+            "(figures flat, environment has selective material texture on "
+            "wood paneling and documents). 16:9 aspect ratio."
+        ),
+    ),
+    StyleRef(
+        number=15,
+        name="neutral-channel-default",
+        filename="r15_neutral_default.png",
+        description="Channel's neutral default visual identity — soft American-Modernist palette with no specific cultural geography. Used for channel art, banner, default thumbnails, framework episodes",
+        lut_primary="standard",
+        prompt=(
+            _CONSTRUCTIVIST_ANCHOR +
+            "A neutral atmospheric backdrop scene establishing the Parallax "
+            "channel's default visual identity. Abstract industrial-"
+            "modernist landscape: layered geometric forms suggesting "
+            "infrastructure (architectural silhouettes, transportation "
+            "corridors, network connections) at distance, no specific "
+            "cultural geography or named location. No human figures. "
+            "PALETTE EMPHASIS: the channel's softest American-Modernist-"
+            "leaning default — walnut (#5C4A3D), umber (#8B7355), gold "
+            "(#C4A747), bone (#F0E6D0), paper (#F5F0E8) — with rust "
+            "(#A64D46) only as a single sparing accent on one element "
+            "(a transportation line, a sun glint, a building edge). NOT "
+            "Soviet revolutionary palette dominance. This is the channel's "
+            "neutral default — Saul Bass / Push Pin / Charley Harper "
+            "restraint applied to abstract infrastructure. "
+            "COMPOSITIONAL EMPHASIS: balanced asymmetric editorial layout, "
+            "deliberate negative space, hierarchy through size and weight "
+            "rather than color saturation. Push Pin Studios / Eames-era "
+            "flat-modernist grid discipline. NOT diagonal monumentalist "
+            "Soviet axis. "
+            "Mood: contemporary American mid-century editorial design "
+            "optimism, intentional, architectural. The channel's default "
+            "visual register when no specific cultural geography applies. "
+            "Used for: channel art, banner imagery, default thumbnail "
+            "style, episodes covering abstract topics or philosophical "
+            "frameworks without strong geographic specificity. Realism: "
+            "flat (atmospheric backdrop usage; full graphic flatness for "
+            "monumentalist editorial composition). 16:9 aspect ratio."
+        ),
+    ),
 ]
 
 # Index by name for CLI lookup
@@ -263,7 +564,14 @@ REFS_BY_NAME = {r.name: r for r in STYLE_REFS}
 REFS_BY_NUMBER = {r.number: r for r in STYLE_REFS}
 
 # Recommended generation order (face first, then scale test, then contexts)
-GENERATION_ORDER = [1, 5, 2, 3, 4, 6, 7]
+GENERATION_ORDER = [
+    # Phase 1 — foundational anchors (face standard, intimate domestic, industrial)
+    1, 5, 2, 3, 4, 6, 7,
+    # Phase 2 — broader 20th-century constructivist family (May 4 calibration)
+    8, 9, 10, 11,
+    # Phase 3 — coverage completion (May 4 calibration round 3)
+    15, 12, 13, 14,
+]
 
 
 # ── fal.ai Generation ───────────────────────────────────────────────────

@@ -6,7 +6,34 @@ See CONTENT_IDENTITY.md for format definitions, topic discovery framework, and s
 See RESEARCH_WORKFLOW.md for signal monitoring sources and research process.
 See PRODUCTION_PIPELINE.md for the viability check template and sequencing heuristics.
 
-Last updated: May 3, 2026
+Last updated: May 5, 2026
+
+---
+
+## Launch Sequence (First Cluster)
+
+**Throughline:** "Why cooperation is structurally harder than it looks — and when it happens anyway."
+
+The Prisoner's Dilemma episode functions as a **founding meta-framework** that compounds into every subsequent arc. The game theory logic (one-shot vs. iterated PD, shadow of the future, tragedy of the commons) recurs in the chip war (silicon-trap), export control failure (blockades-leak), arms control (treaty-nobody-believes), and industrial policy (industrial-convergence). Viewers who watch the first cluster build an internalized analytical toolkit they'll recognize in every future episode.
+
+The research audit for blockades-leak (May 2, 2026) explicitly notes that its philosophical framework already draws on Axelrod's iterated PD and tragedy of the commons — it was built to follow prisoners-dilemma even before the sequencing decision was made.
+
+**Sequencing by desired viewer behavior** (see `project/psychology/SYNTHESIS.md`):
+- Ep 1 → **Subscribe**: calm competence + framework mastery ("I want more of this thinking")
+- Ep 2 → **Share**: high arousal + crisp "wait what" insight ("everyone needs to see this")
+- Ep 3 → **Return visit**: "you showed why the obvious fix also fails — what comes next?"
+
+| Ep | Slug | Format | Arc | Pipeline State |
+|---|---|---|---|---|
+| 1 | `prisoners-dilemma` | Philosopher's Lens | Arc 3 (meta-framework for all arcs) | 🔬 Deep Research in progress |
+| 2 | `silicon-trap` | Detective | Arc 1 | 📋 Script v5, shot list, visual assets built — needs narration + stock footage |
+| 3 | `blockades-leak` | Philosopher's Lens | Arc 1 | 📋 Script v1, full pipeline run complete — needs production |
+| 4 | `treaty-nobody-believes` | Wargame | Arc 3 | 🔄 Incubating — New START expiry (Feb 2026) is trigger |
+| 5 | `industrial-convergence` | Dialectic | Arc 1 | 📡 Signal — viable concept, needs research |
+
+**Format variety across the cluster:** Philosopher's Lens → Detective → Philosopher's Lens → Wargame → Dialectic. No two consecutive episodes in the same format.
+
+**prisoners-dilemma arc note:** Filed under Arc 3 thematically (Diplomacy of Deception), but its primary function is as a meta-framework episode that earns callbacks in Arc 1, Arc 3, Arc 4 (small-state strategic games), and Arc 5 (Tianxia as an alternative solution to the cooperation problem). Every episode that involves collective action, defection incentives, or shadow-of-the-future arguments draws on the foundation laid here.
 
 ---
 
@@ -68,7 +95,7 @@ Patterns and signals being monitored. These aren't episode ideas yet — they're
 | Slug | Format | Working Title | Thesis / Hook | State | Last Checked |
 |---|---|---|---|---|---|
 | silicon-trap | Detective | The Silicon Trap | America bet $280B on semiconductor sovereignty — why the chip war is a trap both sides are walking into with eyes open. | 📋 DRAFT — Script v5, shot list ready, visual assets built. Strong analytical episode but may work better as non-launch. | May 2 |
-| blockades-leak | Philosopher's Lens | Why Technological Blockades Always Leak | Tragedy of the commons + COCOM history → export controls are structurally porous, and they always have been. | 📋 DRAFT — Script v1, full pipeline run. Needs viability re-check for historical depth. | May 2 |
+| blockades-leak | Philosopher's Lens | Why Technological Blockades Always Leak | Tragedy of the commons + COCOM history → export controls are structurally porous, and they always have been. | 📋 SCRIPT READY — Script v1 complete, full pipeline run (viability check, research audit, angle memo, visual concept, script audit, visual spec all done). Viability check: VIABLE 5/5 (May 1). Research audit: READY FOR SCRIPTING 25/25 (May 2). Historical parallels fully verified: COCOM, Venice Murano glass, North Atlantic fishing quotas, NPT/Khan network. **Launch cluster Ep 3.** | May 5 |
 | ai-nuclear | Dialectic | Is AI the New Nuclear Weapon? | Thesis: winner-take-all strategic asset. Antithesis: diffuses like electricity. Synthesis: the real question is whether AI concentrates or distributes *decision-making power*. | 📡 SIGNAL — compelling dialectic, needs viability check | Apr 26 |
 | ghosts-cocom | Time Collapse | The Ghosts of COCOM | 1949 and 2024 intercut — the Cold War technology denial regime and its modern echo. How similar are the mechanics? Where does the analogy break? | 🔄 INCUBATING — needs deep archival research to confirm structural depth. Time Collapse format demands the parallel be genuinely structural, not just vibes. | Apr 26 |
 | industrial-convergence | Dialectic | Why Every Country Suddenly Believes in Industrial Policy | Thesis: industrial policy is back because free markets failed strategic sectors. Antithesis: industrial policy is back because great power competition makes economic nationalism rational even when it's inefficient. Synthesis: the convergence isn't about whether industrial policy "works" — it's a security dilemma applied to economics (if one subsidizes, all must, regardless of whether it works). Five countries, different ideologies, same structural trap. | 📡 SIGNAL — discovered via Convergent Drift scan. Reframed from Detective to Dialectic — the debate between market failure and security dilemma is the real structure. Arc 1 already has silicon-trap (Detective) and blockades-leak (Philosopher's Lens); Dialectic adds format variety. | May 3 |
@@ -98,7 +125,7 @@ Patterns and signals being monitored. These aren't episode ideas yet — they're
 
 | Slug | Format | Working Title | Thesis / Hook | State | Last Checked |
 |---|---|---|---|---|---|
-| prisoners-dilemma | Philosopher's Lens | The Prisoner's Dilemma Is Wrong About Almost Everything | What game theory gets right, what it gets wrong, and why international cooperation is harder than the textbook version. | ✅ VIABLE — **launch episode candidate.** Evergreen, high compounding, showcases the Parallax method. Framework IS the subject; geopolitics is the proof. | May 2 |
+| prisoners-dilemma | Philosopher's Lens | The Prisoner's Dilemma Is Wrong About Almost Everything | What game theory gets right, what it gets wrong, and why international cooperation is harder than the textbook version. | 🔬 RESEARCHING — **Launch episode (Cluster Ep 1).** Deep Research Pass 1 prompt ready (`episodes/prisoners-dilemma/deep-research-prompt.md`). Functions as meta-framework for all arcs — game theory logic (one-shot vs. iterated PD, shadow of the future, Axelrod's tournament) compounds into silicon-trap, blockades-leak, treaty-nobody-believes, industrial-convergence. | May 5 |
 | treaty-nobody-believes | Wargame | The Treaty Nobody Believes | Structured scenario: two powers negotiate an arms control agreement when neither trusts the other. Walk through the decision tree. | 🔄 INCUBATING — **trigger found:** New START expired Feb 2026. No US-Russia arms control treaty for first time in 50 years. Ready for viability check. | May 3 |
 | nixon-china | Detective | Why Did Nixon Go to China? | The counterintuitive logic of engaging your enemy — and what it reveals about the current US-China dynamic. | 📡 SIGNAL — strong hook, needs viability check for fresh angle (well-trodden territory) | Apr 26 |
 | handshake | Translator | How China and the West Read a Handshake Differently | 势 (shi), face, and strategic patience vs. contractual commitment and credible signaling. Same diplomatic event, different analytical lenses. | 📡 SIGNAL — need a specific diplomatic event to anchor this (watching for trigger) | Apr 26 |

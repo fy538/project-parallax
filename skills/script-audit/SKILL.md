@@ -1,7 +1,7 @@
 ---
 name: script-audit
 description: >
-  Audit a video script for narrative quality across 8 lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, visual layer quality, decoder posture, and connection density. Produces specific issues with locations and suggested rewrites. Use whenever someone asks to 'review the script', 'audit the script', 'check my script', 'does this flow', 'is this engaging', 'what's wrong with this draft', or when a new script version needs quality verification. This evaluates craft quality — distinct from persona-eval (audience fit) and visual-concept (visual feasibility). Always run after script-draft, before review-package.
+  Audit a video script for narrative quality across 9 lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, visual layer quality, decoder posture, connection density, and psychological architecture. Produces specific issues with locations and suggested rewrites. Use whenever someone asks to 'review the script', 'audit the script', 'check my script', 'does this flow', 'is this engaging', 'what's wrong with this draft', or when a new script version needs quality verification. This evaluates craft quality — distinct from persona-eval (audience fit) and visual-concept (visual feasibility). Always run after script-draft, before review-package.
 ---
 
 # Script Audit
@@ -21,7 +21,7 @@ The single most important quality criterion: **is this interesting?** A script c
 3. **Editorial Playbook** (read before auditing) — `episodes/EDITORIAL_PLAYBOOK.md` contains channel-level production rules extracted from past episodes. Read Sections 1 (Narrative Structure) and 2 (Visual Production) before running your lenses. When you find an issue that matches a playbook rule, cite it as "Playbook: [rule ID]" in your report — this helps Tiger see which patterns are recurring vs. new. If you find an issue that *should* be a playbook rule but isn't, flag it as "Candidate Rule" in your report.
 4. **Learning Log** (read if it exists) — `episodes/LEARNING_LOG.md` contains post-publish analytics findings. If available, check whether any of your findings were already identified in a previous episode's retrospective — this tells Tiger whether a pattern is persisting despite being known.
 
-## The Six Lenses
+## The Nine Lenses
 
 Run each lens independently. For each issue found, provide:
 - **Location**: quote the specific text (keep it short — just enough to identify the spot)
@@ -256,6 +256,71 @@ Verdict: DENSE / ADEQUATE / THIN
 
 If the verdict is THIN, suggest specific connections from the brief that could be woven into weak beats, with a concrete placement suggestion for each.
 
+### Lens 9: Psychological Architecture
+
+This lens checks whether the script's structure is built to satisfy viewers under ambient uncertainty — not just intellectually, but emotionally and motivationally. The audience is educated, curious, and operating under real-world cognitive load. The source material is `project/psychology/SYNTHESIS.md`.
+
+**Cold open four-beat structure.** The opening must complete all four beats before any substantive content arrives. Check for each:
+1. **Schema activation** — a familiar concept, situation, or belief the viewer already holds is named or evoked (the mental model the episode will complicate)
+2. **Violation** — that schema is immediately disrupted: a paradox, a counterintuitive finding, a contradiction the viewer hasn't resolved. This creates the information gap.
+3. **Narrowing** — the scope of the question contracts to something tractable. Generic complexity (what does this all mean?) sharpens into a specific puzzle (why did X happen despite Y?)
+4. **Solvability promise** — explicit signal that the episode will close the gap: a named framework, a named mechanism, or a direct "here's what we're going to untangle"
+
+If any beat is missing, flag it and write a suggested rewrite. The most common failure: opening with a schema violation but skipping the narrowing and solvability promise, leaving the viewer in anxiety without a promised resolution path.
+
+**Emotional arc integrity.** Map the script against the intended arc:
+- Surveillance/anxiety (beginning): viewer feels the problem is real and personally relevant
+- Inquiry (early-middle): analytical engagement; the investigation is underway and tractable
+- Micro-resolutions (middle): sub-questions answered, building toward the larger frame — each beat should offer partial closure
+- Restored efficacy + forward curiosity (close): viewer leaves feeling more capable, not more confused or resigned
+
+Flag deviations: an episode that stays in anxiety too long without pivoting to inquiry produces dread and disengagement. An episode that resolves too quickly without sufficient anxiety phase feels trivial. An episode that ends in a second anxiety spike (new threat introduced without a resolution beat) destroys the subscribe-and-return motivation.
+
+**Anger/anxiety activation check.** This is the most important single flag in this lens. Read every passage that assigns causation to specific actors' intent, coordination, or hidden motives. Ask: is this structural analysis (incentives, constraints, game-theoretic payoffs) or agency-attribution (what they planned, what they don't want you to know, the real reason)?
+
+- **Anxiety-producing framing** (productive): "The incentive structure makes defection rational regardless of what either side wants." "Even a cooperative actor would face this constraint." → Activates surveillance system → viewer seeks more information, updates beliefs.
+- **Anger-producing framing** (epistemically risky): "China is deliberately undermining..." / "The establishment wants you to think..." / "Washington's real agenda is..." → Activates disposition system → viewer seeks confirmation, closes to counterargument.
+
+Flag any passage where the emotional activation is plausibly anger rather than anxiety. This is the toxin-line test for the psychological dimension — it compounds with Lens 7 (Decoder Posture). Provide a rewrite that preserves the analytical point while shifting causation from intent to structure.
+
+**Assertive calibration language.** Scan for hedging language that reads as intellectual weakness rather than honest uncertainty: "maybe," "perhaps," "it's complicated," "we might see," "some people think," "it's hard to say." These are not calibrated — they're diffuse.
+
+Flag each instance. For each, check: is this a genuine uncertainty or is the writer hiding behind vagueness? If genuine, rewrite using assertive calibration: "The most defensible reading is..." / "What the evidence supports strongly is..." / "What remains open is..." / "The highest-uncertainty variable is..." / "Three developments would change this assessment." If not genuine (just hedging that could be stated plainly), flag it as a claim that should be made directly.
+
+Distinguish from deliberate uses of uncertainty that enhance credibility — a single well-framed "we don't yet know X, but here's how to think about it when the data comes in" is excellent. The problem is habitual hedging where no landing position is ever offered.
+
+**Bounded verdict close.** Check that the ending section contains all three elements:
+1. **Best current reading** — a specific, defensible analytical position stated directly (not a restatement of the complexity)
+2. **Confidence boundary** — what the position depends on; what would have to be true for this reading to be wrong
+3. **Watchpoints** — 2-3 concrete, observable signals the viewer can track to know whether the analysis is aging well
+
+If any element is missing, flag it and write the missing piece. Common failure: strong best-current-reading but no watchpoints, leaving the viewer with a position but no way to verify it over time. This is what separates analysis from assertion — watchpoints are the accountability mechanism.
+
+**Output format:**
+
+```
+Cold open: PASS / FAIL
+  Beat 1 (schema): [present/missing]
+  Beat 2 (violation): [present/missing]
+  Beat 3 (narrowing): [present/missing]
+  Beat 4 (solvability): [present/missing]
+
+Emotional arc: [intact / deviation at beat N: describe]
+  Longest anxiety section without pivot: [~N words / ~N min]
+  Episode close: [restored efficacy + forward curiosity / lingering dread / resignation]
+
+Anger/anxiety check: [CLEAN / N flags]
+  [Each flagged passage with rewrite]
+
+Assertive calibration: [N hedging instances]
+  [Each flagged phrase with rewrite]
+
+Bounded verdict: PRESENT / PARTIAL / ABSENT
+  Best current reading: [present/absent]
+  Confidence boundary: [present/absent]
+  Watchpoints: [present/absent / count]
+```
+
 ---
 
 ## Output Format
@@ -295,6 +360,9 @@ Structure the report as follows:
 ## Lens 8: Connection Density
 [Connection map. Count, surprise level, distribution, brief utilization. Verdict.]
 
+## Lens 9: Psychological Architecture
+[Cold open four-beat check. Emotional arc map. Anger/anxiety flags with rewrites. Assertive calibration flags. Bounded verdict close check.]
+
 ## Priority Fixes
 [Top 3-5 issues ranked by impact on viewer engagement. Each with:
 - WHY it matters (what the viewer experiences)
@@ -311,4 +379,4 @@ The Priority Fixes section is the most important part of the report. A script au
 - **Write the fix, not the diagnosis.** Suggested rewrites should be actual prose the narrator could read aloud, not meta-advice like "add a transition here" or "consider making this more engaging." Write the transition. Write the engaging version.
 - **Distinguish symptoms from causes.** When flagging lecture patterns, determine whether a signpost phrase should be cut entirely or needs to be replaced with better connective tissue. Sometimes the signpost is covering for a structural problem — cutting it without fixing the structure makes things worse (this is the most common mistake in script revision).
 - **Respect what works.** If the script is genuinely good in a particular lens, say so in one sentence and move on. Don't manufacture issues to fill space. A report that flags 3 real problems is more valuable than one that flags 15 issues of varying significance.
-- **Weight the lenses correctly.** Lenses 1-4 are about whether the script is *interesting*; Lens 5 is about whether it's *accurate*; Lens 6 is about whether it's *producible and visually compelling*. Lenses 1-4 should get ~65% of the report's attention, Lens 6 ~20%, and Lens 5 ~15%. A visually monotonous script is almost as bad as a boring one — the viewer experiences both as "I want to click away."
+- **Weight the lenses correctly.** Lenses 1-4 are about whether the script is *interesting*; Lens 5 is about whether it's *accurate*; Lens 6 is about whether it's *producible and visually compelling*; Lens 9 is about whether it *satisfies the viewer psychologically*. Lenses 1-4 should get ~55% of the report's attention; Lens 9 ~15%; Lens 6 ~15%; Lens 5 ~10%; Lenses 7-8 ~5% combined. A script that leaves the viewer in unresolved anxiety or relying on anger activation will underperform regardless of how interesting or accurate it is.

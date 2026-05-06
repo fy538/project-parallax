@@ -338,6 +338,11 @@ Run through this checklist before handing the script to Tiger:
 - [ ] Toxin line clean — "resembles" not "proves," analogies have named breakdowns
 - [ ] All claims tagged ({✅}, {⚠️}, {NEW}) — single braces only, not double ({{✅} is a common typo)
 - [ ] Passes radio edit test (argument clear as audio-only)
+- [ ] Cold open completes all four beats: schema activation → violation → narrowing → solvability promise
+- [ ] Emotional arc intact: anxiety → inquiry → micro-resolutions → restored efficacy + forward curiosity (no episode-ending anxiety spike)
+- [ ] Anger/anxiety check: causation attributed to structure and incentives, not hidden intent or enemy agency ("the incentive structure makes defection rational" not "they are deliberately undermining...")
+- [ ] Assertive calibration language used throughout: "most defensible reading," "what the evidence supports strongly," "highest-uncertainty variable," "what would change this" — not habitual "maybe/perhaps/it's complicated" hedging
+- [ ] Bounded verdict close present: best current reading + confidence boundary + 2-3 concrete watchpoints the viewer can track
 
 **Visual:**
 - [ ] Visual motif introduced in first 2 minutes, returns 2+ times, evolves
@@ -346,11 +351,12 @@ Run through this checklist before handing the script to Tiger:
 - [ ] No more than 2 consecutive [AI-GEN:] or [ILLUST:] without mode switch
 - [ ] No more than 30s continuous [FOOTAGE:] without visual change
 - [ ] Every 5 seconds has a visual spec (no unspecified gaps)
-- [ ] Mode balance: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN 5-15%, LAYERED 5-10%
+- [ ] Mode balance per VIS-01 (post-May 4 calibration): MG 40-55%, FOOTAGE 15-25% (archival-weighted), ILLUST 5-15%, AI-GEN 5-15%, LAYERED 5-10%
 - [ ] All three registers (Analytical/Atmospheric/Grounding) represented
 - [ ] All footage specs pass sourcability check (no abstract concepts as footage)
 - [ ] Priority tiers assigned (5-8 P1, 10-15 P2, 8-12 P3)
 - [ ] Asset summary tables complete with mode breakdown + register column
+- [ ] **Voiceover discipline for culturally-loaded visual language:** any beat with Soviet Constructivist / Chinese propaganda / Japanese Showa typography emphasis in the shot list includes at least one analytical framing move in the narration (name the visual rhetoric explicitly, OR make recurrence the argument by pairing with structurally parallel imagery from another regime, OR include falsification per NAR-19, OR pull back to personal stakes per NAR-05). Per VISUAL_LANGUAGE.md "Voiceover Discipline for Culturally-Loaded Visual Language." Without analytical framing, propaganda visual language reads as channel ideology rather than channel commentary.
 
 **Direction:**
 - [ ] All P1 hero visuals carry at least one DIR: annotation

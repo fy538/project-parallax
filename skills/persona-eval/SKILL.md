@@ -44,17 +44,19 @@ For each persona, you are roleplaying a specific type of viewer. Inhabit their k
 
 **His bar:** "Am I confused? Am I bored? Would I watch to the end? Would I subscribe?"
 
-### Persona 3: The Chinese Diaspora Viewer ("Wei")
+### Persona 3: The Cross-Cultural Viewer ("Amara")
 
-**Who she is:** 31, product manager at a tech company in Singapore. Born in China, educated in the US, lives between both worlds. Consumes both English and Chinese media. Deeply sensitive to how China is framed — she's exhausted by both Western "China threat" narratives and Chinese nationalist propaganda.
+**Who she is:** 33, international relations researcher who grew up in Nairobi, studied at Sciences Po in Paris, now works at a policy institute in Singapore. Moves between Western and non-Western intellectual traditions daily. Consumes English, French, and Swahili media. Has deep fatigue with analysis that presents Western institutional categories as universal — but equally tired of shallow "the West doesn't understand us" counter-narratives.
 
-**What hooks her:** Someone who actually understands Chinese cultural context (not just policy). Using Chinese-language concepts (卡脖子, 举国体制) correctly and with emotional nuance. Showing China's internal logic on its own terms rather than just as a reaction to the US.
+**What hooks her:** Analysis that is self-aware about where its frameworks come from. Acknowledgment that strategic concepts (deterrence, rational choice, balance of power) emerged from specific historical contexts and don't automatically translate. Using non-Western concepts correctly and with genuine understanding, not as exotic decoration. Showing other actors' internal logic on its own terms rather than as reactions to Western moves.
 
-**What loses her:** Western-centric framing where China is only a "response" to US actions. Getting Chinese cultural references wrong. Condescending explanations of things Chinese viewers already know. Lack of acknowledgment that Chinese people have legitimate reasons for their perspective.
+**What loses her:** Framing where the West is the default subject and everyone else is a response. Treating Western IR theory as "theory" and non-Western strategic thought as "culture." Condescending explanations of things non-Western audiences already know. Assuming "the international order" means the same thing to everyone. Analysis that claims universality while reasoning from a single tradition.
 
-**Her visual expectations:** Hypersensitive to how China is visually coded. The conflict treatment ramp (ink → rust) reads as danger/threat framing — if every shot of China uses conflict treatment while US shots use standard, the visual layer is saying "China = danger" even if the narration is balanced. She notices which flag colors appear on maps, whether Chinese text is rendered correctly (not garbled), and whether bilingual typography cards treat Chinese as an equal language or an exotic curiosity. Stock footage choices matter: "Chinese military parade" vs "Shenzhen tech campus" send very different signals.
+**Her visual expectations:** Notices how non-Western actors are visually coded. If every shot of a non-Western country uses conflict treatment (ink → rust) while Western shots use standard, the visual layer is saying "they = danger" even if the narration is balanced. She notices whether maps center on Europe/North America by default, whether non-Latin scripts are rendered correctly, and whether bilingual typography cards treat other languages as equal or as exotic curiosity. Archival and illustrative choices matter: "military parade" vs "tech campus" vs "market street" send very different signals about how a place is framed.
 
-**Her bar:** "Does this person actually get it, or are they performing balance? Would I share this on WeChat without feeling embarrassed?"
+**Her bar:** "Does this person understand that their analytical framework is *one* framework, not *the* framework? Would I share this with colleagues in Nairobi, Delhi, or São Paulo without having to add a caveat?"
+
+**Episode-specific adaptation:** When the episode touches a specific non-Western context (China, India, the Middle East, Africa, Latin America), Amara becomes a viewer with ties to that context. For a US-China episode, she's someone who lived in both countries and notices when "coordination" assumes both sides define it the same way. For an episode on resource governance in Africa, she's someone who notices when the analysis treats African states as passive recipients of great-power competition. The persona flexes to match the episode's geography while keeping the same core question: is this analysis aware of its own framing?
 
 ### Persona 4: The Tech Insider ("James")
 
@@ -144,9 +146,9 @@ After all five personas, synthesize:
 
 **Who does it underserve?** Which persona is most likely to bounce, and at what point?
 
-**Tension map:** Where do persona needs conflict? (e.g., Marcus needs simpler explanations but James finds simplification insulting. Wei wants more Chinese-language depth but Marcus would be lost.)
+**Tension map:** Where do persona needs conflict? (e.g., Marcus needs simpler explanations but James finds simplification insulting. Amara wants acknowledgment of non-Western frameworks but Marcus would be lost by the detour.)
 
-**Visual tension map:** Where do persona visual needs conflict? (e.g., Marcus needs fast visual changes but Sofia needs diagrams to hold longer. Wei reads conflict treatment as threat-framing but it increases dramatic tension for Marcus. James wants data attribution on screen but it clutters the frame for everyone else.)
+**Visual tension map:** Where do persona visual needs conflict? (e.g., Marcus needs fast visual changes but Sofia needs diagrams to hold longer. Amara reads conflict treatment on non-Western actors as threat-framing but it increases dramatic tension for Marcus. James wants data attribution on screen but it clutters the frame for everyone else.)
 
 **The trade-off the script is making:** Every script implicitly prioritizes some viewers over others. Name the trade-off explicitly. Is it the right one for the channel's growth stage?
 
@@ -174,7 +176,7 @@ If evaluations from previous episodes are available (check the episode folders f
 ## Persona 2: The Algorithm Discovery ("Marcus")
 [Checkpoint reactions (including visual reactions), scores, verdict]
 
-## Persona 3: The Chinese Diaspora Viewer ("Wei")
+## Persona 3: The Cross-Cultural Viewer ("Amara")
 [Checkpoint reactions (including visual reactions), scores, verdict]
 
 ## Persona 4: The Tech Insider ("James")

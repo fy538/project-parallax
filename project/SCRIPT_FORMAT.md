@@ -145,15 +145,22 @@ DURATION: 2s
 
 ## Visual Modes
 
-Every visual moment in the right column falls into one of three modes. Tag each entry to make the mode explicit — downstream tools (visual-spec, asset-source, assembly) parse these tags to route work correctly.
+The right column carries five mode tags for production granularity, but conceptually these collapse to **three content types** (per VISUAL_LANGUAGE.md → "The Three Content Types"): Remotion (analytical), AI-generated (constructivist illustration in atmospheric or grounded role), and Footage (real-world capture — archival or screen recording). The three-type model is the simpler mental map for script-drafting; the five tags below encode editorial role distinctions even when the underlying content type is shared.
+
+Tag each entry to make the mode explicit — downstream tools (visual-spec, asset-source, assembly) parse these tags to route work correctly.
 
 ### Mode tags
 
-- **`[FOOTAGE:]`** — footage only. The viewer sees stock video, archival imagery, or a held photograph. No motion graphic overlay. This is the default for establishing context, story beats, breathing room, and emotional landing.
-- **`[MG:]`** — motion graphic only. The viewer sees a Remotion template (chart, map, framework, typography card). No footage underneath. This is the default for data reveals, structural arguments, geographic arguments, and definitions.
-- **`[LAYERED:]`** — footage with MG composited on top. A key stat over cleanroom footage, a label over an aerial shot, a highlight outline over satellite imagery. Use sparingly (2-3 per beat max) — the technique loses punch through overuse.
-- **`[AI-GEN:]`** — AI-generated video with stylized (mannequin-face) figures (Register 3: Grounding). Used for physically real but unsourceable spaces (restricted facilities, historical reconstructions, conceptual scenes made literal). Clips are 5-10 seconds, generated via Kling 3.0 / Sora 2 from reference frames, then passed through `treat_video.py` brand treatment. Never for named individuals or claimed specific events. See AI_VIDEO_PIPELINE.md for full spec.
-- **`[ILLUST:]`** — AI-generated constructivist/atmospheric illustration (Register 2: Atmospheric). Used for emotional texture, dystopian mood, propaganda-poster-style conceptual art, and trippy abstract visuals that create *feeling* rather than communicate *data*. Generated via Recraft V3 API (`tools/recraft/recraft.py`), output as SVG, then passed through duotone brand treatment (`--treat standard|conflict|editorial`). These are NOT data-carrying — use `[MG:]` for anything the viewer needs to *read*. See VISUAL_LANGUAGE.md "Three Visual Registers" section.
+- **`[FOOTAGE:]`** — non-substitutable real-world capture. Two sub-types:
+  - `[FOOTAGE: archival]` (default if unspecified) — stock video, archival imagery, or a held photograph of named real figures or specific real events. Roosevelt signing the embargo, Xi Jinping at a party congress, real news moments. Sourced from Pexels / Pixabay / Unsplash for general-purpose footage; from Wikimedia Commons / Library of Congress / public domain archives for named historical figures and specific events.
+  - `[FOOTAGE: screen]` — screen recordings of actual software interfaces or product UIs. ChatGPT running, DeepSeek's chat UI, a Bloomberg terminal, an actual model output. Captured rather than generated; carries documentary credibility unique to "I literally ran this." Treatment preserves UI legibility — slight grain to match treated footage tonally, vignette to focus on the relevant region, NEVER full duotone (the UI must remain readable). Used for tech-heavy episodes covering AI products, software, financial tools, real interfaces.
+
+  This is the default for establishing context, story beats, breathing room, and emotional landing. **Post-May 4 displacement principle:** generic stock footage (cleanrooms, skylines, trading floors not depicting specific real moments) should mostly be replaced by AI-generated atmospheric or grounded scenes — they're more brand-distinctive. Reserve `[FOOTAGE:]` for the non-substitutable archival and screen-recording cases.
+
+- **`[MG:]`** — motion graphic only. The viewer sees a Remotion template (chart, map, framework, typography card). No footage underneath. Code-locked, brand-perfect, exactly repeatable. This is the default for data reveals, structural arguments, geographic arguments, and definitions.
+- **`[LAYERED:]`** — footage with MG composited on top. A key stat over cleanroom footage, a label over an aerial shot, a highlight outline over satellite imagery. Composition pattern combining `[MG:]` and `[FOOTAGE:]`, not a separate content type. Use sparingly (2-3 per beat max) — the technique loses punch through overuse.
+- **`[AI-GEN:]`** — AI-generated grounded scene (Register 3: Grounding). Constructivist figurative illustration with planar-faceted figures (4-5 color-blocked face planes, eyes obscured, no rendered features) drawing on Rodchenko's 1924 portrait series and Lissitzky's Self-Portrait. Used for physically real but unsourceable spaces (restricted facilities, historical reconstructions, conceptual scenes made literal). Reference frames generated via `tools/recraft/recraft.py --register grounding --realism balanced --text-treatment <tradition>`; animated clips via Kling 3.0 / Sora 2 from reference frames at `realism: flat` (animation-flat rule per VIS-09); all assets passed through `treat_video.py` brand treatment. Never for named individuals or claimed specific events. See AI_VIDEO_PIPELINE.md for full spec.
+- **`[ILLUST:]`** — AI-generated atmospheric backdrop (Register 2: Atmospheric). Same constructivist illustration vocabulary as `[AI-GEN:]` but used as background mood at 30-40% opacity behind narration, rather than as foreground figurative scene. Carries civilizational weight, industrial dread, conceptual scale. Generated via Recraft V3 API (`tools/recraft/recraft.py --register atmospheric`), output as SVG/PNG, passed through duotone brand treatment (`--treat standard|conflict|editorial` per VIS-10 pairing rules). NOT data-carrying — use `[MG:]` for anything the viewer needs to *read*. Combined with `[AI-GEN:]` they share constructivist visual language; differ only in editorial role (background mood vs. foreground scene). See VISUAL_LANGUAGE.md "Three Visual Registers" and "Three Content Types" sections.
 
 When a visual column entry has no mode tag, the pipeline infers it from context: `TEMPLATE: FOOTAGE` or `TEMPLATE: IMAGE` → footage mode; a named Remotion template → MG mode; `SOURCE: AI-GEN` → AI-GEN mode; Recraft/illustration reference → ILLUST mode. Explicit tags are preferred because they make the editorial intent unambiguous and help script-audit catch visual monotony.
 
@@ -190,8 +197,10 @@ These come from VISUAL_LANGUAGE.md and should be checked by script-audit:
 - No more than **2 consecutive `[ILLUST:]`** entries without a mode switch. Atmospheric register creates mood but fatigues if sustained.
 - Each beat should roughly follow: footage (establish) → MG (analyze) → footage (breathe) → MG or layered (climax) → footage (land). AI-GEN and ILLUST slot in wherever footage would go — AI-GEN for physical spaces, ILLUST for emotional/conceptual texture.
 - `[LAYERED:]` entries should be brief (3-8 seconds) with simple overlays — complex charts need the viewer's full attention and belong in `[MG:]`.
-- `[AI-GEN:]` should account for no more than 10-20% of episode runtime (~60-120 seconds per 13-minute episode).
-- `[ILLUST:]` should account for no more than 10-15% of episode runtime (~50-100 seconds per 13-minute episode).
+- `[AI-GEN:]` should account for 5-15% of episode runtime (~40-120 seconds per 13-minute episode).
+- `[ILLUST:]` should account for 5-15% of episode runtime (~40-120 seconds per 13-minute episode).
+- Combined `[AI-GEN:]` + `[ILLUST:]` target: 15-30% of episode runtime per VIS-01 (post-May 4 calibration). The displacement principle: generic stock footage that previously filled "real-world wallpaper" should mostly move to atmospheric or grounded AI-generated content, since those are more brand-distinctive and culturally specific per the per-episode emphasis architecture.
+- `[FOOTAGE:]` post-calibration target: 15-25% of episode runtime, weighted heavily toward archival of named figures/real events plus `[FOOTAGE: screen]` for software interfaces. Generic stock should be the exception, not the default.
 
 ### Visual density annotations (`PACE:`)
 
@@ -409,6 +418,96 @@ Copy this for each beat:
 ```
 
 Note: Only the P1/P2 hero moments carry `DIR:` lines. The P3 ambient closer uses template defaults — this is the right balance (~40% of entries directed in this beat).
+
+---
+
+## Psychological Architecture of the Narration
+
+The narration column must satisfy four structural requirements grounded in the six-report psychology
+synthesis at `project/psychology/SYNTHESIS.md`. These determine whether the audience enters the
+right cognitive state for belief updating, stays through the episode, and returns for the next one.
+
+### Cold Open: Four-Beat Structure
+
+Every cold open must hit these four beats in order, within the first 90 seconds:
+
+1. **Schema** — Activate a prior belief the audience already holds. ("You probably think X is true.")
+2. **Violation** — Introduce a case that should not fit that belief. ("But this happened — and it shouldn't have.")
+3. **Narrowing** — Reduce the puzzle to one closeable unknown. ("The real question isn't whether X. It's why the system produced X.")
+4. **Solvability promise** — Signal the route to closure, explicitly. ("By the end of this, you'll have the framework.")
+
+Do not open with topic announcement, context, or definitions. The viewer must feel the gap before
+receiving any information. The solvability promise is mandatory — without it, anxiety tips into
+avoidance rather than inquiry.
+
+**Emotional target:** diagnostic unease, not ambient doom. One destabilizing contradiction with
+concrete stakes. Not a montage of threats.
+
+**What to avoid:** stacking multiple threats in the cold open (anxiety overshoots the productive range);
+enthusiasm hooks ("this is so fascinating") which reinforce existing loyalties instead of activating
+the inquiry state needed for genuine belief updating; framing events as someone's fault (anger
+activation) rather than something that doesn't add up (anxiety/surveillance activation).
+
+### Emotional Arc
+
+The episode must follow this sequence:
+
+- **Cold open → ~3 min**: Bounded anxiety. One broken expectation. Concrete stakes. Framework promise
+  within the first 60–90 seconds.
+- **~3–12 min**: Anxiety converted to inquiry. Each beat closes a local question and opens a deeper
+  one. Viewer stays in the surveillance/inquiry state through structured uncertainty — not sustained dread.
+- **~12 min → close**: Restored epistemic efficacy. The viewer can now track this class of problem
+  more intelligently.
+
+**Terminal emotional state determines viewer behavior:**
+
+| End state | Primary behavior |
+|---|---|
+| Calm competence + trust + mild curiosity | Subscribe |
+| High arousal + "this explains what others are missing" | Share |
+| Unfinished curiosity under trust | Return visit |
+| Lingering dread without resolution | Disengage |
+
+Design each episode knowing which behavior it needs to drive. The default target is subscribe (launch
+episodes, first-in-arc episodes). Viral/share episodes should escalate arousal at the main insight
+beat and close sharply. Arc-mid episodes should end with the unfinished-curiosity state.
+
+### Assertive Calibration Language
+
+Conclusions and analytical claims must use assertive calibration, not hedging.
+
+**Avoid (hedge-as-analysis):**
+- "Maybe this explains..." / "Perhaps..." / "It's complicated" / "Who knows" / "Only time will tell"
+
+**Use instead:**
+- "The most defensible reading is..."
+- "What the evidence supports strongly is..."
+- "What remains open is..."
+- "The highest-uncertainty variable here is..."
+- "Three developments would change this assessment."
+
+These phrasings deliver closure at the level of model boundaries — satisfying the audience's need
+for structure without overclaiming on facts. Confidence attaches to the analytical procedure, not
+to specific predicted outcomes. This is the defining voice register of Parallax.
+
+**The anger/anxiety check:** Scan every causal framing. "Something doesn't add up here — the
+structural incentives produced this outcome" activates the surveillance/inquiry system. "Here's who
+is responsible for this" activates the anger/grievance system (punitive information seeking, closed
+to updating). Parallax exclusively uses structural/incentive framing. Every causal claim should
+point to mechanisms and incentive structures, never to coordinated intent of hidden agents.
+
+### Bounded Verdict Close
+
+The final beat must deliver a bounded verdict — not "only time will tell" and not false certainty.
+
+**Three-part structure:**
+1. **Best current reading** — the strongest interpretation the evidence supports, stated assertively
+2. **Confidence boundary** — where the model holds and where it fails
+3. **Watchpoints** — 2–3 specific, observable developments that would force a revision
+
+This gives procedural closure (I now know how to think about this class of problem) while preserving
+factual honesty (the specific outcome remains uncertain). The watchpoints convert passive viewers
+into active pattern-watchers — which is the correct definition of what Parallax delivers.
 
 ---
 

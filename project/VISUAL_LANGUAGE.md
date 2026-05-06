@@ -9,6 +9,43 @@ The core insight: viewers process footage and motion graphics differently. Foota
 Created: April 26, 2026
 Updated: May 3, 2026 — Added Three-Register Visual System, transition grammar, faceless figure convention
 Updated: May 4, 2026 — Unified Registers 2 and 3 under constructivist aesthetic; replaced photoreal mannequin convention with constructivist-figurative approach. Added realism-dosage sub-mode and per-scene typography-tradition parameter.
+Updated: May 4, 2026 — Codified the three-content-type mental model. Five script tags collapse to three content categories (Remotion / AI-generated / Footage); LAYERED is a composition pattern, not a fourth category. Calibration shifts: FOOTAGE budget drops toward archival-only, generic stock displaced by AI-generated content.
+
+---
+
+## The Three Content Types (the canonical mental model)
+
+The script format encodes five visual mode tags (`[MG:]`, `[FOOTAGE:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`) for production granularity, but conceptually they collapse to **three content types**. This is the simpler mental model script writers should hold while drafting:
+
+**1. Remotion** — code-locked analytical content. Maps, charts, framework diagrams, timelines, typography cards. The viewer's brain reads precise data, structural arguments, geographic relationships, foreign-term definitions. Brand-perfect by code, infinitely tunable, exactly repeatable across re-renders. Register 1 (Analytical). Script tag: `[MG:]`. Target: 40-55% of episode runtime per VIS-01.
+
+**2. AI-generated** — constructivist illustration in two editorial roles, sharing the same visual vocabulary post-May 4 unification. Both rendered through Recraft V3 (stills) or Recraft → Kling/Sora (animated clips), pulling palette emphasis from the per-episode `episodeColorEmphasis` field. The two roles:
+
+- **Atmospheric backdrop** (Register 2, script tag `[ILLUST:]`) — the constructivist illustration at 30-40% opacity behind narration, carrying mood and civilizational weight. Replaces what would otherwise be generic stock footage wallpaper.
+- **Grounded scene** (Register 3, script tag `[AI-GEN:]`) — foreground figurative scene with planar-faceted figures in environments. Replaces what would otherwise be photoreal mannequin scenes (pre-migration) or unsourceable stock footage.
+
+Same constructivist DNA, different cognitive function. Combined target: 15-30% of episode runtime (5-15% each per VIS-09).
+
+**3. Footage** — non-substitutable real-world capture. Two sub-types:
+
+- **Archival** — named figures and specific real events that AI-GEN cannot ethically substitute (Roosevelt, Xi Jinping, real news moments, specific signing ceremonies). Wikimedia, Library of Congress, public domain archives.
+- **Screen recordings** — captured software interfaces, real product screens, actual model outputs (ChatGPT running, DeepSeek's chat UI, a Bloomberg terminal). Captured rather than generated; carries documentary credibility unique to "I literally ran this."
+
+Script tag: `[FOOTAGE:]` with optional `[FOOTAGE: screen]` sub-tag. Target post-calibration: 15-25% of episode runtime, weighted heavily toward archival.
+
+### Why LAYERED isn't a fourth category
+
+The `[LAYERED:]` script tag indicates a *composition pattern* — typically MG element composited over footage (a stat over a real-world image). It's the intersection of types 1 and 3 (Remotion + Footage), not a separate content type. Production-level tag, not conceptual category. Target: 5-10% of episode runtime; sparing use only for hero data-over-real-world moments.
+
+### The decision flow, simplified
+
+When script-drafting and unsure which tag to use, the three-type test is:
+
+1. **Does the viewer need to *read* this precisely?** (numbers, structure, comparison, framework) → Remotion `[MG:]`.
+2. **Is this a real named person, real specific event, or actual software interface?** → Footage `[FOOTAGE:]` (archival or screen sub-type).
+3. **Otherwise** — anything that needs to be *felt, inhabited, or moodily backdropped* — → AI-generated. Backdrop role uses `[ILLUST:]`; foreground figurative scene uses `[AI-GEN:]`.
+
+The displacement principle post-migration: if generic stock footage was the default for a moment but no specific real person/event/UI is being depicted, prefer AI-generated. Generic stock now reads as "unfocused channel"; AI-generated reads as "intentional editorial choice."
 
 ---
 
@@ -30,7 +67,7 @@ Before deciding *which visual mode* to use (footage, MG, layered, AI-GEN), under
 
 ### Register 2: Atmospheric (Constructivist Backdrop)
 
-**Aesthetic:** Constructivist illustration in the Parallax house style. Soviet constructivism meets Bauhaus geometry meets art deco propaganda poster — drawing on Alexander Rodchenko, El Lissitzky, John Heartfield, and Frans Masereel's industrial woodcuts. Flowing organic forms (smoke, cables, ribbons) meet brutal industrial geometry (factories, towers, pipes). Bold compositional confidence, monumentalist scale, color-blocked forms with no soft shading or gradients. Restricted warm palette per palette.json — ink, walnut, umber, gold, rust, bone on paper background.
+**Aesthetic:** Constructivist illustration in the Parallax house style — drawing on the broader 20th-century constructivist family (Bauhaus design school, American mid-century editorial modernism via Saul Bass / Push Pin Studios / Fortune magazine, British industrial modernism via E. McKnight Kauffer, Japanese Showa-era graphic design via Kamekura, alongside Soviet Constructivism via Rodchenko / Lissitzky and German political photomontage via Heartfield / Masereel). The base aesthetic is the *shared graphic discipline* this family carries: bold compositional confidence, color-blocked forms with no soft shading or gradients, geometric clarity, restrained palette, editorial publication weight. Cultural inflection (Soviet revolutionary intensity, American mid-century restraint, Chinese vermillion, Japanese Showa minimalism, literati ink-wash) is supplied by the per-scene typography emphasis, not by the base. Restricted warm palette per palette.json — ink, walnut, umber, gold, rust, bone on paper background.
 
 **Narrative function:** Feeling. "This is what the system feels like from inside." These visuals carry the emotional weight of the subject — industrial power, technological dependency, civilizational stakes, systemic threat. They don't communicate data; they communicate dread, ambition, scale, and entrapment. The subject is *systems and forces*, not specific people.
 
@@ -94,21 +131,65 @@ The coherence model:
 
 Use these transition types consistently across every episode. Viewers learn the motion vocabulary even if they can't name it.
 
-**Channel signature transitions (codified in BRAND.md → "Cross-Register Transition Signatures"):**
+**Channel signature transitions (codified in BRAND.md → "Cross-Pillar Transition Signatures").** Three classes of transition based on the texture-and-source-character profile of the two pillars being bridged:
 
-| Direction | Signature transition | Duration | Feeling |
-|---|---|---|---|
-| **Analytical → Grounding/Atmospheric** | Amber color-wash with grain-fade-in | 600-800ms | The clean data dissolves into the warm illustrated world it describes; grain ramps in over the second half, signaling texture register shift |
-| **Grounding/Atmospheric → Analytical** | Dissolve with grain-fade-out and ink iris-in | 500-700ms | The illustrated world crystallizes into the precise pattern; grain fades out, ink iris contracts to reveal clean Remotion content |
-| **Grounding ↔ Atmospheric** | Cross-dissolve | 300-500ms | Same constructivist visual language, different role (foreground figurative ↔ background mood); soft transition appropriate |
-| **Within Analytical** | Cut (or wipe at register-defined corner) | 1 frame cut, 200-300ms wipe | Same texture register, no bridge needed |
-| **Beat boundaries** | Fade through bone or ink (mode-dependent) | 400-600ms | Episode structure transitions, not register transitions |
+**Class A — Within a pillar (soft or hard transitions, both valid):**
+
+| Direction | Signature transition | Duration |
+|---|---|---|
+| Within Analytical (Remotion ↔ Remotion) | Cut, or wipe at register-defined corner | 1 frame to 200-300ms |
+| Within Constructivist (Atmospheric ↔ Grounding) | Cross-dissolve | 300-500ms |
+| Within Footage (Archival ↔ Archival, Screen ↔ Screen, Archival ↔ Screen) | Cut or cross-dissolve | 1 frame to 400ms |
+
+**Class B — Cross-pillar with texture gap (clean Remotion ↔ either grainy pillar; always uses color-wash + grain transition; hard cuts forbidden):**
+
+| Direction | Signature transition | Duration |
+|---|---|---|
+| Analytical → AI-generated | Amber color-wash with illustrated-grain-fade-in | 600-800ms |
+| AI-generated → Analytical | Dissolve with illustrated-grain-fade-out and ink iris-in | 500-700ms |
+| Analytical → Footage | Sepia color-wash with photographic-grain-fade-in | 600-800ms |
+| Footage → Analytical | Dissolve with photographic-grain-fade-out and bone iris-in | 500-700ms |
+
+**Class C — Cross-pillar with source-character gap only (both grainy, illustrated vs. photographic):**
+
+| Direction | Signature transition | Duration |
+|---|---|---|
+| AI-generated ↔ Footage | Warm cross-dissolve through walnut | 400-500ms |
+
+**Beat boundaries** (any → any): Fade through bone or ink (mode-dependent), 400-600ms.
+
+The mnemonic: amber color-wash means "into illustrated world," sepia color-wash means "into documented world," ink/bone iris-in means "back to analytical." Walnut cross-dissolve marks "interpreted ↔ documented" within the grain-textured pillars. Viewers learn these unconsciously across episodes.
 
 Rules:
-- **Never hard-cut across registers.** The texture/style gap between clean Remotion (Register 1) and grain-textured constructivist (Registers 2/3) is large enough that hard cuts feel jarring. Always use the signature transition for that direction — color-wash going down to grain, dissolve+iris coming back up. render-qa flags any cross-register hard-cut as a likely error.
-- **Hard cuts *within* the constructivist registers are valid.** Grounding ↔ Grounding, Atmospheric ↔ Atmospheric, and Grounding ↔ Atmospheric all share visual language post-May 4 unification. This is a meaningful change from the prior system, where photoreal-grounding to constructivist-atmospheric required a transition.
+- **Never hard-cut Class B (clean ↔ grainy across pillars).** Always use the signature transition. render-qa flags any Class B hard-cut as a likely error.
+- **Class A hard cuts are valid** within any single pillar; same texture and same source character, no bridge needed.
+- **Class C tolerates hard cuts** when editing rhythm explicitly calls for it, but the warm walnut cross-dissolve is the channel default since the source-character gap (illustrated vs. photographic) is real even when texture is shared.
 - **Register 2 in foreground appears max twice per beat.** As background at 30-40% opacity it can appear longer, but visual intensity in the foreground is a spice, not a main course.
-- **Per-episode signature override:** an episode's `visual-identity.json` may override the default signatures (e.g., conflict-treatment episodes use rust color-wash instead of amber). Defaults defined in BRAND.md; per-episode overrides documented in the visual identity card.
+- **Per-episode signature override:** an episode's `visual-identity.json` may override the default signatures (e.g., conflict-treatment episodes use rust color-wash instead of amber for Class B Analytical → AI-generated). Defaults defined in BRAND.md; per-episode overrides documented in the visual identity card.
+
+### Voiceover Discipline for Culturally-Loaded Visual Language
+
+When an episode deploys Soviet Constructivist, Chinese propaganda, Japanese Showa-era, or otherwise politically-loaded visual emphasis, the narration must analytically frame the imagery rather than presenting it celebratorily. This is the Adam Curtis precedent — propaganda visual language can be deployed analytically (with sophistication) or aesthetically (with confusion). The difference is whether the voiceover engages with the visual rhetoric explicitly.
+
+**Why this matters editorially.** The constructivist illustration tradition has political-aesthetic gravity that can be misread as ideological alignment. The May 4 risk-mitigation calibration broadened the channel's base aesthetic from Soviet/German-leaning to the whole 20th-century constructivist family, which dramatically softens the default reading. But when an episode *does* deploy Soviet/Chinese/Japanese propaganda emphasis (because the content is explicitly about Soviet/Chinese/Japanese state power), the visual rhetoric requires analytical framing in the narration to prevent ambiguity. Without explicit framing, viewers may read the channel as endorsing the propaganda tradition; with explicit framing, viewers read it as commentary.
+
+**The voiceover discipline rule:**
+
+When the visual layer renders Soviet Constructivist / Chinese propaganda / Japanese Showa imagery (per the typography emphasis in the shot list), the script's narration must include at least one of these analytical framings within the same beat:
+
+1. **Name the visual rhetoric explicitly.** "This is the visual language Soviet workers themselves saw" / "Cultural Revolution propaganda traditions" / "Showa-era state imagery." The viewer reads the channel as making the rhetoric visible for analysis, not channeling it.
+
+2. **Make the recurrence the argument.** Pair the loaded imagery with structurally parallel imagery from a different regime. "The Soviets used this visual rhetoric for industrial mobilization in 1972; the United States is using parallel rhetoric for semiconductor mobilization in 2026." The visual juxtaposition becomes the structural argument the episode is making.
+
+3. **Include falsification.** Per NAR-19, name what would change your mind about the parallel being drawn. "If the structural recurrence holds, watch for X; if X doesn't appear, the parallel is weaker than I think." Explicit falsifiability anchors analytical posture.
+
+4. **Pull back to personal stakes.** Per NAR-05, end the beat or episode on concrete personal implications, not propaganda intensity. The closing voiceover should be in the channel's own voice (smart-friend register), not the propaganda tradition's voice.
+
+**The anti-pattern.** Showing Soviet imagery without naming it as such; using Cultural Revolution propaganda aesthetic in a beat about contemporary Chinese tech without analytically engaging with that rhetoric; ending an episode on monumentalist propaganda intensity rather than personal stakes. These read as channel ideology rather than channel commentary.
+
+**Implementation.** The script-draft skill should check that any beat with Soviet/Chinese/Japanese typography emphasis in the shot list also includes one of the four framing moves above in the corresponding narration. The script-audit skill checks for this in its visual-narration alignment lens.
+
+**Exception.** When the entire episode is about state-power visual rhetoric explicitly (rare, but possible — e.g., a Predictive History episode on "How states use propaganda to mobilize"), the loaded imagery is the subject, and the framing rule applies at the episode level rather than the beat level. In those cases, the cold open should establish the analytical posture and subsequent beats can deploy the imagery freely.
 
 ### The Depersonalized Figure Convention
 
@@ -352,6 +433,6 @@ This test is built into the production pipeline as a checkpoint between script d
 - **POLISH.md** — the quality spec for motion graphics. Covers animation, composition, and brand identity for the MG layer.
 - **BRAND.md** — the image treatment pipeline. Stock footage, archival images, and AI-generated stills get brand treatment (duotone, grain, vignette) before they go into the video.
 - **AI_VIDEO_PIPELINE.md** — the full spec for AI-generated video (Register 3 animated clips). Covers aesthetic, tools, workflow, prompting, and editorial guardrails.
-- **SVG_ILLUSTRATION_PIPELINE.md** — legacy Claude SVG workflow. For production illustration, use Recraft (`tools/recraft/recraft.py`) instead. Claude SVG remains useful for rapid ideation sketches only.
+- **SVG_ILLUSTRATION_PIPELINE.md** — *deprecated May 4, 2026*. The Claude SVG generation path is retired in favor of `tools/recraft/recraft.py` (Recraft V3 API). Recraft's `vector_illustration` style covers the analytical/diagrammatic content this path previously served and integrates with the per-typography palette emphasis architecture (see PROMPT_PREAMBLES.md). The doc is kept for reference but should not drive new production.
 - **tools/recraft/recraft.py** — CLI tool for generating Register 2 (atmospheric) illustrations and Register 3 (grounding) photorealistic stills via Recraft V3 API. Includes brand duotone treatment and batch mode.
 - **tools/brand-treatment/treat.py** — the color unification pipeline. All three registers pass through this to share tonal DNA. The single most important tool for making mixed-media feel cohesive.

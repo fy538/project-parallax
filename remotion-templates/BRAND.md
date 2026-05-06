@@ -240,7 +240,7 @@ Place the treated image into the layout grid according to one of three placement
 - Technical photography (chip dies, machinery, circuit boards, lab equipment)
 - Documentary photography (street scenes, infrastructure, architecture)
 - Portraits / faces (leaders, engineers, historical figures) — treated equally through the pipeline
-- AI-generated SVG: **geometric/diagrammatic only** (network diagrams, flow charts, framework comparisons, data visualizations). Generated via Claude SVG following the visual vocabulary in SVG_ILLUSTRATION_PIPELINE.md. These bypass the image treatment pipeline — they're built in Meridian palette from the start.
+- AI-generated SVG: **geometric/diagrammatic only** (network diagrams, flow charts, framework comparisons, data visualizations). Post-May 4, 2026 these are generated via `tools/recraft/recraft.py --register analytical` (the Recraft V3 vector_illustration style). The pre-May 4 Claude SVG path documented in SVG_ILLUSTRATION_PIPELINE.md is retired. These bypass the image treatment pipeline — they're built in Meridian palette from the start.
 
 **Avoid these:**
 - Photorealistic AI generations (date fast, uncanny, undermine credibility)
@@ -373,21 +373,35 @@ The reverse test: "If I saw this next to a constructivist illustration cover, wo
 4. Track to target position (600-800ms, ease-in-out)
 5. Lock-on pulse: inner circle scales 1.0 → 1.1 → 1.0 (200ms, spring)
 
-### Cross-Register Transition Signatures
+### Cross-Pillar Transition Signatures
 
-Crossing between Register 1 (Remotion analytical, clean) and Register 2 / 3 (constructivist illustration, grain-textured) is the largest texture/style gap in any episode's visual layer. Hard cuts across this gap feel jarring. The channel uses signature transitions consistently so viewers learn the motion vocabulary unconsciously — these aren't decisions made per-shot, they're channel signatures.
+The three content pillars — Remotion (analytical, clean texture), AI-generated (constructivist illustration, grain texture, illustrated source), Footage (archival/screen, grain texture, photographic source) — have distinct texture and source-character profiles. Transitions between them carry editorial weight: a clean-to-grain transition signals "designed information dissolves into observed/illustrated world," and a same-texture-different-source transition signals "interpretation crystallizes into documented reality" or vice versa. The channel uses signature transitions consistently so viewers learn the motion vocabulary unconsciously — these aren't decisions made per-shot, they're channel signatures encoding the cognitive shift between cognitive modes.
 
-| Direction | Signature transition | Duration | Why |
-|-----------|---------------------|----------|-----|
-| **Analytical → Grounding/Atmospheric** (Remotion → constructivist illustration or AI-GEN scene) | Amber color-wash with grain-fade-in | 600-800ms | The clean data dissolves into the warm illustrated world it describes. Grain ramps in over the second half of the wash, signaling the texture register shift. |
-| **Grounding/Atmospheric → Analytical** (constructivist → Remotion) | Dissolve with grain-fade-out and ink iris-in | 500-700ms | The illustrated world crystallizes into the precise pattern. Grain fades out, ink-tinted iris contracts to reveal clean Remotion content. |
-| **Grounding ↔ Atmospheric** (within constructivist registers, same visual language) | Cross-dissolve | 300-500ms | Same visual language, different role. Soft transition appropriate. |
-| **Within Analytical** (Remotion → Remotion) | Cut (or wipe at register-defined corner) | Single frame for cut, 200-300ms wipe | Same texture register, no bridge needed. |
-| **Beat boundaries** (any → any) | Fade through bone or ink (mode-dependent) | 400-600ms | Episode structure transitions, not register transitions. |
+The transitions sort into three classes:
 
-**Implementation note:** the Transitions library (`src/components/Transitions.tsx`) supports the underlying types (color-wash, blur-through, dissolve, iris, cut, wipe, fade). The signature pairings above are codified as preset transition configurations consumed via `cut()` directives in the script and parsed by `generate_manifest.py`. A `cut()` directive crossing between registers automatically applies the signature transition for that register pair unless overridden.
+**Class A — Within a pillar (same texture, same source character).** Soft transitions or hard cuts are fine; the visual language is shared. No bridge needed.
 
-The unity rule: **never hard-cut across registers without a signature transition**. Hard cuts within a single register are fine (they share visual language); hard cuts across registers create visible seams. render-qa flags any cross-register hard-cut in the assembly manifest as a likely error.
+**Class B — Cross-pillar with texture gap** (clean Remotion ↔ either grainy pillar). Largest visual gap in the episode. Always uses an explicit color-wash + grain transition. Hard cuts across this gap are forbidden.
+
+**Class C — Cross-pillar with source-character gap only** (AI-generated ↔ Footage, both grainy but illustrated vs. photographic). Soft cross-dissolve through a brand midtone. Marks the source shift without heavy bridge.
+
+| Class | Direction | Signature transition | Duration | Why |
+|---|---|---|---|---|
+| A | **Within Analytical** (Remotion ↔ Remotion) | Cut, or wipe at register-defined corner | 1 frame for cut, 200-300ms for wipe | Same texture, same pillar, no bridge needed |
+| A | **Within Constructivist** (AI-gen Atmospheric ↔ Grounding) | Cross-dissolve | 300-500ms | Same texture (grain), same source (illustrated). Soft transition appropriate |
+| A | **Within Footage** (Archival ↔ Archival, Screen ↔ Screen, or Archival ↔ Screen) | Cut or cross-dissolve | 1 frame to 400ms | Same texture (grain), same source character (real-world capture). Can cut on action when archival carries motion |
+| B | **Analytical → AI-generated** (Remotion → Constructivist) | Amber color-wash with illustrated-grain-fade-in | 600-800ms | The clean data dissolves into the warm illustrated world it describes. Amber signals constructivist family. Grain ramps in over the second half |
+| B | **AI-generated → Analytical** (Constructivist → Remotion) | Dissolve with illustrated-grain-fade-out and ink iris-in | 500-700ms | The illustrated world crystallizes into the precise pattern. Grain fades out, ink iris contracts to reveal clean Remotion |
+| B | **Analytical → Footage** (Remotion → Archival/Screen) | Sepia color-wash with photographic-grain-fade-in | 600-800ms | The clean data dissolves into the documented real world. Sepia signals archival/photographic source, distinct from amber (which signals constructivist illustrated source) — same color-wash mechanic, different tint encodes which pillar receives |
+| B | **Footage → Analytical** (Archival/Screen → Remotion) | Dissolve with photographic-grain-fade-out and bone iris-in | 500-700ms | The documented reality crystallizes into the analytical pattern. Symmetric reverse of Analytical → Footage |
+| C | **AI-generated ↔ Footage** (Constructivist ↔ Archival/Screen) | Warm cross-dissolve through walnut | 400-500ms | Both pillars share grain texture; the dissolve marks the source-character shift (interpreted ↔ documented) without heavy bridge. Walnut (brand midtone, #5C4A3D) tints the dissolve briefly to signal the source transition |
+| — | **Beat boundaries** (any → any) | Fade through bone or ink (mode-dependent) | 400-600ms | Episode structure transitions, not pillar transitions. Used at beat-end regardless of pillar |
+
+**The mnemonic for the color-wash tints:** amber means "into illustrated world," sepia means "into documented world," ink/bone means "back to analytical." The viewer learns these unconsciously across episodes — by the third episode, an amber color-wash signals "we're moving to constructivist" before the cut completes.
+
+**Implementation note:** the Transitions library (`src/components/Transitions.tsx`) supports the underlying types (color-wash, blur-through, dissolve, iris, cut, wipe, fade). The signature pairings above are codified as preset transition configurations consumed via `cut()` directives in the script and parsed by `generate_manifest.py`. A `cut()` directive crossing between pillars automatically applies the signature transition for that pair unless overridden. The new sepia color-wash and walnut cross-dissolve variants are added to the Transitions library alongside the existing amber color-wash and ink iris-in.
+
+The unity rule: **never hard-cut across pillars in Class B (clean ↔ grainy) without a signature transition**. Class A (within-pillar) hard cuts are valid since visual language is shared. Class C (AI-gen ↔ Footage) tolerates hard cuts when editing rhythm explicitly calls for them, but the warm cross-dissolve is the channel default since both pillars share grain texture and the source-character gap is real even if the texture gap isn't. render-qa flags any Class B hard-cut in the assembly manifest as a likely error; Class C hard-cuts pass with a soft warning that asks "did you mean to skip the warm-dissolve signature here?"
 
 ---
 

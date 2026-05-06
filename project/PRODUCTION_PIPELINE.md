@@ -317,7 +317,7 @@ python tools/asset-source/source.py --batch episodes/silicon-trap/shot-list.json
 
 **Note:** Requires API keys (PEXELS_API_KEY, PIXABAY_API_KEY, UNSPLASH_ACCESS_KEY). Fails gracefully without them — reports which APIs are unavailable.
 
-**Post-sourcing feedback loop:** After source.py runs, the **source-feedback** skill reads `asset-manifest.json`, identifies search terms that returned zero or low-quality results, and suggests alternative visual approaches for each gap. Alternatives include: better search terms (with exact re-source commands), Remotion template substitution, Claude SVG illustration, AI-generated engraved images, or "hold on narration" (keep previous composition on screen). P1 hero gaps are flagged as critical blockers; P3 ambient gaps get lightweight fallback suggestions. If a gap requires script reshaping (P1 hero visual fundamentally unavailable), the skill escalates back to script revision.
+**Post-sourcing feedback loop:** After source.py runs, the **source-feedback** skill reads `asset-manifest.json`, identifies search terms that returned zero or low-quality results, and suggests alternative visual approaches for each gap. Alternatives include: better search terms (with exact re-source commands), Remotion template substitution, Recraft illustration via `tools/recraft/recraft.py --register analytical` (analytical fallback) or `--register atmospheric` (mood backdrop replacement), AI-generated grounded scene via `--register grounding` (for unsourceable physical spaces), or "hold on narration" (keep previous composition on screen). P1 hero gaps are flagged as critical blockers; P3 ambient gaps get lightweight fallback suggestions. If a gap requires script reshaping (P1 hero visual fundamentally unavailable), the skill escalates back to script revision.
 
 **Skill location:** `skills/source-feedback/SKILL.md`
 
@@ -382,20 +382,32 @@ python tools/brand-treatment/treat_video.py clip.mp4 --preview
 
 ### Track D: SVG Illustrations
 
-**Tool:** Cowork (Claude SVG generation) or Recraft V4 / Flux 2 Pro API
+**Tool:** Recraft V3 API via `tools/recraft/recraft.py` (primary, post-May 4) or Flux 2 Pro API (secondary, for `realism: grounded` photoreal hero references only)
 
-For visual concepts that don't exist as stock footage and aren't covered by Remotion templates — abstract metaphors, structural diagrams, information-dense flow visualizations.
+For visual concepts that don't exist as stock footage and aren't covered by Remotion templates — abstract metaphors, structural diagrams, conceptual scenes, atmospheric backdrops, grounded figurative scenes.
 
-**Decision tree:** Geometric/diagrammatic → Claude SVG (free). Organic/artistic → Recraft or Flux ($0.04-0.08/image).
+**Decision tree:** Use the per-register architecture documented in PROMPT_PREAMBLES.md.
+- Atmospheric backdrop (mood, civilizational weight) → `recraft.py --register atmospheric`
+- Grounded figurative scene (figures in environments) → `recraft.py --register grounding`
+- Diagrammatic illustration (rare — most analytical content should be Remotion) → `recraft.py --register analytical`
+- Per-scene typography matched to geography/era → `--text-treatment <tradition>` (chinese_propaganda, russian_constructivist, english_modernist, etc.)
+- Per-scene realism dosage → `--realism flat | balanced | grounded` (animated clips MUST use flat per VIS-09)
+
+The pre-May 4 Claude SVG path documented in SVG_ILLUSTRATION_PIPELINE.md is **deprecated**. Recraft's vector_illustration style covers the analytical/diagrammatic content Claude SVG previously served, with stronger output and integration with the per-typography palette emphasis architecture.
 
 **Workflow:**
-1. Identify illustration candidates from script's right column (`AI-GENERATE` tags and conceptual visual moments)
-2. Write structured prompts (concept, content requirements, brand compliance, polish requirements)
-3. Generate at 1920×1080 with Meridian palette compliance
-4. Polish audit against POLISH.md (spacing grid, typography tiers, depth, hierarchy)
-5. Integrate into Remotion (static SVG import, animated React component, or hybrid)
+1. Identify illustration candidates from script's right column (`[ILLUST:]` and `[AI-GEN:]` tags)
+2. Compose prompts via `recraft.py` (the constructivist preamble + register/realism/text_treatment blocks compose automatically)
+3. Generate at 1920×1080
+4. Run through `treat.py` (raster) or `apply_duotone_svg` (vector) for brand treatment
+5. Verify via render-qa register-aware checklist before assembly
 
-**Full spec:** See `project/SVG_ILLUSTRATION_PIPELINE.md` for prompt templates, quality checklist, and Remotion integration patterns.
+**Full specs:**
+- `project/AI_VIDEO_PIPELINE.md` — aesthetic spec, tool selection, editorial guardrails
+- `project/PROMPT_PREAMBLES.md` — preamble architecture and per-register composition
+- `project/TYPOGRAPHY_TRADITIONS.md` — typography traditions and per-scene palette emphasis
+- `tools/ai-video/GENERATION_WORKFLOW.md` — operational guide for the full production cycle
+- `project/SVG_ILLUSTRATION_PIPELINE.md` — *deprecated*; kept for reference only
 
 **File organization:** SVGs to `remotion-templates/public/illustrations/<slug>/`, animated versions to `src/illustrations/<slug>/`.
 
