@@ -298,6 +298,10 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.3,
   });
+  // Pace-aware scaling for tree reveal cadence (per-level + within-level
+  // stagger gaps + initial timing offsets).
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
   const { durationInFrames: totalFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
@@ -368,8 +372,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const highlightColor = data.highlightColor || palette.amber;
 
   // ── Title animation ───────────────────────────────────────────────────
-  const titleOpacity = fadeIn(frame, 0, sec(0.8));
-  const titleSlide = slideIn(frame, 0, 20, sec(0.6));
+  const titleOpacity = fadeIn(frame, 0, sec(0.8 * t));
+  const titleSlide = slideIn(frame, 0, 20, sec(0.6 * t));
   const titleExitOp = exitFade(frame, totalFrames, sec(0.5));
 
   // ── Camera step label ─────────────────────────────────────────────────
@@ -409,7 +413,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 .filter((e) => !e.isHighlighted)
                 .map((edge, i) => {
                   const childLevel = positions.get(edge.childId)?.level ?? 0;
-                  const startFrame = sec(0.6) + childLevel * sec(0.4);
+                  const startFrame = sec(0.6 * t) + childLevel * sec(0.4 * s);
                   const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
                   // Dim edges when their nodes are dimmed
                   const parentDim = camera.getNodeDim(edge.parentId);
@@ -492,7 +496,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                   (n) => positions.get(n.id)?.level === level
                 );
                 const indexInLevel = levelNodes.findIndex((n) => n.id === node.id);
-                const startFrame = sec(0.5) + level * sec(0.4) + indexInLevel * sec(0.1);
+                const startFrame = sec(0.5 * t) + level * sec(0.4 * s) + indexInLevel * sec(0.1 * s);
 
                 return (
                   <TreeNodeComponent

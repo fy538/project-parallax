@@ -589,6 +589,8 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
     markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.3,
   });
+  // Pace-aware stagger scale for the per-gauge entrance.
+  const s = direction.paceStaggerScale;
   const { durationInFrames } = useVideoConfig();
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
@@ -648,7 +650,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
                   marketSource={gauge.marketSource}
                   color={gauge.color || palette.amber}
                   frame={frame}
-                  startFrame={stagger(i, sec(0.4), sec(0.3))}
+                  startFrame={stagger(i, sec(0.4 * s), sec(0.3))}
                   arcRadius={100}
                   mode={bgVariant as "light" | "dark"}
                   beatPulse={beat.pulse}

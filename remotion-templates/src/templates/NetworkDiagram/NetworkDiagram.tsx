@@ -323,6 +323,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   const direction = useDirection(data._direction);
   const { style: compositionStyle, exitOpacity } = useCompositionAnimation(direction.driftOptions);
   const theme = useThemeMode(data.backgroundVariant);
+  // Pace-aware scaling for the network entrance cadence (per-node + per-edge
+  // staggers + initial timing offsets in static mode).
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
 
   const hasCameraPath = !!data.cameraPath && data.cameraPath.length > 0;
   const showParticles = data.ambientParticles ?? hasCameraPath;
@@ -405,18 +409,18 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   };
 
   // ── Static mode timing ────────��────────────────────────────────────
-  const structureStartFrame = sec(0.2);
-  const nodeStartFrame = sec(0.5);
-  const edgeStartFrame = sec(1.2);
-  const controlStartFrame = sec(1.8);
-  const calloutStartFrame = sec(2.2);
+  const structureStartFrame = sec(0.2 * t);
+  const nodeStartFrame = sec(0.5 * t);
+  const edgeStartFrame = sec(1.2 * t);
+  const controlStartFrame = sec(1.8 * t);
+  const calloutStartFrame = sec(2.2 * t);
 
   const getNodeOpacity = (nodeIndex: number): number => {
     if (hasCameraPath) {
       // In narrated mode, all nodes appear quickly, camera handles focus
       return fadeIn(frame, sec(0.2) + stagger(nodeIndex, sec(0.04)), sec(0.3));
     }
-    const startDelay = stagger(nodeIndex, sec(0.08));
+    const startDelay = stagger(nodeIndex, sec(0.08 * s));
     return fadeIn(frame, nodeStartFrame + startDelay, sec(0.35));
   };
 
@@ -424,7 +428,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     if (hasCameraPath) {
       return fadeIn(frame, sec(0.5) + stagger(edgeIndex, sec(0.05)), sec(0.4));
     }
-    const startDelay = stagger(edgeIndex, sec(0.1));
+    const startDelay = stagger(edgeIndex, sec(0.1 * s));
     return lineDrawProgress(frame, edgeStartFrame + startDelay, sec(0.6));
   };
 

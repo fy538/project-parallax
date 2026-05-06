@@ -132,6 +132,10 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   const theme = useThemeMode(data.backgroundVariant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Pace-aware scaling for the ladder climb cadence (rung stagger +
+  // entrance timing). PACE: urgent escalates faster, breathing builds tension.
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
   const area = contentArea("content", "generous");
 
   const numRungs = data.rungs.length;
@@ -178,11 +182,11 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   });
 
   // ── Timing ──────────────────────────────────────────────────────────────
-  const rungStagger = hasCameraPath ? sec(0.3) : sec(1.2);
-  const rungFadeIn = sec(0.4);
-  const spineDrawPerRung = sec(0.6);
+  const rungStagger = hasCameraPath ? sec(0.3 * s) : sec(1.2 * s);
+  const rungFadeIn = sec(0.4 * t);
+  const spineDrawPerRung = sec(0.6 * t);
   const outroFrames = sec(1.5);
-  const ladderStart = sec(0.5);
+  const ladderStart = sec(0.5 * t);
 
   // ── Exit ────────────────────────────────────────────────────────────────
   const exit = exitFade(frame, durationInFrames, outroFrames);

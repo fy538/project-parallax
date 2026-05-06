@@ -93,6 +93,8 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Pace-aware scaling for grid draw + polygon grow + morph cadence.
+  const t = direction.paceTimingScale;
   const area = contentArea("content", "generous");
 
   const numAxes = data.axes.length;
@@ -105,12 +107,12 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   const centerY = chartSize / 2;
 
   // ── Timing ──────────────────────────────────────────────────────────────
-  const gridDrawFrames = sec(1);
-  const polygonGrowFrames = sec(1.5);
-  const morphFrames = sec(2);
+  const gridDrawFrames = sec(1 * t);
+  const polygonGrowFrames = sec(1.5 * t);
+  const morphFrames = sec(2 * t);
   const outroFrames = sec(1.5);
 
-  const gridStart = sec(0.3);
+  const gridStart = sec(0.3 * t);
   const polygonStart = gridStart + gridDrawFrames;
   const morphStart = polygonStart + polygonGrowFrames + sec(0.5);
 

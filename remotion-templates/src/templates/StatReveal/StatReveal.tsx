@@ -224,19 +224,22 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
     markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.3,
   });
+  // Pace-aware scaling — see TitleTransition for the pattern.
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
 
   // ── Layout zones — replaces contentArea("content") ─────────────────
   const { zones } = useTemplateLayout({ title: "content", footerHeight: 40, safeArea: "generous" });
   const area = zones.content.rect;
 
-  // ── Timing ──────────────────────────────────────────────────────────────
-  const heroCountFrames = sec(2);
-  const heroHoldFrames = sec(0.5);
-  const barStagger = sec(0.06); // 60ms — dense whip stagger per POLISH A3
-  const barGrowFrames = sec(1);
+  // ── Timing (pace-scaled) ────────────────────────────────────────────────
+  const heroCountFrames = sec(2 * t);
+  const heroHoldFrames = sec(0.5 * t);
+  const barStagger = sec(0.06 * s); // 60ms baseline — dense whip stagger per POLISH A3
+  const barGrowFrames = sec(1 * t);
   const outroFrames = sec(1.5);
 
-  const heroStart = sec(0.5);
+  const heroStart = sec(0.5 * t);
   const barsStart = heroStart + heroCountFrames + heroHoldFrames;
 
   // ── Hero count-up progress ──────────────────────────────────────────────

@@ -79,6 +79,9 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const { durationInFrames: totalFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Pace-aware scaling for the per-phase duration. PACE: urgent compresses
+  // each focus dwell; breathing extends contemplation.
+  const t = direction.paceTimingScale;
 
   const isDark = data.backgroundVariant === "dark";
   const mode = isDark ? dark : light;
@@ -92,12 +95,12 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const rightItemCount = data.right.items.length;
 
   const phases = useMemo(() => [
-    { name: "intro", duration: sec(0.6) },
-    { name: "focusLeft", duration: sec(1.2 + leftItemCount * 0.5) },
-    { name: "transition", duration: sec(0.8) },
-    { name: "focusRight", duration: sec(1.2 + rightItemCount * 0.5) },
-    { name: "overview", duration: sec(2.5) },
-  ], [leftItemCount, rightItemCount]);
+    { name: "intro", duration: sec(0.6 * t) },
+    { name: "focusLeft", duration: sec((1.2 + leftItemCount * 0.5) * t) },
+    { name: "transition", duration: sec(0.8 * t) },
+    { name: "focusRight", duration: sec((1.2 + rightItemCount * 0.5) * t) },
+    { name: "overview", duration: sec(2.5 * t) },
+  ], [leftItemCount, rightItemCount, t]);
 
   const { getPhaseStart, isPhase, isPast } = usePhase(phases);
 

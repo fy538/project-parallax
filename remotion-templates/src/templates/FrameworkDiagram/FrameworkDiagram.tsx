@@ -39,12 +39,15 @@ const ComparisonVariant: React.FC<{
   const theme = useThemeMode(data.backgroundVariant);
   const { durationInFrames } = useVideoConfig();
   const emphasis = useEpisodeColorEmphasis();
-  // Audio-reactive amplification for the VS divider glow oscillation. Read
-  // syncPoints straight off the input block (parent already calls
-  // useDirection). Hook is called unconditionally — the conditional VS
-  // render below uses `vsBeat.pulse` only when columns.length === 2.
+  // Pull syncPoints + pace scale via useDirection (the canonical resolver —
+  // avoids duplicating the PACE_TIMING table here). Cheap to call twice.
+  const direction = useDirection(data._direction);
+  const s = direction.paceStaggerScale;
+  // Audio-reactive amplification for the VS divider glow oscillation. Hook
+  // is called unconditionally; the conditional VS render below uses
+  // `vsBeat.pulse` only when columns.length === 2.
   const vsBeat = useBeatSync({
-    markers: (data._direction?.syncPoints ?? []).map((p) => p.timeSec),
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.4,
   });
   const columns = data.columns || [];
@@ -67,7 +70,7 @@ const ComparisonVariant: React.FC<{
       }}
     >
       {columns.map((col, ci) => {
-        const colStart = stagger(ci, sec(0.6), sec(0.5));
+        const colStart = stagger(ci, sec(0.6 * s), sec(0.5));
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
         // Cinematic: columns enter with spring overshoot (POLISH A2)
         const colScale = 0.92 + 0.08 * heroSpring(frame, layout.fps, colStart);
@@ -141,7 +144,7 @@ const ComparisonVariant: React.FC<{
 
             {/* Items — more dramatic stagger with scale entrance */}
             {col.items.map((item, ii) => {
-              const itemStart = colStart + stagger(ii, sec(0.12), sec(0.4));
+              const itemStart = colStart + stagger(ii, sec(0.12 * s), sec(0.4));
               const itemOpacity = fadeIn(frame, itemStart, sec(0.4));
               const itemSlide = slideIn(frame, itemStart, 30, sec(0.5));
               const itemScale = scaleReveal(frame, itemStart, sec(0.4), 1.05, 1.0);

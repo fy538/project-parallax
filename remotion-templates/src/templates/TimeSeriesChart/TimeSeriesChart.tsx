@@ -300,14 +300,17 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
     [data.lines, xMin, xMax, yMin, yMax]
   );
 
-  // Animation frame markers
-  const axesStart = sec(0.2);
-  const eraStart = sec(0.5);
-  const lineDrawStart = sec(0.8);
-  const lineDrawDuration = sec(1.3);
-  const areaFillStart = sec(1.8);
-  const annotationStart = sec(2);
-  const heroStatStart = sec(2.3);
+  // Animation frame markers (pace-scaled — direction.paceTimingScale shifts
+  // the whole reveal cadence; urgent draws lines faster, breathing lingers).
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
+  const axesStart = sec(0.2 * t);
+  const eraStart = sec(0.5 * t);
+  const lineDrawStart = sec(0.8 * t);
+  const lineDrawDuration = sec(1.3 * t);
+  const areaFillStart = sec(1.8 * t);
+  const annotationStart = sec(2 * t);
+  const heroStatStart = sec(2.3 * t);
   // exitStart and titleOpacity available for future use
 
   // ── Gridlines (5 horizontal lines across the chart) ──────────────────────
@@ -320,7 +323,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   // ── Line drawing animations ──────────────────────────────────────────────
   // Each line draws with stagger
   const lineStartFrames = data.lines.map((_, i) =>
-    lineDrawStart + stagger(i, sec(0.2), 0)
+    lineDrawStart + stagger(i, sec(0.2 * s), 0)
   );
 
   // ── Annotations ────────────────────────────────────────────────────────────

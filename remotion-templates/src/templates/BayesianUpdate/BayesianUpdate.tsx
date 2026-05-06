@@ -793,10 +793,13 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
     return computeDistributionStates(data.hypotheses[1].prior, data.evidence);
   }, [data.variant, data.hypotheses, data.evidence]);
 
-  // ── Evidence timing ──────────────────────────────────────────────────
+  // ── Evidence timing (pace-scaled) ─────────────────────────────────────
+  // PACE: urgent compresses the evidence cadence so updates feel decisive;
+  // breathing expands it so the audience has time to absorb each curve shift.
+  const t = direction.paceTimingScale;
   const evidenceCount = data.evidence.length;
-  const introFrames = sec(1.5); // Time before first evidence
-  const perEvidenceFrames = sec(1.8); // Time per evidence item
+  const introFrames = sec(1.5 * t); // Time before first evidence
+  const perEvidenceFrames = sec(1.8 * t); // Time per evidence item
 
   // ── Current distribution state (interpolated with overshoot) ─────────
   const currentState = useMemo(() => {
