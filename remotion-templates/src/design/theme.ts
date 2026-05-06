@@ -87,6 +87,25 @@ export interface PaletteEmphasis {
   surfaceTone: string;
   /** Sequential color stops for multi-series chart fills (5-stop gradient or categorical sequence). */
   chartFillSequence: readonly string[];
+  /**
+   * Optional display-font override for titles + hero text. When set, takes
+   * precedence over `fonts.heading` in TitleBlock. Mirrors the
+   * `text_treatment` axis in tools/recraft/recraft.py — same emphasis name
+   * should produce typographic voice continuity between AI cover art and
+   * Remotion overlays. Falls back to channel default when undefined.
+   *
+   * Note: CJK-aware font names (Noto Sans SC, Songti SC, Hiragino) rely
+   * on system installation. Macs ship most of these; Linux render hosts
+   * may need explicit font installation. The fallback chain ensures the
+   * render doesn't break — it just degrades to the next available font.
+   */
+  displayFont?: string;
+  /**
+   * Optional body-font override. Currently exposed but only opt-in;
+   * TitleBlock uses displayFont. Future templates can read this for
+   * subtitle/body emphasis when the editorial voice calls for it.
+   */
+  bodyFont?: string;
 }
 
 const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
@@ -131,6 +150,10 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.walnut,
       palette.taupe,
     ],
+    // Heavy geometric sans approximating Rodchenko/Klutsis weight. Uses
+    // Helvetica Black (or Arial Black on Linux) where available; falls
+    // back to bold Space Grotesk.
+    displayFont: '"Helvetica Neue", "Arial Black", "Space Grotesk", Inter, sans-serif',
   },
   // American mid-century / contemporary tech — softer subset
   // mirrors text_treatment: english_modernist (walnut + umber + gold + bone)
@@ -165,6 +188,9 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.walnut,
       palette.bone,
     ],
+    // Heiti (黑体) sans for CJK-aware text rendering. Noto Sans SC ships
+    // with most modern systems; PingFang SC is macOS native.
+    displayFont: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Space Grotesk", sans-serif',
   },
   // Pre-revolutionary Chinese / classical — ink wash dominant
   // mirrors text_treatment: chinese_traditional (literati restraint)
@@ -181,6 +207,9 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.bone,
       palette.paper,
     ],
+    // Songti (宋体) serif for literati/classical voice — calligraphic
+    // weight, contrast strokes. Falls back through Western serif.
+    displayFont: '"Songti SC", "STSong", "Source Han Serif SC", "Hiragino Mincho ProN", Georgia, serif',
   },
   // Japanese Showa-era (1930s-40s) — minimal palette, 2-3 colors
   // mirrors text_treatment: japanese_showa
@@ -197,6 +226,9 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.walnut,
       palette.taupe,
     ],
+    // Hiragino Kaku Gothic for Japanese sans-serif voice — minimalist
+    // Showa-era poster typography. Yu Gothic is Windows fallback.
+    displayFont: '"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Helvetica Neue", sans-serif',
   },
 };
 

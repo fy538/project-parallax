@@ -36,6 +36,7 @@ import {
   type Mode,
 } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
+import { useEpisodeColorEmphasis } from "../hooks/useEpisodeColorEmphasis";
 import { FadeIn } from "./FadeIn";
 import { CLAMP } from "../utils/animation";
 
@@ -80,6 +81,13 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   const frame = useCurrentFrame();
   const accent =
     accentColor || (mode === "dark" ? palette.amber : palette.oxblood);
+  // Per-episode display-font override. emphasis.displayFont (when set by
+  // EMPHASIS_MAP for the active episode) wins over the channel default,
+  // so a Soviet/Showa/Chinese-state episode has typographic voice
+  // continuity with its AI cover art (recraft.py text_treatment) — not
+  // just shared color emphasis.
+  const emphasis = useEpisodeColorEmphasis();
+  const titleFontFamily = emphasis.displayFont ?? fonts.heading;
   // Underline scale-in animation (after title fade-in completes)
   const underlineProgress = interpolate(
     frame,
@@ -121,7 +129,7 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
               fontSize: finalSize,
               fontWeight: fontWeights.semibold,
               color: theme.text.primary,
-              fontFamily: fonts.heading,
+              fontFamily: titleFontFamily,
               textShadow: theme.textShadow,
               maxWidth: textMaxWidth.h2,
               letterSpacing: letterSpacing.h2,

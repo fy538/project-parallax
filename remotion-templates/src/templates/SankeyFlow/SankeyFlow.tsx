@@ -46,6 +46,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import type { SankeyFlowData, SankeyNode, SankeyLink } from "./types";
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -303,6 +304,10 @@ const FlowParticlesLayer: React.FC<{
   speed: number;
   density: number;
 }> = React.memo(({ links, frame, startFrame, speed, density }) => {
+  // Per-episode primary accent for link particles when no explicit
+  // link.color is set. Direct hook call avoids prop-drilling emphasis
+  // through the parent's render path.
+  const emphasis = useEpisodeColorEmphasis();
   // Only show after links have started drawing
   const maxLinkValue = useMemo(
     () => Math.max(...links.map((l) => l.thickness), 1),
@@ -323,7 +328,7 @@ const FlowParticlesLayer: React.FC<{
         {links.map((link, linkIdx) => {
           // Number of particles proportional to flow thickness
           const particleCount = Math.max(2, Math.round((link.thickness / maxLinkValue) * 6 * density));
-          const color = link.color || palette.amber;
+          const color = link.color || emphasis.primaryAccent;
 
           return Array.from({ length: particleCount }, (_, pIdx) => {
             // Each particle has a phase offset for even distribution
@@ -560,6 +565,8 @@ const SankeyLinkComponent: React.FC<{
   sourceColor?: string;
   targetColor?: string;
 }> = React.memo(({ link, frame, startFrame, columnCount, sourceColor, targetColor }) => {
+  // Per-episode primary accent fallback for unconfigured links.
+  const emphasis = useEpisodeColorEmphasis();
   // Stagger link draws by column distance
   const colDistance = Math.abs(link.from.charCodeAt(0) - link.to.charCodeAt(0));
   const linkStartFrame = startFrame + sec(0.2 + colDistance * 0.15);
@@ -573,7 +580,7 @@ const SankeyLinkComponent: React.FC<{
 
   const opacity = fadeIn(frame, linkStartFrame, sec(0.2));
 
-  const linkColor = link.color || palette.amber;
+  const linkColor = link.color || emphasis.primaryAccent;
   const fromColor = sourceColor || linkColor;
   const toColor = targetColor || linkColor;
 

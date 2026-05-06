@@ -43,6 +43,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import type { GameBoardData, ChessPiece, GoStone, CounterAnimation } from "./types";
 
@@ -104,6 +105,12 @@ const ChessBoard: React.FC<{
   mode: "light" | "dark";
 }> = ({ data, frame, state, mode }) => {
   const theme = useThemeMode(mode);
+  // Per-episode primary accent for active-state markers (selected square,
+  // last-move highlight, threat overlay). A Soviet-emphasis chess board
+  // gets vermillion highlights instead of channel amber, matching
+  // the episode's identity throughout.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
   const boardSize = data.boardSize || 8;
   const squareSize = 600 / boardSize; // 75px per square for 8x8
 
@@ -120,7 +127,7 @@ const ChessBoard: React.FC<{
         width: 600,
         height: 600,
         background: theme.bg.surface,
-        border: `${radii.sm}px solid ${palette.amber}`,
+        border: `${radii.sm}px solid ${accent}`,
         boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`,
       }}
     >
@@ -141,7 +148,7 @@ const ChessBoard: React.FC<{
             y1={0}
             x2={i}
             y2={boardSize}
-            stroke={palette.amber}
+            stroke={accent}
             strokeWidth="0.02"
             opacity="0.3"
           />
@@ -154,7 +161,7 @@ const ChessBoard: React.FC<{
             y1={i}
             x2={boardSize}
             y2={i}
-            stroke={palette.amber}
+            stroke={accent}
             strokeWidth="0.02"
             opacity="0.3"
           />
@@ -257,6 +264,8 @@ const GoBoard: React.FC<{
   mode: "light" | "dark";
 }> = ({ data, frame, state, mode }) => {
   const theme = useThemeMode(mode);
+  // Per-episode primary accent for last-move highlight + capture markers.
+  const accent = useEpisodeColorEmphasis().primaryAccent;
   const boardSize = data.boardSize || 9;
   const gridSize = 500; // 500x500 grid
 
@@ -304,7 +313,7 @@ const GoBoard: React.FC<{
               y1={0}
               x2={x}
               y2={gridSize}
-              stroke={palette.amber}
+              stroke={accent}
               strokeWidth="0.5"
               opacity="0.4"
             />
@@ -320,7 +329,7 @@ const GoBoard: React.FC<{
               y1={y}
               x2={gridSize}
               y2={y}
-              stroke={palette.amber}
+              stroke={accent}
               strokeWidth="0.5"
               opacity="0.4"
             />
@@ -416,6 +425,8 @@ const PayoffMatrix: React.FC<{
   mode: "light" | "dark";
 }> = ({ data, frame, state, mode }) => {
   const theme = useThemeMode(mode);
+  // Per-episode primary accent for active-cell highlight + glow.
+  const accent = useEpisodeColorEmphasis().primaryAccent;
   const cols = data.colOptions?.length || 2;
   const cellSize = 140;
   const labelWidth = 120;
@@ -498,18 +509,18 @@ const PayoffMatrix: React.FC<{
                   width: cellSize,
                   height: cellSize,
                   borderRadius: radii.sm,
-                  border: `1px solid ${isHighlighted ? palette.amber : palette.amber + "28"}`,
+                  border: `1px solid ${isHighlighted ? accent : accent + "28"}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   backgroundColor: isHighlighted
-                    ? `${palette.amber}1F`
-                    : `${palette.amber}06`,
+                    ? `${accent}1F`
+                    : `${accent}06`,
                   opacity: cellOpacity,
                   transform: `scale(${cellPopScale})`,
                   transformOrigin: "center center",
                   boxShadow: isHighlighted
-                    ? `${shadows.medium}, 0 0 24px ${palette.amber}50, inset 0 1px 0 rgba(255,255,255,0.08)`
+                    ? `${shadows.medium}, 0 0 24px ${accent}50, inset 0 1px 0 rgba(255,255,255,0.08)`
                     : `${shadows.subtle}, inset 0 1px 0 rgba(255,255,255,0.04)`,
                 }}
               >
@@ -518,10 +529,10 @@ const PayoffMatrix: React.FC<{
                     fontSize: isHighlighted ? fontSizes.h3 : fontSizes.body,
                     fontFamily: fonts.data,
                     fontWeight: isHighlighted ? 700 : 500,
-                    color: isHighlighted ? palette.amber : theme.text.primary,
+                    color: isHighlighted ? accent : theme.text.primary,
                     textAlign: "center",
                     textShadow: isHighlighted
-                      ? `0 0 12px ${palette.amber}80, ${shadows.textLift}`
+                      ? `0 0 12px ${accent}80, ${shadows.textLift}`
                       : shadows.textLift,
                   }}
                 >
