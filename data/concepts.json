@@ -880,6 +880,243 @@
         "institutional-design"
       ],
       "callbackVisual": "3s FrameworkDiagram — Ostrom's 8 principles with export control violations highlighted in rust"
+    },
+    {
+      "id": "china-7nm-commercial-scale-2027",
+      "term": {
+        "en": "China 7nm commercial scale by 2027"
+      },
+      "_status": "draft",
+      "type": "prediction",
+      "definition": "China will not achieve commercial-scale 7nm chip production (>50,000 wafers/month) by Q4 2027.",
+      "insight": "Export controls slow but don't stop. If SMIC can't scale 7nm by late 2027, controls bought at least one full generation of lead time — the threshold that matters for AI development windows.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 5,
+        "timestamp": "16:00-18:00",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "bifurcation",
+        "ai-timeline-uncertainty"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "us-china",
+        "oracle",
+        "export-controls"
+      ],
+      "prediction": {
+        "claim": "China will not achieve commercial-scale 7nm chip production (>50,000 wafers/month) by Q4 2027.",
+        "probability": 0.65,
+        "timeframe": "2027-Q4",
+        "falsification": "SMIC or another Chinese fab announces >50K wafers/month of 7nm-equivalent production, confirmed by TechInsights teardown or SMIC quarterly report.",
+        "whatWouldChangeMyMind": "Credible TechInsights teardowns showing 7nm yields above 70% on Chinese-built chips in volume before 2027, or SMIC quarterly filings showing wafer-count growth inconsistent with anything but 7nm-scale operation.",
+        "status": "open",
+        "watchSignals": [
+          "SMIC quarterly earnings — wafer shipments by node",
+          "TechInsights teardowns of Huawei/Chinese-brand flagship chips",
+          "CSIS semiconductor tracker updates"
+        ]
+      }
+    },
+    {
+      "id": "us-china-partial-bifurcation-2028",
+      "term": {
+        "en": "Partial tech bifurcation as dominant outcome"
+      },
+      "_status": "draft",
+      "type": "prediction",
+      "definition": "The US-China semiconductor dispute will produce partial bifurcation (two parallel ecosystems) rather than full decoupling or renewed convergence by 2028.",
+      "insight": "Neither full victory nor full failure — the divergence without equilibrium outcome predicted by the Silicon Trap analysis. Clean resolution in either direction requires political will or catastrophe that current incentives make unlikely.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 5,
+        "timestamp": "16:30-18:00",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "bifurcation",
+        "technology-denial",
+        "caught-in-between-nations"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "us-china",
+        "oracle"
+      ],
+      "prediction": {
+        "claim": "The US-China semiconductor dispute will produce partial bifurcation — two parallel but not fully separate ecosystems — by 2028, rather than full decoupling or renewed convergence.",
+        "probability": 0.7,
+        "timeframe": "2028-01",
+        "falsification": "A major US-China semiconductor agreement substantially restoring cross-border chip flows is signed, OR full legal prohibition on all chip trade between US-allied supply chain and China takes effect.",
+        "whatWouldChangeMyMind": "A Taiwan Strait military incident triggering emergency full decoupling, or a breakthrough US-China diplomatic deal that restores TSMC-China business relationships to pre-2022 levels.",
+        "status": "open",
+        "watchSignals": [
+          "US-China bilateral trade data — semiconductor category",
+          "TSMC cross-strait production allocation announcements",
+          "Huawei smartphone chipset sourcing reports",
+          "Kalshi: US-China trade war escalation contracts"
+        ]
+      }
+    },
+    {
+      "id": "chips-act-20pct-target-miss-2030",
+      "term": {
+        "en": "CHIPS Act 20% advanced-node target miss"
+      },
+      "_status": "draft",
+      "type": "prediction",
+      "definition": "The US will not achieve 20% of world advanced-node semiconductor production domestically by 2030.",
+      "insight": "The CHIPS Act committed $52.7B for a target requiring engineering feats not yet demonstrated at volume. TSMC Arizona yields are strong but volume and node advancement remain years behind Taiwan.",
+      "introduced": {
+        "episode": "silicon-trap",
+        "beat": 4,
+        "timestamp": "12:00-16:00",
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "technology-denial",
+        "bifurcation"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "us-china",
+        "oracle",
+        "chips-act"
+      ],
+      "prediction": {
+        "claim": "The US will not achieve 20% of world advanced-node (sub-5nm) semiconductor production from domestic fabs by 2030.",
+        "probability": 0.72,
+        "timeframe": "2030-Q1",
+        "falsification": "TSMC Arizona, Intel 18A, or Samsung Texas collectively produce >20% of global sub-5nm wafer starts by 2030 Q1, per SIA or SEMI industry data.",
+        "whatWouldChangeMyMind": "Intel 18A achieving >70% yield at volume by 2027, or TSMC Arizona N2 production beginning ahead of 2028 schedule.",
+        "status": "open",
+        "watchSignals": [
+          "TSMC Arizona quarterly production reports",
+          "Intel 18A yield announcements",
+          "SIA annual state-of-industry data",
+          "CHIPS Act milestone completion rate (GAO tracker)"
+        ]
+      }
+    },
+    {
+      "id": "g7-semiconductor-control-defection-2027",
+      "term": {
+        "en": "G7 semiconductor control defection by 2027"
+      },
+      "_status": "draft",
+      "type": "prediction",
+      "definition": "At least one G7 country will significantly weaken semiconductor export controls or secure major carve-outs by 2027, consistent with the Defection Cascade mechanism.",
+      "insight": "The Blockade Paradox in action: tighter controls increase the profit from defection. The question is not whether defection happens but which ally defects first and how.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 4,
+        "timestamp": null,
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "blockade-paradox",
+        "defection-cascade",
+        "tragedy-of-the-commons"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "export-controls",
+        "oracle",
+        "commons"
+      ],
+      "prediction": {
+        "claim": "At least one G7 country will formally weaken semiconductor export controls or secure major carve-outs (worth >$1B annual revenues to its companies) by Q4 2027.",
+        "probability": 0.6,
+        "timeframe": "2027-Q4",
+        "falsification": "All G7 members maintain or tighten semiconductor controls through 2027 with no carve-outs exceeding $500M annual revenue impact.",
+        "whatWouldChangeMyMind": "Clear evidence that allied companies are not suffering significant revenue losses from controls, or a binding multilateral enforcement mechanism with real penalties.",
+        "status": "open",
+        "scenarioName": "The Defection Cascade",
+        "watchSignals": [
+          "ASML quarterly earnings — China revenue share and forward guidance",
+          "Dutch government ASML policy announcements",
+          "Japan METI export control review statements",
+          "South Korea semiconductor policy announcements",
+          "SK Hynix and Samsung China operations revenue disclosures"
+        ]
+      }
+    },
+    {
+      "id": "china-self-sufficiency-below-50pct-2028",
+      "term": {
+        "en": "China chip self-sufficiency stays below 50% by 2028"
+      },
+      "_status": "draft",
+      "type": "prediction",
+      "definition": "China's semiconductor self-sufficiency will remain below 50% of domestic demand by 2028, consistent with controls slowing but not stopping progress.",
+      "insight": "The honest middle position: controls are not failing entirely (self-sufficiency is not accelerating past 50%) but are not succeeding entirely. 50% is the threshold where the strategic calculus changes — below it, China still depends on the global supply chain.",
+      "introduced": {
+        "episode": "blockades-leak",
+        "beat": 3,
+        "timestamp": null,
+        "template": null,
+        "treatment": "organic",
+        "accentColor": null
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "blockade-paradox",
+        "defection-cascade",
+        "technology-denial"
+      ],
+      "pillar": [
+        "geopolitics"
+      ],
+      "tags": [
+        "arc-1",
+        "semiconductors",
+        "oracle",
+        "china"
+      ],
+      "prediction": {
+        "claim": "China's semiconductor self-sufficiency (domestic production as share of domestic consumption) will remain below 50% by 2028.",
+        "probability": 0.75,
+        "timeframe": "2028-01",
+        "falsification": "CSIS semiconductor tracker, SEMI, or Chinese MIIT reports show China producing >50% of consumed chips domestically by 2028.",
+        "whatWouldChangeMyMind": "Big Fund III delivering domestic fab capacity ahead of schedule, or an unexpected technology breakthrough enabling rapid SMIC scaling.",
+        "status": "open",
+        "watchSignals": [
+          "CSIS semiconductor self-sufficiency tracker (annual)",
+          "China MIIT announcements",
+          "SMIC, YMTC, CXMT quarterly capacity reports",
+          "Big Fund III capital deployment pace"
+        ]
+      }
     }
   ]
 }

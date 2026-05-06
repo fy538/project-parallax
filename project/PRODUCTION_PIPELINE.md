@@ -455,7 +455,9 @@ The NLE (DaVinci Resolve) is still used for final polish: audio mastering, color
 **Before publishing:**
 1. Run Contemporary Context Update prompt in Claude.ai (things may have changed since research)
 2. Run Fact-Check Pass on any remaining unverified claims
-3. Final review in Cowork (~10 min)
+3. **Oracle track gate (mandatory):** Verify that at least one `type: "prediction"` entry for this episode is committed to `data/concepts.json` and `data/predictions-log.json`. The git commit timestamp is the accountability anchor — post-publish filing doesn't count. If the episode contains a bounded verdict close with watchpoints but no registered prediction, elevate the strongest watchpoint to a prediction entry now. See `project/ORACLE_TRACK.md` for format.
+4. Check Kalshi/Metaculus for any relevant contracts on open predictions. Record market price alongside your probability in `predictions-log.json`.
+5. Final review in Cowork (~10 min)
 
 **Platform targets:**
 - YouTube (primary): long-form 15-20 min analytical videos
