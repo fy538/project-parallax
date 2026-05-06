@@ -347,6 +347,13 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
+  // Pace-aware scaling. paceTimingScale shifts initial reveal offsets
+  // (urgent=0.7 starts sooner, breathing=1.4 lingers); paceStaggerScale
+  // tightens or spreads the per-bar reveal cadence. Bar grow duration
+  // inside AnimatedBar stays default-paced — pace controls when bars
+  // start, not how fast they grow.
+  const t = direction.paceTimingScale;
+  const s = direction.paceStaggerScale;
   // Audio-reactive punch-in on the focus-pull transform. Subtle (2% scale)
   // because focusPull already drives a strong zoom; this amplifies the "land"
   // moment on the highlighted bar without breaking layout.
@@ -483,7 +490,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // ── Focus pull: compute highlight bar's finish frame ────────────────────
   const highlightBarIndex = data.highlightIndex ?? -1;
   const highlightFinishFrame = highlightBarIndex >= 0
-    ? stagger(highlightBarIndex, sec(0.15), sec(0.8)) + sec(1.4) // hero bar duration
+    ? stagger(highlightBarIndex, sec(0.15 * s), sec(0.8 * t)) + sec(1.4) // hero bar duration
     : sec(1.5); // fallback: halfway through first bar stagger
 
   return (
@@ -625,7 +632,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                 color={dp.color || getCategoricalColor(i)}
                 unit={unit}
                 frame={frame}
-                startFrame={stagger(i, sec(0.15), sec(0.8))}
+                startFrame={stagger(i, sec(0.15 * s), sec(0.8 * t))}
                 barWidth={barWidth}
                 maxHeight={maxHeight}
                 isHighlighted={data.highlightIndex === i}
@@ -752,7 +759,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               maxValue={comparisonData.maxVal}
               unit={unit}
               frame={frame}
-              startFrame={stagger(i, sec(0.15), sec(0.8))}
+              startFrame={stagger(i, sec(0.15 * s), sec(0.8 * t))}
               pairWidth={comparisonData.pairWidth}
               maxHeight={maxHeight}
               formatAsYear={data.formatAsYear}

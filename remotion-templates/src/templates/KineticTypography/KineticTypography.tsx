@@ -467,11 +467,19 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   const accentColor = data.accentColor || palette.amber;
   const totalFrames = sec(data.durationSec || 5);
 
+  // Pace-aware timing scale for the count-up + reveal cadence. Pulled via
+  // useDirection here (it's the cheapest way to get the canonical scale
+  // resolution; main KineticTypography also calls it but the cost is trivial).
+  // Drives the felt tempo of the stat reveal — urgent ticks faster, breathing
+  // lingers.
+  const direction = useDirection(data._direction);
+  const t = direction.paceTimingScale;
+
   // Animate the number with overshoot-settle
   const rawValue = data.statValue || "0";
   const numericMatch = rawValue.match(/^([\d.]+)(.*)$/);
   let displayValue = rawValue;
-  const countUpEndFrame = sec(1.8);
+  const countUpEndFrame = sec(1.8 * t);
   const overshootAmount = 0.03; // 3% overshoot on the count itself
 
   if (numericMatch) {
@@ -481,7 +489,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
     // Count-up with overshoot: 0 → 103% → 100%
     const countProgress = interpolate(
       frame,
-      [sec(0.5), countUpEndFrame, countUpEndFrame + sec(0.3)],
+      [sec(0.5 * t), countUpEndFrame, countUpEndFrame + sec(0.3 * t)],
       [0, 1 + overshootAmount, 1],
       CLAMP_CUBIC
     );
@@ -493,18 +501,18 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
     displayValue = `${currentNum}${suffix}`;
   }
 
-  // Cinematic scale reveal: number arrives at 130% and eases down
-  const revealScale = scaleReveal(frame, sec(0.2), sec(0.8), 1.3, 1.0);
+  // Cinematic scale reveal: number arrives at 130% and eases down (pace-scaled)
+  const revealScale = scaleReveal(frame, sec(0.2 * t), sec(0.8 * t), 1.3, 1.0);
   // Micro-settle pulse after count-up — slightly stronger
   const pulseScale = pulse(frame, countUpEndFrame, 9, 1.04);
   // Audio-reactive bloom: pulse on Whisper-resolved sync points. Read straight
   // off data._direction to avoid double-calling useDirection (already called
   // by parent KineticTypography). Clamped because bloom drives CSS opacity.
   const beat = useBeatSync({
-    markers: (data._direction?.syncPoints ?? []).map((p) => p.timeSec),
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.3,
   });
-  const bloom = Math.min(1, smoothBloom(frame, sec(0.3), sec(0.3), 0.5) + beat.pulse * 0.25);
+  const bloom = Math.min(1, smoothBloom(frame, sec(0.3 * t), sec(0.3 * t), 0.5) + beat.pulse * 0.25);
 
   // Chromatic-aberration kick — 1 frame of R/B channel split as count-up locks
   // Amplitude 1px max, peaks at countUpEndFrame, decays in 3 frames.

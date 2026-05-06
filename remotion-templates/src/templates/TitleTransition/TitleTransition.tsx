@@ -89,11 +89,19 @@ const EpisodeTitleVariant: React.FC<{
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation({ noExit: true, ...direction.driftOptions });
 
+  // Pace-aware timing scale — urgent=0.7 (faster), analytical=1.0 (default),
+  // breathing=1.4 (slower, more deliberate). Multiply key entrance durations
+  // and start frames by this so PACE: annotations actually move the felt
+  // tempo of the title reveal, not just the segment length.
+  const t = direction.paceTimingScale;
+
   // Fade out near end
   const outOpacity = fadeOut(frame, totalFrames, sec(0.5));
 
-  // Cinematic scale reveal for title — arrives at 120% and eases down
-  const titleScale = scaleReveal(frame, sec(0.4), sec(0.8), 1.2, 1.0);
+  // Cinematic scale reveal for title — arrives at 120% and eases down.
+  // Start and duration both pace-scaled so urgent titles snap, breathing
+  // titles linger.
+  const titleScale = scaleReveal(frame, sec(0.4 * t), sec(0.8 * t), 1.2, 1.0);
   // Spring-based entrance for title (A2 physics)
   const titleSpringY = interpolate(
     heroSpring(frame, layout.fps, stagger(1, 9)),
@@ -102,8 +110,9 @@ const EpisodeTitleVariant: React.FC<{
     CLAMP
   );
 
-  // Letter-spacing "lens focus" — tracking tightens as title arrives
-  const titleLetterSpacing = letterSpacingAnim(frame, sec(0.4), sec(0.8), 12, 2);
+  // Letter-spacing "lens focus" — tracking tightens as title arrives.
+  // Pace-scaled to match the scale reveal cadence above.
+  const titleLetterSpacing = letterSpacingAnim(frame, sec(0.4 * t), sec(0.8 * t), 12, 2);
 
   // Smooth bloom behind title (no hard seam) + audio-reactive pulse from
   // Whisper-resolved sync points. When direction.syncPoints is empty (estimate
@@ -338,8 +347,11 @@ const SectionVariant: React.FC<{
     pulseDecay: 0.3,
   });
 
-  // Cinematic scale for section number — arrives at 140%
-  const numberScale = scaleReveal(frame, sec(0.1), sec(0.6), 1.4, 1.0);
+  // Pace-aware timing scale (see EpisodeTitleVariant for full rationale).
+  const t = direction.paceTimingScale;
+
+  // Cinematic scale for section number — arrives at 140%, pace-scaled.
+  const numberScale = scaleReveal(frame, sec(0.1 * t), sec(0.6 * t), 1.4, 1.0);
 
   // Spring-based entrance for section title
   const titleSpringY = interpolate(
