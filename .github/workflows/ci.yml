@@ -75,4 +75,18 @@ jobs:
         run: ./scripts/typecheck.sh
 
       - name: Vitest unit tests (Remotion-side, no browser needed)
-        run: cd remotion-templates && npx vitest run src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/lint-conventions.test.ts src/__tests__/useBeatSync.test.ts src/__tests__/useEpisodeColorEmphasis.test.ts src/__tests__/useDirection.test.ts
+        run: cd remotion-templates && npm run test:unit
+
+      - name: Install Playwright Chromium for visual regression
+        run: cd remotion-templates && npx playwright install chromium
+
+      - name: Vitest visual regression (env-aware skips)
+        # Visual regression renders ~36 stills via Remotion + Chromium and
+        # diffs against committed baselines. Map tests skip without
+        # MAPBOX_ACCESS_TOKEN; ImageComposite skips without the sample
+        # asset. Both gracefully report as "skipped" rather than failing.
+        # Mapbox token is optional — set it as a repo secret to extend
+        # coverage to map templates in CI.
+        env:
+          MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
+        run: cd remotion-templates && npm run test:visual

@@ -10,6 +10,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:baseline": "rm -rf src/__tests__/baselines && vitest run",
+    "test:visual": "vitest run src/__tests__/templates.test.ts",
+    "test:unit": "vitest run src/__tests__/lint-conventions.test.ts src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/useBeatSync.test.ts src/__tests__/useEpisodeColorEmphasis.test.ts src/__tests__/useDirection.test.ts",
     "snapshot": "node scripts/snapshot.mjs",
     "create-template": "node scripts/create-template.mjs",
     "lint": "node scripts/lint-conventions.mjs",
