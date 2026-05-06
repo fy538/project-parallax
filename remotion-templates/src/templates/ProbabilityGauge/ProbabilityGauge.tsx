@@ -42,6 +42,7 @@ import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import type { ProbabilityGaugeData, ShiftItem, ScorecardItem } from "./types";
 
@@ -591,6 +592,9 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
   });
   // Pace-aware stagger scale for the per-gauge entrance.
   const s = direction.paceStaggerScale;
+  // Per-episode color emphasis — gauge fallback color now follows the
+  // episode's primary accent instead of the channel default.
+  const emphasis = useEpisodeColorEmphasis();
   const { durationInFrames } = useVideoConfig();
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
@@ -648,7 +652,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
                   value={gauge.value}
                   label={gauge.label}
                   marketSource={gauge.marketSource}
-                  color={gauge.color || palette.amber}
+                  color={gauge.color || emphasis.primaryAccent}
                   frame={frame}
                   startFrame={stagger(i, sec(0.4 * s), sec(0.3))}
                   arcRadius={100}

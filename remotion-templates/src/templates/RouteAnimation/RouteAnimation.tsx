@@ -43,6 +43,7 @@ import { hexToRgba, scaleToZoom, interpolateCamera } from "../../utils/mapUtils"
 import type { CameraState } from "../../utils/mapUtils";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
 import { MapGL } from "../../components/MapGL";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -249,7 +250,10 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   const direction = useDirection(data._direction);
   const theme = useThemeMode("light");
   const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
-  const routeColor = data.routeColor || palette.amber;
+  // Per-episode color emphasis — route arc and point markers fall back to
+  // the episode's primary accent instead of channel-default amber.
+  const emphasis = useEpisodeColorEmphasis();
+  const routeColor = data.routeColor || emphasis.primaryAccent;
 
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
   const currentPhase = data.phases[currentPhaseIdx];

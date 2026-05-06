@@ -48,6 +48,7 @@ import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -753,6 +754,10 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
   const direction = useDirection(data._direction);
   const theme = useThemeMode(data.backgroundVariant || "light");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Per-episode color emphasis for the single-hypothesis curve color (compare
+  // variant uses semantic US/China colors which represent specific entities,
+  // not stylistic accents — those stay).
+  const emphasis = useEpisodeColorEmphasis();
   // Audio-reactive scale kick on Whisper-resolved sync points. Compounds
   // with the existing per-evidence settleScale below — beats that land near
   // an evidence transition reinforce that moment.
@@ -925,7 +930,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
   // ── Colors ───────────────────────────────────────────────────────────
   const curve1Color = data.variant === "compare"
     ? (data.hypotheses?.[0]?.color || semantic.us)
-    : palette.amber;
+    : emphasis.primaryAccent;
   const curve2Color = data.hypotheses?.[1]?.color || semantic.china;
 
   // ── Entrance animation for the curve ─────────────────────────────────

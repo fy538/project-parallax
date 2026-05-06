@@ -25,6 +25,7 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile, random } from "remotion";
 import { dark, light, palette, layout, fonts, fontSizes } from "../design/theme";
+import { useEpisodeColorEmphasis, useEpisodeColorEmphasisName } from "../hooks/useEpisodeColorEmphasis";
 
 // ── Deterministic random via Remotion's seeded random() ────────────────
 // Remotion's random(seed) is deterministic per composition — same seed
@@ -285,6 +286,19 @@ export const Background: React.FC<BackgroundProps> = ({
   // Default atmosphere: normal for dark, subtle for light (cinematic paper feel)
   const effectiveDensity = atmosphere ?? (isDark ? "normal" : "subtle");
 
+  // Per-episode color emphasis. The atmospheric tint defaults to the
+  // episode's primary accent when (a) no explicit `tint` is passed AND
+  // (b) the episode opted into a non-neutral emphasis — this extends
+  // per-episode visual identity from charts/labels into the ambient
+  // frame for Soviet/Chinese-state/Showa/etc. episodes without changing
+  // how neutral-emphasis episodes (the channel default) have always
+  // rendered. Templates that want a specific tint (e.g. semantic.us
+  // for US-focused analysis) still pass `tint` explicitly.
+  const emphasis = useEpisodeColorEmphasis();
+  const emphasisName = useEpisodeColorEmphasisName();
+  const effectiveTint =
+    tint ?? (emphasisName !== "neutral" ? emphasis.primaryAccent : undefined);
+
   // ── Background gradient ─────────────────────────────────────────────
   const bgStyle: React.CSSProperties = (() => {
     if (color) return { backgroundColor: color };
@@ -333,19 +347,27 @@ export const Background: React.FC<BackgroundProps> = ({
         />
       )}
 
-      {/* Color temperature tint — emotional register shift (stronger than before) */}
-      {tint && (
+      {/* Color temperature tint — emotional register shift. When no explicit
+          tint is passed, the episode's primary accent provides a per-episode
+          atmospheric cast at lower intensity (10/06 hex alpha vs 18/0C) so
+          the default emphasis-driven tint is gentler than a script-specified
+          tint that's intentionally pushing emotional temperature. */}
+      {effectiveTint && (
         <AbsoluteFill
           style={{
-            background: `radial-gradient(ellipse at 40% 45%, ${tint}18 0%, ${tint}0C 50%, transparent 100%)`,
+            background: tint
+              ? `radial-gradient(ellipse at 40% 45%, ${tint}18 0%, ${tint}0C 50%, transparent 100%)`
+              : `radial-gradient(ellipse at 40% 45%, ${effectiveTint}10 0%, ${effectiveTint}06 50%, transparent 100%)`,
             pointerEvents: "none",
           }}
         />
       )}
 
-      {/* Atmospheric particles — the cinematic layer */}
+      {/* Atmospheric particles — the cinematic layer. Pass effectiveTint
+          (which may be the episode emphasis fallback) so particle hue
+          participates in per-episode identity. */}
       {effectiveDensity !== "none" && (
-        <Atmosphere density={effectiveDensity} tint={tint} isDark={isDark} intensity={atmosphereIntensity} noBlur={noBlur} />
+        <Atmosphere density={effectiveDensity} tint={effectiveTint} isDark={isDark} intensity={atmosphereIntensity} noBlur={noBlur} />
       )}
 
       {/* Light mode ruled border — inset 40px, 1px border (BRAND.md: editorial briefing) */}

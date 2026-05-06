@@ -35,6 +35,7 @@ import {
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -127,6 +128,9 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Per-episode color emphasis — callout dot/leader lines fall back to
+  // the episode's primary accent.
+  const emphasis = useEpisodeColorEmphasis();
   const theme = useThemeMode(data.backgroundVariant || "dark");
 
   // ── Image area — below title using contentArea ──────────────────────────
@@ -219,7 +223,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
             imgLeft,
             imgTop
           );
-          const color = callout.color || palette.amber;
+          const color = callout.color || emphasis.primaryAccent;
 
           const calloutStart = calloutsStart + i * calloutStagger;
           const dotProgress = interpolate(

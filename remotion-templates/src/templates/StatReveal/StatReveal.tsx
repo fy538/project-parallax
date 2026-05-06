@@ -37,6 +37,7 @@ import {
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -68,6 +69,8 @@ interface HeroStatProps {
   /** Cinematic scale reveal — number arrives at 1.3× and eases to 1.0× */
   revealScale: number;
   theme: ReturnType<typeof useThemeMode>;
+  /** Per-episode primary accent. Defaults to channel amber if not provided. */
+  accentColor?: string;
 }
 
 const HeroStat: React.FC<HeroStatProps> = ({
@@ -80,6 +83,7 @@ const HeroStat: React.FC<HeroStatProps> = ({
   opacity,
   revealScale,
   theme,
+  accentColor = palette.amber,
 }) => {
   const currentValue = value * progress;
   const displayValue = formatNumber(currentValue, decimals, prefix, suffix);
@@ -99,9 +103,9 @@ const HeroStat: React.FC<HeroStatProps> = ({
         style={{
           fontSize: 120,
           fontWeight: fontWeights.bold,
-          color: palette.amber,
+          color: accentColor,
           fontFamily: fonts.data,
-          textShadow: `0 0 24px ${palette.amber}50, ${theme.textShadow}`,
+          textShadow: `0 0 24px ${accentColor}50, ${theme.textShadow}`,
           letterSpacing: -2,
           lineHeight: 1,
           transform: `scale(${revealScale})`,
@@ -227,6 +231,8 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
   // Pace-aware scaling — see TitleTransition for the pattern.
   const t = direction.paceTimingScale;
   const s = direction.paceStaggerScale;
+  // Per-episode color emphasis for hero stat color.
+  const emphasis = useEpisodeColorEmphasis();
 
   // ── Layout zones — replaces contentArea("content") ─────────────────
   const { zones } = useTemplateLayout({ title: "content", footerHeight: 40, safeArea: "generous" });
@@ -338,6 +344,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
             opacity={heroOpacity * exit}
             revealScale={scaleReveal(frame, heroStart, sec(0.8), 1.3, 1.0) * (1 + beat.pulse * 0.05)}
             theme={theme}
+            accentColor={emphasis.primaryAccent}
           />
         </div>
 

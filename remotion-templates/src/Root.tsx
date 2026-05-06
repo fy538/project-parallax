@@ -91,6 +91,7 @@ import {
   CatalogGamePayoff,
   CatalogBifurcationLatin,
   CatalogShowreel,
+  CatalogEmphasisShowcase,
 } from "./catalog";
 
 export const RemotionRoot: React.FC = () => {
@@ -169,6 +170,7 @@ export const RemotionRoot: React.FC = () => {
       */}
       <Folder name="Catalog">
         <CatalogShowreel />
+        <CatalogEmphasisShowcase />
 
         <Folder name="Maps">
           <CatalogChoroplethG7 />

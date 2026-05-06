@@ -39,9 +39,22 @@ import {
 
 // ── Context ─────────────────────────────────────────────────────────────────
 
-const EpisodeColorEmphasisContext = createContext<PaletteEmphasis>(
-  getEpisodeColorEmphasis("neutral")
-);
+/**
+ * Context value carries both the resolved palette AND the source emphasis
+ * name. Consumers that care about identity (e.g. Background atmospheric
+ * tint, which only kicks in for non-neutral emphases to preserve the
+ * default look) can branch on `name`.
+ */
+interface EpisodeColorEmphasisContextValue {
+  palette: PaletteEmphasis;
+  /** Original emphasis identifier — "neutral", "soviet", etc. Defaults to "neutral". */
+  name: EpisodeColorEmphasis;
+}
+
+const EpisodeColorEmphasisContext = createContext<EpisodeColorEmphasisContextValue>({
+  palette: getEpisodeColorEmphasis("neutral"),
+  name: "neutral",
+});
 
 EpisodeColorEmphasisContext.displayName = "EpisodeColorEmphasisContext";
 
@@ -60,9 +73,15 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
   value,
   children,
 }) => {
-  const emphasis = useMemo(() => getEpisodeColorEmphasis(value), [value]);
+  const ctx = useMemo<EpisodeColorEmphasisContextValue>(
+    () => ({
+      palette: getEpisodeColorEmphasis(value),
+      name: (value && typeof value === "string" ? value : "neutral") as EpisodeColorEmphasis,
+    }),
+    [value],
+  );
   return (
-    <EpisodeColorEmphasisContext.Provider value={emphasis}>
+    <EpisodeColorEmphasisContext.Provider value={ctx}>
       {children}
     </EpisodeColorEmphasisContext.Provider>
   );
@@ -71,7 +90,7 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
 // ── Hook ────────────────────────────────────────────────────────────────────
 
 /**
- * Consume the current episode's color emphasis.
+ * Consume the current episode's color emphasis palette.
  *
  * Returns a PaletteEmphasis object with primaryAccent, secondaryAccent,
  * dominantText, surfaceTone, and chartFillSequence. Templates use these
@@ -81,5 +100,14 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
  * template renders get the channel default automatically.
  */
 export function useEpisodeColorEmphasis(): PaletteEmphasis {
-  return useContext(EpisodeColorEmphasisContext);
+  return useContext(EpisodeColorEmphasisContext).palette;
+}
+
+/**
+ * Consume the raw emphasis name. Use when behavior should differ between
+ * "neutral" (channel default — preserve historical look) and explicit
+ * episode emphases (apply per-episode visual identity).
+ */
+export function useEpisodeColorEmphasisName(): EpisodeColorEmphasis {
+  return useContext(EpisodeColorEmphasisContext).name;
 }

@@ -23,6 +23,7 @@ import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, C
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
 import { Crosshair } from "../../components/Crosshair";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -85,7 +86,8 @@ const EpisodeTitleVariant: React.FC<{
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
-  const accentColor = data.accentColor || palette.amber;
+  const emphasis = useEpisodeColorEmphasis();
+  const accentColor = data.accentColor || emphasis.primaryAccent;
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation({ noExit: true, ...direction.driftOptions });
 
@@ -335,7 +337,8 @@ const SectionVariant: React.FC<{
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
-  const accentColor = data.accentColor || palette.amber;
+  const emphasis = useEpisodeColorEmphasis();
+  const accentColor = data.accentColor || emphasis.primaryAccent;
   const outOpacity = fadeOut(frame, totalFrames, sec(0.4));
   const direction = useDirection(data._direction);
 
@@ -476,7 +479,8 @@ const EndCardVariant: React.FC<{
   totalFrames: number;
 }> = ({ data, frame, totalFrames }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
-  const accentColor = data.accentColor || palette.amber;
+  const emphasis = useEpisodeColorEmphasis();
+  const accentColor = data.accentColor || emphasis.primaryAccent;
 
   // Spring-based entrance for CTA (A2 physics)
   const ctaSpringY = interpolate(

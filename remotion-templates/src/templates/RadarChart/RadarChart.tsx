@@ -38,6 +38,7 @@ import {
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
@@ -95,6 +96,8 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   // Pace-aware scaling for grid draw + polygon grow + morph cadence.
   const t = direction.paceTimingScale;
+  // Per-episode color emphasis for the focus-axis label tint.
+  const emphasis = useEpisodeColorEmphasis();
   const area = contentArea("content", "generous");
 
   const numAxes = data.axes.length;
@@ -594,7 +597,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
             right: layout.safeAreaTier.generous.right,
             fontSize: fontSizes.caption,
             fontFamily: fonts.data,
-            color: palette.amber,
+            color: emphasis.primaryAccent,
             letterSpacing: 1,
             opacity: fadeIn(frame, 0, sec(0.3)) * exit,
             textShadow: shadows.textLift,

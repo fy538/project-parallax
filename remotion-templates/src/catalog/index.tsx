@@ -72,3 +72,5 @@ export {
 } from "./Scenarios";
 
 export { CatalogShowreel } from "./Showreel";
+
+export { CatalogEmphasisShowcase } from "./EmphasisShowcase";

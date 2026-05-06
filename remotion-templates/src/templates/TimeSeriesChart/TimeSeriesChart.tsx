@@ -62,6 +62,7 @@ import {
 import { Background } from "../../components/Background";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -172,6 +173,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
+  // Per-episode color emphasis — reference line falls back to episode's
+  // primary accent instead of channel-default amber.
+  const emphasis = useEpisodeColorEmphasis();
   // Audio-reactive leading-edge brighten on Whisper-resolved sync points.
   // Used below to brighten the live-recording mid-ring as beats land.
   const beat = useBeatSync({
@@ -569,7 +573,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               chartTop,
               chartBottom
             );
-            const refColor = refLine.color || palette.amber;
+            const refColor = refLine.color || emphasis.primaryAccent;
             const refStrokeDasharray = refLine.dashed ? "4,4" : undefined;
             const refOpacity = fadeIn(
               frame,

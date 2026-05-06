@@ -52,6 +52,7 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   useTreeCamera,
@@ -302,6 +303,9 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   // stagger gaps + initial timing offsets).
   const t = direction.paceTimingScale;
   const s = direction.paceStaggerScale;
+  // Per-episode color emphasis — highlightColor (used for path highlights
+  // and active-node accent) falls back to episode primary accent.
+  const emphasis = useEpisodeColorEmphasis();
   const { durationInFrames: totalFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
@@ -369,7 +373,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     return result;
   }, [data.nodes, positions, data.highlightedPath]);
 
-  const highlightColor = data.highlightColor || palette.amber;
+  const highlightColor = data.highlightColor || emphasis.primaryAccent;
 
   // ── Title animation ───────────────────────────────────────────────────
   const titleOpacity = fadeIn(frame, 0, sec(0.8 * t));
