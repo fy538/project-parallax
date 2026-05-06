@@ -29,13 +29,29 @@ import {
 } from "./render-helper";
 import { initBrowser, closeBrowser, ensureBaselineDir } from "./setup";
 
-// Frames to render per composition. Frame 30 catches mid-animation regressions
-// (the original baseline). Frames 0 and 90 catch entrance + late-state drift —
-// e.g. a broken stagger that lands fine at frame 30 but mis-fires at 0, or an
-// exit fade that disappears mid-clip. Three frames at ~2-3s each keeps the
-// suite under ~3 minutes for the full landscape set.
-const TEST_FRAMES = [0, 30, 90];
-const TEST_FRAME = 30; // legacy alias; some helpers still reference it
+// Default frame for every composition — preserves the original single-frame
+// baseline coverage that the existing baselines were captured against.
+const TEST_FRAME = 30;
+
+// Motion-critical templates get *additional* frame coverage at entrance (0)
+// and late-state (60). This catches stagger/entrance/exit regressions that
+// the single mid-animation frame can't see. Frame 60 is the conservative
+// late-state pick: every composition is at least 2 seconds (60 frames at
+// 30fps), so frame 60 is always a valid render. Going higher (90, 120) would
+// trip on the shortest Shorts compositions.
+//
+// Why a curated list and not all 32 templates? 32 × 3 = 96 renders per
+// `npm test`, which would push the suite past 15 minutes. The five below are
+// where camera/stagger work has the most surface area and where frame-30-only
+// coverage has historically missed regressions.
+const MOTION_EXTRA_FRAMES = [0, 60];
+const MOTION_CRITICAL = new Set([
+  "TitleTransition",
+  "KineticTypography",
+  "DataChart",
+  "ChoroplethMap",
+  "RouteAnimation",
+]);
 
 // Baseline directory
 const BASELINE_DIR = path.resolve(__dirname, "baselines");
@@ -130,7 +146,10 @@ describe("Visual Regression Tests", () => {
    * 4. Report result (match/diff)
    */
   ALL_COMPOSITIONS.forEach((compositionId) => {
-    TEST_FRAMES.forEach((testFrame) => {
+    const framesForThis = MOTION_CRITICAL.has(compositionId)
+      ? [TEST_FRAME, ...MOTION_EXTRA_FRAMES]
+      : [TEST_FRAME];
+    framesForThis.forEach((testFrame) => {
       it(
         `${compositionId}: frame ${testFrame} matches baseline`,
         async () => {

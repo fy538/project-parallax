@@ -115,7 +115,11 @@ const EpisodeTitleVariant: React.FC<{
     markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.35,
   });
-  const titleBloom = smoothBloom(frame, sec(0.4), sec(0.3), 0.5) + beat.pulse * 0.35;
+  // Clamp at 1 because titleBloom is consumed as CSS opacity. Without the
+  // clamp, a beat landing during the entrance peak (smoothBloom already at
+  // ~1.0) would silently overflow — CSS clips opacity to 1 and the beat
+  // pulse becomes invisible exactly when it's supposed to be most intense.
+  const titleBloom = Math.min(1, smoothBloom(frame, sec(0.4), sec(0.3), 0.5) + beat.pulse * 0.35);
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);
@@ -349,8 +353,9 @@ const SectionVariant: React.FC<{
   // Letter-spacing focus on section title
   const titleLetterSpacing = letterSpacingAnim(frame, sec(0.3), sec(0.7), 8, 1.5);
 
-  // Smooth bloom behind title + beat pulse
-  const bloom = smoothBloom(frame, sec(0.3), sec(0.2), 0.4) + beat.pulse * 0.3;
+  // Smooth bloom behind title + beat pulse — clamped to 1 because consumed
+  // as CSS opacity (see EpisodeTitleVariant note for full rationale).
+  const bloom = Math.min(1, smoothBloom(frame, sec(0.3), sec(0.2), 0.4) + beat.pulse * 0.3);
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);
