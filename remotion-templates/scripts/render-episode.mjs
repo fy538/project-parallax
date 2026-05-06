@@ -131,13 +131,37 @@ for (const { seq, comp, file, desc } of sequence) {
     continue;
   }
 
-  // Read data and build props
-  const data = JSON.parse(readFileSync(jsonPath, "utf-8"));
+  // Read data and build props.
+  // Per-clip render overrides live in an optional `_render` block on the
+  // data file (parallel to the `_direction` block templates already use).
+  // Examples:
+  //   "_render": { "crf": 16 }                 // lower CRF = higher quality
+  //   "_render": { "imageFormat": "jpeg" }     // override the project default
+  //   "_render": { "scale": 2 }                // 2x supersample then downscale
+  //   "_render": { "pixelFormat": "yuv422p" }  // less chroma subsampling
+  // The block is stripped from the props before they reach the template
+  // (templates don't need to know about render plumbing) and translated to
+  // CLI flags. Remotion render flags reference: https://remotion.dev/docs/cli/render
+  const rawData = JSON.parse(readFileSync(jsonPath, "utf-8"));
+  const renderOverrides = rawData._render ?? {};
+  const { _render: _stripped, ...data } = rawData;
+  void _stripped;
   const propsJson = JSON.stringify({ data });
 
   // Write props to temp file (avoids shell escaping issues with complex JSON)
   const propsFile = join(outDir, `_props-${seq}.json`);
   writeFileSync(propsFile, propsJson);
+
+  // Build per-clip CLI flag overrides from _render. Each is opt-in; absence
+  // means "fall back to remotion.config.ts project defaults."
+  const renderFlags = [];
+  if (renderOverrides.crf !== undefined) renderFlags.push(`--crf=${renderOverrides.crf}`);
+  if (renderOverrides.imageFormat) renderFlags.push(`--image-format=${renderOverrides.imageFormat}`);
+  if (renderOverrides.pixelFormat) renderFlags.push(`--pixel-format=${renderOverrides.pixelFormat}`);
+  if (renderOverrides.scale !== undefined) renderFlags.push(`--scale=${renderOverrides.scale}`);
+  if (renderFlags.length > 0) {
+    process.stdout.write(`  [overrides: ${renderFlags.join(" ")}] `);
+  }
 
   const ext = preview ? "png" : "mp4";
   const output = join(outDir, `${seq}-${slug}.${ext}`);
@@ -151,12 +175,14 @@ for (const { seq, comp, file, desc } of sequence) {
         "--frame=90",
         `--props=${propsFile}`,
         ...(browserArg ? [browserArg] : []),
+        ...renderFlags,
         `--output=${output}`,
       ]
     : [
         "npx", "remotion", "render", "src/index.ts", comp,
         `--props=${propsFile}`,
         ...(browserArg ? [browserArg] : []),
+        ...renderFlags,
         output,
       ];
 

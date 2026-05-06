@@ -36,6 +36,7 @@ import {
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -217,6 +218,12 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Audio-reactive scale kick on Whisper-resolved sync points. Returns
+  // neutral state when no sync points exist.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
 
   // ── Layout zones — replaces contentArea("content") ─────────────────
   const { zones } = useTemplateLayout({ title: "content", footerHeight: 40, safeArea: "generous" });
@@ -326,7 +333,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
             decimals={data.stat.decimals}
             progress={heroProgress}
             opacity={heroOpacity * exit}
-            revealScale={scaleReveal(frame, heroStart, sec(0.8), 1.3, 1.0)}
+            revealScale={scaleReveal(frame, heroStart, sec(0.8), 1.3, 1.0) * (1 + beat.pulse * 0.05)}
             theme={theme}
           />
         </div>

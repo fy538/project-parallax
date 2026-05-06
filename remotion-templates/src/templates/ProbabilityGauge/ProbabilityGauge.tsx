@@ -41,6 +41,7 @@ import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import type { ProbabilityGaugeData, ShiftItem, ScorecardItem } from "./types";
 
@@ -55,13 +56,16 @@ const GaugeArc: React.FC<{
   startFrame: number;
   arcRadius: number;
   mode: "light" | "dark";
-}> = React.memo(({ value, label, marketSource, color, frame, startFrame, arcRadius, mode }) => {
+  /** Audio-reactive pulse from useBeatSync — adds extra overshoot on beat. 0 = no effect. */
+  beatPulse?: number;
+}> = React.memo(({ value, label, marketSource, color, frame, startFrame, arcRadius, mode, beatPulse = 0 }) => {
   const theme = useThemeMode(mode);
   const strokeWidth = 12;
   const circumference = useMemo(() => Math.PI * arcRadius * 2, [arcRadius]);
 
-  // Animate arc fill with spring overshoot (overshoots 3% then settles)
-  const overshootTarget = Math.min((value / 100) * 1.03, 1.0);
+  // Animate arc fill with spring overshoot (overshoots 3% then settles).
+  // Beat sync amplifies the overshoot up to ~7% on a strong pulse.
+  const overshootTarget = Math.min((value / 100) * (1.03 + beatPulse * 0.04), 1.0);
   const arcProgress = interpolate(
     frame,
     [startFrame, startFrame + sec(1.2), startFrame + sec(1.5)],
@@ -579,6 +583,12 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Audio-reactive overshoot kick for gauge arc fills. Passed down to each
+  // GaugeArc instance — they all share the same beat signal.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
   const { durationInFrames } = useVideoConfig();
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
@@ -641,6 +651,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
                   startFrame={stagger(i, sec(0.4), sec(0.3))}
                   arcRadius={100}
                   mode={bgVariant as "light" | "dark"}
+                  beatPulse={beat.pulse}
                 />
               ))}
             </div>

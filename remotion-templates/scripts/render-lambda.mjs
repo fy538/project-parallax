@@ -67,10 +67,20 @@ function loadSequence(slug) {
 
 async function renderSingle(composition, propsFile, { still, frame }) {
   const dataPath = path.resolve(__dirname, "..", propsFile);
-  const data = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+  // Per-clip render overrides live in an optional `_render` block on the
+  // data file. See render-episode.mjs for full schema documentation; both
+  // render paths honor the same fields so a clip's quality intent travels
+  // with its data.
+  const rawData = JSON.parse(fs.readFileSync(dataPath, "utf-8"));
+  const renderOverrides = rawData._render ?? {};
+  const { _render: _stripped, ...data } = rawData;
+  void _stripped;
   const inputProps = { data };
 
   console.log(`\n🎬 Rendering ${composition} from ${path.basename(propsFile)}...`);
+  if (Object.keys(renderOverrides).length > 0) {
+    console.log(`  overrides: ${JSON.stringify(renderOverrides)}`);
+  }
 
   if (still) {
     const { url } = await renderStillOnLambda({
@@ -96,9 +106,12 @@ async function renderSingle(composition, propsFile, { still, frame }) {
     // PNG intermediate frames (lossless) — matches local render config. JPEG
     // would introduce quantization artifacts on hairline graphics + text
     // before H.264 encoding. ~20-30% longer per-frame render; quality lift
-    // is worth it for a graphics-heavy channel.
-    imageFormat: "png",
-    pixelFormat: "yuv420p",
+    // is worth it for a graphics-heavy channel. Per-clip _render overrides
+    // (below) trump these defaults.
+    imageFormat: renderOverrides.imageFormat ?? "png",
+    pixelFormat: renderOverrides.pixelFormat ?? "yuv420p",
+    ...(renderOverrides.crf !== undefined ? { crf: renderOverrides.crf } : {}),
+    ...(renderOverrides.scale !== undefined ? { scale: renderOverrides.scale } : {}),
     framesPerLambda: 20,
   });
 

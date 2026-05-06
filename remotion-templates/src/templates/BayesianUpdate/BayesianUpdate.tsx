@@ -47,6 +47,7 @@ import {
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -752,6 +753,13 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
   const direction = useDirection(data._direction);
   const theme = useThemeMode(data.backgroundVariant || "light");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // Audio-reactive scale kick on Whisper-resolved sync points. Compounds
+  // with the existing per-evidence settleScale below — beats that land near
+  // an evidence transition reinforce that moment.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
 
   const area = contentArea("content", "generous");
 
@@ -899,7 +907,9 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
   const currentProb = Math.round(currentState.mean);
   const currentProb2 = currentState2 ? Math.round(currentState2.mean) : null;
 
-  // Micro-settle pulse when each evidence item finishes its transition
+  // Micro-settle pulse when each evidence item finishes its transition.
+  // Beat sync compounds: a Whisper sync point landing near an evidence
+  // transition adds an extra ~3% scale kick on top of the settle pulse.
   const settleScale = useMemo(() => {
     for (let i = 0; i < evidenceCount; i++) {
       const evidenceSettleFrame = introFrames + i * perEvidenceFrames + sec(1.2);
@@ -907,7 +917,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
       if (p > 1.001) return p;
     }
     return 1.0;
-  }, [frame, introFrames, perEvidenceFrames, evidenceCount]);
+  }, [frame, introFrames, perEvidenceFrames, evidenceCount]) * (1 + beat.pulse * 0.03);
 
   // ── Colors ───────────────────────────────────────────────────────────
   const curve1Color = data.variant === "compare"

@@ -25,6 +25,7 @@ import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
 import { AnimatedText } from "../../components/AnimatedText";
@@ -496,8 +497,14 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   const revealScale = scaleReveal(frame, sec(0.2), sec(0.8), 1.3, 1.0);
   // Micro-settle pulse after count-up — slightly stronger
   const pulseScale = pulse(frame, countUpEndFrame, 9, 1.04);
-  // Smooth bloom behind the number
-  const bloom = smoothBloom(frame, sec(0.3), sec(0.3), 0.5);
+  // Audio-reactive bloom: pulse on Whisper-resolved sync points. Read straight
+  // off data._direction to avoid double-calling useDirection (already called
+  // by parent KineticTypography). Clamped because bloom drives CSS opacity.
+  const beat = useBeatSync({
+    markers: (data._direction?.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
+  const bloom = Math.min(1, smoothBloom(frame, sec(0.3), sec(0.3), 0.5) + beat.pulse * 0.25);
 
   // Chromatic-aberration kick — 1 frame of R/B channel split as count-up locks
   // Amplitude 1px max, peaks at countUpEndFrame, decays in 3 frames.

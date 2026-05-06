@@ -461,7 +461,7 @@
         },
         "renderQuality": {
           "type": "object",
-          "description": "Optional per-clip render-quality override. Lets hero segments (title cards, key reveals, map hold-frames) opt into higher-fidelity encoding without raising the cost for every clip in the episode. Currently advisory — not yet wired into render-episode.mjs / render-lambda.mjs; reserve the field so manifests can declare intent before the renderer learns to honor it.",
+          "description": "Optional per-segment render-quality override. Currently ADVISORY at the segment level — FullEpisode renders as a single Remotion composition and Remotion CLI flags apply at the composition level, not per-segment. To get per-clip render overrides today, use the `_render` block on individual data files instead (honored by render-episode.mjs and render-lambda.mjs). This segment-level field documents intent for the day FullEpisode learns true per-segment rendering (e.g. via separate composition-per-segment + ffmpeg concat).",
           "additionalProperties": false,
           "properties": {
             "crf": {

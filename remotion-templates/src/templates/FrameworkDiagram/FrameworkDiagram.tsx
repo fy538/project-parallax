@@ -25,6 +25,7 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
 import type { FrameworkDiagramData, FrameworkPhase, EliminatedScenario } from "./types";
@@ -38,6 +39,14 @@ const ComparisonVariant: React.FC<{
   const theme = useThemeMode(data.backgroundVariant);
   const { durationInFrames } = useVideoConfig();
   const emphasis = useEpisodeColorEmphasis();
+  // Audio-reactive amplification for the VS divider glow oscillation. Read
+  // syncPoints straight off the input block (parent already calls
+  // useDirection). Hook is called unconditionally — the conditional VS
+  // render below uses `vsBeat.pulse` only when columns.length === 2.
+  const vsBeat = useBeatSync({
+    markers: (data._direction?.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.4,
+  });
   const columns = data.columns || [];
   const cols = useMemo(
     () => columnLayout(columns.length, { titleVariant: "content", safeAreaTier: "generous" }),
@@ -172,7 +181,8 @@ const ComparisonVariant: React.FC<{
       {columns.length === 2 && (() => {
         const vsOpacity = fadeIn(frame, sec(1.0), sec(0.5));
         const exit = exitFade(frame, durationInFrames, 15);
-        const glowPulse = 0.3 + 0.15 * Math.sin(frame * 0.025);
+        // Beat sync amplifies the glow oscillation amplitude on sync points.
+        const glowPulse = 0.3 + (0.15 + vsBeat.pulse * 0.1) * Math.sin(frame * 0.025);
         return (
           <div
             style={{

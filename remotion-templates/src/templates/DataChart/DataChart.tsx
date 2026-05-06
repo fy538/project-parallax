@@ -29,6 +29,7 @@ import { Background } from "../../components/Background";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useNarratedCamera } from "../../hooks/useNarratedCamera";
 import type { DataChartData, SpotlightStep } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
@@ -346,6 +347,13 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
+  // Audio-reactive punch-in on the focus-pull transform. Subtle (2% scale)
+  // because focusPull already drives a strong zoom; this amplifies the "land"
+  // moment on the highlighted bar without breaking layout.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
   // Per-episode color emphasis — pulls primaryAccent from the episode's
   // visual identity (chart fills, reference lines, accent labels). Falls back
   // to neutral (amber) if no emphasis is set. See remotion-templates/BRAND.md.
@@ -517,7 +525,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
           overflow: "visible",
           transform: `scale(${
             highlightBarIndex >= 0
-              ? focusPull(frame, durationInFrames, highlightFinishFrame)
+              ? focusPull(frame, durationInFrames, highlightFinishFrame) * (1 + beat.pulse * 0.02)
               : 1.0
           })`,
           transformOrigin: highlightBarIndex >= 0 ? "center 70%" : "center center",

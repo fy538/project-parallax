@@ -61,6 +61,7 @@ import {
 } from "../../utils/countUp";
 import { Background } from "../../components/Background";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -171,6 +172,12 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
+  // Audio-reactive leading-edge brighten on Whisper-resolved sync points.
+  // Used below to brighten the live-recording mid-ring as beats land.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.25,
+  });
 
   // Extract colors from theme via hook
   const bgVariant = data.backgroundVariant || "light";
@@ -664,13 +671,15 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                   opacity={0.18}
                   style={{ filter: `blur(4px)` }}
                 />
-                {/* Mid ring — slight pulse to suggest "live" recording */}
+                {/* Mid ring — slight pulse to suggest "live" recording.
+                    Beat sync brightens the ring up to ~0.5 on Whisper sync
+                    points, reinforcing the line-draw-meets-narration moment. */}
                 <circle
                   cx={tip.x}
                   cy={tip.y}
                   r={9}
                   fill={line.color}
-                  opacity={0.32}
+                  opacity={Math.min(0.6, 0.32 + beat.pulse * 0.25)}
                 />
                 {/* Dot core — solid, sits at the geometric tip */}
                 <circle

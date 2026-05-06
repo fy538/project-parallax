@@ -51,6 +51,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   useTreeCamera,
@@ -156,6 +157,8 @@ const TreeNodeComponent: React.FC<{
   focusScale: number;
   /** Stable index for default categorical color when node.color is missing. */
   defaultColorIndex?: number;
+  /** Audio-reactive pulse from useBeatSync — amplifies the active-node glow. 0 = no effect. */
+  beatPulse?: number;
 }> = React.memo(({
   node,
   position,
@@ -166,6 +169,7 @@ const TreeNodeComponent: React.FC<{
   dimAmount,
   focusScale,
   defaultColorIndex = 0,
+  beatPulse = 0,
 }) => {
   const theme = useThemeMode(mode);
   const nodeOpacity = fadeIn(frame, startFrame, sec(0.5));
@@ -208,7 +212,7 @@ const TreeNodeComponent: React.FC<{
           height: "100%",
           ...nodeBoxStyle,
           boxShadow: isActive
-            ? `${contentShadow(true)}, ${accentGlow(nodeColor, 24)}`
+            ? `${contentShadow(true)}, ${accentGlow(nodeColor, 24 + Math.round(beatPulse * 8))}`
             : contentShadow(true),
           display: "flex",
           flexDirection: "column",
@@ -287,6 +291,13 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation({ noExit: true, ...direction.driftOptions });
+  // Audio-reactive amplification for the active-node glow. Passed down to
+  // every TreeNodeComponent — only the active node uses it (the boxShadow
+  // condition gates it on isActive).
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
   const { durationInFrames: totalFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
@@ -495,6 +506,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     dimAmount={camera.getNodeDim(node.id)}
                     focusScale={camera.getNodeScale(node.id)}
                     defaultColorIndex={data.nodes.indexOf(node)}
+                    beatPulse={beat.pulse}
                   />
                 );
               })}
