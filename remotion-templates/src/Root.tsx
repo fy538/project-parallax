@@ -47,6 +47,7 @@ import {
 import { SiliconTrapComposition, SiliconTrapFullComposition } from "./templates/Episodes";
 import { AudioPreviewComposition } from "./templates/AudioPreview";
 import { PrisonersDilemmaShowcaseComposition } from "./templates/Episodes/PrisonersDilemmaShowcase";
+import { ThumbnailComposition } from "./templates/Thumbnail";
 
 // Catalog — toolkit view (multi-variant demos, never tied to a real episode)
 import {
@@ -152,6 +153,10 @@ export const RemotionRoot: React.FC = () => {
         <ImageCompositeComposition />
         <PhotoMontageComposition />
         <AnnotatedImageComposition />
+      </Folder>
+
+      <Folder name="Thumbnails">
+        <ThumbnailComposition />
       </Folder>
 
       <Folder name="Shorts">

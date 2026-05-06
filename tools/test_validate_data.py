@@ -325,3 +325,350 @@ def test_template_data_file_skips_schema_files(tmp_path, monkeypatch):
     p.parent.mkdir(parents=True)
     p.write_text("{}")
     assert vd.is_template_data_file(p) is False
+
+
+# ── validate_schema — crash handler ──────────────────────────────────────────
+
+
+def test_schema_crash_handler_returns_error(tmp_path, monkeypatch):
+    """If jsonschema.validate raises an unexpected exception, return a 'crashed' error string."""
+    import importlib
+
+    schema = tmp_path / "schema.json"
+    schema.write_text(json.dumps({"type": "object"}), encoding="utf-8")
+    data = tmp_path / "data.json"
+    data.write_text('{"x": 1}', encoding="utf-8")
+
+    try:
+        import jsonschema
+    except ImportError:
+        return  # skip if jsonschema not installed
+
+    def boom(instance, schema_):
+        raise RuntimeError("unexpected internal error")
+
+    monkeypatch.setattr(jsonschema, "validate", boom)
+    err = vd.validate_schema(data, schema)
+    assert err is not None
+    assert "crashed" in err
+
+
+# ── _expected_audio_files — manifest → file path set ─────────────────────────
+
+
+def test_expected_audio_files_music_track(tmp_path):
+    manifest = {
+        "episode": "silicon-trap",
+        "musicBed": {"tracks": [{"file": "theme.mp3"}]},
+        "segments": [],
+    }
+    paths = vd._expected_audio_files(manifest, "silicon-trap")
+    assert "episodes/silicon-trap/theme.mp3" in paths
+
+
+def test_expected_audio_files_multiple_tracks(tmp_path):
+    manifest = {
+        "musicBed": {"tracks": [{"file": "intro.mp3"}, {"file": "outro.mp3"}]},
+        "segments": [],
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert "episodes/ep01/intro.mp3" in paths
+    assert "episodes/ep01/outro.mp3" in paths
+
+
+def test_expected_audio_files_sound_cue(tmp_path):
+    manifest = {
+        "musicBed": {},
+        "segments": [
+            {"soundCue": {"type": "whoosh", "intensity": "heavy"}}
+        ],
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert "audio/sfx/transitions/whoosh-heavy.wav" in paths
+
+
+def test_expected_audio_files_cue_defaults_intensity_to_normal(tmp_path):
+    manifest = {
+        "musicBed": {},
+        "segments": [{"soundCue": {"type": "swipe"}}],
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert "audio/sfx/transitions/swipe-normal.wav" in paths
+
+
+def test_expected_audio_files_secondary_cue(tmp_path):
+    manifest = {
+        "musicBed": {},
+        "segments": [{"soundCueSecondary": {"type": "click", "intensity": "light"}}],
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert "audio/sfx/transitions/click-light.wav" in paths
+
+
+def test_expected_audio_files_texture_cues(tmp_path):
+    manifest = {
+        "musicBed": {},
+        "segments": [
+            {"textureCues": [{"type": "heartbeat"}, {"type": "breath"}]}
+        ],
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert "audio/sfx/textures/heartbeat.wav" in paths
+    assert "audio/sfx/textures/breath.wav" in paths
+
+
+def test_expected_audio_files_empty_manifest(tmp_path):
+    paths = vd._expected_audio_files({}, "ep01")
+    assert paths == set()
+
+
+def test_expected_audio_files_skips_null_type(tmp_path):
+    manifest = {
+        "musicBed": {"tracks": [{"file": None}]},
+        "segments": [{"soundCue": {"intensity": "normal"}}],  # no type key
+    }
+    paths = vd._expected_audio_files(manifest, "ep01")
+    assert paths == set()
+
+
+# ── check_audio_assets — disk existence check ────────────────────────────────
+
+
+def test_check_audio_assets_no_public_dir(tmp_path, monkeypatch):
+    """If public/ doesn't exist, return (0, []) without crashing."""
+    monkeypatch.setattr(vd, "PUBLIC_DIR", tmp_path / "nonexistent-public")
+    manifest_path = tmp_path / "assembly-manifest.json"
+    manifest_path.write_text(json.dumps({"musicBed": {}, "segments": []}), encoding="utf-8")
+    count, missing = vd.check_audio_assets(manifest_path)
+    assert count == 0
+    assert missing == []
+
+
+def test_check_audio_assets_malformed_manifest(tmp_path, monkeypatch):
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    bad = tmp_path / "assembly-manifest.json"
+    bad.write_text("{not json", encoding="utf-8")
+    count, missing = vd.check_audio_assets(bad)
+    assert count == 0
+    assert missing == []
+
+
+def test_check_audio_assets_all_present(tmp_path, monkeypatch):
+    public = tmp_path / "public"
+    (public / "episodes/ep01").mkdir(parents=True)
+    (public / "episodes/ep01/theme.mp3").write_text("audio")
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    manifest_path = tmp_path / "assembly-manifest.json"
+    manifest_path.write_text(json.dumps({
+        "episode": "ep01",
+        "musicBed": {"tracks": [{"file": "theme.mp3"}]},
+        "segments": [],
+    }), encoding="utf-8")
+    count, missing = vd.check_audio_assets(manifest_path)
+    assert count == 1
+    assert missing == []
+
+
+def test_check_audio_assets_reports_missing(tmp_path, monkeypatch):
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    manifest_path = tmp_path / "assembly-manifest.json"
+    manifest_path.write_text(json.dumps({
+        "episode": "ep01",
+        "musicBed": {"tracks": [{"file": "theme.mp3"}]},
+        "segments": [],
+    }), encoding="utf-8")
+    count, missing = vd.check_audio_assets(manifest_path)
+    assert count == 1
+    assert "episodes/ep01/theme.mp3" in missing
+
+
+def test_check_audio_assets_uses_parent_dir_as_slug_fallback(tmp_path, monkeypatch):
+    """If manifest has no 'episode' key, fall back to manifest parent directory name."""
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    ep_dir = tmp_path / "my-episode"
+    ep_dir.mkdir()
+    manifest_path = ep_dir / "assembly-manifest.json"
+    manifest_path.write_text(json.dumps({
+        "musicBed": {"tracks": [{"file": "music.mp3"}]},
+        "segments": [],
+    }), encoding="utf-8")
+    count, missing = vd.check_audio_assets(manifest_path)
+    assert count == 1
+    assert "episodes/my-episode/music.mp3" in missing
+
+
+# ── predictions-log schema in SCHEMAS list ────────────────────────────────────
+
+
+def test_schema_for_predictions_log(tmp_path, monkeypatch):
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    schema = tmp_path / "data/predictions-log.schema.json"
+    schema.parent.mkdir(parents=True)
+    schema.write_text("{}", encoding="utf-8")
+    target = tmp_path / "data/predictions-log.json"
+    target.write_text("{}", encoding="utf-8")
+    assert vd.schema_for(target) == schema
+
+
+# ── main() — CLI integration tests ───────────────────────────────────────────
+
+
+def _run_main(argv, monkeypatch, tmp_root):
+    """Monkeypatch ROOT and sys.argv, call main(), return exit code."""
+    monkeypatch.setattr(vd, "ROOT", tmp_root)
+    monkeypatch.setattr(vd, "PALETTE_PATH", tmp_root / "palette.json")
+    monkeypatch.setattr(vd, "PUBLIC_DIR", tmp_root / "public")
+    monkeypatch.setattr(sys, "argv", ["validate_data.py"] + argv)
+    return vd.main()
+
+
+def test_main_no_files_returns_zero(tmp_path, monkeypatch, capsys):
+    """When no JSON files are found at all, exit 0 with a clean message."""
+    code = _run_main([], monkeypatch, tmp_path)
+    assert code == 0
+    assert "No JSON files" in capsys.readouterr().out
+
+
+def test_main_valid_json_returns_zero(tmp_path, monkeypatch, capsys):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    (data_dir / "simple.json").write_text('{"ok": true}', encoding="utf-8")
+    code = _run_main(["--no-palette", "--no-audio"], monkeypatch, tmp_path)
+    assert code == 0
+    assert "✓" in capsys.readouterr().out
+
+
+def test_main_malformed_json_returns_one(tmp_path, monkeypatch, capsys):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    (data_dir / "bad.json").write_text("{bad", encoding="utf-8")
+    code = _run_main(["--no-palette", "--no-audio"], monkeypatch, tmp_path)
+    assert code == 1
+    assert "failed validation" in capsys.readouterr().err
+
+
+def test_main_files_flag_skips_non_json(tmp_path, monkeypatch, capsys):
+    """--files with only non-JSON paths exits 0 immediately (pre-commit shortcut)."""
+    txt = tmp_path / "something.txt"
+    txt.write_text("hello")
+    monkeypatch.setattr(sys, "argv", ["validate_data.py", "--files", str(txt)])
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    code = vd.main()
+    assert code == 0
+
+
+def test_main_files_flag_validates_specific_file(tmp_path, monkeypatch, capsys):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    good = data_dir / "good.json"
+    good.write_text('{"x": 1}', encoding="utf-8")
+    bad = data_dir / "bad.json"
+    bad.write_text("{broken", encoding="utf-8")
+    # Only pass the good file — bad should not be validated
+    monkeypatch.setattr(sys, "argv", ["validate_data.py", "--files", str(good), "--no-palette", "--no-audio"])
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    monkeypatch.setattr(vd, "PALETTE_PATH", tmp_path / "palette.json")
+    monkeypatch.setattr(vd, "PUBLIC_DIR", tmp_path / "public")
+    code = vd.main()
+    assert code == 0
+
+
+def test_main_episode_flag_unknown_episode_returns_one(tmp_path, monkeypatch, capsys):
+    code = _run_main(["--episode", "nonexistent-slug", "--no-palette", "--no-audio"], monkeypatch, tmp_path)
+    assert code == 1
+    assert "nonexistent-slug" in capsys.readouterr().err
+
+
+def test_main_episode_flag_finds_json_under_episodes_subdir(tmp_path, monkeypatch, capsys):
+    """--episode finds JSON under episodes/<slug>/ and remotion-templates/data/episodes/<slug>/."""
+    ep_dir = tmp_path / "episodes" / "my-ep"
+    ep_dir.mkdir(parents=True)
+    (ep_dir / "brief.json").write_text('{"ok": 1}', encoding="utf-8")
+    code = _run_main(["--episode", "my-ep", "--no-palette", "--no-audio"], monkeypatch, tmp_path)
+    assert code == 0
+    assert "✓" in capsys.readouterr().out
+
+
+def test_main_schema_violation_reported(tmp_path, monkeypatch, capsys):
+    """If a file matches a schema and violates it, exit 1 with schema error message."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    # Write a schema that requires "version" to be an integer
+    schema = data_dir / "simple.schema.json"
+    schema.write_text(json.dumps({
+        "type": "object",
+        "required": ["version"],
+        "properties": {"version": {"type": "integer"}},
+    }), encoding="utf-8")
+    # Override SCHEMAS so this file is schema-checked
+    monkeypatch.setattr(vd, "SCHEMAS", [("data/simple.json", "data/simple.schema.json")])
+    target = data_dir / "simple.json"
+    target.write_text('{"version": "should-be-int"}', encoding="utf-8")
+    code = _run_main(["--no-palette", "--no-audio"], monkeypatch, tmp_path)
+    assert code == 1
+    assert "schema error" in capsys.readouterr().err
+
+
+def test_main_palette_check_runs_on_template_data_file(tmp_path, monkeypatch, capsys):
+    """Palette check runs on template data files and reports off-palette hex."""
+    ep_dir = tmp_path / "remotion-templates/data/episodes/ep01"
+    ep_dir.mkdir(parents=True)
+    (ep_dir / "scene.json").write_text(json.dumps({"color": "#FF00FF"}), encoding="utf-8")
+    palette = tmp_path / "tools/brand-treatment/palette.json"
+    palette.parent.mkdir(parents=True)
+    palette.write_text(json.dumps({"palette": {"ink": "#1C1814"}}), encoding="utf-8")
+    monkeypatch.setattr(vd, "PALETTE_PATH", palette)
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    monkeypatch.setattr(vd, "PUBLIC_DIR", tmp_path / "public")
+    monkeypatch.setattr(sys, "argv", ["validate_data.py", "--no-audio"])
+    code = vd.main()
+    assert code == 1
+    assert "#ff00ff" in capsys.readouterr().err
+
+
+def test_main_audio_soft_warning_does_not_fail(tmp_path, monkeypatch, capsys):
+    """Missing audio without --audio-strict → warning in output but exit 0."""
+    ep_dir = tmp_path / "remotion-templates/data/episodes/ep01"
+    ep_dir.mkdir(parents=True)
+    manifest = ep_dir / "assembly-manifest.json"
+    manifest.write_text(json.dumps({
+        "episode": "ep01",
+        "musicBed": {"tracks": [{"file": "missing.mp3"}]},
+        "segments": [],
+    }), encoding="utf-8")
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    monkeypatch.setattr(vd, "PALETTE_PATH", tmp_path / "palette.json")
+    monkeypatch.setattr(sys, "argv", ["validate_data.py", "--no-palette"])
+    code = vd.main()
+    assert code == 0
+    out = capsys.readouterr()
+    assert "missing audio" in out.out  # summary mentions it
+
+
+def test_main_audio_strict_fails_on_missing_audio(tmp_path, monkeypatch, capsys):
+    """With --audio-strict, missing audio files cause exit 1."""
+    ep_dir = tmp_path / "remotion-templates/data/episodes/ep01"
+    ep_dir.mkdir(parents=True)
+    manifest = ep_dir / "assembly-manifest.json"
+    manifest.write_text(json.dumps({
+        "episode": "ep01",
+        "musicBed": {"tracks": [{"file": "missing.mp3"}]},
+        "segments": [],
+    }), encoding="utf-8")
+    public = tmp_path / "public"
+    public.mkdir()
+    monkeypatch.setattr(vd, "PUBLIC_DIR", public)
+    monkeypatch.setattr(vd, "ROOT", tmp_path)
+    monkeypatch.setattr(vd, "PALETTE_PATH", tmp_path / "palette.json")
+    monkeypatch.setattr(sys, "argv", ["validate_data.py", "--no-palette", "--audio-strict"])
+    code = vd.main()
+    assert code == 1

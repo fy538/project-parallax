@@ -48,6 +48,10 @@ SCHEMAS = [
         "data/concept-registry.schema.json",
     ),
     (
+        "data/predictions-log.json",
+        "data/predictions-log.schema.json",
+    ),
+    (
         "episodes/*/shot-list.json",
         "data/shot-list.schema.json",
     ),

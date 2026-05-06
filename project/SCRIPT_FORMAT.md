@@ -162,6 +162,27 @@ Tag each entry to make the mode explicit — downstream tools (visual-spec, asse
 - **`[AI-GEN:]`** — AI-generated grounded scene (Register 3: Grounding). Constructivist figurative illustration with planar-faceted figures (4-5 color-blocked face planes, eyes obscured, no rendered features) drawing on Rodchenko's 1924 portrait series and Lissitzky's Self-Portrait. Used for physically real but unsourceable spaces (restricted facilities, historical reconstructions, conceptual scenes made literal). Reference frames generated via `tools/recraft/recraft.py --register grounding --realism balanced --text-treatment <tradition>`; animated clips via Kling 3.0 / Sora 2 from reference frames at `realism: flat` (animation-flat rule per VIS-09); all assets passed through `treat_video.py` brand treatment. Never for named individuals or claimed specific events. See AI_VIDEO_PIPELINE.md for full spec.
 - **`[ILLUST:]`** — AI-generated atmospheric backdrop (Register 2: Atmospheric). Same constructivist illustration vocabulary as `[AI-GEN:]` but used as background mood at 30-40% opacity behind narration, rather than as foreground figurative scene. Carries civilizational weight, industrial dread, conceptual scale. Generated via Recraft V3 API (`tools/recraft/recraft.py --register atmospheric`), output as SVG/PNG, passed through duotone brand treatment (`--treat standard|conflict|editorial` per VIS-10 pairing rules). NOT data-carrying — use `[MG:]` for anything the viewer needs to *read*. Combined with `[AI-GEN:]` they share constructivist visual language; differ only in editorial role (background mood vs. foreground scene). See VISUAL_LANGUAGE.md "Three Visual Registers" and "Three Content Types" sections.
 
+- **`[FORECAST:]`** — on-screen probability gauge. The episode's formal prediction beat. Used in the
+  Scenario + Prediction Beat when stating a falsifiable, time-bounded prediction. Renders via the
+  `ProbabilityGauge` Remotion template. Always classified as P1. Requires the full 6-layer schema
+  from `project/CALIBRATION_LANGUAGE.md`. Format:
+  ```
+  [FORECAST:]
+  TEMPLATE: ProbabilityGauge
+  PROBABILITY:      65
+  VERBAL TAG:       above even odds
+  BASE RATE:        Historical precedent for this class: ~50%
+  KEY DRIVER:       [single main case-specific factor]
+  KEY DISCONFIRMER: [evidence that would push estimate in opposite direction]
+  BENCHMARK:        Kalshi: 58% — Parallax diverges because [one sentence]
+  RESOLUTION:       [clairvoyance-test question with specific date]
+  DATA:             [ep-slug/probability-[slug].json]
+  DURATION:         6s
+  ```
+  Note: `[FORECAST:]` is a data/argument element, not a visual mood. It is never used as P2 or P3.
+  The 6-layer schema is mandatory — partial implementations (probability alone, no disconfirmer)
+  will fail the script-audit forecast check.
+
 When a visual column entry has no mode tag, the pipeline infers it from context: `TEMPLATE: FOOTAGE` or `TEMPLATE: IMAGE` → footage mode; a named Remotion template → MG mode; `SOURCE: AI-GEN` → AI-GEN mode; Recraft/illustration reference → ILLUST mode. Explicit tags are preferred because they make the editorial intent unambiguous and help script-audit catch visual monotony.
 
 ### How the tags look in the table
@@ -448,6 +469,14 @@ enthusiasm hooks ("this is so fascinating") which reinforce existing loyalties i
 the inquiry state needed for genuine belief updating; framing events as someone's fault (anger
 activation) rather than something that doesn't add up (anxiety/surveillance activation).
 
+**Title confidence check:** The thumbnail-title pair must not overstate the episode's conclusion.
+If the title is more confident than the bounded verdict that closes the episode, rewrite the title —
+not the conclusion. NFC research shows that early simplifications become sticky anchors, especially
+for viewers in a high closure-pressure state (i.e., the exact audience Parallax targets). A title
+that overpromises creates false freezing: viewers feel the conclusion didn't deliver what the hook
+promised, which reads as analytical fragility rather than honest uncertainty. The test: read the
+title, then read the bounded verdict close. If the title makes a stronger claim, it needs revision.
+
 ### Emotional Arc
 
 The episode must follow this sequence:
@@ -471,6 +500,22 @@ The episode must follow this sequence:
 Design each episode knowing which behavior it needs to drive. The default target is subscribe (launch
 episodes, first-in-arc episodes). Viral/share episodes should escalate arousal at the main insight
 beat and close sharply. Arc-mid episodes should end with the unfinished-curiosity state.
+
+**Structural markers:** Two beats require an explicit marker comment in their beat header line:
+
+- `<!-- [FRAMEWORK UNLOCK] -->` — the beat where the interpretive lens is explicitly handed to the
+  viewer. Target: no later than 40% through the episode (~6 min in a 15-min episode). The
+  anxiety-to-inquiry conversion cannot happen without this beat. If the surveillance system stays
+  active past the midpoint without a framework being introduced, anxious viewers start searching
+  for threat-consistent information rather than open-minded analysis — and the episode tips from
+  inquiry into sustained dread.
+- `<!-- [MAIN REVEAL] -->` — the beat where the episode's governing question is answered. The
+  first major reveal *before* this marker should solve why the obvious explanation fails, not the
+  main question itself. Closing the governing question too early collapses the attentional window
+  that makes subsequent evidence feel urgent. The main answer should arrive late enough that it
+  sits atop accumulated evidence, not instead of it.
+
+Usage: `### BEAT 3 — THE FRAMEWORK UNLOCK (4:30–6:00) <!-- [FRAMEWORK UNLOCK] -->`
 
 ### Assertive Calibration Language
 
@@ -504,6 +549,13 @@ The final beat must deliver a bounded verdict — not "only time will tell" and 
 1. **Best current reading** — the strongest interpretation the evidence supports, stated assertively
 2. **Confidence boundary** — where the model holds and where it fails
 3. **Watchpoints** — 2–3 specific, observable developments that would force a revision
+
+4. **Reflection trigger** — a closing question or reframe that prompts the viewer to apply the
+   framework to their own mental model. Transportation research shows that post-episode memories and
+   self-relevant reflections mediate belief change beyond what in-episode narration can achieve alone.
+   One sentence is enough: "What does this framework change about how you read [current event]?" or
+   "The next time you see [pattern], you'll know which question to ask." The close is not just tension
+   release — it is the moment that converts a passive viewer into an active framework user.
 
 This gives procedural closure (I now know how to think about this class of problem) while preserving
 factual honesty (the specific outcome remains uncertain). The watchpoints convert passive viewers
@@ -624,6 +676,17 @@ The script-audit skill should check:
 - `DIR: hold()` is present on data reveals and emotional peaks (these moments need breathing room)
 - No compositions have more than 4 `DIR:` lines (over-directing — simplify)
 - `sync:"word"` targets actually appear in the corresponding narration text
+- **Psychology checks (from `project/psychology/SYNTHESIS.md`):**
+- Cold open title confidence check: the title does not make a stronger claim than the bounded verdict close
+- Cold open hits all four beats in order: schema → violation → narrowing → solvability promise
+- `<!-- [FRAMEWORK UNLOCK] -->` marker present in a beat no later than 40% through the episode
+- `<!-- [MAIN REVEAL] -->` marker present; the first major reveal before it solves why the obvious explanation fails, not the main question
+- Anxiety-to-inquiry conversion is complete before the episode midpoint (surveillance mode not sustained past ~50% runtime without framework)
+- Bounded verdict close delivers all four elements: best current reading + confidence boundary + watchpoints + reflection trigger
+- No causal framing activates anger ("here's who did this") rather than anxiety/inquiry ("something doesn't add up structurally")
+- No Level 3 vague uncertainty language (maybe, perhaps, who knows, only time will tell, it's complicated)
+- Any on-screen predictions use `[FORECAST:]` tag with all 6 schema fields present; resolution criteria pass the clairvoyance test
+- Target behavior (subscribe / share / return) is identified in angle-memo and the episode close matches that target's optimal end state
 
 ---
 

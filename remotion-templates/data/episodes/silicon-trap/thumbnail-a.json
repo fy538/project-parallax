@@ -1,0 +1,14 @@
+{
+  "data": {
+    "layout": "juxtaposition",
+    "episode": "silicon-trap",
+    "episodeLabel": "EP01 · GEOPOLITICS",
+    "imageSrc": "episodes/silicon-trap/wafer-macro.jpg",
+    "imageRamp": "standard",
+    "titleText": "TRIUMPH & TRAP",
+    "statPrimary": "$165B",
+    "statPrimaryLabel": "U.S. chip subsidies",
+    "statContrast": "7%",
+    "statContrastLabel": "domestic output"
+  }
+}

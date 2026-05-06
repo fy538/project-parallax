@@ -531,6 +531,83 @@ After you produce the retrospective report, append the key findings to `episodes
 
 ---
 
+## Oracle Track Update
+
+After appending to LEARNING_LOG.md, update `data/predictions-log.json` and `data/concepts.json` for any predictions tied to this episode.
+
+### Step 1 — Set publishDate (if not already set)
+
+Find every entry in `predictions-log.json` where `episode` matches the slug of the episode just published and `publishDate` is `null`. Set `publishDate` to the actual YouTube publish date (ISO date string, e.g. `"2026-09-15"`).
+
+**Why this matters:** publishDate in the log is the accountability anchor for the Oracle track. The git commit timestamp on the prediction entry proves it was filed before publish; the publishDate field records when the clock started.
+
+### Step 2 — Check whether this episode resolves any open prediction
+
+Open predictions from *prior* episodes may be resolved by evidence discussed in this episode's narration or referenced in the analytics. Scan open entries across all episodes, not just the current one. Resolution criteria:
+- **confirmed**: The predicted outcome occurred (evidence meets the falsification threshold)
+- **falsified**: The predicted outcome demonstrably did not occur
+- **partially-confirmed**: Evidence is mixed — some aspects resolved, others still open
+- **revised**: New evidence moves the probability significantly (>15 percentage points); update `currentProbability` and keep `status: "open"`
+- **expired**: Timeframe passed without sufficient evidence to confirm or falsify
+
+### Step 3 — Write the resolution (if resolving)
+
+For each resolved prediction, update **both** files:
+
+**In `data/predictions-log.json`:**
+```json
+{
+  "status": "confirmed",
+  "resolutionDate": "YYYY-MM-DD",
+  "outcome": "One sentence: what actually happened and the key evidence.",
+  "brierFinal": 0.12,
+  "lesson": "One sentence: what this result tells us about the model."
+}
+```
+
+**Brier score calculation:** `brierFinal = (probabilityAtPrediction - outcome_numeric)²`  
+where `outcome_numeric = 1.0` for confirmed/partially-confirmed, `0.0` for falsified.  
+For `partially-confirmed`, use `0.5` as the outcome.
+
+After updating individual entries, recalculate `calibrationSummary`:
+- Increment `closed` by the number of newly resolved predictions
+- Recalculate `runningBrier` as the mean of all non-null `brierFinal` values
+
+**In `data/concepts.json`**, update the matching concept's `prediction` sub-object:
+```json
+"prediction": {
+  "status": "confirmed",
+  "resolution": {
+    "date": "YYYY-MM-DD",
+    "evidence": "Source + summary of what happened.",
+    "episode": "retrospective-episode-slug"
+  }
+}
+```
+
+### Step 4 — Generate "Was I Right?" content note
+
+If any prediction was resolved this cycle, append a note to the retrospective report:
+
+```
+## Oracle Track Update
+
+### Resolved predictions this cycle:
+- [prediction-id]: [status] — Brier score: [X]. [One sentence on what the result means for calibration.]
+
+### Still open:
+- [prediction-id]: [current probability, any revision]
+
+### Calibration running total:
+- [N] predictions closed, [M] open
+- Running Brier: [X] vs. baseline (always-50%): 0.25
+- [Assessment: beating/trailing the baseline by X points]
+```
+
+This note is the raw material for a "Was I Right?" Short or the quarterly scorecard.
+
+---
+
 ## Editorial Playbook Updates
 
 After appending to LEARNING_LOG.md, review `episodes/EDITORIAL_PLAYBOOK.md` and make three types of updates:

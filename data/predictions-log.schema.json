@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Parallax Predictions Log",
+  "description": "Flat prediction log for Oracle track retrospectives and Brier calibration scoring.",
+  "type": "object",
+  "required": ["version", "predictions", "calibrationSummary"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string" },
+    "description": { "type": "string" },
+    "predictions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/PredictionEntry" }
+    },
+    "calibrationSummary": {
+      "type": "object",
+      "required": ["totalPredictions", "closed", "baselineBrier"],
+      "additionalProperties": false,
+      "properties": {
+        "totalPredictions": { "type": "integer", "minimum": 0 },
+        "closed": { "type": "integer", "minimum": 0 },
+        "runningBrier": { "type": ["number", "null"] },
+        "kalshiBrier": { "type": ["number", "null"] },
+        "baselineBrier": { "type": "number" },
+        "note": { "type": "string" }
+      }
+    }
+  },
+  "$defs": {
+    "PredictionEntry": {
+      "type": "object",
+      "required": ["id", "episode", "claim", "probabilityAtPrediction", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Kebab-case ID matching the concept registry entry."
+        },
+        "episode": { "type": "string" },
+        "publishDate": { "type": ["string", "null"] },
+        "claim": { "type": "string" },
+        "probabilityAtPrediction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "kalshiPriceAtPrediction": { "type": ["number", "null"] },
+        "metaculusPriceAtPrediction": { "type": ["number", "null"] },
+        "status": {
+          "type": "string",
+          "enum": ["open", "confirmed", "falsified", "partially-confirmed", "revised", "expired"]
+        },
+        "lastReviewed": { "type": ["string", "null"] },
+        "currentProbability": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "brierPartial": { "type": ["number", "null"] },
+        "resolutionDate": { "type": ["string", "null"] },
+        "outcome": { "type": ["string", "null"] },
+        "brierFinal": { "type": ["number", "null"] },
+        "lesson": { "type": ["string", "null"] }
+      }
+    }
+  }
+}
