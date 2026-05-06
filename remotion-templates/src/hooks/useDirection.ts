@@ -127,11 +127,26 @@ const PACE_TIMING: Record<PaceProfile, { timing: number; stagger: number }> = {
   breathing: { timing: 1.4, stagger: 1.5 },   // slower, more deliberate
 };
 
-// ── Hook ────────────────────────────────────────────────────────────
+// ── Pure resolver (testable without React) ──────────────────────────────────
 
-export const useDirection = (
-  direction?: DirectionBlock | null
-): DirectionResult => {
+/**
+ * Resolve a DirectionBlock to a DirectionResult. Pure function — no React
+ * hook calls, no state, no side effects. The hook below is a thin alias
+ * that satisfies the naming convention; templates can import either, but
+ * `resolveDirection` is the entry point for tests + non-React consumers
+ * (manifest validators, schema migrations, CLI tools).
+ *
+ * Behavior is fully backward-compatible: when `direction` is undefined or
+ * null, returns the no-direction defaults (paceTimingScale=1.0,
+ * paceStaggerScale=1.0, all other fields undefined). When `direction` is
+ * present, derives atmosphereIntensity from ambientParticles count,
+ * resolves driftPreset to animation options, and resolves paceProfile to
+ * timing/stagger scales. Unknown preset/profile values fall back to
+ * sensible defaults (empty drift options, analytical pace).
+ */
+export function resolveDirection(
+  direction?: DirectionBlock | null,
+): DirectionResult {
   if (!direction) {
     return {
       atmosphere: undefined,
@@ -181,4 +196,16 @@ export const useDirection = (
     paceStaggerScale: paceScales.stagger,
     hasDirection: true,
   };
-};
+}
+
+// ── Hook ────────────────────────────────────────────────────────────────────
+
+/**
+ * React-convention alias for `resolveDirection`. Templates call this from
+ * their render bodies to consume the `_direction` block from data files.
+ * Has no React-specific behavior (no useState, no useMemo, no useEffect)
+ * — it's a pure resolver named `use*` for ergonomics inside templates.
+ */
+export const useDirection = (
+  direction?: DirectionBlock | null,
+): DirectionResult => resolveDirection(direction);
