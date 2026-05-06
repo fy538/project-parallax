@@ -169,6 +169,15 @@ interface TextureCue {
   label?: string;
 }
 
+interface SyncPoint {
+  word: string;
+  /** Absolute time in episode seconds. Null when the syncWord didn't match
+   * any Whisper word in the segment's range. */
+  timeSec: number | null;
+  frame: number | null;
+  confidence: number;
+}
+
 interface ManifestSegment {
   id: string;
   type: SegmentType;
@@ -188,6 +197,10 @@ interface ManifestSegment {
   soundCue?: SoundCue;
   soundCueSecondary?: SoundCue;
   textureCues?: TextureCue[];
+  /** Frame-accurate sync points resolved by generate_manifest.py from
+   * Whisper word timestamps. timeSec is in absolute episode time;
+   * ForegroundSegment converts to segment-relative before injecting. */
+  syncPoints?: SyncPoint[];
 }
 
 interface NarrationInfo {
@@ -521,7 +534,9 @@ class SegmentErrorBoundary extends Component<
 const ForegroundSegment: React.FC<{
   segment: ManifestSegment;
   templateData: Record<string, any>;
-}> = memo(({ segment, templateData }) => {
+  /** Composition fps — needed to convert manifest absolute frames to segment-relative. */
+  fps: number;
+}> = memo(({ segment, templateData, fps }) => {
   const { template } = segment;
 
   if (!template?.component) {
@@ -559,13 +574,42 @@ const ForegroundSegment: React.FC<{
     );
   }
 
+  // Inject Whisper-resolved syncPoints from the manifest into the template's
+  // _direction block. This is the bridge that makes useBeatSync actually fire.
+  // The manifest stores syncPoints in absolute episode time; the template
+  // (wrapped in <Sequence from={startFrame}>) sees frame 0 at segment start,
+  // so we convert each timeSec to segment-relative by subtracting startSec.
+  // Unresolved sync points (Whisper couldn't find the word) are filtered out.
+  let dataWithSync = data;
+  if (data && segment.syncPoints && segment.syncPoints.length > 0) {
+    const relative = segment.syncPoints
+      .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
+        p.timeSec !== null && p.frame !== null,
+      )
+      .map((p) => ({
+        word: p.word,
+        timeSec: p.timeSec - segment.startSec,
+        frame: p.frame - Math.round(segment.startSec * fps),
+        confidence: p.confidence,
+      }));
+    if (relative.length > 0) {
+      dataWithSync = {
+        ...data,
+        _direction: {
+          ...(data._direction ?? {}),
+          syncPoints: relative,
+        },
+      };
+    }
+  }
+
   return (
     <SegmentErrorBoundary
       segmentId={segment.id}
       componentName={template.component}
     >
       <AbsoluteFill>
-        <Component data={data} />
+        <Component data={dataWithSync} />
       </AbsoluteFill>
     </SegmentErrorBoundary>
   );
@@ -710,6 +754,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                       <ForegroundSegment
                         segment={seg}
                         templateData={templateData}
+                        fps={fps}
                       />
                     ),
                   }}
@@ -718,6 +763,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                 <ForegroundSegment
                   segment={seg}
                   templateData={templateData}
+                  fps={fps}
                 />
               )}
             </TransitionWrapper>

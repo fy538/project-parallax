@@ -63,9 +63,51 @@ function loadSequence(slug) {
   return JSON.parse(fs.readFileSync(p, "utf-8")).clips;
 }
 
+// ── Sync points bridge ────────────────────────────────────────────────────
+// Mirror of render-episode.mjs buildSyncPointsLookup(). Builds a map of
+// dataFile → segment-relative syncPoints from the episode manifest, so
+// useBeatSync actually fires during Lambda renders. See render-episode.mjs
+// for the full rationale.
+
+function buildSyncPointsLookup(episode) {
+  const manifestPath = path.resolve(
+    __dirname,
+    "..",
+    "data",
+    "episodes",
+    episode,
+    "assembly-manifest.json",
+  );
+  if (!fs.existsSync(manifestPath)) return new Map();
+  let manifest;
+  try {
+    manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+  } catch (e) {
+    console.warn(`  manifest exists but failed to parse — sync points won't be injected (${e.message})`);
+    return new Map();
+  }
+  const fps = manifest.fps ?? 30;
+  const map = new Map();
+  for (const seg of manifest.segments ?? []) {
+    const file = seg.template?.dataFile;
+    if (!file || map.has(file)) continue;
+    if (!seg.syncPoints || seg.syncPoints.length === 0) continue;
+    const relative = seg.syncPoints
+      .filter((p) => p.timeSec !== null && p.frame !== null)
+      .map((p) => ({
+        word: p.word,
+        timeSec: p.timeSec - seg.startSec,
+        frame: p.frame - Math.round(seg.startSec * fps),
+        confidence: p.confidence,
+      }));
+    if (relative.length > 0) map.set(file, relative);
+  }
+  return map;
+}
+
 // ── Render a single composition ────────────────────────────────────────────
 
-async function renderSingle(composition, propsFile, { still, frame }) {
+async function renderSingle(composition, propsFile, { still, frame, syncPoints }) {
   const dataPath = path.resolve(__dirname, "..", propsFile);
   // Per-clip render overrides live in an optional `_render` block on the
   // data file. See render-episode.mjs for full schema documentation; both
@@ -75,6 +117,17 @@ async function renderSingle(composition, propsFile, { still, frame }) {
   const renderOverrides = rawData._render ?? {};
   const { _render: _stripped, ...data } = rawData;
   void _stripped;
+
+  // Inject Whisper-resolved syncPoints from the manifest (if the caller
+  // looked them up via buildSyncPointsLookup). Lets useBeatSync fire on the
+  // exact word the script's sync:"..." annotations marked.
+  if (syncPoints && syncPoints.length > 0) {
+    data._direction = {
+      ...(data._direction ?? {}),
+      syncPoints,
+    };
+  }
+
   const inputProps = { data };
 
   console.log(`\n🎬 Rendering ${composition} from ${path.basename(propsFile)}...`);
@@ -163,6 +216,10 @@ async function renderEpisode(episode) {
     process.exit(1);
   }
   const dataDir = `data/episodes/${episode}`;
+  const syncPointsByFile = buildSyncPointsLookup(episode);
+  if (syncPointsByFile.size > 0) {
+    console.log(`  bridged syncPoints for ${syncPointsByFile.size} clip(s) from manifest`);
+  }
   console.log(`\n🎬 Rendering all ${sequence.length} clips for ${episode}...\n`);
 
   const results = [];
@@ -170,7 +227,9 @@ async function renderEpisode(episode) {
     const { comp, file } = sequence[i];
     const num = String(i + 1).padStart(2, "0");
     console.log(`[${num}/${sequence.length}] ${comp} — ${file}`);
-    const result = await renderSingle(comp, `${dataDir}/${file}`, {});
+    const result = await renderSingle(comp, `${dataDir}/${file}`, {
+      syncPoints: syncPointsByFile.get(file),
+    });
     results.push({ num, file, ...result });
   }
 

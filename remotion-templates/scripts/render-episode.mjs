@@ -103,9 +103,58 @@ if (!browserArg) {
   }
 }
 
+// ─── Sync points bridge ─────────────────────────────────────────────────────
+// The pipeline writes Whisper-resolved syncPoints into the assembly manifest
+// (one array per segment). Templates consume them via data._direction.syncPoints
+// — but the data files don't contain syncPoints (they're derived from narration
+// audio + script DIR annotations, regenerated on every Whisper run). So at
+// render time we look up each clip's segment in the manifest, extract its
+// syncPoints, convert from absolute episode time to clip-relative time
+// (subtract segment.startSec), and inject into data._direction before invoking
+// Remotion. Without this bridge, useBeatSync is dormant on every render.
+const dataDir = join(ROOT, "data", "episodes", episode);
+const manifestPath = join(dataDir, "assembly-manifest.json");
+
+function buildSyncPointsLookup() {
+  if (!existsSync(manifestPath)) return new Map();
+  let manifest;
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+  } catch (e) {
+    console.warn(`  manifest exists but failed to parse — sync points won't be injected (${e.message})`);
+    return new Map();
+  }
+  const fps = manifest.fps ?? 30;
+  // Map dataFile → first segment that uses it. If a data file is reused across
+  // multiple segments, the first occurrence wins — per-clip render produces a
+  // single MP4 per data file regardless of how many places it's used.
+  const map = new Map();
+  for (const seg of manifest.segments ?? []) {
+    const file = seg.template?.dataFile;
+    if (!file || map.has(file)) continue;
+    if (!seg.syncPoints || seg.syncPoints.length === 0) continue;
+    const relative = seg.syncPoints
+      .filter((p) => p.timeSec !== null && p.frame !== null)
+      .map((p) => ({
+        word: p.word,
+        timeSec: p.timeSec - seg.startSec,
+        frame: p.frame - Math.round(seg.startSec * fps),
+        confidence: p.confidence,
+      }));
+    if (relative.length > 0) {
+      map.set(file, relative);
+    }
+  }
+  return map;
+}
+
+const syncPointsByDataFile = buildSyncPointsLookup();
+if (syncPointsByDataFile.size > 0) {
+  console.log(`  bridged syncPoints for ${syncPointsByDataFile.size} clip(s) from manifest`);
+}
+
 // ─── Render ─────────────────────────────────────────────────────────────────
 
-const dataDir = join(ROOT, "data", "episodes", episode);
 const outDir = join(ROOT, "out", episode);
 mkdirSync(outDir, { recursive: true });
 
@@ -146,6 +195,17 @@ for (const { seq, comp, file, desc } of sequence) {
   const renderOverrides = rawData._render ?? {};
   const { _render: _stripped, ...data } = rawData;
   void _stripped;
+
+  // Inject Whisper-resolved syncPoints from the manifest into _direction so
+  // useBeatSync fires. See buildSyncPointsLookup() above for the source.
+  const injected = syncPointsByDataFile.get(file);
+  if (injected) {
+    data._direction = {
+      ...(data._direction ?? {}),
+      syncPoints: injected,
+    };
+  }
+
   const propsJson = JSON.stringify({ data });
 
   // Write props to temp file (avoids shell escaping issues with complex JSON)
