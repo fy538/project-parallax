@@ -624,12 +624,28 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
 }) => {
   const { fps } = useVideoConfig();
 
-  // Split segments into layers + build index for layered lookups
+  // Split segments into layers + build index for layered lookups.
+  //
+  // HOLD segments are merged into the preceding non-HOLD segment of the same
+  // layer by extending that segment's endSec. The HOLD itself is dropped from
+  // the rendering list. Effect: the previous visual sustains through the HOLD
+  // window — for FOOTAGE the video keeps playing, for TEMPLATE the template
+  // animation continues past its natural end (interpolate's clamp behavior
+  // typically holds the final state). True last-frame freeze (per the
+  // schema's `freeze: true` semantic) is approximated by extension; capturing
+  // and re-rendering the literal last frame would require frame-state
+  // snapshotting, deferred until the extension behavior proves insufficient.
+  // Without this preprocessing HOLD segments fall through to BackgroundSegment
+  // (which renders the asset-pending placeholder) or ForegroundSegment (which
+  // renders nothing) — neither sustains the previous visual.
   const { backgroundSegs, foregroundSegs, segmentIndex } = useMemo(() => {
     const bg: ManifestSegment[] = [];
     const fg: ManifestSegment[] = [];
     const idx: Record<string, ManifestSegment> = {};
 
+    // Pass 1: build per-layer ordered lists, indexing by id. HOLD segments
+    // are routed to their layer like any other segment — pass 2 below
+    // collapses them into the preceding non-HOLD on that layer.
     for (const seg of manifest.segments) {
       idx[seg.id] = seg;
       if (seg.layer === "foreground") {
@@ -639,20 +655,57 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       }
     }
 
+    // Pass 2: per layer, walk the ordered list and merge HOLDs into the
+    // preceding non-HOLD by extending its endSec. Drop the HOLD itself.
+    // Sort defensively in case the manifest isn't in time order.
+    const mergeHolds = (segs: ManifestSegment[]): ManifestSegment[] => {
+      const sorted = segs.slice().sort((a, b) => a.startSec - b.startSec);
+      const out: ManifestSegment[] = [];
+      for (const seg of sorted) {
+        if (seg.type === "HOLD") {
+          if (out.length === 0) {
+            // HOLD with nothing before it on this layer — log and drop.
+            // Without a preceding visual to sustain, it would render as a
+            // placeholder; dropping it leaves a transparent gap, which is
+            // strictly preferable.
+            // eslint-disable-next-line no-console
+            console.warn(
+              `[FullEpisode] HOLD segment ${seg.id} has no preceding segment on layer "${seg.layer}" to sustain. Dropping.`,
+            );
+            continue;
+          }
+          // Extend the preceding segment's endSec to cover this HOLD window.
+          // Replace the last entry with a copy carrying the extended end so
+          // we don't mutate the input manifest.
+          const prev = out[out.length - 1];
+          out[out.length - 1] = { ...prev, endSec: Math.max(prev.endSec, seg.endSec) };
+        } else {
+          out.push(seg);
+        }
+      }
+      return out;
+    };
+
+    const bgMerged = mergeHolds(bg);
+    const fgMerged = mergeHolds(fg);
+
     // Identify background segments claimed by layered foregrounds —
     // these are rendered inside LayeredComposition, not standalone.
+    // Note: this runs against the post-merge fg list; layered-bg references
+    // by id still resolve via segmentIndex which holds the original (pre-
+    // merge) segment objects.
     const claimedBgIds = new Set<string>();
-    for (const seg of fg) {
+    for (const seg of fgMerged) {
       if (seg.layered?.backgroundSegmentId) {
         claimedBgIds.add(seg.layered.backgroundSegmentId);
       }
     }
 
-    const standaloneBg = bg.filter((s) => !claimedBgIds.has(s.id));
+    const standaloneBg = bgMerged.filter((s) => !claimedBgIds.has(s.id));
 
     return {
       backgroundSegs: standaloneBg,
-      foregroundSegs: fg,
+      foregroundSegs: fgMerged,
       segmentIndex: idx,
     };
   }, [manifest.segments]);
