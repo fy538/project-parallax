@@ -9,13 +9,25 @@
  *   - Space Grotesk → display, heading
  *   - IBM Plex Mono → body, metadata
  *   - JetBrains Mono → data, mono
- *   - Noto Sans SC → Chinese text
+ *   - Noto Sans SC → Chinese text (chinese-state emphasis)
+ *
+ * Emphasis-specific fonts (mirror recraft.py text_treatment voices for
+ * EMPHASIS_MAP entries in theme.ts — needed because the original chains
+ * lead with macOS-native fonts (PingFang SC, Songti SC, Hiragino Kaku
+ * Gothic ProN) that don't exist on Linux render hosts (CI, Lambda) and
+ * silently fall through to generic sans-serif/serif:
+ *   - Noto Serif SC → chinese-traditional (Songti substitute)
+ *   - Noto Sans JP  → japanese-showa     (Hiragino Kaku Gothic substitute)
+ *   - Oswald        → soviet             (Rodchenko/Klutsis condensed weight)
  */
 
 import { loadFont as loadSpaceGrotesk } from "@remotion/google-fonts/SpaceGrotesk";
 import { loadFont as loadIBMPlexMono } from "@remotion/google-fonts/IBMPlexMono";
 import { loadFont as loadJetBrainsMono } from "@remotion/google-fonts/JetBrainsMono";
 import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
+import { loadFont as loadNotoSerifSC } from "@remotion/google-fonts/NotoSerifSC";
+import { loadFont as loadNotoSansJP } from "@remotion/google-fonts/NotoSansJP";
+import { loadFont as loadOswald } from "@remotion/google-fonts/Oswald";
 
 // Load all weights/styles for each font (no args = load everything)
 const { fontFamily: spaceGrotesk } = loadSpaceGrotesk();
@@ -31,6 +43,20 @@ const { fontFamily: notoSansSC } = loadNotoSansSC("normal", {
   weights: ["400", "700"],
   ignoreTooManyRequestsWarning: true,
 });
+const { fontFamily: notoSerifSC } = loadNotoSerifSC("normal", {
+  weights: ["400", "700"],
+  ignoreTooManyRequestsWarning: true,
+});
+const { fontFamily: notoSansJP } = loadNotoSansJP("normal", {
+  weights: ["400", "700"],
+  ignoreTooManyRequestsWarning: true,
+});
+// Oswald ships only a normal-style condensed sans; weight 700 covers the
+// heavy poster voice. Single subset (latin) is enough — used for soviet
+// emphasis display only, not for body/data text.
+const { fontFamily: oswald } = loadOswald("normal", {
+  weights: ["500", "700"],
+});
 
 /**
  * Loaded font family strings — use these if you need the exact
@@ -42,4 +68,7 @@ export const loadedFonts = {
   body: ibmPlexMono,
   data: jetBrainsMono,
   chinese: notoSansSC,
+  chineseSerif: notoSerifSC,
+  japanese: notoSansJP,
+  sovietDisplay: oswald,
 } as const;

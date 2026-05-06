@@ -94,10 +94,13 @@ export interface PaletteEmphasis {
    * should produce typographic voice continuity between AI cover art and
    * Remotion overlays. Falls back to channel default when undefined.
    *
-   * Note: CJK-aware font names (Noto Sans SC, Songti SC, Hiragino) rely
-   * on system installation. Macs ship most of these; Linux render hosts
-   * may need explicit font installation. The fallback chain ensures the
-   * render doesn't break — it just degrades to the next available font.
+   * Note: emphasis-specific FOSS fallbacks (Noto Sans SC, Noto Serif SC,
+   * Noto Sans JP, Oswald) are preloaded via design/fonts.ts so the
+   * typographic voice survives on Linux render hosts (CI, Lambda) that
+   * don't ship macOS-native faces (PingFang SC, Songti SC, Hiragino Kaku
+   * Gothic ProN, Helvetica Neue). macOS-native names lead each chain
+   * for preview parity; the Google-Fonts substitute sits next so the
+   * render doesn't degrade to a generic sans-serif/serif.
    */
   displayFont?: string;
   /**
@@ -150,10 +153,12 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.walnut,
       palette.taupe,
     ],
-    // Heavy geometric sans approximating Rodchenko/Klutsis weight. Uses
-    // Helvetica Black (or Arial Black on Linux) where available; falls
-    // back to bold Space Grotesk.
-    displayFont: '"Helvetica Neue", "Arial Black", "Space Grotesk", Inter, sans-serif',
+    // Heavy condensed sans approximating Rodchenko/Klutsis poster
+    // typography. Oswald is preloaded via design/fonts.ts (FOSS, Google
+    // Fonts) so the Rodchenko voice survives on Linux render hosts where
+    // Helvetica Neue isn't available; Helvetica Neue stays in the chain
+    // for macOS preview parity, then bold Space Grotesk as last resort.
+    displayFont: 'Oswald, "Helvetica Neue", "Arial Black", "Space Grotesk", Inter, sans-serif',
   },
   // American mid-century / contemporary tech — softer subset
   // mirrors text_treatment: english_modernist (walnut + umber + gold + bone)
@@ -188,8 +193,9 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.walnut,
       palette.bone,
     ],
-    // Heiti (黑体) sans for CJK-aware text rendering. Noto Sans SC ships
-    // with most modern systems; PingFang SC is macOS native.
+    // Heiti (黑体) sans for CJK-aware text rendering. PingFang SC is
+    // macOS-native; Noto Sans SC is preloaded via design/fonts.ts so the
+    // Heiti voice survives on Linux render hosts that don't ship PingFang.
     displayFont: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Space Grotesk", sans-serif',
   },
   // Pre-revolutionary Chinese / classical — ink wash dominant
@@ -208,8 +214,10 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.paper,
     ],
     // Songti (宋体) serif for literati/classical voice — calligraphic
-    // weight, contrast strokes. Falls back through Western serif.
-    displayFont: '"Songti SC", "STSong", "Source Han Serif SC", "Hiragino Mincho ProN", Georgia, serif',
+    // weight, contrast strokes. Songti SC / STSong are macOS-native;
+    // Noto Serif SC is preloaded via design/fonts.ts so the literati
+    // serif voice survives on Linux render hosts.
+    displayFont: '"Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", "Hiragino Mincho ProN", Georgia, serif',
   },
   // Japanese Showa-era (1930s-40s) — minimal palette, 2-3 colors
   // mirrors text_treatment: japanese_showa
@@ -227,7 +235,9 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
       palette.taupe,
     ],
     // Hiragino Kaku Gothic for Japanese sans-serif voice — minimalist
-    // Showa-era poster typography. Yu Gothic is Windows fallback.
+    // Showa-era poster typography. Hiragino is macOS-native, Yu Gothic
+    // is Windows; Noto Sans JP is preloaded via design/fonts.ts so the
+    // JP gothic voice survives on Linux render hosts.
     displayFont: '"Hiragino Kaku Gothic ProN", "Yu Gothic", "Noto Sans JP", "Helvetica Neue", sans-serif',
   },
 };

@@ -465,6 +465,10 @@ Other templates (TitleTransition, CrosshairOverlay, MetadataStrip, etc.) keep th
 
 If an episode's `visual-identity.json` is missing or `episodeColorEmphasis` is unset, templates fall back to `neutral` (full palette, `amber` accents). This preserves backward compatibility — existing data files render identically until an episode opts in to emphasis.
 
+### Typographic voice (per-emphasis display font)
+
+Each non-neutral emphasis also carries a `displayFont` chain that mirrors the `text_treatment` axis in `tools/recraft/recraft.py`, so AI-generated cover art and Remotion overlays share a typographic voice (heavy condensed sans for `soviet`, Heiti sans for `chinese-state`, Songti serif for `chinese-traditional`, Hiragino-style sans for `japanese-showa`). FOSS fallbacks for each chain (Oswald, Noto Sans SC, Noto Serif SC, Noto Sans JP) are auto-loaded via `src/design/fonts.ts` so the voice survives on Linux render hosts (CI, Lambda) that don't ship the macOS-native faces. Adding a new emphasis with a non-system font: load it in `fonts.ts` and put the family name in the chain right after the macOS-native lead.
+
 ---
 
 ## Metadata System
