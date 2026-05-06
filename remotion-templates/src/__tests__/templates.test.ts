@@ -175,18 +175,21 @@ describe("Visual Regression Tests", () => {
               `[Result] ${compositionId} f${testFrame}: BASELINE CREATED (${currentStats.size} bytes)`
             );
           } else {
-            // Step 4: Compare
+            // Step 4: Compare via real pixel diff (was file-size 5%
+            // tolerance — see comparePNGs JSDoc for why that was leaky).
             const result = comparePNGs(baselineFile, currentFile);
-            const baselineStats = fs.statSync(baselineFile);
 
             if (result.match) {
               console.log(
-                `[Result] ${compositionId} f${testFrame}: PASS (baseline: ${baselineStats.size}b, current: ${currentStats.size}b, diff: ${result.sizeDiff}b)`
+                `[Result] ${compositionId} f${testFrame}: PASS (${result.diffPixels}/${result.totalPixels} px differ, ${result.diffPct.toFixed(3)}%)`
               );
               expect(true).toBe(true); // Passed
             } else {
               console.warn(
-                `[Result] ${compositionId} f${testFrame}: VISUAL DIFFERENCE (baseline: ${baselineStats.size}b, current: ${currentStats.size}b, diff: ${result.sizeDiff}b)`
+                `[Result] ${compositionId} f${testFrame}: VISUAL REGRESSION ` +
+                `(${result.diffPixels}/${result.totalPixels} px differ, ` +
+                `${result.diffPct.toFixed(3)}% > 0.5% threshold). ` +
+                `Diff PNG: ${result.diffPath ?? "(not written)"}`
               );
               expect(result.match).toBe(true);
             }

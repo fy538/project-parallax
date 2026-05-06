@@ -65,29 +65,31 @@ export interface BeatSyncState {
   currentBeatType: string | undefined;
 }
 
-// ── Hook ───────────────────────────────────────────────────────────────────
+// ── Pure compute (testable without React) ──────────────────────────────────
 
-export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
-  const { markers, pulseDecay = 0.25, anticipationFrames = 2 } = opts;
-  const frame = useCurrentFrame();
+/** Frame-domain beat marker (pre-converted from time-domain). */
+interface BeatFrame {
+  frame: number;
+  intensity: number;
+  type?: string;
+}
 
-  // Normalize markers to BeatMarker[]
-  const normalizedMarkers = useMemo(() => {
-    return markers.map((m) =>
-      typeof m === "number" ? { time: m, intensity: 1.0 } : m
-    );
-  }, [markers]);
-
-  // Convert to frame positions (memoized)
-  const beatFrames = useMemo(() => {
-    return normalizedMarkers.map((m) => ({
-      frame: sec(m.time) - anticipationFrames,
-      intensity: m.intensity ?? 1.0,
-      type: m.type,
-    }));
-  }, [normalizedMarkers, anticipationFrames]);
-
-  // If no markers, return neutral state
+/**
+ * Pure helper that computes the BeatSyncState given a current frame and
+ * pre-converted beat-frame markers. Extracted from the hook so the math
+ * (lastBeatIndex walk, exponential decay, on-beat window) is testable
+ * without rendering React or mocking useCurrentFrame.
+ *
+ * `decayFrames` and `anticipationFrames` are passed already in frame units
+ * (the hook handles seconds → frames conversion via sec()) so this function
+ * has zero Remotion dependency.
+ */
+export function computeBeatState(
+  frame: number,
+  beatFrames: BeatFrame[],
+  decayFrames: number,
+  beatWindowFrames: number = 3,
+): BeatSyncState {
   if (beatFrames.length === 0) {
     return {
       pulse: 0,
@@ -100,7 +102,7 @@ export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
     };
   }
 
-  // Find last beat before current frame
+  // Find last beat at or before current frame.
   let lastBeatIndex = -1;
   for (let i = 0; i < beatFrames.length; i++) {
     if (frame >= beatFrames[i].frame) {
@@ -108,28 +110,23 @@ export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
     }
   }
 
-  // Frames since last beat
   const framesSinceLastBeat =
     lastBeatIndex >= 0 ? frame - beatFrames[lastBeatIndex].frame : Infinity;
 
-  // Frames until next beat
   const nextBeatIndex = lastBeatIndex + 1;
   const framesUntilNextBeat =
     nextBeatIndex < beatFrames.length
       ? beatFrames[nextBeatIndex].frame - frame
       : -1;
 
-  // Pulse: exponential decay from 1.0 at beat, with intensity scaling
-  const decayFrames = sec(pulseDecay);
   const intensity =
     lastBeatIndex >= 0 ? beatFrames[lastBeatIndex].intensity : 0;
+  // Pulse cuts off at 3× decay window to avoid trailing tails consuming budget.
   const pulse =
     lastBeatIndex >= 0 && framesSinceLastBeat <= decayFrames * 3
       ? intensity * Math.exp(-framesSinceLastBeat / decayFrames)
       : 0;
 
-  // On-beat: true for a small window around the beat
-  const beatWindowFrames = 3; // ~100ms at 30fps
   const isOnBeat =
     lastBeatIndex >= 0 && framesSinceLastBeat <= beatWindowFrames;
 
@@ -145,4 +142,29 @@ export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
     currentIntensity: intensity,
     currentBeatType,
   };
+}
+
+// ── Hook ───────────────────────────────────────────────────────────────────
+
+export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
+  const { markers, pulseDecay = 0.25, anticipationFrames = 2 } = opts;
+  const frame = useCurrentFrame();
+
+  // Normalize markers to BeatMarker[]
+  const normalizedMarkers = useMemo(() => {
+    return markers.map((m) =>
+      typeof m === "number" ? { time: m, intensity: 1.0 } : m
+    );
+  }, [markers]);
+
+  // Convert to frame positions (memoized)
+  const beatFrames = useMemo<BeatFrame[]>(() => {
+    return normalizedMarkers.map((m) => ({
+      frame: sec(m.time) - anticipationFrames,
+      intensity: m.intensity ?? 1.0,
+      type: m.type,
+    }));
+  }, [normalizedMarkers, anticipationFrames]);
+
+  return computeBeatState(frame, beatFrames, sec(pulseDecay));
 };

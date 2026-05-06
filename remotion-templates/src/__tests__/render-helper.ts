@@ -103,47 +103,111 @@ export async function renderCompositionFrame(
 }
 
 /**
- * Compare two PNG files for visual regression testing.
- * Returns file sizes as a quick smoke test (basic validation).
+ * Compare two PNG files for visual regression testing using actual pixel
+ * comparison via `pixelmatch`. The previous implementation used a 5%
+ * file-size tolerance, which had two failure modes: deliberate visual
+ * changes that compress to similar size passed silently, and lossless
+ * re-encodes tripped false positives. Pixel diff catches both.
  *
- * For more advanced pixel-level comparison, integrate with libraries like:
- * - pixelmatch
- * - jimp
- * - sharp with custom diff logic
+ * Behavior:
+ *   - Read both PNGs (must be same dimensions; throws if not).
+ *   - Run pixelmatch with threshold 0.1 (looser than default 0.1 to
+ *     tolerate font rasterization noise across CI/local boundaries).
+ *   - Default pass criterion: < 0.5% of pixels differ. Tunable via
+ *     `pixelDiffPct` option for templates with known rasterization noise.
+ *   - On mismatch, writes a side-by-side diff PNG to `<currentPath>.diff
+ *     .png` so visual inspection doesn't require manually opening both
+ *     baseline and current files.
  *
- * @returns { match: boolean; baseline: number; current: number; diff: number }
+ * Returns metrics the test caller can log + assert against.
  */
+
+import { PNG } from "pngjs";
+import pixelmatch from "pixelmatch";
+
+export interface ComparePNGsOptions {
+  /** Per-pixel color-distance threshold passed to pixelmatch (0–1). Lower = stricter. Default 0.1. */
+  pixelThreshold?: number;
+  /** Maximum acceptable percentage of differing pixels before match=false. Default 0.5. */
+  pixelDiffPct?: number;
+  /** Write the diff PNG to disk on mismatch (defaults to true). */
+  writeDiffOnMismatch?: boolean;
+}
+
 export function comparePNGs(
   baselinePath: string,
-  currentPath: string
+  currentPath: string,
+  options: ComparePNGsOptions = {},
 ): {
   match: boolean;
+  /** Total differing pixels. */
+  diffPixels: number;
+  /** Percentage of pixels that differ (0-100). */
+  diffPct: number;
+  /** Total pixels compared (width × height). */
+  totalPixels: number;
+  /** Baseline + current file sizes — kept for logging continuity. */
   baselineSize: number;
   currentSize: number;
-  sizeDiff: number;
+  /** Path to the diff PNG written on mismatch; null otherwise. */
+  diffPath: string | null;
 } {
   if (!fs.existsSync(baselinePath)) {
     throw new Error(`Baseline PNG not found: ${baselinePath}`);
   }
-
   if (!fs.existsSync(currentPath)) {
     throw new Error(`Current PNG not found: ${currentPath}`);
   }
 
-  const baselineSize = fs.statSync(baselinePath).size;
-  const currentSize = fs.statSync(currentPath).size;
-  const sizeDiff = Math.abs(baselineSize - currentSize);
+  const {
+    pixelThreshold = 0.1,
+    pixelDiffPct = 0.5,
+    writeDiffOnMismatch = true,
+  } = options;
 
-  // Allow 5% size variation as tolerance for slight rendering variations
-  // (compression artifacts, font rasterization, etc.)
-  const tolerance = baselineSize * 0.05;
-  const match = sizeDiff <= tolerance;
+  const baselinePng = PNG.sync.read(fs.readFileSync(baselinePath));
+  const currentPng = PNG.sync.read(fs.readFileSync(currentPath));
+
+  if (
+    baselinePng.width !== currentPng.width ||
+    baselinePng.height !== currentPng.height
+  ) {
+    throw new Error(
+      `PNG dimension mismatch: baseline ${baselinePng.width}×${baselinePng.height} ` +
+        `vs current ${currentPng.width}×${currentPng.height}`,
+    );
+  }
+
+  const { width, height } = baselinePng;
+  const totalPixels = width * height;
+  const diff = new PNG({ width, height });
+
+  const diffPixels = pixelmatch(
+    baselinePng.data,
+    currentPng.data,
+    diff.data,
+    width,
+    height,
+    { threshold: pixelThreshold },
+  );
+
+  const diffPct = (diffPixels / totalPixels) * 100;
+  const match = diffPct <= pixelDiffPct;
+
+  let diffPath: string | null = null;
+  if (!match && writeDiffOnMismatch) {
+    diffPath = `${currentPath}.diff.png`;
+    fs.writeFileSync(diffPath, PNG.sync.write(diff));
+  }
 
   return {
     match,
-    baselineSize,
-    currentSize,
-    sizeDiff,
+    diffPixels,
+    diffPct,
+    totalPixels,
+    baselineSize: fs.statSync(baselinePath).size,
+    currentSize: fs.statSync(currentPath).size,
+    diffPath,
   };
 }
 

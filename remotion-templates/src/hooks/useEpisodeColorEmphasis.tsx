@@ -38,6 +38,26 @@ import {
   getEpisodeColorEmphasis,
 } from "../design/theme";
 
+// ── Pure helpers (testable without React) ──────────────────────────────────
+
+/**
+ * Normalize an emphasis value to a canonical EpisodeColorEmphasis name.
+ * Anything that isn't a recognized value (undefined, null, typos, stale
+ * config, future values) falls back to "neutral" — which keeps `name`
+ * consistent with the palette that `getEpisodeColorEmphasis(value)` will
+ * actually resolve to. Without this normalization, an invalid value
+ * resolves to neutral palette but would be tagged as "non-neutral" by
+ * name, causing Background to apply an (unintended) atmospheric tint.
+ */
+export function normalizeEpisodeColorEmphasis(
+  value: EpisodeColorEmphasis | string | undefined | null,
+): EpisodeColorEmphasis {
+  return typeof value === "string" &&
+    (EMPHASIS_VALUES as readonly string[]).includes(value)
+    ? (value as EpisodeColorEmphasis)
+    : "neutral";
+}
+
 // ── Context ─────────────────────────────────────────────────────────────────
 
 /**
@@ -74,23 +94,13 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
   value,
   children,
 }) => {
-  const ctx = useMemo<EpisodeColorEmphasisContextValue>(() => {
-    // Validate against the canonical list rather than trusting any
-    // string. Invalid emphases (typos, stale config, future values) fall
-    // back to "neutral" — which keeps `name` consistent with what
-    // getEpisodeColorEmphasis(value) actually resolves to. Without this
-    // guard, an invalid value would resolve to neutral palette but be
-    // tagged as "non-neutral" by name, causing Background to apply an
-    // (unintended) atmospheric tint.
-    const validName: EpisodeColorEmphasis =
-      typeof value === "string" && (EMPHASIS_VALUES as readonly string[]).includes(value)
-        ? (value as EpisodeColorEmphasis)
-        : "neutral";
-    return {
+  const ctx = useMemo<EpisodeColorEmphasisContextValue>(
+    () => ({
       palette: getEpisodeColorEmphasis(value),
-      name: validName,
-    };
-  }, [value]);
+      name: normalizeEpisodeColorEmphasis(value),
+    }),
+    [value],
+  );
   return (
     <EpisodeColorEmphasisContext.Provider value={ctx}>
       {children}

@@ -75,4 +75,4 @@ jobs:
         run: ./scripts/typecheck.sh
 
       - name: Vitest unit tests (Remotion-side, no browser needed)
-        run: cd remotion-templates && npx vitest run src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/lint-conventions.test.ts
+        run: cd remotion-templates && npx vitest run src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/lint-conventions.test.ts src/__tests__/useBeatSync.test.ts src/__tests__/useEpisodeColorEmphasis.test.ts
