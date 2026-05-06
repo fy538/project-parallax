@@ -40,17 +40,46 @@ export interface ScorecardItem {
   outcome: "correct" | "wrong" | "pending";
 }
 
+/**
+ * 6-layer forecast format from CALIBRATION_LANGUAGE.md.
+ * All six fields are required — a forecast missing any layer reads as advocacy, not analysis.
+ */
+export interface ForecastData {
+  /** Whole number probability 0–100. Displayed largest on screen. */
+  probability: number;
+  /** Verbal tag anchored to the number, not replacing it (e.g., "above even odds") */
+  verbalTag: string;
+  /** Outside view / historical base rate stated first (e.g., "Historical precedent for this class: ~50%") */
+  baseRate: string;
+  /** Single main case-specific factor pushing the estimate up or down */
+  keyDriver: string;
+  /** Evidence that would push the estimate in the opposite direction — required for credibility */
+  keyDisconfirmer: string;
+  /**
+   * Prediction market comparison with one-sentence divergence note.
+   * Format: "Kalshi: 58% / Metaculus: 61% — Parallax diverges because [reason]"
+   */
+  benchmark: string;
+  /**
+   * Clairvoyance-test resolution criteria with specific date.
+   * Must be scoreable by a hypothetical person with perfect knowledge of the future.
+   */
+  resolution: string;
+}
+
 export interface ProbabilityGaugeData {
   episode: string;
   title: string;
   subtitle?: string;
-  variant: "gauge" | "shift" | "scorecard";
+  variant: "gauge" | "shift" | "scorecard" | "forecast";
   /** For gauge variant — one or more probability arcs */
   gauges?: GaugeItem[];
   /** For shift variant — probability changes */
   shifts?: ShiftItem[];
   /** For scorecard variant — prediction track record */
   scorecard?: ScorecardItem[];
+  /** For forecast variant — 6-layer superforecasting display */
+  forecast?: ForecastData;
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";

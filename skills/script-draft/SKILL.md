@@ -24,6 +24,7 @@ Read these files in order. Each one gives you something specific:
 6. **DIRECTING_LANGUAGE.md** (`/project/DIRECTING_LANGUAGE.md`) — the `DIR:` annotation syntax. Tells you *how* to direct camera, reveals, timing, transitions, and mood. Read the five directive types, template support matrix, and density guidelines.
 7. **FOOTAGE_SOURCING.md** (`/project/FOOTAGE_SOURCING.md`) — sourcability tiers. Tells you what footage actually exists before you spec it.
 8. **JIANG_NARRATIVE_RESEARCH.md** (`/project/JIANG_NARRATIVE_RESEARCH.md`) — the 12 extractable techniques and the toxin line. The narrative posture reference.
+9. **CALIBRATION_LANGUAGE.md** (`/project/CALIBRATION_LANGUAGE.md`) — the assertive calibration vocabulary. Read before drafting any speculative or predictive narration. Levels: quantified probability (best) > verbal calibration with explicit boundaries (acceptable) > vague uncertainty phrases (never). Process certainty + outcome humility split: be assertive about the analytical method, humble about specific predicted outcomes. For any `[FORECAST:]` segment, use the 6-layer format from this document.
 
 Also check whether a previous script version exists for this episode. If it does, read it — learn what worked and what didn't from the revision log.
 
@@ -68,6 +69,13 @@ Thread it like this:
 - **Late episode:** Use the name as shorthand that now carries all the accumulated meaning. "The [concept name] isn't just about X — it's about Y too." The name should feel heavier each time it returns.
 
 Example for "The Silicon Trap": Beat 2 describes the trap dynamic without naming it → Beat 4 names it ("That's the silicon trap — not a trap for one side, a trap for everyone") → Beat 5 deploys it ("You're already inside the silicon trap"). Three mentions minimum in narration body text.
+
+**Structural markers: [FRAMEWORK UNLOCK] and [MAIN REVEAL].** Two beats require an explicit marker comment in their beat header line. Place these in the correct position — script-audit will flag them if missing or misplaced.
+
+- `<!-- [FRAMEWORK UNLOCK] -->` — The beat where the named conceptual product is named and the analytical framework crystallizes. Must appear **no later than 40% through the episode** (~6 min in a 15 min episode). If the framework isn't unlocked by this point, the viewer is still in setup — the information gap stays open too long and curiosity converts to impatience rather than sustained inquiry.
+- `<!-- [MAIN REVEAL] -->` — The episode's primary revelatory beat. The first major reveal *before* this marker must solve why the obvious explanation fails — it earns the main reveal. The main reveal itself should build on the unlocked framework.
+
+Usage in the beat header: `## BEAT 3 — THE FRAMEWORK UNLOCK (4:30–6:00) <!-- [FRAMEWORK UNLOCK] -->`
 
 **Checkpoint beats every 3-5 minutes (NAR-12).** After each major analytical section, pause and consolidate. This can be a single line ("So here's where we are: ...") or a beat of deliberate silence. Use checkpoints to flag uncertainty too — "This claim rests on X; if that's wrong, the argument changes."
 
@@ -338,6 +346,17 @@ Run through this checklist before handing the script to Tiger:
 - [ ] Toxin line clean — "resembles" not "proves," analogies have named breakdowns
 - [ ] All claims tagged ({✅}, {⚠️}, {NEW}) — single braces only, not double ({{✅} is a common typo)
 - [ ] Passes radio edit test (argument clear as audio-only)
+- [ ] <!-- [FRAMEWORK UNLOCK] --> marker present no later than 40% through episode runtime
+- [ ] <!-- [MAIN REVEAL] --> marker present; beat before it establishes why the obvious explanation fails
+
+**Narrator voice calibration (run on every speculative or analytical passage):**
+- [ ] Outside view (base rate) stated before inside view (case-specific reasoning) in every speculative passage
+- [ ] Multiple hypotheses named, not just the favored one
+- [ ] At least one "what would change this assessment" per major analytical claim
+- [ ] Uncertainty is specific and anchored — no Level 3 vague phrases (maybe, perhaps, who knows, only time will tell, it's complicated)
+- [ ] No causal framing points to coordinated hidden-agent intent — structural/incentive framing only
+- [ ] Every `[FORECAST:]` segment uses the 6-layer format from CALIBRATION_LANGUAGE.md (probability, verbal tag, base rate, key driver, key disconfirmer, benchmark)
+- [ ] Forecast resolution criteria pass the clairvoyance test (specific date + binary/binned outcome a hypothetical person with perfect future knowledge could unambiguously score)
 
 **Visual:**
 - [ ] Visual motif introduced in first 2 minutes, returns 2+ times, evolves

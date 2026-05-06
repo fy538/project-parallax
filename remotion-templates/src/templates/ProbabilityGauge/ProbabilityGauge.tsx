@@ -43,7 +43,7 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import type { ProbabilityGaugeData, ShiftItem, ScorecardItem } from "./types";
+import type { ProbabilityGaugeData, ShiftItem, ScorecardItem, ForecastData } from "./types";
 
 // ── Gauge Arc Component ────────────────────────────────────────────────────
 
@@ -576,6 +576,158 @@ const Scorecard: React.FC<{
   );
 });
 
+// ── Forecast Card Component (6-layer format from CALIBRATION_LANGUAGE.md) ────
+
+const FORECAST_LABELS: Record<string, string> = {
+  baseRate: "BASE RATE",
+  keyDriver: "KEY DRIVER",
+  keyDisconfirmer: "DISCONFIRMER",
+  benchmark: "BENCHMARK",
+  resolution: "RESOLUTION",
+};
+
+const ForecastCard: React.FC<{
+  forecast: ForecastData;
+  frame: number;
+  mode: "light" | "dark";
+}> = React.memo(({ forecast, frame, mode }) => {
+  const theme = useThemeMode(mode);
+
+  // Count-up for probability number
+  const numStart = sec(0.2);
+  const numEnd = sec(1.4);
+  const displayValue = Math.round(
+    interpolate(frame, [numStart, numEnd], [0, forecast.probability], CLAMP_CUBIC)
+  );
+  const settleFrame = numEnd;
+  const settleScale = pulse(frame, settleFrame, 9, 1.025);
+
+  // Layer-by-layer reveal: each meta row staggers in after the number settles
+  const rows: Array<{ key: keyof typeof FORECAST_LABELS; value: string }> = [
+    { key: "baseRate", value: forecast.baseRate },
+    { key: "keyDriver", value: forecast.keyDriver },
+    { key: "keyDisconfirmer", value: forecast.keyDisconfirmer },
+    { key: "benchmark", value: forecast.benchmark },
+    { key: "resolution", value: forecast.resolution },
+  ];
+
+  const rowBaseFrame = sec(1.6);
+  const rowStagger = sec(0.22);
+
+  const dividerColor = `${theme.text.muted}30`;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 0,
+        width: "100%",
+        maxWidth: 860,
+        ...cardPresets.shadowFloat(mode === "dark"),
+        padding: `${layout.spacing.xl}px ${layout.spacing.xxl ?? layout.spacing.xl * 1.5}px`,
+        opacity: fadeIn(frame, sec(0.1), sec(0.25)),
+      }}
+    >
+      {/* ── Probability hero ── */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          paddingBottom: layout.spacing.lg,
+          borderBottom: `1px solid ${dividerColor}`,
+          marginBottom: layout.spacing.lg,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.data,
+            fontSize: fontSizes.display,
+            fontWeight: fontWeights.bold,
+            color: theme.text.primary,
+            lineHeight: 1,
+            textShadow: `0 0 24px ${palette.amber}40, 0 0 48px ${palette.amber}18`,
+            transform: `scale(${settleScale})`,
+            transformOrigin: "center",
+          }}
+        >
+          {displayValue}
+          <span style={{ fontSize: fontSizes.h2, color: palette.amber }}>%</span>
+        </div>
+        <div
+          style={{
+            fontSize: fontSizes.label,
+            color: palette.amber,
+            fontFamily: fonts.mono,
+            letterSpacing: letterSpacing.meta,
+            textTransform: "uppercase",
+            marginTop: layout.spacing.xs,
+            opacity: fadeIn(frame, numEnd, sec(0.3)),
+          }}
+        >
+          {forecast.verbalTag}
+        </div>
+      </div>
+
+      {/* ── 5 metadata rows ── */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+        {rows.map(({ key, value }, i) => {
+          const isResolution = key === "resolution";
+          const isDisconfirmer = key === "keyDisconfirmer";
+          const rowOpacity = fadeIn(frame, rowBaseFrame + i * rowStagger, sec(0.28));
+          const rowSlide = slideIn(frame, rowBaseFrame + i * rowStagger, 8, sec(0.28));
+          return (
+            <div
+              key={key}
+              style={{
+                display: "flex",
+                gap: layout.spacing.md,
+                borderTop: isResolution
+                  ? `1px solid ${theme.text.muted}55`
+                  : i > 0
+                  ? `1px solid ${dividerColor}`
+                  : undefined,
+                paddingTop: isResolution ? layout.spacing.md : layout.spacing.sm,
+                paddingBottom: layout.spacing.sm,
+                marginTop: isResolution ? layout.spacing.xs : 0,
+                opacity: rowOpacity,
+                transform: `translateY(${rowSlide}px)`,
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.meta,
+                  letterSpacing: letterSpacing.meta,
+                  textTransform: "uppercase",
+                  color: isDisconfirmer ? semantic.danger : isResolution ? palette.amber : theme.text.muted,
+                  minWidth: 132,
+                  paddingTop: 2,
+                  flexShrink: 0,
+                }}
+              >
+                {FORECAST_LABELS[key]}
+              </div>
+              <div
+                style={{
+                  fontSize: fontSizes.body,
+                  color: theme.text.primary,
+                  fontFamily: isResolution ? fonts.mono : fonts.body,
+                  lineHeight: 1.4,
+                  fontStyle: isResolution ? undefined : undefined,
+                }}
+              >
+                {value}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
 // ── Main Component ────────────────────────────────────────────────────────
 
 export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ data }) => {
@@ -699,6 +851,15 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
                 mode={bgVariant as "light" | "dark"}
               />
             </div>
+          )}
+
+          {/* FORECAST VARIANT — 6-layer superforecasting card */}
+          {data.variant === "forecast" && data.forecast && (
+            <ForecastCard
+              forecast={data.forecast}
+              frame={frame}
+              mode={bgVariant as "light" | "dark"}
+            />
           )}
         </div>
 

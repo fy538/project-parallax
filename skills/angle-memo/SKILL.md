@@ -189,6 +189,15 @@ For pre-launch episodes, stakes-shock (#1) and framework-promise (#4) are the sa
 
 The opener must ground stakes within 30 seconds (NAR-10). The viewer needs to feel personally implicated before any context or history.
 
+**Mandatory 4-beat structure:** Every cold open must complete these four beats regardless of which type is chosen:
+
+1. **Schema** — activate a prior belief the viewer already holds ("The standard story is X")
+2. **Violation** — disrupt it with a single concrete contradiction ("But here's what that story doesn't explain...")
+3. **Narrowing** — reduce to one closeable question ("The real question is: why does Y happen even when Z?")
+4. **Solvability promise** — signal the route to closure without giving the answer ("The answer turns out to involve something most analysts overlook entirely.")
+
+These four beats must be identifiable within the first 60 seconds. Information Gap Theory research shows that curiosity is triggered by a *specific knowledge gap*, not by mystery in general — the narrowing and solvability promise do this work. A cold open without the solvability promise creates diffuse unease rather than directed curiosity.
+
 ### 3. Cross-Domain Connections
 
 The research brief should contain 4-5 cross-domain connections (from the 3-pass research process). Select 2-3 that will anchor the script. Rank by:
@@ -211,6 +220,17 @@ Format:
 ```
 
 The arc should follow a tension curve, not a flat line. Typical patterns: disorientation → recognition → complexity → dread → personal stakes. The last beat must be personal implication (NAR-05).
+
+**Target behavior — design the closing beat for one outcome:**
+
+| Closing emotional state | Viewer behavior produced | Design for this when... |
+|------------------------|--------------------------|-------------------------|
+| Calm competence (expert has it in hand) | Subscribe | The episode's thesis is settled and reassuring; analytical closure is possible |
+| High arousal (awe, alarm, urgency) | Share | The thesis is revelatory and the stakes feel immediate — the viewer needs to tell someone |
+| Unfinished curiosity (question slightly open) | Return visit | The series arc has a next episode that answers the remaining question |
+| Lingering dread (no resolution) | Disengage | **Avoid** — exits permanently |
+
+Identify the target behavior in the memo (subscribe, share, or return visit) and design the closing beat accordingly. Dread without resolution is the only outcome to actively prevent. For launch episodes, "subscribe" and "share" are both valid; "share" requires a higher arousal endpoint and is harder to sustain without the existing trust that subscriptions provide — default to "subscribe" for cold audiences.
 
 ### 5. Stakes Sentence
 
@@ -400,3 +420,6 @@ This section is a checklist for script-draft — every callback should appear in
 - [ ] Speculation budget is set: structure chosen, depth chosen, "what would change my mind" written, falsifiable prediction drafted
 - [ ] Total length is 300-500 words (this is a memo, not a brief)
 - [ ] Material that was cut could NOT be reinserted without breaking the spine
+- [ ] Cold open completes all four beats in order: schema → violation → narrowing → solvability promise
+- [ ] Target behavior identified (subscribe / share / return visit) and closing beat designed for that target
+- [ ] Title confidence check: no working title makes a stronger claim than the bounded verdict the episode will actually deliver
