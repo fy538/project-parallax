@@ -26,15 +26,26 @@ const ScorecardItemSchema = z.object({
   outcome: z.enum(["correct", "wrong", "pending"]),
 });
 
+const ForecastDataSchema = z.object({
+  probability: z.number().min(0).max(100),
+  verbalTag: z.string(),
+  baseRate: z.string(),
+  keyDriver: z.string(),
+  keyDisconfirmer: z.string(),
+  benchmark: z.string(),
+  resolution: z.string(),
+});
+
 export const ProbabilityGaugeSchema = z.object({
   data: z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    variant: z.enum(["gauge", "shift", "scorecard"]),
+    variant: z.enum(["gauge", "shift", "scorecard", "forecast"]),
     gauges: z.array(GaugeItemSchema).optional(),
     shifts: z.array(ShiftItemSchema).optional(),
     scorecard: z.array(ScorecardItemSchema).optional(),
+    forecast: ForecastDataSchema.optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),

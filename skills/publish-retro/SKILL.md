@@ -192,6 +192,90 @@ If persona-eval flagged that Sofia needs FrameworkDiagrams to hold for 12+ secon
 
 **Building the visual effectiveness database:** Over multiple episodes, this creates a production playbook at three levels. Template level: "FrameworkDiagrams holding 12+ seconds perform +7% retention vs. <6 seconds." Register level: "Atmospheric backgrounds at 30% opacity hold attention +4% over generic stock footage — confirms the Register 2 hypothesis." Pairing level: "Grounding+editorial (historical reconstructions) outperform grounding+standard for pre-1980s content by 6%, validating VIS-10's prescription."
 
+### 5. "Was I Right?" Forecast Retrospective
+
+Every episode that contains `[FORECAST:]` tags has made public, falsifiable predictions with resolution criteria and probability estimates. This section closes that loop: score each prediction, explain the miss or hit, and extract a process lesson.
+
+**Read before this section:** `project/CALIBRATION_LANGUAGE.md` (the "Was I Right?" Retrospective Structure section).
+
+Run the 6-step protocol for each forecast the episode made:
+
+**Step 1 — Original clip/timestamp.**
+Reproduce the exact forecasting moment from the script verbatim (narration + all 6 [FORECAST:] layers). No paraphrase, no reframing. If the forecast was made in a prior episode, link to the episode file and timestamp.
+
+**Step 2 — Original probability + resolution criteria.**
+Reproduce verbatim. Note: if the resolution criteria were vague (failed the clairvoyance test), score the forecast against the most literal defensible reading — and flag the criteria quality as a process issue regardless of outcome.
+
+**Step 3 — All interim updates.**
+List every revision made between the original forecast and resolution: the date of each update, the evidence that triggered it, and the direction of the revision (up/down). If no updates were logged, note that as a potential process gap (failure to update on evidence is itself a scoring signal). Interim updates can come from script notes, social media follow-ups, or short-form content.
+
+**Step 4 — Final outcome + Brier score.**
+State the actual outcome against the resolution criteria (binary: resolved YES/NO, or binned: which bin). Calculate the Brier score: `BS = (probability − outcome)²` where probability is the final held probability (after any updates) and outcome is 0 or 1. A perfect score is 0. A guess of 50% on anything gives 0.25. Higher is worse.
+
+| Probability held | Outcome | Brier Score |
+|-----------------|---------|-------------|
+| 0.65 | Yes (1) | (0.65−1)² = 0.1225 |
+| 0.65 | No (0) | (0.65−0)² = 0.4225 |
+| 0.50 | Either | 0.25 (baseline) |
+
+Note whether Parallax was above, below, or aligned with the prediction market benchmark at resolution. If Parallax diverged from the market and was right, explain why. If Parallax diverged and was wrong, name what the market was pricing that the analysis underweighted.
+
+**Step 5 — Error taxonomy.**
+If the forecast missed, classify the type of miss:
+
+| Error Type | Description | Diagnostic |
+|-----------|-------------|------------|
+| **Base-rate miss** | Wrong outside view; comparison class was off | Would using a different reference class have changed the estimate? |
+| **Causal-model miss** | Inside view was structurally wrong; the mechanism failed | Which causal link broke, and was it foreseeable? |
+| **Timing miss** | Direction correct, timing wrong | If the timeframe extended, would the prediction resolve correctly? |
+| **Underreaction** | Evidence moved; estimate didn't move enough | Were there interim signals that should have triggered an update? |
+| **Genuine tail event** | Correct process, statistically unavoidable miss | Would the same forecast be correct in 100 replays given the same information? |
+
+If the forecast was correct, still classify what would have made it wrong — this is the disconfirmer check.
+
+**Step 6 — Process verdict.**
+Choose one and explain:
+- **"I would make the same call under the same information"** — the miss was outcome luck (tail event or genuinely random timing), not a process error. The calibration was correct; the world was unusual.
+- **"Here is the specific process rule that changes"** — the miss was a process error. Name the one rule change that would have improved the estimate, and register it as a candidate rule for future forecasting.
+
+The process verdict comes *after* the score, never before. The narrative justification does not precede the evidence. Trust repair research shows that corrections are credible when original uncertainty was disclosed and the postmortem distinguishes process quality from outcome luck — and damaging when they look like retrospective goalpost-moving.
+
+**Output format for each forecast:**
+
+```
+### Forecast [N]: [Brief description of the prediction]
+
+**Step 1 — Original forecast:**
+[Verbatim narration + all 6 [FORECAST:] layers from the script]
+Source: [episode slug, beat name, timestamp]
+
+**Step 2 — Resolution criteria (verbatim):**
+[Clairvoyance-test question + date]
+Criteria quality: PASS / VAGUE — [note if criteria failed the clairvoyance test]
+
+**Step 3 — Interim updates:**
+[Date] — Evidence: [what moved] — Direction: [up/down/no change]
+[... or "No interim updates logged"]
+
+**Step 4 — Outcome + Brier score:**
+Outcome: [YES / NO / Bin X]
+Final held probability: [X%]
+Brier score: [(P−O)²] → [relative to 0.25 baseline: +X better / +X worse]
+Market comparison: Parallax held [X%], market was at [Y%] at resolution — [one sentence on divergence]
+
+**Step 5 — Error taxonomy:**
+[Miss type + one-sentence diagnosis] / [If correct: what would have made it wrong]
+
+**Step 6 — Process verdict:**
+[Same call / Process change: specific rule]
+```
+
+**Aggregate forecast tracking:**
+After each retrospective, update the predictions registry in `data/concepts.json` with the resolution outcome and Brier score. Over time, calculate:
+- **Calibration score:** Across all 65%-probability forecasts, did approximately 65% resolve correctly? Systematic over- or under-confidence is the most important calibration signal.
+- **Brier score trend:** Is aggregate forecasting accuracy improving episode-over-episode?
+- **Resolution rate:** What fraction of open predictions have resolved? Unresolved predictions older than their stated timeframe need a status review.
+
 ### 6. Comment Sentiment Mining
 
 Top comments are the richest qualitative signal. They reveal:
@@ -369,6 +453,12 @@ After 5+ episodes, retire any pairing the data contradicts and add candidate rul
 - **Conflict treatment impact:** [Did conflict-treatment visuals affect retention? Persona reactions?]
 - **Treatment-by-visual-type:** [Did treatment choice matter more for some visual types than others?]
 - **Recommendation for next episode:** [Based on this episode's data, which treatment should we prioritize?]
+
+---
+
+## "Was I Right?" Forecast Retrospective
+
+[For each [FORECAST:] tag the episode contained, in order: verbatim original forecast (all 6 layers) → resolution criteria quality check → interim updates log → outcome + Brier score vs. market benchmark → error taxonomy → process verdict. If no forecasts resolved this cycle, note open predictions with status. Aggregate calibration score if ≥3 forecasts have resolved across all episodes.]
 
 ---
 
