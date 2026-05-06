@@ -6,10 +6,26 @@
 >
 > **Who reads this:** research-audit, script-audit, visual-concept, persona-eval, review-package, thumbnail-concept, shorts-adaptation, and the script drafting process. Each skill reads the sections relevant to its domain.
 >
-> **Who writes this:** publish-retro (appends evidence-backed rules after analytics validate them) and Tiger (approves candidate rules flagged by review-package, adds manual edits after rewrite sessions). review-package reads the playbook and flags candidate rules, but does not write to it. Nothing gets added without evidence and Tiger's approval.
+> **Who writes this:** publish-retro (appends evidence-backed rules after analytics validate them) and Tiger (approves candidate rules flagged by review-package, adds manual edits after rewrite sessions). review-package reads the playbook and flags candidate rules by appending to the **Pending Rules** section below — it does not write directly to the domain sections. Nothing moves from Pending to a domain section without Tiger's approval.
 >
 > Created: April 27, 2026
-> Last updated: May 1, 2026
+> Last updated: 2026-05-06
+
+---
+
+## Pending Rules (awaiting Tiger approval)
+
+> **Skills:** append candidate rules here using the format below. Do not write directly to domain sections.
+> **Tiger:** review this section during the script-review checkpoint (~30 min session). For each candidate: approve (move to domain section, assign rule ID), modify (edit here then move), or reject (delete with a one-line note).
+
+| # | Proposed by | Episode | Domain | Candidate rule (one line) | Evidence summary |
+|---|---|---|---|---|---|
+| — | — | — | — | *No pending rules* | — |
+
+**Format for new entries:**
+```
+| [N] | [skill name] | [slug] | [NAR/VIS/PER/RES/PROD] | [pattern in one sentence] | [brief evidence: what happened, what it suggests] |
+```
 
 ---
 
@@ -21,7 +37,7 @@
 
 **If you're running publish-retro:** After generating the retrospective report, check whether any finding is strong enough to become a new rule (see "When to Add a Rule" below).
 
-**If you're running review-package:** When synthesizing audits, check whether recurring issues across audit lenses correspond to existing playbook rules. If an issue appears that *should* be a rule but isn't, flag it as a "Candidate Rule" in the review package for Tiger to approve.
+**If you're running review-package:** When synthesizing audits, check whether recurring issues across audit lenses correspond to existing playbook rules. If an issue appears that *should* be a rule but isn't, append a candidate entry to the **Pending Rules** table at the top of this document. Do not write it directly into a domain section.
 
 ### When to Add a Rule
 

@@ -99,7 +99,7 @@ The goal isn't to avoid covered topics — it's to find the angle only Parallax 
 
 ## Stage 2: Viability Check (NEW)
 
-**Tool:** Cowork or manual (5 minutes per topic)
+**Tool:** Cowork → **topic-viability** skill (5 minutes per topic)
 
 The gate between "interesting idea" and "committing 30+ minutes to Deep Research." A one-page viability brief that forces you to confirm depth exists before investing research time.
 
@@ -118,7 +118,9 @@ The gate between "interesting idea" and "committing 30+ minutes to Deep Research
 
 **Human checkpoint:** Tiger reviews the viability brief (~5 min). This is a fast kill-or-proceed decision.
 
-**Output:** Update IDEAS.md status to ✅ VIABLE. Save viability brief to `episodes/<slug>/viability.md` (optional — can also be a note in IDEAS.md).
+**Output:** Update IDEAS.md status to ✅ VIABLE. Save viability brief to `episodes/<slug>/viability.md` — **required, not optional.** This is the audit trail for why a topic was promoted. Without it there's no record to diagnose a topic that fails at research-audit.
+
+**Skill location:** `skills/topic-viability/SKILL.md` (also installed in Cowork plugins for auto-triggering).
 
 ---
 
@@ -134,22 +136,32 @@ Per-episode deep research producing a structured 8-section brief. Now structured
 - Focus: get the core argument, key claims, obvious historical parallels, data points
 - This is the current Deep Research workflow — one big run
 
+**→ Between Pass 1 and Pass 2:** Run the **research-bridge** skill in Cowork. Paste or save the Pass 1 brief, and the skill extracts structural concepts, top connections, and unverified load-bearing claims — then generates ready-to-paste Pass 2 and Pass 3 prompts with all fields pre-filled. No manual prompt editing needed. Saves the output to `episodes/<slug>/research-bridge-output.md`.
+
 **Pass 2 — Cross-Domain Connection Hunt:**
 - Targeted follow-up specifically designed to surface surprising connections
 - Use the bisociation method: list the topic's core structural concepts (monopoly, geographic concentration, geopolitical leverage), then deliberately search across adjacent civilizations and domains (Chinese, Islamic, Roman, Venetian, Ottoman, Mongol history; game theory, economics, philosophy, literature, science)
 - The goal: find the 2-3 connections that make viewers think "I never would have put those two things together"
 - This pass often requires 2-3 separate Deep Research prompts, each targeting a different domain
+- **Prompt:** use the Pass 2 prompt from research-bridge output (pre-filled, paste directly into Claude.ai)
+
+**→ Between Pass 2 and Pass 3:** Re-run **research-bridge** on the combined Pass 1+2 brief. It will generate an updated Pass 3 prompt incorporating the strongest connections from Pass 2.
 
 **Pass 3 — Verification + Depth:**
 - Verify the top 3-5 load-bearing claims from Passes 1-2
 - Deepen the strongest 2-3 cross-domain connections: confirm the structural mechanism holds, find where the analogy breaks, locate primary sources
 - Run the fact-check prompt on anything that will anchor a key narrative beat
+- **Prompt:** use the Pass 3 prompt from research-bridge output (pre-filled)
 
 **Human checkpoint:** Review brief for factual issues or forced analogies (~15-30 min, can overlap with other work).
 
-**Output:** Save brief to `episodes/<slug>/brief.md`
+**Cost log:** After all 3 passes complete, log: `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount <X> --note "Deep Research 3-pass"` (check Claude.ai usage page for session cost).
+
+**Output:** Save final combined brief to `episodes/<slug>/brief.md`. Save per-pass versions as `research-pass1.md`, `research-pass2.md`, `research-pass3.md` if differences are worth preserving.
 
 **Supplementary prompts available for:** historical deep dives, framework investigations, contemporary context updates, fact-check passes. See RESEARCH_WORKFLOW.md for all prompt templates including the new Pass 2 cross-domain prompt.
+
+**Skill location:** `skills/research-bridge/SKILL.md` (also installed in Cowork plugins for auto-triggering).
 
 **Files uploaded to this project:** PROJECT_VISION.md, CONTENT_RISK_PLAYBOOK.md, SEO_KEYWORDS.md, silicon-trap brief.md (as gold-standard example).
 
@@ -197,12 +209,13 @@ The bridge between analytical brief and narrative script. This is where the *nar
 7. **Series tag** (if applicable) — does this episode belong to a numbered series? What's the tag?
 8. **Working title options** (3-5) — following Jiang titling mechanics: named concept, information-asymmetry framing, series tag. See SEO_KEYWORDS.md for keyword constraints.
 9. **Visual arc** — the visual layer's parallel narrative plan. Three elements: (a) the visual motif — a recurring element tied to the named concept that evolves across the episode (e.g., a net diagram that tangles progressively for "The Silicon Trap"), (b) 2-3 visual-first moments where the image should arrive before narration explains it, and (c) 1-2 visual counterpoint moments where the visual deliberately tensions with the narration. See VISUAL_LANGUAGE.md → "Visual-Narrative Timing" section. This ensures the visual layer is planned as a co-equal storytelling channel, not back-filled after the narration locks.
+10. **Oracle track seed** — does the decoder framing or structural argument imply a testable claim? If yes, draft it now as a bounded verdict: "By [date/condition], [observable outcome] will occur because [mechanism]." Record it in `data/predictions-log.json` before the script is written — the git commit timestamp is the accountability anchor. Pre-publish registration (Stage 10) is too late; the claim is more considered when the argument is still fluid. If no testable claim exists, write "no prediction" explicitly so the Stage 10 gate doesn't have to guess. See `project/ORACLE_TRACK.md` for format.
 
 **Why this step exists:** silicon-trap went through 4 script versions. The biggest structural changes (v2→v3 reorganization from logic-order to tension-order, v4 visual layer overhaul) happened because narrative decisions were discovered during revision rather than made upfront. The angle memo front-loads these decisions. It doesn't prevent revision — it prevents *discovering your story on draft 3*.
 
-**Human checkpoint:** Tiger reviews the memo (~5 min) and picks or modifies the cold open, title direction, and connection selection. This is a fast decision-making step, not a reading step.
+**Human checkpoint:** Tiger reviews the memo (~5 min) and picks or modifies the cold open, title direction, connection selection, and oracle seed (approve prediction draft or mark "no prediction"). This is a fast decision-making step, not a reading step.
 
-**Output:** `episodes/<slug>/angle-memo.md`
+**Output:** `episodes/<slug>/angle-memo.md` (includes oracle seed or explicit "no prediction" note)
 
 ---
 
@@ -222,7 +235,7 @@ Script development happens in Cowork with access to the research brief, angle me
 7. Iterate based on audit findings.
 8. Run **review-package** skill — synthesizes visual-concept + script-audit + persona-eval into a single prioritized review document for Tiger's 30-minute session. Produces cross-audit priority fix list, persona-visual cross-analysis, 2-3 cold-open variants (refined from angle memo), and 2-3 decision points.
 
-**Human checkpoint:** Script review and rewrite (~30 min). Tiger reads the **review-package** output — one document that merges all three audits, ranks fixes by cross-audit impact, presents cold-open alternatives, and surfaces only the decisions he needs to make. This replaces reading three separate reports.
+**Human checkpoint:** Script review and rewrite (~30 min). Tiger reads the **review-package** output — one document that merges all three audits, ranks fixes by cross-audit impact, presents cold-open alternatives, and surfaces only the decisions he needs to make. This replaces reading three separate reports. **After rewriting, log key decisions in `episodes/<slug>/REVISION_LOG.md`** — what structural change was made, what problem it solved, and what the v-number is. Ten minutes now compounds into editorial playbook evidence later. This is a required artifact, not optional.
 
 9. After rewrite: run **visual-concept re-validation** (quick-check mode) — lightweight 3-lens check that the revised narration still aligns with the visual layer. Catches template-narration drift, P1 misalignment, and rhythm breaks from the rewrite.
 10. **Title/hook workshop** — finalize the title, cold open, and thumbnail concept as a package. This is a structured step, not an afterthought. Inputs: the angle memo's working titles, the review-package's cold-open variants, the named conceptual product, and SEO_KEYWORDS.md. Outputs: final title (with series tag if applicable), final cold-open paragraph, and a thumbnail concept brief (visual + text overlay + emotion). The title and open should work as a unit — the title promises, the open delivers, the thumbnail sells both. See JIANG_NARRATIVE_RESEARCH.md titling mechanics section.
@@ -238,6 +251,8 @@ Script development happens in Cowork with access to the research brief, angle me
 **Script format spec:** See SCRIPT_FORMAT.md for the complete two-column format definition. See DIRECTING_LANGUAGE.md for the `DIR:` annotation syntax (five directives: `cam()`, `reveal()`, `hold()`, `cut()`, `mood()`).
 
 **The script IS the edit.** After direction annotations are added, no directing decisions happen outside the script. Everything downstream (visual-spec JSON, AI-GEN briefs, audio cues, assembly manifest timing) executes the script's decisions deterministically.
+
+**Concept registry update (mandatory after script locks):** Once the script passes the human rewrite checkpoint, update `data/concepts.json` with any new named frameworks, foreign terms, or predictions introduced in this episode. CLI: `python tools/concepts/lookup.py validate` to check for schema errors after editing. This is what makes the callback mechanism (`visual-spec` Step 1.5) work across episodes — if a concept isn't registered here, it won't surface as a callback candidate in future episodes.
 
 **Skills used:**
 - **visual-concept** — visual feasibility + tool fit + monotony + treatment-narrative alignment across 5 lenses; includes re-validation quick-check mode (installed in Cowork plugins)
@@ -259,8 +274,14 @@ Four parallel tracks feed into final assembly:
 1. Run **visual-spec** skill on the approved script → Step 1.5 checks `data/concepts.json` for prior-episode concepts (use `tools/concepts/lookup.py reuse-check` as CLI shortcut) and marks callbacks with 🔄 → produces visual breakdown table covering ALL five visual modes (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), with mode balance check against targets and direction column showing parsed `DIR:` annotations
 2. Human approves the visual plan (~5 min)
 3. Skill generates four outputs: (a) Remotion JSON data files for all MG compositions — including `_direction` blocks parsed from `DIR:` annotations (camera paths, reveal modes, hold timing, transition specs, atmosphere); (b) `footage-manifest.json` with `_direction` for hold/mood/cut per clip; (c) Recraft illustration specs for `[ILLUST:]` segments with direction-informed treatment and mood; (d) AI video briefs for `[AI-GEN:]` segments with `cam()` translated to natural-language camera direction and `mood()` to scene atmosphere
-4. Render via local scripts or Lambda
-5. Run **render-qa** skill → generates `npx remotion still` commands for P1/P2 compositions, produces per-template verification checklists (data accuracy, CJK rendering, color coding, text readability). Tiger spot-checks stills before assembly.
+4. **Validate JSON data files before rendering:** `python3 tools/validate_data.py remotion-templates/data/episodes/<slug>/` — all files must pass schema validation. Fix any errors before proceeding. A malformed data file reaching Remotion causes silent composition failures that are hard to diagnose.
+5. Render via local scripts or Lambda
+6. Run **render-qa** skill → generates `npx remotion still` commands for P1/P2 compositions, produces per-template verification checklists (data accuracy, CJK rendering, color coding, text readability). Tiger spot-checks stills before assembly.
+7. Run **visual-qa** skill → reads the rendered stills using vision capabilities and evaluates each composition against POLISH.md design rules across 7 visual lenses (layout/spacing, typography hierarchy, visual depth, color/contrast, animation entrance state, composition balance, data integrity). Produces a scored report with specific, actionable findings. This is the pixel-level check that catches problems only visible in the rendered output, not caught by validate_data.py or render-qa. Saves report to `episodes/<slug>/visual-qa.md`.
+8. Log visual production costs — one entry per service used:
+   - Illustrations: `python3 tools/cost_tracker.py add --episode <slug> --service recraft --amount <X> --note "Illustrations batch"`
+   - AI video (if used): `python3 tools/cost_tracker.py add --episode <slug> --service kling --amount <X> --note "AI-GEN clips"` (or `--service sora`)
+   - Lambda renders (if used): `python3 tools/cost_tracker.py add --episode <slug> --service lambda --amount <X> --note "Remotion Lambda render"`
 
 **Templates (7 types, all built):**
 1. **ChoroplethMap** — Phase-based country highlighting on world maps
@@ -537,19 +558,30 @@ Maintain three planning horizons:
 - Full workflow: RESEARCH_WORKFLOW.md
 
 ### Production Skills (built, installed in Cowork)
+
+**Pre-scripting:**
+- **topic-viability** — 5-question kill-or-proceed gate (structural resonance, historical parallel, decoder framing, rubric, angle gap); outputs VIABLE/INCUBATING/REJECT verdict (Stage 2) (also at `skills/topic-viability/SKILL.md`)
+- **research-bridge** — sits between Deep Research passes; extracts structural concepts + load-bearing claims from a Pass 1 brief and generates ready-to-paste Pass 2 and Pass 3 prompts with all fields pre-filled (Stage 3) (also at `skills/research-bridge/SKILL.md`)
 - **research-audit** — 8-lens brief quality gate incl. connection density (also at `skills/research-audit/SKILL.md`)
 - **angle-memo** — 10 narrative decisions before script drafting (also at `skills/angle-memo/SKILL.md`)
+
+**Scripting:**
 - **script-draft** — 3-phase production script drafting (narration → radio edit → visual + DIR: annotations); emits `DIR:` lines for P1/P2 moments (also at `skills/script-draft/SKILL.md`)
 - **visual-concept** — 6-lens visual feasibility audit with script reshaping feedback + re-validation quick-check mode (also at `skills/visual-concept/SKILL.md`)
 - **script-audit** — 8-lens narrative quality review incl. decoder posture, connection density, and 6 direction-specific checks (also at `skills/script-audit/SKILL.md`)
 - **persona-eval** — audience resonance check with visual engagement scoring and visual tension map (also at `skills/persona-eval/SKILL.md`)
 - **review-package** — cross-audit synthesis with cold-open variants for Tiger's 30-min review session (also at `skills/review-package/SKILL.md`)
+- **thumbnail-concept** — 3 composition approaches (Juxtaposition, Data Provocation, Symbolic) + A/B text variants (also at `skills/thumbnail-concept/SKILL.md`)
+
+**Visual production:**
 - **visual-spec** — script → 4 outputs: Remotion JSON data files (with `_direction` blocks parsed from DIR: annotations), Recraft illustration specs, footage manifest, AI video briefs (also at `skills/visual-spec/SKILL.md`)
 - **audio-spec** — 3-layer cue sheet (music bed + transition SFX + texture hits); direction-aware: cut()→SFX type, hold()→silence, mood()→music shifts, reveal(sync:)→SFX timestamps (also at `skills/audio-spec/SKILL.md`)
-- **render-qa** — pre-assembly composition verification with frame-check commands and per-template checklists (also at `skills/render-qa/SKILL.md`)
+- **render-qa** — pre-assembly code-level/data-level verification with frame-check commands and per-template checklists; runs before visual-qa (also at `skills/render-qa/SKILL.md`)
+- **visual-qa** — vision-based pixel check on rendered stills using Claude's vision capabilities; evaluates against POLISH.md across 7 lenses (layout, typography, depth, color/contrast, animation state, composition, data integrity); catches problems only visible in rendered output (also at `skills/visual-qa/SKILL.md`)
 - **source-feedback** — post-sourcing gap analysis and alternative visual suggestions (also at `skills/source-feedback/SKILL.md`)
+
+**Post-production:**
 - **publish-retro** — post-publish analytics retrospective with persona prediction validation and cumulative learning (also at `skills/publish-retro/SKILL.md`)
-- **thumbnail-concept** — 3 composition approaches (Juxtaposition, Data Provocation, Symbolic) + A/B text variants (also at `skills/thumbnail-concept/SKILL.md`)
 - **shorts-adaptation** — 6 series, standalone Shorts briefs from full script (also at `skills/shorts-adaptation/SKILL.md`)
 
 ### Visual Production (built)
@@ -587,9 +619,6 @@ Maintain three planning horizons:
 
 ## What's Not Built Yet
 
-These items are documented in the pipeline but don't exist as runnable tools:
+See [`project/BACKLOG.md`](./BACKLOG.md) for the full prioritized list of unbuilt tools with current workarounds, dependencies, and "when to revisit" notes.
 
-1. **Platform adapter** — Automated Remotion rendering of Shorts from briefs (the shorts-adaptation skill generates briefs, but rendering to 9:16 video is manual). Currently manual.
-2. **Thumbnail image generator** — Remotion compositions for thumbnail images (the thumbnail-concept skill generates composition briefs, but no automated image generation yet).
-3. **Full Agent SDK orchestration** — Custom multi-agent pipeline replacing the Claude.ai Projects + Cowork workflow. Deferred until 10+ episodes validate the manual workflow. See RESEARCH_WORKFLOW.md → "Future Evolution" section.
-4. **RAG fact-checking pipeline** — Automated verification against a source database. Currently handled by research-audit skill's web search + human judgment.
+**Summary:** BL-01 thumbnail image generator (P1), BL-02 Shorts platform adapter (P1), BL-03 RAG fact-checking pipeline (P2), BL-04 full Agent SDK orchestration (P3).
