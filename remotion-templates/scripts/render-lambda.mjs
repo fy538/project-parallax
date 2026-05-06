@@ -93,7 +93,12 @@ async function renderSingle(composition, propsFile, { still, frame }) {
     composition,
     inputProps,
     codec: "h264",
-    imageFormat: "jpeg",
+    // PNG intermediate frames (lossless) — matches local render config. JPEG
+    // would introduce quantization artifacts on hairline graphics + text
+    // before H.264 encoding. ~20-30% longer per-frame render; quality lift
+    // is worth it for a graphics-heavy channel.
+    imageFormat: "png",
+    pixelFormat: "yuv420p",
     framesPerLambda: 20,
   });
 

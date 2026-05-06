@@ -459,6 +459,35 @@
             }
           }
         },
+        "renderQuality": {
+          "type": "object",
+          "description": "Optional per-clip render-quality override. Lets hero segments (title cards, key reveals, map hold-frames) opt into higher-fidelity encoding without raising the cost for every clip in the episode. Currently advisory — not yet wired into render-episode.mjs / render-lambda.mjs; reserve the field so manifests can declare intent before the renderer learns to honor it.",
+          "additionalProperties": false,
+          "properties": {
+            "crf": {
+              "type": "integer",
+              "minimum": 14,
+              "maximum": 28,
+              "description": "Constant Rate Factor for H.264. Lower = higher quality (and bigger file). Defaults to Remotion's 18; hero clips might use 14-16."
+            },
+            "imageFormat": {
+              "type": "string",
+              "enum": ["png", "jpeg"],
+              "description": "Per-clip override for intermediate frame format. Defaults to project-wide setting in remotion.config.ts (currently png)."
+            },
+            "motionBlur": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enable per-frame motion blur sampling. Costs render time linearly with sample count; reserve for camera-heavy clips (RouteAnimation, ChoroplethMap zoom)."
+            },
+            "scale": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 4,
+              "description": "Render this clip at N× resolution then downscale during encoding. Supersampling — useful for fine-line graphics (FrameworkDiagram, TimeSeriesChart). 1 = no supersample (default)."
+            }
+          }
+        },
         "soundCueSecondary": {
           "type": "object",
           "description": "Secondary transition SFX for segments with two distinct audio moments (e.g. entrance + key moment). Same schema as soundCue.",

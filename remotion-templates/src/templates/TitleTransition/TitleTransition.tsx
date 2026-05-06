@@ -22,6 +22,7 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useBeatSync } from "../../hooks/useBeatSync";
 import { Background } from "../../components/Background";
 import { Crosshair } from "../../components/Crosshair";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -104,8 +105,17 @@ const EpisodeTitleVariant: React.FC<{
   // Letter-spacing "lens focus" — tracking tightens as title arrives
   const titleLetterSpacing = letterSpacingAnim(frame, sec(0.4), sec(0.8), 12, 2);
 
-  // Smooth bloom behind title (no hard seam)
-  const titleBloom = smoothBloom(frame, sec(0.4), sec(0.3), 0.5);
+  // Smooth bloom behind title (no hard seam) + audio-reactive pulse from
+  // Whisper-resolved sync points. When direction.syncPoints is empty (estimate
+  // mode, no narration recorded yet), beat.pulse stays at 0 and titleBloom
+  // is unchanged. When sync points exist, the bloom intensifies on the exact
+  // word the script writer marked — visual lands on consonant, not on
+  // estimated time.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.35,
+  });
+  const titleBloom = smoothBloom(frame, sec(0.4), sec(0.3), 0.5) + beat.pulse * 0.35;
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);
@@ -314,6 +324,15 @@ const SectionVariant: React.FC<{
   const theme = useThemeMode(data.backgroundVariant || "light");
   const accentColor = data.accentColor || palette.amber;
   const outOpacity = fadeOut(frame, totalFrames, sec(0.4));
+  const direction = useDirection(data._direction);
+
+  // Audio-reactive pulse on Whisper-resolved sync points. Same pattern as
+  // EpisodeTitleVariant — bloom intensifies on the exact word the script
+  // marks. Returns neutral state when no sync points are available.
+  const beat = useBeatSync({
+    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
+    pulseDecay: 0.3,
+  });
 
   // Cinematic scale for section number — arrives at 140%
   const numberScale = scaleReveal(frame, sec(0.1), sec(0.6), 1.4, 1.0);
@@ -330,8 +349,8 @@ const SectionVariant: React.FC<{
   // Letter-spacing focus on section title
   const titleLetterSpacing = letterSpacingAnim(frame, sec(0.3), sec(0.7), 8, 1.5);
 
-  // Smooth bloom behind title
-  const bloom = smoothBloom(frame, sec(0.3), sec(0.2), 0.4);
+  // Smooth bloom behind title + beat pulse
+  const bloom = smoothBloom(frame, sec(0.3), sec(0.2), 0.4) + beat.pulse * 0.3;
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);

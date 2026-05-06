@@ -163,6 +163,10 @@ export const MapGL: React.FC<MapGLProps> = ({
         bearing={bearing}
         projection={useGlobe ? "globe" : "mercator"}
         onLoad={handleLoad}
+        // Render quality: antialiasing smooths line edges (country borders,
+        // route arcs) at the cost of GPU; for offline video render this is
+        // essentially free since we're not chasing 60fps interactivity.
+        antialias={true}
         // Disable all interaction — this is video, not interactive
         scrollZoom={false}
         boxZoom={false}
