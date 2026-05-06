@@ -16,19 +16,31 @@ let browser: Browser | null = null;
 /**
  * Find Playwright's bundled Chromium executable.
  * Searches the ms-playwright cache directory for the headless_shell binary.
+ *
+ * macOS caches at ~/Library/Caches/ms-playwright; Linux + WSL at ~/.cache/
+ * ms-playwright. Earlier this only checked the Linux path, which silently
+ * skipped every visual regression test on Mac dev machines (the suite
+ * reported "0 failed" because vitest counted the throw as a setup error,
+ * not test failures). Mirrors the search strategy in scripts/render-episode
+ * .mjs.
  */
 export async function findChromiumPath(): Promise<string> {
   const home = process.env.HOME || process.env.USERPROFILE || "";
-  const playwrightCacheDir = path.join(home, ".cache", "ms-playwright");
+  const candidateDirs = [
+    path.join(home, "Library", "Caches", "ms-playwright"), // macOS
+    path.join(home, ".cache", "ms-playwright"),             // Linux / WSL
+  ];
 
-  if (!fs.existsSync(playwrightCacheDir)) {
+  const playwrightCacheDir = candidateDirs.find((d) => fs.existsSync(d));
+  if (!playwrightCacheDir) {
     throw new Error(
-      `Playwright cache directory not found at ${playwrightCacheDir}. ` +
-        `Make sure Playwright is installed via npm.`
+      `Playwright cache directory not found in any of: ${candidateDirs.join(", ")}. ` +
+        `Make sure Playwright is installed via npm.`,
     );
   }
 
-  // Search recursively for headless_shell binary
+  // Search recursively for headless_shell binary (Linux Chromium) or the
+  // macOS "Google Chrome for Testing" app bundle's main executable.
   function findBinary(dir: string): string | null {
     const files = fs.readdirSync(dir);
     for (const file of files) {
@@ -38,7 +50,11 @@ export async function findChromiumPath(): Promise<string> {
       if (stat.isDirectory()) {
         const found = findBinary(fullPath);
         if (found) return found;
-      } else if (file === "headless_shell" || file === "chromium.exe") {
+      } else if (
+        file === "headless_shell" ||
+        file === "chromium.exe" ||
+        file === "Google Chrome for Testing"
+      ) {
         return fullPath;
       }
     }
@@ -49,7 +65,7 @@ export async function findChromiumPath(): Promise<string> {
   if (!chromiumPath) {
     throw new Error(
       `Chromium binary not found in ${playwrightCacheDir}. ` +
-        `Run 'npm install playwright' first.`
+        `Run 'npm install playwright' first.`,
     );
   }
 

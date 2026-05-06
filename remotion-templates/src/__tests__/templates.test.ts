@@ -61,9 +61,9 @@ const TEMP_DIR = path.resolve(__dirname, ".temp-renders");
 const COMPOSITIONS = [
   // Timelines
   "HorizontalTimeline",
-  "TimelineComparison",    // deprecated, kept for regression
-  "TimelineMorph",         // deprecated, kept for regression
-  "DualTimeline",          // deprecated, kept for regression
+  // (TimelineComparison / TimelineMorph / DualTimeline were removed from
+  //  Root.tsx; the deprecated entries previously kept here for regression
+  //  now reference compositions that don't exist and crash the suite.)
   "EscalationLadder",
   // Data
   "DataChart",
@@ -95,14 +95,17 @@ const COMPOSITIONS = [
   "ProbabilityGauge",
 ];
 
-// Shorts compositions
+// Shorts compositions — IDs match the Root.tsx registrations (note the
+// hyphen in FrameworkDiagram-Short et al. — Shorts adopted hyphenated
+// naming after the original test list was written).
 const SHORTS_COMPOSITIONS = [
   "KineticShort",
   "DataChartShort",
   "SplitShort",
   "StatRevealShort",
-  "FrameworkDiagramShort",
-  "TimelineComparisonShort",
+  "FrameworkDiagram-Short",
+  // TimelineComparison-Short relies on the deprecated TimelineComparison
+  // template; removed from this list when the parent was retired.
 ];
 
 // Combined list for testing

@@ -74,3 +74,5 @@ export {
 export { CatalogShowreel } from "./Showreel";
 
 export { CatalogEmphasisShowcase } from "./EmphasisShowcase";
+
+export { CatalogTemplatePreview, PREVIEW_TEMPLATES } from "./TemplatePreview";

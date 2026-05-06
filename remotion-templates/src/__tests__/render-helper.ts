@@ -10,10 +10,22 @@
 import path from "path";
 import fs from "fs";
 import { bundle } from "@remotion/bundler";
-import { renderStill } from "@remotion/renderer";
-import { getBrowser, initBrowser } from "./setup";
+import { renderStill, selectComposition, type VideoConfig } from "@remotion/renderer";
+import { findChromiumPath } from "./setup";
+
+let chromiumExecutable: string | null = null;
+async function getBrowserExecutable(): Promise<string> {
+  if (!chromiumExecutable) {
+    chromiumExecutable = await findChromiumPath();
+  }
+  return chromiumExecutable;
+}
 
 let serveUrl: string | null = null;
+// Cache resolved compositions across tests so we don't re-select on every
+// call. selectComposition is non-trivial (loads the bundle, evaluates the
+// composition's calculateMetadata).
+const compositionCache = new Map<string, VideoConfig>();
 
 /**
  * Initialize the bundler once before all tests.
@@ -59,6 +71,11 @@ export function getServeUrl(): string {
 /**
  * Render a specific frame from a composition.
  *
+ * Note: Remotion 4.x's renderStill requires a full VideoConfig object
+ * (with width/height/fps/durationInFrames) for the `composition` field,
+ * not a string ID. We resolve via selectComposition + cache to avoid
+ * re-resolving the same composition across multiple frames.
+ *
  * @param compositionId - The composition ID (e.g., "ChoroplethMap")
  * @param frame - Frame number to render (e.g., 30)
  * @param outputPath - Where to save the PNG
@@ -76,8 +93,20 @@ export async function renderCompositionFrame(
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  // Ensure browser is initialized
-  const browser = await initBrowser();
+  const browserExecutable = await getBrowserExecutable();
+
+  // Resolve composition once per id (cached). renderStill needs the full
+  // VideoConfig object including width/height — passing just the string id
+  // throws "height must be a number, but you passed a value of type undefined."
+  let composition = compositionCache.get(compositionId);
+  if (!composition) {
+    composition = await selectComposition({
+      serveUrl: url,
+      id: compositionId,
+      browserExecutable,
+    });
+    compositionCache.set(compositionId, composition);
+  }
 
   console.log(
     `[Render] Rendering ${compositionId} frame ${frame} -> ${outputPath}`
@@ -86,10 +115,10 @@ export async function renderCompositionFrame(
   try {
     await renderStill({
       serveUrl: url,
-      composition: compositionId,
+      composition,
       output: outputPath,
       frame,
-      browser,
+      browserExecutable,
     });
 
     console.log(`[Render] Successfully saved: ${outputPath}`);
