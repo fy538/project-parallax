@@ -27,6 +27,7 @@
     "@remotion/cli": "^4.0.451",
     "@remotion/google-fonts": "^4.0.451",
     "@remotion/lambda": "^4.0.451",
+    "@remotion/layout-utils": "^4.0.451",
     "@remotion/light-leaks": "^4.0.456",
     "@remotion/player": "^4.0.451",
     "@remotion/sfx": "^4.0.456",

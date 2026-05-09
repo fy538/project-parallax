@@ -22,8 +22,9 @@
  * POLISH.md L13: Use TitleBlock, don't hand-build title blocks.
  */
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
+import { measureText } from "@remotion/layout-utils";
 import {
   fonts,
   fontSizes,
@@ -88,6 +89,30 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   // just shared color emphasis.
   const emphasis = useEpisodeColorEmphasis();
   const titleFontFamily = emphasis.displayFont ?? fonts.heading;
+  // Actual rendered font size for the title.
+  // measureText() measures the exact browser-rendered width of the title string
+  // at h2 size, then scales down proportionally if it exceeds the available safe
+  // area width. Floor at h3 (36px) so the title never becomes unreadable.
+  // Falls back to system-font measurement on first Studio frame before fonts load
+  // (validateFontIsLoaded intentionally omitted — render mode pre-loads fonts;
+  // a first-frame preview glitch is preferable to a thrown error).
+  const titleFontSize = useMemo(() => {
+    const availableWidth = Math.min(
+      textMaxWidth.h2,
+      layout.width - safe.left - safe.right
+    );
+    const { width: measuredWidth } = measureText({
+      text: title,
+      fontFamily: titleFontFamily,
+      fontSize: fontSizes.h2,
+      fontWeight: fontWeights.semibold,
+      letterSpacing: `${letterSpacing.h2}px`,
+    });
+    const scale = Math.min(1, availableWidth / Math.max(1, measuredWidth));
+    const minScale = fontSizes.h3 / fontSizes.h2;
+    return Math.max(fontSizes.h3, fontSizes.h2 * Math.max(scale, minScale));
+  }, [title, titleFontFamily, safe.left, safe.right]);
+
   // Underline scale-in animation (after title fade-in completes)
   const underlineProgress = interpolate(
     frame,
@@ -107,39 +132,21 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
       }}
     >
       {/* Title — h2, heading font, primary text color.
-          Dynamic font size: long titles auto-scale down so they don't
-          overflow the safe area. Estimate width using a 0.55 char-width
-          factor (rough but reliable for English headings) and reduce
-          font-size proportionally. Floor at h3 so headings never become
-          unreadable; titles longer than that should be split into
-          title + subtitle by the data author. */}
-      {(() => {
-        const charWidthFactor = 0.55;
-        const availableWidth = Math.min(
-          textMaxWidth.h2,
-          layout.width - safe.left - safe.right
-        );
-        const estimatedWidth = title.length * fontSizes.h2 * charWidthFactor;
-        const scale = Math.min(1, availableWidth / Math.max(1, estimatedWidth));
-        const minScale = fontSizes.h3 / fontSizes.h2;
-        const finalSize = Math.max(fontSizes.h3, fontSizes.h2 * Math.max(scale, minScale));
-        return (
-          <div
-            style={{
-              fontSize: finalSize,
-              fontWeight: fontWeights.semibold,
-              color: theme.text.primary,
-              fontFamily: titleFontFamily,
-              textShadow: theme.textShadow,
-              maxWidth: textMaxWidth.h2,
-              letterSpacing: letterSpacing.h2,
-              lineHeight: 1.1,
-            }}
-          >
-            {title}
-          </div>
-        );
-      })()}
+          Font size is pre-computed via measureText() — see titleFontSize above. */}
+      <div
+        style={{
+          fontSize: titleFontSize,
+          fontWeight: fontWeights.semibold,
+          color: theme.text.primary,
+          fontFamily: titleFontFamily,
+          textShadow: theme.textShadow,
+          maxWidth: textMaxWidth.h2,
+          letterSpacing: letterSpacing.h2,
+          lineHeight: 1.1,
+        }}
+      >
+        {title}
+      </div>
 
       {/* Optional accent underline — gradient-fade signature, draws in left-to-right */}
       {underline && (
