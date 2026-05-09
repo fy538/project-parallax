@@ -36,10 +36,12 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
+from paths import get_project_root  # noqa: E402
+
 # ── Paths ───────────────────────────────────────────────────────────────────
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = SCRIPT_DIR.parent.parent
+PROJECT_ROOT = get_project_root()
 DEFAULT_REGISTRY = PROJECT_ROOT / "data" / "concepts.json"
 SCHEMA_PATH = PROJECT_ROOT / "data" / "concept-registry.schema.json"
 

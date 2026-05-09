@@ -248,6 +248,28 @@ def check_audio_assets(manifest_path: Path) -> tuple[int, list[str]]:
     return (len(referenced), missing)
 
 
+def check_orphaned_episode_data() -> list[str]:
+    """Warn about remotion-templates/data/episodes/ slugs with no matching episodes/ dir.
+
+    An orphan means data files exist for a slug that was renamed or deleted.
+    This is a soft warning — the data might be intentionally pre-staged.
+    """
+    data_episodes = ROOT / "remotion-templates" / "data" / "episodes"
+    episodes_dir = ROOT / "episodes"
+    warnings: list[str] = []
+    if not data_episodes.exists():
+        return []
+    for slug_dir in sorted(data_episodes.iterdir()):
+        if not slug_dir.is_dir():
+            continue
+        if not (episodes_dir / slug_dir.name).is_dir():
+            warnings.append(
+                f"remotion-templates/data/episodes/{slug_dir.name}/ has no matching "
+                f"episodes/{slug_dir.name}/ directory (orphaned data files?)"
+            )
+    return warnings
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate Parallax JSON data files.")
     parser.add_argument(
@@ -353,6 +375,14 @@ def main() -> int:
                 else:
                     audio_warnings += 1
 
+    # Layer 3.5 (soft): orphaned episode data directories
+    # Only run on full validation — skip for targeted --files or --episode runs.
+    orphan_warnings: list[str] = []
+    if not args.files and not args.episode:
+        orphan_warnings = check_orphaned_episode_data()
+        for w in orphan_warnings:
+            print(f"⚠ {w}", file=sys.stderr)
+
     if failures:
         print(f"\n{failures} file(s) failed validation.", file=sys.stderr)
         return 1
@@ -366,6 +396,8 @@ def main() -> int:
     msg = f"✓ {len(files)} JSON file(s) validated{extra_str}."
     if audio_warnings:
         msg += f"  [{audio_warnings} manifest(s) reference missing audio — see warnings above]"
+    if orphan_warnings:
+        msg += f"  [{len(orphan_warnings)} orphaned data director{'y' if len(orphan_warnings) == 1 else 'ies'} — see warnings above]"
     print(msg)
     return 0
 

@@ -53,6 +53,9 @@ HOLD_PRESETS = {
     "linger": (3.0, "linger"),
 }
 
+# Valid top-level DIR: directive types (from project/DIRECTING_LANGUAGE.md)
+VALID_DIR_TYPES = {"cam", "cut", "hold", "mood", "reveal"}
+
 # Transition type mappings for cut()
 VALID_CUT_TYPES = {
     "cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up",
@@ -365,10 +368,26 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
     for line in dir_lines:
         m = DIR_LINE_RE.match(line)
         if not m:
+            # Line starts with DIR: but doesn't match type(params) syntax
+            stripped = line.strip()
+            if stripped.startswith("DIR:"):
+                print(
+                    f"  ⚠ Malformed DIR: annotation (expected 'DIR: type(params)'): {stripped!r}",
+                    file=sys.stderr,
+                )
             continue
 
         dtype = m.group(1).lower()
         params_str = m.group(2).strip()
+
+        if dtype not in VALID_DIR_TYPES:
+            valid_list = ", ".join(sorted(VALID_DIR_TYPES))
+            print(
+                f"  ⚠ Unknown DIR: type {dtype!r} — valid types are: {valid_list}\n"
+                f"    in: {line.strip()!r}",
+                file=sys.stderr,
+            )
+            continue
 
         if dtype == "hold":
             # Parse hold() — affects segment timing
@@ -411,6 +430,13 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                 cut_type = tokens[0].lower()
                 if cut_type in VALID_CUT_TYPES:
                     result["transitionOut"] = cut_type
+                else:
+                    valid_list = ", ".join(sorted(VALID_CUT_TYPES))
+                    print(
+                        f"  ⚠ Unknown cut type {cut_type!r} — valid types are: {valid_list}\n"
+                        f"    in: {line.strip()!r}",
+                        file=sys.stderr,
+                    )
 
             # Look for duration and color in remaining tokens
             for token in tokens[1:]:
