@@ -127,6 +127,7 @@ def check_hardcoded_font_sizes(filepath: Path, lines: list[str]) -> list[Issue]:
         "KineticTypography/KineticTypography.tsx": {160, 180},  # hero quote mark, big stat number
         "StatReveal/StatReveal.tsx": {120},                      # hero stat number
         "TitleTransition/TitleTransition.tsx": {120},            # section number
+        "AudioPreview/AudioPreview.tsx": {120},                  # timer countdown display
     }
     exempt_sizes = DISPLAY_EXEMPTIONS.get(rel, set())
 
@@ -216,7 +217,7 @@ def check_ghostly_opacity(filepath: Path, lines: list[str]) -> list[Issue]:
 
 
 def check_content_area_usage(filepath: Path, lines: list[str]) -> list[Issue]:
-    """POL-04: Templates that position content below a title should use contentArea()."""
+    """POL-04: Templates with title-driven layout should use shared layout helpers."""
     issues = []
     rel = str(filepath.relative_to(TEMPLATES_DIR))
     template_name = filepath.parent.name
@@ -228,18 +229,21 @@ def check_content_area_usage(filepath: Path, lines: list[str]) -> list[Issue]:
 
     content = "\n".join(lines)
     has_content_area = "contentArea" in content
+    has_chart_layout = "chartLayout(" in content
     has_title_block = "TitleBlock" in content or "title" in content.lower()
     has_safe_area_math = re.search(r'safeArea\.(top|left|right|bottom)', content)
 
-    # If it has a title and manually does safe area math but doesn't use contentArea
-    if has_title_block and has_safe_area_math and not has_content_area:
+    # If it has a title and manually does safe area math but doesn't use a shared
+    # layout helper, nudge it toward the canonical contract. Cartesian charts
+    # may use chartLayout() instead of contentArea().
+    if has_title_block and has_safe_area_math and not (has_content_area or has_chart_layout):
         issues.append(Issue(
             severity="info",
             rule="POL-04",
             file=rel,
             line=0,
-            message=f"Template has title + manual safeArea math but doesn't use contentArea() helper",
-            fix="Import contentArea from theme and use it for content positioning",
+            message="Template has title + manual safeArea math but doesn't use shared layout helpers",
+            fix="Use contentArea() for general templates or chartLayout() for cartesian chart templates",
         ))
 
     return issues
@@ -428,9 +432,10 @@ def check_linear_interpolation(filepath: Path, lines: list[str]) -> list[Issue]:
     rel = str(filepath.relative_to(TEMPLATES_DIR))
 
     bare_interp = re.compile(r'\binterpolate(?!Colors)\s*\(')
-    # CLAMP_* constants, explicit easing: key, Easing.*, spring helpers, named easing vars
+    # CLAMP_* constants, explicit easing: key, Easing.*, spring helpers, named easing vars,
+    # or a // linear-ok suppression comment acknowledging intentional linear motion.
     has_easing = re.compile(
-        r'CLAMP_|Easing\.|easing\s*:|spring\(|springConfig|easings\.|barEasing|growEasing|exitEasing'
+        r'CLAMP_|Easing\.|easing\s*:|spring\(|springConfig|easings\.|barEasing|growEasing|exitEasing|linear-ok'
     )
 
     for i, line in enumerate(lines, 1):
@@ -689,7 +694,7 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
     # Template types that use alternative title fields (not "title")
     TITLE_ALTERNATIVES = {
         "kinetic": {"text", "quote", "statLabel", "statValue", "term"},  # KineticTypography variants
-        "title": {"sectionTitle"},  # TitleTransition
+        "title": {"sectionTitle", "ctaText"},  # TitleTransition (incl. end-card variant)
     }
 
     for ep_dir in sorted(data_dir.iterdir()):
@@ -715,8 +720,14 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
 
             rel = str(json_file.relative_to(data_dir))
 
+            # Thumbnail files store all their fields one level deeper under "data"
+            # because the Thumbnail composition accepts { data: ThumbnailData } as props.
+            # Unwrap for validation purposes so the checks below work uniformly.
+            prefix = json_file.stem.split("-")[0]
+            effective = data.get("data", data) if prefix == "thumbnail" else data
+
             # Check episode field (universally required)
-            if "episode" not in data:
+            if "episode" not in effective:
                 issues.append(Issue(
                     severity="error",
                     rule="DATA-03",
@@ -727,9 +738,10 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                 ))
 
             # Check title field — but allow template-specific alternatives
-            prefix = json_file.stem.split("-")[0]
-            alt_fields = TITLE_ALTERNATIVES.get(prefix, set())
-            has_title = "title" in data or any(f in data for f in alt_fields)
+            thumb_title_fields = {"titleText", "heroText", "symbolTitle"}
+            alt_fields = (TITLE_ALTERNATIVES.get(prefix, set()) |
+                          (thumb_title_fields if prefix == "thumbnail" else set()))
+            has_title = "title" in effective or any(f in effective for f in alt_fields)
             if not has_title:
                 issues.append(Issue(
                     severity="error",
@@ -741,8 +753,12 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                 ))
 
             # Check recommended fields
+            # Thumbnail files are static renders — durationSec and backgroundVariant
+            # are meaningless for them; the outer wrapper sets those at render time.
             for field in recommended_fields:
-                if field not in data:
+                if prefix == "thumbnail":
+                    continue
+                if field not in effective:
                     issues.append(Issue(
                         severity="info",
                         rule="DATA-03",
@@ -780,8 +796,9 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                         fix="Add pairs: [{eraA: {...}, eraB: {...}}]",
                     ))
 
-            # TimelineComparison needs leftEvents/rightEvents
-            elif "timeline" in stem and "timeseries" not in stem and "morph" not in stem:
+            # TimelineComparison needs leftEvents/rightEvents.
+            # HorizontalTimeline uses "pairs" instead — exclude those files.
+            elif "timeline" in stem and "timeseries" not in stem and "morph" not in stem and "pairs" not in data:
                 if "leftEvents" not in data and "events" not in data:
                     issues.append(Issue(
                         severity="error",
@@ -792,9 +809,11 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                         fix="Add leftEvents and rightEvents arrays",
                     ))
 
-            # DataChart needs dataPoints or bars
+            # DataChart needs dataPoints or bars.
+            # "lines" is the TimeSeriesChart format — also accepted.
             elif "chart" in stem and "timeseries" not in stem:
-                if "dataPoints" not in data and "bars" not in data and "series" not in data and "comparisonPairs" not in data:
+                if ("dataPoints" not in data and "bars" not in data and "series" not in data
+                        and "comparisonPairs" not in data and "lines" not in data):
                     issues.append(Issue(
                         severity="warning",
                         rule="DATA-03",
@@ -828,15 +847,16 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                         fix="Add phases: [{label, durationSec, ...}]",
                     ))
 
-            # Framework needs columns or items
+            # Framework needs columns, items, nodes (flow variant), or cells (matrix variant)
             elif "framework" in stem:
-                if "columns" not in data and "items" not in data:
+                if ("columns" not in data and "items" not in data
+                        and "nodes" not in data and "cells" not in data):
                     issues.append(Issue(
                         severity="warning",
                         rule="DATA-03",
                         file=rel,
                         line=0,
-                        message="FrameworkDiagram data has no columns/items array",
+                        message="FrameworkDiagram data has no columns/items/nodes/cells array",
                         fix="Ensure the framework has renderable content",
                     ))
 

@@ -27,6 +27,7 @@ import {
   sec,
   duotone as duotoneRamps,
   palette,
+  textMaxWidth,
 } from "../../design/theme";
 import { textShadow } from "../../utils/depth";
 import {
@@ -110,7 +111,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
   const grainOffsetY = (frame * 0.85) % 512;
 
   return (
-    <AbsoluteFill style={{ backgroundColor: theme.bg.base, overflow: "hidden" }}>
+    <AbsoluteFill style={{ overflow: "hidden" }}>
       {/* Real SVG duotone filter (proper ramp remap, not gradient overlay) */}
       <svg width="0" height="0" style={{ position: "absolute", pointerEvents: "none" }}>
         <defs>
@@ -186,6 +187,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
                 lineHeight: 1.2,
+                maxWidth: textMaxWidth.h2,
                 marginBottom: layout.spacing.sm,
               }}
             >
@@ -406,7 +408,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const imageScale = scaleReveal(frame, 0, sec(0.8), 1.04, 1.0);
   const nameStripOpacity = fadeIn(frame, sec(0.5), sec(0.4));
   // Parallax: text drifts slightly faster than image
-  const textDriftY = interpolate(frame, [0, totalFrames], [8, -8], CLAMP);
+  const textDriftY = interpolate(frame, [0, totalFrames], [8, -8], CLAMP); // linear-ok: slow full-clip parallax drift, linear speed is intentional
 
   const imageWidth = (layout.width * 40) / 100; // 40% of frame
   const imageX = 0; // Left side (can be changed to right side if needed)
@@ -545,6 +547,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               fontWeight: fontWeights.bold,
               letterSpacing: letterSpacing.h1,
               lineHeight: 1.2,
+              maxWidth: textMaxWidth.h1,
               marginBottom: layout.spacing.md,
             }}
           >

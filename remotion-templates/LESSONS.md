@@ -591,3 +591,40 @@ The total segment count = MG compositions + AI-gen clips + archival stills. Dura
 ### L94: AI-gen clips go in public/, not imported as modules
 **Problem:** Importing `.mp4` files as ES modules requires webpack/bundler config for media assets. Remotion's `staticFile()` is simpler and doesn't bloat the JS bundle.
 **Rule:** All video/audio assets go in `public/` and are referenced via `staticFile()`. Never `import clip from "./clip.mp4"`. Directory convention: `public/episodes/<slug>/clips/` for AI-gen, `public/audio/` for SFX/music.
+
+---
+
+## Testing & Code Quality (May 2026)
+
+### L95: Extract pure functions from hooks for unit-testable math
+**Problem:** Hooks with load-bearing math (phase transitions, beat sync, layout computation) can't be tested without mocking Remotion internals (`useCurrentFrame`, `useVideoConfig`). Without tests the math is invisible — future refactors silently break transitions.
+**Pattern:** Extract all math into a pure `computeX(args)` function exported alongside the hook. The hook becomes a thin wrapper that reads frame state and delegates. Tests call the pure function directly.
+**Examples in codebase:**
+- `computePhaseState(frame, phases, baseDelay)` ↔ `usePhase` — phase boundary and progress math
+- `computeBeatState(frame, beats, fps)` ↔ `useBeatSync` — beat pulse and anticipation math
+- `computeTemplateLayout(options)` ↔ `useTemplateLayout` — zone geometry math
+**Rule:** Any hook with non-trivial math (> a few interpolate calls) MUST have a pure-function twin. The split is zero cost at runtime and makes the math directly auditable.
+
+### L96: `const safe = layout.safeAreaTier.generous` — single-constant overlay contract
+**Problem:** Templates reading `layout.safeAreaTier.generous.top` at each use site create N independent references to the same object. If the layout tier changes, every read site must be updated. Worse: mixed reads (`layout.safeAreaTier.generous.top` in one place, a local copy elsewhere) can silently diverge.
+**Pattern:** Assign once at the top of the component body and spread from there:
+```typescript
+const safe = layout.safeAreaTier.generous;
+// Then: safe.top, safe.bottom, safe.left, safe.right at every use site
+```
+**Why it matters:** Same principle as `const colors = theme.text` or `const zones = useTemplateLayout(...)` — one named reference means one refactor point when the source changes. The compiler resolves it anyway; this is purely a readability/maintainability convention.
+**Applied to:** DuelingFrameworks (cinematic), EscalationLadder, TimelineMorph, TimelineComparison in the RENDER_QUALITY_ROADMAP layout migrations.
+
+### L97: POL-10 shadow suppression — `// shadows.X` comment as inline exemption
+**Context:** The `shadows.*` token object (`shadows.subtle`, `shadows.medium`, `shadows.textLift`, `shadows.accentGlow(color)`, etc.) covers most shadow needs. But some effects are legitimately custom: cinematic double-glow with two radii, opacity-modified variants, grain-matched vignette values that don't map to a token.
+**Lint rule (POL-10):** Flags any `boxShadow`/`textShadow` line that doesn't reference `shadows.` anywhere on the same line.
+**Suppression pattern:** Add `// shadows.X extension` (or `// shadows.X (opacity variant)`, etc.) to the same line. The `shadows\.` regex match triggers the exemption. The comment documents intent: "I know about the token system; this extends it."
+```typescript
+// Violating (flagged):
+boxShadow: `0 0 8px ${ptColor}80`
+// Compliant with suppression comment:
+boxShadow: `0 0 8px ${ptColor}80`, // shadows.accentGlowSm (80% opacity variant)
+// Compliant with true token substitution:
+boxShadow: shadows.accentGlowSm(ptColor)
+```
+**Rule:** Prefer true token substitution when the token matches. Use the suppression comment only when the effect is a deliberate extension that no token covers. Never suppress without the explanatory comment — the comment is the documentation.
