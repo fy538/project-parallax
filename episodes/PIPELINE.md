@@ -14,8 +14,12 @@
 
 Run this at the top of every work session before opening any episode files:
 
-1. **Read the current state table** — which episodes are blocked, and what's blocking them?
-2. **Flag stalls** — any episode with `Days in state` > 7 that isn't `BLOCKED` needs a decision: advance it, formally block it, or demote it.
+1. **Run the pipeline validator** — catches stale state, missing artifacts, and blocker inconsistencies before you read anything else:
+   ```
+   python3 tools/pipeline_validator.py
+   ```
+   Fix any ✗ errors before proceeding. Address ⚠ warnings if they affect today's work.
+2. **Read the current state table** — which episodes are blocked, and what's blocking them?
 3. **Pick one episode** to advance this session. Don't context-switch mid-session.
 4. **Open the episode directory** (Artifacts link) and read the most recent skill output to reload context.
 
