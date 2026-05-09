@@ -31,7 +31,6 @@ import React, { type ReactNode } from "react";
 import { AbsoluteFill, Sequence, useCurrentFrame, interpolate } from "remotion";
 import {
   palette,
-  semantic,
   fonts,
   fontSizes,
   layout,
@@ -287,7 +286,7 @@ const HeroLayout = React.memo(
             <div
               style={{
                 position: "absolute",
-                top: layout.safeArea.top + 200,
+                top: layout.safeArea.top + 210,
                 left: 0,
                 fontFamily: fonts.heading,
                 fontSize: HERO_HEADLINE_SIZE,
@@ -312,7 +311,7 @@ const HeroLayout = React.memo(
             <div
               style={{
                 position: "absolute",
-                top: layout.safeArea.top + 280,
+                top: layout.safeArea.top + 320,
                 left: 0,
                 fontFamily: fonts.heading,
                 fontSize: BODY_FONT_SIZE,
@@ -687,10 +686,11 @@ export const EditorialFrame = React.memo(
           headline={headline}
           body={body}
           byline={byline}
-          children={children}
           showBrandMark={_showBrandMark}
           kickerColor={kickerColor}
-        />
+        >
+          {children}
+        </HeroLayout>
       );
     }
 
@@ -701,10 +701,11 @@ export const EditorialFrame = React.memo(
           hero={hero}
           body={body}
           byline={byline}
-          children={children}
           showBrandMark={_showBrandMark}
           kickerColor={kickerColor}
-        />
+        >
+          {children}
+        </AsideLayout>
       );
     }
 

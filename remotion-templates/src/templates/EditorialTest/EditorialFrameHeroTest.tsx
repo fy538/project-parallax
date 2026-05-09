@@ -19,6 +19,7 @@ import { AbsoluteFill } from "remotion";
 import { EditorialSurface } from "../../components/EditorialSurface";
 import { EditorialFrame } from "../../components/EditorialFrame";
 import { DataChart } from "../DataChart/DataChart";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { palette, semantic } from "../../design/theme";
 import type { DataChartData } from "../DataChart/types";
 
@@ -74,19 +75,24 @@ const cooperationData: DataChartData = {
 
 // ── Composition ───────────────────────────────────────────────────────────────
 
-export const EditorialFrameHeroTest: React.FC = () => (
-  <AbsoluteFill>
-    <EditorialSurface intensity={0.6}>
-      <EditorialFrame
-        variant="hero"
-        kicker="iterated prisoner's dilemma"
-        hero="23%"
-        headline="Does cooperation need memory?"
-        body="Cooperation rate after 200 rounds when players cannot recall prior moves."
-        byline="parallax · prisoner's dilemma · 2026"
-      >
-        <DataChart data={cooperationData} />
-      </EditorialFrame>
-    </EditorialSurface>
-  </AbsoluteFill>
-);
+export const EditorialFrameHeroTest: React.FC = () => {
+  // noDrift: EditorialSurface provides paper background; inner DataChart runs
+  // its own useCompositionAnimation for Ken Burns on the chart content.
+  useCompositionAnimation({ noDrift: true });
+  return (
+    <AbsoluteFill>
+      <EditorialSurface intensity={0.6}>
+        <EditorialFrame
+          variant="hero"
+          kicker="iterated prisoner's dilemma"
+          hero="23%"
+          headline="Does cooperation need memory?"
+          body="Cooperation rate after 200 rounds when players cannot recall prior moves."
+          byline="parallax · prisoner's dilemma · 2026"
+        >
+          <DataChart data={cooperationData} />
+        </EditorialFrame>
+      </EditorialSurface>
+    </AbsoluteFill>
+  );
+};

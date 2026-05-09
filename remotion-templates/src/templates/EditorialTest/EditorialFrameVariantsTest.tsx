@@ -17,6 +17,7 @@ import { AbsoluteFill } from "remotion";
 import { EditorialSurface } from "../../components/EditorialSurface";
 import { EditorialFrame } from "../../components/EditorialFrame";
 import { DataChart } from "../DataChart/DataChart";
+import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { palette, semantic } from "../../design/theme";
 import type { DataChartData } from "../DataChart/types";
 
@@ -43,30 +44,36 @@ const defectionRateData: DataChartData = {
 
 // ── Aside composition ─────────────────────────────────────────────────────────
 
-export const EditorialFrameAsideTest: React.FC = () => (
-  <AbsoluteFill>
-    <EditorialSurface intensity={0.6}>
-      <EditorialFrame
-        variant="aside"
-        kicker="iterated prisoner's dilemma"
-        hero="77%"
-        body="No-Memory defects in 77% of interactions. Without recall, agents cannot distinguish cooperators from defectors."
-        byline="parallax · prisoner's dilemma · 2026"
-      >
-        <DataChart data={defectionRateData} />
-      </EditorialFrame>
-    </EditorialSurface>
-  </AbsoluteFill>
-);
+export const EditorialFrameAsideTest: React.FC = () => {
+  useCompositionAnimation({ noDrift: true });
+  return (
+    <AbsoluteFill>
+      <EditorialSurface intensity={0.6}>
+        <EditorialFrame
+          variant="aside"
+          kicker="iterated prisoner's dilemma"
+          hero="77%"
+          body="No-Memory defects in 77% of interactions. Without recall, agents cannot distinguish cooperators from defectors."
+          byline="parallax · prisoner's dilemma · 2026"
+        >
+          <DataChart data={defectionRateData} />
+        </EditorialFrame>
+      </EditorialSurface>
+    </AbsoluteFill>
+  );
+};
 
 // ── Minimal composition ───────────────────────────────────────────────────────
 
-export const EditorialFrameMinimalTest: React.FC = () => (
-  <AbsoluteFill>
-    <EditorialSurface intensity={0.6}>
-      <EditorialFrame variant="minimal" showBrandMark>
-        <DataChart data={defectionRateData} />
-      </EditorialFrame>
-    </EditorialSurface>
-  </AbsoluteFill>
-);
+export const EditorialFrameMinimalTest: React.FC = () => {
+  useCompositionAnimation({ noDrift: true });
+  return (
+    <AbsoluteFill>
+      <EditorialSurface intensity={0.6}>
+        <EditorialFrame variant="minimal" showBrandMark>
+          <DataChart data={defectionRateData} />
+        </EditorialFrame>
+      </EditorialSurface>
+    </AbsoluteFill>
+  );
+};
