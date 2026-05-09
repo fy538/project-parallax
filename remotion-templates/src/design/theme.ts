@@ -840,6 +840,28 @@ export const crosshair = {
   springConfig: { damping: 14, mass: 1.0 },
 } as const;
 
+// ── Motion Budget ────────────────────────────────────────────────────────────
+// Single source of truth for Ken Burns / drift parameters.
+// useCompositionAnimation reads these as its defaults; contentArea() uses
+// the pan values to shrink the usable rect so content never drifts toward
+// the viewport edge.
+//
+// POLISH.md A6 target: scale 1.06, panX 18px, panY 8px, rotation 0.3°.
+// At scale 1.06 centered on the 1920×1080 canvas, content at safe.left (120px)
+// shifts to ~68px — still inside the viewport. The pan budget then takes that
+// another 18px inward, landing at ~50px. contentArea() subtracts panX/panY so
+// the layout rect stays comfortably clear of that worst-case boundary.
+export const motionBudget = {
+  /** Ken Burns scale ceiling. Content scales up by this factor toward center. */
+  scale: 1.06,
+  /** Max horizontal pan in px (composition drifts this far across full duration). */
+  panX: 18,
+  /** Max vertical pan in px. */
+  panY: 8,
+  /** Max rotation in degrees. Barely perceptible — organic handheld feel. */
+  rotation: 0.3,
+} as const;
+
 // ── Layout Primitives (POLISH.md enforcement) ─────────────────────────────
 // These helpers make spacing violations hard by computing derived values
 // from the canonical tokens above. Templates consume these instead of
@@ -889,9 +911,11 @@ export const contentArea = (
   const safe = layout.safeAreaTier[safeAreaTier];
   const top =
     safe.top + titleHeight[titleVariant] + layout.spacing.xl; // 48px title-to-content gap
-  const left = safe.left;
-  const right = safe.right;
-  const bottom = safe.bottom;
+  // Pan budget: motionBudget.panX/panY subtracted so content placed at these
+  // edges never drifts past the viewport boundary during Ken Burns motion.
+  const left = safe.left + motionBudget.panX;
+  const right = safe.right + motionBudget.panX;
+  const bottom = safe.bottom + motionBudget.panY;
   return {
     top,
     left,

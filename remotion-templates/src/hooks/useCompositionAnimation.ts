@@ -25,6 +25,7 @@
 
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { interpolate, Easing } from "remotion";
+import { motionBudget } from "../design/theme";
 
 export interface CompositionAnimationOptions {
   /** Exit fade duration in frames. Default: 15 (POLISH.md A7) */
@@ -33,24 +34,25 @@ export interface CompositionAnimationOptions {
   enterFrames?: number;
   /**
    * Max scale for Ken Burns drift. 0 to disable.
-   * Default: 1.06 (cinematic overhaul — was 1.02, now 3× more pronounced).
-   * The 6% zoom is subtle enough to not distort text but visible enough
-   * to make the composition feel like it was filmed with a slowly moving camera.
+   * Default: motionBudget.scale (1.06). The 6% zoom is subtle enough to not
+   * distort text but visible enough to make the composition feel filmed with
+   * a slowly moving camera. contentArea() is sized to absorb this movement.
    */
   maxScale?: number;
   /**
    * Max horizontal pan drift in px. 0 to disable.
-   * Default: 18 (cinematic overhaul — was 6, now 3× more pronounced).
+   * Default: motionBudget.panX (18). contentArea() subtracts this from
+   * left/right margins so layout content never drifts toward the viewport edge.
    */
   maxPanX?: number;
   /**
-   * Max vertical pan drift in px. 0 to disable. Default: 8.
-   * Adds a gentle diagonal feel to the camera movement.
+   * Max vertical pan drift in px. 0 to disable.
+   * Default: motionBudget.panY (8). contentArea() subtracts this from bottom.
    */
   maxPanY?: number;
   /**
-   * Max rotation drift in degrees. 0 to disable. Default: 0.3.
-   * A barely perceptible tilt that adds organic handheld feel.
+   * Max rotation drift in degrees. 0 to disable.
+   * Default: motionBudget.rotation (0.3°). Barely perceptible organic tilt.
    */
   maxRotation?: number;
   /** Disable Ken Burns entirely (for maps, interactive compositions) */
@@ -91,10 +93,10 @@ export const useCompositionAnimation = (
   const {
     exitFrames = 15,
     enterFrames = 8,
-    maxScale = 1.06,
-    maxPanX = 18,
-    maxPanY = 8,
-    maxRotation = 0.3,
+    maxScale = motionBudget.scale,
+    maxPanX = motionBudget.panX,
+    maxPanY = motionBudget.panY,
+    maxRotation = motionBudget.rotation,
     noDrift = false,
     noExit = false,
   } = options;

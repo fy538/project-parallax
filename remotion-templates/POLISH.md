@@ -27,7 +27,7 @@ The goal: every movement should feel **intentional and weighted**, like objects 
 
 **A5: Subtle secondary motion on data elements.** After a bar finishes growing, add a 100ms micro-settle (spring with high damping). After a statistic finishes counting, hold 200ms then subtly pulse the number (scale 1.0→1.02→1.0 over 300ms). These details register subconsciously.
 
-**A6: Ken Burns on static compositions.** Any screen held for >3 seconds gets a slow drift: either a subtle scale (1.00→1.02 over the full duration) or a slow pan (5-10px translation). This prevents "frozen slide" syndrome.
+**A6: Ken Burns on static compositions.** Any screen held for >3 seconds gets a slow drift via `useCompositionAnimation()`. Canonical values live in `motionBudget` (theme.ts): scale 1.00→1.06, panX 0→18px, panY 0→8px, rotation 0→0.3°. `contentArea()` already subtracts the pan budget from layout margins, so content placed within the content area is safe from viewport-edge clipping at peak drift. Use `noDrift: true` when applying manual Ken Burns to avoid compounding.
 
 **A7: Exit animations exist.** Elements don't just cut. If a composition transitions, the last 15-20 frames should fade out key elements (opacity 1→0 with ease-in). Background can hold.
 
