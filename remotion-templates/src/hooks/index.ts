@@ -3,7 +3,6 @@
  *
  * Every template should use:
  *   useCompositionAnimation() — for automatic Ken Burns + exit fade
- *   useEntrance() — for semantic element entrances
  *   useThemeMode() — for mode-correct color tokens (dark/light)
  *   useVerticalLayout() — for 9:16 Shorts layout tokens
  *
@@ -37,8 +36,6 @@
  */
 
 export { useCompositionAnimation } from "./useCompositionAnimation";
-export { useEntrance, useStaggeredEntrance } from "./useEntrance";
-export type { EntranceRole } from "./useEntrance";
 export { useThemeMode } from "./useThemeMode";
 export type { ThemeTokens } from "./useThemeMode";
 export { useVerticalLayout } from "./useVerticalLayout";
