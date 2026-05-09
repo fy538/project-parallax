@@ -77,10 +77,10 @@ def search_pexels(query: str, media_type: str = "photo", count: int = RESULTS_PE
                 results.append({
                     "source": "pexels",
                     "type": "video",
-                    "id": item["id"],
+                    "id": item.get("id", ""),
                     "url": item.get("url", ""),
                     "preview": item.get("image", ""),
-                    "download": hd["link"] if hd else "",
+                    "download": hd.get("link", "") if hd else "",
                     "width": hd.get("width", 0) if hd else 0,
                     "height": hd.get("height", 0) if hd else 0,
                     "duration": item.get("duration", 0),
@@ -91,7 +91,7 @@ def search_pexels(query: str, media_type: str = "photo", count: int = RESULTS_PE
                 results.append({
                     "source": "pexels",
                     "type": "photo",
-                    "id": item["id"],
+                    "id": item.get("id", ""),
                     "url": item.get("url", ""),
                     "preview": item.get("src", {}).get("medium", ""),
                     "download": item.get("src", {}).get("original", ""),
@@ -130,7 +130,7 @@ def search_pixabay(query: str, media_type: str = "photo", count: int = RESULTS_P
                 results.append({
                     "source": "pixabay",
                     "type": "video",
-                    "id": item["id"],
+                    "id": item.get("id", ""),
                     "url": item.get("pageURL", ""),
                     "preview": f"https://i.vimeocdn.com/video/{item.get('picture_id', '')}_640x360.jpg",
                     "download": large.get("url", ""),
@@ -144,7 +144,7 @@ def search_pixabay(query: str, media_type: str = "photo", count: int = RESULTS_P
                 results.append({
                     "source": "pixabay",
                     "type": "photo",
-                    "id": item["id"],
+                    "id": item.get("id", ""),
                     "url": item.get("pageURL", ""),
                     "preview": item.get("webformatURL", ""),
                     "download": item.get("largeImageURL", ""),
@@ -177,7 +177,7 @@ def search_unsplash(query: str, count: int = RESULTS_PER_SOURCE) -> list:
             results.append({
                 "source": "unsplash",
                 "type": "photo",
-                "id": item["id"],
+                "id": item.get("id", ""),
                 "url": item.get("links", {}).get("html", ""),
                 "preview": item.get("urls", {}).get("small", ""),
                 "download": item.get("urls", {}).get("full", ""),
