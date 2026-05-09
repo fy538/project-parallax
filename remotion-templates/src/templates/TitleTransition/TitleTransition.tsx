@@ -19,7 +19,7 @@ import {
 } from "remotion";
 import { palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
+import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, bloomIntensity, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -29,24 +29,6 @@ import { Crosshair } from "../../components/Crosshair";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TitleTransitionData } from "./types";
-
-// ── Smooth bloom: single 3-point curve (no hard seam at peak) ─────────────
-
-const smoothBloom = (
-  frame: number,
-  startFrame: number,
-  riseDuration: number,
-  sustainLevel: number = 0.5,
-): number => {
-  const peakFrame = startFrame + riseDuration;
-  const settleFrame = peakFrame + riseDuration * 2;
-  return interpolate(
-    frame,
-    [startFrame, peakFrame, settleFrame],
-    [0, 1, sustainLevel],
-    CLAMP // linear-ok
-  );
-};
 
 // ── Letter-spacing animation: wide→tight ("lens focus") ───────────────────
 
@@ -130,7 +112,7 @@ const EpisodeTitleVariant: React.FC<{
   // clamp, a beat landing during the entrance peak (smoothBloom already at
   // ~1.0) would silently overflow — CSS clips opacity to 1 and the beat
   // pulse becomes invisible exactly when it's supposed to be most intense.
-  const titleBloom = Math.min(1, smoothBloom(frame, sec(0.4), sec(0.3), 0.5) + beat.pulse * 0.35);
+  const titleBloom = Math.min(1, bloomIntensity(frame, sec(0.4), sec(0.3), 0.5) + beat.pulse * 0.35);
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);
@@ -370,7 +352,7 @@ const SectionVariant: React.FC<{
 
   // Smooth bloom behind title + beat pulse — clamped to 1 because consumed
   // as CSS opacity (see EpisodeTitleVariant note for full rationale).
-  const bloom = Math.min(1, smoothBloom(frame, sec(0.3), sec(0.2), 0.4) + beat.pulse * 0.3);
+  const bloom = Math.min(1, bloomIntensity(frame, sec(0.3), sec(0.2), 0.4) + beat.pulse * 0.3);
 
   // Exit fade wrapper (A7)
   const contentExitOpacity = exitFade(frame, totalFrames, 15);

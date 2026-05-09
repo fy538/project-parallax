@@ -25,6 +25,8 @@ export const SplitCompositionSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
+    cinematicMode: z.boolean().optional(),
+    ambientParticles: z.boolean().optional(),
     _direction: z.unknown().optional(),
   }),
 });

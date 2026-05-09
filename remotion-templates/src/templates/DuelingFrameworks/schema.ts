@@ -34,6 +34,8 @@ export const DuelingFrameworksSchema = z.object({
     episode: z.string().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     durationSec: z.number().optional(),
+    cinematicMode: z.boolean().optional(),
+    ambientParticles: z.boolean().optional(),
     _direction: z.unknown().optional(),
   }),
 });

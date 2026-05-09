@@ -22,7 +22,7 @@ import {
 } from "remotion";
 import { palette, semantic, fonts, fontSizes, textMaxWidth, layout, sec, shadows } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
-import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, bloomIntensity, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -32,24 +32,6 @@ import { AnimatedText } from "../../components/AnimatedText";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { QuoteData } from "./types";
-
-// ── Smooth bloom: single 3-point curve ────────────────────────────────────
-
-const smoothBloom = (
-  frame: number,
-  startFrame: number,
-  riseDuration: number,
-  sustainLevel: number = 0.5,
-): number => {
-  const peakFrame = startFrame + riseDuration;
-  const settleFrame = peakFrame + riseDuration * 2;
-  return interpolate(
-    frame,
-    [startFrame, peakFrame, settleFrame],
-    [0, 1, sustainLevel],
-    CLAMP // linear-ok
-  );
-};
 
 // ── Parallax drift: differential Ken Burns per layer ──────────────────────
 // Rate multiplier controls how fast each layer drifts.
@@ -105,7 +87,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   const exitOpacity = exitFade(frame, totalFrames, 15);
 
   // Smooth bloom behind quote mark
-  const quoteBloom = smoothBloom(frame, 0, sec(0.2), 0.4);
+  const quoteBloom = bloomIntensity(frame, 0, sec(0.2), 0.4);
 
   // ── Parallax depth layers (memoized to avoid recalculation) ──
   const { quoteMarkDrift, textDrift, attributionDrift } = useMemo(() => ({
@@ -513,7 +495,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
     markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
     pulseDecay: 0.3,
   });
-  const bloom = Math.min(1, smoothBloom(frame, sec(0.3 * t), sec(0.3 * t), 0.5) + beat.pulse * 0.25);
+  const bloom = Math.min(1, bloomIntensity(frame, sec(0.3 * t), sec(0.3 * t), 0.5) + beat.pulse * 0.25);
 
   // Chromatic-aberration kick — 1 frame of R/B channel split as count-up locks
   // Amplitude 1px max, peaks at countUpEndFrame, decays in 3 frames.
