@@ -142,6 +142,7 @@ export const TimelineComparison: React.FC<{
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const theme = useThemeMode("light");
+  const safe = layout.safeAreaTier.generous;
   const { durationInFrames } = useVideoConfig();
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
@@ -163,9 +164,9 @@ export const TimelineComparison: React.FC<{
         <div
           style={{
             position: "absolute",
-            top: layout.safeAreaTier.generous.top,
-            left: layout.safeAreaTier.generous.left,
-            right: layout.safeAreaTier.generous.right,
+            top: safe.top,
+            left: safe.left,
+            right: safe.right,
             display: "flex",
             justifyContent: "space-between",
             opacity: fadeIn(frame, 0, sec(0.6)),
@@ -226,9 +227,9 @@ export const TimelineComparison: React.FC<{
           style={{
             position: "absolute",
             top: contentArea("minimal", "generous").top,
-            left: layout.safeAreaTier.generous.left,
-            right: layout.safeAreaTier.generous.right,
-            bottom: layout.safeAreaTier.generous.bottom,
+            left: safe.left,
+            right: safe.right,
+            bottom: safe.bottom,
             display: "flex",
             justifyContent: "space-between",
           }}
@@ -266,8 +267,8 @@ export const TimelineComparison: React.FC<{
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom,
-            left: layout.safeAreaTier.generous.left,
+            bottom: safe.bottom,
+            left: safe.left,
             fontSize: fontSizes.label,
             color: theme.text.muted,
             letterSpacing: 2,

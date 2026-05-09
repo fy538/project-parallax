@@ -130,6 +130,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);
+  const safe = layout.safeAreaTier.generous;
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   // Pace-aware scaling for the ladder climb cadence (rung stagger +
@@ -404,7 +405,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   // a 2-octave Perlin-like wobble. Amplitude scales with tensionProgress so
   // calm rungs are still, escalating rungs breathe with the camera.
   const jitterAmp = hasCameraPath
-    ? interpolate(tensionProgress, [0, 1], [0.4, 2.4], CLAMP)
+    ? interpolate(tensionProgress, [0, 1], [0.4, 2.4], CLAMP) // linear-ok: maps tension→jitter amplitude, not frame-based motion
     : 0;
   // 2-octave wobble at different frequencies
   const jitterX = jitterAmp * (
@@ -496,8 +497,8 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
           <div
             style={{
               position: "absolute",
-              top: layout.safeAreaTier.generous.top + 60,
-              right: layout.safeAreaTier.generous.right,
+              top: safe.top + 60,
+              right: safe.right,
               fontSize: fontSizes.caption,
               fontFamily: fonts.data,
               color: SEVERITY_COLORS[data.rungs[currentSeverityIndex]?.severity || "low"],
@@ -528,8 +529,8 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
           fadeInDuration={sec(0.4)}
           style={{
             position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom,
-            left: layout.safeAreaTier.generous.left,
+            bottom: safe.bottom,
+            left: safe.left,
           }}
         />
 

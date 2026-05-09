@@ -44,13 +44,16 @@ import {
   shadows,
   radii,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
   slideIn,
   stagger,
   CLAMP,
+  CLAMP_CUBIC,
   CLAMP_QUARTIC,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -209,6 +212,7 @@ const FrameworkPanel: React.FC<{
           textAlign: alignText,
           margin: 0,
           marginBottom: layout.spacing.md,
+          maxWidth: textMaxWidth.h2,
           fontFamily: getFontFamily(data.name),
           lineHeight: lineHeight.h2,
           textShadow: shadows.textLift,
@@ -330,6 +334,7 @@ const CinematicDuelingFrameworks: React.FC<{
 
   const isDark = data.backgroundVariant === "dark";
   const theme = useThemeMode(isDark ? "dark" : "light");
+  const safe = layout.safeAreaTier.generous;
 
   // ── Phase timing (cinematic has longer individual phases) ───────────
   const tenetCountA = data.frameworkA.tenets.length;
@@ -417,7 +422,7 @@ const CinematicDuelingFrameworks: React.FC<{
     frame,
     [dividerStart, dividerStart + sec(0.6)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   // VS text pulse
@@ -466,7 +471,7 @@ const CinematicDuelingFrameworks: React.FC<{
               style={{
                 position: "absolute",
                 left: frameworkALeft,
-                top: layout.safeAreaTier.generous.top + 80,
+                top: safe.top + 80,
                 width: panelWidth,
                 opacity: getFrameworkOpacity("A") * exitOpacity,
                 filter: getFrameworkBlur("A") > 0 ? `blur(${getFrameworkBlur("A")}px)` : undefined,
@@ -482,6 +487,7 @@ const CinematicDuelingFrameworks: React.FC<{
                   color: data.frameworkA.color,
                   margin: 0,
                   marginBottom: layout.spacing.lg,
+                  maxWidth: textMaxWidth.h2,
                   fontFamily: getFontFamily(data.frameworkA.name),
                   lineHeight: lineHeight.h2,
                   textShadow: shadows.textLift,
@@ -530,13 +536,13 @@ const CinematicDuelingFrameworks: React.FC<{
                 frame,
                 [clashStart, clashStart + sec(0.15), clashStart + sec(0.3), clashStart + sec(0.6)],
                 [1, 2, 2, 1],
-                { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                CLAMP_SINE
               );
               const clashGlow = interpolate(
                 frame,
                 [clashStart, clashStart + sec(0.15), clashStart + sec(0.3), clashStart + sec(0.6)],
                 [0, 1, 1, 0],
-                { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                CLAMP_SINE
               );
               return (
                 <div
@@ -572,6 +578,7 @@ const CinematicDuelingFrameworks: React.FC<{
                       color: theme.text.accent,
                       fontFamily: fonts.display,
                       letterSpacing: letterSpacing.h1,
+                      maxWidth: textMaxWidth.h2,
                       textShadow: `0 0 ${20 + clashGlow * 30}px ${theme.text.accent}${clashGlow > 0.5 ? "80" : "40"}`,
                       opacity: fadeIn(frame, dividerStart + sec(0.2), sec(0.4)),
                     }}
@@ -587,7 +594,7 @@ const CinematicDuelingFrameworks: React.FC<{
               style={{
                 position: "absolute",
                 left: frameworkBLeft,
-                top: layout.safeAreaTier.generous.top + 80,
+                top: safe.top + 80,
                 width: panelWidth,
                 opacity: getFrameworkOpacity("B") * exitOpacity,
                 filter: getFrameworkBlur("B") > 0 ? `blur(${getFrameworkBlur("B")}px)` : undefined,
@@ -603,6 +610,7 @@ const CinematicDuelingFrameworks: React.FC<{
                   color: data.frameworkB.color,
                   margin: 0,
                   marginBottom: layout.spacing.lg,
+                  maxWidth: textMaxWidth.h2,
                   fontFamily: getFontFamily(data.frameworkB.name),
                   lineHeight: lineHeight.h2,
                   textShadow: shadows.textLift,
@@ -649,7 +657,7 @@ const CinematicDuelingFrameworks: React.FC<{
                 style={{
                   position: "absolute",
                   left: frameworkALeft,
-                  bottom: layout.safeAreaTier.generous.bottom + 20,
+                  bottom: safe.bottom + 20,
                   width: frameworkBLeft + panelWidth - frameworkALeft,
                   opacity: exitOpacity,
                 }}
@@ -795,7 +803,7 @@ const StaticDuelingFrameworks: React.FC<{
     frame,
     [dividerStartFrame, dividerStartFrame + sec(1)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const scoringStartFrame = getPhaseStart("scoring");

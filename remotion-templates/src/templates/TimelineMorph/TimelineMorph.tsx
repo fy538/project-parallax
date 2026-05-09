@@ -47,6 +47,7 @@ import {
   exitFade,
   CLAMP,
   CLAMP_QUAD,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -105,7 +106,7 @@ const MorphEventCard: React.FC<{
       frame,
       [holdEndFrame, holdEndFrame + sec(morphDurationSec * 0.5)],
       [1, 0],
-      CLAMP
+      CLAMP_SINE
     );
 
     // Opacity for era B text (fades in during morph)
@@ -113,7 +114,7 @@ const MorphEventCard: React.FC<{
       frame,
       [holdEndFrame + sec(morphDurationSec * 0.5), morphEndFrame],
       [0, 1],
-      CLAMP
+      CLAMP_SINE
     );
 
     return (
@@ -242,6 +243,7 @@ export const TimelineMorph: React.FC<{
   const direction = useDirection(data._direction);
   const mode = (data.backgroundVariant || "light") as "light" | "dark";
   const theme = useThemeMode(mode);
+  const safe = layout.safeAreaTier.generous;
   const { durationInFrames } = useVideoConfig();
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
@@ -268,14 +270,14 @@ export const TimelineMorph: React.FC<{
     frame,
     [holdEndFrame, holdEndFrame + sec(morphDuration * 0.5)],
     [1, 0],
-    CLAMP
+    CLAMP_SINE
   );
 
   const eraTitleBOpacity = interpolate(
     frame,
     [holdEndFrame + sec(morphDuration * 0.5), morphEndFrame],
     [0, 1],
-    CLAMP
+    CLAMP_SINE
   );
 
   const eraTitleColor = interpolateColors(
@@ -296,9 +298,9 @@ export const TimelineMorph: React.FC<{
         <div
           style={{
             position: "absolute",
-            top: layout.safeAreaTier.generous.top,
-            left: layout.safeAreaTier.generous.left,
-            right: layout.safeAreaTier.generous.right,
+            top: safe.top,
+            left: safe.left,
+            right: safe.right,
             paddingBottom: layout.spacing.sm,
             opacity: fadeIn(frame, 0, sec(0.6)),
           }}
@@ -351,9 +353,9 @@ export const TimelineMorph: React.FC<{
           style={{
             position: "absolute",
             top: contentArea("minimal", "generous").top,
-            left: layout.safeAreaTier.generous.left,
-            right: layout.safeAreaTier.generous.right,
-            bottom: layout.safeAreaTier.generous.bottom,
+            left: safe.left,
+            right: safe.right,
+            bottom: safe.bottom,
           }}
         >
           <div
@@ -382,8 +384,8 @@ export const TimelineMorph: React.FC<{
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom,
-            left: layout.safeAreaTier.generous.left,
+            bottom: safe.bottom,
+            left: safe.left,
             fontSize: fontSizes.label,
             color: theme.text.muted,
             letterSpacing: 2,

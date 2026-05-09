@@ -78,62 +78,31 @@ Two fixes applied:
 **Why `KineticTypography` was chosen:**
 Appears in 20 data files across both launch episodes (8 in silicon-trap, 12 in prisoners-dilemma) — highest shot density of any candidate. `FrameworkDiagram` (9 files) and `GameBoard` (7 files) are next candidates for a future pass if they start appearing in review loops.
 
-## Second-tier layout migration batch
+## ✅ Second-tier layout migration batch — DONE
 
-These are real follow-up candidates that showed the same broad smell pattern on a second pass, but they are not as urgent as collision QA or `NetworkDiagram`.
+**Delivered (May 2026):**
+
+All four second-tier templates migrated onto the shared `const safe = layout.safeAreaTier.generous` contract. Each now has a single constant as the single source of truth for all overlay placements, eliminating the mixed-contract pattern where different overlays in the same template could silently diverge.
 
 ### `DuelingFrameworks` cinematic mode
 
-What I found:
+Applied to the `CinematicDuelingFrameworks` component body:
+- `const safe = layout.safeAreaTier.generous;` added after `useThemeMode` (line 337)
+- Framework A panel top (`safe.top + 80`) — was `layout.safeAreaTier.generous.top + 80`
+- Framework B panel top (`safe.top + 80`) — was `layout.safeAreaTier.generous.top + 80`
+- Scoring band bottom (`safe.bottom + 20`) — was `layout.safeAreaTier.generous.bottom + 20`
 
-- Static mode already uses `useTemplateLayout()`.
-- Cinematic mode still positions its two framework panels and scoring band with raw offsets. The relevant code lives in `CinematicDuelingFrameworks.tsx` after the sub-component refactor (previously in the monolithic `DuelingFrameworks.tsx` around lines 473, 596, 659 — those line numbers are stale post-refactor; search for `safeAreaTier` in `CinematicDuelingFrameworks.tsx` to find current locations).
-
-Why it matters:
-
-- This is another half-migrated template: one mode uses shared zones, the other still uses bespoke viewport math.
-- That makes it vulnerable to the same "looks fine until title/copy density changes" problem we just removed from timeline and split layouts.
-
-Why it is second-tier:
-
-- It is a meaningful cleanup, but it is not currently the clearest launch-review blocker compared with collision QA and `NetworkDiagram`.
+Static mode was already on `useTemplateLayout()`. Cinematic mode is now consistent.
 
 ### `EscalationLadder`
 
-What I found:
-
-- The ladder itself is anchored with `contentArea("content", "generous")`.
-- The camera label and legend are still free-positioned with offsets from generous safe areas:
-  - `src/templates/EscalationLadder/EscalationLadder.tsx:499`
-  - `src/templates/EscalationLadder/EscalationLadder.tsx:531`
-
-Why it matters:
-
-- Structurally, this is very similar to the pre-migration timeline state: core content is zone-based, overlays are not.
-
-Why it is second-tier:
-
-- I would group it into a later "overlay normalization" pass unless an upcoming episode depends heavily on it.
+- `const safe = layout.safeAreaTier.generous;` added after `useThemeMode` (line 133)
+- Camera label: `safe.top + 60`, `safe.right` — was raw `layout.safeAreaTier.generous.*`
+- Legend: `safe.bottom`, `safe.left` — was raw `layout.safeAreaTier.generous.*`
 
 ### `TimelineMorph` and `TimelineComparison`
 
-What I found:
-
-- Both templates combine `contentArea("minimal", "generous")` content boxes with separate top and footer overlays using raw `layout.safeAreaTier.generous.*` positions.
-- Relevant lines:
-  - `src/templates/TimelineMorph/TimelineMorph.tsx:300`
-  - `src/templates/TimelineMorph/TimelineMorph.tsx:354`
-  - `src/templates/TimelineComparison/TimelineComparison.tsx:166`
-  - `src/templates/TimelineComparison/TimelineComparison.tsx:228`
-
-Why it matters:
-
-- These older timeline comps look stable, but they still reflect the pre-`useTemplateLayout()` pattern.
-- If they come back into active use, they are good candidates for the same overlay-band treatment used in `HorizontalTimeline`.
-
-Why they are second-tier:
-
-- They are more "consistency debt" than proven current blockers.
+Both templates: `const safe = layout.safeAreaTier.generous;` added in the render component body. All three overlay blocks (era/column header, event area, episode label) now read from `safe.*` instead of inline `layout.safeAreaTier.generous.*`.
 
 ## Useful cleanup, but not the main blocker
 
@@ -164,11 +133,11 @@ Those templates still have room for polish, but they do not currently show the s
 
 ## Suggested execution order
 
-1. Build render-level collision assertions for the templates already under real-data QA.
-2. Migrate `NetworkDiagram` if the next episode needs it, or move directly to item 3 if not.
-3. Do the second-pass `TimeSeriesChart` overlay cleanup if chart review still finds issues.
-4. Add one more real-data QA suite for a high-surface but structurally safer template family.
-5. Batch the second-tier layout migrations: `DuelingFrameworks`, `EscalationLadder`, then the legacy timeline comps.
+1. ✅ Build render-level collision assertions for the templates already under real-data QA.
+2. ✅ Migrate `NetworkDiagram` if the next episode needs it, or move directly to item 3 if not.
+3. ✅ Do the second-pass `TimeSeriesChart` overlay cleanup if chart review still finds issues.
+4. ✅ Add one more real-data QA suite for a high-surface but structurally safer template family.
+5. ✅ Batch the second-tier layout migrations: `DuelingFrameworks`, `EscalationLadder`, then the legacy timeline comps.
 6. Sweep `POL-10` inline shadow cleanup when the layout/blocking work is stable.
 
 ## Decision rule
