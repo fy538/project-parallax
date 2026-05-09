@@ -248,7 +248,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
-  const theme = useThemeMode("light");
+  const theme = useThemeMode(data.backgroundVariant || "light");
   const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
   // Per-episode color emphasis — route arc and point markers fall back to
   // the episode's primary accent instead of channel-default amber.

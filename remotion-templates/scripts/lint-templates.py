@@ -364,6 +364,109 @@ def check_hardcoded_palette_hex(filepath: Path, lines: list[str]) -> list[Issue]
     return issues
 
 
+def check_linear_interpolation(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-08: interpolate() without an easing config produces linear motion (A1).
+
+    Flags bare `interpolate(` calls where no easing evidence appears within
+    15 lines — wide enough to capture multi-line calls where CLAMP_* is on
+    a line 4-6 below the opening parenthesis. Excludes interpolateColors().
+    """
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    bare_interp = re.compile(r'\binterpolate(?!Colors)\s*\(')
+    # CLAMP_* constants, explicit easing: key, Easing.*, spring helpers, named easing vars
+    has_easing = re.compile(
+        r'CLAMP_|Easing\.|easing\s*:|spring\(|springConfig|easings\.|barEasing|growEasing|exitEasing'
+    )
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        if not bare_interp.search(line):
+            continue
+        # 15-line window: 2 before + current + 12 after — covers multi-line call bodies
+        window = "\n".join(lines[max(0, i - 3):min(len(lines), i + 12)])
+        if not has_easing.search(window):
+            issues.append(Issue(
+                severity="info",
+                rule="POL-08",
+                file=rel,
+                line=i,
+                message="interpolate() with no easing visible in 15-line window — may be linear (A1)",
+                fix="Add CLAMP_QUAD/CLAMP_SINE as 4th arg, or switch to fadeIn()/slideIn() helpers",
+            ))
+
+    return issues
+
+
+def check_missing_max_width(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-09: Large text (h1/h2/display tokens) without maxWidth risks full-viewport wrapping (L9)."""
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    # Only fire on explicit fontSizes.* token references for h1/h2/display scale
+    large_font = re.compile(r'fontSize:\s*fontSizes\.(h1|h2|display|title)\b')
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        if not large_font.search(line):
+            continue
+        # Check 10-line window ahead for maxWidth
+        window = "\n".join(lines[max(0, i - 2):min(len(lines), i + 10)])
+        if "maxWidth" not in window:
+            issues.append(Issue(
+                severity="info",
+                rule="POL-09",
+                file=rel,
+                line=i,
+                message="Large text without maxWidth — can span full 1920px if unconstrained (L9)",
+                fix="Add maxWidth from textMaxWidth tokens: textMaxWidth.h1 (1400) / textMaxWidth.h2 (1200)",
+            ))
+
+    return issues
+
+
+def check_inline_shadows(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-10: Shadow values should use shadows.* tokens from theme.ts (L12).
+
+    Flags boxShadow/textShadow with literal string values that don't reference
+    a shadows.* token. Template literals augmenting tokens (e.g. `${shadows.medium}, ...`)
+    are exempt because they extend a token rather than bypass it.
+    """
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    shadow_prop = re.compile(r'\b(boxShadow|textShadow)\s*:')
+    # Literal string: quote or backtick immediately after the colon+space
+    shadow_literal = re.compile(r'\b(boxShadow|textShadow)\s*:\s*["`\']')
+    exempt_values = re.compile(r'"none"|\'none\'|shadows\.|undefined')
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        if not shadow_prop.search(line):
+            continue
+        if not shadow_literal.search(line):
+            continue
+        if exempt_values.search(line):
+            continue
+        issues.append(Issue(
+            severity="info",
+            rule="POL-10",
+            file=rel,
+            line=i,
+            message="Inline shadow string — use shadows.subtle / shadows.medium / shadows.accentGlow(color) (L12)",
+            fix="Import shadows from theme.ts and replace inline string with shadows.* token",
+        ))
+
+    return issues
+
+
 def check_duplicate_compositions(episode_dir: Path) -> list[Issue]:
     """DATA-01: Detect data files that cover the same content (potential duplicates)."""
     issues = []
@@ -709,6 +812,9 @@ def lint_templates() -> list[Issue]:
             issues.extend(check_dark_mode_hardcoding(tsx_file, lines))
             issues.extend(check_background_redundancy(tsx_file, lines))
             issues.extend(check_hardcoded_palette_hex(tsx_file, lines))
+            issues.extend(check_linear_interpolation(tsx_file, lines))
+            issues.extend(check_missing_max_width(tsx_file, lines))
+            issues.extend(check_inline_shadows(tsx_file, lines))
 
     return issues
 

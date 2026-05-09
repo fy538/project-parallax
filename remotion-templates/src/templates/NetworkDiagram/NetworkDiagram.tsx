@@ -39,6 +39,7 @@ import {
   radii,
   dividerStyle,
   shadows,
+  contentArea,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -50,7 +51,6 @@ import {
 import {
   computeLayout,
   toPixels,
-  defaultSafeArea,
 } from "../../utils/layoutPresets";
 import { lineDrawProgress } from "../../utils/drawLine";
 import { bezierEdge } from "../../utils/edges";
@@ -340,7 +340,15 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   }, [data.layout, data.nodes.length, data.gridColumns]);
 
   const positions = useMemo(() => {
-    const safeArea = defaultSafeArea;
+    // Use contentArea to keep nodes below TitleBlock — defaultSafeArea.top (180px)
+    // predates the generous safe area tier and doesn't account for title height.
+    const area = contentArea("content", "generous");
+    const safeArea = {
+      left: area.left,
+      top: area.top,
+      width: area.width,
+      height: area.height,
+    };
     return data.nodes.map((node, idx) => {
       const base = baseLayout[idx];
       const override = node.position || { x: base.x, y: base.y };

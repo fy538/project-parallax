@@ -551,3 +551,20 @@ const value = (from + t * (overshoot - from)) - (overshoot - target) * settleT;
 ### L86: Sync anchor cascading can squeeze previous steps to zero
 **Problem:** In `useNarratedCamera`, when a sync point snaps a step's start boundary backward past the previous step's start, the previous step gets negative width — invisible but it breaks interpolation.
 **Fix:** After snapping, check if `boundaries[i-1].end <= boundaries[i-1].start` and enforce a minimum 0.5s duration, pushing the current step's start forward to compensate.
+
+## Layout polish patterns (May 2026)
+
+### L87: `zones.centeredStyle` — one-liner for centered content in any zone
+`useTemplateLayout` zones now expose a `centeredStyle` field alongside `style`. Spread it on any container that needs to vertically + horizontally center its children: `<div style={zones.content.centeredStyle}>`. It sets `display:flex, flexDirection:column, alignItems:center, justifyContent:center, overflow:hidden` at the pre-computed zone position. No separate `alignItems`/`justifyContent` or explicit `height` needed — the zone already carries the correct height.
+
+### L88: `textSafe.wrap` — prevent text overflow in bounded boxes
+Spread `...textSafe.wrap` on any text container in a bounded region (matrix cell, timeline card, framework node) to get `overflow:hidden, wordBreak:break-word, overflowWrap:break-word`. Also add `maxWidth: containerWidth - padding * 2` so the text wraps rather than pushes out of its cell. The `textSafe` object also has `.ellipsis` (single-line truncation) and `.clamp(n)` (n-line WebkitBox clamp).
+
+### L89: MatrixVariant cells — `minHeight` not `height`, dynamic sizing not hardcoded
+Fixed-`height` on matrix cells caused text overflow as soon as a cell label wrapped. Pattern: compute `availCellH = Math.floor((area.height - headerHeight - rows * margin * 2) / rows)` then `cellHeight = Math.min(180, Math.max(80, availCellH))` and apply as `minHeight` (not `height`) so cells grow with content. Same for `cellSize` (width). Wrap in `useMemo` — called at 30fps.
+
+### L90: `titleHeight.content` must cover the two-line wrapping case
+`titleHeight.content` was 92px (single-line estimate). A two-line h2 title wraps at ~106px and the subtitle adds ~33px → total ≈147px. Bumped to 150px. All 19 templates using `contentArea("content", ...)` or `useTemplateLayout({ title: "content" })` immediately get the corrected gap without any template changes.
+
+### L91: NetworkDiagram nodes must use `contentArea`, not `defaultSafeArea`
+`defaultSafeArea.top = layout.safeArea.top + 100 = 180px` — hard-coded before the generous safe area tier (120px) and before `titleHeight.content` grew to 150px. Actual content starts at `contentArea("content", "generous").top = 318px`. Using `defaultSafeArea` put nodes under the TitleBlock overlay. Fix: replace `defaultSafeArea` with a `SafeArea` object built from `contentArea("content", "generous")` in the `positions` useMemo.
