@@ -62,27 +62,21 @@ Two fixes applied:
 - Annotation labels use chart-space coordinates (annotX derived from data values) — correct by design, not a layout contract issue.
 - Y-axis label zone uses `layout.padding` (80 px standard) rather than generous — intentional extra space for tick mark text; narrowing it would risk label overflow.
 
-### 4. Expand real-data QA to one more high-surface template family
+### 4. ✅ Expand real-data QA to one more high-surface template family — DONE
 
-Why this matters:
+**Delivered (May 2026):**
 
-- The new chart/timeline/split suites are much better than the legacy "render frame 30 of every template" smoke test in `src/__tests__/templates.test.ts`.
-- The next quality gains will come from using real episode data on the templates that appear most often, not from adding more generic one-frame tests.
+- `src/__tests__/kinetic-typography-real-data.test.ts` — 12 tests (6 cases × 2 frames each) covering both `quote` and `statistic` variants across silicon-trap and prisoners-dilemma:
+  - `silicon-trap/kinetic-trap` — short quote, dark bg (baseline reference)
+  - `silicon-trap/kinetic-morris-chang` — long attribution, text overflow pressure
+  - `silicon-trap/kinetic-165b` — statistic + $ prefix, light bg (layout anchor switch)
+  - `prisoners-dilemma/kinetic-nash-quote` — maximum density: full attribution + source line
+  - `prisoners-dilemma/kinetic-2000-articles` — statistic with long multi-domain context
+  - `prisoners-dilemma/kinetic-wrong-game-real` — no attribution row (centering drift check)
+- 12 baseline PNGs committed to `src/__tests__/baselines/kinetic-review/`
 
-Best candidates:
-
-- `FrameworkDiagram`
-- `GameBoard`
-- `KineticTypography`
-
-Why these are second-tier:
-
-- They do not currently show the same mixed-layout smell as the chart/timeline/split/network group.
-- They are still high-surface templates, so a thin real-data suite would improve confidence on the shots that appear most often.
-
-Definition of done:
-
-- Each candidate gets a small review suite with one live shot and one stress variant, following the pattern used by chart/timeline/split QA.
+**Why `KineticTypography` was chosen:**
+Appears in 20 data files across both launch episodes (8 in silicon-trap, 12 in prisoners-dilemma) — highest shot density of any candidate. `FrameworkDiagram` (9 files) and `GameBoard` (7 files) are next candidates for a future pass if they start appearing in review loops.
 
 ## Second-tier layout migration batch
 
