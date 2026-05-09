@@ -520,6 +520,66 @@ def check_inline_shadows(filepath: Path, lines: list[str]) -> list[Issue]:
     return issues
 
 
+def check_svg_transform_box(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-11: CSS transforms on SVG elements need transformBox: 'fill-box'.
+
+    When a CSS `transform` style is applied to an SVG element (<svg>, <g>,
+    <rect>, <circle>, <path>, <ellipse>, <text>, <line>, <polyline>, <polygon>),
+    the default transform-origin resolves against the SVG viewport (top-left),
+    not the element's own bounding box. Without `transformBox: 'fill-box'`,
+    scale/rotate animations pivot from the wrong point.
+
+    SVG *attribute* transforms (transform="translate(x,y) scale(s)") are
+    exempt — they already encode the pivot explicitly via translate-scale-translate.
+    This rule only targets inline `style={{ transform: ... }}` on SVG elements.
+
+    Note: `transformBox: 'fill-box'` must accompany `transformOrigin` when set,
+    or the origin resolves against the wrong coordinate system regardless.
+    """
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    svg_elements = re.compile(
+        r'<(svg|g|rect|circle|path|ellipse|text|line|polyline|polygon)\b'
+    )
+    # CSS style transform (style prop, not SVG attribute)
+    css_transform = re.compile(r'\btransform\s*:\s*["`\']|transform\s*:\s*\w')
+    has_transform_box = re.compile(r'\btransformBox\b')
+
+    # Scan for SVG elements whose style block has transform but no transformBox.
+    # Simple line-by-line heuristic: flag a line that is both inside an SVG
+    # element open tag AND has a CSS transform without transformBox on the same line.
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        # Only flag lines that reference a CSS-style transform on an SVG element
+        if not css_transform.search(line):
+            continue
+        if has_transform_box.search(line):
+            continue
+        # Check surrounding context (±5 lines) for an SVG element opening tag
+        ctx_start = max(0, i - 6)
+        ctx_end = min(len(lines), i + 2)
+        ctx = "\n".join(lines[ctx_start:ctx_end])
+        if not svg_elements.search(ctx):
+            continue
+        # Exclude SVG attribute transforms (no `style` keyword on the line)
+        if "style=" not in line and "style:{" not in line and "style: {" not in line:
+            # This is likely an SVG attribute transform — skip
+            continue
+        issues.append(Issue(
+            severity="warning",
+            rule="POL-11",
+            file=rel,
+            line=i,
+            message="CSS transform on SVG element without transformBox: 'fill-box' — pivot defaults to viewport top-left",
+            fix="Add transformBox: 'fill-box' alongside transformOrigin to anchor transforms to the element's own bounding box",
+        ))
+
+    return issues
+
+
 def check_duplicate_compositions(episode_dir: Path) -> list[Issue]:
     """DATA-01: Detect data files that cover the same content (potential duplicates)."""
     issues = []
@@ -868,6 +928,7 @@ def lint_templates() -> list[Issue]:
             issues.extend(check_linear_interpolation(tsx_file, lines))
             issues.extend(check_missing_max_width(tsx_file, lines))
             issues.extend(check_inline_shadows(tsx_file, lines))
+            issues.extend(check_svg_transform_box(tsx_file, lines))
 
     return issues
 

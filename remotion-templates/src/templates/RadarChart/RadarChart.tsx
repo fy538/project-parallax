@@ -293,6 +293,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
             overflow: "visible",
             transform: hasAxisFocus ? `rotate(${focusRotationAngle}deg)` : undefined,
             transformOrigin: "center center",
+            transformBox: "fill-box",
             transition: "none",
           }}
         >
