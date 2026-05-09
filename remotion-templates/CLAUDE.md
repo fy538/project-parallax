@@ -29,7 +29,7 @@ remotion-templates/
     ├── Root.tsx              # Composition registration (all 25+ in <Folder> groups)
     ├── design/               # theme.ts (BRAND.md in code), fonts.ts (preload)
     ├── components/           # Background, MetadataStrip, Crosshair, TitleBlock, Transitions, etc.
-    ├── hooks/                # useCompositionAnimation, useDirection, useEntrance, useThemeMode, ...
+    ├── hooks/                # useCompositionAnimation, useDirection, useThemeMode, ...
     ├── utils/                # animation.ts, depth.ts, dataWarnings.ts, chartLayout.ts, mapUtils
     └── templates/            # One folder per template; FullEpisode in templates/Episodes/
 ```
@@ -80,7 +80,7 @@ export const YourTemplate: React.FC<{ data: YourDataType }> = ({ data }) => {
 };
 ```
 
-Hooks, utilities, and shared components are documented via JSDoc/TSDoc in the source — read the file when you need to use one. Key hooks: `useCompositionAnimation` (Ken Burns + exit fade, wired into all templates), `useDirection` (`_direction` JSON → atmosphere/drift/hold), `useEntrance` (semantic entrance presets: hero/content/data/label/structure), `useThemeMode` (mode-aware tokens), `useVerticalLayout` (Shorts).
+Hooks, utilities, and shared components are documented via JSDoc/TSDoc in the source — read the file when you need to use one. Key hooks: `useCompositionAnimation` (Ken Burns + exit fade, wired into all templates), `useDirection` (`_direction` JSON → atmosphere/drift/hold), `usePhase` (beat-by-beat scene phasing), `useTemplateLayout` (responsive layout tokens), `useThemeMode` (mode-aware tokens), `useVerticalLayout` (Shorts).
 
 ## Rendering
 

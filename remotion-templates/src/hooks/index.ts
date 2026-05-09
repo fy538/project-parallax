@@ -36,6 +36,11 @@
  */
 
 export { useCompositionAnimation } from "./useCompositionAnimation";
+export { useDirection, resolveDirection } from "./useDirection";
+export type { DirectionBlock, DirectionResult, DirectionSyncPoint } from "./useDirection";
+export { usePhase } from "./usePhase";
+export type { PhaseDefinition, PhaseState } from "./usePhase";
+export { useTemplateLayout } from "./useTemplateLayout";
 export { useThemeMode } from "./useThemeMode";
 export type { ThemeTokens } from "./useThemeMode";
 export { useVerticalLayout } from "./useVerticalLayout";

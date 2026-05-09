@@ -258,8 +258,7 @@ When building a new template or polishing an existing one, prefer these shared b
 **Configs:**
 - `gentleSpring` — damping 15, stiffness 80, mass 0.8 → smooth, no visible bounce. For UI elements.
 - `heroSpring` — damping 12, stiffness 100, mass 1.0 → slight overshoot, cinematic feel. For titles, key stats.
-- `microSettle` — damping 25, stiffness 200, mass 0.5 → tiny settle after growth. For bar completion, counter finish.
-**Rule:** Match spring to element importance: hero > gentle > micro. Never use the same spring for everything.
+**Rule:** Match spring to element importance: hero > gentle. Never use the same spring for everything.
 
 ---
 
@@ -297,14 +296,9 @@ When building a new template or polishing an existing one, prefer these shared b
 **Rule:** New templates MUST call this hook. Never implement Ken Burns or exit fade manually — that's the hook's job.
 **Convention:** Standard = `()`, Maps = `{ noDrift: true }`, Own-exit = `{ noExit: true }`, Shorts = `{ noDrift: true }`.
 
-### L44: useEntrance separates animation character from animation timing
-**Pattern:** Templates declare an element's semantic *role* (`"hero"`, `"content"`, `"data"`, `"label"`, `"structure"`) and get the correct animation physics without choosing between `fadeIn`, `heroSpring`, `slideIn`, or `interpolate`. The hook maps roles to animation parameters: hero gets spring physics with overshoot, data gets scale-in, labels get quick fades, structure is near-instant.
-**Rule:** Use `useEntrance` for individual element animations. Use `useStaggeredEntrance(role, index, baseDelay)` for lists. Control ordering via `startFrame`, not by choosing different animation functions.
-**Gotcha:** Hooks can't be called conditionally or in loops (React rules). For dynamic lists, compute the startFrame outside and pass it to `useEntrance` — or use the raw `interpolate`/`spring` functions from animation.ts.
+### L44: ~~useEntrance~~ — removed
 
-### L45: useDivider replaces 6+ duplicated gradient divider patterns
-**Pattern:** The "gradient line that fades at edges" appeared in TitleTransition (3×), KineticTypography (2×), and SplitComposition (1×) — each with slightly different animation code. `useDivider(startFrame, options)` standardizes this into one hook returning `{ lineStyle }` ready to spread onto a `<div>`.
-**Rule:** For any decorative divider line, use `useDivider`. For structural dividers that are part of the layout (like SplitComposition's center column), it's fine to keep custom code.
+> **Removed May 2026.** `useEntrance` and `useDivider` were deleted — zero usage across all 25 templates. For element entrance animations, use the `CLAMP_SINE` / `CLAMP_CUBIC` interpolation configs with explicit `startFrame` offsets. For divider lines, keep the inline gradient `interpolate` pattern already present in TitleTransition / KineticTypography.
 
 ### L46: Hook wiring pattern — compStyle wraps inside Background
 **Pattern:** The correct nesting is `<Background> → <AbsoluteFill style={compStyle}> → content`. Background stays static (no drift/fade) while all content inside the compStyle wrapper animates together. Don't apply compStyle to the Background itself — it would cause the vignette and grain to drift/fade.
@@ -535,10 +529,9 @@ const value = (from + t * (overshoot - from)) - (overshoot - target) * settleT;
 
 ## Pacing System (May 2026)
 
-### L83: useEntrance timingScale — pace-aware animations without template changes
-**Problem:** Templates hardcode animation durations. When pace shifts from analytical to urgent, animations should tighten; when breathing, they should relax. But modifying every template's animation code is impractical.
-**Solution:** `useEntrance(role, startFrame, timingScale)` accepts an optional `timingScale` (default 1.0). For hero elements, it scales spring mass (higher mass = slower spring). For all others, it scales the interpolation duration: `dur = Math.round(baseDur * ts)`. Clamped to [0.4, 2.0] to prevent absurd values. `useStaggeredEntrance` also scales the stagger gap: `scaledStagger = Math.round(staggerFrames * timingScale)`.
-**Usage:** `const entrance = useEntrance("data", 15, direction.paceTimingScale)` — existing calls without the third arg work unchanged.
+### L83: ~~useEntrance timingScale~~ — removed
+
+> **Removed May 2026.** The `timingScale` feature was speculative and never wired into any template. Pace-aware timing is handled at the `_direction` → `useDirection` layer instead.
 
 ### L84: Beat-boundary pace reset prevents infection
 **Problem:** A `PACE: urgent` in Beat 3 could infect all of Beat 4 if the writer forgot to reset. Silent bugs — the manifest would show compressed durations in unintended segments.
