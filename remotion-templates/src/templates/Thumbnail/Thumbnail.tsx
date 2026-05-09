@@ -18,7 +18,7 @@
 
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
-import { palette, fonts, fontSizes } from "../../design/theme";
+import { palette, fonts, fontSizes, layout, cjk } from "../../design/theme";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
@@ -28,6 +28,14 @@ import type { ThumbnailData } from "./types";
 const SAFE_X = 80;  // narrowed from 160 so stats have room
 const SAFE_Y = 48;
 const HEADER_FS = 11;
+// Thumbnail-specific type scale (no theme.ts equivalents at these sizes — thumbnail
+// uses non-standard bold stat sizes optimised for 1280×720 at-a-glance legibility)
+const THUMB_STAT_FS = 88;       // primary hero stat — between display(96) and h1(64)
+const THUMB_SUBTEXT_FS = 30;    // sub-caption — between h3(36) and body(22)
+const THUMB_MARK_FS = 20;       // ∴ brand mark glyph — between label(18) and body(22)
+// Thumbnail-specific spacing (canvas is 1280×720, not 1920×1080)
+const THUMB_STAT_PAD_L = 28;   // right-panel left inset — fits narrow stat column
+const THUMB_SEP_GAP = 20;       // gap flanking hairline separator — between sm(16)/md(24)
 
 // ── Shared: brand header strip ────────────────────────────────────────────────
 
@@ -113,7 +121,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
             <div
               style={{
                 fontFamily: fonts.mono,
-                fontSize: 10,
+                fontSize: fontSizes.meta,
                 color: palette.taupe,
                 letterSpacing: 2,
                 textTransform: "uppercase",
@@ -185,7 +193,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          paddingLeft: 28,
+          paddingLeft: THUMB_STAT_PAD_L,
           gap: 0,
         }}
       >
@@ -193,7 +201,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
           <div
             style={{
               fontFamily: fonts.data,
-              fontSize: 88,
+              fontSize: THUMB_STAT_FS,
               fontWeight: 700,
               color: palette.gold,
               lineHeight: 1,
@@ -226,8 +234,8 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
               width: "80%",
               height: 1,
               background: `linear-gradient(90deg, ${palette.bone}50 0%, transparent 100%)`,
-              marginTop: 20,
-              marginBottom: 20,
+              marginTop: THUMB_SEP_GAP,
+              marginBottom: THUMB_SEP_GAP,
             }}
           />
         )}
@@ -236,7 +244,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
           <div
             style={{
               fontFamily: fonts.data,
-              fontSize: 72,
+              fontSize: cjk.fontSizes.h1,
               fontWeight: 700,
               color: contrastColor,
               lineHeight: 1,
@@ -300,14 +308,14 @@ const LayoutDataProvocation: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        paddingTop: 32,
+        paddingTop: layout.spacing.lg,
       }}
     >
       {data.heroText && (
         <div
           style={{
             fontFamily: fonts.heading,
-            fontSize: 108,
+            fontSize: cjk.fontSizes.display,
             fontWeight: 700,
             color: palette.gold,
             lineHeight: 1,
@@ -324,13 +332,13 @@ const LayoutDataProvocation: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         <div
           style={{
             fontFamily: fonts.body,
-            fontSize: 30,
+            fontSize: THUMB_SUBTEXT_FS,
             fontWeight: 400,
             color: palette.bone,
             letterSpacing: 3,
             textAlign: "center",
             textTransform: "uppercase",
-            marginTop: 20,
+            marginTop: THUMB_SEP_GAP,
             textShadow: `0 2px 12px ${palette.ink}`,
           }}
         >
@@ -388,7 +396,7 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         top: SAFE_Y,
         right: SAFE_X,
         fontFamily: fonts.body,
-        fontSize: 20,
+        fontSize: THUMB_MARK_FS,
         color: palette.rust,
         letterSpacing: 1,
         zIndex: 10,
@@ -404,8 +412,8 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: 32,
-        paddingTop: 16,
+        gap: layout.spacing.lg,
+        paddingTop: layout.spacing.sm,
       }}
     >
       {data.illustrationSrc ? (

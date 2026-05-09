@@ -372,7 +372,7 @@ export const HorizontalTimeline: React.FC<{
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
-  const eraAColor = data.eraAColor || palette.amber;
+  const eraAColor = data.eraAColor || palette.gold;
   const eraBColor = data.eraBColor || palette.rust;
 
   // ── Compute event list and positions ─────────────────────────────────

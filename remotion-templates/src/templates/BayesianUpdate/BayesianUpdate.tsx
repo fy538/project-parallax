@@ -207,7 +207,7 @@ const EvidenceCard: React.FC<{
           width: 36,
           height: 36,
           borderRadius: "50%",
-          backgroundColor: `${cardColor}0A`,
+          backgroundColor: `${cardColor}25`,
           border: `2px solid ${cardColor}60`,
           display: "flex",
           alignItems: "center",
@@ -390,10 +390,10 @@ const HypothesisBar: React.FC<HypothesisBarProps & { isLeading?: boolean }> = Re
             alignItems: "center",
             position: "relative",
             height: 28,
-            backgroundColor: `${theme.text.muted}15`,
+            backgroundColor: `${theme.text.muted}25`,
             borderRadius: `${radii.sm}px ${radii.sm}px 0 0`,
             overflow: "hidden",
-            border: `1px solid ${theme.text.muted}20`,
+            border: `1px solid ${theme.text.muted}30`,
             boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`,
           }}
         >

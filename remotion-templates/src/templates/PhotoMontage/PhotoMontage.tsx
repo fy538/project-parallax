@@ -503,7 +503,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
         {cutFlashOpacity > 0 && (
           <AbsoluteFill
             style={{
-              backgroundColor: palette.amber,
+              backgroundColor: palette.gold,
               opacity: cutFlashOpacity,
               mixBlendMode: "screen",
               pointerEvents: "none",

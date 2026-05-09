@@ -867,7 +867,7 @@ export const titleHeight = {
   episode: 220,
   /** Section title (number + title + underline) */
   section: 160,
-  /** Chart/diagram title (h2 + optional subtitle) — safe for 2-line titles */
+  /** Chart/diagram title (h2 + optional subtitle) — safe for 2-line titles (two-line title + subtitle ≈ 147px) */
   content: 150,
   /** Minimal (single line h3) */
   minimal: 56,

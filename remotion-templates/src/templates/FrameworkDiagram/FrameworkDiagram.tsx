@@ -16,7 +16,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, clampText } from "../../design/theme";
+import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
@@ -574,22 +574,24 @@ const MatrixVariant: React.FC<{
   const cells = data.cells || [];
   const accentColor = data.accentColor || emphasis.primaryAccent;
 
-  const area = contentArea("content", "generous");
-
-  // Scale cell dimensions to fill the available content area rather than
-  // using a hardcoded 200×120. Caps prevent cells from becoming unreadably
-  // large on sparse grids; floors prevent illegible cramming on dense grids.
   const headerWidth = 180;
   const colHeaderHeight = 48;
-  const cellMargin = layout.spacing.xs / 2; // 4px — matches the `margin: layout.spacing.xs / 2` below
-  const availCellW = Math.floor(
-    (area.width - headerWidth - colHeaders.length * cellMargin * 2) / Math.max(1, colHeaders.length)
-  );
-  const availCellH = Math.floor(
-    (area.height - colHeaderHeight - rowHeaders.length * cellMargin * 2) / Math.max(1, rowHeaders.length)
-  );
-  const cellSize = Math.min(260, Math.max(140, availCellW));
-  const cellHeight = Math.min(180, Math.max(80, availCellH));
+  const cellMargin = layout.spacing.xs / 2;
+  const area = useMemo(() => contentArea("content", "generous"), []);
+  const cellSize = useMemo(() => {
+    const availW = Math.floor(
+      (area.width - headerWidth - colHeaders.length * cellMargin * 2) /
+        Math.max(1, colHeaders.length)
+    );
+    return Math.min(260, Math.max(140, availW));
+  }, [area.width, colHeaders.length, cellMargin]);
+  const cellHeight = useMemo(() => {
+    const availH = Math.floor(
+      (area.height - colHeaderHeight - rowHeaders.length * cellMargin * 2) /
+        Math.max(1, rowHeaders.length)
+    );
+    return Math.min(180, Math.max(80, availH));
+  }, [area.height, rowHeaders.length, cellMargin]);
 
   const cellLookup = useMemo(() => {
     const map = new Map<string, typeof cells[number]>();
@@ -652,7 +654,7 @@ const MatrixVariant: React.FC<{
                   stagger(ri, sec(0.3), sec(0.5)),
                   sec(0.3)
                 ),
-                ...clampText,
+                ...textSafe.wrap,
               }}
             >
               {rh}
@@ -694,7 +696,7 @@ const MatrixVariant: React.FC<{
                     boxShadow: isHighlight
                       ? `${shadows.medium}, 0 0 24px ${accentColor}50, inset 0 1px 0 rgba(255,255,255,0.08)`
                       : `${shadows.subtle}, inset 0 1px 0 rgba(255,255,255,0.04)`,
-                    ...clampText,
+                    ...textSafe.wrap,
                   }}
                 >
                   <div
@@ -706,6 +708,7 @@ const MatrixVariant: React.FC<{
                       lineHeight: 1.4,
                       textShadow: shadows.textLift,
                       maxWidth: cellSize - cardPadding.horizontal * 2,
+                      ...textSafe.wrap,
                     }}
                   >
                     {cell?.label || ""}

@@ -552,31 +552,19 @@ const value = (from + t * (overshoot - from)) - (overshoot - target) * settleT;
 **Problem:** In `useNarratedCamera`, when a sync point snaps a step's start boundary backward past the previous step's start, the previous step gets negative width — invisible but it breaks interpolation.
 **Fix:** After snapping, check if `boundaries[i-1].end <= boundaries[i-1].start` and enforce a minimum 0.5s duration, pushing the current step's start forward to compensate.
 
-## Layout & Centering (May 2026)
+## Layout polish patterns (May 2026)
 
-### L87: zones.centeredStyle — one-liner for centered content in any zone
-**Problem:** Every template that needed centered content re-invented flexbox centering on top of zone positioning — sometimes omitting `height` (making vertical centering impossible), sometimes missing `overflow: hidden` (causing content bleed).
-**Fix:** `useTemplateLayout` now returns `centeredStyle` alongside `style` on each zone. It adds `display: flex, flexDirection: column, alignItems: center, justifyContent: center, overflow: hidden` to the same position+size rect.
-**Usage:** `<div style={zones.content.centeredStyle}>` — children are centered both axes, clipped.
-**Rule:** Use `centeredStyle` any time you want content centered in its zone. Use `style` when you need flow layout (top-aligned items).
+### L87: `zones.centeredStyle` — one-liner for centered content in any zone
+`useTemplateLayout` zones now expose a `centeredStyle` field alongside `style`. Spread it on any container that needs to vertically + horizontally center its children: `<div style={zones.content.centeredStyle}>`. It sets `display:flex, flexDirection:column, alignItems:center, justifyContent:center, overflow:hidden` at the pre-computed zone position. No separate `alignItems`/`justifyContent` or explicit `height` needed — the zone already carries the correct height.
 
-### L88: clampText — spread to prevent text overflow in any constrained box
-**Problem:** Cells, nodes, and cards with fixed or max dimensions would let text bleed past their visible bounds. Adding `overflow: hidden` alone doesn't handle word breaks.
-**Fix:** `clampText` exported from `theme.ts`: `{ overflow: "hidden", overflowWrap: "break-word", wordBreak: "break-word" }`.
-**Usage:** `<div style={{ width: 200, minHeight: 120, ...clampText }}>` — text wraps and is clipped, never overflows the border.
-**Rule:** Any box with a constrained width or height that holds variable text should spread `clampText`.
+### L88: `textSafe.wrap` — prevent text overflow in bounded boxes
+Spread `...textSafe.wrap` on any text container in a bounded region (matrix cell, timeline card, framework node) to get `overflow:hidden, wordBreak:break-word, overflowWrap:break-word`. Also add `maxWidth: containerWidth - padding * 2` so the text wraps rather than pushes out of its cell. The `textSafe` object also has `.ellipsis` (single-line truncation) and `.clamp(n)` (n-line WebkitBox clamp).
 
-### L89: MatrixVariant cells — minHeight not height, dynamic sizing not hardcoded
-**Problem:** Matrix cells had `height: cellSize * 0.6` (fixed 120px) with no overflow guard. Long labels overflowed cell borders. `cellSize = 200` was hardcoded regardless of grid dimensions.
-**Fix:** Cell dimensions are now computed from available content area and grid size:
-- `cellSize = clamp(140, availableW / nCols, 260)` — fills available width up to a readable max
-- `cellHeight = clamp(80, availableH / nRows, 180)` — fills available height up to a readable max
-- Cells use `minHeight: cellH` (not fixed height) so content expands them if needed
-- All cells spread `clampText` to guard overflow
-**Rule:** Never hardcode `cellSize` or `cellHeight` in grid layouts. Always derive from available area ÷ count.
+### L89: MatrixVariant cells — `minHeight` not `height`, dynamic sizing not hardcoded
+Fixed-`height` on matrix cells caused text overflow as soon as a cell label wrapped. Pattern: compute `availCellH = Math.floor((area.height - headerHeight - rows * margin * 2) / rows)` then `cellHeight = Math.min(180, Math.max(80, availCellH))` and apply as `minHeight` (not `height`) so cells grow with content. Same for `cellSize` (width). Wrap in `useMemo` — called at 30fps.
 
-### L90: titleHeight.content must cover the two-line wrapping case
-**Problem:** `titleHeight.content` was 92px, sized for a single-line h2 + single-line subtitle. Any title long enough to wrap to two lines (common for descriptive episode titles) produces an actual height of ~147px, causing 7–41px of overlap between TitleBlock and the content area below it.
-**Fix:** Bumped `titleHeight.content` from 92 → 150. This covers the two-line title + single-subtitle case with a few pixels of cushion, and eliminates overlap in all 19 templates that use `contentArea()`. Content zone top moves from 260px → 328px (68px less content height, worth the trade).
-**Rule:** When setting titleHeight variants, size for the realistic WORST CASE (wrapping title), not the ideal single-line case. The lost content height is always a better trade than visual collision.
-**Do not reduce** without re-running the overlap check: `contentArea.top = safe.top + titleHeight + 48; TitleBlock bottom = safe.top + actual_rendered_height; overlap = TitleBlock bottom − contentArea.top`.
+### L90: `titleHeight.content` must cover the two-line wrapping case
+`titleHeight.content` was 92px (single-line estimate). A two-line h2 title wraps at ~106px and the subtitle adds ~33px → total ≈147px. Bumped to 150px. All 19 templates using `contentArea("content", ...)` or `useTemplateLayout({ title: "content" })` immediately get the corrected gap without any template changes.
+
+### L91: NetworkDiagram nodes must use `contentArea`, not `defaultSafeArea`
+`defaultSafeArea.top = layout.safeArea.top + 100 = 180px` — hard-coded before the generous safe area tier (120px) and before `titleHeight.content` grew to 150px. Actual content starts at `contentArea("content", "generous").top = 318px`. Using `defaultSafeArea` put nodes under the TitleBlock overlay. Fix: replace `defaultSafeArea` with a `SafeArea` object built from `contentArea("content", "generous")` in the `positions` useMemo.

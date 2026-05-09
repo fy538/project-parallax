@@ -223,7 +223,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
 }) => {
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
-  const theme = useThemeMode("light");
+  const theme = useThemeMode(data.backgroundVariant || "light");
   const { durationInFrames } = useVideoConfig();
   const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
   // Per-episode color emphasis — pulls primaryAccent for contested-actor
