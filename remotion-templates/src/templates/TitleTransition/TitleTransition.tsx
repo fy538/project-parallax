@@ -17,7 +17,7 @@ import {
   interpolate,
   Easing,
 } from "remotion";
-import { palette, fonts, fontSizes, layout, sec, shadows, gradients, durations } from "../../design/theme";
+import { palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -442,6 +442,7 @@ const SectionVariant: React.FC<{
               color: theme.text.primary,
               fontFamily: fonts.heading,
               marginTop: layout.spacing.sm,
+              maxWidth: textMaxWidth.h1,
               letterSpacing: titleLetterSpacing,
               opacity: fadeIn(frame, sec(0.4), sec(0.5)),
               transform: `scale(${titleScale}) translateY(${titleSpringY}px)`,
