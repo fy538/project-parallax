@@ -7,6 +7,7 @@ For each episode in episodes/PIPELINE.md, verifies:
   · No forward-state artifacts contradict the claimed state (catches stale table)
   · Stall detection: days in state exceeds warn/alert thresholds
   · Blocker consistency: "Blocked on" populated but state is not BLOCKED/REVISING
+  · Naming drift: canonical filename missing but versioned copies present
 
 Also writes episodes/<slug>/_checkpoint.md — a per-episode stage checklist
 auto-populated from actual file presence. Agents and humans read this for a
@@ -17,6 +18,8 @@ Usage:
   python3 tools/pipeline_validator.py silicon-trap  # check one episode
   python3 tools/pipeline_validator.py --strict      # exit 1 on warnings too
   python3 tools/pipeline_validator.py --no-checkpoint  # skip writing checkpoints
+  python3 tools/pipeline_validator.py --fix         # promote latest versioned → canonical
+  python3 tools/pipeline_validator.py --fix silicon-trap  # fix one episode only
 
 Exit 0 if clean, 1 if errors found (or warnings under --strict).
 """
@@ -111,6 +114,40 @@ FORWARD_EVIDENCE = [
     ("angle-memo.md",               "RESEARCH READY",  "episode"),
     ("research-audit.md",           "RESEARCH READY",  "episode"),
 ]
+
+
+# ── Canonical naming fixes ────────────────────────────────────────────────────
+# Each tuple: (canonical_filename, versioned_glob)
+# Used by --fix to promote the latest matching draft to the canonical name.
+# Order matters: earlier entries run first (harmless here, but be explicit).
+CANONICAL_FIXES: list[tuple[str, str]] = [
+    ("script-production.md",      "script-v*-production.md"),
+    ("script-audit.md",           "script-audit-v*.md"),
+    ("persona-eval.md",           "persona-eval-v*.md"),
+    ("visual-concept-audit.md",   "visual-concept-audit-v*.md"),
+    ("review-package.md",         "review-package-v*.md"),
+    ("research-audit.md",         "research-audit-v*.md"),
+]
+
+
+def fix_naming_drift(ep_dir: Path) -> list[str]:
+    """Promote the latest versioned draft to canonical for any missing canonical files.
+
+    Does NOT delete intermediate versions — human decides materiality.
+    Returns a list of human-readable rename messages (empty if nothing to fix).
+    """
+    renames: list[str] = []
+    for canonical, versioned_glob in CANONICAL_FIXES:
+        canon_path = ep_dir / canonical
+        if canon_path.exists():
+            continue  # canonical already present — nothing to do
+        hits = sorted(ep_dir.glob(versioned_glob))
+        if not hits:
+            continue  # no versioned copies either — genuine gap, not drift
+        latest = hits[-1]
+        latest.rename(canon_path)
+        renames.append(f"  {latest.name}  →  {canonical}")
+    return renames
 
 
 # ── PIPELINE.md parser ────────────────────────────────────────────────────────
@@ -622,6 +659,16 @@ def main() -> int:
         action="store_true",
         help="Skip writing _checkpoint.md files (check-only mode).",
     )
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help=(
+            "Promote the latest versioned draft to canonical filename for any "
+            "episode that has naming drift (canonical missing, versioned present). "
+            "Runs before validation so the subsequent check reflects the fix. "
+            "Does NOT delete intermediate versions — review manually."
+        ),
+    )
     args = parser.parse_args()
 
     rows = parse_pipeline_md()
@@ -638,6 +685,25 @@ def main() -> int:
     print("══════════════════════════════════════════════════════")
     print("  Parallax Episode Pipeline Validator")
     print("══════════════════════════════════════════════════════")
+
+    # ── --fix: promote versioned drafts to canonical before validation ─────────
+    if args.fix:
+        fix_summary: list[str] = []
+        for row in rows:
+            ep_dir = EPISODES_DIR / row.slug
+            if not ep_dir.is_dir():
+                continue
+            renames = fix_naming_drift(ep_dir)
+            if renames:
+                fix_summary.append(f"\n  {row.slug}:")
+                fix_summary.extend(renames)
+        if fix_summary:
+            print("\n── Naming drift fixes " + "─" * 35)
+            for line in fix_summary:
+                print(line)
+            print()
+        else:
+            print("\n  ✓ No naming drift to fix — all canonical files present.\n")
 
     reports = [validate_episode(r) for r in rows]
     checkpoints_written: list[str] = []

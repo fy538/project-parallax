@@ -11,16 +11,11 @@
 
 ## Script
 - [x] Angle Memo — angle-memo.md
-- [x] Script Draft — script-v5-production.md
-  - ⚠ no canonical script-production.md — rename script-v5-production.md once gate passes
-- [x] Script Audit — script-audit-v4.md
-  - ⚠ no canonical script-audit.md
-- [x] Persona Eval — persona-eval-v4.md
-  - ⚠ no canonical persona-eval.md
-- [x] Visual Concept — visual-concept-audit-v4.md
-  - ⚠ no canonical visual-concept-audit.md
-- [x] Review Package — review-package-v4.md
-  - ⚠ no canonical review-package.md
+- [x] Script Draft — script-production.md
+- [x] Script Audit — script-audit.md
+- [x] Persona Eval — persona-eval.md
+- [x] Visual Concept — visual-concept-audit.md
+- [x] Review Package — review-package.md
 - [ ] Title/Hook + Thumbnails — thumbnail-concepts.md missing
 
 ## Production Prep
@@ -37,4 +32,4 @@
 - [ ] Publish Retro — not yet run
 
 ---
-**Progress:** 9/19 stages complete · 5 naming drift warning(s)
+**Progress:** 9/19 stages complete

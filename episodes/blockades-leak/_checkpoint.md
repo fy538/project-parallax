@@ -12,8 +12,7 @@
 
 ## Script
 - [x] Angle Memo — angle-memo.md
-- [x] Script Draft — script-v1-production.md
-  - ⚠ no canonical script-production.md — rename script-v1-production.md once gate passes
+- [x] Script Draft — script-production.md
 - [x] Script Audit — script-audit.md
 - [x] Persona Eval — persona-eval.md
 - [x] Visual Concept — visual-concept-audit.md
@@ -34,4 +33,4 @@
 - [ ] Publish Retro — not yet run
 
 ---
-**Progress:** 11/19 stages complete · 1 naming drift warning(s)
+**Progress:** 11/19 stages complete

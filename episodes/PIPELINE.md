@@ -73,7 +73,11 @@ When an episode changes state:
 
 ## File naming convention
 
-**Canonical outputs** use the plain filename. **Draft/versioned outputs** use a version suffix. When a gate passes, rename the accepted version to the canonical name.
+**One canonical name per stage output. Always.**
+
+The canonical filename is the machine-readable, skill-readable truth. When a gate passes, the accepted version **overwrites** — it does not accumulate alongside prior drafts.
+
+**Canonical outputs** use the plain filename. **Draft/versioned outputs** use a version suffix and exist only while the gate is still open. The moment a gate passes: rename the latest draft to the canonical name. You may keep an older versioned file *only if it represents a materially different approach* (different angle, different structure) — not as an iteration record. Pure iteration drafts (`v2 → v3 → v4`) should be deleted once `v4` becomes canonical.
 
 | Artifact | Canonical name | Versioned drafts |
 |---|---|---|
@@ -91,7 +95,10 @@ When an episode changes state:
 | Visual QA | `visual-qa.md` | — (regenerate per render; don't version) |
 | Revision log | `REVISION_LOG.md` | — (append-only; never versioned) |
 
-**Rule:** skills that read prior outputs (review-package reading script-audit, etc.) should always open the canonical filename, not a versioned file. If the canonical file is missing, that's a signal the gate hasn't been formally accepted yet.
+**Rules:**
+1. Skills that read prior outputs (review-package reading script-audit, etc.) always open the **canonical filename**, not a versioned file. If canonical is missing, the gate has not been formally accepted yet.
+2. `pipeline_validator.py` reports naming drift as a warning when only versioned copies exist. Run `python3 tools/pipeline_validator.py --fix` to auto-promote the latest versioned file to canonical. Review the rename before committing — the tool does not delete intermediates.
+3. **Do not rename to canonical while actively revising.** The canonical name signals "gate passed." Keep the versioned suffix until the gate run is complete.
 
 ---
 
