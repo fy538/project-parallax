@@ -800,18 +800,44 @@ export const depth = {
 // ── Shadow Tokens (POLISH.md V3) ──────────────────────────────────────────
 
 export const shadows = {
-  /** Barely visible lift — default for cards, chart bars, framework nodes */
+  /** Barely visible lift — default for cards, chart bars, framework nodes (dark mode) */
   subtle: "0 2px 12px rgba(0,0,0,0.25)",
-  /** Highlighted elements — active states, hovered items */
+  /** Lift on light backgrounds — same role as subtle, reduced opacity */
+  subtleLight: "0 1px 8px rgba(0,0,0,0.08)",
+  /** Highlighted elements — active states, hovered items (dark mode) */
   medium: "0 4px 20px rgba(0,0,0,0.35)",
-  /** Colored halo — large, soft. Key data points, active map countries. */
-  accentGlow: (color: string) => `0 0 16px ${color}40`,
+  /** Highlighted elements on light backgrounds */
+  mediumLight: "0 2px 12px rgba(0,0,0,0.12)",
+  /** Colored halo — large, soft. Key data points, active map countries. Optional spread override. */
+  accentGlow: (color: string, spread = 16) => `0 0 ${spread}px ${color}40`,
   /** Colored halo — medium. Timeline dots, chart highlights. */
   accentGlowMd: (color: string) => `0 0 12px ${color}40`,
   /** Colored halo — tight. Inline badges, small nodes, text emphasis. */
   accentGlowSm: (color: string) => `0 0 8px ${color}40`,
   /** Text lift on dark backgrounds (POLISH.md V7) */
   textLift: "0 1px 3px rgba(0,0,0,0.5)",
+  /** Text shadow on light backgrounds — none (no lift needed against light bg) */
+  textLiftLight: "none",
+  /**
+   * Intensity-scaled glow: intensity ≤ 0 → "none", intensity 1 → max spread.
+   * Alpha hex also scales with intensity so half-emphasis reads as a softer halo.
+   * Replaces depth.ts glow() — use for focus isolation and animation emphasis.
+   */
+  glow: (color: string, intensity = 1, baseSpreadPx = 8, scaleSpreadPx = 4): string => {
+    if (intensity <= 0) return "none";
+    const spread = baseSpreadPx + scaleSpreadPx * intensity;
+    const alphaHex = Math.round(0x60 * intensity).toString(16).padStart(2, "0");
+    return `0 0 ${spread}px ${color}${alphaHex}`;
+  },
+  /**
+   * Stack multiple shadow layers. Skips falsy and "none" entries.
+   * Returns "none" when no real layers remain.
+   * Replaces depth.ts layeredShadow() — use for compositing content + accent shadows.
+   */
+  layer: (...layers: (string | null | undefined | false)[]): string => {
+    const real = layers.filter((s): s is string => Boolean(s) && s !== "none");
+    return real.length === 0 ? "none" : real.join(", ");
+  },
 } as const;
 
 // ── Gradient Helpers (POLISH.md V2, V4) ────────────────────────────────────

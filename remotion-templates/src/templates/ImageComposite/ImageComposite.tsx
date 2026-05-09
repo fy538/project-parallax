@@ -28,8 +28,8 @@ import {
   duotone as duotoneRamps,
   palette,
   textMaxWidth,
+  shadows,
 } from "../../design/theme";
-import { textShadow } from "../../utils/depth";
 import {
   fadeIn,
   slideIn,
@@ -176,7 +176,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             transform: `translateY(${textTranslate}px) scale(${textScale})`,
             transformOrigin: "left bottom",
             color: theme.text.primary,
-            textShadow: textShadow(true),
+            textShadow: shadows.textLift,
           }}
         >
           {data.title && (

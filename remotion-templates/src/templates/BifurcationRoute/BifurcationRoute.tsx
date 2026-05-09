@@ -31,6 +31,7 @@ import {
   sec,
   radii,
   cardPresets,
+  shadows,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -43,7 +44,6 @@ import {
   CLAMP_CUBIC,
   CLAMP_SINE,
 } from "../../utils/animation";
-import { contentShadow, accentGlow } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -523,8 +523,8 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
                     ...cardPresets.inset(isDark),
                     borderRadius: "50%",
                     boxShadow: isFork && forkGlowIntensity > 0
-                      ? `${contentShadow(true)}, ${accentGlow(palette.amber, 20 * forkGlowIntensity)}`
-                      : contentShadow(true),
+                      ? `${shadows.subtle}, ${shadows.accentGlow(palette.amber, 20 * forkGlowIntensity)}`
+                      : shadows.subtle,
                     borderColor: nodeColor,
                   }}
                 >

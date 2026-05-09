@@ -30,9 +30,9 @@ import {
   radii,
   cardPresets,
   textMaxWidth,
+  shadows,
 } from "../../design/theme";
 import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC, CLAMP_SINE } from "../../utils/animation";
-import { contentShadow, cardStyle } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -100,7 +100,7 @@ const GaugeArc: React.FC<{
         width={arcRadius * 2 + strokeWidth + 24}
         height={arcRadius + strokeWidth + 24}
         viewBox={`-12 -8 ${arcRadius * 2 + strokeWidth + 24} ${arcRadius + strokeWidth + 32}`}
-        style={{ filter: `drop-shadow(${contentShadow(true)})`, overflow: "visible" }}
+        style={{ filter: `drop-shadow(${shadows.subtle})`, overflow: "visible" }}
       >
         {/* Background arc (full circle, muted) */}
         <path

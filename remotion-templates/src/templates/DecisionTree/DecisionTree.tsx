@@ -36,6 +36,7 @@ import {
   radii,
   cardPresets,
   getCategoricalColor,
+  shadows,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -45,7 +46,6 @@ import {
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { smoothStepEdge } from "../../utils/edges";
-import { contentShadow, accentGlow } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -214,8 +214,8 @@ const TreeNodeComponent: React.FC<{
           height: "100%",
           ...nodeBoxStyle,
           boxShadow: isActive
-            ? `${contentShadow(true)}, ${accentGlow(nodeColor, 24 + Math.round(beatPulse * 8))}`
-            : contentShadow(true),
+            ? `${shadows.subtle}, ${shadows.accentGlow(nodeColor, 24 + Math.round(beatPulse * 8))}`
+            : shadows.subtle,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
