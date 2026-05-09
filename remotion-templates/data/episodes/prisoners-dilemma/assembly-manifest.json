@@ -1,0 +1,1911 @@
+{
+  "version": "1.0",
+  "episode": "prisoners-dilemma",
+  "title": "prisoners-dilemma",
+  "fps": 30,
+  "totalDurationSec": 886.8,
+  "mode": "estimate",
+  "pacing": {
+    "multipliers": {
+      "urgent": 0.7,
+      "analytical": 1.0,
+      "breathing": 1.4
+    },
+    "profilesUsed": [
+      "breathing",
+      "urgent"
+    ],
+    "diffs": [],
+    "netDeltaSec": 0
+  },
+  "narration": {
+    "totalDurationSec": 886.8,
+    "words": []
+  },
+  "musicBed": {
+    "tracks": [
+      {
+        "id": "contemplative-1",
+        "file": "audio/music/prisoners-dilemma/bed-contemplative-1.wav",
+        "startSec": 0,
+        "endSec": 212.0,
+        "fadeInSec": 2.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.15,
+        "mood": "contemplative",
+        "beat": "beat1"
+      },
+      {
+        "id": "analytical-2",
+        "file": "audio/music/prisoners-dilemma/bed-analytical-2.wav",
+        "startSec": 207.0,
+        "endSec": 452.0,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.12,
+        "mood": "analytical",
+        "beat": "beat2"
+      },
+      {
+        "id": "analytical-3",
+        "file": "audio/music/prisoners-dilemma/bed-analytical-3.wav",
+        "startSec": 447.0,
+        "endSec": 692.0,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 3.0,
+        "volume": 0.12,
+        "mood": "analytical",
+        "beat": "beat3"
+      },
+      {
+        "id": "resolution-4",
+        "file": "audio/music/prisoners-dilemma/bed-resolution-4.wav",
+        "startSec": 687.0,
+        "endSec": 886.8,
+        "fadeInSec": 3.0,
+        "fadeOutSec": 0.0,
+        "volume": 0.12,
+        "mood": "resolution",
+        "beat": "beat4"
+      }
+    ]
+  },
+  "beats": [
+    {
+      "id": "beat1",
+      "title": "THE FAILED EXPERIMENT",
+      "startSec": 0,
+      "endSec": 210
+    },
+    {
+      "id": "beat2",
+      "title": "HOW A FAILED MODEL CONQUERED THE WORLD",
+      "startSec": 210,
+      "endSec": 450
+    },
+    {
+      "id": "beat3",
+      "title": "THE WRONG GAME",
+      "startSec": 450,
+      "endSec": 690
+    },
+    {
+      "id": "beat4",
+      "title": "THERE WAS ALWAYS ANOTHER GAME",
+      "startSec": 690,
+      "endSec": 930
+    },
+    {
+      "id": "beat5",
+      "title": "YOUR GAME",
+      "startSec": 930,
+      "endSec": 1080
+    }
+  ],
+  "segments": [
+    {
+      "id": "beat1-seg01",
+      "type": "TEMPLATE",
+      "startSec": 0.0,
+      "endSec": 12.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "The Prisoner's Dilemma is the most influential framework in the history of strat",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-standard-frame.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.6,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 6.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg02",
+      "type": "TEMPLATE",
+      "startSec": 20.8,
+      "endSec": 25.8,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "Here's what it can't explain: its own first experiment.",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-cant-explain.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg03",
+      "type": "TEMPLATE",
+      "startSec": 25.8,
+      "endSec": 32.8,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "The question this episode is about — how a framework that failed on day one conq",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-model-conquers.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "iris",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.7,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg04",
+      "type": "FOOTAGE",
+      "startSec": 41.8,
+      "endSec": 48.8,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "In January 1950, two researchers at the RAND Corporation ran the first-ever pris",
+      "asset": {
+        "searchTerms": [
+          "Constructivist mid-century research office: two geometric figures in shirtsleeves at a small table with paper grids, warm amber light through venetian-blind slats casting parallel shadows, color-blocked interior in bone and grey-green"
+        ],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "transition": {
+        "in": "iris",
+        "out": "cut",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat1-seg05",
+      "type": "FOOTAGE",
+      "startSec": 48.8,
+      "endSec": 61.2,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "The subjects — an economist named Armen Alchian and a mathematician named John W",
+      "asset": {
+        "searchTerms": [],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat1-seg06",
+      "type": "TEMPLATE",
+      "startSec": 61.2,
+      "endSec": 72.2,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "syncWords": [
+        "sixty percent",
+        "sixty"
+      ],
+      "narrationRef": "They cooperated sixty percent of the time. {✅}",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-flood-dresher.json"
+      },
+      "transition": {
+        "out": "color-wash",
+        "washColor": "#1C1814"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.8,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg07",
+      "type": "FOOTAGE",
+      "startSec": 72.2,
+      "endSec": 79.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "Mutual defection — the only outcome the model predicted — happened fourteen time",
+      "asset": {
+        "searchTerms": [],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat1-seg08",
+      "type": "FOOTAGE",
+      "startSec": 79.4,
+      "endSec": 84.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "John Nash — the man whose equilibrium concept the experiment was testing — read ",
+      "asset": {
+        "searchTerms": [],
+        "source": "wikimedia-commons"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat1-seg09",
+      "type": "TEMPLATE",
+      "startSec": 91.4,
+      "endSec": 97.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "Nash's verdict: they would have been more rational if they couldn't see each oth",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-nash-quote.json"
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg10",
+      "type": "FOOTAGE",
+      "startSec": 98.4,
+      "endSec": 107.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "That response — blame the players, not the model — set a template. The most infl",
+      "asset": {
+        "searchTerms": [
+          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions — university, military headquarters, stock exchange — all turning toward the equation as if worshipping it"
+        ],
+        "source": null,
+        "shotListId": "aigen-02"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "transition": {
+        "out": "iris"
+      }
+    },
+    {
+      "id": "beat1-seg11",
+      "type": "TEMPLATE",
+      "startSec": 113.2,
+      "endSec": 119.2,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "And right now, it is shaping every negotiation that will determine your future.",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-every-negotiation.json"
+      },
+      "transition": {
+        "in": "iris",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg12",
+      "type": "FOOTAGE",
+      "startSec": 119.4,
+      "endSec": 125.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "The standard story is that the Prisoner's Dilemma explains why cooperation betwe",
+      "asset": {
+        "searchTerms": [
+          "Constructivist aerial view: geometric building complex with national flags as abstract color bars, figures as small dots converging on entrance, overhead perspective, color-blocked in ink and bone with amber accent on central hall"
+        ],
+        "source": null,
+        "shotListId": "aigen-03"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat1-seg13",
+      "type": "TEMPLATE",
+      "startSec": 129.4,
+      "endSec": 137.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "But that's not what's going on. The Prisoner's Dilemma doesn't describe the game",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-motif-beat1.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.0,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 3.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg14",
+      "type": "TEMPLATE",
+      "startSec": 143.4,
+      "endSec": 157.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "syncWords": [
+        "two thousand"
+      ],
+      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {✅} Biologists imported it to e",
+      "template": {
+        "component": "DataChart",
+        "dataFile": "chart-diffusion.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 8.4,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 5.6,
+          "volume": 0.08
+        },
+        {
+          "type": "bar-grow",
+          "offsetSec": 7.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg15",
+      "type": "FOOTAGE",
+      "startSec": 165.8,
+      "endSec": 173.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "A model that couldn't predict two people in a room was explaining everything fro",
+      "asset": {
+        "searchTerms": [],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat2-seg16",
+      "type": "FOOTAGE",
+      "startSec": 173.0,
+      "endSec": 178.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "How? Because of where it was born.",
+      "asset": {
+        "searchTerms": [],
+        "source": "wikimedia-commons"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat2-seg17",
+      "type": "FOOTAGE",
+      "startSec": 178.0,
+      "endSec": 185.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Not a university. Not a think tank the way we use the word now. RAND Corporation",
+      "asset": {
+        "searchTerms": [
+          "Constructivist institutional corridor: fluorescent light bars as geometric strips, lone figure in suit walking past chalkboards dense with game matrices, color-blocked walls in grey-green and cream, figure rendered as angular silhouette"
+        ],
+        "source": null,
+        "shotListId": "aigen-04"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "transition": {
+        "out": "color-wash",
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat2-seg18",
+      "type": "TEMPLATE",
+      "startSec": 193.6,
+      "endSec": 201.6,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {✅} T",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-nuclear.json"
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.0,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 3.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg19",
+      "type": "FOOTAGE",
+      "startSec": 218.4,
+      "endSec": 220.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Nuclear strategy in miniature.",
+      "asset": {
+        "searchTerms": [],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat2-seg20",
+      "type": "FOOTAGE",
+      "startSec": 220.0,
+      "endSec": 223.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "And then it escaped the building.",
+      "asset": {
+        "searchTerms": [
+          "Constructivist doorway: dark geometric interior frame opening onto bright amber exterior, light rays as sharp triangular beams, threshold as clean dividing line between shadow and light"
+        ],
+        "source": null,
+        "shotListId": "aigen-05"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat2-seg21",
+      "type": "TEMPLATE",
+      "startSec": 223.0,
+      "endSec": 238.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Every discipline that adopted it had to narrow something to make the model fit. ",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-narrowing.json"
+      },
+      "paceProfile": "urgent",
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 4.5,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 8.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg22",
+      "type": "TEMPLATE",
+      "startSec": 238.2,
+      "endSec": 243.2,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "The model spread everywhere. It applies almost nowhere.",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-2000-articles.json"
+      },
+      "paceProfile": "urgent",
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg23",
+      "type": "TEMPLATE",
+      "startSec": 243.2,
+      "endSec": 251.2,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "Which raises the question this episode is actually about: if the model failed it",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-something-working.json"
+      },
+      "paceProfile": "urgent",
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat2-seg24",
+      "type": "TEMPLATE",
+      "startSec": 259.2,
+      "endSec": 269.2,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "Checkpoint. A model built for anonymous one-shot encounters became the default l",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-checkpoint-beat2.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg25",
+      "type": "FOOTAGE",
+      "startSec": 285.2,
+      "endSec": 294.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "A model that failed its first experiment, applied to everything, still spreading",
+      "asset": {
+        "searchTerms": [
+          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines — mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
+        ],
+        "source": null,
+        "shotListId": "aigen-06"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "iris",
+        "durationSec": 0.75
+      }
+    },
+    {
+      "id": "beat3-seg26",
+      "type": "FOOTAGE",
+      "startSec": 303.2,
+      "endSec": 310.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "You walk into a negotiation. You've been trained — explicitly or implicitly, thr",
+      "asset": {
+        "searchTerms": [
+          "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber"
+        ],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "transition": {
+        "in": "iris",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat3-seg27",
+      "type": "TEMPLATE",
+      "startSec": 320.0,
+      "endSec": 331.0,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "syncWords": [
+        "defect"
+      ],
+      "narrationRef": "So you defect. And your counterpart — trained by the same textbooks, shaped by t",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-trap-mechanism.json"
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.8,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg28",
+      "type": "TEMPLATE",
+      "startSec": 332.6,
+      "endSec": 340.6,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 3.0,
+      "holdBehavior": "linger",
+      "narrationRef": "The prediction came true. But it came true .",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-prediction-believed.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg29",
+      "type": "TEMPLATE",
+      "startSec": 340.6,
+      "endSec": 345.6,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "I call this The Wrong Game.",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-wrong-game-title.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg30",
+      "type": "FOOTAGE",
+      "startSec": 345.6,
+      "endSec": 349.6,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "asset": {
+        "searchTerms": [
+          "Constructivist stock exchange floor: geometric traders as angular silhouettes reaching upward, ticker tape as flowing ribbon of numbers, equation hovering above like a sun, color-blocked in amber and ink"
+        ],
+        "source": null,
+        "shotListId": "aigen-08"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat3-seg31",
+      "type": "TEMPLATE",
+      "startSec": 349.6,
+      "endSec": 357.6,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "It's the same mechanism that hit finance. In 1973, Fischer Black and Myron Schol",
+      "template": {
+        "component": "TimeSeriesChart",
+        "dataFile": "chart-vol-smile.json"
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 4.8,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "line-draw",
+          "offsetSec": 2.4,
+          "volume": 0.08
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg32",
+      "type": "TEMPLATE",
+      "startSec": 375.2,
+      "endSec": 387.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "The Prisoner's Dilemma has the same structure. Assume defection is rational. Bui",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-motif-beat3.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.6,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 6.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg33",
+      "type": "FOOTAGE",
+      "startSec": 393.6,
+      "endSec": 399.6,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "The Prisoner's Dilemma isn't wrong about everything. There are situations where ",
+      "asset": {
+        "searchTerms": [
+          "Constructivist oil infrastructure: geometric refinery towers as angular columns against amber sunset, pipeline as bold horizontal line, smoke as stylized spiral forms, color-blocked in rust and ink"
+        ],
+        "source": null,
+        "shotListId": "aigen-09"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat3-seg34",
+      "type": "TEMPLATE",
+      "startSec": 407.2,
+      "endSec": 419.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  — the game we assume",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-cycle-vs-question.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.6,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 6.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg35",
+      "type": "TEMPLATE",
+      "startSec": 431.2,
+      "endSec": 437.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong — but that it's the wrong",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-wrong-game-real.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat3-seg36",
+      "type": "TEMPLATE",
+      "startSec": 443.4,
+      "endSec": 453.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "Checkpoint. This isn't conspiracy — nobody sat in a room and decided to mislead ",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-checkpoint-beat3.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg37",
+      "type": "FOOTAGE",
+      "startSec": 464.6,
+      "endSec": 473.6,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "But here's the relief. There was always another game available. And we have proo",
+      "asset": {
+        "searchTerms": [
+          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures — some carrying logs together, others building a structure — color-blocked in warm palette"
+        ],
+        "source": null,
+        "shotListId": "aigen-10"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.75
+      }
+    },
+    {
+      "id": "beat4-seg38",
+      "type": "FOOTAGE",
+      "startSec": 473.6,
+      "endSec": 480.6,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {✅} A group of hunters face a cho",
+      "asset": {
+        "searchTerms": [
+          "Constructivist forest hunt: geometric trees as vertical columns, angular hunters with spears converging on a stylized stag in center, one hunter at edge turning toward a small hare, dawn light as amber rays through canopy, color-blocked in bone and ink"
+        ],
+        "source": null,
+        "shotListId": "aigen-11"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat4-seg39",
+      "type": "TEMPLATE",
+      "startSec": 498.4,
+      "endSec": 512.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "syncWords": [
+        "fundamentally"
+      ],
+      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma — but it is fund",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-staghunt.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 3.5,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 5.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg40",
+      "type": "TEMPLATE",
+      "startSec": 512.4,
+      "endSec": 523.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "syncWords": [
+        "cooperation"
+      ],
+      "narrationRef": "In the Prisoner's Dilemma, mutual cooperation is not an equilibrium. Defection a",
+      "template": {
+        "component": "SplitComposition",
+        "dataFile": "split-pd-vs-staghunt.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.3,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 6.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg41",
+      "type": "TEMPLATE",
+      "startSec": 531.0,
+      "endSec": 538.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {✅} An iterated Prison",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-iterated-equiv.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.8,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg42",
+      "type": "TEMPLATE",
+      "startSec": 549.2,
+      "endSec": 555.2,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "Which means the question was never \"how do you escape the logic of defection?\" I",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-reframe.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.8,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 3.3,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg43",
+      "type": "FOOTAGE",
+      "startSec": 560.0,
+      "endSec": 565.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "And we don't have to theorize. Elinor Ostrom spent thirty years documenting comm",
+      "asset": {
+        "searchTerms": [
+          "Constructivist terraced farmland: geometric stepped hillside with angular irrigation channels, small cooperative figures working at different levels, warm amber light across terraces, color-blocked in bone and green-grey"
+        ],
+        "source": null,
+        "shotListId": "aigen-10"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat4-seg44",
+      "type": "TEMPLATE",
+      "startSec": 568.0,
+      "endSec": 584.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "[VISUAL-FIRST: 3s]",
+      "template": {
+        "component": "ChoroplethMap",
+        "dataFile": "choropleth-ostrom.json"
+      },
+      "soundCue": {
+        "type": "map-whoosh",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "region-glow",
+          "offsetSec": 4.0,
+          "volume": 0.08
+        },
+        {
+          "type": "region-glow",
+          "offsetSec": 8.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg45",
+      "type": "FOOTAGE",
+      "startSec": 584.0,
+      "endSec": 596.8,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
+      "asset": {
+        "searchTerms": [],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat4-seg46",
+      "type": "TEMPLATE",
+      "startSec": 596.8,
+      "endSec": 610.8,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "Ostrom documented what they shared: eight design principles. {✅} Clear boundarie",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-ostrom-vs-pd.json"
+      },
+      "transition": {
+        "out": "dissolve"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 4.2,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 7.7,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg47",
+      "type": "TEMPLATE",
+      "startSec": 614.4,
+      "endSec": 620.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "Communication. Reputation. Repeated interaction. Institutional context. Capacity",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-cooperation-designed.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.5,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg48",
+      "type": "FOOTAGE",
+      "startSec": 624.2,
+      "endSec": 630.2,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale — identifiable p",
+      "asset": {
+        "searchTerms": [
+          "Constructivist ocean vastness: endless geometric waves as repeating angular forms stretching to horizon, no boundaries visible, tiny boat as single dot, overwhelming scale, color-blocked in ink and bone with grey-blue tint"
+        ],
+        "source": null,
+        "shotListId": "aigen-13"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      }
+    },
+    {
+      "id": "beat5-seg49",
+      "type": "FOOTAGE",
+      "startSec": 645.8,
+      "endSec": 649.8,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "asset": {
+        "searchTerms": [
+          "Constructivist city street: geometric pedestrian figures walking in evening light, angular building facades on both sides, long shadows as parallel lines, amber streetlight glow, color-blocked in ink and warm tones"
+        ],
+        "source": null,
+        "shotListId": "aigen-14"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.75
+      }
+    },
+    {
+      "id": "beat5-seg50",
+      "type": "TEMPLATE",
+      "startSec": 649.8,
+      "endSec": 657.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Most of the major negotiations happening right now — US-China AI governance, cli",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-motif-beat5.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 2.4,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 4.4,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg51",
+      "type": "TEMPLATE",
+      "startSec": 672.2,
+      "endSec": 685.2,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 3.0,
+      "holdBehavior": "linger",
+      "narrationRef": "And the question the stag hunt asks — \"can we coordinate on the outcome we both ",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-motif-final.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.45
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.9,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 7.2,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg52",
+      "type": "FOOTAGE",
+      "startSec": 695.2,
+      "endSec": 699.2,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "asset": {
+        "searchTerms": [
+          "Constructivist horizon: two geometric landmasses separated by narrow strait, each with a single glowing dot (amber and grey), reflection in the water between them, still and contemplative, color-blocked in ink and bone"
+        ],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat5-seg53",
+      "type": "TEMPLATE",
+      "startSec": 699.2,
+      "endSec": 711.2,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Here's what would change my mind. If a major actor — say, the US or China in the",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "framework-falsification.json"
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.6,
+          "volume": 0.06
+        },
+        {
+          "type": "card-settle",
+          "offsetSec": 6.6,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg54",
+      "type": "TEMPLATE",
+      "startSec": 728.0,
+      "endSec": 743.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "I put the probability of a US-China joint AI safety communiqué with shared techn",
+      "template": {
+        "component": "ProbabilityGauge",
+        "dataFile": "forecast-pd-cooperation.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 9.0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "bar-grow",
+          "offsetSec": 6.0,
+          "volume": 0.08
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg55",
+      "type": "TEMPLATE",
+      "startSec": 753.4,
+      "endSec": 760.4,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Watch for the signals. The NPT Review Conference language — are they talking abo",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-watch-signals.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.3
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.8,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg56",
+      "type": "FOOTAGE",
+      "startSec": 771.0,
+      "endSec": 776.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Games can be changed. It's not easy — seventy-five years of institutional moment",
+      "asset": {
+        "searchTerms": [
+          "Constructivist lecture hall: rows of geometric student figures facing a chalkboard covered in game matrices, angular professor silhouette at podium, overhead fluorescent strips, color-blocked in bone and grey with amber chalkboard highlights"
+        ],
+        "source": null,
+        "shotListId": "aigen-16"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat5-seg57",
+      "type": "FOOTAGE",
+      "startSec": 782.6,
+      "endSec": 790.6,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "But it has been done before. In 1986, Reagan and Gorbachev walked into a summit ",
+      "asset": {
+        "searchTerms": [],
+        "source": "wikimedia-commons"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat5-seg58",
+      "type": "TEMPLATE",
+      "startSec": 809.0,
+      "endSec": 821.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 2.0,
+      "holdBehavior": "breathe",
+      "narrationRef": "What the evidence establishes: the stag hunt was always available, cooperation i",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-evidence-establishes.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      },
+      "soundCue": {
+        "type": "quote-bell",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 3.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg59",
+      "type": "TEMPLATE",
+      "startSec": 849.4,
+      "endSec": 854.4,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "The Prisoner's Dilemma failed its first experiment in 1950. Alchian and Williams",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-flood-dresher.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.45
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 1.2,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 2.0,
+          "volume": 0.06
+        }
+      ]
+    },
+    {
+      "id": "beat5-seg60",
+      "type": "FOOTAGE",
+      "startSec": 867.0,
+      "endSec": 877.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 3.0,
+      "holdBehavior": "linger",
+      "narrationRef": "Seventy-five years later, the model that couldn't predict two people in a room i",
+      "asset": {
+        "searchTerms": [
+          "Constructivist panorama: two vast geometric cityscapes facing each other across a narrow channel, the channel itself shaped like a game theory matrix, tiny mannequin figures standing at the edges looking across, amber light from below, ink sky above"
+        ],
+        "source": null
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat5-seg61",
+      "type": "TEMPLATE",
+      "startSec": 878.8,
+      "endSec": 886.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 3.0,
+      "holdBehavior": "linger",
+      "narrationRef": "Now you can see it. The next time you hear that cooperation between rivals is im",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-final-choice.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "soundCue": {
+        "type": "beat-transition",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.0,
+          "volume": 0.08
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 3.2,
+          "volume": 0.06
+        }
+      ]
+    }
+  ]
+}

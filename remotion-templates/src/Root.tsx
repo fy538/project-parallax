@@ -96,6 +96,9 @@ import {
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogBifurcationLatin,
+  CatalogEditorialHero,
+  CatalogEditorialAside,
+  CatalogEditorialMinimal,
   CatalogShowreel,
   CatalogEmphasisShowcase,
   CatalogTemplatePreview,
@@ -249,6 +252,12 @@ export const RemotionRoot: React.FC = () => {
           <CatalogGameChess />
           <CatalogGamePayoff />
           <CatalogBifurcationLatin />
+        </Folder>
+
+        <Folder name="Editorial">
+          <CatalogEditorialHero />
+          <CatalogEditorialAside />
+          <CatalogEditorialMinimal />
         </Folder>
       </Folder>
     </>

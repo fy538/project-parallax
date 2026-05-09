@@ -33,6 +33,32 @@
       "enum": ["estimate", "precise"],
       "description": "How timing was derived. 'estimate' = from script hints and word count. 'precise' = from Whisper narration timestamps."
     },
+    "pacing": {
+      "type": "object",
+      "description": "PACE: annotation summary emitted by generate_manifest.py. Records which pacing profiles were applied and any net timing delta.",
+      "additionalProperties": false,
+      "properties": {
+        "multipliers": {
+          "type": "object",
+          "description": "Duration multipliers per pacing profile.",
+          "additionalProperties": { "type": "number" }
+        },
+        "profilesUsed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Pacing profiles referenced in the script."
+        },
+        "diffs": {
+          "type": "array",
+          "description": "Segment-level timing adjustments.",
+          "items": { "type": "object" }
+        },
+        "netDeltaSec": {
+          "type": "number",
+          "description": "Net timing change in seconds from pacing adjustments."
+        }
+      }
+    },
     "episodeColorEmphasis": {
       "type": "string",
       "enum": ["neutral", "soviet", "american-modernist", "chinese-state", "chinese-traditional", "japanese-showa"],
@@ -384,6 +410,10 @@
               "type": "number",
               "default": 0.5,
               "description": "Transition duration in seconds. Ignored for cut transitions."
+            },
+            "washColor": {
+              "type": "string",
+              "description": "Hex color for color-wash transitions, e.g. '#1C1814'."
             }
           }
         },
@@ -435,6 +465,26 @@
         "notes": {
           "type": "string",
           "description": "Production notes from the script's italicized annotations."
+        },
+        "holdAfter": {
+          "type": "number",
+          "description": "Extra seconds to hold this segment after narration ends. Emitted from DIR: hold annotations in the script."
+        },
+        "holdBehavior": {
+          "type": "string",
+          "enum": ["freeze", "loop", "continue", "linger", "breathe", "land"],
+          "default": "freeze",
+          "description": "What to do during the holdAfter period."
+        },
+        "paceProfile": {
+          "type": "string",
+          "enum": ["urgent", "analytical", "breathing"],
+          "description": "PACE: annotation applied to this segment, controlling duration multiplier."
+        },
+        "syncWords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key words from narration used for Whisper sync alignment in precise mode."
         },
         "soundCue": {
           "type": "object",

@@ -38,20 +38,13 @@ import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
 import { TitleTransition } from "../TitleTransition/TitleTransition";
 import { SplitComposition } from "../SplitComposition/SplitComposition";
 import { ProbabilityGauge } from "../ProbabilityGauge/ProbabilityGauge";
+import { AiGenClip } from "../../components/AiGenClip";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 const CLIP_DIR = "episodes/prisoners-dilemma/clips";
 
-/** Wrapper that plays an AI-gen clip from public/ with brand-consistent fallback */
-const AiGenClip: React.FC<{ src: string; label: string }> = ({ src, label }) => (
-  <AbsoluteFill style={{ backgroundColor: "#1C1814" }}>
-    <OffthreadVideo
-      src={staticFile(src)}
-      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-    />
-  </AbsoluteFill>
-);
+const CLIP_NATIVE_SEC = 6; // Hailuo free tier: all clips are 6s
 
 /** Placeholder for archival stills not yet sourced */
 const ArchivalPlaceholder: React.FC<{ label: string }> = ({ label }) => (
@@ -167,6 +160,7 @@ type VideoClip = {
   type: "video";
   file: string;
   durationSec: number;
+  playbackRate: number;
   label: string;
 };
 
@@ -185,10 +179,12 @@ const mg = (
   label: string,
 ): TemplateClip => ({ type: "template", component, data, durationSec, label });
 
-const vid = (filename: string, label: string): VideoClip => ({
+/** Stretch a 6s Hailuo clip to fill targetSec by slowing playback */
+const vid = (filename: string, label: string, targetSec = 8): VideoClip => ({
   type: "video",
   file: `${CLIP_DIR}/${filename}`,
-  durationSec: 6,
+  durationSec: targetSec,
+  playbackRate: CLIP_NATIVE_SEC / targetSec,
   label,
 });
 
@@ -289,7 +285,7 @@ export const PrisonersDilemmaShowcase: React.FC = () => {
             {clip.type === "template" ? (
               <clip.component data={clip.data as any} />
             ) : clip.type === "video" ? (
-              <AiGenClip src={clip.file} label={clip.label} />
+              <AiGenClip src={staticFile(clip.file)} playbackRate={clip.playbackRate} />
             ) : (
               <ArchivalPlaceholder label={clip.label} />
             )}

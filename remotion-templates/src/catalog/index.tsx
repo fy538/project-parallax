@@ -71,6 +71,12 @@ export {
   CatalogBifurcationLatin,
 } from "./Scenarios";
 
+export {
+  CatalogEditorialHero,
+  CatalogEditorialAside,
+  CatalogEditorialMinimal,
+} from "./Editorial";
+
 export { CatalogShowreel } from "./Showreel";
 
 export { CatalogEmphasisShowcase } from "./EmphasisShowcase";

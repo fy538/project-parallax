@@ -568,3 +568,26 @@ Fixed-`height` on matrix cells caused text overflow as soon as a cell label wrap
 
 ### L91: NetworkDiagram nodes must use `contentArea`, not `defaultSafeArea`
 `defaultSafeArea.top = layout.safeArea.top + 100 = 180px` — hard-coded before the generous safe area tier (120px) and before `titleHeight.content` grew to 150px. Actual content starts at `contentArea("content", "generous").top = 318px`. Using `defaultSafeArea` put nodes under the TitleBlock overlay. Fix: replace `defaultSafeArea` with a `SafeArea` object built from `contentArea("content", "generous")` in the `positions` useMemo.
+
+---
+
+## AI-Generated Clip Integration (May 2026)
+
+### L92: OffthreadVideo + playbackRate for stretching fixed-duration AI clips
+**Problem:** AI video generators (Hailuo, Kling, Pika) output clips at fixed durations (e.g., Hailuo free tier = 6s). Scripts often need these atmospheric shots to hold for 8-10s to cover narration.
+**Solution:** Use `<OffthreadVideo playbackRate={nativeDuration / targetDuration} />` to slow clips to fill the needed time. A 6s clip at `playbackRate={0.75}` fills 8s; at `0.6` it fills 10s. Works especially well for atmospheric/establishing shots generated with low motion intensity (0-1), since the slowdown is nearly imperceptible.
+**Component:** `src/components/AiGenClip.tsx` — reusable wrapper. Accepts `src` (staticFile path) and `playbackRate`. Renders full-bleed with `objectFit: "cover"` on ink background.
+**Setup:** Copy AI-gen clips into `public/episodes/<slug>/clips/`. Reference via `staticFile("episodes/<slug>/clips/<filename>.mp4")`.
+**Practical limits:** Below 0.5x (6s → 12s) motion artifacts become noticeable even on slow clips. For shots needing >12s coverage, loop or cut to a different visual.
+**Why OffthreadVideo over Video:** `<Video>` causes cache eviction stalls at 20-30% render progress in long compositions with many short clips. `<OffthreadVideo>` extracts frames off-thread, avoiding this. Always use `OffthreadVideo` for episode showcase/assembly compositions.
+
+### L93: Showcase compositions should include ALL visual layers
+**Pattern:** Episode showcase files (e.g., `PrisonersDilemmaShowcase.tsx`) should sequence all visual segments — Remotion templates, AI-gen clips, and archival stills — not just the MG layer. This gives a complete preview of the visual rhythm before NLE assembly. Use three clip types:
+- `mg()` — data-driven Remotion template (component + JSON data)
+- `vid()` — AI-gen video clip via OffthreadVideo + playbackRate stretch
+- `arch()` — placeholder card for archival stills not yet sourced
+The total segment count = MG compositions + AI-gen clips + archival stills. Duration auto-calculates from the clip array.
+
+### L94: AI-gen clips go in public/, not imported as modules
+**Problem:** Importing `.mp4` files as ES modules requires webpack/bundler config for media assets. Remotion's `staticFile()` is simpler and doesn't bloat the JS bundle.
+**Rule:** All video/audio assets go in `public/` and are referenced via `staticFile()`. Never `import clip from "./clip.mp4"`. Directory convention: `public/episodes/<slug>/clips/` for AI-gen, `public/audio/` for SFX/music.

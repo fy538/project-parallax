@@ -630,6 +630,12 @@ def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> Optional[
 def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict = None) -> Optional[str]:
     """Try to resolve which Remotion data file a template segment references."""
     vis_lower = vis_raw.lower()
+
+    # Direct extraction: [episode-slug/filename.json] or [filename.json] in spec
+    bracket_m = re.search(r'\[(?:[a-z0-9-]+/)?([a-z0-9-]+\.json)\]', vis_raw)
+    if bracket_m:
+        return bracket_m.group(1)
+
     lookup = data_files or SILICON_TRAP_DATA_FILES
 
     for slug, filename in lookup.items():
