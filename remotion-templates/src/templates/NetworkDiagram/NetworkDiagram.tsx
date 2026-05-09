@@ -331,6 +331,11 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   const hasCameraPath = !!data.cameraPath && data.cameraPath.length > 0;
   const showParticles = data.ambientParticles ?? hasCameraPath;
 
+  // Single safe-area source for all overlays (callouts, source, camera label).
+  // Every position derived here uses the same tier as TitleBlock and contentArea()
+  // so no overlay can accidentally stray into the title or node zones.
+  const safe = layout.safeAreaTier.generous;
+
   // Compute node positions
   const baseLayout = useMemo(() => {
     return computeLayout(data.layout, data.nodes.length, {
@@ -485,10 +490,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           {[0, 0.25, 0.5, 0.75, 1].map((x) => (
             <line
               key={`vline-${x}`}
-              x1={layout.safeAreaTier.generous.left + x * (layout.width - layout.safeAreaTier.generous.left - layout.safeAreaTier.generous.right)}
-              y1={layout.safeAreaTier.generous.top}
-              x2={layout.safeAreaTier.generous.left + x * (layout.width - layout.safeAreaTier.generous.left - layout.safeAreaTier.generous.right)}
-              y2={layout.height - layout.safeAreaTier.generous.bottom}
+              x1={safe.left + x * (layout.width - safe.left - safe.right)}
+              y1={safe.top}
+              x2={safe.left + x * (layout.width - safe.left - safe.right)}
+              y2={layout.height - safe.bottom}
               stroke={theme.text.muted}
               strokeWidth={1}
             />
@@ -638,14 +643,14 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             const calloutHeight = 80;
 
             if (callout.position === "bottom-right") {
-              callX = layout.width - layout.safeArea.right - calloutWidth - 20;
-              callY = layout.height - layout.safeArea.bottom - calloutHeight - 20;
+              callX = layout.width - safe.right - calloutWidth - 20;
+              callY = layout.height - safe.bottom - calloutHeight - 20;
             } else if (callout.position === "bottom-left") {
-              callX = layout.safeArea.left + 20;
-              callY = layout.height - layout.safeArea.bottom - calloutHeight - 20;
+              callX = safe.left + 20;
+              callY = layout.height - safe.bottom - calloutHeight - 20;
             } else {
-              callX = layout.width - layout.safeArea.right - calloutWidth - 20;
-              callY = layout.safeArea.top + 20;
+              callX = layout.width - safe.right - calloutWidth - 20;
+              callY = safe.top + 20;
             }
 
             return (
@@ -668,8 +673,8 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
       {/* ── Source attribution ──────────────────────────────────────── */}
       {data.source && (
         <text
-          x={layout.width - layout.safeAreaTier.generous.right}
-          y={layout.height - layout.safeAreaTier.generous.bottom + 12}
+          x={layout.width - safe.right}
+          y={layout.height - safe.bottom + 12}
           textAnchor="end"
           fill={theme.text.muted}
           fontSize={fontSizes.meta}
@@ -723,8 +728,8 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           <div
             style={{
               position: "absolute",
-              top: layout.safeAreaTier.generous.top,
-              right: layout.safeAreaTier.generous.right,
+              top: safe.top,
+              right: safe.right,
               fontSize: fontSizes.label,
               fontFamily: fonts.mono,
               color: theme.text.muted,

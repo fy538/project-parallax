@@ -31,35 +31,22 @@ That means the problem has shifted. The main blocker is no longer "we don't have
 **Why this matters (restated for future reference):**
 These tests call the layout math directly and cannot be "fixed" by updating a PNG baseline. A collision introduced into `chartLayout()` fails CI even if a developer accepts the broken visual.
 
-**Still pending (not part of this item):**
-`HorizontalTimeline` and `SplitComposition` use `useTemplateLayout()` — a React hook — which cannot be called outside a component. Zone integrity testing for those templates requires either:
-1. Extracting the core geometry into a pure `computeTemplateLayout()` function (recommended), or
-2. Wiring assertions into the render-based real-data suites after each frame renders.
-That extraction is tracked under roadmap item 4 when those templates are next touched.
+**Also delivered (May 2026):**
+- `useTemplateLayout.ts`: geometry extracted into exported `computeTemplateLayout()` pure function; all types exported. Hook is now a thin `useMemo` wrapper — zero behaviour change for callers.
+- `src/__tests__/template-zone-integrity.test.ts` — 80 pure-function unit tests covering `computeTemplateLayout()` across all title variants, all safe-area tiers, split mode, footer variants, gap overrides, HorizontalTimeline + SplitComposition specific shapes, and split-panel invariants. HorizontalTimeline and SplitComposition zone integrity now covered transitively.
 
-### 2. Migrate `NetworkDiagram` onto the shared overlay contract
+### 2. ✅ Migrate `NetworkDiagram` onto the shared overlay contract — DONE
 
-Why this matters:
+**Delivered (May 2026):**
 
-- `NetworkDiagram` already places the graph inside `contentArea("content", "generous")`, but its overlays still use independent safe-area math.
-- The risky pieces are still manually placed:
-  - callouts in `src/templates/NetworkDiagram/NetworkDiagram.tsx:641`
-  - source line in `src/templates/NetworkDiagram/NetworkDiagram.tsx:671`
-  - camera label in `src/templates/NetworkDiagram/NetworkDiagram.tsx:726`
-- That is exactly the mixed-contract pattern that previously caused chart and timeline drift.
+Introduced `const safe = layout.safeAreaTier.generous` at the top of the component body. All four overlay sites now derive from this single constant:
 
-What to change:
+- Background grid reference lines (SVG)
+- Callout cards — was using `layout.safeArea` (80 px standard tier), now uses `safe` (120 px generous). This also fixes a real bug: callouts were positioned 40 px closer to the edge than TitleBlock and node zones, risking overlap into the title area.
+- Source attribution text (SVG)
+- Camera step label div
 
-- Introduce named overlay regions for:
-  - top-right camera/chapter label
-  - bottom-right or bottom-left callout card
-  - source attribution lane
-- Make those derive from one layout source rather than separate `layout.safeArea` and `layout.safeAreaTier.generous` calls.
-- Add a real-data QA suite once the next episode or test fixture actually depends on the template.
-
-Priority note:
-
-- This is a top structural cleanup, but it is slightly lower urgency than collision QA because `NetworkDiagram` is not currently the most visible reviewed template in the launch episode work.
+No behavioural change for the source/camera-label overlays (already used generous). The callout fix is a real correctness improvement. Real-data QA suite deferred until an episode actively uses the template.
 
 ### 3. Do a second-pass cleanup on `TimeSeriesChart`
 
