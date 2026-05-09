@@ -326,7 +326,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     frame,
     [phaseWindow.start, phaseWindow.end],
     [0, 1],
-    CLAMP
+    CLAMP // linear-ok
   );
   const bearingDrift = intraPhaseProgress * 3; // 3° drift per phase hold
 

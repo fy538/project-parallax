@@ -24,13 +24,14 @@ import {
   fontSizes,
   fontWeights,
   letterSpacing,
+  textMaxWidth,
   layout,
   sec,
   contentArea,
   radii,
   cardPresets,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC, CLAMP_SINE } from "../../utils/animation";
 import { contentShadow, cardStyle } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -189,6 +190,7 @@ const GaugeArc: React.FC<{
           position: "relative",
           top: -arcRadius - layout.spacing.md,
           fontSize: fontSizes.display,
+          maxWidth: textMaxWidth.h1,
           fontWeight: fontWeights.bold,
           color: theme.text.primary,
           fontFamily: fonts.data,
@@ -403,7 +405,7 @@ const ShiftBar: React.FC<{
               frame,
               [pauseEnd - sec(0.1), pauseEnd],
               [0, 1],
-              CLAMP
+              CLAMP_SINE
             ),
           }}
         >
@@ -509,6 +511,7 @@ const Scorecard: React.FC<{
                   style={{
                     textAlign: "center",
                     padding: `${layout.spacing.xs}px 0`,
+                    // pol-09-ok: table cell, width constrained by grid layout
                     fontSize: fontSizes.title,
                   }}
                 >
@@ -645,6 +648,7 @@ const ForecastCard: React.FC<{
           style={{
             fontFamily: fonts.data,
             fontSize: fontSizes.display,
+            maxWidth: textMaxWidth.h1,
             fontWeight: fontWeights.bold,
             color: theme.text.primary,
             lineHeight: 1,
@@ -654,7 +658,7 @@ const ForecastCard: React.FC<{
           }}
         >
           {displayValue}
-          <span style={{ fontSize: fontSizes.h2, color: palette.amber }}>%</span>
+          <span style={{ fontSize: fontSizes.h2, color: palette.amber }}>%</span> {/* pol-09-ok: span is a single % glyph inside display div */}
         </div>
         <div
           style={{

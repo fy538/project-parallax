@@ -454,7 +454,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
                       stroke={subj.color}
                       strokeWidth={4.5}
                       strokeLinejoin="round"
-                      opacity={interpolate(morphProgress, [0.2, 0.5, 0.95], [0, 1, 0], CLAMP)}
+                      opacity={interpolate(morphProgress, [0.2, 0.5, 0.95], [0, 1, 0], CLAMP)} // linear-ok
                       style={{ filter: `drop-shadow(0 0 8px ${subj.color}80)` }}
                     />
                   );

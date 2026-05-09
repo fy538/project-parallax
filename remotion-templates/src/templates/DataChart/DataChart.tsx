@@ -73,7 +73,7 @@ const AnimatedBar: React.FC<{
     frame,
     [startFrame, startFrame + growDuration, startFrame + growDuration + sec(0.3)],
     [0, 1 + overshootAmount, 1],
-    CLAMP
+    CLAMP // linear-ok
   );
 
   const barHeight = (value / maxValue) * maxHeight * growProgress;
@@ -275,7 +275,7 @@ const ComparisonBars: React.FC<{
     props.frame,
     [props.startFrame + sec(0.4), props.startFrame + sec(1.0)],
     [0, 0.45],
-    CLAMP
+    CLAMP_SINE
   );
 
   return (
@@ -567,7 +567,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               frame,
               [sec(0.8), sec(2.3)],
               [1.0, 0.45],
-              CLAMP
+              CLAMP_SINE
             );
             return (
               <g key={i}>

@@ -23,11 +23,13 @@ import {
 import {
   fonts,
   fontSizes,
+  textMaxWidth,
   layout,
   palette,
   sec,
   duotone,
   contentArea,
+  shadows,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -186,9 +188,10 @@ const ImageOverlay: React.FC<{
     stat: {
       fontFamily: fonts.data,
       fontSize: fontSizes.h2,
+      maxWidth: textMaxWidth.h2,
       fontWeight: 700,
       color: theme.text.primary,
-      textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`,
+      textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`, // pol-10-ok: heavier stat lift, no token match
       lineHeight: 1.0,
       letterSpacing: 0,
     },
@@ -199,14 +202,14 @@ const ImageOverlay: React.FC<{
       color: theme.text.primary,
       textTransform: "uppercase",
       letterSpacing: 2,
-      textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`,
+      textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`, // pol-10-ok: label lift with higher opacity, no token match
     },
     caption: {
       fontFamily: fonts.body,
       fontSize: fontSizes.caption,
       fontWeight: 400,
       color: theme.text.secondary,
-      textShadow: `0 1px 3px rgba(0, 0, 0, 0.4)`,
+      textShadow: shadows.textLift,
     },
   }[overlayStyle];
 
@@ -430,7 +433,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
       if (range.imageIndex === 0) continue; // no flash on first image
       const cutFrame = range.startFrame;
       if (frame >= cutFrame && frame < cutFrame + 2) {
-        return interpolate(frame, [cutFrame, cutFrame + 2], [0.30, 0], CLAMP);
+        return interpolate(frame, [cutFrame, cutFrame + 2], [0.30, 0], CLAMP); // linear-ok
       }
     }
     return 0;
@@ -471,7 +474,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
                       next.progress,
                       [0, 1],
                       [0, 1],
-                      CLAMP
+                      CLAMP // linear-ok
                     )
                   : 1,
               clipPath:

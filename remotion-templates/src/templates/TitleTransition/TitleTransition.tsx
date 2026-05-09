@@ -17,7 +17,7 @@ import {
   interpolate,
   Easing,
 } from "remotion";
-import { palette, fonts, fontSizes, layout, sec, shadows, gradients, durations } from "../../design/theme";
+import { palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -44,7 +44,7 @@ const smoothBloom = (
     frame,
     [startFrame, peakFrame, settleFrame],
     [0, 1, sustainLevel],
-    CLAMP
+    CLAMP // linear-ok
   );
 };
 
@@ -109,7 +109,7 @@ const EpisodeTitleVariant: React.FC<{
     heroSpring(frame, layout.fps, stagger(1, 9)),
     [0, 1],
     [60, 0],
-    CLAMP
+    CLAMP // linear-ok
   );
 
   // Letter-spacing "lens focus" — tracking tightens as title arrives.
@@ -361,7 +361,7 @@ const SectionVariant: React.FC<{
     heroSpring(frame, layout.fps, stagger(1, 9)),
     [0, 1],
     [50, 0],
-    CLAMP
+    CLAMP // linear-ok
   );
   const titleScale = scaleReveal(frame, sec(0.3), sec(0.7), 1.15, 1.0);
 
@@ -438,6 +438,7 @@ const SectionVariant: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h1,
+              maxWidth: textMaxWidth.h1,
               fontWeight: 600,
               color: theme.text.primary,
               fontFamily: fonts.heading,
@@ -487,7 +488,7 @@ const EndCardVariant: React.FC<{
     heroSpring(frame, layout.fps, stagger(0, 9)),
     [0, 1],
     [40, 0],
-    CLAMP
+    CLAMP // linear-ok
   );
 
   // Exit fade wrapper (A7)
@@ -521,6 +522,7 @@ const EndCardVariant: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h2,
+              maxWidth: textMaxWidth.h2,
               color: theme.text.primary,
               fontWeight: 500,
               textAlign: "center",

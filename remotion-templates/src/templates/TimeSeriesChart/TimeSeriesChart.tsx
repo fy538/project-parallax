@@ -29,6 +29,7 @@ import {
   palette,
   fonts,
   fontSizes,
+  textMaxWidth,
   layout,
   sec,
   shadows,
@@ -418,7 +419,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
+                  gap: layout.spacing.xs,
                 }}
               >
                 <div
@@ -967,6 +968,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             <div
               style={{
                 fontSize: fontSizes.h1,
+                maxWidth: textMaxWidth.h1,
                 fontFamily: fonts.heading,
                 fontWeight: 700,
                 color: accentColor,

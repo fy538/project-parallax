@@ -404,7 +404,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   // a 2-octave Perlin-like wobble. Amplitude scales with tensionProgress so
   // calm rungs are still, escalating rungs breathe with the camera.
   const jitterAmp = hasCameraPath
-    ? interpolate(tensionProgress, [0, 1], [0.4, 2.4], CLAMP)
+    ? interpolate(tensionProgress, [0, 1], [0.4, 2.4], CLAMP) // linear-ok
     : 0;
   // 2-octave wobble at different frequencies
   const jitterX = jitterAmp * (

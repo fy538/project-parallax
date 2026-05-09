@@ -124,6 +124,7 @@ def check_hardcoded_font_sizes(filepath: Path, lines: list[str]) -> list[Issue]:
     # Intentionally oversized display text — hero numbers, decorative quote marks,
     # section numbers, etc. These exceed the design system on purpose for cinematic impact.
     DISPLAY_EXEMPTIONS: dict[str, set[int]] = {
+        "AudioPreview/AudioPreview.tsx": {120},                  # countdown timer — intentionally oversized
         "KineticTypography/KineticTypography.tsx": {160, 180},  # hero quote mark, big stat number
         "StatReveal/StatReveal.tsx": {120},                      # hero stat number
         "TitleTransition/TitleTransition.tsx": {120},            # section number
@@ -377,7 +378,7 @@ def check_linear_interpolation(filepath: Path, lines: list[str]) -> list[Issue]:
     bare_interp = re.compile(r'\binterpolate(?!Colors)\s*\(')
     # CLAMP_* constants, explicit easing: key, Easing.*, spring helpers, named easing vars
     has_easing = re.compile(
-        r'CLAMP_|Easing\.|easing\s*:|spring\(|springConfig|easings\.|barEasing|growEasing|exitEasing'
+        r'CLAMP_|Easing\.|easing\s*:|spring\(|springConfig|easings\.|barEasing|growEasing|exitEasing|linear-ok'
     )
 
     for i, line in enumerate(lines, 1):
@@ -415,9 +416,9 @@ def check_missing_max_width(filepath: Path, lines: list[str]) -> list[Issue]:
             continue
         if not large_font.search(line):
             continue
-        # Check 10-line window ahead for maxWidth
+        # Check 10-line window ahead for maxWidth or suppression comment
         window = "\n".join(lines[max(0, i - 2):min(len(lines), i + 10)])
-        if "maxWidth" not in window:
+        if "maxWidth" not in window and "pol-09-ok" not in window:
             issues.append(Issue(
                 severity="info",
                 rule="POL-09",
@@ -443,7 +444,7 @@ def check_inline_shadows(filepath: Path, lines: list[str]) -> list[Issue]:
     shadow_prop = re.compile(r'\b(boxShadow|textShadow)\s*:')
     # Literal string: quote or backtick immediately after the colon+space
     shadow_literal = re.compile(r'\b(boxShadow|textShadow)\s*:\s*["`\']')
-    exempt_values = re.compile(r'"none"|\'none\'|shadows\.|undefined')
+    exempt_values = re.compile(r'"none"|\'none\'|shadows\.|undefined|pol-10-ok')
 
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
@@ -454,6 +455,10 @@ def check_inline_shadows(filepath: Path, lines: list[str]) -> list[Issue]:
         if not shadow_literal.search(line):
             continue
         if exempt_values.search(line):
+            continue
+        # Template literals with dynamic interpolation (${...}) can't be replaced
+        # by a static shadows.* token without changing the runtime color — exempt them.
+        if '`' in line and '${' in line:
             continue
         issues.append(Issue(
             severity="info",
@@ -601,9 +606,15 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                 continue
 
             rel = str(json_file.relative_to(data_dir))
+            prefix = json_file.stem.split("-")[0]
+
+            # Thumbnail files use {"data": {...}} wrapper — unwrap for field checks.
+            # The Composition accepts {data: ThumbnailData} as props, so the JSON
+            # mirrors that: the actual content lives one level down.
+            effective = data.get("data", data) if prefix == "thumbnail" else data
 
             # Check episode field (universally required)
-            if "episode" not in data:
+            if "episode" not in effective:
                 issues.append(Issue(
                     severity="error",
                     rule="DATA-03",
@@ -614,9 +625,12 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                 ))
 
             # Check title field — but allow template-specific alternatives
-            prefix = json_file.stem.split("-")[0]
+            thumb_title_fields = {"titleText", "heroText", "symbolTitle"}
             alt_fields = TITLE_ALTERNATIVES.get(prefix, set())
-            has_title = "title" in data or any(f in data for f in alt_fields)
+            if prefix == "thumbnail":
+                has_title = any(f in effective for f in thumb_title_fields)
+            else:
+                has_title = "title" in effective or any(f in effective for f in alt_fields)
             if not has_title:
                 issues.append(Issue(
                     severity="error",
@@ -629,7 +643,7 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
 
             # Check recommended fields
             for field in recommended_fields:
-                if field not in data:
+                if field not in effective:
                     issues.append(Issue(
                         severity="info",
                         rule="DATA-03",
@@ -668,8 +682,9 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                     ))
 
             # TimelineComparison needs leftEvents/rightEvents
+            # (HorizontalTimeline uses "pairs" — exempt those)
             elif "timeline" in stem and "timeseries" not in stem and "morph" not in stem:
-                if "leftEvents" not in data and "events" not in data:
+                if "leftEvents" not in data and "events" not in data and "pairs" not in data:
                     issues.append(Issue(
                         severity="error",
                         rule="DATA-03",
@@ -716,8 +731,9 @@ def check_data_schema_fields(data_dir: Path) -> list[Issue]:
                     ))
 
             # Framework needs columns or items
+            # Flow variant uses "nodes", matrix variant uses "cells" — exempt both
             elif "framework" in stem:
-                if "columns" not in data and "items" not in data:
+                if "columns" not in data and "items" not in data and "nodes" not in data and "cells" not in data:
                     issues.append(Issue(
                         severity="warning",
                         rule="DATA-03",

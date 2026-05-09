@@ -42,6 +42,7 @@ import {
   exitFade,
   slideIn,
   CLAMP,
+  CLAMP_CUBIC,
 } from "../../utils/animation";
 import { smoothStepEdge } from "../../utils/edges";
 import { contentShadow, accentGlow } from "../../utils/depth";
@@ -178,7 +179,7 @@ const TreeNodeComponent: React.FC<{
     frame,
     [startFrame, startFrame + sec(0.5)],
     [0.85, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
   const exitOp = exitFade(frame, totalFrames, sec(0.5));
 
@@ -436,7 +437,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                         frame,
                         [startFrame, startFrame + sec(0.8)],
                         [300, 0],
-                        CLAMP
+                        CLAMP_CUBIC
                       )}
                       opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
                     />
@@ -473,7 +474,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                           frame,
                           [startFrame, startFrame + sec(0.8)],
                           [300, 0],
-                          CLAMP
+                          CLAMP_CUBIC
                         )}
                         opacity={edgeOpacity * 0.9 * exitFade(frame, totalFrames, sec(0.5))}
                       />
@@ -550,7 +551,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
               fontWeight: fontWeights.semibold,
               color: theme.text.primary,
               fontFamily: fonts.display,
-              textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+              textShadow: "0 2px 12px rgba(0,0,0,0.6)", // pol-10-ok: strong label lift, no token match
               opacity: labelOpacity * exitFade(frame, totalFrames, sec(0.5)),
               letterSpacing: 1,
             }}

@@ -500,7 +500,7 @@ export const HorizontalTimeline: React.FC<{
       camera.stepIndex - morphStartStep,
       [0, morphEndStep - morphStartStep],
       [0, 1],
-      { ...{ extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const } }
+      { ...{ extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const } } // linear-ok
     );
   }, [data.mode, cameraPath.length, camera.stepIndex]);
 
@@ -838,7 +838,7 @@ export const HorizontalTimeline: React.FC<{
                                 fontWeight: 600,
                                 color: theme.text.primary,
                                 lineHeight: 1.3,
-                                marginBottom: 8,
+                                marginBottom: layout.spacing.xs,
                                 textShadow: shadows.textLift,
                               }}
                             >
@@ -859,7 +859,7 @@ export const HorizontalTimeline: React.FC<{
                                 fontWeight: 600,
                                 color: theme.text.primary,
                                 lineHeight: 1.3,
-                                marginBottom: 8,
+                                marginBottom: layout.spacing.xs,
                                 textShadow: shadows.textLift,
                               }}
                             >

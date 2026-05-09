@@ -47,6 +47,7 @@ import {
   exitFade,
   CLAMP,
   CLAMP_QUAD,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -105,7 +106,7 @@ const MorphEventCard: React.FC<{
       frame,
       [holdEndFrame, holdEndFrame + sec(morphDurationSec * 0.5)],
       [1, 0],
-      CLAMP
+      CLAMP_SINE
     );
 
     // Opacity for era B text (fades in during morph)
@@ -113,7 +114,7 @@ const MorphEventCard: React.FC<{
       frame,
       [holdEndFrame + sec(morphDurationSec * 0.5), morphEndFrame],
       [0, 1],
-      CLAMP
+      CLAMP_SINE
     );
 
     return (
@@ -268,14 +269,14 @@ export const TimelineMorph: React.FC<{
     frame,
     [holdEndFrame, holdEndFrame + sec(morphDuration * 0.5)],
     [1, 0],
-    CLAMP
+    CLAMP_SINE
   );
 
   const eraTitleBOpacity = interpolate(
     frame,
     [holdEndFrame + sec(morphDuration * 0.5), morphEndFrame],
     [0, 1],
-    CLAMP
+    CLAMP_SINE
   );
 
   const eraTitleColor = interpolateColors(

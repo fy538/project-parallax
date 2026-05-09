@@ -39,6 +39,7 @@ import {
   fontWeights,
   letterSpacing,
   lineHeight,
+  textMaxWidth,
   layout,
   sec,
   shadows,
@@ -51,6 +52,7 @@ import {
   stagger,
   CLAMP,
   CLAMP_QUARTIC,
+  CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -107,7 +109,7 @@ const ScoringBar: React.FC<{
         borderRadius: radii.xs,
         overflow: "hidden",
         marginBottom: layout.spacing.md,
-        boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`,
+        boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`, // pol-10-ok: inset track groove — no token equivalent
       }}
     >
       {/* Outer glow layer */}
@@ -134,7 +136,7 @@ const ScoringBar: React.FC<{
           width: `${barWidth}%`,
           background: `linear-gradient(180deg, ${color}E0 0%, ${color} 100%)`,
           zIndex: 1,
-          boxShadow: `inset 0 -1px 2px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.18)`,
+          boxShadow: `inset 0 -1px 2px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.18)`, // pol-10-ok: beveled bar edge
         }}
       />
       {/* Specular highlight — thin bright line at top */}
@@ -203,6 +205,7 @@ const FrameworkPanel: React.FC<{
       <h3
         style={{
           fontSize: fontSizes.h2,
+          maxWidth: textMaxWidth.h2,
           fontWeight: fontWeights.bold,
           letterSpacing: letterSpacing.h2,
           color: data.color,
@@ -417,7 +420,7 @@ const CinematicDuelingFrameworks: React.FC<{
     frame,
     [dividerStart, dividerStart + sec(0.6)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   // VS text pulse
@@ -477,6 +480,7 @@ const CinematicDuelingFrameworks: React.FC<{
               <h3
                 style={{
                   fontSize: fontSizes.h2,
+                  maxWidth: textMaxWidth.h2,
                   fontWeight: fontWeights.bold,
                   letterSpacing: letterSpacing.h2,
                   color: data.frameworkA.color,
@@ -530,13 +534,13 @@ const CinematicDuelingFrameworks: React.FC<{
                 frame,
                 [clashStart, clashStart + sec(0.15), clashStart + sec(0.3), clashStart + sec(0.6)],
                 [1, 2, 2, 1],
-                { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
               );
               const clashGlow = interpolate(
                 frame,
                 [clashStart, clashStart + sec(0.15), clashStart + sec(0.3), clashStart + sec(0.6)],
                 [0, 1, 1, 0],
-                { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+                { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
               );
               return (
                 <div
@@ -568,6 +572,7 @@ const CinematicDuelingFrameworks: React.FC<{
                       top: "50%",
                       transform: `translate(-50%, -50%) scale(${vsPulse})`,
                       fontSize: fontSizes.h2,
+                      maxWidth: textMaxWidth.h2,
                       fontWeight: fontWeights.bold,
                       color: theme.text.accent,
                       fontFamily: fonts.display,
@@ -598,6 +603,7 @@ const CinematicDuelingFrameworks: React.FC<{
               <h3
                 style={{
                   fontSize: fontSizes.h2,
+                  maxWidth: textMaxWidth.h2,
                   fontWeight: fontWeights.bold,
                   letterSpacing: letterSpacing.h2,
                   color: data.frameworkB.color,
@@ -795,7 +801,7 @@ const StaticDuelingFrameworks: React.FC<{
     frame,
     [dividerStartFrame, dividerStartFrame + sec(1)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const scoringStartFrame = getPhaseStart("scoring");

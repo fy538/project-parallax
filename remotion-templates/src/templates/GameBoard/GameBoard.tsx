@@ -21,6 +21,7 @@ import {
   palette,
   fonts,
   fontSizes,
+  textMaxWidth,
   layout,
   sec,
   shadows,
@@ -128,7 +129,7 @@ const ChessBoard: React.FC<{
         height: 600,
         background: theme.bg.surface,
         border: `${radii.sm}px solid ${accent}`,
-        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`,
+        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`, // pol-10-ok: board well depth — no token equivalent
       }}
     >
       {/* Grid lines */}
@@ -637,7 +638,7 @@ const CounterDisplay: React.FC<{
     frame,
     [phaseStart + sec(0.5), phaseStart + phaseDuration - sec(1)],
     [0, 1],
-    CLAMP
+    CLAMP // linear-ok
   );
 
   const cooperateVal = Math.round((counter.cooperate || 0) * progress);
@@ -661,6 +662,7 @@ const CounterDisplay: React.FC<{
           <div
             style={{
               fontSize: fontSizes.display,
+              maxWidth: textMaxWidth.h1,
               fontFamily: fonts.data,
               color: cooperateColor,
               fontWeight: 700,
@@ -687,6 +689,7 @@ const CounterDisplay: React.FC<{
           <div
             style={{
               fontSize: fontSizes.display,
+              maxWidth: textMaxWidth.h1,
               fontFamily: fonts.data,
               color: defectColor,
               fontWeight: 700,

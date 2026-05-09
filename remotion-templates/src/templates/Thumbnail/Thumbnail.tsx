@@ -18,7 +18,7 @@
 
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
-import { palette, fonts, fontSizes, layout, cjk } from "../../design/theme";
+import { palette, fonts, fontSizes, textMaxWidth, layout, cjk } from "../../design/theme";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
@@ -169,6 +169,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
             textAlign: "center",
             fontFamily: fonts.heading,
             fontSize: fontSizes.h2,
+            maxWidth: textMaxWidth.h2,
             fontWeight: 700,
             color: palette.bone,
             letterSpacing: 5,
@@ -431,6 +432,7 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
           style={{
             fontFamily: fonts.heading,
             fontSize: fontSizes.h2,
+            maxWidth: textMaxWidth.h2,
             fontWeight: 700,
             color: palette.bone,
             letterSpacing: 6,

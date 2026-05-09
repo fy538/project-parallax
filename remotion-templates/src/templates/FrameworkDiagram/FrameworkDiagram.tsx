@@ -406,13 +406,13 @@ const FlowVariant: React.FC<{
 
   // Camera-like horizontal pan: translate container to follow active node
   const panProgress = nodes.length > 1
-    ? interpolate(activeNodeIndex, [0, nodes.length - 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+    ? interpolate(activeNodeIndex, [0, nodes.length - 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) // linear-ok
     : 0;
   const panOffset = interpolate(
     frame,
     [0, durationInFrames * 0.8],
     [40, -40 * panProgress],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
   );
 
   return (
@@ -465,7 +465,7 @@ const FlowVariant: React.FC<{
 
           // Progressive focus: dim earlier nodes as later ones appear
           const dimAmount = i < activeNodeIndex
-            ? interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+            ? interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) // linear-ok
             : 0;
           const focusOpacity = 1 - dimAmount;
           const exitOp = exitFade(frame, durationInFrames, 15);

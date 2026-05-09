@@ -27,6 +27,7 @@ import {
   semantic,
   fonts,
   fontSizes,
+  textMaxWidth,
   layout,
   sec,
   contentArea,
@@ -394,7 +395,7 @@ const HypothesisBar: React.FC<HypothesisBarProps & { isLeading?: boolean }> = Re
             borderRadius: `${radii.sm}px ${radii.sm}px 0 0`,
             overflow: "hidden",
             border: `1px solid ${theme.text.muted}30`,
-            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`,
+            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`, // pol-10-ok: inset groove — no token equivalent
           }}
         >
           {/* Bar fill — vertical gradient + transition */}
@@ -1031,6 +1032,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
               <div
                 style={{
                   fontSize: fontSizes.display,
+                  maxWidth: textMaxWidth.h1,
                   fontWeight: 700,
                   fontFamily: fonts.data,
                   color: curve1Color,
@@ -1046,6 +1048,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                 <div
                   style={{
                     fontSize: fontSizes.h2,
+                    maxWidth: textMaxWidth.h2,
                     fontWeight: 600,
                     fontFamily: fonts.data,
                     color: curve2Color,

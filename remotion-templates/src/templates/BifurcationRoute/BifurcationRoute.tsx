@@ -41,6 +41,7 @@ import {
   stagger,
   CLAMP,
   CLAMP_CUBIC,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { contentShadow, accentGlow } from "../../utils/depth";
 import { Background } from "../../components/Background";
@@ -256,7 +257,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
     frame,
     [phaseStarts.zoomToFork, phaseStarts.split, phaseStarts.split + sec(0.5)],
     [0, 1, 0.3],
-    CLAMP
+    CLAMP // linear-ok
   );
 
   // ── Exit fade ──
@@ -659,7 +660,7 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
     frame,
     [splitStartFrame, splitStartFrame + sec(0.5)],
     [1, 0],
-    CLAMP
+    CLAMP_SINE
   );
 
   const exitOpacity = defaultExitOpacity;

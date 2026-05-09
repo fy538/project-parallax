@@ -20,7 +20,7 @@ import {
   useCurrentFrame,
   interpolate,
 } from "remotion";
-import { palette, semantic, fonts, fontSizes, layout, sec, shadows } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, textMaxWidth, layout, sec, shadows } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -47,7 +47,7 @@ const smoothBloom = (
     frame,
     [startFrame, peakFrame, settleFrame],
     [0, 1, sustainLevel],
-    CLAMP
+    CLAMP // linear-ok
   );
 };
 
@@ -317,6 +317,7 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
         <div
           style={{
             fontSize: fontSizes.h2,
+            maxWidth: textMaxWidth.h2,
             color: accentColor,
             fontWeight: 600,
             marginTop: layout.spacing.md,
@@ -614,6 +615,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
         <div
           style={{
             fontSize: fontSizes.h2,
+            maxWidth: textMaxWidth.h2,
             color: theme.text.primary,
             fontWeight: 500,
             marginTop: layout.spacing.md,

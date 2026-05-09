@@ -34,6 +34,7 @@ import {
   fontWeights,
   letterSpacing,
   lineHeight,
+  textMaxWidth,
   layout,
   semantic,
   sec,
@@ -45,6 +46,7 @@ import {
   stagger,
   exitFade,
   CLAMP,
+  CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -136,28 +138,28 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [0, sec(0.3), transStart, transStart + sec(0.5), overviewStart, overviewStart + sec(0.5)],
     [1, 1, 1, 0.2, 0.2, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
   );
 
   const rightOpacity = interpolate(
     frame,
     [0, sec(0.3), transStart, transStart + sec(0.5), overviewStart, overviewStart + sec(0.5)],
     [0.15, 0.15, 0.15, 1, 1, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
   );
 
   const leftBlur = interpolate(
     frame,
     [transStart, transStart + sec(0.4), overviewStart, overviewStart + sec(0.4)],
     [0, 2.5, 2.5, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
   );
 
   const rightBlur = interpolate(
     frame,
     [0, transStart, transStart + sec(0.4)],
     [2, 2, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok
   );
 
   // ── Divider ─────────────────────────────────────────────────────────
@@ -166,7 +168,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [dividerStart, dividerStart + sec(0.6)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const exitOpacity = exitFade(frame, totalFrames, 15);
@@ -264,6 +266,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
             <h2
               style={{
                 fontSize: fontSizes.h2,
+                maxWidth: textMaxWidth.h2,
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
                 color: mode.text.primary,
@@ -345,6 +348,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
             <h2
               style={{
                 fontSize: fontSizes.h2,
+                maxWidth: textMaxWidth.h2,
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
                 color: mode.text.primary,
@@ -529,6 +533,7 @@ const SplitSideContent: React.FC<{
       <h2
         style={{
           fontSize: fontSizes.h2,
+          maxWidth: textMaxWidth.h2,
           fontWeight: fontWeights.bold,
           letterSpacing: letterSpacing.h2,
           color: mode.text.primary,
@@ -622,7 +627,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [dividerStartFrame, dividerStartFrame + dividerDuration],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const labelStartFrame = 35;
