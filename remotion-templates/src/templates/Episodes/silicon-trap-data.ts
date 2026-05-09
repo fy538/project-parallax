@@ -25,7 +25,7 @@ import chart7pctDemand from "../../../data/episodes/silicon-trap/chart-7pct-dema
 
 // Beat 2 — The Logic of Denial
 import titleSectionDenial from "../../../data/episodes/silicon-trap/title-section-denial.json";
-import dualTimelineOilChips from "../../../data/episodes/silicon-trap/dual-timeline-oil-chips.json";
+import horizontalTimelineOilChip from "../../../data/episodes/silicon-trap/horizontal-timeline-oil-chip.json";
 import kineticRevenueDeal from "../../../data/episodes/silicon-trap/kinetic-revenue-deal.json";
 import chartChipsAct from "../../../data/episodes/silicon-trap/chart-chips-act.json";
 import choroplethCocom from "../../../data/episodes/silicon-trap/choropleth-cocom.json";
@@ -65,7 +65,7 @@ export {
   kinetic165b,
   chart7pctDemand,
   titleSectionDenial,
-  dualTimelineOilChips,
+  horizontalTimelineOilChip,
   kineticRevenueDeal,
   chartChipsAct,
   choroplethCocom,
@@ -98,7 +98,7 @@ export const TEMPLATE_DATA: Record<string, unknown> = {
   "kinetic-165b.json": kinetic165b,
   "chart-7pct-demand.json": chart7pctDemand,
   "title-section-denial.json": titleSectionDenial,
-  "dual-timeline-oil-chips.json": dualTimelineOilChips,
+  "horizontal-timeline-oil-chip.json": horizontalTimelineOilChip,
   "kinetic-revenue-deal.json": kineticRevenueDeal,
   "chart-chips-act.json": chartChipsAct,
   "choropleth-cocom.json": choroplethCocom,

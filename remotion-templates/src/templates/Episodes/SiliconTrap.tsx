@@ -10,6 +10,7 @@
  *   v4 → v5 changes: +2 GameBoard (chess/go), +1 DecisionTree, +1 TimeSeriesChart,
  *     +1 RouteAnimation (bifurcation), −1 FrameworkDiagram (chess-go),
  *     −1 FrameworkDiagram (ai-timeline), −1 DataChart (smic-yield)
+ *   v5 → v6 changes: DualTimeline → HorizontalTimeline (cinematic camera upgrade, L69)
  */
 
 import { defineEpisode, clip, sumPhases, sumPhasesPlus } from "../../utils/defineEpisode";
@@ -24,7 +25,7 @@ import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
 import { GameBoard } from "../GameBoard/GameBoard";
 import { DecisionTree } from "../DecisionTree/DecisionTree";
 import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
-import { DualTimeline } from "../DualTimeline/DualTimeline";
+import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
 
 // All 29 data files come from one source — see silicon-trap-data.ts. Adding a
 // clip means editing that barrel only; this file picks it up automatically.
@@ -34,7 +35,7 @@ import {
   kinetic165b,
   chart7pctDemand,
   titleSectionDenial,
-  dualTimelineOilChips,
+  horizontalTimelineOilChip,
   kineticRevenueDeal,
   chartChipsAct,
   choroplethCocom,
@@ -75,7 +76,7 @@ export const SiliconTrap = defineEpisode({
 
     // 05-10 — Beat 2: The Logic of Denial
     clip({ component: TitleTransition, data: titleSectionDenial }),
-    clip({ component: DualTimeline, data: dualTimelineOilChips }),
+    clip({ component: HorizontalTimeline, data: horizontalTimelineOilChip }),
     clip({ component: KineticTypography, data: kineticRevenueDeal }),
     clip({ component: DataChart, data: chartChipsAct }),
     clip({ component: ChoroplethMap, data: choroplethCocom, durationOf: sumPhases }),

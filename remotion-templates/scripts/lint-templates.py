@@ -637,38 +637,77 @@ def check_duplicate_compositions(episode_dir: Path) -> list[Issue]:
 
 
 def check_data_file_references(episode_tsx: Path) -> list[Issue]:
-    """DATA-02: Check that all imported data files exist and all data files are imported."""
+    """DATA-02: Check that all imported data files exist and all data files are imported.
+
+    Scans both the episode composition (SiliconTrap.tsx) and the data barrel
+    (silicon-trap-data.ts) because imports were moved to the barrel file to
+    avoid editing two files per clip addition.
+
+    Thumbnail files are excluded: they are standalone render targets (one-off
+    compositions, not episode clips) and are intentionally absent from the
+    episode Series.
+    """
     issues = []
     if not episode_tsx.exists():
         return []
 
+    # Collect content from multiple sources:
+    #   1. The main episode composition (SiliconTrap.tsx)
+    #   2. The data barrel (silicon-trap-data.ts) — imports were moved here so adding
+    #      a clip only requires editing one file, not two.
+    #   3. All template index.tsx files — these import silicon-trap JSON files as
+    #      sample/default-props data for Remotion Studio composition registration.
+    #      A data file used only as sample data is still "in use" and must not
+    #      be flagged as an unimported orphan.
+    slug = "silicon-trap"
+    barrel = episode_tsx.parent / f"{slug}-data.ts"
     content = episode_tsx.read_text()
+    if barrel.exists():
+        content += "\n" + barrel.read_text()
+    for index_file in TEMPLATES_DIR.glob("*/index.tsx"):
+        text = index_file.read_text()
+        if f"data/episodes/{slug}" in text:
+            content += "\n" + text
+
     rel = str(episode_tsx.relative_to(TEMPLATES_DIR))
 
-    # Extract all JSON imports
-    import_pattern = re.compile(r'import\s+\w+\s+from\s+"[^"]*?/data/episodes/(\w+)/([^"]+\.json)"')
+    # Extract all JSON imports from the combined content.
+    # Episode slugs contain hyphens (e.g. "silicon-trap"), so use [\w-]+ not \w+.
+    import_pattern = re.compile(r'import\s+\w+\s+from\s+"[^"]*?/data/episodes/([\w-]+)/([^"]+\.json)"')
     imported_files: dict[str, int] = {}
     for i, line in enumerate(content.split("\n"), 1):
         m = import_pattern.search(line)
         if m:
-            ep = m.group(1)
             fname = m.group(2)
             imported_files[fname] = i
 
+    # Thumbnail files are standalone render targets, not episode Series clips.
+    # Excluding them prevents perpetual false-positive DATA-02 infos.
+    EPISODE_ONLY_PREFIXES = {"thumbnail"}
+
     # Check data directory for JSON files
-    ep_dir = DATA_DIR / "silicon-trap"
+    ep_dir = DATA_DIR / slug
     if ep_dir.exists():
-        actual_files = {f.name for f in ep_dir.glob("*.json") if f.name != "assembly-manifest.json"}
+        actual_files = {
+            f.name for f in ep_dir.glob("*.json")
+            if f.name != "assembly-manifest.json"
+            and f.stem.split("-")[0] not in EPISODE_ONLY_PREFIXES
+        }
+
+        # Files NOT subject to the existence check (excluded from actual_files intentionally)
+        EXISTENCE_SKIP = {"assembly-manifest.json"}
 
         # Files imported but don't exist
         for fname, line_num in imported_files.items():
+            if fname in EXISTENCE_SKIP:
+                continue
             if fname not in actual_files:
                 issues.append(Issue(
                     severity="error",
                     rule="DATA-02",
                     file=rel,
                     line=line_num,
-                    message=f"Imported data file {fname} does not exist in data/episodes/silicon-trap/",
+                    message=f"Imported data file {fname} does not exist in data/episodes/{slug}/",
                     fix="Remove import or create the missing JSON file",
                 ))
 
@@ -677,10 +716,10 @@ def check_data_file_references(episode_tsx: Path) -> list[Issue]:
             issues.append(Issue(
                 severity="info",
                 rule="DATA-02",
-                file=f"silicon-trap/{fname}",
+                file=f"{slug}/{fname}",
                 line=0,
-                message=f"Data file exists but is not imported in silicon-trap episode file",
-                fix="Import in silicon-trap episode file or move to _deprecated/",
+                message=f"Data file exists but is not imported in {slug} episode file",
+                fix="Import in the data barrel (silicon-trap-data.ts) or move to _deprecated/",
             ))
 
     return issues
