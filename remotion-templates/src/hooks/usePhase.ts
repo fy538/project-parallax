@@ -65,34 +65,49 @@ export interface PhaseState {
 }
 
 /**
- * Declarative phase manager for multi-phase template animations.
+ * Pure phase computation — no React dependencies.
  *
- * @param phases - Ordered array of phase definitions
- * @param baseDelay - Optional delay before the first phase starts (in frames). Default: 0
+ * Contains all the load-bearing math. `usePhase` is a thin wrapper that
+ * reads `useCurrentFrame()` and delegates here, mirroring the
+ * computeBeatState / useBeatSync split so this logic is unit-testable
+ * without mocking Remotion hooks.
  */
-export const usePhase = (
+export function computePhaseState(
+  frame: number,
   phases: PhaseDefinition[],
   baseDelay: number = 0
-): PhaseState => {
-  const frame = useCurrentFrame();
+): PhaseState {
+  if (phases.length === 0) {
+    // Degenerate case: no phases defined — return a safe neutral state.
+    const noop = () => 0;
+    return {
+      phase: "",
+      phaseIndex: 0,
+      progress: 0,
+      rawProgress: 0,
+      frameInPhase: 0,
+      phaseStart: 0,
+      getPhaseStart: noop,
+      getPhaseEnd: noop,
+      isPhase: () => false,
+      isPast: () => false,
+      totalDuration: baseDelay,
+    };
+  }
+
+  // Build cumulative start frames.
+  const starts: number[] = [];
+  let cumulative = 0;
+  for (const p of phases) {
+    starts.push(cumulative);
+    cumulative += p.duration;
+  }
+  const totalDuration = cumulative;
+
   const adjustedFrame = frame - baseDelay;
 
-  // Build cumulative start frames — memoized since phases don't change between frames.
-  // Uses JSON key since phases array is typically recreated each render.
-  const phasesKey = phases.map((p) => `${p.name}:${p.duration}`).join("|");
-  const { starts, totalDuration } = useMemo(() => {
-    const s: number[] = [];
-    let cumulative = 0;
-    for (const p of phases) {
-      s.push(cumulative);
-      cumulative += p.duration;
-    }
-    return { starts: s, totalDuration: cumulative };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey]);
-
-  // Find current phase
-  let idx = phases.length - 1; // default to last
+  // Find current phase index — defaults to last when frame overruns.
+  let idx = phases.length - 1;
   for (let i = 0; i < phases.length; i++) {
     if (adjustedFrame < starts[i] + phases[i].duration) {
       idx = i;
@@ -103,25 +118,29 @@ export const usePhase = (
   const currentPhase = phases[idx];
   const phaseStart = starts[idx] + baseDelay;
   const frameInPhase = Math.max(0, adjustedFrame - starts[idx]);
-  const rawProgress = currentPhase.duration > 0
-    ? interpolate(adjustedFrame, [starts[idx], starts[idx] + currentPhase.duration], [0, 1], CLAMP)
-    : 1;
-  const progress = currentPhase.easing ? currentPhase.easing(rawProgress) : rawProgress;
+  const rawProgress =
+    currentPhase.duration > 0
+      ? interpolate(
+          adjustedFrame,
+          [starts[idx], starts[idx] + currentPhase.duration],
+          [0, 1],
+          CLAMP
+        )
+      : 1;
+  const progress = currentPhase.easing
+    ? currentPhase.easing(rawProgress)
+    : rawProgress;
 
-  // Lookup helpers — memoized with stable references
-  const getPhaseStart = useCallback((name: string): number => {
+  const getPhaseStart = (name: string): number => {
     const i = phases.findIndex((p) => p.name === name);
     return i >= 0 ? starts[i] + baseDelay : 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey, baseDelay]);
+  };
 
-  const getPhaseEnd = useCallback((name: string): number => {
+  const getPhaseEnd = (name: string): number => {
     const i = phases.findIndex((p) => p.name === name);
     return i >= 0 ? starts[i] + phases[i].duration + baseDelay : 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey, baseDelay]);
+  };
 
-  // These depend on current frame state, so they can't be memoized further
   const isPhase = (name: string): boolean => currentPhase.name === name;
 
   const isPast = (name: string): boolean => {
@@ -141,5 +160,54 @@ export const usePhase = (
     isPhase,
     isPast,
     totalDuration: totalDuration + baseDelay,
+  };
+}
+
+/**
+ * Declarative phase manager for multi-phase template animations.
+ *
+ * @param phases - Ordered array of phase definitions
+ * @param baseDelay - Optional delay before the first phase starts (in frames). Default: 0
+ */
+export const usePhase = (
+  phases: PhaseDefinition[],
+  baseDelay: number = 0
+): PhaseState => {
+  const frame = useCurrentFrame();
+
+  // Stable key so memoisation works even when phases array is recreated.
+  const phasesKey = phases.map((p) => `${p.name}:${p.duration}`).join("|");
+
+  // Memoize start-frame array — pure from phases, never changes between frames.
+  const { starts, totalDuration } = useMemo(() => {
+    const s: number[] = [];
+    let cum = 0;
+    for (const p of phases) { s.push(cum); cum += p.duration; }
+    return { starts: s, totalDuration: cum };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phasesKey]);
+
+  // Delegate all math to the pure function so tests can call it directly.
+  const state = computePhaseState(frame, phases, baseDelay);
+
+  // Memoize the stable lookup helpers (their output only depends on phases,
+  // not the current frame) so callers get referentially stable functions.
+  const getPhaseStart = useCallback((name: string): number => {
+    const i = phases.findIndex((p) => p.name === name);
+    return i >= 0 ? starts[i] + baseDelay : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phasesKey, baseDelay]);
+
+  const getPhaseEnd = useCallback((name: string): number => {
+    const i = phases.findIndex((p) => p.name === name);
+    return i >= 0 ? starts[i] + phases[i].duration + baseDelay : 0;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phasesKey, baseDelay]);
+
+  return {
+    ...state,
+    totalDuration,
+    getPhaseStart,
+    getPhaseEnd,
   };
 };
