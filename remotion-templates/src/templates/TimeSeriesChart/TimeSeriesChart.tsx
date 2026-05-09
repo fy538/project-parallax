@@ -37,6 +37,7 @@ import {
   barStyle,
   dividerStyle,
   letterSpacing,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -69,7 +70,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
 import { formatNumber } from "../../utils/numberFormat";
 import { niceDomain, formatTick } from "../../utils/niceTicks";
-import { chartLayout } from "../../utils/chartLayout";
+import { chartLayout, validateChartLayoutIntegrity } from "../../utils/chartLayout";
 import { computeLabelStacks } from "../../utils/labelStack";
 import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import type { TimeSeriesChartData } from "./types";
@@ -201,19 +202,37 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   // multi-series) + bottom x-axis labels + source line. Chart gets the
   // remaining bounding box. extraPad adds room for y-axis tick labels
   // and right-side legend clearance ON TOP OF the standard safe area.
-  const cl = chartLayout({
-    hasTitle: true,
-    hasLegend: data.lines.length > 1,
-    hasXAxis: true,
-    hasSource: !!data.source,
-    extraPad: { left: 100, right: 100 }, // y-axis label space + legend strip clearance
-  });
+  const cl = useMemo(
+    () =>
+      chartLayout({
+        hasTitle: true,
+        hasLegend: data.lines.length > 1,
+        hasXAxis: true,
+        hasSource: !!data.source,
+        safeAreaTier: "generous",
+        extraPad: { left: 100, right: 100 }, // y-axis label space + legend strip clearance
+      }),
+    [data.lines.length, data.source]
+  );
+  const chartLayoutIssues = useMemo(() => validateChartLayoutIntegrity(cl), [cl]);
+  warnIf(
+    chartLayoutIssues.length > 0,
+    "TimeSeriesChart",
+    `Chart layout integrity failed: ${chartLayoutIssues.join("; ")}`,
+    cl
+  );
   const chartLeft = cl.chart.left;
   const chartRight = cl.chart.left + cl.chart.width;
   const chartTop = cl.chart.top;
   const chartBottom = cl.chart.top + cl.chart.height;
   const chartWidth = cl.chart.width;
   const chartHeight = cl.chart.height;
+  // SourceAttribution positions itself at `bottom: layout.safeArea.bottom + bottomOffset`.
+  // Since cl uses safeAreaTier "generous" (120px), we need bottomOffset = generous - standard
+  // so the component lands at 120px from the canvas bottom, matching the rest of the layout.
+  const sourceBottomOffset = data.source
+    ? layout.safeAreaTier.generous.bottom - layout.safeArea.bottom
+    : 0;
 
   // Compute axis ranges — memoized so flatMap/min/max don't run every frame
   const { yMin, yMax, xMin, xMax } = useMemo(() => {
@@ -401,9 +420,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           <div
             style={{
               position: "absolute",
-              top: chartTop - 56,
-              left: chartLeft,
-              right: layout.width - chartRight,
+              top: cl.legend.top,
+              left: cl.legend.left,
+              width: cl.legend.width,
+              minHeight: cl.legend.height || 36,
               display: "flex",
               flexDirection: "row",
               justifyContent: "flex-end",
@@ -418,7 +438,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
+                  gap: layout.spacing.xs,
                 }}
               >
                 <div
@@ -956,8 +976,8 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           <div
             style={{
               position: "absolute",
-              top: layout.padding + 20,
-              right: layout.padding + 20,
+              top: layout.safeAreaTier.generous.top,
+              right: layout.safeAreaTier.generous.right,
               textAlign: "right",
               opacity: fadeIn(frame, heroStatStart, sec(0.5)),
               transform: `scale(${0.92 + 0.08 * heroSpring(frame, layout.fps, heroStatStart)})`,
@@ -972,6 +992,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 color: accentColor,
                 margin: 0,
                 lineHeight: 1.0,
+                maxWidth: textMaxWidth.h1,
                 textShadow: `0 0 12px ${accentColor}60, ${shadows.textLift}`,
               }}
             >
@@ -1004,7 +1025,12 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
         {/* ── Source attribution — uses the shared component so position,
             type, opacity, and fade timing match every other chart. */}
-        <SourceAttribution source={data.source} mode={bgVariant} prefix="Source: " bottomOffset={20} />
+        <SourceAttribution
+          source={data.source}
+          mode={bgVariant}
+          prefix="Source: "
+          bottomOffset={sourceBottomOffset}
+        />
       </AbsoluteFill>
       {/* Brand strips */}
       <HeaderStrip mode={bgVariant} metadata={data.episode} />

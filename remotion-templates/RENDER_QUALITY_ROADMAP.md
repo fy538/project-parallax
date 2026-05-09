@@ -48,25 +48,19 @@ Introduced `const safe = layout.safeAreaTier.generous` at the top of the compone
 
 No behavioural change for the source/camera-label overlays (already used generous). The callout fix is a real correctness improvement. Real-data QA suite deferred until an episode actively uses the template.
 
-### 3. Do a second-pass cleanup on `TimeSeriesChart`
+### 3. ✅ Second-pass cleanup on `TimeSeriesChart` — DONE
 
-Why this matters:
+**Delivered (May 2026):**
 
-- `TimeSeriesChart` is much healthier than before because the chart/legend/source lanes now come from `chartLayout()`.
-- It still has a few overlays that bypass the shared contract:
-  - annotation labels around `src/templates/TimeSeriesChart/TimeSeriesChart.tsx:939`
-  - hero stat at `src/templates/TimeSeriesChart/TimeSeriesChart.tsx:979`
-  - some left/right label positioning tied to chart edges rather than a named overlay zone
+Two fixes applied:
 
-Why it is not first:
+1. **`sourceBottomOffset` computation** — replaced opaque three-step derivation (`H - safeArea.bottom - sourceBottom`) with the direct expression `layout.safeAreaTier.generous.bottom - layout.safeArea.bottom` (always 40 px — the delta between generous and standard tiers). `SourceAttribution` internally adds `layout.safeArea.bottom`, so adding 40 lands it at exactly the generous safe area boundary, matching the rest of the layout.
 
-- The current real-data chart suite is green.
-- The remaining geometry is more localized than the old chart/title/source problem.
+2. **Hero stat position** — `top/right: layout.padding + 20` (80 + 20 = 100 px) placed the stat 20 px above the generous safe area top, in the HeaderStrip zone. Fixed to `layout.safeAreaTier.generous.top/right` (120 px), keeping the stat inside the safe area and aligned with the TitleBlock.
 
-What to do when it becomes worth it:
-
-- Move hero stat and annotation label lanes into explicit top-right / above-chart overlay regions.
-- Reuse the same layout vocabulary as charts and timeline instead of one-off offsets.
+**Left intentionally unchanged:**
+- Annotation labels use chart-space coordinates (annotX derived from data values) — correct by design, not a layout contract issue.
+- Y-axis label zone uses `layout.padding` (80 px standard) rather than generous — intentional extra space for tick mark text; narrowing it would risk label overflow.
 
 ### 4. Expand real-data QA to one more high-surface template family
 
