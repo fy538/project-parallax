@@ -806,6 +806,10 @@ export const shadows = {
   medium: "0 4px 20px rgba(0,0,0,0.35)",
   /** Colored halo — key data, active map countries. Pass accent color. */
   accentGlow: (color: string) => `0 0 16px ${color}40`,
+  /** Tighter halo for mid-sized glowing elements */
+  accentGlowMd: (color: string) => `0 0 12px ${color}40`,
+  /** Subtle halo for small labels and icon badges */
+  accentGlowSm: (color: string) => `0 0 8px ${color}40`,
   /** Text lift on dark backgrounds (POLISH.md V7) */
   textLift: "0 1px 3px rgba(0,0,0,0.5)",
 } as const;
@@ -850,8 +854,8 @@ export const titleHeight = {
   episode: 220,
   /** Section title (number + title + underline) */
   section: 160,
-  /** Chart/diagram title (h2 + optional subtitle) */
-  content: 92,
+  /** Chart/diagram title (h2 + optional subtitle) — safe for 2-line titles (two-line title + subtitle ≈ 147px) */
+  content: 150,
   /** Minimal (single line h3) */
   minimal: 56,
 } as const;

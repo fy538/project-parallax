@@ -304,6 +304,66 @@ def check_background_redundancy(filepath: Path, lines: list[str]) -> list[Issue]
     return issues
 
 
+def check_hardcoded_palette_hex(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-07: Brand palette hex values used directly in CSS property assignments.
+
+    Catches both current palette values and stale/old values that were valid
+    in a previous version of palette.json but are no longer in the brand.
+    Skips comparison expressions (isLightPiece === "#...") and comment lines.
+    """
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    # Hex → canonical token name. Includes stale aliases so old values are flagged.
+    PALETTE_MAP = {
+        "#1c1814": "palette.ink",
+        "#2a2520": "palette.midnight",
+        "#5c4a3d": "palette.walnut",
+        "#8b7355": "palette.umber",
+        "#b8a189": "palette.taupe",
+        "#d9c9b0": "palette.sand",
+        "#f0e6d0": "palette.bone",
+        "#f5f0e8": "palette.paper",
+        "#c4a747": "palette.gold",
+        "#4a7ba7": "semantic.us",
+        "#a64d46": "semantic.china",
+        # Stale — old palette values that no longer match palette.json
+        "#e5a544": "palette.gold (stale amber — update to palette.gold)",
+        "#c23b22": "palette.rust (stale rust — update to palette.rust)",
+        "#6b1d1d": "palette.walnut (stale oxblood — update to palette.walnut)",
+    }
+
+    CSS_COLOR_PROPS = re.compile(
+        r'\b(color|backgroundColor|borderColor|fill|stroke|background)\s*:'
+    )
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        # Skip comments
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        # Skip lines that are comparison expressions (luminance heuristics etc.)
+        if ".toLowerCase()" in line and "===" in line:
+            continue
+        # Only check lines that have a CSS color property assignment
+        if not CSS_COLOR_PROPS.search(line):
+            continue
+
+        line_lower = stripped.lower()
+        for hex_val, token_name in PALETTE_MAP.items():
+            if hex_val in line_lower:
+                issues.append(Issue(
+                    severity="warning",
+                    rule="POL-07",
+                    file=rel,
+                    line=i,
+                    message=f"Hardcoded palette hex {hex_val} — use {token_name}",
+                    fix=f"Import palette/semantic from theme.ts and replace {hex_val} with {token_name}",
+                ))
+
+    return issues
+
+
 def check_duplicate_compositions(episode_dir: Path) -> list[Issue]:
     """DATA-01: Detect data files that cover the same content (potential duplicates)."""
     issues = []
@@ -648,6 +708,7 @@ def lint_templates() -> list[Issue]:
             issues.extend(check_content_area_usage(tsx_file, lines))
             issues.extend(check_dark_mode_hardcoding(tsx_file, lines))
             issues.extend(check_background_redundancy(tsx_file, lines))
+            issues.extend(check_hardcoded_palette_hex(tsx_file, lines))
 
     return issues
 

@@ -24,6 +24,7 @@ import {
   fonts,
   fontSizes,
   layout,
+  palette,
   sec,
   duotone,
   contentArea,
@@ -502,7 +503,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
         {cutFlashOpacity > 0 && (
           <AbsoluteFill
             style={{
-              backgroundColor: "#E5A544",
+              backgroundColor: palette.gold,
               opacity: cutFlashOpacity,
               mixBlendMode: "screen",
               pointerEvents: "none",

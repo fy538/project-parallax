@@ -16,7 +16,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle } from "../../design/theme";
+import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
@@ -574,8 +574,24 @@ const MatrixVariant: React.FC<{
   const cells = data.cells || [];
   const accentColor = data.accentColor || emphasis.primaryAccent;
 
-  const cellSize = 200;
   const headerWidth = 180;
+  const colHeaderHeight = 48;
+  const cellMargin = layout.spacing.xs / 2;
+  const area = useMemo(() => contentArea("content", "generous"), []);
+  const cellSize = useMemo(() => {
+    const availW = Math.floor(
+      (area.width - headerWidth - colHeaders.length * cellMargin * 2) /
+        Math.max(1, colHeaders.length)
+    );
+    return Math.min(260, Math.max(140, availW));
+  }, [area.width, colHeaders.length, cellMargin]);
+  const cellHeight = useMemo(() => {
+    const availH = Math.floor(
+      (area.height - colHeaderHeight - rowHeaders.length * cellMargin * 2) /
+        Math.max(1, rowHeaders.length)
+    );
+    return Math.min(180, Math.max(80, availH));
+  }, [area.height, rowHeaders.length, cellMargin]);
 
   const cellLookup = useMemo(() => {
     const map = new Map<string, typeof cells[number]>();
@@ -589,11 +605,15 @@ const MatrixVariant: React.FC<{
     <div
       style={{
         position: "absolute",
-        top: contentArea("content", "generous").top,
-        left: contentArea("content", "generous").left,
-        right: contentArea("content", "generous").right,
+        top: area.top,
+        left: area.left,
+        width: area.width,
+        height: area.height,
         display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <div>
@@ -634,6 +654,7 @@ const MatrixVariant: React.FC<{
                   stagger(ri, sec(0.3), sec(0.5)),
                   sec(0.3)
                 ),
+                ...textSafe.wrap,
               }}
             >
               {rh}
@@ -658,8 +679,8 @@ const MatrixVariant: React.FC<{
                   key={ci}
                   style={{
                     width: cellSize,
-                    height: cellSize * 0.6,
-                    margin: layout.spacing.xs / 2,
+                    minHeight: cellHeight,
+                    margin: cellMargin,
                     borderRadius: radii.md,
                     border: `1px solid ${isHighlight ? accentColor : cellColor}${isHighlight ? "60" : "28"}`,
                     backgroundColor: isHighlight
@@ -686,6 +707,8 @@ const MatrixVariant: React.FC<{
                       fontWeight: isHighlight ? 600 : 400,
                       lineHeight: 1.4,
                       textShadow: shadows.textLift,
+                      maxWidth: cellSize - cardPadding.horizontal * 2,
+                      ...textSafe.wrap,
                     }}
                   >
                     {cell?.label || ""}
