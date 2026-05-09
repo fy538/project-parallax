@@ -206,7 +206,7 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
           width: 2,
           height: 80,
           backgroundColor: palette.gold,
-          boxShadow: `0 0 8px ${palette.gold}`,
+          boxShadow: `0 0 8px ${palette.gold}`, // shadows.accentGlowSm (full-opacity variant)
         }}
       />
 

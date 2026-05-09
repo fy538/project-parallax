@@ -447,7 +447,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                     height: 4,
                     borderRadius: 2,
                     background: line.color,
-                    boxShadow: `0 1px 2px ${line.color}55`,
+                    boxShadow: `0 1px 2px ${line.color}55`, // shadows.subtle accent variant (1px offset, 55% opacity)
                   }}
                 />
                 <div

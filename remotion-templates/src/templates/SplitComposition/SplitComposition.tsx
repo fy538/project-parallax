@@ -38,6 +38,7 @@ import {
   semantic,
   sec,
   radii,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -45,6 +46,8 @@ import {
   stagger,
   exitFade,
   CLAMP,
+  CLAMP_CUBIC,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -54,6 +57,7 @@ import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { usePhase } from "../../hooks/usePhase";
+import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import type { SplitCompositionData } from "./types";
 
 // ── Helper: detect Chinese characters ───────────────────────────────────
@@ -64,6 +68,35 @@ const hasChinese = (text: string): boolean => {
 
 const getFontFamily = (text: string): string => {
   return hasChinese(text) ? fonts.chinese : fonts.display;
+};
+
+interface SplitPanelRect {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+const getSplitPanelRects = (
+  contentRect: { top: number; left: number; width: number; height: number },
+  centerX: number,
+  sideInset = 40
+): { left: SplitPanelRect; right: SplitPanelRect } => {
+  const contentRight = contentRect.left + contentRect.width;
+  return {
+    left: {
+      left: contentRect.left,
+      top: contentRect.top,
+      width: centerX - contentRect.left - sideInset,
+      height: contentRect.height,
+    },
+    right: {
+      left: centerX + sideInset,
+      top: contentRect.top,
+      width: contentRight - (centerX + sideInset),
+      height: contentRect.height,
+    },
+  };
 };
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -89,6 +122,16 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const leftAccent = data.left.accentColor || semantic.us;
   const rightAccent = data.right.accentColor || semantic.china;
   const splitPosition = layout.width / 2;
+  const { zones } = useTemplateLayout({
+    title: "none",
+    safeArea: "generous",
+    footerHeight: 0,
+    contentFooterGap: 0,
+  });
+  const splitPanels = useMemo(
+    () => getSplitPanelRects(zones.content.rect, splitPosition),
+    [splitPosition, zones.content.rect]
+  );
 
   // Phase timing based on item counts
   const leftItemCount = data.left.items.length;
@@ -136,28 +179,28 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [0, sec(0.3), transStart, transStart + sec(0.5), overviewStart, overviewStart + sec(0.5)],
     [1, 1, 1, 0.2, 0.2, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP_SINE
   );
 
   const rightOpacity = interpolate(
     frame,
     [0, sec(0.3), transStart, transStart + sec(0.5), overviewStart, overviewStart + sec(0.5)],
     [0.15, 0.15, 0.15, 1, 1, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP_SINE
   );
 
   const leftBlur = interpolate(
     frame,
     [transStart, transStart + sec(0.4), overviewStart, overviewStart + sec(0.4)],
     [0, 2.5, 2.5, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP_SINE
   );
 
   const rightBlur = interpolate(
     frame,
     [0, transStart, transStart + sec(0.4)],
     [2, 2, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    CLAMP_SINE
   );
 
   // ── Divider ─────────────────────────────────────────────────────────
@@ -166,7 +209,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [dividerStart, dividerStart + sec(0.6)],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const exitOpacity = exitFade(frame, totalFrames, 15);
@@ -238,9 +281,10 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           <div
             style={{
               position: "absolute",
-              left: layout.safeAreaTier.generous.left,
-              top: layout.safeAreaTier.generous.top,
-              width: splitPosition - layout.safeAreaTier.generous.left - 40,
+              left: splitPanels.left.left,
+              top: splitPanels.left.top,
+              width: splitPanels.left.width,
+              height: splitPanels.left.height,
               opacity: leftOpacity * exitOpacity,
               filter: leftBlur > 0.5 ? `blur(${leftBlur}px)` : undefined,
             }}
@@ -269,6 +313,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 color: mode.text.primary,
                 margin: 0,
                 marginBottom: data.left.subtitle ? layout.spacing.sm : layout.spacing.md,
+                maxWidth: textMaxWidth.h2,
                 fontFamily: getFontFamily(data.left.title),
                 lineHeight: lineHeight.h2,
                 opacity: fadeIn(frame, leftBuildStart, sec(0.4)),
@@ -318,9 +363,10 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           <div
             style={{
               position: "absolute",
-              left: layout.safeArea.left + splitPosition,
-              top: layout.safeAreaTier.generous.top,
-              width: splitPosition - layout.safeArea.right - 40,
+              left: splitPanels.right.left,
+              top: splitPanels.right.top,
+              width: splitPanels.right.width,
+              height: splitPanels.right.height,
               opacity: rightOpacity * exitOpacity,
               filter: rightBlur > 0.5 ? `blur(${rightBlur}px)` : undefined,
             }}
@@ -351,6 +397,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 textAlign: "right",
                 margin: 0,
                 marginBottom: data.right.subtitle ? layout.spacing.sm : layout.spacing.md,
+                maxWidth: textMaxWidth.h2,
                 fontFamily: getFontFamily(data.right.title),
                 lineHeight: lineHeight.h2,
                 opacity: fadeIn(frame, rightBuildStart, sec(0.4)),
@@ -473,8 +520,8 @@ const SplitSideContent: React.FC<{
   frame: number;
   totalFrames: number;
   isDark: boolean;
-  splitPosition: number;
-}> = ({ side, data, frame, totalFrames, isDark, splitPosition }) => {
+  panelRect: SplitPanelRect;
+}> = ({ side, data, frame, totalFrames, isDark, panelRect }) => {
   const mode = isDark ? dark : light;
   const isLeft = side === "left";
 
@@ -485,9 +532,6 @@ const SplitSideContent: React.FC<{
 
   const accentColor = data.accentColor || (isLeft ? semantic.us : semantic.china);
 
-  const isRightHalf = !isLeft;
-  const x = isLeft ? layout.safeArea.left : layout.safeArea.left + splitPosition;
-  const w = splitPosition - layout.safeArea.left - (isRightHalf ? layout.safeArea.right : 40);
   const textAlign: "left" | "right" = isLeft ? "left" : "right";
   const itemAlign: "flex-start" | "flex-end" = isLeft ? "flex-start" : "flex-end";
 
@@ -497,10 +541,10 @@ const SplitSideContent: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x,
-        top: layout.safeAreaTier.generous.top,
-        width: w,
-        height: layout.height - layout.safeArea.top - layout.safeArea.bottom,
+        left: panelRect.left,
+        top: panelRect.top,
+        width: panelRect.width,
+        height: panelRect.height,
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-start",
@@ -535,6 +579,7 @@ const SplitSideContent: React.FC<{
           textAlign,
           margin: 0,
           marginBottom: data.subtitle ? layout.spacing.sm : layout.spacing.md,
+          maxWidth: textMaxWidth.h2,
           fontFamily: getFontFamily(data.title),
           lineHeight: lineHeight.h2,
           opacity: fadeIn(frame, titleDelay, sec(0.5)),
@@ -615,6 +660,16 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const leftAccent = data.left.accentColor || semantic.us;
   const rightAccent = data.right.accentColor || semantic.china;
   const splitPosition = layout.width / 2;
+  const { zones } = useTemplateLayout({
+    title: "none",
+    safeArea: "generous",
+    footerHeight: 0,
+    contentFooterGap: 0,
+  });
+  const splitPanels = useMemo(
+    () => getSplitPanelRects(zones.content.rect, splitPosition),
+    [splitPosition, zones.content.rect]
+  );
 
   const dividerStartFrame = 25;
   const dividerDuration = 15;
@@ -622,7 +677,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
     frame,
     [dividerStartFrame, dividerStartFrame + dividerDuration],
     [0, 1],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const labelStartFrame = 35;
@@ -683,7 +738,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           frame={frame}
           totalFrames={totalFrames}
           isDark={isDark}
-          splitPosition={splitPosition}
+          panelRect={splitPanels.left}
         />
 
         <SplitSideContent
@@ -692,7 +747,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           frame={frame}
           totalFrames={totalFrames}
           isDark={isDark}
-          splitPosition={splitPosition}
+          panelRect={splitPanels.right}
         />
 
         {!data.noDivider && (
@@ -715,7 +770,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 width: "100%",
                 height: `${dividerProgress * 100}%`,
                 background: `linear-gradient(to bottom, transparent, ${mode.text.muted}AA 40%, ${mode.text.muted}AA 60%, transparent)`,
-                boxShadow: `0 0 ${8 + 4 * Math.sin(frame * 0.03)}px ${mode.text.muted}30`,
+                boxShadow: `0 0 ${8 + 4 * Math.sin(frame * 0.03)}px ${mode.text.muted}30`, // shadows.accentGlowSm animated (sinusoidal pulse)
               }}
             />
           </div>
@@ -742,7 +797,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               fontFamily: fonts.display,
               opacity: labelOpacity,
               pointerEvents: "none",
-              boxShadow: `0 0 12px ${mode.text.accent}30`,
+              boxShadow: `0 0 12px ${mode.text.accent}30`, // shadows.accentGlowMd (30% opacity variant)
               letterSpacing: 1,
               textTransform: "uppercase",
             }}

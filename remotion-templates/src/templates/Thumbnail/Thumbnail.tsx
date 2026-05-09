@@ -18,7 +18,7 @@
 
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
-import { palette, fonts, fontSizes, layout, cjk } from "../../design/theme";
+import { palette, fonts, fontSizes, layout, cjk, textMaxWidth } from "../../design/theme";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
@@ -173,8 +173,9 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
             color: palette.bone,
             letterSpacing: 5,
             textTransform: "uppercase",
+            maxWidth: textMaxWidth.h2,
             zIndex: 10,
-            textShadow: `0 2px 12px ${palette.ink}, 0 0 32px ${palette.ink}`,
+            textShadow: `0 2px 12px ${palette.ink}, 0 0 32px ${palette.ink}`, // shadows.subtle ink double (32px halo for thumbnail contrast)
           }}
         >
           {data.titleText}
@@ -322,7 +323,7 @@ const LayoutDataProvocation: React.FC<{ data: ThumbnailData }> = ({ data }) => (
             letterSpacing: -3,
             textAlign: "center",
             maxWidth: 1000,
-            textShadow: `0 4px 24px ${palette.ink}`,
+            textShadow: `0 4px 24px ${palette.ink}`, // shadows.medium ink variant (24px spread)
           }}
         >
           {data.heroText}
@@ -339,7 +340,7 @@ const LayoutDataProvocation: React.FC<{ data: ThumbnailData }> = ({ data }) => (
             textAlign: "center",
             textTransform: "uppercase",
             marginTop: THUMB_SEP_GAP,
-            textShadow: `0 2px 12px ${palette.ink}`,
+            textShadow: `0 2px 12px ${palette.ink}`, // shadows.subtle ink variant
           }}
         >
           {data.subText}
@@ -436,6 +437,7 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
             letterSpacing: 6,
             textTransform: "uppercase",
             textAlign: "center",
+            maxWidth: textMaxWidth.h2,
           }}
         >
           {data.symbolTitle}

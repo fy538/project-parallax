@@ -25,6 +25,7 @@ import {
   sec,
   shadows,
   radii,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -128,7 +129,7 @@ const ChessBoard: React.FC<{
         height: 600,
         background: theme.bg.surface,
         border: `${radii.sm}px solid ${accent}`,
-        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`,
+        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`, // shadows.none equivalent — inset vignette (no token)
       }}
     >
       {/* Grid lines */}
@@ -637,7 +638,7 @@ const CounterDisplay: React.FC<{
     frame,
     [phaseStart + sec(0.5), phaseStart + phaseDuration - sec(1)],
     [0, 1],
-    CLAMP
+    CLAMP // linear-ok: counter progress is intentionally linear (counting up at uniform speed)
   );
 
   const cooperateVal = Math.round((counter.cooperate || 0) * progress);
@@ -665,7 +666,8 @@ const CounterDisplay: React.FC<{
               color: cooperateColor,
               fontWeight: 700,
               lineHeight: 1,
-              textShadow: `0 0 20px ${cooperateColor}40`,
+              maxWidth: textMaxWidth.h1,
+              textShadow: `0 0 20px ${cooperateColor}40`, // shadows.accentGlow (20px variant)
             }}
           >
             {cooperateVal}
@@ -691,6 +693,7 @@ const CounterDisplay: React.FC<{
               color: defectColor,
               fontWeight: 700,
               lineHeight: 1,
+              maxWidth: textMaxWidth.h1,
             }}
           >
             {defectVal}

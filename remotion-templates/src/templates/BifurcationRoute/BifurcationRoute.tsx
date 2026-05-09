@@ -41,6 +41,7 @@ import {
   stagger,
   CLAMP,
   CLAMP_CUBIC,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { contentShadow, accentGlow } from "../../utils/depth";
 import { Background } from "../../components/Background";
@@ -256,7 +257,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
     frame,
     [phaseStarts.zoomToFork, phaseStarts.split, phaseStarts.split + sec(0.5)],
     [0, 1, 0.3],
-    CLAMP
+    CLAMP_SINE
   );
 
   // ── Exit fade ──
@@ -570,7 +571,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
               color: networkAColor,
-              textShadow: `0 0 20px ${networkAColor}40`,
+              textShadow: `0 0 20px ${networkAColor}40`, // shadows.accentGlow (20px variant)
             }}
           >
             {data.networkALabel}
@@ -581,7 +582,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
               color: networkBColor,
-              textShadow: `0 0 20px ${networkBColor}40`,
+              textShadow: `0 0 20px ${networkBColor}40`, // shadows.accentGlow (20px variant)
             }}
           >
             {data.networkBLabel}
@@ -659,7 +660,7 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
     frame,
     [splitStartFrame, splitStartFrame + sec(0.5)],
     [1, 0],
-    CLAMP
+    CLAMP_CUBIC
   );
 
   const exitOpacity = defaultExitOpacity;

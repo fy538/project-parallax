@@ -146,7 +146,7 @@ const MorphEventCard: React.FC<{
               borderRadius: "50%",
               backgroundColor: cardColor,
               border: `2px solid ${cardColor}`,
-              boxShadow: `0 0 12px ${cardColor}60, 0 2px 8px rgba(0,0,0,0.3)`,
+              boxShadow: `0 0 12px ${cardColor}60, 0 2px 8px rgba(0,0,0,0.3)`, // shadows.accentGlowMd + shadows.subtle composite (60% opacity)
             }}
           />
           <div

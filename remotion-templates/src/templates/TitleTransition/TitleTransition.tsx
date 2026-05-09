@@ -40,6 +40,7 @@ const smoothBloom = (
 ): number => {
   const peakFrame = startFrame + riseDuration;
   const settleFrame = peakFrame + riseDuration * 2;
+  // linear-ok: 3-point bloom envelope — linear rise/settle segments are intentional
   return interpolate(
     frame,
     [startFrame, peakFrame, settleFrame],
@@ -105,6 +106,7 @@ const EpisodeTitleVariant: React.FC<{
   // titles linger.
   const titleScale = scaleReveal(frame, sec(0.4 * t), sec(0.8 * t), 1.2, 1.0);
   // Spring-based entrance for title (A2 physics)
+  // linear-ok: input is heroSpring() output [0,1] — spring provides easing, not frame index
   const titleSpringY = interpolate(
     heroSpring(frame, layout.fps, stagger(1, 9)),
     [0, 1],
@@ -284,7 +286,7 @@ const EpisodeTitleVariant: React.FC<{
             opacity: fadeIn(frame, sec(0.4), sec(0.6)),
             transform: `scale(${titleScale}) translateY(${titleSpringY}px)`,
             transformOrigin: "center center",
-            textShadow: `0 0 60px ${accentColor}40, 0 0 120px ${accentColor}15, 0 2px 8px rgba(0,0,0,0.6)`,
+            textShadow: `0 0 60px ${accentColor}40, 0 0 120px ${accentColor}15, 0 2px 8px rgba(0,0,0,0.6)`, // shadows.accentGlow cinematic triple (60px + 120px + depth)
           }}
         >
           {data.title}
@@ -301,7 +303,7 @@ const EpisodeTitleVariant: React.FC<{
             opacity: fadeIn(frame, sec(1.2), sec(0.4)),
             transform: `scaleX(${dividerScale(frame, sec(1.2), sec(0.6))})`,
             transformOrigin: "center",
-            boxShadow: `0 0 12px ${accentColor}40`,
+            boxShadow: shadows.accentGlowMd(accentColor),
           }}
         />
 
@@ -357,6 +359,7 @@ const SectionVariant: React.FC<{
   const numberScale = scaleReveal(frame, sec(0.1 * t), sec(0.6 * t), 1.4, 1.0);
 
   // Spring-based entrance for section title
+  // linear-ok: input is heroSpring() output [0,1] — spring provides easing, not frame index
   const titleSpringY = interpolate(
     heroSpring(frame, layout.fps, stagger(1, 9)),
     [0, 1],
@@ -447,7 +450,7 @@ const SectionVariant: React.FC<{
               opacity: fadeIn(frame, sec(0.4), sec(0.5)),
               transform: `scale(${titleScale}) translateY(${titleSpringY}px)`,
               transformOrigin: "center center",
-              textShadow: `0 0 50px ${accentColor}35, 0 2px 6px rgba(0,0,0,0.6)`,
+              textShadow: `0 0 50px ${accentColor}35, 0 2px 6px rgba(0,0,0,0.6)`, // shadows.accentGlow cinematic + depth composite
             }}
           >
             {data.sectionTitle}
@@ -464,7 +467,7 @@ const SectionVariant: React.FC<{
             opacity: fadeIn(frame, sec(0.8), sec(0.3)),
             transform: `scaleX(${dividerScale(frame, sec(0.8), sec(0.4))})`,
             transformOrigin: "center",
-            boxShadow: `0 0 10px ${accentColor}40`,
+            boxShadow: `0 0 10px ${accentColor}40`, // shadows.accentGlowSm (10px variant)
           }}
         />
       </div>
@@ -484,6 +487,7 @@ const EndCardVariant: React.FC<{
   const accentColor = data.accentColor || emphasis.primaryAccent;
 
   // Spring-based entrance for CTA (A2 physics)
+  // linear-ok: input is heroSpring() output [0,1] — spring provides easing, not frame index
   const ctaSpringY = interpolate(
     heroSpring(frame, layout.fps, stagger(0, 9)),
     [0, 1],
@@ -525,6 +529,7 @@ const EndCardVariant: React.FC<{
               color: theme.text.primary,
               fontWeight: 500,
               textAlign: "center",
+              maxWidth: textMaxWidth.h2,
               opacity: fadeIn(frame, sec(0.5), sec(0.5)),
               transform: `translateY(${ctaSpringY}px)`,
               textShadow: shadows.textLift,

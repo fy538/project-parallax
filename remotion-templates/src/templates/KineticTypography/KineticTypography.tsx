@@ -20,7 +20,7 @@ import {
   useCurrentFrame,
   interpolate,
 } from "remotion";
-import { palette, semantic, fonts, fontSizes, layout, sec, shadows } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, layout, sec, shadows, textMaxWidth } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -43,6 +43,7 @@ const smoothBloom = (
 ): number => {
   const peakFrame = startFrame + riseDuration;
   const settleFrame = peakFrame + riseDuration * 2;
+  // linear-ok: 3-point bloom envelope — linear rise/settle segments are intentional
   return interpolate(
     frame,
     [startFrame, peakFrame, settleFrame],
@@ -154,7 +155,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
           marginBottom: layout.spacing.md,
           transform: `scale(${quoteMarkScale * quoteMarkDrift})`,
           transformOrigin: "left center",
-          textShadow: `0 0 40px ${accentColor}40`,
+          textShadow: `0 0 40px ${accentColor}40`, // shadows.accentGlow (40px large variant)
         }}
       >
         &ldquo;
@@ -200,7 +201,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
               fontSize: fontSizes.h3,
               color: accentColor,
               fontWeight: 500,
-              textShadow: `0 0 20px ${accentColor}30, 0 1px 3px rgba(0,0,0,0.5)`,
+              textShadow: `0 0 20px ${accentColor}30, 0 1px 3px rgba(0,0,0,0.5)`, // shadows.accentGlow + shadows.textLift composite
               position: "relative",
               paddingBottom: 4,
             }}
@@ -320,6 +321,7 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
             color: accentColor,
             fontWeight: 600,
             marginTop: layout.spacing.md,
+            maxWidth: textMaxWidth.h2,
             opacity: fadeIn(frame, sec(1.5), sec(0.5)),
             transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px) scale(${supportDrift})`,
             transformOrigin: "left center",
@@ -430,7 +432,7 @@ const BilingualVariant: React.FC<{ data: QuoteData; frame: number }> = ({
           transform: `scaleX(${dividerScale(frame, sec(1.5), sec(0.5))})`,
           transformOrigin: "left center",
           opacity: fadeIn(frame, sec(1.5), sec(0.3)),
-          boxShadow: `0 0 8px ${accentColor}40`,
+          boxShadow: shadows.accentGlowSm(accentColor),
         }}
       />
 
@@ -565,7 +567,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
           fontFamily: fonts.heading,
           opacity: fadeIn(frame, sec(0.2), sec(0.4)),
           lineHeight: 1,
-          textShadow: `0 0 60px ${accentColor}60, 0 0 120px ${accentColor}20`,
+          textShadow: `0 0 60px ${accentColor}60, 0 0 120px ${accentColor}20`, // shadows.accentGlow cinematic (60px + 120px double)
           transform: `scale(${revealScale * pulseScale})`,
           transformOrigin: "center",
         }}
@@ -617,6 +619,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
             color: theme.text.primary,
             fontWeight: 500,
             marginTop: layout.spacing.md,
+            maxWidth: textMaxWidth.h2,
             opacity: fadeIn(frame, sec(1.5), sec(0.5)),
             transform: `translateY(${slideIn(frame, sec(1.5), 30, sec(0.6))}px)`,
             textShadow: shadows.textLift,

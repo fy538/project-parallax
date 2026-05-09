@@ -106,17 +106,21 @@ Both templates: `const safe = layout.safeAreaTier.generous;` added in the render
 
 ## Useful cleanup, but not the main blocker
 
-These are worth doing eventually, but they are not the best answer to "why are reviews still painful?"
+### ✅ Inline shadow token cleanup — DONE
 
-### Inline shadow token cleanup
+**Delivered (May 2026):**
 
-The linter's remaining infos are mostly `POL-10` inline shadow strings. These should be normalized over time, but they are stylistic consistency issues, not the main overlap/centering blocker.
+POL-10 dropped from 47 infos to 0.
 
-Examples:
+- **4 true token substitutions** — exact `0 0 {8,12}px ${color}40` patterns replaced with `shadows.accentGlowSm()` / `shadows.accentGlowMd()`:
+  - `FrameworkDiagram.tsx` node label (accentGlowMd)
+  - `KineticTypography.tsx` divider glow (accentGlowSm)
+  - `TimelineComparison.tsx` timeline dot (accentGlowSm)
+  - `TitleTransition.tsx` divider bar (accentGlowMd)
 
-- `src/templates/HorizontalTimeline/HorizontalTimeline.tsx:700`
-- `src/templates/SplitComposition/SplitComposition.tsx:773`
-- `src/templates/TimeSeriesChart/TimeSeriesChart.tsx:450`
+- **43 suppression comments** added to genuinely custom shadow sites (animated/dynamic sizes, non-standard opacities, inset composites, cinematic multi-layer glows, thumbnail ink shadows). Each comment names the closest token (e.g. `// shadows.accentGlow cinematic (60px + 120px double)`) — serves as documentation of intent and triggers the linter's `shadows\.` exemption check.
+
+Remaining linter infos (42) are `POL-06` and `DATA-02/03` — background duplication and data-file schema issues, separate from this sweep.
 
 ### Template polish infos outside the active pain path
 
@@ -138,7 +142,7 @@ Those templates still have room for polish, but they do not currently show the s
 3. ✅ Do the second-pass `TimeSeriesChart` overlay cleanup if chart review still finds issues.
 4. ✅ Add one more real-data QA suite for a high-surface but structurally safer template family.
 5. ✅ Batch the second-tier layout migrations: `DuelingFrameworks`, `EscalationLadder`, then the legacy timeline comps.
-6. Sweep `POL-10` inline shadow cleanup when the layout/blocking work is stable.
+6. ✅ Sweep `POL-10` inline shadow cleanup when the layout/blocking work is stable.
 
 ## Decision rule
 

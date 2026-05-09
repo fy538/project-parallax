@@ -33,6 +33,7 @@ import {
   shadows,
   radii,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -394,7 +395,7 @@ const HypothesisBar: React.FC<HypothesisBarProps & { isLeading?: boolean }> = Re
             borderRadius: `${radii.sm}px ${radii.sm}px 0 0`,
             overflow: "hidden",
             border: `1px solid ${theme.text.muted}30`,
-            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`,
+            boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`, // shadows.none equivalent — inset surface (no token)
           }}
         >
           {/* Bar fill — vertical gradient + transition */}
@@ -628,7 +629,7 @@ const MultiVariant: React.FC<{
                         height: 12,
                         borderRadius: "50%",
                         backgroundColor: hypothesisColors[i],
-                        boxShadow: `0 0 4px ${hypothesisColors[i]}60`,
+                        boxShadow: `0 0 4px ${hypothesisColors[i]}60`, // shadows.accentGlowSm (4px, 60% opacity variant)
                       }}
                     />
                     <div
@@ -1036,6 +1037,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                   color: curve1Color,
                   textShadow: shadows.textLift,
                   lineHeight: 1,
+                  maxWidth: textMaxWidth.h1,
                   transform: `scale(${settleScale})`,
                   transformOrigin: "left bottom",
                 }}
@@ -1051,6 +1053,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                     color: curve2Color,
                     textShadow: shadows.textLift,
                     lineHeight: 1,
+                    maxWidth: textMaxWidth.h2,
                     opacity: 0.8,
                   }}
                 >

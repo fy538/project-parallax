@@ -55,6 +55,7 @@ import { Background } from "../../components/Background";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import type {
   HorizontalTimelineData,
   TimelineEventData,
@@ -183,7 +184,7 @@ const YearMarker: React.FC<{
           height: markerSize,
           borderRadius: "50%",
           backgroundColor: color,
-          boxShadow: `0 0 ${8 + weight * 4}px ${color}60, 0 0 ${16 + weight * 6}px ${color}25`,
+          boxShadow: `0 0 ${8 + weight * 4}px ${color}60, 0 0 ${16 + weight * 6}px ${color}25`, // shadows.accentGlow animated (weight-based dynamic double glow)
         }}
       />
       {/* Year label */}
@@ -371,6 +372,16 @@ export const HorizontalTimeline: React.FC<{
   const theme = useThemeMode(mode);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  const footerHeight =
+    data.mode === "dual"
+      ? fontSizes.label * 2 + layout.spacing.xl
+      : fontSizes.label + layout.spacing.xl;
+  const { zones } = useTemplateLayout({
+    title: "content",
+    safeArea: "generous",
+    footerHeight,
+    contentFooterGap: 0,
+  });
 
   const eraAColor = data.eraAColor || palette.gold;
   const eraBColor = data.eraBColor || palette.rust;
@@ -496,6 +507,7 @@ export const HorizontalTimeline: React.FC<{
     if (camera.stepIndex < morphStartStep) return 0;
     if (camera.stepIndex >= morphEndStep) return 1;
 
+    // linear-ok: maps discrete step-index distance, not frame-time — smooth comes from camera interpolation above
     return interpolate(
       camera.stepIndex - morphStartStep,
       [0, morphEndStep - morphStartStep],
@@ -503,6 +515,25 @@ export const HorizontalTimeline: React.FC<{
       { ...{ extrapolateLeft: "clamp" as const, extrapolateRight: "clamp" as const } }
     );
   }, [data.mode, cameraPath.length, camera.stepIndex]);
+
+  const overlayBands = useMemo(() => {
+    const titleSupplementHeight = fontSizes.h3 + layout.spacing.lg;
+    const titleSupplementTop = Math.min(
+      zones.title.rect.top + zones.title.rect.height - titleSupplementHeight,
+      zones.title.rect.top + Math.max(layout.spacing.md, Math.round(zones.title.rect.height * 0.4))
+    );
+
+    return {
+      titleBox: zones.title.rect,
+      titleSupplement: {
+        top: titleSupplementTop,
+        left: zones.title.rect.left,
+        width: zones.title.rect.width,
+        height: titleSupplementHeight,
+      },
+      footerBox: zones.footer.rect,
+    };
+  }, [zones.footer.rect, zones.title.rect]);
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
@@ -666,7 +697,7 @@ export const HorizontalTimeline: React.FC<{
                           height: 14,
                           borderRadius: "50%",
                           backgroundColor: pair.eraB.color || eraBColor,
-                          boxShadow: `0 0 10px ${pair.eraB.color || eraBColor}50`,
+                          boxShadow: `0 0 10px ${pair.eraB.color || eraBColor}50`, // shadows.accentGlowSm (10px, 50% opacity variant)
                           opacity: fadeIn(frame, revealFrame, sec(0.4)) * (1 - eventDim * 0.75),
                           transform: `scale(${eventScale})`,
                           filter: eventBlur > 0 ? `blur(${eventBlur}px)` : undefined,
@@ -838,7 +869,7 @@ export const HorizontalTimeline: React.FC<{
                                 fontWeight: 600,
                                 color: theme.text.primary,
                                 lineHeight: 1.3,
-                                marginBottom: 8,
+                                marginBottom: layout.spacing.xs,
                                 textShadow: shadows.textLift,
                               }}
                             >
@@ -859,7 +890,7 @@ export const HorizontalTimeline: React.FC<{
                                 fontWeight: 600,
                                 color: theme.text.primary,
                                 lineHeight: 1.3,
-                                marginBottom: 8,
+                                marginBottom: layout.spacing.xs,
                                 textShadow: shadows.textLift,
                               }}
                             >
@@ -886,8 +917,8 @@ export const HorizontalTimeline: React.FC<{
           <div
             style={{
               position: "absolute",
-              top: layout.safeAreaTier.generous.top,
-              right: layout.safeAreaTier.generous.right,
+              top: overlayBands.titleBox.top,
+              right: overlayBands.titleBox.right,
               fontSize: fontSizes.label,
               fontFamily: fonts.mono,
               fontWeight: 600,
@@ -909,8 +940,9 @@ export const HorizontalTimeline: React.FC<{
               <div
                 style={{
                   position: "absolute",
-                  top: layout.safeAreaTier.generous.top + 60,
-                  left: layout.safeAreaTier.generous.left,
+                  top: overlayBands.titleSupplement.top,
+                  left: overlayBands.titleSupplement.left,
+                  width: overlayBands.titleSupplement.width,
                   fontSize: fontSizes.label,
                   fontFamily: fonts.mono,
                   fontWeight: 600,
@@ -928,8 +960,9 @@ export const HorizontalTimeline: React.FC<{
               <div
                 style={{
                   position: "absolute",
-                  bottom: layout.safeAreaTier.generous.bottom + 60,
-                  left: layout.safeAreaTier.generous.left,
+                  top: overlayBands.footerBox.top,
+                  left: overlayBands.footerBox.left,
+                  width: overlayBands.footerBox.width,
                   fontSize: fontSizes.label,
                   fontFamily: fonts.mono,
                   fontWeight: 600,
@@ -951,8 +984,9 @@ export const HorizontalTimeline: React.FC<{
           <div
             style={{
               position: "absolute",
-              top: layout.safeAreaTier.generous.top + 60,
-              left: layout.safeAreaTier.generous.left,
+              top: overlayBands.titleSupplement.top,
+              left: overlayBands.titleSupplement.left,
+              width: overlayBands.titleSupplement.width,
               fontSize: fontSizes.h3,
               fontFamily: fonts.heading,
               fontWeight: 600,
@@ -975,8 +1009,12 @@ export const HorizontalTimeline: React.FC<{
           <div
             style={{
               position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              left: layout.safeAreaTier.generous.left,
+              top:
+                overlayBands.footerBox.top +
+                overlayBands.footerBox.height -
+                (fontSizes.label + layout.spacing.xs),
+              left: overlayBands.footerBox.left,
+              width: overlayBands.footerBox.width,
               fontSize: fontSizes.label,
               color: theme.text.muted,
               letterSpacing: 2,

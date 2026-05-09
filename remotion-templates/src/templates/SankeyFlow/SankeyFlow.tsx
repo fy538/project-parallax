@@ -442,7 +442,7 @@ const SankeyNodeComponent: React.FC<{
             background: nodeColor,
             opacity: 0.85,
             borderRadius: 2,
-            boxShadow: `0 1px 2px ${nodeColor}40`,
+            boxShadow: `0 1px 2px ${nodeColor}40`, // shadows.subtle accent variant (1px offset)
           }}
         />
 
@@ -487,7 +487,7 @@ const SankeyNodeComponent: React.FC<{
                 fontWeight: 700,
                 fontFamily: fonts.mono,
                 color: nodeColor,
-                textShadow: `0 2px 8px ${nodeColor}40, 0 4px 12px rgba(0,0,0,0.15)`,
+                textShadow: `0 2px 8px ${nodeColor}40, 0 4px 12px rgba(0,0,0,0.15)`, // shadows.accentGlow + shadows.subtle composite
                 lineHeight: 1,
                 whiteSpace: "nowrap",
               }}

@@ -322,6 +322,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   }
 
   // Continuous slow bearing drift within each phase (globe "breathes")
+  // linear-ok: raw phase progress — easing applied by consumers (camera interpolation, bearing drift)
   const intraPhaseProgress = interpolate(
     frame,
     [phaseWindow.start, phaseWindow.end],
@@ -561,7 +562,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                       borderRadius: "50%",
                       backgroundColor: ptColor,
                       border: `2px solid ${theme.bg.surface}`,
-                      boxShadow: `0 0 8px ${ptColor}80`,
+                      boxShadow: `0 0 8px ${ptColor}80`, // shadows.accentGlowSm (80% opacity variant)
                     }}
                   />
                   {/* Labels container — positioned based on labelPosition */}

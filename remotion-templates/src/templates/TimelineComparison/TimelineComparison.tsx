@@ -73,7 +73,7 @@ const EventCard: React.FC<{
             height: 14,
             borderRadius: "50%",
             backgroundColor: event.color || accentColor,
-            boxShadow: `0 0 8px ${event.color || accentColor}40`,
+            boxShadow: shadows.accentGlowSm(event.color || accentColor),
           }}
         />
         <div

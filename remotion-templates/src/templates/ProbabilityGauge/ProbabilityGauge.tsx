@@ -29,8 +29,9 @@ import {
   contentArea,
   radii,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC, CLAMP_SINE } from "../../utils/animation";
 import { contentShadow, cardStyle } from "../../utils/depth";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -194,13 +195,14 @@ const GaugeArc: React.FC<{
           fontFamily: fonts.data,
           textAlign: "center",
           lineHeight: 1,
-          textShadow: `0 0 20px ${color}40, 0 0 40px ${color}20`,
+          maxWidth: textMaxWidth.h1,
+          textShadow: `0 0 20px ${color}40, 0 0 40px ${color}20`, // shadows.accentGlow double (20px + 40px halo)
           transform: `scale(${settleScale})`,
           transformOrigin: "center",
         }}
       >
         {displayValue}
-        <span style={{ fontSize: fontSizes.h2, color: color }}>%</span>
+        <span style={{ fontSize: fontSizes.h2, color: color, maxWidth: textMaxWidth.h2 }}>%</span>
       </div>
 
       {/* Label */}
@@ -343,7 +345,7 @@ const ShiftBar: React.FC<{
               width: `${displayAfter}%`,
               background: `linear-gradient(180deg, ${barColor}E0 0%, ${barColor} 100%)`,
               borderRadius: 4,
-              boxShadow: `0 0 8px ${barColor}55, inset 0 -1px 1px rgba(0,0,0,0.18)`,
+              boxShadow: `0 0 8px ${barColor}55, inset 0 -1px 1px rgba(0,0,0,0.18)`, // shadows.accentGlowSm + inset composite
             }}
           />
           {/* Specular thin line */}
@@ -380,7 +382,7 @@ const ShiftBar: React.FC<{
                   fontSize: fontSizes.h3,
                   color: barColor,
                   opacity: pauseOpacity,
-                  textShadow: `0 0 6px ${barColor}80`,
+                  textShadow: `0 0 6px ${barColor}80`, // shadows.accentGlowSm (6px, 80% opacity variant)
                   fontWeight: 700,
                   pointerEvents: "none",
                 }}
@@ -403,7 +405,7 @@ const ShiftBar: React.FC<{
               frame,
               [pauseEnd - sec(0.1), pauseEnd],
               [0, 1],
-              CLAMP
+              CLAMP_SINE
             ),
           }}
         >
@@ -510,13 +512,14 @@ const Scorecard: React.FC<{
                     textAlign: "center",
                     padding: `${layout.spacing.xs}px 0`,
                     fontSize: fontSizes.title,
+                    maxWidth: textMaxWidth.h1,
                   }}
                 >
                   {item.outcome === "correct" && (
                     <span
                       style={{
                         color: semantic.success,
-                        textShadow: `0 0 12px ${semantic.success}80, 0 0 4px ${semantic.success}60`,
+                        textShadow: `0 0 12px ${semantic.success}80, 0 0 4px ${semantic.success}60`, // shadows.accentGlowMd + tight composite (80% + 60% opacity)
                         display: "inline-block",
                       }}
                     >
@@ -527,7 +530,7 @@ const Scorecard: React.FC<{
                     <span
                       style={{
                         color: semantic.danger,
-                        textShadow: `0 0 12px ${semantic.danger}80, 0 0 4px ${semantic.danger}60`,
+                        textShadow: `0 0 12px ${semantic.danger}80, 0 0 4px ${semantic.danger}60`, // shadows.accentGlowMd + tight composite (80% + 60% opacity)
                         display: "inline-block",
                       }}
                     >
@@ -538,7 +541,7 @@ const Scorecard: React.FC<{
                     <span
                       style={{
                         color: palette.amber,
-                        textShadow: `0 0 8px ${palette.amber}60`,
+                        textShadow: `0 0 8px ${palette.amber}60`, // shadows.accentGlowSm (60% opacity variant)
                         opacity: 0.5 + 0.3 * Math.sin(frame * 0.08),
                         display: "inline-block",
                       }}
@@ -648,13 +651,14 @@ const ForecastCard: React.FC<{
             fontWeight: fontWeights.bold,
             color: theme.text.primary,
             lineHeight: 1,
-            textShadow: `0 0 24px ${palette.amber}40, 0 0 48px ${palette.amber}18`,
+            maxWidth: textMaxWidth.h1,
+            textShadow: `0 0 24px ${palette.amber}40, 0 0 48px ${palette.amber}18`, // shadows.accentGlow large (24px + 48px double halo)
             transform: `scale(${settleScale})`,
             transformOrigin: "center",
           }}
         >
           {displayValue}
-          <span style={{ fontSize: fontSizes.h2, color: palette.amber }}>%</span>
+          <span style={{ fontSize: fontSizes.h2, color: palette.amber, maxWidth: textMaxWidth.h2 }}>%</span>
         </div>
         <div
           style={{

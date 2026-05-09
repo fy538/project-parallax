@@ -105,7 +105,7 @@ const HeroStat: React.FC<HeroStatProps> = ({
           fontWeight: fontWeights.bold,
           color: accentColor,
           fontFamily: fonts.data,
-          textShadow: `0 0 24px ${accentColor}50, ${theme.textShadow}`,
+          textShadow: `0 0 24px ${accentColor}50, ${theme.textShadow}`, // shadows.accentGlow + theme.textShadow composite
           letterSpacing: -2,
           lineHeight: 1,
           transform: `scale(${revealScale})`,

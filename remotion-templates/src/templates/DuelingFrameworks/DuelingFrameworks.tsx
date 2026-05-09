@@ -110,7 +110,7 @@ const ScoringBar: React.FC<{
         borderRadius: radii.xs,
         overflow: "hidden",
         marginBottom: layout.spacing.md,
-        boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`,
+        boxShadow: `inset 0 1px 2px rgba(0,0,0,0.08)`, // shadows.none equivalent — inset surface (no token)
       }}
     >
       {/* Outer glow layer */}
@@ -137,7 +137,7 @@ const ScoringBar: React.FC<{
           width: `${barWidth}%`,
           background: `linear-gradient(180deg, ${color}E0 0%, ${color} 100%)`,
           zIndex: 1,
-          boxShadow: `inset 0 -1px 2px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.18)`,
+          boxShadow: `inset 0 -1px 2px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.18)`, // shadows.none equivalent — inset border composite (no token)
         }}
       />
       {/* Specular highlight — thin bright line at top */}
@@ -579,7 +579,7 @@ const CinematicDuelingFrameworks: React.FC<{
                       fontFamily: fonts.display,
                       letterSpacing: letterSpacing.h1,
                       maxWidth: textMaxWidth.h2,
-                      textShadow: `0 0 ${20 + clashGlow * 30}px ${theme.text.accent}${clashGlow > 0.5 ? "80" : "40"}`,
+                      textShadow: `0 0 ${20 + clashGlow * 30}px ${theme.text.accent}${clashGlow > 0.5 ? "80" : "40"}`, // shadows.accentGlow animated (dynamic size + opacity)
                       opacity: fadeIn(frame, dividerStart + sec(0.2), sec(0.4)),
                     }}
                   >

@@ -94,7 +94,7 @@ const EventCard: React.FC<{
             height: 14,
             borderRadius: "50%",
             backgroundColor: accentColor,
-            boxShadow: `0 0 10px ${accentColor}80`,
+            boxShadow: `0 0 10px ${accentColor}80`, // shadows.accentGlowSm (10px, 80% opacity variant)
           }}
         />
         <div

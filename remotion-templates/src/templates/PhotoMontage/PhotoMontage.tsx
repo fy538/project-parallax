@@ -28,6 +28,7 @@ import {
   sec,
   duotone,
   contentArea,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -188,9 +189,10 @@ const ImageOverlay: React.FC<{
       fontSize: fontSizes.h2,
       fontWeight: 700,
       color: theme.text.primary,
-      textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`,
+      textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`, // shadows.textLift (8px variant)
       lineHeight: 1.0,
       letterSpacing: 0,
+      maxWidth: textMaxWidth.h2,
     },
     label: {
       fontFamily: fonts.body,
@@ -199,14 +201,14 @@ const ImageOverlay: React.FC<{
       color: theme.text.primary,
       textTransform: "uppercase",
       letterSpacing: 2,
-      textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`,
+      textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`, // shadows.textLift (4px variant)
     },
     caption: {
       fontFamily: fonts.body,
       fontSize: fontSizes.caption,
       fontWeight: 400,
       color: theme.text.secondary,
-      textShadow: `0 1px 3px rgba(0, 0, 0, 0.4)`,
+      textShadow: `0 1px 3px rgba(0, 0, 0, 0.4)`, // shadows.textLift (40% opacity variant)
     },
   }[overlayStyle];
 
@@ -430,7 +432,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
       if (range.imageIndex === 0) continue; // no flash on first image
       const cutFrame = range.startFrame;
       if (frame >= cutFrame && frame < cutFrame + 2) {
-        return interpolate(frame, [cutFrame, cutFrame + 2], [0.30, 0], CLAMP);
+        return interpolate(frame, [cutFrame, cutFrame + 2], [0.30, 0], CLAMP); // linear-ok: 2-frame flash, easing has no visual effect at this duration
       }
     }
     return 0;
@@ -468,7 +470,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
               opacity:
                 data.transition === "dissolve"
                   ? interpolate(
-                      next.progress,
+                      next.progress, // linear-ok: identity mapping of progress→opacity; caller eases progress
                       [0, 1],
                       [0, 1],
                       CLAMP

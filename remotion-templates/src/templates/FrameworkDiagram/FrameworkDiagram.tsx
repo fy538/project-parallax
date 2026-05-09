@@ -134,7 +134,7 @@ const ComparisonVariant: React.FC<{
                   fontWeight: 600,
                   color: theme.text.primary,
                   fontFamily: fonts.heading,
-                  textShadow: `0 0 20px ${colColor}30`,
+                  textShadow: `0 0 20px ${colColor}30`, // shadows.accentGlow (20px, 30% opacity variant)
                   maxWidth: textMaxWidth.h2,
                 }}
               >
@@ -200,7 +200,7 @@ const ComparisonVariant: React.FC<{
               opacity: vsOpacity * exit,
               letterSpacing: 3,
               textTransform: "uppercase",
-              textShadow: `0 0 12px ${palette.amber}${Math.round(glowPulse * 255).toString(16).padStart(2, "0")}`,
+              textShadow: `0 0 12px ${palette.amber}${Math.round(glowPulse * 255).toString(16).padStart(2, "0")}`, // shadows.accentGlowMd animated (dynamic opacity)
             }}
           >
             vs
@@ -379,7 +379,7 @@ const FlowVariant: React.FC<{
                       fontSize: fontSizes.caption,
                       color: nodeColor,
                       marginTop: layout.spacing.xs,
-                      textShadow: `0 0 12px ${nodeColor}40`,
+                      textShadow: shadows.accentGlowMd(nodeColor),
                     }}
                   >
                     {node.sublabel}
@@ -406,13 +406,14 @@ const FlowVariant: React.FC<{
 
   // Camera-like horizontal pan: translate container to follow active node
   const panProgress = nodes.length > 1
+    // linear-ok: maps discrete node index→pan ratio, not frame-based animation
     ? interpolate(activeNodeIndex, [0, nodes.length - 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
     : 0;
   const panOffset = interpolate(
     frame,
     [0, durationInFrames * 0.8],
     [40, -40 * panProgress],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok: slow continuous parallax pan, linear drift is intentional
   );
 
   return (
@@ -465,6 +466,7 @@ const FlowVariant: React.FC<{
 
           // Progressive focus: dim earlier nodes as later ones appear
           const dimAmount = i < activeNodeIndex
+            // linear-ok: maps discrete node-distance→dim level, not frame-based motion
             ? interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
             : 0;
           const focusOpacity = 1 - dimAmount;
