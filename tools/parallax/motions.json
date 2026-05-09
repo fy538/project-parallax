@@ -1,0 +1,19 @@
+{
+  "aigen-01": { "motion": "dolly_in",   "intensity": 0.3 },
+  "aigen-02": { "motion": "zoom_in",    "intensity": 0.25 },
+  "aigen-03": { "motion": "tilt_down",  "intensity": 0.3 },
+  "aigen-04": { "motion": "dolly_in",   "intensity": 0.3 },
+  "aigen-05": { "motion": "dolly_in",   "intensity": 0.3 },
+  "aigen-06": { "motion": "dolly_in",   "intensity": 0.35 },
+  "aigen-07": { "motion": "dolly_out",  "intensity": 0.3 },
+  "aigen-08": { "motion": "tilt_down",  "intensity": 0.25 },
+  "aigen-09": { "motion": "pan_right",  "intensity": 0.35 },
+  "aigen-10": { "motion": "zoom_out",   "intensity": 0.3 },
+  "aigen-11": { "motion": "dolly_in",   "intensity": 0.35 },
+  "aigen-12": { "motion": "tilt_up",    "intensity": 0.3 },
+  "aigen-13": { "motion": "zoom_out",   "intensity": 0.3 },
+  "aigen-14": { "motion": "pan_left",   "intensity": 0.3 },
+  "aigen-15": { "motion": "dolly_in",   "intensity": 0.15 },
+  "aigen-16": { "motion": "dolly_in",   "intensity": 0.25 },
+  "aigen-17": { "motion": "pan_right",  "intensity": 0.35 }
+}

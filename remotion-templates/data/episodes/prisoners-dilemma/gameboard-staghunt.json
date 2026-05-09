@@ -1,33 +1,72 @@
 {
   "episode": "prisoners-dilemma",
   "title": "The Stag Hunt",
-  "subtitle": "Rousseau (1755)",
+  "subtitle": "Jean-Jacques Rousseau, 1755",
   "variant": "payoff-matrix",
   "rowPlayer": "Hunter A",
   "colPlayer": "Hunter B",
-  "rowOptions": ["Stag", "Hare"],
-  "colOptions": ["Stag", "Hare"],
+  "rowOptions": [
+    "Stag",
+    "Hare"
+  ],
+  "colOptions": [
+    "Stag",
+    "Hare"
+  ],
   "cells": [
-    { "row": 0, "col": 0, "value": "4, 4", "highlight": true },
-    { "row": 0, "col": 1, "value": "0, 3", "highlight": false },
-    { "row": 1, "col": 0, "value": "3, 0", "highlight": false },
-    { "row": 1, "col": 1, "value": "3, 3", "highlight": true }
+    {
+      "row": 0,
+      "col": 0,
+      "value": "4, 4",
+      "highlight": true,
+      "color": "#C4A747"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "value": "0, 3",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "value": "3, 0",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "value": "2, 2",
+      "highlight": true,
+      "color": "#888780"
+    }
   ],
   "phases": [
     {
-      "label": "Two equilibria",
-      "durationSec": 6,
-      "highlights": [0, 3],
-      "annotation": "Cooperation IS rational — if you trust the other will cooperate"
+      "label": "The Payoffs",
+      "durationSec": 4,
+      "highlights": [],
+      "annotation": "Stag = enormous reward, but only if nobody breaks ranks"
     },
     {
-      "label": "The cooperative equilibrium",
-      "durationSec": 6,
-      "highlights": [0],
-      "annotation": "The puzzle isn't domination. It's coordination."
+      "label": "Two Equilibria",
+      "durationSec": 4,
+      "highlights": [
+        0,
+        3
+      ],
+      "annotation": "Cooperation IS an equilibrium \u2014 if you trust the other will cooperate \u25cf \u25cf"
+    },
+    {
+      "label": "The Difference",
+      "durationSec": 4,
+      "highlights": [
+        0
+      ],
+      "annotation": "The puzzle shifts: not domination, but coordination"
     }
   ],
   "durationSec": 12,
   "backgroundVariant": "dark",
-  "backgroundTint": "#C4A747"
+  "cinematicMode": true
 }

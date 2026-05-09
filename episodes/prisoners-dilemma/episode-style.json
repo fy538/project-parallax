@@ -1,0 +1,13 @@
+{
+  "style_id": "f1234664-0afd-472b-a0e6-243f32fc24f1",
+  "name": "prisoners-dilemma-ep-v4pro",
+  "base_style": "digital_illustration",
+  "reference_images": [
+    "r7_conceptual_corridor.png",
+    "r8_bauhaus_educational.png",
+    "r9_american_modernist_fortune.png",
+    "r14_multifigure_boardroom.png",
+    "r15_neutral_default.png"
+  ],
+  "created_at": "2026-05-07T02:05:56Z"
+}

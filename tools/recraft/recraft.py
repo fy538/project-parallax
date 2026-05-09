@@ -2,8 +2,9 @@
 """
 Parallax Recraft Generation Tool
 
-Generates production-quality illustrations and photoreal images via the Recraft V3
-API, with brand-locked prompt preambles per visual register.
+Generates production-quality illustrations and photoreal images via the Recraft V4
+API, with brand-locked prompt preambles per visual register and optional style
+reference images for visual consistency across episodes.
 
 Two-stage brand unification:
   1. Prompt-level (this tool's --register flag) — bakes brand palette,
@@ -44,8 +45,17 @@ Usage:
   python recraft.py generate "strategic game board" --register atmospheric \\
       --treat standard -o board.svg
 
-  # Batch generate from a shot list JSON (per-shot 'register' field supported)
-  python recraft.py batch shot-list.json --output assets/ --treat standard
+  # Create a style reference from images (returns a style_id for future use)
+  python recraft.py create-style --name "prisoners-dilemma-ep" \\
+      --base-style vector_illustration \\
+      ref1.png ref2.png ref3.png
+
+  # Generate with a style reference (3-tier cascade: channel→episode→production)
+  python recraft.py generate "scene description" --register grounding \\
+      --style-id abc123 -o scene.png
+
+  # Batch generate from a shot list JSON with style reference
+  python recraft.py batch shot-list.json --output assets/ --style-id abc123
 
   # Batch with a default register for shots that don't specify one
   python recraft.py batch shot-list.json --register atmospheric --output assets/
@@ -58,6 +68,12 @@ Usage:
 
   # Raw prompt — bypass register/mode preambles entirely
   python recraft.py generate "exact prompt as-is" --raw
+
+3-Tier Visual Cascade:
+  Tier 1: Channel reference images (tools/ai-video/style-references/)
+  Tier 2: Episode reference style — create with `create-style` from a subset
+          of Tier 1 images, tuned to the episode's specific mood/palette
+  Tier 3: Production stills — batch generate with `batch --style-id <id>`
 
 Environment variables:
   RECRAFT_API_KEY  — Get at https://www.recraft.ai/docs/api-reference/getting-started
@@ -154,16 +170,135 @@ ALL_STYLES = {**VECTOR_STYLES, **ICON_STYLES, **RASTER_STYLES}
 
 # ── API Client ───────────────────────────────────────────────────────────────
 
+# Model selection: Recraft V4 is the current generation. The API model string
+# is "recraftv3" for standard (1MP) or "recraftv3-pro" for 4MP output.
+# Recraft V4 Pro — higher quality raster output, prompt-only (no styles).
+DEFAULT_MODEL = "recraftv4_pro"
+
+# V3 and V4 have different supported image sizes.
+# V3 uses explicit WxH (1820x1024 for 16:9).
+# V4 Pro uses aspect ratios or its own WxH set.
+DEFAULT_SIZE_V3 = "1820x1024"
+DEFAULT_SIZE_V4 = "16:9"  # V4 supports aspect ratio format
+
+
+def create_style(
+    image_paths: list[str],
+    base_style: str = "vector_illustration",
+    name: str = "",
+) -> str:
+    """
+    Create a style reference by uploading images to the Recraft /styles endpoint.
+
+    This is Tier 2 of the 3-tier visual cascade:
+      Tier 1: Channel reference images (tools/ai-video/style-references/)
+      Tier 2: Episode reference style (created here from a subset of Tier 1)
+      Tier 3: Production stills (generated with Tier 2 style_id)
+
+    Args:
+        image_paths: List of file paths to reference images (PNG/JPG).
+                     Recraft uses these to create a custom style. 3-5 images
+                     recommended for best results.
+        base_style:  The Recraft base style to build on. One of:
+                     'vector_illustration', 'digital_illustration',
+                     'realistic_image'. Default: 'vector_illustration'.
+        name:        Optional name for the style (for your reference).
+
+    Returns:
+        style_id: The Recraft style ID string to use in subsequent
+                  generate_image() calls via the style_id parameter.
+    """
+    if not API_KEY:
+        print("ERROR: RECRAFT_API_KEY environment variable not set.", file=sys.stderr)
+        sys.exit(1)
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+    }
+
+    # Multipart form: one "style" field for the base style, plus image files
+    files = []
+    for path in image_paths:
+        p = Path(path)
+        if not p.exists():
+            print(f"  WARNING: Reference image not found: {path}", file=sys.stderr)
+            continue
+        files.append(("files", (p.name, open(p, "rb"), "image/png")))
+
+    if not files:
+        print("ERROR: No valid reference images found.", file=sys.stderr)
+        sys.exit(1)
+
+    data = {"style": base_style}
+
+    print(f"  Creating style from {len(files)} reference image(s)...")
+    print(f"  Base style: {base_style}")
+    if name:
+        print(f"  Name: {name}")
+
+    try:
+        resp = requests.post(
+            f"{BASE_URL}/styles",
+            headers=headers,
+            data=data,
+            files=files,
+            timeout=120,
+        )
+        resp.raise_for_status()
+        result = resp.json()
+
+        style_id = result.get("id", "")
+        print(f"  ✓ Style created: {style_id}")
+
+        # Save style metadata for future reference
+        if name:
+            meta = {
+                "style_id": style_id,
+                "name": name,
+                "base_style": base_style,
+                "reference_images": [str(Path(p).name) for p in image_paths],
+                "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            }
+            print(f"  Metadata: {json.dumps(meta, indent=2)}")
+
+        return style_id
+
+    except requests.exceptions.HTTPError as e:
+        print(f"  API Error creating style: {e}", file=sys.stderr)
+        try:
+            print(f"  → {resp.json()}", file=sys.stderr)
+        except Exception:
+            print(f"  → {resp.text[:200]}", file=sys.stderr)
+        sys.exit(1)
+
+    finally:
+        # Close file handles
+        for _, (_, fh, _) in files:
+            fh.close()
+
 
 def generate_image(
     prompt: str,
     style: str = "vector_illustration",
-    size: str = "1920x1080",
+    size: str = "",
     n: int = 1,
     use_brand_prefix: bool = True,
+    style_id: Optional[str] = None,
 ) -> list[dict]:
     """
     Generate image(s) via Recraft API.
+
+    Args:
+        prompt: The text prompt.
+        style: Recraft style category (vector_illustration, etc.).
+               Ignored when style_id is set.
+        size: Output dimensions WxH.
+        n: Number of images to generate (1-4).
+        use_brand_prefix: Whether to prepend the legacy brand prefix.
+        style_id: Optional style reference ID from create_style(). When set,
+                  the generated image will follow the visual style established
+                  by the reference images. This is how the 3-tier cascade
+                  enforces episode-level visual consistency.
 
     Returns list of {url, revised_prompt} dicts.
     """
@@ -171,6 +306,11 @@ def generate_image(
         print("ERROR: RECRAFT_API_KEY environment variable not set.", file=sys.stderr)
         print("  Get your key at: https://www.recraft.ai/docs/api-reference/getting-started", file=sys.stderr)
         sys.exit(1)
+
+    # Auto-select size based on model if not explicitly provided
+    is_v4 = "v4" in DEFAULT_MODEL.lower()
+    if not size:
+        size = DEFAULT_SIZE_V4 if is_v4 else DEFAULT_SIZE_V3
 
     full_prompt = (BRAND_PREFIX + prompt) if use_brand_prefix else prompt
 
@@ -180,15 +320,26 @@ def generate_image(
     }
 
     body = {
-        "model": "recraft-v3",
+        "model": DEFAULT_MODEL,
         "prompt": full_prompt,
-        "style": style,
         "size": size,
         "n": n,
     }
 
-    print(f"  Generating: {prompt[:80]}{'...' if len(prompt) > 80 else ''}")
-    print(f"  Style: {style} | Size: {size} | Count: {n}")
+    # V4 Pro does not support styles (no style param, no style_id).
+    # V3 supports both style categories and style references.
+    if is_v4:
+        # V4 Pro: prompt-only, no style fields at all
+        print(f"  Generating: {prompt[:80]}{'...' if len(prompt) > 80 else ''}")
+        print(f"  Model: {DEFAULT_MODEL} (prompt-only) | Size: {size} | Count: {n}")
+    elif style_id:
+        body["style_id"] = style_id
+        print(f"  Generating: {prompt[:80]}{'...' if len(prompt) > 80 else ''}")
+        print(f"  Style ref: {style_id} | Size: {size} | Count: {n}")
+    else:
+        body["style"] = style
+        print(f"  Generating: {prompt[:80]}{'...' if len(prompt) > 80 else ''}")
+        print(f"  Style: {style} | Size: {size} | Count: {n}")
 
     try:
         resp = requests.post(
@@ -227,32 +378,108 @@ def generate_image(
         return []
 
 
-def download_svg(url: str, output_path: Path) -> bool:
-    """Download SVG content from URL and save to file."""
+def download_image(url: str, output_path: Path) -> bool:
+    """
+    Download an image from a Recraft URL and save to file.
+
+    Handles both SVG (text) and raster (PNG/WebP/JPEG) responses.
+    Detects format from Content-Type header and saves accordingly.
+    If the user-specified extension doesn't match the actual format,
+    the file is saved with the correct extension and a note is printed.
+    """
     try:
         resp = requests.get(url, timeout=30)
         resp.raise_for_status()
 
-        content = resp.text
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Verify it's actually SVG
-        if "<svg" not in content[:500].lower():
-            # It's a raster image URL — download as PNG instead
-            png_path = output_path.with_suffix(".png")
-            with open(png_path, "wb") as f:
-                f.write(resp.content)
-            print(f"  Note: Recraft returned raster image, saved as {png_path.name}")
-            return True
+        content_type = resp.headers.get("Content-Type", "").lower()
 
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        # Determine actual format from Content-Type
+        if "svg" in content_type or "<svg" in resp.text[:500].lower():
+            # SVG response — if user requested .png, convert via cairosvg
+            if output_path.suffix.lower() in (".png", ".jpg", ".jpeg"):
+                try:
+                    import cairosvg
+                    save_path = output_path.with_suffix(".png")
+                    cairosvg.svg2png(
+                        bytestring=resp.content,
+                        write_to=str(save_path),
+                        output_width=1820,
+                        output_height=1024,
+                    )
+                    print(f"  Note: SVG response, auto-converted to PNG")
+                except ImportError:
+                    save_path = output_path.with_suffix(".svg")
+                    with open(save_path, "w", encoding="utf-8") as f:
+                        f.write(resp.text)
+                    print(f"  Note: SVG response, saved as {save_path.name} "
+                          f"(install cairosvg for auto PNG conversion)")
+            else:
+                save_path = output_path.with_suffix(".svg")
+                with open(save_path, "w", encoding="utf-8") as f:
+                    f.write(resp.text)
+                if save_path != output_path:
+                    print(f"  Note: SVG response, saved as {save_path.name}")
+        elif "webp" in content_type:
+            # WebP — convert to PNG for compatibility
+            try:
+                from PIL import Image
+                from io import BytesIO
+                img = Image.open(BytesIO(resp.content))
+                save_path = output_path.with_suffix(".png")
+                img.save(save_path, "PNG")
+                print(f"  Note: Converted WebP → PNG, saved as {save_path.name}")
+            except ImportError:
+                # No Pillow — save as WebP
+                save_path = output_path.with_suffix(".webp")
+                with open(save_path, "wb") as f:
+                    f.write(resp.content)
+                print(f"  Note: WebP response (install Pillow to auto-convert to PNG)")
+        else:
+            # PNG/JPEG or unknown — save as binary with requested extension
+            # Detect actual format from magic bytes
+            magic = resp.content[:8]
+            if magic[:4] == b"RIFF" and resp.content[8:12] == b"WEBP":
+                # WebP disguised as something else
+                try:
+                    from PIL import Image
+                    from io import BytesIO
+                    img = Image.open(BytesIO(resp.content))
+                    save_path = output_path.with_suffix(".png")
+                    img.save(save_path, "PNG")
+                    print(f"  Note: Converted WebP → PNG")
+                except ImportError:
+                    save_path = output_path.with_suffix(".webp")
+                    with open(save_path, "wb") as f:
+                        f.write(resp.content)
+            elif magic[:8] == b"\x89PNG\r\n\x1a\n":
+                # Actual PNG
+                save_path = output_path.with_suffix(".png")
+                with open(save_path, "wb") as f:
+                    f.write(resp.content)
+            elif magic[:3] == b"\xff\xd8\xff":
+                # JPEG
+                save_path = output_path.with_suffix(".jpg")
+                with open(save_path, "wb") as f:
+                    f.write(resp.content)
+                if output_path.suffix.lower() == ".png":
+                    print(f"  Note: JPEG response, saved as {save_path.name}")
+            else:
+                # Unknown format — save with user's requested extension
+                save_path = output_path
+                with open(save_path, "wb") as f:
+                    f.write(resp.content)
 
         return True
 
     except Exception as e:
         print(f"  Download failed: {e}", file=sys.stderr)
         return False
+
+
+# Backward compatibility alias
+download_svg = download_image
 
 
 # ── SVG Brand Treatment ──────────────────────────────────────────────────────
@@ -664,9 +891,9 @@ NEGATIVE_PROMPT_BLOCK = (
 # default for grounding is retired — photoreal generation fights the
 # constructivist preamble).
 REGISTER_RECOMMENDED_STYLE = {
-    "atmospheric": "vector_illustration",
-    "grounding": "vector_illustration",
-    "analytical": "vector_illustration",
+    "atmospheric": "digital_illustration",
+    "grounding": "digital_illustration",
+    "analytical": "digital_illustration",
 }
 
 # Backward-compatibility shim: the old REGISTER_PREAMBLES dict exposed
@@ -684,6 +911,70 @@ REGISTER_PREAMBLES = {
     }
     for register in REGISTER_FOCUS_BLOCKS
 }
+
+
+def build_styled_prompt(
+    description: str,
+    register: str,
+    realism: str = "flat",
+) -> str:
+    """
+    Build a SLIM prompt for use WITH a style_id reference.
+
+    When style reference images are set, the aesthetic vocabulary (palette,
+    composition style, art-historical anchors) is carried by the images, not
+    the text. The text prompt only needs to specify:
+      1. What to depict (the scene description)
+      2. Key constraints the images can't encode (figure stylization rules,
+         realism dosage, what to avoid)
+
+    This keeps the prompt under Recraft's 1,000-character limit.
+
+    Compare with build_register_prompt() which composes the full ~5,000-char
+    preamble for use WITHOUT style references.
+    """
+    # Brief register direction (not the full block)
+    register_hint = {
+        "atmospheric": "Monumentalist scale, low horizon, no figures or silhouette-scale only.",
+        "grounding": (
+            "Figures in environment. Faces: 4-5 color-blocked planes, no skin "
+            "tonality, no rendered features, eyes obscured. Hands: flat color planes."
+        ),
+        "analytical": "Diagrammatic, geometric, clean lines, balanced negative space.",
+    }
+
+    realism_hint = {
+        "flat": "Maximum flatness — color-blocked forms only, no texture, no gradients.",
+        "balanced": "Figure stays flat-constructivist. Environment may have selective texture.",
+        "grounded": "Figure stays constructivist. Environment has photographic spatial detail.",
+    }
+
+    # Brief negative (most critical rules only)
+    negative_short = (
+        "No photorealistic faces, no smooth mannequin surfaces, no gradients on figures, "
+        "no stock-photo aesthetic, no cool blue/teal, no 3D render look."
+    )
+
+    parts = [
+        description,
+        register_hint.get(register, ""),
+        realism_hint.get(realism, ""),
+        negative_short,
+    ]
+
+    prompt = " ".join(p for p in parts if p)
+
+    # Safety check — warn if still over limit
+    if len(prompt) > 1000:
+        print(f"  WARNING: Styled prompt is {len(prompt)} chars (limit 1000). "
+              f"Truncating description.", file=sys.stderr)
+        # Trim description to fit
+        overage = len(prompt) - 950
+        description = description[:len(description) - overage] + "..."
+        parts[0] = description
+        prompt = " ".join(p for p in parts if p)
+
+    return prompt
 
 
 def build_register_prompt(
@@ -761,6 +1052,7 @@ def process_batch(
     default_register: Optional[str] = None,
     default_realism: str = "balanced",
     default_text_treatment: str = "none",
+    style_id: Optional[str] = None,
 ) -> dict:
     """
     Process a shot list JSON file, generating SVGs for AI-GENERATE entries.
@@ -807,7 +1099,13 @@ def process_batch(
 
     for i, shot in enumerate(ai_shots):
         shot_id = shot.get("id", f"shot-{i:02d}")
-        description = shot.get("description", "")
+        # Prefer recraft_prompt (detailed scene description for preamble
+        # composition) over description (short human-readable label).
+        # When register is set, the description feeds into
+        # build_register_prompt() which wraps it in the constructivist
+        # preamble blocks. The recraft_prompt field carries the detailed
+        # scene description that should be embedded in the composition.
+        description = shot.get("recraft_prompt") or shot.get("description", "")
         visual_mode = shot.get("visual_mode", "illustration")
         context = shot.get("context", "")
         # Per-shot register/realism/text_treatment override CLI-level defaults;
@@ -824,8 +1122,18 @@ def process_batch(
             manifest["skipped"].append({"id": shot_id, "reason": "no description"})
             continue
 
-        # Build prompt — register-based if set, otherwise legacy visual_mode path
-        if shot_register:
+        # Build prompt — when style_id is set, use slim prompt (under 1000 chars)
+        # because the style reference images carry the aesthetic vocabulary.
+        # Without style_id, use full register preamble (~5000 chars).
+        if shot_register and shot_style_id:
+            prompt = build_styled_prompt(
+                description,
+                shot_register,
+                realism=shot_realism,
+            )
+            print(f"  Register: {shot_register} | Realism: {shot_realism} | "
+                  f"Prompt: {len(prompt)} chars (styled/slim)")
+        elif shot_register:
             prompt = build_register_prompt(
                 description,
                 shot_register,
@@ -849,13 +1157,17 @@ def process_batch(
         else:
             shot_style = shot.get("style", style)
 
+        # Per-shot style_id overrides batch-level style_id
+        shot_style_id = shot.get("style_id") or style_id
+
         # Generate
         results = generate_image(
             prompt=prompt,
             style=shot_style,
-            size="1920x1080",
+            size="",  # auto-select based on model
             n=1,
             use_brand_prefix=False,  # build_parallax_prompt already adds context
+            style_id=shot_style_id,
         )
 
         if not results:
@@ -910,7 +1222,17 @@ def cmd_generate(args):
     """Generate a single illustration."""
     # Build the full prompt based on register / mode / raw flag.
     # Register takes precedence over mode (it's the higher-level concept).
-    if args.register:
+    # When style_id is set, use slim prompt (style images carry aesthetics).
+    style_id = getattr(args, "style_id", None)
+
+    if args.register and style_id:
+        prompt = build_styled_prompt(
+            args.prompt,
+            args.register,
+            realism=args.realism,
+        )
+        style = args.style or REGISTER_PREAMBLES[args.register]["style"]
+    elif args.register:
         prompt = build_register_prompt(
             args.prompt,
             args.register,
@@ -932,6 +1254,7 @@ def cmd_generate(args):
         size=args.size,
         n=args.count,
         use_brand_prefix=False,
+        style_id=style_id,
     )
 
     if not results:
@@ -977,7 +1300,35 @@ def cmd_batch(args):
         default_register=args.register,
         default_realism=args.realism,
         default_text_treatment=args.text_treatment,
+        style_id=getattr(args, "style_id", None),
     )
+
+
+def cmd_create_style(args):
+    """Create a style reference from images."""
+    style_id = create_style(
+        image_paths=args.images,
+        base_style=args.base_style,
+        name=args.name,
+    )
+
+    if args.save:
+        meta = {
+            "style_id": style_id,
+            "name": args.name,
+            "base_style": args.base_style,
+            "reference_images": [str(Path(p).name) for p in args.images],
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        save_path = Path(args.save)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(save_path, "w", encoding="utf-8") as f:
+            json.dump(meta, f, indent=2)
+        print(f"  Style metadata saved to: {save_path}")
+
+    print(f"\n  Use this style_id in subsequent commands:")
+    print(f"    python recraft.py generate \"prompt\" --style-id {style_id}")
+    print(f"    python recraft.py batch shot-list.json --style-id {style_id}")
 
 
 def cmd_styles(args):
@@ -1036,8 +1387,8 @@ def main():
                      choices=["illustration", "diagram", "icon", "metaphor"],
                      help="Legacy visual mode — shapes the prompt prefix when "
                           "--register is not set (default: illustration)")
-    gen.add_argument("--size", default="1920x1080",
-                     help="Image size WxH (default: 1920x1080)")
+    gen.add_argument("--size", default="",
+                     help="Image size WxH or aspect ratio (default: auto based on model)")
     gen.add_argument("-n", "--count", type=int, default=1,
                      help="Number of variations to generate (1-4)")
     gen.add_argument("--treat", choices=list(DUOTONE_RAMPS.keys()),
@@ -1045,6 +1396,11 @@ def main():
                           "use tools/brand-treatment/treat.py for raster output)")
     gen.add_argument("--preview", action="store_true",
                      help="Print URL only, don't download")
+    gen.add_argument("--style-id", dest="style_id", default=None,
+                     help="Recraft style reference ID (from create-style). When "
+                          "set, the generated image follows the visual style of "
+                          "the reference images used to create the style. This is "
+                          "the Tier 2→3 link in the 3-tier visual cascade.")
     gen.add_argument("--raw", action="store_true",
                      help="Use prompt as-is without brand prefix or register preamble")
     gen.set_defaults(func=cmd_generate)
@@ -1070,9 +1426,28 @@ def main():
                           "explicit 'text_treatment' field (default: none).")
     bat.add_argument("-s", "--style", default=None,
                      help="Default Recraft style for shots without register / explicit style")
+    bat.add_argument("--style-id", dest="style_id", default=None,
+                     help="Recraft style reference ID to apply to all shots "
+                          "(per-shot 'style_id' field overrides this)")
     bat.add_argument("--treat", choices=list(DUOTONE_RAMPS.keys()),
                      help="Apply brand duotone treatment to all generated SVGs")
     bat.set_defaults(func=cmd_batch)
+
+    # ── create-style ──
+    cs = subparsers.add_parser("create-style",
+                               help="Create a style reference from images (Tier 2 of cascade)")
+    cs.add_argument("images", nargs="+",
+                    help="Path(s) to reference image files (3-5 recommended)")
+    cs.add_argument("--name", default="",
+                    help="Name for the style (for reference; not sent to API)")
+    cs.add_argument("--base-style", dest="base_style",
+                    default="vector_illustration",
+                    choices=["vector_illustration", "digital_illustration",
+                             "realistic_image"],
+                    help="Recraft base style to build on (default: vector_illustration)")
+    cs.add_argument("--save", default=None,
+                    help="Save style metadata JSON to this file path")
+    cs.set_defaults(func=cmd_create_style)
 
     # ── styles ──
     sty = subparsers.add_parser("styles", help="List available Recraft styles")

@@ -2,7 +2,9 @@
   "episode": "prisoners-dilemma",
   "variant": "quote",
   "text": "Cooperation isn't a miracle. It's designed.",
+  "attribution": "",
+  "attributionContext": "",
   "accentColor": "#C4A747",
-  "backgroundVariant": "light",
+  "backgroundVariant": "dark",
   "durationSec": 5
 }

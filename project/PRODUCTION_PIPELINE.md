@@ -42,6 +42,8 @@ HUMAN                        10. Final Review + Publish      ~10 min
 
 **Total: ~2.75-3 hours human time per episode** (viability check and signal monitoring add ~20 min but save time by preventing research on weak topics).
 
+**Philosopher's Lens format shortcut:** These episodes skip stock footage sourcing (`source.py`) and video treatment (`treat_video.py`). AI-generated visuals use the Recraft→Pika 2.2 image-to-video pipeline: Recraft V3 generates constructivist reference frames, Pika 2.2 animates them into 3-7s clips. Combined with Remotion MG and Wikimedia archival stills, this gives three clean asset types. Cost: ~$5-7 per episode for 15-17 AI-GEN clips. See VISUAL_LANGUAGE.md → "Format-Specific Visual Rules" for details.
+
 The pipeline uses two tools: **Claude.ai** (Deep Research for heavyweight information gathering) and **Cowork** (file system, skills, production). The handoff is a copy-paste of the research brief. See RESEARCH_WORKFLOW.md for the full research stage design.
 
 ---

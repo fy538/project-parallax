@@ -1,29 +1,67 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "Where Does It Actually Apply?",
+  "title": "Conditions of Application",
+  "subtitle": "What the model requires \u2014 and what disappears",
   "variant": "flow",
   "nodes": [
-    { "label": "Anonymous", "sublabel": "FILTER 1", "color": "#C4A747" },
-    { "label": "One-shot", "sublabel": "FILTER 2", "color": "#C4A747" },
-    { "label": "No communication", "sublabel": "FILTER 3", "color": "#C4A747" },
-    { "label": "No reputation", "sublabel": "FILTER 4", "color": "#C4A747" },
-    { "label": "No institutions", "sublabel": "FILTER 5", "color": "#C4A747" },
-    { "label": "No commitment", "sublabel": "FILTER 6", "color": "#C4A747" },
-    { "label": "OPEC quota meeting, maybe", "sublabel": "What remains", "color": "#888780" }
+    {
+      "label": "One-shot game",
+      "sublabel": "No future interaction",
+      "color": "#A64D46"
+    },
+    {
+      "label": "No communication",
+      "sublabel": "Players can't talk",
+      "color": "#A64D46"
+    },
+    {
+      "label": "No reputation",
+      "sublabel": "Anonymous encounter",
+      "color": "#A64D46"
+    },
+    {
+      "label": "No institutions",
+      "sublabel": "No referee, no rules",
+      "color": "#A64D46"
+    },
+    {
+      "label": "No commitment",
+      "sublabel": "Can't bind yourself",
+      "color": "#A64D46"
+    },
+    {
+      "label": "Diplomacy",
+      "sublabel": "eliminated",
+      "color": "#888780"
+    },
+    {
+      "label": "Trade relationships",
+      "sublabel": "eliminated",
+      "color": "#888780"
+    },
+    {
+      "label": "Alliance networks",
+      "sublabel": "eliminated",
+      "color": "#888780"
+    },
+    {
+      "label": "Treaty regimes",
+      "sublabel": "eliminated",
+      "color": "#888780"
+    },
+    {
+      "label": "OPEC quota meeting",
+      "sublabel": "...maybe",
+      "color": "#C4A747"
+    }
   ],
-  "arrowLabels": ["eliminates: diplomacy", "eliminates: trade", "eliminates: alliances", "eliminates: markets", "eliminates: treaties", "→"],
-  "phases": [
-    { "label": "Each assumption narrows the world", "durationSec": 10, "activeNodes": [0, 1, 2, 3, 4, 5] },
-    { "label": "Almost nothing remains", "durationSec": 5, "activeNodes": [6] }
+  "arrowLabels": [
+    "strips away",
+    "strips away",
+    "strips away",
+    "strips away",
+    "leaving only"
   ],
-  "eliminatedScenarios": [
-    { "filter": 0, "scenario": "Diplomacy", "color": "#A64D46" },
-    { "filter": 1, "scenario": "Trade relationships", "color": "#A64D46" },
-    { "filter": 2, "scenario": "Alliance negotiation", "color": "#A64D46" },
-    { "filter": 3, "scenario": "Market competition", "color": "#A64D46" },
-    { "filter": 4, "scenario": "Treaty frameworks", "color": "#A64D46" },
-    { "filter": 5, "scenario": "Arms control", "color": "#A64D46" }
-  ],
-  "durationSec": 15,
-  "backgroundVariant": "light"
+  "backgroundVariant": "dark",
+  "durationSec": 15
 }

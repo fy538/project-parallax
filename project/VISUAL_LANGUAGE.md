@@ -10,6 +10,7 @@ Created: April 26, 2026
 Updated: May 3, 2026 — Added Three-Register Visual System, transition grammar, faceless figure convention
 Updated: May 4, 2026 — Unified Registers 2 and 3 under constructivist aesthetic; replaced photoreal mannequin convention with constructivist-figurative approach. Added realism-dosage sub-mode and per-scene typography-tradition parameter.
 Updated: May 4, 2026 — Codified the three-content-type mental model. Five script tags collapse to three content categories (Remotion / AI-generated / Footage); LAYERED is a composition pattern, not a fourth category. Calibration shifts: FOOTAGE budget drops toward archival-only, generic stock displaced by AI-generated content.
+Updated: May 6, 2026 — Added Format-Specific Visual Rules. Philosopher's Lens episodes adopt a footage-free production path: three asset types (Remotion MG + Recraft→Pika AI-GEN + Wikimedia ARCHIVAL). Image-to-video pipeline: Recraft V3 generates constructivist reference frame, Pika 2.2 animates into 3-7s clip.
 
 ---
 
@@ -46,6 +47,24 @@ When script-drafting and unsure which tag to use, the three-type test is:
 3. **Otherwise** — anything that needs to be *felt, inhabited, or moodily backdropped* — → AI-generated. Backdrop role uses `[ILLUST:]`; foreground figurative scene uses `[AI-GEN:]`.
 
 The displacement principle post-migration: if generic stock footage was the default for a moment but no specific real person/event/UI is being depicted, prefer AI-generated. Generic stock now reads as "unfocused channel"; AI-generated reads as "intentional editorial choice."
+
+### Format-Specific Visual Rules
+
+Not every episode format uses all three content types equally. The displacement principle above is the general rule; these format-specific overrides codify how far the displacement goes.
+
+**Philosopher's Lens episodes** (abstract frameworks, game theory, philosophical analysis): **footage-free production.** Three asset types only:
+
+1. **Remotion MG** (~45-55%) — the analytical backbone. Charts, frameworks, game boards, typography, maps.
+2. **Recraft→Pika AI-GEN** (~25-35%) — all non-analytical visual texture. Image-to-video pipeline: Recraft V3 generates a constructivist reference frame (`vector_illustration` style), then Pika 2.2 animates it into a 3-7s video clip with directed motion (push-in, pan, figure movement, environmental effects). This replaces both stock footage (atmospheric texture) and static illustrations. The motion from Pika adds life that Ken Burns on stills cannot — figures walking, smoke drifting, light shifting, water flowing.
+3. **Wikimedia ARCHIVAL** (~2-5%) — documentary stills of named historical figures or specific events only (e.g., Nash portrait, Reagan-Gorbachev summit photo). Ken Burns motion applied in Remotion. These carry documentary weight that illustration cannot substitute.
+
+**What this eliminates:** Stock footage sourcing (Pexels/Pixabay/Unsplash pipeline), brand treatment pipeline for video (`treat_video.py`), footage QA. Stock footage budget drops to zero.
+
+**The image-to-video pipeline:** Recraft V3 gives precise compositional control (the reference frame locks brand palette, constructivist aesthetic, and scene layout). Pika 2.2 adds natural motion while preserving the frame's style. This two-step approach is more controllable than generating video from text alone — you approve the still before committing to animation. Cost: ~$0.08/image (Recraft) + ~$0.15-0.30/clip (Pika) = ~$5-7 per episode for 15-17 clips.
+
+**When this does NOT apply:** Detective format (specific real-world investigations requiring documentary footage), Time Collapse (historical footage carrying documentary authority), any episode where specific real footage is editorially necessary. Those formats retain the full three-content-type model with stock footage.
+
+**Pacing rule adjustment:** The standard "max 3 consecutive `[MG:]` without a break" still applies, but the break can be `[AI-GEN:]` or `[ARCHIVAL:]` — no `[FOOTAGE:]` needed.
 
 ---
 

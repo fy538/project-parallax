@@ -61,7 +61,7 @@ type SafeAreaTier = keyof typeof layout.safeAreaTier;
 
 interface TemplateLayoutOptions {
   /** Title variant — determines how much vertical space the title zone takes.
-   *  "content" (default) = h2 + subtitle (92px).
+   *  "content" (default) = h2 + subtitle, safe for 2-line titles (150px).
    *  "minimal" = single-line h3 (56px).
    *  "episode" = full episode title block (220px).
    *  "section" = section title (160px).
@@ -111,6 +111,12 @@ interface Rect {
 interface Zone {
   /** Ready-to-spread CSS: position absolute + top/left/width/height */
   style: React.CSSProperties;
+  /**
+   * Like `style`, but also enables flex centering (both axes) + overflow:hidden.
+   * Use this when you want your content centered inside the zone with no overflow.
+   * Example: <div style={zones.content.centeredStyle}> centers chart/matrix/etc.
+   */
+  centeredStyle: React.CSSProperties;
   /** Raw numbers for when you need math (e.g., SVG coordinates) */
   rect: Rect;
 }
@@ -143,6 +149,18 @@ const makeZone = (rect: Rect): Zone => ({
     left: rect.left,
     width: rect.width,
     height: rect.height,
+  },
+  centeredStyle: {
+    position: "absolute" as const,
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
   },
   rect,
 });

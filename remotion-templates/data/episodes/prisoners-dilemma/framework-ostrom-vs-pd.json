@@ -1,35 +1,40 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "Building What PD Assumes Away",
+  "title": "Ostrom's Design Principles vs. PD Assumptions",
+  "subtitle": "Every principle dissolves an assumption the model requires",
   "variant": "comparison",
   "columns": [
     {
-      "title": "Ostrom's Principles",
-      "icon": "✓",
+      "title": "Ostrom's 8 Principles",
+      "icon": "\u2713",
+      "color": "#4A7BA7",
       "items": [
-        "Clear boundaries → Identity",
-        "Graduated sanctions → Reputation",
-        "Collective decisions → Communication",
-        "Monitoring → Repeated interaction",
-        "Right to self-organize → Institutional context",
-        "Nested governance → Commitment capacity"
-      ],
-      "color": "#C4A747"
+        "1. Clear boundaries",
+        "2. Rules match local conditions",
+        "3. Collective-choice arrangements",
+        "4. Monitoring",
+        "5. Graduated sanctions",
+        "6. Conflict resolution",
+        "7. Right to self-organize",
+        "8. Nested enterprises"
+      ]
     },
     {
-      "title": "PD Assumptions Resolved",
-      "icon": "✗",
+      "title": "PD Assumes Away",
+      "icon": "\u2717",
+      "color": "#A64D46",
       "items": [
-        "Anonymous → Known members",
-        "No reputation → Graduated consequences",
-        "No communication → Collective voice",
-        "One-shot → Ongoing",
-        "No institutions → Self-governed",
-        "No commitment → Nested structure"
-      ],
-      "color": "#888780"
+        "No boundaries (anonymous)",
+        "Universal rules (context-free)",
+        "No participation in rule-making",
+        "No monitoring possible",
+        "Binary punishment (all or nothing)",
+        "No appeal mechanism",
+        "No institutional capacity",
+        "Flat structure only"
+      ]
     }
   ],
-  "durationSec": 10,
-  "backgroundVariant": "light"
+  "backgroundVariant": "dark",
+  "durationSec": 12
 }

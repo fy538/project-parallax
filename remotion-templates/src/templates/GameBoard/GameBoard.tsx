@@ -585,8 +585,7 @@ const PieceCircle: React.FC<{
   // White-piece logic: dark color on bone bg; black-piece: bone color on ink bg.
   // Detect via color luminance heuristic.
   const isLightPiece = color.toLowerCase() === palette.bone.toLowerCase()
-    || color.toLowerCase() === "#f0e6d0"
-    || color.toLowerCase() === "#f5f0e8";
+    || color.toLowerCase() === palette.paper.toLowerCase();
   const glyphColor = isLightPiece ? palette.ink : palette.bone;
   const bgColor = isLightPiece ? palette.bone : palette.ink;
   return (

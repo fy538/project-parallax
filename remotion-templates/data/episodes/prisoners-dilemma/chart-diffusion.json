@@ -1,21 +1,41 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "The Spread of a Failed Model",
-  "subtitle": "Prisoner's Dilemma scholarly publications",
+  "title": "The Prisoner's Dilemma Goes Everywhere",
+  "subtitle": "Scholarly publications using PD framework",
   "variant": "bar",
   "unit": "",
   "dataPoints": [
-    { "label": "1950", "value": 1, "color": "#C4A747" },
-    { "label": "1955", "value": 12, "color": "#C4A747" },
-    { "label": "1960", "value": 50, "color": "#C4A747" },
-    { "label": "1965", "value": 200, "color": "#C4A747" },
-    { "label": "1970", "value": 800, "color": "#C4A747" },
-    { "label": "1975", "value": 2000, "color": "#C4A747" }
+    {
+      "label": "1950",
+      "value": 1,
+      "color": "#888780",
+      "sublabel": "First experiment"
+    },
+    {
+      "label": "1960",
+      "value": 50,
+      "color": "#888780",
+      "sublabel": "Strategy & diplomacy"
+    },
+    {
+      "label": "1965",
+      "value": 200,
+      "color": "#C4A747",
+      "sublabel": "+ Biology"
+    },
+    {
+      "label": "1970",
+      "value": 800,
+      "color": "#C4A747",
+      "sublabel": "+ Economics, Law"
+    },
+    {
+      "label": "1975",
+      "value": 2000,
+      "color": "#C4A747",
+      "sublabel": "+ Psychology"
+    }
   ],
-  "highlightIndex": 5,
-  "contextNote": "2,000+ articles for a model that failed its first experiment",
-  "domainLabels": ["Strategy", "Biology", "Economics", "Law", "Psychology"],
-  "durationSec": 12,
-  "backgroundVariant": "light",
-  "source": "Grofman & Pool (1975)"
+  "source": "Axelrod (1984), Poundstone (1992)",
+  "durationSec": 12
 }

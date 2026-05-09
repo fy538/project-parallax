@@ -268,18 +268,92 @@ Feed the approved reference frame to Kling 3.0 (or Sora 2) in image-to-video mod
 3. Generate the full sequence — Sora handles transitions
 4. Split the output into individual clips for the NLE timeline
 
-### Step 4: Brand Treatment
+### Step 4: Post-Video Treatment
 
-Run generated clips through the same treatment pipeline as stock footage:
+Raw AI-generated clips need a multi-stage treatment pass before assembly. The AI output is *too clean* — modern generative video has zero grain, no film texture, no spatial noise — which actively fights the constructivist editorial register, a tradition that lives on offset-printed paper (Fortune, Push Pin, Saul Bass) with inherent surface noise. The post-video stack also handles palette unification, temporal stabilization, and resolution upscaling.
+
+Stages run in sequence: LUT → texture/grain → (optional) frame interpolation → upscaling. Skip stages 4c and 4e by default; include 4a, 4b, 4d on every production clip.
+
+#### 4a. LUT + grain + vignette — `tools/brand-treatment/treat_video.py`
+
+The same brand-treatment tool that processes footage handles AI-gen output. The tool's default mode applies four steps in sequence: desaturate → duotone (per LUT) → grain → vignette. Apply one of three brand LUTs based on the scene's treatment band:
+
+- `standard` — warm umber shadows → amber highlights. Default for present-day reconstructions.
+- `conflict` — ink shadows → rust highlights. For adversarial moments (military, sanctions, contested).
+- `editorial` — desaturated, bone tones. For historical reconstructions (pre-1980s, archival feel).
+
+The constructivist preamble already lands source clips in the warm-umber palette, so the LUT does final 10% polish rather than 60% color rescue. Per VIS-10, atmospheric register + editorial treatment is forbidden.
 
 ```bash
-python treat_video.py --input [clip.mp4] --treatment standard --output [treated_clip.mp4]
+python tools/brand-treatment/treat_video.py raw/ep01/beat2_fab.mp4 \
+    -r standard \
+    -o treated/ep01/
 ```
 
-The three treatment options:
-- `standard` — warm umber shadows → amber highlights. Default for most AI-GEN content.
-- `conflict` — ink shadows → rust highlights. For adversarial/tension content (military standoffs, sanctions enforcement).
-- `editorial` — desaturated, bone/folder tones. For historical reconstructions (pre-1980s events, archival feel).
+#### 4b. Why grain matters specifically for AI-gen
+
+The grain and vignette steps in `treat_video.py` are non-optional for AI-gen, even though they're sometimes skipped on footage when an NLE is doing it manually. AI video output is forensically clean — no grain, no gate weave, no surface texture — which actively *fights* the channel's editorial-magazine register because the constructivist tradition lives on offset-printed paper with inherent noise, not on pristine digital surfaces. A clean AI clip with the LUT applied but no grain still reads as "generative AI." A clean AI clip with the LUT plus grain reads as "printed editorial page in motion."
+
+Tunable consideration: footage default grain is 8-12%; for AI-gen, **err toward the lighter end of that range (~6-8%)**. The constructivist style is already a strong visual signal, and stacking heavy grain on top of strong graphic flatness can muddy the color blocks. Optionally extend `treat_video.py` with an `--ai-gen` preset that locks lighter grain + slightly tighter vignette as a per-source-type tunable.
+
+If a clip is going through the NLE for finer control, use `--lut-only-treatment` and apply DaVinci Resolve's "Film Grain" effect (intensity ~5-7) at assembly time. Same effect, different surface — pick the path that matches whether you're batching or hand-tuning.
+
+#### 4c. Frame interpolation / temporal stabilization — case-by-case
+
+AI video at 24fps can have subtle "boiling" — color blocks shimmering at their edges as the model regenerates content frame-to-frame. Two paths to mitigate:
+
+- **Frame interpolation to 60fps** via **RIFE** (free, open-source). RIFE smooths motion enough to mask boiling without softening the geometry. GUI wrappers (FlowFrames) make this a one-command operation. Best for clips with visible boiling on hard edges.
+- **Temporal denoising** via DaVinci Resolve's built-in temporal denoiser, or Neat Video (standalone, paid). Locks color blocks without softening edges. Best when motion is already smooth but edges shimmer.
+
+This stage is **case-by-case, not mandatory**. Run it only if visible boiling fails the QA bar. Render-qa should flag clips where edge stability is suspect; if flagged, run interpolation or denoising. Pika 2.5 outputs in initial 480p testing have not shown significant boiling, but compression at 480p partly masks the issue — re-evaluate after the first 1080p production runs.
+
+#### 4d. Upscaling — required for production output
+
+Free-tier Pika output is 480p. Production deliverables target 1080p minimum (4K is future-proof and gives recrop flexibility for Shorts). Upscaler recommendations:
+
+- **Topaz Video AI** ($299 one-time, paid). Use the **Artemis** or **Iris** models for stylized content — these preserve hard edges better than the photo-tuned alternatives. Best quality for the channel's flat illustration aesthetic.
+- **Real-ESRGAN-Video** (free, open-source). Slightly less crisp on flat color blocks but adequate for non-hero shots.
+
+**Upscaler model choice matters:** photo-portrait upscaling models (Topaz's "Proteus" or its face-enhance variants) will actively re-render planar faces toward photorealism — they assume the input *should* look like a photograph. Use illustration-aware models exclusively. Test once on a single r12 clip before committing to a model preset.
+
+Stage ordering: do upscale AFTER LUT and grain. The LUT applies at native resolution where dynamic range is correct, and grain is added at the upscaled resolution where it can be controlled at the right pixel scale.
+
+#### 4e. (Deferred) Re-stylization pass — last-resort fix
+
+If post-treatment clips show photoreal creep that survived the original I2V generation, a second pass through a stylization-tuned model (Veo 3.1, or img2img through Flux 2 with the constructivist preamble applied per-frame) can push output back toward planar discipline.
+
+This is a **last-resort fix, not a routine stage**. Most clips should land in the right register from the I2V step. If a clip needs re-stylization to look on-brand, the source reference image was probably too soft and should be regenerated instead. Document the failure in render-qa output so the upstream issue gets fixed rather than masked.
+
+---
+
+### Effects to Avoid
+
+The post-video stack is deliberately minimal. The following are aesthetically tempting but break Parallax's analytical-rhetorical positioning:
+
+| Effect | Why it's wrong for Parallax |
+|---|---|
+| Glitch / RGB split / datamoshing | Reads as "vaporwave video essayist" — wrong genre |
+| Heavy motion blur | Fights flat 2D, signals 3D simulation |
+| Lens flares, light leaks | Too cinematic / Instagram, breaks editorial-magazine register |
+| Particle effects, dust, atmospheric overlays | Signals "this is digital video" not "printed page in motion" |
+| Heavy parallax / 2.5D depth | Fights flat illustration discipline |
+| Aggressive color grading on top of LUT | Breaks per-emphasis palette discipline (palette.json + EMPHASIS_MAP) |
+| Speed ramps, whip pans, hard zooms | Effect-driven momentum mismatches the proportional pacing system |
+| AI face-enhance / detail upscale | Reintroduces photorealism that planar-face discipline exists to prevent |
+
+The post-treatment philosophy: **make the AI-gen feel like a printed editorial page that happens to be in motion**, not like a video with effects. LUT + grain + temporal stability achieves this. Anything more elaborate fights the channel.
+
+---
+
+### Adam Curtis Precedent
+
+Curtis's post-treatment grammar is mostly *restraint*, which fits Parallax exactly. Worth borrowing where applicable — note these are edit-time, not stage-4 effects:
+
+- **Hard cuts** without transitions (formalized as Class A within-pillar transitions in BRAND.md)
+- **Generous holds** — letting a frame breathe 3-5 seconds while narration lands
+- **Match cuts** between pillars (Class C source-character-gap transitions)
+- **Brand-mark wipes** — using ∴ as a structural transition element, not a digital effect
+- **Period-appropriate degradation** — slight tape-style noise, gate weave on Cold War footage. **For footage only, not AI-gen.** AI-gen already gets the constructivist editorial signal from the planar treatment; adding period-degradation on top reads as costume.
 
 ### Step 5: Assembly
 
@@ -471,7 +545,7 @@ Store in: `tools/ai-video/style-references/`
 | **visual-concept** | Evaluates AI-GEN feasibility — can this scene actually be generated well? |
 | **script-audit** | Checks that AI-GEN isn't overused (frequency budget) and complies with editorial guardrails |
 | **source-feedback** | After generation, flags clips that didn't meet quality bar and suggests alternatives |
-| **render-qa** | Verifies AI-GEN clips before assembly (mannequin faces held, no drift, LUT applied) |
+| **render-qa** | Verifies AI-GEN clips at each post-video stage — planar faces held, LUT applied, grain non-destructive, no boiling on hard edges, upscale didn't reintroduce photorealism. Flags clips that would benefit from optional 4c stabilization. |
 | **assembly manifest** | Treats AI-GEN clips as footage subtype in the manifest schema |
 
 ### File System Additions
@@ -484,11 +558,19 @@ tools/
     │   └── ep01/
     │       ├── beat2_fab_walkthrough.json
     │       └── beat4_historical_embargo.json
-    ├── raw/                  # Generated clips before treatment
+    ├── raw/                  # I2V output from Pika/Kling/Sora — pre-treatment
     │   └── ep01/
-    └── treated/              # After treat_video.py pass
+    ├── processed/            # Intermediate post-video stages (kept for QA / debugging)
+    │   └── ep01/
+    │       ├── lut/          # 4a — after LUT pass
+    │       ├── textured/     # 4b — after grain/weave pass
+    │       ├── stable/       # 4c — after RIFE / denoise (only if applied)
+    │       └── upscaled/     # 4d — after Topaz / Real-ESRGAN
+    └── treated/              # Final post-treatment output ready for NLE assembly
         └── ep01/
 ```
+
+The intermediate `processed/` tier is optional — single-pass pipelines can write directly to `treated/`. Keep the staged outputs when render-qa is iterating on a clip or when debugging which stage introduced an issue (e.g., did the grain pass push edges soft, or did the upscaler do it?).
 
 ### Assembly Manifest Schema Addition
 

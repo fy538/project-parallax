@@ -2,6 +2,8 @@
   "episode": "prisoners-dilemma",
   "variant": "quote",
   "text": "The prediction came true because you believed it.",
+  "attribution": "",
+  "attributionContext": "",
   "accentColor": "#F0E6D0",
   "backgroundVariant": "dark",
   "durationSec": 5

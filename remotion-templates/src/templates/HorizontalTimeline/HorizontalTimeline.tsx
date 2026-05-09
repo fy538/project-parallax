@@ -31,6 +31,7 @@ import {
   fonts,
   fontSizes,
   layout,
+  palette,
   sec,
   shadows,
   cardPresets,
@@ -371,8 +372,8 @@ export const HorizontalTimeline: React.FC<{
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
-  const eraAColor = data.eraAColor || "#E5A544"; // amber
-  const eraBColor = data.eraBColor || "#C23B22"; // rust
+  const eraAColor = data.eraAColor || palette.amber;
+  const eraBColor = data.eraBColor || palette.rust;
 
   // ── Compute event list and positions ─────────────────────────────────
   const eventData = useMemo((): {

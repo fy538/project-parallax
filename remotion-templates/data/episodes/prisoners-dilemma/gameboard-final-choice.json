@@ -1,26 +1,56 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "Your Game",
+  "title": "Which Game?",
   "variant": "payoff-matrix",
-  "rowPlayer": "You",
-  "colPlayer": "Them",
-  "rowOptions": ["Cooperate", "Defect"],
-  "colOptions": ["Cooperate", "Defect"],
+  "rowPlayer": "Player A",
+  "colPlayer": "Player B",
+  "rowOptions": [
+    "Cooperate",
+    "Defect"
+  ],
+  "colOptions": [
+    "Cooperate",
+    "Defect"
+  ],
   "cells": [
-    { "row": 0, "col": 0, "value": "●", "highlight": true },
-    { "row": 0, "col": 1, "value": "", "highlight": false },
-    { "row": 1, "col": 0, "value": "", "highlight": false },
-    { "row": 1, "col": 1, "value": "●", "highlight": true }
+    {
+      "row": 0,
+      "col": 0,
+      "value": "\u25cf",
+      "highlight": true,
+      "color": "#C4A747"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "value": "",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "value": "",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "value": "\u25cf",
+      "highlight": true,
+      "color": "#888780"
+    }
   ],
   "phases": [
     {
       "label": "Both available",
       "durationSec": 5,
-      "highlights": [0, 3],
-      "annotation": "Now you can see it."
+      "highlights": [
+        0,
+        3
+      ],
+      "annotation": "Cooperation \u25cf and defection \u25cf \u2014 both equilibria. Which game are they playing?"
     }
   ],
   "durationSec": 5,
-  "backgroundVariant": "dark",
-  "backgroundTint": "#C4A747"
+  "backgroundVariant": "dark"
 }

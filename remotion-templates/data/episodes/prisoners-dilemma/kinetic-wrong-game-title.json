@@ -1,7 +1,9 @@
 {
   "episode": "prisoners-dilemma",
-  "variant": "statistic",
-  "statValue": "THE WRONG GAME",
+  "variant": "quote",
+  "text": "THE WRONG GAME",
+  "attribution": "",
+  "attributionContext": "",
   "accentColor": "#C4A747",
   "backgroundVariant": "dark",
   "durationSec": 4

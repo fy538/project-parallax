@@ -1,0 +1,40 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "What Would Change My Mind",
+  "variant": "flow",
+  "nodes": [
+    {
+      "label": "Major actor reframes",
+      "sublabel": "PD-coded conflict \u2192 coordination problem",
+      "color": "#C4A747"
+    },
+    {
+      "label": "Adopts stag-hunt language",
+      "sublabel": "Shared standards, mutual thresholds",
+      "color": "#C4A747"
+    },
+    {
+      "label": "Builds Ostrom scaffolding",
+      "sublabel": "Boundaries, monitoring, graduated sanctions",
+      "color": "#C4A747"
+    },
+    {
+      "label": "Nothing changes",
+      "sublabel": "No shift in outcomes",
+      "color": "#A64D46"
+    },
+    {
+      "label": "Thesis weakens",
+      "sublabel": "Model is descriptive, not constructive",
+      "color": "#888780"
+    }
+  ],
+  "arrowLabels": [
+    "then",
+    "then",
+    "and yet",
+    "then"
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 12
+}

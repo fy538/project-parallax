@@ -1,10 +1,10 @@
 {
   "episode": "prisoners-dilemma",
-  "variant": "statistic",
-  "statValue": "Built for: anonymous one-shots",
-  "statLabel": "Became: default lens for all strategy",
-  "statContext": "Because: institutional momentum, not empirical success",
-  "accentColor": "#C4A747",
-  "backgroundVariant": "light",
+  "variant": "quote",
+  "text": "Built for: anonymous one-shots. Applied to: everything. Survived because: institutional momentum.",
+  "attribution": "Checkpoint",
+  "attributionContext": "Beat 2",
+  "accentColor": "#F0E6D0",
+  "backgroundVariant": "dark",
   "durationSec": 8
 }

@@ -1,0 +1,32 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Two Games, Two Worlds",
+  "subtitle": "Same situation. Different possibilities.",
+  "left": {
+    "title": "Prisoner's Dilemma",
+    "tag": "ONE EQUILIBRIUM",
+    "accentColor": "#888780",
+    "items": [
+      "Cooperate \u2192 exploited",
+      "Defect \u2192 rational",
+      "\u25cf  Mutual defection",
+      "Cooperation is naive"
+    ]
+  },
+  "right": {
+    "title": "Stag Hunt",
+    "tag": "TWO EQUILIBRIA",
+    "accentColor": "#C4A747",
+    "items": [
+      "Cooperate \u2192 optimal (if trusted)",
+      "Defect \u2192 safe but suboptimal",
+      "\u25cf  Mutual cooperation",
+      "\u25cf  Mutual defection",
+      "Cooperation is rational"
+    ]
+  },
+  "dividerLabel": "\u2234",
+  "durationSec": 10,
+  "backgroundVariant": "dark",
+  "cinematicMode": true
+}

@@ -1,0 +1,30 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Default vs. The Question",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "PD as Default",
+      "icon": "\u27f3",
+      "color": "#A64D46",
+      "items": [
+        "Assume defection is rational",
+        "Build institutions around assumption",
+        "Observe defection",
+        "\"Model confirmed\""
+      ]
+    },
+    {
+      "title": "What If?",
+      "icon": "?",
+      "color": "#C4A747",
+      "items": [
+        "What if the game is different?",
+        "What if cooperation IS an equilibrium?",
+        "What if the model creates the outcome?"
+      ]
+    }
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 12
+}

@@ -1,37 +1,72 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "The Self-Confirming Mechanism",
+  "title": "The Self-Confirming Trap",
   "variant": "payoff-matrix",
   "rowPlayer": "You",
   "colPlayer": "Counterpart",
-  "rowOptions": ["Cooperate", "Defect"],
-  "colOptions": ["Cooperate", "Defect"],
+  "rowOptions": [
+    "Cooperate",
+    "Defect"
+  ],
+  "colOptions": [
+    "Cooperate",
+    "Defect"
+  ],
   "cells": [
-    { "row": 0, "col": 0, "value": "3, 3", "highlight": false },
-    { "row": 0, "col": 1, "value": "0, 5", "highlight": false },
-    { "row": 1, "col": 0, "value": "5, 0", "highlight": false },
-    { "row": 1, "col": 1, "value": "1, 1", "highlight": true }
+    {
+      "row": 0,
+      "col": 0,
+      "value": "3, 3",
+      "highlight": false
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "value": "0, 5",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "value": "5, 0",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "value": "1, 1",
+      "highlight": true,
+      "color": "#C4A747"
+    }
   ],
   "phases": [
     {
-      "label": "You assume defection",
+      "label": "You defect first",
+      "durationSec": 3,
+      "highlights": [
+        2,
+        3
+      ],
+      "annotation": "Trained to assume defection is rational \u2192"
+    },
+    {
+      "label": "They see your defection",
+      "durationSec": 3,
+      "highlights": [
+        3
+      ],
+      "annotation": "They conclude the model was right \u2192"
+    },
+    {
+      "label": "\"Model confirmed\"",
       "durationSec": 4,
-      "highlights": [3],
-      "annotation": "Training says: they will defect"
-    },
-    {
-      "label": "So you defect first",
-      "durationSec": 2,
-      "highlights": [2, 3],
-      "annotation": "Your move → defect"
-    },
-    {
-      "label": "They see your defection and confirm",
-      "durationSec": 2,
-      "highlights": [3],
-      "annotation": "\"Model confirmed\" — they defect too"
+      "highlights": [
+        3
+      ],
+      "annotation": "The prediction came true \u2014 because you believed it"
     }
   ],
-  "durationSec": 8,
-  "backgroundVariant": "dark"
+  "durationSec": 10,
+  "backgroundVariant": "dark",
+  "cinematicMode": true
 }

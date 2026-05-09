@@ -804,8 +804,12 @@ export const shadows = {
   subtle: "0 2px 12px rgba(0,0,0,0.25)",
   /** Highlighted elements — active states, hovered items */
   medium: "0 4px 20px rgba(0,0,0,0.35)",
-  /** Colored halo — key data, active map countries. Pass accent color. */
+  /** Colored halo — large, soft. Key data points, active map countries. */
   accentGlow: (color: string) => `0 0 16px ${color}40`,
+  /** Colored halo — medium. Timeline dots, chart highlights. */
+  accentGlowMd: (color: string) => `0 0 12px ${color}40`,
+  /** Colored halo — tight. Inline badges, small nodes, text emphasis. */
+  accentGlowSm: (color: string) => `0 0 8px ${color}40`,
   /** Text lift on dark backgrounds (POLISH.md V7) */
   textLift: "0 1px 3px rgba(0,0,0,0.5)",
 } as const;
@@ -844,14 +848,27 @@ export const crosshair = {
 /**
  * Title block height estimate by variant.
  * Used to compute where content starts below the title.
+ *
+ * These are MINIMUM SAFE heights — sized for the worst realistic case so
+ * content never overlaps the title, even when the title wraps.
+ *
+ * Math for "content" (h2 + subtitle):
+ *   single-line title + single subtitle ≈  94px  (fits easily)
+ *   two-line title    + single subtitle ≈ 147px  (the common wrapping case)
+ *   150px covers the two-line case with a few pixels of cushion.
+ *
+ * Do not reduce these without re-running the overlap check:
+ *   contentArea.top = safe.top + titleHeight + gap(48)
+ *   TitleBlock bottom = safe.top + actual_rendered_height
+ *   Overlap = TitleBlock bottom − contentArea.top  (must be ≤ 0)
  */
 export const titleHeight = {
   /** Episode title (label + series + title + divider + subtitle) */
   episode: 220,
   /** Section title (number + title + underline) */
   section: 160,
-  /** Chart/diagram title (h2 + optional subtitle) */
-  content: 92,
+  /** Chart/diagram title (h2 + optional subtitle) — safe for 2-line titles */
+  content: 150,
   /** Minimal (single line h3) */
   minimal: 56,
 } as const;
@@ -1019,4 +1036,16 @@ export const cardPadding = {
   vertical: layout.spacing.md, // 24
   horizontal: layout.spacing.lg, // 32
   css: `${layout.spacing.md}px ${layout.spacing.lg}px`,
+} as const;
+
+/**
+ * Prevents text from overflowing its container. Spread into any box-constrained
+ * text element — cells, nodes, cards — where the box has a fixed or max size.
+ *
+ * Usage: <div style={{ ...clampText, width: 200 }}>{label}</div>
+ */
+export const clampText = {
+  overflow: "hidden" as const,
+  overflowWrap: "break-word" as const,
+  wordBreak: "break-word" as const,
 } as const;

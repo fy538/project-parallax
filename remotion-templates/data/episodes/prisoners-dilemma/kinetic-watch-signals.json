@@ -1,10 +1,10 @@
 {
   "episode": "prisoners-dilemma",
-  "variant": "statistic",
-  "statValue": "Watch Signals",
-  "statLabel": "1. NPT RevCon language\n2. AISI joint publications\n3. Track 1.5 communiqué vocabulary",
-  "statContext": "PD vocabulary = 'reciprocal restraint' · Stag hunt vocabulary = 'shared standards'",
+  "variant": "quote",
+  "text": "Watch the signals:\n1. NPT RevCon vocabulary\n2. AISI joint publications\n3. Bilateral AI communiqu\u00e9 language",
+  "attribution": "",
+  "attributionContext": "",
   "accentColor": "#C4A747",
-  "backgroundVariant": "light",
-  "durationSec": 8
+  "backgroundVariant": "dark",
+  "durationSec": 7
 }

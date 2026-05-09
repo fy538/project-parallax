@@ -1,0 +1,10 @@
+{
+  "episode": "prisoners-dilemma",
+  "variant": "statistic",
+  "statValue": "2,000+",
+  "statLabel": "scholarly articles by 1975",
+  "statContext": "Across strategy, biology, economics, law, psychology",
+  "accentColor": "#C4A747",
+  "backgroundVariant": "dark",
+  "durationSec": 4
+}

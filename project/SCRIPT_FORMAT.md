@@ -215,6 +215,8 @@ These come from VISUAL_LANGUAGE.md and should be checked by script-audit:
 - No more than **3 consecutive `[MG:]`** entries without a `[FOOTAGE:]`, `[ILLUST:]`, or `[AI-GEN:]` break.
 - No more than **30 seconds** of continuous `[FOOTAGE:]` without a visual change (new shot, overlay, or cut to MG).
 - No more than **2 consecutive `[AI-GEN:]`** clips without a mode switch. AI-GEN inherits footage's pacing role but its stylized quality fatigues faster.
+
+**Philosopher's Lens format override:** These episodes use a footage-free production path — three asset types only (`[MG:]` + `[AI-GEN:]` + `[ARCHIVAL:]`). `[FOOTAGE:]` tags are not used. `[AI-GEN:]` entries use the Recraft→Pika 2.2 image-to-video pipeline (constructivist reference frame → animated clip) for both atmospheric and scene roles. The max-3 `[MG:]` rule still applies; `[AI-GEN:]` or `[ARCHIVAL:]` count as breaks. See VISUAL_LANGUAGE.md → "Format-Specific Visual Rules" for full pipeline details.
 - No more than **2 consecutive `[ILLUST:]`** entries without a mode switch. Atmospheric register creates mood but fatigues if sustained.
 - Each beat should roughly follow: footage (establish) → MG (analyze) → footage (breathe) → MG or layered (climax) → footage (land). AI-GEN and ILLUST slot in wherever footage would go — AI-GEN for physical spaces, ILLUST for emotional/conceptual texture.
 - `[LAYERED:]` entries should be brief (3-8 seconds) with simple overlays — complex charts need the viewer's full attention and belong in `[MG:]`.

@@ -2,7 +2,9 @@
   "episode": "prisoners-dilemma",
   "variant": "quote",
   "text": "Playing the wrong game makes the wrong game real.",
+  "attribution": "",
+  "attributionContext": "",
   "accentColor": "#C4A747",
-  "backgroundVariant": "light",
+  "backgroundVariant": "dark",
   "durationSec": 5
 }

@@ -1,24 +1,60 @@
 {
   "episode": "prisoners-dilemma",
   "title": "Nuclear Strategy in Miniature",
-  "subtitle": "RAND's premise",
+  "subtitle": "RAND Corporation's operating premise",
   "variant": "payoff-matrix",
-  "rowPlayer": "USA",
-  "colPlayer": "USSR",
-  "rowOptions": ["Restrain", "Strike"],
-  "colOptions": ["Restrain", "Strike"],
+  "rowPlayer": "United States",
+  "colPlayer": "Soviet Union",
+  "rowOptions": [
+    "Restrain",
+    "Strike"
+  ],
+  "colOptions": [
+    "Restrain",
+    "Strike"
+  ],
   "cells": [
-    { "row": 0, "col": 0, "value": "Peace", "highlight": false },
-    { "row": 0, "col": 1, "value": "Destroyed", "highlight": false },
-    { "row": 1, "col": 0, "value": "Dominance", "highlight": false },
-    { "row": 1, "col": 1, "value": "MAD", "highlight": true }
+    {
+      "row": 0,
+      "col": 0,
+      "value": "Peace",
+      "highlight": false
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "value": "Annihilation",
+      "highlight": false,
+      "color": "#A64D46"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "value": "Dominance",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "value": "MAD",
+      "highlight": true,
+      "color": "#A64D46"
+    }
   ],
   "phases": [
     {
       "label": "The Cold War Game",
-      "durationSec": 8,
-      "highlights": [3],
+      "durationSec": 4,
+      "highlights": [],
       "annotation": "Two players. No communication. No trust. No future."
+    },
+    {
+      "label": "Nash Equilibrium",
+      "durationSec": 4,
+      "highlights": [
+        3
+      ],
+      "annotation": "The 'rational' outcome: mutual escalation"
     }
   ],
   "durationSec": 8,

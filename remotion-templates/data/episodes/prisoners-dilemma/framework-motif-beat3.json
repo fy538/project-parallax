@@ -1,19 +1,42 @@
 {
   "episode": "prisoners-dilemma",
   "title": "The Model Everywhere",
-  "variant": "flow",
-  "nodes": [
-    { "label": "RAND", "sublabel": "Origin (1950)", "color": "#888780", "position": { "x": 0.5, "y": 0.5 } },
-    { "label": "Washington", "sublabel": "●", "color": "#C4A747", "position": { "x": 0.2, "y": 0.2 } },
-    { "label": "Beijing", "sublabel": "●", "color": "#C4A747", "position": { "x": 0.8, "y": 0.2 } },
-    { "label": "Geneva", "sublabel": "●", "color": "#C4A747", "position": { "x": 0.2, "y": 0.8 } },
-    { "label": "Brussels", "sublabel": "●", "color": "#C4A747", "position": { "x": 0.8, "y": 0.8 } }
+  "subtitle": "The same game, the same assumption",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Washington",
+      "icon": "\u25cf",
+      "color": "#4A7BA7",
+      "items": [
+        "Defection assumed rational"
+      ]
+    },
+    {
+      "title": "Beijing",
+      "icon": "\u25cf",
+      "color": "#A64D46",
+      "items": [
+        "Defection assumed rational"
+      ]
+    },
+    {
+      "title": "Geneva",
+      "icon": "\u25cf",
+      "color": "#888780",
+      "items": [
+        "Defection assumed rational"
+      ]
+    },
+    {
+      "title": "Brussels",
+      "icon": "\u25cf",
+      "color": "#888780",
+      "items": [
+        "Defection assumed rational"
+      ]
+    }
   ],
-  "arrowLabels": ["spreads", "spreads", "spreads", "spreads"],
-  "phases": [
-    { "label": "Same assumption, everywhere", "durationSec": 10, "activeNodes": [0, 1, 2, 3, 4] }
-  ],
-  "durationSec": 10,
   "backgroundVariant": "dark",
-  "backgroundTint": "#C4A747"
+  "durationSec": 10
 }

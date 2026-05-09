@@ -276,6 +276,59 @@ def check_dark_mode_hardcoding(filepath: Path, lines: list[str]) -> list[Issue]:
     return issues
 
 
+def check_hardcoded_palette_hex(filepath: Path, lines: list[str]) -> list[Issue]:
+    """POL-07: Brand palette hex values used directly in CSS property assignments.
+
+    These should be replaced with palette.* tokens so the component stays in sync
+    when palette.json changes. Only flags CSS value positions (color:, backgroundColor:,
+    borderColor:, fill:, stroke:) — not comparison expressions like .toLowerCase() === "#...".
+    """
+    issues = []
+    rel = str(filepath.relative_to(TEMPLATES_DIR))
+
+    # The 6 canonical brand hex values (both cases). Source: palette.json.
+    PALETTE_MAP = {
+        "#1c1814": "palette.ink",
+        "#e5a544": "palette.amber",
+        "#c23b22": "palette.rust",
+        "#f0e6d0": "palette.bone",
+        "#f5f0e8": "palette.paper",
+        "#6b1d1d": "palette.oxblood",
+    }
+
+    # CSS properties that hold color values — the context where direct hex is wrong.
+    CSS_COLOR_PROPS = re.compile(
+        r'\b(color|backgroundColor|borderColor|fill|stroke|background)\s*:'
+    )
+
+    for i, line in enumerate(lines, 1):
+        # Skip comparison expressions — those are fine (e.g. .toLowerCase() === "#...")
+        if ".toLowerCase()" in line and "===" in line:
+            continue
+        # Skip comments
+        stripped = line.strip()
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+
+        line_lower = line.lower()
+        for hex_val, token in PALETTE_MAP.items():
+            if hex_val not in line_lower:
+                continue
+            # Only flag if a CSS color property is present on the same line
+            if not CSS_COLOR_PROPS.search(line):
+                continue
+            issues.append(Issue(
+                severity="warning",
+                rule="POL-07",
+                file=rel,
+                line=i,
+                message=f"Hardcoded palette hex {hex_val!r} — use {token}",
+                fix=f"Replace with {token} from palette import",
+            ))
+
+    return issues
+
+
 def check_background_redundancy(filepath: Path, lines: list[str]) -> list[Issue]:
     """POL-06: Redundant backgroundColor on AbsoluteFill when Background component is used."""
     issues = []
@@ -648,6 +701,7 @@ def lint_templates() -> list[Issue]:
             issues.extend(check_content_area_usage(tsx_file, lines))
             issues.extend(check_dark_mode_hardcoding(tsx_file, lines))
             issues.extend(check_background_redundancy(tsx_file, lines))
+            issues.extend(check_hardcoded_palette_hex(tsx_file, lines))
 
     return issues
 

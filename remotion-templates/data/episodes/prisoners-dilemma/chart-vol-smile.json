@@ -1,17 +1,136 @@
 {
   "episode": "prisoners-dilemma",
   "title": "The Black-Scholes Parallel",
-  "subtitle": "Implied volatility before and after October 1987",
-  "variant": "comparison",
-  "comparisonPairs": [
-    { "label": "1976–1987", "leftValue": 100, "rightValue": 100 },
-    { "label": "Post-crash", "leftValue": 100, "rightValue": 65 }
+  "subtitle": "Implied volatility: model vs. reality",
+  "lines": [
+    {
+      "label": "Model prediction",
+      "color": "#C4A747",
+      "points": [
+        {
+          "x": "1976",
+          "y": 100
+        },
+        {
+          "x": "1978",
+          "y": 100
+        },
+        {
+          "x": "1980",
+          "y": 100
+        },
+        {
+          "x": "1982",
+          "y": 100
+        },
+        {
+          "x": "1984",
+          "y": 100
+        },
+        {
+          "x": "1986",
+          "y": 100
+        },
+        {
+          "x": "1987",
+          "y": 100
+        },
+        {
+          "x": "1988",
+          "y": 100
+        },
+        {
+          "x": "1990",
+          "y": 100
+        },
+        {
+          "x": "1992",
+          "y": 100
+        }
+      ],
+      "dashed": true,
+      "areaFill": false
+    },
+    {
+      "label": "Market reality",
+      "color": "#888780",
+      "points": [
+        {
+          "x": "1976",
+          "y": 98
+        },
+        {
+          "x": "1978",
+          "y": 99
+        },
+        {
+          "x": "1980",
+          "y": 100
+        },
+        {
+          "x": "1982",
+          "y": 101
+        },
+        {
+          "x": "1984",
+          "y": 100
+        },
+        {
+          "x": "1986",
+          "y": 99
+        },
+        {
+          "x": "1987",
+          "y": 65
+        },
+        {
+          "x": "1988",
+          "y": 70
+        },
+        {
+          "x": "1990",
+          "y": 72
+        },
+        {
+          "x": "1992",
+          "y": 68
+        }
+      ],
+      "areaFill": true,
+      "areaOpacity": 0.12
+    }
   ],
-  "leftGroupLabel": "Model prediction",
-  "leftGroupColor": "#C4A747",
-  "rightGroupLabel": "Market reality",
-  "rightGroupColor": "#888780",
-  "contextNote": "The model didn't describe reality. Reality rearranged itself to match the model — until it couldn't.",
+  "annotations": [
+    {
+      "x": "1987",
+      "label": "October 1987",
+      "sublabel": "Black Monday \u2014 the model breaks",
+      "color": "#A64D46"
+    }
+  ],
+  "eras": [
+    {
+      "from": "1976",
+      "to": "1987",
+      "label": "Model \u2248 Reality",
+      "color": "#4A7BA7",
+      "opacity": 0.06
+    },
+    {
+      "from": "1987",
+      "to": "1992",
+      "label": "The Smile",
+      "color": "#A64D46",
+      "opacity": 0.06
+    }
+  ],
+  "xLabel": "Year",
+  "yLabel": "Implied volatility",
+  "yUnit": " (indexed)",
+  "heroStat": {
+    "value": "1987",
+    "label": "The model couldn't hold"
+  },
   "durationSec": 8,
   "backgroundVariant": "light",
   "source": "MacKenzie (2006)"

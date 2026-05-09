@@ -1,0 +1,25 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Reframe",
+  "variant": "comparison",
+  "columns": [
+    {
+      "title": "Old Question",
+      "icon": "\u2717",
+      "color": "#888780",
+      "items": [
+        "How do you escape the logic of defection?"
+      ]
+    },
+    {
+      "title": "New Question",
+      "icon": "\u2192",
+      "color": "#C4A747",
+      "items": [
+        "How do you coordinate on the outcome you both prefer?"
+      ]
+    }
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 6
+}

@@ -1,9 +1,10 @@
 {
   "episode": "prisoners-dilemma",
-  "variant": "statistic",
-  "statValue": "Not conspiracy: institutional momentum",
-  "statLabel": "The model changed behavior by becoming canonical",
-  "accentColor": "#C4A747",
-  "backgroundVariant": "light",
-  "durationSec": 7
+  "variant": "quote",
+  "text": "Not conspiracy: institutional momentum. The model changes behavior by becoming canonical. Self-reinforcing loop \u2014 not a plot, a trap.",
+  "attribution": "Checkpoint",
+  "attributionContext": "Beat 3",
+  "accentColor": "#F0E6D0",
+  "backgroundVariant": "dark",
+  "durationSec": 8
 }

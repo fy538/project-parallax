@@ -1,13 +1,42 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "The Standard Story",
-  "variant": "flow",
-  "nodes": [
-    { "label": "Prisoner's Dilemma", "sublabel": "The model", "color": "#888780" },
-    { "label": "Rational self-interest", "sublabel": "The assumption", "color": "#888780" },
-    { "label": "Mutual defection", "sublabel": "The prediction", "color": "#A64D46" }
+  "title": "The Prisoner's Dilemma",
+  "subtitle": "The standard frame",
+  "variant": "matrix",
+  "rowHeaders": [
+    "Cooperate",
+    "Defect"
   ],
-  "arrowLabels": ["reveals", "leads to"],
-  "durationSec": 6,
-  "backgroundVariant": "light"
+  "colHeaders": [
+    "Cooperate",
+    "Defect"
+  ],
+  "cells": [
+    {
+      "row": 0,
+      "col": 0,
+      "label": "Both cooperate\n(3, 3)",
+      "highlight": false
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "label": "Sucker's payoff\n(0, 5)",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "label": "Temptation\n(5, 0)",
+      "highlight": false
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "label": "Mutual defection\n(1, 1)",
+      "highlight": true
+    }
+  ],
+  "backgroundVariant": "dark",
+  "durationSec": 12
 }
