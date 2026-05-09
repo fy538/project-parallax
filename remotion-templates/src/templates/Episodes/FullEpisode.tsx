@@ -57,6 +57,7 @@ import { LowerThird } from "../../components/LowerThird";
 import { FilmOverlay } from "../../components/FilmOverlay";
 import { AudioLayer } from "../../components/AudioLayer";
 import { EpisodeColorEmphasisProvider } from "../../hooks/useEpisodeColorEmphasis";
+import { EditorialSurface } from "../../components/EditorialSurface";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -887,7 +888,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
 
   return (
     <EpisodeColorEmphasisProvider value={manifest.episodeColorEmphasis}>
-      <AbsoluteFill style={{ backgroundColor: "#F5F0E8" }}>
+      {/*
+       * EditorialSurface provides the paper background + grain layer that
+       * unifies Remotion analytical content with the AI-generated illustration
+       * pillar. Replaces the former hardcoded backgroundColor: "#F5F0E8".
+       * Intensity 0.6 = "felt, not seen" — warmth before texture.
+       */}
+      <EditorialSurface intensity={0.6}>
         {filmOverlayConfig ? (
           <FilmOverlay
             effects={filmOverlayConfig.effects}
@@ -916,7 +923,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
           musicBedTracks={manifest.musicBed?.tracks}
           segmentAudio={segmentAudio}
         />
-      </AbsoluteFill>
+      </EditorialSurface>
     </EpisodeColorEmphasisProvider>
   );
 };
