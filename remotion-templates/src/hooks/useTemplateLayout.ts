@@ -49,17 +49,23 @@
  * Each zone exposes:
  *   - style: CSSProperties with position/top/left/width/height (spread directly)
  *   - rect: { top, left, width, height, bottom, right } raw numbers for math
+ *
+ * TESTABILITY:
+ *   The geometry is also exported as `computeTemplateLayout()` — a pure function
+ *   with no React dependency. Use it in unit tests to assert zone integrity
+ *   without mounting a component or rendering a frame.
+ *   See src/__tests__/template-zone-integrity.test.ts.
  */
 
 import { useMemo } from "react";
 import { layout, titleHeight } from "../design/theme";
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// ── Types (exported for consumers and tests) ──────────────────────────────────
 
-type TitleVariant = keyof typeof titleHeight | "none" | "custom";
-type SafeAreaTier = keyof typeof layout.safeAreaTier;
+export type TitleVariant = keyof typeof titleHeight | "none" | "custom";
+export type SafeAreaTier = keyof typeof layout.safeAreaTier;
 
-interface TemplateLayoutOptions {
+export interface TemplateLayoutOptions {
   /** Title variant — determines how much vertical space the title zone takes.
    *  "content" (default) = h2 + subtitle, safe for 2-line titles (150px).
    *  "minimal" = single-line h3 (56px).
@@ -73,7 +79,7 @@ interface TemplateLayoutOptions {
    *  Compute from your actual title: Math.ceil(fontSize * lineHeight). */
   customTitleHeight?: number;
 
-  /** Safe area tier. Default: "standard" (80px). */
+  /** Safe area tier. Default: "generous" (120px). */
   safeArea?: SafeAreaTier;
 
   /** Enable split layout — adds left/right zones within content area.
@@ -97,7 +103,7 @@ interface TemplateLayoutOptions {
   contentFooterGap?: number;
 }
 
-interface Rect {
+export interface Rect {
   top: number;
   left: number;
   width: number;
@@ -108,7 +114,7 @@ interface Rect {
   right: number;
 }
 
-interface Zone {
+export interface Zone {
   /** Ready-to-spread CSS: position absolute + top/left/width/height */
   style: React.CSSProperties;
   /**
@@ -121,7 +127,7 @@ interface Zone {
   rect: Rect;
 }
 
-interface TemplateLayoutResult {
+export interface TemplateLayoutResult {
   zones: {
     /** Title zone — top of frame, full width within safe area */
     title: Zone;
@@ -140,7 +146,7 @@ interface TemplateLayoutResult {
   canvas: { width: number; height: number };
 }
 
-// ── Helper: build a Zone from a Rect ──────────────────────────────────────
+// ── Internal helper: build a Zone from a Rect ─────────────────────────────────
 
 const makeZone = (rect: Rect): Zone => ({
   style: {
@@ -165,16 +171,23 @@ const makeZone = (rect: Rect): Zone => ({
   rect,
 });
 
-// ── Hook ──────────────────────────────────────────────────────────────────
+// ── Pure computation (exported — testable without React) ──────────────────────
 
-export const useTemplateLayout = (
+/**
+ * Compute template layout zones from options. Pure function — no React, no hooks.
+ *
+ * This is the testable core behind `useTemplateLayout`. Call it directly in unit
+ * tests to assert zone integrity (no overlaps, in bounds, usable height) without
+ * mounting a component or launching a browser.
+ *
+ * See src/__tests__/template-zone-integrity.test.ts for the zone integrity suite.
+ */
+export function computeTemplateLayout(
   options: TemplateLayoutOptions = {}
-): TemplateLayoutResult => {
+): TemplateLayoutResult {
   const {
     title: titleVariant = "content",
     customTitleHeight,
-    // L69: generous (120px) is the channel-wide default. Templates that need
-    // a different tier (e.g. centered-only → "tight") opt in explicitly.
     safeArea: safeAreaTier = "generous",
     split = false,
     splitGap = layout.spacing.xl,
@@ -183,111 +196,142 @@ export const useTemplateLayout = (
     contentFooterGap = layout.spacing.md,
   } = options;
 
-  return useMemo(() => {
-    const safe = layout.safeAreaTier[safeAreaTier];
-    const W = layout.width;
-    const H = layout.height;
+  const safe = layout.safeAreaTier[safeAreaTier];
+  const W = layout.width;
+  const H = layout.height;
 
-    // ── Title zone height ──────────────────────────────────────────────
-    const titleH =
-      titleVariant === "none"
-        ? 0
-        : titleVariant === "custom"
-          ? (customTitleHeight ?? 92)
-          : titleHeight[titleVariant];
+  // ── Title zone height ─────────────────────────────────────────────────────
+  const titleH =
+    titleVariant === "none"
+      ? 0
+      : titleVariant === "custom"
+        ? (customTitleHeight ?? 92)
+        : titleHeight[titleVariant];
 
-    // ── Vertical zones ─────────────────────────────────────────────────
-    // Title: starts at safe.top, height = titleH
-    const titleTop = safe.top;
-    const titleWidth = W - safe.left - safe.right;
+  // ── Vertical zones ────────────────────────────────────────────────────────
+  // Title: starts at safe.top, height = titleH
+  const titleTop = safe.top;
+  const titleWidth = W - safe.left - safe.right;
 
-    // Content: starts after title + gap
-    const contentTop =
-      titleVariant === "none"
-        ? safe.top
-        : titleTop + titleH + titleContentGap;
+  // Content: starts after title + gap
+  const contentTop =
+    titleVariant === "none"
+      ? safe.top
+      : titleTop + titleH + titleContentGap;
 
-    // Footer: anchored to bottom safe area
-    const footerBottom = safe.bottom;
-    const footerTop = H - footerBottom - footerHeight;
+  // Footer: anchored to bottom safe area
+  const footerBottom = safe.bottom;
+  const footerTop = H - footerBottom - footerHeight;
 
-    // Content height: fills between content top and footer (with gap)
-    const contentBottom = footerHeight > 0
-      ? H - footerTop + contentFooterGap
-      : safe.bottom;
-    const contentHeight = H - contentTop - contentBottom;
-    const contentWidth = W - safe.left - safe.right;
+  // Content height: fills between content top and footer (with gap).
+  // contentBottom here is the distance from canvas bottom to content bottom edge.
+  const contentBottom = footerHeight > 0
+    ? H - footerTop + contentFooterGap
+    : safe.bottom;
+  const contentHeight = H - contentTop - contentBottom;
+  const contentWidth = W - safe.left - safe.right;
 
-    // ── Build zones ────────────────────────────────────────────────────
-    const titleRect: Rect = {
-      top: titleTop,
-      left: safe.left,
-      width: titleWidth,
-      height: titleH,
-      bottom: H - titleTop - titleH,
-      right: safe.right,
-    };
+  // ── Build zones ───────────────────────────────────────────────────────────
+  const titleRect: Rect = {
+    top: titleTop,
+    left: safe.left,
+    width: titleWidth,
+    height: titleH,
+    bottom: H - titleTop - titleH,
+    right: safe.right,
+  };
 
-    const contentRect: Rect = {
-      top: contentTop,
-      left: safe.left,
-      width: contentWidth,
-      height: contentHeight,
-      bottom: contentBottom,
-      right: safe.right,
-    };
+  const contentRect: Rect = {
+    top: contentTop,
+    left: safe.left,
+    width: contentWidth,
+    height: contentHeight,
+    bottom: contentBottom,
+    right: safe.right,
+  };
 
-    const footerRect: Rect = {
-      top: footerTop,
-      left: safe.left,
-      width: contentWidth,
-      height: footerHeight,
-      bottom: footerBottom,
-      right: safe.right,
-    };
+  const footerRect: Rect = {
+    top: footerTop,
+    left: safe.left,
+    width: contentWidth,
+    height: footerHeight,
+    bottom: footerBottom,
+    right: safe.right,
+  };
 
-    // ── Split zones (subdivide content horizontally) ───────────────────
-    const halfWidth = split
-      ? Math.floor((contentWidth - splitGap) / 2)
-      : contentWidth;
+  // ── Split zones (subdivide content horizontally) ──────────────────────────
+  const halfWidth = split
+    ? Math.floor((contentWidth - splitGap) / 2)
+    : contentWidth;
 
-    const leftRect: Rect = {
-      top: contentRect.top,
-      left: safe.left,
-      width: halfWidth,
-      height: contentHeight,
-      bottom: contentBottom,
-      right: W - safe.left - halfWidth,
-    };
+  const leftRect: Rect = {
+    top: contentRect.top,
+    left: safe.left,
+    width: halfWidth,
+    height: contentHeight,
+    bottom: contentBottom,
+    right: W - safe.left - halfWidth,
+  };
 
-    const rightRect: Rect = {
-      top: contentRect.top,
-      left: safe.left + halfWidth + splitGap,
-      width: halfWidth,
-      height: contentHeight,
-      bottom: contentBottom,
-      right: safe.right,
-    };
+  const rightRect: Rect = {
+    top: contentRect.top,
+    left: safe.left + halfWidth + splitGap,
+    width: halfWidth,
+    height: contentHeight,
+    bottom: contentBottom,
+    right: safe.right,
+  };
 
-    return {
-      zones: {
-        title: makeZone(titleRect),
-        content: makeZone(contentRect),
-        footer: makeZone(footerRect),
-        left: makeZone(leftRect),
-        right: makeZone(rightRect),
-      },
-      safe,
-      canvas: { width: W, height: H },
-    };
-  }, [
-    titleVariant,
+  return {
+    zones: {
+      title:   makeZone(titleRect),
+      content: makeZone(contentRect),
+      footer:  makeZone(footerRect),
+      left:    makeZone(leftRect),
+      right:   makeZone(rightRect),
+    },
+    safe,
+    canvas: { width: W, height: H },
+  };
+}
+
+// ── Hook (thin wrapper over computeTemplateLayout) ────────────────────────────
+
+export const useTemplateLayout = (
+  options: TemplateLayoutOptions = {}
+): TemplateLayoutResult => {
+  const {
+    title: titleVariant = "content",
     customTitleHeight,
-    safeAreaTier,
-    split,
-    splitGap,
-    footerHeight,
-    titleContentGap,
-    contentFooterGap,
-  ]);
+    safeArea: safeAreaTier = "generous",
+    split = false,
+    splitGap = layout.spacing.xl,
+    footerHeight = 40,
+    titleContentGap = layout.spacing.xl,
+    contentFooterGap = layout.spacing.md,
+  } = options;
+
+  return useMemo(
+    () =>
+      computeTemplateLayout({
+        title: titleVariant,
+        customTitleHeight,
+        safeArea: safeAreaTier,
+        split,
+        splitGap,
+        footerHeight,
+        titleContentGap,
+        contentFooterGap,
+      }),
+    [
+      titleVariant,
+      customTitleHeight,
+      safeAreaTier,
+      split,
+      splitGap,
+      footerHeight,
+      titleContentGap,
+      contentFooterGap,
+    ]
+  );
 };
