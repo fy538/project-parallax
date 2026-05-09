@@ -47,6 +47,7 @@ import {
 import { SiliconTrapComposition, SiliconTrapFullComposition } from "./templates/Episodes";
 import { AudioPreviewComposition } from "./templates/AudioPreview";
 import { PrisonersDilemmaShowcaseComposition } from "./templates/Episodes/PrisonersDilemmaShowcase";
+import { PrisonersDilemmaFullComposition } from "./templates/Episodes/PrisonersDilemmaFull";
 import { ThumbnailComposition } from "./templates/Thumbnail";
 import {
   EditorialFrameHeroTestComposition,
@@ -111,6 +112,7 @@ export const RemotionRoot: React.FC = () => {
         <SiliconTrapComposition />
         <SiliconTrapFullComposition />
         <PrisonersDilemmaShowcaseComposition />
+        <PrisonersDilemmaFullComposition />
         <AudioPreviewComposition />
       </Folder>
 
