@@ -8,15 +8,21 @@ For each episode in episodes/PIPELINE.md, verifies:
   · Stall detection: days in state exceeds warn/alert thresholds
   · Blocker consistency: "Blocked on" populated but state is not BLOCKED/REVISING
 
+Also writes episodes/<slug>/_checkpoint.md — a per-episode stage checklist
+auto-populated from actual file presence. Agents and humans read this for a
+quick "done / not done" summary without opening a dozen files.
+
 Usage:
-  python3 tools/pipeline_validator.py              # check all episodes
+  python3 tools/pipeline_validator.py              # check all + write checkpoints
   python3 tools/pipeline_validator.py silicon-trap  # check one episode
   python3 tools/pipeline_validator.py --strict      # exit 1 on warnings too
+  python3 tools/pipeline_validator.py --no-checkpoint  # skip writing checkpoints
 
 Exit 0 if clean, 1 if errors found (or warnings under --strict).
 """
 
 import argparse
+import datetime
 import json
 import re
 import sys
@@ -352,6 +358,249 @@ def print_report(report: EpisodeReport) -> None:
             print(f"    {line}")
 
 
+# ── Checkpoint generator ──────────────────────────────────────────────────────
+
+@dataclass
+class StageCheck:
+    label: str
+    done: bool
+    detail: str = ""    # found filename(s) or missing note
+    warn: str = ""      # non-blocking issue (e.g. naming drift)
+
+
+def _first_match(ep_dir: Path, *globs: str) -> Optional[Path]:
+    """Return the first matching file from any of the glob patterns, or None."""
+    for g in globs:
+        hits = sorted(ep_dir.glob(g))
+        if hits:
+            return hits[-1]  # latest if versioned
+    return None
+
+
+def _all_matches(ep_dir: Path, *globs: str) -> list[Path]:
+    results: list[Path] = []
+    for g in globs:
+        results.extend(ep_dir.glob(g))
+    return sorted(set(results))
+
+
+def build_checkpoint_stages(
+    row: EpisodeRow, ep_dir: Path, data_dir: Path
+) -> list[tuple[str, list[StageCheck]]]:
+    """Return a list of (group_name, [StageCheck]) for the checkpoint file."""
+    groups: list[tuple[str, list[StageCheck]]] = []
+
+    # ── Research ──────────────────────────────────────────────────────────────
+    research: list[StageCheck] = []
+
+    viability = _first_match(ep_dir, "viability.md", "viability-check.md")
+    research.append(StageCheck(
+        "Viability check", bool(viability),
+        detail=viability.name if viability else "viability.md missing",
+    ))
+
+    brief = ep_dir / "brief.md"
+    passes = _all_matches(ep_dir, "research-pass*.md")
+    has_research = brief.exists() or bool(passes)
+    pass_names = ", ".join(p.name for p in passes[:3]) if passes else ""
+    brief_part = "brief.md" if brief.exists() else ""
+    detail = " + ".join(filter(None, [brief_part, pass_names])) or "brief.md missing"
+    research.append(StageCheck("Deep Research", has_research, detail=detail))
+
+    audit = _first_match(ep_dir, "research-audit.md", "research-audit-*.md")
+    research.append(StageCheck(
+        "Research Audit", bool(audit),
+        detail=audit.name if audit else "research-audit.md missing",
+    ))
+
+    groups.append(("Research", research))
+
+    # ── Script ────────────────────────────────────────────────────────────────
+    script: list[StageCheck] = []
+
+    angle = ep_dir / "angle-memo.md"
+    script.append(StageCheck(
+        "Angle Memo", angle.exists(),
+        detail="angle-memo.md" if angle.exists() else "angle-memo.md missing",
+    ))
+
+    canonical_script = ep_dir / "script-production.md"
+    versioned_scripts = _all_matches(ep_dir, "script-v*-production.md")
+    if canonical_script.exists():
+        script.append(StageCheck("Script Draft", True, detail="script-production.md"))
+    elif versioned_scripts:
+        latest = versioned_scripts[-1].name
+        script.append(StageCheck(
+            "Script Draft", True, detail=latest,
+            warn=f"no canonical script-production.md — rename {latest} once gate passes",
+        ))
+    else:
+        script.append(StageCheck("Script Draft", False, detail="no script file found"))
+
+    for stage, canonical, glob in [
+        ("Script Audit",     "script-audit.md",          "script-audit-v*.md"),
+        ("Persona Eval",     "persona-eval.md",           "persona-eval-v*.md"),
+        ("Visual Concept",   "visual-concept-audit.md",   "visual-concept-audit-v*.md"),
+        ("Review Package",   "review-package.md",         "review-package-v*.md"),
+    ]:
+        canon_p = ep_dir / canonical
+        versioned = _all_matches(ep_dir, glob)
+        if canon_p.exists():
+            script.append(StageCheck(stage, True, detail=canonical))
+        elif versioned:
+            latest = versioned[-1].name
+            script.append(StageCheck(
+                stage, True, detail=latest,
+                warn=f"no canonical {canonical}",
+            ))
+        else:
+            script.append(StageCheck(stage, False, detail=f"{canonical} missing"))
+
+    thumb = ep_dir / "thumbnail-concepts.md"
+    script.append(StageCheck(
+        "Title/Hook + Thumbnails", thumb.exists(),
+        detail="thumbnail-concepts.md" if thumb.exists() else "thumbnail-concepts.md missing",
+    ))
+
+    groups.append(("Script", script))
+
+    # ── Production Prep ───────────────────────────────────────────────────────
+    prep: list[StageCheck] = []
+
+    vspec = ep_dir / "visual-spec.md"
+    prep.append(StageCheck(
+        "Visual Spec", vspec.exists(),
+        detail="visual-spec.md" if vspec.exists() else "visual-spec.md missing — run visual-spec skill",
+    ))
+
+    audio = _first_match(ep_dir, "audio-cue-sheet.md", "audio-spec.md", "audio-*.md")
+    prep.append(StageCheck(
+        "Audio Spec", bool(audio),
+        detail=audio.name if audio else "audio-cue-sheet.md missing — run audio-spec skill",
+    ))
+
+    shots = ep_dir / "shot-list.json"
+    prep.append(StageCheck(
+        "Shot List", shots.exists(),
+        detail="shot-list.json" if shots.exists() else "shot-list.json missing",
+    ))
+
+    if data_dir.is_dir():
+        json_files = [p for p in data_dir.glob("*.json") if p.name != "assembly-manifest.json"]
+        manifest = data_dir / "assembly-manifest.json"
+        if manifest.exists():
+            try:
+                mdata = json.loads(manifest.read_text())
+                segs = len(mdata.get("segments", []))
+                dur = mdata.get("totalDurationSec", 0)
+                detail = f"assembly-manifest.json ({segs} segments, {dur:.0f}s) + {len(json_files)} data files"
+            except Exception:
+                detail = f"assembly-manifest.json (parse error) + {len(json_files)} data files"
+            prep.append(StageCheck("Template Data + Manifest", True, detail=detail))
+        elif json_files:
+            prep.append(StageCheck(
+                "Template Data + Manifest", False,
+                detail=f"{len(json_files)} data files present but assembly-manifest.json missing",
+            ))
+        else:
+            prep.append(StageCheck("Template Data + Manifest", False,
+                detail="data dir exists but empty"))
+    else:
+        prep.append(StageCheck(
+            "Template Data + Manifest", False,
+            detail=f"remotion-templates/data/episodes/{row.slug}/ not created yet",
+        ))
+
+    groups.append(("Production Prep", prep))
+
+    # ── Production ────────────────────────────────────────────────────────────
+    prod: list[StageCheck] = []
+
+    assets_dir = ep_dir / "assets"
+    video_exts = {".mp4", ".mov", ".mkv", ".webm", ".mxf"}
+    video_files = [p for p in assets_dir.rglob("*") if p.suffix.lower() in video_exts] \
+        if assets_dir.is_dir() else []
+    asset_manifest = assets_dir / "asset-manifest.json" if assets_dir.is_dir() else None
+    has_footage = bool(video_files) or (asset_manifest is not None and asset_manifest.exists())
+    if has_footage:
+        detail = f"asset-manifest.json" if (asset_manifest and asset_manifest.exists()) \
+            else f"{len(video_files)} video file(s) in assets/"
+    else:
+        detail = "no sourced footage — run: python3 tools/asset-source/source.py --batch shot-list.json"
+    prod.append(StageCheck("Stock Footage", has_footage, detail=detail))
+
+    audio_exts = {".wav", ".mp3", ".aiff", ".flac", ".m4a"}
+    narration_files = [
+        p for p in ep_dir.rglob("*")
+        if p.suffix.lower() in audio_exts and "assets" not in p.parts
+    ]
+    # also check a dedicated audio/ subdir
+    narration_files += [p for p in (ep_dir / "audio").rglob("*")
+                        if p.suffix.lower() in audio_exts] \
+        if (ep_dir / "audio").is_dir() else []
+    has_narration = bool(narration_files)
+    prod.append(StageCheck(
+        "Narration", has_narration,
+        detail=narration_files[0].name if has_narration else "not recorded yet",
+    ))
+
+    # NLE / publish inferred from state
+    in_post    = row.state in ("IN POST", "PUBLISHED", "RETROED")
+    published  = row.state in ("PUBLISHED", "RETROED")
+    retroed    = row.state == "RETROED"
+
+    prod.append(StageCheck("NLE Assembly", in_post,
+        detail="complete (state ≥ IN POST)" if in_post else "not started"))
+    prod.append(StageCheck("Publish", published,
+        detail="published" if published else "not yet published"))
+    prod.append(StageCheck("Publish Retro", retroed,
+        detail="complete" if retroed else "not yet run"))
+
+    groups.append(("Production", prod))
+
+    return groups
+
+
+def write_checkpoint(row: EpisodeRow, ep_dir: Path, data_dir: Path) -> None:
+    """Write episodes/<slug>/_checkpoint.md from current artifact state."""
+    today = datetime.date.today().isoformat()
+    groups = build_checkpoint_stages(row, ep_dir, data_dir)
+
+    lines: list[str] = [
+        f"# {row.slug} — Pipeline Checkpoint",
+        f"> Auto-generated {today} by `pipeline_validator.py` · do not edit manually",
+        f"> Refresh: `python3 tools/pipeline_validator.py`",
+        "",
+        f"**State:** {row.state}  ·  {row.days_in_state} days in state",
+    ]
+    if row.blocked_on not in ("—", "", "-"):
+        lines.append(f"**Blocked on:** {row.blocked_on}")
+    lines.append("")
+
+    for group_name, checks in groups:
+        lines.append(f"## {group_name}")
+        for c in checks:
+            box = "x" if c.done else " "
+            suffix = f" — {c.detail}" if c.detail else ""
+            lines.append(f"- [{box}] {c.label}{suffix}")
+            if c.warn:
+                lines.append(f"  - ⚠ {c.warn}")
+        lines.append("")
+
+    # Quick summary counts
+    all_checks = [c for _, grp in groups for c in grp]
+    done  = sum(1 for c in all_checks if c.done)
+    total = len(all_checks)
+    warns = sum(1 for c in all_checks if c.warn)
+    lines.append(f"---")
+    lines.append(f"**Progress:** {done}/{total} stages complete"
+                 + (f" · {warns} naming drift warning(s)" if warns else ""))
+    lines.append("")
+
+    out = ep_dir / "_checkpoint.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> int:
@@ -367,6 +616,11 @@ def main() -> int:
         "--strict",
         action="store_true",
         help="Exit 1 on warnings as well as errors.",
+    )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Skip writing _checkpoint.md files (check-only mode).",
     )
     args = parser.parse_args()
 
@@ -386,8 +640,18 @@ def main() -> int:
     print("══════════════════════════════════════════════════════")
 
     reports = [validate_episode(r) for r in rows]
+    checkpoints_written: list[str] = []
     for rep in reports:
         print_report(rep)
+        if not args.no_checkpoint:
+            ep_dir   = EPISODES_DIR / rep.slug
+            data_dir = REMOTION_DATA / rep.slug
+            if ep_dir.is_dir():
+                write_checkpoint(
+                    next(r for r in rows if r.slug == rep.slug),
+                    ep_dir, data_dir,
+                )
+                checkpoints_written.append(rep.slug)
 
     # Summary
     total_errors   = sum(len(r.errors)   for r in reports)
@@ -402,6 +666,9 @@ def main() -> int:
         print(f"  Stale state detected: {', '.join(stale)}")
     if total_errors == 0 and total_warnings == 0:
         print("  ✓ All checks passed — PIPELINE.md is consistent with artifacts.")
+    if checkpoints_written:
+        print(f"  Checkpoints written: "
+              + ", ".join(f"episodes/{s}/_checkpoint.md" for s in checkpoints_written))
     print()
 
     if total_errors:
