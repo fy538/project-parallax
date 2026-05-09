@@ -252,8 +252,12 @@ def validate_episode(row: EpisodeRow) -> EpisodeReport:
                 f"(required for {row.state})"))
 
     # ── Forward-state evidence (stale table detection) ────────────────────────
+    # Skip for failure states — BLOCKED/REVISING intentionally hold late-stage
+    # artifacts from the state they were in before stalling/reverting.
     claimed_idx = state_index(row.state)
     stale_evidence: list[tuple[str, str]] = []  # (description, implied_state)
+    if row.state in BLOCKED_STATES:
+        claimed_idx = len(STATE_ORDER)  # treat as "any state is fine"
 
     for artifact, implies_state, location in FORWARD_EVIDENCE:
         implied_idx = state_index(implies_state)
