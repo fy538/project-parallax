@@ -17,6 +17,7 @@ import {
   layout,
   sec,
   shadows,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -161,6 +162,7 @@ export const StaticDuelingFrameworks: React.FC<{
             <div
               style={{
                 fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.label,
                 fontWeight: fontWeights.semibold,
                 color: theme.text.muted,
                 letterSpacing: letterSpacing.label,
@@ -251,6 +253,7 @@ export const StaticDuelingFrameworks: React.FC<{
               <div
                 style={{
                   fontSize: fontSizes.body,
+                  maxWidth: textMaxWidth.label,
                   fontWeight: fontWeights.semibold,
                   color: theme.text.accent,
                   fontFamily: getBodyFont(data.verdictLabel),

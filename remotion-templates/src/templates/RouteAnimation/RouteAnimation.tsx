@@ -27,6 +27,7 @@ import {
   sec,
   shadows,
   contentArea,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -612,6 +613,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                           <div
                             style={{
                               fontSize: fontSizes.h3,
+                              maxWidth: textMaxWidth.label,
                               fontFamily: fonts.heading,
                               fontWeight: 600,
                               color: theme.text.primary,
@@ -626,6 +628,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                           <div
                             style={{
                               fontSize: fontSizes.body,
+                              maxWidth: textMaxWidth.label,
                               fontFamily: fonts.body,
                               color: theme.text.muted,
                               textShadow: shadows.textLift,
@@ -681,6 +684,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             <div
               style={{
                 fontSize: fontSizes.h3,
+                maxWidth: textMaxWidth.h3,
                 fontWeight: 600,
                 color: theme.text.primary,
                 textShadow: shadows.textLift,
@@ -692,6 +696,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
               <div
                 style={{
                   fontSize: fontSizes.body,
+                  maxWidth: textMaxWidth.body,
                   color: theme.text.muted,
                   marginTop: layout.spacing.xs,
                   textShadow: shadows.textLift,

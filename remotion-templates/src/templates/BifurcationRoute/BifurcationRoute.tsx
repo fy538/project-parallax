@@ -32,6 +32,7 @@ import {
   radii,
   cardPresets,
   shadows,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -556,7 +557,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeAreaTier.generous.bottom + 20,
+            bottom: layout.safeAreaTier.generous.bottom + layout.spacing.md,
             left: layout.safeAreaTier.generous.left,
             right: layout.safeAreaTier.generous.right,
             display: "flex",
@@ -568,6 +569,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
           <div
             style={{
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
               color: networkAColor,
@@ -579,6 +581,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
           <div
             style={{
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontFamily: fonts.display,
               fontWeight: fontWeights.bold,
               color: networkBColor,

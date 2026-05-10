@@ -653,7 +653,7 @@ const BeatFlash: React.FC<{ durationInFrames: number; hueShift: number }> = ({
   hueShift,
 }) => {
   const frame = useCurrentFrame();
-  // Fast in (0→20%), short hold (20→50%), slow fade out (50→100%)
+  // linear-ok: 4-keyframe asymmetric envelope (fast in / hold / slow out) — easing is in the keyframe spacing
   const opacity = interpolate(
     frame,
     [

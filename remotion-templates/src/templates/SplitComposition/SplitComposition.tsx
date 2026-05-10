@@ -326,6 +326,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               <div
                 style={{
                   fontSize: fontSizes.body,
+                  maxWidth: textMaxWidth.body,
                   color: mode.text.secondary,
                   marginBottom: layout.spacing.lg,
                   fontFamily: getFontFamily(data.left.subtitle),
@@ -410,6 +411,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               <div
                 style={{
                   fontSize: fontSizes.body,
+                  maxWidth: textMaxWidth.body,
                   color: mode.text.secondary,
                   textAlign: "right",
                   marginBottom: layout.spacing.lg,
@@ -593,6 +595,7 @@ const SplitSideContent: React.FC<{
         <div
           style={{
             fontSize: fontSizes.body,
+            maxWidth: textMaxWidth.body,
             fontWeight: fontWeights.regular,
             color: mode.text.secondary,
             textAlign,

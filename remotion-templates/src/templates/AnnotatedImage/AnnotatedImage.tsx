@@ -415,7 +415,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
                 fontFamily={fonts.heading}
                 fontWeight={fontWeights.semibold}
                 opacity={labelOpacity}
-                style={{ textShadow: "none" }}
+                style={{ textShadow: shadows.textLiftLight }}
               >
                 {callout.label}
               </text>

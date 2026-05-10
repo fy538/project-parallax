@@ -199,6 +199,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
             style={{
               display: "inline-block",
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               color: accentColor,
               fontWeight: 500,
               textShadow: `0 0 20px ${accentColor}30, 0 1px 3px rgba(0,0,0,0.5)`, // shadows.accentGlow + shadows.textLift composite
@@ -226,6 +227,7 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
             <div
               style={{
                 fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.body,
                 color: theme.text.muted,
                 marginTop: layout.spacing.xs,
                 opacity: fadeIn(frame, sec(2.8), sec(0.4)),
@@ -298,6 +300,7 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
         <div
           style={{
             fontSize: fontSizes.h3,
+            maxWidth: textMaxWidth.h3,
             color: theme.text.muted,
             fontFamily: fonts.mono,
             fontStyle: "italic",
@@ -634,6 +637,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
         <div
           style={{
             fontSize: fontSizes.body,
+            maxWidth: textMaxWidth.body,
             color: theme.text.muted,
             marginTop: layout.spacing.sm,
             opacity: fadeIn(frame, sec(2.2), sec(0.5)),

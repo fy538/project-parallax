@@ -595,7 +595,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
         <div
           style={{
             position: "absolute",
-            top: layout.safeAreaTier.generous.top + 60,
+            top: layout.safeAreaTier.generous.top + layout.spacing.xxl,
             right: layout.safeAreaTier.generous.right,
             fontSize: fontSizes.caption,
             fontFamily: fonts.data,

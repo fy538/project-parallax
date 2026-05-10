@@ -26,6 +26,7 @@ import {
   radii,
   cardPresets,
   getCategoricalColor,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -487,6 +488,7 @@ const SankeyNodeComponent: React.FC<{
             <div
               style={{
                 fontSize: fontSizes.h3,
+                maxWidth: textMaxWidth.node,
                 fontWeight: 700,
                 fontFamily: fonts.mono,
                 color: nodeColor,

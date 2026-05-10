@@ -289,6 +289,7 @@ const ShiftBar: React.FC<{
       <div
         style={{
           fontSize: fontSizes.body,
+          maxWidth: textMaxWidth.label,
           fontWeight: fontWeights.semibold,
           color: theme.text.primary,
         }}
@@ -380,6 +381,7 @@ const ShiftBar: React.FC<{
                   top: "50%",
                   transform: "translate(-50%, -50%)",
                   fontSize: fontSizes.h3,
+                  maxWidth: textMaxWidth.node,
                   color: barColor,
                   opacity: pauseOpacity,
                   textShadow: `0 0 6px ${barColor}80`, // shadows.accentGlowSm (6px, 80% opacity variant)
@@ -455,6 +457,7 @@ const Scorecard: React.FC<{
           width: "100%",
           borderCollapse: "collapse",
           fontSize: fontSizes.body,
+          maxWidth: textMaxWidth.body,
           fontFamily: fonts.mono,
         }}
       >
@@ -567,6 +570,7 @@ const Scorecard: React.FC<{
           display: "flex",
           justifyContent: "space-between",
           fontSize: fontSizes.body,
+          maxWidth: textMaxWidth.body,
           fontWeight: fontWeights.semibold,
           color: theme.text.primary,
         }}
@@ -719,6 +723,7 @@ const ForecastCard: React.FC<{
               <div
                 style={{
                   fontSize: fontSizes.body,
+                  maxWidth: textMaxWidth.body,
                   color: theme.text.primary,
                   fontFamily: isResolution ? fonts.mono : fonts.body,
                   lineHeight: 1.4,

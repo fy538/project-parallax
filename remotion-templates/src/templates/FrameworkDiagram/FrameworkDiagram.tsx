@@ -166,6 +166,7 @@ const ComparisonVariant: React.FC<{
                   <div
                     style={{
                       fontSize: fontSizes.body,
+                      maxWidth: textMaxWidth.body,
                       color: theme.text.primary,
                       lineHeight: 1.5,
                       textShadow: shadows.textLift,
@@ -194,6 +195,7 @@ const ComparisonVariant: React.FC<{
               left: "50%",
               transform: "translate(-50%, -50%)",
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.node,
               color: theme.text.muted,
               fontWeight: 500,
               fontFamily: fonts.mono,
@@ -366,6 +368,7 @@ const FlowVariant: React.FC<{
                 <div
                   style={{
                     fontSize: fontSizes.h3,
+                    maxWidth: textMaxWidth.node,
                     color: theme.text.primary,
                     fontWeight: 600,
                     textShadow: shadows.textLift,
@@ -490,6 +493,7 @@ const FlowVariant: React.FC<{
                 <div
                   style={{
                     fontSize: fontSizes.h3,
+                    maxWidth: textMaxWidth.node,
                     color: theme.text.primary,
                     fontWeight: 600,
                     textShadow: shadows.textLift,

@@ -238,6 +238,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                       <div
                         style={{
                           fontSize: fontSizes.body,
+                          maxWidth: textMaxWidth.body,
                           fontWeight: fontWeights.regular,
                           color: theme.text.secondary,
                           fontFamily: getBodyFont(tenet.text),
@@ -361,6 +362,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                       <div
                         style={{
                           fontSize: fontSizes.body,
+                          maxWidth: textMaxWidth.body,
                           fontWeight: fontWeights.regular,
                           color: theme.text.secondary,
                           fontFamily: getBodyFont(tenet.text),
@@ -391,6 +393,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                 <div
                   style={{
                     fontSize: fontSizes.body,
+                    maxWidth: textMaxWidth.label,
                     fontWeight: fontWeights.semibold,
                     color: theme.text.muted,
                     letterSpacing: letterSpacing.label,
@@ -454,6 +457,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                   <div
                     style={{
                       fontSize: fontSizes.body,
+                      maxWidth: textMaxWidth.label,
                       fontWeight: fontWeights.semibold,
                       color: theme.text.accent,
                       fontFamily: getBodyFont(data.verdictLabel),

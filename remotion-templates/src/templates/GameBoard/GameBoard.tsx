@@ -615,7 +615,7 @@ const PieceCircle: React.FC<{
         fontWeight: 600,
         lineHeight: 1,
         maxWidth: "90%",
-        textShadow: isGlyph ? "0 1px 2px rgba(0,0,0,0.3)" : undefined,
+        textShadow: isGlyph ? shadows.textLift : undefined,
       }}
     >
       {glyph}
@@ -872,6 +872,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
                 <p
                   style={{
                     fontSize: fontSizes.body,
+                    maxWidth: textMaxWidth.body,
                     fontFamily: fonts.body,
                     color: theme.text.primary,
                     margin: 0,

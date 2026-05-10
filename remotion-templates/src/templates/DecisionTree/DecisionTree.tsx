@@ -37,6 +37,7 @@ import {
   cardPresets,
   getCategoricalColor,
   shadows,
+  textMaxWidth,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -226,6 +227,7 @@ const TreeNodeComponent: React.FC<{
         <div
           style={{
             fontSize: fontSizes.body,
+            maxWidth: textMaxWidth.node,
             fontFamily: fonts.display,
             fontWeight: fontWeights.semibold,
             lineHeight: 1.3,
@@ -544,14 +546,15 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
           <div
             style={{
               position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom + 80,
+              bottom: layout.safeAreaTier.generous.bottom + layout.spacing.xxxl,
               left: "50%",
               transform: "translateX(-50%)",
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontWeight: fontWeights.semibold,
               color: theme.text.primary,
               fontFamily: fonts.display,
-              textShadow: "0 2px 12px rgba(0,0,0,0.6)", // shadows.subtle (high-contrast variant, 60% opacity)
+              textShadow: shadows.subtleStrong,
               opacity: labelOpacity * exitFade(frame, totalFrames, sec(0.5)),
               letterSpacing: 1,
             }}

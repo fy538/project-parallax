@@ -47,9 +47,18 @@ TITLEBLOCK_EXEMPT = {
     "EP01",                # Episode composition (orchestrator)
     "EP01Full",            # Full episode composition (orchestrator)
     "FullEpisode",         # Generic episode player
-    "KineticShort",        # Shorts variant
-    "DataChartShort",      # Shorts variant
-    "SplitShort",          # Shorts variant
+    "DuelingPanels",       # Sub-component; parent owns title
+    "Thumbnail",           # 1280×720 still, not animated
+    # Shorts (1080×1920) use ShortsWrapper, not TitleBlock — different layout system
+    "KineticShort",
+    "DataChartShort",
+    "SplitShort",
+    "ChoroplethMapShort",
+    "FrameworkDiagramShort",
+    "ProbabilityGaugeShort",
+    "SplitCompositionShort",
+    "StatRevealShort",
+    "TimelineComparisonShort",
 }
 
 # Valid 8px grid multiples (0-256 range covers all reasonable spacing)
@@ -209,7 +218,12 @@ def check_missing_titleblock(lines: list[str], relpath: str, template_name: str)
 
 
 def check_linear_interpolation(lines: list[str], relpath: str) -> list[Violation]:
-    """A1: No linear interpolation — every interpolate() must have easing config."""
+    """A1: No linear interpolation — every interpolate() must have easing config.
+
+    Suppression markers (must include a justification):
+      // easing: <reason>      — comment immediately above the call
+      // linear-ok: <reason>   — comment above OR inline within the call's lines
+    """
     violations = []
     for i, line in enumerate(lines, 1):
         stripped = line.strip()
@@ -217,16 +231,18 @@ def check_linear_interpolation(lines: list[str], relpath: str) -> list[Violation
             continue
         # Match interpolate( without an easing or extrapolateRight nearby
         if "interpolate(" in line and "easing" not in line.lower():
-            # Check preceding comment for lint suppression (easing: justification)
+            # Check preceding comment for lint suppression
             prev_line = lines[i-2].strip() if i >= 2 else ""
-            if prev_line.startswith("//") and "easing:" in prev_line.lower():
+            if prev_line.startswith("//") and ("easing:" in prev_line.lower() or "linear-ok:" in prev_line.lower()):
                 continue
             # Check surrounding lines for easing config (multi-line calls span ~10 lines)
             context = "\n".join(lines[max(0, i-1):min(len(lines), i+12)])
-            # CLAMP_SINE, CLAMP_CUBIC_INOUT etc. are pre-defined configs with easing
+            # CLAMP_SINE, CLAMP_CUBIC_INOUT etc. are pre-defined configs with easing.
+            # `linear-ok:` inline (e.g. trailing comment on the options line) also suppresses.
             has_easing = (
                 "easing" in context.lower()
                 or "Easing" in context
+                or "linear-ok:" in context.lower()
                 or re.search(r'\bCLAMP(?:_\w+)?\b', context)
             )
             if not has_easing:
@@ -234,7 +250,7 @@ def check_linear_interpolation(lines: list[str], relpath: str) -> list[Violation
                     rule="A1",
                     file=relpath,
                     line=i,
-                    message="interpolate() without easing config. Add easing: Easing.out(Easing.cubic).",
+                    message="interpolate() without easing config. Add easing or // linear-ok: <reason>.",
                     snippet=stripped,
                 ))
     return violations
@@ -353,8 +369,10 @@ def lint_file(filepath: Path, base: Path) -> list[Violation]:
     lines = filepath.read_text().splitlines()
 
     # Extract template name from path (e.g., "DataChart" from ".../DataChart/DataChart.tsx")
+    # Sub-components / variants live alongside their parent (e.g., DuelingFrameworks/DuelingPanels.tsx);
+    # use the stem when it differs from the parent directory name so per-variant exemptions can apply.
     template_name = filepath.parent.name
-    if template_name in ("Shorts", "Episodes"):
+    if template_name in ("Shorts", "Episodes") or filepath.stem != filepath.parent.name:
         template_name = filepath.stem
 
     violations = []

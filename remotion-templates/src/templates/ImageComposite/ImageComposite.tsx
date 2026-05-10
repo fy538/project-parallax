@@ -210,6 +210,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
               style={{
                 fontFamily: fonts.body,
                 fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.body,
                 fontWeight: fontWeights.regular,
                 letterSpacing: letterSpacing.body,
                 marginBottom: layout.spacing.xs,
@@ -367,6 +368,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
             color: theme.text.primary,
             fontFamily: fonts.display,
             fontSize: fontSizes.h3,
+            maxWidth: textMaxWidth.h3,
             fontWeight: fontWeights.semibold,
             letterSpacing: letterSpacing.h3,
           }}
@@ -570,6 +572,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
             style={{
               fontFamily: fonts.body,
               fontSize: fontSizes.body,
+              maxWidth: textMaxWidth.body,
               fontWeight: fontWeights.regular,
               letterSpacing: letterSpacing.body,
               lineHeight: 1.5,

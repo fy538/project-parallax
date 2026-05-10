@@ -13,6 +13,7 @@ import {
   palette,
   fonts,
   fontWeights,
+  layout,
 } from "../../design/theme";
 import { fadeIn, slideIn } from "../../utils/animation";
 import { ShortsWrapper } from "../../components/ShortsWrapper";
@@ -134,7 +135,7 @@ export const SplitShort: React.FC<{ data: SplitCompositionData }> = ({
               top: vl.contentTop - 40,
               left: 0,
               right: 0,
-              bottom: vl.safeArea.bottom + 20,
+              bottom: vl.safeArea.bottom + layout.spacing.md,
               display: "flex",
               flexDirection: "column",
             }}

@@ -20,7 +20,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { semantic, fonts, fontSizes, layout, sec, contentArea, cardPadding, shadows, radii, cardPresets, dividerStyle } from "../../design/theme";
+import { semantic, fonts, fontSizes, layout, sec, contentArea, cardPadding, shadows, radii, cardPresets, dividerStyle, textMaxWidth } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { fadeIn, slideIn, stagger, exitFade, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -108,6 +108,7 @@ const EventCard: React.FC<{
         <div
           style={{
             fontSize: fontSizes.body,
+            maxWidth: textMaxWidth.body,
             color: theme.text.primary,
             fontWeight: 500,
             lineHeight: 1.4,
@@ -176,6 +177,7 @@ export const TimelineComparison: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontWeight: 600,
               color: theme.text.primary,
               fontFamily: fonts.heading,
@@ -200,6 +202,7 @@ export const TimelineComparison: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontWeight: 600,
               color: theme.text.primary,
               fontFamily: fonts.heading,

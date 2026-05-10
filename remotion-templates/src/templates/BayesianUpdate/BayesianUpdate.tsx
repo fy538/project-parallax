@@ -218,6 +218,7 @@ const EvidenceCard: React.FC<{
           alignItems: "center",
           justifyContent: "center",
           fontSize: fontSizes.body,
+          maxWidth: textMaxWidth.node,
           color: cardColor,
           fontWeight: 700,
           flexShrink: 0,

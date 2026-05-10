@@ -29,6 +29,7 @@ import {
   sec,
   shadows,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
@@ -129,6 +130,7 @@ const EventCard: React.FC<{
         <div
           style={{
             fontSize: fontSizes.body,
+            maxWidth: textMaxWidth.body,
             color: theme.text.primary,
             fontWeight: 500,
             lineHeight: 1.4,
@@ -243,6 +245,7 @@ export const DualTimeline: React.FC<{
               <div
                 style={{
                   fontSize: fontSizes.h3,
+                  maxWidth: textMaxWidth.h3,
                   fontWeight: 700,
                   color: eraAColor,
                   fontFamily: fonts.heading,
@@ -273,6 +276,7 @@ export const DualTimeline: React.FC<{
               <div
                 style={{
                   fontSize: fontSizes.h3,
+                  maxWidth: textMaxWidth.h3,
                   fontWeight: 700,
                   color: eraBColor,
                   fontFamily: fonts.heading,

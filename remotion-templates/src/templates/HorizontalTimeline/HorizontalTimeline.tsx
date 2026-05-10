@@ -35,6 +35,7 @@ import {
   sec,
   shadows,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -988,6 +989,7 @@ export const HorizontalTimeline: React.FC<{
               left: overlayBands.titleSupplement.left,
               width: overlayBands.titleSupplement.width,
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontFamily: fonts.heading,
               fontWeight: 600,
               color: interpolateColors(morphProgress, [0, 1], [eraAColor, eraBColor]),

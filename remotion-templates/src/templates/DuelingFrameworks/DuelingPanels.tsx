@@ -205,6 +205,7 @@ export const FrameworkPanel: React.FC<{
                   <div
                     style={{
                       fontSize: fontSizes.body,
+                      maxWidth: textMaxWidth.body,
                       fontWeight: fontWeights.medium,
                       color: theme.text.primary,
                       fontFamily: fonts.chinese,
@@ -219,6 +220,7 @@ export const FrameworkPanel: React.FC<{
                     style={{
                       marginTop: 4,
                       fontSize: Math.round(fontSizes.body * 0.6),
+                      maxWidth: textMaxWidth.body,
                       fontWeight: fontWeights.regular,
                       color: theme.text.muted,
                       fontFamily: fonts.body,
@@ -235,6 +237,7 @@ export const FrameworkPanel: React.FC<{
                 <div
                   style={{
                     fontSize: fontSizes.body,
+                    maxWidth: textMaxWidth.body,
                     fontWeight: fontWeights.regular,
                     color: theme.text.secondary,
                     fontFamily: getBodyFont(tenet.text),

@@ -38,6 +38,7 @@ import {
   shadows,
   radii,
   cardPresets,
+  textMaxWidth,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -201,6 +202,7 @@ const MorphEventCard: React.FC<{
             <div
               style={{
                 fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.body,
                 color: theme.text.primary,
                 fontWeight: 500,
                 lineHeight: 1.4,
@@ -214,6 +216,7 @@ const MorphEventCard: React.FC<{
             <div
               style={{
                 fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.body,
                 color: theme.text.primary,
                 fontWeight: 500,
                 lineHeight: 1.4,
@@ -308,6 +311,7 @@ export const TimelineMorph: React.FC<{
           <div
             style={{
               fontSize: fontSizes.h3,
+              maxWidth: textMaxWidth.h3,
               fontWeight: 600,
               color: eraTitleColor,
               fontFamily: fonts.heading,

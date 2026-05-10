@@ -804,6 +804,8 @@ export const shadows = {
   subtle: "0 2px 12px rgba(0,0,0,0.25)",
   /** Lift on light backgrounds — same role as subtle, reduced opacity */
   subtleLight: "0 1px 8px rgba(0,0,0,0.08)",
+  /** Subtle lift with high contrast — overlays on busy backgrounds where readability matters more than restraint */
+  subtleStrong: "0 2px 12px rgba(0,0,0,0.6)",
   /** Highlighted elements — active states, hovered items (dark mode) */
   medium: "0 4px 20px rgba(0,0,0,0.35)",
   /** Highlighted elements on light backgrounds */
