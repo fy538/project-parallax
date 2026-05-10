@@ -7,6 +7,9 @@ export default defineConfig({
 
     // Set high timeout for rendering tests (60 seconds per test)
     testTimeout: 60000,
+    // Render-suite hooks bundle Chromium + Remotion and can exceed the default
+    // hook timeout when several real-data suites initialize in one run.
+    hookTimeout: 180000,
 
     // Run tests sequentially to avoid browser contention
     threads: false,

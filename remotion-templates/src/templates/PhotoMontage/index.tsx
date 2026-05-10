@@ -12,7 +12,7 @@ const sampleData: PhotoMontageData = {
   episode: "silicon-trap",
   images: [
     {
-      src: "footage/silicon-trap/car-dashboard.jpg",
+      src: "assets/sample-historical.png",
       durationSec: 3,
       treatment: "standard",
       compositeMode: "inset",
@@ -24,7 +24,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/silicon-trap/smartphone-circuit.jpg",
+      src: "assets/sample-historical.png",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",
@@ -36,7 +36,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/silicon-trap/mri-machine.jpg",
+      src: "assets/sample-historical.png",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",
@@ -48,7 +48,7 @@ const sampleData: PhotoMontageData = {
       },
     },
     {
-      src: "footage/silicon-trap/data-center-rack.jpg",
+      src: "assets/sample-historical.png",
       durationSec: 2,
       treatment: "standard",
       compositeMode: "inset",

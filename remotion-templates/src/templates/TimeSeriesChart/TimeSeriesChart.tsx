@@ -227,11 +227,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const chartBottom = cl.chart.top + cl.chart.height;
   const chartWidth = cl.chart.width;
   const chartHeight = cl.chart.height;
-  // SourceAttribution positions itself at `bottom: layout.safeArea.bottom + bottomOffset`.
-  // Since cl uses safeAreaTier "generous" (120px), we need bottomOffset = generous - standard
-  // so the component lands at 120px from the canvas bottom, matching the rest of the layout.
+  // SourceAttribution anchors to the standard safe area, so compensate upward to
+  // match this template's generous safe-area tier.
   const sourceBottomOffset = data.source
-    ? layout.safeAreaTier.generous.bottom - layout.safeArea.bottom
+    ? layout.safeAreaTier.generous.bottom - layout.safeAreaTier.standard.bottom
     : 0;
 
   // Compute axis ranges — memoized so flatMap/min/max don't run every frame

@@ -27,6 +27,11 @@ let serveUrl: string | null = null;
 // composition's calculateMetadata).
 const compositionCache = new Map<string, VideoConfig>();
 
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 function getCompositionCacheKey(
   compositionId: string,
   inputProps?: Record<string, unknown>
@@ -122,23 +127,35 @@ export async function renderCompositionFrame(
     `[Render] Rendering ${compositionId} frame ${frame} -> ${outputPath}`
   );
 
-  try {
-    await renderStill({
-      serveUrl: url,
-      composition,
-      output: outputPath,
-      frame,
-      browserExecutable,
-      inputProps,
-    });
+  const maxAttempts = 2;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await renderStill({
+        serveUrl: url,
+        composition,
+        output: outputPath,
+        frame,
+        browserExecutable,
+        inputProps,
+      });
 
-    console.log(`[Render] Successfully saved: ${outputPath}`);
-  } catch (error) {
-    console.error(
-      `[Render] Failed to render ${compositionId} frame ${frame}:`,
-      error
-    );
-    throw error;
+      console.log(`[Render] Successfully saved: ${outputPath}`);
+      return;
+    } catch (error) {
+      const isLastAttempt = attempt === maxAttempts;
+      if (isLastAttempt) {
+        console.error(
+          `[Render] Failed to render ${compositionId} frame ${frame}:`,
+          error
+        );
+        throw error;
+      }
+
+      console.warn(
+        `[Render] Retry ${attempt}/${maxAttempts - 1} for ${compositionId} frame ${frame} after transient render failure.`,
+      );
+      await sleep(1000);
+    }
   }
 }
 

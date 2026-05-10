@@ -91,6 +91,7 @@ const sampleData: NetworkDiagramData = {
       position: "bottom-right",
     },
   ],
+  source: "CSIS, SEMI, company filings",
   durationSec: 12,
 };
 
