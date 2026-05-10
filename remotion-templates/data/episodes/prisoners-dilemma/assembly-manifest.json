@@ -158,6 +158,15 @@
       ]
     },
     {
+      "id": "beat1-seg01-hold",
+      "type": "HOLD",
+      "startSec": 17.0,
+      "endSec": 20.8,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg02",
       "type": "TEMPLATE",
       "startSec": 20.8,
@@ -224,6 +233,15 @@
       ]
     },
     {
+      "id": "beat1-seg03-hold",
+      "type": "HOLD",
+      "startSec": 32.8,
+      "endSec": 61.2,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg04",
       "type": "FOOTAGE",
       "startSec": 41.8,
@@ -269,6 +287,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat1-seg05-hold",
+      "type": "HOLD",
+      "startSec": 61.2,
+      "endSec": 72.2,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg06",
@@ -335,6 +362,15 @@
       }
     },
     {
+      "id": "beat1-seg06-hold",
+      "type": "HOLD",
+      "startSec": 72.2,
+      "endSec": 91.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg08",
       "type": "FOOTAGE",
       "startSec": 79.4,
@@ -351,6 +387,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat1-seg08-hold",
+      "type": "HOLD",
+      "startSec": 84.4,
+      "endSec": 98.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg09",
@@ -381,6 +426,15 @@
       ]
     },
     {
+      "id": "beat1-seg09-hold",
+      "type": "HOLD",
+      "startSec": 97.4,
+      "endSec": 113.2,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg10",
       "type": "FOOTAGE",
       "startSec": 98.4,
@@ -407,6 +461,15 @@
       "transition": {
         "out": "iris"
       }
+    },
+    {
+      "id": "beat1-seg10-hold",
+      "type": "HOLD",
+      "startSec": 107.4,
+      "endSec": 119.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg11",
@@ -442,6 +505,15 @@
       ]
     },
     {
+      "id": "beat1-seg11-hold",
+      "type": "HOLD",
+      "startSec": 119.2,
+      "endSec": 129.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg12",
       "type": "FOOTAGE",
       "startSec": 119.4,
@@ -463,6 +535,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat1-seg12-hold",
+      "type": "HOLD",
+      "startSec": 125.4,
+      "endSec": 165.8,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg13",
@@ -521,6 +602,15 @@
       }
     },
     {
+      "id": "beat2-title-hold",
+      "type": "HOLD",
+      "startSec": 140.4,
+      "endSec": 143.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg14",
       "type": "TEMPLATE",
       "startSec": 143.4,
@@ -560,6 +650,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat2-seg14-hold",
+      "type": "HOLD",
+      "startSec": 157.4,
+      "endSec": 193.6,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg15",
@@ -625,6 +724,15 @@
       }
     },
     {
+      "id": "beat2-seg17-hold",
+      "type": "HOLD",
+      "startSec": 185.0,
+      "endSec": 218.4,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg18",
       "type": "TEMPLATE",
       "startSec": 193.6,
@@ -659,6 +767,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat2-seg18-hold",
+      "type": "HOLD",
+      "startSec": 201.6,
+      "endSec": 223.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg19",
@@ -700,6 +817,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat2-seg20-hold",
+      "type": "HOLD",
+      "startSec": 223.0,
+      "endSec": 285.2,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg21",
@@ -792,6 +918,15 @@
       ]
     },
     {
+      "id": "beat2-seg23-hold",
+      "type": "HOLD",
+      "startSec": 251.2,
+      "endSec": 259.2,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg24",
       "type": "TEMPLATE",
       "startSec": 259.2,
@@ -848,6 +983,15 @@
       }
     },
     {
+      "id": "beat3-title-hold",
+      "type": "HOLD",
+      "startSec": 272.2,
+      "endSec": 320.0,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg25",
       "type": "FOOTAGE",
       "startSec": 285.2,
@@ -877,6 +1021,15 @@
       }
     },
     {
+      "id": "beat3-seg25-hold",
+      "type": "HOLD",
+      "startSec": 294.2,
+      "endSec": 303.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg26",
       "type": "FOOTAGE",
       "startSec": 303.2,
@@ -901,6 +1054,15 @@
         "durationSec": 0.5,
         "washColor": "#1C1814"
       }
+    },
+    {
+      "id": "beat3-seg26-hold",
+      "type": "HOLD",
+      "startSec": 310.2,
+      "endSec": 345.6,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg27",
@@ -942,6 +1104,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat3-seg27-hold",
+      "type": "HOLD",
+      "startSec": 331.0,
+      "endSec": 332.6,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg28",
@@ -1032,6 +1203,24 @@
       }
     },
     {
+      "id": "beat3-seg29-hold",
+      "type": "HOLD",
+      "startSec": 345.6,
+      "endSec": 349.6,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
+      "id": "beat3-seg30-hold",
+      "type": "HOLD",
+      "startSec": 349.6,
+      "endSec": 393.6,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg31",
       "type": "TEMPLATE",
       "startSec": 349.6,
@@ -1056,6 +1245,15 @@
           "volume": 0.08
         }
       ]
+    },
+    {
+      "id": "beat3-seg31-hold",
+      "type": "HOLD",
+      "startSec": 357.6,
+      "endSec": 375.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg32",
@@ -1096,6 +1294,15 @@
       ]
     },
     {
+      "id": "beat3-seg32-hold",
+      "type": "HOLD",
+      "startSec": 387.2,
+      "endSec": 407.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg33",
       "type": "FOOTAGE",
       "startSec": 393.6,
@@ -1117,6 +1324,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat3-seg33-hold",
+      "type": "HOLD",
+      "startSec": 399.6,
+      "endSec": 464.6,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg34",
@@ -1150,6 +1366,15 @@
       ]
     },
     {
+      "id": "beat3-seg34-hold",
+      "type": "HOLD",
+      "startSec": 419.2,
+      "endSec": 431.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg35",
       "type": "TEMPLATE",
       "startSec": 431.2,
@@ -1181,6 +1406,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat3-seg35-hold",
+      "type": "HOLD",
+      "startSec": 437.2,
+      "endSec": 443.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg36",
@@ -1237,6 +1471,15 @@
         "offsetSec": 0,
         "intensity": "normal"
       }
+    },
+    {
+      "id": "beat4-title-hold",
+      "type": "HOLD",
+      "startSec": 456.4,
+      "endSec": 498.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg37",
@@ -1297,6 +1540,15 @@
         "out": "cut",
         "durationSec": 0.5
       }
+    },
+    {
+      "id": "beat4-seg38-hold",
+      "type": "HOLD",
+      "startSec": 480.6,
+      "endSec": 560.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg39",
@@ -1376,6 +1628,15 @@
       ]
     },
     {
+      "id": "beat4-seg40-hold",
+      "type": "HOLD",
+      "startSec": 523.4,
+      "endSec": 531.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg41",
       "type": "TEMPLATE",
       "startSec": 531.0,
@@ -1407,6 +1668,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat4-seg41-hold",
+      "type": "HOLD",
+      "startSec": 538.0,
+      "endSec": 549.2,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg42",
@@ -1445,6 +1715,15 @@
       ]
     },
     {
+      "id": "beat4-seg42-hold",
+      "type": "HOLD",
+      "startSec": 555.2,
+      "endSec": 568.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg43",
       "type": "FOOTAGE",
       "startSec": 560.0,
@@ -1466,6 +1745,15 @@
         "ramp": "standard",
         "composite": "background"
       }
+    },
+    {
+      "id": "beat4-seg43-hold",
+      "type": "HOLD",
+      "startSec": 565.0,
+      "endSec": 584.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg44",
@@ -1519,6 +1807,24 @@
       }
     },
     {
+      "id": "beat4-seg44-hold",
+      "type": "HOLD",
+      "startSec": 584.0,
+      "endSec": 596.8,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
+      "id": "beat4-seg45-hold",
+      "type": "HOLD",
+      "startSec": 596.8,
+      "endSec": 624.2,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg46",
       "type": "TEMPLATE",
       "startSec": 596.8,
@@ -1555,6 +1861,15 @@
       ]
     },
     {
+      "id": "beat4-seg46-hold",
+      "type": "HOLD",
+      "startSec": 610.8,
+      "endSec": 614.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg47",
       "type": "TEMPLATE",
       "startSec": 614.4,
@@ -1588,6 +1903,15 @@
       ]
     },
     {
+      "id": "beat4-seg47-hold",
+      "type": "HOLD",
+      "startSec": 620.4,
+      "endSec": 631.2,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg48",
       "type": "FOOTAGE",
       "startSec": 624.2,
@@ -1611,6 +1935,15 @@
       }
     },
     {
+      "id": "beat4-seg48-hold",
+      "type": "HOLD",
+      "startSec": 630.2,
+      "endSec": 645.8,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-title",
       "type": "TRANSITION",
       "startSec": 631.2,
@@ -1632,6 +1965,15 @@
         "offsetSec": 0,
         "intensity": "normal"
       }
+    },
+    {
+      "id": "beat5-title-hold",
+      "type": "HOLD",
+      "startSec": 633.2,
+      "endSec": 649.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg49",
@@ -1660,6 +2002,15 @@
         "out": "cut",
         "durationSec": 0.75
       }
+    },
+    {
+      "id": "beat5-seg49-hold",
+      "type": "HOLD",
+      "startSec": 649.8,
+      "endSec": 695.2,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg50",
@@ -1697,6 +2048,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg50-hold",
+      "type": "HOLD",
+      "startSec": 657.8,
+      "endSec": 672.2,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg51",
@@ -1738,6 +2098,15 @@
       ]
     },
     {
+      "id": "beat5-seg51-hold",
+      "type": "HOLD",
+      "startSec": 685.2,
+      "endSec": 699.2,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-seg52",
       "type": "FOOTAGE",
       "startSec": 695.2,
@@ -1763,6 +2132,15 @@
         "out": "cut",
         "durationSec": 0.4
       }
+    },
+    {
+      "id": "beat5-seg52-hold",
+      "type": "HOLD",
+      "startSec": 699.2,
+      "endSec": 771.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg53",
@@ -1794,6 +2172,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg53-hold",
+      "type": "HOLD",
+      "startSec": 711.2,
+      "endSec": 728.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg54",
@@ -1829,6 +2216,15 @@
       ]
     },
     {
+      "id": "beat5-seg54-hold",
+      "type": "HOLD",
+      "startSec": 743.0,
+      "endSec": 753.4,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-seg55",
       "type": "TEMPLATE",
       "startSec": 753.4,
@@ -1860,6 +2256,15 @@
       ]
     },
     {
+      "id": "beat5-seg55-hold",
+      "type": "HOLD",
+      "startSec": 760.4,
+      "endSec": 809.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-seg56",
       "type": "FOOTAGE",
       "startSec": 771.0,
@@ -1889,6 +2294,15 @@
       }
     },
     {
+      "id": "beat5-seg56-hold",
+      "type": "HOLD",
+      "startSec": 776.0,
+      "endSec": 782.6,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-seg57",
       "type": "FOOTAGE",
       "startSec": 782.6,
@@ -1913,6 +2327,15 @@
         "out": "cut",
         "durationSec": 0.4
       }
+    },
+    {
+      "id": "beat5-seg57-hold",
+      "type": "HOLD",
+      "startSec": 790.6,
+      "endSec": 867.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg58",
@@ -1947,6 +2370,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg58-hold",
+      "type": "HOLD",
+      "startSec": 821.0,
+      "endSec": 849.4,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg59",
@@ -1984,6 +2416,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg59-hold",
+      "type": "HOLD",
+      "startSec": 854.4,
+      "endSec": 878.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg60",

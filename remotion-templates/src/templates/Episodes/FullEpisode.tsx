@@ -342,7 +342,7 @@ const COMPOSITE_DEFAULTS: Record<string, number> = {
   raw: 1.0,
 };
 
-const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = {
+export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = {
   TitleTransition,
   ChoroplethMap,
   KineticTypography,
