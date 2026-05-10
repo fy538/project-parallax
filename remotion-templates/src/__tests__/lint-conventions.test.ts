@@ -60,6 +60,20 @@ describe("lint rule: missing-composition-animation (L44)", () => {
     expect(hasRule(issues, "missing-composition-animation")).toBe(false);
   });
 
+  it("accepts @composition-animation: delegated pragma (router/helper escape hatch)", () => {
+    const issues = lint(`
+      // @composition-animation: delegated — pure router
+      import React from "react";
+      import { SubA } from "./SubA";
+      import { SubB } from "./SubB";
+      export const Router = ({ data }: { data: any }) => {
+        if (data.mode === "a") return <SubA data={data} />;
+        return <SubB data={data} />;
+      };
+    `);
+    expect(hasRule(issues, "missing-composition-animation")).toBe(false);
+  });
+
   it("flags any template missing the hook — no grandfathering", () => {
     // The previously-grandfathered templates (GameBoard, StrategicLandscape,
     // TimeSeriesChart) have all been migrated to call useCompositionAnimation.
@@ -213,6 +227,125 @@ describe("lintRootCompositions (L20 — duplicate composition ids)", () => {
     `;
     const issues = lintRootCompositions(root) as Issue[];
     expect(issues).toHaveLength(2);
+  });
+});
+
+describe("lint rule: missing-direction-wiring (Rule 8)", () => {
+  it("warns on animated template that skips useDirection", () => {
+    const issues = lint(`
+      import { AbsoluteFill, useCurrentFrame } from "remotion";
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        const { style } = useCompositionAnimation();
+        return <AbsoluteFill style={style}><div>{data.title}</div></AbsoluteFill>;
+      };
+    `);
+    expect(hasRule(issues, "missing-direction-wiring")).toBe(true);
+  });
+
+  it("accepts animated template that calls useDirection", () => {
+    const issues = lint(`
+      import { AbsoluteFill } from "remotion";
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      import { useDirection } from "../../hooks/useDirection";
+      export const Foo = ({ data }: { data: any }) => {
+        const { style } = useCompositionAnimation();
+        const direction = useDirection(data._direction);
+        return <AbsoluteFill style={style}>{direction.mode}</AbsoluteFill>;
+      };
+    `);
+    expect(hasRule(issues, "missing-direction-wiring")).toBe(false);
+  });
+
+  it("skips static (noDrift: true) compositions", () => {
+    const issues = lint(`
+      import { AbsoluteFill } from "remotion";
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Thumbnail = ({ data }: { data: any }) => {
+        const { style } = useCompositionAnimation({ noDrift: true });
+        return <AbsoluteFill style={style}><div>{data.title}</div></AbsoluteFill>;
+      };
+    `);
+    expect(hasRule(issues, "missing-direction-wiring")).toBe(false);
+  });
+
+  it("skips pure router files with no AbsoluteFill even when they use useCompositionAnimation", () => {
+    // A router/dispatcher file that calls the hook but renders only named
+    // components (no AbsoluteFill) should be exempt — it delegates direction
+    // to its children.
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      import { SubComponentA } from "./SubComponentA";
+      import { SubComponentB } from "./SubComponentB";
+      export const RouterFoo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        if (data.mode === "a") return <SubComponentA data={data} />;
+        return <SubComponentB data={data} />;
+      };
+    `);
+    expect(hasRule(issues, "missing-direction-wiring")).toBe(false);
+  });
+
+  it("does not check index.tsx files", () => {
+    const issues = lint(
+      `const x = useCompositionAnimation();`,
+      "src/templates/Foo/index.tsx"
+    );
+    expect(hasRule(issues, "missing-direction-wiring")).toBe(false);
+  });
+});
+
+describe("lint rule: hardcoded-brand-color (Rule 9)", () => {
+  it("warns on hardcoded palette.ink hex", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        return <div style={{ color: "#1C1814" }}>{data.title}</div>;
+      };
+    `);
+    expect(hasRule(issues, "hardcoded-brand-color")).toBe(true);
+  });
+
+  it("warns on hardcoded legacy amber (#E5A544)", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        return <div style={{ backgroundColor: "#E5A544" }}>{data.title}</div>;
+      };
+    `);
+    const brandIssues = issues.filter((i) => i.rule === "hardcoded-brand-color");
+    expect(brandIssues.length).toBeGreaterThan(0);
+    expect(brandIssues[0].message).toContain("palette.gold");
+  });
+
+  it("does not flag comment lines", () => {
+    const issues = lint(`
+      // Background: #F5F0E8 (paper white)
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        return <div>{data.title}</div>;
+      };
+    `);
+    expect(hasRule(issues, "hardcoded-brand-color")).toBe(false);
+  });
+
+  it("does not flag index.tsx files", () => {
+    const issues = lint(
+      `const defaultBg = "#1C1814";`,
+      "src/templates/Foo/index.tsx"
+    );
+    expect(hasRule(issues, "hardcoded-brand-color")).toBe(false);
+  });
+
+  it("does not flag theme.ts itself", () => {
+    const issues = lint(
+      `export const palette = { ink: "#1C1814" };`,
+      "src/design/theme.ts"
+    );
+    expect(hasRule(issues, "hardcoded-brand-color")).toBe(false);
   });
 });
 

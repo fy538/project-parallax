@@ -86,11 +86,14 @@ narration-relative mixing. Source files should be intensity-balanced inside thei
 
 ## Behavior when files are missing
 
-Remotion's `staticFile()` will issue a console warning and the `<Audio>` component will play
-silence. Episodes will render successfully without any audio assets — the cue points are
-preserved in the manifest, so when files are added later, the renders will pick them up
-without any code changes. This is intentional: the audio integration is decoupled from
-sourcing.
+**All 29 SFX files must exist on disk before rendering.** Remotion pre-downloads every asset
+referenced by `staticFile()` before frame 1 renders — a 404 on any WAV crashes the render
+immediately with "Received a status code of 404."
+
+Silent placeholder WAVs (0.5s silence, 44100 Hz mono 16-bit PCM) are committed to this repo
+for all 29 expected files so renders work out of the box. Replace them with real SFX when
+sourced from Epidemic Sound / Artlist — it is a drop-in swap with no manifest or code changes
+required. The cue point timings in the manifest are preserved regardless.
 
 ## Music bed (Layer 1)
 

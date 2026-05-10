@@ -2,14 +2,16 @@
   "episode": "silicon-trap",
   "title": "The AI Timeline Question",
   "subtitle": "Everything turns on a single variable nobody can predict",
-
   "rootId": "root",
   "nodes": [
     {
       "id": "root",
       "label": "AI arrival timeline",
       "color": "#C4A747",
-      "children": ["fast", "slow"],
+      "children": [
+        "fast",
+        "slow"
+      ],
       "active": true
     },
     {
@@ -17,7 +19,9 @@
       "label": "Fast (2-3 years)",
       "probability": "Uncertain",
       "color": "#4A7BA7",
-      "children": ["controls-succeed"],
+      "children": [
+        "controls-succeed"
+      ],
       "highlighted": false
     },
     {
@@ -25,22 +29,26 @@
       "label": "Slow (10+ years)",
       "probability": "Uncertain",
       "color": "#A64D46",
-      "children": ["controls-backfire"],
+      "children": [
+        "controls-backfire"
+      ],
       "highlighted": false
     },
     {
       "id": "controls-succeed",
       "label": "Controls succeeded",
-      "probability": null,
       "color": "#4A7BA7",
-      "children": ["us-lead"]
+      "children": [
+        "us-lead"
+      ]
     },
     {
       "id": "controls-backfire",
       "label": "Controls backfired",
-      "probability": null,
       "color": "#A64D46",
-      "children": ["china-independent"]
+      "children": [
+        "china-independent"
+      ]
     },
     {
       "id": "us-lead",
@@ -53,16 +61,37 @@
       "color": "#A64D46"
     }
   ],
-
   "cameraPath": [
-    { "focus": "root",              "zoom": 2.2, "duration": 2 },
-    { "focus": "root",              "zoom": 1.4, "duration": 1.5 },
-    { "focus": "us-lead",           "zoom": 1.6, "duration": 3,   "dimOthers": true, "label": "Scenario A: Controls hold" },
-    { "focus": "china-independent", "zoom": 1.6, "duration": 3,   "dimOthers": true, "label": "Scenario B: Controls backfire" },
-    { "focus": "root",              "zoom": 1.0, "duration": 2.5 }
+    {
+      "focus": "root",
+      "zoom": 2.2,
+      "duration": 2
+    },
+    {
+      "focus": "root",
+      "zoom": 1.4,
+      "duration": 1.5
+    },
+    {
+      "focus": "us-lead",
+      "zoom": 1.6,
+      "duration": 3,
+      "dimOthers": true,
+      "label": "Scenario A: Controls hold"
+    },
+    {
+      "focus": "china-independent",
+      "zoom": 1.6,
+      "duration": 3,
+      "dimOthers": true,
+      "label": "Scenario B: Controls backfire"
+    },
+    {
+      "focus": "root",
+      "zoom": 1.0,
+      "duration": 2.5
+    }
   ],
-
-  "highlightedPath": null,
   "highlightColor": "#C4A747",
   "source": "Parallax analysis",
   "backgroundVariant": "dark",

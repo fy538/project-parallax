@@ -1,5 +1,6 @@
 import { Composition } from "remotion";
 import { HorizontalTimeline } from "./HorizontalTimeline";
+import { HorizontalTimelineSchema } from "./schema";
 import { layout, sec } from "../../design/theme";
 import type { HorizontalTimelineData } from "./types";
 
@@ -19,6 +20,7 @@ export const HorizontalTimelineComposition = () => (
   <Composition
     id="HorizontalTimeline"
     component={HorizontalTimeline}
+    schema={HorizontalTimelineSchema}
     calculateMetadata={({ props }) => ({
       durationInFrames: sec((props.data as HorizontalTimelineData).durationSec || 15),
       fps: layout.fps,

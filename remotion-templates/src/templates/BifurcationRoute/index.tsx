@@ -8,11 +8,13 @@
 
 import { Composition } from "remotion";
 import { BifurcationRoute } from "./BifurcationRoute";
+import { BifurcationRouteSchema } from "./schema";
 import type { BifurcationRouteData } from "./types";
 
-// Export component and types
+// Export component, schema, and types
 export { BifurcationRoute };
-export type { BifurcationRouteData };
+export { BifurcationRouteSchema } from "./schema";
+export type { BifurcationRouteData, BifurcationNode, BifurcationLink } from "./types";
 
 // Sample data for Remotion Studio preview
 const sampleData: BifurcationRouteData = {
@@ -52,6 +54,7 @@ export const BifurcationRouteComposition = () => (
   <Composition
     id="BifurcationRoute"
     component={BifurcationRoute}
+    schema={BifurcationRouteSchema}
     durationInFrames={300}
     fps={30}
     width={1920}

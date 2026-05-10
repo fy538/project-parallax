@@ -23,6 +23,12 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
 
+/** Resolves image src: https:// passes through; relative paths use staticFile(). */
+const resolveAssetSrc = (src: string): string =>
+  src.startsWith("http://") || src.startsWith("https://")
+    ? src
+    : staticFile(src);
+
 // ── Thumbnail-specific constants ──────────────────────────────────────────────
 // Safe area: 1280×720 inner 960×540 → 160px H, 90px V per BRAND.md
 const SAFE_X = 80;  // narrowed from 160 so stats have room
@@ -102,7 +108,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
       >
         {data.imageSrc ? (
           <BrandImage
-            src={staticFile(data.imageSrc)}
+            src={resolveAssetSrc(data.imageSrc)}
             ramp={data.imageRamp ?? "standard"}
             composite="inset"
           />
@@ -282,7 +288,7 @@ const LayoutDataProvocation: React.FC<{ data: ThumbnailData }> = ({ data }) => (
     {/* Faded background image */}
     {data.imageSrc && (
       <BrandImage
-        src={staticFile(data.imageSrc)}
+        src={resolveAssetSrc(data.imageSrc)}
         ramp={data.imageRamp ?? "standard"}
         composite="background"
         opacity={0.18}
@@ -419,7 +425,7 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
     >
       {data.illustrationSrc ? (
         <Img
-          src={staticFile(data.illustrationSrc)}
+          src={resolveAssetSrc(data.illustrationSrc)}
           alt={data.symbolTitle ?? "Illustration"}
           style={{ width: 480, height: 360, objectFit: "contain" }}
         />

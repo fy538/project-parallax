@@ -1,6 +1,9 @@
 /**
  * Display sub-components for DuelingFrameworks:
  *   ScoringBar, FrameworkPanel
+ *
+ * @composition-animation: delegated — sub-component helper rendered by
+ * CinematicDuelingFrameworks / StaticDuelingFrameworks, which own the hook call.
  */
 
 import React from "react";

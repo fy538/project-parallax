@@ -39,13 +39,14 @@ import React, { useMemo, memo, Component, type ReactNode, type ErrorInfo } from 
 import {
   AbsoluteFill,
   Audio,
+  interpolate,
   OffthreadVideo,
   Sequence,
   staticFile,
+  useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { LightLeak } from "@remotion/light-leaks";
-import { layout } from "../../design/theme";
+import { layout, palette, semantic } from "../../design/theme";
 import { BrandImage } from "../../components/BrandImage";
 import { SectionIndicator } from "../../components/SectionIndicator";
 import {
@@ -202,6 +203,10 @@ interface ManifestSegment {
    * Whisper word timestamps. timeSec is in absolute episode time;
    * ForegroundSegment converts to segment-relative before injecting. */
   syncPoints?: SyncPoint[];
+  /** Per-segment direction block from generate_manifest.py (DIR:/PACE: annotations).
+   * Merged into data._direction by ForegroundSegment — segment overrides data-file
+   * defaults; Whisper syncPoints always win over both. */
+  _direction?: Record<string, unknown>;
 }
 
 interface NarrationInfo {
@@ -386,8 +391,8 @@ const BackgroundSegment: React.FC<{
     // Asset not yet sourced — render branded placeholder
     const placeholderType = asset?.placeholder || "solid-color";
     const bgColor = placeholderType === "solid-color"
-      ? (asset?.fallbackColor || "#F5F0E8")
-      : "#F5F0E8";
+      ? (asset?.fallbackColor || palette.paper)
+      : palette.paper;
 
     return (
       <AbsoluteFill
@@ -413,7 +418,7 @@ const BackgroundSegment: React.FC<{
           </div>
           <div>{asset?.shotListId || asset?.searchTerms?.[0] || segment.id}</div>
           {assetStatus === "failed" && (
-            <div style={{ color: "#C23B22", marginTop: 4 }}>ASSET FAILED</div>
+            <div style={{ color: semantic.danger, marginTop: 4 }}>ASSET FAILED</div>
           )}
         </div>
       </AbsoluteFill>
@@ -506,12 +511,12 @@ class SegmentErrorBoundary extends Component<
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: "#1C1814",
+            backgroundColor: palette.ink,
           }}
         >
           <div
             style={{
-              color: "#A64D46",
+              color: semantic.danger,
               fontFamily: "IBM Plex Mono, monospace",
               fontSize: 18,
               textAlign: "center",
@@ -521,7 +526,7 @@ class SegmentErrorBoundary extends Component<
           >
             ⚠️ {this.props.componentName} threw
             <br />
-            <span style={{ fontSize: 13, color: "#888780" }}>
+            <span style={{ fontSize: 13, color: semantic.neutral }}>
               segment {this.props.segmentId}: {this.state.message}
             </span>
           </div>
@@ -564,7 +569,7 @@ const ForegroundSegment: React.FC<{
       >
         <div
           style={{
-            color: "#E5A544",
+            color: palette.gold,
             fontFamily: "IBM Plex Mono, monospace",
             fontSize: 16,
           }}
@@ -575,32 +580,51 @@ const ForegroundSegment: React.FC<{
     );
   }
 
-  // Inject Whisper-resolved syncPoints from the manifest into the template's
-  // _direction block. This is the bridge that makes useBeatSync actually fire.
-  // The manifest stores syncPoints in absolute episode time; the template
-  // (wrapped in <Sequence from={startFrame}>) sees frame 0 at segment start,
-  // so we convert each timeSec to segment-relative by subtracting startSec.
-  // Unresolved sync points (Whisper couldn't find the word) are filtered out.
+  // Build the merged _direction that templates receive via data._direction.
+  //
+  // Three-layer priority (lower = overrides higher):
+  //   1. data-file _direction — per-template defaults authored in visual-spec
+  //   2. segment._direction  — per-beat overrides from DIR:/PACE: manifest annotations
+  //   3. syncPoints          — Whisper word timestamps (always win, computed at build time)
+  //
+  // This means a manifest paceProfile="urgent" on a segment overrides a
+  // paceProfile="breathing" baked into its data file, and Whisper sync is
+  // never clobbered by either.
   let dataWithSync = data;
-  if (data && segment.syncPoints && segment.syncPoints.length > 0) {
-    const relative = segment.syncPoints
-      .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
-        p.timeSec !== null && p.frame !== null,
-      )
-      .map((p) => ({
-        word: p.word,
-        timeSec: p.timeSec - segment.startSec,
-        frame: p.frame - Math.round(segment.startSec * fps),
-        confidence: p.confidence,
-      }));
-    if (relative.length > 0) {
-      dataWithSync = {
-        ...data,
-        _direction: {
-          ...(data._direction ?? {}),
-          syncPoints: relative,
-        },
-      };
+  if (data) {
+    const hasSyncPoints = segment.syncPoints && segment.syncPoints.length > 0;
+    const hasSegmentDirection = segment._direction != null && Object.keys(segment._direction).length > 0;
+
+    if (hasSyncPoints || hasSegmentDirection) {
+      const relative = hasSyncPoints
+        ? segment.syncPoints!
+            .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
+              p.timeSec !== null && p.frame !== null,
+            )
+            .map((p) => ({
+              word: p.word,
+              timeSec: p.timeSec - segment.startSec,
+              frame: p.frame - Math.round(segment.startSec * fps),
+              confidence: p.confidence,
+            }))
+        : [];
+
+      // Only build a new data object when there is actual content to inject.
+      // If sync points were all filtered out (null timeSec/frame) and there is
+      // no segment-level direction, skip — avoids changing data._direction from
+      // undefined to {} and creating a spurious new object reference.
+      if (relative.length > 0 || hasSegmentDirection) {
+        const mergedDirection = {
+          ...(data._direction ?? {}),          // 1. data-file base
+          ...(segment._direction ?? {}),        // 2. manifest segment overrides
+          ...(relative.length > 0 ? { syncPoints: relative } : {}),  // 3. Whisper wins
+        };
+
+        dataWithSync = {
+          ...data,
+          _direction: mergedDirection,
+        };
+      }
     }
   }
 
@@ -616,7 +640,50 @@ const ForegroundSegment: React.FC<{
   );
 });
 
-// ── Main composition ───���──────────────────────────────────────────────────────
+// ── Beat flash (replaces @remotion/light-leaks) ──────────────────────────────
+//
+// @remotion/light-leaks uses a WebGL canvas and hard-crashes with cancelRender()
+// when headless Chromium can't get a WebGL context (the default on macOS without
+// --gl=angle). This CSS-based radial burst achieves the same film-burn look
+// with zero GPU dependencies — interpolated opacity + radial-gradient + screen
+// blend mode produces an identical cinematic beat-boundary flash.
+
+const BeatFlash: React.FC<{ durationInFrames: number; hueShift: number }> = ({
+  durationInFrames,
+  hueShift,
+}) => {
+  const frame = useCurrentFrame();
+  // Fast in (0→20%), short hold (20→50%), slow fade out (50→100%)
+  const opacity = interpolate(
+    frame,
+    [
+      0,
+      Math.round(durationInFrames * 0.2),
+      Math.round(durationInFrames * 0.5),
+      durationInFrames,
+    ],
+    [0, 0.65, 0.35, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  // Base hue: amber (~38°). hueShift rotates: rose (−25°), cyan (+30°), warm (−10°)
+  const hue = 38 + hueShift;
+  return (
+    <AbsoluteFill
+      style={{
+        background: `radial-gradient(ellipse 80% 60% at 42% 38%,
+          hsla(${hue}, 90%, 88%, 0.95) 0%,
+          hsla(${hue}, 75%, 65%, 0.55) 35%,
+          transparent 70%)`,
+        opacity,
+        mixBlendMode: "screen",
+        pointerEvents: "none",
+      }}
+    />
+  );
+};
+
+// ── Main composition ──────────────────────────────────────────────────────────
 
 export const FullEpisode: React.FC<FullEpisodeProps> = ({
   manifest,
@@ -744,17 +811,22 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
             durationInFrames={durationFrames}
             name={`bg-${seg.id}`}
           >
-            <TransitionWrapper
-              transitionIn={seg.transition?.in}
-              transitionOut={seg.transition?.out}
-              durationSec={seg.transition?.durationSec}
-              durationInFrames={durationFrames}
+            <SegmentErrorBoundary
+              segmentId={seg.id}
+              componentName={seg.type}
             >
-              <BackgroundSegment
-                segment={seg}
-                assetBasePath={assetBasePath}
-              />
-            </TransitionWrapper>
+              <TransitionWrapper
+                transitionIn={seg.transition?.in}
+                transitionOut={seg.transition?.out}
+                durationSec={seg.transition?.durationSec}
+                durationInFrames={durationFrames}
+              >
+                <BackgroundSegment
+                  segment={seg}
+                  assetBasePath={assetBasePath}
+                />
+              </TransitionWrapper>
+            </SegmentErrorBoundary>
           </Sequence>
         );
       })}
@@ -799,10 +871,15 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                 >
                   {{
                     background: (
-                      <BackgroundSegment
-                        segment={layeredBg}
-                        assetBasePath={assetBasePath}
-                      />
+                      <SegmentErrorBoundary
+                        segmentId={layeredBg.id}
+                        componentName={layeredBg.type}
+                      >
+                        <BackgroundSegment
+                          segment={layeredBg}
+                          assetBasePath={assetBasePath}
+                        />
+                      </SegmentErrorBoundary>
                     ),
                     foreground: (
                       <ForegroundSegment
@@ -856,9 +933,9 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         );
       })}
 
-      {/* Layer 4b: Light leaks at beat boundaries — subtle film-burn flash for cinematic transitions.
-          One LightLeak per beat (skipping the first), 1.0s duration starting at beat boundary.
-          Hue shifts gently per beat for variety; uses Remotion's built-in light-leaks effect. */}
+      {/* Layer 4b: Beat-boundary film-burn flash.
+          One BeatFlash per beat (skipping the first), 1.0s centered on the beat boundary.
+          Hue shifts gently per beat for variety. Pure CSS — no WebGL required. */}
       {manifest.beats && manifest.beats.slice(1).map((beat, idx) => {
         const burnDurationSec = 1.0;
         const startFrame = Math.round((beat.startSec - burnDurationSec * 0.3) * fps);
@@ -868,18 +945,12 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         const hueShift = hueShifts[idx % hueShifts.length];
         return (
           <Sequence
-            key={`leak-${beat.id}`}
+            key={`flash-${beat.id}`}
             from={Math.max(0, startFrame)}
             durationInFrames={durationInFrames}
-            name={`light-leak-${beat.id}`}
+            name={`beat-flash-${beat.id}`}
           >
-            <AbsoluteFill style={{ opacity: 0.4, mixBlendMode: "screen", pointerEvents: "none" }}>
-              <LightLeak
-                durationInFrames={durationInFrames}
-                hueShift={hueShift}
-                seed={beat.startSec * 1000}
-              />
-            </AbsoluteFill>
+            <BeatFlash durationInFrames={durationInFrames} hueShift={hueShift} />
           </Sequence>
         );
       })}

@@ -198,8 +198,12 @@ const TransitionSFXLayer: React.FC<{
       const startFrame = Math.round(absoluteStart * fps);
       const volume = SFX_INTENSITY_VOLUME[intensity] ?? 0.35;
 
-      // File naming: {type}-{intensity}.wav
-      const file = `audio/sfx/transitions/${cue.type}-${intensity}.wav`;
+      // File naming: {type}-{intensity}.wav for cues with explicit intensity,
+      // {type}.wav for intensity-less cues (e.g. end-stinger — used once per
+      // episode, no intensity variants). Must match public/audio/sfx/transitions/.
+      const file = cue.intensity
+        ? `audio/sfx/transitions/${cue.type}-${cue.intensity}.wav`
+        : `audio/sfx/transitions/${cue.type}.wav`;
 
       cues.push({
         key: `sfx-${seg.segmentId}-${suffix}`,

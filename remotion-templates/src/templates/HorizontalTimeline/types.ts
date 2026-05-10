@@ -125,7 +125,7 @@ export interface HorizontalTimelineData {
 
   // ── Meta ──
   /** Episode identifier */
-  episode?: string;
+  episode: string;
   /** Total duration in seconds */
   durationSec?: number;
 

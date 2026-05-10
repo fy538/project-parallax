@@ -17,6 +17,8 @@
  *   5. No nested Ken Burns drift inside compStyle (L66 — silent compounding bug)
  *   6. Chinese text must explicitly set fontFamily: fonts.chinese (L13)
  *   7. Composition IDs in Root.tsx must be unique (L20)
+ *   8. Animated templates must call useDirection(data._direction) for manifest direction wiring
+ *   9. No hardcoded brand palette hex values — use palette.* / semantic.* constants
  */
 
 import fs from "fs";
@@ -29,6 +31,29 @@ const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
 const EXCLUDE_DIRS = ["Episodes", "__tests__"];
+
+// ── Palette color literals → must use palette.* / semantic.* constants ──────
+// These are the hex values from palette.json. If written as string literals
+// in component files they'll drift out of sync when the palette changes.
+const KNOWN_PALETTE_LITERALS = {
+  "#1C1814": "palette.ink",
+  "#2A2520": "palette.midnight",
+  "#5C4A3D": "palette.walnut",
+  "#8B7355": "palette.umber",
+  "#B8A189": "palette.taupe",
+  "#D9C9B0": "palette.sand",
+  "#F0E6D0": "palette.bone",
+  "#F5F0E8": "palette.paper",
+  "#C4A747": "palette.gold",
+  "#4A7BA7": "semantic.us",
+  "#A64D46": "semantic.china (or semantic.danger)",
+  "#888780": "semantic.neutral",
+  // Common legacy values still encountered in the codebase
+  "#E5A544": "palette.gold (old amber — palette.gold is now #C4A747)",
+  "#C23B22": "semantic.danger (old rust — now #A64D46)",
+  "#6B1D1D": "palette.walnut (old oxblood — now #5C4A3D)",
+  "#D64545": "semantic.danger (non-palette danger red — use semantic.danger)",
+};
 
 // ── Rules ──────────────────────────────────────────────────────────────────
 
@@ -63,6 +88,12 @@ const rules = [
       if (basename.includes("schema")) return [];
       if (!basename.endsWith(".tsx")) return []; // Only check TSX (React components)
       if (content.includes("@deprecated")) return []; // Skip deprecated templates
+
+      // Escape hatch for pure router/dispatcher files and sub-component helpers
+      // that delegate composition animation to their children. Add this pragma
+      // to suppress the check on files that intentionally skip the hook:
+      //   // @composition-animation: delegated
+      if (content.includes("@composition-animation: delegated")) return [];
 
       // Accept the hook directly OR any of the canonical wrappers that call it.
       // ShortsWrapper applies the hook to its render-prop children; EpisodeSeries
@@ -180,6 +211,84 @@ const rules = [
     },
     severity: "warn",
     fix: 'Set fontFamily: fonts.chinese on the CJK span, or use hasChinese()/hasCJK() to detect and switch fonts conditionally.',
+  },
+  // ── Rule 8: Animated templates must wire useDirection (manifest direction) ──
+  // Any template that calls useCompositionAnimation without { noDrift: true }
+  // is an animated composition and should call useDirection(data._direction)
+  // so that _direction blocks in assembly-manifest.json take effect.
+  // Pure routers (files with no direct JSX output) are skipped because they
+  // delegate to sub-components that each call useDirection themselves.
+  {
+    id: "missing-direction-wiring",
+    description: "Animated templates must call useDirection(data._direction) so manifest _direction blocks take effect",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (!basename.endsWith(".tsx")) return [];
+      if (basename.startsWith("index")) return [];
+      if (basename.includes("schema")) return [];
+      if (content.includes("@deprecated")) return [];
+
+      // Only applies to files that call useCompositionAnimation
+      if (!content.includes("useCompositionAnimation")) return [];
+
+      // Skip static compositions (noDrift: true means no animation to direct)
+      if (/useCompositionAnimation\s*\(\s*\{[^}]*noDrift:\s*true/.test(content)) return [];
+
+      // Skip audio-only compositions (no visual animation to direct)
+      if (/useCompositionAnimation\s*\(\s*\{[^}]*noExit:\s*true/.test(content) &&
+          !content.includes("AbsoluteFill")) return [];
+
+      // Skip pure router/dispatcher files that render only other components
+      // (no AbsoluteFill / direct visual JSX — they delegate to sub-components)
+      if (!/AbsoluteFill/.test(content)) return [];
+
+      if (!content.includes("useDirection")) {
+        return [{
+          line: 1,
+          message: "Animated template calls useCompositionAnimation but never calls useDirection(data._direction)",
+        }];
+      }
+      return [];
+    },
+    severity: "warn",
+    fix: "Add: import { useDirection } from '../../hooks/useDirection'; — then call: const direction = useDirection(data._direction);",
+  },
+  // ── Rule 9: No hardcoded brand palette hex values ─────────────────────────
+  // Brand colors must be referenced via palette.* or semantic.* constants from
+  // design/theme.ts. Hardcoded literals drift out of sync when palette.json changes.
+  // This rule flags the known palette hex values (case-insensitive).
+  {
+    id: "hardcoded-brand-color",
+    description: "Hardcoded brand palette hex — use palette.* or semantic.* constant from design/theme.ts",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (!basename.endsWith(".tsx") && !basename.endsWith(".ts")) return [];
+      if (basename.startsWith("index")) return [];
+      if (basename.includes("schema")) return [];
+      if (basename.includes("theme")) return [];  // theme.ts defines the values
+      if (content.includes("@deprecated")) return [];
+
+      const issues = [];
+      const lines = content.split("\n");
+      for (const [hex, constant] of Object.entries(KNOWN_PALETTE_LITERALS)) {
+        const re = new RegExp(hex, "gi");
+        lines.forEach((line, i) => {
+          // Skip comment lines and import lines (palette.json import in theme.ts)
+          if (/^\s*(\/\/|\/\*|\*|import )/.test(line)) return;
+          if (re.test(line)) {
+            issues.push({
+              line: i + 1,
+              message: `Hardcoded palette color ${hex} — use ${constant}`,
+            });
+          }
+        });
+      }
+      return issues;
+    },
+    severity: "warn",
+    fix: "Replace the hex literal with the palette/semantic constant (e.g. palette.ink, semantic.danger). Import from ../../design/theme.",
   },
 ];
 

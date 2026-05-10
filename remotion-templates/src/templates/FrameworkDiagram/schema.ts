@@ -26,21 +26,48 @@ const MatrixCellSchema = z.object({
 });
 
 export const FrameworkDiagramSchema = z.object({
-  data: z.object({
-    episode: z.string(),
-    title: z.string(),
-    subtitle: z.string().optional(),
-    variant: z.enum(["comparison", "flow", "matrix"]),
-    columns: z.array(ComparisonColumnSchema).optional(),
-    nodes: z.array(FlowNodeSchema).optional(),
-    arrowLabels: z.array(z.string()).optional(),
-    rowHeaders: z.array(z.string()).optional(),
-    colHeaders: z.array(z.string()).optional(),
-    cells: z.array(MatrixCellSchema).optional(),
-    accentColor: z.string().optional(),
-    backgroundVariant: z.enum(["dark", "light"]).optional(),
-    durationSec: z.number().optional(),
-    _direction: z.unknown().optional(),
-    backgroundTint: z.string().optional(),
-  }),
+  data: z
+    .object({
+      episode: z.string(),
+      title: z.string(),
+      subtitle: z.string().optional(),
+      variant: z.enum(["comparison", "flow", "matrix"]),
+      columns: z.array(ComparisonColumnSchema).optional(),
+      nodes: z.array(FlowNodeSchema).optional(),
+      arrowLabels: z.array(z.string()).optional(),
+      rowHeaders: z.array(z.string()).optional(),
+      colHeaders: z.array(z.string()).optional(),
+      cells: z.array(MatrixCellSchema).optional(),
+      accentColor: z.string().optional(),
+      backgroundVariant: z.enum(["dark", "light"]).optional(),
+      durationSec: z.number().positive().optional(),
+      _direction: z.unknown().optional(),
+      backgroundTint: z.string().optional(),
+    })
+    .superRefine((d, ctx) => {
+      if (
+        d.variant === "comparison" &&
+        (!d.columns || d.columns.length === 0)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "variant 'comparison' requires at least one column",
+          path: ["columns"],
+        });
+      }
+      if (d.variant === "flow" && (!d.nodes || d.nodes.length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "variant 'flow' requires at least one node",
+          path: ["nodes"],
+        });
+      }
+      if (d.variant === "matrix" && (!d.cells || d.cells.length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "variant 'matrix' requires at least one cell",
+          path: ["cells"],
+        });
+      }
+    }),
 });

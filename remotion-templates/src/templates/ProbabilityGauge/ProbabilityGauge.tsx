@@ -442,7 +442,9 @@ const Scorecard: React.FC<{
   const calibration = useMemo(() => {
     const correct = items.filter((i) => i.outcome === "correct").length;
     const total = items.length;
-    return { correct, total, calibration: Math.round((correct / total) * 100) };
+    // Guard: empty scorecard → avoid 0/0 = NaN
+    const calibration = total > 0 ? Math.round((correct / total) * 100) : 0;
+    return { correct, total, calibration };
   }, [items]);
 
   return (

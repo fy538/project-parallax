@@ -8,6 +8,9 @@
  *   - No segment exceeds totalDurationSec
  *   - No same-layer segment overlaps
  *   - No single-layer gap > 30s (dead visual air)
+ *   - All audio files (musicBed, soundCues, textureCues, narration) exist on disk
+ *   - MAPBOX_ACCESS_TOKEN is set when map templates are used
+ *   - All template data files pass their Zod schema (catches bad data before render)
  *   - All required segment fields present
  *   - Manifest has valid fps + totalDurationSec
  *
@@ -22,6 +25,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import { TEMPLATE_COMPONENTS } from "../templates/Episodes/FullEpisode";
+import { TEMPLATE_SCHEMAS } from "../templates/Episodes/templateSchemas";
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -203,6 +207,83 @@ for (const { slug, manifestPath } of EPISODES) {
       expect(missing).toHaveLength(0);
     });
 
+    // ── Beat timestamp validation ─────────────────────────────────────────────
+    //
+    // beats[].startSec drives three runtime systems:
+    //   1. SectionIndicator — shows which section label is active
+    //   2. BeatFlash — fires the light-flash transition on beat changes
+    //   3. LowerThird — some overlays key off beat boundaries
+    //
+    // A beat whose startSec is later than the first actual content for that beat
+    // means the label shows late (or wrong label shows). A beat whose startSec
+    // exceeds totalDurationSec never fires at all.
+
+    it("all beats[].startSec are within the episode duration", () => {
+      const total: number = manifest.totalDurationSec;
+      const beats: any[] = manifest.beats ?? [];
+      if (beats.length === 0) return; // No beats declared — skip
+
+      const overrun = beats.filter((b: any) => b.startSec > total + 0.1);
+      if (overrun.length > 0) {
+        const details = overrun.map(
+          (b: any) =>
+            `  ${b.id}: startSec=${b.startSec} > totalDurationSec=${total} ` +
+            `(label "${b.title ?? b.id}" will NEVER appear)`
+        );
+        throw new Error(
+          `\n${overrun.length} beat(s) start beyond the episode end:\n` +
+          `${details.join("\n")}\n\n` +
+          `Fix: set beats[].startSec to the actual first-segment startSec for each beat.`
+        );
+      }
+      expect(overrun).toHaveLength(0);
+    });
+
+    it("beats[].startSec match the first content segment for each beat (≤5s drift)", () => {
+      // Tolerance: allow beat.startSec to be set up to 5s BEFORE the first segment
+      // (e.g., if a HOLD segment precedes real content). Fail if beat.startSec is
+      // more than 5s AFTER the first non-HOLD segment in that beat — that means the
+      // SectionIndicator label is showing late for a chunk of real content.
+      const TOLERANCE_SEC = 5;
+
+      const beats: any[] = manifest.beats ?? [];
+      if (beats.length === 0) return;
+
+      // Build a map: beatId → minimum startSec across all non-HOLD segments
+      const firstSegPerBeat: Record<string, number> = {};
+      for (const seg of manifest.segments ?? []) {
+        const beatId: string | undefined = seg.beat ?? seg.beatId;
+        if (!beatId || seg.type === "HOLD") continue;
+        const s: number = seg.startSec;
+        if (!(beatId in firstSegPerBeat) || s < firstSegPerBeat[beatId]) {
+          firstSegPerBeat[beatId] = s;
+        }
+      }
+
+      const drifted: string[] = [];
+      for (const b of beats) {
+        const firstSeg = firstSegPerBeat[b.id];
+        if (firstSeg === undefined) continue; // Beat has no segments — skip
+
+        const drift = b.startSec - firstSeg; // positive = beat label fires LATE
+        if (drift > TOLERANCE_SEC) {
+          drifted.push(
+            `  ${b.id}: beat.startSec=${b.startSec} but first segment starts ` +
+            `at ${firstSeg} (label fires ${drift.toFixed(1)}s late)`
+          );
+        }
+      }
+      if (drifted.length > 0) {
+        throw new Error(
+          `\n${drifted.length} beat(s) have startSec set too late:\n` +
+          `${drifted.join("\n")}\n\n` +
+          `Fix: update beats[].startSec to match the minimum startSec of non-HOLD\n` +
+          `segments labeled with that beat id. See generate_manifest.py.`
+        );
+      }
+      expect(drifted).toHaveLength(0);
+    });
+
     // ── Timeline math ────────────────────────────────────────────────────────
 
     it("no segment exceeds totalDurationSec", () => {
@@ -250,6 +331,180 @@ for (const { slug, manifestPath } of EPISODES) {
         );
       }
       expect(overlaps).toHaveLength(0);
+    });
+
+    // ── Mapbox token pre-flight ───────────────────────────────────────────────
+    //
+    // ChoroplethMap and RouteAnimation call assertMapboxToken() at render time.
+    // A missing MAPBOX_ACCESS_TOKEN throws synchronously inside the component —
+    // in standalone renders it crashes the entire composition; in FullEpisode it
+    // now shows a red error card per segment (BackgroundSegment is wrapped in an
+    // error boundary), but the episode will look broken at every map segment.
+
+    it("episodes using map templates have MAPBOX_ACCESS_TOKEN set", () => {
+      const MAP_COMPONENTS = new Set(["ChoroplethMap", "RouteAnimation"]);
+      const mapSegments = (manifest.segments ?? []).filter(
+        (s: any) => MAP_COMPONENTS.has(s.template?.component)
+      );
+      if (mapSegments.length === 0) return; // No map templates — skip
+
+      const token = process.env.MAPBOX_ACCESS_TOKEN;
+      if (!token) {
+        throw new Error(
+          `\nEpisode "${slug}" uses ${mapSegments.length} map segment(s) ` +
+          `(${[...new Set(mapSegments.map((s: any) => s.template.component))].join(", ")}) ` +
+          `but MAPBOX_ACCESS_TOKEN is not set.\n\n` +
+          `Fix: add MAPBOX_ACCESS_TOKEN=pk.... to .env in remotion-templates/\n` +
+          `  or set it in your shell before rendering:\n` +
+          `  MAPBOX_ACCESS_TOKEN=pk.... npx remotion render ...`
+        );
+      }
+      expect(token.startsWith("pk.")).toBe(true);
+    });
+
+    // ── Audio asset pre-flight ────────────────────────────────────────────────
+    //
+    // Remotion pre-downloads ALL staticFile() assets before frame 1 renders.
+    // A 404 on any WAV crashes the render immediately — there is NO graceful
+    // fallback to silence. This check catches missing files before any render.
+
+    it("all audio files referenced in musicBed and soundCues exist on disk", () => {
+      const missing: string[] = [];
+
+      // 1. Music bed tracks: public/episodes/{slug}/{track.file}
+      for (const track of manifest.musicBed?.tracks ?? []) {
+        const filePath = path.join(PUBLIC_DIR, "episodes", slug, track.file);
+        if (!fs.existsSync(filePath)) {
+          missing.push(`  [musicBed] ${track.id}: public/episodes/${slug}/${track.file}`);
+        }
+      }
+
+      // 2. Transition SFX: public/audio/sfx/transitions/{type}-{intensity}.wav
+      //    and end-stinger (no intensity suffix).
+      const seenSfx = new Set<string>();
+      for (const seg of manifest.segments ?? []) {
+        for (const cue of [seg.soundCue, seg.soundCueSecondary]) {
+          if (!cue?.type) continue;
+          const filename =
+            cue.intensity
+              ? `${cue.type}-${cue.intensity}.wav`
+              : `${cue.type}.wav`;
+          if (seenSfx.has(filename)) continue;
+          seenSfx.add(filename);
+          const filePath = path.join(
+            PUBLIC_DIR,
+            "audio/sfx/transitions",
+            filename
+          );
+          if (!fs.existsSync(filePath)) {
+            missing.push(
+              `  [soundCue/${seg.id}] public/audio/sfx/transitions/${filename}`
+            );
+          }
+        }
+      }
+
+      // 3. Texture hits: public/audio/sfx/textures/{type}.wav
+      const seenTextures = new Set<string>();
+      for (const seg of manifest.segments ?? []) {
+        for (const tex of seg.textureCues ?? []) {
+          if (!tex.type || seenTextures.has(tex.type)) continue;
+          seenTextures.add(tex.type);
+          const filePath = path.join(
+            PUBLIC_DIR,
+            "audio/sfx/textures",
+            `${tex.type}.wav`
+          );
+          if (!fs.existsSync(filePath)) {
+            missing.push(
+              `  [textureCue] public/audio/sfx/textures/${tex.type}.wav`
+            );
+          }
+        }
+      }
+
+      // 4. Narration audio: public/episodes/{slug}/{narration.audioFile}
+      //    Not yet recorded for current episodes (audioFile is null/absent),
+      //    but once set this will crash the render if the file is missing.
+      const narrationFile = manifest.narration?.audioFile;
+      if (narrationFile) {
+        const filePath = path.join(PUBLIC_DIR, "episodes", slug, narrationFile);
+        if (!fs.existsSync(filePath)) {
+          missing.push(
+            `  [narration] public/episodes/${slug}/${narrationFile}`
+          );
+        }
+      }
+
+      if (missing.length > 0) {
+        throw new Error(
+          `\n${missing.length} audio file(s) missing — render will crash on 404:\n` +
+          `${missing.join("\n")}\n\n` +
+          `Fix: run  python remotion-templates/scripts/create_placeholder_wavs.py\n` +
+          `  or source real files from Epidemic Sound / Artlist and drop them in place.`
+        );
+      }
+      expect(missing).toHaveLength(0);
+    });
+
+    // ── Template data Zod validation ─────────────────────────────────────────
+    //
+    // FullEpisode loads data files as raw JSON and passes them directly to
+    // template components without re-running Zod validation (the schemas on
+    // <Composition> only run at registration time for standalone renders).
+    // This test runs each data file through its schema's safeParse() so bad
+    // data is caught here rather than producing a red SegmentErrorBoundary
+    // placeholder mid-episode.
+
+    it("all template data files pass their Zod schema", () => {
+      const failures: string[] = [];
+
+      for (const seg of dataFileSegments(manifest)) {
+        const component: string = seg.template?.component;
+        const dataFile: string = seg.template.dataFile;
+        const schema = TEMPLATE_SCHEMAS[component];
+
+        if (!schema) {
+          // No schema registered for this component — skip rather than fail.
+          // Add missing schemas to src/templates/Episodes/templateSchemas.ts.
+          continue;
+        }
+
+        const filePath = path.join(dataDir, dataFile);
+        if (!fs.existsSync(filePath)) continue; // Already caught by data-files test
+
+        let json: unknown;
+        try {
+          json = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        } catch {
+          failures.push(`  ${dataFile}: invalid JSON`);
+          continue;
+        }
+
+        // Schemas validate { data: <fileContents> } — the data file IS the data prop
+        const result = schema.safeParse({ data: json });
+        if (!result.success) {
+          const issues = result.error.issues
+            .slice(0, 3) // cap at 3 issues per file to keep output readable
+            .map((i) => `    [${i.path.join(".")}] ${i.message}`);
+          failures.push(
+            `  ${seg.id} → ${dataFile} (${component}):\n${issues.join("\n")}` +
+            (result.error.issues.length > 3
+              ? `\n    … and ${result.error.issues.length - 3} more`
+              : "")
+          );
+        }
+      }
+
+      if (failures.length > 0) {
+        throw new Error(
+          `\n${failures.length} data file(s) failed schema validation:\n` +
+          `${failures.join("\n\n")}\n\n` +
+          `Fix: correct the data file to match the template's Zod schema.\n` +
+          `     Schema is in src/templates/<ComponentName>/schema.ts`
+        );
+      }
+      expect(failures).toHaveLength(0);
     });
 
     // ── Visual coverage ───────────────────────────────────────────────────────

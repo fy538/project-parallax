@@ -3,7 +3,7 @@
 ## Purpose
 This document captures all research findings so future conversations don't re-investigate topics already explored. Each section includes key findings, data points, and source links.
 
-Last updated: May 9, 2026 (v2 — added §§13–17)
+Last updated: May 10, 2026 (v3 — added §§18–21)
 
 ---
 
@@ -609,3 +609,140 @@ AP, Reuters, NYT, Nature, Science, JAMA, ICMJE all converge on: **AI may assist;
 - `EDITORIAL_PLAYBOOK.md` — codify "every quote, date, number, and named paper must be human-inspected" as a non-negotiable.
 - `prompts/` — add a "claim + source text → does the source support this claim?" auditor prompt for second-pass verification.
 - Episode template — add `verified-as-of: YYYY-MM-DD` field to every time-sensitive claim in the research memo.
+
+---
+
+## 18. Launch Operations — Credibility-Driven Channel Launch Playbook (May 2026)
+
+### Source
+Full report: [`./research/2026-05-launch-operations.md`](./research/2026-05-launch-operations.md). Tier A of the May 2026 channel-operations research set, commissioned to inform episode-1 launch decisions. **Quality caveat:** the highest-confidence findings (channel-page setup, first-week algorithm dynamics, Test & Compare mechanics) are well-grounded in YouTube documentation and TubeAnalytics 2026 analyses; the lower-confidence findings (pre-launch buffer depth, launch-sequence cadence) substituted generic creator-economy advice when the credibility-niche-specific evidence the prompt asked for wasn't found. The report itself rates several recommendations as Medium-Low confidence.
+
+### High-confidence findings (act on these)
+- **First-week test audience.** New videos are shown to a 100–500 impression test audience in the first 24–48 hours. To pass and expand, need **CTR ≳ 4%** and **AVD ≳ 40%** on that initial impression set. Below those thresholds, distribution stalls.
+- **External traffic seeding helps materially.** Google research found videos receiving early external traffic are ~2× more likely to rank in search within 30 days. Reddit / newsletter / social seeding in the first 48 hours is high-leverage.
+- **Iteration timing rule:** don't retitle or rethumb before ~2–4K impressions. Below that threshold, signal is dominated by test-audience composition, not title intrinsic effectiveness. Codified as **PROD-06** in EDITORIAL_PLAYBOOK.
+- **YouTube Test & Compare** (rolled out globally to creators with Advanced Features in late 2025): tests up to 3 variants, runs 1–2 weeks, decides by total watch-time share (not pure CTR). Desktop Studio only. Not available for Shorts, Made-for-Kids, or mature content.
+- **Channel-page setup before launch matters and is well-documented.** Banner, icon, About page (200+ words for SEO), trailer slot decision, initial playlists, channel sections — see PRE_LAUNCH_CHECKLIST §3.
+
+### Lower-confidence findings (treat as informational, not rules)
+- **Pre-launch buffer:** report recommends ~3 fully-finished episodes plus 1–3 in production. Rated Medium confidence; sourced from creator anecdotes, not credibility-niche comparables.
+- **Launch sequence:** report recommends 3-video batch launch on day/week 1 then biweekly. Rated **Medium-Low** confidence by the report itself — sourced from generic creator-economy forums, not from what credibility-niche channels actually did. **Both CaspianReport and Asianometry launched single-video and grew slowly** (CaspianReport via a Reddit r/videos front-page hit; Asianometry via slow vlog drift). Tiger should not commit to the 3-video batch advice; treat single-video, well-promoted, with 2–3 episodes in the can to maintain biweekly cadence as the equally-defensible alternative.
+- **Hindsight comparable** — no public retrospective data found. Most-recent comparable in our exact lane has the least usable launch evidence. Acknowledged gap.
+
+### Pipeline integration points
+- `episodes/PRE_LAUNCH_CHECKLIST.md` — created. Section 3 (channel page setup) and Section 4 (first-week ops awareness) both draw from this report's high-confidence findings.
+- `EDITORIAL_PLAYBOOK.md` — added PROD-06 (iteration timing) from this report.
+- Launch sequence decision — **explicitly not codified as a rule.** Stays as Tiger's editorial judgment.
+
+---
+
+## 19. 12-Month Operational Playbook (May 2026)
+
+### Source
+Full report: [`./research/2026-05-12-month-operational-playbook.md`](./research/2026-05-12-month-operational-playbook.md). Tier B of the May 2026 channel-operations research set. Month-by-month operational guidance covering cadence, comments, newsletter, Shorts/cross-platform, Patreon/Memberships, and sponsorship.
+
+### Caveat: timeline-optimistic
+The playbook's milestone timing (~1K subs by Month 3, 5–10K by Month 6, sponsorship outreach at Month 6) is faster than the credibility-niche evidence supports. RESEARCH_LOG §7 has the empirical baseline at 254 days median to 1K subs with a long tail; CaspianReport took ~7 years to 100K. Treat the playbook's structure as right and its month numbers as aspirational. The "wait until X subs to do Y" gates are correct in *order* — slide the timing later by 2–3x for our content type.
+
+### Useful findings (high-confidence, well-grounded)
+- **Newsletter platform fees, May 2026:**
+  - Substack — 10% revenue cut on paid tiers. Easy onboarding, organic discoverability.
+  - Beehiiv — free to 2.5K subs, **0% revenue cut**, built-in ad marketplace.
+  - ConvertKit — free to 1K subs, ~0.6% revenue cut, strong automations.
+  - Ghost — self-hosted, 0% platform fee, requires hosting + setup. Highest control and lowest lock-in.
+  - For Parallax: Beehiiv free tier is the lowest-friction starting point.
+- **Patreon conversion benchmark for analytical content:** ~1–2% of YouTube subs convert to paying Patrons in year 1. At 2K subs that's 20–40 members. Tier structure should favor **substantive perks** (research notes, source bibliographies, member-only Q&A) over cosmetic perks (badges, ad-free) for analytical content. Cosmetic perks work for high-volume creators; not for depth content.
+- **Free→paid newsletter conversion:** ~5–10% on Substack-style platforms; YouTube audience often converts lower (~0.5–2% in year 1). Implication: keep the bulk of newsletter content free for reach, charge modestly for premium tier ($5–10/mo) when introduced.
+- **Sponsorship economics for educational/analytical content:** ThoughtLeaders rule of thumb $0.01–$0.10 per view; one creator reported $300–$1K deals at ~50K views. At 5K subs and 10–30K views/video, realistic deal size is ~$400–$1,200.
+- **Sponsorship outreach platforms:** ThoughtLeaders accepts sub-10K but most agencies require 10K+. NebulaTalent invitation-only. For sub-10K, direct outreach is the path.
+- **FTC compliance for sponsorship:** clear disclosure required — verbal "sponsored by X" + on-screen tag + description note. NY Attorney General enforces parallel consumer protection standards.
+- **Shorts → long-form conversion:** YouTube/Google research: 61% of viewers use Shorts to discover new channels; 56% of those then watch long-form. Combined Shorts + long-form strategies outperform single-format. End-screen and pinned-comment cross-promo from Shorts → long-form is the documented pattern.
+
+### Pipeline integration points
+- `episodes/PRE_LAUNCH_CHECKLIST.md` Section 1 references newsletter-list setup before launch (audience portability for risk mitigation).
+- Future doc: when Tiger crosses the relevant subscriber thresholds (1K → newsletter soft launch; 2–5K → Patreon launch; 5–10K → sponsorship outreach), pull the relevant section of the playbook into a milestone runbook.
+- Treat the Month X gating timing as 2–3x slower in practice. **No codified playbook rules** drawn from this report yet; revisit at the 1K-sub milestone with empirical Parallax data.
+
+---
+
+## 20. AI Content Compliance for an AI-Augmented Channel (May 2026)
+
+### Source
+Full report: [`./research/2026-05-ai-content-compliance.md`](./research/2026-05-ai-content-compliance.md). Cross-cutting Compliance research, May 2026 channel-operations set. **Quality:** strongest of the four operations reports — well-cited, documentation-grounded, action-clear.
+
+### Headline finding: Parallax is far inside the safe zone
+YouTube's Help Center *explicitly lists* the AI use cases Parallax actually has as **exempt from disclosure**:
+- Generative AI used for production assistance — *exempt*
+- Stylized / animated illustration that is not photorealistic — *exempt*
+- Motion graphics, charts, abstract data visualization — *exempt*
+- AI-cleaned audio of one's own voice (noise reduction, repair) — *exempt*
+- AI-assisted thumbnails when underlying photography is human — *exempt*
+- Cloning one's own voice — *exempt*
+
+The 16-channel termination event (January 2026, ~35M combined subs) targeted entirely-AI workflows where *"AI handled every step — scripting, voice, visuals, publishing — with zero human editorial input."* Parallax is nowhere near that line.
+
+### Operational consequences
+- **Default upload disclosure: "Altered content: No"** for every Parallax episode. Choose Yes only if a specific episode contains a *photorealistic* synthetic depiction of a real person, place, or event a viewer could mistake for actual footage. The constructivist illustration aesthetic does not meet that bar.
+- **Disclosure has no penalty.** YouTube has stated explicitly that disclosing "won't limit a video's audience or impact its eligibility to earn money." Risk is from under-disclosing, not over-disclosing — but for Parallax, neither is operationally relevant most of the time.
+- **Backstage human-authorship audit trail.** Maintain script drafts, narration audio archives, project files with timestamped edits, and per-episode AI-tool-usage notes. Not required by policy, but provides receipts if a video is ever flagged as inauthentic.
+- **Voice cloning policy:** only Tiger's own voice. Cloning anyone else (including public figures) is disclosure-required or disallowed depending on context. Hard-line operational rule.
+- **No template repetition.** "Mass-produced, template-driven" pattern triggers the inauthentic-content classifier. Each episode title and description uniquely reflects subject — already aligned with the white-space title rule (PROJECT_VISION).
+- **Retroactive enforcement risk is low.** No public examples of YouTube ex-post demonetizing old videos because of new disclosure rules. Following current guidance faithfully is sufficient defense.
+
+### FTC and broader legal
+- FTC requires sponsorship disclosure regardless of AI usage; standard "sponsored by" + "#ad" practices apply.
+- Washington State (2026) law prohibits AI-generated deceptive audio/video impersonating real persons without consent. California's AB 2655 (Deepfake Deception Act, effective Jan 2027) requires platform-level labeling of AI-generated political content.
+- For Parallax: only use Tiger's voice/likeness; don't impersonate others; don't produce realistic fake news. Standard editorial practice already covers this.
+
+### Pipeline integration points
+- `episodes/PRE_LAUNCH_CHECKLIST.md` Section 2 — full operational checklist drawn from this report.
+- No EDITORIAL_PLAYBOOK rule needed; this is one-time clarification rather than ongoing discipline. The default "Altered content: No + maintain authorship audit trail" is captured in the pre-launch checklist.
+
+---
+
+## 21. Operational Risk Management — Pre-Launch Checklist & Incident Runbooks (May 2026)
+
+### Source
+Full report: [`./research/2026-05-operational-risk-management.md`](./research/2026-05-operational-risk-management.md). Cross-cutting Risk research, May 2026 channel-operations set, US-jurisdiction-calibrated (Tiger NYC-area).
+
+### Highest-leverage finding: pre-launch security investment is small
+- **Total cost: ~$50–100** for two FIDO2 hardware keys (YubiKey 5 series or Google Titan).
+- **Total time: ~3 hours** to set up password manager, hardware keys, Advanced Protection enrollment, recovery configuration, Owner/Editor account separation.
+- **Documented downside of skipping:** one creator hacked via phishing recovered email in 12 hours but waited **3.5 weeks** for YouTube to restore the channel. Phishing via fake brand-deal emails is the documented primary attack vector against creators. Almost half of known YouTube hacks involved victims without strong 2FA.
+
+### Pre-launch security checklist (codified in PRE_LAUNCH_CHECKLIST §1)
+- Password manager + unique strong password
+- Disable SMS 2FA; use TOTP minimum, hardware keys preferred
+- Two FIDO2 hardware keys (one daily, one offline backup)
+- Google Advanced Protection Program enrolled
+- SIM lock with carrier PIN
+- Brand Account / channel permissions structure: Owner offline + Editor for daily uploads
+- Backup codes generated and stored offline
+- Off-platform audience contact pathway (newsletter / RSS) live before episode 1
+- Raw masters backed up off-platform
+
+### Copyright and demonetization findings
+- **Content ID claims** (~98% of all claims) typically don't issue strikes — they block or monetize. **Copyright strikes** are DMCA takedowns, manual; three in 90 days terminates the channel.
+- **Disputed Content ID claims resolve in the creator's favor at ~62%** — appeals work, but cost ~1–5 weeks.
+- **Counter-notification timeline for copyright strikes:** 10 business days for the claimant to sue or retract. If they do nothing, YouTube must restore.
+- **Demonetization triggers for geopolitics in 2026:** war, massacre, genocide, terrorism, attack, bombing, atrocity — title and thumbnail trigger words. Graphic conflict imagery in thumbnails. Even neutral coverage of Ukraine and Gaza has been limited per documented post-2023 policy tightening. **Codified as PROD-05** in EDITORIAL_PLAYBOOK.
+- **Demonetization appeal:** ~7 day cycle; one human review per video; success rates not publicly reported but anecdotal evidence suggests reasonable success when framing is genuinely benign.
+
+### Channel termination
+- Termination policy explicitly forbids creating a new channel under "circumvention." Practical workaround: off-platform audience contact (newsletter, social) lets you announce a new channel even if YouTube technically forbids the new account.
+- **Appeal window: up to 1 year** from termination via Studio "Begin Review."
+- **Backups become your only continuity path** — Google Takeout becomes unavailable post-termination. Pre-launch raw-master archive is the insurance policy.
+
+### Legal / business setup (US/NY-calibrated)
+- **LLC vs sole prop:** sole prop fine pre-monetization; LLC adds personal liability protection for ~$300–500 NYS filing + small annual fees. Worth filing once a sponsor contract or significant revenue exists, not before.
+- **NY anti-SLAPP law (2020):** provides special protection for online commentary, raises the bar for defamation plaintiffs against public-figure analysis to "actual malice." Favors creators in political analysis. Material legal advantage Parallax inherits by being NY-based.
+- **Insurance pre-monetization:** E&O / creator-liability policies (~$500+/year) generally not cost-effective at sub-50K revenue. Revisit at meaningful revenue threshold.
+- **Sponsorship contracts:** use written agreements; ContractsCounsel / Visme / InfluenceFlow have free templates. Keep all sponsor communications documented.
+
+### Incident runbooks
+The full report includes detailed runbooks for: copyright strike (counter-notice + 10-day wait), automated demonetization (Studio appeal + ~7-day wait), account security breach (Google account recovery → channel reclaim, 1h–4 weeks depending on incident severity), channel termination (Studio appeal within 1 year + off-platform audience activation). Reference the full report when an incident occurs rather than relying on memory.
+
+### Pipeline integration points
+- `episodes/PRE_LAUNCH_CHECKLIST.md` — Section 1 (security), Section 5 (demonetization framing) codified from this report.
+- `EDITORIAL_PLAYBOOK.md` — added **PROD-05** (geopolitics demonetization-framing check) from this report.
+- `DECISIONS.md` candidate — record the LLC-deferred-until-sponsor-contract decision once Tiger confirms.

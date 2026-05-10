@@ -215,7 +215,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
           pointerEvents: "none",
         }}
       >
-        {data.callouts.map((callout, i) => {
+        {(data.callouts ?? []).map((callout, i) => {
           const pos = computeCalloutPosition(
             callout,
             imgWidth,

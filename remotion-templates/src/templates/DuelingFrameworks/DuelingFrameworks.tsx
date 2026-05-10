@@ -25,6 +25,9 @@
  * Bilingual support in both modes.
  */
 
+// @composition-animation: delegated — pure router; CinematicDuelingFrameworks
+// and StaticDuelingFrameworks each call useCompositionAnimation themselves.
+
 // Import the sub-modules and re-export the main component.
 import React from "react";
 import { CinematicDuelingFrameworks } from "./CinematicDuelingFrameworks";

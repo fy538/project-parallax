@@ -112,7 +112,9 @@ function computeMultiHypothesisStates(
     const shiftPercent = e.magnitude * 2;
 
     if (e.direction === "up") {
-      // Increase hypothesis 0, decrease others proportionally
+      // Increase hypothesis 0, decrease others proportionally.
+      // Guard: single-hypothesis → nothing to redistribute to, skip.
+      if (currentProbs.length <= 1) continue; // eslint-disable-line no-continue
       const decrease = shiftPercent / (currentProbs.length - 1);
       currentProbs = currentProbs.map((p, i) => {
         if (i === 0) {
@@ -122,7 +124,9 @@ function computeMultiHypothesisStates(
         }
       });
     } else {
-      // Decrease hypothesis 0, increase others proportionally
+      // Decrease hypothesis 0, increase others proportionally.
+      // Guard: single-hypothesis → nothing to redistribute to, skip.
+      if (currentProbs.length <= 1) continue; // eslint-disable-line no-continue
       const increase = shiftPercent / (currentProbs.length - 1);
       currentProbs = currentProbs.map((p, i) => {
         if (i === 0) {
@@ -485,12 +489,12 @@ const MultiVariant: React.FC<{
 
     // Compute states
     const states = useMemo(
-      () => computeMultiHypothesisStates(priors, data.evidence),
-      [priors, data.evidence]
+      () => computeMultiHypothesisStates(priors, (data.evidence ?? [])),
+      [priors, (data.evidence ?? [])]
     );
 
     // Timing
-    const evidenceCount = data.evidence.length;
+    const evidenceCount = (data.evidence ?? []).length;
     const introFrames = sec(1.5);
     const perEvidenceFrames = sec(1.8);
 
@@ -669,7 +673,7 @@ const MultiVariant: React.FC<{
                 EVIDENCE
               </div>
 
-              {data.evidence.map((item, i) => {
+              {(data.evidence ?? []).map((item, i) => {
                 const itemStart = introFrames + i * perEvidenceFrames;
                 return (
                   <EvidenceCard
@@ -789,21 +793,21 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
     : (data.hypotheses?.[0]?.prior ?? 50);
 
   const states = useMemo(
-    () => computeDistributionStates(prior, data.evidence),
-    [prior, data.evidence]
+    () => computeDistributionStates(prior, (data.evidence ?? [])),
+    [prior, (data.evidence ?? [])]
   );
 
   // For compare variant, compute second track
   const states2 = useMemo(() => {
-    if (data.variant !== "compare" || !data.hypotheses) return null;
-    return computeDistributionStates(data.hypotheses[1].prior, data.evidence);
+    if (data.variant !== "compare" || !data.hypotheses || data.hypotheses.length < 2) return null;
+    return computeDistributionStates(data.hypotheses[1].prior, data.evidence ?? []);
   }, [data.variant, data.hypotheses, data.evidence]);
 
   // ── Evidence timing (pace-scaled) ─────────────────────────────────────
   // PACE: urgent compresses the evidence cadence so updates feel decisive;
   // breathing expands it so the audience has time to absorb each curve shift.
   const t = direction.paceTimingScale;
-  const evidenceCount = data.evidence.length;
+  const evidenceCount = (data.evidence ?? []).length;
   const introFrames = sec(1.5 * t); // Time before first evidence
   const perEvidenceFrames = sec(1.8 * t); // Time per evidence item
 
@@ -1252,7 +1256,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
               EVIDENCE
             </div>
 
-            {data.evidence.map((item, i) => {
+            {(data.evidence ?? []).map((item, i) => {
               const itemStart = introFrames + i * perEvidenceFrames;
               return (
                 <EvidenceCard

@@ -588,7 +588,10 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
           {yTicks.slice().reverse().map((tickValue, i) => {
             // Place ticks proportionally on the niced y-axis.
             // i=0 is at the top (highest tickValue), so y=0; i=last is at maxHeight.
-            const y = (i / (yTicks.length - 1)) * maxHeight;
+            // Guard: single-tick edge case (all values 0 or empty data) → pin to top.
+            const y = yTicks.length > 1
+              ? (i / (yTicks.length - 1)) * maxHeight
+              : 0;
             const progress = gridlineDraw(frame, sec(0.2), sec(0.6), i, sec(0.06));
             // formatAsYear bypasses thousand-separator commas — same rule
             // applied to bar value labels above.

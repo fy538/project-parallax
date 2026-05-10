@@ -21,6 +21,10 @@ export default defineConfig({
     // Enable globals (describe, it, expect, etc.) without explicit imports
     globals: true,
 
+    // Load .env so env-dependent checks (e.g. MAPBOX_ACCESS_TOKEN) behave
+    // identically in tests and in `npx remotion render`.
+    setupFiles: ["dotenv/config"],
+
     // Include test files
     include: ["src/__tests__/**/*.test.ts"],
     exclude: ["node_modules", "dist"],

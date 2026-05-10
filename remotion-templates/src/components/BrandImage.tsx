@@ -196,18 +196,23 @@ export const BrandImage: React.FC<BrandImageProps> = ({
         </defs>
       </svg>
 
-      {/* The treated image */}
-      <Img
-        src={src}
-        alt={alt}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: fit,
-          objectPosition: position,
-          filter: `url(#${filterId})`,
-        }}
-      />
+      {/* The treated image — skipped when src is empty (video-child mode:
+           FullEpisode passes src="" for FOOTAGE segments so the video renders
+           as {children} while still receiving grain + vignette overlays).
+           Remotion <Img> throws on falsy src since 4.0.457. */}
+      {src && (
+        <Img
+          src={src}
+          alt={alt}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: fit,
+            objectPosition: position,
+            filter: `url(#${filterId})`,
+          }}
+        />
+      )}
 
       {/* Step 3a: Grain overlay */}
       {!noGrain && (

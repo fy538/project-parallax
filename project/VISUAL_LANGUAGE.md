@@ -52,11 +52,16 @@ The displacement principle post-migration: if generic stock footage was the defa
 
 Not every episode format uses all three content types equally. The displacement principle above is the general rule; these format-specific overrides codify how far the displacement goes.
 
-**Philosopher's Lens episodes** (abstract frameworks, game theory, philosophical analysis): **footage-free production.** Three asset types only:
+**Philosopher's Lens episodes** (abstract frameworks, game theory, philosophical analysis): **footage-free production with AI-gen-forward visual rebalance** (committed May 9, 2026 per the channel-vs-category positioning shift in PROJECT_VISION.md). Three asset types only:
 
-1. **Remotion MG** (~45-55%) — the analytical backbone. Charts, frameworks, game boards, typography, maps.
-2. **Recraft→Pika AI-GEN** (~25-35%) — all non-analytical visual texture. Image-to-video pipeline: Recraft V3 generates a constructivist reference frame (`vector_illustration` style), then Pika 2.2 animates it into a 3-7s video clip with directed motion (push-in, pan, figure movement, environmental effects). This replaces both stock footage (atmospheric texture) and static illustrations. The motion from Pika adds life that Ken Burns on stills cannot — figures walking, smoke drifting, light shifting, water flowing.
-3. **Wikimedia ARCHIVAL** (~2-5%) — documentary stills of named historical figures or specific events only (e.g., Nash portrait, Reagan-Gorbachev summit photo). Ken Burns motion applied in Remotion. These carry documentary weight that illustration cannot substitute.
+1. **Remotion MG** (target ~40-45%, was 45-55% pre-rebalance) — the analytical backbone. Charts, frameworks, game boards, typography, maps. Reduced from prior target to make room for the visual signature; analytical rigor is preserved through narration, FORECAST, and core MG structure, while atmospheric texture moves to AI-gen.
+2. **AI-gen** (target ~35-40%, was 25-35% pre-rebalance) — all non-analytical visual texture, plus expanded use as background atmosphere under analytical content. Three sub-modes:
+   - **`[AI-GEN:]` single-shot** — atmospheric punctuation, 5-12s clips. ChatGPT image generation + Hailuo 02 image-to-video.
+   - **`[SCENE:]` chained-morph blocks** — sustained atmospheric scenes, 20-50s. ChatGPT 4-anchor reference + Pika 2.5 start+end-frame morphs. The channel's signature production technique. Per-episode cap relaxed in May 9 rebalance — see SCRIPT_FORMAT.md "Multi-Frame Scene Blocks" for current limits.
+   - **`[ILLUST:]` atmospheric backdrop** — constructivist illustration at 30-40% opacity behind narration or layered under MG cards, providing atmospheric texture without displacing analytical content. Newly emphasized in the rebalance: prior versions used [ILLUST:] sparingly, the rebalance expects 6-10 [ILLUST:] backdrops per episode behind KineticTypography and FrameworkDiagram cards.
+3. **Wikimedia ARCHIVAL** (~2-5%) — documentary stills of named historical figures or specific events only (e.g., Nash portrait, Reagan-Gorbachev summit photo). Ken Burns motion applied in Remotion. These carry documentary weight that illustration cannot substitute. The May 9 rebalance KEEPS archival as the documentary register — see `CHAINED_STILL_LESSONS.md` Section 9 thinking on why the texture hierarchy matters.
+
+**The May 9 rebalance rationale.** The pre-rebalance MG-heavy ratio (45-55%) was inherited from analytical-essay genre conventions. The May 9 channel positioning commits to a third-category identity — analytical rigor PLUS distinctive constructivist visual signature — which requires more visual-layer real estate for the AI-gen register that NO other analytical channel uses. The narration stays analytical; the visual surface tilts atmospheric. This is the operational meaning of "thinks like a research analyst, looks like a Saul Bass / Adam Curtis fever dream."
 
 **What this eliminates:** Stock footage sourcing (Pexels/Pixabay/Unsplash pipeline), brand treatment pipeline for video (`treat_video.py`), footage QA. Stock footage budget drops to zero.
 

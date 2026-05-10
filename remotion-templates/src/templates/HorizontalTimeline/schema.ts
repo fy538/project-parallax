@@ -108,12 +108,35 @@ export const HorizontalTimelineSchema = z.object({
 
     // ── Meta ──
     /** Episode identifier */
-    episode: z.string().optional(),
+    episode: z.string(),
     /** Total duration in seconds */
-    durationSec: z.number().optional(),
+    durationSec: z.number().positive().optional(),
 
     // ── Directing language overrides ──
     /** Per-composition direction block from visual-spec _direction namespace. */
     _direction: z.unknown().optional(),
+  })
+  .superRefine((d, ctx) => {
+    if (d.mode === "single" && (!d.events || d.events.length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "mode 'single' requires at least one event",
+        path: ["events"],
+      });
+    }
+    if (d.mode === "dual" && (!d.pairs || d.pairs.length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "mode 'dual' requires at least one pair",
+        path: ["pairs"],
+      });
+    }
+    if (d.mode === "morph" && (!d.morphEvents || d.morphEvents.length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "mode 'morph' requires at least one morphEvent",
+        path: ["morphEvents"],
+      });
+    }
   }),
 });

@@ -47,6 +47,12 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import type { PhotoMontageData, MontageImage } from "./types";
 
+/** Resolves image src: https:// passes through; relative paths use staticFile(). */
+const resolveAssetSrc = (src: string): string =>
+  src.startsWith("http://") || src.startsWith("https://")
+    ? src
+    : staticFile(src);
+
 // ── Helper: Compute frame ranges for each image accounting for transitions ──
 
 interface ImageFrameRange {
@@ -343,7 +349,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
             }}
           >
             <img
-              src={staticFile(image.src)}
+              src={resolveAssetSrc(image.src)}
               style={{
                 position: "absolute",
                 top: 0,
@@ -360,7 +366,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
           </KenBurns>
         ) : (
           <img
-            src={staticFile(image.src)}
+            src={resolveAssetSrc(image.src)}
             style={{
               position: "absolute",
               top: 0,

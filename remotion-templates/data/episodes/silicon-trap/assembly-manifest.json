@@ -61,32 +61,32 @@
     {
       "id": "beat1",
       "title": "THE PARADOX",
-      "startSec": 0,
-      "endSec": 180
+      "startSec": 0.0,
+      "endSec": 112.0
     },
     {
       "id": "beat2",
       "title": "THE LOGIC OF DENIAL",
-      "startSec": 180,
-      "endSec": 420
+      "startSec": 112.0,
+      "endSec": 291.8
     },
     {
       "id": "beat3",
       "title": "THE OTHER SIDE OF THE WALL",
-      "startSec": 420,
-      "endSec": 750
+      "startSec": 291.8,
+      "endSec": 522.0
     },
     {
       "id": "beat4",
       "title": "THE TRAP",
-      "startSec": 750,
-      "endSec": 930
+      "startSec": 522.0,
+      "endSec": 683.6
     },
     {
       "id": "beat5",
       "title": "YOUR CHIPS",
-      "startSec": 930,
-      "endSec": 1050
+      "startSec": 683.6,
+      "endSec": 812.8
     }
   ],
   "segments": [
@@ -112,7 +112,7 @@
         "composite": "background",
         "opacity": 0.4
       },
-      "notes": "\u00b7 \"TSMC Arizona construction site aerial drone\" > \"semiconductor factory aerial desert\" > \"large factory construction aerial\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 40% \u00b7 6s \u00b7"
+      "notes": "· \"TSMC Arizona construction site aerial drone\" > \"semiconductor factory aerial desert\" > \"large factory construction aerial\" · Pexels · standard · background @ 40% · 6s ·"
     },
     {
       "id": "beat1-seg01-hold",
@@ -131,7 +131,7 @@
       "layer": "foreground",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "In December 2025, TSMC's first Arizona fab hit a 92% chip yield \u2014 four percentag",
+      "narrationRef": "In December 2025, TSMC's first Arizona fab hit a 92% chip yield — four percentag",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-92-yield.json"
@@ -166,7 +166,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P1",
-      "narrationRef": "A fab \u2014 a fabrication plant \u2014 is where chips are physically made. Not designed, ",
+      "narrationRef": "A fab — a fabrication plant — is where chips are physically made. Not designed, ",
       "asset": {
         "searchTerms": [
           "semiconductor cleanroom wafer handling",
@@ -181,7 +181,7 @@
         "composite": "inset",
         "opacity": 0.7
       },
-      "notes": "\u00b7 \"semiconductor cleanroom wafer handling\" > \"chip factory cleanroom workers\" > \"cleanroom manufacturing\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 70% \u00b7 match narration (~18s) \u00b7"
+      "notes": "· \"semiconductor cleanroom wafer handling\" > \"chip factory cleanroom workers\" > \"cleanroom manufacturing\" · Pexels · standard · inset @ 70% · match narration (~18s) ·"
     },
     {
       "id": "beat1-seg03-hold",
@@ -250,7 +250,7 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "\u00b7 \"Arizona desert housing construction workers\" > \"temporary worker housing desert\" > \"Arizona suburban construction\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~20s) \u00b7"
+      "notes": "· \"Arizona desert housing construction workers\" > \"temporary worker housing desert\" > \"Arizona suburban construction\" · Pexels · standard · background @ 35% · match narration (~20s) ·"
     },
     {
       "id": "beat1-seg05-hold",
@@ -481,7 +481,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P1",
-      "narrationRef": "That was 1941. In 2022, the United States tried it again. Not with oil \u2014 with th",
+      "narrationRef": "That was 1941. In 2022, the United States tried it again. Not with oil — with th",
       "template": {
         "component": "HorizontalTimeline",
         "dataFile": "horizontal-timeline-oil-chip.json"
@@ -597,7 +597,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "Export controls \u2014 a national security instrument \u2014 had become a tax. Possibly an",
+      "narrationRef": "Export controls — a national security instrument — had become a tax. Possibly an",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-chips-act.json"
@@ -655,7 +655,7 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "\u00b7 \"Cold War era government building Washington\" > \"1950s government archive footage\" > \"diplomatic meeting Cold War\" \u00b7 Wikimedia Commons / Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 6s \u00b7"
+      "notes": "· \"Cold War era government building Washington\" > \"1950s government archive footage\" > \"diplomatic meeting Cold War\" · Wikimedia Commons / Pexels · standard · background @ 35% · 6s ·"
     },
     {
       "id": "beat2-seg16-hold",
@@ -674,7 +674,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "So \u2014 does technology denial ever actually work? Once. For forty-five years, seve",
+      "narrationRef": "So — does technology denial ever actually work? Once. For forty-five years, seve",
       "template": {
         "component": "ChoroplethMap",
         "dataFile": "choropleth-cocom.json"
@@ -797,7 +797,7 @@
       "beat": "beat3",
       "priority": "P2",
       "template": {
-        "component": "TitleTransition",
+        "component": "KineticTypography",
         "dataFile": "kinetic-kabozi.json"
       },
       "transition": {
@@ -819,7 +819,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P1",
-      "narrationRef": "To understand how China experiences all of this, you need to know a phrase: \u5361\u8116\u5b50 ",
+      "narrationRef": "To understand how China experiences all of this, you need to know a phrase: 卡脖子 ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-kabozi.json"
@@ -916,7 +916,7 @@
         "composite": "inset",
         "opacity": 0.75
       },
-      "notes": "\u00b7 \"ballpoint pen tip macro\" \u00b7 standard \u00b7 inset @ 75% \u00b7 4s \u00b7"
+      "notes": "· \"ballpoint pen tip macro\" · standard · inset @ 75% · 4s ·"
     },
     {
       "id": "beat3-seg24-hold",
@@ -1105,7 +1105,7 @@
         "composite": "inset",
         "opacity": 0.65
       },
-      "notes": "\u00b7 \"typewriter typing closeup\" > \"manual precision work hands\" > \"vintage printing press\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 65% \u00b7 5s \u00b7"
+      "notes": "· \"typewriter typing closeup\" > \"manual precision work hands\" > \"vintage printing press\" · Pexels · standard · inset @ 65% · 5s ·"
     },
     {
       "id": "beat3-seg29-hold",
@@ -1124,7 +1124,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P1",
-      "narrationRef": "But there's a ceiling \u2014 and the evidence of that ceiling is written on the chip ",
+      "narrationRef": "But there's a ceiling — and the evidence of that ceiling is written on the chip ",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-kirin-teardown.json"
@@ -1164,7 +1164,7 @@
       "layer": "background",
       "beat": "beat3",
       "priority": "P3",
-      "narrationRef": "You can see that same gap \u2014 ambition running ahead of capability, then capabilit",
+      "narrationRef": "You can see that same gap — ambition running ahead of capability, then capabilit",
       "asset": {
         "searchTerms": [
           "artificial intelligence data center servers",
@@ -1228,7 +1228,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "Then DeepSeek tried to train their next model, R2, on domestic chips \u2014 Huawei's ",
+      "narrationRef": "Then DeepSeek tried to train their next model, R2, on domestic chips — Huawei's ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-deepseek-zero.json"
@@ -1323,7 +1323,7 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "narrationRef": "There's a metaphor that keeps pulling me back. The US plays chess \u2014 targeting sp",
+      "narrationRef": "There's a metaphor that keeps pulling me back. The US plays chess — targeting sp",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-chess.json"
@@ -1368,7 +1368,7 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "narrationRef": "China plays go \u2014 w\u00e9iq\u00ed. And if you haven't played go, the difference matters. Yo",
+      "narrationRef": "China plays go — wéiqí. And if you haven't played go, the difference matters. Yo",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-go.json"
@@ -1459,7 +1459,7 @@
         "composite": "inset",
         "opacity": 0.7
       },
-      "notes": "\u00b7 \"ASML lithography machine factory\" > \"semiconductor manufacturing equipment cleanroom\" > \"high tech factory interior\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 70% \u00b7 8s \u00b7"
+      "notes": "· \"ASML lithography machine factory\" > \"semiconductor manufacturing equipment cleanroom\" > \"high tech factory interior\" · Pexels · standard · inset @ 70% · 8s ·"
     },
     {
       "id": "beat4-seg40-hold",
@@ -1571,7 +1571,7 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "\u00b7 \"Netherlands Veldhoven aerial\" > \"South Korea Samsung factory\" > \"industrial facility exterior modern\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 6s \u00b7"
+      "notes": "· \"Netherlands Veldhoven aerial\" > \"South Korea Samsung factory\" > \"industrial facility exterior modern\" · Pexels · standard · background @ 35% · 6s ·"
     },
     {
       "id": "beat4-seg43-hold",
@@ -1590,7 +1590,7 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "And the countries caught inside the trap are the ones who built it. ASML \u2014 the o",
+      "narrationRef": "And the countries caught inside the trap are the ones who built it. ASML — the o",
       "template": {
         "component": "ChoroplethMap",
         "dataFile": "choropleth-caught-between.json"
@@ -1635,7 +1635,7 @@
         "component": "KineticTypography",
         "dataFile": "kinetic-morris-chang.json"
       },
-      "notes": "\u00b7 Quote: \"Globalization is almost dead. Free trade is almost dead.\" \u2014 Morris Chang, TSMC Founder \u00b7 bone text, amber attribution \u00b7 5s hold \u00b7",
+      "notes": "· Quote: \"Globalization is almost dead. Free trade is almost dead.\" — Morris Chang, TSMC Founder · bone text, amber attribution · 5s hold ·",
       "transition": {
         "in": "dissolve",
         "out": "cut",
@@ -1671,7 +1671,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P3",
-      "narrationRef": "If Miller is right \u2014 Chris Miller, who wrote  in 2022 \u2014 then what comes next isn",
+      "narrationRef": "If Miller is right — Chris Miller, who wrote  in 2022 — then what comes next isn",
       "asset": {
         "searchTerms": [
           "world map divided split",

@@ -99,6 +99,9 @@ const layoutSankey = (
   const columns = Array.from(byColumn.keys()).sort((a, b) => a - b);
   const columnCount = columns.length;
 
+  // Guard: empty nodes array → return empty layout rather than dividing by 0.
+  if (columnCount === 0) return { nodes: [], links: [] };
+
   // Compute column x positions — centered within their slots so the
   // diagram as a whole has equal horizontal padding either side.
   // Nodes are thin colored bars (D3-Sankey convention): width is purely

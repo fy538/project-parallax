@@ -219,7 +219,11 @@ These come from VISUAL_LANGUAGE.md and should be checked by script-audit:
 - No more than **3 consecutive `[MG:]`** entries without a `[FOOTAGE:]`, `[ILLUST:]`, `[AI-GEN:]`, or `[SCENE:]` break.
 - No more than **30 seconds** of continuous `[FOOTAGE:]` without a visual change (new shot, overlay, or cut to MG).
 - No more than **2 consecutive `[AI-GEN:]` single-shot** clips without a mode switch. AI-GEN inherits footage's pacing role but its stylized quality fatigues faster. **A `[SCENE:]` block counts as ONE atmospheric unit, not N successive `[AI-GEN:]` clips** — the chained morph reads to the viewer as a single continuous shot, not multiple cuts. So a `[SCENE:]` block followed by another `[SCENE:]` or `[AI-GEN:]` would be two consecutive atmospheric units; that's the bound.
-- No more than **3 `[SCENE:]` blocks per episode**, and no more than **1 per beat**. Sustained atmospheric stretches are spice, not a main course; budgeting them protects the analytical register that defines the channel. See VISUAL_LANGUAGE.md → "Sustained Atmospheric Stretches" for the editorial reasoning.
+- **`[SCENE:]` block cap (relaxed May 9, 2026):** Up to **5 `[SCENE:]` blocks per episode** (was 3 pre-rebalance). Two sub-types:
+  - **Long SCENE blocks (20-50s, 4-5 frames):** sustained atmospheric stretches that meet all three guardrails (continuous narration, visual change every 15-20s, ends on analytical re-engagement). Max **2 long blocks per episode**, max **1 per beat**.
+  - **Short SCENE blocks (10-22s, 2-3 frames):** thread-pair morphs that bridge adjacent AI-gen moments without occupying as much narrative real estate. Max **3 short blocks per episode**. Multiple short blocks per beat are acceptable IF they don't exceed the consecutive-AI-GEN rule.
+  
+  The expanded cap reflects the May 9 channel-vs-category positioning shift — the chained-still-morph technique IS the channel's visual signature, and concentrating it in only 2-3 moments per episode under-uses a primary differentiator. See VISUAL_LANGUAGE.md → "Sustained Atmospheric Stretches" and PROJECT_VISION.md → channel-vs-category positioning for the editorial reasoning.
 
 **Philosopher's Lens format override:** These episodes use a footage-free production path — three asset types only (`[MG:]` + `[AI-GEN:]` / `[SCENE:]` + `[ARCHIVAL:]`). `[FOOTAGE:]` tags are not used. The validated pipeline as of May 9, 2026 is **ChatGPT image generation** (with 4-anchor reference uploads + sequential generation + morph-aware prompting discipline) **→ Pika 2.5** (start+end-frame mode, 8s clips, stability-verb motion prompts). `[SCENE:]` blocks are the natural home for sustained atmospheric stretches in this format; single-shot `[AI-GEN:]` remains valid for 5-8s atmospheric punctuation. The max-3 `[MG:]` rule still applies; `[AI-GEN:]`, `[SCENE:]`, or `[ARCHIVAL:]` count as breaks. See VISUAL_LANGUAGE.md → "Format-Specific Visual Rules" and CHAINED_STILL_LESSONS.md for full pipeline details.
 - No more than **2 consecutive `[ILLUST:]`** entries without a mode switch. Atmospheric register creates mood but fatigues if sustained.
@@ -744,7 +748,16 @@ After all beats, include a consolidated summary. Start with a visual mode breakd
 | [LAYERED:] | 3 | ~0:40 | ~5% | Mixed |
 | TRANSITION | 5 | ~0:35 | ~4% | — |
 
-Target ranges: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN single-shot 5-15%, SCENE 0-10% (max 3 blocks per episode), LAYERED 5-10%, TRANSITION 3-7%. Combined `[AI-GEN:]` + `[SCENE:]` + `[ILLUST:]` should hit 15-30% of runtime per the post-May 4 displacement target.
+Target ranges (revised May 9, 2026 per channel-vs-category rebalance):
+- **MG 35-45%** (was 40-55%) — analytical backbone, slightly reduced to make room for visual signature
+- **AI-GEN single-shot 10-18%** (was 5-15%) — atmospheric punctuation
+- **SCENE 8-15%** (was 0-10%, cap relaxed to 5 blocks/episode) — chained-morph signature
+- **ILLUST 8-15%** (was 5-15%) — atmospheric backdrop, expanded role
+- **LAYERED 5-10%** — composition pattern, including [ILLUST:]+[MG:] combinations
+- **FOOTAGE 25-40%** — only applies to non-Philosopher's Lens episodes
+- **TRANSITION 3-7%**
+
+Combined `[AI-GEN:]` + `[SCENE:]` + `[ILLUST:]` should hit **30-45%** of runtime (was 15-30%). This is the operationalization of "looks like a Saul Bass / Adam Curtis fever dream" — the visual surface should read as illustrated atmospheric throughout, even when analytical content is in the foreground. The narration stays analytical; the visual register tilts toward atmospheric to differentiate from analytical-with-generic-visuals channels.
 
 The three registers (Analytical/Atmospheric/Grounding) should all be present in most episodes. If any register is completely absent, the visual texture flattens. Footage is register-neutral — it provides real-world grounding but isn't part of the three-register system. `[SCENE:]` blocks may sit in either Grounding or Atmospheric register depending on the scene's `register=` metadata.
 

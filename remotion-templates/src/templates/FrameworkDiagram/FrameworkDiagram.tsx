@@ -16,7 +16,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
@@ -536,7 +536,7 @@ const FlowVariant: React.FC<{
                     {/* Eliminated scenario beside arrow */}
                     {(eliminatedByFilter.get(i) || []).map(({ es, idx }, ei) => {
                       const esVisible = eliminatedVisible[idx];
-                      const esColor = es.color || "#D64545";
+                      const esColor = es.color || semantic.danger;
                       return esVisible ? (
                         <div
                           key={ei}

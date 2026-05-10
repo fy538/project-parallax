@@ -48,6 +48,17 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import type { ImageCompositeData } from "./types";
 
 /**
+ * Resolves an image src to a render-safe URL.
+ * - https:// / http:// paths pass through as-is (Remotion <Img> handles them natively).
+ * - Relative paths are wrapped with staticFile() to resolve from public/.
+ * Without this guard, passing a URL to staticFile() throws a TypeError synchronously.
+ */
+const resolveAssetSrc = (src: string): string =>
+  src.startsWith("http://") || src.startsWith("https://")
+    ? src
+    : staticFile(src);
+
+/**
  * Variant: Background — Full-bleed image with Ken Burns drift and duotone overlay.
  */
 const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
@@ -142,7 +153,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
           filter: `url(#${filterId})`,
         }}
       >
-        <Img src={staticFile(data.imagePath)} style={{ width: "100%", height: "100%" }} />
+        <Img src={resolveAssetSrc(data.imagePath)} style={{ width: "100%", height: "100%" }} />
       </AbsoluteFill>
 
       {/* Crawling film grain — backgroundPosition drifts per frame */}
@@ -333,7 +344,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           </svg>
           {/* Image with proper SVG duotone */}
           <Img
-            src={staticFile(data.imagePath)}
+            src={resolveAssetSrc(data.imagePath)}
             style={{
               width: "100%",
               height: "100%",
@@ -483,7 +494,7 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           </defs>
         </svg>
         <Img
-          src={staticFile(data.imagePath)}
+          src={resolveAssetSrc(data.imagePath)}
           style={{
             width: "100%",
             height: "100%",
