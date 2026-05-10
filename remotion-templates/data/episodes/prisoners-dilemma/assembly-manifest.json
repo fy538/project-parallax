@@ -3,7 +3,7 @@
   "episode": "prisoners-dilemma",
   "title": "prisoners-dilemma",
   "fps": 30,
-  "totalDurationSec": 886.8,
+  "totalDurationSec": 891.8,
   "mode": "estimate",
   "pacing": {
     "multipliers": {
@@ -104,10 +104,33 @@
   ],
   "segments": [
     {
+      "id": "beat0-title",
+      "type": "TRANSITION",
+      "startSec": 0.0,
+      "endSec": 5.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-episode.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
       "id": "beat1-seg01",
       "type": "TEMPLATE",
-      "startSec": 0.0,
-      "endSec": 12.0,
+      "startSec": 5.0,
+      "endSec": 17.0,
       "layer": "foreground",
       "beat": "beat1",
       "priority": "P2",
@@ -177,7 +200,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "The question this episode is about — how a framework that failed on day one conq",
+      "narrationRef": "The question this episode is about \u2014 how a framework that failed on day one conq",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-model-conquers.json"
@@ -213,7 +236,9 @@
         "searchTerms": [
           "Constructivist mid-century research office: two geometric figures in shirtsleeves at a small table with paper grids, warm amber light through venetian-blind slats casting parallel shadows, color-blocked interior in bone and grey-green"
         ],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-01-rand-office.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -233,10 +258,12 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "The subjects — an economist named Armen Alchian and a mathematician named John W",
+      "narrationRef": "The subjects \u2014 an economist named Armen Alchian and a mathematician named John W",
       "asset": {
         "searchTerms": [],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-01-rand-office.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -257,7 +284,7 @@
         "sixty percent",
         "sixty"
       ],
-      "narrationRef": "They cooperated sixty percent of the time. {✅}",
+      "narrationRef": "They cooperated sixty percent of the time. {\u2705}",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-flood-dresher.json"
@@ -292,7 +319,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "Mutual defection — the only outcome the model predicted — happened fourteen time",
+      "narrationRef": "Mutual defection \u2014 the only outcome the model predicted \u2014 happened fourteen time",
       "asset": {
         "searchTerms": [],
         "source": null
@@ -315,7 +342,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "John Nash — the man whose equilibrium concept the experiment was testing — read ",
+      "narrationRef": "John Nash \u2014 the man whose equilibrium concept the experiment was testing \u2014 read ",
       "asset": {
         "searchTerms": [],
         "source": "wikimedia-commons"
@@ -363,13 +390,15 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "That response — blame the players, not the model — set a template. The most infl",
+      "narrationRef": "That response \u2014 blame the players, not the model \u2014 set a template. The most infl",
       "asset": {
         "searchTerms": [
-          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions — university, military headquarters, stock exchange — all turning toward the equation as if worshipping it"
+          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions \u2014 university, military headquarters, stock exchange \u2014 all turning toward the equation as if worshipping it"
         ],
-        "source": null,
-        "shotListId": "aigen-02"
+        "source": "local-aigen",
+        "shotListId": "aigen-02",
+        "file": "clips/aigen-02-equation-poster.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -425,8 +454,10 @@
         "searchTerms": [
           "Constructivist aerial view: geometric building complex with national flags as abstract color bars, figures as small dots converging on entrance, overhead perspective, color-blocked in ink and bone with amber accent on central hall"
         ],
-        "source": null,
-        "shotListId": "aigen-03"
+        "source": "local-aigen",
+        "shotListId": "aigen-03",
+        "file": "clips/aigen-03-aerial-complex.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -467,6 +498,29 @@
       ]
     },
     {
+      "id": "beat2-title",
+      "type": "TRANSITION",
+      "startSec": 138.4,
+      "endSec": 140.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-beat2.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
       "id": "beat2-seg14",
       "type": "TEMPLATE",
       "startSec": 143.4,
@@ -479,7 +533,7 @@
       "syncWords": [
         "two thousand"
       ],
-      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {✅} Biologists imported it to e",
+      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {\u2705} Biologists imported it to e",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-diffusion.json"
@@ -556,8 +610,10 @@
         "searchTerms": [
           "Constructivist institutional corridor: fluorescent light bars as geometric strips, lone figure in suit walking past chalkboards dense with game matrices, color-blocked walls in grey-green and cream, figure rendered as angular silhouette"
         ],
-        "source": null,
-        "shotListId": "aigen-04"
+        "source": "local-aigen",
+        "shotListId": "aigen-04",
+        "file": "clips/aigen-04-rand-corridor.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -576,7 +632,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {✅} T",
+      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {\u2705} T",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-nuclear.json"
@@ -635,8 +691,10 @@
         "searchTerms": [
           "Constructivist doorway: dark geometric interior frame opening onto bright amber exterior, light rays as sharp triangular beams, threshold as clean dividing line between shadow and light"
         ],
-        "source": null,
-        "shotListId": "aigen-05"
+        "source": "local-aigen",
+        "shotListId": "aigen-05",
+        "file": "clips/aigen-05-doorway-threshold.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -767,6 +825,29 @@
       ]
     },
     {
+      "id": "beat3-title",
+      "type": "TRANSITION",
+      "startSec": 270.2,
+      "endSec": 272.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-beat3.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
       "id": "beat3-seg25",
       "type": "FOOTAGE",
       "startSec": 285.2,
@@ -779,7 +860,7 @@
       "narrationRef": "A model that failed its first experiment, applied to everything, still spreading",
       "asset": {
         "searchTerms": [
-          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines — mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
+          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines \u2014 mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
         ],
         "source": null,
         "shotListId": "aigen-06"
@@ -803,7 +884,7 @@
       "layer": "background",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "You walk into a negotiation. You've been trained — explicitly or implicitly, thr",
+      "narrationRef": "You walk into a negotiation. You've been trained \u2014 explicitly or implicitly, thr",
       "asset": {
         "searchTerms": [
           "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber"
@@ -834,7 +915,7 @@
       "syncWords": [
         "defect"
       ],
-      "narrationRef": "So you defect. And your counterpart — trained by the same textbooks, shaped by t",
+      "narrationRef": "So you defect. And your counterpart \u2014 trained by the same textbooks, shaped by t",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-trap-mechanism.json"
@@ -940,8 +1021,10 @@
         "searchTerms": [
           "Constructivist stock exchange floor: geometric traders as angular silhouettes reaching upward, ticker tape as flowing ribbon of numbers, equation hovering above like a sun, color-blocked in amber and ink"
         ],
-        "source": null,
-        "shotListId": "aigen-08"
+        "source": "local-aigen",
+        "shotListId": "aigen-08",
+        "file": "clips/aigen-08-stock-exchange.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1025,8 +1108,10 @@
         "searchTerms": [
           "Constructivist oil infrastructure: geometric refinery towers as angular columns against amber sunset, pipeline as bold horizontal line, smoke as stylized spiral forms, color-blocked in rust and ink"
         ],
-        "source": null,
-        "shotListId": "aigen-09"
+        "source": "local-aigen",
+        "shotListId": "aigen-09",
+        "file": "clips/aigen-09-oil-infrastructure.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1041,7 +1126,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  — the game we assume",
+      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  \u2014 the game we assume",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-cycle-vs-question.json"
@@ -1074,7 +1159,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong — but that it's the wrong",
+      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong \u2014 but that it's the wrong",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-wrong-game-real.json"
@@ -1107,7 +1192,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Checkpoint. This isn't conspiracy — nobody sat in a room and decided to mislead ",
+      "narrationRef": "Checkpoint. This isn't conspiracy \u2014 nobody sat in a room and decided to mislead ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-checkpoint-beat3.json"
@@ -1131,6 +1216,29 @@
       ]
     },
     {
+      "id": "beat4-title",
+      "type": "TRANSITION",
+      "startSec": 454.4,
+      "endSec": 456.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-beat4.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
+    },
+    {
       "id": "beat4-seg37",
       "type": "FOOTAGE",
       "startSec": 464.6,
@@ -1143,10 +1251,12 @@
       "narrationRef": "But here's the relief. There was always another game available. And we have proo",
       "asset": {
         "searchTerms": [
-          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures — some carrying logs together, others building a structure — color-blocked in warm palette"
+          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures \u2014 some carrying logs together, others building a structure \u2014 color-blocked in warm palette"
         ],
-        "source": null,
-        "shotListId": "aigen-10"
+        "source": "local-aigen",
+        "shotListId": "aigen-10",
+        "file": "clips/aigen-10-sunrise-cooperative.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1167,13 +1277,15 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {✅} A group of hunters face a cho",
+      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {\u2705} A group of hunters face a cho",
       "asset": {
         "searchTerms": [
           "Constructivist forest hunt: geometric trees as vertical columns, angular hunters with spears converging on a stylized stag in center, one hunter at edge turning toward a small hare, dawn light as amber rays through canopy, color-blocked in bone and ink"
         ],
-        "source": null,
-        "shotListId": "aigen-11"
+        "source": "local-aigen",
+        "shotListId": "aigen-11",
+        "file": "clips/aigen-11-forest-stag-hunt.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1199,7 +1311,7 @@
       "syncWords": [
         "fundamentally"
       ],
-      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma — but it is fund",
+      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma \u2014 but it is fund",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-staghunt.json"
@@ -1273,7 +1385,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {✅} An iterated Prison",
+      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {\u2705} An iterated Prison",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-iterated-equiv.json"
@@ -1345,8 +1457,10 @@
         "searchTerms": [
           "Constructivist terraced farmland: geometric stepped hillside with angular irrigation channels, small cooperative figures working at different levels, warm amber light across terraces, color-blocked in bone and green-grey"
         ],
-        "source": null,
-        "shotListId": "aigen-10"
+        "source": "local-aigen",
+        "shotListId": "aigen-10",
+        "file": "clips/aigen-12-terraced-farmland.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1394,7 +1508,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
+      "narrationRef": "Spanish irrigation cooperatives in Valencia \u2014 still operating after six hundred ",
       "asset": {
         "searchTerms": [],
         "source": null
@@ -1414,7 +1528,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Ostrom documented what they shared: eight design principles. {✅} Clear boundarie",
+      "narrationRef": "Ostrom documented what they shared: eight design principles. {\u2705} Clear boundarie",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-ostrom-vs-pd.json"
@@ -1481,17 +1595,42 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale — identifiable p",
+      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale \u2014 identifiable p",
       "asset": {
         "searchTerms": [
           "Constructivist ocean vastness: endless geometric waves as repeating angular forms stretching to horizon, no boundaries visible, tiny boat as single dot, overwhelming scale, color-blocked in ink and bone with grey-blue tint"
         ],
-        "source": null,
-        "shotListId": "aigen-13"
+        "source": "local-aigen",
+        "shotListId": "aigen-13",
+        "file": "clips/aigen-13-ocean-vastness.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
         "composite": "background"
+      }
+    },
+    {
+      "id": "beat5-title",
+      "type": "TRANSITION",
+      "startSec": 631.2,
+      "endSec": 633.2,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-section-beat5.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
       }
     },
     {
@@ -1506,8 +1645,10 @@
         "searchTerms": [
           "Constructivist city street: geometric pedestrian figures walking in evening light, angular building facades on both sides, long shadows as parallel lines, amber streetlight glow, color-blocked in ink and warm tones"
         ],
-        "source": null,
-        "shotListId": "aigen-14"
+        "source": "local-aigen",
+        "shotListId": "aigen-14",
+        "file": "clips/aigen-14-city-street.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1528,7 +1669,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Most of the major negotiations happening right now — US-China AI governance, cli",
+      "narrationRef": "Most of the major negotiations happening right now \u2014 US-China AI governance, cli",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-motif-beat5.json"
@@ -1567,7 +1708,7 @@
       "priority": "P2",
       "holdAfter": 3.0,
       "holdBehavior": "linger",
-      "narrationRef": "And the question the stag hunt asks — \"can we coordinate on the outcome we both ",
+      "narrationRef": "And the question the stag hunt asks \u2014 \"can we coordinate on the outcome we both ",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-motif-final.json"
@@ -1608,7 +1749,9 @@
         "searchTerms": [
           "Constructivist horizon: two geometric landmasses separated by narrow strait, each with a single glowing dot (amber and grey), reflection in the water between them, still and contemplative, color-blocked in ink and bone"
         ],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-15-horizon-landmasses.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1629,7 +1772,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Here's what would change my mind. If a major actor — say, the US or China in the",
+      "narrationRef": "Here's what would change my mind. If a major actor \u2014 say, the US or China in the",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-falsification.json"
@@ -1662,7 +1805,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "I put the probability of a US-China joint AI safety communiqué with shared techn",
+      "narrationRef": "I put the probability of a US-China joint AI safety communiqu\u00e9 with shared techn",
       "template": {
         "component": "ProbabilityGauge",
         "dataFile": "forecast-pd-cooperation.json"
@@ -1693,7 +1836,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Watch for the signals. The NPT Review Conference language — are they talking abo",
+      "narrationRef": "Watch for the signals. The NPT Review Conference language \u2014 are they talking abo",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-watch-signals.json"
@@ -1724,13 +1867,15 @@
       "layer": "background",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Games can be changed. It's not easy — seventy-five years of institutional moment",
+      "narrationRef": "Games can be changed. It's not easy \u2014 seventy-five years of institutional moment",
       "asset": {
         "searchTerms": [
           "Constructivist lecture hall: rows of geometric student figures facing a chalkboard covered in game matrices, angular professor silhouette at podium, overhead fluorescent strips, color-blocked in bone and grey with amber chalkboard highlights"
         ],
-        "source": null,
-        "shotListId": "aigen-16"
+        "source": "local-aigen",
+        "shotListId": "aigen-16",
+        "file": "clips/aigen-16-lecture-hall.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1855,7 +2000,9 @@
         "searchTerms": [
           "Constructivist panorama: two vast geometric cityscapes facing each other across a narrow channel, the channel itself shaped like a game theory matrix, tiny mannequin figures standing at the edges looking across, amber light from below, ink sky above"
         ],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-17-panorama-cityscapes.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "conflict",
@@ -1906,6 +2053,29 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "closing-title",
+      "type": "TRANSITION",
+      "startSec": 886.8,
+      "endSec": 891.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P1",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-end-card.json"
+      },
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 0.6
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "normal"
+      }
     }
   ]
 }

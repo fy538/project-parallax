@@ -22,7 +22,7 @@ export const PrisonersDilemmaFull: React.FC = () => (
   <FullEpisode
     manifest={manifest as any}
     templateData={TEMPLATE_DATA}
-    assetBasePath="assets/prisoners-dilemma"
+    assetBasePath="episodes/prisoners-dilemma"
   />
 );
 
@@ -35,7 +35,7 @@ export const PrisonersDilemmaFullComposition = () => (
         props: {
           manifest: manifest as any,
           templateData: TEMPLATE_DATA,
-          assetBasePath: "assets/prisoners-dilemma",
+          assetBasePath: "episodes/prisoners-dilemma",
         },
       })
     }
