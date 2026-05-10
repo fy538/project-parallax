@@ -15,8 +15,8 @@
  */
 
 import React from "react";
-import { AbsoluteFill, staticFile } from "remotion";
-import { EditorialSurface } from "../../components/EditorialSurface";
+import { AbsoluteFill } from "remotion";
+import { EditorialSurface, pickBackdrop } from "../../components/EditorialSurface";
 import { EditorialFrame } from "../../components/EditorialFrame";
 import { DataChart } from "../DataChart/DataChart";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -81,10 +81,7 @@ export const EditorialFrameHeroTest: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>
-      <EditorialSurface
-        intensity={0.6}
-        backdrop={staticFile("assets/backdrops/cartographic.png")}
-      >
+      <EditorialSurface intensity={0.4} backdrop={pickBackdrop("cartographic")}>
         <EditorialFrame
           variant="hero"
           kicker="iterated prisoner's dilemma"

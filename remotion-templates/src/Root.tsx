@@ -52,6 +52,7 @@ import { PrisonersDilemmaFullComposition } from "./templates/Episodes/PrisonersD
 import { ThumbnailComposition } from "./templates/Thumbnail";
 import {
   EditorialFrameHeroTestComposition,
+  EditorialFrameHeroFlippedTestComposition,
   EditorialFrameAsideTestComposition,
   EditorialFrameMinimalTestComposition,
 } from "./templates/EditorialTest";
@@ -183,6 +184,7 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Editorial">
         <EditorialFrameHeroTestComposition />
+        <EditorialFrameHeroFlippedTestComposition />
         <EditorialFrameAsideTestComposition />
         <EditorialFrameMinimalTestComposition />
       </Folder>

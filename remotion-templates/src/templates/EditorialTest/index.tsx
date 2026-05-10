@@ -10,12 +10,25 @@
 import { Composition } from "remotion";
 import { layout, sec } from "../../design/theme";
 import { EditorialFrameHeroTest } from "./EditorialFrameHeroTest";
+import { EditorialFrameHeroFlippedTest } from "./EditorialFrameHeroFlippedTest";
 import { EditorialFrameAsideTest, EditorialFrameMinimalTest } from "./EditorialFrameVariantsTest";
 
 export const EditorialFrameHeroTestComposition = () => (
   <Composition
     id="EditorialFrameHeroTest"
     component={EditorialFrameHeroTest}
+    width={layout.width}
+    height={layout.height}
+    fps={layout.fps}
+    durationInFrames={sec(14)}
+    defaultProps={{}}
+  />
+);
+
+export const EditorialFrameHeroFlippedTestComposition = () => (
+  <Composition
+    id="EditorialFrameHeroFlippedTest"
+    component={EditorialFrameHeroFlippedTest}
     width={layout.width}
     height={layout.height}
     fps={layout.fps}

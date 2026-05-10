@@ -23,7 +23,7 @@
  */
 
 import React, { type ReactNode } from "react";
-import { AbsoluteFill, Img, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { palette } from "../design/theme";
 
 export interface EditorialSurfaceProps {
@@ -170,3 +170,97 @@ export const EditorialSurface = React.memo(
   },
 );
 EditorialSurface.displayName = "EditorialSurface";
+
+// ── Backdrop manifest ─────────────────────────────────────────────────────────
+//
+// One row per backdrop in public/assets/backdrops/. The `anchor` field
+// describes where the backdrop's visual weight sits — used to pair with the
+// matching EditorialFrame variant so the foreground hero block lands on the
+// dense side and the chart lands over the quiet zone.
+//
+// Anchor → recommended frame variant:
+//   right    → "hero-flipped"  (hero right, chart left over the quiet)
+//   left     → "hero"           (hero left, chart right; body may need lift)
+//   centered → "hero"           (centered subject sits between hero and chart)
+//   bottom   → either           (sky/quiet zone fills the upper two-thirds)
+//
+// Add new backdrops here as the library grows. The manifest is the only place
+// the public/assets/backdrops/ filenames are enumerated in code — templates
+// pass `pickBackdrop("reading-room")` rather than typing the path literal.
+
+export type BackdropAnchor = "right" | "left" | "centered" | "bottom";
+
+export interface BackdropEntry {
+  /** Stem of the file in public/assets/backdrops/ (no extension). */
+  id: string;
+  /** Where the backdrop's visual weight sits. Drives variant pairing. */
+  anchor: BackdropAnchor;
+  /** Recommended EditorialFrame variant. */
+  variant: "hero" | "hero-flipped";
+  /** Short editorial description — what this backdrop says, when to use it. */
+  notes: string;
+}
+
+export const BACKDROP_MANIFEST: readonly BackdropEntry[] = [
+  {
+    id: "cartographic",
+    anchor: "centered",
+    variant: "hero",
+    notes: "Low-density topographic wash. Neutral. Pairs with any analytical content.",
+  },
+  {
+    id: "horizon",
+    anchor: "bottom",
+    variant: "hero",
+    notes: "Quiet sky over a low horizon line. Atmospheric supportive register.",
+  },
+  {
+    id: "twilight-skyline",
+    anchor: "bottom",
+    variant: "hero",
+    notes: "City silhouette along the bottom edge. Contemporary, urban register.",
+  },
+  {
+    id: "empty-plaza",
+    anchor: "centered",
+    variant: "hero",
+    notes: "Distant portico sits between hero and chart. Civic/institutional register.",
+  },
+  {
+    id: "industrial-yard",
+    anchor: "left",
+    variant: "hero",
+    notes: "Single smokestack anchors left. Industrial/material register. Body text may need to lift.",
+  },
+  {
+    id: "reading-room",
+    anchor: "right",
+    variant: "hero-flipped",
+    notes: "Book wall + diagonal light beams on right. Archival/scholarly register.",
+  },
+];
+
+const BACKDROP_INDEX: Record<string, BackdropEntry> = Object.fromEntries(
+  BACKDROP_MANIFEST.map((b) => [b.id, b]),
+);
+
+/**
+ * Resolve a backdrop id (e.g. "reading-room") to a staticFile() path ready to
+ * pass to `<EditorialSurface backdrop={...} />`. Throws on unknown id so a
+ * typo surfaces at composition mount rather than as a silent blank backdrop.
+ */
+export const pickBackdrop = (id: string): string => {
+  if (!BACKDROP_INDEX[id]) {
+    throw new Error(
+      `[EditorialSurface] Unknown backdrop "${id}". Available: ${BACKDROP_MANIFEST.map((b) => b.id).join(", ")}`,
+    );
+  }
+  return staticFile(`assets/backdrops/${id}.png`);
+};
+
+/**
+ * Look up the manifest entry — useful for picking the right EditorialFrame
+ * variant given a backdrop id at composition time. Returns null on unknown id.
+ */
+export const backdropMeta = (id: string): BackdropEntry | null =>
+  BACKDROP_INDEX[id] ?? null;

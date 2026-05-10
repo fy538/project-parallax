@@ -40,13 +40,16 @@ import { CLAMP_CUBIC, CLAMP_SINE } from "../utils/animation";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type EditorialVariant = "hero" | "aside" | "minimal";
+export type EditorialVariant = "hero" | "hero-flipped" | "aside" | "minimal";
 
 export interface EditorialFrameProps {
   /**
    * Layout variant. Default "minimal" — explicit opt-in to editorial scaffolding.
    * - "hero": full editorial layout with kicker, large hero stat, headline, body,
-   *   and children in the right two-thirds of the frame.
+   *   on the left, and children in the right two-thirds of the frame.
+   * - "hero-flipped": mirror of "hero" — hero block right, chart left. Pair with
+   *   right-anchored atmospheric backdrops (e.g. reading-room) so the hero
+   *   block sits on the dense side and the chart over the quiet zone.
    * - "aside": chart-dominant variant — smaller hero, compressed layout, children
    *   claim the primary visual real estate.
    * - "minimal": pure passthrough. Children render in their natural composition,
@@ -184,8 +187,41 @@ const HeroLayout = React.memo(
     children,
     showBrandMark,
     kickerColor,
-  }: Omit<EditorialFrameProps, "variant"> & { kickerColor: string }) => {
+    flipped = false,
+  }: Omit<EditorialFrameProps, "variant"> & {
+    kickerColor: string;
+    /**
+     * When true, mirror the layout horizontally: hero block on the right,
+     * chart on the left, brand mark lower-left, byline bottom-right.
+     * Kicker stays top-left (channel-default anchor).
+     */
+    flipped?: boolean;
+  }) => {
     const frame = useCurrentFrame();
+
+    // Horizontal placement: flipped swaps text panel and chart panel.
+    // Kicker stays top-left regardless of flip (channel-default anchor).
+    const textPanelStyle = flipped
+      ? {
+          right: layout.safeArea.right,
+          width: HERO_LEFT_PANEL_WIDTH,
+        }
+      : {
+          left: layout.safeArea.left,
+          width: HERO_LEFT_PANEL_WIDTH,
+        };
+    const textAlign: "left" | "right" = flipped ? "right" : "left";
+    const heroTransformOrigin = flipped ? "right center" : "left center";
+
+    const childrenPanelStyle = flipped
+      ? {
+          left: layout.safeArea.left,
+          right: HERO_RIGHT_PANEL_LEFT,
+        }
+      : {
+          left: HERO_RIGHT_PANEL_LEFT,
+          right: layout.safeArea.right,
+        };
 
     // Frame 0–15: kicker rule extends, label fades
     const kickerRuleWidth = interpolate(frame, [0, 15], [0, 40], CLAMP_CUBIC);
@@ -207,63 +243,67 @@ const HeroLayout = React.memo(
     const bylineRuleWidth = interpolate(frame, [100, 130], [0, 60], CLAMP_CUBIC);
     const bylineOpacity = interpolate(frame, [115, 135], [0, 1], CLAMP_SINE);
 
+    // Inner-item horizontal alignment inside the text panel: standard hero
+    // hugs the left edge; flipped hero hugs the right edge of its panel.
+    const innerEdge = flipped ? { right: 0 } : { left: 0 };
+
     return (
       <AbsoluteFill>
-        {/* ── Left text panel ──────────────────────────────────────────── */}
+        {/* ── Kicker: always top-left of frame (channel-default anchor) ─ */}
+        {kicker && (
+          <div
+            style={{
+              position: "absolute",
+              top: layout.safeArea.top + 8,
+              left: layout.safeArea.left,
+              display: "flex",
+              alignItems: "center",
+              gap: layout.spacing.xs,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                width: kickerRuleWidth,
+                height: 1,
+                backgroundColor: kickerColor,
+                flexShrink: 0,
+              }}
+            />
+            <div
+              style={{
+                fontFamily: fonts.mono,
+                fontSize: KICKER_FONT_SIZE,
+                fontWeight: 400,
+                color: palette.ink,
+                letterSpacing: 2,
+                textTransform: "lowercase" as const,
+                opacity: kickerOpacity,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {kicker}
+            </div>
+          </div>
+        )}
+
+        {/* ── Hero text panel (flips left↔right) ──────────────────────── */}
         <div
           style={{
             position: "absolute",
             top: 0,
-            left: layout.safeArea.left,
             bottom: 0,
-            width: HERO_LEFT_PANEL_WIDTH,
             pointerEvents: "none",
+            ...textPanelStyle,
           }}
         >
-          {/* Kicker: rule + label */}
-          {kicker && (
-            <div
-              style={{
-                position: "absolute",
-                top: layout.safeArea.top + 8,
-                left: 0,
-                display: "flex",
-                alignItems: "center",
-                gap: layout.spacing.xs,
-              }}
-            >
-              <div
-                style={{
-                  width: kickerRuleWidth,
-                  height: 1,
-                  backgroundColor: kickerColor,
-                  flexShrink: 0,
-                }}
-              />
-              <div
-                style={{
-                  fontFamily: fonts.mono,
-                  fontSize: KICKER_FONT_SIZE,
-                  fontWeight: 400,
-                  color: palette.ink,
-                  letterSpacing: 2,
-                  textTransform: "lowercase" as const,
-                  opacity: kickerOpacity,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {kicker}
-              </div>
-            </div>
-          )}
-
           {/* Hero stat */}
           {hero !== undefined && (
             <div
               style={{
                 position: "absolute",
                 top: layout.safeArea.top + 56,
-                left: 0,
+                ...innerEdge,
                 fontFamily: fonts.heading,
                 fontSize: HERO_FONT_SIZE,
                 fontWeight: 500,
@@ -272,9 +312,10 @@ const HeroLayout = React.memo(
                 lineHeight: 1,
                 maxWidth: HERO_LEFT_PANEL_WIDTH,
                 overflow: "hidden",
+                textAlign,
                 opacity: heroOpacity,
                 transform: `scale(${heroScale}) translateY(${heroTranslateY}px)`,
-                transformOrigin: "left center",
+                transformOrigin: heroTransformOrigin,
               }}
             >
               {hero}
@@ -287,7 +328,7 @@ const HeroLayout = React.memo(
               style={{
                 position: "absolute",
                 top: layout.safeArea.top + 210,
-                left: 0,
+                ...innerEdge,
                 fontFamily: fonts.heading,
                 fontSize: HERO_HEADLINE_SIZE,
                 fontWeight: 500,
@@ -298,6 +339,7 @@ const HeroLayout = React.memo(
                 overflow: "hidden",
                 wordBreak: "break-word",
                 overflowWrap: "break-word",
+                textAlign,
                 opacity: headlineOpacity,
                 transform: `translateY(${headlineTranslateY}px)`,
               }}
@@ -312,7 +354,7 @@ const HeroLayout = React.memo(
               style={{
                 position: "absolute",
                 top: layout.safeArea.top + 320,
-                left: 0,
+                ...innerEdge,
                 fontFamily: fonts.heading,
                 fontSize: BODY_FONT_SIZE,
                 fontWeight: 400,
@@ -323,6 +365,7 @@ const HeroLayout = React.memo(
                 overflow: "hidden",
                 wordBreak: "break-word",
                 overflowWrap: "break-word",
+                textAlign,
                 opacity: bodyOpacity * 0.7,
               }}
             >
@@ -330,13 +373,16 @@ const HeroLayout = React.memo(
             </div>
           )}
 
-          {/* Byline: ink rule + text, bottom-anchored */}
+          {/* Byline: ink rule + text, bottom-anchored to same side as hero */}
           {byline && (
             <div
               style={{
                 position: "absolute",
                 bottom: layout.safeArea.bottom,
-                left: 0,
+                ...innerEdge,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: flipped ? "flex-end" : "flex-start",
               }}
             >
               <div
@@ -358,6 +404,7 @@ const HeroLayout = React.memo(
                   textTransform: "lowercase" as const,
                   opacity: bylineOpacity * 0.6,
                   whiteSpace: "nowrap",
+                  textAlign,
                 }}
               >
                 {byline}
@@ -366,15 +413,14 @@ const HeroLayout = React.memo(
           )}
         </div>
 
-        {/* ── Right children panel ──────────────────────────────────────── */}
+        {/* ── Chart panel (flips left↔right) ───────────────────────────── */}
         <div
           style={{
             position: "absolute",
             top: 0,
-            left: HERO_RIGHT_PANEL_LEFT,
-            right: layout.safeArea.right,
             bottom: 0,
             overflow: "hidden",
+            ...childrenPanelStyle,
           }}
         >
           {/*
@@ -396,12 +442,14 @@ const HeroLayout = React.memo(
           </Sequence>
         </div>
 
-        {/* ── Brand mark: lower-right ───────────────────────────────────── */}
+        {/* ── Brand mark: opposite corner from hero block ─────────────── */}
         {showBrandMark && (
           <div
             style={{
               position: "absolute",
-              right: layout.safeArea.right + layout.spacing.xs,
+              ...(flipped
+                ? { left: layout.safeArea.left + layout.spacing.xs }
+                : { right: layout.safeArea.right + layout.spacing.xs }),
               bottom: layout.safeArea.bottom + layout.spacing.xs,
             }}
           >
@@ -678,7 +726,7 @@ export const EditorialFrame = React.memo(
 
     const _showBrandMark = showBrandMark ?? variant !== "minimal";
 
-    if (variant === "hero") {
+    if (variant === "hero" || variant === "hero-flipped") {
       return (
         <HeroLayout
           kicker={kicker}
@@ -688,6 +736,7 @@ export const EditorialFrame = React.memo(
           byline={byline}
           showBrandMark={_showBrandMark}
           kickerColor={kickerColor}
+          flipped={variant === "hero-flipped"}
         >
           {children}
         </HeroLayout>

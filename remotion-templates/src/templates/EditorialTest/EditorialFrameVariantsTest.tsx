@@ -14,7 +14,7 @@
 
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { EditorialSurface } from "../../components/EditorialSurface";
+import { EditorialSurface, pickBackdrop } from "../../components/EditorialSurface";
 import { EditorialFrame } from "../../components/EditorialFrame";
 import { DataChart } from "../DataChart/DataChart";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -48,7 +48,7 @@ export const EditorialFrameAsideTest: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>
-      <EditorialSurface intensity={0.6}>
+      <EditorialSurface intensity={0.4} backdrop={pickBackdrop("horizon")}>
         <EditorialFrame
           variant="aside"
           kicker="iterated prisoner's dilemma"
@@ -69,7 +69,7 @@ export const EditorialFrameMinimalTest: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>
-      <EditorialSurface intensity={0.6}>
+      <EditorialSurface intensity={0.4} backdrop={pickBackdrop("cartographic")}>
         <EditorialFrame variant="minimal" showBrandMark>
           <DataChart data={defectionRateData} />
         </EditorialFrame>
