@@ -210,7 +210,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
         hasXAxis: true,
         hasSource: !!data.source,
         safeAreaTier: "generous",
-        extraPad: { left: 100, right: 100 }, // y-axis label space + legend strip clearance
+        extraPad: { left: 100, right: 220 }, // y-axis label gutter + terminal value label gutter
       }),
     [data.lines.length, data.source]
   );
@@ -257,15 +257,19 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
       const dataMin = yMin;
       const dataMax = yMax;
       const range = dataMax - dataMin || 1;
+      // Tight headroom (5%) — leaves enough vertical air for the line to
+      // breathe but doesn't waste a quarter of the chart on dead space.
+      // Terminal labels at the right edge use the chart's right gutter, not
+      // the top, so they don't need extra y-headroom.
       if (dataMin >= 0) {
         yMin = 0;
-        yMax = dataMax + range * 0.1;
+        yMax = dataMax + range * 0.05;
       } else if (dataMax <= 0) {
-        yMin = dataMin - range * 0.1;
+        yMin = dataMin - range * 0.05;
         yMax = 0;
       } else {
-        yMin = dataMin - range * 0.1;
-        yMax = dataMax + range * 0.1;
+        yMin = dataMin - range * 0.05;
+        yMax = dataMax + range * 0.05;
       }
       [yMin, yMax] = niceDomain(yMin, yMax, 5);
     }
@@ -350,6 +354,45 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
   // ── Annotations ────────────────────────────────────────────────────────────
   const annotationOpacity = fadeIn(frame, annotationStart, sec(0.4)) * exitFade(frame, durationInFrames, sec(0.5));
+
+  // Pre-resolve each annotation's pixel position against the first line that
+  // either contains the x value or has adjacent points to interpolate between.
+  // Used by BOTH the SVG dot/leader-line rendering and the HTML label, so they
+  // stay in sync (avoids the regression where label sat at chartTop-60 and dot
+  // sat on the actual data point).
+  const annotationPositions = useMemo(() => {
+    if (!data.annotations) return [] as Array<{ xPx: number; yPx: number; resolved: boolean }>;
+    return data.annotations.map((annot) => {
+      const annotXNumeric = typeof annot.x === "string" ? parseFloat(annot.x) : annot.x;
+      for (const line of data.lines) {
+        const pts = line.points;
+        for (let i = 0; i < pts.length; i++) {
+          const px = typeof pts[i].x === "string" ? parseFloat(pts[i].x as string) : (pts[i].x as number);
+          if (px === annotXNumeric) {
+            return {
+              xPx: getXPosition(pts[i].x, xMin, xMax, chartLeft, chartRight),
+              yPx: getYPosition(pts[i].y, yMin, yMax, chartTop, chartBottom),
+              resolved: true,
+            };
+          }
+          if (i > 0) {
+            const prev = pts[i - 1];
+            const prevX = typeof prev.x === "string" ? parseFloat(prev.x as string) : (prev.x as number);
+            if (prevX < annotXNumeric && annotXNumeric < px) {
+              const t = (annotXNumeric - prevX) / (px - prevX);
+              const interpY = prev.y + t * (pts[i].y - prev.y);
+              return {
+                xPx: getXPosition(annotXNumeric, xMin, xMax, chartLeft, chartRight),
+                yPx: getYPosition(interpY, yMin, yMax, chartTop, chartBottom),
+                resolved: true,
+              };
+            }
+          }
+        }
+      }
+      return { xPx: chartLeft, yPx: chartBottom, resolved: false };
+    });
+  }, [data.annotations, data.lines, xMin, xMax, yMin, yMax, chartLeft, chartRight, chartTop, chartBottom]);
 
   // ── Hero stat (large corner statistic) ──────────────────────────────────
   let heroStatValue = 0;
@@ -494,7 +537,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               chartLeft,
               chartRight
             );
-            const eraOpacity = Math.min(era.opacity ?? 0.08, 0.08) * eraFadeOpacity;
+            // Era bands span large ranges of the chart — a "subtle" 0.08 fill
+            // becomes visually heavy when 80% of the canvas is covered by it.
+            // Clamp to 0.05 unless the data explicitly requests more.
+            const eraOpacity = Math.min(era.opacity ?? 0.05, 0.05) * eraFadeOpacity;
             const borderOpacity = eraFadeOpacity * 0.4;
 
             return (
@@ -645,18 +691,30 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             );
             const lineStyle = lineDrawStyle(linePathLengths[lineIdx], lineProgress);
 
+            // Hero/supporting hierarchy: when any line in the dataset is
+            // marked `hero`, supporting lines render thinner and at reduced
+            // opacity so the protagonist's trajectory dominates. If no line
+            // is a hero, every line gets the standard treatment.
+            const anyHero = data.lines.some((l) => l.hero);
+            const isHero = line.hero;
+            const heroStroke = anyHero
+              ? (isHero ? (line.width ?? 7) : (line.width ?? 3))
+              : (line.width ?? 5);
+            const heroOpacity = anyHero && !isHero ? 0.55 : 1;
             return (
               <polyline
                 key={`line-${lineIdx}`}
                 points={linePointStrings[lineIdx]}
                 fill="none"
                 stroke={line.color}
-                strokeWidth={line.width ?? 5}
+                strokeWidth={heroStroke}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray={line.dashed ? "8,4" : undefined}
                 strokeDashoffset={lineStyle.strokeDashoffset as number}
-                opacity={fadeIn(frame, lineDrawStart_frame, sec(0.2)) * exitOpacity}
+                opacity={
+                  fadeIn(frame, lineDrawStart_frame, sec(0.2)) * exitOpacity * heroOpacity
+                }
                 style={{ filter: `drop-shadow(0 2px 3px ${line.color}55)` }}
               />
             );
@@ -723,22 +781,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
           {/* ── Annotation dots and lines ──────────────────────────────────*/}
           {data.annotations?.map((annot, annotIdx) => {
-            // Find which line and point this annotation refers to
-            let annotX = chartLeft;
-            let annotY = chartBottom;
-            let found = false;
-
-            for (const line of data.lines) {
-              for (const point of line.points) {
-                if (point.x === annot.x || String(point.x) === String(annot.x)) {
-                  annotX = getXPosition(point.x, xMin, xMax, chartLeft, chartRight);
-                  annotY = getYPosition(point.y, yMin, yMax, chartTop, chartBottom);
-                  found = true;
-                  break;
-                }
-              }
-              if (found) break;
-            }
+            const pos = annotationPositions[annotIdx];
+            const annotX = pos?.xPx ?? chartLeft;
+            const annotY = pos?.yPx ?? chartBottom;
 
             const annotColor = annot.color || accentColor;
             const annotLineOpacity = annot.line !== false ? annotationOpacity : 0;
@@ -783,6 +828,96 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               </g>
             );
           })}
+
+          {/* ── Terminal value labels (right edge of each line) ─────────────*/}
+          {/* Editorial idiom: every line gets its current/final value labeled
+              at the right edge, anchoring the eye's destination. Labels
+              auto-stack vertically when two lines' endpoints fall within ~32px
+              of each other to avoid collision. */}
+          {(() => {
+            const labelStart = lineStartFrames.length > 0
+              ? lineStartFrames[lineStartFrames.length - 1] + lineDrawDuration
+              : sec(2);
+            const baseOpacity = fadeIn(frame, labelStart, sec(0.5)) * exitOpacity;
+            if (baseOpacity < 0.01) return null;
+            const anyHero = data.lines.some((l) => l.hero);
+
+            // Compute desired label y for each line (= last point's y) and
+            // sort by y. Then push labels down to enforce a minimum gap.
+            const labelEntries = data.lines
+              .map((line, idx) => {
+                const pts = linePixelPoints[idx];
+                if (pts.length === 0) return null;
+                const last = pts[pts.length - 1];
+                const lastValue = line.points[line.points.length - 1].y;
+                return {
+                  idx,
+                  line,
+                  endX: last.x,
+                  endY: last.y,
+                  value: lastValue,
+                };
+              })
+              .filter((e): e is NonNullable<typeof e> => e !== null)
+              .sort((a, b) => a.endY - b.endY);
+
+            const minGap = 36;
+            const placed = [...labelEntries];
+            for (let i = 1; i < placed.length; i++) {
+              const prev = placed[i - 1];
+              if (placed[i].endY - prev.endY < minGap) {
+                placed[i] = { ...placed[i], endY: prev.endY + minGap };
+              }
+            }
+
+            return placed.map((entry) => {
+              const isHero = entry.line.hero;
+              const labelOpacity = baseOpacity * (anyHero && !isHero ? 0.7 : 1);
+              return (
+                <g key={`terminal-${entry.idx}`} opacity={labelOpacity}>
+                  {/* Tiny dot at the actual line endpoint */}
+                  <circle
+                    cx={entry.endX}
+                    cy={entry.line.points[entry.line.points.length - 1].y === entry.value
+                      ? getYPosition(entry.value, yMin, yMax, chartTop, chartBottom)
+                      : entry.endY}
+                    r={4}
+                    fill={entry.line.color}
+                  />
+                  {/* Value (bold, color-matched) */}
+                  <text
+                    x={entry.endX + 14}
+                    y={entry.endY}
+                    fill={entry.line.color}
+                    fontSize={isHero ? fontSizes.h3 : fontSizes.label}
+                    fontWeight={700}
+                    fontFamily={fonts.data}
+                    dominantBaseline="middle"
+                  >
+                    {formatNumber(entry.value, { decimals: entry.value >= 100 ? 0 : 1 })}
+                    {data.yUnit && (
+                      <tspan fontSize={fontSizes.label} fill={mutedColor}>
+                        {data.yUnit}
+                      </tspan>
+                    )}
+                  </text>
+                  {/* Source label (small, muted) — under the value */}
+                  <text
+                    x={entry.endX + 14}
+                    y={entry.endY + (isHero ? 22 : 18)}
+                    fill={mutedColor}
+                    fontSize={fontSizes.meta}
+                    fontWeight={500}
+                    fontFamily={fonts.mono}
+                    dominantBaseline="middle"
+                    letterSpacing={letterSpacing.meta}
+                  >
+                    {entry.line.label.toUpperCase()}
+                  </text>
+                </g>
+              );
+            });
+          })()}
         </svg>
 
         {/* ── Y-axis labels ──────────────────────────────────────────────────*/}
@@ -803,6 +938,11 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
         >
           {Array.from({ length: 5 }).map((_, i) => {
             const yValue = yMax - (i / 4) * (yMax - yMin);
+            // Show the unit only on the topmost tick — subsequent ticks omit
+            // it (Tufte-style: state the unit once, then let numerals carry
+            // the meaning). Drops "M / M / M / M / M" or "ppm / ppm / ppm…"
+            // visual noise on every tick.
+            const isTop = i === 0;
             return (
               <div
                 key={`y-label-${i}`}
@@ -817,7 +957,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 }}
               >
                 {formatNumber(yValue, { decimals: yValue >= 100 ? 0 : 1 })}
-                {data.yUnit && <span style={{ marginLeft: 2 }}>{data.yUnit}</span>}
+                {isTop && data.yUnit && <span style={{ marginLeft: 2 }}>{data.yUnit}</span>}
               </div>
             );
           })}
@@ -834,9 +974,35 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             opacity: fadeIn(frame, axesStart + sec(0.1), sec(0.3)),
           }}
         >
-          {/* Sample x-axis labels: first, middle, last */}
-          {[0, 0.5, 1].map((progress, i) => {
-            const xValue = xMin + progress * (xMax - xMin);
+          {/* X-axis tick labels — adaptive density. For year-style x ranges
+              we target ~6 ticks at human-readable intervals (decade or
+              quarter-century). For short ranges (≤30 years) we step every
+              5 years; for longer ranges we step every 25 or 50 years. */}
+          {((): number[] => {
+            const span = xMax - xMin;
+            // Pick a step that produces 5–7 ticks for the given span.
+            const candidates = [1, 2, 5, 10, 25, 50, 100];
+            const targetTicks = 6;
+            let step = candidates[candidates.length - 1];
+            for (const c of candidates) {
+              if (span / c <= targetTicks + 1) { step = c; break; }
+            }
+            const first = Math.ceil(xMin / step) * step;
+            const ticks: number[] = [];
+            for (let v = first; v <= xMax + 0.001; v += step) ticks.push(v);
+            // Ensure first and last data points are represented even if they
+            // don't land on a step boundary (e.g. 1850–2024 with step 25
+            // would otherwise miss 2024).
+            if (ticks[0] !== xMin) ticks.unshift(xMin);
+            if (ticks[ticks.length - 1] !== xMax) ticks.push(xMax);
+            // Drop ticks that would crowd the start/end markers.
+            return ticks.filter((v, i, arr) => {
+              if (i === 0 || i === arr.length - 1) return true;
+              const prev = arr[i - 1];
+              const next = arr[i + 1];
+              return v - prev >= step * 0.6 && next - v >= step * 0.6;
+            });
+          })().map((xValue, i) => {
             const labelX = getXPosition(xValue, xMin, xMax, chartLeft, chartRight);
             return (
               <div
@@ -905,69 +1071,72 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
           </div>
         )}
 
-        {/* ── Annotation callouts (text labels) — with collision-avoidance force-layout ──*/}
+        {/* ── Annotation callouts (text labels) ─────────────────────────────
+            Labels sit close to the data point with a short leader-line.
+            Stacking is handled by computeLabelStacks for clustered annotations.
+            Drops the previous "labels float at chartTop - 60" behavior — the
+            label is now visually connected to the moment it describes. */}
         {(() => {
           if (!data.annotations) return null;
-          // Pre-compute annotation x positions and stack offsets to avoid overlap
-          // Stack annotations vertically so clustered labels don't collide.
-          // The util in `utils/labelStack` is shared with any chart that
-          // needs the same collision-avoidance — keeps the algorithm in
-          // one place instead of inlined per-template.
-          const annots = data.annotations.map((annot) => ({
+          const annots = data.annotations.map((annot, idx) => ({
             ...annot,
-            xPx: getXPosition(annot.x, xMin, xMax, chartLeft, chartRight),
+            xPx: annotationPositions[idx]?.xPx ?? chartLeft,
           }));
-          const stackByIdx = computeLabelStacks(annots, { collisionThreshold: 80 });
+          const stackByIdx = computeLabelStacks(annots, { collisionThreshold: 120 });
           return data.annotations.map((annot, annotIdx) => {
-          const annotX = getXPosition(
-            annot.x,
-            xMin,
-            xMax,
-            chartLeft,
-            chartRight
-          );
-          const offsetX = annotX < layout.width / 2 ? 16 : -16;
-          const textAnchor = annotX < layout.width / 2 ? "left" : "right";
-          const stackOffsetY = stackByIdx[annotIdx] * 40;
-
-          return (
-            <div
-              key={`annot-label-${annotIdx}`}
-              style={{
-                position: "absolute",
-                left: annotX + offsetX,
-                top: chartTop - 60 + stackOffsetY,
-                textAlign: textAnchor,
-                opacity: annotationOpacity,
-              }}
-            >
+            const pos = annotationPositions[annotIdx];
+            if (!pos) return null;
+            const isRightHalf = pos.xPx > chartLeft + (chartRight - chartLeft) * 0.6;
+            // Label sits ~60px above the dot by default; offsets to the LEFT
+            // when the dot is in the right portion of the chart so it stays
+            // inside the chart bounds.
+            const labelOffsetX = isRightHalf ? -16 : 16;
+            const labelOffsetY = -56 - stackByIdx[annotIdx] * 40;
+            const labelX = pos.xPx + labelOffsetX;
+            const labelY = pos.yPx + labelOffsetY;
+            const textAlign = isRightHalf ? "right" : "left";
+            return (
               <div
+                key={`annot-label-${annotIdx}`}
                 style={{
-                  fontSize: fontSizes.label,
-                  fontFamily: fonts.mono,
-                  color: annot.color || accentColor,
-                  fontWeight: 600,
-                  textShadow: shadows.textLift,
+                  position: "absolute",
+                  left: isRightHalf ? undefined : labelX,
+                  right: isRightHalf ? layout.width - labelX : undefined,
+                  top: labelY,
+                  textAlign,
+                  opacity: annotationOpacity,
+                  maxWidth: 240,
                 }}
               >
-                {annot.label}
-              </div>
-              {annot.sublabel && (
                 <div
                   style={{
-                    fontSize: fontSizes.meta,
+                    fontSize: fontSizes.label,
                     fontFamily: fonts.mono,
-                    color: mutedColor,
-                    marginTop: layout.spacing.xs,
+                    color: annot.color || accentColor,
+                    fontWeight: 600,
                     textShadow: shadows.textLift,
+                    maxWidth: textMaxWidth.label,
                   }}
                 >
-                  {annot.sublabel}
+                  {annot.label}
                 </div>
-              )}
-            </div>
-          );
-        });
+                {annot.sublabel && (
+                  <div
+                    style={{
+                      fontSize: fontSizes.meta,
+                      fontFamily: fonts.mono,
+                      color: mutedColor,
+                      marginTop: layout.spacing.xs,
+                      textShadow: shadows.textLift,
+                      maxWidth: textMaxWidth.label,
+                    }}
+                  >
+                    {annot.sublabel}
+                  </div>
+                )}
+              </div>
+            );
+          });
         })()}
 
         {/* ── Hero stat (large corner statistic) ──────────────────────────────*/}

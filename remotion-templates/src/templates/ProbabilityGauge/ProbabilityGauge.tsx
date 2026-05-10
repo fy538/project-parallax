@@ -45,7 +45,7 @@ import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import type { ProbabilityGaugeData, ShiftItem, ScorecardItem, ForecastData } from "./types";
+import type { ProbabilityGaugeData, GaugeItem, ShiftItem, ScorecardItem, ForecastData } from "./types";
 
 // ── Gauge Arc Component ────────────────────────────────────────────────────
 
@@ -232,6 +232,289 @@ const GaugeArc: React.FC<{
           {marketSource}
         </div>
       )}
+    </div>
+  );
+});
+
+// ── Probability Strip Component ────────────────────────────────────────────
+//
+// Multi-source probability comparison on a shared 0–100% axis. One row per
+// source, dot landing at each value — Cleveland & McGill (1984) rank
+// position-on-a-common-axis as the most perceptually accurate encoding.
+// Editorial form used by NYT Upshot approval trackers, FiveThirtyEight model
+// comparisons, and Economist forecast pages. Replaces the multi-arc gauge
+// pattern, which fails on clustered values (labels collide at tick positions).
+const ProbabilityStrip: React.FC<{
+  items: GaugeItem[];
+  frame: number;
+  startFrame: number;
+  width: number;
+  defaultColor: string;
+  mode: "light" | "dark";
+}> = React.memo(({ items, frame, startFrame, width, defaultColor, mode }) => {
+  const theme = useThemeMode(mode);
+
+  // Layout: source-label gutter | shared 0–100% axis | value gutter
+  const labelGutter = 280;
+  const valueGutter = 140;
+  const axisWidth = width - labelGutter - valueGutter;
+  const rowHeight = 84;
+  const rowGap = 8;
+  const axisLabelHeight = 36;
+
+  const values = items.map((g) => g.value);
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const spread = maxVal - minVal;
+  const showSpread = items.length >= 2 && spread >= 5;
+  const spreadFade = showSpread
+    ? fadeIn(frame, startFrame + sec(1.4) + items.length * sec(0.2), sec(0.4))
+    : 0;
+
+  const minorTicks = [0, 25, 50, 75, 100];
+  const axisFade = fadeIn(frame, startFrame, sec(0.5));
+
+  const totalRowsHeight = items.length * rowHeight + (items.length - 1) * rowGap;
+  const totalHeight = totalRowsHeight + axisLabelHeight + 32 + (showSpread ? 56 : 0);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        width,
+        height: totalHeight,
+      }}
+    >
+      {/* ── Spread annotation (top-right, above the rows) ─────────────── */}
+      {showSpread && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            right: valueGutter,
+            opacity: spreadFade,
+            fontSize: fontSizes.meta,
+            color: theme.text.muted,
+            fontFamily: fonts.mono,
+            letterSpacing: letterSpacing.meta,
+            textTransform: "uppercase",
+            maxWidth: textMaxWidth.label,
+            whiteSpace: "nowrap",
+          }}
+        >
+          {spread}-pt spread between forecasts
+        </div>
+      )}
+
+      {/* ── Per-source rows ───────────────────────────────────────────── */}
+      {items.map((item, i) => {
+        const rowTop = (showSpread ? 56 : 0) + i * (rowHeight + rowGap);
+        const rowStart = startFrame + sec(0.4) + i * sec(0.3);
+        const rowFade = fadeIn(frame, rowStart, sec(0.4));
+        const dotProgress = interpolate(
+          frame,
+          [rowStart + sec(0.2), rowStart + sec(0.8)],
+          [0, 1],
+          CLAMP_CUBIC
+        );
+        const valueOpacity = fadeIn(frame, rowStart + sec(0.5), sec(0.4));
+        const settle = pulse(frame, rowStart + sec(0.8), 8, 1.04);
+        const displayValue = Math.round(item.value * dotProgress);
+        const color = item.color || defaultColor;
+
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              top: rowTop,
+              left: 0,
+              width,
+              height: rowHeight,
+              opacity: rowFade,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {/* Source label gutter (left) */}
+            <div
+              style={{
+                width: labelGutter,
+                paddingRight: layout.spacing.lg,
+                textAlign: "right",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: fontSizes.h3,
+                  fontWeight: fontWeights.semibold,
+                  color: theme.text.primary,
+                  fontFamily: fonts.heading,
+                  lineHeight: 1.1,
+                  maxWidth: textMaxWidth.label,
+                }}
+              >
+                {item.label}
+              </div>
+              {item.marketSource && (
+                <div
+                  style={{
+                    marginTop: 4,
+                    fontSize: fontSizes.meta,
+                    color: theme.text.muted,
+                    fontFamily: fonts.mono,
+                    letterSpacing: letterSpacing.meta,
+                    textTransform: "uppercase",
+                    maxWidth: textMaxWidth.label,
+                  }}
+                >
+                  {item.marketSource}
+                </div>
+              )}
+            </div>
+
+            {/* Shared axis (middle) */}
+            <div
+              style={{
+                width: axisWidth,
+                height: rowHeight,
+                position: "relative",
+              }}
+            >
+              {/* Background track */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: rowHeight / 2 - 1,
+                  left: 0,
+                  width: "100%",
+                  height: 2,
+                  background: theme.text.muted,
+                  opacity: 0.18,
+                }}
+              />
+              {/* Filled portion (0 → value) — subtle weight on the row's color */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: rowHeight / 2 - 1.5,
+                  left: 0,
+                  width: `${item.value * dotProgress}%`,
+                  height: 3,
+                  background: color,
+                  opacity: 0.45,
+                  borderRadius: 2,
+                }}
+              />
+              {/* Dot at the value */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: rowHeight / 2,
+                  left: `${item.value * dotProgress}%`,
+                  transform: `translate(-50%, -50%) scale(${settle})`,
+                  width: 18,
+                  height: 18,
+                  borderRadius: "50%",
+                  background: color,
+                  border: `3px solid ${theme.bg.base}`,
+                  boxShadow: `0 0 12px ${color}60, ${shadows.subtle}`,
+                  opacity: dotProgress > 0.05 ? 1 : 0,
+                }}
+              />
+            </div>
+
+            {/* Value gutter (right) */}
+            <div
+              style={{
+                width: valueGutter,
+                paddingLeft: layout.spacing.lg,
+                fontSize: fontSizes.h2,
+                fontWeight: fontWeights.bold,
+                fontFamily: fonts.data,
+                color: theme.text.primary,
+                lineHeight: 1,
+                opacity: valueOpacity,
+                whiteSpace: "nowrap",
+                maxWidth: textMaxWidth.label,
+              }}
+            >
+              {displayValue}
+              <span
+                style={{
+                  fontSize: fontSizes.h3,
+                  color,
+                  fontWeight: fontWeights.semibold,
+                  marginLeft: 2,
+                }}
+              >
+                %
+              </span>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* ── Shared 0–100% axis (below the rows) ───────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: (showSpread ? 56 : 0) + totalRowsHeight + 24,
+          left: labelGutter,
+          width: axisWidth,
+          opacity: axisFade,
+        }}
+      >
+        {/* Top border of axis */}
+        <div
+          style={{
+            width: "100%",
+            height: 1,
+            background: theme.text.muted,
+            opacity: 0.4,
+          }}
+        />
+        {/* Tick marks + labels */}
+        {minorTicks.map((pct) => (
+          <div
+            key={pct}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: `${pct}%`,
+              transform: "translateX(-50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                width: 1,
+                height: 6,
+                background: theme.text.muted,
+                opacity: 0.5,
+              }}
+            />
+            <div
+              style={{
+                marginTop: 6,
+                fontSize: fontSizes.meta,
+                color: theme.text.muted,
+                fontFamily: fonts.mono,
+                letterSpacing: letterSpacing.meta,
+                maxWidth: textMaxWidth.label,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {pct}%
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 });
@@ -449,138 +732,254 @@ const Scorecard: React.FC<{
     return { correct, total, calibration };
   }, [items]);
 
+  // Outcome → label, color, glyph triple
+  const outcomeMeta = (outcome: ScorecardItem["outcome"]) => {
+    if (outcome === "correct") {
+      return { label: "RESOLVED", glyph: "✓", color: semantic.success };
+    }
+    if (outcome === "wrong") {
+      return { label: "WRONG", glyph: "✕", color: semantic.danger };
+    }
+    return { label: "PENDING", glyph: "◐", color: palette.amber };
+  };
+
+  // Hero calibration stat — accent color reflects performance band:
+  // ≥70% accent gold (well-calibrated), 40-69% amber, <40% rust
+  const calibrationColor =
+    calibration.calibration >= 70
+      ? semantic.success
+      : calibration.calibration >= 40
+        ? palette.amber
+        : semantic.danger;
+  const heroOpacity = fadeIn(frame, startFrame + sec(0.4) + items.length * sec(0.2), sec(0.5));
+  const heroNumProgress = interpolate(
+    frame,
+    [startFrame + sec(0.4) + items.length * sec(0.2),
+     startFrame + sec(0.9) + items.length * sec(0.2)],
+    [0, 1],
+    CLAMP_CUBIC
+  );
+  const displayCalibration = Math.round(calibration.calibration * heroNumProgress);
+
+  // Column layout — explicit widths instead of table's auto-sizing.
+  // Prediction takes flex remainder; numeric columns are fixed and right-aligned.
+  const COL_YOUR_EST = 140;
+  const COL_MARKET = 140;
+  const COL_OUTCOME = 220;
+  const ROW_PADDING_Y = layout.spacing.md;
+  const ACCENT_EDGE = 4;
+
   return (
-    <div style={{ ...cardPresets.shadowFloat(mode === "dark"), display: "inline-block" }}>
-      {/* Table */}
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          fontSize: fontSizes.body,
-          maxWidth: textMaxWidth.body,
-          fontFamily: fonts.mono,
-        }}
-      >
-        <thead>
-          <tr style={{ borderBottom: `1px solid ${theme.text.muted}40` }}>
-            <th style={{ textAlign: "left", padding: `${layout.spacing.xs}px 0`, color: theme.text.muted }}>
-              Prediction
-            </th>
-            <th style={{ textAlign: "center", padding: `${layout.spacing.xs}px 0`, color: theme.text.muted }}>
-              Your Est.
-            </th>
-            <th style={{ textAlign: "center", padding: `${layout.spacing.xs}px 0`, color: theme.text.muted }}>
-              Market
-            </th>
-            <th style={{ textAlign: "center", padding: `${layout.spacing.xs}px 0`, color: theme.text.muted }}>
-              Outcome
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, i) => {
-            const rowStartFrame = startFrame + stagger(i, sec(0.2), 0);
-            const rowOpacity = fadeIn(frame, rowStartFrame, sec(0.3));
-
-            return (
-              <tr
-                key={i}
-                style={{
-                  borderBottom: `1px solid ${theme.text.muted}30`,
-                  opacity: rowOpacity,
-                  transform: `translateY(${slideIn(frame, rowStartFrame, layout.spacing.xs, sec(0.3))}px)`,
-                }}
-              >
-                <td style={{ padding: `${layout.spacing.xs}px 0`, color: theme.text.primary }}>
-                  {item.prediction}
-                </td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    padding: `${layout.spacing.xs}px 0`,
-                    color: theme.text.secondary,
-                  }}
-                >
-                  {item.yourEstimate}%
-                </td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    padding: `${layout.spacing.xs}px 0`,
-                    color: theme.text.secondary,
-                  }}
-                >
-                  {item.marketPrice !== undefined ? `${item.marketPrice}%` : "—"}
-                </td>
-                <td
-                  style={{
-                    textAlign: "center",
-                    padding: `${layout.spacing.xs}px 0`,
-                    fontSize: fontSizes.title,
-                    maxWidth: textMaxWidth.h1,
-                  }}
-                >
-                  {item.outcome === "correct" && (
-                    <span
-                      style={{
-                        color: semantic.success,
-                        textShadow: `0 0 12px ${semantic.success}80, 0 0 4px ${semantic.success}60`, // shadows.accentGlowMd + tight composite (80% + 60% opacity)
-                        display: "inline-block",
-                      }}
-                    >
-                      ✓
-                    </span>
-                  )}
-                  {item.outcome === "wrong" && (
-                    <span
-                      style={{
-                        color: semantic.danger,
-                        textShadow: `0 0 12px ${semantic.danger}80, 0 0 4px ${semantic.danger}60`, // shadows.accentGlowMd + tight composite (80% + 60% opacity)
-                        display: "inline-block",
-                      }}
-                    >
-                      ✕
-                    </span>
-                  )}
-                  {item.outcome === "pending" && (
-                    <span
-                      style={{
-                        color: palette.amber,
-                        textShadow: `0 0 8px ${palette.amber}60`, // shadows.accentGlowSm (60% opacity variant)
-                        opacity: 0.5 + 0.3 * Math.sin(frame * 0.08),
-                        display: "inline-block",
-                      }}
-                    >
-                      ◐
-                    </span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      {/* Summary row */}
+    <div style={{ width: "100%", display: "flex", flexDirection: "column" }}>
+      {/* ── Header row ─────────────────────────────────────────────────── */}
       <div
         style={{
-          marginTop: layout.spacing.md,
-          paddingTop: layout.spacing.xs,
-          borderTop: `1px solid ${theme.text.muted}40`,
           display: "flex",
-          justifyContent: "space-between",
-          fontSize: fontSizes.body,
-          maxWidth: textMaxWidth.body,
-          fontWeight: fontWeights.semibold,
-          color: theme.text.primary,
+          alignItems: "baseline",
+          padding: `${layout.spacing.sm}px ${layout.spacing.md}px`,
+          paddingLeft: ACCENT_EDGE + layout.spacing.md,
+          borderBottom: `1px solid ${theme.text.muted}40`,
+          fontFamily: fonts.mono,
+          fontSize: fontSizes.meta,
+          letterSpacing: letterSpacing.meta,
+          textTransform: "uppercase",
+          color: theme.text.muted,
         }}
       >
-        <span>
-          {calibration.correct}/{calibration.total} correct
-        </span>
-        <span style={{ color: semantic.success }}>
-          {calibration.calibration}% calibration
-        </span>
+        <div style={{ flex: 1 }}>Prediction</div>
+        <div style={{ width: COL_YOUR_EST, textAlign: "right" }}>Your est.</div>
+        <div style={{ width: COL_MARKET, textAlign: "right" }}>Market</div>
+        <div style={{ width: COL_OUTCOME, textAlign: "right" }}>Outcome</div>
+      </div>
+
+      {/* ── Prediction rows ───────────────────────────────────────────── */}
+      {items.map((item, i) => {
+        const rowStartFrame = startFrame + stagger(i, sec(0.25), 0);
+        const rowOpacity = fadeIn(frame, rowStartFrame, sec(0.4));
+        const rowSlide = slideIn(frame, rowStartFrame, layout.spacing.sm, sec(0.4));
+        const meta = outcomeMeta(item.outcome);
+        const glyphSettle = pulse(frame, rowStartFrame + sec(0.3), 8, 1.06);
+        const isPending = item.outcome === "pending";
+        const pendingPulse = isPending ? 0.7 + 0.3 * Math.sin(frame * 0.08) : 1;
+
+        return (
+          <div
+            key={i}
+            style={{
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              padding: `${ROW_PADDING_Y}px ${layout.spacing.md}px`,
+              paddingLeft: ACCENT_EDGE + layout.spacing.md,
+              borderBottom: `1px solid ${theme.text.muted}25`,
+              opacity: rowOpacity,
+              transform: `translateY(${rowSlide}px)`,
+            }}
+          >
+            {/* Accent edge in outcome color */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: ACCENT_EDGE,
+                background: meta.color,
+                opacity: 0.85,
+              }}
+            />
+
+            {/* Prediction text */}
+            <div
+              style={{
+                flex: 1,
+                fontFamily: fonts.body,
+                fontSize: fontSizes.body,
+                maxWidth: textMaxWidth.body,
+                color: theme.text.primary,
+                lineHeight: 1.35,
+                paddingRight: layout.spacing.lg,
+              }}
+            >
+              {item.prediction}
+            </div>
+
+            {/* Your estimate */}
+            <div
+              style={{
+                width: COL_YOUR_EST,
+                maxWidth: textMaxWidth.label,
+                textAlign: "right",
+                fontFamily: fonts.data,
+                fontSize: fontSizes.h3,
+                fontWeight: fontWeights.semibold,
+                color: theme.text.primary,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {item.yourEstimate}<span style={{ fontSize: fontSizes.body, maxWidth: textMaxWidth.label, color: theme.text.muted, marginLeft: 2 }}>%</span>
+            </div>
+
+            {/* Market price (or em-dash for missing) */}
+            <div
+              style={{
+                width: COL_MARKET,
+                maxWidth: textMaxWidth.label,
+                textAlign: "right",
+                fontFamily: fonts.data,
+                fontSize: fontSizes.h3,
+                fontWeight: fontWeights.regular,
+                color: theme.text.secondary,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {item.marketPrice !== undefined ? (
+                <>
+                  {item.marketPrice}
+                  <span style={{ fontSize: fontSizes.body, maxWidth: textMaxWidth.label, color: theme.text.muted, marginLeft: 2 }}>%</span>
+                </>
+              ) : (
+                <span style={{ color: theme.text.muted, fontSize: fontSizes.body, maxWidth: textMaxWidth.label }}>—</span>
+              )}
+            </div>
+
+            {/* Outcome (text label + glyph) */}
+            <div
+              style={{
+                width: COL_OUTCOME,
+                textAlign: "right",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: layout.spacing.sm,
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.label,
+                letterSpacing: letterSpacing.meta,
+                textTransform: "uppercase",
+                fontWeight: fontWeights.semibold,
+                color: meta.color,
+                opacity: pendingPulse,
+              }}
+            >
+              <span style={{ maxWidth: textMaxWidth.label }}>{meta.label}</span>
+              <span
+                style={{
+                  fontSize: fontSizes.h3,
+                  lineHeight: 1,
+                  display: "inline-block",
+                  transform: `scale(${glyphSettle})`,
+                  textShadow: `0 0 10px ${meta.color}60`,
+                }}
+              >
+                {meta.glyph}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+
+      {/* ── Hero calibration banner ───────────────────────────────────── */}
+      <div
+        style={{
+          marginTop: layout.spacing.xl,
+          paddingTop: layout.spacing.lg,
+          paddingLeft: ACCENT_EDGE + layout.spacing.md,
+          paddingRight: layout.spacing.md,
+          borderTop: `1px solid ${theme.text.muted}40`,
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          opacity: heroOpacity,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.meta,
+            letterSpacing: letterSpacing.meta,
+            textTransform: "uppercase",
+            color: theme.text.muted,
+            maxWidth: textMaxWidth.label,
+          }}
+        >
+          {calibration.correct} of {calibration.total} resolved correctly
+        </div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            gap: layout.spacing.sm,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: fonts.data,
+              fontSize: fontSizes.display,
+              fontWeight: fontWeights.bold,
+              color: calibrationColor,
+              lineHeight: 1,
+              textShadow: `0 0 16px ${calibrationColor}40`,
+              maxWidth: textMaxWidth.h1,
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {displayCalibration}
+            <span style={{ fontSize: fontSizes.h2, marginLeft: 2 }}>%</span>
+          </div>
+          <div
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.label,
+              letterSpacing: letterSpacing.meta,
+              textTransform: "uppercase",
+              color: theme.text.primary,
+              fontWeight: fontWeights.semibold,
+              maxWidth: textMaxWidth.label,
+            }}
+          >
+            calibration
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -826,6 +1225,18 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
             </div>
           )}
 
+          {/* STRIP VARIANT — multi-source comparison on a shared 0-100% axis */}
+          {data.variant === "strip" && data.gauges && (
+            <ProbabilityStrip
+              items={data.gauges}
+              frame={frame}
+              startFrame={sec(0.3 * s)}
+              width={Math.min(1280, area.width - layout.spacing.xxxl * 2)}
+              defaultColor={emphasis.primaryAccent}
+              mode={bgVariant as "light" | "dark"}
+            />
+          )}
+
           {/* SHIFT VARIANT */}
           {data.variant === "shift" && data.shifts && (
             <div
@@ -855,7 +1266,8 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
           {data.variant === "scorecard" && data.scorecard && (
             <div
               style={{
-                maxWidth: 900,
+                width: "100%",
+                maxWidth: 1400,
                 opacity: fadeIn(frame, sec(0.3), sec(0.5)),
               }}
             >

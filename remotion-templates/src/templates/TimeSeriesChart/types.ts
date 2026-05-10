@@ -19,7 +19,7 @@ export interface TimeSeriesLine {
   label: string;
   color: string;
   points: TimeSeriesPoint[];
-  /** Line width. Default: 3 */
+  /** Line width. Default: 5 (hero) or 3 (supporting). */
   width?: number;
   /** Dashed line? Default: false */
   dashed?: boolean;
@@ -27,6 +27,12 @@ export interface TimeSeriesLine {
   areaFill?: boolean;
   /** Area fill opacity. Default: 0.15 */
   areaOpacity?: number;
+  /**
+   * Editorial hierarchy: when at least one line is `hero`, supporting lines
+   * are rendered thinner and de-emphasized so the protagonist's trajectory
+   * dominates the eye. Use sparingly — at most one hero per chart.
+   */
+  hero?: boolean;
 }
 
 export interface TimeSeriesAnnotation {

@@ -103,6 +103,13 @@ import {
   CatalogShowreel,
   CatalogEmphasisShowcase,
   CatalogTemplatePreview,
+  CatalogDuelingEmpireFall,
+  CatalogTimelineComparisonRevolutions,
+  CatalogDualImperialTransitions,
+  CatalogMorphBlockades,
+  CatalogImageArchive,
+  CatalogMontageTreatments,
+  CatalogAnnotatedDemo,
 } from "./catalog";
 
 export const RemotionRoot: React.FC = () => {
@@ -240,6 +247,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogNwChain />
           <CatalogSplitMaps />
           <CatalogSplitTime />
+          <CatalogDuelingEmpireFall />
         </Folder>
 
         <Folder name="Timelines">
@@ -247,6 +255,15 @@ export const RemotionRoot: React.FC = () => {
           <CatalogTimelineDualPandemics />
           <CatalogLadderColdWar />
           <CatalogLadderArms />
+          <CatalogTimelineComparisonRevolutions />
+          <CatalogDualImperialTransitions />
+          <CatalogMorphBlockades />
+        </Folder>
+
+        <Folder name="Cinematic">
+          <CatalogImageArchive />
+          <CatalogMontageTreatments />
+          <CatalogAnnotatedDemo />
         </Folder>
 
         <Folder name="Scenarios">

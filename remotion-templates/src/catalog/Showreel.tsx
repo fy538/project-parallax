@@ -29,6 +29,18 @@ import { TitleTransition } from "../templates/TitleTransition/TitleTransition";
 import { FrameworkDiagram } from "../templates/FrameworkDiagram/FrameworkDiagram";
 import { NetworkDiagram } from "../templates/NetworkDiagram/NetworkDiagram";
 import { SplitComposition } from "../templates/SplitComposition/SplitComposition";
+import { DecisionTree } from "../templates/DecisionTree/DecisionTree";
+import { GameBoard } from "../templates/GameBoard/GameBoard";
+import { BifurcationRoute } from "../templates/BifurcationRoute/BifurcationRoute";
+import { HorizontalTimeline } from "../templates/HorizontalTimeline/HorizontalTimeline";
+import { EscalationLadder } from "../templates/EscalationLadder/EscalationLadder";
+import { DuelingFrameworks } from "../templates/DuelingFrameworks/DuelingFrameworks";
+import { TimelineComparison } from "../templates/TimelineComparison/TimelineComparison";
+import { DualTimeline } from "../templates/DualTimeline/DualTimeline";
+import { TimelineMorph } from "../templates/TimelineMorph/TimelineMorph";
+import { ImageComposite } from "../templates/ImageComposite/ImageComposite";
+import { PhotoMontage } from "../templates/PhotoMontage/PhotoMontage";
+import { AnnotatedImage } from "../templates/AnnotatedImage/AnnotatedImage";
 
 // Catalog data
 import { catalogMapsData } from "./Maps";
@@ -36,6 +48,10 @@ import { catalogDataData } from "./Data";
 import { catalogTypographyData } from "./Typography";
 import { catalogTitlesData } from "./Titles";
 import { catalogDiagramsData } from "./Diagrams";
+import { catalogScenariosData } from "./Scenarios";
+import { catalogTimelinesData } from "./Timelines";
+import { catalogCinematicData } from "./Cinematic";
+import { EditorialHeroDemo, EditorialAsideDemo, EditorialMinimalDemo } from "./Editorial";
 
 import { Slate, SectionDivider } from "./Slate";
 
@@ -260,6 +276,111 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogDiagramsData.splitTime.durationSec ?? 11,
     render: () => <SplitComposition data={catalogDiagramsData.splitTime} />,
   },
+  slateSegment("Diagrams", "DuelingFrameworks", "empire-fall"),
+  {
+    durationSec: catalogDiagramsData.duelingEmpireFall.durationSec ?? 22,
+    render: () => <DuelingFrameworks data={catalogDiagramsData.duelingEmpireFall} />,
+  },
+
+  // ── Scenarios ──
+  sectionSegment(
+    "Scenarios",
+    "DecisionTree · GameBoard × 2 · BifurcationRoute"
+  ),
+  slateSegment("Scenarios", "DecisionTree", "chess-opening"),
+  {
+    durationSec: catalogScenariosData.treeChessOpening.durationSec ?? 12,
+    render: () => <DecisionTree data={catalogScenariosData.treeChessOpening} />,
+  },
+  slateSegment("Scenarios", "GameBoard", "chess-endgame"),
+  {
+    durationSec: catalogScenariosData.gameChess.durationSec ?? 10,
+    render: () => <GameBoard data={catalogScenariosData.gameChess} />,
+  },
+  slateSegment("Scenarios", "GameBoard", "stag-hunt"),
+  {
+    durationSec: catalogScenariosData.gamePayoff.durationSec ?? 9,
+    render: () => <GameBoard data={catalogScenariosData.gamePayoff} />,
+  },
+  slateSegment("Scenarios", "BifurcationRoute", "latin-romance"),
+  {
+    durationSec: catalogScenariosData.bifurcationLatin.durationSec ?? 12,
+    render: () => <BifurcationRoute data={catalogScenariosData.bifurcationLatin} />,
+  },
+
+  // ── Timelines ──
+  sectionSegment(
+    "Timelines",
+    "HorizontalTimeline × 2 · EscalationLadder × 2"
+  ),
+  slateSegment("Timelines", "HorizontalTimeline", "computers"),
+  {
+    durationSec: catalogTimelinesData.timelineComputers.durationSec ?? 15,
+    render: () => <HorizontalTimeline data={catalogTimelinesData.timelineComputers} />,
+  },
+  slateSegment("Timelines", "HorizontalTimeline", "pandemics-dual"),
+  {
+    durationSec: catalogTimelinesData.timelineDualPandemics.durationSec ?? 15,
+    render: () => <HorizontalTimeline data={catalogTimelinesData.timelineDualPandemics} />,
+  },
+  slateSegment("Timelines", "EscalationLadder", "cold-war"),
+  {
+    durationSec: catalogTimelinesData.ladderColdWar.durationSec ?? 12,
+    render: () => <EscalationLadder data={catalogTimelinesData.ladderColdWar} />,
+  },
+  slateSegment("Timelines", "EscalationLadder", "arms-treaties"),
+  {
+    durationSec: catalogTimelinesData.ladderArms.durationSec ?? 12,
+    render: () => <EscalationLadder data={catalogTimelinesData.ladderArms} />,
+  },
+  slateSegment("Timelines", "TimelineComparison", "revolutions"),
+  {
+    durationSec: 16,
+    render: () => <TimelineComparison data={catalogTimelinesData.comparisonRevolutions} />,
+  },
+  slateSegment("Timelines", "DualTimeline", "imperial-transitions"),
+  {
+    durationSec: catalogTimelinesData.dualImperialTransitions.durationSec ?? 16,
+    render: () => <DualTimeline data={catalogTimelinesData.dualImperialTransitions} />,
+  },
+  slateSegment("Timelines", "TimelineMorph", "blockades"),
+  {
+    durationSec: catalogTimelinesData.morphBlockades.durationSec ?? 16,
+    render: () => <TimelineMorph data={catalogTimelinesData.morphBlockades} />,
+  },
+
+  // ── Cinematic ──
+  sectionSegment(
+    "Cinematic",
+    "ImageComposite · PhotoMontage · AnnotatedImage"
+  ),
+  slateSegment("Cinematic", "ImageComposite", "archive"),
+  {
+    durationSec: catalogCinematicData.compositeArchive.durationSec ?? 8,
+    render: () => <ImageComposite data={catalogCinematicData.compositeArchive} />,
+  },
+  slateSegment("Cinematic", "PhotoMontage", "treatments"),
+  {
+    durationSec: catalogCinematicData.montageTreatments.durationSec ?? 12,
+    render: () => <PhotoMontage data={catalogCinematicData.montageTreatments} />,
+  },
+  slateSegment("Cinematic", "AnnotatedImage", "callout-demo"),
+  {
+    durationSec: catalogCinematicData.annotatedDemo.durationSec ?? 12,
+    render: () => <AnnotatedImage data={catalogCinematicData.annotatedDemo} />,
+  },
+
+  // ── Editorial ──
+  sectionSegment(
+    "Editorial",
+    "EditorialFrame × 3 — hero, aside, minimal"
+  ),
+  slateSegment("Editorial", "EditorialFrame", "hero"),
+  { durationSec: 14, render: () => <EditorialHeroDemo /> },
+  slateSegment("Editorial", "EditorialFrame", "aside"),
+  { durationSec: 12, render: () => <EditorialAsideDemo /> },
+  slateSegment("Editorial", "EditorialFrame", "minimal"),
+  { durationSec: 10, render: () => <EditorialMinimalDemo /> },
 
   // Outro
   {

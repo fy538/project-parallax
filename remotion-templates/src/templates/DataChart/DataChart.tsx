@@ -402,7 +402,17 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const itemCount = data.dataPoints?.length || data.comparisonPairs?.length || 1;
   const density = itemCount <= 3 ? "sparse" : itemCount <= 5 ? "normal" : "dense";
   const barGap = density === "dense" ? layout.spacing.md : layout.spacing.xl;
-  const labelSpace = 80; // room for bar labels + sublabels below the bars
+  // Y-axis tick labels render at x=-20 with overflow:visible (extending leftward
+  // past chart.left). Reserve room beyond the safe-area inset so they stay
+  // inside the brand boundary even when chart.left would normally hug it.
+  const yAxisLabelSpace = 80;
+  // Bar value labels (e.g. "1,500") sit ABOVE each bar inside the bar container.
+  // Without this reservation, a 100% bar's value label spills ~80px above the
+  // plot area into the title's vertical space — see screenshot regression L99.
+  // The matching reservation BELOW the bars (for bar labels + sublabels) lives
+  // inside the bar container's `maxHeight + 80` height, NOT in chartLayout —
+  // so we don't double-count it as extraPad.bottom.
+  const VALUE_LABEL_HEADROOM = 80;
   const hasTopBand = data.variant === "comparison" || hasSpotlight;
   const hasBottomBand = !!data.source || !!data.contextNote;
   const chartBoxes = useMemo(
@@ -414,7 +424,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
         hasSource: hasBottomBand,
         sourceRows: data.source && data.contextNote ? 2 : 1,
         safeAreaTier: "generous",
-        extraPad: { bottom: labelSpace + layout.spacing.lg },
+        extraPad: { bottom: layout.spacing.lg, left: yAxisLabelSpace },
       }),
     [data.contextNote, data.source, hasBottomBand, hasTopBand]
   );
@@ -508,7 +518,10 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     left: chartBoxes.chart.left,
     right: layout.width - (chartBoxes.chart.left + chartBoxes.chart.width),
   };
-  const maxHeight = chartBoxes.chart.height;
+  // Reserve VALUE_LABEL_HEADROOM at the top of the plot area so the
+  // bar value labels (positioned above each bar in AnimatedBar) render inside
+  // chart.height instead of spilling upward into the title.
+  const maxHeight = chartBoxes.chart.height - VALUE_LABEL_HEADROOM;
   const unit = data.unit || "";
 
   // ── Gridline configuration ─────────────────────────────────────────────
@@ -517,7 +530,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const sourceBottomOffset = hasBottomBand
     ? Math.max(
         0,
-        layout.height - layout.safeArea.bottom - (chartBoxes.source.top + chartBoxes.source.height)
+        layout.height - layout.safeAreaTier.generous.bottom - (chartBoxes.source.top + chartBoxes.source.height)
       )
     : 0;
 

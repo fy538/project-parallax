@@ -79,7 +79,7 @@ Before deciding *which visual mode* to use (footage, MG, layered, AI-GEN), under
 
 ### Register 1: Analytical (Remotion Templates)
 
-**Aesthetic:** Clean, geometric, programmatic. Space Grotesk typography, precise data, spring-physics animations, ambient particles. The most controlled visual surface — every pixel is brand-locked through theme.ts.
+**Aesthetic:** Clean, geometric, programmatic. IBM Plex Sans typography (Franklin Gothic-derived, mid-century editorial — was Space Grotesk pre-May 10, 2026), precise data, spring-physics animations, ambient particles. The most controlled visual surface — every pixel is brand-locked through theme.ts.
 
 **Narrative function:** Understanding. "Here's the pattern. Here's the data. Here's the structure." The viewer's brain shifts into analytical mode. These moments carry the intellectual argument.
 
@@ -468,6 +468,27 @@ Before finalizing the visual column, read the narration column alone as if it we
 If the narration doesn't work without visuals (the argument is unclear, transitions feel abrupt, key points are missing), that's a narration problem, not a visual opportunity. Fix the words first.
 
 This test is built into the production pipeline as a checkpoint between script draft and visual-concept audit (see PRODUCTION_PIPELINE.md, Stage 6).
+
+---
+
+## On-Screen Text vs. Narration
+
+Parallax is a narration-first channel. The narrator is the protagonist; visuals are evidence. On-screen text earns its place only when narration can't do the job — never as a duplicate of what the voice will already say.
+
+**The test:** *can the narrator say this faster and more naturally than the screen can show it?* If yes, narration. On-screen text wins only when it's persistent (data labels viewers re-read), provenance (source attribution — narrator wouldn't say "Source: World Bank"), or framing (kicker / byline magazine convention). Otherwise it competes for attention and locks narration to a specific phrasing.
+
+| Always on-screen | Selectively on-screen | Almost never on-screen |
+|---|---|---|
+| Title (one short headline) | Kicker (1-3 words above headline) | Narrated sentences duplicated |
+| Source attribution | Hero stat callout | Multi-line explanations |
+| Axis labels, data labels, glyph legends | Italic context note (one short line) | Multi-paragraph analysis |
+| Date stamp | Editorial frame (kicker / byline structure for hero moments) | Anything narration can say clearly |
+
+**Where text wins:** quote cards and KineticTypography (the words *are* the visual), title cards (they *are* the message), stat reveals (the number is the punchline; narration confirms), and `EditorialFrame` hero variants (magazine-spread idiom for cold opens or major section transitions). Use sparingly — these are *hero moments*, not the default mode.
+
+**Cognitive cost:** two competing information streams (text on screen + narration) split attention. The Economist's video team has documented this: aggressive cuts to on-screen text once narration covers it. Match that discipline.
+
+**Practical implication for templates:** the standard chart frame ships with title + subtitle + axis labels + source. That's the right baseline. Anything beyond — kicker, hero stat, context note, in-frame annotation — is a per-frame editorial decision, not a template default. Don't pad templates with explanatory text that narration will deliver better.
 
 ---
 

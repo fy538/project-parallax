@@ -55,6 +55,7 @@ export {
   CatalogNwChain,
   CatalogSplitMaps,
   CatalogSplitTime,
+  CatalogDuelingEmpireFall,
 } from "./Diagrams";
 
 export {
@@ -62,7 +63,16 @@ export {
   CatalogTimelineDualPandemics,
   CatalogLadderColdWar,
   CatalogLadderArms,
+  CatalogTimelineComparisonRevolutions,
+  CatalogDualImperialTransitions,
+  CatalogMorphBlockades,
 } from "./Timelines";
+
+export {
+  CatalogImageArchive,
+  CatalogMontageTreatments,
+  CatalogAnnotatedDemo,
+} from "./Cinematic";
 
 export {
   CatalogTreeChess,

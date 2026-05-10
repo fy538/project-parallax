@@ -283,6 +283,8 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
           height: area.height,
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
+          gap: layout.spacing.xxxl,
         }}
       >
         <svg
@@ -526,7 +528,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
           })}
         </svg>
 
-        {/* Legend */}
+        {/* Legend (right of chart, vertically centered via flex parent) */}
         <Legend
           items={data.subjects.map((subj) => ({
             label: subj.name,
@@ -536,19 +538,12 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
           exit={exit}
           theme={theme}
           layout="vertical"
-          swatchSize={16}
+          swatchSize={20}
           fontSize="body"
           textColor={theme.text.primary}
-          gap={layout.spacing.md}
+          gap={layout.spacing.lg}
           startFrame={polygonStart + sec(0.5)}
           fadeInDuration={sec(0.4)}
-          style={{
-            position: "absolute",
-            left: chartSize + layout.spacing.xl,
-            top: 0,
-            bottom: 0,
-            justifyContent: "center",
-          }}
         />
 
         {/* Morph label */}

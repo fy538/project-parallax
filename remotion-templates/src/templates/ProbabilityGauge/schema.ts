@@ -41,7 +41,7 @@ export const ProbabilityGaugeSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    variant: z.enum(["gauge", "shift", "scorecard", "forecast"]),
+    variant: z.enum(["gauge", "strip", "shift", "scorecard", "forecast"]),
     gauges: z.array(GaugeItemSchema).optional(),
     shifts: z.array(ShiftItemSchema).optional(),
     scorecard: z.array(ScorecardItemSchema).optional(),

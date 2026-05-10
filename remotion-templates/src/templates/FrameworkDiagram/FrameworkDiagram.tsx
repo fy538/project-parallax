@@ -16,7 +16,14 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, semantic, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, layout, sec, contentArea, columnLayout, cardPadding, textMaxWidth, shadows, radii, cardPresets, dividerStyle, textSafe, letterSpacing } from "../../design/theme";
+
+// CJK detector — used to switch the bilingual secondary label and item body
+// font to the Chinese stack. Inlined to avoid a cross-template import on a
+// one-line regex.
+const CJK_REGEX = /[一-鿿぀-ゟ゠-ヿ]/;
+const getBodyFont = (text: string): string =>
+  CJK_REGEX.test(text) ? fonts.chinese : fonts.body;
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
@@ -56,6 +63,20 @@ const ComparisonVariant: React.FC<{
     [columns.length]
   );
 
+  // Editorial column comparison — items sit directly on the paper with thin
+  // row dividers, ordinal numbering for pair-alignment, and a subtle accent
+  // rule under each column header. No card chrome, no VS interlude — the eye
+  // reads down each column then across, supported by the row numbers.
+  const maxItems = Math.max(...columns.map((c) => c.items.length), 0);
+
+  // Parse "Title (中文)" pattern so we can render the parenthetical at lighter
+  // weight. Also tolerates titles without a parenthetical.
+  const splitTitle = (full: string): { primary: string; secondary?: string } => {
+    const m = full.match(/^(.*?)\s*\((.+)\)\s*$/);
+    if (m) return { primary: m[1], secondary: m[2] };
+    return { primary: full };
+  };
+
   return (
     <div
       style={{
@@ -72,9 +93,9 @@ const ComparisonVariant: React.FC<{
       {columns.map((col, ci) => {
         const colStart = stagger(ci, sec(0.6 * s), sec(0.5));
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
-        // Cinematic: columns enter with spring overshoot (POLISH A2)
-        const colScale = 0.92 + 0.08 * heroSpring(frame, layout.fps, colStart);
+        const colScale = 0.96 + 0.04 * heroSpring(frame, layout.fps, colStart);
         const colColor = col.color || emphasis.primaryAccent;
+        const { primary, secondary } = splitTitle(col.title);
 
         return (
           <div
@@ -88,88 +109,128 @@ const ComparisonVariant: React.FC<{
               flexDirection: "column",
             }}
           >
-            {/* Column header — with accent glow + scaleX underline */}
+            {/* Column header — icon + bilingual title + accent rule */}
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: layout.spacing.sm,
-                marginBottom: layout.spacing.md,
-                paddingBottom: layout.spacing.sm,
                 position: "relative",
+                paddingBottom: layout.spacing.md,
+                marginBottom: layout.spacing.lg,
               }}
             >
-              {/* Animated underline — scaleX from left */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: layout.spacing.sm,
+                }}
+              >
+                {col.icon && (
+                  <span
+                    style={{
+                      fontSize: fontSizes.h2,
+                      maxWidth: textMaxWidth.node,
+                      color: colColor,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {col.icon}
+                  </span>
+                )}
+                <div
+                  style={{
+                    fontSize: fontSizes.h1,
+                    fontWeight: 700,
+                    color: theme.text.primary,
+                    fontFamily: fonts.heading,
+                    lineHeight: 1.1,
+                    maxWidth: textMaxWidth.h1,
+                  }}
+                >
+                  {primary}
+                  {secondary && (
+                    <span
+                      style={{
+                        fontSize: fontSizes.h3,
+                        fontWeight: 400,
+                        color: theme.text.muted,
+                        marginLeft: layout.spacing.sm,
+                        fontFamily: getBodyFont(secondary),
+                      }}
+                    >
+                      {secondary}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {/* Accent rule — solid column color, draws in left→right */}
               <div
                 style={{
                   position: "absolute",
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 3,
-                  background: `linear-gradient(90deg, ${colColor}, ${colColor}40)`,
-                  transform: `scaleX(${interpolate(frame, [colStart + sec(0.2), colStart + sec(0.7)], [0, 1], CLAMP_QUAD)})`,
+                  height: 2,
+                  background: colColor,
+                  opacity: 0.7,
+                  transform: `scaleX(${interpolate(
+                    frame,
+                    [colStart + sec(0.2), colStart + sec(0.8)],
+                    [0, 1],
+                    CLAMP_QUAD
+                  )})`,
                   transformOrigin: "left center",
                 }}
               />
-              {/* Subtle glow under the header border */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -2,
-                  left: 0,
-                  right: 0,
-                  height: 4,
-                  background: colColor,
-                  filter: "blur(8px)",
-                  opacity: fadeIn(frame, colStart + sec(0.3), sec(0.4)) * 0.5,
-                }}
-              />
-              {col.icon && (
-                <span style={{ fontSize: fontSizes.h3 }}>{col.icon}</span>
-              )}
-              <div
-                style={{
-                  fontSize: fontSizes.h2,
-                  fontWeight: 600,
-                  color: theme.text.primary,
-                  fontFamily: fonts.heading,
-                  textShadow: `0 0 20px ${colColor}30`, // shadows.accentGlow (20px, 30% opacity variant)
-                  maxWidth: textMaxWidth.h2,
-                }}
-              >
-                {col.title}
-              </div>
             </div>
 
-            {/* Items — more dramatic stagger with scale entrance */}
-            {col.items.map((item, ii) => {
+            {/* Items — pair-aligned rows with ordinal numbering */}
+            {Array.from({ length: maxItems }).map((_, ii) => {
+              const item = col.items[ii];
+              if (!item) return null;
               const itemStart = colStart + stagger(ii, sec(0.12 * s), sec(0.4));
               const itemOpacity = fadeIn(frame, itemStart, sec(0.4));
-              const itemSlide = slideIn(frame, itemStart, 30, sec(0.5));
-              const itemScale = scaleReveal(frame, itemStart, sec(0.4), 1.05, 1.0);
+              const itemSlide = slideIn(frame, itemStart, 16, sec(0.5));
               const itemExit = exitFade(frame, durationInFrames, 15);
-              const itemColor = col.color || emphasis.primaryAccent;
+              const ordinal = String(ii + 1).padStart(2, "0");
 
               return (
                 <div
                   key={ii}
                   style={{
                     opacity: itemOpacity * itemExit,
-                    transform: `translateY(${itemSlide}px) scale(${itemScale})`,
-                    transformOrigin: "left center",
-                    marginBottom: layout.spacing.sm,
-                    // Editorial letterhead — accent left edge in column color
-                    ...cardPresets.accentEdge(itemColor, data.backgroundVariant === "dark"),
+                    transform: `translateY(${itemSlide}px)`,
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: layout.spacing.md,
+                    paddingTop: layout.spacing.md,
+                    paddingBottom: layout.spacing.md,
+                    borderTop: `1px solid ${theme.text.muted}30`,
                   }}
                 >
+                  {/* Ordinal — mono caps, muted, narrow gutter */}
                   <div
                     style={{
+                      fontSize: fontSizes.label,
+                      fontFamily: fonts.mono,
+                      color: colColor,
+                      letterSpacing: letterSpacing.meta,
+                      fontWeight: 600,
+                      width: 32,
+                      flexShrink: 0,
+                      maxWidth: textMaxWidth.label,
+                    }}
+                  >
+                    {ordinal}
+                  </div>
+                  {/* Item text */}
+                  <div
+                    style={{
+                      flex: 1,
                       fontSize: fontSizes.body,
                       maxWidth: textMaxWidth.body,
                       color: theme.text.primary,
-                      lineHeight: 1.5,
-                      textShadow: shadows.textLift,
+                      lineHeight: 1.4,
+                      fontFamily: getBodyFont(item),
                     }}
                   >
                     {item}
@@ -177,38 +238,17 @@ const ComparisonVariant: React.FC<{
                 </div>
               );
             })}
+            {/* Closing rule beneath the last item — matches header rule weight */}
+            <div
+              style={{
+                height: 1,
+                background: theme.text.muted,
+                opacity: 0.3,
+              }}
+            />
           </div>
         );
       })}
-
-      {/* VS divider for 2-column comparisons — quiet typographic moment with glow */}
-      {columns.length === 2 && (() => {
-        const vsOpacity = fadeIn(frame, sec(1.0), sec(0.5));
-        const exit = exitFade(frame, durationInFrames, 15);
-        // Beat sync amplifies the glow oscillation amplitude on sync points.
-        const glowPulse = 0.3 + (0.15 + vsBeat.pulse * 0.1) * Math.sin(frame * 0.025);
-        return (
-          <div
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              fontSize: fontSizes.h3,
-              maxWidth: textMaxWidth.node,
-              color: theme.text.muted,
-              fontWeight: 500,
-              fontFamily: fonts.mono,
-              opacity: vsOpacity * exit,
-              letterSpacing: 3,
-              textTransform: "uppercase",
-              textShadow: `0 0 12px ${palette.amber}${Math.round(glowPulse * 255).toString(16).padStart(2, "0")}`, // shadows.accentGlowMd animated (dynamic opacity)
-            }}
-          >
-            vs
-          </div>
-        );
-      })()}
     </div>
   );
 });
@@ -419,6 +459,23 @@ const FlowVariant: React.FC<{
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" } // linear-ok: slow continuous parallax pan, linear drift is intentional
   );
 
+  // Editorial process spine: ordinal numbers + horizontal spine line through
+  // circle markers + node title/subtitle blocks below + arrow labels above
+  // each segment. Replaces the card-row-with-arrows ("PowerPoint SmartArt")
+  // treatment. Spine color progresses from muted at start to accent at end,
+  // and the terminal node is rendered hero-weight to celebrate the destination.
+  const exitOp = exitFade(frame, durationInFrames, 15);
+  const numNodes = nodes.length;
+
+  // Geometry: nodes share equal slots across the chart area regardless of
+  // arrow label length — the slot width is constant, label wraps if needed.
+  // Spine markers sit at slot centers.
+  const flowWidth = Math.min(area.width - layout.spacing.xxxl * 2, 1500);
+  const slotWidth = numNodes > 0 ? flowWidth / numNodes : flowWidth;
+  const markerRadius = 13;
+  // Color progression along the spine — starts neutral, lands on accent.
+  // Each marker reads its t in [0,1] (i / (n-1)) to interpolate.
+
   return (
     <div
       style={{
@@ -450,53 +507,247 @@ const FlowVariant: React.FC<{
         </div>
       )}
 
-      {/* Nodes row */}
+      {/* Process spine layout — fills the chart area with structured rows */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: 0,
+          position: "relative",
+          width: flowWidth,
+          height: 360,
           transform: `translateX(${panOffset}px)`,
         }}
       >
+        {/* Spine line — single horizontal rule passing through markers,
+            draws in left-to-right as nodes appear. Sits at the vertical
+            center of the flow region. */}
+        <svg
+          width={flowWidth}
+          height={360}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            overflow: "visible",
+          }}
+        >
+          <defs>
+            <linearGradient id="flow-spine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={theme.text.primary} stopOpacity={0.5} />
+              <stop offset="100%" stopColor={accentColor} stopOpacity={1} />
+            </linearGradient>
+            <linearGradient id="flow-zone-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={accentColor} stopOpacity={0} />
+              <stop offset="50%" stopColor={accentColor} stopOpacity={0.05} />
+              <stop offset="100%" stopColor={accentColor} stopOpacity={0.02} />
+            </linearGradient>
+          </defs>
+          {/* Background zone — subtle horizontal band giving the flow region
+              visual weight against the surrounding paper. Faint enough not
+              to compete with the spine; just enough that the diagram doesn't
+              feel like dots floating in white space. */}
+          {(() => {
+            const zoneOpacity = fadeIn(frame, sec(0.3), sec(0.5)) * exitOp;
+            return (
+              <rect
+                x={0}
+                y={140}
+                width={flowWidth}
+                height={80}
+                fill="url(#flow-zone-grad)"
+                opacity={zoneOpacity}
+                rx={4}
+              />
+            );
+          })()}
+          {/* Spine — single confident horizontal line. Track shows the full
+              extent at low opacity from frame zero so the geometry reads
+              even before nodes appear; the foreground stroke draws in over
+              that track as the lifecycle progresses. */}
+          {(() => {
+            const spineStart = stagger(0, sec(0.8), sec(0.5));
+            const spineProgress = interpolate(
+              frame,
+              [spineStart, spineStart + sec(numNodes * 0.6)],
+              [0, 1],
+              CLAMP_QUAD
+            );
+            const spineLeft = slotWidth / 2;
+            const spineRight = flowWidth - slotWidth / 2;
+            const spineWidth = spineRight - spineLeft;
+            const trackOpacity = fadeIn(frame, sec(0.4), sec(0.4)) * exitOp;
+            return (
+              <g>
+                {/* Track — full-extent ghost line behind the animating spine */}
+                <line
+                  x1={spineLeft}
+                  y1={180}
+                  x2={spineRight}
+                  y2={180}
+                  stroke={theme.text.muted}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  opacity={trackOpacity * 0.35}
+                />
+                {/* Foreground spine — gradient muted→accent, draws in */}
+                <line
+                  x1={spineLeft}
+                  y1={180}
+                  x2={spineLeft + spineWidth * spineProgress}
+                  y2={180}
+                  stroke="url(#flow-spine-grad)"
+                  strokeWidth={5}
+                  strokeLinecap="round"
+                  opacity={exitOp}
+                />
+              </g>
+            );
+          })()}
+          {/* Directional chevrons — small ▶ pointing forward at each segment
+              midpoint, between markers. Makes the spine's direction explicit
+              without competing with the arrow-verb labels above. Scales with
+              the spine's draw-in progress so chevrons reveal in sequence. */}
+          {Array.from({ length: Math.max(0, numNodes - 1) }).map((_, i) => {
+            const segStart = stagger(i + 1, sec(0.8), sec(0.5)) - sec(0.2);
+            const segOpacity = fadeIn(frame, segStart, sec(0.3)) * exitOp;
+            const cx = slotWidth * (i + 1);
+            const t = numNodes > 1 ? (i + 0.5) / (numNodes - 1) : 0;
+            const color = i === numNodes - 2 ? accentColor : theme.text.secondary;
+            return (
+              <polygon
+                key={`chev-${i}`}
+                points={`${cx - 8},${172} ${cx + 6},${180} ${cx - 8},${188}`}
+                fill={color}
+                opacity={(0.65 + 0.35 * t) * segOpacity}
+              />
+            );
+          })}
+          {/* Markers — single accent color at each node's slot center, with
+              opacity progression telegraphing the lifecycle's "becoming
+              formalized" arc. Earlier stages render lighter, later stages
+              fully saturated. The terminal stage is hero-sized. */}
+          {nodes.map((_node, i) => {
+            const isVisible = visibleNodeIndices.includes(i);
+            if (!isVisible) return null;
+            const nodeStart = stagger(i, sec(0.8), sec(0.5));
+            const markerProgress = interpolate(
+              frame,
+              [nodeStart, nodeStart + sec(0.4)],
+              [0, 1],
+              CLAMP_QUAD
+            );
+            const cx = slotWidth * (i + 0.5);
+            const t = numNodes > 1 ? i / (numNodes - 1) : 0;
+            // Progression: muted → accent. Use the gradient endpoints' colors
+            // so the markers visually align with the spine they sit on.
+            const markerOpacity = 0.55 + 0.45 * t;
+            const isHero = i === numNodes - 1;
+            // Solid marker (no hollow inner circle) — reads as a waypoint on
+            // the spine, not a port/socket. Outer halo gives some atmosphere
+            // without breaking the dense-mass quality of the marker proper.
+            return (
+              <g key={`marker-${i}`} opacity={markerProgress * exitOp}>
+                <circle
+                  cx={cx}
+                  cy={180}
+                  r={isHero ? markerRadius + 8 : markerRadius + 3}
+                  fill={accentColor}
+                  opacity={(isHero ? 0.35 : 0.2) * markerOpacity}
+                />
+                <circle
+                  cx={cx}
+                  cy={180}
+                  r={isHero ? markerRadius + 2 : markerRadius - 2}
+                  fill={accentColor}
+                  opacity={isHero ? 1 : markerOpacity}
+                />
+              </g>
+            );
+          })}
+          {/* Arrow labels (verbs) — between marker pairs, ABOVE the spine */}
+          {arrowLabels.map((label, i) => {
+            if (!label || i >= numNodes - 1) return null;
+            const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
+            const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3)) * exitOp;
+            const xMid = slotWidth * (i + 1);
+            return (
+              <text
+                key={`arrow-${i}`}
+                x={xMid}
+                y={140}
+                textAnchor="middle"
+                fill={theme.text.muted}
+                fontSize={fontSizes.label}
+                fontFamily={fonts.body}
+                fontStyle="italic"
+                opacity={arrowOpacity}
+              >
+                {label}
+              </text>
+            );
+          })}
+        </svg>
+
+        {/* Stage tiles — ordinal + title + subtitle, one per slot */}
         {nodes.map((node, i) => {
           const isVisible = visibleNodeIndices.includes(i);
+          if (!isVisible) return null;
           const nodeStart = stagger(i, sec(0.8), sec(0.5));
-          const nodeOpacity = isVisible ? fadeIn(frame, nodeStart, sec(0.4)) : 0;
-          const nodeSlide = slideIn(frame, nodeStart, 30, sec(0.4));
-          const nodeColor = node.color || accentColor;
-
-          // Progressive focus: dim earlier nodes as later ones appear
-          const dimAmount = i < activeNodeIndex
-            // linear-ok: maps discrete node-distance→dim level, not frame-based motion
-            ? interpolate(activeNodeIndex - i, [0, 3], [0, 0.5], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
-            : 0;
-          const focusOpacity = 1 - dimAmount;
-          const exitOp = exitFade(frame, durationInFrames, 15);
+          const nodeOpacity = fadeIn(frame, nodeStart, sec(0.4));
+          const nodeSlide = slideIn(frame, nodeStart, 16, sec(0.4));
+          const isHero = i === numNodes - 1;
+          const stageColor = isHero ? accentColor : theme.text.muted;
+          const ordinal = String(i + 1).padStart(2, "0");
 
           return (
-            <React.Fragment key={i}>
-              {/* Node */}
+            <div
+              key={`stage-${i}`}
+              style={{
+                position: "absolute",
+                left: slotWidth * i,
+                top: 0,
+                width: slotWidth,
+                height: 360,
+                opacity: nodeOpacity * exitOp,
+                transform: `translateY(${nodeSlide}px)`,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingTop: layout.spacing.md,
+                paddingBottom: layout.spacing.md,
+                pointerEvents: "none",
+              }}
+            >
+              {/* Ordinal — sits ABOVE the spine, near the top */}
               <div
                 style={{
-                  opacity: nodeOpacity * focusOpacity * exitOp,
-                  transform: `translateX(${nodeSlide}px) scale(${scaleReveal(frame, nodeStart, sec(0.5), 1.1, 1.0)}) perspective(1200px) rotateY(${i % 2 === 0 ? -3 : 3}deg)`,
-                  transformOrigin: "center center",
-                  width: nodeWidth,
-                  ...cardPresets.inset(data.backgroundVariant === "dark"),
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.label,
+                  letterSpacing: letterSpacing.meta,
+                  color: stageColor,
+                  fontWeight: 600,
+                  maxWidth: textMaxWidth.label,
+                }}
+              >
+                {ordinal}
+              </div>
+
+              {/* Title + subtitle — below the spine */}
+              <div
+                style={{
                   textAlign: "center",
-                  flexShrink: 0,
-                  filter: dimAmount > 0.1 ? `blur(${dimAmount * 1.5}px)` : undefined,
+                  width: slotWidth - layout.spacing.md * 2,
+                  marginTop: 200,
                 }}
               >
                 <div
                   style={{
-                    fontSize: fontSizes.h3,
-                    maxWidth: textMaxWidth.node,
-                    color: theme.text.primary,
-                    fontWeight: 600,
-                    textShadow: shadows.textLift,
+                    fontSize: isHero ? fontSizes.h2 : fontSizes.h3,
+                    fontWeight: isHero ? 700 : 600,
+                    color: isHero ? accentColor : theme.text.primary,
+                    fontFamily: fonts.heading,
+                    lineHeight: 1.1,
+                    maxWidth: textMaxWidth.h2,
+                    textShadow: isHero ? `0 0 16px ${accentColor}40` : undefined,
                   }}
                 >
                   {node.label}
@@ -504,62 +755,59 @@ const FlowVariant: React.FC<{
                 {node.sublabel && (
                   <div
                     style={{
-                      fontSize: fontSizes.caption,
-                      color: theme.text.muted,
+                      fontSize: fontSizes.label,
+                      color: theme.text.secondary,
                       marginTop: layout.spacing.xs,
-                      textShadow: shadows.textLift,
+                      maxWidth: textMaxWidth.label,
+                      lineHeight: 1.3,
+                      fontFamily: fonts.body,
                     }}
                   >
                     {node.sublabel}
                   </div>
                 )}
-              </div>
-
-              {/* Arrow between nodes */}
-              {i < nodes.length - 1 && (() => {
-                const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
-                const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3));
-                return (
+                {/* Endpoint tag on the hero (terminal) node */}
+                {isHero && (
                   <div
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      width: arrowGap,
-                      flexShrink: 0,
-                      opacity: arrowOpacity * exitOp,
+                      marginTop: layout.spacing.sm,
+                      fontFamily: fonts.mono,
+                      fontSize: fontSizes.meta,
+                      letterSpacing: letterSpacing.meta,
+                      textTransform: "uppercase",
+                      color: accentColor,
+                      opacity: 0.85,
+                      maxWidth: textMaxWidth.label,
                     }}
                   >
-                    <AnimatedArrow
-                      startFrame={arrowStart}
-                      color={accentColor}
-                      label={arrowLabels[i]}
-                      labelColor={theme.text.muted}
-                    />
-
-                    {/* Eliminated scenario beside arrow */}
-                    {(eliminatedByFilter.get(i) || []).map(({ es, idx }, ei) => {
-                      const esVisible = eliminatedVisible[idx];
-                      const esColor = es.color || semantic.danger;
-                      return esVisible ? (
-                        <div
-                          key={ei}
-                          style={{
-                            fontSize: fontSizes.small,
-                            color: esColor,
-                            marginTop: 2,
-                            textDecoration: "line-through",
-                            opacity: fadeIn(frame, stagger(i, sec(0.8), sec(0.5)) + sec(1.2), sec(0.3)),
-                          }}
-                        >
-                          {es.scenario}
-                        </div>
-                      ) : null;
-                    })}
+                    Endpoint
                   </div>
-                );
-              })()}
-            </React.Fragment>
+                )}
+              </div>
+
+              {/* Eliminated scenarios beside this slot's outgoing arrow */}
+              {(eliminatedByFilter.get(i) || []).map(({ es, idx }, ei) => {
+                const esVisible = eliminatedVisible[idx];
+                const esColor = es.color || semantic.danger;
+                return esVisible ? (
+                  <div
+                    key={`elim-${ei}`}
+                    style={{
+                      position: "absolute",
+                      top: 220,
+                      left: slotWidth + layout.spacing.md,
+                      fontSize: fontSizes.meta,
+                      maxWidth: textMaxWidth.label,
+                      color: esColor,
+                      textDecoration: "line-through",
+                      opacity: fadeIn(frame, nodeStart + sec(1.2), sec(0.3)),
+                    }}
+                  >
+                    {es.scenario}
+                  </div>
+                ) : null;
+              })}
+            </div>
           );
         })}
       </div>

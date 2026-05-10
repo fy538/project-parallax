@@ -28,13 +28,16 @@ export interface SourceAttributionProps {
   bottomOffset?: number;
   /** Optional prefix label, e.g. "Source: " or "Data: ". */
   prefix?: string;
+  /** Safe-area tier for right/bottom inset. Defaults to "generous" (L69 channel standard). */
+  safeAreaTier?: keyof typeof layout.safeAreaTier;
 }
 
 export const SourceAttribution: React.FC<SourceAttributionProps> = React.memo(
-  ({ source, mode = "light", startSec = 0.5, bottomOffset = 0, prefix }) => {
+  ({ source, mode = "light", startSec = 0.5, bottomOffset = 0, prefix, safeAreaTier = "generous" }) => {
     const frame = useCurrentFrame();
     const theme = useThemeMode(mode);
     const startFrame = sec(startSec);
+    const safe = layout.safeAreaTier[safeAreaTier];
 
     if (!source) return null;
 
@@ -45,8 +48,8 @@ export const SourceAttribution: React.FC<SourceAttributionProps> = React.memo(
       <div
         style={{
           position: "absolute",
-          bottom: layout.safeArea.bottom + bottomOffset,
-          right: layout.safeArea.right,
+          bottom: safe.bottom + bottomOffset,
+          right: safe.right,
           fontFamily: fonts.mono,
           fontSize: fontSizes.meta,
           fontWeight: 400,

@@ -32,7 +32,6 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   slideIn,
-  exitFade,
   easings,
   CLAMP_SINE,
 } from "../../utils/animation";
@@ -107,10 +106,10 @@ const layoutSankey = (
   // diagram as a whole has equal horizontal padding either side.
   // Nodes are thin colored bars (D3-Sankey convention): width is purely
   // a visual marker, not a data dimension. The bar's HEIGHT carries the
-  // value. Width 14px gives just enough mass for the colored stripe to
-  // read cleanly without competing with the ribbons it terminates.
+  // value. Width 18px gives the colored stripe enough mass to anchor the
+  // ribbons it terminates without competing with their flow.
   const colWidth = chartWidth / columnCount;
-  const nodeWidth = 14;
+  const nodeWidth = 18;
   const colXOffsets = new Map<number, number>();
   columns.forEach((col, idx) => {
     // Center each bar within its slot.
@@ -679,10 +678,12 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
 
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
-  // Layout
+  // Layout — `contentArea` already reserves the title clearance + 48px gap,
+  // so chart-area top = area.top with no further offset (previous code
+  // double-counted by also subtracting fontSizes.h1 + spacing.xl).
   const area = contentArea("content", "generous");
   const chartWidth = area.width;
-  const chartHeight = area.height - fontSizes.h1 - layout.spacing.xl;
+  const chartHeight = area.height;
 
   const { nodes: layoutNodes, links: layoutLinks } = useMemo(
     () => layoutSankey(nodes, links, chartWidth, chartHeight),
@@ -695,7 +696,6 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   const sourceNodesStart = sec(0.3);
   const linksStart = sec(1.2);
   const otherNodesStart = sec(1.5);
-  const exitStart = sec(durationSec - 1.5);
 
   // Source nodes (leftmost column)
   const sourceNodeIds = new Set(
@@ -748,7 +748,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
         style={{
           position: "absolute",
           left: area.left,
-          top: area.top + fontSizes.h1 + layout.spacing.xl,
+          top: area.top,
           width: chartWidth,
           height: chartHeight,
         }}
@@ -815,34 +815,6 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
         )}
       </div>
 
-      {/* Source attribution — slideIn (no naked fade) */}
-      {source && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: area.bottom,
-            left: area.left,
-            fontSize: fontSizes.caption,
-            fontFamily: fonts.mono,
-            color: theme.text.muted,
-            opacity: fadeIn(frame, titleFrameEnd, sec(0.4)),
-            transform: `translateY(${slideIn(frame, titleFrameEnd, layout.spacing.xs, sec(0.5))}px)`,
-            textShadow: shadows.textLift,
-          }}
-        >
-          {source}
-        </div>
-      )}
-
-      {/* Exit fade */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "black",
-          opacity: exitFade(frame, exitStart, sec(1)),
-        }}
-      />
       </AbsoluteFill>
     </Background>
   );

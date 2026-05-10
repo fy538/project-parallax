@@ -60,7 +60,7 @@ const diffusionData: DataChartData = {
 
 // ── Demo compositions ─────────────────────────────────────────────────────────
 
-const EditorialHeroDemo: React.FC = () => {
+export const EditorialHeroDemo: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>
@@ -80,7 +80,7 @@ const EditorialHeroDemo: React.FC = () => {
   );
 };
 
-const EditorialAsideDemo: React.FC = () => {
+export const EditorialAsideDemo: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>
@@ -99,7 +99,7 @@ const EditorialAsideDemo: React.FC = () => {
   );
 };
 
-const EditorialMinimalDemo: React.FC = () => {
+export const EditorialMinimalDemo: React.FC = () => {
   useCompositionAnimation({ noDrift: true });
   return (
     <AbsoluteFill>

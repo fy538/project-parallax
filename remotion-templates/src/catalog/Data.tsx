@@ -169,7 +169,7 @@ const tsPopulation: TimeSeriesChartData = {
   subtitle: "Five regions diverge across the 20th century",
   lines: [
     {
-      label: "Asia", color: "#C23B22",
+      label: "Asia", color: "#C23B22", hero: true,
       points: [{ x: 1900, y: 947 }, { x: 1950, y: 1404 }, { x: 2000, y: 3741 }, { x: 2024, y: 4721 }],
     },
     {
@@ -197,10 +197,10 @@ const gaugeWeather: ProbabilityGaugeData = {
   episode: CATALOG_EPISODE,
   title: "Will It Rain Tomorrow?",
   subtitle: "Three estimates compared",
-  variant: "gauge",
+  variant: "strip",
   gauges: [
-    { label: "NWS official", value: 65 },
-    { label: "ECMWF model", value: 72, color: "#3266AD" },
+    { label: "NWS", value: 65, marketSource: "Official" },
+    { label: "ECMWF", value: 72, color: "#3266AD", marketSource: "Model" },
     { label: "Crowdsourced", value: 58, color: "#E5A544", marketSource: "Manifold" },
   ],
   source: "Hypothetical demonstration",
@@ -248,12 +248,12 @@ const radarAthletes: RadarChartData = {
   title: "Three Track Specialists Compared",
   subtitle: "Six attributes, normalized to peer percentile",
   axes: [
-    { label: "Top Speed", short: "SPD" },
-    { label: "Endurance", short: "END" },
-    { label: "Power", short: "PWR" },
-    { label: "Technical Skill", short: "TECH" },
-    { label: "Recovery", short: "REC" },
-    { label: "Versatility", short: "VER" },
+    { label: "Speed" },
+    { label: "Endurance" },
+    { label: "Power" },
+    { label: "Technique" },
+    { label: "Recovery" },
+    { label: "Versatility" },
   ],
   subjects: [
     { name: "Sprinter", values: [98, 30, 92, 75, 45, 35], color: "#C23B22", fillOpacity: 0.15 },

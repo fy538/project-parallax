@@ -1,10 +1,15 @@
 /**
  * Data types for the ProbabilityGauge template.
  *
- * Supports three variants:
- *   - gauge: Semi-circular probability arcs with market prices
+ * Supports four variants:
+ *   - gauge: Semi-circular probability arcs (single value, dashboard-style)
+ *   - strip: Horizontal probability rule with named markers (multi-source comparison)
  *   - shift: Probability transitions (before → after) with triggers
  *   - scorecard: Prediction tracking with calibration stats
+ *
+ * Use `strip` whenever you have 2+ sources estimating the same probability.
+ * Cleveland & McGill (1984): position-on-a-common-axis is the most accurate
+ * visual encoding. Reach for `gauge` only with a single value.
  */
 
 import type { DirectionBlock } from "../../hooks/useDirection";
@@ -71,7 +76,7 @@ export interface ProbabilityGaugeData {
   episode: string;
   title: string;
   subtitle?: string;
-  variant: "gauge" | "shift" | "scorecard" | "forecast";
+  variant: "gauge" | "strip" | "shift" | "scorecard" | "forecast";
   /** For gauge variant — one or more probability arcs */
   gauges?: GaugeItem[];
   /** For shift variant — probability changes */

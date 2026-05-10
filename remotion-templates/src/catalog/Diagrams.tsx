@@ -16,6 +16,8 @@ import type { NetworkDiagramData } from "../templates/NetworkDiagram/types";
 import { SplitComposition } from "../templates/SplitComposition/SplitComposition";
 import { SplitCompositionSchema } from "../templates/SplitComposition/schema";
 import type { SplitCompositionData } from "../templates/SplitComposition/types";
+import { DuelingFrameworks } from "../templates/DuelingFrameworks/DuelingFrameworks";
+import type { DuelingFrameworksData } from "../templates/DuelingFrameworks/types";
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
@@ -206,6 +208,43 @@ const splitTime: SplitCompositionData = {
   durationSec: 11,
 };
 
+// ─── DuelingFrameworks × 1 ────────────────────────────────────────────────
+
+const duelingEmpireFall: DuelingFrameworksData = {
+  episode: CATALOG_EPISODE,
+  title: "Why Empires Fall",
+  subtitle: "Two diagnostic lenses on the same end-state",
+  phenomenon: "the late-stage decline of imperial systems",
+  verdictLabel: "Which lens fits the late stage?",
+  cinematicMode: true,
+  ambientParticles: true,
+  durationSec: 22,
+  frameworkA: {
+    name: "Imperial Overstretch",
+    color: "#C23B22",
+    score: 76,
+    verdict: "Explains the tempo and timing",
+    tenets: [
+      { text: "Military commitments outrun the economic base" },
+      { text: "Defense spending crowds out productive investment" },
+      { text: "Relative decline becomes absolute" },
+      { text: "The fiscal ceiling forces a strategic retreat" },
+    ],
+  },
+  frameworkB: {
+    name: "Legitimacy Crisis",
+    color: "#3266AD",
+    score: 71,
+    verdict: "Explains how the end actually arrives",
+    tenets: [
+      { text: "The ruling order loses its sacred authority" },
+      { text: "Succession turns contested and violent" },
+      { text: "Elite consensus fractures under pressure" },
+      { text: "The periphery stops believing in the center" },
+    ],
+  },
+};
+
 // ─── Composition registrations ────────────────────────────────────────────
 
 const fwComp = (id: string, data: FrameworkDiagramData) => (
@@ -263,8 +302,25 @@ const splitComp = (id: string, data: SplitCompositionData) => (
 export const CatalogSplitMaps = () => splitComp(catalogId("SplitComposition", "maps"), splitMaps);
 export const CatalogSplitTime = () => splitComp(catalogId("SplitComposition", "time"), splitTime);
 
+const duelingComp = (id: string, data: DuelingFrameworksData) => (
+  <Composition
+    id={id}
+    component={DuelingFrameworks}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DuelingFrameworksData).durationSec || 18),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data }}
+  />
+);
+
+export const CatalogDuelingEmpireFall = () => duelingComp(catalogId("DuelingFrameworks", "empire-fall"), duelingEmpireFall);
+
 export const catalogDiagramsData = {
   fwComparison, fwFlow, fwMatrix,
   nwHubSpoke, nwChain,
   splitMaps, splitTime,
+  duelingEmpireFall,
 };
