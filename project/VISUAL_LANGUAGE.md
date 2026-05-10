@@ -492,6 +492,28 @@ Parallax is a narration-first channel. The narrator is the protagonist; visuals 
 
 ---
 
+## Map vs. Network Diagram: Is the Geography Meaningful?
+
+A recurring template-selection mistake: rendering geographically-anchored relationships (trade routes, military alliances tied to territory, road or rail networks) as a schematic NetworkDiagram instead of as a real map. The schematic throws away latitude, distance, neighbouring borders, and every other editorial signal the real geography carries — "all roads led to Rome" is *literally a fact about geography*, and "Londinium in Britain, Alexandria in Egypt, Carthago in North Africa" is the editorial weight that a hub-and-five-bubbles diagram silently deletes.
+
+**The decision rule:** *is the spatial position editorially meaningful?*
+
+| Yes — geography matters | No — relationship matters |
+|---|---|
+| Trade routes, supply lanes | Supply-chain chokepoints (TSMC ↔ chip designers) |
+| Military alliances anchored to territory | Coalition / alignment / dependency structures |
+| Road, rail, sea-lane networks | Influence networks (intellectual lineage, citation graphs) |
+| Infrastructure topology where adjacency matters | Causation diagrams (multiple trends → one outcome) |
+| Anywhere "near vs far" or "on the way to" carries meaning | Organizational hierarchies (politburo, cabinet, board) |
+|  | Concept maps (a central idea and its sub-claims) |
+
+**Yes →** `ChoroplethMap` (regional values), `RouteAnimation` (paths through space).
+**No →** `NetworkDiagram` (relationship structure).
+
+**Test:** if you find yourself naming geographic places (Lyon, Cairo, Constantinople), the schematic is almost always wrong. If your nodes are abstract entities (TSMC, the Federal Reserve, a school of thought, a causal driver), the schematic is almost always right.
+
+---
+
 ## Relationship to Other Docs
 
 - **SCRIPT_FORMAT.md** — the syntax for specifying visuals in the script's right column. This doc tells you *what* to write; that doc tells you *how* to write it.

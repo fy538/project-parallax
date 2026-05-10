@@ -828,24 +828,30 @@ const MatrixVariant: React.FC<{
   const cells = data.cells || [];
   const accentColor = data.accentColor || emphasis.primaryAccent;
 
-  const headerWidth = 180;
-  const colHeaderHeight = 48;
-  const cellMargin = layout.spacing.xs / 2;
+  // Editorial 2×2 (or NxM) matrix — fills the chart area, drops card chrome
+  // for subtle accent-tinted quadrants, action verb is display-weight hero
+  // text (split from "Verb — description" pattern in the cell label), axes
+  // drawn as actual lines with directional cues, hero quadrant gets a
+  // "FOCUS" tag and accent border. Designed for the Eisenhower-class 2×2
+  // typology framework — the matrix IS the entire visualization, so it
+  // earns canvas presence rather than living as a small inline diagram.
+
   const area = useMemo(() => contentArea("content", "generous"), []);
-  const cellSize = useMemo(() => {
-    const availW = Math.floor(
-      (area.width - headerWidth - colHeaders.length * cellMargin * 2) /
-        Math.max(1, colHeaders.length)
-    );
-    return Math.min(260, Math.max(140, availW));
-  }, [area.width, colHeaders.length, cellMargin]);
-  const cellHeight = useMemo(() => {
-    const availH = Math.floor(
-      (area.height - colHeaderHeight - rowHeaders.length * cellMargin * 2) /
-        Math.max(1, rowHeaders.length)
-    );
-    return Math.min(180, Math.max(80, availH));
-  }, [area.height, rowHeaders.length, cellMargin]);
+
+  // Geometry: matrix fills most of the chart area. Y-axis label gutter on
+  // the left, column headers above, X-axis label below, row headers in a
+  // narrow strip just left of the grid.
+  const yAxisGutter = 60;
+  const rowHeaderWidth = 200;
+  const colHeaderHeight = 56;
+  const xAxisGutter = 48;
+  const cellGap = layout.spacing.xs;
+  const numCols = colHeaders.length;
+  const numRows = rowHeaders.length;
+  const gridWidth = area.width - yAxisGutter - rowHeaderWidth;
+  const gridHeight = area.height - colHeaderHeight - xAxisGutter;
+  const cellW = (gridWidth - cellGap * (numCols - 1)) / Math.max(1, numCols);
+  const cellH = (gridHeight - cellGap * (numRows - 1)) / Math.max(1, numRows);
 
   const cellLookup = useMemo(() => {
     const map = new Map<string, typeof cells[number]>();
@@ -855,6 +861,17 @@ const MatrixVariant: React.FC<{
     return map;
   }, [cells]);
 
+  // Split "Verb — description" pattern so we can hero the verb and tone
+  // down the description. Tolerates labels without an em-dash.
+  const splitCellLabel = (label: string): { verb: string; desc?: string } => {
+    const m = label.match(/^(.*?)\s*[—–-]\s*(.+)$/);
+    if (m) return { verb: m[1].trim(), desc: m[2].trim() };
+    return { verb: label };
+  };
+
+  const exitOp = exitFade(frame, 99999, 15); // matrix doesn't compute durationInFrames here
+  const fade = fadeIn(frame, sec(0.2), sec(0.5));
+
   return (
     <div
       style={{
@@ -863,115 +880,253 @@ const MatrixVariant: React.FC<{
         left: area.left,
         width: area.width,
         height: area.height,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
       }}
     >
-      <div>
-        {/* Column headers row */}
-        <div style={{ display: "flex", marginLeft: headerWidth }}>
-          {colHeaders.map((ch, ci) => (
-            <div
-              key={ci}
-              style={{
-                width: cellSize,
-                textAlign: "center",
-                fontSize: fontSizes.caption,
-                color: theme.text.muted,
-                fontWeight: 600,
-                padding: `${layout.spacing.sm}px ${layout.spacing.xs}px`,
-                opacity: fadeIn(frame, stagger(ci, sec(0.3), sec(0.5)), sec(0.3)),
-              }}
-            >
-              {ch}
-            </div>
-          ))}
+      {/* ── Y-axis label (rotated, left edge) ─────────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: colHeaderHeight,
+          left: 0,
+          width: yAxisGutter,
+          height: gridHeight,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: fade * exitOp,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.meta,
+            letterSpacing: letterSpacing.meta,
+            textTransform: "uppercase",
+            color: theme.text.muted,
+            transform: "rotate(-90deg)",
+            whiteSpace: "nowrap",
+            maxWidth: textMaxWidth.label,
+          }}
+        >
+          ↑ More {rowHeaders[0] || "important"}
         </div>
+      </div>
 
-        {/* Rows */}
-        {rowHeaders.map((rh, ri) => (
-          <div key={ri} style={{ display: "flex", alignItems: "center" }}>
-            {/* Row header */}
+      {/* ── Column headers (above grid, aligned with cell centers) ────── */}
+      {colHeaders.map((ch, ci) => (
+        <div
+          key={`col-${ci}`}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: yAxisGutter + rowHeaderWidth + ci * (cellW + cellGap),
+            width: cellW,
+            height: colHeaderHeight,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: fadeIn(frame, stagger(ci, sec(0.3), sec(0.4)), sec(0.4)) * exitOp,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.label,
+              letterSpacing: letterSpacing.meta,
+              textTransform: "uppercase",
+              color: theme.text.primary,
+              fontWeight: 600,
+              maxWidth: textMaxWidth.label,
+            }}
+          >
+            {ch}
+          </div>
+        </div>
+      ))}
+
+      {/* ── Row headers (left of each row) ────────────────────────────── */}
+      {rowHeaders.map((rh, ri) => (
+        <div
+          key={`row-${ri}`}
+          style={{
+            position: "absolute",
+            top: colHeaderHeight + ri * (cellH + cellGap),
+            left: yAxisGutter,
+            width: rowHeaderWidth,
+            height: cellH,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            paddingRight: layout.spacing.md,
+            opacity: fadeIn(frame, stagger(ri, sec(0.3), sec(0.4)), sec(0.4)) * exitOp,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.label,
+              letterSpacing: letterSpacing.meta,
+              textTransform: "uppercase",
+              color: theme.text.primary,
+              fontWeight: 600,
+              textAlign: "right",
+              lineHeight: 1.2,
+              maxWidth: textMaxWidth.label,
+              ...textSafe.wrap,
+            }}
+          >
+            {rh}
+          </div>
+        </div>
+      ))}
+
+      {/* ── Cells (the actual matrix) ─────────────────────────────────── */}
+      {rowHeaders.map((_, ri) =>
+        colHeaders.map((_, ci) => {
+          const cell = cellLookup.get(`${ri}-${ci}`);
+          const cellStart = stagger(
+            ri * numCols + ci,
+            sec(0.18),
+            sec(0.6)
+          );
+          const cellOpacity = fadeIn(frame, cellStart, sec(0.4));
+          const cellSlideY = slideIn(frame, cellStart, 16, sec(0.4));
+          const cellColor = cell?.color || theme.text.muted;
+          const isHero = cell?.highlight === true;
+          const heroColor = isHero ? accentColor : cellColor;
+          const quadrantNumber = `Q${ri * numCols + ci + 1}`;
+          const { verb, desc } = splitCellLabel(cell?.label || "");
+
+          return (
             <div
+              key={`cell-${ri}-${ci}`}
               style={{
-                width: headerWidth,
-                fontSize: fontSizes.caption,
-                color: theme.text.muted,
-                fontWeight: 600,
-                textAlign: "right",
-                paddingRight: layout.spacing.md,
-                opacity: fadeIn(
-                  frame,
-                  stagger(ri, sec(0.3), sec(0.5)),
-                  sec(0.3)
-                ),
-                ...textSafe.wrap,
+                position: "absolute",
+                top: colHeaderHeight + ri * (cellH + cellGap),
+                left: yAxisGutter + rowHeaderWidth + ci * (cellW + cellGap),
+                width: cellW,
+                height: cellH,
+                opacity: cellOpacity * exitOp,
+                transform: `translateY(${cellSlideY}px)`,
               }}
             >
-              {rh}
-            </div>
+              {/* Cell background — subtle accent tint, no card chrome.
+                  Hero cell gets a stronger fill + accent border to mark
+                  it as the protagonist quadrant. */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: `${heroColor}${isHero ? "1A" : "0C"}`,
+                  borderLeft: `${isHero ? 4 : 2}px solid ${heroColor}${isHero ? "" : "55"}`,
+                  borderRadius: 2,
+                }}
+              />
 
-            {/* Cells in this row */}
-            {colHeaders.map((_, ci) => {
-              const cell = cellLookup.get(`${ri}-${ci}`);
-              const cellStart = stagger(
-                ri * colHeaders.length + ci,
-                sec(0.2),
-                sec(0.8)
-              );
-              const cellOpacity = fadeIn(frame, cellStart, sec(0.4));
-              const cellScale = scaleReveal(frame, cellStart, sec(0.4), 1.08, 1.0);
-              const cellSlideY = slideIn(frame, cellStart, 16, sec(0.4));
-              const cellColor = cell?.color || palette.midnight;
-              const isHighlight = cell?.highlight;
-
-              return (
-                <div
-                  key={ci}
-                  style={{
-                    width: cellSize,
-                    minHeight: cellHeight,
-                    margin: cellMargin,
-                    borderRadius: radii.md,
-                    border: `1px solid ${isHighlight ? accentColor : cellColor}${isHighlight ? "60" : "28"}`,
-                    backgroundColor: isHighlight
-                      ? `${accentColor}1F`
-                      : `${cellColor}08`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    opacity: cellOpacity,
-                    transform: `translateY(${cellSlideY}px) scale(${cellScale}) perspective(1400px) rotateX(${ri % 2 === 0 ? -2 : 2}deg)`,
-                    transformOrigin: "center center",
-                    padding: cardPadding.css,
-                    boxShadow: isHighlight
-                      ? `${shadows.medium}, 0 0 24px ${accentColor}50, inset 0 1px 0 rgba(255,255,255,0.08)`
-                      : `${shadows.subtle}, inset 0 1px 0 rgba(255,255,255,0.04)`,
-                    ...textSafe.wrap,
-                  }}
-                >
-                  <div
+              {/* Quadrant tag (top-left) — mono caps marker */}
+              <div
+                style={{
+                  position: "absolute",
+                  top: layout.spacing.md,
+                  left: layout.spacing.md + (isHero ? 4 : 2),
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.meta,
+                  letterSpacing: letterSpacing.meta,
+                  color: heroColor,
+                  fontWeight: 700,
+                  maxWidth: textMaxWidth.label,
+                }}
+              >
+                {quadrantNumber}
+                {isHero && (
+                  <span
                     style={{
-                      fontSize: fontSizes.caption,
-                      color: isHighlight ? accentColor : theme.text.primary,
-                      textAlign: "center",
-                      fontWeight: isHighlight ? 600 : 400,
-                      lineHeight: 1.4,
-                      textShadow: shadows.textLift,
-                      maxWidth: cellSize - cardPadding.horizontal * 2,
-                      ...textSafe.wrap,
+                      marginLeft: layout.spacing.sm,
+                      paddingLeft: layout.spacing.sm,
+                      borderLeft: `1px solid ${heroColor}66`,
+                      color: heroColor,
                     }}
                   >
-                    {cell?.label || ""}
-                  </div>
+                    Focus
+                  </span>
+                )}
+              </div>
+
+              {/* Hero text block (centered) */}
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: layout.spacing.xl,
+                  textAlign: "center",
+                }}
+              >
+                {/* Action verb — display weight hero */}
+                <div
+                  style={{
+                    fontSize: isHero ? fontSizes.h1 : fontSizes.h2,
+                    fontWeight: 700,
+                    color: isHero ? accentColor : theme.text.primary,
+                    fontFamily: fonts.heading,
+                    lineHeight: 1.05,
+                    maxWidth: textMaxWidth.h2,
+                    textShadow: isHero ? `0 0 16px ${accentColor}40` : undefined,
+                  }}
+                >
+                  {verb}
                 </div>
-              );
-            })}
-          </div>
-        ))}
+                {desc && (
+                  <div
+                    style={{
+                      marginTop: layout.spacing.sm,
+                      fontSize: fontSizes.body,
+                      color: theme.text.secondary,
+                      fontFamily: fonts.body,
+                      fontStyle: "italic",
+                      lineHeight: 1.3,
+                      maxWidth: textMaxWidth.body,
+                    }}
+                  >
+                    {desc}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })
+      )}
+
+      {/* ── X-axis label (below grid) ─────────────────────────────────── */}
+      <div
+        style={{
+          position: "absolute",
+          top: colHeaderHeight + gridHeight,
+          left: yAxisGutter + rowHeaderWidth,
+          width: gridWidth,
+          height: xAxisGutter,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: fade * exitOp,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: fonts.mono,
+            fontSize: fontSizes.meta,
+            letterSpacing: letterSpacing.meta,
+            textTransform: "uppercase",
+            color: theme.text.muted,
+            maxWidth: textMaxWidth.label,
+            whiteSpace: "nowrap",
+          }}
+        >
+          ← More {colHeaders[0] || "urgent"}
+        </div>
       </div>
     </div>
   );

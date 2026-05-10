@@ -93,58 +93,47 @@ const fwMatrix: FrameworkDiagramData = {
 
 // ─── NetworkDiagram × 2 ───────────────────────────────────────────────────
 
+// NetworkDiagram demos must show RELATIONSHIP structure where geography is
+// editorially irrelevant — otherwise a map template carries more meaning.
+// Roman-roads-style data (named places, real geographic positions, routes
+// that hug actual coastlines) belongs in ChoroplethMap or RouteAnimation.
+// This catalog entry deliberately picks a chokepoint relationship: TSMC's
+// position is structural ("everyone goes through us"), not spatial. The
+// chart would lose its editorial point on a Taiwan map; on the network
+// diagram the dependency structure IS the point.
 const nwHubSpoke: NetworkDiagramData = {
   episode: CATALOG_EPISODE,
-  title: "The Roman Road Network",
-  subtitle: "All roads led to Rome — for an extractable reason",
+  title: "TSMC: The Chip-Supply Chokepoint",
+  subtitle: "One foundry sits between every advanced chip designer and a finished product",
   layout: "hub-spoke",
   nodes: [
-    { id: "rome", label: "Rome", type: "nation", color: "#6B1D1D", importance: "primary",
-      stat: { value: "85k km", label: "of paved road" } },
-    { id: "lugdunum", label: "Lugdunum", sublabel: "Lyon", type: "institution", color: "#E5A544" },
-    { id: "alexandria", label: "Alexandria", sublabel: "grain", type: "institution", color: "#E5A544" },
-    { id: "constantinople", label: "Byzantium", sublabel: "later capital", type: "institution", color: "#3266AD" },
-    { id: "carthago", label: "Carthago", sublabel: "Africa", type: "institution", color: "#888780" },
-    { id: "londinium", label: "Londinium", type: "institution", color: "#888780" },
+    { id: "tsmc", label: "TSMC", type: "nation", color: "#6B1D1D", importance: "primary",
+      stat: { value: "92%", label: "of advanced-node chips" } },
+    { id: "apple", label: "Apple", sublabel: "M & A-series", type: "institution", color: "#888780" },
+    { id: "nvidia", label: "Nvidia", sublabel: "AI accelerators", type: "institution", color: "#E5A544" },
+    { id: "amd", label: "AMD", sublabel: "CPU · GPU", type: "institution", color: "#888780" },
+    { id: "qualcomm", label: "Qualcomm", sublabel: "Mobile SoC", type: "institution", color: "#3266AD" },
+    { id: "broadcom", label: "Broadcom", sublabel: "Networking", type: "institution", color: "#888780" },
   ],
   edges: [
-    { from: "rome", to: "lugdunum", style: "solid", label: "Via Aurelia" },
-    { from: "rome", to: "alexandria", style: "solid", label: "grain ships" },
-    { from: "rome", to: "constantinople", style: "solid", label: "Via Egnatia" },
-    { from: "rome", to: "carthago", style: "solid" },
-    { from: "rome", to: "londinium", style: "solid" },
+    { from: "tsmc", to: "apple", style: "solid" },
+    { from: "tsmc", to: "nvidia", style: "solid" },
+    { from: "tsmc", to: "amd", style: "solid" },
+    { from: "tsmc", to: "qualcomm", style: "solid" },
+    { from: "tsmc", to: "broadcom", style: "solid" },
   ],
   callouts: [
-    { value: "60 mi/day", label: "Roman courier speed via the Cursus Publicus", position: "bottom-right" },
+    { value: "1 supplier", label: "for every leading-edge chip outside Samsung's foundry", position: "bottom-right" },
   ],
   durationSec: 12,
 };
 
-const nwChain: NetworkDiagramData = {
-  episode: CATALOG_EPISODE,
-  title: "The Coffee Bean's Journey",
-  subtitle: "From Ethiopian highlands to a Brooklyn café",
-  layout: "horizontal-chain",
-  nodes: [
-    { id: "farm", label: "Farm", sublabel: "Yirgacheffe, Ethiopia", type: "actor", color: "#5DAA68", importance: "primary" },
-    { id: "coop", label: "Cooperative", sublabel: "Wash & dry", type: "institution", color: "#E5A544" },
-    { id: "exporter", label: "Exporter", sublabel: "Addis Ababa", type: "institution", color: "#888780" },
-    { id: "importer", label: "Importer", sublabel: "Hamburg", type: "institution", color: "#3266AD" },
-    { id: "roaster", label: "Roaster", sublabel: "Brooklyn", type: "actor", color: "#6B1D1D", importance: "primary" },
-    { id: "shop", label: "Shop", sublabel: "Williamsburg", type: "actor", color: "#C23B22" },
-  ],
-  edges: [
-    { from: "farm", to: "coop", style: "solid", label: "harvest" },
-    { from: "coop", to: "exporter", style: "solid" },
-    { from: "exporter", to: "importer", style: "solid", label: "shipping" },
-    { from: "importer", to: "roaster", style: "solid" },
-    { from: "roaster", to: "shop", style: "solid", label: "next-day" },
-  ],
-  callouts: [
-    { value: "~3%", label: "Share of final retail price returned to the farmer", position: "bottom-right" },
-  ],
-  durationSec: 11,
-};
+// horizontal-chain catalog demo deprecated May 10, 2026 — sequential
+// progressions belong in FrameworkDiagram flow (which carries spine,
+// chevrons, ordinals, hero terminal); value-capture stories belong in
+// PricingWaterfall (see PricingWaterfall/index.tsx). The horizontal-chain
+// layout enum value remains in NetworkDiagram for back-compat but should
+// not be the recommended path for new content. See CLAUDE.md "Known gaps".
 
 // ─── SplitComposition × 2 ─────────────────────────────────────────────────
 
@@ -216,7 +205,12 @@ const duelingEmpireFall: DuelingFrameworksData = {
   subtitle: "Two diagnostic lenses on the same end-state",
   phenomenon: "the late-stage decline of imperial systems",
   verdictLabel: "Which lens fits the late stage?",
-  cinematicMode: true,
+  // cinematicMode disabled May 10, 2026 — the wide-canvas + camera-pan
+  // architecture has unresolved layout collisions (title vs framework
+  // headers during pan; scoring bars wider than the overview viewport).
+  // Static variant is cleaner and reads as editorial. Re-enable when
+  // cinematic mode has been refactored for proper viewport containment.
+  cinematicMode: false,
   ambientParticles: true,
   durationSec: 22,
   frameworkA: {
@@ -282,7 +276,6 @@ const nwComp = (id: string, data: NetworkDiagramData) => (
 );
 
 export const CatalogNwHubSpoke = () => nwComp(catalogId("NetworkDiagram", "hub-spoke"), nwHubSpoke);
-export const CatalogNwChain = () => nwComp(catalogId("NetworkDiagram", "horizontal-chain"), nwChain);
 
 const splitComp = (id: string, data: SplitCompositionData) => (
   <Composition
@@ -320,7 +313,7 @@ export const CatalogDuelingEmpireFall = () => duelingComp(catalogId("DuelingFram
 
 export const catalogDiagramsData = {
   fwComparison, fwFlow, fwMatrix,
-  nwHubSpoke, nwChain,
+  nwHubSpoke,
   splitMaps, splitTime,
   duelingEmpireFall,
 };

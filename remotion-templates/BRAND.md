@@ -114,13 +114,15 @@ Background treatment: flat or lightly textured `paper` with subtle noise (2-3% o
 |------|------|--------|-----|
 | **Display** | IBM Plex Sans | 600-700 | Episode titles, hero text, section headers, hero numbers |
 | **Display** | IBM Plex Sans | 400-500 | Subtitles, descriptions |
+| **Body** | IBM Plex Sans | 400-500 | Paragraph text, framework tenets, item lists, card body content |
 | **Serif body** | IBM Plex Serif | 400-500 | Long-form passages, asides, citations, editorial-register narrative |
-| **Body** | IBM Plex Mono | 400 | Metadata, coordinates, labels, captions, kicker labels, byline |
-| **Body** | IBM Plex Mono | 600 | Emphasized data, highlighted metadata |
-| **Data** | JetBrains Mono | 400-700 | Chart values, statistics, code-style data |
+| **Metadata** | IBM Plex Mono | 400-600 | Kicker labels, byline, coordinates, dates, axis labels, source attribution, captions |
+| **Data** | JetBrains Mono | 400-700 | Chart values, statistics, tabular numbers |
 | **Chinese** | Noto Sans SC | 400-700 | All Chinese text (10-15% larger than equivalent English) |
 
-IBM Plex Sans is the voice of the channel — Franklin Gothic-derived, mid-century editorial, the actual lineage Burtin and Beall set Fortune magazine in (1945-55). IBM Plex Serif is the long-form companion — transitional serif from the same Plex superfamily, used when the editorial register calls for a transitional serif (asides, citations, narrative paragraphs). IBM Plex Mono is the evidence layer — coordinates, dates, classifications, file numbers, kicker labels, bylines. JetBrains Mono is reserved for pure data display (chart labels, statistics).
+IBM Plex Sans is the voice of the channel — Franklin Gothic-derived, mid-century editorial, the actual lineage Burtin and Beall set Fortune magazine in (1945-55). It carries both the display register (titles, hero numbers) AND the body paragraph register (tenets, lists, descriptions) — using the same family across the hierarchy keeps the typographic voice consistent. IBM Plex Serif is the long-form companion — transitional serif from the same Plex superfamily, used when the editorial register calls for a transitional serif (asides, citations, narrative paragraphs). IBM Plex Mono is the metadata layer — coordinates, dates, classifications, file numbers, kicker labels, bylines, axis labels, source attribution. JetBrains Mono is reserved for pure data display (chart values, statistics, tabular numbers that need column alignment).
+
+**Naming note.** In `theme.ts`, `fonts.body` = Plex Sans (paragraph text), `fonts.metadata` = Plex Mono (the labels-and-captions layer), `fonts.mono` is an alias for `fonts.metadata`. A May 10 regression briefly had `fonts.body` pointing to Mono, which made every tenet, item, and subtitle render typewriter-style; reverted same day.
 
 The Plex superfamily (Sans + Serif + Mono, all by Mike Abbink for Bold Monday / IBM, 2017) was designed as a coherent system honoring Paul Rand's mid-century IBM corporate-modernist heritage. Adopting all three gives Parallax a single typographic source of truth in the genuine Bauhaus → Swiss → mid-century editorial lineage.
 

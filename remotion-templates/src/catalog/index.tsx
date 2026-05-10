@@ -32,6 +32,10 @@ export {
   CatalogBayesVenice,
   CatalogRadarAthletes,
   CatalogSankeyEnergy,
+  CatalogWaterfallCoffee,
+  CatalogWaterfallMotionStill,
+  CatalogWaterfallMotionBriefing,
+  CatalogWaterfallMotionDocumentary,
 } from "./Data";
 
 export {
@@ -52,7 +56,6 @@ export {
   CatalogFwFlow,
   CatalogFwMatrix,
   CatalogNwHubSpoke,
-  CatalogNwChain,
   CatalogSplitMaps,
   CatalogSplitTime,
   CatalogDuelingEmpireFall,

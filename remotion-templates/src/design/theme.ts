@@ -398,18 +398,32 @@ export const fonts = {
   // Explicitly Franklin Gothic-derived — the lineage Burtin and Beall set Fortune
   // magazine in (1945-55), the actual mid-century editorial register Parallax
   // reaches for. Migrated from Space Grotesk on May 10, 2026; see BRAND.md →
-  // Typography for the rationale and DECISIONS.md for the entry.
+  // Typography for the rationale and DECISIONS.md (D40) for the entry.
   display: '"IBM Plex Sans", Inter, Arial, sans-serif',
   heading: '"IBM Plex Sans", Inter, Arial, sans-serif', // alias for display
-  // Body metadata, axis labels, kicker labels, byline. IBM Plex Mono is the
-  // evidence layer — coordinates, dates, classifications, file numbers.
-  body: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
+  // Body paragraph text — editorial copy, framework tenets, item lists, card
+  // body content, subtitles. Same Plex Sans as display so the typographic
+  // voice stays consistent across hierarchy levels. (Pre-May 10 was Space
+  // Grotesk; post-D40 is Plex Sans. Brief regression on May 10 had this
+  // pointing at Mono, which made paragraphs render typewriter-style; fixed
+  // on the same day.)
+  body: '"IBM Plex Sans", Inter, Arial, sans-serif',
   // Long-form body / editorial-register passages. Plex Serif (Bold Monday / IBM)
   // pairs as the serif companion in the Plex superfamily; use when the editorial
   // voice calls for a transitional serif (asides, citations, narrative paragraphs).
   serifBody: '"IBM Plex Serif", Georgia, "Times New Roman", serif',
+  // Metadata / labels / kicker / axis ticks / source attribution / captions.
+  // The "evidence layer" — coordinates, dates, classifications, file numbers,
+  // small uppercase mono-caps tags. Use IBM Plex Mono so the metadata visually
+  // separates from the editorial copy by texture, not just size.
+  metadata: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
+  // Numeric data — chart values, statistics, axis values that need tabular
+  // alignment. JetBrains Mono is denser than Plex Mono and reads better at
+  // small sizes for fast number scanning.
   data: '"JetBrains Mono", Menlo, monospace',
-  mono: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace', // alias for body
+  // Generic mono — alias for `metadata`. Retained for templates that opt
+  // into mono semantically (code-style annotations, terminal-ish moments).
+  mono: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
   chinese: '"Noto Sans SC", "PingFang SC", sans-serif',
 } as const;
 

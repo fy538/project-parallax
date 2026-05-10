@@ -534,8 +534,11 @@ const SplitSideContent: React.FC<{
 
   const accentColor = data.accentColor || (isLeft ? semantic.us : semantic.china);
 
-  const textAlign: "left" | "right" = isLeft ? "left" : "right";
-  const itemAlign: "flex-start" | "flex-end" = isLeft ? "flex-start" : "flex-end";
+  // Magazine-spread treatment: each side reads naturally left-to-right
+  // (no mirrored alignment), content vertically centers in its column,
+  // first item gets pull-quote weight, subsequent items quieter. Page-
+  // number-style roman ordinal (I / II) anchors each side as a "page".
+  const ordinal = isLeft ? "I" : "II";
 
   const exitOpacity = exitFade(frame, totalFrames, 15);
 
@@ -549,39 +552,63 @@ const SplitSideContent: React.FC<{
         height: panelRect.height,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         opacity: exitOpacity,
       }}
     >
-      {data.tag && (
+      {/* Kicker row — page-style ordinal + tag, with thin rule beneath */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          gap: layout.spacing.md,
+          marginBottom: layout.spacing.lg,
+          paddingBottom: layout.spacing.sm,
+          borderBottom: `1px solid ${mode.text.muted}40`,
+          opacity: fadeIn(frame, tagDelay, sec(0.4)),
+          transform: `translateY(${slideIn(frame, tagDelay, layout.spacing.xs, sec(0.4))}px)`,
+        }}
+      >
         <div
           style={{
-            fontSize: fontSizes.caption,
-            fontWeight: fontWeights.semibold,
-            letterSpacing: letterSpacing.label,
-            textTransform: "uppercase",
-            color: accentColor,
-            textAlign,
-            marginBottom: layout.spacing.lg,
-            fontFamily: fonts.body,
-            opacity: fadeIn(frame, tagDelay, sec(0.4)),
-            transform: `translateY(${slideIn(frame, tagDelay, layout.spacing.xs, sec(0.4))}px)`,
+            fontSize: fontSizes.h3,
+            fontWeight: fontWeights.regular,
+            color: mode.text.muted,
+            fontFamily: fonts.heading,
+            fontStyle: "italic",
+            lineHeight: 1,
+            maxWidth: textMaxWidth.label,
           }}
         >
-          {data.tag}
+          {ordinal}
         </div>
-      )}
+        {data.tag && (
+          <div
+            style={{
+              fontSize: fontSizes.label,
+              fontWeight: fontWeights.semibold,
+              letterSpacing: letterSpacing.meta,
+              textTransform: "uppercase",
+              color: accentColor,
+              fontFamily: fonts.mono,
+              maxWidth: textMaxWidth.label,
+            }}
+          >
+            {data.tag}
+          </div>
+        )}
+      </div>
 
       <h2
         style={{
-          fontSize: fontSizes.h2,
+          fontSize: fontSizes.h1,
           fontWeight: fontWeights.bold,
           letterSpacing: letterSpacing.h2,
           color: mode.text.primary,
-          textAlign,
+          textAlign: "left",
           margin: 0,
-          marginBottom: data.subtitle ? layout.spacing.sm : layout.spacing.md,
-          maxWidth: textMaxWidth.h2,
+          marginBottom: data.subtitle ? layout.spacing.md : layout.spacing.lg,
+          maxWidth: textMaxWidth.h1,
           fontFamily: getFontFamily(data.title),
           lineHeight: lineHeight.h2,
           opacity: fadeIn(frame, titleDelay, sec(0.5)),
@@ -591,17 +618,21 @@ const SplitSideContent: React.FC<{
         {data.title}
       </h2>
 
+      {/* First item gets pull-quote treatment when there's no subtitle —
+          it carries the definitional thrust of the side. With a subtitle,
+          subtitle plays that role and items[0] is just the first bullet. */}
       {data.subtitle && (
         <div
           style={{
-            fontSize: fontSizes.body,
+            fontSize: fontSizes.h3,
             maxWidth: textMaxWidth.body,
             fontWeight: fontWeights.regular,
             color: mode.text.secondary,
-            textAlign,
-            marginBottom: layout.spacing.lg,
+            textAlign: "left",
+            marginBottom: layout.spacing.xl,
             fontFamily: getFontFamily(data.subtitle),
-            lineHeight: lineHeight.body,
+            fontStyle: "italic",
+            lineHeight: 1.35,
             opacity: fadeIn(frame, titleDelay + 4, sec(0.4)),
             transform: `translateY(${slideIn(frame, titleDelay + 4, layout.spacing.xs, sec(0.4))}px)`,
           }}
@@ -614,8 +645,8 @@ const SplitSideContent: React.FC<{
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: layout.spacing.md,
-          alignItems: itemAlign,
+          gap: layout.spacing.sm,
+          alignItems: "flex-start",
         }}
       >
         {data.items.map((item: string, idx: number) => {
@@ -625,21 +656,43 @@ const SplitSideContent: React.FC<{
           const transform = isLeft
             ? `translateX(${itemOffset}px)`
             : `translateX(${-itemOffset}px)`;
+          // First item in pull-quote weight when there's no subtitle to
+          // carry that role; otherwise all items render at body weight.
+          const isLeadItem = idx === 0 && !data.subtitle;
 
           return (
             <div
               key={idx}
               style={{
-                fontSize: fontSizes.body,
-                fontWeight: fontWeights.regular,
-                color: mode.text.secondary,
+                position: "relative",
+                paddingLeft: isLeadItem ? 0 : layout.spacing.md,
+                fontSize: isLeadItem ? fontSizes.h3 : fontSizes.body,
+                fontWeight: isLeadItem ? fontWeights.medium : fontWeights.regular,
+                color: isLeadItem ? mode.text.primary : mode.text.secondary,
                 fontFamily: getFontFamily(item),
-                lineHeight: lineHeight.body,
-                maxWidth: "90%",
+                fontStyle: isLeadItem ? "italic" : "normal",
+                lineHeight: 1.4,
+                maxWidth: textMaxWidth.body,
                 opacity: itemOpacity,
                 transform,
+                marginBottom: isLeadItem ? layout.spacing.md : 0,
               }}
             >
+              {/* Subtle bullet glyph for non-lead items — a thin colored
+                  marker rather than a circle, keeps the editorial feel. */}
+              {!isLeadItem && (
+                <span
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 12,
+                    width: 6,
+                    height: 1,
+                    background: accentColor,
+                    opacity: 0.6,
+                  }}
+                />
+              )}
               {item}
             </div>
           );
@@ -714,7 +767,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               width: splitPosition,
               height: layout.height,
               backgroundColor: leftAccent,
-              opacity: 0.06,
+              opacity: 0.1,
               pointerEvents: "none",
             }}
           />
@@ -729,7 +782,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               width: layout.width - splitPosition,
               height: layout.height,
               backgroundColor: rightAccent,
-              opacity: 0.06,
+              opacity: 0.1,
               pointerEvents: "none",
             }}
           />
@@ -764,7 +817,8 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
               opacity: exitOpacity,
             }}
           >
-            {/* Divider with subtle accent glow + breath pulse */}
+            {/* Magazine-spine divider — solid full-height rule, draws in
+                from top, stronger color than the previous fading gradient. */}
             <div
               style={{
                 position: "absolute",
@@ -772,37 +826,29 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 top: 0,
                 width: "100%",
                 height: `${dividerProgress * 100}%`,
-                background: `linear-gradient(to bottom, transparent, ${mode.text.muted}AA 40%, ${mode.text.muted}AA 60%, transparent)`,
-                boxShadow: `0 0 ${8 + 4 * Math.sin(frame * 0.03)}px ${mode.text.muted}30`, // shadows.accentGlowSm animated (sinusoidal pulse)
+                background: mode.text.muted,
+                opacity: 0.45,
               }}
             />
           </div>
         )}
 
-        {!data.noDivider && (
+        {/* Spine pill (OR / VS) intentionally removed May 10, 2026.
+            The magazine-spine divider + side-by-side layout already
+            communicates binary opposition; the pill was redundant chrome
+            that collided with subtitle text. `dividerLabel` field is kept
+            on the data type for back-compat but no longer renders.
+            If a future composition genuinely needs an explicit conjunction,
+            put it in one side's tag/title rather than as floating chrome. */}
+        {false && (
           <div
             style={{
               position: "absolute",
               left: "50%",
               top: "50%",
               transform: "translate(-50%, -50%)",
-              width: layout.spacing.lg,
-              height: layout.spacing.lg,
-              borderRadius: `${radii.pill}px`,
-              border: `1px solid ${mode.text.accent}80`,
-              backgroundColor: `${mode.bg.surface}E0`,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: fontSizes.label,
-              fontWeight: fontWeights.semibold,
-              color: mode.text.accent,
-              fontFamily: fonts.display,
               opacity: labelOpacity,
               pointerEvents: "none",
-              boxShadow: `0 0 12px ${mode.text.accent}30`, // shadows.accentGlowMd (30% opacity variant)
-              letterSpacing: 1,
-              textTransform: "uppercase",
             }}
           >
             {dividerLabel}

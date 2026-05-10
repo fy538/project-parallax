@@ -72,6 +72,10 @@ export const StaticDuelingFrameworks: React.FC<{
   } else if (isPhase("frameworkB")) {
     frameworkAOpacity = 0.3;
   }
+  // Scoring phase no longer dims tenets — tenets stay full-opacity throughout
+  // because the scoring section has been simplified (score bars + arbitrary
+  // percentages dropped May 10, 2026; only the verdict captions + final
+  // verdict question remain, which fit comfortably below the tenet cards).
 
   const dividerStartFrame = getPhaseStart("frameworkA") + sec(0.5);
   const dividerProgress = interpolate(
@@ -149,6 +153,13 @@ export const StaticDuelingFrameworks: React.FC<{
           />
         </div>
 
+        {/* Scoring phase — simplified May 10, 2026. Score bars + arbitrary
+            percentages dropped (they implied quantitative judgment that was
+            never measured; the verdict text already does the editorial job).
+            What remains: per-framework verdict captions ("Explains the tempo
+            and timing"), and the final verdict question as an editorial
+            kicker at the bottom. Sits in the footer zone, comfortably below
+            the tenets — no opacity hacks needed. */}
         {isPast("frameworkB") && (
           <div
             style={{
@@ -159,88 +170,35 @@ export const StaticDuelingFrameworks: React.FC<{
               opacity: exitOpacity,
             }}
           >
-            <div
-              style={{
-                fontSize: fontSizes.body,
-                maxWidth: textMaxWidth.label,
-                fontWeight: fontWeights.semibold,
-                color: theme.text.muted,
-                letterSpacing: letterSpacing.label,
-                textTransform: "uppercase",
-                marginBottom: layout.spacing.lg,
-                fontFamily: getBodyFont(data.phenomenon),
-                opacity: fadeIn(frame, scoringStartFrame, sec(0.3)),
-              }}
-            >
-              {data.phenomenon}
-            </div>
-
-            <div style={{ display: "flex", gap: layout.spacing.xl, marginBottom: layout.spacing.xl }}>
+            <div style={{ display: "flex", gap: layout.spacing.xl, marginBottom: layout.spacing.lg }}>
               <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: fontSizes.label,
-                    fontWeight: fontWeights.semibold,
-                    color: data.frameworkA.color,
-                    marginBottom: layout.spacing.sm,
-                    fontFamily: getFontFamily(data.frameworkA.name),
-                  }}
-                >
-                  {data.frameworkA.name}
-                </div>
-                <ScoringBar
-                  score={data.frameworkA.score}
-                  color={data.frameworkA.color}
-                  frame={frame}
-                  startFrame={scoringStartFrame + sec(0.2)}
-                  duration={sec(1.5)}
-                  theme={theme}
-                />
                 {data.frameworkA.verdict && (
                   <div
                     style={{
-                      fontSize: fontSizes.caption,
-                      color: theme.text.secondary,
+                      fontSize: fontSizes.body,
+                      maxWidth: textMaxWidth.body,
+                      color: data.frameworkA.color,
                       fontFamily: getBodyFont(data.frameworkA.verdict),
-                      lineHeight: lineHeight.body,
-                      marginTop: layout.spacing.sm,
-                      opacity: fadeIn(frame, scoringStartFrame + sec(1.5), sec(0.4)),
+                      fontStyle: "italic",
+                      lineHeight: 1.35,
+                      opacity: fadeIn(frame, scoringStartFrame + sec(0.2), sec(0.4)),
                     }}
                   >
                     {data.frameworkA.verdict}
                   </div>
                 )}
               </div>
-
               <div style={{ flex: 1 }}>
-                <div
-                  style={{
-                    fontSize: fontSizes.label,
-                    fontWeight: fontWeights.semibold,
-                    color: data.frameworkB.color,
-                    marginBottom: layout.spacing.sm,
-                    fontFamily: getFontFamily(data.frameworkB.name),
-                  }}
-                >
-                  {data.frameworkB.name}
-                </div>
-                <ScoringBar
-                  score={data.frameworkB.score}
-                  color={data.frameworkB.color}
-                  frame={frame}
-                  startFrame={scoringStartFrame + sec(0.35)}
-                  duration={sec(1.5)}
-                  theme={theme}
-                />
                 {data.frameworkB.verdict && (
                   <div
                     style={{
-                      fontSize: fontSizes.caption,
-                      color: theme.text.secondary,
+                      fontSize: fontSizes.body,
+                      maxWidth: textMaxWidth.body,
+                      color: data.frameworkB.color,
                       fontFamily: getBodyFont(data.frameworkB.verdict),
-                      lineHeight: lineHeight.body,
-                      marginTop: layout.spacing.sm,
-                      opacity: fadeIn(frame, scoringStartFrame + sec(1.65), sec(0.4)),
+                      fontStyle: "italic",
+                      lineHeight: 1.35,
+                      opacity: fadeIn(frame, scoringStartFrame + sec(0.35), sec(0.4)),
                     }}
                   >
                     {data.frameworkB.verdict}
@@ -252,15 +210,16 @@ export const StaticDuelingFrameworks: React.FC<{
             {data.verdictLabel && (
               <div
                 style={{
-                  fontSize: fontSizes.body,
-                  maxWidth: textMaxWidth.label,
+                  fontSize: fontSizes.h3,
+                  maxWidth: textMaxWidth.body,
                   fontWeight: fontWeights.semibold,
-                  color: theme.text.accent,
+                  color: theme.text.primary,
                   fontFamily: getBodyFont(data.verdictLabel),
+                  fontStyle: "italic",
                   marginTop: layout.spacing.lg,
                   paddingTop: layout.spacing.lg,
                   borderTop: `1px solid ${theme.text.muted}40`,
-                  opacity: fadeIn(frame, scoringStartFrame + sec(2), sec(0.4)),
+                  opacity: fadeIn(frame, scoringStartFrame + sec(0.6), sec(0.4)),
                 }}
               >
                 {data.verdictLabel}

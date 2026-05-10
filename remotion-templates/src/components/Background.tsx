@@ -25,6 +25,12 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile, random } from "remotion";
 import { dark, light, palette, layout, fonts, fontSizes } from "../design/theme";
+import {
+  motionIdentities,
+  DEFAULT_MOTION_IDENTITY,
+  computeWobble,
+  type MotionIdentity,
+} from "../design/motion";
 import { useEpisodeColorEmphasis, useEpisodeColorEmphasisName } from "../hooks/useEpisodeColorEmphasis";
 
 // ── Deterministic random via Remotion's seeded random() ────────────────
@@ -235,6 +241,20 @@ interface BackgroundProps {
   stampLabel?: string;
   /** Disable grain overlay (default: enabled) */
   noGrain?: boolean;
+  /** Disable atmospheric drift overlay (default: enabled in light mode).
+   *  Slow-moving low-opacity warm gradients behind content add depth and
+   *  "weather" to the frame — the substrate-motion intervention that
+   *  separates editorial video from rendered slides. See VISUAL_LANGUAGE.md
+   *  → Motion Identity (substrate-vs-element doctrine). */
+  noAtmosphere?: boolean;
+  /** Named motion-identity preset — combines grain, atmosphere, and wobble
+   *  intensities into one switchable register. Three identities ship today:
+   *  "briefing" (default — substrate alive but restrained), "still" (no
+   *  substrate motion, for technical diagrams or paused moments), and
+   *  "documentary" (heavier grain + wobble for found-footage register).
+   *  Individual prop toggles (noGrain, noAtmosphere) override the preset's
+   *  enabled flags but inherit its intensity calibration. */
+  motionIdentity?: MotionIdentity;
   /**
    * Subtle color tint for emotional temperature (Layer 3 color storytelling).
    * A hex color overlaid at ~6% opacity to shift the ambient mood.
@@ -271,6 +291,8 @@ export const Background: React.FC<BackgroundProps> = ({
   variant = "light",
   border,
   noGrain = false,
+  noAtmosphere = false,
+  motionIdentity = DEFAULT_MOTION_IDENTITY,
   tint,
   atmosphere,
   atmosphereIntensity = 1.0,
@@ -279,6 +301,21 @@ export const Background: React.FC<BackgroundProps> = ({
   children,
 }) => {
   const isDark = variant === "dark" || variant === "map";
+  // Used by all substrate-motion layers (grain seed, atmospheric cloud
+  // positions, wobble offset). Substrate motion is the editorial-video
+  // signature — frame is alive even when nothing else moves.
+  const frame = useCurrentFrame();
+
+  // Resolve motion identity → individual layer config. Prop-level toggles
+  // (noGrain, noAtmosphere) win over preset defaults so a "briefing" Background
+  // can still opt out of grain for a specific composition.
+  const motion = motionIdentities[motionIdentity];
+  const grainActive = motion.grain.enabled && !noGrain;
+  const atmosphereActive = motion.atmosphere.enabled && !noAtmosphere && variant === "light";
+  const wobbleOffset = motion.wobble.enabled
+    ? computeWobble(frame, motion.wobble.amplitude)
+    : { x: 0, y: 0 };
+  const grainOpacity = isDark ? motion.grain.opacityDark : motion.grain.opacityLight;
 
   // Light mode gets ruled border by default (BRAND.md editorial briefing feel)
   const effectiveBorder = border ?? (variant === "light");
@@ -323,19 +360,105 @@ export const Background: React.FC<BackgroundProps> = ({
 
   return (
     <AbsoluteFill style={{ ...bgStyle, overflow: "hidden" }}>
-      {/* Grain overlay — subtle film texture */}
-      {!noGrain && (
-        <AbsoluteFill
+      {/* Substrate wobble wrapper — applies sub-pixel jitter to grain,
+          atmosphere, vignette, tint, and particles. Content (children) and
+          editorial chrome (border, stamp) live OUTSIDE this wrapper so type
+          never jitters (eye reads jitter on numbers as data instability). */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transform: `translate(${wobbleOffset.x}px, ${wobbleOffset.y}px)`,
+          willChange: motion.wobble.enabled ? "transform" : undefined,
+        }}
+      >
+      {/* Animated film grain — per-frame re-randomized noise (seeded by
+          current frame) gives real "film stock" motion at the substrate
+          level. Industry name: "organic grain plate." Opacity, enabled
+          state, and visibility all driven by the resolved motion identity. */}
+      {grainActive && (
+        <svg
           style={{
-            backgroundImage: `url(${staticFile("assets/noise-512.png")})`,
-            backgroundRepeat: "repeat",
-            backgroundSize: "512px 512px",
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
             mixBlendMode: isDark ? "overlay" : "multiply",
-            opacity: isDark ? 0.12 : 0.04,
+            opacity: grainOpacity,
             pointerEvents: "none",
           }}
-        />
+          aria-hidden
+        >
+          <filter id="organic-grain">
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="1.6"
+              numOctaves={2}
+              // Seed advances every other frame (15Hz at 30fps) — matches
+              // how 35mm film grain at 24fps visually pulses, each frame
+              // a distinct emulsion event.
+              seed={Math.floor(frame / 2)}
+            />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#organic-grain)" />
+        </svg>
       )}
+
+      {/* Atmospheric drift — slow-moving low-opacity radial gradients give
+          the frame "weather" behind content. Two clouds at different speeds
+          create gentle parallax: the substrate looks like it has temperature
+          and humidity, not a flat plane. Industry name: "ambient layer" /
+          "atmospheric perspective" (after Da Vinci's sfumato). Used by FT
+          climate pieces, Bloomberg Originals, Netflix Explained. Calibrated
+          to research recommendation: <8% opacity, 30–60s loop, warm tones
+          in light mode. Disabled in dark mode (the dark vignette already
+          carries the atmospheric weight) and on maps (need clear basemap). */}
+      {atmosphereActive && (() => {
+        // Two clouds at different periods + offset positions create the
+        // parallax-dust effect. Periods chosen as coprime so the cycle
+        // doesn't visually repeat within a typical episode duration.
+        const period1 = 1500; // 50s at 30fps
+        const period2 = 2100; // 70s at 30fps
+        const c1x = 0.30 + Math.sin((frame * 2 * Math.PI) / period1) * 0.12;
+        const c1y = 0.35 + Math.cos((frame * 2 * Math.PI) / period1) * 0.10;
+        const c2x = 0.70 + Math.cos((frame * 2 * Math.PI) / period2) * 0.10;
+        const c2y = 0.60 + Math.sin((frame * 2 * Math.PI) / period2) * 0.08;
+        const cloudColor = palette.gold;
+        // Per-identity intensity scaling — "documentary" softens atmosphere
+        // (so the heavier grain doesn't compete), "briefing" uses standard.
+        const scale = motion.atmosphere.intensityScale;
+        // Hex alpha values scaled by intensityScale. 0x26 = 38 = standard
+        // base; multiply by scale and floor back into hex for output.
+        const hex = (a: number) => Math.max(0, Math.min(255, Math.round(a * scale))).toString(16).padStart(2, "0");
+        return (
+          <AbsoluteFill style={{ pointerEvents: "none", mixBlendMode: "multiply" }}>
+            <div
+              style={{
+                position: "absolute",
+                width: "70%",
+                height: "70%",
+                left: `${c1x * 100}%`,
+                top: `${c1y * 100}%`,
+                transform: "translate(-50%, -50%)",
+                background: `radial-gradient(circle, ${cloudColor}${hex(0x26)} 0%, ${cloudColor}${hex(0x10)} 40%, transparent 70%)`,
+                filter: "blur(80px)",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                width: "60%",
+                height: "60%",
+                left: `${c2x * 100}%`,
+                top: `${c2y * 100}%`,
+                transform: "translate(-50%, -50%)",
+                background: `radial-gradient(circle, ${palette.umber}${hex(0x1F)} 0%, ${palette.umber}${hex(0x0A)} 40%, transparent 70%)`,
+                filter: "blur(100px)",
+              }}
+            />
+          </AbsoluteFill>
+        );
+      })()}
 
       {/* Vignette overlay — edges darken (dark mode) or subtle (light mode) */}
       {isDark && (
@@ -369,6 +492,9 @@ export const Background: React.FC<BackgroundProps> = ({
       {effectiveDensity !== "none" && (
         <Atmosphere density={effectiveDensity} tint={effectiveTint} isDark={isDark} intensity={atmosphereIntensity} noBlur={noBlur} />
       )}
+      </div>
+      {/* end substrate-wobble wrapper — everything below this is outside the
+          wobble so type and editorial chrome never jitter. */}
 
       {/* Light mode ruled border — inset 40px, 1px border (BRAND.md: editorial briefing) */}
       {effectiveBorder && (

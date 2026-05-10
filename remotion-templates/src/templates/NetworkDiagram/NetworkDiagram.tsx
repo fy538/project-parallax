@@ -1,6 +1,35 @@
 /**
  * NetworkDiagram — nodes connected by edges with virtual camera narration.
  *
+ * ── When to use this primitive ─────────────────────────────────────────
+ *
+ * USE for relationship structure between named entities — hub-spoke
+ * dependencies, coalition / alignment diagrams, influence networks,
+ * causation diagrams, organizational hierarchies, concept maps. The
+ * editorial point is WHO connects to WHOM, not WHERE they sit.
+ *
+ * DO NOT USE when the entities are real places at real geographic
+ * positions and the geography itself is editorially meaningful —
+ * trade routes, military alliances anchored to territory, road or rail
+ * networks, infrastructure topology. In those cases use ChoroplethMap
+ * (regions / values) or RouteAnimation (paths through space). A
+ * schematic graph throws away latitude, distance, neighbouring borders,
+ * and any other free editorial information the real geography carries.
+ *
+ *   Decision rule: "Is the spatial position editorially meaningful?"
+ *     yes → ChoroplethMap or RouteAnimation
+ *     no  → NetworkDiagram
+ *
+ * Genuine NetworkDiagram cases (geography would be ornamental):
+ *   - Supply-chain chokepoints (one supplier, many buyers)
+ *   - Coalition / alignment / dependency structures
+ *   - Influence networks (intellectual lineage, citation graphs)
+ *   - Causation diagrams (multiple trends → one outcome)
+ *   - Organizational hierarchies (politburo, cabinet, board)
+ *   - Concept maps (a central idea and its sub-claims)
+ *
+ * ── Animation modes ───────────────────────────────────────────────────
+ *
  * Two modes:
  *   1. Static (no cameraPath): Original staggered entrance animation
  *   2. Narrated (cameraPath provided): Virtual camera pans between nodes/clusters,
@@ -393,8 +422,13 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   const tokenMap = useMemo(() => createTokenMap(), []);
 
   // Helper functions
+  // Hub-and-spoke compositions need a clear hierarchy: the protagonist
+  // node (importance "primary") wants noticeable visual mass, satellites
+  // a quieter weight. Bumping primary to 56 gives the hub real presence
+  // without dwarfing the diagram; secondary stays small so the hub reads
+  // as the obvious center.
   const nodeRadius = (importance?: "primary" | "secondary"): number =>
-    importance === "secondary" ? 30 : 40;
+    importance === "secondary" ? 30 : 56;
 
   const nodeById = useMemo(() => {
     const map: Record<string, typeof data.nodes[number]> = {};
@@ -484,24 +518,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
         </filter>
       </defs>
 
-      {/* ── Structure (subtle grid reference) ────────────────────────── */}
-      {!hasCameraPath && (
-        <g opacity={structureOpacity * exitOpacity * 0.15}>
-          {[0, 0.25, 0.5, 0.75, 1].map((x) => (
-            <line
-              key={`vline-${x}`}
-              x1={safe.left + x * (layout.width - safe.left - safe.right)}
-              y1={safe.top}
-              x2={safe.left + x * (layout.width - safe.left - safe.right)}
-              y2={layout.height - safe.bottom}
-              stroke={theme.text.muted}
-              strokeWidth={1}
-            />
-          ))}
-        </g>
-      )}
-
-      {/* ── Edges ───────────────────────────────────────���────────────── */}
+      {/* ── Edges ──────────────────────────────────────────────────────── */}
       <g opacity={exitOpacity}>
         {data.edges.map((edge, edgeIdx) => {
           const fromPos = positionMap[edge.from];
@@ -541,11 +558,11 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             );
           } else if (edge.style === "dashed") {
             return (
-              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={2} strokeDasharray="8 4" opacity={progress * edgeCameraOpacity} />
+              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} strokeDasharray="8 4" opacity={progress * edgeCameraOpacity * 0.7} strokeLinecap="round" />
             );
           } else {
             return (
-              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={2} opacity={progress * edgeCameraOpacity} />
+              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} opacity={progress * edgeCameraOpacity * 0.7} strokeLinecap="round" />
             );
           }
         })}
@@ -575,10 +592,14 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             : nodeStartFrame + stagger(nodeIdx, sec(0.08));
           const lockScale = lockOnPulse(frame, nodeAppearFrame, config.fps);
 
+          // Editorial primitives — circles for nations + institutions
+          // (hexagons read as blockchain/mesh-network UI, off-brand for
+          // intelligence-briefing aesthetic). Actors keep rounded-rect for
+          // typographic plates; concepts keep the diamond as a marker.
           const NodeComponent = (() => {
             switch (node.type) {
               case "nation": return CircleNode;
-              case "institution": return HexagonNode;
+              case "institution": return CircleNode;
               case "actor": return RoundedRectNode;
               case "concept": return DiamondNode;
               default: return CircleNode;
@@ -633,34 +654,79 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
         </g>
       )}
 
-      {/* ── Callouts ─────────────────────────────────────────────────── */}
+      {/* ── Callouts ────────────────────────────────────────────────────
+          Editorial pull-quote: thin accent rule on the inner edge, large
+          display value, mono-caps label below. No bordered box — the
+          accent rule + typography do the work. */}
       {data.callouts && (
         <g opacity={calloutOpacity * exitOpacity}>
           {data.callouts.map((callout, callIdx) => {
+            const calloutWidth = 320;
+            const calloutHeight = 96;
             let callX = 0;
             let callY = 0;
-            const calloutWidth = 240;
-            const calloutHeight = 80;
+            // Anchor side determines which edge the accent rule lives on.
+            let isRight = false;
 
             if (callout.position === "bottom-right") {
-              callX = layout.width - safe.right - calloutWidth - 20;
-              callY = layout.height - safe.bottom - calloutHeight - 20;
+              callX = layout.width - safe.right - calloutWidth;
+              callY = layout.height - safe.bottom - calloutHeight - 32;
+              isRight = true;
             } else if (callout.position === "bottom-left") {
-              callX = safe.left + 20;
-              callY = layout.height - safe.bottom - calloutHeight - 20;
+              callX = safe.left;
+              callY = layout.height - safe.bottom - calloutHeight - 32;
+              isRight = false;
             } else {
-              callX = layout.width - safe.right - calloutWidth - 20;
-              callY = safe.top + 20;
+              callX = layout.width - safe.right - calloutWidth;
+              callY = safe.top + 32;
+              isRight = true;
             }
+            const ruleX = isRight ? callX : callX + calloutWidth - 1;
 
             return (
               <g key={`callout-${callIdx}`}>
-                <rect x={callX} y={callY} width={calloutWidth} height={calloutHeight} rx={radii.md} fill={theme.bg.surface} stroke={theme.text.secondary} strokeWidth={dividerStyle.thickness} opacity={0.9} />
-                <text x={callX + calloutWidth / 2} y={callY + 25} textAnchor="middle" fill={palette.amber} fontSize={fontSizes.h3} fontFamily={fonts.data} fontWeight={700} letterSpacing={1} filter={`url(#${filterId("text-shadow-stat")})`}>
+                {/* Inner accent rule — the only chrome */}
+                <line
+                  x1={ruleX}
+                  y1={callY}
+                  x2={ruleX}
+                  y2={callY + calloutHeight}
+                  stroke={palette.amber}
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                />
+                {/* Value — large display */}
+                <text
+                  x={isRight ? callX + 16 : callX + calloutWidth - 16}
+                  y={callY + 36}
+                  textAnchor={isRight ? "start" : "end"}
+                  fill={palette.amber}
+                  fontSize={fontSizes.h2}
+                  fontFamily={fonts.data}
+                  fontWeight={700}
+                  letterSpacing={1}
+                >
                   {callout.value}
                 </text>
-                <foreignObject x={callX + 8} y={callY + 35} width={calloutWidth - 16} height={calloutHeight - 40}>
-                  <div style={{ fontSize: fontSizes.caption, fontFamily: fonts.mono, fontWeight: 400, color: theme.text.secondary, textAlign: "center", lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", letterSpacing: 0.5 }}>
+                {/* Label — mono caps muted */}
+                <foreignObject
+                  x={isRight ? callX + 16 : callX}
+                  y={callY + 48}
+                  width={calloutWidth - 32}
+                  height={calloutHeight - 48}
+                >
+                  <div
+                    style={{
+                      fontSize: fontSizes.caption,
+                      fontFamily: fonts.mono,
+                      fontWeight: 400,
+                      color: theme.text.muted,
+                      textAlign: isRight ? "left" : "right",
+                      lineHeight: 1.3,
+                      letterSpacing: 0.5,
+                      maxWidth: calloutWidth - 32,
+                    }}
+                  >
                     {callout.label}
                   </div>
                 </foreignObject>
@@ -743,13 +809,19 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           </div>
         )}
 
-        {/* Title — centralized TitleBlock component */}
-        <TitleBlock
-          title={data.title}
-          subtitle={data.subtitle}
-          mode={data.backgroundVariant || "light"}
-          safeAreaTier="generous"
-        />
+        {/* Title — centralized TitleBlock component. Wrapped in an
+            absolutely-positioned div so the FadeIn's transform + center
+            origin can't accidentally collapse the TitleBlock's positioning
+            context (regression: title was rendering off-canvas because
+            FadeIn outer div had zero-sized static box). */}
+        <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          <TitleBlock
+            title={data.title}
+            subtitle={data.subtitle}
+            mode={data.backgroundVariant || "light"}
+            safeAreaTier="generous"
+          />
+        </div>
       </AbsoluteFill>
     </Background>
   );

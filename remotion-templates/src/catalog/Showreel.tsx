@@ -24,6 +24,7 @@ import { ProbabilityGauge } from "../templates/ProbabilityGauge/ProbabilityGauge
 import { BayesianUpdate } from "../templates/BayesianUpdate/BayesianUpdate";
 import { RadarChart } from "../templates/RadarChart/RadarChart";
 import { SankeyFlow } from "../templates/SankeyFlow/SankeyFlow";
+import { PricingWaterfall } from "../templates/PricingWaterfall/PricingWaterfall";
 import { KineticTypography } from "../templates/KineticTypography/KineticTypography";
 import { TitleTransition } from "../templates/TitleTransition/TitleTransition";
 import { FrameworkDiagram } from "../templates/FrameworkDiagram/FrameworkDiagram";
@@ -199,6 +200,11 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogDataData.sankeyEnergy.durationSec ?? 11,
     render: () => <SankeyFlow data={catalogDataData.sankeyEnergy} />,
   },
+  slateSegment("Data", "PricingWaterfall", "coffee-cup"),
+  {
+    durationSec: catalogDataData.waterfallCoffee.durationSec ?? 10,
+    render: () => <PricingWaterfall data={catalogDataData.waterfallCoffee} />,
+  },
 
   // ── Typography ──
   sectionSegment("Typography", "KineticTypography × 4 — quote, definition, bilingual, statistic"),
@@ -260,11 +266,6 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogDiagramsData.nwHubSpoke.durationSec ?? 12,
     render: () => <NetworkDiagram data={catalogDiagramsData.nwHubSpoke} />,
-  },
-  slateSegment("Diagrams", "NetworkDiagram", "horizontal-chain"),
-  {
-    durationSec: catalogDiagramsData.nwChain.durationSec ?? 11,
-    render: () => <NetworkDiagram data={catalogDiagramsData.nwChain} />,
   },
   slateSegment("Diagrams", "SplitComposition", "maps"),
   {

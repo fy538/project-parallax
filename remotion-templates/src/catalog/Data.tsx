@@ -23,6 +23,9 @@ import type { ProbabilityGaugeData } from "../templates/ProbabilityGauge/types";
 import { BayesianUpdate } from "../templates/BayesianUpdate/BayesianUpdate";
 import { BayesianUpdateSchema } from "../templates/BayesianUpdate/schema";
 import type { BayesianUpdateData } from "../templates/BayesianUpdate/types";
+import { PricingWaterfall } from "../templates/PricingWaterfall/PricingWaterfall";
+import { PricingWaterfallSchema } from "../templates/PricingWaterfall/schema";
+import type { PricingWaterfallData } from "../templates/PricingWaterfall/types";
 import { RadarChart } from "../templates/RadarChart/RadarChart";
 import { RadarChartSchema } from "../templates/RadarChart/schema";
 import type { RadarChartData } from "../templates/RadarChart/types";
@@ -416,10 +419,103 @@ export const CatalogSankeyEnergy = () => (
   />
 );
 
+// ─── PricingWaterfall × 1 ─────────────────────────────────────────────────
+//
+// Coffee bean's journey — the canonical value-capture demo. Replaces the
+// NetworkDiagram horizontal-chain version (deprecated May 10, 2026), which
+// could show the journey but couldn't carry the "3% to the farmer"
+// editorial point as a chart instead of a corner pull-quote.
+
+const waterfallCoffee: PricingWaterfallData = {
+  episode: CATALOG_EPISODE,
+  title: "Where Your $5 Cup Goes",
+  subtitle: "The coffee bean's journey from Yirgacheffe to Williamsburg",
+  total: {
+    value: "$5",
+    label: "specialty coffee, retail",
+  },
+  stages: [
+    { label: "Farm", share: 3, descriptor: "Yirgacheffe, Ethiopia", hero: true },
+    { label: "Cooperative", share: 5, descriptor: "Wash & dry" },
+    { label: "Exporter", share: 8, descriptor: "Addis Ababa" },
+    { label: "Importer", share: 14, descriptor: "Hamburg" },
+    { label: "Roaster", share: 25, descriptor: "Brooklyn" },
+    { label: "Café", share: 45, descriptor: "Williamsburg" },
+  ],
+  source: "Specialty Coffee Association reports; representative figures",
+  durationSec: 10,
+};
+
+export const CatalogWaterfallCoffee = () => (
+  <Composition
+    id={catalogId("PricingWaterfall", "coffee-cup")}
+    component={PricingWaterfall}
+    schema={PricingWaterfallSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as PricingWaterfallData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: waterfallCoffee }}
+  />
+);
+
+// ─── Motion Identity comparison — same content, 3 substrate-motion presets
+// Scrub each in Studio to evaluate the substrate-motion theory in motion
+// (the effect doesn't read in stills — film grain and atmospheric drift
+// are felt at the edge of attention, not consciously noticed).
+
+export const CatalogWaterfallMotionStill = () => (
+  <Composition
+    id={catalogId("PricingWaterfall", "motion-still")}
+    component={PricingWaterfall}
+    schema={PricingWaterfallSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as PricingWaterfallData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: { ...waterfallCoffee, motionIdentity: "still" as const } }}
+  />
+);
+
+export const CatalogWaterfallMotionBriefing = () => (
+  <Composition
+    id={catalogId("PricingWaterfall", "motion-briefing")}
+    component={PricingWaterfall}
+    schema={PricingWaterfallSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as PricingWaterfallData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: { ...waterfallCoffee, motionIdentity: "briefing" as const } }}
+  />
+);
+
+export const CatalogWaterfallMotionDocumentary = () => (
+  <Composition
+    id={catalogId("PricingWaterfall", "motion-documentary")}
+    component={PricingWaterfall}
+    schema={PricingWaterfallSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as PricingWaterfallData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: { ...waterfallCoffee, motionIdentity: "documentary" as const } }}
+  />
+);
+
 export const catalogDataData = {
   statApollo, statMariana, statHabitable,
   chartMountains, chartSpaceRace,
   tsCarbonDioxide, tsPopulation,
   gaugeWeather, gaugeScorecard,
   bayesVenice, radarAthletes, sankeyEnergy,
+  waterfallCoffee,
 };

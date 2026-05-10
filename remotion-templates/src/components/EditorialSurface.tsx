@@ -23,7 +23,7 @@
  */
 
 import React, { type ReactNode } from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, useCurrentFrame } from "remotion";
 import { palette } from "../design/theme";
 
 export interface EditorialSurfaceProps {
@@ -34,6 +34,15 @@ export interface EditorialSurfaceProps {
   paperColor?: string;
   /** Disable the subtle corner vignette. Default false. */
   noVignette?: boolean;
+  /**
+   * Optional atmospheric backdrop image. When set, the image is rendered as
+   * the bottom layer (under children, grain, and vignette) and replaces the
+   * solid paperColor as the visual ground. Pass a staticFile() path, e.g.
+   * `staticFile("assets/backdrops/cartographic.png")`. Use sparingly — see
+   * VISUAL_LANGUAGE.md → Register 2 (atmospheric backdrop) for the editorial
+   * pairing rules (per-scene/per-composition, not channel-wide default).
+   */
+  backdrop?: string;
 }
 
 // Module-level constant: decompose palette.ink to RGB once so VignetteLayer
@@ -133,12 +142,26 @@ export const EditorialSurface = React.memo(
     intensity = 0.6,
     paperColor,
     noVignette = false,
+    backdrop,
   }: EditorialSurfaceProps) => {
     const clampedIntensity = Math.min(Math.max(intensity, 0), 1);
     const bg = paperColor ?? palette.paper;
 
     return (
       <AbsoluteFill style={{ backgroundColor: bg }}>
+        {backdrop && (
+          <AbsoluteFill style={{ zIndex: 0, pointerEvents: "none" }}>
+            <Img
+              src={backdrop}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </AbsoluteFill>
+        )}
         {children}
         <GrainLayer intensity={clampedIntensity} />
         {!noVignette && <VignetteLayer intensity={clampedIntensity} />}

@@ -30,6 +30,7 @@ import { BifurcationRouteComposition } from "./templates/BifurcationRoute";
 import { DuelingFrameworksComposition } from "./templates/DuelingFrameworks";
 import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
+import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
 import { RadarChartComposition } from "./templates/RadarChart";
 import { AnnotatedImageComposition } from "./templates/AnnotatedImage";
 import { EscalationLadderComposition } from "./templates/EscalationLadder";
@@ -75,6 +76,10 @@ import {
   CatalogBayesVenice,
   CatalogRadarAthletes,
   CatalogSankeyEnergy,
+  CatalogWaterfallCoffee,
+  CatalogWaterfallMotionStill,
+  CatalogWaterfallMotionBriefing,
+  CatalogWaterfallMotionDocumentary,
   CatalogQuoteHeraclitus,
   CatalogDefinitionAnagnorisis,
   CatalogBilingualTianxia,
@@ -86,7 +91,6 @@ import {
   CatalogFwFlow,
   CatalogFwMatrix,
   CatalogNwHubSpoke,
-  CatalogNwChain,
   CatalogSplitMaps,
   CatalogSplitTime,
   CatalogTimelineComputers,
@@ -142,6 +146,7 @@ export const RemotionRoot: React.FC = () => {
         <BayesianUpdateMultiComposition />
         <StatRevealComposition />
         <RadarChartComposition />
+        <PricingWaterfallComposition />
       </Folder>
 
       <Folder name="Typography">
@@ -224,6 +229,13 @@ export const RemotionRoot: React.FC = () => {
           <CatalogBayesVenice />
           <CatalogRadarAthletes />
           <CatalogSankeyEnergy />
+          <CatalogWaterfallCoffee />
+        </Folder>
+
+        <Folder name="Motion-Identity">
+          <CatalogWaterfallMotionStill />
+          <CatalogWaterfallMotionBriefing />
+          <CatalogWaterfallMotionDocumentary />
         </Folder>
 
         <Folder name="Typography">
@@ -244,7 +256,6 @@ export const RemotionRoot: React.FC = () => {
           <CatalogFwFlow />
           <CatalogFwMatrix />
           <CatalogNwHubSpoke />
-          <CatalogNwChain />
           <CatalogSplitMaps />
           <CatalogSplitTime />
           <CatalogDuelingEmpireFall />

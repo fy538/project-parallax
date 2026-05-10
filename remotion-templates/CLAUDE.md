@@ -47,6 +47,12 @@ Categories:
 - **Episodes**: `FullEpisode.tsx` (manifest-driven), `SiliconTrap.tsx` (per-episode `<Series>`)
 - **Shorts (9:16)**: KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort
 
+### Known gaps (build when an episode actually needs it)
+
+- **Hub-with-radial-routes map** — one anchor city + N destinations on a real geographic basemap. Use case: trade-route hubs ("all roads led to Rome"), military campaigns radiating from a command center, supply lanes from a single port. RouteAnimation handles single phased routes; ChoroplethMap handles regional values; neither does "one hub, N routes radiating to named destinations on a real map." First investigate whether RouteAnimation can be extended (a `radial: true` flag plus a hub field) before building net-new. Trigger: an episode script lands a `[MG: hub-map]`-class annotation that RouteAnimation genuinely can't satisfy.
+
+- **PricingWaterfall (value-chain decomposition)** — *built May 10, 2026 — see `templates/PricingWaterfall/`*. The canonical form for value-capture stories: a fixed total ($1, $5, $100) split into stage segments with the smallest sliver in accent color. Editorial outlets converge on this idiom: FT (iPhone breakdowns), Bloomberg Opinion (oil/cocoa decompositions), Reuters cocoa pricing, Specialty Coffee Association farmgate-share reports, Fair Trade USA penny-breakdown graphics. Cleveland's perceptual hierarchy backs it — position-along-a-common-scale on a fixed denominator the viewer already understands. Sankey is the runner-up but reads as "infographic" rather than "argument" at video scrubbing speed. Use cases: supply-chain margin extraction, where-your-tax-dollar-goes, cost-of-goods decomposition.
+
 ## Design system
 
 - **Source of truth for colors:** [`tools/brand-treatment/palette.json`](../tools/brand-treatment/palette.json) → loaded by `src/design/theme.ts`. Don't hex-hardcode brand colors anywhere.
