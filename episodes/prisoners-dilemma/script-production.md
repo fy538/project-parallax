@@ -7,7 +7,15 @@
 **Beats:** 5
 **Named concept:** The Wrong Game
 **Discovery shape:** Inversion (build the model, then break it — pivot at ~40-50% runtime)
-**Script version:** v5.4 (v5.3 visual-spec complete + AI-GEN restored: Recraft→Pika 2.2 image-to-video pipeline for all scene/metaphor visuals, DataChart→TimeSeriesChart for vol-smile, GameBoard→SplitComposition for PD-vs-staghunt, MG run breaks inserted)
+**Script version:** v5.6 (May 9, 2026) — **Two `[SCENE:]` block conversions** under the May 9 chained-still-morph workflow:
+- **Beat 3 opening** (Path A): `[SCENE: wrong-game-establish]`, 4 frames over ~30s. Replaces two scattered `[AI-GEN:]` cells (grid landscape + negotiation room). Validated by the May 9 Scene C bakeoff. Scene spec at `scenes/wrong-game-establish.md`.
+- **Beat 4 close** (Path A): `[SCENE: cooperation-arc]`, 3 frames over ~26s. Restructured the Beat 4 ending: AI-GEN terraced (was line 170) and AI-GEN ocean (was line 184) migrate into the scene block as Frame A and Frame C; new Frame B (alpine commons, aigen-12a) bridges them with the hero morph (alpine → ocean = "boundedness vanishing"). The KineticTypography "Cooperation isn't a miracle. It's designed." card stays as the typography landing for the thesis line; the scene block carries the Ostrom caveat narration. Scene spec at `scenes/cooperation-arc.md`.
+
+Narration unchanged from v5.4 (zero words rewritten across both conversions). Five Beat-4-close cells consolidated to four.
+
+Visual pipeline updated: ChatGPT image generation + Pika 2.5 (chained morphs) for `[SCENE:]` blocks; existing single-shot `[AI-GEN:]` cells unchanged. The 13 single-shot Hailuo clips outside the two scene blocks remain production-ready as-is.
+
+**v5.4** (superseded): v5.3 visual-spec complete + AI-GEN restored: Recraft→Pika 2.2 image-to-video pipeline for all scene/metaphor visuals, DataChart→TimeSeriesChart for vol-smile, GameBoard→SplitComposition for PD-vs-staghunt, MG run breaks inserted.
 **Target behavior:** Subscribe (calm competence close — viewer walks away with a bounded analytical tool, not alarm)
 
 ---
@@ -102,15 +110,14 @@
 |-----------|-------------------|
 | **TRANSITION** · TitleTransition · "THE WRONG GAME" · 2s |
 | | PACE: breathing |
-| A model that failed its first experiment, applied to everything, still spreading. That alone is a curiosity — an academic footnote about institutional momentum. But the Prisoner's Dilemma isn't just mislabeling the world. It's *remaking* the world in its own image. | **P2** · [AI-GEN:] metaphor · "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines — mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink" · vector_illustration · standard · 7s · Pika: landscape slowly morphing to match grid lines, spotlight beam intensifying |
-|  | DIR: mood(dense, drift:slow) |
-|  | DIR: hold(breathe) |
-|  | DIR: cut(iris, origin:center) |
+| A model that failed its first experiment, applied to everything, still spreading. That alone is a curiosity — an academic footnote about institutional momentum. But the Prisoner's Dilemma isn't just mislabeling the world. It's *remaking* the world in its own image. | **P1** · [SCENE: wrong-game-establish] · 4 frames over ~30s · register=grounding · arc=linear · See: scenes/wrong-game-establish.md |
+|  | EMOTIONAL: dread → recognition → resignation |
+|  | CAMERA: eye-level, fixed throughout · world resolves around fixed viewpoint |
+|  | DIR: cut(iris, origin:center) — entry transition from prior KT |
+|  | DIR: mood(dense, drift:slow) — applies across the chain |
+|  | DIR: cut(color-wash, ink) — exit transition into trap-mechanism GameBoard |
 | | PACE: analytical |
-| You walk into a negotiation. You've been trained — explicitly or implicitly, through textbooks and policy memos and a half-century of strategic culture — to assume your counterpart will defect. That the rational move is to defect first. That cooperation is naive. | **P2** · [AI-GEN:] scene · "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber" · vector_illustration · standard · 7s · Pika: slow pull-back, figures approaching table from opposite sides, shadows shifting |
-|  | DIR: cam(push-in, over:7s) |
-|  | DIR: mood(normal, dim:0.3) |
-|  | DIR: cut(color-wash, ink) |
+| You walk into a negotiation. You've been trained — explicitly or implicitly, through textbooks and policy memos and a half-century of strategic culture — to assume your counterpart will defect. That the rational move is to defect first. That cooperation is naive. | continuation of [SCENE: wrong-game-establish] — narration runs over the chain, with Frame A on "remaking the world," Frame B on "trained to assume," Frame C on "rational to defect first," Frame D on "cooperation is naive" |
 | So you defect. And your counterpart — trained by the same textbooks, shaped by the same culture — sees your defection and concludes the model was right all along. | **P1** · [MG:] GameBoard — POV of the payoff matrix. Both players' arrows converge on defection. The equilibrium dot brightens. "Model confirmed" fades in. · [prisoners-dilemma/gameboard-trap-mechanism.json] · 10s |
 |  | DIR: reveal(sequential, per-phase:3s) |
 |  | DIR: cam(overview → element:0, sync:"defect", track) |
@@ -167,9 +174,7 @@
 | Which means the question was never "how do you escape the logic of defection?" It was always "how do you coordinate on the outcome you both prefer?" | **P2** · [MG:] FrameworkDiagram — Old question struck through: "How to escape defection?" → New question in amber: "How to coordinate on cooperation?" · [prisoners-dilemma/framework-reframe.json] · 6s |
 |  | DIR: reveal(instant, hero:1, glow) |
 | *[Beat.]* | |
-| And we don't have to theorize. Elinor Ostrom spent thirty years documenting communities that solved this problem in practice. {✅} | **P3** · [AI-GEN:] scene · "Constructivist terraced farmland: geometric stepped hillside with angular irrigation channels, small cooperative figures working at different levels, warm amber light across terraces, color-blocked in bone and green-grey" · vector_illustration · standard · 5s · Pika: slow tilt up, water flowing through irrigation channels, figures in gentle motion |
-|  | DIR: mood(subtle) |
-| [VISUAL-FIRST: 3s] | **P1** · [MG:] ChoroplethMap — World map lights up with Ostrom's 800+ cases: Spain (huertas), Switzerland (alps), Japan (iriaichi), Maine (lobster), plus dozens more. Counter: "800+ documented cases." Viewer sees the map filling before narration explains what the dots are. · [prisoners-dilemma/choropleth-ostrom.json] · 14s |
+| And we don't have to theorize. Elinor Ostrom spent thirty years documenting communities that solved this problem in practice. {✅} [VISUAL-FIRST: 3s] | **P1** · [MG:] ChoroplethMap — World map lights up with Ostrom's 800+ cases: Spain (huertas), Switzerland (alps), Japan (iriaichi), Maine (lobster), plus dozens more. Counter: "800+ documented cases." Viewer sees the map filling before narration explains what the dots are. · [prisoners-dilemma/choropleth-ostrom.json] · 14s |
 |  | DIR: reveal(stagger:200ms) |
 |  | DIR: cam(wide → tight:[0, 35], over:8s, track) |
 |  | DIR: hold(breathe) |
@@ -178,11 +183,16 @@
 |  | DIR: reveal(stagger:400ms, progressive) |
 |  | DIR: cam(overview) |
 |  | DIR: hold(breathe) |
-|  | DIR: cut(dissolve) |
-| Communication. Reputation. Repeated interaction. Institutional context. Capacity for commitment. The model says cooperation requires a miracle. The evidence says cooperation is designed. | **P2** · [MG:] KineticTypography — "Cooperation isn't a miracle. It's designed." · amber · 5s hold |
+| Communication. Reputation. Repeated interaction. Institutional context. Capacity for commitment. The model says cooperation requires a miracle. The evidence says cooperation is designed. | **P2** · [MG:] KineticTypography — "Cooperation isn't a miracle. It's designed." · amber · 8s hold |
 |  | DIR: hold(land) |
-| One important caveat. Ostrom's cases are mostly community-scale — identifiable people, clear boundaries, face-to-face relationships. {✅} The global climate commons and oceanic fisheries resist her principles precisely because boundaries are unclear and monitoring is expensive. The PD isn't wrong about everything. But it's wrong about most of the things we've been applying it to. | **P3** · [AI-GEN:] scene · "Constructivist ocean vastness: endless geometric waves as repeating angular forms stretching to horizon, no boundaries visible, tiny boat as single dot, overwhelming scale, color-blocked in ink and bone with grey-blue tint" · vector_illustration · standard · 6s · Pika: slow zoom out, waves gently undulating, boat rocking subtly |
-|  | DIR: mood(subtle, drift:slow) |
+|  | DIR: cut(dissolve) — into [SCENE: cooperation-arc] |
+| One important caveat. Ostrom's cases are mostly community-scale — identifiable people, clear boundaries, face-to-face relationships. {✅} The global climate commons and oceanic fisheries resist her principles precisely because boundaries are unclear and monitoring is expensive. The PD isn't wrong about everything. But it's wrong about most of the things we've been applying it to. | **P1** · [SCENE: cooperation-arc] · 3 frames over ~26s · register=grounding · arc=tonal · See: scenes/cooperation-arc.md |
+|  | EMOTIONAL: rooted → extended → unmoored |
+|  | CAMERA: gentle drift across landscape · environmental morph carries the visual change |
+|  | FRAMES: A=terraced (existing aigen-12) · B=alpine commons (NEW aigen-12a) · C=ocean (existing aigen-13) |
+|  | HERO MORPH: B → C (alpine commons dissolves into ocean — "boundedness vanishing") |
+|  | DIR: mood(subtle, drift:slow) — applies across the chain |
+|  | DIR: cut(dissolve) — exit transition into Beat 5 TitleTransition |
 
 **Beat 4 word count:** ~640 words · **Est. runtime:** ~4:00
 
@@ -241,12 +251,28 @@
 | Mode | Count | Est. Screen Time | % of Episode | Register |
 |------|-------|-------------------|--------------|----------|
 | [MG:] | 27 | ~8:20 | ~46% | Analytical |
-| [AI-GEN:] | 17 | ~5:30 | ~30% | Atmospheric / Grounding |
+| [AI-GEN:] (single-shot) | 13 | ~4:14 | ~23% | Atmospheric / Grounding |
+| [SCENE:] (chained) | 2 | ~0:56 | ~5% | Grounding |
 | [ARCHIVAL:] | 3 | ~0:16 | ~2% | Documentary |
 | [FORECAST:] | 1 | ~0:14 | ~1% | Analytical |
 | TRANSITION | 4 | ~0:08 | ~2% | — |
 
-Visual pipeline (v5.4): all stock footage eliminated. All scene/metaphor visuals use Recraft→Pika 2.2 image-to-video pipeline: Recraft V3 generates constructivist reference frame (vector_illustration style), Pika 2.2 animates into 3-7s video clip. Three documentary stills retained as [ARCHIVAL:] (Nash portrait, RAND building, Reagan-Gorbachev — all Wikimedia Commons, Ken Burns motion in Remotion). Net effect: three asset types (MG + AI-GEN + ARCHIVAL). Cost: ~$1.36 Recraft + ~$3-5 Pika = ~$5-7 total for 17 clips.
+Visual pipeline (v5.6, May 9, 2026): all stock footage eliminated. **Two AI-gen subtypes:**
+- **[AI-GEN:] single-shot** (13 cells, was 17 in v5.4 → 15 in v5.5 → 13 in v5.6) — atmospheric punctuation moments at 5-8s. Existing ChatGPT-generated stills + Hailuo 02 image-to-video clips. Production-ready as of v5.4. (Decrement: 4 single-shot cells migrated into the two `[SCENE:]` blocks.)
+- **[SCENE:] chained** (2 blocks, new in v5.5–v5.6) — Beat 3 opening "wrong-game-establish" (4 frames, ~30s) + Beat 4 close "cooperation-arc" (3 frames, ~26s). Total ~56s of chained morph runtime. Generated via ChatGPT (4-anchor reference uploads, sequential generation, morph-aware prompting per `project/CHAINED_STILL_LESSONS.md`) + Pika 2.5 (start+end-frame, 8-10s clips, stability-verb motion prompts). Beat 3 validated in the May 9 Scene C bakeoff. Beat 4 hero morph (alpine commons → ocean) is the editorially most important shot under the new pipeline. See `scenes/wrong-game-establish.md` and `scenes/cooperation-arc.md`.
+
+Three documentary stills retained as [ARCHIVAL:] (Nash portrait, RAND building, Reagan-Gorbachev — all Wikimedia Commons, heavy editorial-LUT treatment for visual unification with the constructivist register). Net effect: four asset categories (MG + AI-GEN + SCENE + ARCHIVAL). Per-episode pacing budget honored: 2 `[SCENE:]` blocks against the max of 3, 1 per beat ✓.
+
+**Cost:** ~$5-7 for the 13 single-shot Hailuo clips (already incurred) + ~$1-3 for the 5 Pika 2.5 morph clips across both `[SCENE:]` blocks (free tier should cover most; hero morph budgeted for 3-4 attempts).
+
+**Pending v5.6 production work:**
+1. Beat 3 Pair 2 (Frame B → C) regen with smoke fix per `scenes/wrong-game-establish.md`.
+2. Beat 4 Frame B (aigen-12a alpine commons) generation per `scenes/cooperation-arc.md`.
+3. Beat 4 Morph A → B (terraces → alpine) — single attempt likely sufficient.
+4. Beat 4 Morph B → C (alpine → ocean, HERO) — 3-4 attempts, pick best.
+5. Archival sourcing (Nash, RAND HQ, Reagan-Gorbachev) — Wikimedia Commons.
+6. Showcase update: `PrisonersDilemmaShowcase.tsx` re-sequence to consume the two `[SCENE:]` block chains.
+7. Re-render `prisoners-dilemma-full` against May-9 upgraded templates.
 
 ### Direction Summary
 | Metric | Count |

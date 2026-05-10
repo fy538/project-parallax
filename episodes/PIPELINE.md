@@ -6,7 +6,7 @@
 
 | Slug | State | Days in state | Format | Next action | Blocked on | Target publish | Artifacts |
 |---|---|---|---|---|---|---|---|
-| `prisoners-dilemma` | DRAFTING | 0 | Philosopher's Lens | Run review-package v5.2 (persona-eval done; script at v5.2) | — | 2026-06-01 | [dir](prisoners-dilemma/) |
+| `prisoners-dilemma` | RENDER READY | 0 | Philosopher's Lens | Beat 3 Pair 2 smoke regen · Beat 4 Frame B (aigen-12a alpine) gen + 2 morphs (incl. hero alpine→ocean) · archival sourcing · showcase resequence · re-render `prisoners-dilemma-full` · narration · NLE | — | 2026-06-01 | [dir](prisoners-dilemma/) |
 | `silicon-trap` | RENDER READY | 8 | Wargamer | Source 21 stock clips, then narrate | Stock footage not yet sourced | 2026-05-25 | [dir](silicon-trap/) |
 | `blockades-leak` | INCUBATING | 52 | TBD | Re-run topic-viability gate | Low historical depth on v1 research | — | [dir](blockades-leak/) |
 
