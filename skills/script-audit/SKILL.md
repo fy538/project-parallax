@@ -1,18 +1,24 @@
 ---
 name: script-audit
 description: >
-  Audit a video script for narrative quality across 8 lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, visual layer quality, decoder posture, and connection density. Produces specific issues with locations and suggested rewrites. Use whenever someone asks to 'review the script', 'audit the script', 'check my script', 'does this flow', 'is this engaging', 'what's wrong with this draft', or when a new script version needs quality verification. This evaluates craft quality — distinct from persona-eval (audience fit) and visual-concept (visual feasibility). Always run after script-draft, before review-package.
+  Audit a video script for narrative quality across 10 lenses: broken transitions, lecture patterns, missing human moments, pacing problems, unverified claims, visual layer quality, decoder posture, connection density, psychological architecture, and frontstage rigor density. Produces specific issues with locations and suggested rewrites. Use whenever someone asks to 'review the script', 'audit the script', 'check my script', 'does this flow', 'is this engaging', 'what's wrong with this draft', or when a new script version needs quality verification. This evaluates craft quality — distinct from persona-eval (audience fit) and visual-concept (visual feasibility). Always run after script-draft, before review-package.
 ---
 
 # Script Audit
 
-You are auditing a video narration script for narrative quality and visual layer health. Your job is to read the script carefully and run nine independent audit lenses, then produce a consolidated report with specific issues, locations, and suggested rewrites.
+You are auditing a video narration script for narrative quality and visual layer health. Your job is to read the script carefully and run ten independent audit lenses, then produce a consolidated report with specific issues, locations, and suggested rewrites.
 
 ## Context
 
 These scripts are for a YouTube/Bilibili channel that analyzes geopolitics through historical analogy and philosophical frameworks. The tone target is "smart friend explaining something fascinating over drinks" — intellectually rigorous but narratively engaging. The audience is educated adults (25-44) who read Foreign Affairs and listen to Lex Fridman. They will click away if the script feels like a lecture.
 
 The single most important quality criterion: **is this interesting?** A script can be factually impeccable and structurally logical and still fail if it doesn't sustain tension and curiosity throughout.
+
+## Doctrine: Backstage Maximum, Frontstage Confident
+
+This skill owns the **frontstage voice** half of the Parallax editorial doctrine (see [`episodes/EDITORIAL_PLAYBOOK.md`](../../episodes/EDITORIAL_PLAYBOOK.md) → Core Doctrine). research-audit is responsible for backstage rigor — every quote, date, number, and named source verified before scripting begins. By the time a script reaches you, that work is done. Your job is to make sure the script *acts like it's done* — confident voice, vivid metaphor, bounded analogies that name their limits in one sharp clause and move on, no hedge stacking, no verification-process narration, no false-consensus smoothing of contested claims.
+
+The doctrine resolves a tension that wrecks credibility-driven channels: maximum rigor that bleeds into the script reads as flat or evasive (the failure mode this skill catches); confident voice that skips backstage work reads as Jiang Xueqin (the failure mode research-audit catches). Lens 10 specifically guards the frontstage half.
 
 ## Inputs
 
@@ -21,7 +27,7 @@ The single most important quality criterion: **is this interesting?** A script c
 3. **Editorial Playbook** (read before auditing) — `episodes/EDITORIAL_PLAYBOOK.md` contains channel-level production rules extracted from past episodes. Read Sections 1 (Narrative Structure) and 2 (Visual Production) before running your lenses. When you find an issue that matches a playbook rule, cite it as "Playbook: [rule ID]" in your report — this helps Tiger see which patterns are recurring vs. new. If you find an issue that *should* be a playbook rule but isn't, flag it as "Candidate Rule" in your report.
 4. **Learning Log** (read if it exists) — `episodes/LEARNING_LOG.md` contains post-publish analytics findings. If available, check whether any of your findings were already identified in a previous episode's retrospective — this tells Tiger whether a pattern is persisting despite being known.
 
-## The Nine Lenses
+## The Ten Lenses
 
 Run each lens independently. For each issue found, provide:
 - **Location**: quote the specific text (keep it short — just enough to identify the spot)
@@ -345,6 +351,90 @@ Target behavior: [subscribe / share / return / unspecified] — close designed f
 Verdict: PASS / NEEDS WORK — [1-2 sentence summary of most critical psychological architecture issues]
 ```
 
+### Lens 10: Frontstage Rigor Density
+
+This lens owns the *frontstage voice* half of the Parallax editorial doctrine. Lens 9 catches Level-3 vague calibration ("maybe," "perhaps," "who knows"); this lens catches the *opposite* failure mode — backstage rigor leaking forward as **layered hedging**, **false-consensus or false-dispute framing**, or **verification-process narration**. All three read as evasive or anxious to the viewer regardless of how good the underlying research was.
+
+The lens is **not** about reducing intellectual honesty. The bounded-analogy form (one sharp clause naming where an analogy breaks, per NAR-13 and PROJECT_VISION → Bounded Analogy) is *frontstage rigor done right* and should be validated when present. The failures below are specific failure modes, not blanket de-hedging.
+
+#### Failure 1: Layered Hedging
+
+A single hedge per claim, in the right place, is the form. Three hedges stacked is fear:
+
+- "Some scholars have argued, with appropriate qualifications, that this might possibly suggest…"
+- "It's worth noting, perhaps, that there may be reasons to think…"
+- "While the evidence is incomplete and the debate is ongoing, it could be the case that…"
+
+The test: would a smart advocate for the claim recognize this as *their* phrasing of it, or would they cringe? If they'd cringe, you've over-hedged. Each layered qualification subtracts narrative pull while adding nothing the bounded-analogy form doesn't already provide.
+
+For each instance, suggest a rewrite that keeps the bounded form (one limit clause where it's earning its keep) but removes the fear (other layers):
+
+- Before: *"Some scholars have argued, with appropriate qualifications, that this might possibly suggest a structural pattern, though the evidence remains contested..."*
+- After: *"This suggests a structural pattern — though the strongest version of the counterclaim, that X, has real force."*
+
+The "after" version is more confident *and* more honest: it names the specific counter-position rather than gesturing at "contested evidence."
+
+#### Failure 2: False-Consensus or False-Dispute Framing
+
+Two sides of the same coin:
+
+- **False consensus** — a genuinely contested interpretive claim narrated as settled fact. If the brief's research-audit Lens 2d (Disagreement Handling) flagged the claim as contested, the script must honor the contestation. Smoothing it into singular truth is a frontstage failure.
+- **False dispute** — a settled empirical claim narrated as if it were debated. Scattered "some say X, others say Y" framing applied to questions that have actual answers, usually because the writer is performing balance. Flag any "experts disagree about whether…" framing where the experts don't actually disagree.
+
+For each, the fix is to match the narration to what the brief's disagreement-handling actually established. If the claim is contested, name one credible counter-position in a single clause — bounded-analogy style — and move on. If the claim is settled, narrate it as settled.
+
+Cross-reference: if `brief.md` exists in the same folder and has Sub-Lens 2d output, use it. If the script-level claim diverges from the brief's contestation status, that's the highest-priority flag in this lens.
+
+#### Failure 3: Verification-Process Narration
+
+Any line where the narration talks about *how the claim was verified* is a frontstage failure. The work was done backstage. The narration's job is the analysis, not the audit trail. Examples to flag:
+
+- "Verified as of [date]" — belongs in the research memo, never in narration
+- "According to my research…"
+- "I confirmed this with three sources…"
+- "After cross-checking the original transcripts…"
+- "The strongest version of this claim that survived audit is…"
+
+These break the viewer's experience of the analysis to focus on the analyst's process. They also signal anxiety — the writer is reassuring themselves and the audience that the work was done. The work *was* done; that's why the claim is in the script.
+
+The fix is always the same: cut the verification-process clause entirely. The claim either passes research-audit and gets stated, or it doesn't pass and gets cut. There's no third state where the script earns trust by performing its own verification.
+
+#### Failure 4: Hedge Density Threshold
+
+Beyond individual instances, scan for hedge *density*. Soft rule of thumb: if more than ~15% of declarative sentences carry a hedge marker (*might / perhaps / maybe / arguably / possibly / it's possible that / one could argue / it seems / it appears / suggests / suggests that*), the script has tipped from disciplined bounded analogy into pervasive uncertainty performance. Flag the script-level pattern, not just individual instances.
+
+The fix: leave hedges where they're doing real work (naming where an analogy breaks; flagging a contested interpretive claim; framing a forecast). Remove them everywhere else — turning "this might suggest" into "this suggests" when the suggestion is well-supported, and "perhaps X" into "X" when X is what the writer actually thinks.
+
+#### What to Validate (not flag)
+
+Bounded-analogy moves that are *frontstage rigor done right* — note these as **Frontstage Rigor: Strong** rather than flagging them:
+
+- A single sharp clause naming where an analogy breaks: *"this resembles X — though Z makes the parallel imperfect"*
+- One contested-claim hedge that names a credible counter-position: *"the strongest version of the counterclaim is that…"*
+- Honest "what would change my mind" lines (per NAR-19) — confidence signals, not hedges
+- Falsifiable predictions with named criteria (per NAR-17) — specificity is rigor
+- Herzog-style metaphor that earns its keep emotionally without straining literal accuracy
+
+When these are present, count them. They are the form working as designed.
+
+#### Output for this lens
+
+```
+Lens 10: Frontstage Rigor Density
+
+Layered hedging instances: [N flagged] — [most common stacking pattern]
+False-consensus framing: [N flagged]
+False-dispute framing: [N flagged]
+Verification-process narration: [N flagged] — [most common location]
+Hedge density: [X%] of declarative sentences carry a hedge marker — [BELOW / AT / ABOVE 15% threshold]
+Bounded-analogy moves validated: [N — list locations]
+"What would change my mind" lines: [N present, N expected per NAR-19]
+
+Verdict: STRONG / DISCIPLINED / OVER-HEDGED — [1-2 sentence summary]
+```
+
+A verdict of OVER-HEDGED is high-priority because it directly attacks the channel's interestingness without buying the rigor (which is research-audit's job, not narration's). The fix is rewriting, not researching.
+
 ---
 
 ## Output Format
@@ -387,6 +477,9 @@ Structure the report as follows:
 ## Lens 9: Psychological Architecture
 [Cold open 4-beat check. [FRAMEWORK UNLOCK] / [MAIN REVEAL] timing. Anxiety-to-inquiry conversion. Anger/anxiety framing flags. Assertive calibration scan. Bounded verdict close element count. Title confidence check. Target behavior alignment. [FORECAST:] tag completeness. Verdict: PASS / NEEDS WORK.]
 
+## Lens 10: Frontstage Rigor Density
+[Layered hedging instances. False-consensus / false-dispute framing. Verification-process narration. Hedge density percentage. Bounded-analogy moves validated. Verdict: STRONG / DISCIPLINED / OVER-HEDGED.]
+
 ## Priority Fixes
 [Top 3-5 issues ranked by impact on viewer engagement. Each with:
 - WHY it matters (what the viewer experiences)
@@ -403,4 +496,4 @@ The Priority Fixes section is the most important part of the report. A script au
 - **Write the fix, not the diagnosis.** Suggested rewrites should be actual prose the narrator could read aloud, not meta-advice like "add a transition here" or "consider making this more engaging." Write the transition. Write the engaging version.
 - **Distinguish symptoms from causes.** When flagging lecture patterns, determine whether a signpost phrase should be cut entirely or needs to be replaced with better connective tissue. Sometimes the signpost is covering for a structural problem — cutting it without fixing the structure makes things worse (this is the most common mistake in script revision).
 - **Respect what works.** If the script is genuinely good in a particular lens, say so in one sentence and move on. Don't manufacture issues to fill space. A report that flags 3 real problems is more valuable than one that flags 15 issues of varying significance.
-- **Weight the lenses correctly.** Lenses 1-4 are about whether the script is *interesting*; Lens 5 is about whether it's *accurate*; Lens 6 is about whether it's *producible and visually compelling*; Lens 9 is about whether it's *psychologically engineered to build an audience*. Lenses 1-4 should get ~55% of the report's attention, Lens 9 ~15%, Lens 6 ~15%, and Lenses 5, 7, 8 ~15% combined. Lens 9 failures are architectural — they require restructuring beats, not just rewriting sentences, so flag them early and clearly.
+- **Weight the lenses correctly.** Lenses 1-4 are about whether the script is *interesting*; Lens 5 is about whether it's *accurate*; Lens 6 is about whether it's *producible and visually compelling*; Lens 9 is about whether it's *psychologically engineered to build an audience*; Lens 10 is about whether the script *trusts its own backstage rigor* and reads with confident voice rather than hedge-laden caution. Lenses 1-4 should get ~50% of the report's attention, Lens 9 ~15%, Lens 6 ~15%, Lens 10 ~10%, and Lenses 5, 7, 8 ~10% combined. Lens 9 failures are architectural — they require restructuring beats, not just rewriting sentences. Lens 10 failures are tonal — usually fixable with sentence-level rewrites, but their cumulative effect on viewer experience is large.

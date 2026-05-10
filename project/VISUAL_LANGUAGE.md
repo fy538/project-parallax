@@ -321,7 +321,7 @@ A well-paced video essay alternates between visual modes the way music alternate
 
 - **No more than 3 consecutive full-screen MGs without a footage break.** Two charts back-to-back is fine. Three feels like a lecture. Four is a slideshow. Insert even 5-8 seconds of footage between MG clusters.
 - **No more than 30 seconds of footage-only without a visual change.** Footage is restful, but too much becomes TV B-roll wallpaper. Cut to a different shot, add a text overlay, or transition to an MG.
-- **No more than 2 consecutive AI-GEN clips without a mode switch.** AI-GEN is immersive but its stylized quality becomes fatiguing if overused. One clip is a window into an inaccessible world. Three in a row starts to feel like a video game cutscene.
+- **No more than 2 consecutive AI-GEN single-shot clips without a mode switch.** AI-GEN single shots are immersive but their stylized quality becomes fatiguing if overused. One clip is a window into an inaccessible world. Three in a row starts to feel like a video game cutscene. **This rule does NOT apply to multi-frame [SCENE:] blocks** (see SCRIPT_FORMAT.md → "Multi-Frame Scene Blocks") — a chained scene of 3-5 frames morphed into one continuous ~24-40s shot reads to the viewer as a single atmospheric unit, not as multiple consecutive clips. The fatigue concern is "successive cuts to different AI-illustrated worlds," not "one continuous AI-illustrated scene that breathes for 30 seconds."
 - **Alternate density within each beat.** A beat should follow a rough arc: establish with footage → analyze with MG → breathe with footage → climax with MG or layered → land with footage. AI-GEN slots in where footage would go but can't be sourced — it inherits footage's pacing role. Not every beat will follow this exactly, but the pattern prevents monotony.
 
 ### Beat Cadence Template
@@ -344,6 +344,27 @@ This isn't a rigid formula — it's a tendency. Some beats are data-heavy (Beat 
 ### The 10-Second Principle
 
 No visual element should go unspecified for more than 10 seconds. This doesn't mean a new asset every 10 seconds — a 25-second footage shot is fine as long as the script explicitly calls for it. What it prevents is the accidental void: narration playing over nothing because the script writer forgot to specify a visual.
+
+### Sustained Atmospheric Stretches (added May 9, 2026)
+
+Sometimes a scene earns more than 10 seconds of continuous atmospheric or grounding visual time — a multi-frame chained scene that reads as one extended shot rather than a sequence of cuts. The May 2026 chained-still-morph workflow (see CHAINED_STILL_LESSONS.md) makes this technically achievable for the channel; this section governs *when* it's editorially appropriate.
+
+**The 60-second guideline (synthesized, not yet validated on Parallax retention data).** Atmospheric or grounding stretches up to ~60 seconds are defensible without retention loss IF and ONLY IF all three of the following guardrails hold:
+
+1. **Continuous narration carries analytical content over the stretch.** The atmosphere amplifies the argument; it doesn't replace it. The Adam Curtis model — long archival sequences with voice-of-god narration making the analytical case — is the precedent. Atmosphere without analytical narration is decoration; atmosphere with analytical narration is a form of argument.
+2. **Something visually changes every 15–20 seconds inside the stretch.** Even a single "scene" should breathe — a camera move, a figure entering, a palette shift, a new compositional element resolving. Total stillness for 60 seconds is hypnotic in archive footage but feels stalled in illustrated content. The chained-morph technique makes this rule easy to honor: each morph clip in a chain is a 6-10s "change event."
+3. **The stretch ends on analytical re-engagement, not a fade.** Cut from the atmospheric scene back into MG (data, framework, typography card) at the moment the narration calls for it. Fading out of a long atmospheric stretch creates a "we lost the thread" feeling; cutting back to analysis makes the atmospheric stretch read retroactively as deliberate breath, not drift.
+
+Stretches over 60 seconds without one of those guardrails go past where any published data supports. The MrBeast-school view treats any 30-60s stretch as retention risk by default — that's the wrong model for Parallax content but worth knowing as the dominant counter-position. Empirical retention data on the channel's specific audience, post-launch, is the authoritative source; the 60-second guideline is provisional and should be revised as analytics accumulate.
+
+**Pacing budget per episode.** A 15-20 minute Philosopher's Lens episode can typically support **1-3 sustained atmospheric stretches of 30-60s each**, no more. Two reasons: (a) more than that and the analytical channel is effectively off for too much of the episode, breaking the channel's "rigorous decoder" register; (b) atmospheric stretches are expensive to produce at the chained-still-morph quality bar, so the production budget naturally constrains them.
+
+**When NOT to use a sustained atmospheric stretch:**
+- The scene is a 5-8s atmospheric punctuation moment — use a single AI-GEN clip instead, much cheaper and faster.
+- The arc requires figure motion (figures walking, gesturing) rather than figure resolution — single-shot I2V handles motion better than chain-morphs.
+- The narration over the stretch is analytical-data-dense (numbers, citations, frameworks) — viewers can't simultaneously process atmospheric visual change and analytical-data-dense audio. Reserve sustained atmospheric stretches for narratively-paced or emotionally-charged narration.
+
+**Production technique:** See CHAINED_STILL_LESSONS.md for the validated workflow (ChatGPT chained stills + Pika 2.5 morphs) and SCRIPT_FORMAT.md for the `[SCENE:]` script-block notation that encodes a sustained atmospheric stretch as a first-class unit.
 
 ---
 

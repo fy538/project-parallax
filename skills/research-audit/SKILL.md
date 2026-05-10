@@ -6,7 +6,25 @@ description: >
 
 # Research Audit
 
-You are auditing an episode research brief to determine whether it's ready for script development. Your job is to run eight independent audit lenses, attempt to verify unconfirmed claims, and produce a verdict.
+You are auditing an episode research brief to determine whether it's ready for script development. Your job is to select the appropriate audit tier, run eight independent audit lenses (Lens 2 contains five sub-lenses for factual rigor), attempt to verify unconfirmed claims, and produce a verdict.
+
+## Doctrine: Backstage Maximum, Frontstage Confident
+
+This skill owns the **backstage rigor** half of the Parallax editorial doctrine. The whole point of being thorough here is so that script-draft can be written with confident, vivid voice — every quote, date, number, and named source verified before narration is drafted. Backstage discipline earns the frontstage license to be vivid; without it, the script either flattens into hedge-laden lecture or, worse, produces a fabricated quote that retroactively poisons the channel's trust capital.
+
+The empirical case: even the strongest frontier models in published 2026 benchmarks only hit ~80% fully accurate references; "the citation exists" and "the source supports the claim" are different tests, with the latter passing only ~39–77% of the time across deep-research agents. Disagreement is routinely flattened into faux consensus. URL hallucination ranges 3–13% even in the best tools. None of these failure modes are catchable downstream — by script-audit they're already on screen. They have to be caught here, or they ship.
+
+See [`episodes/EDITORIAL_PLAYBOOK.md`](../../episodes/EDITORIAL_PLAYBOOK.md) → Core Doctrine and [`project/RESEARCH_LOG.md`](../../project/RESEARCH_LOG.md) §17 (Verification Architecture) for the full evidence base.
+
+## Audit Tier Selection
+
+Before running the lenses, decide which tier applies. The tier determines the rigor floor for **Lens 2 (Claims Verification)** — the other seven lenses run identically at every tier.
+
+- **MVP** — runs on **every episode**, no exceptions. Verifies every direct quote, every date, every numerical/percentage/magnitude claim, every named paper/book/study, and the lead claim of every paragraph. This is the non-negotiable floor. Do not advance an episode past research-audit without MVP passing.
+- **Standard** — adds the Disagreement and Freshness sub-lenses (2d, 2e). Use when the episode makes a contested interpretive claim, depends on time-sensitive data, or contradicts a widely held view. Most analytical Parallax episodes should run Standard.
+- **Flagship** — adds a **private evidence appendix** to the brief: source excerpts, page references, or screenshot URLs for every nontrivial on-screen factual assertion. Reserved for episodes where being wrong on a single fact would damage trust disproportionately — controversial claims, the launch episode, episodes that name specific named figures or make specific numerical predictions.
+
+State the tier at the top of the audit report. If you're unsure between MVP and Standard, choose Standard. If you're unsure between Standard and Flagship, ask Tiger — the Flagship tier requires Tiger's time as well as the auditor's.
 
 ## Verdict Criteria
 
@@ -83,20 +101,69 @@ For each section:
 - Do the falsifiable predictions have timeframes? "X will happen eventually" is unfalsifiable. "If X hasn't happened by Q2 2028, this thesis is weakened" is useful.
 - Is there at least one genuine "what would change my mind"? This is the strongest credibility signal in the entire brief.
 
-### Lens 2: Claims Verification
+### Lens 2: Claims Verification — The Five Sub-Lenses
 
-This is the most actionable lens. Go through the verification table (Section 2) and:
+This is the most actionable lens and the one where the audit tier matters. Run sub-lenses 2a–2c at every tier; add 2d–2e at Standard or Flagship; add the evidence appendix at Flagship.
 
-1. **Count the verification status breakdown:** How many ✅ CONFIRMED / ⚠️ LIKELY CORRECT / ⚠️ NOT YET VERIFIED / ❌ INCORRECT?
-2. **Risk-rank the unverified claims:** Not all unverified claims are equal. A claim that serves as a throwaway detail matters less than one that anchors a key narrative beat. For each ⚠️ claim, note where it appears in the narrative arc and how load-bearing it is.
-3. **Attempt to verify the high-priority unverified claims.** Use web search to find corroborating or contradicting sources. For each claim you search:
-   - State the claim
-   - What you found (with source URLs)
-   - Updated status: ✅ CONFIRMED / ⚠️ STILL UNCERTAIN / ❌ CONTRADICTED
-4. **Check for orphan claims** — claims that appear in the narrative arc but don't appear in the verification table at all. These are the most dangerous because nobody flagged them for checking.
-5. **Check for discrepancies** — does the narrative say one number but the data dashboard say another?
+The sub-lenses correspond to the documented failure modes in 2026 frontier-model evaluation: "the citation exists" and "the source supports the claim" are different tests; quote/date/number fidelity drifts even in citation-bearing outputs; disagreement gets flattened; freshness rots silently. Each sub-lens targets one failure mode.
 
-The goal is to get every load-bearing claim to ✅ before scripting begins. Cosmetic claims (background color, scene-setting details) can remain ⚠️ with a note.
+**Before starting:** count the verification table breakdown (✅ CONFIRMED / ⚠️ LIKELY CORRECT / ⚠️ NOT YET VERIFIED / ❌ INCORRECT). Note orphan claims (in the narrative but not in the table — most dangerous because nobody flagged them) and discrepancies (narrative number ≠ data dashboard number).
+
+#### Sub-Lens 2a: Citation Existence (every tier)
+
+For every cited work, verify the source object exists *as cited*. Title, author, year, venue, DOI/ISBN/URL all match the same real object. This catches the three most common reference-level failures: total fabrication, partial attribute corruption (real paper with wrong year/author), and identifier hijacking (wrong DOI on a real-sounding citation).
+
+Use web search to verify any citation you can't immediately confirm from memory. If a citation fails this gate, the brief does not advance unchanged — flag it for replacement or removal.
+
+#### Sub-Lens 2b: Source Support (every tier)
+
+For every paragraph in the brief, verify the cited source supports the **precise proposition** — not just the general topic. This is the single most important check, because a working URL on a topical page leaves enormous room for sentence-level claims that the source doesn't actually back. The 2026 source-attribution benchmarks put frontier models at only 39–77% factual accuracy on this exact test.
+
+For load-bearing claims (anchor a key beat or thesis): open the cited source, locate the supporting passage, confirm it backs the specific phrasing in the brief. If the source supports a *related* claim but not the precise one in the brief, that's a fail — flag it for rewording or for finding a different source. If the brief uses a second LLM here, give it the raw claim *and* the source text, and make Tiger the final adjudicator.
+
+For non-load-bearing claims, this can be sampled rather than exhaustive at MVP tier; at Standard or Flagship, exhaustive.
+
+#### Sub-Lens 2c: Quote, Date, and Number Exactness (every tier)
+
+Auto-extract every:
+- **Direct quote** (anything in quotation marks attributed to a person)
+- **Date** (year, month/day, decade marker)
+- **Percentage / magnitude / numerical claim**
+- **Superlative** ("largest," "first," "only," "earliest")
+- **Timed causal sequence** ("after X, Y happened" — verify the temporal order)
+- **Named paper, book, or study**
+
+Line-check each against its source. This catches the BBC/EBU class of failure — quote distortions, off-by-a-year dates, percentages that drift between citation and narration. These are the most reputation-damaging errors because they're concrete, falsifiable, and frequently caught by viewers in comments.
+
+For direct quotes specifically: confirm the exact wording, not the gist. "Globalization is almost dead" and "globalization is essentially over" are not the same quote. If the brief paraphrases but presents as direct, downgrade to indirect speech.
+
+#### Sub-Lens 2d: Disagreement Handling (Standard and Flagship only)
+
+For every nontrivial *interpretive* claim in the brief, force it into one of three buckets:
+- **Consensus** — historians/economists/scholars broadly agree.
+- **Active dispute** — there is a real disagreement among informed scholars; multiple credible positions exist.
+- **Unclear / mixed evidence** — the data is genuinely insufficient to settle it.
+
+Flag every claim where the brief presents an *active dispute* as if it were *consensus*, or vice versa. The most common failure: a contested historical interpretation gets narrated as settled fact because Deep Research smoothed over the disagreement. The fix is not necessarily to add hedging in narration — it's to ensure the *brief* names at least one credible counter-source for every contested interpretive claim, so the script-draft stage can decide how to honor that disagreement (per the bounded-analogy convention) without flattening it into faux consensus.
+
+This is the strongest defense against "smoothed-over disagreement presented as singular truth."
+
+#### Sub-Lens 2e: Temporal Freshness (Standard and Flagship only)
+
+Any claim that depends on:
+- Live institutions or roles ("the current Secretary of…")
+- Recent events (last 24 months)
+- Current officeholders or leadership
+- Evolving casualty counts, economic indicators, election results
+- Newly released archives or papers
+
+…gets a time-stamp check. Mark each time-sensitive claim with **verified as of [YYYY-MM-DD]** *in the brief itself*. This date does **not** appear in narration — that's a frontstage failure (per script-audit Lens 6) — but it does appear in the brief so the script-draft stage knows what's stale-risk.
+
+The 2026 deep-research evaluations show that deeper search often *increases* citation volume while introducing more stale or hallucinated URLs; freshness rot scales with research effort, not against it. So a brief built from a comprehensive research pass needs *more* freshness checking, not less.
+
+#### Flagship Add-On: Evidence Appendix
+
+For Flagship-tier audits only: produce a private evidence appendix (saved alongside the brief, never narrated). For every nontrivial on-screen factual assertion, the appendix contains either a verbatim source excerpt, a page reference, or a screenshot URL. The appendix exists so that if a claim is challenged in public, Tiger can produce the receipt within minutes. Cost: real, but smaller than the cost of one fabricated quote that ships.
 
 ### Lens 3: Historical Parallel Integrity
 
@@ -176,18 +243,27 @@ A Weak connection density score by itself should trigger at minimum a CONDITIONA
 ## Episode: [number and title]
 ## Date: [today]
 
+## Tier: [MVP / Standard / Flagship]
+[1 sentence stating which tier was selected and why.]
+
 ## Verdict: [READY FOR SCRIPTING / CONDITIONAL / NEEDS MORE RESEARCH]
 [2-3 sentences explaining the verdict. If CONDITIONAL, state caveats. If NEEDS MORE RESEARCH, state exactly what's needed and suggest specific Deep Research prompts.]
 
 ## Structural Completeness
 [Section-by-section. Only flag gaps — don't narrate what's fine.]
 
-## Claims Verification
+## Claims Verification (Five-Lens Framework)
 ### Status breakdown: X/Y confirmed, Z unverified, W load-bearing unverified
+### Sub-Lens 2a (Citation Existence): [pass / fail count + specific failures]
+### Sub-Lens 2b (Source Support): [paragraphs with adequate / inadequate source support]
+### Sub-Lens 2c (Quote-Date-Number Exactness): [extracted items checked, drifts found]
+### Sub-Lens 2d (Disagreement Handling — Standard+ only): [contested claims flagged, missing counter-sources]
+### Sub-Lens 2e (Temporal Freshness — Standard+ only): [time-sensitive claims with verified-as-of dates]
 ### Verification attempts:
 [claim → what you found → updated status, for each searched claim]
 ### Orphan claims: [claims in narrative not in verification table]
 ### Discrepancies: [number mismatches between sections]
+### Evidence appendix status (Flagship only): [complete / incomplete + gaps]
 
 ## Historical Parallels
 [Per-parallel assessment. If well-constructed, one line and move on.]

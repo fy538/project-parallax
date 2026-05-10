@@ -9,8 +9,10 @@ AI-generated video is the **fourth visual mode** (`[AI-GEN:]`), sitting between 
 Created: May 2, 2026
 Updated: May 4, 2026 — Cross-linked to three-register visual system and prompt preamble layer.
 Updated: May 4, 2026 — Replaced photoreal-mannequin "Stylized Realism" aesthetic with "Stylized Constructivism." Registers 2 and 3 now share constructivist visual language; differ only in role (background vs. foreground figurative). Added per-scene typography-tradition parameter and realism-dosage sub-mode.
+Updated: May 9, 2026 — **Empirically validated chained-still-morph workflow** on prisoners-dilemma Scene C bakeoff. ChatGPT image generation (with 4-anchor reference uploads + sequential generation + morph-aware prompts) + Pika 2.5 (start+end-frame mode, 8s clips) confirmed as the working stack for atmospheric scene chains. New "Chained Still Morph Workflow" subsection added under Generation Workflow. Tool Selection updated: Pika 2.5 promoted to primary for chained atmospheric scenes; ChatGPT promoted to primary for stills with 4-anchor discipline; Recraft V3 retained as secondary. Full discipline rules and lessons in `CHAINED_STILL_LESSONS.md`. Earlier tool recommendations (Recraft → Kling/Sora/Seedance) remain valid for specific use cases but are no longer the default for atmospheric chains.
 
 **Related docs:**
+- **CHAINED_STILL_LESSONS.md** — empirical findings from the May 9, 2026 prisoners-dilemma Scene C bakeoff. The canonical source for the chained-still-morph prompting discipline (DO/DON'T rules, failure modes, validated tool stack). This pipeline doc references those rules at a summary level; the lessons doc carries the specifics.
 - **VISUAL_LANGUAGE.md** — *when* to use AI-GEN vs. the other three modes. Defines the three visual registers (Analytical / Atmospheric / Grounding); this pipeline produces Register 3.
 - **PROMPT_PREAMBLES.md** — the prompt-level brand layer that pairs with this generation pipeline. Documents the `--register grounding` preamble in `tools/recraft/recraft.py` for stills, and the `treat_video.py` LUT pass for clips. Two-stage brand unification.
 - **FOOTAGE_SOURCING.md** — sourcing tiers; AI-GEN replaces many "Unsourceable" entries.
@@ -93,11 +95,38 @@ Per VIS-10, atmospheric register + editorial treatment is forbidden — the edit
 
 ---
 
-## Tool Selection (May 2026)
+## Tool Selection (May 2026, updated May 9)
 
-**Note on the constructivist shift:** The May 4, 2026 migration from photoreal-realism to stylized-constructivism changes which tools are best-fit for which step. Recraft V3 becomes the **primary stills tool** because it's strongest at the constructivist illustration aesthetic that's now the channel default. Flux 2 Pro remains useful for the rare scenes that need photographic grounding (`realism: grounded` in grounded scenes), but the bulk of stills work moves to Recraft. Video tools (Kling, Sora, Runway, Seedance) animate the Recraft-generated reference frames; their underlying photorealism strength matters less now that the source frames are constructivist illustrations.
+**Two-axis tool selection.** As of the May 9, 2026 bakeoff, the validated tool stack splits along two axes:
 
-### Primary: Kling 3.0
+1. **Single-shot atmospheric clip vs. chained-scene morph chain.** Single shots are 5-8s clips animated from one reference frame; chains are 3-5 stills morphed pair-by-pair into ~24-40s of continuous-feeling video. The two use different tools and different prompting disciplines.
+2. **Constructivist illustration vs. photographic grounding.** Most channel content is constructivist (post-May 4 default); occasional grounded scenes still benefit from photoreal source frames.
+
+The validated default for atmospheric chained scenes is **ChatGPT image generation → Pika 2.5 (start+end-frame, 8s clips)**, with the discipline rules in `CHAINED_STILL_LESSONS.md`. The Recraft → Kling/Sora/Seedance path documented below remains valid for single-shot atmospheric clips and is not deprecated; it's just no longer the default for chains. The May 9 bakeoff tested only the chain path; the single-shot path retains its prior tool ranking until tested head-to-head.
+
+### Primary for chained scenes: Pika 2.5 (validated May 9, 2026)
+
+**Why it's the default for atmospheric morph chains on Parallax aesthetic:**
+- Empirically validated on the prisoners-dilemma Scene C 4-frame chain — produced clean morphs across geometric transformation, table-emergence, and figure-introduction
+- Native start+end-frame support exposed in the web UI (klingai-style)
+- 8s clip length at 1080p is sufficient for the morph transitions in a typical chain
+- Free tier covers most bakeoff/iteration work; paid tier ~$0.20-0.35/clip
+- Particularly handles figure-introduction morphs better than expected — the constructivist faceless figure aesthetic is forgiving of "appears from nothing" interpolation
+
+**Best for:** Pair-by-pair morphing across a chain of 3-5 stills. Atmospheric scenes that need to feel continuous over 24-40s. Any scene where the camera is fixed and the world transforms.
+
+**Limitations:**
+- Vertical-motion verbs in motion prompts (`lift`, `rise`, `emerge`, `ascend`) cause particle/smoke artifacts — replace with stability verbs (`clarify`, `form`, `resolve in place`, `coalesce`). See `CHAINED_STILL_LESSONS.md` for the full DO/DON'T list.
+- Untested vs. Vidu Q1 and Kling 3.0 on the same scene — the May 2026 field report suggested those alternatives but Pika 2.5 was the empirical winner in the only bakeoff run so far.
+- Camera-move morphs (push-in, pan, dolly) untested — Scene C used static-camera transformations only.
+
+**Workflow:** See `CHAINED_STILL_LESSONS.md` for the full validated workflow. Brief: generate stills sequentially in ChatGPT with multi-anchor reference uploads → upload start+end frames to Pika 2.5 → 8s morph at 1080p with stability-verb motion prompt + extended negative prompt (smoke, dust, particles).
+
+### Secondary for chained scenes: Vidu Q1 + Kling 3.0 (untested but plausible)
+
+The May 2026 field report (`research/2026-05-chained-video-generation.md`) recommended Vidu Q1 (7-image reference-to-video) + Kling 3.0 (10s start+end-frame) as the off-the-shelf chained pipeline for editorial illustration. These remain plausible alternatives to Pika 2.5 and worth running head-to-head on a future bakeoff scene. Vidu's all-in-one approach (4 references → single 5s clip) is a fundamentally different architecture from Pika's pairwise morph and may handle some failure modes better. Until tested, treat as "candidate, not validated."
+
+### Primary for single-shot atmospheric clips: Kling 3.0
 
 **Why it's the default for Parallax:**
 - Native 4K output (3840×2160) without upscaling artifacts — matches our delivery spec
@@ -148,9 +177,17 @@ Per VIS-10, atmospheric register + editorial treatment is forbidden — the edit
 
 **Limitations:** Mid-tier pricing, shorter clip durations than Kling.
 
-### Reference Frame Generation: Flux 2 Pro (Primary) + GPT Image 2 (Iteration)
+### Reference Frame Generation: ChatGPT (Primary for chains, validated May 9) | Recraft V3 (Primary for single shots) | Flux 2 Pro (Photoreal grounding only)
 
-Before video generation, create a single **reference frame** that locks:
+**Two paths:**
+
+- **For chained-still scenes (the validated May 9 path):** ChatGPT image generation, in a single conversation per scene, with the 4 episode reference images uploaded at the top. Generate frames sequentially. For each frame after the first, upload Frame 1 (the chain anchor) plus the immediately prior frame as additional references. The 4 episode references stay loaded throughout and remain the canonical style source. Full prompting discipline rules in `CHAINED_STILL_LESSONS.md`. Cost: $0 incremental (existing ChatGPT subscription).
+
+- **For single-shot atmospheric clips (constructivist scenes):** Recraft V3 via `tools/recraft/recraft.py` with `--register grounding` or `--register atmospheric`. The constructivist preamble locks palette, typography tradition, dosage. Best for one-off P1 reference frames where you'll animate via Kling/Sora rather than chain-morph. Cost: subscription-based, effectively free at channel volume.
+
+- **For grounded photoreal scenes (rare, restricted-facility reconstructions):** Flux 2 Pro via fal.ai. Use only when `realism: grounded` is editorially required and the scene won't be animated by chain-morph (which requires `realism: flat` for animation stability). Cost: ~$0.045 per 1920×1080 image.
+
+Before video generation, create reference frames that lock:
 - The exact environment/space
 - Lighting direction and quality
 - The mannequin-face character style
@@ -267,6 +304,44 @@ Feed the approved reference frame to Kling 3.0 (or Sora 2) in image-to-video mod
 2. Upload reference frame as style anchor
 3. Generate the full sequence — Sora handles transitions
 4. Split the output into individual clips for the NLE timeline
+
+### Step 3.5: Chained Still Morph Workflow (Validated May 9, 2026)
+
+When a scene needs to feel continuous over more than one Kling/Pika clip — typically 24–40 seconds of sustained atmospheric or grounding time — the workflow above (single reference frame → single I2V clip) is wrong. Instead, use the chained-still-morph workflow validated on the prisoners-dilemma Scene C bakeoff. This is the new default for sustained scenes; single-shot I2V is now reserved for punctuation moments of 5-8s.
+
+**When to use this workflow:**
+
+- Scene needs to read as one continuous shot (not a sequence of cuts) for more than 8 seconds
+- The script has tagged a multi-frame scene block (per the SCRIPT_FORMAT.md extension)
+- The arc is camera-static (world transforms around fixed viewpoint) — camera-move chains are untested
+
+**When NOT to use it:**
+
+- Scene is 5-8s atmospheric punctuation (use single-shot I2V instead — cheaper, faster, lower coordination cost)
+- The arc requires figure motion (figures walking, gesturing) rather than figure resolution — single-shot I2V handles motion better than chain-morphs
+
+**The 5-step chain workflow:**
+
+1. **Storyboard 3-5 keyframes** in the script's visual column. Each frame is a paragraph-length composition spec following the Alan Moore panel-description convention (per the field report's scripting recommendations). Define camera position once at the scene level (typically "eye-level, fixed throughout"); each frame describes the world at that camera position, not a different angle.
+
+2. **Generate stills sequentially in ChatGPT** with multi-anchor reference uploads. Open one conversation per scene; upload the 4 episode style references at the top. Generate Frame A from those references alone. For each subsequent frame, upload Frame 1 (the anchor) + the immediately prior frame + the 4 episode references continue to live in the conversation context. Each prompt explicitly states: camera position fixed, what doesn't change (lighting, palette, composition anchors), the single thing that does change. Pin specific palette hex codes per prompt.
+
+3. **Verify the chain in a 4-up grid** before generating any video clips. Do all frames look like the same world from the same viewpoint at the same moment? If a frame's lighting, palette, or composition has drifted from prior frames, regenerate it before moving on.
+
+4. **Generate morph clips pair-by-pair in Pika 2.5.** For a 4-frame chain, that's 3 morph clips (A→B, B→C, C→D), each 8 seconds at 1080p. Motion prompt opens with "Camera holds static." and uses stability verbs (clarify, form, resolve in place, coalesce) — NEVER vertical-motion verbs (lift, rise, emerge, ascend) which produce particle/smoke artifacts. Negative prompt always includes `smoke, dust, particles, atmospheric haze, fog, mist, rising elements, fire, steam` plus the standard `flicker, morphing, warping, palette change, photoreal texture, anime style`. Run figure-introduction morphs 2-3 times and pick the best.
+
+5. **NLE assembly with hard cuts and color-grade snap.** Drop the morph clips in sequence with NO transitions between them — the morph itself is the transition; a fade creates a double-transition that reads as visual stutter. Run a color grade pass that snaps each clip's dominant amber and ink hex to canonical palette values to correct any drift. Then proceed to Step 4 (Post-Video Treatment) as normal — LUT, grain, vignette pass applies to the assembled chain output.
+
+**Validated economics (per chained scene):**
+
+- ~30 minutes ChatGPT iteration for 4 stills, $0 incremental
+- ~30 minutes Pika 2.5 generation including queue waits, $0-2 (free tier covers most cases)
+- ~24-32 seconds of finished AI-illustrated continuous video per scene
+- Per Philosopher's Lens episode budgeting 2-3 chained scenes plus 4-6 single-shot clips: ~3-5 hours of total AI-gen work, $5-15 in API costs.
+
+**Failure modes and recovery:** See `CHAINED_STILL_LESSONS.md`. Most common: smoke artifact from vertical-motion verbs (regenerate with stability verbs); figure ghosting on figure-introduction morphs (run 2-3 attempts, pick best); palette drift across chain (color-grade snap pass in NLE).
+
+**The lessons doc is the canonical source for the prompting discipline.** This pipeline doc summarizes the workflow; CHAINED_STILL_LESSONS.md carries the per-failure-mode rules. Update the lessons doc as new bakeoffs surface new findings; let those findings flow back here only after they replicate.
 
 ### Step 4: Post-Video Treatment
 
@@ -634,7 +709,7 @@ These would replace 6 segments currently using either hard-to-source footage or 
 
 1. **Planar face specificity:** How much geometric facet vs. how much smooth-plane suggestion? The Beijing-apartment reference (lens-shadow obscured eyes, jaw-plane facets) sets a target, but the parameter space is large. Worth testing variants on the same subject to see what reads as "intentionally constructivist" vs. "broken AI."
 2. **Audio sync:** Some AI tools (Veo 3.1, Kling 3.0) can generate synchronized audio. Do we want ambient sound from AI-GEN clips, or always replace with designed audio in post?
-3. **Animation of constructivist illustrations:** Kling/Sora/Runway are all calibrated for photoreal source frames. Animating constructivist illustration as the source produces a different challenge — the model has to preserve graphic flatness through motion rather than drift toward photorealism. Worth testing during Phase 1.
+3. **Animation of constructivist illustrations:** ~~Kling/Sora/Runway are all calibrated for photoreal source frames. Animating constructivist illustration as the source produces a different challenge — the model has to preserve graphic flatness through motion rather than drift toward photorealism. Worth testing during Phase 1.~~ **PARTIALLY ANSWERED (May 9, 2026):** Pika 2.5 preserves constructivist graphic flatness through start+end-frame morphs without drifting toward photorealism — empirically validated on the prisoners-dilemma Scene C bakeoff. Still untested: Kling 3.0, Vidu Q1, Sora 2, Runway Gen-4 on the same aesthetic. Camera-move morphs (push-in, pan, dolly on constructivist source) also untested — Scene C used static camera only. See `CHAINED_STILL_LESSONS.md` and the bakeoff log for details.
 4. **Viewer perception study:** After EP01 launches, should we test audience response to AI-GEN segments specifically? (Retention data from publish-retro will show if viewers drop off during these moments. The register-level analytics added May 4 will surface whether constructivist outperforms the prior mannequin convention would have.)
 5. **Shorts adaptation:** Do AI-GEN clips work in 9:16? The constructivist aesthetic translates better to phone viewing than the mannequin convention did — graphic flatness is more legible at small scale than photorealism. But worth verifying.
 6. **Typography accuracy at scale:** As the channel ships more episodes covering more regions, the typography accuracy bar gets harder. Tiger's bilingual fluency is the quality gate for Chinese; for Russian/Japanese/other languages, what's the verification process? Native-speaker review per episode? Curated phrase library?

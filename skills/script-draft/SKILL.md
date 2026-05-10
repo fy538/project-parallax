@@ -12,6 +12,23 @@ The script is the single source of truth for both content and direction. Everyth
 
 The script must work as a story first and a document second. The viewer should feel like a co-investigator discovering a hidden structure, not a student receiving a lesson.
 
+## Doctrine: Backstage Maximum, Frontstage Confident
+
+You are writing the **frontstage** half of the Parallax editorial doctrine. By the time you're drafting, research-audit has already verified every quote, date, number, and named source. That's the backstage rigor. Your job is to write narration that *acts like the verification has already happened* — confident voice, vivid metaphor, bounded analogies that name their limit in one sharp clause and move on. Not hedge-stacked, not verification-narrating, not consensus-smoothing.
+
+Two operational consequences:
+
+**Bounded analogy is the signature form.** *"This analogy is useful here, misleading there, dangerous if overextended."* Setup the structural pattern confidently → name where it breaks in one sharp clause → return to the argument. This is the form that differentiates Parallax from civilizational-prophecy channels (Whatifalthist/Zeihan/Jiang) and pure briefing channels (CaspianReport/TLDR). Don't kill a strong analogy because it has a flaw; name the flaw and move on. The bounded clause is one of the most concentrated places confidence and rigor coexist — it should be present and crisp, never apologetic.
+
+**Herzog's "ecstatic truth" license.** Vivid metaphor and evocative imagery are *allowed and encouraged* when they serve emotional clarity, not when they strain literal accuracy. The stormy-sea shot for "technological anxiety" is fine; a fabricated quote attributed to Schelling is not. The license is earned by the rigor — backstage discipline is what entitles the script to be vivid. Don't squander the license by replacing strong metaphor with literal description out of misplaced caution.
+
+**What the doctrine forbids in narration** (script-audit Lens 10 will catch these):
+- Layered hedging — "some scholars have argued, with appropriate qualifications, that this might possibly suggest…"
+- Verification-process narration — "verified as of [date]," "according to my research," "I confirmed this with three sources"
+- False-consensus framing — narrating a contested interpretive claim as settled fact (or vice versa)
+
+See [`episodes/EDITORIAL_PLAYBOOK.md`](../../episodes/EDITORIAL_PLAYBOOK.md) → Core Doctrine and [`project/PROJECT_VISION.md`](../../project/PROJECT_VISION.md) → "Bounded Analogy: The Signature Form" for the full doctrine.
+
 ## Before You Start
 
 Read these files in order. Each one gives you something specific:
@@ -88,6 +105,25 @@ Usage in the beat header: `## BEAT 3 — THE FRAMEWORK UNLOCK (4:30–6:00) <!--
 **End on personal stakes (NAR-05).** The closing beat must make the viewer feel personally implicated. Concrete, tangible, in-their-life. The last 60 seconds should name specific objects the viewer owns or uses (your car, your phone, your hospital's MRI) and connect them to the episode's argument. Do NOT end on "and nobody knows how this ends" or "that uncertainty is the real story" — those are epistemological observations that belong in a professor's closing, not a storyteller's. The uncertainty should live *inside* the concrete stakes, not replace them.
 
 **The toxin line (NAR-13).** Historical analogies are hypothesis generators, not conclusions. Always name at least one way an analogy breaks. Use "this resembles" and "structural resonance," never "this proves" or "this is X happening again." If you need hidden actors to make the argument work, the argument is broken.
+
+**Bounded-analogy convention (the signature form, operationalized).** The toxin line tells you what to *avoid*; the bounded-analogy convention tells you what to *write*. Every full historical or cross-domain parallel in the script follows a three-move structure:
+
+1. **Setup the pattern confidently** — describe the structural mechanism with the same authorial confidence you'd use for an established fact. Don't pre-hedge; the hedge belongs in move 2, not draped over move 1. ("Venice's Murano glass monopoly worked the same way: an island of irreplaceable expertise, geographic concentration as a deliberate state strategy, and a handful of hyper-specialized artisans the rest of the world couldn't replicate.")
+2. **Name where it breaks — in one sharp clause** — the limit clause is the heart of the form. It should be specific, concrete, and short. Not "of course the situations are different" (that's vague). Not three paragraphs of qualifications (that's fear). One sharp clause. ("The parallel breaks at scale: Murano employed maybe a thousand glassblowers; TSMC employs sixty thousand engineers, and replacing them is closer to replacing a small city than a guild.")
+3. **Return to the argument** — don't dwell in the limit. Use it as a pivot to deepen the analysis. ("But the geographic-concentration logic still holds — and it explains why both states made the same mistake about how stable the monopoly really was.")
+
+Don't kill a strong analogy because it has a flaw. Don't pretend the flaw doesn't exist. Name it in one clause and let the analogy do its remaining work.
+
+The bounded clause is **non-optional** — every full parallel must have one. But it should not feel like a tax. Done well, it's the most cognitively satisfying moment in the analogy: the writer demonstrates they've thought about where the reasoning fails, which earns the trust to assert what the reasoning still establishes.
+
+**Herzog's ecstatic truth license.** Vivid metaphor and evocative imagery are *allowed and encouraged* when they serve emotional clarity, not when they strain literal accuracy. A "stormy sea" shot for "technological anxiety" earns its keep emotionally; a fabricated quote attributed to a real person doesn't. When choosing between a verified-but-flat phrasing and a vivid-but-slightly-loose one that doesn't strain literal accuracy, pick the vivid one. The Curtis-style juxtaposition that makes an argument felt as much as stated is a frontstage move; backstage rigor is what entitles the script to use it. Don't squander the license by substituting literal description out of misplaced caution.
+
+What this looks like in narration:
+- ✓ "China could launch astronauts but couldn't make a pen tip — a vulnerability the Chinese have a phrase for: 卡脖子, the throat-grip." (Vivid, precise, the metaphor does work.)
+- ✓ "Export controls were the wall. The wall held. Behind it, a workshop." (Compressed Curtis-style metaphor; carries emotional weight.)
+- ✗ "Export controls created what one might describe as a structural barrier, though of course the metaphor of a 'wall' simplifies a complex policy reality…" (Literal, hedged, dead.)
+
+The principle: **backstage rigor protects the frontstage license; without the rigor, the license is unearned.**
 
 **Claim verification tags.** Tag every factual claim:
 - `{✅}` — confirmed in the research brief's verification table
@@ -344,6 +380,10 @@ Run through this checklist before handing the script to Tiger:
 - [ ] Bilateral balance — each side's internal logic shown on its own terms
 - [ ] Closes on personal stakes, not epistemological observation
 - [ ] Toxin line clean — "resembles" not "proves," analogies have named breakdowns
+- [ ] **Bounded-analogy form on every full parallel** — three moves present (setup confidently → name break in one sharp clause → return to argument). Limit clause is concrete and short (one sentence, not a paragraph of qualifications)
+- [ ] **No frontstage rigor leakage** — no "verified as of [date]," no "according to my research," no "I confirmed this with…" anywhere in narration. Verification language belongs in the brief, never in voiceover (script-audit Lens 10 will flag if present)
+- [ ] **No layered hedging** — at most one hedge per claim, in the place where it does real work. "Some scholars might possibly argue, with qualifications, that…" is fear, not rigor
+- [ ] **Herzog license used, not squandered** — vivid metaphor preferred over literal description when both are available and the metaphor doesn't strain literal accuracy
 - [ ] All claims tagged ({✅}, {⚠️}, {NEW}) — single braces only, not double ({{✅} is a common typo)
 - [ ] Passes radio edit test (argument clear as audio-only)
 - [ ] Cold open completes all four beats: schema activation → violation → narrowing → solvability promise

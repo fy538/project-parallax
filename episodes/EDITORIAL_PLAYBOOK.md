@@ -9,7 +9,29 @@
 > **Who writes this:** publish-retro (appends evidence-backed rules after analytics validate them) and Tiger (approves candidate rules flagged by review-package, adds manual edits after rewrite sessions). review-package reads the playbook and flags candidate rules by appending to the **Pending Rules** section below — it does not write directly to the domain sections. Nothing moves from Pending to a domain section without Tiger's approval.
 >
 > Created: April 27, 2026
-> Last updated: 2026-05-06
+> Last updated: 2026-05-09
+
+---
+
+## Core Doctrine: Backstage Maximum, Frontstage Confident
+
+> Read this before any specific rule. Every numbered rule below serves this doctrine; if a numbered rule and this doctrine ever conflict, the doctrine wins and the rule is wrong.
+
+Parallax operates on a single editorial doctrine: **backstage rigor is maximum, frontstage voice is confident.** Every quote, date, number, and named source is human-verified before it leaves research-audit — that work is paid in Tiger's time, not the viewer's experience. Every line of narration is then written with the confidence that the verification has already happened. "This suggests" — not "some scholars have argued that this might possibly suggest." Hedging language, "verified as of [date]" disclaimers in the voiceover, and false-consensus framing of contested claims are *frontstage failures* — they belong in the research memo, not the script.
+
+The doctrine resolves a tension that wrecks credibility-driven channels. Maximum rigor that bleeds into the script reads as flat or evasive. Confident voice that skips backstage work reads as Jiang Xueqin — viral until the first serious critic shows up. Parallax does both: backstage discipline earns the frontstage license to be vivid.
+
+**Bounded analogy is the wedge, not a tax.** *"This analogy is useful here, misleading there, dangerous if overextended"* is the form Parallax owns. Naming the imperfection in one sharp clause is more interesting than killing the analogy or pretending it's perfect — and it's the discipline that differentiates Parallax from civilizational-prophecy channels on one side and pure briefing channels on the other. The form is structural: setup the pattern confidently, name where it breaks in one sharp clause, return to the argument. Don't kill a strong analogy because it has a flaw; name the flaw and move on.
+
+**Herzog's "ecstatic truth" license.** Vivid metaphor and evocative imagery are allowed — encouraged — when they serve emotional clarity, not when they strain literal accuracy. The stormy-sea shot for "technological anxiety" is fine; a fabricated quote attributed to Schelling is not. Backstage rigor protects the frontstage license; without the rigor, the license is unearned.
+
+**Operational ownership across the pipeline:**
+- **research-audit** owns backstage rigor — five lenses (Citation Existence / Source Support / Quote-Date-Number / Disagreement / Freshness), three tiers (MVP / Standard / Flagship). MVP runs on every episode.
+- **script-draft** owns the bounded-analogy convention and the ecstatic-truth license. Confident frontstage voice; setup-break-return analogies; no narration of the verification process.
+- **script-audit** owns frontstage voice — flag over-hedging, false-consensus framing, and any line that talks about how the claim was verified.
+- **persona-eval** owns the audience-side test: did confidence land as authority or arrogance, did the bounded clause read as honesty or evasion.
+
+Source: May 9, 2026 doctrine session, derived from §17 (Verification Architecture), §15 (White Space), §13 (Documentary Techniques) in `project/RESEARCH_LOG.md`.
 
 ---
 
@@ -422,3 +444,4 @@ RETIRED:    Contradicted by new evidence. Kept in the doc (struck through)
 | May 4, 2026 | Updated VIS-09 to reflect the unified constructivist aesthetic: Registers 2 and 3 now share the same Rodchenko/Heartfield/Masereel visual vocabulary, differing only in role (background vs. foreground figurative). Replaces the prior split (atmospheric=constructivist illustration, grounding=photoreal mannequin). Hard cuts now valid within the constructivist registers since they share aesthetic. Aesthetic validated on intimate-domestic test case. | May 4 register migration (mannequin→constructivist) |
 | May 4, 2026 | Added VIS-11: illustration style constant, palette and composition adapt per cultural context. Captures the architectural insight from the May 4 SV re-test — brand identity lives in illustration style + palette range, cultural specificity in palette/compositional emphasis per scene. Closes the architectural validation loop: Soviet, American, and (pending SMIC re-test) Chinese cultural inflections all confirmed within the same constructivist DNA. | May 4 SV re-test, palette/compositional emphasis architecture |
 | May 4, 2026 | Calibration: VIS-01 budget targets shifted to reflect post-AI-GEN-migration displacement. FOOTAGE drops 30-40% → 15-25% (archival-weighted, reserved for named figures/real events/software UIs). AI-GEN/ILLUST jumps 5-15% each → 15-30% combined. Generic stock displaced by constructivist illustration. Three-content-type mental model codified in VISUAL_LANGUAGE.md. | May 4 post-migration calibration |
+| May 9, 2026 | Added **Core Doctrine: Backstage Maximum, Frontstage Confident** as a meta-section above the numbered domain sections. Codifies the rigor / interestingness tradeoff: maximum verification effort backstage; confident, vivid, bounded-analogy voice frontstage. Names operational ownership across research-audit, script-draft, script-audit, persona-eval. Doctrine derived from §17 (Verification Architecture), §15 (White Space), §13 (Documentary Techniques). Companion edits to PROJECT_VISION.md, CLAUDE.md, research-audit, script-audit, script-draft. | May 9 doctrine session, RESEARCH_LOG.md §§13-17 |

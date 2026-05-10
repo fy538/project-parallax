@@ -2,7 +2,7 @@
 
 > **For build/test/lint commands and dev conventions, read [AGENTS.md](./AGENTS.md) first.** This file is the project context (what Parallax is, what's queued, voice anchors).
 >
-> Last updated: May 5, 2026
+> Last updated: May 9, 2026
 
 ## What this is
 
@@ -30,10 +30,18 @@
 
 ## Content philosophy
 
+> **Elevator pitch:** *Not a news explainer, not a doom oracle, not an academic lecture — a rigorously argued analogy essay with philosophical guardrails.*
+
 "Educated mysticism" — structural patterns across civilizations presented as heuristic lenses, not predictions. Three pillars: historical analogy, philosophical frameworks, contemporary geopolitics. Tone: intellectually rigorous but narratively engaging — "smart friend explaining something fascinating over drinks."
 
 - **Always:** "structural resonance," "echoes," "this suggests," explicit uncertainty
 - **Never:** "this proves," conspiracy framing, declarative predictions, false confidence
+
+**Signature form: bounded analogy.** *"This analogy is useful here, misleading there, dangerous if overextended."* Setup the structural pattern confidently → name where it breaks in one sharp clause → return to the argument. This is the form that differentiates Parallax from civilizational-prophecy channels (Whatifalthist/Zeihan/Jiang) and pure briefing channels (CaspianReport/TLDR). Don't kill a strong analogy because it has a flaw; name the flaw and move on. See `project/PROJECT_VISION.md` → "Bounded Analogy: The Signature Form."
+
+**Editorial doctrine: backstage maximum, frontstage confident.** Verify every quote/date/number/named source backstage; write narration with the confidence that verification has happened. Hedging language and "verified as of" disclaimers belong in the research memo, not the voiceover. Maximum rigor that bleeds into the script reads as flat or evasive; confident voice that skips backstage work reads as Jiang Xueqin. Parallax does both. See [`episodes/EDITORIAL_PLAYBOOK.md`](./episodes/EDITORIAL_PLAYBOOK.md) → Core Doctrine.
+
+**Title rule:** Titles answer *"what structure am I revealing?"*, not *"what topic am I covering?"*. Whatever the present event, the title promises a structure (brittle empires, succession traps, legitimacy crises, imperial overstretch).
 
 ## Repo map
 

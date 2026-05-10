@@ -5,9 +5,11 @@ The production script format for Parallax episodes. Every script serves two audi
 
 Created: April 26, 2026
 Updated: May 4, 2026
+Updated: May 9, 2026 — Added `[SCENE:]` block notation for multi-frame chained scenes (per the May 9 prisoners-dilemma Scene C bakeoff). Sustained atmospheric stretches now have first-class encoding in the script. Updated consecutive-`[AI-GEN:]` pacing rule to exempt frames within a `[SCENE:]` block. Updated Philosopher's Lens override to reflect ChatGPT → Pika 2.5 as the validated chained pipeline (see `CHAINED_STILL_LESSONS.md`).
 
 **Related docs:**
-- **VISUAL_LANGUAGE.md** — *when* to use footage vs. motion graphics vs. both. Read that first for the editorial logic.
+- **VISUAL_LANGUAGE.md** — *when* to use footage vs. motion graphics vs. both. Read that first for the editorial logic. Includes the 60-second sustained-atmospheric-stretch guideline that governs when a `[SCENE:]` block is editorially appropriate.
+- **CHAINED_STILL_LESSONS.md** — production technique for `[SCENE:]` blocks. Empirical findings from the May 9 prisoners-dilemma Scene C bakeoff. The DO/DON'T rules for prompting still chains and morph clips live there.
 - **DIRECTING_LANGUAGE.md** — *how* to direct camera, reveals, timing, transitions, and mood via `DIR:` annotations. The complete syntax reference.
 - **PACING_SYSTEM.md** — proportional camera paths, Whisper sync loop, and `PACE:` visual density annotations. The timing coordination spec.
 - **FOOTAGE_SOURCING.md** — *where* to get footage, organized by visual need. Consult when specifying stock footage.
@@ -162,6 +164,8 @@ Tag each entry to make the mode explicit — downstream tools (visual-spec, asse
 - **`[AI-GEN:]`** — AI-generated grounded scene (Register 3: Grounding). Constructivist figurative illustration with planar-faceted figures (4-5 color-blocked face planes, eyes obscured, no rendered features) drawing on Rodchenko's 1924 portrait series and Lissitzky's Self-Portrait. Used for physically real but unsourceable spaces (restricted facilities, historical reconstructions, conceptual scenes made literal). Reference frames generated via `tools/recraft/recraft.py --register grounding --realism balanced --text-treatment <tradition>`; animated clips via Kling 3.0 / Sora 2 from reference frames at `realism: flat` (animation-flat rule per VIS-09); all assets passed through `treat_video.py` brand treatment. Never for named individuals or claimed specific events. See AI_VIDEO_PIPELINE.md for full spec.
 - **`[ILLUST:]`** — AI-generated atmospheric backdrop (Register 2: Atmospheric). Same constructivist illustration vocabulary as `[AI-GEN:]` but used as background mood at 30-40% opacity behind narration, rather than as foreground figurative scene. Carries civilizational weight, industrial dread, conceptual scale. Generated via Recraft V3 API (`tools/recraft/recraft.py --register atmospheric`), output as SVG/PNG, passed through duotone brand treatment (`--treat standard|conflict|editorial` per VIS-10 pairing rules). NOT data-carrying — use `[MG:]` for anything the viewer needs to *read*. Combined with `[AI-GEN:]` they share constructivist visual language; differ only in editorial role (background mood vs. foreground scene). See VISUAL_LANGUAGE.md "Three Visual Registers" and "Three Content Types" sections.
 
+- **`[SCENE:]`** — multi-frame chained scene. A sustained atmospheric or grounding stretch encoded as one editorial unit rather than as N consecutive `[AI-GEN:]` or `[ILLUST:]` cells. Comprises 3-5 stills generated as a chain (ChatGPT with multi-anchor reference uploads) plus 2-4 morph clips between adjacent stills (Pika 2.5 start+end-frame), totaling ~20-50 seconds of continuous-feeling video. Read by the viewer as a single shot, not as a sequence of cuts. Used when the editorial goal is sustained atmospheric/grounding time and the 60-second guideline guardrails (continuous narration, visual change every 15-20s, ends on analytical re-engagement) all hold. See VISUAL_LANGUAGE.md → "Sustained Atmospheric Stretches" for when, and the **Multi-Frame Scene Blocks** section below for the script syntax. Production discipline lives in CHAINED_STILL_LESSONS.md.
+
 - **`[FORECAST:]`** — on-screen probability gauge. The episode's formal prediction beat. Used in the
   Scenario + Prediction Beat when stating a falsifiable, time-bounded prediction. Renders via the
   `ProbabilityGauge` Remotion template. Always classified as P1. Requires the full 6-layer schema
@@ -212,11 +216,12 @@ When a visual column entry has no mode tag, the pipeline infers it from context:
 
 These come from VISUAL_LANGUAGE.md and should be checked by script-audit:
 
-- No more than **3 consecutive `[MG:]`** entries without a `[FOOTAGE:]`, `[ILLUST:]`, or `[AI-GEN:]` break.
+- No more than **3 consecutive `[MG:]`** entries without a `[FOOTAGE:]`, `[ILLUST:]`, `[AI-GEN:]`, or `[SCENE:]` break.
 - No more than **30 seconds** of continuous `[FOOTAGE:]` without a visual change (new shot, overlay, or cut to MG).
-- No more than **2 consecutive `[AI-GEN:]`** clips without a mode switch. AI-GEN inherits footage's pacing role but its stylized quality fatigues faster.
+- No more than **2 consecutive `[AI-GEN:]` single-shot** clips without a mode switch. AI-GEN inherits footage's pacing role but its stylized quality fatigues faster. **A `[SCENE:]` block counts as ONE atmospheric unit, not N successive `[AI-GEN:]` clips** — the chained morph reads to the viewer as a single continuous shot, not multiple cuts. So a `[SCENE:]` block followed by another `[SCENE:]` or `[AI-GEN:]` would be two consecutive atmospheric units; that's the bound.
+- No more than **3 `[SCENE:]` blocks per episode**, and no more than **1 per beat**. Sustained atmospheric stretches are spice, not a main course; budgeting them protects the analytical register that defines the channel. See VISUAL_LANGUAGE.md → "Sustained Atmospheric Stretches" for the editorial reasoning.
 
-**Philosopher's Lens format override:** These episodes use a footage-free production path — three asset types only (`[MG:]` + `[AI-GEN:]` + `[ARCHIVAL:]`). `[FOOTAGE:]` tags are not used. `[AI-GEN:]` entries use the Recraft→Pika 2.2 image-to-video pipeline (constructivist reference frame → animated clip) for both atmospheric and scene roles. The max-3 `[MG:]` rule still applies; `[AI-GEN:]` or `[ARCHIVAL:]` count as breaks. See VISUAL_LANGUAGE.md → "Format-Specific Visual Rules" for full pipeline details.
+**Philosopher's Lens format override:** These episodes use a footage-free production path — three asset types only (`[MG:]` + `[AI-GEN:]` / `[SCENE:]` + `[ARCHIVAL:]`). `[FOOTAGE:]` tags are not used. The validated pipeline as of May 9, 2026 is **ChatGPT image generation** (with 4-anchor reference uploads + sequential generation + morph-aware prompting discipline) **→ Pika 2.5** (start+end-frame mode, 8s clips, stability-verb motion prompts). `[SCENE:]` blocks are the natural home for sustained atmospheric stretches in this format; single-shot `[AI-GEN:]` remains valid for 5-8s atmospheric punctuation. The max-3 `[MG:]` rule still applies; `[AI-GEN:]`, `[SCENE:]`, or `[ARCHIVAL:]` count as breaks. See VISUAL_LANGUAGE.md → "Format-Specific Visual Rules" and CHAINED_STILL_LESSONS.md for full pipeline details.
 - No more than **2 consecutive `[ILLUST:]`** entries without a mode switch. Atmospheric register creates mood but fatigues if sustained.
 - Each beat should roughly follow: footage (establish) → MG (analyze) → footage (breathe) → MG or layered (climax) → footage (land). AI-GEN and ILLUST slot in wherever footage would go — AI-GEN for physical spaces, ILLUST for emotional/conceptual texture.
 - `[LAYERED:]` entries should be brief (3-8 seconds) with simple overlays — complex charts need the viewer's full attention and belong in `[MG:]`.
@@ -257,6 +262,162 @@ Three profiles are available:
 - `PACE: breathing` pairs naturally with `DIR: hold()` and `DIR: mood(dense)` — slow pacing + held visuals + atmospheric mood creates the "let it sink in" effect.
 - `PACE: urgent` pairs with quick cuts and minimal direction — the speed itself is the editorial signal.
 - PACE affects the assembly manifest's duration estimates. In Whisper mode (post-recording), actual narration timing takes precedence but PACE still scales visual holds.
+
+---
+
+## Multi-Frame Scene Blocks (`[SCENE:]`)
+
+Added May 9, 2026, after the prisoners-dilemma Scene C bakeoff validated the chained-still-morph workflow.
+
+### What a `[SCENE:]` block is
+
+A sustained atmospheric or grounding stretch — typically 20-50 seconds — encoded as a single editorial unit composed of 3-5 stills morphed together pair-by-pair into ~24-40 seconds of continuous-feeling video. Unlike a sequence of standalone `[AI-GEN:]` cells (which read to the viewer as cuts between distinct images), a `[SCENE:]` block reads as one continuous shot in which the world transforms while the camera holds.
+
+A scene block is the right unit when:
+
+- The narration over the stretch is paced for atmosphere or storytelling, not data-dense argument
+- The visual goal is the viewer *inhabiting* a place (Curtis-style sustained breath) rather than receiving a series of distinct illustrations
+- The scene has a clear arc — linear progression, resolved tension, environmental morph — that benefits from continuous interpolation rather than a cut sequence
+- The 60-second-stretch guardrails from VISUAL_LANGUAGE.md hold
+
+A scene block is the WRONG unit when:
+
+- The atmospheric beat is 5-8 seconds — use a single-shot `[AI-GEN:]` instead, much cheaper and faster
+- The arc requires figure motion (figures walking, gesturing) — single-shot I2V handles motion better than chain-morphs
+- The narration is analytical-data-dense
+
+### Block syntax in the visual column
+
+A scene block is denoted by a `[SCENE: scene-id]` tag in the visual column, with the full frame and morph specification stored in a sibling markdown file referenced by the tag. This keeps the script readable while encoding the scene's full production detail.
+
+```
+| NARRATION | VISUAL PRODUCTION |
+|-----------|-------------------|
+| *(Long narration paragraph that runs over the scene)* | **P1** · [SCENE: rand-establish] · 4 frames over 32s · register=grounding · arc=linear · See: scenes/rand-establish.md |
+|                                                       | EMOTIONAL: dread → recognition → resignation |
+|                                                       | CAMERA: eye-level, fixed throughout |
+|                                                       | DIR: cut(color-wash, ink) |
+```
+
+The four required metadata lines:
+
+1. **`[SCENE: scene-id]`** — slug-style identifier. Becomes the filename of the scene spec (`scenes/<scene-id>.md`) and the prefix for generated still and clip files (`aigen-<scene-id>-frame-A.png`, etc.).
+2. **`N frames over Ns`** — frame count and total scene duration. Frame count typically 3-5; duration typically 20-50s. The morph durations sum to scene duration (e.g., 4 frames × 8s morphs = 24s).
+3. **`register=grounding|atmospheric`** — which visual register the scene operates in. Grounding for figurative scenes (people in environments), atmospheric for backdrop-style metaphor scenes.
+4. **`arc=linear|resolved|pivoted|tonal`** — the camera/world arc shape. Linear: world progressively transforms in one direction (Scene C bakeoff was this). Resolved: scene goes somewhere and lands (e.g., stag-hunt → cooperative outcome). Pivoted: camera changes direction mid-scene (requires a clean pivot frame). Tonal: setting changes, camera role similar (e.g., terraces → alpine → ocean).
+
+Plus three optional metadata lines:
+
+- **`EMOTIONAL: <beat → beat → beat>`** — the Pixar-style emotional beat outline (per the field-report-recommended convention). Solves the question "is this middle frame doing real work or is it just an interpolation?" Each frame should hit one emotional beat.
+- **`CAMERA: <scene-level camera spec>`** — the static-camera or camera-arc spec that holds across all frames in the scene. Frame-level `cam()` direction inside the scene spec file should not contradict this scene-level spec.
+- **`DIR: <direction lines>`** — scene-level direction that applies to scene boundaries (entry transition, exit transition, scene-level mood). Frame-level direction lives in the scene spec file.
+
+### The scene spec file
+
+Each `[SCENE:]` block in the script points to a sibling markdown file at `episodes/<episode-slug>/scenes/<scene-id>.md`. The scene spec file carries the per-frame compositional specs and per-morph motion prompts. This is analogous to how `[MG:]` cells point to JSON data files for Remotion templates.
+
+The scene spec file template (extends the bakeoff format from `episodes/prisoners-dilemma/bakeoff/scene-c-prompts.md`):
+
+```markdown
+# Scene: <scene-id>
+
+> One-paragraph editorial intent. What this scene contributes to the episode's argument.
+>
+> Block: 4 frames over 32s · register=grounding · arc=linear · emotional arc: <beat → beat → beat>
+
+## Camera & continuity
+
+- Camera position: <eye-level, fixed | aerial, fixed | etc.>
+- Lighting direction: <upper-left amber wash | overhead directional | etc.>
+- Palette pinned: <ink #1C1814 / amber #E5A544 / bone #F0E6D0 | etc.>
+- Style anchor: 4 episode reference images (the same set used for the episode's other AI-gen)
+
+## Continuation message (paste once at start of ChatGPT scene conversation)
+
+> [Standard continuation message per CHAINED_STILL_LESSONS.md, customized for this scene]
+
+## Frame A — <one-line description>
+**Upload:** None additional (4 episode style refs already loaded).
+[Alan Moore-style paragraph spec]
+
+## Frame B — <one-line description>
+**Upload:** Frame A.
+[paragraph spec]
+
+[... etc through Frame N]
+
+## Morph A → B
+- Tool: Pika 2.5 (start+end frame, 1080p)
+- Duration: 8s
+- Motion prompt: [stability-verb motion prompt]
+- Negative prompt: [standard negative including smoke/dust/particles]
+
+[... etc through morph N-1 → N]
+
+## NLE assembly notes
+- Hard cuts between morph clips
+- Color-grade snap to canonical palette
+- Scene-entry transition: <iris | color-wash | dissolve> per script's DIR: cut()
+- Scene-exit transition: <...>
+```
+
+A canonical worked example lives at `episodes/prisoners-dilemma/bakeoff/scene-c-prompts.md` (the validation bakeoff). New scene specs should follow that template.
+
+### How `[SCENE:]` flows downstream
+
+```
+Script ([SCENE: scene-id] tag + 4 metadata lines)
+     ↓ visual-spec parses
+Generation brief: opens scene spec file, validates frame count + arc + emotional beats
+     ↓ also feeds
+ChatGPT image generation (sequential per frame, multi-anchor uploads)
+     ↓
+Pika 2.5 morph clips (per pair, with motion prompts from scene spec)
+     ↓
+NLE assembly: hard-cut chain inside scene; color-grade snap; treat_video.py LUT/grain/vignette
+     ↓
+Assembly manifest: scene block represented as ONE composite atmospheric unit with subtype "scene-chain"
+```
+
+The assembly manifest schema gains a new clip subtype:
+
+```json
+{
+  "type": "ai-gen-scene",
+  "scene_id": "rand-establish",
+  "register": "grounding",
+  "arc": "linear",
+  "frames": ["aigen-rand-establish-A.png", "aigen-rand-establish-B.png", ...],
+  "morph_clips": ["aigen-rand-establish-morph-AB.mp4", ...],
+  "duration": 32.0,
+  "treatment": "standard"
+}
+```
+
+### Pacing rules specific to scene blocks
+
+- **Max 3 `[SCENE:]` blocks per episode.** Sustained atmospheric stretches are spice, not a main course.
+- **Max 1 `[SCENE:]` block per beat.** Two scene blocks in one beat means the analytical channel is off too long for the beat's argument to land.
+- **A `[SCENE:]` block counts as 1 atmospheric unit** for the purpose of the consecutive-AI-GEN rule, not N successive AI-GEN clips.
+- **Scene block durations** typically fall in the 20-50s band. Below 20s, use a single `[AI-GEN:]` clip instead — the production overhead of the chain isn't justified at short durations. Above 50s, the 60s pacing guideline starts to apply (see VISUAL_LANGUAGE.md), and you should verify all three guardrails before committing.
+
+### Script-audit checks for `[SCENE:]` blocks
+
+The script-audit skill should verify, for every `[SCENE:]` block:
+
+- The four required metadata lines are present (frames-over-duration, register, arc, scene-id with file pointer)
+- The scene spec file at `scenes/<scene-id>.md` exists and is well-formed
+- Frame count is 3-5
+- Total duration is 20-50s
+- The arc value is one of `linear | resolved | pivoted | tonal`
+- The emotional-beat outline (if present) has one beat per frame
+- The camera spec is consistent with the per-frame specs in the scene file
+- No more than 3 scene blocks in the episode total
+- No more than 1 scene block per beat
+- The narration over the scene block isn't analytical-data-dense (use of `{✅}`/`{⚠️}`/`{NEW}` claim tags is a signal — many tags inside one scene block is a warning)
+- Scene-block boundaries have explicit `DIR: cut()` for entry and exit transitions
+
+---
 
 ### Register transition grammar
 
@@ -578,12 +739,14 @@ After all beats, include a consolidated summary. Start with a visual mode breakd
 | [MG:] | 14 | ~5:30 | ~42% | Analytical |
 | [FOOTAGE:] | 12 | ~4:00 | ~31% | — (real world) |
 | [ILLUST:] | 4 | ~1:15 | ~10% | Atmospheric |
-| [AI-GEN:] | 3 | ~1:00 | ~8% | Grounding |
+| [AI-GEN:] (single-shot) | 3 | ~1:00 | ~8% | Grounding |
+| [SCENE:] (chained) | 1 | ~0:32 | ~4% | Grounding/Atmospheric |
 | [LAYERED:] | 3 | ~0:40 | ~5% | Mixed |
 | TRANSITION | 5 | ~0:35 | ~4% | — |
 
-Target ranges: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN 5-15%, LAYERED 5-10%, TRANSITION 3-7%.
-The three registers (Analytical/Atmospheric/Grounding) should all be present in most episodes. If any register is completely absent, the visual texture flattens. Footage is register-neutral — it provides real-world grounding but isn't part of the three-register system.
+Target ranges: MG 40-55%, FOOTAGE 25-40%, ILLUST 5-15%, AI-GEN single-shot 5-15%, SCENE 0-10% (max 3 blocks per episode), LAYERED 5-10%, TRANSITION 3-7%. Combined `[AI-GEN:]` + `[SCENE:]` + `[ILLUST:]` should hit 15-30% of runtime per the post-May 4 displacement target.
+
+The three registers (Analytical/Atmospheric/Grounding) should all be present in most episodes. If any register is completely absent, the visual texture flattens. Footage is register-neutral — it provides real-world grounding but isn't part of the three-register system. `[SCENE:]` blocks may sit in either Grounding or Atmospheric register depending on the scene's `register=` metadata.
 
 ### Remotion Compositions (generate via visual-spec)
 | # | Template | Description | Data file | Mode |

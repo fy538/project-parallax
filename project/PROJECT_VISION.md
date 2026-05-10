@@ -17,6 +17,8 @@ The content leverages agentic AI workflows for research, scripting, and visual p
 
 ## Content Philosophy: "Educated Mysticism"
 
+> **Elevator pitch:** *Not a news explainer, not a doom oracle, not an academic lecture — a rigorously argued analogy essay with philosophical guardrails.* This is the line that places Parallax against the actual market structure (CaspianReport on one side, Whatifalthist/Zeihan on the other) rather than against a fantasy competitor set. Source: May 2026 white-space audit, [`project/RESEARCH_LOG.md`](RESEARCH_LOG.md) §15.
+
 The content occupies a specific niche between academic rigor and narrative intrigue. It is NOT academic lecture, NOT pop history entertainment, and NOT conspiracy content. It lives in the space between.
 
 ### The Three-Tier Epistemological Structure
@@ -55,6 +57,25 @@ The content occupies a specific niche between academic rigor and narrative intri
 ### The Overclaiming Guardrail
 
 The audience demand Parallax rides — making a chaotic world feel legible — *pulls toward* overclaiming. Viewers who love you for providing coherence will also be the ones most disappointed when you say "I don't know." The temptation is always to provide more structure than the evidence supports. Resist this. The world is genuinely chaotic; frameworks that make it feel fully legible are lying. Educated mysticism means providing *partial* coherence — patterns that illuminate without pretending to explain everything. The honesty about limits is itself a differentiator in this market.
+
+### Bounded Analogy: The Signature Form
+
+Parallax's signature analytical move is **bounded analogy** — *"this analogy is useful here, misleading there, dangerous if overextended."* It is the specific form that differentiates the channel from civilizational-prophecy channels (Whatifalthist, Zeihan, Jiang Xueqin) on one side and pure briefing channels (CaspianReport, TLDR News) on the other. Setup the structural pattern confidently, name where it breaks in one sharp clause, return to the argument. Do not kill a strong analogy because it has a flaw; name the flaw and move on.
+
+Bounded analogy is not a tax we pay for being honest — it is the form. It generates script structure for free (setup → payoff → limit → implication), and it is what makes the analysis *more* interesting, not less. Jiang Xueqin's analogies don't break anywhere; the moment a viewer notices that, the trust evaporates retroactively across the entire catalog. Bounded analogy is the discipline that prevents that failure mode while keeping the cognitive payoff that drove his rapid ascent.
+
+### The Backstage / Frontstage Doctrine
+
+The single most important rule for managing the rigor / interestingness tradeoff:
+
+- **Backstage rigor is maximum.** Every quote, date, number, and named source is verified before it leaves research-audit. The five-lens audit (Citation Existence / Source Support / Quote-Date-Number / Disagreement / Freshness) runs on every episode at MVP tier. This work is paid in Tiger's time, not the viewer's experience.
+- **Frontstage voice is confident.** Narration is written with the confidence that the verification has already happened. "This suggests" — not "some scholars have argued that this might possibly suggest." Disclaimers, "verified as of" caveats, and false-consensus framing of contested claims are *frontstage failures*. They belong in the research memo, not the voiceover.
+
+Maximum rigor that bleeds into the script reads as flat or evasive. Confident voice that skips backstage work reads as Jiang Xueqin. Parallax does both: backstage discipline earns the frontstage license to be vivid. This doctrine is the operational form of "educated mysticism" — the *educated* part lives backstage, the *mysticism* lives frontstage.
+
+Companion principle: **Herzog's "ecstatic truth" license.** Vivid metaphor and evocative imagery are allowed when they serve emotional clarity, not when they strain literal accuracy. The stormy-sea shot for "technological anxiety" is fine; a fabricated quote attributed to Schelling is not. The license is earned by the rigor.
+
+See [`episodes/EDITORIAL_PLAYBOOK.md`](../episodes/EDITORIAL_PLAYBOOK.md) Core Doctrine section for operational ownership across pipeline stages.
 
 ---
 
@@ -143,7 +164,12 @@ Real-time analysis of breaking events through the dual lens of historical patter
 ## Competitive Positioning
 
 ### One-Line Positioning Statement
-**Parallax** — the channel that teaches you HOW to think about geopolitics — not WHAT to think — by viewing every event from multiple analytical positions. CaspianReport gives you the answer. Zeihan gives you one model. Spaniel gives you game theory. Parallax gives you the toolkit to evaluate all of them.
+
+**Primary (elevator pitch):** *Not a news explainer, not a doom oracle, not an academic lecture — a rigorously argued analogy essay with philosophical guardrails.*
+
+**Long form (intra-channel comparison):** Parallax — the channel that teaches you HOW to think about geopolitics — not WHAT to think — by viewing every event from multiple analytical positions. CaspianReport gives you the answer. Zeihan gives you one model. Spaniel gives you game theory. Parallax gives you the toolkit to evaluate all of them.
+
+**One-sentence audience promise:** *Title rule — answer "what structure am I revealing?", not "what topic am I covering?"* Whatever the present event, the title and thumbnail should promise a structure: brittle empires, succession traps, frontier dynamics, legitimacy crises, imperial overstretch, strategic chokepoints, administrative sclerosis. Source: May 2026 white-space audit, RESEARCH_LOG §15.
 
 ### Inspiration & Cautionary Case: Professor Jiang Xueqin ("Predictive History")
 - 2M+ subscribers, exploded from viral 2024 "Iran Trap" prediction; Tucker Carlson interview (March 2026) drove 8M+ combined views
@@ -210,6 +236,8 @@ Extracted from Tiger's communication style in project conversations, refined wit
 This means: open with contradictions and stakes, not context. Introduce frameworks by applying them first and naming them after. Treat the audience as smart people who haven't had time to connect the dots, not as people who need background explained.
 
 **Tone target for content:** Think "smart friend showing you something wild they figured out" — not "professor lecturing" and not "news anchor reporting." The audience should feel like they're discovering something *with* you, not being talked at. The energy is closer to "you're not gonna believe what I found" than "let me walk you through this."
+
+**Confidence calibration (the backstage / frontstage doctrine in voice form):** The "Always use" / "Never use" rules above describe *forms* — not levels of timidity. "This suggests" and "structural resonance" are tools for the bounded-analogy form, not blanket hedging. Confident voice can — and should — use them. The failure mode to avoid is *layered* hedging ("some scholars have argued, with appropriate qualifications, that this *might* possibly suggest…") which collapses the form into evasion. One hedge per claim, in the right place, is the form. Three is fear. The rule for choosing: would a smart advocate for the claim recognize this as *their* phrasing of it, or would they cringe? If they'd cringe, you've over-hedged. See EDITORIAL_PLAYBOOK Core Doctrine and NAR-14 (hedged analysis ≠ neutral analysis).
 
 **Guardrail:** The decoder posture must never tip into conspiracy framing. The line is clear: decode *structures and incentives*, never *hidden agents*. "The system produces this outcome because of these incentive structures" — not "these people are secretly coordinating." See JIANG_NARRATIVE_RESEARCH.md toxin-vs-technique table and NAR-13 in EDITORIAL_PLAYBOOK.md.
 
