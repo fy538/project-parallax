@@ -152,8 +152,8 @@ The goal: text should have **clear visual hierarchy at a glance** — the viewer
 ### Rules
 
 **T1: Three-tier type hierarchy per screen.** Each composition uses exactly three text sizes:
-- **Primary** (the thing you read first): 48-64px, weight 700, Space Grotesk
-- **Secondary** (supporting context): 22-28px, weight 400-500, Space Grotesk
+- **Primary** (the thing you read first): 48-64px, weight 600-700, IBM Plex Sans
+- **Secondary** (supporting context): 22-28px, weight 400-500, IBM Plex Sans
 - **Tertiary** (labels, sources, captions): 14-18px, weight 400, IBM Plex Mono or JetBrains Mono for data
 
 No screen should have more than 3 tiers. If it needs 4, the design is too dense — split it.

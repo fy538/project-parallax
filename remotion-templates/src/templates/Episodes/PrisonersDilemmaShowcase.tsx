@@ -78,7 +78,7 @@ const ArchivalPlaceholder: React.FC<{ label: string }> = ({ label }) => (
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      fontFamily: "Space Grotesk, sans-serif",
+      fontFamily: '"IBM Plex Sans", Inter, Arial, sans-serif',
     }}
   >
     <div style={{ color: "#E5A544", fontSize: 48, marginBottom: 16 }}>🖼️</div>
@@ -100,7 +100,7 @@ const ChoroplethMapPlaceholder: React.FC<{ data: any }> = ({ data }) => (
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
-      fontFamily: "Space Grotesk, sans-serif",
+      fontFamily: '"IBM Plex Sans", Inter, Arial, sans-serif',
     }}
   >
     <div style={{ color: "#E5A544", fontSize: 48, marginBottom: 16 }}>🗺️</div>

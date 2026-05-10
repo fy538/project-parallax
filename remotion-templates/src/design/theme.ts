@@ -157,8 +157,8 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
     // typography. Oswald is preloaded via design/fonts.ts (FOSS, Google
     // Fonts) so the Rodchenko voice survives on Linux render hosts where
     // Helvetica Neue isn't available; Helvetica Neue stays in the chain
-    // for macOS preview parity, then bold Space Grotesk as last resort.
-    displayFont: 'Oswald, "Helvetica Neue", "Arial Black", "Space Grotesk", Inter, sans-serif',
+    // for macOS preview parity, then IBM Plex Sans as last resort.
+    displayFont: 'Oswald, "Helvetica Neue", "Arial Black", "IBM Plex Sans", Inter, sans-serif',
   },
   // American mid-century / contemporary tech — softer subset
   // mirrors text_treatment: english_modernist (walnut + umber + gold + bone)
@@ -196,7 +196,7 @@ const EMPHASIS_MAP: Record<EpisodeColorEmphasis, PaletteEmphasis> = {
     // Heiti (黑体) sans for CJK-aware text rendering. PingFang SC is
     // macOS-native; Noto Sans SC is preloaded via design/fonts.ts so the
     // Heiti voice survives on Linux render hosts that don't ship PingFang.
-    displayFont: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", "Space Grotesk", sans-serif',
+    displayFont: '"PingFang SC", "Noto Sans SC", "Microsoft YaHei", "IBM Plex Sans", sans-serif',
   },
   // Pre-revolutionary Chinese / classical — ink wash dominant
   // mirrors text_treatment: chinese_traditional (literati restraint)
@@ -394,12 +394,23 @@ export type Mode = "dark" | "light";
 // ── Typography ─────────────────────────────────────────────────────────────
 
 export const fonts = {
-  display: "Space Grotesk, Inter, Arial, sans-serif",
-  heading: "Space Grotesk, Inter, Arial, sans-serif", // alias for display
-  body: "IBM Plex Mono, JetBrains Mono, Menlo, monospace",
-  data: "JetBrains Mono, Menlo, monospace",
-  mono: "IBM Plex Mono, JetBrains Mono, Menlo, monospace", // alias for body
-  chinese: "Noto Sans SC, PingFang SC, sans-serif",
+  // Display / heading uses IBM Plex Sans (Mike Abbink / Bold Monday for IBM, 2017).
+  // Explicitly Franklin Gothic-derived — the lineage Burtin and Beall set Fortune
+  // magazine in (1945-55), the actual mid-century editorial register Parallax
+  // reaches for. Migrated from Space Grotesk on May 10, 2026; see BRAND.md →
+  // Typography for the rationale and DECISIONS.md for the entry.
+  display: '"IBM Plex Sans", Inter, Arial, sans-serif',
+  heading: '"IBM Plex Sans", Inter, Arial, sans-serif', // alias for display
+  // Body metadata, axis labels, kicker labels, byline. IBM Plex Mono is the
+  // evidence layer — coordinates, dates, classifications, file numbers.
+  body: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
+  // Long-form body / editorial-register passages. Plex Serif (Bold Monday / IBM)
+  // pairs as the serif companion in the Plex superfamily; use when the editorial
+  // voice calls for a transitional serif (asides, citations, narrative paragraphs).
+  serifBody: '"IBM Plex Serif", Georgia, "Times New Roman", serif',
+  data: '"JetBrains Mono", Menlo, monospace',
+  mono: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace', // alias for body
+  chinese: '"Noto Sans SC", "PingFang SC", sans-serif',
 } as const;
 
 export const fontSizes = {

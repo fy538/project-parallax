@@ -61,7 +61,7 @@ export interface EditorialFrameProps {
   kicker?: string;
   /**
    * Hero value: large display number, percentage, payoff pair, date, or
-   * short name. Space Grotesk Medium (weight 500) — size carries the impact,
+   * short name. IBM Plex Sans Medium (weight 500) — size carries the impact,
    * not weight.
    */
   hero?: string | number;

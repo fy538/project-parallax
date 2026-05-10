@@ -112,14 +112,21 @@ Background treatment: flat or lightly textured `paper` with subtle noise (2-3% o
 
 | Role | Font | Weight | Use |
 |------|------|--------|-----|
-| **Display** | Space Grotesk | 700 | Episode titles, hero text, section headers |
-| **Display** | Space Grotesk | 400-500 | Subtitles, descriptions |
-| **Body** | IBM Plex Mono | 400 | Metadata, coordinates, labels, captions |
+| **Display** | IBM Plex Sans | 600-700 | Episode titles, hero text, section headers, hero numbers |
+| **Display** | IBM Plex Sans | 400-500 | Subtitles, descriptions |
+| **Serif body** | IBM Plex Serif | 400-500 | Long-form passages, asides, citations, editorial-register narrative |
+| **Body** | IBM Plex Mono | 400 | Metadata, coordinates, labels, captions, kicker labels, byline |
 | **Body** | IBM Plex Mono | 600 | Emphasized data, highlighted metadata |
 | **Data** | JetBrains Mono | 400-700 | Chart values, statistics, code-style data |
 | **Chinese** | Noto Sans SC | 400-700 | All Chinese text (10-15% larger than equivalent English) |
 
-Space Grotesk is the voice of the channel — geometric, confident, modern but not cold. IBM Plex Mono is the evidence layer — coordinates, dates, classifications, file numbers. JetBrains Mono is reserved for pure data display (chart labels, statistics).
+IBM Plex Sans is the voice of the channel — Franklin Gothic-derived, mid-century editorial, the actual lineage Burtin and Beall set Fortune magazine in (1945-55). IBM Plex Serif is the long-form companion — transitional serif from the same Plex superfamily, used when the editorial register calls for a transitional serif (asides, citations, narrative paragraphs). IBM Plex Mono is the evidence layer — coordinates, dates, classifications, file numbers, kicker labels, bylines. JetBrains Mono is reserved for pure data display (chart labels, statistics).
+
+The Plex superfamily (Sans + Serif + Mono, all by Mike Abbink for Bold Monday / IBM, 2017) was designed as a coherent system honoring Paul Rand's mid-century IBM corporate-modernist heritage. Adopting all three gives Parallax a single typographic source of truth in the genuine Bauhaus → Swiss → mid-century editorial lineage.
+
+**Migration note (May 10, 2026).** The display face migrated from Space Grotesk (Florian Karsten, 2018) to IBM Plex Sans. Space Grotesk's lineage is monospaced-tech-display (derived from Colophon's Space Mono), and at the 100pt hero-number scale Parallax leans on, its quirks (extended `f j r t`, oval counters, distinctive `g`) compete with the data they label. Plex Sans's lining figures disappear into "this is a quantity," matching how Burtin and Beall set Franklin Gothic numerals in Fortune. See `project/DECISIONS.md` for the full decision record.
+
+**Anthropic alignment note.** Parallax's typographic register (warm-modernist editorial, paper-substrate, mid-century corporate-modernist lineage) is a near-sibling to Anthropic's Claude design language (Styrene A → Anthropic Sans + Tiempos → Anthropic Serif, with the same warm cream/clay palette philosophy). This is accidental but worth knowing — the channel inherits "looks intelligent and considered" by association rather than fighting against it.
 
 ### Type Scale
 
@@ -140,7 +147,7 @@ Space Grotesk is the voice of the channel — geometric, confident, modern but n
 - **Weight contrast ≥200 between primary and secondary.** E.g., 700 vs 500, 600 vs 400.
 - **Headers ≥36px get letter-spacing ≥1.5px.** Opens up headlines, prevents cramping.
 - **Chinese text: Noto Sans SC, 10-15% larger** than equivalent English to maintain optical parity.
-- **All-caps text: always IBM Plex Mono or Space Grotesk 600+**, never body weight. All-caps at light weights looks anemic.
+- **All-caps text: always IBM Plex Mono or IBM Plex Sans 600+**, never body weight. All-caps at light weights looks anemic.
 
 ---
 
@@ -298,7 +305,7 @@ What to avoid: close-up faces as the dominant thumbnail element (personality-led
 - Channel wordmark (`∴ PARALLAX` in IBM Plex Mono) in header strip
 - Episode number in top-right corner
 - Treated image as background (Mode A) or inset panel (Mode B)
-- Title in Space Grotesk 700, lower-left quadrant
+- Title in IBM Plex Sans 600-700, lower-left quadrant
 
 ### Social Crops
 
