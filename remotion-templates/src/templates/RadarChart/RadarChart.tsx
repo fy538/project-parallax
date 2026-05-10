@@ -35,6 +35,7 @@ import {
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
   CLAMP_QUARTIC,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -455,7 +456,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
                       stroke={subj.color}
                       strokeWidth={4.5}
                       strokeLinejoin="round"
-                      opacity={interpolate(morphProgress, [0.2, 0.5, 0.95], [0, 1, 0], CLAMP)}
+                      opacity={interpolate(morphProgress, [0.2, 0.5, 0.95], [0, 1, 0], CLAMP_SINE)}
                       style={{ filter: `drop-shadow(0 0 8px ${subj.color}80)` }}
                     />
                   );

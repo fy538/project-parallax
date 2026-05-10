@@ -1,19 +1,42 @@
 /**
  * PrisonersDilemmaShowcase — Preview composition for the full visual layer.
  *
- * Renders all 41 Remotion data files + 17 AI-generated Hailuo clips in script
- * order so you can scrub through the entire visual layer in Remotion Studio or
- * render to MP4. Total: 58 segments.
+ * Renders all 41 Remotion data files + 13 AI-generated Hailuo single-shot clips
+ * + 5 Pika 2.5 morph clips (across 2 [SCENE:] blocks) in script order, so you
+ * can scrub through the entire visual layer in Remotion Studio or render to MP4.
+ *
+ * Total segments updated for script v5.6 (May 9, 2026):
+ *   - Beat 3 opening: 2 single-shot AI-GEN cells replaced by 3 morph clips
+ *     ([SCENE: wrong-game-establish], 4 frames over ~24s).
+ *   - Beat 4 close: aigen-12 + aigen-13 single-shot cells replaced by 2 morph
+ *     clips ([SCENE: cooperation-arc], 3 frames over ~18s, with the alpine →
+ *     ocean hero morph). KT "Cooperation is designed" extended from 5s to 8s.
+ *
+ * The 13 remaining single-shot Hailuo clips (Beats 1, 2, 3-mid, 4-opening,
+ * 5) are unchanged from v5.4. See `episodes/prisoners-dilemma/scenes/` for the
+ * scene-block specs and `project/CHAINED_STILL_LESSONS.md` for the discipline
+ * rules behind the chained-still-morph workflow.
  *
  * Archival stills (Nash portrait, RAND HQ, Reagan-Gorbachev) are placeholders
  * until sourced.
  *
  * NOT the final episode composition (that requires an assembly manifest with
- * narration timing) — this is a preview/review tool.
+ * narration timing) — this is a preview/review tool. The production composition
+ * is `PrisonersDilemmaFull.tsx`.
  *
  * SETUP: Copy AI-gen clips into public/episodes/prisoners-dilemma/clips/
  *   cp episodes/prisoners-dilemma/assets/clips/*.mp4 \
  *      remotion-templates/public/episodes/prisoners-dilemma/clips/
+ *
+ * The 5 morph clips (canonical filenames below) need to be generated and placed
+ * in the same directory before this composition will render cleanly. Until then,
+ * Remotion Studio will show "missing asset" warnings for those 5 segments.
+ *
+ *   aigen-wrong-game-establish-AB.mp4   (Beat 3, 8s, Pika 2.5)
+ *   aigen-wrong-game-establish-BC.mp4   (Beat 3, 8s, Pika 2.5)
+ *   aigen-wrong-game-establish-CD.mp4   (Beat 3, 8s, Pika 2.5)
+ *   aigen-cooperation-arc-AB.mp4        (Beat 4, 8s, Pika 2.5 — terraces → alpine)
+ *   aigen-cooperation-arc-BC.mp4        (Beat 4, 10s, Pika 2.5 — alpine → ocean HERO)
  *
  * Register in Root.tsx under the Episodes folder.
  */
@@ -188,6 +211,19 @@ const vid = (filename: string, label: string, targetSec = 8): VideoClip => ({
   label,
 });
 
+/**
+ * Play a Pika 2.5 morph clip at native rate (no stretching). Pika 2.5 morphs
+ * inside a [SCENE:] block are generated at their target duration (8s or 10s),
+ * so playbackRate is 1.0 — passing the native length as durationSec.
+ */
+const vidNative = (filename: string, label: string, durationSec: number): VideoClip => ({
+  type: "video",
+  file: `${CLIP_DIR}/${filename}`,
+  durationSec,
+  playbackRate: 1.0,
+  label,
+});
+
 const arch = (label: string, durationSec = 5): PlaceholderClip => ({
   type: "placeholder",
   durationSec,
@@ -223,8 +259,12 @@ const clips: Clip[] = [
 
   // ── Beat 3: THE WRONG GAME ─────────────────────────────────────────────
   mg(TitleTransition, titleSectionBeat3, 2, "Beat 3 Title"),
-  vid("aigen-06-grid-landscape.mp4", "AI-GEN: Grid Landscape"),
-  vid("aigen-07-negotiation-room.mp4", "AI-GEN: Negotiation Room"),
+  // [SCENE: wrong-game-establish] — 4 frames over ~24s, hard cuts between morphs.
+  // Replaces v5.4's 2 single-shot AI-GEN cells (grid landscape + negotiation room).
+  // Validated by the May 9 prisoners-dilemma Scene C bakeoff. See scenes/wrong-game-establish.md.
+  vidNative("aigen-wrong-game-establish-AB.mp4", "[SCENE wrong-game] A→B grid tightens", 8),
+  vidNative("aigen-wrong-game-establish-BC.mp4", "[SCENE wrong-game] B→C table forms (smoke-fixed)", 8),
+  vidNative("aigen-wrong-game-establish-CD.mp4", "[SCENE wrong-game] C→D figures arrive", 8),
   mg(GameBoard, gameboardTrapMechanism, 10, "Self-Confirming Trap"),
   mg(KineticTypography, kineticPredictionBelieved, 5, "Prediction Came True"),
   mg(KineticTypography, kineticWrongGameTitle, 4, "THE WRONG GAME"),
@@ -244,11 +284,20 @@ const clips: Clip[] = [
   mg(SplitComposition, splitPdVsStaghunt, 10, "PD vs Stag Hunt Split"),
   mg(KineticTypography, kineticIteratedEquiv, 6, "Iterated PD ≡ Stag Hunt"),
   mg(FrameworkDiagram, frameworkReframe, 6, "Old → New Question"),
-  vid("aigen-12-terraced-farmland.mp4", "AI-GEN: Terraced Farmland"),
+  // aigen-12 terraced no longer plays standalone — its content migrates into the
+  // [SCENE: cooperation-arc] block at end of beat as Frame A (per script v5.6).
   mg(ChoroplethMapPlaceholder, choroplethOstrom, 14, "Ostrom 800+ Cases (WebGL)"),
   mg(FrameworkDiagram, frameworkOstromVsPd, 12, "Ostrom Principles vs PD"),
-  mg(KineticTypography, kineticCooperationDesigned, 5, "Cooperation Is Designed"),
-  vid("aigen-13-ocean-vastness.mp4", "AI-GEN: Ocean Vastness"),
+  // Extended from 5s → 8s in v5.6 to land the thesis line under longer narration
+  // before the [SCENE:] block opens.
+  mg(KineticTypography, kineticCooperationDesigned, 8, "Cooperation Is Designed"),
+  // [SCENE: cooperation-arc] — 3 frames over ~18s of morph runtime (terraced →
+  // alpine commons → ocean), hard cuts between clips. The B→C alpine→ocean morph
+  // is the HERO shot of the redesign — visualizes the "boundedness vanishing"
+  // beat of the Ostrom caveat. Replaces v5.4's standalone aigen-12 + aigen-13.
+  // See scenes/cooperation-arc.md.
+  vidNative("aigen-cooperation-arc-AB.mp4", "[SCENE cooperation] A→B terraces → alpine", 8),
+  vidNative("aigen-cooperation-arc-BC.mp4", "[SCENE cooperation] B→C alpine → ocean (HERO)", 10),
 
   // ── Beat 5: YOUR GAME ──────────────────────────────────────────────────
   mg(TitleTransition, titleSectionBeat5, 2, "Beat 5 Title"),

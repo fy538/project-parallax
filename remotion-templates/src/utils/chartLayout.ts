@@ -8,12 +8,13 @@
  * INTO those boxes. When something changes (legend added, source dropped),
  * only this helper needs to know — templates don't recompute math.
  *
- * Status: stub. TimeSeriesChart and DataChart still use their own inline
- * layout. This helper is the target shape for migration. Use it for new
- * cartesian templates from the start.
+ * Status: active. DataChart and TimeSeriesChart now consume this helper
+ * for their primary title/legend/chart/source regions. New cartesian
+ * templates should use it from the start, and older ones should migrate
+ * toward it instead of adding more bespoke geometry.
  */
 
-import { layout, fontSizes, titleHeight } from "../design/theme";
+import { layout, titleHeight } from "../design/theme";
 
 export interface ChartLayoutInput {
   /** Does the chart have a TitleBlock at top? Default: true. */
@@ -24,10 +25,14 @@ export interface ChartLayoutInput {
   hasLegend?: boolean;
   /** Number of legend rows (each is one row of swatch+label entries). Default 1. */
   legendRows?: number;
+  /** Safe-area tier — should match the companion TitleBlock safeAreaTier. Default: "generous". */
+  safeAreaTier?: keyof typeof layout.safeAreaTier;
   /** Does the chart have an x-axis tick label row at the bottom? */
   hasXAxis?: boolean;
   /** Does the chart have a source attribution line at the bottom? */
   hasSource?: boolean;
+  /** Number of source/context rows reserved at the bottom. Default 1. */
+  sourceRows?: number;
   /**
    * Override the global safe-area inset on each side. Replaces (not adds to)
    * the `layout.safeArea` defaults. Use sparingly — when you need a non-
@@ -76,6 +81,7 @@ export interface ChartLayoutResult {
  */
 const HEIGHTS = {
   legendRow: 36,
+  stackRowGap: 4,
   legendGap: 12,    // gap between title block and legend
   chartGap: 24,     // gap between legend (or title) and chart top
   axisXLabel: 40,
@@ -90,8 +96,10 @@ export function chartLayout(opts: ChartLayoutInput = {}): ChartLayoutResult {
     titleVariant = "content",
     hasLegend = false,
     legendRows = 1,
+    safeAreaTier = "generous",
     hasXAxis = false,
     hasSource = false,
+    sourceRows = 1,
     insets = {},
     extraPad = {},
   } = opts;
@@ -100,19 +108,22 @@ export function chartLayout(opts: ChartLayoutInput = {}): ChartLayoutResult {
   // `extraPad` then adds chart-specific room (y-axis tick label width, etc.)
   // on top — same effect as the legacy `layout.padding + chartPaddingLeft`
   // pattern, but with declarative semantics.
-  const top = (insets.top ?? layout.safeArea.top) + (extraPad.top ?? 0);
-  const right = (insets.right ?? layout.safeArea.right) + (extraPad.right ?? 0);
-  const bottom = (insets.bottom ?? layout.safeArea.bottom) + (extraPad.bottom ?? 0);
-  const left = (insets.left ?? layout.safeArea.left) + (extraPad.left ?? 0);
+  const safe = layout.safeAreaTier[safeAreaTier];
+  const top = (insets.top ?? safe.top) + (extraPad.top ?? 0);
+  const right = (insets.right ?? safe.right) + (extraPad.right ?? 0);
+  const bottom = (insets.bottom ?? safe.bottom) + (extraPad.bottom ?? 0);
+  const left = (insets.left ?? safe.left) + (extraPad.left ?? 0);
 
   const canvasWidth = layout.width - left - right;
 
   const titleH = hasTitle ? titleHeight[titleVariant] : 0;
   const legendH = hasLegend
-    ? HEIGHTS.legendRow * legendRows + (legendRows - 1) * 4
+    ? HEIGHTS.legendRow * legendRows + (legendRows - 1) * HEIGHTS.stackRowGap
     : 0;
   const axisXH = hasXAxis ? HEIGHTS.axisXLabel : 0;
-  const sourceH = hasSource ? HEIGHTS.sourceRow : 0;
+  const sourceH = hasSource
+    ? HEIGHTS.sourceRow * sourceRows + (sourceRows - 1) * HEIGHTS.stackRowGap
+    : 0;
 
   // Top-down stacking: title → legend gap → legend → chart gap → chart → axis-x gap → axis-x → source gap → source.
   let cursor = top;
@@ -170,6 +181,44 @@ export function chartLayout(opts: ChartLayoutInput = {}): ChartLayoutResult {
   };
 
   return { title, legend, chart, axisX, source };
+}
+
+export function validateChartLayoutIntegrity(layoutResult: ChartLayoutResult): string[] {
+  const issues: string[] = [];
+  const boxes = [
+    ["title", layoutResult.title],
+    ["legend", layoutResult.legend],
+    ["chart", layoutResult.chart],
+    ["axisX", layoutResult.axisX],
+    ["source", layoutResult.source],
+  ] as const;
+
+  const hasArea = (height: number) => height > 0;
+  const rectBottom = (box: BoundingBox) => box.top + box.height;
+
+  for (const [name, box] of boxes) {
+    if (!hasArea(box.height)) continue;
+    if (box.top < 0 || box.left < 0) {
+      issues.push(`${name} starts outside the canvas`);
+    }
+    if (box.width < 0 || box.height < 0) {
+      issues.push(`${name} has a negative size`);
+    }
+    if (box.left + box.width > layout.width || rectBottom(box) > layout.height) {
+      issues.push(`${name} extends beyond the canvas bounds`);
+    }
+  }
+
+  const ordered = boxes.filter(([, box]) => hasArea(box.height));
+  for (let i = 1; i < ordered.length; i++) {
+    const [prevName, prevBox] = ordered[i - 1];
+    const [currName, currBox] = ordered[i];
+    if (currBox.top < rectBottom(prevBox)) {
+      issues.push(`${currName} overlaps ${prevName}`);
+    }
+  }
+
+  return issues;
 }
 
 /**

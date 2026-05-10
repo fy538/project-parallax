@@ -27,6 +27,13 @@ let serveUrl: string | null = null;
 // composition's calculateMetadata).
 const compositionCache = new Map<string, VideoConfig>();
 
+function getCompositionCacheKey(
+  compositionId: string,
+  inputProps?: Record<string, unknown>
+): string {
+  return `${compositionId}::${JSON.stringify(inputProps ?? {})}`;
+}
+
 /**
  * Initialize the bundler once before all tests.
  * Bundles the entry point and returns a serve URL for rendering.
@@ -83,7 +90,8 @@ export function getServeUrl(): string {
 export async function renderCompositionFrame(
   compositionId: string,
   frame: number,
-  outputPath: string
+  outputPath: string,
+  inputProps?: Record<string, unknown>
 ): Promise<void> {
   const url = getServeUrl();
 
@@ -98,14 +106,16 @@ export async function renderCompositionFrame(
   // Resolve composition once per id (cached). renderStill needs the full
   // VideoConfig object including width/height — passing just the string id
   // throws "height must be a number, but you passed a value of type undefined."
-  let composition = compositionCache.get(compositionId);
+  const cacheKey = getCompositionCacheKey(compositionId, inputProps);
+  let composition = compositionCache.get(cacheKey);
   if (!composition) {
     composition = await selectComposition({
       serveUrl: url,
       id: compositionId,
       browserExecutable,
+      inputProps,
     });
-    compositionCache.set(compositionId, composition);
+    compositionCache.set(cacheKey, composition);
   }
 
   console.log(
@@ -119,6 +129,7 @@ export async function renderCompositionFrame(
       output: outputPath,
       frame,
       browserExecutable,
+      inputProps,
     });
 
     console.log(`[Render] Successfully saved: ${outputPath}`);

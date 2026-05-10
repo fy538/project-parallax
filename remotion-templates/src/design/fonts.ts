@@ -29,10 +29,25 @@ import { loadFont as loadNotoSerifSC } from "@remotion/google-fonts/NotoSerifSC"
 import { loadFont as loadNotoSansJP } from "@remotion/google-fonts/NotoSansJP";
 import { loadFont as loadOswald } from "@remotion/google-fonts/Oswald";
 
-// Load all weights/styles for each font (no args = load everything)
-const { fontFamily: spaceGrotesk } = loadSpaceGrotesk();
-const { fontFamily: ibmPlexMono } = loadIBMPlexMono();
-const { fontFamily: jetBrainsMono } = loadJetBrainsMono();
+// Constrain Latin fonts to the weights we actually use in templates. The
+// default "load everything" path triggers dozens of network requests per font
+// in render tests and floods QA output with perf warnings.
+const commonLatinWeights = ["400", "500", "600", "700"] as const;
+const { fontFamily: spaceGrotesk } = loadSpaceGrotesk("normal", {
+  weights: [...commonLatinWeights],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
+const { fontFamily: ibmPlexMono } = loadIBMPlexMono("normal", {
+  weights: [...commonLatinWeights],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
+const { fontFamily: jetBrainsMono } = loadJetBrainsMono("normal", {
+  weights: [...commonLatinWeights],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
 // NOTE: Don't pass `subsets` here. Google Fonts now chunks Noto Sans SC's
 // CJK glyphs across many numeric subsets ([4], [5], [21]-[91], [97]-[119], etc.)
 // while still listing "chinese-simplified" as a subset *name* — passing that

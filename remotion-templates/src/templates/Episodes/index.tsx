@@ -17,7 +17,7 @@ export { SiliconTrapFullComposition } from "./SiliconTrapFull";
 
 // ── Duration calculation ──────────────────────────────────────────────────────
 
-// silicon-trap has 28 clips with 15-frame overlaps between them.
+// silicon-trap: 15-frame overlaps between clips.
 // Total = sum(all clip durations) - (27 overlaps × 15 frames)
 // Duration is approximate — actual durations depend on data-driven calculations
 // (e.g., ChoroplethMap phases, RouteAnimation phases, DualTimeline events).

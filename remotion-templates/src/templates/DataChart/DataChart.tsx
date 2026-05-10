@@ -14,7 +14,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
-import { palette, semantic, fonts, fontSizes, layout, sec, shadows, gradients, contentArea, radii, barStyle, getCategoricalColor } from "../../design/theme";
+import { palette, semantic, fonts, fontSizes, layout, sec, shadows, gradients, radii, barStyle, getCategoricalColor } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { formatNumber } from "../../utils/numberFormat";
 import { niceDomain, niceTicks, formatTick } from "../../utils/niceTicks";
@@ -31,7 +31,9 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useNarratedCamera } from "../../hooks/useNarratedCamera";
-import type { DataChartData, SpotlightStep } from "./types";
+import { chartLayout, validateChartLayoutIntegrity } from "../../utils/chartLayout";
+import { warnIf } from "../../utils/dataWarnings";
+import type { DataChartData } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
 
 // ── Animated bar ────────────────────────────────────────────────────────────
@@ -73,7 +75,7 @@ const AnimatedBar: React.FC<{
     frame,
     [startFrame, startFrame + growDuration, startFrame + growDuration + sec(0.3)],
     [0, 1 + overshootAmount, 1],
-    CLAMP
+    CLAMP // linear-ok: 3-point overshoot — linear segments give controlled bounce shape
   );
 
   const barHeight = (value / maxValue) * maxHeight * growProgress;
@@ -275,7 +277,7 @@ const ComparisonBars: React.FC<{
     props.frame,
     [props.startFrame + sec(0.4), props.startFrame + sec(1.0)],
     [0, 0.45],
-    CLAMP
+    CLAMP_SINE
   );
 
   return (
@@ -400,14 +402,39 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   const itemCount = data.dataPoints?.length || data.comparisonPairs?.length || 1;
   const density = itemCount <= 3 ? "sparse" : itemCount <= 5 ? "normal" : "dense";
   const barGap = density === "dense" ? layout.spacing.md : layout.spacing.xl;
-  const area = contentArea("content", "generous");
+  const labelSpace = 80; // room for bar labels + sublabels below the bars
+  const hasTopBand = data.variant === "comparison" || hasSpotlight;
+  const hasBottomBand = !!data.source || !!data.contextNote;
+  const chartBoxes = useMemo(
+    () =>
+      chartLayout({
+        hasTitle: true,
+        hasLegend: hasTopBand,
+        legendRows: 1,
+        hasSource: hasBottomBand,
+        sourceRows: data.source && data.contextNote ? 2 : 1,
+        safeAreaTier: "generous",
+        extraPad: { bottom: labelSpace + layout.spacing.lg },
+      }),
+    [data.contextNote, data.source, hasBottomBand, hasTopBand]
+  );
+  const chartLayoutIssues = useMemo(
+    () => validateChartLayoutIntegrity(chartBoxes),
+    [chartBoxes]
+  );
+  warnIf(
+    chartLayoutIssues.length > 0,
+    "DataChart",
+    `Chart layout integrity failed: ${chartLayoutIssues.join("; ")}`,
+    chartBoxes
+  );
 
   const barWidth = useMemo(
     () => Math.min(
       density === "dense" ? 100 : 160,
-      area.width / (data.dataPoints?.length || 1) - barGap
+      chartBoxes.chart.width / (data.dataPoints?.length || 1) - barGap
     ),
-    [data.dataPoints?.length, barGap, density]
+    [chartBoxes.chart.width, data.dataPoints?.length, barGap, density]
   );
 
   // ── Spotlight camera elements (bar centers) ─────────────────────────────
@@ -415,13 +442,13 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     if (!hasSpotlight || !data.dataPoints) return [];
     const numBars = data.dataPoints.length;
     const totalWidth = numBars * (barWidth + barGap) - barGap;
-    const startX = (layout.width - totalWidth) / 2;
+    const startX = chartBoxes.chart.left + (chartBoxes.chart.width - totalWidth) / 2;
     return data.dataPoints.map((_, i) => ({
       id: `bar-${i}`,
       x: startX + i * (barWidth + barGap) + barWidth / 2,
       y: layout.height * 0.5, // center vertically
     }));
-  }, [hasSpotlight, data.dataPoints, barWidth, barGap]);
+  }, [hasSpotlight, data.dataPoints, barWidth, barGap, chartBoxes.chart.left, chartBoxes.chart.width]);
 
   // Convert spotlight sequence to camera path
   const spotlightCameraPath: NarratedCameraStep[] = useMemo(() => {
@@ -467,25 +494,32 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     ]);
     return {
       maxVal: allVals.length > 0 ? Math.max(...allVals) : 1,
-      pairWidth: area.width / (data.comparisonPairs?.length || 1) - layout.spacing.md
+      pairWidth:
+        chartBoxes.chart.width / (data.comparisonPairs?.length || 1) -
+        layout.spacing.md,
     };
-  }, [data.comparisonPairs]);
+  }, [chartBoxes.chart.width, data.comparisonPairs]);
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
-  const labelSpace = 80; // room for bar labels + sublabels below the bars
   const chartArea = {
-    top: area.top + layout.spacing.md, // extra breathing room below title
-    bottom: layout.safeArea.bottom + labelSpace + layout.spacing.lg,
-    left: area.left,
-    right: area.right,
+    top: chartBoxes.chart.top,
+    bottom: layout.height - (chartBoxes.chart.top + chartBoxes.chart.height),
+    left: chartBoxes.chart.left,
+    right: layout.width - (chartBoxes.chart.left + chartBoxes.chart.width),
   };
-  const maxHeight = layout.height - chartArea.top - chartArea.bottom;
+  const maxHeight = chartBoxes.chart.height;
   const unit = data.unit || "";
 
   // ── Gridline configuration ─────────────────────────────────────────────
   const gridLineCount = 5; // 0%, 25%, 50%, 75%, 100%
-  const chartWidth = layout.width - chartArea.left - chartArea.right;
+  const chartWidth = chartBoxes.chart.width;
+  const sourceBottomOffset = hasBottomBand
+    ? Math.max(
+        0,
+        layout.height - layout.safeArea.bottom - (chartBoxes.source.top + chartBoxes.source.height)
+      )
+    : 0;
 
   // ── Focus pull: compute highlight bar's finish frame ────────────────────
   const highlightBarIndex = data.highlightIndex ?? -1;
@@ -567,7 +601,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               frame,
               [sec(0.8), sec(2.3)],
               [1.0, 0.45],
-              CLAMP
+              CLAMP_SINE
             );
             return (
               <g key={i}>
@@ -767,84 +801,98 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
           ))}
       </div>
 
-      {/* ── Spotlight annotation overlay ──────────────────────────────────── */}
-      {hasSpotlight && data.spotlightSequence && (() => {
-        const currentStepIdx = spotlightCamera.stepIndex;
-        const currentSpotlight = data.spotlightSequence[currentStepIdx];
-        if (!currentSpotlight?.annotation) return null;
-        const annotationOpacity = fadeIn(frame, sec(0.5), sec(0.4));
-        return (
-          <div
-            style={{
-              position: "absolute",
-              top: layout.safeAreaTier.generous.top + 60,
-              left: layout.safeAreaTier.generous.left,
-              maxWidth: layout.width * 0.4,
-              fontSize: fontSizes.label,
-              fontFamily: fonts.body,
-              color: theme.text.secondary,
-              fontStyle: "italic",
-              opacity: annotationOpacity,
-              textShadow: shadows.textLift,
-              lineHeight: 1.4,
-            }}
-          >
-            {currentSpotlight.annotation}
-          </div>
-        );
-      })()}
-
-      {/* ── Spotlight label ─────────────────────────────────────────────── */}
-      {hasSpotlight && spotlightCamera.currentLabel && (
+      {/* ── Top metadata band — shares one reserved zone with the chart layout */}
+      {hasTopBand && (
         <div
           style={{
             position: "absolute",
-            top: layout.safeAreaTier.generous.top + 60,
-            right: layout.safeAreaTier.generous.right,
-            fontSize: fontSizes.caption,
-            fontFamily: fonts.data,
-            color: palette.amber,
-            letterSpacing: 1,
-            opacity: fadeIn(frame, 0, sec(0.3)),
-            textShadow: shadows.textLift,
+            top: chartBoxes.legend.top,
+            left: chartBoxes.legend.left,
+            width: chartBoxes.legend.width,
+            minHeight: chartBoxes.legend.height || 36,
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: layout.spacing.lg,
+            pointerEvents: "none",
           }}
         >
-          {spotlightCamera.currentLabel}
-        </div>
-      )}
+          {hasSpotlight && data.spotlightSequence && (() => {
+            const currentStepIdx = spotlightCamera.stepIndex;
+            const currentSpotlight = data.spotlightSequence[currentStepIdx];
+            if (!currentSpotlight?.annotation) return null;
+            const annotationOpacity = fadeIn(frame, sec(0.5), sec(0.4));
+            return (
+              <div
+                style={{
+                  maxWidth: chartBoxes.legend.width * 0.45,
+                  fontSize: fontSizes.label,
+                  fontFamily: fonts.body,
+                  color: theme.text.secondary,
+                  fontStyle: "italic",
+                  opacity: annotationOpacity,
+                  textShadow: shadows.textLift,
+                  lineHeight: 1.4,
+                }}
+              >
+                {currentSpotlight.annotation}
+              </div>
+            );
+          })()}
 
-      {/* ── Legend for comparisons ──────────────────────────────────────── */}
-      {data.variant === "comparison" && (
-        <Legend
-          items={[
-            { label: data.leftGroupLabel ?? "", color: data.leftGroupColor || semantic.us },
-            { label: data.rightGroupLabel ?? "", color: data.rightGroupColor || semantic.china },
-          ]}
-          frame={frame}
-          exit={exitFade(frame, durationInFrames, 15)}
-          theme={theme}
-          startFrame={sec(0.5)}
-          fadeInDuration={sec(0.5)}
-          style={{
-            position: "absolute",
-            top: layout.safeAreaTier.generous.top + 10,
-            right: layout.safeAreaTier.generous.right,
-          }}
-        />
+          {data.variant === "comparison" && (
+            <Legend
+              items={[
+                { label: data.leftGroupLabel ?? "", color: data.leftGroupColor || semantic.us },
+                { label: data.rightGroupLabel ?? "", color: data.rightGroupColor || semantic.china },
+              ]}
+              frame={frame}
+              exit={exitFade(frame, durationInFrames, 15)}
+              theme={theme}
+              startFrame={sec(0.5)}
+              fadeInDuration={sec(0.5)}
+              style={{
+                marginLeft: "auto",
+              }}
+            />
+          )}
+
+          {hasSpotlight && spotlightCamera.currentLabel && (
+            <div
+              style={{
+                marginLeft: "auto",
+                fontSize: fontSizes.caption,
+                fontFamily: fonts.data,
+                color: palette.amber,
+                letterSpacing: 1,
+                opacity: fadeIn(frame, 0, sec(0.3)),
+                textShadow: shadows.textLift,
+              }}
+            >
+              {spotlightCamera.currentLabel}
+            </div>
+          )}
+        </div>
       )}
 
       {/* ── Source attribution — uses the shared component so position,
           type, opacity, and fade timing match every other chart. */}
-      <SourceAttribution source={data.source} mode="light" prefix="Source: " startSec={2} />
+      <SourceAttribution
+        source={data.source}
+        mode="light"
+        prefix="Source: "
+        startSec={2}
+        bottomOffset={sourceBottomOffset}
+      />
 
       {/* ── Context note — frames what the data means ─────────────────── */}
       {data.contextNote && (
         <div
           style={{
             position: "absolute",
-            bottom: layout.safeArea.bottom + (data.source ? 24 : 0),
-            left: layout.safeAreaTier.generous.left,
-            maxWidth: (layout.width - layout.safeArea.left - layout.safeArea.right) * 0.55,
+            top: chartBoxes.source.top,
+            left: chartBoxes.source.left,
+            maxWidth: chartBoxes.source.width * 0.55,
             fontSize: fontSizes.caption,
             color: theme.text.secondary,
             fontStyle: "italic",
