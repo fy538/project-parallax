@@ -112,7 +112,16 @@
         "composite": "background",
         "opacity": 0.4
       },
-      "notes": "· \"TSMC Arizona construction site aerial drone\" > \"semiconductor factory aerial desert\" > \"large factory construction aerial\" · Pexels · standard · background @ 40% · 6s ·"
+      "notes": "\u00b7 \"TSMC Arizona construction site aerial drone\" > \"semiconductor factory aerial desert\" > \"large factory construction aerial\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 40% \u00b7 6s \u00b7"
+    },
+    {
+      "id": "beat1-seg01-hold",
+      "type": "HOLD",
+      "startSec": 6.0,
+      "endSec": 15.2,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg02",
@@ -122,7 +131,7 @@
       "layer": "foreground",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "In December 2025, TSMC's first Arizona fab hit a 92% chip yield — four percentag",
+      "narrationRef": "In December 2025, TSMC's first Arizona fab hit a 92% chip yield \u2014 four percentag",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-92-yield.json"
@@ -141,6 +150,15 @@
       ]
     },
     {
+      "id": "beat1-seg02-hold",
+      "type": "HOLD",
+      "startSec": 9.0,
+      "endSec": 47.6,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg03",
       "type": "FOOTAGE",
       "startSec": 15.2,
@@ -148,7 +166,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P1",
-      "narrationRef": "A fab — a fabrication plant — is where chips are physically made. Not designed, ",
+      "narrationRef": "A fab \u2014 a fabrication plant \u2014 is where chips are physically made. Not designed, ",
       "asset": {
         "searchTerms": [
           "semiconductor cleanroom wafer handling",
@@ -163,7 +181,16 @@
         "composite": "inset",
         "opacity": 0.7
       },
-      "notes": "· \"semiconductor cleanroom wafer handling\" > \"chip factory cleanroom workers\" > \"cleanroom manufacturing\" · Pexels · standard · inset @ 70% · match narration (~18s) ·"
+      "notes": "\u00b7 \"semiconductor cleanroom wafer handling\" > \"chip factory cleanroom workers\" > \"cleanroom manufacturing\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 70% \u00b7 match narration (~18s) \u00b7"
+    },
+    {
+      "id": "beat1-seg03-hold",
+      "type": "HOLD",
+      "startSec": 33.2,
+      "endSec": 58.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg04",
@@ -192,6 +219,15 @@
       ]
     },
     {
+      "id": "beat1-seg04-hold",
+      "type": "HOLD",
+      "startSec": 51.6,
+      "endSec": 88.4,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat1-seg05",
       "type": "FOOTAGE",
       "startSec": 58.4,
@@ -214,7 +250,16 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "· \"Arizona desert housing construction workers\" > \"temporary worker housing desert\" > \"Arizona suburban construction\" · Pexels · standard · background @ 35% · match narration (~20s) ·"
+      "notes": "\u00b7 \"Arizona desert housing construction workers\" > \"temporary worker housing desert\" > \"Arizona suburban construction\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 match narration (~20s) \u00b7"
+    },
+    {
+      "id": "beat1-seg05-hold",
+      "type": "HOLD",
+      "startSec": 78.4,
+      "endSec": 92.4,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
     },
     {
       "id": "beat1-seg06",
@@ -275,6 +320,24 @@
       }
     },
     {
+      "id": "beat1-seg06-hold",
+      "type": "HOLD",
+      "startSec": 92.4,
+      "endSec": 112.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
+      "id": "beat1-seg07-hold",
+      "type": "HOLD",
+      "startSec": 102.4,
+      "endSec": 114.0,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg08",
       "type": "TRANSITION",
       "startSec": 112.0,
@@ -321,6 +384,24 @@
       }
     },
     {
+      "id": "beat2-seg08-hold",
+      "type": "HOLD",
+      "startSec": 114.0,
+      "endSec": 130.8,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
+      "id": "beat2-seg09-hold",
+      "type": "HOLD",
+      "startSec": 126.0,
+      "endSec": 162.2,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg10",
       "type": "TEMPLATE",
       "startSec": 130.8,
@@ -362,6 +443,15 @@
       ]
     },
     {
+      "id": "beat2-seg10-hold",
+      "type": "HOLD",
+      "startSec": 140.8,
+      "endSec": 150.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg11",
       "type": "TRANSITION",
       "startSec": 150.4,
@@ -391,7 +481,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P1",
-      "narrationRef": "That was 1941. In 2022, the United States tried it again. Not with oil — with th",
+      "narrationRef": "That was 1941. In 2022, the United States tried it again. Not with oil \u2014 with th",
       "template": {
         "component": "HorizontalTimeline",
         "dataFile": "horizontal-timeline-oil-chip.json"
@@ -425,6 +515,15 @@
       ]
     },
     {
+      "id": "beat2-seg12-hold",
+      "type": "HOLD",
+      "startSec": 159.4,
+      "endSec": 187.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg13",
       "type": "IMAGE",
       "startSec": 162.2,
@@ -445,6 +544,15 @@
         "composite": "background",
         "opacity": 0.35
       }
+    },
+    {
+      "id": "beat2-seg13-hold",
+      "type": "HOLD",
+      "startSec": 187.0,
+      "endSec": 232.6,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg14",
@@ -473,6 +581,15 @@
       ]
     },
     {
+      "id": "beat2-seg14-hold",
+      "type": "HOLD",
+      "startSec": 192.0,
+      "endSec": 207.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg15",
       "type": "TEMPLATE",
       "startSec": 207.0,
@@ -480,7 +597,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "Export controls — a national security instrument — had become a tax. Possibly an",
+      "narrationRef": "Export controls \u2014 a national security instrument \u2014 had become a tax. Possibly an",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-chips-act.json"
@@ -509,6 +626,15 @@
       ]
     },
     {
+      "id": "beat2-seg15-hold",
+      "type": "HOLD",
+      "startSec": 213.0,
+      "endSec": 238.6,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg16",
       "type": "FOOTAGE",
       "startSec": 232.6,
@@ -529,7 +655,16 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "· \"Cold War era government building Washington\" > \"1950s government archive footage\" > \"diplomatic meeting Cold War\" · Wikimedia Commons / Pexels · standard · background @ 35% · 6s ·"
+      "notes": "\u00b7 \"Cold War era government building Washington\" > \"1950s government archive footage\" > \"diplomatic meeting Cold War\" \u00b7 Wikimedia Commons / Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 6s \u00b7"
+    },
+    {
+      "id": "beat2-seg16-hold",
+      "type": "HOLD",
+      "startSec": 238.6,
+      "endSec": 281.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg17",
@@ -539,7 +674,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "So — does technology denial ever actually work? Once. For forty-five years, seve",
+      "narrationRef": "So \u2014 does technology denial ever actually work? Once. For forty-five years, seve",
       "template": {
         "component": "ChoroplethMap",
         "dataFile": "choropleth-cocom.json"
@@ -561,6 +696,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat2-seg17-hold",
+      "type": "HOLD",
+      "startSec": 246.6,
+      "endSec": 257.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat2-seg18",
@@ -599,6 +743,15 @@
       ]
     },
     {
+      "id": "beat2-seg18-hold",
+      "type": "HOLD",
+      "startSec": 265.4,
+      "endSec": 291.8,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P3"
+    },
+    {
       "id": "beat2-seg19",
       "type": "IMAGE",
       "startSec": 281.0,
@@ -625,6 +778,15 @@
         "out": "fade",
         "durationSec": 0.5
       }
+    },
+    {
+      "id": "beat2-seg19-hold",
+      "type": "HOLD",
+      "startSec": 287.0,
+      "endSec": 307.4,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg20",
@@ -657,7 +819,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P1",
-      "narrationRef": "To understand how China experiences all of this, you need to know a phrase: 卡脖子 ",
+      "narrationRef": "To understand how China experiences all of this, you need to know a phrase: \u5361\u8116\u5b50 ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-kabozi.json"
@@ -679,6 +841,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat3-seg21-hold",
+      "type": "HOLD",
+      "startSec": 298.8,
+      "endSec": 347.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg22",
@@ -745,7 +916,16 @@
         "composite": "inset",
         "opacity": 0.75
       },
-      "notes": "· \"ballpoint pen tip macro\" · standard · inset @ 75% · 4s ·"
+      "notes": "\u00b7 \"ballpoint pen tip macro\" \u00b7 standard \u00b7 inset @ 75% \u00b7 4s \u00b7"
+    },
+    {
+      "id": "beat3-seg24-hold",
+      "type": "HOLD",
+      "startSec": 318.4,
+      "endSec": 334.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg25",
@@ -769,6 +949,15 @@
         "composite": "background",
         "opacity": 0.3
       }
+    },
+    {
+      "id": "beat3-seg25-hold",
+      "type": "HOLD",
+      "startSec": 347.4,
+      "endSec": 418.2,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg26",
@@ -795,6 +984,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat3-seg26-hold",
+      "type": "HOLD",
+      "startSec": 351.4,
+      "endSec": 375.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg27",
@@ -833,6 +1031,15 @@
       ]
     },
     {
+      "id": "beat3-seg27-hold",
+      "type": "HOLD",
+      "startSec": 383.4,
+      "endSec": 409.8,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg28",
       "type": "TEMPLATE",
       "startSec": 409.8,
@@ -842,8 +1049,8 @@
       "priority": "P2",
       "narrationRef": "It's more expensive. It's slower. And it works. Yields went from below forty per",
       "template": {
-        "component": "DataChart",
-        "dataFile": "chart-smic-yield.json"
+        "component": "TimeSeriesChart",
+        "dataFile": "timeseries-smic-yield.json"
       },
       "transition": {
         "in": "dissolve",
@@ -869,6 +1076,15 @@
       ]
     },
     {
+      "id": "beat3-seg28-hold",
+      "type": "HOLD",
+      "startSec": 414.8,
+      "endSec": 423.2,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg29",
       "type": "FOOTAGE",
       "startSec": 418.2,
@@ -889,7 +1105,16 @@
         "composite": "inset",
         "opacity": 0.65
       },
-      "notes": "· \"typewriter typing closeup\" > \"manual precision work hands\" > \"vintage printing press\" · Pexels · standard · inset @ 65% · 5s ·"
+      "notes": "\u00b7 \"typewriter typing closeup\" > \"manual precision work hands\" > \"vintage printing press\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 65% \u00b7 5s \u00b7"
+    },
+    {
+      "id": "beat3-seg29-hold",
+      "type": "HOLD",
+      "startSec": 423.2,
+      "endSec": 448.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg30",
@@ -899,7 +1124,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P1",
-      "narrationRef": "But there's a ceiling — and the evidence of that ceiling is written on the chip ",
+      "narrationRef": "But there's a ceiling \u2014 and the evidence of that ceiling is written on the chip ",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-kirin-teardown.json"
@@ -923,6 +1148,15 @@
       ]
     },
     {
+      "id": "beat3-seg30-hold",
+      "type": "HOLD",
+      "startSec": 429.2,
+      "endSec": 480.4,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg31",
       "type": "FOOTAGE",
       "startSec": 448.0,
@@ -930,7 +1164,7 @@
       "layer": "background",
       "beat": "beat3",
       "priority": "P3",
-      "narrationRef": "You can see that same gap — ambition running ahead of capability, then capabilit",
+      "narrationRef": "You can see that same gap \u2014 ambition running ahead of capability, then capabilit",
       "asset": {
         "searchTerms": [
           "artificial intelligence data center servers",
@@ -944,6 +1178,15 @@
         "composite": "background",
         "opacity": 0.3
       }
+    },
+    {
+      "id": "beat3-seg31-hold",
+      "type": "HOLD",
+      "startSec": 452.0,
+      "endSec": 458.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat3-seg32",
@@ -969,6 +1212,15 @@
       }
     },
     {
+      "id": "beat3-seg32-hold",
+      "type": "HOLD",
+      "startSec": 480.4,
+      "endSec": 502.4,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
+    },
+    {
       "id": "beat3-seg33",
       "type": "TEMPLATE",
       "startSec": 480.4,
@@ -976,7 +1228,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "Then DeepSeek tried to train their next model, R2, on domestic chips — Huawei's ",
+      "narrationRef": "Then DeepSeek tried to train their next model, R2, on domestic chips \u2014 Huawei's ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-deepseek-zero.json"
@@ -995,16 +1247,13 @@
       ]
     },
     {
-      "id": "beat3-seg34",
+      "id": "beat3-seg33-hold",
       "type": "HOLD",
-      "startSec": 500.4,
-      "endSec": 502.4,
-      "layer": "background",
+      "startSec": 485.4,
+      "endSec": 522.0,
+      "layer": "foreground",
       "beat": "beat3",
-      "priority": "P2",
-      "hold": {
-        "freeze": true
-      }
+      "priority": "P3"
     },
     {
       "id": "beat3-seg35",
@@ -1033,6 +1282,15 @@
         "out": "fade",
         "durationSec": 0.5
       }
+    },
+    {
+      "id": "beat3-seg35-hold",
+      "type": "HOLD",
+      "startSec": 522.0,
+      "endSec": 560.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg36",
@@ -1065,10 +1323,10 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "narrationRef": "There's a metaphor that keeps pulling me back. The US plays chess — targeting sp",
+      "narrationRef": "There's a metaphor that keeps pulling me back. The US plays chess \u2014 targeting sp",
       "template": {
-        "component": "FrameworkDiagram",
-        "dataFile": "framework-chess-go.json"
+        "component": "GameBoard",
+        "dataFile": "gameboard-chess.json"
       },
       "transition": {
         "in": "dissolve",
@@ -1094,6 +1352,15 @@
       ]
     },
     {
+      "id": "beat4-seg37-hold",
+      "type": "HOLD",
+      "startSec": 532.0,
+      "endSec": 536.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg38",
       "type": "TEMPLATE",
       "startSec": 536.4,
@@ -1101,10 +1368,10 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "narrationRef": "China plays go — wéiqí. And if you haven't played go, the difference matters. Yo",
+      "narrationRef": "China plays go \u2014 w\u00e9iq\u00ed. And if you haven't played go, the difference matters. Yo",
       "template": {
-        "component": "FrameworkDiagram",
-        "dataFile": "framework-chess-go.json"
+        "component": "GameBoard",
+        "dataFile": "gameboard-go.json"
       },
       "transition": {
         "in": "dissolve",
@@ -1130,6 +1397,15 @@
       ]
     },
     {
+      "id": "beat4-seg38-hold",
+      "type": "HOLD",
+      "startSec": 544.4,
+      "endSec": 556.8,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg39",
       "type": "TRANSITION",
       "startSec": 556.8,
@@ -1153,6 +1429,15 @@
       }
     },
     {
+      "id": "beat4-seg39-hold",
+      "type": "HOLD",
+      "startSec": 557.8,
+      "endSec": 568.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg40",
       "type": "FOOTAGE",
       "startSec": 560.0,
@@ -1174,7 +1459,16 @@
         "composite": "inset",
         "opacity": 0.7
       },
-      "notes": "· \"ASML lithography machine factory\" > \"semiconductor manufacturing equipment cleanroom\" > \"high tech factory interior\" · Pexels · standard · inset @ 70% · 8s ·"
+      "notes": "\u00b7 \"ASML lithography machine factory\" > \"semiconductor manufacturing equipment cleanroom\" > \"high tech factory interior\" \u00b7 Pexels \u00b7 standard \u00b7 inset @ 70% \u00b7 8s \u00b7"
+    },
+    {
+      "id": "beat4-seg40-hold",
+      "type": "HOLD",
+      "startSec": 568.0,
+      "endSec": 605.6,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg41",
@@ -1208,6 +1502,15 @@
       ]
     },
     {
+      "id": "beat4-seg41-hold",
+      "type": "HOLD",
+      "startSec": 580.0,
+      "endSec": 600.4,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg42",
       "type": "TEMPLATE",
       "startSec": 600.4,
@@ -1239,6 +1542,15 @@
       ]
     },
     {
+      "id": "beat4-seg42-hold",
+      "type": "HOLD",
+      "startSec": 603.4,
+      "endSec": 611.6,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg43",
       "type": "FOOTAGE",
       "startSec": 605.6,
@@ -1259,7 +1571,16 @@
         "composite": "background",
         "opacity": 0.35
       },
-      "notes": "· \"Netherlands Veldhoven aerial\" > \"South Korea Samsung factory\" > \"industrial facility exterior modern\" · Pexels · standard · background @ 35% · 6s ·"
+      "notes": "\u00b7 \"Netherlands Veldhoven aerial\" > \"South Korea Samsung factory\" > \"industrial facility exterior modern\" \u00b7 Pexels \u00b7 standard \u00b7 background @ 35% \u00b7 6s \u00b7"
+    },
+    {
+      "id": "beat4-seg43-hold",
+      "type": "HOLD",
+      "startSec": 611.6,
+      "endSec": 660.8,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat4-seg44",
@@ -1269,7 +1590,7 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "And the countries caught inside the trap are the ones who built it. ASML — the o",
+      "narrationRef": "And the countries caught inside the trap are the ones who built it. ASML \u2014 the o",
       "template": {
         "component": "ChoroplethMap",
         "dataFile": "choropleth-caught-between.json"
@@ -1293,6 +1614,15 @@
       ]
     },
     {
+      "id": "beat4-seg44-hold",
+      "type": "HOLD",
+      "startSec": 621.6,
+      "endSec": 641.6,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg45",
       "type": "TEMPLATE",
       "startSec": 641.6,
@@ -1305,7 +1635,7 @@
         "component": "KineticTypography",
         "dataFile": "kinetic-morris-chang.json"
       },
-      "notes": "· Quote: \"Globalization is almost dead. Free trade is almost dead.\" — Morris Chang, TSMC Founder · bone text, amber attribution · 5s hold ·",
+      "notes": "\u00b7 Quote: \"Globalization is almost dead. Free trade is almost dead.\" \u2014 Morris Chang, TSMC Founder \u00b7 bone text, amber attribution \u00b7 5s hold \u00b7",
       "transition": {
         "in": "dissolve",
         "out": "cut",
@@ -1325,6 +1655,15 @@
       ]
     },
     {
+      "id": "beat4-seg45-hold",
+      "type": "HOLD",
+      "startSec": 646.6,
+      "endSec": 683.6,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P3"
+    },
+    {
       "id": "beat4-seg46",
       "type": "FOOTAGE",
       "startSec": 660.8,
@@ -1332,7 +1671,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P3",
-      "narrationRef": "If Miller is right — Chris Miller, who wrote  in 2022 — then what comes next isn",
+      "narrationRef": "If Miller is right \u2014 Chris Miller, who wrote  in 2022 \u2014 then what comes next isn",
       "asset": {
         "searchTerms": [
           "world map divided split",
@@ -1351,6 +1690,15 @@
         "out": "fade",
         "durationSec": 0.5
       }
+    },
+    {
+      "id": "beat4-seg46-hold",
+      "type": "HOLD",
+      "startSec": 683.6,
+      "endSec": 728.4,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg47",
@@ -1385,8 +1733,8 @@
       "priority": "P2",
       "narrationRef": "There's a question underneath all of this that nobody can answer, and it changes",
       "template": {
-        "component": "FrameworkDiagram",
-        "dataFile": "framework-ai-timeline.json"
+        "component": "DecisionTree",
+        "dataFile": "decisiontree-ai-timeline.json"
       },
       "transition": {
         "in": "dissolve",
@@ -1410,6 +1758,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg48-hold",
+      "type": "HOLD",
+      "startSec": 695.6,
+      "endSec": 752.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg49",
@@ -1522,6 +1879,15 @@
       }
     },
     {
+      "id": "beat5-seg53-hold",
+      "type": "HOLD",
+      "startSec": 752.8,
+      "endSec": 786.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P3"
+    },
+    {
       "id": "beat5-seg54",
       "type": "TEMPLATE",
       "startSec": 752.8,
@@ -1551,6 +1917,15 @@
           "volume": 0.06
         }
       ]
+    },
+    {
+      "id": "beat5-seg54-hold",
+      "type": "HOLD",
+      "startSec": 762.8,
+      "endSec": 808.8,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P3"
     },
     {
       "id": "beat5-seg55",
