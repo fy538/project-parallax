@@ -6,6 +6,7 @@ import type { HorizontalTimelineData } from "./types";
 import sampleData from "../../../data/episodes/silicon-trap/horizontal-timeline-oil-chip.json";
 
 export { HorizontalTimeline } from "./HorizontalTimeline";
+export { HorizontalTimelineSchema } from "./schema";
 export type {
   HorizontalTimelineData,
   TimelineEventData,

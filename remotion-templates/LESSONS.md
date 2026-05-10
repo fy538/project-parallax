@@ -68,10 +68,10 @@ When building a new template or polishing an existing one, prefer these shared b
 **Fix:** Use the CLI flag `--browser-executable=/path/to/chrome` on every `remotion still` or `remotion render` command.
 **Setup:** Install Playwright's Chromium with `npx playwright install chromium`, then find the binary with `find ~/.cache/ms-playwright -name "headless_shell" | head -1`.
 
-### L5: Map templates won't render geography in sandboxed environments
-**Problem:** ChoroplethMap and RouteAnimation fetch TopoJSON from `cdn.jsdelivr.net` at render time. Sandboxed environments (Claude's Linux shell) can't reach this CDN, so maps render with no country outlines.
-**Workaround:** Maps render correctly in local Remotion Studio (`npm start`). For QA in sandbox, test non-map templates (charts, typography, titles, frameworks) which don't need external data.
-**Future fix:** Bundle TopoJSON in `public/geo/` for fully offline rendering.
+### L5: Map templates require MAPBOX_ACCESS_TOKEN — no CDN TopoJSON
+**Problem:** ChoroplethMap and RouteAnimation have been migrated from react-simple-maps + CDN TopoJSON to Mapbox GL (`react-map-gl/mapbox`). They now require a `MAPBOX_ACCESS_TOKEN` env var to fetch Mapbox vector tiles. Sandboxed environments (Claude's Linux shell, CI without the token) cannot render them at all.
+**Workaround:** Maps render correctly in local Remotion Studio (`npm start`) with a `.env` token. Visual regression tests skip the map compositions automatically when `MAPBOX_ACCESS_TOKEN` is unset (`getSkipReason` in `templates.test.ts`). For QA in sandbox, test non-map templates (charts, typography, titles, frameworks).
+**Note:** The old "Future fix: Bundle TopoJSON in `public/geo/`" no longer applies — the templates use Mapbox vector tiles, not file-based TopoJSON. Offline map rendering would require switching to MapLibre GL + PMTiles, which is substantial scope.
 
 ### L6: Self-render QA loop
 **Process:** `npx remotion still` renders a single frame as PNG → Read the PNG with Claude's image tool → critique against BRAND.md rules → edit code → re-render. This loop works for all non-map templates in sandbox.
