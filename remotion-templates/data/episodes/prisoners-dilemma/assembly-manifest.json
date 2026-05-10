@@ -1006,8 +1006,10 @@
         "searchTerms": [
           "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines \u2014 mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
         ],
-        "source": null,
-        "shotListId": "aigen-06"
+        "source": "local-aigen",
+        "shotListId": "aigen-06",
+        "file": "clips/aigen-06-grid-landscape.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1042,7 +1044,10 @@
         "searchTerms": [
           "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber"
         ],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-07-negotiation-room.mp4",
+        "status": "resolved",
+        "shotListId": "aigen-07"
       },
       "treatment": {
         "ramp": "standard",
