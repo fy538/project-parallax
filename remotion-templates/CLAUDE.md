@@ -58,7 +58,10 @@ Categories:
 - **Source of truth for colors:** [`tools/brand-treatment/palette.json`](../tools/brand-treatment/palette.json) → loaded by `src/design/theme.ts`. Don't hex-hardcode brand colors anywhere.
 - **Animation timing:** import from `src/design/theme.ts` — `timing.entrance.{snap, fast, crisp, medium, slow}`, `timing.exit.*`, `timing.stagger.*`, `timing.hold.*`. Don't reintroduce bare `sec(0.4)` / `sec(0.2)` magic numbers (use `entrance.crisp` and `entrance.snap`).
 - **Animation defaults:** `KEN_BURNS_MAX_SCALE`, `PAN_DRIFT_MAX_OFFSET`, `EXIT_FADE_DURATION` are exported from `src/utils/animation.ts`. The `kenBurnsDrift`/`panDrift`/`exitFade` functions reference them by default.
-- **POLISH.md** defines the visual quality bar (checkable rules); **BRAND.md** is the human-readable design spec.
+- **POLISH.md** defines the visual quality bar (checkable rules + Editorial Doctrine D1–D16); **BRAND.md** is the human-readable design spec.
+- **`references/template-research/`** — per-template dossiers documenting how state-of-the-art editorial outlets (NYT Upshot, FT, Economist, Bloomberg, Reuters, Pudding) handle each viz form. Read the dossier for a template before doing polish or extension work on it. The dossier contains canonical idioms, real-world references, Parallax-specific defaults, and known failure modes.
+
+**Polish workflow:** when editing any template visually, first read POLISH.md's "Editorial Doctrine" section (D1–D16) + the template's dossier in `references/template-research/<template-name>.md`. The doctrine captures cross-template patterns (drop card chrome, hero hierarchy, ordinal numbering, etc.); the dossiers capture template-specific canon.
 
 ## How to create a new template
 

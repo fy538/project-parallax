@@ -257,3 +257,214 @@ These changes should be applied in this order (shared infrastructure first, then
 11. **RouteAnimation** — Segment trail glow, point pulse spring
 
 Each template update follows the same pattern: apply depth (V rules) → fix spacing (L rules) → upgrade animation (A rules) → verify typography (T rules) → run QA checklist.
+
+---
+
+## Editorial Doctrine (added May 10, 2026)
+
+Compiled from session-by-session diagnoses of templates that "felt off." These are the recurring patterns that show up across the catalog. Read this section before doing polish work on any template — most "what's wrong with this composition" diagnoses reduce to one of these.
+
+Each rule has the form: **observation → fix → why**. Cross-references to `references/template-research/<template>.md` when the rule has a deeper canonical backing.
+
+### D1. Drop card chrome on editorial frames
+
+**Observation:** Rounded-corner subtly-tinted rectangles around every content block read as Bootstrap settings panel / PowerPoint slideware, not editorial. They create competing surfaces with the paper background.
+
+**Fix:** Items sit directly on the paper. Thin row dividers (1px low-opacity rule) replace card boundaries. Accent left-edge for hierarchy (in outcome color, framework color, etc.) — not a full card.
+
+**Why:** The brand is intelligence-briefing on paper. Floating cards make the paper into a substrate for floating UI elements. NYT Upshot, FT, Economist, Pudding don't card-wrap.
+
+**Where it lands:** every template with items in a list or grid — FrameworkDiagram (comparison / flow / matrix), DuelingFrameworks tenets, ProbabilityGauge scorecard, SplitComposition items.
+
+---
+
+### D2. Mirrored alignment creates a center valley
+
+**Observation:** In N-column layouts where right column is `textAlign: "right"` and left is `textAlign: "left"`, both columns push text toward the center divider, leaving the outer edges of the canvas empty AND creating a tight center valley. Looks marooned in the upper-center.
+
+**Fix:** Both columns use natural `textAlign: "left"` (or center if compositionally needed). Content fills each column from its inner edge outward.
+
+**Why:** Newspaper 2-column layouts use mirroring on purpose (gutter at the spine), but newspapers fill columns vertically. When content occupies only the top third + mirrored alignment, the eye sees two narrow text strips squeezed toward center with dead air everywhere else.
+
+**Where it lands:** SplitComposition (was mirrored, now natural left-align).
+
+---
+
+### D3. Vertically center content when there isn't enough to fill
+
+**Observation:** Templates top-anchor their content, leaving 50–70% of the canvas empty below. Reads as cropped or unfinished.
+
+**Fix:** `justify-content: center` on the content container OR shift content down by computing midpoint between title bottom and footer top.
+
+**Why:** Empty paper below content reads as "the chart got cut off" or "loading…" The composition should occupy the canvas it's allocated.
+
+**Where it lands:** SplitComposition, RadarChart (centered the chart+legend cluster), FrameworkDiagram comparison.
+
+---
+
+### D4. Use ordinal numbering for sequential or comparative items
+
+**Observation:** Lists of items at uniform weight have no scanning index. Viewer can't tell which is first, which is the protagonist, where they are in the sequence.
+
+**Fix:** Numbered ordinals (01, 02, 03…) in mono caps in the accent color or column color. Force parallelism in comparison columns (if you can't write item #4 for both sides, the comparison isn't ready).
+
+**Why:** Ordinals are the editorial reading aid. NYT Upshot uses them; HBR uses them; Stratechery uses them. They also force the data writer to be honest about parity.
+
+**Where it lands:** FrameworkDiagram comparison + flow + matrix (Q1-Q4), DuelingFrameworks tenets (if needed), any sequential list.
+
+---
+
+### D5. Hero/supporting hierarchy when one item is the protagonist
+
+**Observation:** Every line/bar/node renders at the same visual weight. The protagonist (e.g., the line the narrator is about to discuss, the bar that's the punchline) doesn't stand out.
+
+**Fix:** Single hero element gets accent color + heavier stroke / larger size / glow halo. Everything else mutes to taupe / 30% opacity / smaller stroke.
+
+**Why:** The protagonist is the editorial point of the frame; the eye should land there in <300ms.
+
+**Where it lands:** TimeSeriesChart (hero line via `hero: true`), DataChart (highlightIndex), PricingWaterfall (hero stage), FrameworkDiagram flow (terminal hero node), matrix (FOCUS quadrant).
+
+---
+
+### D6. Geographic data belongs on a map, not a schematic
+
+**Observation:** Cities, countries, real places rendered as nodes-and-edges in NetworkDiagram. Loses all the editorial information geography carries (distance, neighbors, terrain).
+
+**Fix:** If your nodes are named geographic places, use a map (ChoroplethMap, RouteAnimation). NetworkDiagram is for *relationship structure where geography is irrelevant* — supply-chain chokepoints, citation graphs, coalition diagrams, concept maps.
+
+**Why:** "All roads led to Rome" is literally a fact about geography. Showing Londinium / Alexandria / Carthago as 5 circles around a center circle throws away the editorial meaning.
+
+**Where it lands:** Documented in `references/template-research/route-animation.md` and `VISUAL_LANGUAGE.md` ("Map vs. Network Diagram"). NetworkDiagram catalog was updated from Roman roads to TSMC chip-supply chokepoint for this reason.
+
+---
+
+### D7. Arbitrary numbers aren't data
+
+**Observation:** Score bars (76%, 71%) on framework comparisons; "ratings" with no source. Dresses up an editorial assertion as a measurement.
+
+**Fix:** Drop the fake quantification. Use the verbal verdict directly ("Explains the tempo and timing"). Hero stat callouts must be derived from actual data (with source attribution).
+
+**Why:** Numbers without methodology imply rigor that wasn't earned. The verbal verdict is the rhetorical clincher; the bar chart is data-viz junk. Economist doesn't put scoring bars on framework comparisons — they let the prose do the work.
+
+**Where it lands:** DuelingFrameworks scoring phase (score bars removed May 10, 2026; per-framework verdict captions + verdict question kicker only).
+
+---
+
+### D8. Sequential progressions need direction cues
+
+**Observation:** Flow diagrams with nodes-and-lines but no arrows, chevrons, or numbered stages. Eye can't tell which way the journey runs.
+
+**Fix:** Spine line + chevrons (or numbered ordinals). Hero terminal node (the destination earns weight).
+
+**Why:** A flow is meaningless without direction. Equal-spaced nodes connected by lines is a graph, not a sequence.
+
+**Where it lands:** FrameworkDiagram flow variant. See `references/template-research/framework-diagram.md` for canon.
+
+---
+
+### D9. Terminal value labels anchor line-chart endings
+
+**Observation:** Multi-line time-series charts where lines just end. Viewer doesn't know which line is which without consulting a legend (forcing eye ping-pong).
+
+**Fix:** Each line gets its name + final value labeled at the right edge, stacked to avoid collision. NYT format: "Asia · 4,712M". Skip the legend.
+
+**Why:** The viewer's eye lands at line endings anyway. Putting the identifier there removes the legend round-trip.
+
+**Where it lands:** TimeSeriesChart (implemented). See `references/template-research/time-series-chart.md` for canon.
+
+---
+
+### D10. Y-axis must not overshoot data
+
+**Observation:** Y-axis tops out at 6,000 when max data is 4,500. Wastes 25% of vertical canvas on dead space.
+
+**Fix:** Headroom should be ≤10% above max value. Use nice ticks but don't round up generously.
+
+**Why:** Empty space at the top flattens the trajectory and starves the chart of visual mass.
+
+**Where it lands:** TimeSeriesChart (headroom changed 10% → 5% in session). Audit any chart with a fitted y-axis.
+
+---
+
+### D11. X-axis ticks should be readable, not minimal
+
+**Observation:** 3-tick x-axis (start / middle / end) on a 124-year span. Middle value (1962) is arbitrary; viewer has no temporal context for the bend.
+
+**Fix:** Adaptive ticks at decade or quarter-century intervals — 6–7 ticks at human-readable steps. Always include first and last.
+
+**Why:** Sparse ticks force viewers to extrapolate. Editorial readers want to know "what year was that inflection?"
+
+**Where it lands:** TimeSeriesChart (implemented). Audit any line chart with year axes.
+
+---
+
+### D12. Annotations connect to data points, not float in corners
+
+**Observation:** "Crosses 400 ppm" as floating text top-right of the chart, disconnected from where the line actually crosses 400.
+
+**Fix:** Annotation = vertical hairline from axis to data point + label leader pointing to the point. Interpolate between data points when annotation X doesn't match a sample.
+
+**Why:** Floating annotations look like captions, not data marks. They lose the editorial connection between the moment and the place on the chart.
+
+**Where it lands:** TimeSeriesChart (interpolation fix + leader-line positioning landed in session).
+
+---
+
+### D13. Distinguish `fonts.body` (Plex Sans, paragraphs) from `fonts.metadata` (Plex Mono, labels)
+
+**Observation:** Editorial paragraphs render in IBM Plex Mono (typewriter style) because `fonts.body` was renamed during font migration. Tenets, items, subtitles all look like a transcript.
+
+**Fix:** `fonts.body` = IBM Plex Sans (paragraph text). `fonts.metadata` = IBM Plex Mono (kicker labels, axis labels, source attribution, captions). `fonts.mono` is an alias for `fonts.metadata`. Don't use `fonts.body` for kicker labels or `fonts.metadata` for paragraphs.
+
+**Why:** Body text in editorial design is never mono. Mono is the *evidence layer* — coordinates, dates, classifications, file numbers. Mixing them up makes paragraphs read as code and kicker labels read as headlines.
+
+**Where it lands:** Theme.ts + BRAND.md updated May 10, 2026. Audit any template that uses `fonts.body` on long paragraph text.
+
+---
+
+### D14. Axis labels go ON the axes, not floating in margins
+
+**Observation:** Matrix with "Urgent / Not Urgent" floating in the margins, not anchored to the axes.
+
+**Fix:** Axes are drawn as actual lines with directional arrows ("↑ More Important", "← More Urgent"). Labels live ON the axes.
+
+**Why:** Floating axis labels read as a legend; axes-as-axes read as space. The matrix's coordinate logic only works when the axes are visible.
+
+**Where it lands:** FrameworkDiagram matrix variant (implemented).
+
+---
+
+### D15. Wrap absolutely-positioned elements in a positioning context
+
+**Observation:** TitleBlock not rendering in NetworkDiagram because it was wrapped in FadeIn (which has a transform creating a zero-sized stacking context). Title positioned `absolute, top: safe.top` ended up relative to FadeIn's zero box, not the AbsoluteFill.
+
+**Fix:** Wrap TitleBlock (and similar absolute-positioned components) in a `<div style={{ position: "absolute", inset: 0 }}>` to ensure the positioning context is the canvas, not the transformed parent.
+
+**Why:** CSS transforms create new containing blocks for absolute-positioned children. Wrappers that look benign (FadeIn with transform: scale) silently break absolute positioning.
+
+**Where it lands:** NetworkDiagram (title was missing for many frames before this fix). Watch for similar patterns in any template wrapping positioned components in FadeIn / animated wrappers.
+
+---
+
+### D16. The composition should look intentional, not like an asset accidentally cropped
+
+**Observation:** Content occupies one quarter of the canvas (e.g., a matrix in the lower-right corner; a chart left-anchored with empty right half). Looks like the canvas was bigger than the design accounted for.
+
+**Fix:** Either expand the chart to fill its allocated area, or explicitly use the empty space (editorial commentary, kicker stat, pull-quote). Don't leave dead paper.
+
+**Why:** Empty canvas reads as accidental — like a slide that got pasted in but didn't resize. Editorial frames either fill their space or use it deliberately.
+
+**Where it lands:** FrameworkDiagram matrix (was cornered, now fills canvas), NetworkDiagram (was off-center, now centered).
+
+---
+
+## Reading order when polishing a template
+
+1. Read this section's doctrine (D1–D16)
+2. Read the template's dossier in `references/template-research/<template>.md` for canonical idioms + specific upgrades
+3. Render the existing template at frame 30 + frame 180 to see current state
+4. Apply doctrine rules + dossier upgrades
+5. Regen visual regression baselines
+6. Run `polish_lint.py` and ensure clean
+
+This collapses the loop from "user screenshots → I diagnose" to "I audit against doctrine + dossier → propose specific upgrades."
