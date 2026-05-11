@@ -24,7 +24,7 @@ import { Legend } from "../../components/Legend";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
+import { fadeIn, stagger, slideIn, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -565,6 +565,226 @@ const LollipopChart: React.FC<{
   );
 });
 
+// ── Small-multiples panels (DataChart) ─────────────────────────────────────
+//
+// Grid of small panels, each showing the same item structure rendered as
+// mini horizontal bars. Shared value scale across all panels (max value
+// computed once across the entire dataset) so the eye reads "compared to
+// what?" — Tufte's foundational quantitative-reasoning question.
+//
+// Reference: references/template-research/data-chart.md § 6.5
+
+const SmallMultiplesPanels: React.FC<{
+  panels: NonNullable<DataChartData["panels"]>;
+  globalMax: number;
+  unit: string;
+  chartLeft: number;
+  chartTop: number;
+  chartWidth: number;
+  chartHeight: number;
+  frame: number;
+  staggerScale: number;
+  timingScale: number;
+  formatAsYear?: boolean;
+  mode: "light" | "dark";
+}> = React.memo(({
+  panels,
+  globalMax,
+  unit,
+  chartLeft,
+  chartTop,
+  chartWidth,
+  chartHeight,
+  frame,
+  staggerScale,
+  timingScale,
+  formatAsYear,
+  mode,
+}) => {
+  const theme = useThemeMode(mode);
+
+  // Grid layout: aim for square-ish panels. For 4 panels, 2×2; for 6, 3×2.
+  const numPanels = panels.length;
+  const cols = numPanels <= 2 ? numPanels : numPanels <= 4 ? 2 : numPanels <= 6 ? 3 : 4;
+  const rows = Math.ceil(numPanels / cols);
+  const colGap = 36;
+  const rowGap = 32;
+  const panelW = (chartWidth - colGap * (cols - 1)) / cols;
+  const panelH = (chartHeight - rowGap * (rows - 1)) / rows;
+
+  return (
+    <>
+      {panels.map((panel, panelIdx) => {
+        const col = panelIdx % cols;
+        const row = Math.floor(panelIdx / cols);
+        const panelX = chartLeft + col * (panelW + colGap);
+        const panelY = chartTop + row * (panelH + rowGap);
+
+        const panelStart = sec(0.4 * timingScale) + panelIdx * sec(0.15 * staggerScale);
+        const panelOpacity = fadeIn(frame, panelStart, sec(0.5));
+
+        // Header height for title + optional subtitle
+        const headerH = panel.subtitle ? 50 : 32;
+        const rowHeight = Math.max(
+          24,
+          (panelH - headerH) / Math.max(1, panel.dataPoints.length),
+        );
+        const labelWidth = Math.min(120, panelW * 0.4);
+        const valueWidth = Math.min(60, panelW * 0.18);
+        const stemAreaWidth = panelW - labelWidth - valueWidth - 16;
+
+        return (
+          <div
+            key={`panel-${panelIdx}`}
+            style={{
+              position: "absolute",
+              left: panelX,
+              top: panelY,
+              width: panelW,
+              height: panelH,
+              opacity: panelOpacity,
+              transform: `translateY(${slideIn(frame, panelStart, 8, sec(0.5))}px)`,
+            }}
+          >
+            {/* Panel header */}
+            <div
+              style={{
+                fontSize: fontSizes.label,
+                fontFamily: fonts.metadata,
+                color: theme.text.primary,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                fontWeight: 600,
+                lineHeight: 1.1,
+              }}
+            >
+              {panel.title}
+            </div>
+            {panel.subtitle && (
+              <div
+                style={{
+                  fontSize: fontSizes.caption,
+                  fontFamily: fonts.body,
+                  color: theme.text.muted,
+                  marginTop: 2,
+                  lineHeight: 1.2,
+                }}
+              >
+                {panel.subtitle}
+              </div>
+            )}
+
+            {/* Bars */}
+            <div
+              style={{
+                position: "absolute",
+                top: headerH,
+                left: 0,
+                width: panelW,
+                bottom: 0,
+              }}
+            >
+              {panel.dataPoints.map((dp, rowIdx) => {
+                const rowStart = panelStart + sec(0.2) + rowIdx * sec(0.08);
+                const growProgress = interpolate(
+                  frame,
+                  [rowStart, rowStart + sec(0.6)],
+                  [0, 1],
+                  CLAMP_CUBIC,
+                );
+                const stemEnd = (dp.value / Math.max(globalMax, 1e-9)) * stemAreaWidth;
+                const stemX = stemEnd * growProgress;
+                const valueOpacity = fadeIn(frame, rowStart + sec(0.5), sec(0.3));
+                const rowTopY = rowIdx * rowHeight;
+                const rowCenterY = rowHeight / 2;
+                const barH = Math.max(4, rowHeight * 0.45);
+                const barColor = dp.color || theme.text.primary;
+                const stemStartX = labelWidth + 8;
+
+                return (
+                  <div
+                    key={`bar-${rowIdx}`}
+                    style={{
+                      position: "absolute",
+                      top: rowTopY,
+                      left: 0,
+                      width: panelW,
+                      height: rowHeight,
+                      opacity: fadeIn(frame, rowStart, sec(0.4)),
+                    }}
+                  >
+                    {/* Label */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: rowCenterY - fontSizes.caption / 2,
+                        left: 0,
+                        width: labelWidth,
+                        textAlign: "right",
+                        paddingRight: 6,
+                        fontSize: fontSizes.caption,
+                        fontFamily: fonts.body,
+                        color: theme.text.secondary,
+                        lineHeight: 1,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {dp.label}
+                    </div>
+                    {/* Bar */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: rowCenterY - barH / 2,
+                        left: stemStartX,
+                        width: stemX,
+                        height: barH,
+                        background: barColor,
+                        opacity: 0.85,
+                        borderRadius: 2,
+                      }}
+                    />
+                    {/* Value */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: rowCenterY - fontSizes.caption / 2,
+                        left: stemStartX + stemEnd + 6,
+                        width: valueWidth,
+                        fontSize: fontSizes.caption,
+                        fontFamily: fonts.data,
+                        color: barColor,
+                        opacity: valueOpacity,
+                        lineHeight: 1,
+                        whiteSpace: "nowrap",
+                        textShadow: shadows.textLift,
+                      }}
+                    >
+                      {formatAsYear
+                        ? String(Math.round(dp.value))
+                        : formatNumber(dp.value, {
+                            decimals: 0,
+                            style: dp.value >= 10000 ? "abbreviated" : "decimal",
+                          })}
+                      {unit && (
+                        <span style={{ fontSize: fontSizes.meta, color: theme.text.muted, marginLeft: 1 }}>
+                          {unit}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+});
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
@@ -1086,6 +1306,31 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
           />
         </div>
       )}
+
+      {/* ── Small-multiples variant — grid of mini horizontal bar panels with
+          shared value scale. See: data-chart.md § 6.5 */}
+      {data.variant === "small-multiples" && data.panels && data.panels.length > 0 && (() => {
+        const globalMax = Math.max(
+          1e-9,
+          ...data.panels.flatMap((p) => p.dataPoints.map((dp) => dp.value)),
+        );
+        return (
+          <SmallMultiplesPanels
+            panels={data.panels}
+            globalMax={globalMax}
+            unit={unit}
+            chartLeft={chartArea.left}
+            chartTop={chartArea.top}
+            chartWidth={chartBoxes.chart.width}
+            chartHeight={chartBoxes.chart.height}
+            frame={frame}
+            staggerScale={s}
+            timingScale={t}
+            formatAsYear={data.formatAsYear}
+            mode="light"
+          />
+        );
+      })()}
 
       {/* ── Top metadata band — shares one reserved zone with the chart layout */}
       {hasTopBand && (

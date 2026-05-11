@@ -160,6 +160,65 @@ const chartAxelrodRankings: DataChartData = {
   durationSec: 12,
 };
 
+// Small-multiples DataChart sample — Olympic medal rankings by Games,
+// four panels (Helsinki '52 / Tokyo '64 / Munich '72 / Moscow '80) showing
+// the same five-country comparison. Shared value scale lets the eye read
+// "compared to what?" across panels. Right form when a multi-line chart
+// would be spaghetti.
+// See: references/template-research/data-chart.md § 6.5
+const chartOlympicsSmallMultiples: DataChartData = {
+  episode: CATALOG_EPISODE,
+  title: "Cold War Olympics, Four Games",
+  subtitle: "Total medals per country — shared value scale across panels",
+  variant: "small-multiples",
+  unit: "",
+  panels: [
+    {
+      title: "Helsinki '52",
+      dataPoints: [
+        { label: "USSR", value: 71, color: "#C23B22" },
+        { label: "US", value: 76, color: "#3266AD" },
+        { label: "Hungary", value: 42 },
+        { label: "Sweden", value: 35 },
+        { label: "Italy", value: 21 },
+      ],
+    },
+    {
+      title: "Tokyo '64",
+      dataPoints: [
+        { label: "USSR", value: 96, color: "#C23B22" },
+        { label: "US", value: 90, color: "#3266AD" },
+        { label: "Hungary", value: 22 },
+        { label: "Sweden", value: 8 },
+        { label: "Italy", value: 27 },
+      ],
+    },
+    {
+      title: "Munich '72",
+      dataPoints: [
+        { label: "USSR", value: 99, color: "#C23B22" },
+        { label: "US", value: 94, color: "#3266AD" },
+        { label: "E. Germany", value: 66 },
+        { label: "W. Germany", value: 40 },
+        { label: "Hungary", value: 35 },
+      ],
+    },
+    {
+      title: "Moscow '80",
+      subtitle: "US boycott",
+      dataPoints: [
+        { label: "USSR", value: 195, color: "#C23B22" },
+        { label: "E. Germany", value: 126 },
+        { label: "Bulgaria", value: 41 },
+        { label: "Cuba", value: 20 },
+        { label: "Italy", value: 15 },
+      ],
+    },
+  ],
+  source: "International Olympic Committee",
+  durationSec: 11,
+};
+
 // ─── TimeSeriesChart × 2 ──────────────────────────────────────────────────
 
 // Simplified: dropped the heroStat (which collided with the top-right annotation)
@@ -226,6 +285,39 @@ const tsLifeExpectancySlope: TimeSeriesChartData = {
     },
   ],
   source: "Our World in Data",
+  durationSec: 10,
+};
+
+// Small-multiples demo — same population data as `tsPopulation`, rendered
+// as four side-by-side panels with a shared y-axis. Right form when the
+// editorial point is "compare these trajectories without spaghetti."
+// See: references/template-research/time-series-chart.md § 6.3
+const tsPopulationSmallMultiples: TimeSeriesChartData = {
+  episode: CATALOG_EPISODE,
+  title: "Four Trajectories, One Century",
+  subtitle: "Population (millions) — same y-axis across all panels",
+  variant: "small-multiples",
+  lines: [
+    {
+      label: "Asia", color: "#C23B22", hero: true,
+      points: [{ x: 1900, y: 947 }, { x: 1950, y: 1404 }, { x: 2000, y: 3741 }, { x: 2024, y: 4721 }],
+    },
+    {
+      label: "Africa", color: "#E5A544",
+      points: [{ x: 1900, y: 133 }, { x: 1950, y: 228 }, { x: 2000, y: 819 }, { x: 2024, y: 1485 }],
+    },
+    {
+      label: "Europe", color: "#3266AD",
+      points: [{ x: 1900, y: 408 }, { x: 1950, y: 549 }, { x: 2000, y: 728 }, { x: 2024, y: 743 }],
+    },
+    {
+      label: "Americas", color: "#5DAA68",
+      points: [{ x: 1900, y: 156 }, { x: 1950, y: 339 }, { x: 2000, y: 836 }, { x: 2024, y: 1037 }],
+    },
+  ],
+  xLabel: "Year",
+  yUnit: " M",
+  source: "UN Population Division",
   durationSec: 10,
 };
 
@@ -406,6 +498,7 @@ const dataChartComp = (id: string, data: DataChartData) => (
 export const CatalogChartMountains = () => dataChartComp(catalogId("DataChart", "speeds-bar"), chartMountains);
 export const CatalogChartSpaceRace = () => dataChartComp(catalogId("DataChart", "space-race-comparison"), chartSpaceRace);
 export const CatalogChartAxelrodLollipop = () => dataChartComp(catalogId("DataChart", "axelrod-lollipop"), chartAxelrodRankings);
+export const CatalogChartOlympicsSmallMultiples = () => dataChartComp(catalogId("DataChart", "olympics-small-multiples"), chartOlympicsSmallMultiples);
 
 const tsComp = (id: string, data: TimeSeriesChartData) => (
   <Composition
@@ -425,6 +518,7 @@ const tsComp = (id: string, data: TimeSeriesChartData) => (
 export const CatalogTsCO2 = () => tsComp(catalogId("TimeSeriesChart", "atmospheric-co2"), tsCarbonDioxide);
 export const CatalogTsPopulation = () => tsComp(catalogId("TimeSeriesChart", "world-population"), tsPopulation);
 export const CatalogTsLifeExpectancySlope = () => tsComp(catalogId("TimeSeriesChart", "life-expectancy-slope"), tsLifeExpectancySlope);
+export const CatalogTsPopulationSmallMultiples = () => tsComp(catalogId("TimeSeriesChart", "population-small-multiples"), tsPopulationSmallMultiples);
 
 const gaugeComp = (id: string, data: ProbabilityGaugeData) => (
   <Composition
@@ -583,8 +677,8 @@ export const CatalogWaterfallMotionDocumentary = () => (
 
 export const catalogDataData = {
   statApollo, statMariana, statHabitable,
-  chartMountains, chartSpaceRace, chartAxelrodRankings,
-  tsCarbonDioxide, tsPopulation, tsLifeExpectancySlope,
+  chartMountains, chartSpaceRace, chartAxelrodRankings, chartOlympicsSmallMultiples,
+  tsCarbonDioxide, tsPopulation, tsLifeExpectancySlope, tsPopulationSmallMultiples,
   gaugeWeather, gaugeScorecard,
   bayesVenice, radarAthletes, sankeyEnergy,
   waterfallCoffee,

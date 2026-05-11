@@ -40,10 +40,15 @@ export const DataChartSchema = z.object({
       episode: z.string(),
       title: z.string(),
       subtitle: z.string().optional(),
-      variant: z.enum(["bar", "comparison", "horizontal", "lollipop"]),
+      variant: z.enum(["bar", "comparison", "horizontal", "lollipop", "small-multiples"]),
       unit: z.string().optional(),
       dataPoints: z.array(DataPointSchema).optional(),
       comparisonPairs: z.array(ComparisonPairSchema).optional(),
+      panels: z.array(z.object({
+        title: z.string(),
+        subtitle: z.string().optional(),
+        dataPoints: z.array(DataPointSchema),
+      })).optional(),
       leftGroupLabel: z.string().optional(),
       rightGroupLabel: z.string().optional(),
       leftGroupColor: z.string().optional(),
@@ -80,6 +85,16 @@ export const DataChartSchema = z.object({
           code: z.ZodIssueCode.custom,
           message: "variant 'comparison' requires at least one comparisonPair",
           path: ["comparisonPairs"],
+        });
+      }
+      if (
+        d.variant === "small-multiples" &&
+        (!d.panels || d.panels.length === 0)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "variant 'small-multiples' requires at least one panel",
+          path: ["panels"],
         });
       }
     }),

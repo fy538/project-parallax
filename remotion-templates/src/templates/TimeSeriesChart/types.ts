@@ -121,8 +121,16 @@ export interface TimeSeriesChartData {
    *    cross indicate ranking inversions; lines that diverge indicate
    *    widening gaps. Tufte called this "ranking change at a glance."
    *    See: references/template-research/time-series-chart.md § 6.2
+   * - `small-multiples` — N small panels in a grid, each rendering one line
+   *    against the same shared y-domain. Right when series count exceeds 4
+   *    and a multi-line chart would read as spaghetti. Each panel gets a
+   *    title and a sparse mini-axis; the hero panel (`line.hero: true`) gets
+   *    accent color + heavier stroke. Tufte's small-multiples principle:
+   *    "at the heart of quantitative reasoning is a single question: compared
+   *    to what?"
+   *    See: references/template-research/time-series-chart.md § 6.3
    */
-  variant?: "line" | "slope";
+  variant?: "line" | "slope" | "small-multiples";
 
   lines: TimeSeriesLine[];
   annotations?: TimeSeriesAnnotation[];

@@ -41,8 +41,30 @@ export interface DataChartData {
    *    Cleveland's perceptual hierarchy: position-along-common-scale survives
    *    in lollipop form while ink-to-data ratio drops dramatically.
    *    See: references/template-research/data-chart.md § 6.4
+   * - `small-multiples` — grid of small panels, each with the same item
+   *    list rendered as mini horizontal bars sharing a value scale.
+   *    Right for cross-category comparison ("show me the rankings across
+   *    six countries / six years / six demographics"). Tufte's signature
+   *    form for "compared to what?" Pair with `panels` field.
+   *    See: references/template-research/data-chart.md § 6.5
    */
-  variant: "bar" | "comparison" | "horizontal" | "lollipop";
+  variant: "bar" | "comparison" | "horizontal" | "lollipop" | "small-multiples";
+
+  /**
+   * Panels for `small-multiples` variant. Each panel renders the same item
+   * structure (a list of DataPoint) but for a different category — e.g.,
+   * "GDP rankings by region," each panel showing the same six countries'
+   * GDP, panels labeled "Asia / Europe / Americas." Maximum value is
+   * computed across ALL panels so the value axis is shared.
+   *
+   * Required when `variant: "small-multiples"`. Ignored otherwise.
+   */
+  panels?: Array<{
+    title: string;
+    dataPoints: DataPoint[];
+    /** Optional subtitle / context for this panel. */
+    subtitle?: string;
+  }>;
   /** Unit label (e.g., "%", "passes", "$B"). */
   unit?: string;
   /** For bar charts. */

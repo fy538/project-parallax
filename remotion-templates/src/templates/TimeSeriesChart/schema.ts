@@ -57,7 +57,7 @@ export const TimeSeriesChartSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    variant: z.enum(["line", "slope"]).optional(),
+    variant: z.enum(["line", "slope", "small-multiples"]).optional(),
     lines: z.array(TimeSeriesLineSchema),
     annotations: z.array(TimeSeriesAnnotationSchema).optional(),
     eras: z.array(TimeSeriesEraSchema).optional(),

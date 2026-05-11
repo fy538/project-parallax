@@ -379,6 +379,195 @@ const SlopeChart: React.FC<{
   );
 });
 
+// ── Small-multiples renderer ────────────────────────────────────────────────
+//
+// Tufte's small-multiples principle: when comparing 4+ series, a single
+// multi-line chart turns into spaghetti — break the comparison into a grid
+// of small individual charts that share a y-axis, and the eye reads each
+// trajectory cleanly before doing the cross-panel comparison.
+//
+// Right form for "approval ratings by demographic, six panels," "GDP growth
+// by country," "infection waves by region." Wrong for: data where the
+// relationship between series IS the point (then use the multi-line chart).
+//
+// Reference: references/template-research/time-series-chart.md § 6.3
+
+const SmallMultiplesChart: React.FC<{
+  lines: TimeSeriesLine[];
+  yMin: number;
+  yMax: number;
+  xMin: number;
+  xMax: number;
+  yUnit: string;
+  chartLeft: number;
+  chartTop: number;
+  chartWidth: number;
+  chartHeight: number;
+  frame: number;
+  mode: "light" | "dark";
+}> = React.memo(({
+  lines,
+  yMin,
+  yMax,
+  xMin,
+  xMax,
+  yUnit,
+  chartLeft,
+  chartTop,
+  chartWidth,
+  chartHeight,
+  frame,
+  mode,
+}) => {
+  const theme = useThemeMode(mode);
+
+  // Grid dimensions: aim for ~2:1 aspect ratio per panel. For 4-6 series,
+  // 3 columns × ceil(n/3) rows reads well at video scale.
+  const numPanels = lines.length;
+  const cols = numPanels <= 3 ? numPanels : numPanels <= 6 ? 3 : 4;
+  const rows = Math.ceil(numPanels / cols);
+  const colGap = 24;
+  const rowGap = 36;
+  const panelWidth = (chartWidth - colGap * (cols - 1)) / cols;
+  const panelHeight = (chartHeight - rowGap * (rows - 1)) / rows;
+  // Reserve top of each panel for title, bottom for x-axis baseline.
+  const titleH = 32;
+  const baselineH = 4;
+  const plotW = panelWidth;
+  const plotH = panelHeight - titleH - baselineH;
+
+  // Find hero panel index (first line marked hero, else none).
+  const heroIdx = lines.findIndex((l) => l.hero);
+
+  return (
+    <>
+      {lines.map((line, idx) => {
+        const col = idx % cols;
+        const row = Math.floor(idx / cols);
+        const panelX = chartLeft + col * (panelWidth + colGap);
+        const panelY = chartTop + row * (panelHeight + rowGap);
+        const plotX0 = panelX;
+        const plotY0 = panelY + titleH;
+        const isHero = idx === heroIdx;
+
+        // Convert each point to pixel coordinates within this panel's plot box.
+        const xRange = xMax - xMin || 1;
+        const yRange = yMax - yMin || 1;
+        const pointStrings = line.points.map((p) => {
+          const xVal = typeof p.x === "string" ? parseFloat(p.x) : p.x;
+          const cx = plotX0 + ((xVal - xMin) / xRange) * plotW;
+          const cy = plotY0 + plotH - ((p.y - yMin) / yRange) * plotH;
+          return `${cx},${cy}`;
+        }).join(" ");
+
+        // Line stagger reveal (left → right).
+        const lineStart = sec(0.4) + idx * sec(0.15);
+        const lineProgress = interpolate(frame, [lineStart, lineStart + sec(0.8)], [0, 1], CLAMP_CUBIC);
+        const lineOpacity = fadeIn(frame, lineStart, sec(0.5));
+
+        // Terminal-value label (last point) — Tufte convention.
+        const lastPoint = line.points[line.points.length - 1];
+        const lastX = typeof lastPoint.x === "string" ? parseFloat(lastPoint.x) : lastPoint.x;
+        const terminalX = plotX0 + ((lastX - xMin) / xRange) * plotW;
+        const terminalY = plotY0 + plotH - ((lastPoint.y - yMin) / yRange) * plotH;
+        const terminalOpacity = fadeIn(frame, lineStart + sec(0.8), sec(0.4));
+
+        return (
+          <React.Fragment key={`sm-${idx}`}>
+            {/* Panel title */}
+            <div
+              style={{
+                position: "absolute",
+                left: panelX,
+                top: panelY,
+                width: panelWidth,
+                fontSize: fontSizes.label,
+                fontFamily: fonts.metadata,
+                color: isHero ? line.color : theme.text.secondary,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                fontWeight: isHero ? 700 : 500,
+                lineHeight: 1.2,
+                opacity: fadeIn(frame, lineStart - sec(0.2), sec(0.4)),
+                maxWidth: panelWidth,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {line.label}
+            </div>
+
+            {/* Panel baseline (x-axis) + sparse y-axis tick */}
+            <svg
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: layout.width,
+                height: layout.height,
+                pointerEvents: "none",
+              }}
+            >
+              {/* Baseline */}
+              <line
+                x1={plotX0}
+                y1={plotY0 + plotH}
+                x2={plotX0 + plotW}
+                y2={plotY0 + plotH}
+                stroke={theme.text.muted}
+                strokeWidth={1}
+                opacity={0.35 * fadeIn(frame, lineStart - sec(0.3), sec(0.4))}
+              />
+              {/* Polyline path with progressive reveal via stroke-dasharray */}
+              <polyline
+                points={pointStrings}
+                fill="none"
+                stroke={line.color}
+                strokeWidth={isHero ? 3 : 1.75}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity={lineOpacity * (isHero ? 1 : 0.8)}
+                pathLength={1}
+                strokeDasharray={1}
+                strokeDashoffset={1 - lineProgress}
+              />
+              {/* Terminal dot */}
+              <circle
+                cx={terminalX}
+                cy={terminalY}
+                r={isHero ? 5 : 3}
+                fill={line.color}
+                opacity={terminalOpacity}
+              />
+            </svg>
+
+            {/* Terminal value label */}
+            <div
+              style={{
+                position: "absolute",
+                left: terminalX + 8,
+                top: terminalY - fontSizes.caption / 2 - 2,
+                fontSize: isHero ? fontSizes.body : fontSizes.caption,
+                fontFamily: fonts.data,
+                fontWeight: isHero ? 700 : 500,
+                color: line.color,
+                opacity: terminalOpacity,
+                whiteSpace: "nowrap",
+                lineHeight: 1,
+                textShadow: shadows.textLift,
+              }}
+            >
+              {Math.round(lastPoint.y)}
+              {yUnit && <span style={{ fontSize: fontSizes.caption, color: theme.text.muted, marginLeft: 2 }}>{yUnit}</span>}
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+});
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
@@ -702,6 +891,52 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             xStartLabel={startLabel}
             xEndLabel={endLabel}
             yUnit={data.yUnit || ""}
+            frame={frame}
+            mode={bgVariant}
+          />
+          {data.source && (
+            <SourceAttribution source={data.source} mode={bgVariant} prefix="Source: " bottomOffset={sourceBottomOffset} />
+          )}
+          <HeaderStrip mode={bgVariant} metadata={data.episode} />
+          <FooterStrip mode={bgVariant} />
+        </AbsoluteFill>
+      </Background>
+    );
+  }
+
+  // ── Small-multiples variant early return ─────────────────────────────────
+  // N small panels in a grid sharing y-domain. Use when series > 4 and a
+  // multi-line chart would be spaghetti. See: time-series-chart.md § 6.3
+  if (data.variant === "small-multiples") {
+    return (
+      <Background
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(data.backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
+        tint={direction.backgroundTint ?? data.backgroundTint}
+        atmosphere={direction.atmosphere}
+        atmosphereIntensity={direction.atmosphereIntensity}
+      >
+        <AbsoluteFill
+          style={{
+            opacity: contentOpacity,
+            transform: `scale(${driftScale})`,
+            transformOrigin: "center center",
+          }}
+        >
+          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+          <SmallMultiplesChart
+            lines={data.lines}
+            yMin={yMin}
+            yMax={yMax}
+            xMin={xMin}
+            xMax={xMax}
+            yUnit={data.yUnit || ""}
+            chartLeft={chartLeft}
+            chartTop={chartTop}
+            chartWidth={chartWidth}
+            chartHeight={chartHeight}
             frame={frame}
             mode={bgVariant}
           />

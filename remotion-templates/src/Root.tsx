@@ -82,9 +82,11 @@ import {
   CatalogChartMountains,
   CatalogChartSpaceRace,
   CatalogChartAxelrodLollipop,
+  CatalogChartOlympicsSmallMultiples,
   CatalogTsCO2,
   CatalogTsPopulation,
   CatalogTsLifeExpectancySlope,
+  CatalogTsPopulationSmallMultiples,
   CatalogGaugeWeather,
   CatalogGaugeScorecard,
   CatalogBayesVenice,
@@ -256,9 +258,11 @@ export const RemotionRoot: React.FC = () => {
           <CatalogChartMountains />
           <CatalogChartSpaceRace />
           <CatalogChartAxelrodLollipop />
+          <CatalogChartOlympicsSmallMultiples />
           <CatalogTsCO2 />
           <CatalogTsPopulation />
           <CatalogTsLifeExpectancySlope />
+          <CatalogTsPopulationSmallMultiples />
           <CatalogGaugeWeather />
           <CatalogGaugeScorecard />
           <CatalogBayesVenice />
