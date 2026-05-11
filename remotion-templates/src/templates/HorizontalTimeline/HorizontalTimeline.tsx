@@ -536,8 +536,14 @@ export const HorizontalTimeline: React.FC<{
     contentFooterGap: 0,
   });
 
-  const eraAColor = data.eraAColor || palette.gold;
-  const eraBColor = data.eraBColor || palette.rust;
+  // Dossier-canonical era default palette: rust (Era A = historical) +
+  // ink (Era B = contemporary). Both already in the brand palette, so the
+  // dual timeline reads in-register without introducing a non-brand color.
+  // Override only when an episode has specific bilateral coloring
+  // (US-blue vs China-rust, etc.).
+  // See: references/template-research/timeline-comparison.md § 4
+  const eraAColor = data.eraAColor || palette.rust;
+  const eraBColor = data.eraBColor || palette.ink;
 
   // Era weight ratio — applies opacity weighting to whichever era is foiled.
   // Default `equal` keeps both eras at full opacity (Parallax's bounded-

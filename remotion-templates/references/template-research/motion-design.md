@@ -163,7 +163,12 @@ The existing animation utilities + substrate motion system:
 1. **Document the substrate-motion-identity decision** in POLISH.md or BRAND.md as the canonical motion philosophy. Already implemented; needs codification.
 2. **Audit slide-in usage on body text.** Body labels should fade, not slide. Find and fix templates using `slideIn` on body-weight text.
 3. ~~**Anticipatory reveal helper.** Add `anticipatoryReveal(frame, narrationCueFrame, settleFrames=12, anticipateFrames=5)` to `utils/animation.ts` — wraps `fadeIn` with the 150ms-pre-narration timing.~~ **Done — May 11, 2026.** `anticipatoryReveal()` and `anticipatoryStartFrame()` shipped in `utils/animation.ts`; covered by `src/__tests__/anticipatoryReveal.test.ts`. Adoption next: thread through templates as narration cues come online via Whisper-resolved sync points (see `useBeatSync` integration pattern).
-4. **Continuous-motion audit.** Find templates with `Math.sin(frame * 0.X)` or similar continuous pulse on data elements. Replace with single-pulse-on-landing.
+4. ~~**Continuous-motion audit.** Find templates with `Math.sin(frame * 0.X)` or similar continuous pulse on data elements. Replace with single-pulse-on-landing.~~ **Done — May 11, 2026.** Audited all `Math.sin(frame...)` and `Math.cos(frame...)` uses across templates and components:
+
+  - **Fixed**: `RadarChart.tsx` — vertex pulse on focused axis was a continuous sine wave; replaced with `pulse()` single-pulse-on-landing that fires 12 frames after focus settles (1.0 → 1.2 → 1.0).
+  - **Allowed (substrate)**: `Background.tsx`, `AmbientParticles.tsx`, `FilmOverlay.tsx` — ambient atmosphere oscillation per the substrate-motion identity.
+  - **Allowed (camera)**: `BifurcationRoute.tsx`, `EscalationLadder.tsx` — Perlin-like 2-octave camera wobble. Substrate-level, not data-level.
+  - **Allowed (state indicator)**: `FooterStrip.tsx` ●REC pulse, `ProbabilityGauge.tsx` pending-outcome pulse. Indeterminate-state signaling — the pulse IS the state. Documented inline with cross-reference.
 5. ~~**Document forbidden easings** in POLISH.md A1 expansion. Currently A1 catches "no easing"; add "bouncy/elastic/back-ease forbidden in editorial register."~~ **Done — May 11, 2026.** Shipped as `polish_lint.py` rule **A2 — Forbidden easing (bounce/elastic/back)**. Catches `Easing.bounce`, `Easing.elastic(...)`, `Easing.back(...)` and asks for `ease-out-cubic/quartic` instead. Suppression via `// easing-ok: <reason>`. 51/51 templates clean today; rule prevents future regressions.
 
 ## TL;DR

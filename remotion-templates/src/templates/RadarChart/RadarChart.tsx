@@ -31,6 +31,7 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   exitFade,
+  pulse,
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
@@ -182,9 +183,23 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
     }
   }
 
-  // Vertex pulse for focused axis
-  const vertexPulseScale = hasAxisFocus && currentFocusAxisIndex >= 0
-    ? 1 + 0.3 * Math.sin(frame * 0.12)
+  // Vertex pulse for focused axis — SINGLE pulse on landing (not continuous).
+  // The dossier convention: "one pulse is punctuation, repeated pulse is
+  // anxiety." When axis focus arrives, vertex pulses once (1.0 → 1.2 → 1.0
+  // over ~12 frames) to confirm landing, then holds.
+  // See: references/template-research/motion-design.md § 2 (single-pulse-on-landing)
+  const vertexPulseScale = hasAxisFocus && currentFocusAxisIndex >= 0 && axisFocusBounds.length > 0
+    ? (() => {
+        // Find the current bound's start frame for the focused axis.
+        const currentBoundForPulse = axisFocusBounds.find(
+          (b) => b.step.axisIndex === currentFocusAxisIndex && frame >= b.start,
+        );
+        if (!currentBoundForPulse) return 1;
+        // Pulse 12 frames AFTER focus settles (transitionEnd = +sec(0.8)),
+        // so the pulse reads as "I've arrived" punctuation.
+        const pulseStart = currentBoundForPulse.start + sec(0.8);
+        return pulse(frame, pulseStart, 12, 1.2);
+      })()
     : 1;
 
   // ── Grid progress ──────────────────────────────────────────────────────

@@ -805,6 +805,11 @@ const Scorecard: React.FC<{
         const meta = outcomeMeta(item.outcome);
         const glyphSettle = pulse(frame, rowStartFrame + sec(0.3), 8, 1.06);
         const isPending = item.outcome === "pending";
+        // Indeterminate-state pulse (like ●REC) — communicates "still ongoing"
+        // rather than "data settled." This is semantically distinct from the
+        // forbidden continuous pulse on a settled data element. The state
+        // *is* the pulse; once the outcome resolves to win/lose/draw, the
+        // pulse stops. See: motion-design.md (allowed: state indicators).
         const pendingPulse = isPending ? 0.7 + 0.3 * Math.sin(frame * 0.08) : 1;
 
         return (
