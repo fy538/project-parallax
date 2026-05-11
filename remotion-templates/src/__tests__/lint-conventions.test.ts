@@ -96,6 +96,98 @@ describe("lint rule: missing-composition-animation (L44)", () => {
   });
 });
 
+describe("lint rule: missing-title-block", () => {
+  const minimalAnimatedTemplate = `
+    import { AbsoluteFill } from "remotion";
+    import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+    import { useDirection } from "../../hooks/useDirection";
+    export const Foo = ({ data }: { data: { title: string } }) => {
+      useDirection(data._direction);
+      const { style } = useCompositionAnimation();
+      return (
+        <AbsoluteFill style={style}>
+          <span>{data.title}</span>
+        </AbsoluteFill>
+      );
+    };
+  `;
+
+  it("flags templates that use data.title without TitleBlock", () => {
+    const issues = lint(
+      minimalAnimatedTemplate,
+      "src/templates/Foo/Bar.tsx",
+    );
+    expect(hasRule(issues, "missing-title-block")).toBe(true);
+  });
+
+  it("allows TitleBlock", () => {
+    const issues = lint(
+      `
+      import { AbsoluteFill } from "remotion";
+      import { TitleBlock } from "../../components/TitleBlock";
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      import { useDirection } from "../../hooks/useDirection";
+      export const Foo = ({ data }: any) => {
+        useDirection(data._direction);
+        const { style } = useCompositionAnimation();
+        return (
+          <AbsoluteFill style={style}>
+            <TitleBlock title={data.title} mode="content" />
+          </AbsoluteFill>
+        );
+      };
+    `,
+      "src/templates/Foo/Bar.tsx",
+    );
+    expect(hasRule(issues, "missing-title-block")).toBe(false);
+  });
+
+  it("skips Shorts/ (9:16 templates use Shorts title chrome, not TitleBlock)", () => {
+    const issues = lint(
+      minimalAnimatedTemplate,
+      "src/templates/Shorts/DataChartShort.tsx",
+    );
+    expect(hasRule(issues, "missing-title-block")).toBe(false);
+  });
+
+  it("skips known non-TitleBlock layouts by basename", () => {
+    for (const base of [
+      "SplitComposition.tsx",
+      "Thumbnail.tsx",
+      "TitleTransition.tsx",
+      "ImageComposite.tsx",
+    ]) {
+      const issues = lint(
+        minimalAnimatedTemplate,
+        `src/templates/X/${base}`,
+      );
+      expect(hasRule(issues, "missing-title-block")).toBe(false);
+    }
+  });
+
+  it("accepts @title-block: none pragma", () => {
+    const issues = lint(
+      `
+      // @title-block: none — custom kicker row
+      ${minimalAnimatedTemplate}
+    `,
+      "src/templates/Foo/CustomTitle.tsx",
+    );
+    expect(hasRule(issues, "missing-title-block")).toBe(false);
+  });
+
+  it("accepts @title-block: delegated pragma (child owns TitleBlock)", () => {
+    const issues = lint(
+      `
+      // @title-block: delegated — layout shell only
+      ${minimalAnimatedTemplate}
+    `,
+      "src/templates/Foo/Shell.tsx",
+    );
+    expect(hasRule(issues, "missing-title-block")).toBe(false);
+  });
+});
+
 describe("lint rule: nested-ken-burns (L66)", () => {
   it("warns when a template uses both useCompositionAnimation and a manual kenBurnsDrift", () => {
     const issues = lint(`

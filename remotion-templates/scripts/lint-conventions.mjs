@@ -11,7 +11,9 @@
  *
  * Conventions enforced:
  *   1. No direct layout.safeArea.* in templates (use layout.safeAreaTier.generous.*)
- *   2. All templates must use TitleBlock (not manual title positioning)
+ *   2. Long-form templates must use TitleBlock — Shorts, Thumbnail, transitions,
+ *      split-screen, and ImageComposite are excluded; others may use
+ *      @title-block: none | @title-block: delegated
  *   3. No hardcoded 80/108 pixel safe area values
  *   4. Templates must import useCompositionAnimation
  *   5. No nested Ken Burns drift inside compStyle (L66 — silent compounding bug)
@@ -31,6 +33,36 @@ const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
 const EXCLUDE_DIRS = ["Episodes", "__tests__"];
+
+/**
+ * Long-form templates must use <TitleBlock>; these paths use different title
+ * chrome (9:16 shorts, section cards, thumbnails, image-led layouts). Keep the
+ * basename list in sync with `npm run lint` — any new exception needs a design
+ * rationale, not a silent skip.
+ */
+const MISSING_TITLE_BLOCK_EXCLUDED_BASENAMES = new Set([
+  "SplitComposition.tsx", // split-screen: title in panel chrome, not TitleBlock
+  "Thumbnail.tsx", // 16:9 promo card — condensed title treatment
+  "TitleTransition.tsx", // full-card section openers
+  "ImageComposite.tsx", // photo-first: HeaderStrip / caption strip, not TitleBlock
+]);
+
+function isMissingTitleBlockRuleSkipped(content, filePath) {
+  // Explicit opt-out (rare one-offs). Use `none` when this file owns a custom
+  // title row; `delegated` when a child component renders TitleBlock instead.
+  if (
+    content.includes("@title-block: none") ||
+    content.includes("@title-block: delegated")
+  ) {
+    return true;
+  }
+  const normalized = filePath.replace(/\\/g, "/");
+  if (normalized.includes("/Shorts/")) return true;
+  if (MISSING_TITLE_BLOCK_EXCLUDED_BASENAMES.has(path.basename(filePath))) {
+    return true;
+  }
+  return false;
+}
 
 // ── Palette color literals → must use palette.* / semantic.* constants ──────
 // These are the hex values from palette.json. If written as string literals
@@ -121,6 +153,7 @@ const rules = [
       if (basename.includes("schema")) return [];
       if (!basename.endsWith(".tsx")) return []; // Only TSX files
       if (content.includes("@deprecated")) return [];
+      if (isMissingTitleBlockRuleSkipped(content, filePath)) return [];
 
       // Check if it renders a title but doesn't use TitleBlock
       const hasTitle = content.includes("data.title");
