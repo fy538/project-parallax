@@ -28,6 +28,11 @@ export const ChoroplethMapSchema = z.object({
     projection: z.enum(["globe", "mercator", "equalEarth", "naturalEarth", "albers"]).optional(),
     center: z.tuple([z.number(), z.number()]).optional(),
     scale: z.number().optional(),
+    legend: z.object({
+      breaks: z.array(z.number()).optional(),
+      unit: z.string().optional(),
+      label: z.string().optional(),
+    }).optional(),
     colorRamp: z.union([
       z.enum(["blue", "red", "teal", "gray"]),
       z.array(z.string()),

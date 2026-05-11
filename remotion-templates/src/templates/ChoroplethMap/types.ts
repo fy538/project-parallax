@@ -68,6 +68,28 @@ export interface ChoroplethMapData {
   scale?: number;
   /** Color ramp name from theme, or custom array of hex colors. */
   colorRamp?: "blue" | "red" | "teal" | "gray" | string[];
+  /**
+   * Optional legend strip configuration. When set, renders a horizontal
+   * color-ramp legend above the FooterStrip at the bottom of the map.
+   * Mandatory for choropleths that show *quantitative* data — without a
+   * legend, the color encoding is illegible.
+   *
+   * - `breaks` — numeric breakpoints between bins (length = bins - 1).
+   *    Pair with `quantileBreaks()` from `src/utils/quantileBins.ts`.
+   *    When omitted, renders a continuous-gradient legend.
+   * - `unit` — suffix appended to break values ("%", " GDP", "/cap").
+   * - `label` — caption shown left of the swatches (e.g., "GDP per capita").
+   *
+   * See: references/template-research/choropleth-map.md § 6.4
+   */
+  legend?: {
+    /** Internal break values between bins (length = numBins - 1). */
+    breaks?: number[];
+    /** Unit suffix for break-value labels. */
+    unit?: string;
+    /** Caption to the left of the swatches. */
+    label?: string;
+  };
   /** The phases of the animation, played sequentially. */
   phases: AnimationPhase[];
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */

@@ -378,6 +378,84 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
         )}
 
         {/* Episode info now consolidated into HeaderStrip (top) */}
+
+        {/* Legend strip — horizontal color-ramp bar above the FooterStrip.
+            Mandatory for quantitative choropleths so the color encoding
+            is readable. Renders break-value labels in mono caps + optional
+            caption on the left. See: choropleth-map.md § 6.4 */}
+        {data.legend && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: 64,
+              left: layout.safeAreaTier.generous.left,
+              right: layout.safeAreaTier.generous.right,
+              display: "flex",
+              alignItems: "center",
+              gap: layout.spacing.md,
+              opacity: fadeIn(frame, sec(0.6), sec(0.6)) * exitFade(frame, durationInFrames, 15),
+              pointerEvents: "none",
+            }}
+          >
+            {/* Caption */}
+            {data.legend.label && (
+              <div
+                style={{
+                  fontSize: fontSizes.label,
+                  fontFamily: fonts.metadata,
+                  color: theme.text.secondary,
+                  letterSpacing: 3,
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  maxWidth: 320,
+                }}
+              >
+                {data.legend.label}
+              </div>
+            )}
+
+            {/* Color ramp swatch row */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                flex: 1,
+                maxWidth: 600,
+              }}
+            >
+              {colorRamp.map((color, idx) => {
+                const isLast = idx === colorRamp.length - 1;
+                const breakValue = data.legend?.breaks?.[idx];
+                return (
+                  <React.Fragment key={`swatch-${idx}`}>
+                    <div
+                      style={{
+                        flex: 1,
+                        height: 12,
+                        background: color,
+                        opacity: 0.85,
+                      }}
+                    />
+                    {!isLast && breakValue !== undefined && (
+                      <div
+                        style={{
+                          fontSize: fontSizes.caption,
+                          fontFamily: fonts.data,
+                          color: theme.text.muted,
+                          padding: `0 ${layout.spacing.xs}px`,
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {breakValue}
+                        {data.legend?.unit ? data.legend.unit : ""}
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </AbsoluteFill>
     </Background>
   );

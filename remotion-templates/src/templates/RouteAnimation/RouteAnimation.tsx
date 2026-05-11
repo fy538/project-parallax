@@ -405,6 +405,29 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
 
   // ── deck.gl layers ────────────────────────────────────────────────────
 
+  // Haversine distance in km. Used to decide great-circle arc height per
+  // segment — short hops render flat (decorative arcing reads as pretentious
+  // when the geography doesn't need it). See:
+  // references/template-research/route-animation.md § 6.5 (great-circle threshold)
+  const haversineKm = (
+    a: [number, number],
+    b: [number, number],
+  ): number => {
+    const R = 6371; // Earth radius km
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(b[1] - a[1]);
+    const dLon = toRad(b[0] - a[0]);
+    const lat1 = toRad(a[1]);
+    const lat2 = toRad(b[1]);
+    const h =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(h));
+  };
+
+  /** Below this distance, arcs render flat (no great-circle curvature). */
+  const GREAT_CIRCLE_KM_THRESHOLD = 3000;
+
   const arcData = useMemo(() => {
     const arcs: Array<{
       from: [number, number];
@@ -414,6 +437,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       isNew: boolean;
       dashed: boolean;
       index: number;
+      arcHeight: number;
     }> = [];
 
     data.segments.forEach((seg, i) => {
@@ -424,6 +448,12 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       // destination point's color (or seg.color). Falls back to seg.color
       // for both ends when endpoint colors aren't specified.
       const baseColor = seg.color || routeColor;
+      // Per-segment arc height: short hops stay flat (great-circle curvature
+      // looks decorative when the geography doesn't earn it). 3000km matches
+      // roughly the Mediterranean diameter — anything tighter reads as a
+      // regional connection that shouldn't bow.
+      const distanceKm = haversineKm(fromPt.coordinates, toPt.coordinates);
+      const arcHeight = distanceKm < GREAT_CIRCLE_KM_THRESHOLD ? 0 : 0.3;
       arcs.push({
         from: fromPt.coordinates,
         to: toPt.coordinates,
@@ -432,6 +462,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
         isNew: newSegments.has(i),
         dashed: !!seg.dashed,
         index: i,
+        arcHeight,
       });
     });
 
@@ -466,7 +497,9 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       return d.isNew ? base * newArcProgress : base;
     },
     greatCircle: true,
-    getHeight: 0.3,
+    // Per-segment arc height — flat for sub-threshold hops, normal for true
+    // great-circle distances. See `arcHeight` computation above.
+    getHeight: (d: any) => d.arcHeight,
     widthUnits: "pixels" as const,
     updateTriggers: {
       getSourceColor: [newArcProgress],
@@ -494,8 +527,10 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
         const [lon2, lat2] = arc.to;
         const lon = lon1 + (lon2 - lon1) * rawT;
         const lat = lat1 + (lat2 - lat1) * rawT;
-        // Lift toward arc apex for 3D feel — sin-based parabola, matches getHeight: 0.3
-        const altitude = Math.sin(rawT * Math.PI) * 80000; // meters
+        // Lift toward arc apex for 3D feel — parabola scaled by the same
+        // arcHeight as the underlying ArcLayer (so flat sub-threshold arcs
+        // get flat particles too).
+        const altitude = Math.sin(rawT * Math.PI) * 80000 * (arc.arcHeight / 0.3); // meters
         // Edge fade — particles fade in at start, out near end
         const edgeFade = Math.min(rawT * 8, (1 - rawT) * 8, 1);
         // Color interpolates between source and target
@@ -524,14 +559,25 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     },
   });
 
-  // Point markers via ScatterplotLayer (for the glow ring)
+  // Point markers via ScatterplotLayer.
+  //
+  // Canonical anchor-marker treatment per the dossier:
+  //   - Outer glow halo (14px filled, low alpha) — atmospheric ring
+  //   - Inner dot (6px filled, full alpha) — the actual marker
+  //   - Thin gold ring (1.5px stroke) around the inner dot — anchors the eye
+  //
+  // The three layers compose: halo says "something is here," dot says "this
+  // is the place," gold ring says "this is named, look at it."
+  //
+  // See: references/template-research/route-animation.md § 6.3
   const pointData = useMemo(() => {
     return data.points
       .map((pt, i) => ({ ...pt, index: i }))
       .filter((pt) => allActivePoints.has(pt.index));
   }, [data.points, allActivePoints]);
 
-  const scatterLayer = new ScatterplotLayer({
+  // Outer atmospheric glow halo (14px, low alpha)
+  const scatterHaloLayer = new ScatterplotLayer({
     id: "point-glow",
     data: pointData,
     getPosition: (d: any) => d.coordinates,
@@ -543,7 +589,24 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     },
   });
 
-  const layers = [arcLayer, flowParticleLayer, scatterLayer];
+  // Inner filled dot + gold ring (the canonical anchor marker)
+  const scatterMarkerLayer = new ScatterplotLayer({
+    id: "point-marker",
+    data: pointData,
+    getPosition: (d: any) => d.coordinates,
+    getRadius: 6,
+    getFillColor: (d: any) => hexToRgba(d.color || routeColor, 230),
+    stroked: true,
+    getLineColor: (_d: any) => hexToRgba(palette.gold, 220),
+    getLineWidth: 1.5,
+    lineWidthUnits: "pixels" as const,
+    radiusUnits: "pixels" as const,
+    updateTriggers: {
+      getFillColor: [routeColor],
+    },
+  });
+
+  const layers = [arcLayer, flowParticleLayer, scatterHaloLayer, scatterMarkerLayer];
 
   // ── Render ────────────────────────────────────────────────────────────
 

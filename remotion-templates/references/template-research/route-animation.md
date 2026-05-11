@@ -87,9 +87,9 @@ The existing `RouteAnimation` template:
 
 1. ~~**Build the `radial` mode** (extends `RouteAnimation`, not a new template). Hub field + destinations array; bearing-sorted label placement; staggered arc starts. This closes the gap docced in CLAUDE.md.~~ **Done — May 11, 2026.** Shipped as `data.radial?: { hubIndex, staggerSec?, hubColor?, arcColor? }`. When set, segments and a default phase are auto-derived; destinations are sorted clockwise by bearing from the hub so the stagger reveals "broadcast outward" rather than chaotic simultaneous reveal. Reference: catalog `rome-radial` (9 Roman roads from the Republic). Closes the "Hub-with-radial-routes map" known gap in `remotion-templates/CLAUDE.md`.
 2. **Path-style audit.** Current routes may be using saturated colors; default should be ink + rust-for-current-segment.
-3. **Anchor marker treatment.** Filled 6px circle + 1.5px gold ring — codify as the standard marker.
+3. ~~**Anchor marker treatment.** Filled 6px circle + 1.5px gold ring — codify as the standard marker.~~ **Done — May 11, 2026.** Shipped as a layered ScatterplotLayer setup: outer atmospheric glow halo (14px, low alpha) + inner filled 6px dot + 1.5px gold stroke ring around the dot. Three layers compose: halo says "something is here," dot says "this is the place," gold ring says "this is named — look at it."
 4. **Easing review.** Confirm ease-out cubic with 300ms hold between segments; flag any linear easing.
-5. **Great-circle threshold guard.** Don't render great-circle arcs for spans under ~3000km — looks decorative, not informative.
+5. ~~**Great-circle threshold guard.** Don't render great-circle arcs for spans under ~3000km — looks decorative, not informative.~~ **Done — May 11, 2026.** Computed per-segment haversine distance; arcs under `GREAT_CIRCLE_KM_THRESHOLD = 3000` render with `arcHeight = 0` (flat). Flow particles also drop to ground level so the curvature stays internally consistent. Long-haul arcs (London → Tokyo, Buenos Aires → Sydney) keep the canonical great-circle bow.
 
 ## 7. Failure mode flags (always catch in audit)
 
