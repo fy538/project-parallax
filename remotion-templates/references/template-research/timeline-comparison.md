@@ -139,6 +139,10 @@ We have all four templates built. Polish in our session was mostly cosmetic; thi
 - **Era labels missing or small** — viewer infers era from event labels, gets it wrong
 - **Proportional spacing within era but mixed between eras** — eye reads calendar position when it should read phase
 
+> **Safe-count range (HorizontalTimeline single-mode, May 2026 stress-test):** ~`durationSec / 2` events. The form scales GRACEFULLY at high counts — the camera pans horizontally across the timeline so events do not clip, do not collide, and the spine does not break. The failure mode is **dwell-time compression**: each event gets `durationSec / eventCount` seconds of screen focus, and below ~1.5–2s per event the narration cadence outruns the viewer's ability to read the title-and-description card at scrubbing speed. The stress build (16 events / 16s = 1s per event) showed all events rendering correctly geometrically, but each card flashed by too fast to absorb at video tempo.
+>
+> Sized-correctly rule: target `durationSec ≈ 2 × eventCount` for single-mode horizontal timelines. If an episode legitimately needs more events than its segment runtime supports, either (i) extend `durationSec` proportionally, (ii) collapse adjacent events into composite eras ("1880s–1900s: tabulators displace clerks"), or (iii) split across two timeline segments at a beat boundary. For dual-mode, the per-pair budget is roughly the same; ≥ 5 pairs runs into both dwell-time compression and the existing "spaghetti" rule above.
+
 ## TL;DR
 
 **Default →** TimelineComparison (stacked parallel, phase-aligned).
