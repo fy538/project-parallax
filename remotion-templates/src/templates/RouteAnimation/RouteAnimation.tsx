@@ -297,40 +297,72 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       to: d.index,
       ...(arcColor ? { color: arcColor } : {}),
     }));
+    // Empty phase title — radial-mode already shows the chart's title via
+    // TitleBlock at the top of the canvas; reusing data.title here would
+    // render a duplicate phase-label overlay. The single auto-derived phase
+    // is purely a container for the animated reveal.
     const derivedPhases: RoutePhase[] = [
       {
-        title: rawData.title,
-        subtitle: rawData.subtitle,
+        title: "",
         durationSec: rawData.durationSec ?? 8,
         activeSegments: derivedSegments.map((_, i) => i),
         activePoints: [hubIdx, ...destinations.map((d) => d.index)],
       },
     ];
+    // Bearing-based label placement — fans labels OUTWARD from the hub so
+    // that clusters of destinations on the same side of the hub don't
+    // overlap each other. North-ish destinations (bearing 315..45) get
+    // labels above; east-ish (45..135) get labels right; south-ish
+    // (135..225) get labels below; west-ish (225..315) get labels left.
+    const labelPositionForBearing = (bearing: number): "above" | "below" | "left" | "right" => {
+      const b = ((bearing % 360) + 360) % 360;
+      if (b < 45 || b >= 315) return "above";
+      if (b < 135) return "right";
+      if (b < 225) return "below";
+      return "left";
+    };
+    const destBearings = new Map<number, number>();
+    destinations.forEach((d) => {
+      destBearings.set(d.index, bearingOf(d.point.coordinates[0], d.point.coordinates[1]));
+    });
+
     return {
       ...rawData,
       segments: derivedSegments,
       phases: derivedPhases,
-      // Hub color override applies via the point's `color` field.
-      points: rawData.radial.hubColor
-        ? rawData.points.map((p, i) =>
-            i === hubIdx ? { ...p, color: rawData.radial!.hubColor } : p,
-          )
-        : rawData.points,
+      points: rawData.points.map((p, i) => {
+        if (i === hubIdx) {
+          // Hub color override (if set) — labelPosition retained from data
+          // since the hub doesn't have a bearing relative to itself.
+          return rawData.radial!.hubColor ? { ...p, color: rawData.radial!.hubColor } : p;
+        }
+        const bearing = destBearings.get(i);
+        if (bearing === undefined) return p;
+        // Honor explicit per-point labelPosition if the data writer set one;
+        // otherwise compute from bearing.
+        if (p.labelPosition) return p;
+        return { ...p, labelPosition: labelPositionForBearing(bearing) };
+      }),
     };
   }, [rawData]);
 
-  // Path-style convention: settled routes render in INK (subdued, recedes
-  // behind the basemap as context), and the CURRENT (animating) segment
-  // renders in the rust/accent color. The viewer's eye locks to the new
-  // arc while past arcs stay continuously legible as context.
+  // Path-style hierarchy: all arcs share the route color (visual cohesion
+  // — the route is the same trip across phases). The CURRENT (just-animated)
+  // segment renders at full alpha; SETTLED (past-phase) segments fade to
+  // ~⅓ alpha — present as continuous context, but receding so the new arc
+  // dominates the eye.
   //
-  // Override via `data.routeColor` if an episode needs a single saturated
-  // color across all segments (rare — usually the per-state styling is
-  // what makes a multi-route map readable).
+  // Initial implementation used `palette.ink` for settled, which read as
+  // invisible against light basemaps (ink ≈ country-border color). The
+  // alpha-modulation approach preserves color identity AND creates the
+  // hierarchy without inventing a second base color.
+  //
+  // Override via `data.routeColor` if an episode needs a single
+  // saturated color. Per-segment `seg.color` and per-point `pt.color`
+  // still take precedence over both alphas.
   //
   // See: references/template-research/route-animation.md § 6.2
   const routeColor = data.routeColor || emphasis.primaryAccent;
-  const settledRouteColor = palette.ink;
 
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
   const currentPhase = data.phases[currentPhaseIdx];
@@ -353,8 +385,27 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     return set;
   }, [data.phases, currentPhaseIdx]);
 
-  // Segments newly added in this phase (for animation)
-  const newSegments = new Set(data.phases[currentPhaseIdx].activeSegments);
+  // Segments newly added IN THIS PHASE — used for both animation reveal
+  // and path-style hierarchy. Earlier-phase segments are "settled" context
+  // (rendered in `settledRouteColor`); only the truly-new-this-phase
+  // segments are "current" (rendered in `routeColor`).
+  //
+  // Bug fixed: previously this was `new Set(currentPhase.activeSegments)`,
+  // which contained ALL segments the phase had ever activated — typical
+  // route data repeats earlier segments in each phase's activeSegments,
+  // so `newSegments` was equivalent to `allActiveSegments` and the
+  // "settled-vs-current" hierarchy never triggered. The diff against
+  // the previous phase's activeSegments gives the actually-new segments.
+  const newSegments = useMemo(() => {
+    const currentActive = new Set(data.phases[currentPhaseIdx].activeSegments);
+    if (currentPhaseIdx === 0) return currentActive;
+    const previousActive = new Set(data.phases[currentPhaseIdx - 1].activeSegments);
+    const diff = new Set<number>();
+    for (const segIdx of currentActive) {
+      if (!previousActive.has(segIdx)) diff.add(segIdx);
+    }
+    return diff;
+  }, [data.phases, currentPhaseIdx]);
 
   // ── Camera ────────────────────────────────────────────────────────────
   // Camera LEADS content: it starts transitioning 0.3s before the phase
@@ -455,13 +506,12 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       if (!allActiveSegments.has(i)) return;
       const fromPt = data.points[seg.from];
       const toPt = data.points[seg.to];
-      // Path-style hierarchy: the currently-animating segment uses the
-      // accent route color; settled (past-phase) segments recede to ink so
-      // they read as context, not co-equal anchors. Per-segment `seg.color`
-      // and per-point `pt.color` still override when specified.
-      // See: references/template-research/route-animation.md § 6.2
-      const isCurrentSegment = newSegments.has(i);
-      const baseColor = seg.color || (isCurrentSegment ? routeColor : settledRouteColor);
+      // All arcs share the same color identity — `seg.color` per-data
+      // override → `routeColor` channel default. Hierarchy between current
+      // and settled comes from alpha modulation in the ArcLayer below.
+      // Per-segment `seg.color` overrides when the route data wants a
+      // segment-specific color (e.g., highlighting a sanctioned leg).
+      const baseColor = seg.color || routeColor;
       // Per-segment arc height: short hops stay flat (great-circle curvature
       // looks decorative when the geography doesn't earn it). 3000km matches
       // roughly the Mediterranean diameter — anything tighter reads as a
@@ -498,12 +548,24 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     data: arcData,
     getSourcePosition: (d: any) => d.from,
     getTargetPosition: (d: any) => d.to,
+    // Path-style hierarchy via alpha:
+    //   isNew (current segment, mid-reveal): animates from 0 → 200 alpha
+    //   isNew && settled:                    not applicable
+    //   !isNew (past-phase, settled):        80 alpha (visible context)
+    //   !isNew && currently-revealing:       not applicable
+    //
+    // The settled alpha is intentionally a third of the current alpha so
+    // the eye locks to the new arc; past arcs stay legible as continuous
+    // context (the route hasn't disappeared — it's just no longer the
+    // active claim).
+    //
+    // See: references/template-research/route-animation.md § 6.2
     getSourceColor: (d: any) => {
-      const alpha = d.isNew ? Math.round(newArcProgress * 200) : 200;
+      const alpha = d.isNew ? Math.round(newArcProgress * 200) : 80;
       return hexToRgba(d.sourceColor, alpha);
     },
     getTargetColor: (d: any) => {
-      const alpha = d.isNew ? Math.round(newArcProgress * 200) : 200;
+      const alpha = d.isNew ? Math.round(newArcProgress * 200) : 80;
       return hexToRgba(d.targetColor, alpha);
     },
     getWidth: (d: any) => {
@@ -603,16 +665,19 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     },
   });
 
-  // Inner filled dot + gold ring (the canonical anchor marker)
+  // Inner filled dot + gold ring (the canonical anchor marker).
+  // Ring weight bumped from 1.5px → 2.5px and dot radius from 6 → 7 for
+  // visibility at video-scrub scale. At 1.5px the ring sub-pixeled into
+  // invisibility when rendered at 1920×1080 then compressed.
   const scatterMarkerLayer = new ScatterplotLayer({
     id: "point-marker",
     data: pointData,
     getPosition: (d: any) => d.coordinates,
-    getRadius: 6,
+    getRadius: 7,
     getFillColor: (d: any) => hexToRgba(d.color || routeColor, 230),
     stroked: true,
-    getLineColor: (_d: any) => hexToRgba(palette.gold, 220),
-    getLineWidth: 1.5,
+    getLineColor: (_d: any) => hexToRgba(palette.gold, 255),
+    getLineWidth: 2.5,
     lineWidthUnits: "pixels" as const,
     radiusUnits: "pixels" as const,
     updateTriggers: {
@@ -800,8 +865,11 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           safeAreaTier="generous"
         />
 
-        {/* Phase title overlay — appears after camera settles */}
-        <div
+        {/* Phase title overlay — appears after camera settles.
+            Suppressed when the phase has no title (e.g., radial mode's
+            auto-derived single phase, which inherits the chart title via
+            TitleBlock at the top and shouldn't duplicate it here). */}
+        {currentPhase.title && <div
           style={{
             position: "absolute",
             bottom: contentArea("content", "generous").bottom + layout.spacing.md,
@@ -851,7 +919,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
         {/* Episode label */}
         {/* Episode label now lives in HeaderStrip — no longer duplicated here */}

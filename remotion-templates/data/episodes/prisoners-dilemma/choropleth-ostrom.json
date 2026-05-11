@@ -17,11 +17,13 @@
       "countries": [
         {
           "name": "Spain",
+          "iso3": "ESP",
           "fill": "#C4A747",
           "label": "Valencia huertas (600+ years)"
         },
         {
           "name": "Switzerland",
+          "iso3": "CHE",
           "fill": "#C4A747",
           "label": "Alpine grazing commons (13th c.)"
         }
@@ -36,21 +38,17 @@
       "title": "Across every continent",
       "durationSec": 4,
       "countries": [
-        {
-          "name": "Spain",
-          "fill": "#C4A747"
-        },
-        {
-          "name": "Switzerland",
-          "fill": "#C4A747"
-        },
+        { "name": "Spain", "iso3": "ESP", "fill": "#C4A747" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#C4A747" },
         {
           "name": "Japan",
+          "iso3": "JPN",
           "fill": "#C4A747",
           "label": "Iriaichi forest cooperatives"
         },
         {
           "name": "United States of America",
+          "iso3": "USA",
           "fill": "#C4A747",
           "label": "Maine lobster fisheries"
         }
@@ -66,66 +64,21 @@
       "subtitle": "Cooperation is designed, not miraculous",
       "durationSec": 6,
       "countries": [
-        {
-          "name": "Spain",
-          "fill": "#C4A747"
-        },
-        {
-          "name": "Switzerland",
-          "fill": "#C4A747"
-        },
-        {
-          "name": "Japan",
-          "fill": "#C4A747"
-        },
-        {
-          "name": "United States of America",
-          "fill": "#C4A747"
-        },
-        {
-          "name": "Nepal",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Philippines",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Indonesia",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Turkey",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Kenya",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Brazil",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Mexico",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "India",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Canada",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Norway",
-          "fill": "#4A7BA7"
-        },
-        {
-          "name": "Sri Lanka",
-          "fill": "#4A7BA7"
-        }
+        { "name": "Spain", "iso3": "ESP", "fill": "#C4A747" },
+        { "name": "Switzerland", "iso3": "CHE", "fill": "#C4A747" },
+        { "name": "Japan", "iso3": "JPN", "fill": "#C4A747" },
+        { "name": "United States of America", "iso3": "USA", "fill": "#C4A747" },
+        { "name": "Nepal", "iso3": "NPL", "fill": "#4A7BA7" },
+        { "name": "Philippines", "iso3": "PHL", "fill": "#4A7BA7" },
+        { "name": "Indonesia", "iso3": "IDN", "fill": "#4A7BA7" },
+        { "name": "Turkey", "iso3": "TUR", "fill": "#4A7BA7" },
+        { "name": "Kenya", "iso3": "KEN", "fill": "#4A7BA7" },
+        { "name": "Brazil", "iso3": "BRA", "fill": "#4A7BA7" },
+        { "name": "Mexico", "iso3": "MEX", "fill": "#4A7BA7" },
+        { "name": "India", "iso3": "IND", "fill": "#4A7BA7" },
+        { "name": "Canada", "iso3": "CAN", "fill": "#4A7BA7" },
+        { "name": "Norway", "iso3": "NOR", "fill": "#4A7BA7" },
+        { "name": "Sri Lanka", "iso3": "LKA", "fill": "#4A7BA7" }
       ],
       "center": [
         20,
