@@ -754,15 +754,24 @@ export const HorizontalTimeline: React.FC<{
         {/* Camera viewport — contains all timeline content */}
         <div style={camera.viewportStyle}>
           <div style={camera.contentStyle}>
-            {/* ── Glowing spine ─────────────────────────────────────── */}
-            <TimelineSpine
-              totalWidth={eventData.totalWidth}
-              color={eraAColor}
-              frame={frame}
-              mode={mode}
-            />
+            {/* ── Glowing spine — era A.
+                Wrapped in foil-mute opacity for dual mode so the rail
+                recedes consistently with its events when eraWeight is
+                "foil-old". For single/morph modes, eraAFoilMute is 1.0
+                (eraWeight defaults to "equal"), so this is a no-op. */}
+            <div style={{ opacity: eraAFoilMute }}>
+              <TimelineSpine
+                totalWidth={eventData.totalWidth}
+                color={eraAColor}
+                frame={frame}
+                mode={mode}
+              />
+            </div>
 
-            {/* ── Dual mode: second spine for era B ─────────────────── */}
+            {/* ── Dual mode: second spine for era B.
+                Foil-mute opacity wraps the entire spine block so the rail
+                recedes consistently with its events when eraWeight is
+                "foil-new". Default (eraWeight="equal") leaves it at 1.0. */}
             {data.mode === "dual" && (
               <div
                 style={{
@@ -771,6 +780,7 @@ export const HorizontalTimeline: React.FC<{
                   left: 0,
                   width: eventData.totalWidth,
                   height: 4,
+                  opacity: eraBFoilMute,
                 }}
               >
                 <div
