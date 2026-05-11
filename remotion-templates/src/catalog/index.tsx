@@ -90,6 +90,7 @@ export {
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogGamePDCanonical,
+  CatalogGameIteratedPD,
   CatalogBifurcationLatin,
 } from "./Scenarios";
 

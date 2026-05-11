@@ -155,6 +155,57 @@ const gamePDCanonical: GameBoardData = {
   backgroundVariant: "light",
 };
 
+// Iterated-play demo — same PD matrix across rounds 1 / 10 / 50 / 200,
+// equilibrium shifting visibly from "first move" to "settled mutual
+// cooperation under shadow of the future." The Axelrod reveal compressed
+// into four panels. See: references/template-research/game-theory.md § B3
+const gameIteratedPD: GameBoardData = {
+  episode: CATALOG_EPISODE,
+  title: "When Repetition Changes the Game",
+  subtitle: "PD across 200 rounds — the equilibrium learns",
+  variant: "iterated-play",
+  rowPlayer: "A",
+  colPlayer: "B",
+  rowOptions: ["Cooperate", "Defect"],
+  colOptions: ["Cooperate", "Defect"],
+  cells: [
+    { row: 0, col: 0, value: "3, 3" },
+    { row: 0, col: 1, value: "0, 5" },
+    { row: 1, col: 0, value: "5, 0" },
+    { row: 1, col: 1, value: "1, 1" },
+  ],
+  rounds: [
+    {
+      label: "Round 1",
+      highlights: [3],
+      annotation: "Both defect — the one-shot Nash holds.",
+    },
+    {
+      label: "Round 10",
+      highlights: [3, 0],
+      annotation: "Trust starts probing as players remember.",
+    },
+    {
+      label: "Round 50",
+      highlights: [0, 3],
+      annotation: "Tit-for-tat outscores Always-Defect; cooperation spreads.",
+    },
+    {
+      label: "Round 200",
+      highlights: [0],
+      annotation: "Mutual cooperation is now the stable equilibrium.",
+    },
+  ],
+  phases: [
+    {
+      label: "Axelrod tournament",
+      durationSec: 12,
+    },
+  ],
+  durationSec: 12,
+  backgroundVariant: "light",
+};
+
 // ─── BifurcationRoute × 1 ─────────────────────────────────────────────────
 
 const bifurcationLatin: BifurcationRouteData = {
@@ -265,6 +316,21 @@ export const CatalogGamePDCanonical = () => (
   />
 );
 
+export const CatalogGameIteratedPD = () => (
+  <Composition
+    id={catalogId("GameBoard", "iterated-pd")}
+    component={GameBoard}
+    schema={GameBoardSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as GameBoardData).durationSec || 12),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: gameIteratedPD }}
+  />
+);
+
 export const CatalogBifurcationLatin = () => (
   <Composition
     id={catalogId("BifurcationRoute", "latin-romance")}
@@ -278,5 +344,5 @@ export const CatalogBifurcationLatin = () => (
 );
 
 export const catalogScenariosData = {
-  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, bifurcationLatin,
+  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD, bifurcationLatin,
 };

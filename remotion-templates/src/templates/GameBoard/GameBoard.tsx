@@ -1041,6 +1041,222 @@ const PDCanonicalMatrix: React.FC<{
   );
 };
 
+// ── Iterated-play small-multiples matrix ───────────────────────────────────
+//
+// Small-multiples of the same 2×2 payoff matrix across N rounds. Each panel
+// shares the cell structure (rowOptions, colOptions, cells); only the
+// highlighted cells differ per round. The visual story is the equilibrium
+// shifting visibly across panels — the Axelrod-tournament reveal.
+//
+// Reference: references/template-research/game-theory.md § B3
+
+const IteratedPlayMatrix: React.FC<{
+  data: GameBoardData;
+  frame: number;
+  mode: "light" | "dark";
+}> = ({ data, frame, mode }) => {
+  const theme = useThemeMode(mode);
+  const rounds = data.rounds || [];
+  const cells = data.cells || [];
+  const rows = data.rowOptions?.length || 2;
+  const cols = data.colOptions?.length || 2;
+
+  // Layout: 2/3/4 columns depending on round count.
+  const numPanels = rounds.length;
+  const gridCols = numPanels <= 2 ? numPanels : numPanels <= 4 ? 2 : numPanels <= 6 ? 3 : 4;
+  const gridRows = Math.ceil(numPanels / gridCols);
+  const panelGap = 40;
+  // Each panel is a mini 2×2 matrix; sizing tuned for ~3 panels per row at 1920w.
+  const panelMaxWidth = 480;
+  const cellSize = 90;
+  const headerHeight = 30;
+  const labelWidth = 80;
+  const gridWidth = labelWidth + cols * cellSize;
+  const gridHeight = headerHeight + rows * cellSize;
+  const panelHeight = gridHeight + 60; // room for round label + annotation
+
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${gridCols}, ${panelMaxWidth}px)`,
+        gridAutoRows: `${panelHeight}px`,
+        gap: panelGap,
+        justifyContent: "center",
+        alignContent: "center",
+      }}
+    >
+      {rounds.map((round, panelIdx) => {
+        const panelStart = sec(0.5) + panelIdx * sec(0.5);
+        const panelOpacity = fadeIn(frame, panelStart, sec(0.5));
+        const cellRevealStart = panelStart + sec(0.3);
+        const annotationOpacity = fadeIn(frame, panelStart + sec(0.7), sec(0.5));
+
+        return (
+          <div
+            key={`round-${panelIdx}`}
+            style={{
+              opacity: panelOpacity,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            {/* Round label */}
+            <div
+              style={{
+                fontSize: fontSizes.label,
+                fontFamily: fonts.metadata,
+                color: theme.text.primary,
+                letterSpacing: 3,
+                textTransform: "uppercase",
+                fontWeight: 600,
+                lineHeight: 1,
+              }}
+            >
+              {round.label}
+            </div>
+
+            {/* Mini 2×2 matrix */}
+            <div
+              style={{
+                position: "relative",
+                width: gridWidth,
+                height: gridHeight,
+              }}
+            >
+              {/* Column option headers */}
+              {data.colOptions?.map((option, ci) => (
+                <div
+                  key={`col-${ci}`}
+                  style={{
+                    position: "absolute",
+                    left: labelWidth + ci * cellSize,
+                    top: 0,
+                    width: cellSize,
+                    height: headerHeight,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: fontSizes.caption,
+                    fontFamily: fonts.body,
+                    color: theme.text.muted,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {option}
+                </div>
+              ))}
+
+              {/* Row option labels */}
+              {data.rowOptions?.map((option, ri) => (
+                <div
+                  key={`row-${ri}`}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: headerHeight + ri * cellSize,
+                    width: labelWidth,
+                    height: cellSize,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    paddingRight: 8,
+                    fontSize: fontSizes.caption,
+                    fontFamily: fonts.body,
+                    color: theme.text.muted,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {option}
+                </div>
+              ))}
+
+              {/* Cells */}
+              {Array.from({ length: rows * cols }).map((_, idx) => {
+                const r = Math.floor(idx / cols);
+                const c = idx % cols;
+                const cell = cells.find((x) => x.row === r && x.col === c);
+                const isActive = round.highlights.includes(idx);
+                const cellOpacity = fadeIn(
+                  frame,
+                  cellRevealStart + idx * sec(0.05),
+                  sec(0.3),
+                );
+                const cellBg = isActive
+                  ? `${palette.amber}22`
+                  : mode === "dark"
+                    ? `${palette.ink}40`
+                    : `${palette.paper}60`;
+                const cellBorder = isActive
+                  ? palette.amber
+                  : mode === "dark"
+                    ? `${palette.bone}1A`
+                    : `${palette.ink}1A`;
+
+                return (
+                  <div
+                    key={`cell-${idx}`}
+                    style={{
+                      position: "absolute",
+                      left: labelWidth + c * cellSize,
+                      top: headerHeight + r * cellSize,
+                      width: cellSize,
+                      height: cellSize,
+                      border: `${isActive ? 2 : 1}px solid ${cellBorder}`,
+                      borderRadius: 2,
+                      background: cellBg,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      opacity: cellOpacity,
+                      boxShadow: isActive ? `0 0 12px ${palette.amber}40` : "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: isActive ? fontSizes.label : fontSizes.caption,
+                        fontFamily: fonts.data,
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? palette.amber : theme.text.primary,
+                        whiteSpace: "nowrap",
+                        maxWidth: cellSize - 8,
+                        textAlign: "center",
+                      }}
+                    >
+                      {cell?.value || "—"}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Annotation */}
+            {round.annotation && (
+              <div
+                style={{
+                  fontSize: fontSizes.caption,
+                  fontFamily: fonts.body,
+                  fontStyle: "italic",
+                  color: theme.text.secondary,
+                  textAlign: "center",
+                  maxWidth: panelMaxWidth - 32,
+                  opacity: annotationOpacity,
+                  lineHeight: 1.3,
+                  marginTop: 4,
+                }}
+              >
+                {round.annotation}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 // ── Unicode chess glyph map ─────────────────────────────────────────────────
 // Map data labels (case-insensitive) to filled chess Unicode glyphs.
 // Filled glyphs read better at video scale than outline ones.
@@ -1329,6 +1545,9 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
           )}
           {data.variant === "pd-canonical" && (
             <PDCanonicalMatrix data={data} frame={frame} state={state} mode={mode} />
+          )}
+          {data.variant === "iterated-play" && (
+            <IteratedPlayMatrix data={data} frame={frame} mode={mode} />
           )}
         </div>
 

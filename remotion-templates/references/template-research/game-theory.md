@@ -157,7 +157,7 @@ The existing `GameBoard` template:
 2. **Nash glyph in cell corner** — use Parallax's ∴ brand mark; pure ∴ inside the equilibrium cell's top-right corner
 3. **Best-response arrows** — small arrowheads drawn from off-equilibrium cells, pointing toward the deviation each player would make. The Nash is the cell with all arrows pointing IN.
 4. **Hero-cell separation** — distinct treatment for "the moral hero" (mutual cooperation, bone+amber) vs "the analytical hero / equilibrium" (mutual defection in PD, oxblood border + ∴)
-5. **Iterated-play sub-form** — small-multiples of the matrix across rounds (round 1, round 5, round 20…) for the Axelrod-tournament reveal
+5. ~~**Iterated-play sub-form** — small-multiples of the matrix across rounds (round 1, round 5, round 20…) for the Axelrod-tournament reveal~~ **Done — May 11, 2026.** Shipped as `variant: "iterated-play"` + `data.rounds: Array<{ label, highlights, annotation? }>`. Renders a grid of mini 2×2 matrices labeled by round; each panel shares the cell structure, only the highlighted cells differ. The Axelrod reveal compressed into N panels. Catalog reference: `catalog-game-board-iterated-pd` (rounds 1 / 10 / 50 / 200 showing the equilibrium shift from defection to cooperation under shadow of the future).
 
 ## TL;DR
 

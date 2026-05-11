@@ -83,7 +83,7 @@ export interface GameBoardData {
   title: string;
   subtitle?: string;
 
-  variant: "chess" | "go" | "payoff-matrix" | "pd-canonical";
+  variant: "chess" | "go" | "payoff-matrix" | "pd-canonical" | "iterated-play";
 
   /** Chess: board size (default 8) */
   boardSize?: number;
@@ -99,6 +99,29 @@ export interface GameBoardData {
   rowOptions?: string[];
   colOptions?: string[];
   cells?: PayoffCell[];
+
+  // ── iterated-play variant options ────────────────────────────────────
+  /**
+   * Snapshots of the matrix state across rounds. Used by `iterated-play`
+   * variant to render a small-multiples grid of 2×2 payoff matrices
+   * labeled "Round 1 / Round 5 / Round 20..." with each panel showing the
+   * matrix's state at that round — the Axelrod-tournament reveal.
+   *
+   * Each round shares the same cells/rowOptions/colOptions structure
+   * (defined at the top level); only the highlighted cell(s) and optional
+   * annotation differ per round. The visual story is the equilibrium
+   * shifting visibly across panels.
+   *
+   * See: references/template-research/game-theory.md § B3 (iterated play)
+   */
+  rounds?: Array<{
+    /** Round label, e.g. "Round 1", "Round 5", "Round 200". */
+    label: string;
+    /** Indices into `cells` to highlight as active in this round. */
+    highlights: number[];
+    /** Optional sub-annotation (one short line, e.g., "First defection"). */
+    annotation?: string;
+  }>;
 
   // ── pd-canonical variant options ─────────────────────────────────────
   /**
