@@ -466,11 +466,28 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 
 **Where it lands:** Threaded through templates as Whisper-resolved narration cues come online. Per-template adoption tracked in `references/template-research/motion-design.md` § 8.
 
+### D18. Episode openings hold music until AFTER the title card lands
+
+**Observation:** Music starts in the first 3 seconds of the cold open. Reads as YouTube-explainer register, not editorial-essay register.
+
+**Fix:** **Music enters only after the title card exits, not during the cold open and not during the title card itself.** The cold open is a single artifact (archival photo, single analytical visual, or text on paper) held with measured narration and *silence*. The title card lands in silence. Then music swells under the first body segment.
+
+**Why:** Every YouTube explainer enters music in the first 3 seconds. The silence is the channel's differentiation. The Economist, NYT, FT, Atlantic, and Op-Docs all hold music until after the title card lands — this is the single strongest cross-outlet convention in editorial video. Parallax's silence at the open IS the register signal.
+
+**Companion rules** (all from `references/template-research/title-card.md` § 4):
+- Cold-open runtime ≤ 2% of episode length (10-14s for 15min, 15-25s for 30min)
+- Title-card hold = 2.0s on screen (below 1.0s flashes past; above 3.0s reads as forgot-to-cut)
+- Hard cut between cold open and title card — no wipes, no dissolves, no motion transitions
+- No audio sting on title-card landing (broadcast convention, not editorial)
+- Opener narration is substantive (first line is a claim or question, NOT "in this video we'll...")
+
+**Where it lands:** `TitleTransition` `editorial-title` variant enforces the visual side (2.0s hold, fade-only, ∴ corner mark). Music and SFX are audio-track decisions made downstream in NLE assembly; this doctrine governs both.
+
 ---
 
 ## Reading order when polishing a template
 
-1. Read this section's doctrine (D1–D16)
+1. Read this section's doctrine (D1–D18)
 2. Read the template's dossier in `references/template-research/<template>.md` for canonical idioms + specific upgrades
 3. Render the existing template at frame 30 + frame 180 to see current state
 4. Apply doctrine rules + dossier upgrades

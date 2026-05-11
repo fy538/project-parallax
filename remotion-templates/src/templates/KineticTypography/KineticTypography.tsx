@@ -1,6 +1,25 @@
 /**
  * KineticTypography — animated quotes, definitions, bilingual text, and statistics.
  *
+ * ──────────────────────────────────────────────────────────────────────────────
+ * SCOPE GUARDRAIL — NOT FOR TITLE CARDS.
+ *
+ * This template is for IN-ESSAY EMPHASIS only: pull-quotes, definitions,
+ * bilingual reveals, statistic moments. The animation register (letter-by-
+ * letter or word-by-word kinetic reveal, count-up overshoot, parallax depth
+ * drift) is intentionally energetic — appropriate inside the body of an
+ * argument where the moment is a punctuation, not the opening contract.
+ *
+ * Title cards are TitleTransition.editorial-title: Kicker + Title + Dek,
+ * fade-only entrance, 2.0s held in silence. Kinetic letter-by-letter title
+ * reveals belong to Vox / Johnny Harris register, NOT Parallax. See:
+ * references/template-research/title-card.md § 3 (failure mode: kinetic
+ * letter-by-letter title).
+ *
+ * If you find yourself reaching for KineticTypography to open an episode,
+ * use TitleTransition variant="editorial-title" instead.
+ * ──────────────────────────────────────────────────────────────────────────────
+ *
  * Cinematic overhaul v2:
  * - Parallax depth layers: elements drift at different rates (quote mark 1.5×, text 1.0×, attribution 0.6×)
  * - Eased Chinese character stagger (logarithmic fast→slow)

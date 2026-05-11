@@ -10,6 +10,7 @@ const CountryDataSchema = z.object({
   value: z.number().optional(),
   fill: z.string().optional(),
   label: z.string().optional(),
+  noData: z.boolean().optional(),
 });
 
 const AnimationPhaseSchema = z.object({

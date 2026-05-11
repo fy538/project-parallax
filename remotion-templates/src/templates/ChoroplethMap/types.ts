@@ -19,6 +19,19 @@ export interface CountryData {
   fill?: string;
   /** Label to display on or near the country. */
   label?: string;
+  /**
+   * Flag this country as having no data (rather than zero). When true, the
+   * fill is set to a distinct neutral umber that's distinguishable from the
+   * lightest bin of the active color ramp — so "no data" reads as a separate
+   * category, not as "low value."
+   *
+   * The dossier failure mode this prevents: "Gray for 'no data'
+   * indistinguishable from the lightest bin." Using a brand neutral
+   * (`palette.umber`) rather than the ramp's gray avoids that collision.
+   *
+   * See: references/template-research/choropleth-map.md § 6.5
+   */
+  noData?: boolean;
 }
 
 /** A phase in the animation — countries change color/state at each phase. */

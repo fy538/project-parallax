@@ -160,6 +160,14 @@ function resolveCountryFill(
 ): string {
   const base = ramps.gray[1];
 
+  // No-data treatment: distinct umber neutral that doesn't collide with the
+  // lightest bin of the active ramp. The dossier's failure mode this avoids
+  // is "Gray for 'no data' indistinguishable from the lightest bin."
+  // See: references/template-research/choropleth-map.md § 6.5
+  if (country.noData) {
+    return lerpHex(base, palette.umber, transitionT);
+  }
+
   if (country.fill) {
     return lerpHex(base, country.fill, transitionT);
   }
@@ -245,7 +253,7 @@ function buildCountryOpacityExpression(
   );
 
   const isoList = phase.countries
-    .filter((c) => c.iso3 && (c.fill || c.value !== undefined))
+    .filter((c) => c.iso3 && (c.fill || c.value !== undefined || c.noData))
     .map((c) => c.iso3!);
 
   if (isoList.length === 0) return ["literal", 0];

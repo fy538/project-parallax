@@ -319,7 +319,18 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     };
   }, [rawData]);
 
+  // Path-style convention: settled routes render in INK (subdued, recedes
+  // behind the basemap as context), and the CURRENT (animating) segment
+  // renders in the rust/accent color. The viewer's eye locks to the new
+  // arc while past arcs stay continuously legible as context.
+  //
+  // Override via `data.routeColor` if an episode needs a single saturated
+  // color across all segments (rare — usually the per-state styling is
+  // what makes a multi-route map readable).
+  //
+  // See: references/template-research/route-animation.md § 6.2
   const routeColor = data.routeColor || emphasis.primaryAccent;
+  const settledRouteColor = palette.ink;
 
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
   const currentPhase = data.phases[currentPhaseIdx];
@@ -444,10 +455,13 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       if (!allActiveSegments.has(i)) return;
       const fromPt = data.points[seg.from];
       const toPt = data.points[seg.to];
-      // Gradient arcs: blend from source point's color (or seg.color) into
-      // destination point's color (or seg.color). Falls back to seg.color
-      // for both ends when endpoint colors aren't specified.
-      const baseColor = seg.color || routeColor;
+      // Path-style hierarchy: the currently-animating segment uses the
+      // accent route color; settled (past-phase) segments recede to ink so
+      // they read as context, not co-equal anchors. Per-segment `seg.color`
+      // and per-point `pt.color` still override when specified.
+      // See: references/template-research/route-animation.md § 6.2
+      const isCurrentSegment = newSegments.has(i);
+      const baseColor = seg.color || (isCurrentSegment ? routeColor : settledRouteColor);
       // Per-segment arc height: short hops stay flat (great-circle curvature
       // looks decorative when the geography doesn't earn it). 3000km matches
       // roughly the Mediterranean diameter — anything tighter reads as a
