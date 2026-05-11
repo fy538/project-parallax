@@ -147,8 +147,13 @@ export interface GameBoardData {
    */
   payoffUnits?: string;
 
-  /** Phased animation */
-  phases: GamePhase[];
+  /**
+   * Phased animation. Required for `chess`, `go`, `payoff-matrix`, and
+   * `pd-canonical` variants; ignored by `iterated-play` (which uses `rounds`).
+   * Schema-enforced via `superRefine` rather than a static `.min(1)` so the
+   * iterated-play catalog data doesn't need filler phases.
+   */
+  phases?: GamePhase[];
 
   source?: string;
   durationSec?: number;

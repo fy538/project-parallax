@@ -421,6 +421,12 @@ const SmallMultiplesChart: React.FC<{
 }) => {
   const theme = useThemeMode(mode);
 
+  // Defensive guard — schema's `lines.min(1)` should catch this at validation
+  // time, but template code paths that bypass Zod (e.g., direct prop spread
+  // via composition tooling) could still produce an empty lines array.
+  // Without this guard, `cols = 0` below produces divide-by-zero → Infinity.
+  if (lines.length === 0) return null;
+
   // Grid dimensions: aim for ~2:1 aspect ratio per panel. For 4-6 series,
   // 3 columns × ceil(n/3) rows reads well at video scale.
   const numPanels = lines.length;

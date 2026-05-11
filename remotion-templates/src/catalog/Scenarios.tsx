@@ -196,12 +196,8 @@ const gameIteratedPD: GameBoardData = {
       annotation: "Mutual cooperation is now the stable equilibrium.",
     },
   ],
-  phases: [
-    {
-      label: "Axelrod tournament",
-      durationSec: 12,
-    },
-  ],
+  // Note: no `phases` array — iterated-play variant uses `rounds` instead.
+  // Schema's superRefine enforces this gate.
   durationSec: 12,
   backgroundVariant: "light",
 };

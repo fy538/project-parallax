@@ -58,7 +58,9 @@ export const TimeSeriesChartSchema = z.object({
     title: z.string(),
     subtitle: z.string().optional(),
     variant: z.enum(["line", "slope", "small-multiples"]).optional(),
-    lines: z.array(TimeSeriesLineSchema),
+    lines: z.array(TimeSeriesLineSchema).min(1, {
+      message: "TimeSeriesChart requires at least one line. Empty `lines` would also cause divide-by-zero in the small-multiples panel grid.",
+    }),
     annotations: z.array(TimeSeriesAnnotationSchema).optional(),
     eras: z.array(TimeSeriesEraSchema).optional(),
     referenceLines: z.array(TimeSeriesReferenceLineSchema).optional(),

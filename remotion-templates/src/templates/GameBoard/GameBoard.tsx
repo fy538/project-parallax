@@ -73,8 +73,11 @@ const getStateAtFrame = (
   let currentPhaseIndex = -1;
   let cumulativeFrames = 0;
 
-  for (let i = 0; i < data.phases.length; i++) {
-    const phase = data.phases[i];
+  // `phases` is optional on the data type — iterated-play uses `rounds`
+  // instead. For variants that don't carry phases, this loop is a no-op.
+  const phases = data.phases ?? [];
+  for (let i = 0; i < phases.length; i++) {
+    const phase = phases[i];
     const phaseDuration = sec(phase.durationSec);
     const phaseStart = cumulativeFrames;
     const phaseEnd = cumulativeFrames + phaseDuration;
@@ -213,7 +216,7 @@ const ChessBoard: React.FC<{
         if (piece.captured) {
           const captureStart =
             state.currentPhaseIndex >= 0
-              ? data.phases
+              ? (data.phases ?? [])
                   .slice(0, state.currentPhaseIndex + 1)
                   .reduce((sum, p) => sum + sec(p.durationSec), 0)
               : frame;
@@ -1434,17 +1437,22 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
 
   const state = useMemo(() => getStateAtFrame(data, frame, fps), [data, frame, fps]);
 
+  // `phases` is optional on the data type (schema gates by variant — see
+  // GameBoard/schema.ts superRefine). Coerce to [] for the variants that
+  // don't use it (iterated-play uses `rounds` instead).
+  const phases = data.phases ?? [];
+
   // Total duration: sum of all phases
-  const totalDuration = data.durationSec || data.phases.reduce((sum, p) => sum + p.durationSec, 0);
+  const totalDuration = data.durationSec || phases.reduce((sum, p) => sum + p.durationSec, 0);
 
   // Current phase label
   const currentPhaseLabel =
-    state.currentPhaseIndex >= 0 ? data.phases[state.currentPhaseIndex]?.label : "";
+    state.currentPhaseIndex >= 0 ? phases[state.currentPhaseIndex]?.label : "";
   const currentPhaseSublabel =
-    state.currentPhaseIndex >= 0 ? data.phases[state.currentPhaseIndex]?.sublabel : "";
+    state.currentPhaseIndex >= 0 ? phases[state.currentPhaseIndex]?.sublabel : "";
 
   // Phase label fade
-  const phaseStart = data.phases
+  const phaseStart = phases
     .slice(0, state.currentPhaseIndex)
     .reduce((sum, p) => sum + sec(p.durationSec), 0);
   const phaseLabelOpacity = fadeIn(frame, phaseStart, sec(0.4));
@@ -1465,7 +1473,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
     if (!isCinematic) return 1;
     // During phases, zoom in slightly; between phases, ease back
     if (state.currentPhaseIndex < 0) return 1;
-    const phaseProgress = (frame - phaseStart) / sec(data.phases[state.currentPhaseIndex]?.durationSec || 2);
+    const phaseProgress = (frame - phaseStart) / sec(phases[state.currentPhaseIndex]?.durationSec || 2);
     // Zoom in at phase start, hold, ease out near phase end
     if (phaseProgress < 0.2) {
       return interpolate(phaseProgress, [0, 0.2], [1.0, 1.12], CLAMP_CUBIC);
@@ -1474,7 +1482,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
       return interpolate(phaseProgress, [0.8, 1.0], [1.12, 1.0], CLAMP_CUBIC);
     }
     return 1.12;
-  }, [isCinematic, state.currentPhaseIndex, frame, phaseStart, data.phases]);
+  }, [isCinematic, state.currentPhaseIndex, frame, phaseStart, phases]);
 
   return (
     <AbsoluteFill>
@@ -1586,7 +1594,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
             )}
             {/* Annotation text */}
             {state.currentPhaseIndex >= 0 &&
-              data.phases[state.currentPhaseIndex]?.annotation && (
+              phases[state.currentPhaseIndex]?.annotation && (
                 <p
                   style={{
                     fontSize: fontSizes.body,
@@ -1598,17 +1606,17 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
                     opacity: fadeIn(frame, phaseStart + sec(0.5), sec(0.4)),
                   }}
                 >
-                  {data.phases[state.currentPhaseIndex].annotation}
+                  {phases[state.currentPhaseIndex].annotation}
                 </p>
               )}
             {/* Counter animation */}
             {state.currentPhaseIndex >= 0 &&
-              data.phases[state.currentPhaseIndex]?.counterAnimation && (
+              phases[state.currentPhaseIndex]?.counterAnimation && (
                 <CounterDisplay
-                  counter={data.phases[state.currentPhaseIndex].counterAnimation!}
+                  counter={phases[state.currentPhaseIndex].counterAnimation!}
                   frame={frame}
                   phaseStart={phaseStart}
-                  phaseDuration={sec(data.phases[state.currentPhaseIndex].durationSec)}
+                  phaseDuration={sec(phases[state.currentPhaseIndex].durationSec)}
                   mode={mode}
                 />
               )}

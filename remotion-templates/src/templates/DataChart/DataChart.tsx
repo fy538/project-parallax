@@ -603,6 +603,11 @@ const SmallMultiplesPanels: React.FC<{
 }) => {
   const theme = useThemeMode(mode);
 
+  // Defensive guard — schema's superRefine should catch empty panels, but
+  // unvalidated paths (direct prop spread) could still bypass it. Without
+  // this, `cols = 0` below produces divide-by-zero downstream.
+  if (panels.length === 0) return null;
+
   // Grid layout: aim for square-ish panels. For 4 panels, 2×2; for 6, 3×2.
   const numPanels = panels.length;
   const cols = numPanels <= 2 ? numPanels : numPanels <= 4 ? 2 : numPanels <= 6 ? 3 : 4;

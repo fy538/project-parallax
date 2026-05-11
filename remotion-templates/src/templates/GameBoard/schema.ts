@@ -59,11 +59,37 @@ export const GameBoardSchema = z.object({
     showBestResponseArrows: z.boolean().optional(),
     showNashGlyph: z.boolean().optional(),
     payoffUnits: z.string().optional(),
-    phases: z.array(GamePhaseSchema).min(1),
+    // Phases is optional at the schema level; the superRefine below enforces
+    // that non-iterated variants require non-empty phases, while iterated-play
+    // requires non-empty rounds instead. Previously a `.min(1)` here forced
+    // catalog samples like `gameIteratedPD` to pad filler phases.
+    phases: z.array(GamePhaseSchema).optional(),
     source: z.string().optional(),
     durationSec: z.number().positive().optional(),
     backgroundTint: z.string().optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     _direction: z.unknown().optional(),
+  })
+  .superRefine((d, ctx) => {
+    // Phases / rounds requirement gates by variant:
+    //   chess | go | payoff-matrix | pd-canonical → require non-empty `phases`
+    //   iterated-play                              → require non-empty `rounds`
+    if (d.variant === "iterated-play") {
+      if (!d.rounds || d.rounds.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "variant 'iterated-play' requires at least one entry in `rounds`",
+          path: ["rounds"],
+        });
+      }
+    } else {
+      if (!d.phases || d.phases.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `variant '${d.variant}' requires at least one entry in \`phases\``,
+          path: ["phases"],
+        });
+      }
+    }
   }),
 });
