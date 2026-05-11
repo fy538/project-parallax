@@ -118,6 +118,28 @@ const EpisodeTitleVariant: React.FC<{
   // Pace-scaled to match the scale reveal cadence above.
   const titleLetterSpacing = letterSpacingAnim(frame, sec(0.4 * t), sec(0.8 * t), 12, 2);
 
+  // ── Anticipatory-reveal adoption (POLISH.md D17, motion-design.md § 3) ──
+  // Title and subtitle are the editorially-loaded reveals. Convention:
+  //   syncPoints[0] → title narration cue
+  //   syncPoints[1] → subtitle narration cue
+  // Each opacity fadeIn lands 5 frames before the cue when syncPoints exist.
+  // Falls back to original estimate start frames otherwise → identical
+  // visual baseline.
+  // See editorial-title variant (commit 1da5a49) for the reference idiom —
+  // identical convention, applied here to episode-title.
+  const TITLE_START_DEFAULT = sec(0.4);
+  const TITLE_SETTLE = sec(0.6);
+  const SUBTITLE_START_DEFAULT = sec(1.5);
+  const SUBTITLE_SETTLE = sec(0.5);
+  const titleStartFrame =
+    direction.syncPoints?.[0]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[0].frame, TITLE_SETTLE)
+      : TITLE_START_DEFAULT;
+  const subtitleStartFrame =
+    direction.syncPoints?.[1]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[1].frame, SUBTITLE_SETTLE)
+      : SUBTITLE_START_DEFAULT;
+
   // Smooth bloom behind title (no hard seam) + audio-reactive pulse from
   // Whisper-resolved sync points. When direction.syncPoints is empty (estimate
   // mode, no narration recorded yet), beat.pulse stays at 0 and titleBloom
@@ -283,7 +305,7 @@ const EpisodeTitleVariant: React.FC<{
             maxWidth: 1400,
             lineHeight: 1.2,
             letterSpacing: titleLetterSpacing,
-            opacity: fadeIn(frame, sec(0.4), sec(0.6)),
+            opacity: fadeIn(frame, titleStartFrame, TITLE_SETTLE),
             transform: `scale(${titleScale}) translateY(${titleSpringY}px)`,
             transformOrigin: "center center",
             textShadow: `0 0 60px ${accentColor}40, 0 0 120px ${accentColor}15, 0 2px 8px rgba(0,0,0,0.6)`, // shadows.accentGlow cinematic triple (60px + 120px + depth)
@@ -317,7 +339,7 @@ const EpisodeTitleVariant: React.FC<{
               textAlign: "center",
               maxWidth: 1100,
               lineHeight: 1.4,
-              opacity: fadeIn(frame, sec(1.5), sec(0.5)),
+              opacity: fadeIn(frame, subtitleStartFrame, SUBTITLE_SETTLE),
               transform: `translateY(${slideIn(frame, sec(1.5), 30, sec(0.6))}px) scale(${scaleReveal(frame, sec(1.5), sec(0.7), 1.02, 1.0)})`,
               transformOrigin: "center center",
               textShadow: shadows.textLift,
@@ -370,6 +392,18 @@ const SectionVariant: React.FC<{
 
   // Letter-spacing focus on section title
   const titleLetterSpacing = letterSpacingAnim(frame, sec(0.3), sec(0.7), 8, 1.5);
+
+  // ── Anticipatory-reveal adoption (POLISH.md D17) ──
+  // The section title (e.g., "THE LOGIC OF DENIAL") is the verbal anchor —
+  // the narrator voices this on entry to the section. `syncPoints[0]` carries
+  // the cue; opacity settles 5 frames before. Section number stays on plain
+  // fadeIn — decorative/structural ordinal, not narration-keyed.
+  const SECTION_TITLE_START_DEFAULT = sec(0.4);
+  const SECTION_TITLE_SETTLE = sec(0.5);
+  const sectionTitleStartFrame =
+    direction.syncPoints?.[0]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[0].frame, SECTION_TITLE_SETTLE)
+      : SECTION_TITLE_START_DEFAULT;
 
   // Smooth bloom behind title + beat pulse — clamped to 1 because consumed
   // as CSS opacity (see EpisodeTitleVariant note for full rationale).
@@ -447,7 +481,7 @@ const SectionVariant: React.FC<{
               marginTop: layout.spacing.sm,
               maxWidth: textMaxWidth.h1,
               letterSpacing: titleLetterSpacing,
-              opacity: fadeIn(frame, sec(0.4), sec(0.5)),
+              opacity: fadeIn(frame, sectionTitleStartFrame, SECTION_TITLE_SETTLE),
               transform: `scale(${titleScale}) translateY(${titleSpringY}px)`,
               transformOrigin: "center center",
               textShadow: `0 0 50px ${accentColor}35, 0 2px 6px rgba(0,0,0,0.6)`, // shadows.accentGlow cinematic + depth composite
@@ -485,6 +519,19 @@ const EndCardVariant: React.FC<{
   const theme = useThemeMode(data.backgroundVariant || "light");
   const emphasis = useEpisodeColorEmphasis();
   const accentColor = data.accentColor || emphasis.primaryAccent;
+  const direction = useDirection(data._direction);
+
+  // ── Anticipatory-reveal adoption (POLISH.md D17) ──
+  // The CTA text is the editorial hero of the end card — the closing line
+  // the narrator voices ("if this matters to you, subscribe…"). Opacity
+  // settles 5 frames before `syncPoints[0]`'s cue. Divider, teaser, and
+  // episode label remain on plain fadeIn — structural / supporting.
+  const CTA_START_DEFAULT = sec(0.5);
+  const CTA_SETTLE = sec(0.5);
+  const ctaStartFrame =
+    direction.syncPoints?.[0]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[0].frame, CTA_SETTLE)
+      : CTA_START_DEFAULT;
 
   // Spring-based entrance for CTA (A2 physics)
   // linear-ok: input is heroSpring() output [0,1] — spring provides easing, not frame index
@@ -530,7 +577,7 @@ const EndCardVariant: React.FC<{
               fontWeight: 500,
               textAlign: "center",
               maxWidth: textMaxWidth.h2,
-              opacity: fadeIn(frame, sec(0.5), sec(0.5)),
+              opacity: fadeIn(frame, ctaStartFrame, CTA_SETTLE),
               transform: `translateY(${ctaSpringY}px)`,
               textShadow: shadows.textLift,
             }}
