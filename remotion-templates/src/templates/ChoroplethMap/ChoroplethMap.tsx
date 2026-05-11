@@ -284,6 +284,13 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
     () => getColorRamp(data.colorRamp),
     [data.colorRamp]
   );
+  // Detect whether any phase has a country marked noData — if so, the legend
+  // strip appends an umber "No data" swatch so the encoding is self-explaining.
+  // See: choropleth-map.md § 6.5 (no-data treatment).
+  const hasAnyNoData = useMemo(
+    () => data.phases.some((p) => p.countries.some((c) => c.noData)),
+    [data.phases]
+  );
   const windows = useMemo(
     () => computePhaseWindows(data.phases),
     [data.phases]
@@ -499,6 +506,55 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
                 );
               })}
             </div>
+
+            {/* "No data" swatch — appended after the ramp when any country
+                is marked noData. Visually distinct from the ramp swatches
+                (narrower, palette.umber fill, leading vertical separator)
+                so the eye reads it as a separate category, not as another bin.
+                See: choropleth-map.md § 6.5 */}
+            {hasAnyNoData && (
+              <>
+                {/* Thin vertical separator between ramp and no-data swatch */}
+                <div
+                  style={{
+                    width: 1,
+                    height: 16,
+                    background: theme.text.muted,
+                    opacity: 0.35,
+                    marginLeft: layout.spacing.sm,
+                    marginRight: layout.spacing.sm,
+                    flexShrink: 0,
+                  }}
+                />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: layout.spacing.xs,
+                    flexShrink: 0,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 32,
+                      height: 12,
+                      background: palette.umber,
+                      opacity: 0.85,
+                    }}
+                  />
+                  <div
+                    style={{
+                      fontSize: fontSizes.caption,
+                      fontFamily: fonts.data,
+                      color: theme.text.muted,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {data.legend?.noDataLabel ?? "No data"}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
       </AbsoluteFill>

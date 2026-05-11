@@ -33,6 +33,7 @@ export const ChoroplethMapSchema = z.object({
       breaks: z.array(z.number()).optional(),
       unit: z.string().optional(),
       label: z.string().optional(),
+      noDataLabel: z.string().optional(),
     }).optional(),
     colorRamp: z.union([
       z.enum(["blue", "red", "teal", "gray", "ylOrBr", "rdBu"]),

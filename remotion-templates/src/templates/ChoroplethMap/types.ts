@@ -120,6 +120,13 @@ export interface ChoroplethMapData {
     unit?: string;
     /** Caption to the left of the swatches. */
     label?: string;
+    /**
+     * Label for the "no data" swatch, which is auto-appended to the legend
+     * when any country in any phase has `noData: true`. Default "No data".
+     * Set explicitly when the editorial frame uses different language
+     * (e.g., "Not included", "Sanctioned countries excluded").
+     */
+    noDataLabel?: string;
   };
   /** The phases of the animation, played sequentially. */
   phases: AnimationPhase[];
