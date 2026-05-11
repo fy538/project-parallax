@@ -24,12 +24,13 @@ From repo root:
 
 Per-stack (when you need granular control):
 
-- Python tests: `pytest tools/ -q` (163 tests across 6 modules, <1s)
+- Python tests: `pytest tools/ -q` (330 tests across modules, <1s)
 - Python tests in watch mode: `./scripts/test-watch.sh` (requires `entr`)
 - TS typecheck: `cd remotion-templates && npx tsc --noEmit`
 - TS lint: `cd remotion-templates && npm run lint`
 - TS visual regression: `cd remotion-templates && npm test`
-- TS **real-data** PNG regression (all manifest `data/episodes` JSONs wired in `*-real-data.test.ts`): `cd remotion-templates && npm run test:real-data` — requires Playwright Chromium. **`map-real-data.test.ts` skips** unless `MAPBOX_ACCESS_TOKEN` is set to a public token (`pk....`). Example: `MAPBOX_ACCESS_TOKEN=pk.... npm run test:real-data`. Optional GitHub secret `MAPBOX_ACCESS_TOKEN` enables map baselines in the macOS CI job.
+- TS **real-data** PNG regression (all manifest `data/episodes` JSONs wired in `*-real-data.test.ts`): `cd remotion-templates && npm run test:real-data` — requires Playwright Chromium. **`map-real-data.test.ts` skips** unless `MAPBOX_ACCESS_TOKEN` is set to a public token (`pk....`). Example: `MAPBOX_ACCESS_TOKEN=pk.... npm run test:real-data`.
+- **Orphan episode JSON** (files under `remotion-templates/data/episodes/<slug>/` not referenced as `template.dataFile` in `assembly-manifest.json`): `python3 tools/list_orphan_episode_json.py` (optional `--episode <slug>`, `--json`). Triage only — drafts and alternates may be intentional.
 - Manifest gen: `python3 tools/assembly/generate_manifest.py --script <path> --episode <slug> --output <path>`
 - Backdrop pick list: `python3 tools/assembly/print_backdrop_catalog.py` (add `--dark-register`, `--tag TAG`, `--tone-prefix dark`, `--chart-at-least high|medium|low`, `--markdown`). Pairing rules: `remotion-templates/design-references/backdrops/BACKDROP_CHART_PAIRING.md`
 - JSON validation: `python3 tools/validate_data.py` (or `--files a.json b.json` for a subset)
@@ -41,6 +42,12 @@ Per-stack (when you need granular control):
 ## Slash commands and subagents
 
 The `.claude/commands/` directory has prompt templates for common workflows: `/new-episode`, `/new-template`, `/concept-search`, `/render-preview`, `/audit-script`. The `.claude/agents/` directory has `script-reviewer` and `visual-spec-reviewer` subagents for delegated audit tasks.
+
+## GitHub Actions (CI)
+
+- **Pull requests:** Linux [`scripts/test.sh`](./scripts/test.sh) + macOS **`macos-smoke`** (typecheck, unit Vitest, `templates.test.ts` visual smoke). Does **not** run the heavy **`test:real-data`** PNG suite (keeps PRs fast).
+- **`test:real-data` in CI:** Job **`macos-real-data`** in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — runs on **push to `main`**, **daily schedule** (UTC), and **`workflow_dispatch`**. Installs Playwright and runs `npm run test:real-data` (same as local full PNG regression).
+- **Mapbox maps in CI:** Add repository secret **`MAPBOX_ACCESS_TOKEN`** with a **public** token (`pk....`): GitHub → repo **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Without it, **`map-real-data.test.ts`** skips in CI (same as local).
 
 ## Pipeline state
 
@@ -70,7 +77,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 
 ## Testing
 
-- Repo root **`./scripts/test.sh`** runs Python, `tsc`, and a **narrow Vitest subset** (fast checks). It does **not** run `*-real-data` PNG suites; use `cd remotion-templates && npm run test:real-data` when you need full manifest-aligned still diffs (or rely on CI: macOS job).
+- Repo root **`./scripts/test.sh`** runs Python, `tsc`, and a **narrow Vitest subset** (fast checks). It does **not** run `*-real-data` PNG suites; use `cd remotion-templates && npm run test:real-data` locally, or rely on the **`macos-real-data`** CI job (main / nightly / manual — see GitHub Actions above).
 - Python tests are <1s. **New parsing/state logic must come with a test.** Patterns to copy: `tools/assembly/test_generate_manifest.py` (parsing-heavy), `tools/test_cost_tracker.py` (markdown round-trip), `tools/brand-treatment/test_treat.py` (numeric image processing invariants).
 - **Visual regression baselines** live in `remotion-templates/src/__tests__/baselines/`. Run `./scripts/regen-baselines.sh` after any intentional visual change (palette, animation timing, template refactor) and commit the resulting PNGs. `cd remotion-templates && npm test` then catches future drift via 5% file-size tolerance.
 - Visual regression baselines live in `remotion-templates/src/__tests__/baselines/`. After intentional visual changes, regenerate with `npm run test:baseline`.

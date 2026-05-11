@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Daily health check (UTC); Linux + optional heavy macOS jobs below
+    - cron: "0 12 * * *"
 
 jobs:
   # Primary CI runs on Linux (faster + cheaper). Validates JSON, lint,
@@ -85,10 +89,31 @@ jobs:
         # real-data suite. ImageComposite may skip without sample assets.
         run: cd remotion-templates && npm run test:visual
 
+  # Episode-JSON PNG baselines: heavy (~10+ min). Skipped on pull_request.
+  # Runs on push to main, nightly schedule, and workflow_dispatch.
+  macos-real-data:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: macos-latest
+    concurrency:
+      group: macos-real-data-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: remotion-templates/package-lock.json
+
+      - name: Install Node deps
+        run: cd remotion-templates && npm ci
+
+      - name: Install Playwright Chromium for real-data renders
+        run: cd remotion-templates && npx playwright install chromium
+
       - name: Vitest real-data PNG regression (*-real-data.test.ts)
-        # Episode JSON stills vs committed baselines under baselines/*/.
-        # map-real-data.test.ts skips unless MAPBOX_ACCESS_TOKEN is a public
-        # pk.* token — set repo secret MAPBOX_ACCESS_TOKEN to run map shots in CI.
         env:
           MAPBOX_ACCESS_TOKEN: ${{ secrets.MAPBOX_ACCESS_TOKEN }}
         run: cd remotion-templates && npm run test:real-data
