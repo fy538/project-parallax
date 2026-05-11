@@ -41,13 +41,14 @@ import {
   exitFade,
   heroSpring,
   pulse,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
 } from "../../utils/animation";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
-import { useDirection } from "../../hooks/useDirection";
+import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
@@ -469,8 +470,9 @@ const MultiVariant: React.FC<{
   durationInFrames: number;
   area: ReturnType<typeof contentArea>;
   compStyle: React.CSSProperties;
+  syncPoints?: DirectionSyncPoint[];
 }> = React.memo(
-  ({ data, theme, frame, durationInFrames, area, compStyle }) => {
+  ({ data, theme, frame, durationInFrames, area, compStyle, syncPoints }) => {
     if (!data.multiHypotheses || data.multiHypotheses.length === 0) {
       return null;
     }
@@ -573,6 +575,14 @@ const MultiVariant: React.FC<{
               }}
             >
               {/* Intro label */}
+              {/* Anticipatory-reveal adoption (POLISH.md D17): the question
+                  is the editorial frame for the whole Bayesian update — the
+                  narrator's verbal anchor ("How do we know if X?"). The
+                  question opacity settles 5 frames before `syncPoints[0]`'s
+                  cue. Settle = sec(0.5). Falls back to sec(0.3) absent a cue
+                  → identical visual baseline.
+                  See TitleTransition.editorial-title (commit 1da5a49) for
+                  the reference idiom. */}
               {data.question && (
                 <div
                   style={{
@@ -581,7 +591,13 @@ const MultiVariant: React.FC<{
                     fontFamily: fonts.mono,
                     marginBottom: layout.spacing.lg,
                     textShadow: shadows.textLift,
-                    opacity: fadeIn(frame, sec(0.3), sec(0.5)),
+                    opacity: fadeIn(
+                      frame,
+                      syncPoints?.[0]?.frame !== undefined
+                        ? anticipatoryStartFrame(syncPoints[0].frame, sec(0.5))
+                        : sec(0.3),
+                      sec(0.5),
+                    ),
                   }}
                 >
                   {data.question}
@@ -964,6 +980,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
         durationInFrames={durationInFrames}
         area={area}
         compStyle={compStyle}
+        syncPoints={direction.syncPoints}
       />
     );
   }
@@ -1019,6 +1036,11 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
             }}
           >
             {/* Question label */}
+            {/* Anticipatory-reveal adoption (POLISH.md D17): the question
+                is the verbal anchor — the narrator says "is X true?" and the
+                question card should be settled by then. Opacity settles 5
+                frames before `syncPoints[0]`'s cue; settle = sec(0.5). Falls
+                back to sec(0.3) absent a cue → identical visual baseline. */}
             {data.question && (
               <div
                 style={{
@@ -1027,7 +1049,13 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                   fontFamily: fonts.mono,
                   marginBottom: layout.spacing.sm,
                   textShadow: shadows.textLift,
-                  opacity: fadeIn(frame, sec(0.3), sec(0.5)),
+                  opacity: fadeIn(
+                    frame,
+                    direction.syncPoints?.[0]?.frame !== undefined
+                      ? anticipatoryStartFrame(direction.syncPoints[0].frame, sec(0.5))
+                      : sec(0.3),
+                    sec(0.5),
+                  ),
                 }}
               >
                 {data.question}
