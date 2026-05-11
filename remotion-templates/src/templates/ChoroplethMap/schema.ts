@@ -25,7 +25,7 @@ export const ChoroplethMapSchema = z.object({
   data: z.object({
     episode: z.string(),
     title: z.string(),
-    projection: z.enum(["geoMercator", "geoNaturalEarth1", "geoEqualEarth"]).optional(),
+    projection: z.enum(["globe", "mercator", "equalEarth", "naturalEarth", "albers"]).optional(),
     center: z.tuple([z.number(), z.number()]).optional(),
     scale: z.number().optional(),
     colorRamp: z.union([

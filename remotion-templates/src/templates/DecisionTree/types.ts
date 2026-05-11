@@ -59,6 +59,26 @@ export interface DecisionTreeData {
   /** Color for highlighted path */
   highlightColor?: string;
   /**
+   * Editorial gate on numeric probability labels.
+   *
+   * When `false` (default), any `node.probability` string matching a numeric
+   * percentage pattern (`/\d+\s*%/`) is suppressed. Qualitative labels
+   * ("Mainline", "Sharp", "Likely") always render.
+   *
+   * When `true`, all probability labels render — only set this when the
+   * percentages come from a named source. The dossier failure mode is
+   * "Decision tree with invented probabilities — worse than no probabilities;
+   * cite or omit."
+   *
+   * For Cuban Missile Crisis, chess openings, or any case where probabilities
+   * are editorial guesses, keep this `false` and use qualitative labels.
+   * For Tetlock-style forecasting, Kelly-betting, medical triage, set `true`
+   * and cite the source via `data.source`.
+   *
+   * Reference: references/template-research/game-theory.md § A4
+   */
+  probabilityWeights?: boolean;
+  /**
    * Camera path — sequence of zoom/pan keyframes.
    * If omitted, auto-generates: root close-up → branch reveal → each leaf path → full pullback.
    */

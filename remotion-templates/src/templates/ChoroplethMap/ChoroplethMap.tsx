@@ -309,6 +309,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
           zoom={camera.zoom}
           pitch={camera.pitch}
           bearing={camera.bearing + bearingDrift}
+          projection={data.projection}
           dark={data.backgroundVariant === "dark"}
         >
           <Source

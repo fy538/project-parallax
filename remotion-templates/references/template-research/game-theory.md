@@ -148,7 +148,7 @@ The existing `GameBoard` template:
 ## 6. Specific upgrades proposed
 
 **DecisionTree:**
-1. `probabilityWeights?: boolean` option — when source-cited, show probability percentages on branches; suppress by default
+1. ~~`probabilityWeights?: boolean` option — when source-cited, show probability percentages on branches; suppress by default~~ **Done — May 11, 2026.** Shipped on DecisionTreeData. Default `false` suppresses any `node.probability` matching `/\d+\s*%/` while qualitative labels ("Mainline", "Sharp") always render. Set `true` only when probabilities come from a named source and pair with `data.source` for attribution. The dossier failure mode "invented probabilities — worse than no probabilities" is now schema-gated.
 2. New variant `decision-ladder` — Allison-style nested rectangles for ExComm/Politburo deliberation scenes
 3. ~~"Chosen path" hero treatment — accent color + 2px stroke on the actually-chosen branch, others at 30% opacity 1px~~ **Done — May 11, 2026.** When `data.highlightedPath` is set, off-path edges recede to 1.5px @ 30% opacity and off-path nodes dim to 50%. Chosen path keeps the existing 3px highlight stroke + glow. Verified visually on `chess-opening` catalog: Italian → Modern d3 path reads as protagonist while Evans Gambit / Two Knights / Classical recede.
 

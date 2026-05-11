@@ -24,6 +24,7 @@ export const DecisionTreeSchema = z.object({
     rootId: z.string(),
     highlightedPath: z.array(z.string()).optional(),
     highlightColor: z.string().optional(),
+    probabilityWeights: z.boolean().optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),

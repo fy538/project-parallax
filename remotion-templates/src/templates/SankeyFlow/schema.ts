@@ -18,6 +18,7 @@ const SankeyLinkSchema = z.object({
   value: z.number(),
   color: z.string().optional(),
   label: z.string().optional(),
+  emphasis: z.enum(["accent", "muted"]).optional(),
 });
 
 export const SankeyFlowSchema = z.object({
@@ -34,6 +35,11 @@ export const SankeyFlowSchema = z.object({
     sourceTotal: z.object({
       value: z.string(),
       context: z.string().optional(),
+    }).optional(),
+    aggregateOther: z.object({
+      threshold: z.number().min(0).max(1).optional(),
+      label: z.string().optional(),
+      color: z.string().optional(),
     }).optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),

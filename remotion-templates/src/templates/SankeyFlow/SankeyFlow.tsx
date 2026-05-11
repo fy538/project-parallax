@@ -573,7 +573,13 @@ const SankeyLinkComponent: React.FC<{
   columnCount: number;
   sourceColor?: string;
   targetColor?: string;
-}> = React.memo(({ link, frame, startFrame, columnCount, sourceColor, targetColor }) => {
+  /**
+   * True when ANY link in the chart has emphasis="accent" — activates the
+   * mute/accent hierarchy so non-accent ribbons recede. Default false
+   * (equal-weight all flows). See: references/template-research/sankey-flow.md § 6.2
+   */
+  someAccent?: boolean;
+}> = React.memo(({ link, frame, startFrame, columnCount, sourceColor, targetColor, someAccent = false }) => {
   // Per-episode primary accent fallback for unconfigured links.
   const emphasis = useEpisodeColorEmphasis();
   // Stagger link draws by column distance
@@ -587,7 +593,14 @@ const SankeyLinkComponent: React.FC<{
     easings.structure
   );
 
-  const opacity = fadeIn(frame, linkStartFrame, sec(0.2));
+  // Editorial emphasis: when someAccent is true (data declared an accent flow),
+  // links without `emphasis="accent"` recede to 0.35 opacity. The accent
+  // ribbon then unambiguously carries the editorial point.
+  const isAccent = link.emphasis === "accent";
+  const isMuted = link.emphasis === "muted" || (someAccent && !isAccent);
+  const emphasisMultiplier = isMuted ? 0.35 : 1.0;
+
+  const opacity = fadeIn(frame, linkStartFrame, sec(0.2)) * emphasisMultiplier;
 
   const linkColor = link.color || emphasis.primaryAccent;
   const fromColor = sourceColor || linkColor;
@@ -697,9 +710,80 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   const chartWidth = area.width;
   const chartHeight = area.height;
 
+  // Aggregate minor terminal nodes into an "Other" bucket BEFORE layout.
+  // Prevents the dossier failure mode "any ribbon under ~6px on 1080p" by
+  // folding sub-threshold flows into a single visible terminal.
+  // See: references/template-research/sankey-flow.md § 6
+  const { nodes: aggregatedNodes, links: aggregatedLinks } = useMemo(() => {
+    if (!data.aggregateOther) return { nodes, links };
+    const threshold = data.aggregateOther.threshold ?? 0.03;
+    const otherLabel = data.aggregateOther.label ?? "Other";
+    const otherColor = data.aggregateOther.color ?? theme.text.muted;
+
+    // Identify terminal column (max column index).
+    const maxColumn = Math.max(...nodes.map((n) => n.column));
+    const terminalNodes = nodes.filter((n) => n.column === maxColumn);
+    const grandTotal = terminalNodes.reduce((sum, n) => sum + n.value, 0);
+    if (grandTotal === 0) return { nodes, links };
+
+    // Partition terminals into kept vs rolled-up.
+    const minorIds = new Set(
+      terminalNodes.filter((n) => n.value / grandTotal < threshold).map((n) => n.id),
+    );
+    if (minorIds.size === 0) return { nodes, links };
+
+    // Build "Other" bucket: sum of minor values.
+    const otherValue = terminalNodes
+      .filter((n) => minorIds.has(n.id))
+      .reduce((sum, n) => sum + n.value, 0);
+    const otherId = "__sankey_other__";
+    const otherNode: SankeyNode = {
+      id: otherId,
+      label: otherLabel,
+      value: otherValue,
+      color: otherColor,
+      column: maxColumn,
+    };
+
+    // Drop minor terminal nodes, append Other.
+    const newNodes = [...nodes.filter((n) => !minorIds.has(n.id)), otherNode];
+
+    // Redirect links targeting minor terminals to Other; merge by source.
+    const aggregatedLinkMap = new Map<string, SankeyLink>();
+    const newLinks: SankeyLink[] = [];
+    for (const link of links) {
+      if (!minorIds.has(link.to)) {
+        newLinks.push(link);
+        continue;
+      }
+      // Merge into a single link per source → Other.
+      const key = `${link.from}->${otherId}`;
+      const existing = aggregatedLinkMap.get(key);
+      if (existing) {
+        existing.value += link.value;
+      } else {
+        const merged: SankeyLink = {
+          from: link.from,
+          to: otherId,
+          value: link.value,
+          color: link.color,
+        };
+        aggregatedLinkMap.set(key, merged);
+      }
+    }
+    return { nodes: newNodes, links: [...newLinks, ...aggregatedLinkMap.values()] };
+  }, [nodes, links, data.aggregateOther, theme.text.muted]);
+
   const { nodes: layoutNodes, links: layoutLinks } = useMemo(
-    () => layoutSankey(nodes, links, chartWidth, chartHeight),
-    [nodes, links, chartWidth, chartHeight]
+    () => layoutSankey(aggregatedNodes, aggregatedLinks, chartWidth, chartHeight),
+    [aggregatedNodes, aggregatedLinks, chartWidth, chartHeight]
+  );
+
+  // True when any link declares emphasis="accent" — activates the mute
+  // hierarchy in SankeyLinkComponent. See: sankey-flow.md § 6.2
+  const someAccentLink = useMemo(
+    () => aggregatedLinks.some((l) => l.emphasis === "accent"),
+    [aggregatedLinks],
   );
 
   // Animation timeline
@@ -866,6 +950,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
               columnCount={columnCount}
               sourceColor={fromNode?.color}
               targetColor={toNode?.color}
+              someAccent={someAccentLink}
             />
           );
         })}

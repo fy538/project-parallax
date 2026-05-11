@@ -167,6 +167,8 @@ const TreeNodeComponent: React.FC<{
   defaultColorIndex?: number;
   /** Audio-reactive pulse from useBeatSync — amplifies the active-node glow. 0 = no effect. */
   beatPulse?: number;
+  /** When false (default), numeric percentage labels are suppressed. */
+  probabilityWeights?: boolean;
 }> = React.memo(({
   node,
   position,
@@ -177,6 +179,7 @@ const TreeNodeComponent: React.FC<{
   dimAmount,
   focusScale,
   defaultColorIndex = 0,
+  probabilityWeights = false,
   beatPulse = 0,
 }) => {
   const theme = useThemeMode(mode);
@@ -245,8 +248,13 @@ const TreeNodeComponent: React.FC<{
         </div>
       </div>
 
-      {/* Probability badge (above node) */}
-      {node.probability && (
+      {/* Probability badge (above node). Editorial gate: numeric percentages
+          are suppressed unless `probabilityWeights` is explicitly true.
+          Qualitative labels ("Mainline", "Sharp", "Likely") always render.
+          See: references/template-research/game-theory.md § A4 — "Decision
+          tree with invented probabilities — worse than no probabilities;
+          cite or omit." */}
+      {node.probability && (probabilityWeights || !/\d+\s*%/.test(node.probability)) && (
         <div
           style={{
             position: "absolute",
@@ -546,6 +554,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     focusScale={camera.getNodeScale(node.id)}
                     defaultColorIndex={data.nodes.indexOf(node)}
                     beatPulse={beat.pulse}
+                    probabilityWeights={data.probabilityWeights}
                   />
                 );
               })}

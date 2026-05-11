@@ -25,6 +25,20 @@ export interface SankeyLink {
   value: number;
   color?: string;
   label?: string;
+  /**
+   * Editorial emphasis for this ribbon:
+   * - `"accent"` — the load-bearing flow the narration is about; rendered at
+   *    full opacity in the link's color.
+   * - `"muted"` — context flow; rendered at reduced opacity so the accent
+   *    ribbon dominates the eye.
+   *
+   * Default (omitted) treats all flows equally. When ANY link sets emphasis,
+   * other links automatically read as muted relative to accent ribbons.
+   *
+   * Use to highlight the editorial point without hardcoding colors per-frame.
+   * See: references/template-research/sankey-flow.md § 6.2
+   */
+  emphasis?: "accent" | "muted";
 }
 
 export interface SankeyFlowData {
@@ -66,6 +80,27 @@ export interface SankeyFlowData {
     value: string;
     /** Sub-line context (e.g., "global plastic produced 1950–2017"). */
     context?: string;
+  };
+
+  /**
+   * Auto-aggregate minor terminal nodes into a single "Other" bucket to
+   * prevent unreadable hairline ribbons. When set, every terminal-column
+   * node whose total incoming flow is below `threshold × grandTotal` is
+   * merged into a single "Other" terminal in the same column.
+   *
+   * Without this, real-world data (country-by-country, brand-by-brand)
+   * produces dozens of <6px ribbons that read as noise. See dossier failure
+   * mode "Unreadable hairlines — any ribbon under ~6px on a 1080p frame."
+   *
+   * Reference: references/template-research/sankey-flow.md § 6
+   */
+  aggregateOther?: {
+    /** Fraction of total below which terminal nodes roll into "Other". Default 0.03 (3%). */
+    threshold?: number;
+    /** Label for the aggregated terminal. Default "Other". */
+    label?: string;
+    /** Color for the Other terminal. Default muted gray. */
+    color?: string;
   };
 
   /**

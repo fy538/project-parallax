@@ -22,7 +22,7 @@ import { CATALOG_EPISODE, catalogId } from "./helpers";
 const choroplethG7: ChoroplethMapData = {
   episode: CATALOG_EPISODE,
   title: "The G7 — A Single-Phase Highlight",
-  projection: "geoNaturalEarth1",
+  projection: "naturalEarth",
   center: [10, 30],
   scale: 180,
   phases: [
@@ -46,7 +46,7 @@ const choroplethG7: ChoroplethMapData = {
 const choroplethBlocs: ChoroplethMapData = {
   episode: CATALOG_EPISODE,
   title: "Bloc Architecture, 1955–1990",
-  projection: "geoNaturalEarth1",
+  projection: "naturalEarth",
   center: [20, 40],
   scale: 220,
   phases: [
@@ -119,7 +119,7 @@ const choroplethBlocs: ChoroplethMapData = {
 const choroplethTordesillas: ChoroplethMapData = {
   episode: CATALOG_EPISODE,
   title: "The Treaty of Tordesillas, 1494",
-  projection: "geoNaturalEarth1",
+  projection: "naturalEarth",
   center: [-30, 0],
   scale: 200,
   phases: [

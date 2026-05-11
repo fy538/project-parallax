@@ -3,7 +3,7 @@
   "title": "Ostrom's Commons",
   "backgroundVariant": "dark",
   "durationSec": 14,
-  "projection": "geoMercator",
+  "projection": "mercator",
   "center": [
     20,
     25

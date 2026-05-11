@@ -43,8 +43,25 @@ export interface ChoroplethMapData {
   episode: string;
   /** Segment title. */
   title: string;
-  /** Map projection to use. */
-  projection?: "geoMercator" | "geoNaturalEarth1" | "geoEqualEarth";
+  /**
+   * Map projection to use.
+   *
+   * - `globe` — 3D sphere, best for global narratives at zoom <3.
+   * - `mercator` — flat web-mercator, default for regional views (zoom ≥3).
+   *    DO NOT use for world-scale quantitative comparison — area distortion
+   *    near the poles inflates Greenland / Russia and reads as editorial bias.
+   * - `equalEarth` (recommended default for world-scale choropleth) —
+   *    area-preserving, the only world projection that's editorially honest
+   *    for quantitative comparison.
+   * - `naturalEarth` — compromise projection, NYT/National Geographic default.
+   * - `albers` — best for North America–centric views.
+   *
+   * Defaults: `globe` for zoom <3, `mercator` for zoom ≥3 (preserves legacy
+   * behavior). When set, overrides the auto-choice.
+   *
+   * Reference: references/template-research/choropleth-map.md § 6.1
+   */
+  projection?: "globe" | "mercator" | "equalEarth" | "naturalEarth" | "albers";
   /** Default map center [longitude, latitude]. */
   center?: [number, number];
   /** Default scale. */

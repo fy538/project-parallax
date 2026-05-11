@@ -96,6 +96,14 @@ export interface MapGLProps {
   onLoad?: () => void;
   /** Whether to use globe projection (default: true for zoom < 3) */
   globe?: boolean;
+  /**
+   * Explicit Mapbox projection name. When set, overrides the `globe`
+   * auto-choice and the `globe`/`mercator` defaults. Use `equalEarth` for
+   * editorially honest world-scale choropleth (area-preserving).
+   *
+   * See: references/template-research/choropleth-map.md § 6.1
+   */
+  projection?: "globe" | "mercator" | "equalEarth" | "naturalEarth" | "albers";
   /** Enable terrain hillshading (default: true) */
   terrain?: boolean;
   /** Use the dark Meridian style instead of light (default: false). Templates pass this when the episode is in dark mode. */
@@ -117,6 +125,7 @@ export const MapGL: React.FC<MapGLProps> = ({
   layers = [],
   onLoad,
   globe,
+  projection,
   terrain = true,
   dark = false,
   styleUrl,
@@ -149,6 +158,8 @@ export const MapGL: React.FC<MapGLProps> = ({
   }, [handle, loaded]);
 
   const useGlobe = globe ?? zoom < 3;
+  // Explicit projection prop wins over the globe/mercator auto-choice.
+  const resolvedProjection = projection ?? (useGlobe ? "globe" : "mercator");
 
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
@@ -161,7 +172,7 @@ export const MapGL: React.FC<MapGLProps> = ({
         zoom={zoom}
         pitch={pitch}
         bearing={bearing}
-        projection={useGlobe ? "globe" : "mercator"}
+        projection={resolvedProjection}
         onLoad={handleLoad}
         // Render quality: antialiasing smooths line edges (country borders,
         // route arcs) at the cost of GPU; for offline video render this is
