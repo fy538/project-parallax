@@ -464,7 +464,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const { yMin, yMax, xMin, xMax } = useMemo(() => {
     const allYValues = data.lines.flatMap((line) => line.points.map((p) => p.y));
     const referenceYValues = data.referenceLines?.map((r) => r.y) || [];
-    const allYWithReferences = [...allYValues, ...referenceYValues];
+    // Include band bounds so the chart auto-fits to keep bands visible.
+    const bandYValues = data.referenceBands?.flatMap((b) => [b.y1, b.y2]) || [];
+    const allYWithReferences = [...allYValues, ...referenceYValues, ...bandYValues];
 
     let yMin = allYWithReferences.length > 0 ? Math.min(...allYWithReferences) : 0;
     let yMax = allYWithReferences.length > 0 ? Math.max(...allYWithReferences) : 1;
@@ -508,7 +510,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
     const xMax = allXValues.length > 0 ? Math.max(...allXValues) : 1;
 
     return { yMin, yMax, xMin, xMax };
-  }, [data.lines, data.referenceLines, data.yRange]);
+  }, [data.lines, data.referenceLines, data.referenceBands, data.yRange]);
 
   // Pre-compute pixel coordinates for each data point. We use these for
   // both the polyline string AND for the leading-edge marker — the marker
@@ -908,6 +910,64 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             opacity={fadeIn(frame, axesStart, sec(0.3))}
           />
 
+          {/* ── Reference bands (horizontal shaded ranges) ───────────────────
+              Render BEFORE reference lines and data so the band sits behind
+              everything. Use for "deviation from baseline" stories — the data
+              line crossing a band is the editorial point.
+              See: references/template-research/time-series-chart.md § 6.5 */}
+          {data.referenceBands?.map((band, bandIdx) => {
+            const y1Px = getYPosition(
+              Math.max(band.y1, band.y2),  // upper bound of band (visually higher = smaller y px)
+              yMin,
+              yMax,
+              chartTop,
+              chartBottom,
+            );
+            const y2Px = getYPosition(
+              Math.min(band.y1, band.y2),
+              yMin,
+              yMax,
+              chartTop,
+              chartBottom,
+            );
+            const bandColor = band.color || mutedColor;
+            const bandFillOpacity = band.opacity ?? 0.1;
+            // Band fades in slightly before reference lines so it reads as
+            // chart structure, not as a late annotation.
+            const bandOpacity = fadeIn(
+              frame,
+              axesStart + bandIdx * sec(0.1),
+              sec(0.5),
+            );
+            return (
+              <g key={`band-${bandIdx}`} opacity={bandOpacity}>
+                <rect
+                  x={chartLeft}
+                  y={y1Px}
+                  width={chartWidth}
+                  height={Math.max(1, y2Px - y1Px)}
+                  fill={bandColor}
+                  fillOpacity={bandFillOpacity}
+                />
+                {band.label && (
+                  <text
+                    x={chartRight - 12}
+                    y={(y1Px + y2Px) / 2 + 5}
+                    fill={bandColor}
+                    fontSize={fontSizes.caption}
+                    fontFamily={fonts.metadata}
+                    fontWeight={500}
+                    textAnchor="end"
+                    opacity={0.7}
+                    style={{ letterSpacing: 1.5, textTransform: "uppercase" }}
+                  >
+                    {band.label}
+                  </text>
+                )}
+              </g>
+            );
+          })}
+
           {/* ── Reference lines (horizontal benchmarks) ──────────────────────*/}
           {data.referenceLines?.map((refLine, refIdx) => {
             const refY = getYPosition(
@@ -974,11 +1034,23 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             // marked `hero`, supporting lines render thinner and at reduced
             // opacity so the protagonist's trajectory dominates. If no line
             // is a hero, every line gets the standard treatment.
+            //
+            // Stroke weights: video scrub legibility (8–12s read time) needs
+            // ~2× print weight. Canon (NYT/FT static charts) uses 2.5px hero /
+            // 1.5px supporting; we use 5/2 here (≈ 2× canon). The single-series
+            // no-hero default is 3.5 — halfway between hero and supporting,
+            // appropriate when there's no editorial protagonist.
+            //
+            // Override via `line.width` per-line. See:
+            // references/template-research/time-series-chart.md § 6.1
+            const HERO_STROKE_WIDTH = 5;
+            const SUPPORTING_STROKE_WIDTH = 2;
+            const SOLO_STROKE_WIDTH = 3.5;
             const anyHero = data.lines.some((l) => l.hero);
             const isHero = line.hero;
             const heroStroke = anyHero
-              ? (isHero ? (line.width ?? 7) : (line.width ?? 3))
-              : (line.width ?? 5);
+              ? (isHero ? (line.width ?? HERO_STROKE_WIDTH) : (line.width ?? SUPPORTING_STROKE_WIDTH))
+              : (line.width ?? SOLO_STROKE_WIDTH);
             const heroOpacity = anyHero && !isHero ? 0.55 : 1;
             return (
               <polyline

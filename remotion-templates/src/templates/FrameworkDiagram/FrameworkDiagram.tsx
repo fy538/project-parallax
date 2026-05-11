@@ -1,10 +1,30 @@
 /**
  * FrameworkDiagram — conceptual framework visualizations.
  *
- * Three variants:
- * - "comparison": Side-by-side columns (e.g., Chess vs Go strategy)
- * - "flow": Sequential nodes with arrows (e.g., escalation ladder)
- * - "matrix": Grid with highlighted cells (e.g., 2×2 strategy matrix)
+ * Three variants, each with a NON-OVERLAPPING editorial use case:
+ *
+ * - **comparison** — PARALLEL VIEWS. Two or more columns evaluated against
+ *   the same criteria. Use when the editorial point is "these two frames see
+ *   the same world differently" (Chess vs Go strategy, decoupling vs
+ *   interdependence). Ordinal numbering + row-parallel structure is the
+ *   convention. Add `protagonist: <index>` when one side leads the argument.
+ *
+ * - **flow** — SEQUENTIAL CAUSATION. Stages connected by arrows; each stage
+ *   produces the next. Use when the editorial point is "X causes Y causes Z."
+ *   Add `flowSpacing: "proportional"` + per-node `weight` when stage duration
+ *   is part of the argument. WRONG for: parallel categories (use comparison),
+ *   abstract typologies (use matrix), value distribution (use SankeyFlow).
+ *
+ * - **matrix** — 2D TYPOLOGY. A grid where each cell is the intersection of
+ *   two dimensions. Use when the editorial point is "these two axes carve
+ *   the space into distinct types" (Eisenhower urgent-vs-important,
+ *   BCG growth-vs-share). Add `items: [{ x, y, label }]` for empirical
+ *   scatter — *where actors actually sit* — rather than just labeling
+ *   quadrants abstractly.
+ *
+ * If you can't decide between two variants, your editorial frame is unclear
+ * — fix the framing before picking the form. See dossier § "Decision rule":
+ * references/template-research/framework-diagram.md
  *
  * silicon-trap use case: Chess vs Go — Western vs Chinese strategic thinking.
  */

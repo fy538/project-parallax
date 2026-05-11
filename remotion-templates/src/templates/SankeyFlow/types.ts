@@ -105,8 +105,21 @@ export interface SankeyFlowData {
 
   /**
    * Enable animated flow particles along link paths.
-   * Particles travel from source to destination, with count proportional to flow value.
-   * Default: false (set to true for cinematic mode).
+   * Particles travel from source to destination, with count proportional to
+   * flow value. Default: false.
+   *
+   * **CINEMATIC-MODE ONLY.** Particles are decorative animation that makes
+   * a held composition feel alive; they are NOT analytical signal. Use them
+   * during sustained holds (8+ seconds on the same frame) where the
+   * substrate-motion identity would otherwise feel static. DO NOT use them
+   * during rapid scrubbing or in dense analytical sequences — the motion
+   * competes with the conservation reading.
+   *
+   * Per the editorial doctrine, "elements should hold after revealing"
+   * (POLISH.md A1). Particles violate that rule on purpose to add atmosphere;
+   * apply only when atmosphere is what the moment needs.
+   *
+   * See: references/template-research/sankey-flow.md § 7 (failure modes)
    */
   flowParticles?: boolean;
   /** Particle speed multiplier (default: 1.0) */

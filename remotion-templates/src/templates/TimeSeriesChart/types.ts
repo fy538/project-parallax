@@ -68,6 +68,30 @@ export interface TimeSeriesReferenceLine {
   dashed?: boolean;
 }
 
+/**
+ * Horizontal reference band — a shaded range between two y values, with an
+ * optional label. Right for "deviation from baseline" stories where the
+ * editorial point is "the data left the normal range" — e.g., temperature
+ * anomaly bands, Fed-target inflation corridor, sustainable-yield ranges.
+ *
+ * The band renders below all data lines, in the line color at low opacity,
+ * so the active series remains the eye's primary anchor.
+ *
+ * See: references/template-research/time-series-chart.md § 6.5
+ */
+export interface TimeSeriesReferenceBand {
+  /** Lower bound. */
+  y1: number;
+  /** Upper bound. */
+  y2: number;
+  /** Optional label shown inside the band (right-aligned). */
+  label?: string;
+  /** Band fill color. Default: muted gray. */
+  color?: string;
+  /** Fill opacity. Default 0.1. */
+  opacity?: number;
+}
+
 export interface TimeSeriesChartData {
   episode: string;
   title: string;
@@ -90,6 +114,11 @@ export interface TimeSeriesChartData {
   annotations?: TimeSeriesAnnotation[];
   eras?: TimeSeriesEra[];
   referenceLines?: TimeSeriesReferenceLine[];
+  /**
+   * Horizontal shaded bands behind the data. Use for "deviation from baseline"
+   * stories. See `TimeSeriesReferenceBand` for the editorial convention.
+   */
+  referenceBands?: TimeSeriesReferenceBand[];
 
   /** X-axis label */
   xLabel?: string;

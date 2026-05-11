@@ -44,6 +44,14 @@ const TimeSeriesReferenceLineSchema = z.object({
   dashed: z.boolean().optional(),
 });
 
+const TimeSeriesReferenceBandSchema = z.object({
+  y1: z.number(),
+  y2: z.number(),
+  label: z.string().optional(),
+  color: z.string().optional(),
+  opacity: z.number().min(0).max(1).optional(),
+});
+
 export const TimeSeriesChartSchema = z.object({
   data: z.object({
     episode: z.string(),
@@ -54,6 +62,7 @@ export const TimeSeriesChartSchema = z.object({
     annotations: z.array(TimeSeriesAnnotationSchema).optional(),
     eras: z.array(TimeSeriesEraSchema).optional(),
     referenceLines: z.array(TimeSeriesReferenceLineSchema).optional(),
+    referenceBands: z.array(TimeSeriesReferenceBandSchema).optional(),
     xLabel: z.string().optional(),
     yLabel: z.string().optional(),
     yUnit: z.string().optional(),
