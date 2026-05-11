@@ -41,9 +41,9 @@ import {
 } from "remotion";
 import { palette, semantic, fonts, fontSizes, layout, sec, shadows, textMaxWidth } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
-import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, anticipatoryStartFrame, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
-import { useDirection } from "../../hooks/useDirection";
+import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
@@ -108,10 +108,11 @@ const dividerScale = (
 
 // ── Quote variant ──────────────────────────────────────────────────────────
 
-const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
-  data,
-  frame,
-}) => {
+const QuoteVariant: React.FC<{
+  data: QuoteData;
+  frame: number;
+  syncPoints?: DirectionSyncPoint[];
+}> = ({ data, frame, syncPoints }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
   const emphasis = useEpisodeColorEmphasis();
   const accentColor = data.accentColor || emphasis.primaryAccent;
@@ -186,6 +187,13 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
       </div>
 
       {/* Quote text — mid-ground layer (1.0× drift) */}
+      {/* Anticipatory-reveal adoption (POLISH.md D17): quote text is the
+          hero — the editorially-loaded phrase. When `syncPoints[0]` carries
+          the narration cue, AnimatedText's startFrame is shifted so the
+          FIRST word lands 5 frames before the narrator says it. Settle = one
+          stagger unit (framesPerUnit=3). Falls back to the original sec(0.3)
+          when no cue is supplied → identical visual baseline.
+          See TitleTransition.editorial-title (commit 1da5a49). */}
       <div
         style={{
           transform: `translateY(${heroTranslateY}px) scale(${textDrift})`,
@@ -194,7 +202,11 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
       >
         <AnimatedText
           text={data.text || ""}
-          startFrame={sec(0.3)}
+          startFrame={
+            syncPoints?.[0]?.frame !== undefined
+              ? anticipatoryStartFrame(syncPoints[0].frame, 3)
+              : sec(0.3)
+          }
           framesPerUnit={3}
           mode="word"
           fontSize={fontSizes.h1}
@@ -270,10 +282,11 @@ const QuoteVariant: React.FC<{ data: QuoteData; frame: number }> = ({
 
 // ── Definition variant ─────────────────────────────────────────────────────
 
-const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
-  data,
-  frame,
-}) => {
+const DefinitionVariant: React.FC<{
+  data: QuoteData;
+  frame: number;
+  syncPoints?: DirectionSyncPoint[];
+}> = ({ data, frame, syncPoints }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
   const accentColor = data.accentColor || semantic.highlight;
   const totalFrames = sec(data.durationSec || 5.5);
@@ -302,10 +315,19 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
       }}
     >
       {/* Term — large, character-by-character with eased stagger + parallax */}
+      {/* Anticipatory-reveal adoption (POLISH.md D17): the term IS the
+          definition's hero — the named concept. First character lands 5
+          frames before the narrator says it when `syncPoints[0]` carries
+          the cue; settle = one stagger unit (framesPerUnit=8). Falls back
+          to sec(0.2) absent a cue → identical baseline. */}
       <div style={{ transform: `scale(${termDrift})`, transformOrigin: "left center" }}>
         <AnimatedText
           text={data.term || ""}
-          startFrame={sec(0.2)}
+          startFrame={
+            syncPoints?.[0]?.frame !== undefined
+              ? anticipatoryStartFrame(syncPoints[0].frame, 8)
+              : sec(0.2)
+          }
           framesPerUnit={8}
           mode="character"
           fontSize={120}
@@ -396,10 +418,11 @@ const DefinitionVariant: React.FC<{ data: QuoteData; frame: number }> = ({
 
 // ── Bilingual variant ──────────────────────────────────────────────────────
 
-const BilingualVariant: React.FC<{ data: QuoteData; frame: number }> = ({
-  data,
-  frame,
-}) => {
+const BilingualVariant: React.FC<{
+  data: QuoteData;
+  frame: number;
+  syncPoints?: DirectionSyncPoint[];
+}> = ({ data, frame, syncPoints }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
   const emphasis = useEpisodeColorEmphasis();
   const accentColor = data.accentColor || emphasis.primaryAccent;
@@ -430,11 +453,20 @@ const BilingualVariant: React.FC<{ data: QuoteData; frame: number }> = ({
       }}
     >
       {/* Chinese text — eased stagger + parallax foreground (7 frames/char for weight) */}
+      {/* Anticipatory-reveal adoption (POLISH.md D17): the Chinese phrase
+          is the hero — the named foreign concept (e.g., 卡脖子). First
+          character lands 5 frames before narration via `syncPoints[0]`.
+          Settle = one stagger unit (framesPerUnit=7). Falls back to sec(0.3)
+          → identical baseline absent a cue. */}
       {data.chineseText && (
         <div style={{ transform: `scale(${chineseDrift})`, transformOrigin: "left center" }}>
           <AnimatedText
             text={data.chineseText}
-            startFrame={sec(0.3)}
+            startFrame={
+              syncPoints?.[0]?.frame !== undefined
+                ? anticipatoryStartFrame(syncPoints[0].frame, 7)
+                : sec(0.3)
+            }
             framesPerUnit={7}
             mode="character"
             fontSize={fontSizes.h1}
@@ -504,11 +536,28 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   const direction = useDirection(data._direction);
   const t = direction.paceTimingScale;
 
-  // Animate the number with overshoot-settle
+  // Animate the number with overshoot-settle.
+  //
+  // Anticipatory-reveal adoption (POLISH.md D17, motion-design.md § 3):
+  // the number is the editorially-loaded hero. When `syncPoints[0]` carries
+  // the narration cue (the moment the figure is voiced), the count-up start
+  // is shifted so the count REACHES its final value ~150ms (5 frames) before
+  // the cue — the eye finds the settled number a beat before the ear hears
+  // it. Settle envelope = the count-up duration itself (`sec(1.3 * t)` =
+  // countUpEndFrame − countStart). Falls back to the original sec(0.5 * t)
+  // when no cue is present → identical visual baseline.
+  // See StatReveal (commit e9b4bd3) for the analogous count-up pattern.
   const rawValue = data.statValue || "0";
   const numericMatch = rawValue.match(/^([\d.]+)(.*)$/);
   let displayValue = rawValue;
-  const countUpEndFrame = sec(1.8 * t);
+  const COUNT_UP_DURATION = sec(1.3 * t);
+  const COUNT_START_DEFAULT = sec(0.5 * t);
+  const countCueFrame = direction.syncPoints?.[0]?.frame;
+  const countStart =
+    countCueFrame !== undefined
+      ? anticipatoryStartFrame(countCueFrame, COUNT_UP_DURATION)
+      : COUNT_START_DEFAULT;
+  const countUpEndFrame = countStart + COUNT_UP_DURATION;
   const overshootAmount = 0.03; // 3% overshoot on the count itself
 
   if (numericMatch) {
@@ -518,7 +567,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
     // Count-up with overshoot: 0 → 103% → 100%
     const countProgress = interpolate(
       frame,
-      [sec(0.5 * t), countUpEndFrame, countUpEndFrame + sec(0.3 * t)],
+      [countStart, countUpEndFrame, countUpEndFrame + sec(0.3 * t)],
       [0, 1 + overshootAmount, 1],
       CLAMP_CUBIC
     );
@@ -709,12 +758,14 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
         <HeaderStrip metadata={data.episode} mode={bgVariant} />
         <FooterStrip mode={bgVariant} hideRec={data.variant === "quote"} />
 
-        {data.variant === "quote" && <QuoteVariant data={data} frame={frame} />}
+        {data.variant === "quote" && (
+          <QuoteVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
+        )}
         {data.variant === "definition" && (
-          <DefinitionVariant data={data} frame={frame} />
+          <DefinitionVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "bilingual" && (
-          <BilingualVariant data={data} frame={frame} />
+          <BilingualVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "statistic" && (
           <StatisticVariant data={data} frame={frame} />
