@@ -101,6 +101,7 @@ Sandbox / headless Chromium: `--browser-executable=$(find ~/.cache/ms-playwright
 ## Testing
 
 - **Visual regression:** `npm test` (Vitest + `@remotion/renderer`). Each test renders frame 30 and diffs against a baseline PNG. First run creates baselines; subsequent runs detect drift. Regenerate after intentional changes: `npm run test:baseline`.
+- **Real-data PNG regression:** `npm run test:real-data` — all `src/__tests__/*-real-data.test.ts` (manifest episode JSON). Uses Playwright Chromium; `map-real-data.test.ts` skips without `MAPBOX_ACCESS_TOKEN` (`pk.` prefix). Local: `MAPBOX_ACCESS_TOKEN=pk.... npm run test:real-data`.
 - **TypeScript typecheck:** `npm run typecheck` or from repo root `./scripts/typecheck.sh`.
 - **Convention lint:** `npm run lint`.
 

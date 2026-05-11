@@ -29,6 +29,7 @@ Per-stack (when you need granular control):
 - TS typecheck: `cd remotion-templates && npx tsc --noEmit`
 - TS lint: `cd remotion-templates && npm run lint`
 - TS visual regression: `cd remotion-templates && npm test`
+- TS **real-data** PNG regression (all manifest `data/episodes` JSONs wired in `*-real-data.test.ts`): `cd remotion-templates && npm run test:real-data` — requires Playwright Chromium. **`map-real-data.test.ts` skips** unless `MAPBOX_ACCESS_TOKEN` is set to a public token (`pk....`). Example: `MAPBOX_ACCESS_TOKEN=pk.... npm run test:real-data`. Optional GitHub secret `MAPBOX_ACCESS_TOKEN` enables map baselines in the macOS CI job.
 - Manifest gen: `python3 tools/assembly/generate_manifest.py --script <path> --episode <slug> --output <path>`
 - Backdrop pick list: `python3 tools/assembly/print_backdrop_catalog.py` (add `--dark-register`, `--tag TAG`, `--tone-prefix dark`, `--chart-at-least high|medium|low`, `--markdown`). Pairing rules: `remotion-templates/design-references/backdrops/BACKDROP_CHART_PAIRING.md`
 - JSON validation: `python3 tools/validate_data.py` (or `--files a.json b.json` for a subset)
@@ -69,6 +70,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 
 ## Testing
 
+- Repo root **`./scripts/test.sh`** runs Python, `tsc`, and a **narrow Vitest subset** (fast checks). It does **not** run `*-real-data` PNG suites; use `cd remotion-templates && npm run test:real-data` when you need full manifest-aligned still diffs (or rely on CI: macOS job).
 - Python tests are <1s. **New parsing/state logic must come with a test.** Patterns to copy: `tools/assembly/test_generate_manifest.py` (parsing-heavy), `tools/test_cost_tracker.py` (markdown round-trip), `tools/brand-treatment/test_treat.py` (numeric image processing invariants).
 - **Visual regression baselines** live in `remotion-templates/src/__tests__/baselines/`. Run `./scripts/regen-baselines.sh` after any intentional visual change (palette, animation timing, template refactor) and commit the resulting PNGs. `cd remotion-templates && npm test` then catches future drift via 5% file-size tolerance.
 - Visual regression baselines live in `remotion-templates/src/__tests__/baselines/`. After intentional visual changes, regenerate with `npm run test:baseline`.
