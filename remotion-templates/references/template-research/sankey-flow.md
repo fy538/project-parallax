@@ -95,6 +95,10 @@ The existing `SankeyFlow` template, after our session's polish work:
 - **Cycles or back-flows** — Sankey is a DAG; if data loops, switch to NetworkDiagram
 - **Tiny ribbon to "other" that's actually >20% of total** — sorted-by-value rule violated
 
+> **Safe-count range (SankeyFlow, May 2026 stress-test):** 5–8 nodes total across 3 columns at typical label length (≤ 28 chars per node, no sublabel). Above ~10 nodes OR with long labels (60+ chars), the Sankey geometry itself still scales correctly — bands and conservation render fine — but two failures appear: (i) long labels overflow their column gap and either truncate or clip into the next column, and (ii) when one ribbon dominates (e.g., landfill at 65% of column 2), the remaining 6–7 small bands compress so far that the smallest (≤ 3% of total) drops under the dossier's ~6px hairline floor and becomes unreadable. The stress build (12 nodes / 16 links) showed labels overflowing the right edge and the smallest ribbon (300 Mt unknown-stocks) effectively vanishing.
+>
+> If an episode needs to enumerate ≥ 10 fate categories, collapse small fates into a labeled "other" bucket (the next dossier line above warns against the inverse), or split the Sankey across two slides with shared totals. Editorial canon — LLNL energy, plastic fate, where-the-money-goes — converges on 4–7 fates per column for legibility at scrubbing speed.
+
 ## TL;DR
 
 **3-column left-anchor conservation Sankey, thin 18px ink node bars, solid earth-tone ribbons, single accent-rust emphasis on the editorially load-bearing flow, named values on nodes only, visible source line — the LLNL skeleton wearing the Parallax palette.**
