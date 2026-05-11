@@ -20,6 +20,7 @@ export const DecisionTreeSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
+    variant: z.enum(["extensive", "ladder"]).optional(),
     nodes: z.array(TreeNodeSchema).min(1),
     rootId: z.string(),
     highlightedPath: z.array(z.string()).optional(),

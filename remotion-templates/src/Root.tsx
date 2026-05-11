@@ -114,6 +114,7 @@ import {
   CatalogLadderColdWar,
   CatalogLadderArms,
   CatalogTreeChess,
+  CatalogTreeExCommLadder,
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogGamePDCanonical,
@@ -315,6 +316,7 @@ export const RemotionRoot: React.FC = () => {
 
         <Folder name="Scenarios">
           <CatalogTreeChess />
+          <CatalogTreeExCommLadder />
           <CatalogGameChess />
           <CatalogGamePayoff />
           <CatalogGamePDCanonical />

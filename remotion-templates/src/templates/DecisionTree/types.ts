@@ -50,6 +50,24 @@ export interface DecisionTreeData {
   episode: string;
   title: string;
   subtitle?: string;
+  /**
+   * Visualization variant.
+   *
+   * - `extensive` (default) — horizontal extensive-form tree. Reads left-to-
+   *   right so the time axis is implicit. Right when the editorial point is
+   *   "this branched, that branched, then that." Chess openings, escalation
+   *   paths, contingency cases.
+   * - `ladder` — Allison-style nested rectangles. Top-level nodes (the
+   *   options) render as vertically-stacked panels; child nodes nest inside
+   *   their parent's panel, indented. Right when the editorial point is
+   *   "decision-maker X weighed these options" — ExComm 1962, Politburo
+   *   deliberations, boardroom scenarios. Privileges the actor's deliberative
+   *   frame rather than abstract probability space.
+   *
+   *   See: references/template-research/game-theory.md § A2 (Allison nested
+   *   rectangles).
+   */
+  variant?: "extensive" | "ladder";
   /** All nodes in the tree (flat array, tree structure via children refs) */
   nodes: TreeNode[];
   /** ID of the root node */

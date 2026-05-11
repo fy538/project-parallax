@@ -302,6 +302,184 @@ const TreeNodeComponent: React.FC<{
   );
 });
 
+// ── Decision-ladder variant (Allison-style nested rectangles) ──────────────
+//
+// Privileges the decision-maker's deliberative frame rather than abstract
+// probability space. Top-level options stack vertically as panels; sub-
+// consequences nest inside their parent option, indented. Right for ExComm-
+// class scenes where the editorial frame is "actor X weighed these options."
+//
+// Reference: references/template-research/game-theory.md § A2
+
+const LadderVariant: React.FC<{
+  data: DecisionTreeData;
+  frame: number;
+  totalFrames: number;
+}> = React.memo(({ data, frame, totalFrames }) => {
+  const mode = (data.backgroundVariant || "light") as "light" | "dark";
+  const theme = useThemeMode(mode);
+  const emphasis = useEpisodeColorEmphasis();
+  const highlightColor = data.highlightColor || emphasis.primaryAccent;
+  const nodeMap = useMemo(
+    () => new Map(data.nodes.map((n) => [n.id, n])),
+    [data.nodes],
+  );
+  const root = nodeMap.get(data.rootId);
+  if (!root) return null;
+  const optionIds = root.children ?? [];
+
+  // Recursively render an option and its nested consequences as a
+  // bordered panel with indented children.
+  const renderLadderNode = (
+    nodeId: string,
+    level: number,
+    indexInLevel: number,
+    levelCount: number,
+  ): React.ReactNode => {
+    const node = nodeMap.get(nodeId);
+    if (!node) return null;
+
+    const isHighlighted = node.highlighted || data.highlightedPath?.includes(nodeId);
+    const accent = isHighlighted ? highlightColor : theme.text.muted;
+
+    // Stagger reveal by level + position within level.
+    const revealStart = sec(0.4) + level * sec(0.35) + indexInLevel * sec(0.18);
+    const opacity = fadeIn(frame, revealStart, sec(0.5));
+    const slide = slideIn(frame, revealStart, 12, sec(0.5));
+
+    // Top-level options get heavier panel chrome; nested consequences get
+    // lighter inline rows.
+    const isTopLevel = level === 0;
+
+    return (
+      <div
+        key={nodeId}
+        style={{
+          opacity,
+          transform: `translateY(${slide}px)`,
+          marginTop: isTopLevel
+            ? indexInLevel === 0
+              ? 0
+              : layout.spacing.sm
+            : layout.spacing.xs,
+          marginLeft: level > 0 ? layout.spacing.lg : 0,
+          padding: isTopLevel
+            ? `${layout.spacing.xs}px ${layout.spacing.md}px`
+            : `${layout.spacing.xs}px ${layout.spacing.md}px`,
+          border: isTopLevel
+            ? `${isHighlighted ? 2.5 : 1.5}px solid ${accent}`
+            : "none",
+          borderLeft: !isTopLevel
+            ? `2px solid ${accent}40`
+            : undefined,
+          borderRadius: isTopLevel ? radii.sm : 0,
+          background: isTopLevel
+            ? isHighlighted
+              ? `${accent}10`
+              : `${theme.text.muted}06`
+            : "transparent",
+          // Use a row layout for top-level so ordinal + label are inline,
+          // saving vertical space.
+          display: isTopLevel ? "flex" : "block",
+          alignItems: isTopLevel ? "baseline" : undefined,
+          gap: isTopLevel ? layout.spacing.md : undefined,
+        }}
+      >
+        {/* Ordinal marker for top-level options — inline kicker */}
+        {isTopLevel && (
+          <div
+            style={{
+              fontSize: fontSizes.caption,
+              fontFamily: fonts.metadata,
+              color: accent,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              fontWeight: 600,
+              whiteSpace: "nowrap",
+              flexShrink: 0,
+              minWidth: 64,
+            }}
+          >
+            {String(indexInLevel + 1).padStart(2, "0")} / {String(levelCount).padStart(2, "0")}
+          </div>
+        )}
+
+        {/* Node label + children container */}
+        <div style={{ flex: isTopLevel ? 1 : undefined, maxWidth: textMaxWidth.body }}>
+          <div
+            style={{
+              fontSize: isTopLevel ? fontSizes.body : fontSizes.caption,
+              fontFamily: isTopLevel ? fonts.display : fonts.body,
+              fontWeight: isTopLevel ? 600 : 500,
+              color: isHighlighted ? accent : theme.text.primary,
+              lineHeight: 1.3,
+            }}
+          >
+            {node.label}
+          </div>
+
+        {/* Probability badge — gated by probabilityWeights for percentages */}
+        {node.probability &&
+          (data.probabilityWeights || !/\d+\s*%/.test(node.probability)) && (
+          <div
+            style={{
+              fontSize: fontSizes.caption,
+              fontFamily: fonts.metadata,
+              color: theme.text.muted,
+              marginTop: 4,
+              letterSpacing: 1.5,
+              textTransform: "uppercase",
+            }}
+          >
+            {node.probability}
+          </div>
+        )}
+
+        {/* Recursively render children inside this panel */}
+        {node.children && node.children.length > 0 && (
+          <div style={{ marginTop: isTopLevel ? 4 : 2 }}>
+            {node.children.map((childId, ci) =>
+              renderLadderNode(childId, level + 1, ci, node.children!.length),
+            )}
+          </div>
+        )}
+        </div>
+      </div>
+    );
+  };
+
+  const exitOp = exitFade(frame, totalFrames, sec(0.5));
+  const safe = layout.safeAreaTier.generous;
+
+  return (
+    <>
+      <TitleBlock
+        title={data.title}
+        subtitle={data.subtitle}
+        mode={mode}
+        safeAreaTier="generous"
+      />
+      <div
+        style={{
+          position: "absolute",
+          // Below the title block (title takes ~150px in content variant).
+          top: safe.top + 150 + layout.spacing.lg,
+          left: safe.left,
+          right: safe.right,
+          bottom: safe.bottom,
+          opacity: exitOp,
+          overflow: "hidden",
+          maxWidth: textMaxWidth.body * 1.6,
+        }}
+      >
+        {optionIds.map((optionId, idx) =>
+          renderLadderNode(optionId, 0, idx, optionIds.length),
+        )}
+      </div>
+    </>
+  );
+});
+
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => {
@@ -325,6 +503,29 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const { durationInFrames: totalFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
+
+  // ── Ladder variant early return — Allison-style nested rectangles ──────
+  // Right for ExComm-class deliberation scenes. See LadderVariant component
+  // and references/template-research/game-theory.md § A2.
+  if (data.variant === "ladder") {
+    return (
+      <Background
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
+        atmosphere={direction.atmosphere}
+        atmosphereIntensity={direction.atmosphereIntensity}
+        tint={direction.backgroundTint}
+      >
+        <AbsoluteFill style={compStyle}>
+          <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
+          <FooterStrip mode={backgroundVariant} />
+          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} />
+        </AbsoluteFill>
+      </Background>
+    );
+  }
 
   // ── Layout ────────────────────────────────────────────────────────────
   const positions = useMemo(

@@ -84,6 +84,7 @@ export {
 
 export {
   CatalogTreeChess,
+  CatalogTreeExCommLadder,
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogGamePDCanonical,

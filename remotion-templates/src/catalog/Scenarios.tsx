@@ -39,6 +39,37 @@ const treeChessOpening: DecisionTreeData = {
   durationSec: 12,
 };
 
+// Decision-ladder demo — ExComm 1962, the canonical Allison-style frame.
+// Six options on the table, the chosen path runs root → blockade → quarantine.
+// See: references/template-research/game-theory.md § A2
+const treeExCommLadder: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "ExComm Options, October 1962",
+  subtitle: "Six paths Kennedy's National Security Council weighed",
+  variant: "ladder",
+  nodes: [
+    { id: "root", label: "Soviet missiles in Cuba — what to do?", children: ["do-nothing", "diplomacy", "secret", "blockade", "airstrike", "invasion"] },
+    { id: "do-nothing", label: "Do nothing", children: ["accept-parity"] },
+    { id: "accept-parity", label: "Accept strategic parity; let the missiles stay." },
+    { id: "diplomacy", label: "Open diplomatic channels", children: ["khrushchev-letter"] },
+    { id: "khrushchev-letter", label: "Private negotiation with Khrushchev for missile withdrawal." },
+    { id: "secret", label: "Secret approach to Castro", children: ["castro-defect"] },
+    { id: "castro-defect", label: "Bypass Moscow; lever Castro toward removal directly." },
+    { id: "blockade", label: "Naval quarantine", highlighted: true, children: ["quarantine", "intercept-rules"] },
+    { id: "quarantine", label: "Stop Soviet ships from delivering more weapons.", highlighted: true },
+    { id: "intercept-rules", label: "ROE: stop, board, inspect — fire only if fired upon." },
+    { id: "airstrike", label: "Surgical airstrike", children: ["missile-only", "limited-air"] },
+    { id: "missile-only", label: "Strike only the missile sites — minimal escalation." },
+    { id: "limited-air", label: "Wider strike on Cuban air defenses + missiles." },
+    { id: "invasion", label: "Full invasion", children: ["mass-amphibious"] },
+    { id: "mass-amphibious", label: "Amphibious landing + airborne — regime change." },
+  ],
+  rootId: "root",
+  highlightedPath: ["blockade", "quarantine"],
+  source: "Allison, Essence of Decision (1971); ExComm transcripts",
+  durationSec: 14,
+};
+
 // ─── GameBoard × 2 ────────────────────────────────────────────────────────
 
 const gameChess: GameBoardData = {
@@ -174,6 +205,21 @@ export const CatalogTreeChess = () => (
   />
 );
 
+export const CatalogTreeExCommLadder = () => (
+  <Composition
+    id={catalogId("DecisionTree", "excomm-ladder")}
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treeExCommLadder }}
+  />
+);
+
 export const CatalogGameChess = () => (
   <Composition
     id={catalogId("GameBoard", "chess-endgame")}
@@ -232,5 +278,5 @@ export const CatalogBifurcationLatin = () => (
 );
 
 export const catalogScenariosData = {
-  treeChessOpening, gameChess, gamePayoff, gamePDCanonical, bifurcationLatin,
+  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, bifurcationLatin,
 };
