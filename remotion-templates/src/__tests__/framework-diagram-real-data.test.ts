@@ -37,7 +37,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { FrameworkDiagramData } from "../templates/FrameworkDiagram/types";
 
 import frameworkCocomChina    from "../../data/episodes/silicon-trap/framework-cocom-china.json";
@@ -126,6 +126,7 @@ describe("FrameworkDiagram Real-Data QA", () => {
     console.log("\n=== FrameworkDiagram Real-Data QA ===\n");
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });

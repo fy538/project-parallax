@@ -27,7 +27,7 @@ import {
   comparePNGs,
   saveBaseline,
 } from "./render-helper";
-import { initBrowser, closeBrowser, ensureBaselineDir } from "./setup";
+import { initBrowser, closeBrowser, ensureBaselineDir, regenBaselinesIfRequested } from "./setup";
 
 // Default frame for every composition — preserves the original single-frame
 // baseline coverage that the existing baselines were captured against.
@@ -167,6 +167,14 @@ describe("Visual Regression Tests", () => {
     await initBundler();
 
     console.log("[Setup] Creating baseline directory...");
+    // Templates.test.ts writes loose `<Composition>-frame-<N>.png` files at the
+    // root of baselines/. The *-real-data tests write into subdirs (chart-review/,
+    // framework-review/, etc.) — leave those alone when this test is the one
+    // being regenerated. See setup.ts → regenBaselinesIfRequested.
+    regenBaselinesIfRequested(BASELINE_DIR, {
+      kind: "rootFiles",
+      pattern: /-frame-\d+\.png$/,
+    });
     ensureBaselineDir(BASELINE_DIR);
 
     console.log("[Setup] Creating temp directory...");

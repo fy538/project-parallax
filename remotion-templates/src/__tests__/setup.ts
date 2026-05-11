@@ -121,3 +121,61 @@ export function ensureBaselineDir(baselineDir: string): void {
     fs.mkdirSync(baselineDir, { recursive: true });
   }
 }
+
+/**
+ * Per-test baseline regen — delete only what this test owns.
+ *
+ * Called from each test's `beforeAll` *before* `ensureBaselineDir`. Runs only
+ * when `BASELINE_REGEN=1`, set by `npm run test:baseline`. The point is that
+ * each test scopes its own cleanup, so passing a path filter to vitest
+ * (`npm run test:baseline -- src/__tests__/templates.test.ts`) only refreshes
+ * the baselines that test owns — other test files' baselines stay intact.
+ *
+ * Previously, `test:baseline` did a wholesale `rm -rf src/__tests__/baselines
+ * && vitest run`. Passing a path filter then silently deleted every subdir
+ * baseline (chart-review/, framework-review/, etc.) and only the filtered
+ * test would regenerate, leaving ~130 baselines deleted on disk. See the
+ * footgun commit + game-theory dossier May 2026 note.
+ *
+ * Scopes:
+ * - `{ kind: "subdir" }` — delete every regular file inside `dir`
+ *   (recursively into nested dirs); the dir itself is kept. Use this from
+ *   any `*-real-data.test.ts` since each owns a dedicated `baselines/<x>-review/`.
+ * - `{ kind: "rootFiles", pattern }` — delete only loose files in `dir`
+ *   whose basename matches `pattern`. Subdirs inside `dir` are left alone.
+ *   Use this from `templates.test.ts` which writes alongside (not into) the
+ *   *-review subdirs.
+ *
+ * No-ops when `BASELINE_REGEN` is unset, so production test runs (which only
+ * compare against existing baselines) are unaffected.
+ */
+export function regenBaselinesIfRequested(
+  baselineDir: string,
+  scope: { kind: "subdir" } | { kind: "rootFiles"; pattern: RegExp },
+): void {
+  if (process.env.BASELINE_REGEN !== "1") return;
+  if (!fs.existsSync(baselineDir)) return;
+
+  if (scope.kind === "subdir") {
+    // Delete everything inside the dir (files + nested subdirs). Keep the
+    // dir itself so the subsequent `ensureBaselineDir` call is a cheap stat.
+    for (const entry of fs.readdirSync(baselineDir, { withFileTypes: true })) {
+      const full = path.join(baselineDir, entry.name);
+      fs.rmSync(full, { recursive: true, force: true });
+    }
+    console.log(`[Regen] Cleared baselines/${path.basename(baselineDir)}/`);
+    return;
+  }
+
+  // rootFiles: only loose files matching the pattern, never subdirs.
+  let deleted = 0;
+  for (const entry of fs.readdirSync(baselineDir, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    if (!scope.pattern.test(entry.name)) continue;
+    fs.rmSync(path.join(baselineDir, entry.name), { force: true });
+    deleted++;
+  }
+  if (deleted > 0) {
+    console.log(`[Regen] Cleared ${deleted} loose baseline(s) in ${path.basename(baselineDir)}/`);
+  }
+}

@@ -16,7 +16,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { SplitCompositionData } from "../templates/SplitComposition/types";
 import pdVsStagHunt from "../../data/episodes/prisoners-dilemma/split-pd-vs-staghunt.json";
 
@@ -75,6 +75,7 @@ describe("SplitComposition Real-Data QA", () => {
     console.log("\n=== SplitComposition Real-Data QA ===\n");
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });

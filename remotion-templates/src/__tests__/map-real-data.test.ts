@@ -45,7 +45,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { ChoroplethMapData } from "../templates/ChoroplethMap/types";
 import type { RouteAnimationData } from "../templates/RouteAnimation/types";
 
@@ -133,6 +133,7 @@ describe("Map Templates Real-Data QA", () => {
     console.log(`Token present: ${MAPBOX_TOKEN.slice(0, 8)}...\n`);
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });

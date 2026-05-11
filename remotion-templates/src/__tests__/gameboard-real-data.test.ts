@@ -39,7 +39,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { GameBoardData } from "../templates/GameBoard/types";
 
 import gameboardChess          from "../../data/episodes/silicon-trap/gameboard-chess.json";
@@ -110,6 +110,7 @@ describe("GameBoard Real-Data QA", () => {
     console.log("\n=== GameBoard Real-Data QA ===\n");
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });

@@ -13,7 +13,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { ProbabilityGaugeData } from "../templates/ProbabilityGauge/types";
 
 import forecastPdCooperation from "../../data/episodes/prisoners-dilemma/forecast-pd-cooperation.json";
@@ -33,6 +33,7 @@ describe("ProbabilityGauge Real-Data QA", () => {
     console.log("\n=== ProbabilityGauge Real-Data QA ===\n");
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });

@@ -9,7 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:baseline": "rm -rf src/__tests__/baselines && vitest run",
+    "test:baseline": "BASELINE_REGEN=1 vitest run",
     "test:charts": "vitest run src/__tests__/chart-real-data.test.ts",
     "test:splits": "vitest run src/__tests__/split-real-data.test.ts",
     "test:timelines": "vitest run src/__tests__/horizontal-timeline-real-data.test.ts",

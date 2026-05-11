@@ -17,7 +17,7 @@ import {
   renderCompositionFrame,
   saveBaseline,
 } from "./render-helper";
-import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
+import { closeBrowser, ensureBaselineDir, initBrowser, regenBaselinesIfRequested } from "./setup";
 import type { DataChartData } from "../templates/DataChart/types";
 import type { TimeSeriesChartData } from "../templates/TimeSeriesChart/types";
 import lithographyGap from "../../data/episodes/silicon-trap/chart-lithography.json";
@@ -85,6 +85,7 @@ describe("Chart Real-Data QA", () => {
     console.log("\n=== Chart Real-Data QA ===\n");
     await initBrowser();
     await initBundler();
+    regenBaselinesIfRequested(BASELINE_DIR, { kind: "subdir" });
     ensureBaselineDir(BASELINE_DIR);
     if (!fs.existsSync(TEMP_DIR)) {
       fs.mkdirSync(TEMP_DIR, { recursive: true });
