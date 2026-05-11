@@ -14,7 +14,7 @@
       {
         "id": "contemplative-1",
         "file": "audio/music/silicon-trap/bed-contemplative-1.wav",
-        "startSec": 0,
+        "startSec": 15.2,
         "endSec": 182.0,
         "fadeInSec": 2.0,
         "fadeOutSec": 3.0,
