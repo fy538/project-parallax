@@ -50,6 +50,7 @@ import { AnimatedArrow } from "../../components/AnimatedArrow";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, CLAMP_QUAD } from "../../utils/animation";
+import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -504,6 +505,16 @@ const FlowVariant: React.FC<{
   // and the terminal node is rendered hero-weight to celebrate the destination.
   const exitOp = exitFade(frame, durationInFrames, 15);
   const numNodes = nodes.length;
+
+  // Bounds check on data.heroStage — silent out-of-range index causes no
+  // stage to render as hero (the `i === heroIdx` comparison never matches).
+  // Warn at data-load time rather than clamping; data writers should know.
+  warnIf(
+    data.heroStage !== undefined && (data.heroStage < 0 || data.heroStage >= numNodes),
+    "FrameworkDiagram",
+    `heroStage index out of range; expected 0..${numNodes - 1}, got ${data.heroStage}`,
+    { heroStage: data.heroStage, numNodes },
+  );
 
   // Geometry: nodes share equal slots across the chart area regardless of
   // arrow label length — the slot width is constant, label wraps if needed.

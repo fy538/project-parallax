@@ -29,6 +29,7 @@ export const palette = {
   bone: paletteData.palette.bone,
   paper: paletteData.palette.paper,
   gold: paletteData.palette.gold,
+  dustblue: paletteData.palette.dustblue, // muted us-blue midtone (RdBu diverging midpoint between bone and us)
   // Legacy aliases — keep for backward compat during migration
   amber: paletteData.palette.gold,
   rust: paletteData.semantic.china,

@@ -38,6 +38,7 @@ import {
   getCategoricalColor,
   shadows,
   textMaxWidth,
+  titleHeight,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -462,8 +463,9 @@ const LadderVariant: React.FC<{
       <div
         style={{
           position: "absolute",
-          // Below the title block (title takes ~150px in content variant).
-          top: safe.top + 150 + layout.spacing.lg,
+          // Below the title block — reads `titleHeight.content` from theme so
+          // this stays in sync if the title-block height ever changes.
+          top: safe.top + titleHeight.content + layout.spacing.lg,
           left: safe.left,
           right: safe.right,
           bottom: safe.bottom,

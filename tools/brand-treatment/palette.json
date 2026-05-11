@@ -10,7 +10,8 @@
     "sand":     "#D9C9B0",
     "bone":     "#F0E6D0",
     "paper":    "#F5F0E8",
-    "gold":     "#C4A747"
+    "gold":     "#C4A747",
+    "dustblue": "#7AA3C9"
   },
 
   "semantic": {

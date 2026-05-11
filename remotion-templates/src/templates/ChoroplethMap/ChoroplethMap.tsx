@@ -85,7 +85,7 @@ const RAMP_RD_BU: readonly string[] = [
   palette.walnut,   // oxblood deep
   semantic.china,   // rust
   palette.bone,     // midpoint
-  "#7AA3C9",        // muted blue positive mid (not yet a palette token)
+  palette.dustblue, // muted us-blue mid (between bone and us-blue)
   semantic.us,      // blue
 ];
 
