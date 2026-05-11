@@ -28,6 +28,10 @@ Use when the story is **sequential choice under uncertainty** — actor A moves,
 
 *Works because:* privileges the decision-maker's frame, not abstract probability. *Failure:* loses comparability across branches; harder to scrub.
 
+> **Safe-count range (LadderVariant, May 2026 stress-test):** 4–7 options at typical label length (≤ 50 chars per option, one sentence per consequence). Above 7 options OR with long labels (60+ chars wrapping to 2 lines), the `overflow: hidden` content container in `DecisionTree.tsx` silently clips trailing options — they do not scroll, paginate, or shrink. Verified with a 10-option / 60-char stress build: only options 01–06 rendered fully; 07–10 were swallowed below the safe-area bottom with no visual indication.
+>
+> Allison's own ExComm framing is six options, which fits comfortably; if an episode needs ≥ 8 options, route to a different form (horizontal extensive-form tree with collapsed terminals, or split across two ladder slides on a `SplitComposition`) rather than fighting the layout. Don't try to scale option titles down below `fontSizes.body` — readability at scrubbing speed is the editorial constraint that defines the cap.
+
 **c. Game-tree-with-payoffs (extensive form proper).** Terminal nodes show payoff pairs `(A, B)`. Used by **Stratechery** in platform-competition pieces and **Axelrod** for tit-for-tat illustrations.
 
 *Works because:* unifies sequential and strategic logic — can foreshadow the matrix here. *Failure:* payoff pairs read as math, not narrative; needs hand-holding.
