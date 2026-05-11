@@ -21,9 +21,13 @@
  *
  * CASES:
  *   1. silicon-trap/gameboard-chess            — chess variant, 8×8 board
- *   2. prisoners-dilemma/gameboard-flood-dresher — payoff-matrix, original RAND experiment
- *   3. prisoners-dilemma/gameboard-motif-beat1  — payoff-matrix, generic "The Model" context
- *   4. prisoners-dilemma/gameboard-trap-mechanism — payoff-matrix, self-confirming trap framing
+ *   2. silicon-trap/gameboard-go               — go variant, 19×19 board
+ *   3. prisoners-dilemma/gameboard-flood-dresher — payoff-matrix, original RAND experiment
+ *   4. prisoners-dilemma/gameboard-motif-beat1  — payoff-matrix, generic "The Model" context
+ *   5. prisoners-dilemma/gameboard-trap-mechanism — payoff-matrix, self-confirming trap framing
+ *   6. prisoners-dilemma/gameboard-final-choice — payoff-matrix manifest shot
+ *   7. prisoners-dilemma/gameboard-nuclear — payoff-matrix nuclear framing
+ *   8. prisoners-dilemma/gameboard-staghunt — payoff-matrix stag hunt
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -39,8 +43,12 @@ import { closeBrowser, ensureBaselineDir, initBrowser } from "./setup";
 import type { GameBoardData } from "../templates/GameBoard/types";
 
 import gameboardChess          from "../../data/episodes/silicon-trap/gameboard-chess.json";
+import gameboardGo             from "../../data/episodes/silicon-trap/gameboard-go.json";
 import gameboardFloodDresher   from "../../data/episodes/prisoners-dilemma/gameboard-flood-dresher.json";
+import gameboardFinalChoice    from "../../data/episodes/prisoners-dilemma/gameboard-final-choice.json";
 import gameboardMotifBeat1     from "../../data/episodes/prisoners-dilemma/gameboard-motif-beat1.json";
+import gameboardNuclear        from "../../data/episodes/prisoners-dilemma/gameboard-nuclear.json";
+import gameboardStaghunt       from "../../data/episodes/prisoners-dilemma/gameboard-staghunt.json";
 import gameboardTrapMechanism  from "../../data/episodes/prisoners-dilemma/gameboard-trap-mechanism.json";
 
 const TEST_TIMEOUT   = 60000;
@@ -61,6 +69,11 @@ const GAMEBOARD_CASES: GameBoardCase[] = [
     why: "chess variant — 8×8 board with piece positions and move animations",
   },
   {
+    reviewId: "silicon-trap-gameboard-go",
+    inputProps: { data: gameboardGo as GameBoardData },
+    why: "go variant — 19×19 board, stone positions",
+  },
+  {
     reviewId: "prisoners-dilemma-gameboard-flood-dresher",
     inputProps: { data: gameboardFloodDresher as GameBoardData },
     why: "payoff-matrix — original RAND experiment, historical player names",
@@ -74,6 +87,21 @@ const GAMEBOARD_CASES: GameBoardCase[] = [
     reviewId: "prisoners-dilemma-gameboard-trap-mechanism",
     inputProps: { data: gameboardTrapMechanism as GameBoardData },
     why: "payoff-matrix — self-confirming trap framing, 'You / Counterpart' labels",
+  },
+  {
+    reviewId: "prisoners-dilemma-gameboard-final-choice",
+    inputProps: { data: gameboardFinalChoice as GameBoardData },
+    why: "payoff-matrix — final choice payoff layout (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-gameboard-nuclear",
+    inputProps: { data: gameboardNuclear as GameBoardData },
+    why: "payoff-matrix — nuclear deterrence framing",
+  },
+  {
+    reviewId: "prisoners-dilemma-gameboard-staghunt",
+    inputProps: { data: gameboardStaghunt as GameBoardData },
+    why: "payoff-matrix — stag hunt payoff grid",
   },
 ];
 

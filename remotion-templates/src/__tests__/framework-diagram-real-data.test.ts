@@ -22,6 +22,10 @@
  *   3. prisoners-dilemma/framework-narrowing  — flow variant (4 nodes)
  *   4. prisoners-dilemma/framework-standard-frame — matrix variant (2×2 highlight)
  *   5. prisoners-dilemma/framework-ostrom-vs-pd   — comparison, 2 columns, prisoners-dilemma
+ *   6. prisoners-dilemma/framework-cycle-vs-question — comparison (manifest)
+ *   7. prisoners-dilemma/framework-falsification — flow variant (manifest)
+ *   8–10. prisoners-dilemma/framework-motif-beat3/beat5/final — comparison motif beats
+ *   11. prisoners-dilemma/framework-reframe — comparison (manifest)
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -38,9 +42,15 @@ import type { FrameworkDiagramData } from "../templates/FrameworkDiagram/types";
 
 import frameworkCocomChina    from "../../data/episodes/silicon-trap/framework-cocom-china.json";
 import frameworkKirinTeardown from "../../data/episodes/silicon-trap/framework-kirin-teardown.json";
-import frameworkNarrowing     from "../../data/episodes/prisoners-dilemma/framework-narrowing.json";
-import frameworkStandardFrame from "../../data/episodes/prisoners-dilemma/framework-standard-frame.json";
-import frameworkOstromVsPd    from "../../data/episodes/prisoners-dilemma/framework-ostrom-vs-pd.json";
+import frameworkNarrowing       from "../../data/episodes/prisoners-dilemma/framework-narrowing.json";
+import frameworkStandardFrame   from "../../data/episodes/prisoners-dilemma/framework-standard-frame.json";
+import frameworkOstromVsPd      from "../../data/episodes/prisoners-dilemma/framework-ostrom-vs-pd.json";
+import frameworkCycleVsQuestion from "../../data/episodes/prisoners-dilemma/framework-cycle-vs-question.json";
+import frameworkFalsification   from "../../data/episodes/prisoners-dilemma/framework-falsification.json";
+import frameworkMotifBeat3      from "../../data/episodes/prisoners-dilemma/framework-motif-beat3.json";
+import frameworkMotifBeat5      from "../../data/episodes/prisoners-dilemma/framework-motif-beat5.json";
+import frameworkMotifFinal      from "../../data/episodes/prisoners-dilemma/framework-motif-final.json";
+import frameworkReframe         from "../../data/episodes/prisoners-dilemma/framework-reframe.json";
 
 const TEST_TIMEOUT   = 60000;
 const REVIEW_FRAMES  = [30, 60];
@@ -78,6 +88,36 @@ const FRAMEWORK_CASES: FrameworkCase[] = [
     reviewId: "prisoners-dilemma-framework-ostrom-vs-pd",
     inputProps: { data: frameworkOstromVsPd as FrameworkDiagramData },
     why: "comparison, 2 columns — Ostrom vs PD framing, max tenet density",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-cycle-vs-question",
+    inputProps: { data: frameworkCycleVsQuestion as FrameworkDiagramData },
+    why: "comparison — default vs question columns (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-falsification",
+    inputProps: { data: frameworkFalsification as FrameworkDiagramData },
+    why: "flow variant — falsification / what would change my mind (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-motif-beat3",
+    inputProps: { data: frameworkMotifBeat3 as FrameworkDiagramData },
+    why: "comparison — model everywhere motif beat (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-motif-beat5",
+    inputProps: { data: frameworkMotifBeat5 as FrameworkDiagramData },
+    why: "comparison — same game everywhere motif (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-motif-final",
+    inputProps: { data: frameworkMotifFinal as FrameworkDiagramData },
+    why: "comparison — cooperative equilibrium motif final (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-framework-reframe",
+    inputProps: { data: frameworkReframe as FrameworkDiagramData },
+    why: "comparison — reframe columns (manifest)",
   },
 ];
 

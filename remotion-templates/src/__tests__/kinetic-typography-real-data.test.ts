@@ -20,6 +20,8 @@
  *   4. prisoners-dilemma/kinetic-nash-quote — long quote with full attribution + source
  *   5. prisoners-dilemma/kinetic-2000-articles — statistic with long context, dark bg
  *   6. prisoners-dilemma/kinetic-wrong-game-real — short quote, no attribution (stress: centered layout)
+ *   7–9. silicon-trap/kinetic-92-yield, deepseek-zero, revenue-deal — statistic / yield (manifest)
+ *   10–11. silicon-trap/kinetic-juguo, kinetic-kabozi — definition variant (manifest)
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -37,6 +39,11 @@ import type { KineticTypographyData } from "../templates/KineticTypography/types
 import kineticTrap          from "../../data/episodes/silicon-trap/kinetic-trap.json";
 import kineticMorrisChang   from "../../data/episodes/silicon-trap/kinetic-morris-chang.json";
 import kinetic165B          from "../../data/episodes/silicon-trap/kinetic-165b.json";
+import kinetic92Yield       from "../../data/episodes/silicon-trap/kinetic-92-yield.json";
+import kineticDeepseekZero  from "../../data/episodes/silicon-trap/kinetic-deepseek-zero.json";
+import kineticRevenueDeal   from "../../data/episodes/silicon-trap/kinetic-revenue-deal.json";
+import kineticJuguo         from "../../data/episodes/silicon-trap/kinetic-juguo.json";
+import kineticKabozi        from "../../data/episodes/silicon-trap/kinetic-kabozi.json";
 import kineticNashQuote     from "../../data/episodes/prisoners-dilemma/kinetic-nash-quote.json";
 import kinetic2000Articles  from "../../data/episodes/prisoners-dilemma/kinetic-2000-articles.json";
 import kineticWrongGame     from "../../data/episodes/prisoners-dilemma/kinetic-wrong-game-real.json";
@@ -67,6 +74,31 @@ const KINETIC_CASES: KineticCase[] = [
     reviewId: "silicon-trap-kinetic-165b",
     inputProps: { data: kinetic165B as KineticTypographyData },
     why: "statistic variant, light bg, $ prefix — layout anchor switch from quote",
+  },
+  {
+    reviewId: "silicon-trap-kinetic-92-yield",
+    inputProps: { data: kinetic92Yield as KineticTypographyData },
+    why: "statistic, light bg — yield % (manifest)",
+  },
+  {
+    reviewId: "silicon-trap-kinetic-deepseek-zero",
+    inputProps: { data: kineticDeepseekZero as KineticTypographyData },
+    why: "statistic, dark bg — zero-cost framing (manifest)",
+  },
+  {
+    reviewId: "silicon-trap-kinetic-revenue-deal",
+    inputProps: { data: kineticRevenueDeal as KineticTypographyData },
+    why: "statistic, dark bg — revenue share (manifest)",
+  },
+  {
+    reviewId: "silicon-trap-kinetic-juguo",
+    inputProps: { data: kineticJuguo as KineticTypographyData },
+    why: "definition variant, dark bg — 举国 (manifest)",
+  },
+  {
+    reviewId: "silicon-trap-kinetic-kabozi",
+    inputProps: { data: kineticKabozi as KineticTypographyData },
+    why: "definition variant, dark bg — 卡脖子 (manifest)",
   },
   {
     reviewId: "prisoners-dilemma-kinetic-nash-quote",
