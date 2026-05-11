@@ -10,6 +10,7 @@ Scans template TSX files for violations of POLISH.md rules:
   - Hardcoded box-shadow strings instead of shadows.* tokens (L12)
   - Missing TitleBlock usage in eligible templates (L13)
   - Linear interpolation without easing (A1)
+  - Forbidden easings: bounce / elastic / back (A2)
   - Hardcoded padding values instead of cardPadding token (L10)
   - Magic safe-area offsets (+ 40, + 60, + 120, etc.) (L7)
 
@@ -256,6 +257,60 @@ def check_linear_interpolation(lines: list[str], relpath: str) -> list[Violation
     return violations
 
 
+def check_forbidden_easings(lines: list[str], relpath: str) -> list[Violation]:
+    """A2: Forbidden easings in editorial register.
+
+    Bouncy / elastic / back-ease / anticipation curves belong to product UI
+    and children's content; they read as enthusiasm, which is the opposite
+    of authority. The Economist, NYT, FT, 3Blue1Brown — none of them bounce.
+
+    Forbidden patterns:
+      - Easing.bounce, Easing.bounce(...)
+      - Easing.elastic(...)  (any tension argument)
+      - Easing.back(...)     (any s argument — back-ease overshoots)
+      - Spring with overshoot >= 1.0   (heuristic: stiffness/damping ratios are
+        domain-specific, so we only flag literal "overshoot" or "bounciness"
+        params in spring() calls)
+
+    Suppression:  // easing-ok: <reason>  on the line above the call.
+
+    See: references/template-research/motion-design.md § 4
+    POLISH.md doctrine: forbidden easings in editorial register.
+    """
+    violations = []
+    # Patterns we flag with their human-readable name.
+    forbidden_patterns = [
+        (re.compile(r'\bEasing\.bounce\b'), "Easing.bounce"),
+        (re.compile(r'\bEasing\.elastic\b'), "Easing.elastic"),
+        (re.compile(r'\bEasing\.back\b'), "Easing.back"),
+    ]
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        # Skip the function definitions themselves and pure comments.
+        if stripped.startswith("//") or stripped.startswith("*"):
+            continue
+        for pattern, name in forbidden_patterns:
+            if pattern.search(line):
+                # Suppression marker on previous line
+                prev_line = lines[i - 2].strip() if i >= 2 else ""
+                if prev_line.startswith("//") and "easing-ok:" in prev_line.lower():
+                    continue
+                violations.append(Violation(
+                    rule="A2",
+                    file=relpath,
+                    line=i,
+                    message=(
+                        f"{name} forbidden in editorial register. "
+                        "Bouncy/elastic/back-ease read as product-UI enthusiasm, "
+                        "not analytical authority. Use ease-out-cubic/quartic instead, "
+                        "or // easing-ok: <reason> if intentional (rare; percussive impact only)."
+                    ),
+                    snippet=stripped,
+                ))
+                break  # only one violation per line
+    return violations
+
+
 def check_magic_safe_area_offsets(lines: list[str], relpath: str) -> list[Violation]:
     """L7: No magic offsets on safeArea / safeAreaTier positions — use contentArea() helper."""
     violations = []
@@ -357,6 +412,7 @@ ALL_CHECKS = [
     check_hardcoded_shadows,
     check_hardcoded_textshadow,
     check_linear_interpolation,
+    check_forbidden_easings,
     check_magic_safe_area_offsets,
     check_hardcoded_padding,
     check_missing_maxwidth,
@@ -448,6 +504,7 @@ def main():
             "L13": "Missing TitleBlock component",
             "L14": "Direct light.*/dark.* theme references",
             "A1": "Linear interpolation (no easing)",
+            "A2": "Forbidden easing (bounce/elastic/back)",
         }
         for rule in sorted(rule_counts):
             desc = rule_descriptions.get(rule, "")

@@ -84,7 +84,7 @@ The existing `ChoroplethMap` template (via `MapGL` shared component, Mapbox GL +
 
 1. **Projection switch for world-scale comparisons.** Add a `projection: "equal-earth" | "albers" | "mercator"` option, default to `equal-earth` for non-regional maps. Mercator is editorially dishonest for choropleth.
 2. **ColorBrewer-vetted defaults.** Build palette options around `RdBu` (diverging) and `YlOrBr` rust-to-bone (sequential), bake into the template rather than letting per-episode data pick arbitrary colors.
-3. **Quantile bin helper.** Auto-compute quantile breaks from data, default to 5 bins. Force the data writer to declare the binning strategy (equal-interval, quantile, Jenks).
+3. ~~**Quantile bin helper.** Auto-compute quantile breaks from data, default to 5 bins. Force the data writer to declare the binning strategy (equal-interval, quantile, Jenks).~~ **Done — May 11, 2026.** Shipped as `src/utils/quantileBins.ts` exporting `quantileBreaks()`, `equalIntervalBreaks()`, `assignBin()`, `normalizeForRamp()`, and one-step `binAndNormalize()`. Default strategy is `quantile`; default bin count is 5 (NYT/Reuters convention). Includes a test that explicitly demonstrates the dossier failure mode ("equal-interval on skewed distribution → everything one color") to prevent the convention from being unlearned. Covered by `src/__tests__/quantileBins.test.ts` (17 tests). Jenks deferred — quantile + equal-interval cover ~95% of editorial cases.
 4. **Legend strip standardization.** Horizontal bottom-of-map strip, mono labels, breakpoint values, source attribution baked in. Apply across all variants.
 5. **"No data" treatment.** Hatched or stippled fill for missing regions so it's distinguishable from the lightest bin.
 

@@ -102,12 +102,23 @@ const ComparisonVariant: React.FC<{
         const colColor = col.color || emphasis.primaryAccent;
         const { primary, secondary } = splitTitle(col.title);
 
+        // Editorial protagonist hierarchy: when `data.protagonist` names a
+        // column, the named column reads at full weight; the other column(s)
+        // recede to ~40% so they remain continuously legible but cede the
+        // editorial spotlight. Equal-weight (omitted) is the default —
+        // appropriate for true comparisons where neither side leads. See:
+        // references/template-research/framework-diagram.md § 6.3
+        const hasProtagonist = data.protagonist !== undefined;
+        const isProtagonist = hasProtagonist && data.protagonist === ci;
+        const isFoil = hasProtagonist && data.protagonist !== ci;
+        const foilMute = isFoil ? 0.4 : 1.0;
+
         return (
           <div
             key={ci}
             style={{
               width: cols.columnWidth,
-              opacity: colOpacity,
+              opacity: colOpacity * foilMute,
               transform: `scale(${colScale})`,
               transformOrigin: "top center",
               display: "flex",
@@ -167,16 +178,18 @@ const ComparisonVariant: React.FC<{
                   )}
                 </div>
               </div>
-              {/* Accent rule — solid column color, draws in left→right */}
+              {/* Accent rule — solid column color, draws in left→right.
+                  Protagonist gets full-saturation rule; equal-weight columns
+                  share the canonical 0.7 opacity. */}
               <div
                 style={{
                   position: "absolute",
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  height: 2,
+                  height: isProtagonist ? 3 : 2,
                   background: colColor,
-                  opacity: 0.7,
+                  opacity: isProtagonist ? 1 : 0.7,
                   transform: `scaleX(${interpolate(
                     frame,
                     [colStart + sec(0.2), colStart + sec(0.8)],

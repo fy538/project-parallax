@@ -10,8 +10,20 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 export interface TitleTransitionData {
   episode: string;
 
-  /** Card type. */
-  variant: "episode-title" | "section" | "end-card";
+  /**
+   * Card type.
+   *
+   * - `episode-title` — cinematic episode-title card with bloom/lens-focus/beat-sync.
+   *   The legacy "high-energy" treatment. Use when the episode warrants a dramatic
+   *   open. Silicon-trap and similar editorial-action episodes.
+   * - `section` — chapter dividers between acts.
+   * - `end-card` — CTA + next-episode teaser.
+   * - `editorial-title` — Kicker + Title + Dek three-line stack on paper, fade-only
+   *   entrance, measured 2.0s hold, ∴ brand mark in corner. The Atlantic/FT magazine
+   *   convention. Default for analytical-essay register (Philosopher's Lens, deep-dive).
+   *   See: references/template-research/title-card.md.
+   */
+  variant: "episode-title" | "section" | "end-card" | "editorial-title";
 
   // ── Episode title variant ──
   /** Main title (e.g., "The Chip War"). */
@@ -22,6 +34,31 @@ export interface TitleTransitionData {
   episodeLabel?: string;
   /** Series name if applicable. */
   seriesName?: string;
+
+  // ── Editorial title variant ──
+  /**
+   * Small mono kicker rendered above the title (e.g., "PARALLAX · PHILOSOPHER'S LENS"
+   * or "EPISODE 03 · OPENING"). Plex Mono, ink @ 60%.
+   *
+   * Used only by `editorial-title` variant. Falls back to `seriesName` or
+   * `episodeLabel` if not provided, in that order.
+   */
+  kicker?: string;
+  /**
+   * Italic serif dek rendered beneath the title — a one-line summary that does
+   * the work a punchy title can't (e.g., "Why rational actors choose the worst
+   * outcome — and what it takes to escape"). Plex Serif Italic, ink @ 80%.
+   *
+   * Used only by `editorial-title` variant.
+   */
+  dek?: string;
+  /**
+   * Position of the ∴ brand mark on `editorial-title` cards.
+   * - "top-right" (default for title cards) — small amber glyph in the corner
+   * - "bottom-left" — chapter-card alternative
+   * - "none" — suppress entirely (use for section dividers or chapter cards)
+   */
+  brandMark?: "top-right" | "bottom-left" | "none";
 
   // ── Section variant ──
   /** Section number (e.g., "I", "II", "III"). */

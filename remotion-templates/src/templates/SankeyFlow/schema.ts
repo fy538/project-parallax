@@ -30,6 +30,11 @@ export const SankeyFlowSchema = z.object({
     showValues: z.boolean().optional(),
     valuePrefix: z.string().optional(),
     valueSuffix: z.string().optional(),
+    columnHeaders: z.array(z.string()).optional(),
+    sourceTotal: z.object({
+      value: z.string(),
+      context: z.string().optional(),
+    }).optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),

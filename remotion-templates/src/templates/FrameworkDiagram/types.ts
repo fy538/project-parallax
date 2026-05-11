@@ -57,6 +57,23 @@ export interface FrameworkDiagramData {
   // ── Comparison variant ──
   /** Two or more columns to compare side by side. */
   columns?: ComparisonColumn[];
+  /**
+   * Editorial protagonist — which column carries the argument.
+   *
+   * When set, the named column renders at full weight (accent color, heavier
+   * ordinals, full opacity); the other column(s) recede to ink @ 40% opacity
+   * with muted ordinals. The viewer's eye locks to the protagonist while the
+   * counterpoint stays continuously legible.
+   *
+   * Use when ONE side is editorially weighted (e.g., a thesis vs a foil, the
+   * actor whose decision you're explaining vs the counterfactual). Default
+   * (omitted) gives equal-weight presentation — appropriate for true
+   * comparisons where neither side leads.
+   *
+   * Index into `columns` (0-based). See:
+   * references/template-research/framework-diagram.md § 6.3
+   */
+  protagonist?: number;
 
   // ── Flow variant ──
   /** Sequential nodes connected by arrows. */

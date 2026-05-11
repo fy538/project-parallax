@@ -60,9 +60,57 @@ export interface TimelinePairData {
   eraB: TimelineEventData;
   /** Connection label drawn between paired events (shown on pullback) */
   connection?: string;
+  /**
+   * Phase position on the shared axis (e.g., week-of-outbreak, year-of-war,
+   * months-since-coup). Required when `phaseAxis` is set on the parent data.
+   * Both eraA and eraB align at this position — the vertical alignment IS the
+   * editorial argument ("peak hospitalization happened at week 7 both times").
+   *
+   * See: references/template-research/timeline-comparison.md § 3
+   */
+  phasePosition?: number;
 }
 
-/** For morph mode: events that transform between eras */
+/**
+ * Configures the shared phase axis for dual-mode timelines.
+ *
+ * When set, event x-positions are computed from each pair's `phasePosition`
+ * value (mapped to the [min, max] range) rather than equal spacing. The
+ * axis label and tick marks render at the bottom of the timeline area.
+ *
+ * This is the canonical Parallax form for historical-parallel visualization:
+ * the spatial alignment of events is by phase, not calendar date. Use this
+ * whenever the editorial claim is "the shape of this thing rhymes with the
+ * shape of that thing." Don't use for absolute-calendar comparisons.
+ *
+ * See: references/template-research/timeline-comparison.md
+ */
+export interface PhaseAxisConfig {
+  /** Axis label, e.g., "Weeks since outbreak", "Year of revolution". */
+  label: string;
+  /** Optional unit suffix on tick labels (e.g., "wk", "mo"). */
+  unit?: string;
+  /** Domain minimum (default: min phasePosition across pairs). */
+  min?: number;
+  /** Domain maximum (default: max phasePosition across pairs). */
+  max?: number;
+  /** Explicit tick values; auto-generated from domain if omitted. */
+  ticks?: number[];
+}
+
+/**
+ * For morph mode: events that transform between eras.
+ *
+ * EDITORIAL GATE — use morph form only for INSTITUTIONAL rhymes (same lever
+ * across eras, different machinery: blockade-as-instrument, delegated rule,
+ * monetary discipline). Morph implies institutional continuity; using it for
+ * coincidental parallels implies a causal connection that doesn't exist.
+ *
+ * Rule of thumb: if you can't fill in "the same X in different clothing,"
+ * use dual mode instead. Morph is a once-per-episode analytical punchline.
+ *
+ * See: references/template-research/timeline-comparison.md § 6.5
+ */
 export interface TimelineMorphEventData {
   /** Era A state */
   eraAYear: string;
@@ -100,6 +148,13 @@ export interface HorizontalTimelineData {
   eraATitle?: string;
   /** Era B label (e.g., "2020s Semiconductors") — for dual mode */
   eraBTitle?: string;
+  /**
+   * Enforce phase-position alignment along a shared x-axis (dual mode only).
+   * When set, each pair must declare its `phasePosition` and both eras align
+   * at that position. This is the Parallax canonical form — see
+   * `references/template-research/timeline-comparison.md`.
+   */
+  phaseAxis?: PhaseAxisConfig;
 
   // ── Morph mode events ──
   /** Events that morph between eras */

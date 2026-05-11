@@ -23,6 +23,8 @@ const PayoffCellSchema = z.object({
   value: z.string(),
   highlight: z.boolean().optional(),
   color: z.string().optional(),
+  cellType: z.enum(["T", "R", "P", "S"]).optional(),
+  heroRole: z.enum(["moral", "analytical"]).optional(),
 });
 
 const GamePhaseSchema = z.object({
@@ -39,7 +41,7 @@ export const GameBoardSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    variant: z.enum(["chess", "go", "payoff-matrix"]),
+    variant: z.enum(["chess", "go", "payoff-matrix", "pd-canonical"]),
     boardSize: z.number().optional(),
     initialPieces: z.array(ChessPieceSchema).optional(),
     initialStones: z.array(GoStoneSchema).optional(),
@@ -48,6 +50,10 @@ export const GameBoardSchema = z.object({
     rowOptions: z.array(z.string()).optional(),
     colOptions: z.array(z.string()).optional(),
     cells: z.array(PayoffCellSchema).optional(),
+    showTPRSLegend: z.boolean().optional(),
+    showBestResponseArrows: z.boolean().optional(),
+    showNashGlyph: z.boolean().optional(),
+    payoffUnits: z.string().optional(),
     phases: z.array(GamePhaseSchema).min(1),
     source: z.string().optional(),
     durationSec: z.number().positive().optional(),

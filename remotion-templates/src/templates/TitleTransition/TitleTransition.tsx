@@ -592,6 +592,182 @@ const EndCardVariant: React.FC<{
   );
 };
 
+// ── Editorial title variant ────────────────────────────────────────────────
+// Kicker + Title + Dek three-line magazine stack. Fade-only entrance with
+// `ease-out-cubic`, 2.0s settled hold, ∴ brand mark in corner. Paper bg,
+// ink type, amber reserved for the brand mark only — no bloom, no beat-sync,
+// no scale reveal. The Atlantic / FT / NYT Magazine convention applied to
+// the analytical-essay register.
+//
+// Reference: references/template-research/title-card.md
+//
+// Forbidden patterns this variant explicitly avoids:
+//   - slide-in body type (dek fades; never slides)
+//   - kinetic letter-by-letter title reveals (Vox/Harris register, not Parallax)
+//   - amber/rust on the title type itself (accent reserved for ∴ glyph)
+//   - bloom or anamorphic flare (cinematic register, wrong for editorial)
+//   - audio-sync pulse (the title is held, not punched)
+
+const EditorialTitleVariant: React.FC<{
+  data: TitleTransitionData;
+  frame: number;
+  totalFrames: number;
+}> = ({ data, frame, totalFrames }) => {
+  const mode = data.backgroundVariant || "light";
+  const theme = useThemeMode(mode);
+  // Fall back through kicker → seriesName → episodeLabel so callers can drop
+  // in this variant without touching legacy data shapes.
+  const kicker = data.kicker || data.seriesName || data.episodeLabel;
+  const dek = data.dek || data.subtitle;
+  const brandMark = data.brandMark ?? "top-right";
+
+  // Measured fade-only entrance — no slide, no scale, no spring.
+  // Stagger: kicker → title → dek, each settling within ~600ms.
+  // Settle pacing (frames from start, at 30 fps):
+  //   kicker  fade-in 12 → 30  (400–1000 ms)
+  //   title   fade-in 18 → 42  (600–1400 ms)
+  //   dek     fade-in 30 → 54  (1000–1800 ms)
+  // Title is fully settled by frame 42 (~1.4s); the rest of the duration is
+  // the editorial hold. The dossier specifies 2.0s minimum hold post-settle.
+  const kickerOpacity = fadeIn(frame, sec(0.4), sec(0.6));
+  const titleOpacity = fadeIn(frame, sec(0.6), sec(0.8));
+  const dekOpacity = fadeIn(frame, sec(1.0), sec(0.8));
+  const dividerOpacity = fadeIn(frame, sec(0.8), sec(0.6));
+
+  // Exit fade. Default duration is 4s; the dossier wants the card held ~2s
+  // post-settle then a clean exit. If durationSec ≥ 3, we keep the last
+  // 30 frames (1s) for the fade; otherwise we scale proportionally.
+  const fadeOutFrames = totalFrames >= sec(3) ? sec(1) : Math.floor(totalFrames * 0.25);
+  const outOpacity = fadeOut(frame, totalFrames, fadeOutFrames);
+
+  // ∴ brand mark — amber, hold steady (does not fade with content). Lands
+  // slightly before the title settles so it reads as a fixture of the page.
+  const markOpacity = fadeIn(frame, sec(0.3), sec(0.4));
+  const markPosition = (() => {
+    if (brandMark === "top-right") {
+      return { top: layout.safeAreaTier.generous.top, right: layout.safeAreaTier.generous.right };
+    }
+    if (brandMark === "bottom-left") {
+      return { bottom: layout.safeAreaTier.generous.bottom, left: layout.safeAreaTier.generous.left };
+    }
+    return null;
+  })();
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        opacity: outOpacity,
+        paddingLeft: layout.safeAreaTier.generous.left,
+        paddingRight: layout.safeAreaTier.generous.right,
+      }}
+    >
+      {/* Kicker — Plex Mono, ink @ 60%, uppercase, letter-spaced */}
+      {kicker && (
+        <div
+          style={{
+            fontSize: fontSizes.label,
+            fontFamily: fonts.mono,
+            color: theme.text.secondary,
+            letterSpacing: 4,
+            textTransform: "uppercase",
+            fontWeight: 500,
+            marginBottom: layout.spacing.lg,
+            opacity: kickerOpacity,
+            maxWidth: textMaxWidth.body,
+            textAlign: "center",
+          }}
+        >
+          {kicker}
+        </div>
+      )}
+
+      {/* Title — Plex Sans Display, ink, hero scale, no accent color */}
+      {data.title && (
+        <div
+          style={{
+            fontSize: fontSizes.title,
+            fontFamily: fonts.display,
+            color: theme.text.primary,
+            fontWeight: 700,
+            textAlign: "center",
+            maxWidth: textMaxWidth.h1,
+            lineHeight: 1.1,
+            letterSpacing: -0.5,
+            opacity: titleOpacity,
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+
+      {/* Thin ink rule — magazine convention separating title from dek */}
+      {dek && (
+        <div
+          style={{
+            width: 64,
+            height: 1,
+            background: theme.text.muted,
+            opacity: dividerOpacity * 0.6,
+            marginTop: layout.spacing.lg,
+            marginBottom: layout.spacing.lg,
+          }}
+        />
+      )}
+
+      {/* Dek — Plex Serif Italic, ink @ 80%, one-line summary */}
+      {dek && (
+        <div
+          style={{
+            fontSize: fontSizes.h3,
+            fontFamily: fonts.serifBody,
+            fontStyle: "italic",
+            color: theme.text.secondary,
+            fontWeight: 400,
+            textAlign: "center",
+            maxWidth: textMaxWidth.h2,
+            lineHeight: 1.4,
+            opacity: dekOpacity,
+          }}
+        >
+          {dek}
+        </div>
+      )}
+
+      {/* ∴ Parallax brand mark — amber, fixed corner position. The only
+          element on the card that uses an accent color. JetBrains Mono
+          renders ∴ as three weighted dots (matches GameBoard pd-canonical). */}
+      {markPosition && (
+        <div
+          style={{
+            position: "absolute",
+            ...markPosition,
+            fontSize: fontSizes.h2,
+            fontFamily: fonts.data,
+            color: palette.amber,
+            fontWeight: 700,
+            lineHeight: 0.7,
+            letterSpacing: -2,
+            opacity: markOpacity,
+            maxWidth: fontSizes.h1,
+          }}
+          aria-label="Parallax"
+        >
+          ∴
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const TitleTransition: React.FC<{ data: TitleTransitionData }> = ({
@@ -617,6 +793,9 @@ export const TitleTransition: React.FC<{ data: TitleTransitionData }> = ({
       )}
       {data.variant === "end-card" && (
         <EndCardVariant data={data} frame={frame} totalFrames={totalFrames} />
+      )}
+      {data.variant === "editorial-title" && (
+        <EditorialTitleVariant data={data} frame={frame} totalFrames={totalFrames} />
       )}
       {/* Brand chrome — intelligence briefing texture */}
       <HeaderStrip

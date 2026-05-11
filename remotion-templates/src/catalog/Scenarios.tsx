@@ -2,7 +2,7 @@
  * Catalog — Scenarios category.
  *
  * DecisionTree × 1 (branching scenario)
- * GameBoard × 2 (chess, payoff-matrix)
+ * GameBoard × 3 (chess, payoff-matrix, pd-canonical)
  * BifurcationRoute × 1 (network split)
  */
 
@@ -88,6 +88,42 @@ const gamePayoff: GameBoardData = {
   durationSec: 9,
 };
 
+// pd-canonical — Tucker 1950 framing with T/R/P/S labels, best-response arrows,
+// distinct hero treatments for moral (C,C) vs analytical Nash (D,D). The
+// reference visualization for the prisoners-dilemma launch episode.
+// See: references/template-research/game-theory.md § B.
+const gamePDCanonical: GameBoardData = {
+  episode: CATALOG_EPISODE,
+  title: "The Prisoners' Dilemma",
+  subtitle: "Tucker, 1950 — the canonical 2×2",
+  variant: "pd-canonical",
+  rowPlayer: "Prisoner A",
+  colPlayer: "Prisoner B",
+  rowOptions: ["Stay silent", "Confess"],
+  colOptions: ["Stay silent", "Confess"],
+  cells: [
+    { row: 0, col: 0, value: "−1, −1", cellType: "R", heroRole: "moral" },
+    { row: 0, col: 1, value: "−10, 0", cellType: "S" },
+    { row: 1, col: 0, value: "0, −10", cellType: "T" },
+    { row: 1, col: 1, value: "−5, −5", cellType: "P", heroRole: "analytical" },
+  ],
+  showTPRSLegend: true,
+  showBestResponseArrows: true,
+  showNashGlyph: true,
+  payoffUnits: "yrs",
+  phases: [
+    { label: "Four outcomes", durationSec: 3,
+      annotation: "Payoffs in years of prison. Lower is worse." },
+    { label: "Each prisoner's best response — confess", durationSec: 4,
+      annotation: "Whatever the other does, confessing serves me better." },
+    { label: "Both arrive at the same answer", durationSec: 4, highlights: [3],
+      annotation: "Mutual confession is the only stable outcome — and worse for both than silence." },
+  ],
+  source: "Tucker 1950, illustrative payoffs",
+  durationSec: 11,
+  backgroundVariant: "light",
+};
+
 // ─── BifurcationRoute × 1 ─────────────────────────────────────────────────
 
 const bifurcationLatin: BifurcationRouteData = {
@@ -168,6 +204,21 @@ export const CatalogGamePayoff = () => (
   />
 );
 
+export const CatalogGamePDCanonical = () => (
+  <Composition
+    id={catalogId("GameBoard", "pd-canonical")}
+    component={GameBoard}
+    schema={GameBoardSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as GameBoardData).durationSec || 11),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: gamePDCanonical }}
+  />
+);
+
 export const CatalogBifurcationLatin = () => (
   <Composition
     id={catalogId("BifurcationRoute", "latin-romance")}
@@ -181,5 +232,5 @@ export const CatalogBifurcationLatin = () => (
 );
 
 export const catalogScenariosData = {
-  treeChessOpening, gameChess, gamePayoff, bifurcationLatin,
+  treeChessOpening, gameChess, gamePayoff, gamePDCanonical, bifurcationLatin,
 };

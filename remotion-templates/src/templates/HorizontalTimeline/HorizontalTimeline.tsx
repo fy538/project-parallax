@@ -66,6 +66,8 @@ import type {
   HorizontalTimelineData,
   TimelineEventData,
   TimelineCameraStep,
+  TimelinePairData,
+  PhaseAxisConfig,
 } from "./types";
 
 // ── Constants ──────────────────────────────────────────────────────────────
@@ -367,6 +369,151 @@ const ConnectionLine: React.FC<{
   );
 });
 
+// ── Phase axis render (dual mode, when phaseAxis is set) ───────────────────
+//
+// Draws a shared phase axis beneath the era B spine: a thin rule with tick
+// marks at canonical positions (auto-derived from pair phasePositions, or
+// explicit via config.ticks) and the axis label centered below.
+//
+// This is the visual contract for phase-aligned timelines — the viewer sees
+// the shared scale and can read "week 7 lines up on both sides" directly.
+// Without this affordance, phase alignment is implicit and easily mistaken
+// for calendar alignment. See: references/template-research/timeline-comparison.md § 7.
+
+const AXIS_Y_OFFSET = 260; // pixels below SPINE_Y where the axis lives
+const AXIS_TICK_HEIGHT = 8;
+
+const PhaseAxisRender: React.FC<{
+  config: PhaseAxisConfig;
+  pairs: TimelinePairData[];
+  pairXs: number[];
+  spineY: number;
+  totalWidth: number;
+  color: string;
+  primaryColor: string;
+  frame: number;
+  mode: "light" | "dark";
+}> = React.memo(({ config, pairs, pairXs, spineY, totalWidth, color, primaryColor, frame, mode }) => {
+  const theme = useThemeMode(mode);
+  const phasePositions = pairs.map((p) => p.phasePosition as number);
+  const domainMin = config.min ?? Math.min(...phasePositions);
+  const domainMax = config.max ?? Math.max(...phasePositions);
+  const span = Math.max(1e-9, domainMax - domainMin);
+  const spanPx = Math.max(1, (pairs.length - 1) * EVENT_SPACING);
+
+  // Auto-generate ticks if none provided: 4–6 evenly spaced steps anchored
+  // at the actual pair phase positions when feasible.
+  const ticks: number[] = config.ticks ?? phasePositions;
+
+  // Axis line draws in over 600ms after events have begun settling.
+  const lineProgress = interpolate(frame, [sec(0.8), sec(1.4)], [0, 1], CLAMP_QUAD);
+  const labelOpacity = fadeIn(frame, sec(1.2), sec(0.5));
+
+  const axisTop = spineY + AXIS_Y_OFFSET;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: axisTop,
+        width: totalWidth,
+        height: 60,
+        pointerEvents: "none",
+      }}
+    >
+      {/* Axis baseline */}
+      <div
+        style={{
+          position: "absolute",
+          left: TIMELINE_PADDING,
+          top: 0,
+          width: spanPx * lineProgress,
+          height: 1,
+          background: `linear-gradient(90deg, transparent 0%, ${color}80 6%, ${color}80 94%, transparent 100%)`,
+        }}
+      />
+
+      {/* Ticks — render at every pair's x position (matches event alignment) */}
+      {pairXs.map((x, i) => {
+        const tickOpacity = fadeIn(frame, sec(1.0) + i * sec(0.05), sec(0.4));
+        return (
+          <div
+            key={`tick-${i}`}
+            style={{
+              position: "absolute",
+              left: x,
+              top: 0,
+              width: 1,
+              height: AXIS_TICK_HEIGHT,
+              background: color,
+              opacity: tickOpacity * 0.85,
+              transform: "translateX(-0.5px)",
+            }}
+          />
+        );
+      })}
+
+      {/* Tick labels (phase values) */}
+      {ticks.map((tick, i) => {
+        const tickX = TIMELINE_PADDING + ((tick - domainMin) / span) * spanPx;
+        const tickOpacity = fadeIn(frame, sec(1.1) + i * sec(0.05), sec(0.4));
+        return (
+          <div
+            key={`label-${i}`}
+            style={{
+              position: "absolute",
+              left: tickX,
+              top: AXIS_TICK_HEIGHT + 6,
+              transform: "translateX(-50%)",
+              fontSize: fontSizes.meta,
+              fontFamily: fonts.data,
+              color: theme.text.muted,
+              opacity: tickOpacity,
+              whiteSpace: "nowrap",
+              textShadow: shadows.textLift,
+            }}
+          >
+            {tick}
+            {config.unit ? ` ${config.unit}` : ""}
+          </div>
+        );
+      })}
+
+      {/* Axis label — centered below ticks, accented underline */}
+      <div
+        style={{
+          position: "absolute",
+          left: TIMELINE_PADDING + spanPx / 2,
+          top: AXIS_TICK_HEIGHT + 36,
+          transform: "translateX(-50%)",
+          fontSize: fontSizes.label,
+          fontFamily: fonts.metadata,
+          color: theme.text.secondary,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          opacity: labelOpacity,
+          whiteSpace: "nowrap",
+          textShadow: shadows.textLift,
+        }}
+      >
+        {config.label}
+        <div
+          style={{
+            position: "absolute",
+            bottom: -4,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "60%",
+            height: 1,
+            background: `${primaryColor}60`,
+          }}
+        />
+      </div>
+    </div>
+  );
+});
+
 // ── Main component ─────────────────────────────────────────────────────────
 
 export const HorizontalTimeline: React.FC<{
@@ -412,12 +559,32 @@ export const HorizontalTimeline: React.FC<{
     }
 
     if (data.mode === "dual" && data.pairs) {
-      // Dual mode: era A events above, era B below, same x-positions
+      // Dual mode: era A events above, era B below, same x-positions.
+      // When phaseAxis is set, x is computed from each pair's phasePosition
+      // mapped to a shared phase domain — the vertical alignment IS the
+      // editorial argument. See: references/template-research/timeline-comparison.md
       const events: Array<{ event: TimelineEventData; position: "above" | "below" }> = [];
       const positions: number[] = [];
 
+      // Pair positions along x: phase-aligned or equal-spaced.
+      const pairXs: number[] = (() => {
+        if (data.phaseAxis && data.pairs.every((p) => p.phasePosition !== undefined)) {
+          const phasePositions = data.pairs.map((p) => p.phasePosition as number);
+          const domainMin = data.phaseAxis.min ?? Math.min(...phasePositions);
+          const domainMax = data.phaseAxis.max ?? Math.max(...phasePositions);
+          // Preserve the total width that equal-spacing would produce so
+          // existing camera-path / pullback assumptions still hold.
+          const spanPx = Math.max(1, (data.pairs.length - 1) * EVENT_SPACING);
+          const span = Math.max(1e-9, domainMax - domainMin);
+          return phasePositions.map(
+            (p) => TIMELINE_PADDING + ((p - domainMin) / span) * spanPx,
+          );
+        }
+        return data.pairs.map((_, i) => TIMELINE_PADDING + i * EVENT_SPACING);
+      })();
+
       data.pairs.forEach((pair, i) => {
-        const x = TIMELINE_PADDING + i * EVENT_SPACING;
+        const x = pairXs[i]!;
         // Era A above
         events.push({ event: pair.eraA, position: "above" });
         positions.push(x);
@@ -480,10 +647,13 @@ export const HorizontalTimeline: React.FC<{
     });
   }, [data]);
 
-  // For dual mode, event positions for the camera are the unique x-positions (one per pair)
+  // For dual mode, event positions for the camera are the unique x-positions (one per pair).
+  // eventData.positions has two entries per pair (above/below); we want the unique x-list.
   const cameraPositions = useMemo(() => {
     if (data.mode === "dual" && data.pairs) {
-      return data.pairs.map((_, i) => TIMELINE_PADDING + i * EVENT_SPACING);
+      // Every even index in eventData.positions is an era-A position (same x as
+      // its era-B sibling). Take every other entry to get one x per pair.
+      return data.pairs.map((_, i) => eventData.positions[i * 2]!);
     }
     return eventData.positions;
   }, [data, eventData.positions]);
@@ -659,7 +829,8 @@ export const HorizontalTimeline: React.FC<{
             {data.mode === "dual" && data.pairs && (
               <>
                 {data.pairs.map((pair, i) => {
-                  const x = TIMELINE_PADDING + i * EVENT_SPACING;
+                  // Phase-aligned or equal-spaced — computed in eventData above.
+                  const x = eventData.positions[i * 2]!;
                   const eventDim = camera.getEventDim(i);
                   const eventScale = camera.getEventScale(i);
                   const eventBlur = camera.getEventBlur(i);
@@ -788,6 +959,21 @@ export const HorizontalTimeline: React.FC<{
                   );
                 })}
               </>
+            )}
+
+            {/* ── Phase axis (dual mode only, when phaseAxis is set) ── */}
+            {data.mode === "dual" && data.phaseAxis && data.pairs && (
+              <PhaseAxisRender
+                config={data.phaseAxis}
+                pairs={data.pairs}
+                pairXs={data.pairs.map((_, i) => eventData.positions[i * 2]!)}
+                spineY={SPINE_Y}
+                totalWidth={eventData.totalWidth}
+                color={theme.text.muted}
+                primaryColor={eraBColor}
+                frame={frame}
+                mode={mode}
+              />
             )}
 
             {/* ── Morph mode: events with cross-fade ───────────────── */}

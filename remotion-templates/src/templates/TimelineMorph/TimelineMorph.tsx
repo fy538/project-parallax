@@ -4,6 +4,29 @@
  * depth-of-field focus isolation, and configurable modes (single/dual/morph) that replace
  * all three legacy timeline templates.
  *
+ * ──────────────────────────────────────────────────────────────────────────────
+ * EDITORIAL GATE — use morph form only for INSTITUTIONAL rhymes.
+ *
+ * Morph implies that the same *instrument* persists across eras with only its
+ * substrate changing — same lever, different machinery. Examples that earn it:
+ *   - 1806 Continental System → 2022 SWIFT sanctions (blockade as instrument)
+ *   - Persian satraps → Roman provincial governors (delegated imperial rule)
+ *   - Gold-standard exchange → reserve-currency anchor (monetary discipline)
+ *
+ * Morph is WRONG for coincidental parallels — when the shapes happen to rhyme
+ * but the institutions don't share lineage. A morph that says "Pearl Harbor →
+ * 9/11" implies institutional continuity that doesn't exist; readers infer
+ * causal connection the editor never claimed. Use TimelineComparison (dual)
+ * for that, where the parallel is in the *pattern*, not the *instrument*.
+ *
+ * Rule of thumb: if you can't fill in "the same X in different clothing,"
+ * the form is wrong. Don't reach for morph because it looks dramatic;
+ * morph is a punchline reserved for the analytical climax of an episode —
+ * at most once per episode.
+ *
+ * See: references/template-research/timeline-comparison.md § 6.5
+ * ──────────────────────────────────────────────────────────────────────────────
+ *
  * TimelineMorph — eras morphing into each other.
  *
  * Instead of side-by-side comparison (TimelineComparison), events from era A

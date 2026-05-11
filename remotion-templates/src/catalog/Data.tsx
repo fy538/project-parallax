@@ -132,6 +132,34 @@ const chartSpaceRace: DataChartData = {
   durationSec: 11,
 };
 
+// Lollipop demo — Axelrod-tournament style ranking. Twelve strategies competing
+// across 200 iterated PD rounds; Tit-for-Tat wins, Always-Defect dies last.
+// PD-thematic for the launch episode; the same form fits "approval ratings by
+// country" or any 10+ item ranking. See:
+// references/template-research/data-chart.md § 6.4
+const chartAxelrodRankings: DataChartData = {
+  episode: CATALOG_EPISODE,
+  title: "Cooperation Pays",
+  subtitle: "Average score per round, 200-round Axelrod tournament — top strategies, plus the floor",
+  variant: "lollipop",
+  unit: "",
+  dataPoints: [
+    { label: "Tit-for-Tat", value: 504, color: "#E5A544" },
+    { label: "Tit-for-Two-Tats", value: 500 },
+    { label: "Nydegger", value: 486 },
+    { label: "Grofman", value: 482 },
+    { label: "Shubik", value: 481 },
+    { label: "Stein-Rapoport", value: 478 },
+    { label: "Friedman (grim trigger)", value: 473 },
+    { label: "Davis", value: 472 },
+    { label: "Downing", value: 397 },
+    { label: "Always Defect", value: 225 },
+  ],
+  highlightIndex: 0,
+  source: "Axelrod, The Evolution of Cooperation (1984)",
+  durationSec: 12,
+};
+
 // ─── TimeSeriesChart × 2 ──────────────────────────────────────────────────
 
 // Simplified: dropped the heroStat (which collided with the top-right annotation)
@@ -164,6 +192,41 @@ const tsCarbonDioxide: TimeSeriesChartData = {
   yUnit: " ppm",
   source: "NOAA, ice core records",
   durationSec: 12,
+};
+
+// Slope-chart sample — ranking change between two moments. Life expectancy
+// at birth, 1900 vs 2020, four illustrative countries. Lines that diverge
+// upward show developmental progress; crossings would indicate ranking
+// inversions. The editorial point IS the change between the two anchors,
+// nothing in between.
+// See: references/template-research/time-series-chart.md § 6.2
+const tsLifeExpectancySlope: TimeSeriesChartData = {
+  episode: CATALOG_EPISODE,
+  title: "Life Expectancy at Birth",
+  subtitle: "Four countries, 1900 vs 2020",
+  variant: "slope",
+  xLabel: "1900 → 2020",
+  yUnit: " yrs",
+  lines: [
+    {
+      label: "Japan", color: "#C23B22", hero: true,
+      points: [{ x: 1900, y: 44 }, { x: 2020, y: 84 }],
+    },
+    {
+      label: "South Korea", color: "#E5A544",
+      points: [{ x: 1900, y: 24 }, { x: 2020, y: 83 }],
+    },
+    {
+      label: "United States", color: "#3266AD",
+      points: [{ x: 1900, y: 47 }, { x: 2020, y: 77 }],
+    },
+    {
+      label: "India", color: "#5DAA68",
+      points: [{ x: 1900, y: 24 }, { x: 2020, y: 70 }],
+    },
+  ],
+  source: "Our World in Data",
+  durationSec: 10,
 };
 
 const tsPopulation: TimeSeriesChartData = {
@@ -295,6 +358,11 @@ const sankeyEnergy: SankeyFlowData = {
     { from: "discarded", to: "landfill", value: 4400 },
   ],
   valueSuffix: " Mt",
+  columnHeaders: ["Produced", "Use vs. Discarded", "Fate"],
+  sourceTotal: {
+    value: "8.3K Mt",
+    context: "global plastic produced, 1950–2017",
+  },
   source: "Geyer, Jambeck & Law (2017), Science Advances",
   durationSec: 11,
 };
@@ -337,6 +405,7 @@ const dataChartComp = (id: string, data: DataChartData) => (
 
 export const CatalogChartMountains = () => dataChartComp(catalogId("DataChart", "speeds-bar"), chartMountains);
 export const CatalogChartSpaceRace = () => dataChartComp(catalogId("DataChart", "space-race-comparison"), chartSpaceRace);
+export const CatalogChartAxelrodLollipop = () => dataChartComp(catalogId("DataChart", "axelrod-lollipop"), chartAxelrodRankings);
 
 const tsComp = (id: string, data: TimeSeriesChartData) => (
   <Composition
@@ -355,6 +424,7 @@ const tsComp = (id: string, data: TimeSeriesChartData) => (
 
 export const CatalogTsCO2 = () => tsComp(catalogId("TimeSeriesChart", "atmospheric-co2"), tsCarbonDioxide);
 export const CatalogTsPopulation = () => tsComp(catalogId("TimeSeriesChart", "world-population"), tsPopulation);
+export const CatalogTsLifeExpectancySlope = () => tsComp(catalogId("TimeSeriesChart", "life-expectancy-slope"), tsLifeExpectancySlope);
 
 const gaugeComp = (id: string, data: ProbabilityGaugeData) => (
   <Composition
@@ -513,8 +583,8 @@ export const CatalogWaterfallMotionDocumentary = () => (
 
 export const catalogDataData = {
   statApollo, statMariana, statHabitable,
-  chartMountains, chartSpaceRace,
-  tsCarbonDioxide, tsPopulation,
+  chartMountains, chartSpaceRace, chartAxelrodRankings,
+  tsCarbonDioxide, tsPopulation, tsLifeExpectancySlope,
   gaugeWeather, gaugeScorecard,
   bayesVenice, radarAthletes, sankeyEnergy,
   waterfallCoffee,

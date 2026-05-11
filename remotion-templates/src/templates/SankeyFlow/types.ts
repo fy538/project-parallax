@@ -42,6 +42,33 @@ export interface SankeyFlowData {
   valueSuffix?: string;
 
   /**
+   * Optional column header labels rendered above each Sankey column
+   * (e.g., ["Production", "Use", "Fate"]). Makes the conservation framing
+   * explicit — "values in = values out" — which is the whole point of a
+   * Sankey. Without column headers, the diagram reads as a flow chart;
+   * with them, it reads as a budget.
+   *
+   * Length should match the number of columns (max(node.column) + 1).
+   * See: references/template-research/sankey-flow.md § 6
+   */
+  columnHeaders?: string[];
+
+  /**
+   * Source-total kicker rendered top-left as a prominent stat
+   * (e.g., "8.3K Mt produced 1950–2017"). Names the conservation total
+   * explicitly so the viewer knows what 100% means. Pair with `source`
+   * for full attribution.
+   *
+   * See: references/template-research/sankey-flow.md § 6
+   */
+  sourceTotal?: {
+    /** The big number / phrase (e.g., "8.3K Mt"). Plex Sans display weight. */
+    value: string;
+    /** Sub-line context (e.g., "global plastic produced 1950–2017"). */
+    context?: string;
+  };
+
+  /**
    * Enable animated flow particles along link paths.
    * Particles travel from source to destination, with count proportional to flow value.
    * Default: false (set to true for cinematic mode).

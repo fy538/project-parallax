@@ -183,7 +183,15 @@ export const DualTimeline: React.FC<{
   const eraAColor = data.eraAColor || "#3266AD";
   const eraBColor = data.eraBColor || "#C23B22";
 
-  // Column focus opacity (crossfade between eras)
+  // Column focus opacity (crossfade between eras).
+  //
+  // Dim non-focus era to 0.4 (canonical) rather than 0.2. Continuous presence
+  // of both eras is the whole point of dual-timeline form — the shift between
+  // them is *attentional*, not topological. Dimming to 0.2 effectively removes
+  // the off-focus era, defeating the parallel reading.
+  //
+  // See: references/template-research/timeline-comparison.md § 3 (focus shifting)
+  const DIM_OPACITY = 0.4;
   // Computed directly — no useMemo, since frame changes every render anyway.
   let eraAOpacity = 1.0;
   let eraBOpacity = 1.0;
@@ -193,15 +201,15 @@ export const DualTimeline: React.FC<{
     eraBOpacity = 0.4;
   } else if (phase === "eraA") {
     eraAOpacity = 1.0;
-    eraBOpacity = 0.2;
+    eraBOpacity = DIM_OPACITY;
   } else if (phase === "crossfade") {
-    eraAOpacity = interpolate(frame, [getPhaseStart("crossfade"), getPhaseStart("eraB")], [1.0, 0.2], CLAMP_CUBIC_INOUT);
-    eraBOpacity = interpolate(frame, [getPhaseStart("crossfade"), getPhaseStart("eraB")], [0.2, 1.0], CLAMP_CUBIC_INOUT);
+    eraAOpacity = interpolate(frame, [getPhaseStart("crossfade"), getPhaseStart("eraB")], [1.0, DIM_OPACITY], CLAMP_CUBIC_INOUT);
+    eraBOpacity = interpolate(frame, [getPhaseStart("crossfade"), getPhaseStart("eraB")], [DIM_OPACITY, 1.0], CLAMP_CUBIC_INOUT);
   } else if (phase === "eraB") {
-    eraAOpacity = 0.2;
+    eraAOpacity = DIM_OPACITY;
     eraBOpacity = 1.0;
   } else if (phase === "pullback") {
-    eraAOpacity = interpolate(frame, [getPhaseStart("pullback"), getPhaseStart("exit")], [0.2, 1.0], CLAMP_CUBIC_INOUT);
+    eraAOpacity = interpolate(frame, [getPhaseStart("pullback"), getPhaseStart("exit")], [DIM_OPACITY, 1.0], CLAMP_CUBIC_INOUT);
     eraBOpacity = 1.0;
   }
 

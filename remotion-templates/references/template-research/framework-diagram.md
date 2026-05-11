@@ -140,7 +140,7 @@ The existing `FrameworkDiagram` template, after our session's polish work:
 
 1. **Flow: proportional spacing option.** Add `stageSpacing: "equal" | "proportional"` with optional `durationField` for proportional. Useful for time-encoded flows.
 2. **Matrix: empirical mode.** Add `items?: { x: number, y: number, label: string }[]` for scatter-plot-style matrices (countries as dots in quadrants). Add origin tick rendering when items provided.
-3. **Comparison: protagonist mode.** When one side is the editorial protagonist, allow `protagonist: "left" | "right"` to weight that side with accent + heavier ordinals while keeping the other muted.
+3. ~~**Comparison: protagonist mode.** When one side is the editorial protagonist, allow `protagonist: "left" | "right"` to weight that side with accent + heavier ordinals while keeping the other muted.~~ **Done — May 11, 2026.** Shipped as `data.protagonist?: number` (column index, opt-in). Protagonist column renders at full opacity with a heavier 3px accent rule; foil column(s) recede to 40% opacity. Equal-weight remains the default for true comparisons where neither side leads.
 4. **Slope flow option.** For flows where one stage is the inflection, allow a "hero stage" mid-flow (not just terminal). Currently only the last stage can be hero.
 5. **Document the three variants' decision rule.** Add to the FrameworkDiagram docstring: "comparison = parallel views; flow = sequential causation; matrix = 2D typology." Each has a different non-overlapping use case.
 

@@ -35,6 +35,21 @@ export interface PayoffCell {
   /** Highlight this cell (e.g., Nash equilibrium) */
   highlight?: boolean;
   color?: string;
+  /**
+   * PD-canonical label: T(emptation) / R(eward) / P(unishment) / S(ucker).
+   * Renders as a small mono kicker inside the cell. Only used by `pd-canonical` variant.
+   * Convention: T > R > P > S.
+   */
+  cellType?: "T" | "R" | "P" | "S";
+  /**
+   * Hero treatment for `pd-canonical` variant:
+   *  - "moral"      = the cell narration treats as what *should* happen (mutual cooperation).
+   *                    Bone fill + amber accent.
+   *  - "analytical" = the cell that *will* happen — Nash equilibrium (mutual defection).
+   *                    Oxblood border + ∴ glyph.
+   * Both can coexist; treatment is distinct.
+   */
+  heroRole?: "moral" | "analytical";
 }
 
 export interface CounterAnimation {
@@ -68,7 +83,7 @@ export interface GameBoardData {
   title: string;
   subtitle?: string;
 
-  variant: "chess" | "go" | "payoff-matrix";
+  variant: "chess" | "go" | "payoff-matrix" | "pd-canonical";
 
   /** Chess: board size (default 8) */
   boardSize?: number;
@@ -84,6 +99,30 @@ export interface GameBoardData {
   rowOptions?: string[];
   colOptions?: string[];
   cells?: PayoffCell[];
+
+  // ── pd-canonical variant options ─────────────────────────────────────
+  /**
+   * Show T > R > P > S legend strip beneath the matrix.
+   * Reads values from cells with `cellType` set. Default true for `pd-canonical`.
+   */
+  showTPRSLegend?: boolean;
+  /**
+   * Draw best-response arrows from off-equilibrium cells pointing toward each
+   * player's preferred deviation. Rust color, low opacity. Default true for `pd-canonical`.
+   *
+   * Inferred from cell values when format is "X, Y" (row payoff, col payoff).
+   */
+  showBestResponseArrows?: boolean;
+  /**
+   * Show ∴ Parallax brand mark inside the analytical-hero (Nash) cell's top-right corner.
+   * Default true for `pd-canonical`.
+   */
+  showNashGlyph?: boolean;
+  /**
+   * Units suffix appended to legend (e.g., "years" → "T = 5 years"). Default omitted.
+   * Anchors abstract payoffs to a real referent (Tucker's original framing).
+   */
+  payoffUnits?: string;
 
   /** Phased animation */
   phases: GamePhase[];

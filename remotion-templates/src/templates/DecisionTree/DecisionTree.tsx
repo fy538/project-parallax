@@ -423,7 +423,14 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 pointerEvents: "none",
               }}
             >
-              {/* Non-highlighted edges */}
+              {/* Non-highlighted edges.
+                  When a highlightedPath is set, recede non-chosen branches to
+                  1.5px @ 30% opacity so the chosen path becomes editorially
+                  unambiguous. The chosen-path treatment is the whole point —
+                  it answers "what did the actor actually do" vs. the
+                  hypothetical alternatives. See:
+                  references/template-research/game-theory.md § A4
+                  POLISH.md doctrine D5 (hero/supporting hierarchy). */}
               {edges
                 .filter((e) => !e.isHighlighted)
                 .map((edge, i) => {
@@ -434,13 +441,17 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                   const parentDim = camera.getNodeDim(edge.parentId);
                   const childDim = camera.getNodeDim(edge.childId);
                   const edgeDim = Math.max(parentDim, childDim);
+                  // Recede unchosen branches when a chosen path is named.
+                  const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
+                  const muteFactor = someHighlighted ? 0.3 : 1.0;
+                  const strokeWidth = someHighlighted ? 1.5 : 2.5;
 
                   return (
                     <path
                       key={`edge-${i}`}
                       d={edge.pathData}
                       stroke={theme.text.muted}
-                      strokeWidth={2.5}
+                      strokeWidth={strokeWidth}
                       fill="none"
                       strokeDasharray="8 6"
                       strokeDashoffset={interpolate(
@@ -449,7 +460,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                         [300, 0],
                         CLAMP // linear-ok: dash draw speed is visually neutral for dashed connector lines
                       )}
-                      opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
+                      opacity={edgeOpacity * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
                     />
                   );
                 })}
@@ -513,6 +524,15 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 const indexInLevel = levelNodes.findIndex((n) => n.id === node.id);
                 const startFrame = sec(0.5 * t) + level * sec(0.4 * s) + indexInLevel * sec(0.1 * s);
 
+                // Chosen-path hierarchy: when a highlightedPath is set, recede
+                // off-path nodes to 0.5 dim alongside their dimmed edges so the
+                // chosen branch reads as the editorial protagonist. The path
+                // nodes still get camera-driven dim if focused elsewhere.
+                const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
+                const onPath = someHighlighted && data.highlightedPath!.includes(node.id);
+                const pathDim = someHighlighted && !onPath ? 0.5 : 0;
+                const dimAmount = Math.max(camera.getNodeDim(node.id), pathDim);
+
                 return (
                   <TreeNodeComponent
                     key={node.id}
@@ -522,7 +542,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     startFrame={startFrame}
                     totalFrames={totalFrames}
                     mode={backgroundVariant as "light" | "dark"}
-                    dimAmount={camera.getNodeDim(node.id)}
+                    dimAmount={dimAmount}
                     focusScale={camera.getNodeScale(node.id)}
                     defaultColorIndex={data.nodes.indexOf(node)}
                     beatPulse={beat.pulse}

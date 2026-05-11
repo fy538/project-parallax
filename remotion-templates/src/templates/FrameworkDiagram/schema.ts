@@ -33,6 +33,7 @@ export const FrameworkDiagramSchema = z.object({
       subtitle: z.string().optional(),
       variant: z.enum(["comparison", "flow", "matrix"]),
       columns: z.array(ComparisonColumnSchema).optional(),
+      protagonist: z.number().int().nonnegative().optional(),
       nodes: z.array(FlowNodeSchema).optional(),
       arrowLabels: z.array(z.string()).optional(),
       rowHeaders: z.array(z.string()).optional(),

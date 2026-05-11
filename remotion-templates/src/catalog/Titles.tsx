@@ -1,8 +1,13 @@
 /**
- * Catalog — Title cards (TitleTransition × 3).
+ * Catalog — Title cards (TitleTransition × 4).
  *
- * Three variants: episode-title, section, end-card.
- * Subjects are placeholder-channel-themed.
+ * Four variants:
+ *   - episode-title   cinematic (legacy high-energy treatment, silicon-trap)
+ *   - section         act dividers
+ *   - end-card        CTA + next-episode teaser
+ *   - editorial-title Kicker + Title + Dek magazine stack (Philosopher's Lens default)
+ *
+ * See: references/template-research/title-card.md for the editorial-title convention.
  */
 
 import { Composition } from "remotion";
@@ -41,6 +46,20 @@ const titleEndCard: TitleTransitionData = {
   durationSec: 5,
 };
 
+// Kicker + Title + Dek magazine stack (Atlantic / FT / NYT Magazine convention).
+// Default for analytical-essay register; the launch episode opener.
+// See: references/template-research/title-card.md
+const titleEditorial: TitleTransitionData = {
+  episode: CATALOG_EPISODE,
+  variant: "editorial-title",
+  kicker: "PARALLAX · PHILOSOPHER'S LENS",
+  title: "The Prisoners' Dilemma",
+  dek: "Why rational actors choose the worst outcome — and what it takes to escape",
+  brandMark: "top-right",
+  backgroundVariant: "light",
+  durationSec: 4,
+};
+
 const titleComp = (id: string, data: TitleTransitionData) => (
   <Composition
     id={id}
@@ -59,7 +78,8 @@ const titleComp = (id: string, data: TitleTransitionData) => (
 export const CatalogTitleEpisode = () => titleComp(catalogId("TitleTransition", "episode"), titleEpisode);
 export const CatalogTitleSection = () => titleComp(catalogId("TitleTransition", "section"), titleSection);
 export const CatalogTitleEndCard = () => titleComp(catalogId("TitleTransition", "end-card"), titleEndCard);
+export const CatalogTitleEditorial = () => titleComp(catalogId("TitleTransition", "editorial"), titleEditorial);
 
 export const catalogTitlesData = {
-  titleEpisode, titleSection, titleEndCard,
+  titleEpisode, titleSection, titleEndCard, titleEditorial,
 };

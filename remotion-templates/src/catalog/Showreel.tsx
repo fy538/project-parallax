@@ -230,7 +230,7 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   },
 
   // ── Titles ──
-  sectionSegment("Titles", "TitleTransition × 3 — episode-title, section, end-card"),
+  sectionSegment("Titles", "TitleTransition × 4 — episode-title, section, end-card, editorial-title"),
   slateSegment("Titles", "TitleTransition", "section"),
   {
     durationSec: catalogTitlesData.titleSection.durationSec ?? 4,
@@ -240,6 +240,11 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogTitlesData.titleEndCard.durationSec ?? 5,
     render: () => <TitleTransition data={catalogTitlesData.titleEndCard} />,
+  },
+  slateSegment("Titles", "TitleTransition", "editorial"),
+  {
+    durationSec: catalogTitlesData.titleEditorial.durationSec ?? 4,
+    render: () => <TitleTransition data={catalogTitlesData.titleEditorial} />,
   },
 
   // ── Diagrams ──
@@ -303,6 +308,11 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogScenariosData.gamePayoff.durationSec ?? 9,
     render: () => <GameBoard data={catalogScenariosData.gamePayoff} />,
   },
+  slateSegment("Scenarios", "GameBoard", "pd-canonical"),
+  {
+    durationSec: catalogScenariosData.gamePDCanonical.durationSec ?? 11,
+    render: () => <GameBoard data={catalogScenariosData.gamePDCanonical} />,
+  },
   slateSegment("Scenarios", "BifurcationRoute", "latin-romance"),
   {
     durationSec: catalogScenariosData.bifurcationLatin.durationSec ?? 12,
@@ -323,6 +333,11 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogTimelinesData.timelineDualPandemics.durationSec ?? 15,
     render: () => <HorizontalTimeline data={catalogTimelinesData.timelineDualPandemics} />,
+  },
+  slateSegment("Timelines", "HorizontalTimeline", "revolutions-phase"),
+  {
+    durationSec: catalogTimelinesData.timelineDualRevolutionsPhase.durationSec ?? 18,
+    render: () => <HorizontalTimeline data={catalogTimelinesData.timelineDualRevolutionsPhase} />,
   },
   slateSegment("Timelines", "EscalationLadder", "cold-war"),
   {

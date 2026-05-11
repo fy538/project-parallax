@@ -6,7 +6,7 @@
  */
 
 import { interpolate, interpolateColors, spring, Easing, random } from "remotion";
-import { layout, durations } from "../design/theme";
+import { layout, durations, sec } from "../design/theme";
 
 // ── Reusable interpolation configs (hoisted to avoid per-frame allocation) ─
 // These are the most common interpolation option shapes. Import and pass directly
@@ -71,6 +71,67 @@ export const fadeInOut = (
   const inVal = fadeIn(frame, startFrame, fadeDuration);
   const outVal = fadeOut(frame, endFrame, fadeDuration);
   return Math.min(inVal, outVal);
+};
+
+// ── Narration-synced reveals (Economist 150ms-anticipatory rule) ──────────
+//
+// State-of-the-art editorial video (Economist, NYT, FT) times element reveals
+// to *complete* ~150ms BEFORE the narrator names the thing on screen. The
+// element is settled — not landing — when the word arrives. This is the
+// single most professional move in the format.
+//
+// Reference: references/template-research/motion-design.md § 3 (anticipatory reveal)
+
+/** 150ms at 30fps. The Economist video team's canonical anticipation window. */
+export const ANTICIPATE_FRAMES_DEFAULT = 5;
+
+/**
+ * Compute the entrance `startFrame` for an element that should be fully
+ * settled `anticipateFrames` before the narration cue.
+ *
+ * Use this with `fadeIn`, `slideIn`, `scaleIn`, etc. when you have the
+ * narration cue frame and want the reveal to land on the word, not after it.
+ *
+ * @example
+ *   // Narrator says "the dilemma" at second 4.2 → cue frame = 126 @ 30fps.
+ *   // Element should be settled by frame 121 (cue - 5) and entrance fade
+ *   // should span 12 frames → start at frame 109.
+ *   const start = anticipatoryStartFrame(sec(4.2));
+ *   const opacity = fadeIn(frame, start, sec(0.4));
+ */
+export const anticipatoryStartFrame = (
+  narrationCueFrame: number,
+  settleFrames: number = sec(0.4),
+  anticipateFrames: number = ANTICIPATE_FRAMES_DEFAULT,
+): number => narrationCueFrame - anticipateFrames - settleFrames;
+
+/**
+ * Opacity wrapper for the anticipatory-reveal pattern with cubic ease-out
+ * (the editorial-register default). Returns 0 before the entrance starts,
+ * eases from 0→1 ending `anticipateFrames` BEFORE the cue, then holds at 1.
+ *
+ * Use this when the only thing the element animates is opacity. For motion
+ * (slide, scale), pair `anticipatoryStartFrame()` with the relevant helper.
+ *
+ * @param frame                Current frame (from useCurrentFrame).
+ * @param narrationCueFrame    Frame index at which the narrator names the element.
+ * @param settleFrames         Entrance fade duration in frames. Default sec(0.4) = 12 @ 30fps.
+ * @param anticipateFrames     Frames the element settles BEFORE the cue. Default 5 (150ms).
+ *
+ * @example
+ *   // Reveal a stat card so it lands settled at the narrated word.
+ *   const opacity = anticipatoryReveal(frame, sec(4.2));
+ *   return <div style={{ opacity }}>4 outcomes</div>;
+ */
+export const anticipatoryReveal = (
+  frame: number,
+  narrationCueFrame: number,
+  settleFrames: number = sec(0.4),
+  anticipateFrames: number = ANTICIPATE_FRAMES_DEFAULT,
+): number => {
+  const settleEnd = narrationCueFrame - anticipateFrames;
+  const start = settleEnd - settleFrames;
+  return interpolate(frame, [start, settleEnd], [0, 1], CLAMP_CUBIC);
 };
 
 // ── Motion helpers ──────────────────────────────────────────────────────────

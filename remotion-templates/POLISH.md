@@ -456,6 +456,16 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 
 **Where it lands:** FrameworkDiagram matrix (was cornered, now fills canvas), NetworkDiagram (was off-center, now centered).
 
+### D17. Reveals must complete BEFORE the narrator names the element
+
+**Observation:** Element lands on the same frame the narrator says its name (or worse, after). The viewer's eye is still resolving the animation when the word arrives, so the moment of recognition is muddled.
+
+**Fix:** Time reveals so the element is *settled* (opacity 1, no motion) ~150ms BEFORE the narration cue. Use `anticipatoryReveal(frame, narrationCueFrame)` or `anticipatoryStartFrame(narrationCueFrame)` from `utils/animation.ts` — defaults match the Economist editorial convention (5 frames anticipation, 12 frames settle at 30fps).
+
+**Why:** Editorial video lives or dies on this single move. **The Economist** video team built their reputation on it. When the element is already on screen when the narrator names it, the viewer's brain registers *confirmation* — "yes, that thing." When the element lands on the word, the brain registers *competition* — "what am I looking at vs. what am I hearing." Anticipation reads as intentional; coincidence reads as PowerPoint.
+
+**Where it lands:** Threaded through templates as Whisper-resolved narration cues come online. Per-template adoption tracked in `references/template-research/motion-design.md` § 8.
+
 ---
 
 ## Reading order when polishing a template

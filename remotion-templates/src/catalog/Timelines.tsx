@@ -75,6 +75,53 @@ const timelineDualPandemics: HorizontalTimelineData = {
   durationSec: 18,
 };
 
+// Demonstrates `phaseAxis`: shared x-scale is "Year of revolution" — both
+// eras' events align by phase position, not calendar date. This is the
+// Parallax canonical historical-parallel form. See:
+// references/template-research/timeline-comparison.md
+const timelineDualRevolutionsPhase: HorizontalTimelineData = {
+  episode: CATALOG_EPISODE,
+  title: "Two Revolutions, One Cadence",
+  subtitle: "Aligned by phase, not by calendar",
+  mode: "dual",
+  eraATitle: "French Revolution, 1789–1799",
+  eraBTitle: "Russian Revolution, 1917–1927",
+  phaseAxis: {
+    label: "Year of revolution",
+    unit: "yr",
+    min: 0,
+    max: 10,
+    ticks: [0, 1, 4, 10],
+  },
+  pairs: [
+    {
+      phasePosition: 0,
+      eraA: { year: "1789", title: "Bastille falls", description: "Old order's monopoly on force breaks", weight: 2 },
+      eraB: { year: "1917", title: "October Revolution", description: "Bolsheviks seize the Winter Palace", weight: 2 },
+      connection: "Outbreak",
+    },
+    {
+      phasePosition: 1,
+      eraA: { year: "1790", title: "Radicalization begins", description: "Civil Constitution of the Clergy" },
+      eraB: { year: "1918", title: "Cheka founded", description: "Apparatus of revolutionary terror" },
+      connection: "Radicalization",
+    },
+    {
+      phasePosition: 4,
+      eraA: { year: "1793", title: "The Terror", description: "Robespierre, mass executions", weight: 3 },
+      eraB: { year: "1921", title: "Kronstadt suppressed", description: "Internal dissent crushed", weight: 3 },
+      connection: "Internal purge",
+    },
+    {
+      phasePosition: 10,
+      eraA: { year: "1799", title: "Napoleon's coup", description: "Strongman consolidates the revolution" },
+      eraB: { year: "1927", title: "Stalin consolidates", description: "Trotsky expelled; one-man rule" },
+      connection: "Consolidation",
+    },
+  ],
+  durationSec: 18,
+};
+
 // ─── EscalationLadder × 2 ─────────────────────────────────────────────────
 
 const ladderColdWar: EscalationLadderData = {
@@ -243,6 +290,7 @@ const timelineComp = (id: string, data: HorizontalTimelineData) => (
 
 export const CatalogTimelineComputers = () => timelineComp(catalogId("HorizontalTimeline", "computers"), timelineComputers);
 export const CatalogTimelineDualPandemics = () => timelineComp(catalogId("HorizontalTimeline", "pandemics-dual"), timelineDualPandemics);
+export const CatalogTimelineDualRevolutionsPhase = () => timelineComp(catalogId("HorizontalTimeline", "revolutions-phase"), timelineDualRevolutionsPhase);
 
 const ladderComp = (id: string, data: EscalationLadderData) => (
   <Composition
@@ -319,6 +367,7 @@ export const CatalogMorphBlockades = () =>
   morphComp(catalogId("TimelineMorph", "blockades"), morphBlockades);
 
 export const catalogTimelinesData = {
-  timelineComputers, timelineDualPandemics, ladderColdWar, ladderArms,
+  timelineComputers, timelineDualPandemics, timelineDualRevolutionsPhase,
+  ladderColdWar, ladderArms,
   comparisonRevolutions, dualImperialTransitions, morphBlockades,
 };

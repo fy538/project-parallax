@@ -1,0 +1,64 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "The Prisoners' Dilemma",
+  "subtitle": "Tucker, 1950 — the canonical 2×2",
+  "variant": "pd-canonical",
+  "rowPlayer": "Prisoner A",
+  "colPlayer": "Prisoner B",
+  "rowOptions": ["Stay silent", "Confess"],
+  "colOptions": ["Stay silent", "Confess"],
+  "cells": [
+    {
+      "row": 0,
+      "col": 0,
+      "value": "−1, −1",
+      "cellType": "R",
+      "heroRole": "moral"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "value": "−10, 0",
+      "cellType": "S"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "value": "0, −10",
+      "cellType": "T"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "value": "−5, −5",
+      "cellType": "P",
+      "heroRole": "analytical"
+    }
+  ],
+  "showTPRSLegend": true,
+  "showBestResponseArrows": true,
+  "showNashGlyph": true,
+  "payoffUnits": "yrs",
+  "phases": [
+    {
+      "label": "Four outcomes",
+      "durationSec": 3,
+      "annotation": "Payoffs in years of prison. Lower is worse."
+    },
+    {
+      "label": "Each prisoner asks: what's my best response?",
+      "durationSec": 4,
+      "annotation": "Whatever the other does, confessing serves me better."
+    },
+    {
+      "label": "Both arrive at the same answer",
+      "durationSec": 4,
+      "highlights": [3],
+      "annotation": "Mutual confession is the only stable outcome — and it's worse for both than silence."
+    }
+  ],
+  "durationSec": 11,
+  "backgroundVariant": "light",
+  "ambientParticles": false,
+  "cinematicMode": false
+}

@@ -17,6 +17,7 @@ const TimeSeriesLineSchema = z.object({
   dashed: z.boolean().optional(),
   areaFill: z.boolean().optional(),
   areaOpacity: z.number().optional(),
+  hero: z.boolean().optional(),
 });
 
 const TimeSeriesAnnotationSchema = z.object({
@@ -48,6 +49,7 @@ export const TimeSeriesChartSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
+    variant: z.enum(["line", "slope"]).optional(),
     lines: z.array(TimeSeriesLineSchema),
     annotations: z.array(TimeSeriesAnnotationSchema).optional(),
     eras: z.array(TimeSeriesEraSchema).optional(),

@@ -92,9 +92,9 @@ The existing `DataChart` template:
 ## 6. Specific upgrades proposed
 
 1. **Default to horizontal sorted-descending for >5 items.** Auto-flip orientation based on item count + label length.
-2. **Reinforce hero/muted hierarchy.** When `highlightIndex` is set, ALL other bars render at ink 30% opacity, not their per-data-point color. Per-point color should only override when there's no hero.
-3. **Hero stat treatment for the highlighted bar's value.** Plex Sans 36pt, not the mono label size used for others.
-4. **Lollipop sub-variant.** Add `variant: "lollipop"` for 10+ item rankings.
+2. ~~**Reinforce hero/muted hierarchy.** When `highlightIndex` is set, ALL other bars render at ink 30% opacity, not their per-data-point color. Per-point color should only override when there's no hero.~~ **Done — May 11, 2026.** New `someHighlighted` prop on `AnimatedBar`: when set and `!isHighlighted`, bar fill renders at `ink @ 30%` and value label desaturates. Hero wins; rest recede.
+3. ~~**Hero stat treatment for the highlighted bar's value.** Plex Sans 36pt, not the mono label size used for others.~~ **Done — May 11, 2026.** Hero bar's value swaps from `fonts.mono` → `fonts.display` (Plex Sans) at h2 (48px) with tight letter-spacing — reads as editorial pull-quote, not as a tabular number.
+4. ~~**Lollipop sub-variant.** Add `variant: "lollipop"` for 10+ item rankings.~~ **Done — May 11, 2026.** Shipped as `variant: "lollipop"`. Sorts data descending; renders horizontal stem + terminal dot per row with left-anchored label and right-anchored value. Hero treatment swaps the highlighted row's value to Plex Sans display weight + amber. Catalog reference: `axelrod-lollipop` (12-strategy Axelrod tournament showing cooperation pays).
 5. **Small multiples sub-variant.** Add `variant: "small-multiples"` for cross-category panels with shared y-axis.
 
 ## 7. Failure mode flags (always catch in audit)

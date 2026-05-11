@@ -43,6 +43,16 @@ const TimelinePairDataSchema = z.object({
   eraB: TimelineEventDataSchema,
   /** Connection label drawn between paired events (shown on pullback) */
   connection: z.string().optional(),
+  /** Phase position on shared axis — required when phaseAxis is set. */
+  phasePosition: z.number().optional(),
+});
+
+const PhaseAxisConfigSchema = z.object({
+  label: z.string(),
+  unit: z.string().optional(),
+  min: z.number().optional(),
+  max: z.number().optional(),
+  ticks: z.array(z.number()).optional(),
 });
 
 const TimelineMorphEventDataSchema = z.object({
@@ -83,6 +93,8 @@ export const HorizontalTimelineSchema = z.object({
     eraATitle: z.string().optional(),
     /** Era B label — for dual mode */
     eraBTitle: z.string().optional(),
+    /** Phase-axis config — enforces phase-position alignment in dual mode. */
+    phaseAxis: PhaseAxisConfigSchema.optional(),
 
     // ── Morph mode events ──
     /** Events that morph between eras */
@@ -137,6 +149,32 @@ export const HorizontalTimelineSchema = z.object({
         message: "mode 'morph' requires at least one morphEvent",
         path: ["morphEvents"],
       });
+    }
+    // phaseAxis is dual-only and requires phasePosition on every pair —
+    // anything else turns phase alignment into a decorative claim instead of
+    // a real one. See: references/template-research/timeline-comparison.md § 7.
+    if (d.phaseAxis) {
+      if (d.mode !== "dual") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "phaseAxis is only supported in mode 'dual'",
+          path: ["phaseAxis"],
+        });
+      }
+      if (d.pairs) {
+        d.pairs.forEach((pair, i) => {
+          if (pair.phasePosition === undefined) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message:
+                "phaseAxis is set; every pair must declare phasePosition. " +
+                "Falsifying phase alignment (e.g., letting events fall on calendar-spaced x positions) " +
+                "is the most common audit failure for this template.",
+              path: ["pairs", i, "phasePosition"],
+            });
+          }
+        });
+      }
     }
   }),
 });

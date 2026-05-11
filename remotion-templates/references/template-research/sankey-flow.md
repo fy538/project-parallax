@@ -79,8 +79,8 @@ The existing `SankeyFlow` template, after our session's polish work:
 
 1. **`Other` aggregation flag.** Schema option to auto-roll-up flows <3% of total into "Other" terminal. Prevents unreadable hairlines.
 2. **Per-link emphasis field.** Add `emphasis: "accent" | "muted"` per link so visual-spec can promote one ribbon without hardcoding colors. Default: muted for all, accent on the load-bearing flow.
-3. **Column header labels.** Optional `columnHeaders?: string[]` ("Production / Fate") to make conservation framing explicit at the top of each column.
-4. **Source-total kicker.** Display the source total ("8.3K Mt produced 1950–2017") as a prominent kicker top-left so the conservation total is named, not implied.
+3. ~~**Column header labels.** Optional `columnHeaders?: string[]` ("Production / Fate") to make conservation framing explicit at the top of each column.~~ **Done — May 11, 2026.** Shipped as `data.columnHeaders?: string[]`. Catalog sample `plastic-fate` now uses `["Produced", "Use vs. Discarded", "Fate"]` — the eye reads the three-stage budget at a glance.
+4. ~~**Source-total kicker.** Display the source total ("8.3K Mt produced 1950–2017") as a prominent kicker top-left so the conservation total is named, not implied.~~ **Done — May 11, 2026.** Shipped as `data.sourceTotal?: { value: string; context?: string }`. Renders in Plex Sans display weight + amber, top-left of chart area. Catalog `plastic-fate` reads "8.3K Mt — global plastic produced, 1950–2017."
 5. **`flowParticles` deprecation note.** Decorative animation along ribbons — only enable in cinematic mode (sustained holds). Lint or document this.
 
 ## 7. Failure mode flags (always catch in audit)

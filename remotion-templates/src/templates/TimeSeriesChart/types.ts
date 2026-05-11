@@ -73,6 +73,19 @@ export interface TimeSeriesChartData {
   title: string;
   subtitle?: string;
 
+  /**
+   * Chart variant.
+   *
+   * - `line` (default) — standard multi-line chart with continuous time series.
+   * - `slope` — slope chart: each line has exactly two points (start, end).
+   *    Right form for "ranking 2000 vs 2024" / "approval start vs end of term"
+   *    where the *change between two moments* is the argument. Lines that
+   *    cross indicate ranking inversions; lines that diverge indicate
+   *    widening gaps. Tufte called this "ranking change at a glance."
+   *    See: references/template-research/time-series-chart.md § 6.2
+   */
+  variant?: "line" | "slope";
+
   lines: TimeSeriesLine[];
   annotations?: TimeSeriesAnnotation[];
   eras?: TimeSeriesEra[];

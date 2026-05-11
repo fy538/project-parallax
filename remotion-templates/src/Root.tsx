@@ -80,8 +80,10 @@ import {
   CatalogStatHabitable,
   CatalogChartMountains,
   CatalogChartSpaceRace,
+  CatalogChartAxelrodLollipop,
   CatalogTsCO2,
   CatalogTsPopulation,
+  CatalogTsLifeExpectancySlope,
   CatalogGaugeWeather,
   CatalogGaugeScorecard,
   CatalogBayesVenice,
@@ -98,6 +100,7 @@ import {
   CatalogTitleEpisode,
   CatalogTitleSection,
   CatalogTitleEndCard,
+  CatalogTitleEditorial,
   CatalogFwComparison,
   CatalogFwFlow,
   CatalogFwMatrix,
@@ -106,11 +109,13 @@ import {
   CatalogSplitTime,
   CatalogTimelineComputers,
   CatalogTimelineDualPandemics,
+  CatalogTimelineDualRevolutionsPhase,
   CatalogLadderColdWar,
   CatalogLadderArms,
   CatalogTreeChess,
   CatalogGameChess,
   CatalogGamePayoff,
+  CatalogGamePDCanonical,
   CatalogBifurcationLatin,
   CatalogEditorialHero,
   CatalogEditorialAside,
@@ -247,8 +252,10 @@ export const RemotionRoot: React.FC = () => {
           <CatalogStatHabitable />
           <CatalogChartMountains />
           <CatalogChartSpaceRace />
+          <CatalogChartAxelrodLollipop />
           <CatalogTsCO2 />
           <CatalogTsPopulation />
+          <CatalogTsLifeExpectancySlope />
           <CatalogGaugeWeather />
           <CatalogGaugeScorecard />
           <CatalogBayesVenice />
@@ -274,6 +281,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogTitleEpisode />
           <CatalogTitleSection />
           <CatalogTitleEndCard />
+          <CatalogTitleEditorial />
         </Folder>
 
         <Folder name="Diagrams">
@@ -289,6 +297,7 @@ export const RemotionRoot: React.FC = () => {
         <Folder name="Timelines">
           <CatalogTimelineComputers />
           <CatalogTimelineDualPandemics />
+          <CatalogTimelineDualRevolutionsPhase />
           <CatalogLadderColdWar />
           <CatalogLadderArms />
           <CatalogTimelineComparisonRevolutions />
@@ -306,6 +315,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogTreeChess />
           <CatalogGameChess />
           <CatalogGamePayoff />
+          <CatalogGamePDCanonical />
           <CatalogBifurcationLatin />
         </Folder>
 

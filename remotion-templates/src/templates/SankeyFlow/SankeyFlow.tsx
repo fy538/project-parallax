@@ -758,6 +758,91 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
           rest of the chart family. */}
       <SourceAttribution source={data.source} mode={data.backgroundVariant || "light"} prefix="Source: " />
 
+      {/* Source-total kicker (top-left of chart) — names the conservation total
+          explicitly so the viewer knows what 100% means. Plex Sans display weight.
+          See: references/template-research/sankey-flow.md § 6 */}
+      {data.sourceTotal && (
+        <div
+          style={{
+            position: "absolute",
+            left: area.left,
+            top: area.top - 56,
+            opacity: fadeIn(frame, sec(0.2), sec(0.6)),
+            transform: `translateY(${slideIn(frame, sec(0.2), 8, sec(0.6))}px)`,
+          }}
+        >
+          <div
+            style={{
+              fontSize: fontSizes.h2,
+              fontFamily: fonts.display,
+              fontWeight: 700,
+              color: palette.amber,
+              lineHeight: 1,
+              letterSpacing: -0.5,
+              maxWidth: textMaxWidth.h1,
+              textShadow: shadows.textLift,
+            }}
+          >
+            {data.sourceTotal.value}
+          </div>
+          {data.sourceTotal.context && (
+            <div
+              style={{
+                fontSize: fontSizes.caption,
+                fontFamily: fonts.body,
+                color: theme.text.secondary,
+                marginTop: 4,
+                maxWidth: textMaxWidth.body,
+              }}
+            >
+              {data.sourceTotal.context}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Column headers — render above each column's center x. Makes the
+          conservation framing explicit (e.g. "Production / Use / Fate").
+          See: references/template-research/sankey-flow.md § 6 */}
+      {data.columnHeaders && data.columnHeaders.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            left: area.left,
+            top: area.top - 28,
+            width: chartWidth,
+            height: 24,
+            opacity: fadeIn(frame, sec(0.4), sec(0.6)),
+          }}
+        >
+          {data.columnHeaders.map((header, idx) => {
+            const colWidth = chartWidth / columnCount;
+            const centerX = idx * colWidth + colWidth / 2;
+            return (
+              <div
+                key={`colhead-${idx}`}
+                style={{
+                  position: "absolute",
+                  left: centerX,
+                  top: 0,
+                  transform: "translateX(-50%)",
+                  fontSize: fontSizes.label,
+                  fontFamily: fonts.metadata,
+                  color: theme.text.muted,
+                  letterSpacing: 3,
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                  textShadow: shadows.textLift,
+                  maxWidth: colWidth - 16,
+                }}
+              >
+                {header}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       {/* Chart area */}
       <div
         style={{

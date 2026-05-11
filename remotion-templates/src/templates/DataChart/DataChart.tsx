@@ -24,7 +24,7 @@ import { Legend } from "../../components/Legend";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
+import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -37,7 +37,7 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { warnIf } from "../../utils/dataWarnings";
-import type { DataChartData } from "./types";
+import type { DataChartData, DataPoint } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
 
 // ── Animated bar ────────────────────────────────────────────────────────────
@@ -54,10 +54,23 @@ const AnimatedBar: React.FC<{
   barWidth: number;
   maxHeight: number;
   isHighlighted?: boolean;
+  /**
+   * True when ANY bar in the chart is highlighted (not just this one).
+   * Activates the hero/muted hierarchy — non-highlighted bars render in ink at
+   * 30% opacity to make the hero pop. See:
+   * references/template-research/data-chart.md § 6.
+   */
+  someHighlighted?: boolean;
   /** Render value as plain number (no thousand-separators) — for years, IDs, etc. */
   formatAsYear?: boolean;
-}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false, formatAsYear = false }) => {
+}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false, someHighlighted = false, formatAsYear = false }) => {
   const theme = useThemeMode("light");
+  // Hero/muted hierarchy: when any bar is highlighted, non-highlighted bars
+  // render in ink at 30% opacity, regardless of per-data-point color. The
+  // hero color wins; the rest recede. (data-chart.md § 6.2)
+  const isMuted = someHighlighted && !isHighlighted;
+  const renderColor = isMuted ? `${palette.ink}4D` : color; // 4D ≈ 30% alpha
+  const labelColor = isMuted ? `${palette.ink}80` : (isHighlighted ? color : theme.text.primary);
   // ── Role-based easing: hero bar gets quintic + overshoot, normal gets quartic ──
   const barEasing = isHighlighted ? easings.heroBar : easings.bar;
   const growDuration = isHighlighted ? sec(1.4) : sec(1.2); // hero bar takes slightly longer
@@ -114,16 +127,20 @@ const AnimatedBar: React.FC<{
         height: maxHeight + 80, // bar area + label space below
       }}
     >
-      {/* Value label — positioned just above bar top — Layer 2: fade in after bar growth */}
+      {/* Value label — positioned just above bar top — Layer 2: fade in after bar growth.
+          Hero treatment: when isHighlighted, swap from mono → Plex Sans display weight at
+          h2 size (the hero stat reads as editorial pull-quote, not as a tabular number).
+          Other bars keep mono small. See: references/template-research/data-chart.md § 6.3. */}
       <div
         style={{
           fontSize: isHighlighted ? fontSizes.h2 : fontSizes.h3,
           fontWeight: isHighlighted ? 700 : 600,
-          color: isHighlighted ? color : theme.text.primary,
+          color: labelColor,
           marginBottom: layout.spacing.xs,
-          fontFamily: fonts.mono,
+          fontFamily: isHighlighted ? fonts.display : fonts.mono,
+          letterSpacing: isHighlighted ? -0.5 : 0,
           textAlign: "center",
-          opacity: labelOpacity,
+          opacity: labelOpacity * (isMuted ? 0.6 : 1),
           textShadow: isHighlighted
             ? `0 0 12px ${color}60, ${shadows.textLift}`
             : shadows.textLift,
@@ -196,13 +213,15 @@ const AnimatedBar: React.FC<{
           style={{
             width: barWidth * 0.7,
             height: barHeight,
-            background: gradients.barFill(color),
+            background: gradients.barFill(renderColor),
             borderRadius: barStyle.borderRadius,
             transition: "none",
             // Outer shadow + inset right-edge to suggest end-cap volume
             boxShadow: isHighlighted
               ? `${shadows.medium}, 0 0 20px ${color}40, 0 0 50px ${color}20, inset -1px 0 0 rgba(0,0,0,0.18)`
-              : `${shadows.subtle}, inset -1px 0 0 rgba(0,0,0,0.15)`,
+              : isMuted
+                ? `${shadows.subtle}` // no inset for muted — keep it flat-foil
+                : `${shadows.subtle}, inset -1px 0 0 rgba(0,0,0,0.15)`,
             transform: `scale(${pulseScale})`,
             transformOrigin: "bottom center",
           }}
@@ -343,6 +362,205 @@ const ComparisonBars: React.FC<{
       >
         {props.label}
       </div>
+    </div>
+  );
+});
+
+// ── Lollipop chart ──────────────────────────────────────────────────────────
+//
+// Horizontal lollipop: thin stem + terminal dot, sorted descending.
+// Right form for 10+ item rankings. Position-along-common-scale (Cleveland's
+// most-readable encoding) survives; bar ink mass drops dramatically — the
+// canvas reads as "ranked positions on a shared axis" rather than "wall of
+// rectangles." Reference outlets that use this idiom: NYT Upshot rankings,
+// Pudding feature pieces, FT Climate Graphic Detail.
+//
+// Reference: references/template-research/data-chart.md § 6.4
+
+const LollipopChart: React.FC<{
+  dataPoints: DataPoint[];
+  maxValue: number;
+  chartWidth: number;
+  chartHeight: number;
+  unit: string;
+  frame: number;
+  staggerScale: number;
+  timingScale: number;
+  highlightIndex?: number;
+  formatAsYear?: boolean;
+  mode: "light" | "dark";
+}> = React.memo(({
+  dataPoints,
+  maxValue,
+  chartWidth,
+  chartHeight,
+  unit,
+  frame,
+  staggerScale,
+  timingScale,
+  highlightIndex,
+  formatAsYear,
+  mode,
+}) => {
+  const theme = useThemeMode(mode);
+  // Sort descending by value — the lollipop form's whole point is ranking
+  // readability. Preserve original index so highlightIndex still refers to
+  // the original ordering.
+  const sorted = useMemo(
+    () => dataPoints
+      .map((dp, originalIndex) => ({ dp, originalIndex }))
+      .sort((a, b) => b.dp.value - a.dp.value),
+    [dataPoints],
+  );
+
+  const someHighlighted = highlightIndex !== undefined && highlightIndex >= 0;
+
+  // Layout: each row is a fixed-height slot. Label takes the leftmost ~30%,
+  // stem region takes the middle ~60%, value label takes the right ~10%.
+  const labelWidth = Math.min(360, chartWidth * 0.30);
+  const valueWidth = Math.min(120, chartWidth * 0.12);
+  const stemAreaWidth = chartWidth - labelWidth - valueWidth - layout.spacing.lg * 2;
+  const rowHeight = chartHeight / Math.max(sorted.length, 1);
+  const dotRadius = 9;
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: chartWidth,
+        height: chartHeight,
+        overflow: "visible",
+      }}
+    >
+      {sorted.map(({ dp, originalIndex }, rankIdx) => {
+        const isHighlighted = originalIndex === highlightIndex;
+        const isMuted = someHighlighted && !isHighlighted;
+        const startFrame = stagger(rankIdx, sec(0.08 * staggerScale), sec(0.6 * timingScale));
+        // Stem draws left-to-right; dot pops on landing.
+        const stemEnd = (dp.value / maxValue) * stemAreaWidth;
+        const stemProgress = interpolate(
+          frame,
+          [startFrame, startFrame + sec(0.6 * timingScale)],
+          [0, 1],
+          CLAMP_CUBIC,
+        );
+        const stemX = stemEnd * stemProgress;
+        const dotOpacity = fadeIn(frame, startFrame + sec(0.5 * timingScale), sec(0.25));
+        const labelOpacity = fadeIn(frame, startFrame, sec(0.4));
+        const valueOpacity = fadeIn(frame, startFrame + sec(0.6 * timingScale), sec(0.4));
+
+        const accent = dp.color || (isHighlighted ? palette.amber : theme.text.muted);
+        const renderColor = isMuted ? `${palette.ink}66` : accent;
+        const labelColor = isMuted ? `${palette.ink}80` : theme.text.primary;
+
+        // Row top: positioned in its slot. Within the row container, children
+        // use coordinates relative to the row (row center is rowHeight/2).
+        const rowTop = rankIdx * rowHeight;
+        const rowCenterY = rowHeight / 2;
+        const stemStartX = labelWidth + layout.spacing.lg;
+
+        return (
+          <div
+            key={`lolli-${rankIdx}`}
+            style={{
+              position: "absolute",
+              top: rowTop,
+              left: 0,
+              width: chartWidth,
+              height: rowHeight,
+            }}
+          >
+            {/* Row label (left-anchored) */}
+            <div
+              style={{
+                position: "absolute",
+                top: rowCenterY - fontSizes.body / 2,
+                left: 0,
+                width: labelWidth,
+                textAlign: "right",
+                paddingRight: layout.spacing.md,
+                fontSize: fontSizes.body,
+                fontFamily: fonts.body,
+                fontWeight: isHighlighted ? 600 : 500,
+                color: labelColor,
+                opacity: labelOpacity * (isMuted ? 0.7 : 1),
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                textShadow: shadows.textLift,
+                maxWidth: labelWidth,
+              }}
+            >
+              {dp.label}
+            </div>
+
+            {/* Stem — thin line from labelEnd → dot center */}
+            <div
+              style={{
+                position: "absolute",
+                top: rowCenterY - 1,
+                left: stemStartX,
+                width: stemX,
+                height: 2,
+                background: renderColor,
+                opacity: isMuted ? 0.6 : 0.9,
+                borderRadius: 1,
+              }}
+            />
+
+            {/* Terminal dot */}
+            <div
+              style={{
+                position: "absolute",
+                top: rowCenterY - dotRadius,
+                left: stemStartX + stemX - dotRadius,
+                width: dotRadius * 2,
+                height: dotRadius * 2,
+                borderRadius: "50%",
+                background: renderColor,
+                opacity: dotOpacity,
+                boxShadow: isHighlighted
+                  ? `0 0 14px ${accent}80, ${shadows.subtle}`
+                  : shadows.subtle,
+              }}
+            />
+
+            {/* Value label (right of dot) */}
+            <div
+              style={{
+                position: "absolute",
+                top: rowCenterY - fontSizes.body / 2,
+                left: stemStartX + stemEnd + dotRadius + layout.spacing.sm,
+                width: valueWidth,
+                fontSize: isHighlighted ? fontSizes.h3 : fontSizes.body,
+                fontFamily: isHighlighted ? fonts.display : fonts.data,
+                fontWeight: isHighlighted ? 700 : 500,
+                color: isHighlighted ? accent : (isMuted ? `${palette.ink}80` : theme.text.primary),
+                opacity: valueOpacity * (isMuted ? 0.7 : 1),
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+                textShadow: shadows.textLift,
+                maxWidth: valueWidth,
+              }}
+            >
+              {formatAsYear
+                ? String(Math.round(dp.value))
+                : formatNumber(dp.value, {
+                    decimals: 0,
+                    style: dp.value >= 10000 ? "abbreviated" : "decimal",
+                  })}
+              {unit && (
+                <span style={{ fontSize: fontSizes.caption, color: theme.text.muted, marginLeft: 2 }}>
+                  {unit}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 });
@@ -693,6 +911,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                 barWidth={barWidth}
                 maxHeight={maxHeight}
                 isHighlighted={data.highlightIndex === i}
+                someHighlighted={data.highlightIndex !== undefined && data.highlightIndex >= 0}
                 formatAsYear={data.formatAsYear}
               />
             </div>
@@ -822,7 +1041,39 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               formatAsYear={data.formatAsYear}
             />
           ))}
+
       </div>
+
+      {/* ── Lollipop variant — rendered OUTSIDE the chart-area flex container
+          so its absolute positioning isn't fighting `alignItems: flex-end`.
+          For 10+ item rankings where bars saturate the canvas. Cleveland's
+          position-along-common-scale survives; ink-to-data ratio drops.
+          See: references/template-research/data-chart.md § 6.4 */}
+      {data.variant === "lollipop" && data.dataPoints && (
+        <div
+          style={{
+            position: "absolute",
+            top: chartArea.top,
+            left: chartArea.left,
+            width: chartBoxes.chart.width,
+            height: chartBoxes.chart.height,
+          }}
+        >
+          <LollipopChart
+            dataPoints={data.dataPoints}
+            maxValue={maxValBar}
+            chartWidth={chartBoxes.chart.width}
+            chartHeight={chartBoxes.chart.height}
+            unit={unit}
+            frame={frame}
+            staggerScale={s}
+            timingScale={t}
+            highlightIndex={data.highlightIndex}
+            formatAsYear={data.formatAsYear}
+            mode="light"
+          />
+        </div>
+      )}
 
       {/* ── Top metadata band — shares one reserved zone with the chart layout */}
       {hasTopBand && (

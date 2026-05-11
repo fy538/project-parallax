@@ -78,7 +78,7 @@ import { niceDomain, formatTick } from "../../utils/niceTicks";
 import { chartLayout, validateChartLayoutIntegrity } from "../../utils/chartLayout";
 import { computeLabelStacks } from "../../utils/labelStack";
 import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
-import type { TimeSeriesChartData } from "./types";
+import type { TimeSeriesChartData, TimeSeriesLine } from "./types";
 
 // ── Geometry helpers ────────────────────────────────────────────────────────
 
@@ -156,6 +156,228 @@ const getYPosition = (
   const progress = (yValue - yMin) / (yMax - yMin);
   return chartBottom - progress * (chartBottom - chartTop);
 };
+
+// ── Slope chart renderer ────────────────────────────────────────────────────
+//
+// Slope chart: each line shows exactly two points (start, end). Renders as a
+// pair of dots connected by a straight line, with the label + start value on
+// the left and the end value on the right. Crossings indicate ranking
+// inversions; divergence indicates widening gaps.
+//
+// Right form for "approval start vs end of term," "GDP per capita 2000 vs 2024,"
+// "literacy 1900 vs 2000." Compresses a complex story to a single readable
+// figure where the editorial point is the *change*, not the trajectory.
+//
+// Reference: references/template-research/time-series-chart.md § 6.2
+
+const SlopeChart: React.FC<{
+  lines: TimeSeriesLine[];
+  chartLeft: number;
+  chartTop: number;
+  chartWidth: number;
+  chartHeight: number;
+  xStartLabel: string;
+  xEndLabel: string;
+  yUnit: string;
+  frame: number;
+  mode: "light" | "dark";
+}> = React.memo(({
+  lines,
+  chartLeft,
+  chartTop,
+  chartWidth,
+  chartHeight,
+  xStartLabel,
+  xEndLabel,
+  yUnit,
+  frame,
+  mode,
+}) => {
+  const theme = useThemeMode(mode);
+
+  // Compute y-domain across all lines' two points.
+  const yValues = lines.flatMap((l) => [l.points[0]?.y ?? 0, l.points[l.points.length - 1]?.y ?? 0]);
+  const yMin = Math.min(...yValues);
+  const yMax = Math.max(...yValues);
+  // Pad the domain 5% so dots don't sit on the edge.
+  const pad = (yMax - yMin) * 0.08;
+  const domainMin = yMin - pad;
+  const domainMax = yMax + pad;
+  const yScale = (y: number): number =>
+    chartTop + chartHeight - ((y - domainMin) / Math.max(1e-9, domainMax - domainMin)) * chartHeight;
+
+  // Two x-positions: inset 28% from each edge so labels have room.
+  const leftInset = chartWidth * 0.28;
+  const rightInset = chartWidth * 0.28;
+  const xStart = chartLeft + leftInset;
+  const xEnd = chartLeft + chartWidth - rightInset;
+
+  // Animation: lines draw left → right over 1s starting at 0.4s.
+  const drawProgress = interpolate(
+    frame,
+    [sec(0.4), sec(1.4)],
+    [0, 1],
+    CLAMP_CUBIC,
+  );
+
+  // Order lines by start-y descending so labels stack readably top-to-bottom
+  // by initial rank.
+  const ordered = [...lines]
+    .map((l, originalIdx) => ({ l, originalIdx }))
+    .sort((a, b) => (b.l.points[0]?.y ?? 0) - (a.l.points[0]?.y ?? 0));
+
+  return (
+    <>
+      {/* Slope axis tick labels at top */}
+      <div
+        style={{
+          position: "absolute",
+          left: xStart,
+          top: chartTop - 36,
+          transform: "translateX(-50%)",
+          fontSize: fontSizes.label,
+          fontFamily: fonts.metadata,
+          color: theme.text.muted,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          opacity: fadeIn(frame, sec(0.2), sec(0.4)),
+          whiteSpace: "nowrap",
+        }}
+      >
+        {xStartLabel}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: xEnd,
+          top: chartTop - 36,
+          transform: "translateX(-50%)",
+          fontSize: fontSizes.label,
+          fontFamily: fonts.metadata,
+          color: theme.text.muted,
+          letterSpacing: 3,
+          textTransform: "uppercase",
+          opacity: fadeIn(frame, sec(0.3), sec(0.4)),
+          whiteSpace: "nowrap",
+        }}
+      >
+        {xEndLabel}
+      </div>
+
+      {/* Slope lines + dots */}
+      <svg
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: layout.width,
+          height: layout.height,
+          pointerEvents: "none",
+        }}
+      >
+        {ordered.map(({ l, originalIdx }) => {
+          const y0 = l.points[0]?.y ?? 0;
+          const y1 = l.points[l.points.length - 1]?.y ?? 0;
+          const cy0 = yScale(y0);
+          const cy1 = yScale(y1);
+          // Animated end-point during draw
+          const cx1Animated = xStart + (xEnd - xStart) * drawProgress;
+          const cy1Animated = cy0 + (cy1 - cy0) * drawProgress;
+          const lineStart = stagger(originalIdx, sec(0.1), sec(0.4));
+          const lineOpacity = fadeIn(frame, lineStart, sec(0.4));
+          const isHero = !!l.hero;
+          const strokeWidth = isHero ? 3.5 : 2;
+          const dotR = isHero ? 7 : 5;
+
+          return (
+            <g key={`slope-${originalIdx}`} opacity={lineOpacity}>
+              <line
+                x1={xStart}
+                y1={cy0}
+                x2={cx1Animated}
+                y2={cy1Animated}
+                stroke={l.color}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+              />
+              {/* Start dot */}
+              <circle cx={xStart} cy={cy0} r={dotR} fill={l.color} />
+              {/* End dot — appears when draw completes */}
+              <circle
+                cx={xEnd}
+                cy={cy1}
+                r={dotR * (drawProgress > 0.9 ? 1 : 0)}
+                fill={l.color}
+              />
+            </g>
+          );
+        })}
+      </svg>
+
+      {/* Per-line labels: left side has "Label  yStart", right has "yEnd" */}
+      {ordered.map(({ l, originalIdx }) => {
+        const y0 = l.points[0]?.y ?? 0;
+        const y1 = l.points[l.points.length - 1]?.y ?? 0;
+        const cy0 = yScale(y0);
+        const cy1 = yScale(y1);
+        const labelOpacity = fadeIn(frame, stagger(originalIdx, sec(0.1), sec(0.4)), sec(0.5));
+        const endLabelOpacity = fadeIn(frame, sec(1.5) + stagger(originalIdx, sec(0.06), 0), sec(0.5));
+        const isHero = !!l.hero;
+        return (
+          <React.Fragment key={`slope-labels-${originalIdx}`}>
+            {/* Left: label + start value */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: cy0 - fontSizes.body / 2,
+                width: xStart - 18,
+                maxWidth: xStart - 18,
+                textAlign: "right",
+                paddingRight: layout.spacing.md,
+                fontSize: fontSizes.body,
+                fontFamily: fonts.body,
+                fontWeight: isHero ? 600 : 500,
+                color: theme.text.primary,
+                opacity: labelOpacity,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              <span style={{ color: l.color, fontFamily: fonts.data, marginRight: 8 }}>
+                {formatNumber(y0, { decimals: 0, style: y0 >= 10000 ? "abbreviated" : "decimal" })}
+                {yUnit}
+              </span>
+              {l.label}
+            </div>
+            {/* Right: end value */}
+            <div
+              style={{
+                position: "absolute",
+                left: xEnd + 18,
+                top: cy1 - fontSizes.body / 2,
+                width: chartLeft + chartWidth - xEnd - 18,
+                fontSize: isHero ? fontSizes.h3 : fontSizes.body,
+                fontFamily: fonts.data,
+                fontWeight: isHero ? 700 : 500,
+                color: l.color,
+                opacity: endLabelOpacity,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+                textShadow: shadows.textLift,
+              }}
+            >
+              {formatNumber(y1, { decimals: 0, style: y1 >= 10000 ? "abbreviated" : "decimal" })}
+              {yUnit}
+            </div>
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+});
 
 // ── Main component ──────────────────────────────────────────────────────────
 
@@ -441,6 +663,55 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const driftScale = kenBurnsDrift(frame, durationInFrames, 1.01);
 
   const contentOpacity = Math.min(exitOpacity, 1);
+
+  // ── Slope variant early return — uses SlopeChart sub-renderer ────────────
+  // Slope is structurally simpler than line: no era shading, no annotations,
+  // no reference lines — just paired endpoints with crossings/divergence as
+  // the visual argument. See: references/template-research/time-series-chart.md § 6.2
+  if (data.variant === "slope") {
+    const firstPoint = data.lines[0]?.points[0];
+    const lastPoint = data.lines[0]?.points[data.lines[0].points.length - 1];
+    const startLabel = data.xLabel?.split("→")[0]?.trim() || String(firstPoint?.x ?? "Start");
+    const endLabel = data.xLabel?.split("→")[1]?.trim() || String(lastPoint?.x ?? "End");
+    return (
+      <Background
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(data.backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
+        tint={direction.backgroundTint ?? data.backgroundTint}
+        atmosphere={direction.atmosphere}
+        atmosphereIntensity={direction.atmosphereIntensity}
+      >
+        <AbsoluteFill
+          style={{
+            opacity: contentOpacity,
+            transform: `scale(${driftScale})`,
+            transformOrigin: "center center",
+          }}
+        >
+          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+          <SlopeChart
+            lines={data.lines}
+            chartLeft={chartLeft}
+            chartTop={chartTop}
+            chartWidth={chartWidth}
+            chartHeight={chartHeight}
+            xStartLabel={startLabel}
+            xEndLabel={endLabel}
+            yUnit={data.yUnit || ""}
+            frame={frame}
+            mode={bgVariant}
+          />
+          {data.source && (
+            <SourceAttribution source={data.source} mode={bgVariant} prefix="Source: " bottomOffset={sourceBottomOffset} />
+          )}
+          <HeaderStrip mode={bgVariant} metadata={data.episode} />
+          <FooterStrip mode={bgVariant} />
+        </AbsoluteFill>
+      </Background>
+    );
+  }
 
   return (
     <Background

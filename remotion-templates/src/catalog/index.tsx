@@ -25,8 +25,10 @@ export {
   CatalogStatHabitable,
   CatalogChartMountains,
   CatalogChartSpaceRace,
+  CatalogChartAxelrodLollipop,
   CatalogTsCO2,
   CatalogTsPopulation,
+  CatalogTsLifeExpectancySlope,
   CatalogGaugeWeather,
   CatalogGaugeScorecard,
   CatalogBayesVenice,
@@ -49,6 +51,7 @@ export {
   CatalogTitleEpisode,
   CatalogTitleSection,
   CatalogTitleEndCard,
+  CatalogTitleEditorial,
 } from "./Titles";
 
 export {
@@ -64,6 +67,7 @@ export {
 export {
   CatalogTimelineComputers,
   CatalogTimelineDualPandemics,
+  CatalogTimelineDualRevolutionsPhase,
   CatalogLadderColdWar,
   CatalogLadderArms,
   CatalogTimelineComparisonRevolutions,
@@ -81,6 +85,7 @@ export {
   CatalogTreeChess,
   CatalogGameChess,
   CatalogGamePayoff,
+  CatalogGamePDCanonical,
   CatalogBifurcationLatin,
 } from "./Scenarios";
 

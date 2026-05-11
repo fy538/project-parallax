@@ -40,7 +40,7 @@ export const DataChartSchema = z.object({
       episode: z.string(),
       title: z.string(),
       subtitle: z.string().optional(),
-      variant: z.enum(["bar", "comparison", "horizontal"]),
+      variant: z.enum(["bar", "comparison", "horizontal", "lollipop"]),
       unit: z.string().optional(),
       dataPoints: z.array(DataPointSchema).optional(),
       comparisonPairs: z.array(ComparisonPairSchema).optional(),
@@ -63,7 +63,7 @@ export const DataChartSchema = z.object({
     })
     .superRefine((d, ctx) => {
       if (
-        (d.variant === "bar" || d.variant === "horizontal") &&
+        (d.variant === "bar" || d.variant === "horizontal" || d.variant === "lollipop") &&
         (!d.dataPoints || d.dataPoints.length === 0)
       ) {
         ctx.addIssue({

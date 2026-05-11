@@ -28,8 +28,21 @@ export interface DataChartData {
   episode: string;
   title: string;
   subtitle?: string;
-  /** Chart variant. */
-  variant: "bar" | "comparison" | "horizontal";
+  /**
+   * Chart variant.
+   *
+   * - `bar` — vertical bars, ≤8 items, simple comparison.
+   * - `horizontal` — horizontal bars, sorted descending. The default for ranked
+   *    comparisons with 5+ items per Cleveland-McGill perceptual hierarchy.
+   * - `comparison` — paired side-by-side bars (US vs. USSR style).
+   * - `lollipop` — horizontal lollipop chart: thin stem + terminal dot.
+   *    For 10+ item rankings where bars would visually saturate the canvas
+   *    (Axelrod tournament strategy rankings, country-by-country indicator).
+   *    Cleveland's perceptual hierarchy: position-along-common-scale survives
+   *    in lollipop form while ink-to-data ratio drops dramatically.
+   *    See: references/template-research/data-chart.md § 6.4
+   */
+  variant: "bar" | "comparison" | "horizontal" | "lollipop";
   /** Unit label (e.g., "%", "passes", "$B"). */
   unit?: string;
   /** For bar charts. */

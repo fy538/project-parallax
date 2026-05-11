@@ -553,6 +553,494 @@ const PayoffMatrix: React.FC<{
   );
 };
 
+// ── PD-Canonical Matrix Variant ──────────────────────────────────────────────
+// Tucker-framing 2×2 with T/R/P/S labels, Nash-marked equilibrium, best-response
+// arrows, and distinct hero treatments for moral vs analytical outcomes.
+// Reference: references/template-research/game-theory.md § B.
+
+type Payoffs = { row: number; col: number };
+
+/**
+ * Parse "3, 3" / "-5, 0" / "+3, -1" / "−1, −1" into payoff pair.
+ * Normalizes unicode minus (U+2212) and unicode en-dash (U+2013) to ASCII hyphen
+ * so display strings can use proper typography ("−10, 0") without breaking parsing.
+ * Returns null on malformed.
+ */
+const parsePayoffs = (value: string): Payoffs | null => {
+  const normalized = value.replace(/[−–]/g, "-");
+  const parts = normalized.split(",").map((s) => s.trim());
+  if (parts.length !== 2) return null;
+  const row = Number(parts[0]);
+  const col = Number(parts[1]);
+  if (Number.isNaN(row) || Number.isNaN(col)) return null;
+  return { row, col };
+};
+
+/**
+ * For a 2×2 PD-shape matrix, compute best-response arrows.
+ * Returns an array of arrows { fromIdx, toIdx, player } where player ∈ {"row","col"}.
+ * Row player compares cells within the same column; col player compares within the same row.
+ * Arrows point from worse to better payoff. Nash = cell with no outgoing arrows.
+ */
+const computeBestResponseArrows = (
+  cells: ReadonlyArray<{ row: number; col: number; value: string }>,
+  rows: number,
+  cols: number,
+): Array<{ fromIdx: number; toIdx: number; player: "row" | "col" }> => {
+  const arrows: Array<{ fromIdx: number; toIdx: number; player: "row" | "col" }> = [];
+  const idxOf = (r: number, c: number) => r * cols + c;
+  const payoffOf = (r: number, c: number): Payoffs | null => {
+    const cell = cells.find((x) => x.row === r && x.col === c);
+    return cell ? parsePayoffs(cell.value) : null;
+  };
+
+  // Row-player arrows: within each column, point from non-max to max.
+  for (let c = 0; c < cols; c++) {
+    let bestRow = 0;
+    let bestPayoff = -Infinity;
+    for (let r = 0; r < rows; r++) {
+      const p = payoffOf(r, c);
+      if (p && p.row > bestPayoff) {
+        bestPayoff = p.row;
+        bestRow = r;
+      }
+    }
+    for (let r = 0; r < rows; r++) {
+      if (r === bestRow) continue;
+      arrows.push({ fromIdx: idxOf(r, c), toIdx: idxOf(bestRow, c), player: "row" });
+    }
+  }
+
+  // Col-player arrows: within each row, point from non-max to max.
+  for (let r = 0; r < rows; r++) {
+    let bestCol = 0;
+    let bestPayoff = -Infinity;
+    for (let c = 0; c < cols; c++) {
+      const p = payoffOf(r, c);
+      if (p && p.col > bestPayoff) {
+        bestPayoff = p.col;
+        bestCol = c;
+      }
+    }
+    for (let c = 0; c < cols; c++) {
+      if (c === bestCol) continue;
+      arrows.push({ fromIdx: idxOf(r, c), toIdx: idxOf(r, bestCol), player: "col" });
+    }
+  }
+
+  return arrows;
+};
+
+const PDCanonicalMatrix: React.FC<{
+  data: GameBoardData;
+  frame: number;
+  state: StateSnapshot;
+  mode: "light" | "dark";
+}> = ({ data, frame, state, mode }) => {
+  const theme = useThemeMode(mode);
+  const rows = data.rowOptions?.length || 2;
+  const cols = data.colOptions?.length || 2;
+  const cellSize = 220;
+  const labelWidth = 160;
+  const headerHeight = 72;
+  const cells = data.cells || [];
+
+  const showArrows = data.showBestResponseArrows !== false;
+  const showGlyph = data.showNashGlyph !== false;
+  const showLegend = data.showTPRSLegend !== false;
+
+  // Arrow timing — appear after cells settle.
+  const arrowsStartFrame = sec(1.6);
+  const arrowsOpacity = fadeIn(frame, arrowsStartFrame, sec(0.6));
+
+  const arrows = useMemo(
+    () => (showArrows ? computeBestResponseArrows(cells, rows, cols) : []),
+    [showArrows, cells, rows, cols],
+  );
+
+  // Geometry: top-left of grid is (labelWidth, headerHeight). Cell (r,c) center:
+  const cellCenter = (idx: number): { x: number; y: number } => {
+    const r = Math.floor(idx / cols);
+    const c = idx % cols;
+    return {
+      x: labelWidth + c * cellSize + cellSize / 2,
+      y: headerHeight + r * cellSize + cellSize / 2,
+    };
+  };
+
+  const gridWidth = labelWidth + cols * cellSize;
+  const gridHeight = headerHeight + rows * cellSize;
+
+  // Find TPRS values for legend.
+  const tprsCells = ["T", "R", "P", "S"] as const;
+  const tprsValues: Partial<Record<typeof tprsCells[number], number>> = {};
+  cells.forEach((cell) => {
+    if (cell.cellType) {
+      const payoffs = parsePayoffs(cell.value);
+      // For PD, T/R/P/S are the row player's payoffs in canonical cells.
+      // T = (D,C) row, R = (C,C) both, P = (D,D) both, S = (C,D) row.
+      if (payoffs) tprsValues[cell.cellType] = payoffs.row;
+    }
+  });
+
+  // Account for external labels in the visual bounding box so the matrix
+  // visually centers under the title (the rotated row-player label sits
+  // 60px to the left of the grid; the column-player label sits 28px above).
+  // The outer wrapper carries the full visual width including label gutters;
+  // the inner relative container holds the grid + its absolute external labels
+  // and is offset by the gutter amount so children at left:-60 fall at x=0
+  // of the outer bounding box.
+  const labelGutterLeft = data.rowPlayer ? 60 : 0;
+  const labelGutterTop = data.colPlayer ? 28 : 0;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: layout.spacing.lg }}>
+      <div
+        style={{
+          position: "relative",
+          width: gridWidth + labelGutterLeft,
+          height: gridHeight + labelGutterTop,
+        }}
+      >
+       <div
+        style={{
+          position: "absolute",
+          left: labelGutterLeft,
+          top: labelGutterTop,
+          width: gridWidth,
+          height: gridHeight,
+        }}
+      >
+        {/* Column player label (top, above header) */}
+        {data.colPlayer && (
+          <div
+            style={{
+              position: "absolute",
+              left: labelWidth,
+              top: -28,
+              width: cols * cellSize,
+              textAlign: "center",
+              fontSize: fontSizes.meta,
+              fontFamily: fonts.metadata,
+              color: theme.text.muted,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              opacity: fadeIn(frame, sec(0.3), sec(0.4)),
+            }}
+          >
+            {data.colPlayer}
+          </div>
+        )}
+
+        {/* Row player label (left, rotated) */}
+        {data.rowPlayer && (
+          <div
+            style={{
+              position: "absolute",
+              left: -60,
+              top: headerHeight,
+              height: rows * cellSize,
+              width: 28,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: fontSizes.meta,
+              fontFamily: fonts.metadata,
+              color: theme.text.muted,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              opacity: fadeIn(frame, sec(0.3), sec(0.4)),
+              transform: "rotate(-90deg)",
+              transformOrigin: "center center",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {data.rowPlayer}
+          </div>
+        )}
+
+        {/* Column option headers */}
+        {data.colOptions?.map((option, i) => (
+          <div
+            key={`col-${i}`}
+            style={{
+              position: "absolute",
+              left: labelWidth + i * cellSize,
+              top: 0,
+              width: cellSize,
+              height: headerHeight,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: fontSizes.label,
+              fontFamily: fonts.display,
+              fontWeight: 600,
+              color: theme.text.primary,
+              opacity: fadeIn(frame, sec(0.5) + i * sec(0.15), sec(0.4)),
+            }}
+          >
+            {option}
+          </div>
+        ))}
+
+        {/* Row option labels */}
+        {data.rowOptions?.map((option, i) => (
+          <div
+            key={`row-${i}`}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: headerHeight + i * cellSize,
+              width: labelWidth,
+              height: cellSize,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              paddingRight: layout.spacing.md,
+              fontSize: fontSizes.label,
+              fontFamily: fonts.display,
+              fontWeight: 600,
+              color: theme.text.primary,
+              opacity: fadeIn(frame, sec(0.5) + i * sec(0.15), sec(0.4)),
+            }}
+          >
+            {option}
+          </div>
+        ))}
+
+        {/* Cells */}
+        {Array.from({ length: rows * cols }).map((_, idx) => {
+          const r = Math.floor(idx / cols);
+          const c = idx % cols;
+          const cell = cells.find((x) => x.row === r && x.col === c);
+          const isActive = state.highlights.includes(idx);
+          const cellStartFrame = sec(0.9) + idx * sec(0.15);
+          const cellOpacity = fadeIn(frame, cellStartFrame, sec(0.4));
+
+          const isMoral = cell?.heroRole === "moral";
+          const isAnalytical = cell?.heroRole === "analytical";
+
+          // Distinct hero treatments (D7 / dossier §B3):
+          //   Moral hero      → bone fill + amber underline accent
+          //   Analytical hero → oxblood border + ∴ glyph
+          //   Active phase    → adds outer accent glow (does not replace hero treatment)
+          const fillColor = isMoral
+            ? palette.bone
+            : mode === "dark"
+              ? `${palette.ink}80`
+              : `${palette.paper}A0`;
+          const borderColor = isAnalytical
+            ? palette.oxblood
+            : isActive
+              ? palette.amber
+              : mode === "dark"
+                ? `${palette.bone}24`
+                : `${palette.ink}24`;
+          const borderWidth = isAnalytical ? 2.5 : 1;
+
+          return (
+            <div
+              key={`cell-${idx}`}
+              style={{
+                position: "absolute",
+                left: labelWidth + c * cellSize,
+                top: headerHeight + r * cellSize,
+                width: cellSize,
+                height: cellSize,
+                borderRadius: radii.sm,
+                background: fillColor,
+                border: `${borderWidth}px solid ${borderColor}`,
+                boxShadow: isActive ? `0 0 24px ${palette.amber}40` : shadows.subtle,
+                opacity: cellOpacity,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {/* TPRS kicker (top-left) — single-character label */}
+              {cell?.cellType && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: layout.spacing.md,
+                    left: layout.spacing.md,
+                    fontSize: fontSizes.body,
+                    fontFamily: fonts.metadata,
+                    color: isMoral ? palette.amber : theme.text.muted,
+                    letterSpacing: 2,
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    maxWidth: fontSizes.h2,
+                  }}
+                >
+                  {cell.cellType}
+                </div>
+              )}
+
+              {/* Nash ∴ glyph (top-right) — JetBrains Mono renders ∴ as three
+                  weighted dots, the Parallax brand mark used to denote logical
+                  inevitability. See: references/template-research/game-theory.md §B3. */}
+              {isAnalytical && showGlyph && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: layout.spacing.sm,
+                    right: layout.spacing.md,
+                    fontSize: fontSizes.h2,
+                    fontFamily: fonts.data,
+                    color: palette.oxblood,
+                    fontWeight: 700,
+                    lineHeight: 0.7,
+                    letterSpacing: -2,
+                    maxWidth: fontSizes.h1,
+                  }}
+                  aria-label="Nash equilibrium"
+                >
+                  ∴
+                </div>
+              )}
+
+              {/* Payoff value (center) */}
+              <div
+                style={{
+                  fontSize: fontSizes.h3,
+                  fontFamily: fonts.data,
+                  maxWidth: cellSize - layout.spacing.lg * 2,
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                  color: isMoral
+                    ? palette.amber
+                    : isAnalytical
+                      ? palette.oxblood
+                      : theme.text.primary,
+                  fontWeight: 700,
+                  letterSpacing: 1,
+                }}
+              >
+                {cell?.value || "—"}
+              </div>
+
+              {/* Moral-hero amber underline */}
+              {isMoral && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: layout.spacing.md,
+                    left: "25%",
+                    right: "25%",
+                    height: 2,
+                    background: palette.amber,
+                    opacity: 0.7,
+                  }}
+                />
+              )}
+            </div>
+          );
+        })}
+
+        {/* Best-response arrows (drawn after cells settle) */}
+        {showArrows && (
+          <svg
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: gridWidth,
+              height: gridHeight,
+              opacity: arrowsOpacity,
+              pointerEvents: "none",
+            }}
+            viewBox={`0 0 ${gridWidth} ${gridHeight}`}
+          >
+            <defs>
+              <marker
+                id="pd-arrowhead-rust"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto-start-reverse"
+              >
+                <path d="M 0 0 L 10 5 L 0 10 z" fill={palette.rust} />
+              </marker>
+            </defs>
+            {arrows.map((arrow, i) => {
+              const from = cellCenter(arrow.fromIdx);
+              const to = cellCenter(arrow.toIdx);
+              // Inset endpoints so arrow doesn't overlap cell numerals.
+              const dx = to.x - from.x;
+              const dy = to.y - from.y;
+              const len = Math.sqrt(dx * dx + dy * dy) || 1;
+              const inset = cellSize * 0.32;
+              const ux = dx / len;
+              const uy = dy / len;
+              // Offset perpendicular to arrow direction so row/col arrows don't overlap.
+              const perpX = -uy;
+              const perpY = ux;
+              const sideOffset = arrow.player === "row" ? -14 : 14;
+              const x1 = from.x + ux * inset + perpX * sideOffset;
+              const y1 = from.y + uy * inset + perpY * sideOffset;
+              const x2 = to.x - ux * inset + perpX * sideOffset;
+              const y2 = to.y - uy * inset + perpY * sideOffset;
+              return (
+                <line
+                  key={`arr-${i}`}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={palette.rust}
+                  strokeWidth={2}
+                  strokeOpacity={0.72}
+                  markerEnd="url(#pd-arrowhead-rust)"
+                />
+              );
+            })}
+          </svg>
+        )}
+       </div>
+      </div>
+
+      {/* T/R/P/S legend strip */}
+      {showLegend && Object.keys(tprsValues).length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            gap: layout.spacing.lg,
+            alignItems: "baseline",
+            opacity: fadeIn(frame, sec(2.2), sec(0.6)),
+            fontFamily: fonts.metadata,
+            fontSize: fontSizes.caption,
+            color: theme.text.secondary,
+            letterSpacing: 1,
+            marginTop: layout.spacing.md,
+          }}
+        >
+          {(["T", "R", "P", "S"] as const).map((key, i) => {
+            const val = tprsValues[key];
+            if (val === undefined) return null;
+            return (
+              <React.Fragment key={key}>
+                <span>
+                  <span style={{ color: theme.text.primary, fontWeight: 600, fontSize: fontSizes.label }}>{key}</span>
+                  {" = "}
+                  <span style={{ fontFamily: fonts.data, color: theme.text.primary, fontSize: fontSizes.label }}>{val}</span>
+                  {data.payoffUnits && (
+                    <span style={{ marginLeft: 4, fontSize: fontSizes.caption }}>{data.payoffUnits}</span>
+                  )}
+                </span>
+                {i < 3 && tprsValues[(["T", "R", "P", "S"] as const)[i + 1]!] !== undefined && (
+                  <span style={{ opacity: 0.5, fontSize: fontSizes.label }}>{">"}</span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Unicode chess glyph map ─────────────────────────────────────────────────
 // Map data labels (case-insensitive) to filled chess Unicode glyphs.
 // Filled glyphs read better at video scale than outline ones.
@@ -838,6 +1326,9 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
           )}
           {data.variant === "payoff-matrix" && (
             <PayoffMatrix data={data} frame={frame} state={state} mode={mode} />
+          )}
+          {data.variant === "pd-canonical" && (
+            <PDCanonicalMatrix data={data} frame={frame} state={state} mode={mode} />
           )}
         </div>
 
