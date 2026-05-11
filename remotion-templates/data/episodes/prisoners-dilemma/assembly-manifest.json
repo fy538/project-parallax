@@ -137,7 +137,8 @@
       "narrationRef": "The Prisoner's Dilemma is the most influential framework in the history of strat",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-standard-frame.json"
+        "dataFile": "framework-standard-frame.json",
+        "backdropId": "strategy-grid"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -179,7 +180,8 @@
       "narrationRef": "Here's what it can't explain: its own first experiment.",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-cant-explain.json"
+        "dataFile": "kinetic-cant-explain.json",
+        "backdropId": "archive-nocturne"
       },
       "transition": {
         "in": "dissolve",
@@ -209,7 +211,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "The question this episode is about — how a framework that failed on day one conq",
+      "narrationRef": "The question this episode is about \u2014 how a framework that failed on day one conq",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-model-conquers.json"
@@ -276,7 +278,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "The subjects — an economist named Armen Alchian and a mathematician named John W",
+      "narrationRef": "The subjects \u2014 an economist named Armen Alchian and a mathematician named John W",
       "asset": {
         "searchTerms": [],
         "source": "local-aigen",
@@ -311,10 +313,11 @@
         "sixty percent",
         "sixty"
       ],
-      "narrationRef": "They cooperated sixty percent of the time. {✅}",
+      "narrationRef": "They cooperated sixty percent of the time. {\u2705}",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-flood-dresher.json"
+        "dataFile": "gameboard-flood-dresher.json",
+        "backdropId": "night-grid"
       },
       "transition": {
         "out": "color-wash",
@@ -346,7 +349,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "Mutual defection — the only outcome the model predicted — happened fourteen time",
+      "narrationRef": "Mutual defection \u2014 the only outcome the model predicted \u2014 happened fourteen time",
       "asset": {
         "searchTerms": [],
         "source": null
@@ -378,7 +381,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "John Nash — the man whose equilibrium concept the experiment was testing — read ",
+      "narrationRef": "John Nash \u2014 the man whose equilibrium concept the experiment was testing \u2014 read ",
       "asset": {
         "searchTerms": [],
         "source": "wikimedia-commons"
@@ -410,7 +413,8 @@
       "narrationRef": "Nash's verdict: they would have been more rational if they couldn't see each oth",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-nash-quote.json"
+        "dataFile": "kinetic-nash-quote.json",
+        "backdropId": "archive-nocturne"
       },
       "soundCue": {
         "type": "quote-bell",
@@ -444,10 +448,10 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "That response — blame the players, not the model — set a template. The most infl",
+      "narrationRef": "That response \u2014 blame the players, not the model \u2014 set a template. The most infl",
       "asset": {
         "searchTerms": [
-          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions — university, military headquarters, stock exchange — all turning toward the equation as if worshipping it"
+          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions \u2014 university, military headquarters, stock exchange \u2014 all turning toward the equation as if worshipping it"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-02",
@@ -484,7 +488,8 @@
       "narrationRef": "And right now, it is shaping every negotiation that will determine your future.",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-every-negotiation.json"
+        "dataFile": "kinetic-every-negotiation.json",
+        "backdropId": "city-noir"
       },
       "transition": {
         "in": "iris",
@@ -558,7 +563,8 @@
       "narrationRef": "But that's not what's going on. The Prisoner's Dilemma doesn't describe the game",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-motif-beat1.json"
+        "dataFile": "gameboard-motif-beat1.json",
+        "backdropId": "night-grid"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -623,10 +629,11 @@
       "syncWords": [
         "two thousand"
       ],
-      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {✅} Biologists imported it to e",
+      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {\u2705} Biologists imported it to e",
       "template": {
         "component": "DataChart",
-        "dataFile": "chart-diffusion.json"
+        "dataFile": "chart-diffusion.json",
+        "backdropId": "archive-vault"
       },
       "transition": {
         "in": "dissolve",
@@ -740,10 +747,11 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {✅} T",
+      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {\u2705} T",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-nuclear.json"
+        "dataFile": "gameboard-nuclear.json",
+        "backdropId": "night-operations"
       },
       "transition": {
         "in": "color-wash",
@@ -838,7 +846,8 @@
       "narrationRef": "Every discipline that adopted it had to narrow something to make the model fit. ",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-narrowing.json"
+        "dataFile": "framework-narrowing.json",
+        "backdropId": "situation-board"
       },
       "paceProfile": "urgent",
       "soundCue": {
@@ -901,7 +910,8 @@
       "narrationRef": "Which raises the question this episode is actually about: if the model failed it",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-something-working.json"
+        "dataFile": "kinetic-something-working.json",
+        "backdropId": "archive-nocturne"
       },
       "paceProfile": "urgent",
       "soundCue": {
@@ -1004,7 +1014,7 @@
       "narrationRef": "A model that failed its first experiment, applied to everything, still spreading",
       "asset": {
         "searchTerms": [
-          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines — mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
+          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines \u2014 mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-06",
@@ -1039,7 +1049,7 @@
       "layer": "background",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "You walk into a negotiation. You've been trained — explicitly or implicitly, thr",
+      "narrationRef": "You walk into a negotiation. You've been trained \u2014 explicitly or implicitly, thr",
       "asset": {
         "searchTerms": [
           "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber"
@@ -1082,10 +1092,11 @@
       "syncWords": [
         "defect"
       ],
-      "narrationRef": "So you defect. And your counterpart — trained by the same textbooks, shaped by t",
+      "narrationRef": "So you defect. And your counterpart \u2014 trained by the same textbooks, shaped by t",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-trap-mechanism.json"
+        "dataFile": "gameboard-trap-mechanism.json",
+        "backdropId": "night-grid"
       },
       "transition": {
         "in": "color-wash",
@@ -1132,7 +1143,8 @@
       "narrationRef": "The prediction came true. But it came true .",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-prediction-believed.json"
+        "dataFile": "kinetic-prediction-believed.json",
+        "backdropId": "rift-silhouette"
       },
       "transition": {
         "in": "dissolve",
@@ -1165,7 +1177,8 @@
       "narrationRef": "I call this The Wrong Game.",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-wrong-game-title.json"
+        "dataFile": "kinetic-wrong-game-title.json",
+        "backdropId": "rift-silhouette"
       },
       "transition": {
         "in": "dissolve",
@@ -1236,7 +1249,8 @@
       "narrationRef": "It's the same mechanism that hit finance. In 1973, Fischer Black and Myron Schol",
       "template": {
         "component": "TimeSeriesChart",
-        "dataFile": "chart-vol-smile.json"
+        "dataFile": "chart-vol-smile.json",
+        "backdropId": "city-noir"
       },
       "soundCue": {
         "type": "stat-reveal",
@@ -1273,7 +1287,8 @@
       "narrationRef": "The Prisoner's Dilemma has the same structure. Assume defection is rational. Bui",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-motif-beat3.json"
+        "dataFile": "framework-motif-beat3.json",
+        "backdropId": "night-grid"
       },
       "transition": {
         "in": "dissolve",
@@ -1347,10 +1362,11 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  — the game we assume",
+      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  \u2014 the game we assume",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-cycle-vs-question.json"
+        "dataFile": "framework-cycle-vs-question.json",
+        "backdropId": "strategy-grid"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -1389,7 +1405,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong — but that it's the wrong",
+      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong \u2014 but that it's the wrong",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-wrong-game-real.json"
@@ -1431,7 +1447,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Checkpoint. This isn't conspiracy — nobody sat in a room and decided to mislead ",
+      "narrationRef": "Checkpoint. This isn't conspiracy \u2014 nobody sat in a room and decided to mislead ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-checkpoint-beat3.json"
@@ -1499,7 +1515,7 @@
       "narrationRef": "But here's the relief. There was always another game available. And we have proo",
       "asset": {
         "searchTerms": [
-          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures — some carrying logs together, others building a structure — color-blocked in warm palette"
+          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures \u2014 some carrying logs together, others building a structure \u2014 color-blocked in warm palette"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-10",
@@ -1525,7 +1541,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {✅} A group of hunters face a cho",
+      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {\u2705} A group of hunters face a cho",
       "asset": {
         "searchTerms": [
           "Constructivist forest hunt: geometric trees as vertical columns, angular hunters with spears converging on a stylized stag in center, one hunter at edge turning toward a small hare, dawn light as amber rays through canopy, color-blocked in bone and ink"
@@ -1568,10 +1584,11 @@
       "syncWords": [
         "fundamentally"
       ],
-      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma — but it is fund",
+      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma \u2014 but it is fund",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-staghunt.json"
+        "dataFile": "gameboard-staghunt.json",
+        "backdropId": "cartographic"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -1607,7 +1624,8 @@
       "narrationRef": "In the Prisoner's Dilemma, mutual cooperation is not an equilibrium. Defection a",
       "template": {
         "component": "SplitComposition",
-        "dataFile": "split-pd-vs-staghunt.json"
+        "dataFile": "split-pd-vs-staghunt.json",
+        "backdropId": "cartographic"
       },
       "transition": {
         "in": "dissolve",
@@ -1651,10 +1669,11 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {✅} An iterated Prison",
+      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {\u2705} An iterated Prison",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-iterated-equiv.json"
+        "dataFile": "kinetic-iterated-equiv.json",
+        "backdropId": "constellation-grid"
       },
       "transition": {
         "in": "dissolve",
@@ -1694,7 +1713,8 @@
       "narrationRef": "Which means the question was never \"how do you escape the logic of defection?\" I",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-reframe.json"
+        "dataFile": "framework-reframe.json",
+        "backdropId": "strategy-grid"
       },
       "transition": {
         "in": "dissolve",
@@ -1801,7 +1821,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
+      "narrationRef": "Spanish irrigation cooperatives in Valencia \u2014 still operating after six hundred ",
       "asset": {
         "searchTerms": [],
         "source": null
@@ -1839,10 +1859,11 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Ostrom documented what they shared: eight design principles. {✅} Clear boundarie",
+      "narrationRef": "Ostrom documented what they shared: eight design principles. {\u2705} Clear boundarie",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-ostrom-vs-pd.json"
+        "dataFile": "framework-ostrom-vs-pd.json",
+        "backdropId": "archive-vault"
       },
       "transition": {
         "out": "dissolve"
@@ -1887,7 +1908,8 @@
       "narrationRef": "Communication. Reputation. Repeated interaction. Institutional context. Capacity",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-cooperation-designed.json"
+        "dataFile": "kinetic-cooperation-designed.json",
+        "backdropId": "reading-room"
       },
       "transition": {
         "in": "dissolve",
@@ -1924,7 +1946,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale — identifiable p",
+      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale \u2014 identifiable p",
       "asset": {
         "searchTerms": [
           "Constructivist ocean vastness: endless geometric waves as repeating angular forms stretching to horizon, no boundaries visible, tiny boat as single dot, overwhelming scale, color-blocked in ink and bone with grey-blue tint"
@@ -2025,10 +2047,11 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Most of the major negotiations happening right now — US-China AI governance, cli",
+      "narrationRef": "Most of the major negotiations happening right now \u2014 US-China AI governance, cli",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-motif-beat5.json"
+        "dataFile": "framework-motif-beat5.json",
+        "backdropId": "empty-plaza"
       },
       "paceProfile": "breathing",
       "transition": {
@@ -2073,10 +2096,11 @@
       "priority": "P2",
       "holdAfter": 3.0,
       "holdBehavior": "linger",
-      "narrationRef": "And the question the stag hunt asks — \"can we coordinate on the outcome we both ",
+      "narrationRef": "And the question the stag hunt asks \u2014 \"can we coordinate on the outcome we both ",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-motif-final.json"
+        "dataFile": "framework-motif-final.json",
+        "backdropId": "empty-plaza"
       },
       "paceProfile": "breathing",
       "transition": {
@@ -2155,10 +2179,11 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Here's what would change my mind. If a major actor — say, the US or China in the",
+      "narrationRef": "Here's what would change my mind. If a major actor \u2014 say, the US or China in the",
       "template": {
         "component": "FrameworkDiagram",
-        "dataFile": "framework-falsification.json"
+        "dataFile": "framework-falsification.json",
+        "backdropId": "situation-board"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -2197,10 +2222,11 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "I put the probability of a US-China joint AI safety communiqué with shared techn",
+      "narrationRef": "I put the probability of a US-China joint AI safety communiqu\u00e9 with shared techn",
       "template": {
         "component": "ProbabilityGauge",
-        "dataFile": "forecast-pd-cooperation.json"
+        "dataFile": "forecast-pd-cooperation.json",
+        "backdropId": "horizon"
       },
       "transition": {
         "in": "dissolve",
@@ -2237,10 +2263,11 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Watch for the signals. The NPT Review Conference language — are they talking abo",
+      "narrationRef": "Watch for the signals. The NPT Review Conference language \u2014 are they talking abo",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-watch-signals.json"
+        "dataFile": "kinetic-watch-signals.json",
+        "backdropId": "situation-board"
       },
       "transition": {
         "in": "dissolve",
@@ -2277,7 +2304,7 @@
       "layer": "background",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Games can be changed. It's not easy — seventy-five years of institutional moment",
+      "narrationRef": "Games can be changed. It's not easy \u2014 seventy-five years of institutional moment",
       "asset": {
         "searchTerms": [
           "Constructivist lecture hall: rows of geometric student figures facing a chalkboard covered in game matrices, angular professor silhouette at podium, overhead fluorescent strips, color-blocked in bone and grey with amber chalkboard highlights"
@@ -2355,7 +2382,8 @@
       "narrationRef": "What the evidence establishes: the stag hunt was always available, cooperation i",
       "template": {
         "component": "KineticTypography",
-        "dataFile": "kinetic-evidence-establishes.json"
+        "dataFile": "kinetic-evidence-establishes.json",
+        "backdropId": "horizon"
       },
       "paceProfile": "breathing",
       "transition": {
@@ -2396,7 +2424,8 @@
       "narrationRef": "The Prisoner's Dilemma failed its first experiment in 1950. Alchian and Williams",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-flood-dresher.json"
+        "dataFile": "gameboard-flood-dresher.json",
+        "backdropId": "night-grid"
       },
       "paceProfile": "breathing",
       "transition": {
@@ -2474,7 +2503,8 @@
       "narrationRef": "Now you can see it. The next time you hear that cooperation between rivals is im",
       "template": {
         "component": "GameBoard",
-        "dataFile": "gameboard-final-choice.json"
+        "dataFile": "gameboard-final-choice.json",
+        "backdropId": "strategy-grid"
       },
       "paceProfile": "breathing",
       "transition": {
