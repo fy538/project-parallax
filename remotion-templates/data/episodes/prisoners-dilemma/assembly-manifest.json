@@ -27,7 +27,7 @@
       {
         "id": "contemplative-1",
         "file": "audio/music/prisoners-dilemma/bed-contemplative-1.wav",
-        "startSec": 0,
+        "startSec": 5.0,
         "endSec": 212.0,
         "fadeInSec": 2.0,
         "fadeOutSec": 3.0,
