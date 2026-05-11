@@ -53,6 +53,8 @@ jobs:
   # run renders — just typecheck + tests so any macOS-specific tooling
   # breakage surfaces here, not when Tiger first re-renders an episode.
   macos-smoke:
+    # On schedule, macos-real-data already exercises Chromium; skip duplicate macOS runner.
+    if: github.event_name != 'schedule'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

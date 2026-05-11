@@ -46,7 +46,7 @@ The `.claude/commands/` directory has prompt templates for common workflows: `/n
 ## GitHub Actions (CI)
 
 - **Pull requests:** Linux [`scripts/test.sh`](./scripts/test.sh) + macOS **`macos-smoke`** (typecheck, unit Vitest, `templates.test.ts` visual smoke). Does **not** run the heavy **`test:real-data`** PNG suite (keeps PRs fast).
-- **`test:real-data` in CI:** Job **`macos-real-data`** in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — runs on **push to `main`**, **daily schedule** (UTC), and **`workflow_dispatch`**. Installs Playwright and runs `npm run test:real-data` (same as local full PNG regression).
+- **`test:real-data` in CI:** Job **`macos-real-data`** in [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — runs on **push to `main`**, **daily schedule** (UTC), and **`workflow_dispatch`**. Installs Playwright and runs `npm run test:real-data` (same as local full PNG regression). On the **daily cron**, the lighter **`macos-smoke`** job is skipped so only **`macos-real-data`** uses a macOS runner that day (Linux **`test`** still runs).
 - **Mapbox maps in CI:** Add repository secret **`MAPBOX_ACCESS_TOKEN`** with a **public** token (`pk....`): GitHub → repo **Settings** → **Secrets and variables** → **Actions** → **New repository secret**. Without it, **`map-real-data.test.ts`** skips in CI (same as local).
 
 ## Pipeline state
