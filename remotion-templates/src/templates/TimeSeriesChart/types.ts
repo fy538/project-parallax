@@ -38,8 +38,22 @@ export interface TimeSeriesLine {
 export interface TimeSeriesAnnotation {
   /** X position to annotate */
   x: number | string;
-  /** Label text */
+  /**
+   * Annotation label — describe *WHY* the line bent, not *WHAT* the line shows.
+   *
+   * Right: "OPEC embargo", "Volcker tightening", "2008 collapse"
+   * Wrong: "CO₂ rises sharply", "Inflation peaks", "Stocks crash"
+   *
+   * The chart itself shows what — your label exists to name the cause or
+   * the moment of recognition. If your label just describes the visible
+   * shape of the line, delete it: the data already says that.
+   *
+   * Dossier failure mode: "Annotations describing *what* the chart shows
+   * instead of *why* it bent" — annotations are editorial calls, not
+   * captions. See: references/template-research/time-series-chart.md § 7
+   */
   label: string;
+  /** Optional second line — typically a date, attribution, or qualifier. */
   sublabel?: string;
   /** Vertical line from axis to data point? Default: true */
   line?: boolean;

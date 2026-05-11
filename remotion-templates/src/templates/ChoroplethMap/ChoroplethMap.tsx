@@ -20,6 +20,7 @@ import {
 import { Source, Layer } from "react-map-gl/mapbox";
 import {
   palette,
+  semantic,
   ramps,
   fonts,
   fontSizes,
@@ -55,18 +56,54 @@ import { FooterStrip } from "../../components/FooterStrip";
 import type { ChoroplethMapData, AnimationPhase, CountryData } from "./types";
 
 // ── Color ramp lookup ───────────────────────────────────────────────────────
+//
+// ColorBrewer-vetted defaults adapted to the Parallax palette:
+//
+//   `ylOrBr` — bone → gold → rust → oxblood, the sequential warm ramp.
+//     Recommended default for quantitative single-direction data (income,
+//     intensity, density). Brand-aligned variant of ColorBrewer 5-class YlOrBr.
+//
+//   `rdBu` — rust → bone → blue, the diverging ramp.
+//     Recommended for diff maps or anything with a meaningful midpoint
+//     (deviation from baseline, swing maps). Brand-aligned variant of
+//     ColorBrewer 5-class RdBu.
+//
+// Reference: references/template-research/choropleth-map.md § 6.2
+
+// Brand-aligned YlOrBr (sequential, light → dark, warm).
+// Pulled from palette tokens so the ramp stays in sync with brand updates.
+const RAMP_YL_OR_BR: readonly string[] = [
+  palette.paper,
+  palette.bone,
+  palette.gold,
+  semantic.china,   // rust
+  palette.walnut,   // oxblood-equivalent
+];
+
+// Brand-aligned RdBu (diverging — rust ↔ bone midpoint ↔ blue).
+const RAMP_RD_BU: readonly string[] = [
+  palette.walnut,   // oxblood deep
+  semantic.china,   // rust
+  palette.bone,     // midpoint
+  "#7AA3C9",        // muted blue positive mid (not yet a palette token)
+  semantic.us,      // blue
+];
 
 const rampLookup: Record<string, readonly string[]> = {
   blue: ramps.blue,
   red: ramps.red,
   teal: ramps.amber,
   gray: ramps.gray,
+  ylOrBr: RAMP_YL_OR_BR,
+  rdBu: RAMP_RD_BU,
 };
 
 function getColorRamp(ramp?: string | string[]): readonly string[] {
-  if (!ramp) return ramps.blue;
+  // Default to brand-aligned YlOrBr — the editorially safe choice for most
+  // quantitative choropleth, per choropleth-map.md § 6.2.
+  if (!ramp) return RAMP_YL_OR_BR;
   if (Array.isArray(ramp)) return ramp;
-  return rampLookup[ramp] || ramps.blue;
+  return rampLookup[ramp] || RAMP_YL_OR_BR;
 }
 
 // ── Phase timing ────────────────────────────────────────────────────────────

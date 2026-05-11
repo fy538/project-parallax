@@ -34,7 +34,7 @@ export const ChoroplethMapSchema = z.object({
       label: z.string().optional(),
     }).optional(),
     colorRamp: z.union([
-      z.enum(["blue", "red", "teal", "gray"]),
+      z.enum(["blue", "red", "teal", "gray", "ylOrBr", "rdBu"]),
       z.array(z.string()),
     ]).optional(),
     phases: z.array(AnimationPhaseSchema).min(1),

@@ -66,8 +66,26 @@ export interface ChoroplethMapData {
   center?: [number, number];
   /** Default scale. */
   scale?: number;
-  /** Color ramp name from theme, or custom array of hex colors. */
-  colorRamp?: "blue" | "red" | "teal" | "gray" | string[];
+  /**
+   * Color ramp name or custom array of hex colors.
+   *
+   * Recommended defaults (ColorBrewer-vetted, brand-aligned):
+   * - `ylOrBr` (default) — sequential warm ramp: bone → gold → rust → oxblood.
+   *    Right for single-direction quantitative data (intensity, density,
+   *    income per capita). The editorially safe choice.
+   * - `rdBu` — diverging ramp: oxblood → bone (midpoint) → blue.
+   *    Right for diff maps or anything with a meaningful midpoint
+   *    (deviation from baseline, swing maps).
+   *
+   * Legacy ramps preserved for back-compat: `blue`, `red`, `teal`, `gray`.
+   *
+   * Per the dossier failure mode "diverging palette on non-diverging data":
+   * only use `rdBu` when the data actually has a midpoint. Quantitative-only
+   * data should use `ylOrBr` (or a custom sequential array).
+   *
+   * Reference: references/template-research/choropleth-map.md § 6.2
+   */
+  colorRamp?: "blue" | "red" | "teal" | "gray" | "ylOrBr" | "rdBu" | string[];
   /**
    * Optional legend strip configuration. When set, renders a horizontal
    * color-ramp legend above the FooterStrip at the bottom of the map.
