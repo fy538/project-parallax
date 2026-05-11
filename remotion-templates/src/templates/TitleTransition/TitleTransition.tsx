@@ -19,7 +19,7 @@ import {
 } from "remotion";
 import { palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
+import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, anticipatoryStartFrame, ANTICIPATE_FRAMES_DEFAULT, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -615,6 +615,7 @@ const EditorialTitleVariant: React.FC<{
 }> = ({ data, frame, totalFrames }) => {
   const mode = data.backgroundVariant || "light";
   const theme = useThemeMode(mode);
+  const direction = useDirection(data._direction);
   // Fall back through kicker → seriesName → episodeLabel so callers can drop
   // in this variant without touching legacy data shapes.
   const kicker = data.kicker || data.seriesName || data.episodeLabel;
@@ -629,9 +630,52 @@ const EditorialTitleVariant: React.FC<{
   //   dek     fade-in 30 → 54  (1000–1800 ms)
   // Title is fully settled by frame 42 (~1.4s); the rest of the duration is
   // the editorial hold. The dossier specifies 2.0s minimum hold post-settle.
+  //
+  // ── Anticipatory-reveal adoption (POLISH.md D17, motion-design.md § 3) ──
+  // Title and dek are the two editorially-loaded reveals — the title names
+  // the subject, the dek frames the analytical claim. Both land settled
+  // ~150ms BEFORE the narrator says them (Economist convention). When
+  // `_direction.syncPoints` contains the narration cues, those cues drive
+  // the START frames; otherwise the original estimate start frames are
+  // preserved, producing the IDENTICAL fade curve as before this adoption.
+  //
+  // We use `anticipatoryStartFrame()` (the start-frame helper) combined
+  // with plain `fadeIn` rather than `anticipatoryReveal` (which would
+  // change the easing from linear to cubic — a meaningful visual shift
+  // that would invalidate baselines for no narration-time benefit).
+  //
+  // The kicker and divider stay on plain fadeIn — they're scaffold/structure,
+  // not editorial claims.
+  //
+  // Convention: syncPoints[0] = title cue, syncPoints[1] = dek cue. Future
+  // narration pipelines emit these via the visual-spec → assembly-manifest
+  // path.
+  const syncPoints = direction.syncPoints ?? [];
+  const TITLE_START = sec(0.6);
+  const TITLE_SETTLE = sec(0.8);
+  const DEK_START = sec(1.0);
+  const DEK_SETTLE = sec(0.8);
+  // When sync point present: start = cue - 5 - settle  → settles 5 frames
+  // before the narrator says the word.
+  // When sync point absent: keep the original estimate start frame.
+  const titleStartFrame =
+    syncPoints[0]?.timeSec !== undefined
+      ? anticipatoryStartFrame(
+          Math.round(syncPoints[0].timeSec * layout.fps),
+          TITLE_SETTLE,
+        )
+      : TITLE_START;
+  const dekStartFrame =
+    syncPoints[1]?.timeSec !== undefined
+      ? anticipatoryStartFrame(
+          Math.round(syncPoints[1].timeSec * layout.fps),
+          DEK_SETTLE,
+        )
+      : DEK_START;
+
   const kickerOpacity = fadeIn(frame, sec(0.4), sec(0.6));
-  const titleOpacity = fadeIn(frame, sec(0.6), sec(0.8));
-  const dekOpacity = fadeIn(frame, sec(1.0), sec(0.8));
+  const titleOpacity = fadeIn(frame, titleStartFrame, TITLE_SETTLE);
+  const dekOpacity = fadeIn(frame, dekStartFrame, DEK_SETTLE);
   const dividerOpacity = fadeIn(frame, sec(0.8), sec(0.6));
 
   // Exit fade. Default duration is 4s; the dossier wants the card held ~2s

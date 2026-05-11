@@ -152,8 +152,12 @@ The existing animation utilities + substrate motion system:
 - ✅ POLISH.md A1 lint rule catches linear interpolation without easing
 - ✅ Linear suppression via `// linear-ok:` comment
 
+**Anticipatory-reveal adoption status:**
+- ✅ `anticipatoryReveal()` + `anticipatoryStartFrame()` helpers shipped (commit 3079b2a, 11 unit tests).
+- ✅ **Adopted in `TitleTransition.editorial-title`** (May 11, 2026): the title and dek reveals use `anticipatoryStartFrame()` to compute their start frames from `_direction.syncPoints[0]` (title cue) and `_direction.syncPoints[1]` (dek cue), with fallback to the original estimate start frames when no sync points are present. Uses `anticipatoryStartFrame() + fadeIn()` rather than `anticipatoryReveal()` directly — preserves the linear fade curve so the fallback path produces identical baselines while still landing 150ms before the narrator's word when sync points exist. Pattern documented inline for other templates to copy.
+- Future adoption candidates (when narration cues are available): `StatReveal` (headline number lands before the narrator reads it), `GameBoard.pd-canonical` (Nash glyph lands before the narrator says "Nash"), `DataChart` (hero bar's value).
+
 **Diverges from canon:**
-- ~~No documented `anticipatoryReveal()` helper for narration-synced timing~~ → **built May 11, 2026**. `anticipatoryReveal(frame, narrationCueFrame, settleFrames?, anticipateFrames?)` in `utils/animation.ts` returns opacity 0→1 settling 5 frames (150ms) before the cue. Sibling `anticipatoryStartFrame()` returns the start frame for use with `fadeIn`/`slideIn`/`scaleReveal` etc. Unit-tested.
 - Slide-in is used on body labels in some templates (canon says fade-only for body)
 - Default entrance is `sec(0.4)` = 12 frames at 30fps ≈ 400ms — already aligned with canon's 350ms ✓
 - Some templates have continuous post-entrance pulse/breathe on data elements
@@ -162,7 +166,7 @@ The existing animation utilities + substrate motion system:
 
 1. **Document the substrate-motion-identity decision** in POLISH.md or BRAND.md as the canonical motion philosophy. Already implemented; needs codification.
 2. **Audit slide-in usage on body text.** Body labels should fade, not slide. Find and fix templates using `slideIn` on body-weight text.
-3. ~~**Anticipatory reveal helper.** Add `anticipatoryReveal(frame, narrationCueFrame, settleFrames=12, anticipateFrames=5)` to `utils/animation.ts` — wraps `fadeIn` with the 150ms-pre-narration timing.~~ **Done — May 11, 2026.** `anticipatoryReveal()` and `anticipatoryStartFrame()` shipped in `utils/animation.ts`; covered by `src/__tests__/anticipatoryReveal.test.ts`. Adoption next: thread through templates as narration cues come online via Whisper-resolved sync points (see `useBeatSync` integration pattern).
+3. ~~**Anticipatory reveal helper.** Add `anticipatoryReveal(frame, narrationCueFrame, settleFrames=12, anticipateFrames=5)` to `utils/animation.ts` — wraps `fadeIn` with the 150ms-pre-narration timing.~~ **Done — May 11, 2026.** `anticipatoryReveal()` and `anticipatoryStartFrame()` shipped in `utils/animation.ts`; covered by `src/__tests__/anticipatoryReveal.test.ts`. **Adoption proof landed in `TitleTransition.editorial-title`** (title + dek reveals consume `_direction.syncPoints` when present; fallback to original estimates with identical fade curves). Pattern documented inline for other templates to copy as their narration cues come online.
 4. ~~**Continuous-motion audit.** Find templates with `Math.sin(frame * 0.X)` or similar continuous pulse on data elements. Replace with single-pulse-on-landing.~~ **Done — May 11, 2026.** Audited all `Math.sin(frame...)` and `Math.cos(frame...)` uses across templates and components:
 
   - **Fixed**: `RadarChart.tsx` — vertex pulse on focused axis was a continuous sine wave; replaced with `pulse()` single-pulse-on-landing that fires 12 frames after focus settles (1.0 → 1.2 → 1.0).
