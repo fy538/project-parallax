@@ -13,15 +13,10 @@
  * baseline PNG. Baselines are created on first run and must be committed.
  * To regenerate a baseline: delete the PNG and re-run.
  *
- * CASES:
- *   1. silicon-trap/kinetic-trap         — short quote, dark bg (simplest live shot)
- *   2. silicon-trap/kinetic-morris-chang — long attribution quote, dark bg (text overflow risk)
- *   3. silicon-trap/kinetic-165b         — statistic with $ prefix + context, light bg
- *   4. prisoners-dilemma/kinetic-nash-quote — long quote with full attribution + source
- *   5. prisoners-dilemma/kinetic-2000-articles — statistic with long context, dark bg
- *   6. prisoners-dilemma/kinetic-wrong-game-real — short quote, no attribution (stress: centered layout)
- *   7–9. silicon-trap/kinetic-92-yield, deepseek-zero, revenue-deal — statistic / yield (manifest)
- *   10–11. silicon-trap/kinetic-juguo, kinetic-kabozi — definition variant (manifest)
+ * CASES — see `KINETIC_CASES` for the authoritative list:
+ *   - silicon-trap: all manifest kinetic `dataFile`s (quotes, stats, definitions).
+ *   - prisoners-dilemma: **manifest-complete** — every kinetic `dataFile` in PD
+ *     assembly-manifest (quotes/stats/title kinetic; dark + mixed layouts).
  */
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -47,6 +42,18 @@ import kineticKabozi        from "../../data/episodes/silicon-trap/kinetic-kaboz
 import kineticNashQuote     from "../../data/episodes/prisoners-dilemma/kinetic-nash-quote.json";
 import kinetic2000Articles  from "../../data/episodes/prisoners-dilemma/kinetic-2000-articles.json";
 import kineticWrongGame     from "../../data/episodes/prisoners-dilemma/kinetic-wrong-game-real.json";
+import kineticCantExplain           from "../../data/episodes/prisoners-dilemma/kinetic-cant-explain.json";
+import kineticCheckpointBeat2       from "../../data/episodes/prisoners-dilemma/kinetic-checkpoint-beat2.json";
+import kineticCheckpointBeat3       from "../../data/episodes/prisoners-dilemma/kinetic-checkpoint-beat3.json";
+import kineticCooperationDesigned   from "../../data/episodes/prisoners-dilemma/kinetic-cooperation-designed.json";
+import kineticEveryNegotiation      from "../../data/episodes/prisoners-dilemma/kinetic-every-negotiation.json";
+import kineticEvidenceEstablishes   from "../../data/episodes/prisoners-dilemma/kinetic-evidence-establishes.json";
+import kineticIteratedEquiv         from "../../data/episodes/prisoners-dilemma/kinetic-iterated-equiv.json";
+import kineticModelConquers         from "../../data/episodes/prisoners-dilemma/kinetic-model-conquers.json";
+import kineticPredictionBelieved    from "../../data/episodes/prisoners-dilemma/kinetic-prediction-believed.json";
+import kineticSomethingWorking      from "../../data/episodes/prisoners-dilemma/kinetic-something-working.json";
+import kineticWatchSignals          from "../../data/episodes/prisoners-dilemma/kinetic-watch-signals.json";
+import kineticWrongGameTitle        from "../../data/episodes/prisoners-dilemma/kinetic-wrong-game-title.json";
 
 const TEST_TIMEOUT = 60000;
 const KINETIC_REVIEW_FRAMES = [30, 60];
@@ -114,6 +121,66 @@ const KINETIC_CASES: KineticCase[] = [
     reviewId: "prisoners-dilemma-kinetic-wrong-game",
     inputProps: { data: kineticWrongGame as KineticTypographyData },
     why: "short quote, no attribution — tests centered layout without attribution row",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-cant-explain",
+    inputProps: { data: kineticCantExplain as KineticTypographyData },
+    why: "quote, dark bg — explanatory beat (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-checkpoint-beat2",
+    inputProps: { data: kineticCheckpointBeat2 as KineticTypographyData },
+    why: "quote, dark bg — checkpoint beat 2 (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-checkpoint-beat3",
+    inputProps: { data: kineticCheckpointBeat3 as KineticTypographyData },
+    why: "quote, dark bg — checkpoint beat 3 (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-cooperation-designed",
+    inputProps: { data: kineticCooperationDesigned as KineticTypographyData },
+    why: "quote, dark bg — cooperation designed (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-every-negotiation",
+    inputProps: { data: kineticEveryNegotiation as KineticTypographyData },
+    why: "quote, dark bg — negotiation framing (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-evidence-establishes",
+    inputProps: { data: kineticEvidenceEstablishes as KineticTypographyData },
+    why: "quote, dark bg — evidence establishes (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-iterated-equiv",
+    inputProps: { data: kineticIteratedEquiv as KineticTypographyData },
+    why: "quote, dark bg — iterated game equivalence (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-model-conquers",
+    inputProps: { data: kineticModelConquers as KineticTypographyData },
+    why: "quote, dark bg — model conquers intuition (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-prediction-believed",
+    inputProps: { data: kineticPredictionBelieved as KineticTypographyData },
+    why: "quote, dark bg — prediction believed (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-something-working",
+    inputProps: { data: kineticSomethingWorking as KineticTypographyData },
+    why: "quote, dark bg — something working beat (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-watch-signals",
+    inputProps: { data: kineticWatchSignals as KineticTypographyData },
+    why: "quote, dark bg — watch signals (manifest)",
+  },
+  {
+    reviewId: "prisoners-dilemma-kinetic-wrong-game-title",
+    inputProps: { data: kineticWrongGameTitle as KineticTypographyData },
+    why: "title kinetic / wrong-game section header (manifest)",
   },
 ];
 
