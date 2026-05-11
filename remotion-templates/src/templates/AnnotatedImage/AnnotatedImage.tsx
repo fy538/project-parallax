@@ -38,6 +38,11 @@ import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { BrandImage } from "../../components/BrandImage";
@@ -160,7 +165,10 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
 
   return (
     <Background
-      variant={data.backgroundVariant || "dark"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant || "dark"),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

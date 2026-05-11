@@ -61,6 +61,11 @@ import {
   countUpValue,
 } from "../../utils/countUp";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
@@ -439,7 +444,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
 
   return (
     <Background
-      variant={bgVariant}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

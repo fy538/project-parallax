@@ -59,6 +59,7 @@ export const DataChartSchema = z.object({
       ambientParticles: z.boolean().optional(),
       _direction: z.unknown().optional(),
       backgroundTint: z.string().optional(),
+      transparentBackground: z.boolean().optional(),
     })
     .superRefine((d, ctx) => {
       if (

@@ -47,6 +47,11 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import { usePhase } from "../../hooks/usePhase";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -207,7 +212,10 @@ export const DualTimeline: React.FC<{
 
   return (
     <Background
-      variant={data.backgroundVariant || "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
       tint={direction.backgroundTint}

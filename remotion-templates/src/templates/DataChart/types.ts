@@ -70,6 +70,11 @@ export interface DataChartData {
   contextNote?: string;
   /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
   backgroundTint?: string;
+  /**
+   * When true, `<Background>` uses variant `"transparent"` so a parent atmospheric
+   * layer (e.g. SegmentBackdrop under FullEpisode) is visible behind chart chrome.
+   */
+  transparentBackground?: boolean;
 
   // ── Narrated Camera ("Hans Rosling" mode) ─────────────────────────────
   /**

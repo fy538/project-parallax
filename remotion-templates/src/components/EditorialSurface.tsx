@@ -24,6 +24,8 @@
 
 import React, { type ReactNode } from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
+import backdropManifest from "../../data/backdrop-manifest.json";
+import type { BackdropChartFit } from "../utils/backdropChartFit";
 import { palette } from "../design/theme";
 
 export interface EditorialSurfaceProps {
@@ -173,22 +175,30 @@ EditorialSurface.displayName = "EditorialSurface";
 
 // ── Backdrop manifest ─────────────────────────────────────────────────────────
 //
-// One row per backdrop in public/assets/backdrops/. The `anchor` field
-// describes where the backdrop's visual weight sits — used to pair with the
-// matching EditorialFrame variant so the foreground hero block lands on the
-// dense side and the chart lands over the quiet zone.
+// Canonical data: ../../data/backdrop-manifest.json (ids, anchors, selectionBrief
+// for agents/tools). One PNG per id in public/assets/backdrops/{id}.png.
 //
 // Anchor → recommended frame variant:
 //   right    → "hero-flipped"  (hero right, chart left over the quiet)
 //   left     → "hero"           (hero left, chart right; body may need lift)
 //   centered → "hero"           (centered subject sits between hero and chart)
 //   bottom   → either           (sky/quiet zone fills the upper two-thirds)
-//
-// Add new backdrops here as the library grows. The manifest is the only place
-// the public/assets/backdrops/ filenames are enumerated in code — templates
-// pass `pickBackdrop("reading-room")` rather than typing the path literal.
 
 export type BackdropAnchor = "right" | "left" | "centered" | "bottom";
+
+/** Visual weight of the PNG — pairs with chart density and safe zones. */
+export type BackdropDensity = "quiet" | "medium" | "busy";
+
+/** Color/spatial mood for auto-pick metadata (not VISUAL_LANGUAGE Registers 1–3). */
+export type BackdropTone =
+  | "neutral"
+  | "warm-archival"
+  | "cool-urban"
+  | "industrial"
+  | "dark-neutral"
+  | "dark-warm"
+  | "dark-cool"
+  | "dark-industrial";
 
 export interface BackdropEntry {
   /** Stem of the file in public/assets/backdrops/ (no extension). */
@@ -199,50 +209,62 @@ export interface BackdropEntry {
   variant: "hero" | "hero-flipped";
   /** Short editorial description — what this backdrop says, when to use it. */
   notes: string;
+  /** Agent-oriented: when to pick this id vs others (scripts, LLM tooling). */
+  selectionBrief: string;
+  /** Controlled vocabulary for future auto-selection (Remotion segment backdrops only). */
+  tags?: readonly string[];
+  /** Visual weight of the PNG — default driver for chartFit when chartFit omitted. */
+  density?: BackdropDensity;
+  tone?: BackdropTone;
+  /**
+   * Max recommended foreground chart / label density. If omitted: quiet→high,
+   * medium→medium, busy→low. See design-references/backdrops/BACKDROP_CHART_PAIRING.md.
+   */
+  chartFit?: BackdropChartFit;
 }
 
-export const BACKDROP_MANIFEST: readonly BackdropEntry[] = [
-  {
-    id: "cartographic",
-    anchor: "centered",
-    variant: "hero",
-    notes: "Low-density topographic wash. Neutral. Pairs with any analytical content.",
-  },
-  {
-    id: "horizon",
-    anchor: "bottom",
-    variant: "hero",
-    notes: "Quiet sky over a low horizon line. Atmospheric supportive register.",
-  },
-  {
-    id: "twilight-skyline",
-    anchor: "bottom",
-    variant: "hero",
-    notes: "City silhouette along the bottom edge. Contemporary, urban register.",
-  },
-  {
-    id: "empty-plaza",
-    anchor: "centered",
-    variant: "hero",
-    notes: "Distant portico sits between hero and chart. Civic/institutional register.",
-  },
-  {
-    id: "industrial-yard",
-    anchor: "left",
-    variant: "hero",
-    notes: "Single smokestack anchors left. Industrial/material register. Body text may need to lift.",
-  },
-  {
-    id: "reading-room",
-    anchor: "right",
-    variant: "hero-flipped",
-    notes: "Book wall + diagonal light beams on right. Archival/scholarly register.",
-  },
-];
+export const BACKDROP_MANIFEST: readonly BackdropEntry[] =
+  backdropManifest.backdrops as readonly BackdropEntry[];
 
 const BACKDROP_INDEX: Record<string, BackdropEntry> = Object.fromEntries(
   BACKDROP_MANIFEST.map((b) => [b.id, b]),
 );
+
+/**
+ * Resolve a backdrop id to a staticFile() URL, or null if unknown.
+ * Prefer this for per-segment layers where invalid ids should not throw at render.
+ */
+export const backdropStaticFile = (id: string): string | null => {
+  if (!BACKDROP_INDEX[id]) {
+    return null;
+  }
+  return staticFile(`assets/backdrops/${id}.png`);
+};
+
+/**
+ * Bottom layer for a foreground template segment — atmospheric PNG under charts only.
+ * Parent should apply episode-level paper + grain (e.g. FullEpisode's EditorialSurface).
+ */
+export const SegmentBackdrop = React.memo(({ backdropId }: { backdropId: string }) => {
+  const src = backdropStaticFile(backdropId);
+  if (!src) {
+    return null;
+  }
+  return (
+    <AbsoluteFill style={{ zIndex: 0, pointerEvents: "none" }}>
+      <Img
+        src={src}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+    </AbsoluteFill>
+  );
+});
+SegmentBackdrop.displayName = "SegmentBackdrop";
 
 /**
  * Resolve a backdrop id (e.g. "reading-room") to a staticFile() path ready to
@@ -250,12 +272,13 @@ const BACKDROP_INDEX: Record<string, BackdropEntry> = Object.fromEntries(
  * typo surfaces at composition mount rather than as a silent blank backdrop.
  */
 export const pickBackdrop = (id: string): string => {
-  if (!BACKDROP_INDEX[id]) {
+  const path = backdropStaticFile(id);
+  if (!path) {
     throw new Error(
       `[EditorialSurface] Unknown backdrop "${id}". Available: ${BACKDROP_MANIFEST.map((b) => b.id).join(", ")}`,
     );
   }
-  return staticFile(`assets/backdrops/${id}.png`);
+  return path;
 };
 
 /**

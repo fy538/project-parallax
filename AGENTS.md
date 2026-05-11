@@ -30,6 +30,7 @@ Per-stack (when you need granular control):
 - TS lint: `cd remotion-templates && npm run lint`
 - TS visual regression: `cd remotion-templates && npm test`
 - Manifest gen: `python3 tools/assembly/generate_manifest.py --script <path> --episode <slug> --output <path>`
+- Backdrop pick list: `python3 tools/assembly/print_backdrop_catalog.py` (add `--dark-register`, `--tag TAG`, `--tone-prefix dark`, `--chart-at-least high|medium|low`, `--markdown`). Pairing rules: `remotion-templates/design-references/backdrops/BACKDROP_CHART_PAIRING.md`
 - JSON validation: `python3 tools/validate_data.py` (or `--files a.json b.json` for a subset)
 - Cost log: `python3 tools/cost_tracker.py summary` and `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`

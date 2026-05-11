@@ -32,6 +32,10 @@ import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useNarratedCamera } from "../../hooks/useNarratedCamera";
 import { chartLayout, validateChartLayoutIntegrity } from "../../utils/chartLayout";
+import {
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { warnIf } from "../../utils/dataWarnings";
 import type { DataChartData } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
@@ -542,7 +546,10 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
 
   return (
     <Background
-      variant="light"
+      variant={resolveAnalyticalBackgroundVariant(
+        "light",
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

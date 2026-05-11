@@ -233,7 +233,12 @@ const Atmosphere: React.FC<{
 
 interface BackgroundProps {
   color?: string;
-  variant?: "dark" | "light" | "map";
+  /**
+   * `"transparent"` — no paper fill, grain, or atmospheric substrate; parent layers
+   * (e.g. EditorialSurface + SegmentBackdrop under FullEpisode) show through.
+   * Content chrome (HeaderStrip, chart, etc.) stays on top.
+   */
+  variant?: "dark" | "light" | "map" | "transparent";
   /** Show ruled border inset 40px (light mode only, per BRAND.md). Default: true for light. */
   border?: boolean;
   /** Episode label for the rubber stamp element (light mode only, per BRAND.md).
@@ -300,6 +305,7 @@ export const Background: React.FC<BackgroundProps> = ({
   stampLabel,
   children,
 }) => {
+  const isTransparent = variant === "transparent";
   const isDark = variant === "dark" || variant === "map";
   // Used by all substrate-motion layers (grain seed, atmospheric cloud
   // positions, wobble offset). Substrate motion is the editorial-video
@@ -310,18 +316,27 @@ export const Background: React.FC<BackgroundProps> = ({
   // (noGrain, noAtmosphere) win over preset defaults so a "briefing" Background
   // can still opt out of grain for a specific composition.
   const motion = motionIdentities[motionIdentity];
-  const grainActive = motion.grain.enabled && !noGrain;
-  const atmosphereActive = motion.atmosphere.enabled && !noAtmosphere && variant === "light";
-  const wobbleOffset = motion.wobble.enabled
-    ? computeWobble(frame, motion.wobble.amplitude)
-    : { x: 0, y: 0 };
+  const grainActive =
+    !isTransparent && motion.grain.enabled && !noGrain;
+  const atmosphereActive =
+    !isTransparent &&
+    motion.atmosphere.enabled &&
+    !noAtmosphere &&
+    variant === "light";
+  const wobbleOffset =
+    isTransparent || !motion.wobble.enabled
+      ? { x: 0, y: 0 }
+      : computeWobble(frame, motion.wobble.amplitude);
   const grainOpacity = isDark ? motion.grain.opacityDark : motion.grain.opacityLight;
 
-  // Light mode gets ruled border by default (BRAND.md editorial briefing feel)
-  const effectiveBorder = border ?? (variant === "light");
+  // Light mode gets ruled border by default; transparent defaults off so backdrops read.
+  const effectiveBorder =
+    border ?? (variant === "light" && !isTransparent);
 
-  // Default atmosphere: normal for dark, subtle for light (cinematic paper feel)
-  const effectiveDensity = atmosphere ?? (isDark ? "normal" : "subtle");
+  // Default atmosphere: normal for dark, subtle for light; none when transparent
+  const effectiveDensity = isTransparent
+    ? "none"
+    : atmosphere ?? (isDark ? "normal" : "subtle");
 
   // Per-episode color emphasis. The atmospheric tint defaults to the
   // episode's primary accent when (a) no explicit `tint` is passed AND
@@ -349,6 +364,8 @@ export const Background: React.FC<BackgroundProps> = ({
         return {
           background: `radial-gradient(ellipse at center, ${dark.bg.map} 0%, ${dark.bg.base} 100%)`,
         };
+      case "transparent":
+        return { backgroundColor: "transparent" };
       case "light":
         return {
           backgroundColor: light.bg.base,
@@ -369,7 +386,8 @@ export const Background: React.FC<BackgroundProps> = ({
           position: "absolute",
           inset: 0,
           transform: `translate(${wobbleOffset.x}px, ${wobbleOffset.y}px)`,
-          willChange: motion.wobble.enabled ? "transform" : undefined,
+          willChange:
+            !isTransparent && motion.wobble.enabled ? "transform" : undefined,
         }}
       >
       {/* Animated film grain — per-frame re-randomized noise (seeded by
@@ -475,7 +493,7 @@ export const Background: React.FC<BackgroundProps> = ({
           atmospheric cast at lower intensity (10/06 hex alpha vs 18/0C) so
           the default emphasis-driven tint is gentler than a script-specified
           tint that's intentionally pushing emotional temperature. */}
-      {effectiveTint && (
+      {effectiveTint && !isTransparent && (
         <AbsoluteFill
           style={{
             background: tint

@@ -58,7 +58,12 @@ import { LowerThird } from "../../components/LowerThird";
 import { FilmOverlay } from "../../components/FilmOverlay";
 import { AudioLayer } from "../../components/AudioLayer";
 import { EpisodeColorEmphasisProvider } from "../../hooks/useEpisodeColorEmphasis";
-import { EditorialSurface } from "../../components/EditorialSurface";
+import {
+  BACKDROP_MANIFEST,
+  EditorialSurface,
+  SegmentBackdrop,
+  backdropStaticFile,
+} from "../../components/EditorialSurface";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -85,6 +90,10 @@ import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
 import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
+import { BifurcationRoute } from "../BifurcationRoute/BifurcationRoute";
+import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
+import { StrategicLandscape } from "../StrategicLandscape/StrategicLandscape";
+import { TimelineMorph } from "../TimelineMorph/TimelineMorph";
 import { warnIf } from "../../utils/dataWarnings";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
@@ -114,6 +123,8 @@ interface TreatmentInfo {
 interface TemplateInfo {
   component: string;
   dataFile?: string;
+  /** Atmospheric PNG under this template only (ids from BACKDROP_MANIFEST). */
+  backdropId?: string | null;
 }
 
 interface HoldInfo {
@@ -327,13 +338,13 @@ function getAtmosphereIntensityAtTime(
 ): number {
   const tracks = manifest.musicBed?.tracks;
   if (!tracks || tracks.length === 0) return 1.0;
-  // Find the latest-starting track that contains this timestamp
-  let active = tracks[0];
-  for (const t of tracks) {
-    if (t.startSec <= timeSec && timeSec <= t.endSec && t.startSec >= active.startSec) {
-      active = t;
-    }
-  }
+  const containing = tracks.filter(
+    (t) => t.startSec <= timeSec && timeSec <= t.endSec
+  );
+  if (containing.length === 0) return 1.0;
+  const active = containing.reduce((best, t) =>
+    t.startSec >= best.startSec ? t : best
+  );
   return MOOD_INTENSITY[active.mood ?? "neutral"] ?? 1.0;
 }
 
@@ -371,6 +382,10 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   EscalationLadder,
   DualTimeline,
   HorizontalTimeline,
+  BifurcationRoute,
+  DuelingFrameworks,
+  StrategicLandscape,
+  TimelineMorph,
 };
 
 // ── Background segment renderer ──────────────────────────────────────────────
@@ -542,7 +557,8 @@ const ForegroundSegment: React.FC<{
   templateData: Record<string, any>;
   /** Composition fps — needed to convert manifest absolute frames to segment-relative. */
   fps: number;
-}> = memo(({ segment, templateData, fps }) => {
+  manifest: AssemblyManifest;
+}> = memo(({ segment, templateData, fps, manifest }) => {
   const { template } = segment;
 
   if (!template?.component) {
@@ -582,51 +598,80 @@ const ForegroundSegment: React.FC<{
 
   // Build the merged _direction that templates receive via data._direction.
   //
-  // Three-layer priority (lower = overrides higher):
+  // Layer order (spread order — later keys override earlier for the same field):
   //   1. data-file _direction — per-template defaults authored in visual-spec
   //   2. segment._direction  — per-beat overrides from DIR:/PACE: manifest annotations
-  //   3. syncPoints          — Whisper word timestamps (always win, computed at build time)
+  //   3. syncPoints          — Whisper word timestamps (computed at build time)
+  //   4. musicBedAtmosphereMultiplier — injected last; wins over the same key if it were
+  //      mistakenly authored in JSON (do not author there — FullEpisode owns this field).
   //
-  // This means a manifest paceProfile="urgent" on a segment overrides a
-  // paceProfile="breathing" baked into its data file, and Whisper sync is
-  // never clobbered by either.
+  // When mood is neutral (multiplier 1), the key is omitted so resolveDirection uses ?? 1.
+  // When mood ≠ 1 or sync/segment layers exist, merge runs so tension affects atmosphere.
   let dataWithSync = data;
   if (data) {
     const hasSyncPoints = segment.syncPoints && segment.syncPoints.length > 0;
-    const hasSegmentDirection = segment._direction != null && Object.keys(segment._direction).length > 0;
+    const hasSegmentDirection =
+      segment._direction != null && Object.keys(segment._direction).length > 0;
+    const relative = hasSyncPoints
+      ? segment.syncPoints!
+          .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
+            p.timeSec !== null && p.frame !== null,
+          )
+          .map((p) => ({
+            word: p.word,
+            timeSec: p.timeSec - segment.startSec,
+            frame: p.frame - Math.round(segment.startSec * fps),
+            confidence: p.confidence,
+          }))
+      : [];
 
-    if (hasSyncPoints || hasSegmentDirection) {
-      const relative = hasSyncPoints
-        ? segment.syncPoints!
-            .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
-              p.timeSec !== null && p.frame !== null,
-            )
-            .map((p) => ({
-              word: p.word,
-              timeSec: p.timeSec - segment.startSec,
-              frame: p.frame - Math.round(segment.startSec * fps),
-              confidence: p.confidence,
-            }))
-        : [];
+    const moodMult = getAtmosphereIntensityAtTime(manifest, segment.startSec);
+    const needsDirectionMerge =
+      relative.length > 0 || hasSegmentDirection || moodMult !== 1;
 
-      // Only build a new data object when there is actual content to inject.
-      // If sync points were all filtered out (null timeSec/frame) and there is
-      // no segment-level direction, skip — avoids changing data._direction from
-      // undefined to {} and creating a spurious new object reference.
-      if (relative.length > 0 || hasSegmentDirection) {
-        const mergedDirection = {
-          ...(data._direction ?? {}),          // 1. data-file base
-          ...(segment._direction ?? {}),        // 2. manifest segment overrides
-          ...(relative.length > 0 ? { syncPoints: relative } : {}),  // 3. Whisper wins
-        };
-
-        dataWithSync = {
-          ...data,
-          _direction: mergedDirection,
-        };
-      }
+    if (needsDirectionMerge) {
+      dataWithSync = {
+        ...data,
+        _direction: {
+          ...(data._direction ?? {}),
+          ...(segment._direction ?? {}),
+          ...(relative.length > 0 ? { syncPoints: relative } : {}),
+          ...(moodMult !== 1 ? { musicBedAtmosphereMultiplier: moodMult } : {}),
+        },
+      };
     }
   }
+
+  const backdropId = template.backdropId ?? undefined;
+  const skipSegmentBackdrop =
+    segment.layered != null || template.component === "TitleTransition";
+  const backdropKnown =
+    backdropId != null &&
+    backdropId.length > 0 &&
+    backdropStaticFile(backdropId) != null;
+
+  warnIf(
+    Boolean(
+      backdropId &&
+        backdropId.length > 0 &&
+        !backdropKnown &&
+        !skipSegmentBackdrop,
+    ),
+    "FullEpisode",
+    `Unknown template.backdropId "${backdropId}" in segment ${segment.id} — available: ${BACKDROP_MANIFEST.map((b) => b.id).join(", ")}`,
+  );
+
+  const showSegmentBackdrop =
+    Boolean(backdropKnown && !skipSegmentBackdrop);
+
+  // Templates use opaque light Background by default — paper hides SegmentBackdrop.
+  // Punch through for non-title segments when this row has template.backdropId.
+  const dataForTemplate =
+    showSegmentBackdrop &&
+    dataWithSync &&
+    template.component !== "TitleTransition"
+      ? { ...dataWithSync, transparentBackground: true as const }
+      : dataWithSync;
 
   return (
     <SegmentErrorBoundary
@@ -634,7 +679,12 @@ const ForegroundSegment: React.FC<{
       componentName={template.component}
     >
       <AbsoluteFill>
-        <Component data={dataWithSync} />
+        {showSegmentBackdrop && backdropId ? (
+          <SegmentBackdrop backdropId={backdropId} />
+        ) : null}
+        <AbsoluteFill style={{ zIndex: 1 }}>
+          <Component data={dataForTemplate} />
+        </AbsoluteFill>
       </AbsoluteFill>
     </SegmentErrorBoundary>
   );
@@ -886,6 +936,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                         segment={seg}
                         templateData={templateData}
                         fps={fps}
+                        manifest={manifest}
                       />
                     ),
                   }}
@@ -895,6 +946,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                   segment={seg}
                   templateData={templateData}
                   fps={fps}
+                  manifest={manifest}
                 />
               )}
             </TransitionWrapper>

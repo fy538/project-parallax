@@ -376,6 +376,10 @@
             "dataFile": {
               "type": "string",
               "description": "JSON data file path relative to data/episodes/<slug>/, e.g. 'kinetic-92-yield.json'."
+            },
+            "backdropId": {
+              "type": ["string", "null"],
+              "description": "Optional atmospheric PNG under this Remotion template only (Register 1). Must match an id from BACKDROP_MANIFEST in EditorialSurface.tsx (e.g. cartographic, reading-room). Omitted or null = solid paper from EditorialSurface. Ignored for TitleTransition and layered foreground segments in FullEpisode."
             }
           }
         },

@@ -26,6 +26,10 @@ import { fadeIn, slideIn, stagger, exitFade, CLAMP_QUAD } from "../../utils/anim
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
+import {
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TimelineComparisonData, TimelineEvent } from "./types";
@@ -155,7 +159,10 @@ export const TimelineComparison: React.FC<{
 
   return (
     <Background
-      variant="light"
+      variant={resolveAnalyticalBackgroundVariant(
+        "light",
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

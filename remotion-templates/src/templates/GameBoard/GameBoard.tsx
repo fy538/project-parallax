@@ -38,6 +38,11 @@ import {
   CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { HeaderStrip } from "../../components/HeaderStrip";
@@ -770,7 +775,10 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
   return (
     <AbsoluteFill>
       <Background
-        variant={mode}
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(data.backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
         tint={direction.backgroundTint ?? data.backgroundTint}
         atmosphere={direction.atmosphere}
         atmosphereIntensity={direction.atmosphereIntensity}

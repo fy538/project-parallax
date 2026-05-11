@@ -12,6 +12,8 @@ import { layout, sec } from "../../design/theme";
 import { EditorialFrameHeroTest } from "./EditorialFrameHeroTest";
 import { EditorialFrameHeroFlippedTest } from "./EditorialFrameHeroFlippedTest";
 import { EditorialFrameAsideTest, EditorialFrameMinimalTest } from "./EditorialFrameVariantsTest";
+import { BACKDROP_MANIFEST } from "../../components/EditorialSurface";
+import { ForegroundBackdropFoundation } from "./ForegroundBackdropFoundation";
 
 export const EditorialFrameHeroTestComposition = () => (
   <Composition
@@ -59,4 +61,26 @@ export const EditorialFrameMinimalTestComposition = () => (
     durationInFrames={sec(10)}
     defaultProps={{}}
   />
+);
+
+/**
+ * One composition per backdrop id (fixed defaultProps).
+ * The parametrized `ForegroundBackdropFoundation` composition lives inline in Root.tsx
+ * so Studio 💾 Save to code can find defaultProps.
+ */
+export const ForegroundBackdropShortcutCompositions = () => (
+  <>
+    {BACKDROP_MANIFEST.map((b) => (
+      <Composition
+        key={b.id}
+        id={`ForegroundBackdrop-${b.id}`}
+        component={ForegroundBackdropFoundation}
+        width={layout.width}
+        height={layout.height}
+        fps={layout.fps}
+        durationInFrames={sec(12)}
+        defaultProps={{ backdropId: b.id }}
+      />
+    ))}
+  </>
 );

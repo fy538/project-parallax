@@ -35,12 +35,43 @@ from pathlib import Path
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 
+_SHARED = Path(__file__).resolve().parent.parent / "shared"
+sys.path.insert(0, str(_SHARED))
+from backdrop_manifest import warn_clutter_backdrop_mismatch  # noqa: E402
+
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
 WPM = 150  # analytical narration pace (from PRODUCTION_NOTES)
 FPS = 30
 DEFAULT_BROLL_INTERVAL = 4.0  # seconds per visual change for auto-fill gaps
+
+# ── Backdrop tags ([BACKDROP: id]) ──────────────────────────────────────────
+# Canonical ids: remotion-templates/data/backdrop-manifest.json
+
+BACKDROP_TAG_RE = re.compile(r"\[BACKDROP:\s*([a-z0-9-]+)\]", re.IGNORECASE)
+
+_VALID_BACKDROP_IDS: frozenset[str] | None = None
+
+
+def _backdrop_manifest_path() -> Path:
+    return Path(__file__).resolve().parents[2] / "remotion-templates" / "data" / "backdrop-manifest.json"
+
+
+def valid_backdrop_ids() -> frozenset[str]:
+    """Load backdrop ids from backdrop-manifest.json (cached)."""
+    global _VALID_BACKDROP_IDS
+    if _VALID_BACKDROP_IDS is not None:
+        return _VALID_BACKDROP_IDS
+    path = _backdrop_manifest_path()
+    if not path.is_file():
+        _VALID_BACKDROP_IDS = frozenset()
+        return _VALID_BACKDROP_IDS
+    with path.open(encoding="utf-8") as f:
+        payload = json.load(f)
+    _VALID_BACKDROP_IDS = frozenset(b["id"] for b in payload.get("backdrops", []))
+    return _VALID_BACKDROP_IDS
+
 
 # ── DIR: annotation parsing ───────────────────────────────────────────────
 # Matches: DIR: type(params)
@@ -262,6 +293,7 @@ def parse_visual_spec(spec: str):
         "durationMode": "explicit",  # or "match_narration"
         "notes": "",
         "dataFile": None,
+        "backdropId": None,
     }
 
     if not spec.strip():
@@ -345,6 +377,10 @@ def parse_visual_spec(spec: str):
     # Check for [generate via visual-spec] which means there should be a data file
     if "[generate via visual-spec]" in spec:
         result["dataFile"] = "pending"
+
+    bd_m = BACKDROP_TAG_RE.search(spec)
+    if bd_m:
+        result["backdropId"] = bd_m.group(1).strip().lower()
 
     return result
 
@@ -1060,6 +1096,9 @@ def build_estimate_manifest(
     """
     Build an assembly manifest in estimate mode from script parsing.
 
+    Returns:
+        (manifest, rows) — rows are the parse_script table rows (for script-level lints).
+
     Timing model:
       Each table row in the script has NARRATION (left) and VISUAL (right).
       They happen SIMULTANEOUSLY — the visual accompanies the narration.
@@ -1284,7 +1323,7 @@ def build_estimate_manifest(
         "segments": segments,
     }
 
-    return manifest
+    return manifest, rows
 
 
 # ── Pacing Lint ────────────────────────────────────────────────────────
@@ -1371,6 +1410,39 @@ def lint_pacing(manifest: dict) -> list[str]:
                 f"with no analytical buffer. Consider a transition segment."
             )
         prev_pace = cur_pace
+
+    return warnings
+
+
+def lint_mg_streaks(rows: list[dict]) -> list[str]:
+    """
+    Warn when more than three consecutive script rows use [MG:] in the visual column.
+
+    Editorial rule: VISUAL_LANGUAGE.md — max 3 consecutive [MG:] without a register break.
+    Emits one warning per violating streak (when the 4th consecutive MG row is seen).
+
+    Detection assumes SCRIPT_FORMAT table convention: the visual cell leads with the
+    `[MG:` tag. Rows that mention MG only inline are not counted (avoids false positives).
+    """
+    warnings: list[str] = []
+    mg_prefix = re.compile(r"^\s*\[MG:", re.IGNORECASE)
+    streak = 0
+
+    for row in rows:
+        raw = row.get("visual_raw") or ""
+        if mg_prefix.match(raw):
+            streak += 1
+            if streak == 4:
+                beat = row.get("beat", "?")
+                narr = (row.get("narration") or "").strip()
+                narr_hint = narr[:70] + ("…" if len(narr) > 70 else "")
+                vis_snip = raw[:90] + ("…" if len(raw) > 90 else "")
+                warnings.append(
+                    "VIS-LINT: 4+ consecutive [MG:] rows (max 3) — "
+                    f"beat {beat}; narration: {narr_hint!r}; visual: {vis_snip!r}"
+                )
+        else:
+            streak = 0
 
     return warnings
 
@@ -1581,6 +1653,23 @@ def _build_segment(
         }
         if data_file:
             seg["template"]["dataFile"] = data_file
+
+        bid = parsed.get("backdropId")
+        if (
+            bid
+            and seg_type == "TEMPLATE"
+            and parsed["component"] != "TitleTransition"
+        ):
+            ids = valid_backdrop_ids()
+            if ids and bid not in ids:
+                print(
+                    f"WARNING: Unknown [BACKDROP: {bid}] — not in "
+                    "remotion-templates/data/backdrop-manifest.json. "
+                    f"Known: {', '.join(sorted(ids))}",
+                    file=sys.stderr,
+                )
+            seg["template"]["backdropId"] = bid
+            warn_clutter_backdrop_mismatch(bid, parsed["component"])
 
     # Hold info
     if seg_type == "HOLD":
@@ -2052,7 +2141,7 @@ def main():
 
     # Build estimate manifest
     print(f"Parsing script: {args.script}")
-    manifest = build_estimate_manifest(
+    manifest, script_rows = build_estimate_manifest(
         args.script, args.episode, args.title,
         data_files=ep_data_files, shot_ids=ep_shot_ids,
     )
@@ -2089,6 +2178,12 @@ def main():
     if pace_warnings:
         print()
         for w in pace_warnings:
+            print(f"  ⚠  {w}")
+
+    mg_warnings = lint_mg_streaks(script_rows)
+    if mg_warnings:
+        print()
+        for w in mg_warnings:
             print(f"  ⚠  {w}")
 
     # Pacing curve visualization

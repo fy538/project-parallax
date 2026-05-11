@@ -62,6 +62,11 @@ export interface DirectionBlock {
   // Mood
   atmosphere?: AtmosphereDensity;
   ambientParticles?: number;
+  /**
+   * Injected by FullEpisode from manifest musicBed mood — not authored in data JSON.
+   * Scales resolved atmosphere intensity together with ambientParticles.
+   */
+  musicBedAtmosphereMultiplier?: number;
   driftPreset?: DriftPreset;
   globalDim?: number;
   backgroundTint?: string;
@@ -75,7 +80,7 @@ type PaceProfile = "urgent" | "analytical" | "breathing";
 export interface DirectionResult {
   /** Atmosphere density for Background component */
   atmosphere: AtmosphereDensity | undefined;
-  /** Atmosphere intensity multiplier (derived from ambientParticles) */
+  /** Atmosphere intensity multiplier (ambientParticles / 30 × musicBed multiplier) */
   atmosphereIntensity: number | undefined;
   /** Background tint color */
   backgroundTint: string | undefined;
@@ -139,7 +144,8 @@ const PACE_TIMING: Record<PaceProfile, { timing: number; stagger: number }> = {
  * Behavior is fully backward-compatible: when `direction` is undefined or
  * null, returns the no-direction defaults (paceTimingScale=1.0,
  * paceStaggerScale=1.0, all other fields undefined). When `direction` is
- * present, derives atmosphereIntensity from ambientParticles count,
+ * present, derives atmosphereIntensity from ambientParticles (including explicit 0)
+ * and optional musicBedAtmosphereMultiplier,
  * resolves driftPreset to animation options, and resolves paceProfile to
  * timing/stagger scales. Unknown preset/profile values fall back to
  * sensible defaults (empty drift options, analytical pace).
@@ -165,12 +171,19 @@ export function resolveDirection(
     };
   }
 
-  // Convert ambientParticles count to intensity multiplier
+  // Convert ambientParticles count to base intensity; scale by music-bed mood when injected.
+  // Use typeof so ambientParticles:0 is explicit "suppress particles" (base 0), not "omit".
   // Default particle count at normal density is ~30 (from Background ATMOSPHERE_CONFIG)
   // so ambientParticles:15 → 0.5 intensity, 45 → 1.5 intensity
-  const atmosphereIntensity = direction.ambientParticles
-    ? direction.ambientParticles / 30
-    : undefined;
+  const baseIntensity =
+    typeof direction.ambientParticles === "number"
+      ? direction.ambientParticles / 30
+      : undefined;
+  const moodMult = direction.musicBedAtmosphereMultiplier ?? 1;
+  const atmosphereIntensity =
+    moodMult !== 1 || baseIntensity !== undefined
+      ? (baseIntensity ?? 1.0) * moodMult
+      : undefined;
 
   // Resolve drift preset to animation options
   const driftOptions = direction.driftPreset

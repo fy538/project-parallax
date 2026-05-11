@@ -1,0 +1,228 @@
+{
+  "version": "1.0",
+  "description": "Single source for Remotion segment backdrops + agent-facing selectionBrief. Tools: generate_manifest.py validates [BACKDROP: id]; agents pick id by reading selectionBrief. chartFit (optional): high | medium | low = max recommended foreground chart/detail density for pairing with Remotion templates; omit → derive from density (quiet→high, medium→medium, busy→low). See design-references/backdrops/BACKDROP_CHART_PAIRING.md.",
+  "backdrops": [
+    {
+      "id": "cartographic",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Low-density topographic wash. Neutral. Pairs with any analytical content.",
+      "selectionBrief": "Neutral geographic/topographic flat wash — no strong metaphor. Use as safe default for maps, routes, or any chart when no other backdrop fits better.",
+      "tags": ["cartographic", "abstract-analytical"],
+      "density": "quiet",
+      "tone": "neutral"
+    },
+    {
+      "id": "horizon",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Quiet sky over a low horizon line. Atmospheric supportive register.",
+      "selectionBrief": "Open sky over a low horizon — calm, vast, minimal anchor. Good for existential summaries, scale, or closing beats without urban detail.",
+      "tags": ["open-sky", "atmospheric"],
+      "density": "quiet",
+      "tone": "neutral"
+    },
+    {
+      "id": "twilight-skyline",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "City silhouette along the bottom edge. Contemporary, urban register.",
+      "selectionBrief": "Contemporary city read as a thin silhouette along the bottom — tech/modern competition, urban systems, without busy skyline hero shots.",
+      "tags": ["urban-skyline", "contemporary"],
+      "density": "medium",
+      "tone": "cool-urban"
+    },
+    {
+      "id": "empty-plaza",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Distant portico sits between hero and chart. Civic/institutional register.",
+      "selectionBrief": "Civic / institutional plaza energy — policy, governance, multilateral forums, public authority (quiet monumental space).",
+      "tags": ["civic", "institutional"],
+      "density": "medium",
+      "tone": "neutral"
+    },
+    {
+      "id": "industrial-yard",
+      "anchor": "left",
+      "variant": "hero",
+      "notes": "Single smokestack anchors left. Industrial/material register. Body text may need to lift.",
+      "selectionBrief": "Distant industrial yard — supply chains, manufacturing capacity, plants, reshoring, materials. Anchor left; pair hero layout accordingly.",
+      "tags": ["industrial", "material"],
+      "density": "medium",
+      "tone": "industrial"
+    },
+    {
+      "id": "reading-room",
+      "anchor": "right",
+      "variant": "hero-flipped",
+      "notes": "Book wall + diagonal light beams on right. Archival/scholarly register.",
+      "selectionBrief": "Scholarly reading-room mood — frameworks, philosophy, dense terminology, thesis moments. Book mass anchors right; use hero-flipped pairing.",
+      "tags": ["archival-scholarly", "text-heavy"],
+      "density": "busy",
+      "tone": "warm-archival"
+    },
+    {
+      "id": "fab-interior",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Suggested fab/cleanroom quiet field; single small vertical motif. Process, yield, nodes.",
+      "selectionBrief": "Semiconductor fab / cleanroom suggestion — lithography, yield curves, node gaps, process steps. Quiet interior field with one small vertical cue.",
+      "tags": ["industrial", "semiconductor", "cleanroom"],
+      "density": "quiet",
+      "tone": "neutral"
+    },
+    {
+      "id": "strategy-grid",
+      "anchor": "right",
+      "variant": "hero-flipped",
+      "notes": "Abstract diagram/grid anchor lower-right; game theory, equilibrium charts.",
+      "selectionBrief": "Abstract grid / diagram fragment — game theory, Nash equilibrium, prisoners dilemma vs stag hunt, strategic metaphors without literal boards.",
+      "tags": ["abstract-analytical", "game-theory"],
+      "density": "medium",
+      "chartFit": "high",
+      "tone": "neutral"
+    },
+    {
+      "id": "maritime-horizon",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Band-stack sea/sky horizon; trade routes, chokepoints without literal ships.",
+      "selectionBrief": "Maritime distance — shipping lanes, chokepoints, trade geography, cables (abstract). Horizon low; no literal vessels.",
+      "tags": ["maritime", "trade", "atmospheric"],
+      "density": "quiet",
+      "tone": "neutral"
+    },
+    {
+      "id": "situation-board",
+      "anchor": "left",
+      "variant": "hero",
+      "notes": "Blank wall map/briefing plane left; strategic geography, escalation.",
+      "selectionBrief": "War-room / briefing-board suggestion — escalation ladders, alliance maps, operational geography where the chart carries detail.",
+      "tags": ["institutional", "strategic", "war-room"],
+      "density": "medium",
+      "tone": "neutral"
+    },
+    {
+      "id": "archive-vault",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Corridor/vault depth; records, policy history, sanctions timelines.",
+      "selectionBrief": "Archive / vault corridor — sanctions timelines, policy history, evidence chains, institutional memory (quieter than reading-room book wall).",
+      "tags": ["archival-scholarly", "institutional"],
+      "density": "medium",
+      "tone": "warm-archival"
+    },
+    {
+      "id": "desert-horizon",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Arid plain bands; distance, logistics, energy routes across emptiness.",
+      "selectionBrief": "Arid vastness — desert logistics, energy routes, strategic distance, Middle East / Central Asia scale without cartographic detail.",
+      "tags": ["atmospheric", "geography"],
+      "density": "quiet",
+      "tone": "neutral"
+    },
+    {
+      "id": "bridge-silhouette",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Low bridge/causeway silhouette; chokepoints, connectivity.",
+      "selectionBrief": "Bridge / chokepoint silhouette — connectivity vs bottleneck (Bosphorus-class metaphors), corridors, linked systems.",
+      "tags": ["infrastructure", "connectivity"],
+      "density": "medium",
+      "tone": "neutral"
+    },
+    {
+      "id": "night-operations",
+      "anchor": "left",
+      "variant": "hero",
+      "notes": "Dark CIC / ops floor — faint standby accents. Moody escalation register.",
+      "selectionBrief": "Dark operations-center mood — night-shift crisis framing, C2/briefing tension, escalation beats. Prefer when the segment wants noir-institutional gravity (not daytime plaza). Pairs with dense charts; anchor left.",
+      "tags": ["dark-register", "war-room", "escalation", "institutional"],
+      "density": "medium",
+      "chartFit": "high",
+      "tone": "dark-cool"
+    },
+    {
+      "id": "abyss-depth",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Deep-water darkness with faint horizon band; cables/pipelines read abstract.",
+      "selectionBrief": "Abyssal / depth-field — submarine cables, maritime chokepoints beneath the surface, strategic depth under ice. Horizon low; cooler blacks than ink-only fills.",
+      "tags": ["dark-register", "maritime", "infrastructure", "atmospheric"],
+      "density": "quiet",
+      "tone": "dark-cool"
+    },
+    {
+      "id": "foundry-ember",
+      "anchor": "left",
+      "variant": "hero",
+      "notes": "Industrial night yard — distant furnace or bloom; restrained amber rim.",
+      "selectionBrief": "Night-shift industrial — capacity runs hot/cold, energy-intensive processes, foundries, resilience of heavy industry. Warmer shadow family than abyss; anchor left for smokestack/bloom reads.",
+      "tags": ["dark-register", "industrial", "energy", "supply-chain"],
+      "density": "medium",
+      "tone": "dark-industrial"
+    },
+    {
+      "id": "city-noir",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Urban night canopy — sparse sodium/LED spill, wet asphalt suggestion.",
+      "selectionBrief": "Noir metropolis canopy — tech competition, sanctions evasion night economies, urban resilience without a literal skyline hero. Thin silhouette along bottom; leave upper two-thirds quiet for charts.",
+      "tags": ["dark-register", "urban", "contemporary", "atmospheric"],
+      "density": "medium",
+      "tone": "dark-cool"
+    },
+    {
+      "id": "archive-nocturne",
+      "anchor": "right",
+      "variant": "hero-flipped",
+      "notes": "Reading-room after hours — single shaft/runnel of warm light on book mass.",
+      "selectionBrief": "Archival night — classified annex energy, philosophy/thesis introspection, long-memory institutions. Dark register sibling to reading-room; book/shelving weight on right; use hero-flipped pairing.",
+      "tags": ["dark-register", "archival-scholarly", "institutional", "text-heavy"],
+      "density": "busy",
+      "tone": "dark-warm"
+    },
+    {
+      "id": "constellation-grid",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Sparse star field with ghosted graticule; orbital / PNT / comms abstract.",
+      "selectionBrief": "Constellation + faint grid — GPS/GNSS fragility, Starlink-class constellations, COMSAT competition, night-sky strategy metaphors. Keep constellations minimal; no labeled constellations or UI chrome.",
+      "tags": ["dark-register", "abstract-analytical", "space", "infrastructure"],
+      "density": "quiet",
+      "tone": "dark-neutral"
+    },
+    {
+      "id": "switchyard-night",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Rail or HV switching silhouettes; pooled amber cool-white spill.",
+      "selectionBrief": "Intermodal / grid switching yard at night — logistics chokepoints, sanctions diversion routes, power pooling. Bottom-weighted silhouettes; quieter than foundry-ember.",
+      "tags": ["dark-register", "infrastructure", "logistics", "connectivity"],
+      "density": "medium",
+      "tone": "dark-industrial"
+    },
+    {
+      "id": "rift-silhouette",
+      "anchor": "bottom",
+      "variant": "hero",
+      "notes": "Broken plateau / chasm line against sky gradient — fracture metaphor.",
+      "selectionBrief": "Tectonic rift read — alliance fractures, decoupling fault lines, brittle-order metaphors. Desert/cliff sibling to desert-horizon but night ink field with a single hard horizon break.",
+      "tags": ["dark-register", "atmospheric", "geopolitics-abstract"],
+      "density": "quiet",
+      "tone": "dark-neutral"
+    },
+    {
+      "id": "night-grid",
+      "anchor": "centered",
+      "variant": "hero",
+      "notes": "Dark analytical field — faint ruled/grid plane only (no stars); equilibrium/diagram energy.",
+      "selectionBrief": "Dark-register abstract grid plane — game theory / equilibrium charts when you want a diagram substrate without strategy-grid's daylight paper. Faint meridian lines or ruled field at low contrast; centered quiet zone for overlays; **dark sibling to strategy-grid**.",
+      "tags": ["dark-register", "abstract-analytical", "game-theory", "grid"],
+      "density": "quiet",
+      "tone": "dark-neutral"
+    }
+  ]
+}

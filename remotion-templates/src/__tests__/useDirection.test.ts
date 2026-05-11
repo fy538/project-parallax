@@ -96,11 +96,48 @@ describe("resolveDirection", () => {
       expect(resolveDirection({}).atmosphereIntensity).toBeUndefined();
     });
 
-    it("zero particle count is treated as undefined (falsy guard)", () => {
-      // Documents the current behavior: ambientParticles=0 falls into the
-      // "no atmosphere intensity override" branch, leaving Background to
-      // use its own default. Worth catching if this changes.
-      expect(resolveDirection({ ambientParticles: 0 }).atmosphereIntensity).toBeUndefined();
+    it("zero particle count is explicit suppress-atmosphere (intensity 0)", () => {
+      expect(resolveDirection({ ambientParticles: 0 }).atmosphereIntensity).toBe(0);
+    });
+
+    it("zero particles stays 0 when music bed scales intensity", () => {
+      expect(
+        resolveDirection({
+          ambientParticles: 0,
+          musicBedAtmosphereMultiplier: 1.5,
+        }).atmosphereIntensity,
+      ).toBe(0);
+    });
+  });
+
+  describe("musicBedAtmosphereMultiplier", () => {
+    it("multiplier only scales default base 1.0 when mood ≠ 1", () => {
+      expect(
+        resolveDirection({ musicBedAtmosphereMultiplier: 1.5 }).atmosphereIntensity,
+      ).toBeCloseTo(1.5, 5);
+      expect(
+        resolveDirection({ musicBedAtmosphereMultiplier: 0.6 }).atmosphereIntensity,
+      ).toBeCloseTo(0.6, 5);
+    });
+
+    it("multiplier 1 with no particles leaves intensity undefined (backward compat)", () => {
+      expect(resolveDirection({ musicBedAtmosphereMultiplier: 1 }).atmosphereIntensity).toBeUndefined();
+      expect(resolveDirection({}).atmosphereIntensity).toBeUndefined();
+    });
+
+    it("multiplies particle-derived intensity when both are set", () => {
+      expect(
+        resolveDirection({
+          ambientParticles: 30,
+          musicBedAtmosphereMultiplier: 1.5,
+        }).atmosphereIntensity,
+      ).toBeCloseTo(1.5, 5);
+      expect(
+        resolveDirection({
+          ambientParticles: 15,
+          musicBedAtmosphereMultiplier: 2,
+        }).atmosphereIntensity,
+      ).toBeCloseTo(1.0, 5);
     });
   });
 

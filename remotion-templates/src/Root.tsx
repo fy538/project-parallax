@@ -3,11 +3,16 @@
  *
  * Each template gets its own <Folder> for organization.
  * Add new templates here as you build them.
+ *
+ * ForegroundBackdropFoundation is declared inline under Editorial → Backdrop-foundation
+ * so Remotion Studio can statically analyze defaultProps for 💾 Save to code.
  */
 
 import React from "react";
-import { Folder } from "remotion";
+import { Composition, Folder } from "remotion";
 import "./design/fonts"; // Preload all Meridian brand fonts
+import { BACKDROP_MANIFEST } from "./components/EditorialSurface";
+import { layout, sec } from "./design/theme";
 import { ChoroplethMapComposition } from "./templates/ChoroplethMap";
 import { RouteAnimationComposition } from "./templates/RouteAnimation";
 // DEPRECATED: TimelineComparison, TimelineMorph, DualTimeline — replaced by HorizontalTimeline
@@ -55,7 +60,12 @@ import {
   EditorialFrameHeroFlippedTestComposition,
   EditorialFrameAsideTestComposition,
   EditorialFrameMinimalTestComposition,
+  ForegroundBackdropShortcutCompositions,
 } from "./templates/EditorialTest";
+import {
+  ForegroundBackdropFoundation,
+  ForegroundBackdropFoundationSchema,
+} from "./templates/EditorialTest/ForegroundBackdropFoundation";
 
 // Catalog — toolkit view (multi-variant demos, never tied to a real episode)
 import {
@@ -183,6 +193,19 @@ export const RemotionRoot: React.FC = () => {
       </Folder>
 
       <Folder name="Editorial">
+        <Folder name="Backdrop-foundation">
+          <Composition
+            id="ForegroundBackdropFoundation"
+            component={ForegroundBackdropFoundation}
+            schema={ForegroundBackdropFoundationSchema}
+            width={layout.width}
+            height={layout.height}
+            fps={layout.fps}
+            durationInFrames={sec(12)}
+            defaultProps={{"backdropId":"horizon" as const}}
+          />
+          <ForegroundBackdropShortcutCompositions />
+        </Folder>
         <EditorialFrameHeroTestComposition />
         <EditorialFrameHeroFlippedTestComposition />
         <EditorialFrameAsideTestComposition />

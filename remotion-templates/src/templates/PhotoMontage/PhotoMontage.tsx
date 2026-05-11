@@ -40,6 +40,10 @@ import {
   CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { KenBurns } from "../../components/KenBurns";
@@ -450,7 +454,10 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
 
   return (
     <Background
-      variant="light"
+      variant={resolveAnalyticalBackgroundVariant(
+        "light",
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

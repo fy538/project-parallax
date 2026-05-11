@@ -48,6 +48,11 @@ import {
 } from "../../utils/animation";
 import { smoothStepEdge } from "../../utils/edges";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -390,7 +395,10 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
 
   return (
     <Background
-      variant={backgroundVariant as "dark" | "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
       tint={direction.backgroundTint}

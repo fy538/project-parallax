@@ -53,6 +53,11 @@ import {
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TimelineMorphData, MorphEvent } from "./types";
@@ -291,7 +296,10 @@ export const TimelineMorph: React.FC<{
 
   return (
     <Background
-      variant={mode}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

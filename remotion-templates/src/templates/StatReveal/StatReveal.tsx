@@ -40,6 +40,11 @@ import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -279,7 +284,10 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
 
   return (
     <Background
-      variant={data.backgroundVariant || "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
       tint={direction.backgroundTint}

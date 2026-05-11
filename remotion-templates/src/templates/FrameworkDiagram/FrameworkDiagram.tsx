@@ -35,6 +35,11 @@ import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import type { FrameworkDiagramData, FrameworkPhase, EliminatedScenario } from "./types";
 
 // ── Comparison variant ─────────────────────────────────────────────────────
@@ -1148,7 +1153,10 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
 
   return (
     <Background
-      variant={bgVariant}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

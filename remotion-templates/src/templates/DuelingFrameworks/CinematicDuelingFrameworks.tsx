@@ -30,6 +30,11 @@ import {
   CLAMP_SINE,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -158,7 +163,10 @@ export const CinematicDuelingFrameworks: React.FC<{
 
   return (
     <Background
-      variant={isDark ? "dark" : "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
       tint={direction.backgroundTint}

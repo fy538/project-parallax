@@ -31,6 +31,11 @@ import {
 } from "../../design/theme";
 import { TitleBlock } from "../../components/TitleBlock";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { useDirection } from "../../hooks/useDirection";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -374,7 +379,10 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
 
   return (
     <Background
-      variant={bgVariant}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
       tint={direction.backgroundTint}

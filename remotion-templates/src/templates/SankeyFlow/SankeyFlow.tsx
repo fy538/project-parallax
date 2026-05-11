@@ -39,6 +39,11 @@ import { lineDrawProgress } from "../../utils/drawLine";
 import { countUpValue } from "../../utils/countUp";
 import { formatNumber } from "../../utils/numberFormat";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
 import { AmbientParticles } from "../../components/AmbientParticles";
@@ -722,7 +727,10 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
 
   return (
     <Background
-      variant={data.backgroundVariant || "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

@@ -84,6 +84,11 @@ import {
 import { lineDrawProgress } from "../../utils/drawLine";
 import { bezierEdge } from "../../utils/edges";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { checkChartDataCommon } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
@@ -758,7 +763,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
 
   return (
     <Background
-      variant={data.backgroundVariant || "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

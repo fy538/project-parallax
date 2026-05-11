@@ -46,6 +46,11 @@ import {
   CLAMP_SINE,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -270,7 +275,10 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
 
   return (
     <Background
-      variant={mode}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant ?? "dark"),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
@@ -720,7 +728,12 @@ const StaticBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ data
 
   return (
     <AbsoluteFill style={{ opacity: exitOpacity }}>
-      <Background variant={data.backgroundVariant ?? "dark"} />
+      <Background
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(data.backgroundVariant ?? "dark"),
+          transparentBackdropRequested(data),
+        )}
+      />
 
       <svg width={canvasWidth} height={canvasHeight} style={{ position: "absolute" }}>
         {/* Title */}

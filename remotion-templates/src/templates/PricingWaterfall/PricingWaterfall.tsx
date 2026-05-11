@@ -32,6 +32,11 @@ import {
 } from "../../design/theme";
 import { fadeIn, slideIn, stagger, exitFade, CLAMP_CUBIC } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
@@ -130,7 +135,10 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
 
   return (
     <Background
-      variant={bgVariant}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

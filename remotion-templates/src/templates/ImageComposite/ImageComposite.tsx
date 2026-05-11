@@ -40,6 +40,11 @@ import {
   CLAMP,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -263,7 +268,10 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
 
   return (
     <Background
-      variant={isDark ? "dark" : "light"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
@@ -428,7 +436,10 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
 
   return (
     <Background
-      variant={data.backgroundVariant === "light" ? "light" : "dark"}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}

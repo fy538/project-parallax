@@ -3,7 +3,7 @@
 > Every hard-won lesson from building and iterating on templates.
 > Read this before making changes — it prevents re-discovering known issues.
 >
-> Last updated: May 5, 2026
+> Last updated: May 10, 2026
 
 ## Shared infrastructure (use these — don't reinvent)
 
@@ -18,10 +18,10 @@ When building a new template or polishing an existing one, prefer these shared b
 - **`formatNumber(value, options)` / `formatCountUp(...)`** (`src/utils/numberFormat.ts`) — Intl-based formatting with thousands separators, abbreviation (1.2M / 3.4B), percent, currency. Replaces ad-hoc `toFixed` / `toLocaleString` across templates.
 - **Three text-shadow filters** in NetworkDiagram (`text-shadow-caption`, `text-shadow`, `text-shadow-stat`) — apply hierarchy-aware shadow weight to SVG text. Pattern: caption `dy=0.5`, label `dy=1`, stat `dy=1.5`.
 - **SVG duotone filter chain** (saturate → luminance → feFuncR/G/B ramp) used by PhotoMontage and ImageComposite. Reuse instead of CSS gradient overlays (which are not real duotone).
-- **`<LightLeak>`** (from `@remotion/light-leaks`) — wired into FullEpisode at beat boundaries. Use 0.4 opacity + screen blend mode + per-beat hueShift for cinematic transitions.
-- **Mood-driven atmosphere intensity** — `getAtmosphereIntensityAtTime(manifest, sec)` in FullEpisode maps musicBed.mood → atmosphere multiplier. Tension beats get denser particles automatically.
-- **`useDirection(data._direction)`** (`src/hooks/useDirection.ts`) — bridge between DIRECTING_LANGUAGE.md `_direction` JSON blocks and Remotion rendering. Returns resolved atmosphere, drift, hold, and tint values. All 25 templates are wired. Pattern: `const direction = useDirection(data._direction)` → pass `direction.driftOptions` to `useCompositionAnimation()`, pass `direction.atmosphere`/`direction.atmosphereIntensity`/`direction.backgroundTint` to `<Background>`. Direction overrides template defaults via nullish coalescing (`direction.atmosphere ?? "normal"`). Fully backward compatible — if `_direction` is absent, all values are undefined and existing defaults take over.
-- **Brand chrome default wiring** — All 25 templates now import `<HeaderStrip>` and `<FooterStrip>` by default. Pattern: place inside `<Background>` wrapper, pass template's `mode` variable. TitleTransition additionally has animated `<Crosshair>` tracking in EpisodeTitleVariant.
+- **Beat flash at beat boundaries** — FullEpisode uses an inline **BeatFlash** (CSS radial burst + screen blend + per-beat `hueShift`), not `@remotion/light-leaks`. Light leaks relied on WebGL and could hard-fail headless renders without a GL context; BeatFlash is CPU/CSS-only. See comment block on BeatFlash in `src/templates/Episodes/FullEpisode.tsx`.
+- **Mood-driven atmosphere intensity** — `getAtmosphereIntensityAtTime(manifest, sec)` maps the active `musicBed` track’s `mood` to a multiplier. ForegroundSegment merges `musicBedAtmosphereMultiplier` into `data._direction`; `resolveDirection` in `useDirection.ts` combines it with `ambientParticles` so tension beds scale Background atmosphere without per-template edits.
+- **`useDirection(data._direction)`** (`src/hooks/useDirection.ts`) — bridge between DIRECTING_LANGUAGE.md `_direction` JSON blocks and Remotion rendering. Returns resolved atmosphere, drift, hold, and tint values. All FullEpisode-registered templates are wired. Pattern: `const direction = useDirection(data._direction)` → pass `direction.driftOptions` to `useCompositionAnimation()`, pass `direction.atmosphere`/`direction.atmosphereIntensity`/`direction.backgroundTint` to `<Background>`. Direction overrides template defaults via nullish coalescing (`direction.atmosphere ?? "normal"`). Fully backward compatible — if `_direction` is absent, all values are undefined and existing defaults take over.
+- **Brand chrome default wiring** — Templates that ship editorial chrome import `<HeaderStrip>` and `<FooterStrip>` by default. Pattern: place inside `<Background>` wrapper, pass template's `mode` variable. TitleTransition additionally has animated `<Crosshair>` tracking in EpisodeTitleVariant.
 - **Light mode editorial signatures** — `<Background variant="light">` now renders ruled border (inset 40px) by default (`effectiveBorder = border ?? (variant === "light")`). Optional `stampLabel` prop renders rotated rubber stamp element in top-right area. Both per BRAND.md editorial briefing aesthetic.
 
 ## Visual-polish patterns established (third-pass cinematic upgrades)

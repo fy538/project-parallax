@@ -18,7 +18,9 @@ from generate_manifest import (
     resolve_shot_id,
     build_music_bed,
     lint_pacing,
+    lint_mg_streaks,
     _find_sync_word,
+    _build_segment,
     WPM,
 )
 
@@ -131,6 +133,148 @@ def test_parse_visual_spec_transition_sets_component():
     result = parse_visual_spec("**TRANSITION** 2s")
     assert result["type"] == "TRANSITION"
     assert result["component"] == "TitleTransition"
+
+
+def test_parse_visual_spec_backdrop_tag():
+    spec = "**P1 — DataChart** · 8s · [BACKDROP: cartographic]"
+    result = parse_visual_spec(spec)
+    assert result["backdropId"] == "cartographic"
+
+    mixed = "**P1 — ChoroplethMap** · [BACKDROP: Fab-Interior]"
+    assert parse_visual_spec(mixed)["backdropId"] == "fab-interior"
+
+
+def test_build_segment_template_sets_backdrop_id():
+    parsed = parse_visual_spec(
+        "**P1 — DataChart** · 8s · [BACKDROP: cartographic]",
+    )
+    seg = _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        8.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    assert seg["template"]["backdropId"] == "cartographic"
+
+
+def test_build_segment_title_transition_ignores_backdrop():
+    parsed = parse_visual_spec(
+        "**P1 — TitleTransition** · 4s · [BACKDROP: cartographic]",
+    )
+    seg = _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        4.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    assert "backdropId" not in seg["template"]
+
+
+def test_build_segment_unknown_backdrop_warns(capsys):
+    parsed = parse_visual_spec(
+        "**P1 — DataChart** · 8s · [BACKDROP: not-a-real-backdrop-id]",
+    )
+    seg = _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        8.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    assert seg["template"]["backdropId"] == "not-a-real-backdrop-id"
+    err = capsys.readouterr().err
+    assert "WARNING" in err
+    assert "not-a-real-backdrop-id" in err
+
+
+def test_build_segment_warns_low_chartfit_dense_template(capsys):
+    parsed = parse_visual_spec(
+        "**P1 — SankeyFlow** · 8s · [BACKDROP: reading-room]",
+    )
+    _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        8.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    err = capsys.readouterr().err
+    assert "chartFit low" in err
+    assert "SankeyFlow" in err
+
+
+def test_build_segment_no_chartfit_warn_high_chartfit_backdrop(capsys):
+    parsed = parse_visual_spec(
+        "**P1 — SankeyFlow** · 8s · [BACKDROP: cartographic]",
+    )
+    _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        8.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    err = capsys.readouterr().err
+    assert "chartFit low" not in err
+
+
+def test_build_segment_no_chartfit_warn_sparse_template(capsys):
+    parsed = parse_visual_spec(
+        "**P1 — KineticTypography** · 8s · [BACKDROP: reading-room]",
+    )
+    _build_segment(
+        1,
+        parsed,
+        "TEMPLATE",
+        0.0,
+        8.0,
+        "beat-a",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    err = capsys.readouterr().err
+    assert "chartFit low" not in err
 
 
 def test_parse_visual_spec_image_type():
@@ -579,6 +723,62 @@ def test_lint_pacing_two_pace_changes_ok():
     # 2 transitions — should be fine
     warnings = lint_pacing(_make_manifest(segs, beats=beats))
     assert not any("pace transitions" in w for w in warnings)
+
+
+# ── lint_mg_streaks ───────────────────────────────────────────────────────
+
+
+def _mg_row(beat: str, narr: str, visual: str) -> dict:
+    return {"beat": beat, "narration": narr, "visual_raw": visual}
+
+
+def test_lint_mg_streaks_empty():
+    assert lint_mg_streaks([]) == []
+
+
+def test_lint_mg_streaks_three_ok():
+    rows = [
+        _mg_row("b1", "a", "[MG: **P2 — DataChart**]"),
+        _mg_row("b1", "b", "[mg: foo]"),
+        _mg_row("b1", "c", "  [MG: bar]"),
+    ]
+    assert lint_mg_streaks(rows) == []
+
+
+def test_lint_mg_streaks_four_warns_once():
+    rows = [
+        _mg_row("b1", "n1", "[MG: one]"),
+        _mg_row("b1", "n2", "[MG: two]"),
+        _mg_row("b1", "n3", "[MG: three]"),
+        _mg_row("b1", "n4", "[MG: four]"),
+    ]
+    w = lint_mg_streaks(rows)
+    assert len(w) == 1
+    assert "VIS-LINT" in w[0]
+    assert "beat b1" in w[0]
+
+
+def test_lint_mg_streaks_resets_on_non_mg():
+    rows = [
+        _mg_row("b1", "a", "[MG: a]"),
+        _mg_row("b1", "b", "[MG: b]"),
+        _mg_row("b1", "c", "[MG: c]"),
+        _mg_row("b1", "d", "[FOOTAGE: x]"),
+        _mg_row("b1", "e", "[MG: e]"),
+        _mg_row("b1", "f", "[MG: f]"),
+        _mg_row("b1", "g", "[MG: g]"),
+    ]
+    assert lint_mg_streaks(rows) == []
+
+
+def test_lint_mg_streaks_two_streaks_two_warnings():
+    rows = (
+        [_mg_row("b1", str(i), "[MG: x]") for i in range(4)]
+        + [_mg_row("b1", "break", "[FOOTAGE: y]")]
+        + [_mg_row("b1", str(i + 10), "[MG: x]") for i in range(4)]
+    )
+    w = lint_mg_streaks(rows)
+    assert len(w) == 2
 
 
 # ── _find_sync_word ────────────────────────────────────────────────────────

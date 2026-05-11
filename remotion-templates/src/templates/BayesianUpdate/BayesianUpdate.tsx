@@ -51,6 +51,11 @@ import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { Background } from "../../components/Background";
+import {
+  analyticalBackgroundBase,
+  resolveAnalyticalBackgroundVariant,
+  transparentBackdropRequested,
+} from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -527,11 +532,12 @@ const MultiVariant: React.FC<{
       CLAMP_CUBIC
     );
 
-    const multiMode = data.backgroundVariant || "light";
-
     return (
       <Background
-        variant={multiMode}
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(data.backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
         tint={undefined}
         atmosphere="subtle"
       >
@@ -966,7 +972,10 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
 
   return (
     <Background
-      variant={mode}
+      variant={resolveAnalyticalBackgroundVariant(
+        analyticalBackgroundBase(data.backgroundVariant),
+        transparentBackdropRequested(data),
+      )}
       tint={direction.backgroundTint}
       atmosphere={direction.atmosphere}
       atmosphereIntensity={direction.atmosphereIntensity}
