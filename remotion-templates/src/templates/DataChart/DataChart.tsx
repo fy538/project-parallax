@@ -661,6 +661,18 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     chartBoxes
   );
 
+  // Vertical bars saturate the canvas past ~6 items at video resolution — the
+  // bars get too narrow and value labels start colliding. The dossier's right
+  // form for 6+ ranked items is horizontal sorted-descending, or `lollipop`
+  // when the count climbs past ~10.
+  // See: references/template-research/data-chart.md § 6.1
+  warnIf(
+    data.variant === "bar" && (data.dataPoints?.length ?? 0) > 6,
+    "DataChart",
+    `bar variant with >${data.dataPoints?.length ?? 0} items will read as narrow vertical bars at video scale. Consider variant="horizontal" (sorted-descending) or variant="lollipop" for ranked comparisons.`,
+    { itemCount: data.dataPoints?.length }
+  );
+
   const barWidth = useMemo(
     () => Math.min(
       density === "dense" ? 100 : 160,

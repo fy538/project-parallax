@@ -42,6 +42,7 @@ export const FrameworkDiagramSchema = z.object({
       nodes: z.array(FlowNodeSchema).optional(),
       arrowLabels: z.array(z.string()).optional(),
       flowSpacing: z.enum(["equal", "proportional"]).optional(),
+      heroStage: z.number().int().nonnegative().optional(),
       rowHeaders: z.array(z.string()).optional(),
       colHeaders: z.array(z.string()).optional(),
       cells: z.array(MatrixCellSchema).optional(),

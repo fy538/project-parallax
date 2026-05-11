@@ -685,7 +685,10 @@ const FlowVariant: React.FC<{
             // proportional spacing when flowSpacing="proportional").
             const cx = (slotCenterX[i] + slotCenterX[i + 1]) / 2;
             const t = numNodes > 1 ? (i + 0.5) / (numNodes - 1) : 0;
-            const color = i === numNodes - 2 ? accentColor : theme.text.secondary;
+            // Chevron preceding the hero stage gets accent color (so the eye
+            // tracks toward the inflection, not the trailing chevron).
+            const heroIdxChev = data.heroStage ?? numNodes - 1;
+            const color = i === heroIdxChev - 1 ? accentColor : theme.text.secondary;
             return (
               <polygon
                 key={`chev-${i}`}
@@ -714,7 +717,11 @@ const FlowVariant: React.FC<{
             // Progression: muted → accent. Use the gradient endpoints' colors
             // so the markers visually align with the spine they sit on.
             const markerOpacity = 0.55 + 0.45 * t;
-            const isHero = i === numNodes - 1;
+            // Hero stage: defaults to last stage; can be set to any index
+            // via `data.heroStage` for slope flows where the inflection is
+            // mid-flow rather than terminal. See framework-diagram.md § 6.4
+            const heroIdx = data.heroStage ?? numNodes - 1;
+            const isHero = i === heroIdx;
             // Solid marker (no hollow inner circle) — reads as a waypoint on
             // the spine, not a port/socket. Outer halo gives some atmosphere
             // without breaking the dense-mass quality of the marker proper.
@@ -768,7 +775,10 @@ const FlowVariant: React.FC<{
           const nodeStart = stagger(i, sec(0.8), sec(0.5));
           const nodeOpacity = fadeIn(frame, nodeStart, sec(0.4));
           const nodeSlide = slideIn(frame, nodeStart, 16, sec(0.4));
-          const isHero = i === numNodes - 1;
+          // Hero stage: data.heroStage, or last stage by default. Allows
+          // slope-flow framing where the inflection is mid-flow.
+          const heroIdxStage = data.heroStage ?? numNodes - 1;
+          const isHero = i === heroIdxStage;
           const stageColor = isHero ? accentColor : theme.text.muted;
           const ordinal = String(i + 1).padStart(2, "0");
 

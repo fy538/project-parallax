@@ -539,6 +539,16 @@ export const HorizontalTimeline: React.FC<{
   const eraAColor = data.eraAColor || palette.gold;
   const eraBColor = data.eraBColor || palette.rust;
 
+  // Era weight ratio — applies opacity weighting to whichever era is foiled.
+  // Default `equal` keeps both eras at full opacity (Parallax's bounded-
+  // analogy commitment treats them as analytical peers). Foil modes drop
+  // the foil to 0.5 so the protagonist dominates the eye while the foil
+  // stays continuously legible.
+  // See: references/template-research/timeline-comparison.md § 3
+  const eraWeight = data.eraWeight ?? "equal";
+  const eraAFoilMute = eraWeight === "foil-old" ? 0.5 : 1.0;
+  const eraBFoilMute = eraWeight === "foil-new" ? 0.5 : 1.0;
+
   // ── Compute event list and positions ─────────────────────────────────
   const eventData = useMemo((): {
     events: Array<{ event: TimelineEventData; position: "above" | "below" }>;
@@ -839,35 +849,40 @@ export const HorizontalTimeline: React.FC<{
 
                   return (
                     <React.Fragment key={`dual-${i}`}>
-                      {/* Era A marker + card (above) */}
-                      <YearMarker
-                        x={x}
-                        year={pair.eraA.year}
-                        color={pair.eraA.color || eraAColor}
-                        weight={pair.eraA.weight || 1}
-                        dim={eventDim}
-                        scale={eventScale}
-                        blur={eventBlur}
-                        frame={frame}
-                        revealFrame={revealFrame}
-                        mode={mode}
-                        position="above"
-                      />
-                      <EventCard
-                        event={pair.eraA}
-                        x={x}
-                        position="above"
-                        color={eraAColor}
-                        dim={eventDim}
-                        scale={eventScale}
-                        blur={eventBlur}
-                        frame={frame}
-                        revealFrame={revealFrame}
-                        isFocused={isFocused}
-                        mode={mode}
-                      />
+                      {/* Era A marker + card (above) — wrapped in foil-mute
+                          opacity layer when eraWeight === "foil-old". */}
+                      <div style={{ opacity: eraAFoilMute }}>
+                        <YearMarker
+                          x={x}
+                          year={pair.eraA.year}
+                          color={pair.eraA.color || eraAColor}
+                          weight={pair.eraA.weight || 1}
+                          dim={eventDim}
+                          scale={eventScale}
+                          blur={eventBlur}
+                          frame={frame}
+                          revealFrame={revealFrame}
+                          mode={mode}
+                          position="above"
+                        />
+                        <EventCard
+                          event={pair.eraA}
+                          x={x}
+                          position="above"
+                          color={eraAColor}
+                          dim={eventDim}
+                          scale={eventScale}
+                          blur={eventBlur}
+                          frame={frame}
+                          revealFrame={revealFrame}
+                          isFocused={isFocused}
+                          mode={mode}
+                        />
+                      </div>
 
-                      {/* Era B marker + card (below, on second spine) */}
+                      {/* Era B marker + card (below, on second spine).
+                          Era B opacity multiplied by `eraBFoilMute` so
+                          foil-new mode dims era B continuously. */}
                       <div
                         style={{
                           position: "absolute",
@@ -878,7 +893,7 @@ export const HorizontalTimeline: React.FC<{
                           borderRadius: "50%",
                           backgroundColor: pair.eraB.color || eraBColor,
                           boxShadow: `0 0 10px ${pair.eraB.color || eraBColor}50`, // shadows.accentGlowSm (10px, 50% opacity variant)
-                          opacity: fadeIn(frame, revealFrame, sec(0.4)) * (1 - eventDim * 0.75),
+                          opacity: fadeIn(frame, revealFrame, sec(0.4)) * (1 - eventDim * 0.75) * eraBFoilMute,
                           transform: `scale(${eventScale})`,
                           filter: eventBlur > 0 ? `blur(${eventBlur}px)` : undefined,
                         }}
@@ -889,7 +904,7 @@ export const HorizontalTimeline: React.FC<{
                           left: x - CARD_WIDTH / 2,
                           top: SPINE_Y + 80 + 30,
                           width: CARD_WIDTH,
-                          opacity: fadeIn(frame, revealFrame, sec(0.5)) * (1 - eventDim * 0.75),
+                          opacity: fadeIn(frame, revealFrame, sec(0.5)) * (1 - eventDim * 0.75) * eraBFoilMute,
                           transform: `scale(${eventScale}) translateY(${-slideIn(frame, revealFrame, 20, sec(0.5))}px)`,
                           filter: eventBlur > 0 ? `blur(${eventBlur}px)` : undefined,
                           willChange: "transform, opacity, filter",
@@ -945,16 +960,24 @@ export const HorizontalTimeline: React.FC<{
                         </div>
                       </div>
 
-                      {/* Connection line (visible on pullback) */}
-                      {pair.connection && (
-                        <ConnectionLine
-                          x={x}
-                          label={pair.connection}
-                          color={theme.text.muted}
-                          opacity={camera.focusIndex === -1 ? fadeIn(frame, sec(0.3), sec(0.5)) : 0}
-                          mode={mode}
-                        />
-                      )}
+                      {/* Connection line (visible on pullback).
+                          Stage AFTER both eras are visually established —
+                          connections are editorial claims, so the viewer
+                          should see the evidence first. Default reveal at
+                          sec(0.3); override via data.connectionRevealStart.
+                          See: timeline-comparison.md § 3 */}
+                      {pair.connection && (() => {
+                        const connRevealStart = sec(data.connectionRevealStart ?? 0.3);
+                        return (
+                          <ConnectionLine
+                            x={x}
+                            label={pair.connection}
+                            color={theme.text.muted}
+                            opacity={camera.focusIndex === -1 ? fadeIn(frame, connRevealStart, sec(0.5)) : 0}
+                            mode={mode}
+                          />
+                        );
+                      })()}
                     </React.Fragment>
                   );
                 })}

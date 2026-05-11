@@ -155,6 +155,39 @@ export interface HorizontalTimelineData {
    * `references/template-research/timeline-comparison.md`.
    */
   phaseAxis?: PhaseAxisConfig;
+  /**
+   * When connection lines render (dual mode). In seconds from start.
+   *
+   * Default: connections appear at sec(0.3) — basically immediately. The
+   * dossier convention: connections are EDITORIAL CLAIMS, so they should
+   * land AFTER both eras are visually established, not before. Otherwise
+   * the viewer sees the claim before the evidence.
+   *
+   * Recommended: set to a value after both eras' events have settled
+   * (typically ~3s for a 6-event dual timeline). Pair with narration sync.
+   *
+   * See: references/template-research/timeline-comparison.md § 3 (connection lines)
+   */
+  connectionRevealStart?: number;
+  /**
+   * Era weight ratio for dual mode.
+   *
+   * - `"equal"` (default for Parallax) — both eras get 50% horizontal weight.
+   *    Right when both eras are equally researched and the channel's
+   *    bounded-analogy commitment treats them as analytical peers.
+   * - `"foil-old"` — historical era is the foil; contemporary era is the
+   *    subject. Era B gets ~70% emphasis (heavier strokes, brighter colors);
+   *    Era A renders muted.
+   * - `"foil-new"` — contemporary era is the foil; historical era is the
+   *    subject. Reverse of foil-old.
+   *
+   * Foil modes apply opacity weighting only — both eras still render in
+   * the same horizontal space. The eye reads the protagonist; the foil
+   * stays continuously legible.
+   *
+   * See: references/template-research/timeline-comparison.md § 3 (weight ratio)
+   */
+  eraWeight?: "equal" | "foil-old" | "foil-new";
 
   // ── Morph mode events ──
   /** Events that morph between eras */

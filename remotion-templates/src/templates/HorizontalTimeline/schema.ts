@@ -95,6 +95,10 @@ export const HorizontalTimelineSchema = z.object({
     eraBTitle: z.string().optional(),
     /** Phase-axis config — enforces phase-position alignment in dual mode. */
     phaseAxis: PhaseAxisConfigSchema.optional(),
+    /** When connection lines render (in seconds from start) — dual mode only. */
+    connectionRevealStart: z.number().nonnegative().optional(),
+    /** Era weight ratio for dual mode. */
+    eraWeight: z.enum(["equal", "foil-old", "foil-new"]).optional(),
 
     // ── Morph mode events ──
     /** Events that morph between eras */

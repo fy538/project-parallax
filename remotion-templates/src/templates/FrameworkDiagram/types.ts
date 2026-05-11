@@ -108,6 +108,23 @@ export interface FrameworkDiagramData {
    * See: references/template-research/framework-diagram.md § 6.1
    */
   flowSpacing?: "equal" | "proportional";
+  /**
+   * Which stage gets the hero treatment in the flow variant.
+   *
+   * Default (omitted): the last stage. Right when the flow's terminus IS the
+   * editorial point (e.g., "this is where it ends up").
+   *
+   * Set to a mid-flow index when the *inflection* is the editorial point —
+   * the stage where the trajectory bends. Useful for "slope flows" where
+   * one stage in the middle is the analytical climax (e.g., regulatory
+   * capture mid-cycle, the moment policy passes that locked in the outcome).
+   *
+   * The hero marker gets enlarged, the hero card gets accent color, and the
+   * surrounding stages render as supporting context.
+   *
+   * See: references/template-research/framework-diagram.md § 6.4
+   */
+  heroStage?: number;
 
   // ── Matrix variant ──
   /** Row headers. */
