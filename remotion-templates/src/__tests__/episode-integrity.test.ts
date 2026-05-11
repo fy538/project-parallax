@@ -10,6 +10,7 @@
  *   - No single-layer gap > 30s (dead visual air)
  *   - All audio files (musicBed, soundCues, textureCues, narration) exist on disk
  *   - MAPBOX_ACCESS_TOKEN is set when map templates are used
+ *   - Every template.backdropId references data/backdrop-manifest.json (prevents typos)
  *   - All template data files pass their Zod schema (catches bad data before render)
  *   - All required segment fields present
  *   - Manifest has valid fps + totalDurationSec
@@ -32,6 +33,15 @@ import { TEMPLATE_SCHEMAS } from "../templates/Episodes/templateSchemas";
 const REMOTION_ROOT = path.resolve(__dirname, "../..");
 const DATA_EPISODES_DIR = path.resolve(REMOTION_ROOT, "data/episodes");
 const PUBLIC_DIR = path.resolve(REMOTION_ROOT, "public");
+const BACKDROP_MANIFEST_PATH = path.join(REMOTION_ROOT, "data/backdrop-manifest.json");
+
+/** Same registry FullEpisode uses via EditorialSurface — ids must match exactly. */
+const VALID_BACKDROP_IDS: ReadonlySet<string> = (() => {
+  const raw = JSON.parse(fs.readFileSync(BACKDROP_MANIFEST_PATH, "utf8")) as {
+    backdrops?: Array<{ id: string }>;
+  };
+  return new Set((raw.backdrops ?? []).map((b) => b.id));
+})();
 
 // ── Episode discovery ─────────────────────────────────────────────────────────
 
@@ -181,6 +191,38 @@ for (const { slug, manifestPath } of EPISODES) {
         );
       }
       expect(unknown).toHaveLength(0);
+    });
+
+    // ── Segment backdrop ids ──────────────────────────────────────────────────
+
+    it("every template.backdropId is a known id in data/backdrop-manifest.json", () => {
+      const violations: string[] = [];
+      for (const seg of manifest.segments ?? []) {
+        const tmpl = seg.template;
+        if (!tmpl || typeof tmpl !== "object") continue;
+        const bid = (tmpl as { backdropId?: string | null }).backdropId;
+        if (bid == null || bid === "") continue;
+        if (typeof bid !== "string") {
+          violations.push(
+            `${seg.id}: backdropId must be a string, got ${typeof bid}`
+          );
+          continue;
+        }
+        if (!VALID_BACKDROP_IDS.has(bid)) {
+          violations.push(
+            `  ${seg.id}: unknown backdropId "${bid}" — add PNG + row to ` +
+              `data/backdrop-manifest.json, or fix the typo`
+          );
+        }
+      }
+      if (violations.length > 0) {
+        throw new Error(
+          `\n${violations.length} invalid backdropId reference(s):\n` +
+            `${violations.join("\n")}\n` +
+            `Valid ids: ${[...VALID_BACKDROP_IDS].sort().join(", ")}`
+        );
+      }
+      expect(violations).toHaveLength(0);
     });
 
     // ── Asset file presence ─────────────────────────────────────────────────
