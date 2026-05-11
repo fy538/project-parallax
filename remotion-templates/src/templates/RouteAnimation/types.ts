@@ -71,6 +71,35 @@ export interface RouteAnimationData {
   /** Animation phases — segments appear in sequence. */
   phases: RoutePhase[];
 
+  /**
+   * Radial mode — one hub city + N destinations radiating outward.
+   *
+   * When set, the template auto-generates segments from `hubIndex` to every
+   * other point and reveals them simultaneously with bearing-sorted stagger
+   * (each destination's segment starts slightly after the one to its
+   * clockwise neighbor). Any explicit `segments` array is IGNORED in radial
+   * mode — the segments derive from the hub geometry.
+   *
+   * Phases can still be used to focus the camera on subsets of destinations.
+   * If `phases` is omitted, all destinations reveal in a single pass.
+   *
+   * Use case: trade-route hubs ("all roads led to Rome"), military campaigns
+   * radiating from a command center, supply lanes from a single port.
+   *
+   * See: CLAUDE.md "Known gaps" → Hub-with-radial-routes map
+   * See: references/template-research/route-animation.md § 6.1
+   */
+  radial?: {
+    /** Index into `points` of the hub city. */
+    hubIndex: number;
+    /** Per-arc stagger in seconds (default 0.15 → 30 fps × 0.15 = ~4.5 frames). */
+    staggerSec?: number;
+    /** Color for the hub marker (default amber). */
+    hubColor?: string;
+    /** Color for the arcs (default rust). */
+    arcColor?: string;
+  };
+
   /** Map projection center [lon, lat]. */
   center?: [number, number];
   /** Map projection scale. */

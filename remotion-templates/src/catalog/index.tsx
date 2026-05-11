@@ -15,6 +15,7 @@ export {
   CatalogChoroplethBlocs,
   CatalogChoroplethTordesillas,
   CatalogRouteSilkRoad,
+  CatalogRouteRomeRadial,
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
 } from "./Maps";

@@ -73,6 +73,7 @@ import {
   CatalogChoroplethBlocs,
   CatalogChoroplethTordesillas,
   CatalogRouteSilkRoad,
+  CatalogRouteRomeRadial,
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
   CatalogStatApollo,
@@ -242,6 +243,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogChoroplethBlocs />
           <CatalogChoroplethTordesillas />
           <CatalogRouteSilkRoad />
+          <CatalogRouteRomeRadial />
           <CatalogRouteMagellan />
           <CatalogRouteChokepoints />
         </Folder>

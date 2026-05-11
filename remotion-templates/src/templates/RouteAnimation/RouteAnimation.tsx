@@ -55,7 +55,7 @@ import { MapGL } from "../../components/MapGL";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import type { RouteAnimationData, RoutePhase } from "./types";
+import type { RouteAnimationData, RoutePhase, RouteSegment } from "./types";
 
 // ── Phase time calculator ──────────────────────────────────────────────────
 
@@ -249,16 +249,76 @@ function phaseToCamera(
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
-  data,
+  data: rawData,
 }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const direction = useDirection(data._direction);
-  const theme = useThemeMode(data.backgroundVariant || "light");
+  const direction = useDirection(rawData._direction);
+  const theme = useThemeMode(rawData.backgroundVariant || "light");
   const { style: compStyle } = useCompositionAnimation({ noDrift: true, ...direction.driftOptions });
   // Per-episode color emphasis — route arc and point markers fall back to
   // the episode's primary accent instead of channel-default amber.
   const emphasis = useEpisodeColorEmphasis();
+
+  // ── Radial mode preprocessing ──────────────────────────────────────────
+  // When `data.radial` is set, auto-derive segments (hub → every destination)
+  // and a single phase that reveals all of them. Destinations are sorted by
+  // bearing from the hub so the stagger reveals clockwise — feels like the
+  // hub "broadcasts outward" rather than chaotic simultaneous reveal.
+  // See: CLAUDE.md "Known gaps" → Hub-with-radial-routes map.
+  const data: RouteAnimationData = useMemo(() => {
+    if (!rawData.radial) return rawData;
+    const hubIdx = rawData.radial.hubIndex;
+    const hubPoint = rawData.points[hubIdx];
+    if (!hubPoint) return rawData;
+    const arcColor = rawData.radial.arcColor;
+
+    // Compute bearing from hub for each destination, sort clockwise.
+    const destinations = rawData.points
+      .map((p, i) => ({ point: p, index: i }))
+      .filter((d) => d.index !== hubIdx);
+    const bearingOf = (lon2: number, lat2: number): number => {
+      const [lon1, lat1] = hubPoint.coordinates;
+      const dLon = (lon2 - lon1) * (Math.PI / 180);
+      const phi1 = lat1 * (Math.PI / 180);
+      const phi2 = lat2 * (Math.PI / 180);
+      const y = Math.sin(dLon) * Math.cos(phi2);
+      const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLon);
+      return (Math.atan2(y, x) * (180 / Math.PI) + 360) % 360;
+    };
+    destinations.sort(
+      (a, b) =>
+        bearingOf(a.point.coordinates[0], a.point.coordinates[1]) -
+        bearingOf(b.point.coordinates[0], b.point.coordinates[1]),
+    );
+
+    const derivedSegments: RouteSegment[] = destinations.map((d) => ({
+      from: hubIdx,
+      to: d.index,
+      ...(arcColor ? { color: arcColor } : {}),
+    }));
+    const derivedPhases: RoutePhase[] = [
+      {
+        title: rawData.title,
+        subtitle: rawData.subtitle,
+        durationSec: rawData.durationSec ?? 8,
+        activeSegments: derivedSegments.map((_, i) => i),
+        activePoints: [hubIdx, ...destinations.map((d) => d.index)],
+      },
+    ];
+    return {
+      ...rawData,
+      segments: derivedSegments,
+      phases: derivedPhases,
+      // Hub color override applies via the point's `color` field.
+      points: rawData.radial.hubColor
+        ? rawData.points.map((p, i) =>
+            i === hubIdx ? { ...p, color: rawData.radial!.hubColor } : p,
+          )
+        : rawData.points,
+    };
+  }, [rawData]);
+
   const routeColor = data.routeColor || emphasis.primaryAccent;
 
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);

@@ -85,7 +85,7 @@ The existing `RouteAnimation` template:
 
 ## 6. Specific upgrades proposed
 
-1. **Build the `radial` mode** (extends `RouteAnimation`, not a new template). Hub field + destinations array; bearing-sorted label placement; staggered arc starts. This closes the gap docced in CLAUDE.md.
+1. ~~**Build the `radial` mode** (extends `RouteAnimation`, not a new template). Hub field + destinations array; bearing-sorted label placement; staggered arc starts. This closes the gap docced in CLAUDE.md.~~ **Done — May 11, 2026.** Shipped as `data.radial?: { hubIndex, staggerSec?, hubColor?, arcColor? }`. When set, segments and a default phase are auto-derived; destinations are sorted clockwise by bearing from the hub so the stagger reveals "broadcast outward" rather than chaotic simultaneous reveal. Reference: catalog `rome-radial` (9 Roman roads from the Republic). Closes the "Hub-with-radial-routes map" known gap in `remotion-templates/CLAUDE.md`.
 2. **Path-style audit.** Current routes may be using saturated colors; default should be ink + rust-for-current-segment.
 3. **Anchor marker treatment.** Filled 6px circle + 1.5px gold ring — codify as the standard marker.
 4. **Easing review.** Confirm ease-out cubic with 300ms hold between segments; flag any linear easing.
