@@ -32,6 +32,7 @@ import {
   exitFade,
   heroSpring,
   scaleReveal,
+  anticipatoryStartFrame,
   CLAMP_QUARTIC,
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -250,7 +251,27 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
   const barGrowFrames = sec(1 * t);
   const outroFrames = sec(1.5);
 
-  const heroStart = sec(0.5 * t);
+  // ── Anticipatory-reveal adoption (POLISH.md D17, motion-design.md § 3) ──
+  // The hero number is the editorial "land" — the figure the narrator names.
+  // Per D17 (Economist convention), the count-up should finish ~150ms BEFORE
+  // the narrator says the figure, so the eye finds the settled number a beat
+  // ahead of the ear. The count-up duration (`heroCountFrames`) is the
+  // entrance "settle" — `anticipatoryStartFrame()` shifts `heroStart` back
+  // so `heroStart + heroCountFrames` lands 5 frames before the cue.
+  //
+  // Convention: syncPoints[0] = hero figure cue. When the visual-spec pipeline
+  // emits this via Whisper-resolved cues, the hero anticipates narration.
+  // When absent (the common case today), the original estimate start frame
+  // is preserved → identical visual baseline as pre-adoption.
+  //
+  // See TitleTransition.editorial-title (commit 1da5a49) for the reference
+  // adoption — same idiom, opacity-only reveal there vs count-up here.
+  const HERO_START_DEFAULT = sec(0.5 * t);
+  const heroCueFrame = direction.syncPoints?.[0]?.frame;
+  const heroStart =
+    heroCueFrame !== undefined
+      ? anticipatoryStartFrame(heroCueFrame, heroCountFrames)
+      : HERO_START_DEFAULT;
   const barsStart = heroStart + heroCountFrames + heroHoldFrames;
 
   // ── Hero count-up progress ──────────────────────────────────────────────
