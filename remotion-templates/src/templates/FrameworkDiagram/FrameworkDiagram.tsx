@@ -491,6 +491,41 @@ const FlowVariant: React.FC<{
   const flowWidth = Math.min(area.width - layout.spacing.xxxl * 2, 1500);
   const slotWidth = numNodes > 0 ? flowWidth / numNodes : flowWidth;
   const markerRadius = 13;
+
+  // Per-node slot center x positions. When flowSpacing="proportional" AND
+  // every node has `weight` set, gaps between successive nodes scale with
+  // their weight. Otherwise equal-spaced (legacy behavior).
+  // See: references/template-research/framework-diagram.md § 6.1
+  const slotCenterX = useMemo((): number[] => {
+    const useProportional =
+      data.flowSpacing === "proportional" &&
+      nodes.length > 1 &&
+      nodes.every((n) => typeof n.weight === "number" && (n.weight as number) > 0);
+    if (!useProportional) {
+      // Equal-spaced: slot center at slotWidth * (i + 0.5).
+      return nodes.map((_, i) => slotWidth * (i + 0.5));
+    }
+    // Proportional: gaps between successive nodes scale with weight.
+    // Use n-1 segments (gaps) weighted by midpoint-weight of adjacent nodes
+    // — simpler is to weight each gap by avg(weight[i], weight[i+1]).
+    const weights = nodes.map((n) => n.weight as number);
+    const gapWeights: number[] = [];
+    for (let i = 0; i < weights.length - 1; i++) {
+      gapWeights.push((weights[i] + weights[i + 1]) / 2);
+    }
+    const totalGapWeight = gapWeights.reduce((a, b) => a + b, 0);
+    // First and last nodes anchor at slotWidth/2 and flowWidth - slotWidth/2.
+    const spineLeft = slotWidth / 2;
+    const spineRight = flowWidth - slotWidth / 2;
+    const span = spineRight - spineLeft;
+    const positions: number[] = [spineLeft];
+    let cumulative = 0;
+    for (let i = 0; i < gapWeights.length; i++) {
+      cumulative += gapWeights[i];
+      positions.push(spineLeft + (cumulative / totalGapWeight) * span);
+    }
+    return positions;
+  }, [data.flowSpacing, nodes, slotWidth, flowWidth]);
   // Color progression along the spine — starts neutral, lands on accent.
   // Each marker reads its t in [0,1] (i / (n-1)) to interpolate.
 
@@ -626,7 +661,9 @@ const FlowVariant: React.FC<{
           {Array.from({ length: Math.max(0, numNodes - 1) }).map((_, i) => {
             const segStart = stagger(i + 1, sec(0.8), sec(0.5)) - sec(0.2);
             const segOpacity = fadeIn(frame, segStart, sec(0.3)) * exitOp;
-            const cx = slotWidth * (i + 1);
+            // Chevron at midpoint between adjacent node centers (supports
+            // proportional spacing when flowSpacing="proportional").
+            const cx = (slotCenterX[i] + slotCenterX[i + 1]) / 2;
             const t = numNodes > 1 ? (i + 0.5) / (numNodes - 1) : 0;
             const color = i === numNodes - 2 ? accentColor : theme.text.secondary;
             return (
@@ -652,7 +689,7 @@ const FlowVariant: React.FC<{
               [0, 1],
               CLAMP_QUAD
             );
-            const cx = slotWidth * (i + 0.5);
+            const cx = slotCenterX[i];
             const t = numNodes > 1 ? i / (numNodes - 1) : 0;
             // Progression: muted → accent. Use the gradient endpoints' colors
             // so the markers visually align with the spine they sit on.
@@ -685,7 +722,7 @@ const FlowVariant: React.FC<{
             if (!label || i >= numNodes - 1) return null;
             const arrowStart = stagger(i, sec(0.8), sec(0.5)) + sec(0.3);
             const arrowOpacity = fadeIn(frame, arrowStart, sec(0.3)) * exitOp;
-            const xMid = slotWidth * (i + 1);
+            const xMid = (slotCenterX[i] + slotCenterX[i + 1]) / 2;
             return (
               <text
                 key={`arrow-${i}`}
@@ -720,7 +757,9 @@ const FlowVariant: React.FC<{
               key={`stage-${i}`}
               style={{
                 position: "absolute",
-                left: slotWidth * i,
+                // Card x = slot center − slotWidth/2 (so card stays centered on
+                // its marker regardless of equal vs proportional spacing).
+                left: slotCenterX[i] - slotWidth / 2,
                 top: 0,
                 width: slotWidth,
                 height: 360,
@@ -1146,6 +1185,100 @@ const MatrixVariant: React.FC<{
           ← More {colHeaders[0] || "urgent"}
         </div>
       </div>
+
+      {/* ── Empirical items overlay (scatter plot in quadrant space).
+          When `data.items` is set, plot named points at their (x, y)
+          coordinates over the matrix grid + draw origin crosshair ticks.
+          The matrix cells remain visible as quadrant titles; items show
+          *where actors actually sit*. See:
+          references/template-research/framework-diagram.md § 6.2 */}
+      {data.items && data.items.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            top: colHeaderHeight,
+            left: yAxisGutter + rowHeaderWidth,
+            width: gridWidth,
+            height: gridHeight,
+            pointerEvents: "none",
+          }}
+        >
+          {/* Origin crosshair — vertical + horizontal axis at midpoints */}
+          <div
+            style={{
+              position: "absolute",
+              top: gridHeight / 2 - 0.5,
+              left: 0,
+              width: gridWidth,
+              height: 1,
+              background: theme.text.muted,
+              opacity: 0.35 * fade * exitOp,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: gridWidth / 2 - 0.5,
+              top: 0,
+              width: 1,
+              height: gridHeight,
+              background: theme.text.muted,
+              opacity: 0.35 * fade * exitOp,
+            }}
+          />
+
+          {/* Items — staggered fade-in with weight-scaled markers */}
+          {data.items.map((item, i) => {
+            const itemStart = sec(0.8) + i * sec(0.12);
+            const itemOpacity = fadeIn(frame, itemStart, sec(0.5)) * exitOp;
+            const weight = item.weight ?? 1;
+            const dotRadius = 8 * weight;
+            const itemColor = item.color || accentColor;
+            const cx = item.x * gridWidth;
+            // Invert y — visual top = high y in data (1.0).
+            const cy = (1 - item.y) * gridHeight;
+            return (
+              <div key={`item-${i}`}>
+                {/* Marker */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: cx - dotRadius,
+                    top: cy - dotRadius,
+                    width: dotRadius * 2,
+                    height: dotRadius * 2,
+                    borderRadius: "50%",
+                    background: itemColor,
+                    opacity: itemOpacity,
+                    boxShadow: weight > 1
+                      ? `0 0 16px ${itemColor}50, 0 2px 6px rgba(0,0,0,0.25)`
+                      : `0 2px 4px rgba(0,0,0,0.18)`,
+                  }}
+                />
+                {/* Label — to the right of marker, vertical-center aligned */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: cx + dotRadius + 6,
+                    top: cy - fontSizes.body / 2,
+                    fontSize: weight > 1 ? fontSizes.label + 2 : fontSizes.body,
+                    fontFamily: fonts.body,
+                    fontWeight: weight > 1 ? 600 : 500,
+                    color: theme.text.primary,
+                    opacity: itemOpacity,
+                    whiteSpace: "nowrap",
+                    lineHeight: 1,
+                    textShadow: shadows.textLift,
+                    maxWidth: textMaxWidth.label,
+                  }}
+                >
+                  {item.label}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 });

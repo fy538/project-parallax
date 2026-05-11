@@ -15,6 +15,11 @@ const FlowNodeSchema = z.object({
   label: z.string(),
   sublabel: z.string().optional(),
   color: z.string().optional(),
+  position: z.object({
+    x: z.number(),
+    y: z.number(),
+  }).optional(),
+  weight: z.number().positive().optional(),
 });
 
 const MatrixCellSchema = z.object({
@@ -36,9 +41,17 @@ export const FrameworkDiagramSchema = z.object({
       protagonist: z.number().int().nonnegative().optional(),
       nodes: z.array(FlowNodeSchema).optional(),
       arrowLabels: z.array(z.string()).optional(),
+      flowSpacing: z.enum(["equal", "proportional"]).optional(),
       rowHeaders: z.array(z.string()).optional(),
       colHeaders: z.array(z.string()).optional(),
       cells: z.array(MatrixCellSchema).optional(),
+      items: z.array(z.object({
+        x: z.number().min(0).max(1),
+        y: z.number().min(0).max(1),
+        label: z.string(),
+        color: z.string().optional(),
+        weight: z.number().positive().optional(),
+      })).optional(),
       accentColor: z.string().optional(),
       backgroundVariant: z.enum(["dark", "light"]).optional(),
       durationSec: z.number().positive().optional(),
