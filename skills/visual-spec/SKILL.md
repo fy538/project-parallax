@@ -412,6 +412,19 @@ This ensures template animations respond to pacing intent even without explicit 
 - [ ] `reveal()` mode is supported by the template (see template support matrix)
 - [ ] No conflicting camera data between content fields and `_direction.cameraPath`
 
+### FilmOverlay preset selection (usually nothing to do)
+
+The `[OVERLAY: preset]` script tag exists but is **rarely needed**. The per-segment FilmOverlay cascade auto-resolves the preset for every segment from its `[BACKDROP: id]` choice and template kind (see `remotion-templates/CLAUDE.md` → FilmOverlay cascade for the 5-level chain). Each backdrop in `backdrop-manifest.json` declares its own `recommendedPreset` — choosing the right backdrop already chooses the right film texture.
+
+When to actually use `[OVERLAY: preset]`:
+
+- The cascade-resolved preset doesn't match the editorial register the segment needs. Example: a `StatReveal` on `night-grid` (both cascade to `clean`) for an editorial peak that should land cinematic — annotate `[OVERLAY: cinematic]`.
+- The segment uses a backdrop whose tone differs from the moment's editorial weight. Example: a `dramatic` revelation atop `cartographic` paper (which would otherwise resolve to `clean`).
+
+Otherwise: omit. The cascade is the default for a reason — it keeps script density low and lets backdrop choice carry the visual register.
+
+Note: the whole FilmOverlay system is gated on episode-level `manifest.filmOverlay` being present. If the episode hasn't opted in, `[OVERLAY:]` tags are preserved through to the manifest but ignored at render time.
+
 ### Content principles
 
 **Accuracy over aesthetics.** Every number, every quote, every claim in the JSON must match what the script says. If the script says "roughly eighty percent," the visual can say "~80%" but not "78%" unless that specific number is sourced.

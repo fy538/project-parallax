@@ -187,6 +187,8 @@ Tag each entry to make the mode explicit — downstream tools (visual-spec, asse
   The 6-layer schema is mandatory — partial implementations (probability alone, no disconfirmer)
   will fail the script-audit forecast check.
 
+- **`[OVERLAY: preset]`** — *rare* — per-segment FilmOverlay preset override. Five values: `clean`, `documentary`, `cinematic`, `dramatic`, `archival`. Use only when a specific moment needs to break from the auto-resolved preset; the cascade picks one automatically from the segment's `[BACKDROP:]` choice + template kind, so most segments need nothing. Example: forcing `[OVERLAY: dramatic]` on an otherwise documentary-toned segment for an editorial peak. The whole FilmOverlay system is GATED on episode-level `manifest.filmOverlay` being set — if the episode hasn't opted in, the tag is preserved in the manifest but ignored at render time. See `remotion-templates/CLAUDE.md` → FilmOverlay cascade for the full resolution chain.
+
 When a visual column entry has no mode tag, the pipeline infers it from context: `TEMPLATE: FOOTAGE` or `TEMPLATE: IMAGE` → footage mode; a named Remotion template → MG mode; `SOURCE: AI-GEN` → AI-GEN mode; Recraft/illustration reference → ILLUST mode. Explicit tags are preferred because they make the editorial intent unambiguous and help script-audit catch visual monotony.
 
 ### How the tags look in the table

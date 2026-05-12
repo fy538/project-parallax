@@ -91,6 +91,24 @@ export const YourTemplate: React.FC<{ data: YourDataType }> = ({ data }) => {
 
 Hooks, utilities, and shared components are documented via JSDoc/TSDoc in the source — read the file when you need to use one. Key hooks: `useCompositionAnimation` (Ken Burns + exit fade, wired into all templates), `useDirection` (`_direction` JSON → atmosphere/drift/hold), `useEntrance` (semantic entrance presets: hero/content/data/label/structure), `useThemeMode` (mode-aware tokens), `useVerticalLayout` (Shorts).
 
+## FilmOverlay cascade
+
+Per-segment FilmOverlay (grain, vignette, light-leak, dust, scratch, flicker) is **gated and cascaded**. The whole system is dormant unless the episode opts in by setting `filmOverlay: {}` (or any non-empty config) at the manifest top level. When opted-in, each segment's preset/effects/intensity resolves at render time via `src/utils/resolveFilmOverlay.ts`:
+
+| Priority | Source | Applies to |
+|---|---|---|
+| 1 | `segment.template.filmOverlay.<field>` | preset, effects, intensity (each independently) |
+| 2 | `backdrop.recommendedPreset` from `backdrop-manifest.json` | preset only |
+| 3 | `TEMPLATE_PRESET_MAP[component]` in `FilmOverlayPresets.ts` | preset only |
+| 4 | `manifest.filmOverlay.<field>` (episode default) | preset, effects, intensity |
+| 5 | `"documentary"` (component default) | preset only |
+
+Per-field cascade means script writers can override just `intensity` for one moment without disturbing the cascade-resolved `preset` and `effects`. Most segments need nothing beyond `[BACKDROP: id]` — the backdrop choice (line 2) drives the preset choice (each backdrop in `backdrop-manifest.json` declares its `recommendedPreset`). The explicit `[OVERLAY: preset]` script tag (line 1) is for the editorial peak case only.
+
+`EditorialSurface` (paper background + episode-wide grain layer) stays at the outer composition level — it's NOT cascaded. `FilmOverlay` wraps individual segments; `EditorialSurface` wraps everything.
+
+Cascade unit tests at `src/__tests__/resolveFilmOverlay.test.ts` lock all 5 priority levels.
+
 ## Rendering
 
 - **Preview:** `npm start` — Remotion Studio at `localhost:3000`.
