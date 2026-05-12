@@ -29,6 +29,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "../src/templates");
+const COMPONENTS_DIR = path.resolve(__dirname, "../src/components");
 const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
@@ -323,6 +324,61 @@ const rules = [
     severity: "warn",
     fix: "Replace the hex literal with the palette/semantic constant (e.g. palette.ink, semantic.danger). Import from ../../design/theme.",
   },
+  // ── Rule 10: No console.warn/error/log in render bodies ───────────────────
+  // Templates and shared components render every frame (30fps). A `console.warn`
+  // inside the render body or a per-frame useMemo/useEffect fires 30× per
+  // second, polluting Studio output and slowing renders. Use `warnIf` from
+  // `utils/dataWarnings.ts` instead — it dedupes by (template, message) tuple
+  // per session.
+  //
+  // Suppression: add `// eslint-disable-next-line no-console` on the line
+  // ABOVE the call. Reserve for legitimate one-shot cases:
+  //   - `componentDidCatch` error-boundary logging (lifecycle, not render)
+  //   - `useEffect` + `setTimeout/setInterval` (one-shot or scheduled)
+  //   - Module-level / IIFE-level diagnostics that fire at import time
+  //
+  // Scope: scans src/templates/ + src/components/ (extended by the scanner).
+  // Episodes/ subdir is excluded globally (EXCLUDE_DIRS) — FullEpisode.tsx
+  // has its own warnIf integration and a documented componentDidCatch
+  // console.error inside the error boundary.
+  {
+    id: "no-console-in-render",
+    description: "Use `warnIf` from utils/dataWarnings.ts instead of console.* — renders 30×/sec else",
+    fileLevel: true,
+    // Apply to src/components/ as well as src/templates/ — shared components
+    // render every frame at 30fps too. Other rules are template-specific.
+    scope: "components-too",
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (basename.startsWith("index")) return [];
+      if (basename.includes("schema") || basename.endsWith("types.ts")) return [];
+
+      const lines = content.split("\n");
+      const issues = [];
+      const consoleRe = /\bconsole\.(warn|error|log)\s*\(/;
+      const suppressRe = /eslint-disable(?:-next)?-line\s+no-console/;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!consoleRe.test(line)) continue;
+        // Skip lines inside comments — naive `/^\s*(\/\/|\*)/` check
+        if (/^\s*(\/\/|\*)/.test(line)) continue;
+        // Inline suppression on the same line
+        if (suppressRe.test(line)) continue;
+        // Above-line suppression on the previous non-blank line
+        const prev = lines[i - 1] ?? "";
+        if (suppressRe.test(prev)) continue;
+        const method = line.match(consoleRe)?.[1] ?? "warn";
+        issues.push({
+          line: i + 1,
+          message: `console.${method} fires 30×/sec in render bodies — use warnIf("TemplateName", "message") from utils/dataWarnings.ts, or add \`// eslint-disable-next-line no-console\` above the call for legitimate one-shot cases (componentDidCatch, useEffect+setTimeout).`,
+        });
+      }
+      return issues;
+    },
+    severity: "warn",
+    fix: "import { warnIf } from \"../../utils/dataWarnings\"; — then `warnIf(condition, \"TemplateName\", \"message\");`. " +
+      "For legitimate one-shot cases (componentDidCatch, useEffect+setTimeout), add `// eslint-disable-next-line no-console` above the call.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────
@@ -331,6 +387,7 @@ function getTemplateFiles() {
   const files = [];
 
   function walk(dir) {
+    if (!fs.existsSync(dir)) return;
     const dirName = path.basename(dir);
     if (EXCLUDE_DIRS.includes(dirName)) return;
 
@@ -351,14 +408,42 @@ function getTemplateFiles() {
 }
 
 /**
+ * Files in `src/components/` that render every frame (same drift-hazard
+ * surface as templates for `console.*`). Returned separately so the lint
+ * runner can apply only the `scope: "components-too"` rules to them,
+ * skipping template-specific rules like `missing-composition-animation`
+ * and `missing-title-block`.
+ */
+function getComponentFiles() {
+  const files = [];
+  function walk(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(fullPath);
+      else if (entry.name.endsWith(".tsx") || entry.name.endsWith(".ts")) {
+        files.push(fullPath);
+      }
+    }
+  }
+  walk(COMPONENTS_DIR);
+  return files;
+}
+
+/**
  * Run all rules against in-memory content (no disk I/O). Used by tests.
  * Pass the same `filePath` as if the content were on disk — file-level rules
  * use it for path-based decisions (e.g. excluding deprecated dirs).
  */
-export function lintContent(content, filePath, relativePath = filePath) {
+export function lintContent(content, filePath, relativePath = filePath, scopeFilter = null) {
   const lines = content.split("\n");
   const issues = [];
   for (const rule of rules) {
+    // When linting non-template files (e.g. src/components/), only rules
+    // tagged with `scope: "components-too"` apply. Template-specific rules
+    // like missing-composition-animation would false-positive on shared
+    // components which legitimately don't call those hooks.
+    if (scopeFilter && rule.scope !== scopeFilter) continue;
     if (rule.fileLevel) {
       const fileIssues = rule.check(content, filePath);
       for (const issue of fileIssues) {
@@ -393,10 +478,10 @@ export function lintContent(content, filePath, relativePath = filePath) {
   return issues;
 }
 
-export function lintFile(filePath) {
+export function lintFile(filePath, scopeFilter = null) {
   const content = fs.readFileSync(filePath, "utf-8");
   const relativePath = path.relative(path.resolve(__dirname, ".."), filePath);
-  return lintContent(content, filePath, relativePath);
+  return lintContent(content, filePath, relativePath, scopeFilter);
 }
 
 /**
@@ -446,6 +531,15 @@ let allIssues = [];
 
 for (const file of files) {
   const issues = lintFile(file);
+  allIssues.push(...issues);
+}
+
+// Apply only the `scope: "components-too"` rules to src/components/ files —
+// shared components render every frame at 30fps and share the
+// console-in-render drift hazard with templates, but they legitimately
+// don't call useCompositionAnimation/useDirection/TitleBlock themselves.
+for (const file of getComponentFiles()) {
+  const issues = lintFile(file, "components-too");
   allIssues.push(...issues);
 }
 

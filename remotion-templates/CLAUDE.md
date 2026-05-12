@@ -115,7 +115,7 @@ Components re-render every frame at 30fps. Cheap stuff is fine; the hot mistakes
 - **`Math.max(...arr)` / `Math.min(...arr)` / `arr.sort()` / `arr.filter()` over data props** in render body → wrap in `useMemo`. The codebase has been audited; if you're touching one, follow the existing pattern.
 - **Pure sub-components rendered in a loop** → wrap in `React.memo`.
 - **Hooks (`useMemo`, `useState`, `useId`) after an early `return null`** → Rules of Hooks violation. Move hooks above the conditional return.
-- **`console.warn` in render body** → use `warnIf()` from `utils/dataWarnings.ts`. Otherwise it fires 30× per second.
+- **`console.warn` in render body** → use `warnIf()` from `utils/dataWarnings.ts`. Otherwise it fires 30× per second. Enforced by `lint-conventions.mjs` rule `no-console-in-render` (scans `src/templates/` + `src/components/`). Suppress with `// eslint-disable-next-line no-console` above the call for legitimate one-shot cases (`componentDidCatch`, `useEffect` + `setTimeout`).
 
 ## Known constraints
 

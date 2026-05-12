@@ -173,6 +173,9 @@ export const MapGL: React.FC<MapGLProps> = ({
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!loaded) {
+        // One-shot safety warning after a 30s map-load timeout — fires at most
+        // once per mount, not per frame. Lint rule allowance documented.
+        // eslint-disable-next-line no-console
         console.warn("MapGL: Timed out waiting for map load, continuing render");
         continueRender(handle);
       }
