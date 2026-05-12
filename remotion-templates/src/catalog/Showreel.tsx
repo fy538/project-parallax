@@ -12,6 +12,7 @@
 
 import React from "react";
 import { Composition, Series } from "remotion";
+import { z } from "zod";
 import { layout, sec } from "../design/theme";
 
 // Templates
@@ -493,23 +494,45 @@ const TOTAL_DURATION_SEC = SHOWREEL_SEGMENTS.reduce(
   0
 );
 
+// ─── Schema (drives Remotion Studio props panel) ─────────────────────────
+//
+// In Studio: open catalog-showreel → right-hand "Props" panel.
+// Flip enableFilmOverlay off to see templates clean; dial filmIntensity
+// (0–1) to compare treatment strengths without changing source.
+
+const ShowreelSchema = z.object({
+  /** Toggle grain + vignette overlay on the entire showreel. Default: true. */
+  enableFilmOverlay: z.boolean().default(true),
+  /** Overall FilmOverlay intensity (0 = off, 1 = max). Default: 0.45. */
+  filmIntensity: z.number().min(0).max(1).default(0.45),
+});
+
+type ShowreelProps = z.infer<typeof ShowreelSchema>;
+
 // ─── The Showreel React component ─────────────────────────────────────────
 
-const Showreel: React.FC = () => {
-  return (
-    <FilmOverlay effects={["grain", "vignette"]} intensity={0.45}>
-      <Series>
-        {SHOWREEL_SEGMENTS.map((segment, i) => (
-          <Series.Sequence
-            key={i}
-            durationInFrames={Math.max(1, sec(segment.durationSec))}
-          >
-            {segment.render()}
-          </Series.Sequence>
-        ))}
-      </Series>
-    </FilmOverlay>
+const Showreel: React.FC<ShowreelProps> = ({
+  enableFilmOverlay = true,
+  filmIntensity = 0.45,
+}) => {
+  const series = (
+    <Series>
+      {SHOWREEL_SEGMENTS.map((segment, i) => (
+        <Series.Sequence
+          key={i}
+          durationInFrames={Math.max(1, sec(segment.durationSec))}
+        >
+          {segment.render()}
+        </Series.Sequence>
+      ))}
+    </Series>
   );
+
+  return enableFilmOverlay ? (
+    <FilmOverlay effects={["grain", "vignette"]} intensity={filmIntensity}>
+      {series}
+    </FilmOverlay>
+  ) : series;
 };
 
 // ─── Composition registration ─────────────────────────────────────────────
@@ -518,6 +541,8 @@ export const CatalogShowreel = () => (
   <Composition
     id="catalog-showreel"
     component={Showreel}
+    schema={ShowreelSchema}
+    defaultProps={{ enableFilmOverlay: true, filmIntensity: 0.45 }}
     durationInFrames={Math.max(1, sec(TOTAL_DURATION_SEC))}
     fps={layout.fps}
     width={layout.width}
