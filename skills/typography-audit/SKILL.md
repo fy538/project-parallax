@@ -97,7 +97,7 @@ SplitComposition is **exactly 2 sides** (structurally guaranteed) with **paralle
 
 → Flag: asymmetric label register ("Capitalism" vs. "The doctrine of state-led development that…"). Use parallel grammar.
 
-→ Flag: SplitComposition where one side is clearly the protagonist but `protagonistMode` is unset. Replacement: set `protagonistMode: "left"` or `"right"` for asymmetric weight.
+→ Flag: SplitComposition where one side is clearly the protagonist but both sides have equal visual weight (matching `accentColor`, no `cinematicMode`). Replacement: set the protagonist side's `accentColor` distinctly, and/or enable `cinematicMode: true` for the hero treatment.
 
 ### Lens 6 — Image template load-bearing weight
 

@@ -6,6 +6,15 @@
 **Last updated:** May 2, 2026  
 **Related files:** `template-schemas.md` (JSON field specs), `VISUAL_LANGUAGE.md` (when to use each visual mode), `SCRIPT_FORMAT.md` (script column syntax)
 
+> **Wayfinding note (May 11, 2026):** This doc is now the long-form encyclopedia. For day-to-day template selection, start with the family **SELECTOR wall-tables** — they have decision trees, sibling-disambiguation tables, mandatory rules, and quick-fail checklists:
+> - Maps → [`MAP_TEMPLATE_SELECTOR.md`](../MAP_TEMPLATE_SELECTOR.md)
+> - Charts → [`CHART_TEMPLATE_SELECTOR.md`](../CHART_TEMPLATE_SELECTOR.md)
+> - Diagrams → [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md)
+> - Timelines → [`TIMELINE_TEMPLATE_SELECTOR.md`](../TIMELINE_TEMPLATE_SELECTOR.md)
+> - Typography → [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../TYPOGRAPHY_TEMPLATE_SELECTOR.md)
+>
+> Family-aware index: [`TEMPLATE_FAMILIES.md`](../TEMPLATE_FAMILIES.md). Read the relevant SELECTOR first; come here when you need the deeper prose, real-world examples, or multi-template sequence patterns.
+
 ---
 
 ## Quick Lookup Table
@@ -54,6 +63,8 @@ Use this table to find the right template in seconds. Scan the "I need to show..
 ## Detailed Sections by Category
 
 ### COMPARISONS: When You're Contrasting or Evaluating
+
+> Decision tree + sibling-disambiguation for comparison templates lives in [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md) (SplitComposition vs. FrameworkDiagram comparison vs. DuelingFrameworks) and [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../TYPOGRAPHY_TEMPLATE_SELECTOR.md) (SplitComposition register). Use the SELECTORs to pick; come here for the deeper editorial rationale.
 
 #### Two Opposing Concepts (A vs B)
 
@@ -119,6 +130,9 @@ Example: "P(export controls succeed)" → Your estimate: 55% · Market: 42% · A
 ---
 
 ### PROGRESSIONS: When Events or Stakes Are Rising, Flowing, or Branching
+
+> Decision tree + sibling-disambiguation for progression templates lives in [`TIMELINE_TEMPLATE_SELECTOR.md`](../TIMELINE_TEMPLATE_SELECTOR.md) (TimelineComparison vs. HorizontalTimeline vs. DualTimeline vs. TimelineMorph) and [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md) (FrameworkDiagram flow vs. SankeyFlow vs. EscalationLadder vs. DecisionTree). Start with the SELECTOR for the structural question; this section deepens the prose.
+
 
 #### Single Timeline: Events in Chronological Order
 
@@ -216,6 +230,9 @@ Engage        +1, +1       0, +2
 ---
 
 ### DATA & STATISTICS: When Numbers Tell the Story
+
+> Decision tree + Cleveland-honesty rules + sibling-disambiguation for chart templates live in [`CHART_TEMPLATE_SELECTOR.md`](../CHART_TEMPLATE_SELECTOR.md) (DataChart vs. TimeSeriesChart, StatReveal vs. KineticTypography, BayesianUpdate vs. ProbabilityGauge). Start there for the encoding-honesty rules; this section has the longer-form examples.
+
 
 #### Single Hero Statistic
 
@@ -385,6 +402,9 @@ At a glance, viewers see: US leads in military/tech, China in economic; US has l
 
 ### GEOGRAPHIC: When Location and Routes Matter
 
+> Decision tree + register guidance (atmospheric vs. flat-editorial vs. vintage) for the 6 map templates lives in [`MAP_TEMPLATE_SELECTOR.md`](../MAP_TEMPLATE_SELECTOR.md). Start there for the data-shape → template mapping; this section has the longer-form prose on each map's editorial use cases.
+
+
 #### Highlighting Countries or Regions on a Map
 
 **Templates:** ChoroplethMap (phase-animation, primary) · RouteAnimation (if showing routes too) · AnnotatedImage (zoom detail)
@@ -492,6 +512,9 @@ This is ideal for scenario visualization — not just "what if" in text, but sho
 ---
 
 ### TYPOGRAPHY & EMPHASIS: When Words Matter Most
+
+> Decision tree + register-confusion guidance (KineticTypography vs. TitleTransition is the canonical mistake) + POLISH D-rule grounded mandatory rules live in [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../TYPOGRAPHY_TEMPLATE_SELECTOR.md). Start there for the editorial register decision; this section deepens the rationale.
+
 
 #### Key Quote or Attribution
 
@@ -626,6 +649,9 @@ This is the last thing viewers see — a moment to prompt action. Subtle but cle
 ---
 
 ### STRUCTURAL: When Relationships, Matrices, or Processes Define the Idea
+
+> Decision tree + sibling-disambiguation for structural templates lives in [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md) (FrameworkDiagram variants, NetworkDiagram vs. SankeyFlow, DecisionTree vs. GameBoard, matrix vs. StrategicLandscape). The largest family — start with the SELECTOR's disambiguation tables, then come here for the prose.
+
 
 #### Network of Relationships, Alliances, Dependencies
 
@@ -1115,10 +1141,23 @@ See BRAND.md for palette details. Default is `dark` for in-video content, `light
 
 ## Related Resources
 
+**SELECTOR wall-tables** (the day-to-day operating docs):
+- **[MAP_TEMPLATE_SELECTOR.md](../MAP_TEMPLATE_SELECTOR.md)** — 6 map templates, register guidance
+- **[CHART_TEMPLATE_SELECTOR.md](../CHART_TEMPLATE_SELECTOR.md)** — 6 chart templates, Cleveland-honest encoding rules
+- **[DIAGRAM_TEMPLATE_SELECTOR.md](../DIAGRAM_TEMPLATE_SELECTOR.md)** — 10 diagram templates, sibling-disambiguation
+- **[TIMELINE_TEMPLATE_SELECTOR.md](../TIMELINE_TEMPLATE_SELECTOR.md)** — 4 timeline templates, bounded-analogy doctrine
+- **[TYPOGRAPHY_TEMPLATE_SELECTOR.md](../TYPOGRAPHY_TEMPLATE_SELECTOR.md)** — 6 typography/image templates, register rules
+- **[TEMPLATE_FAMILIES.md](../TEMPLATE_FAMILIES.md)** — Family-aware index across all five families
+
+**Audit skills** (catch mistakes before render):
+- `skills/map-audit`, `chart-audit`, `diagram-audit`, `timeline-audit`, `typography-audit` — each runs after script-draft, before visual-spec
+
+**Other**:
 - **template-schemas.md** — Field specifications for every template's JSON data format
 - **VISUAL_LANGUAGE.md** — Editorial guidance on when to use footage vs MG vs layered vs AI-GEN
 - **SCRIPT_FORMAT.md** — How to write visual specs in the script's right column
 - **BRAND.md** — Design system, colors, typography, layout rules
+- **template-research/** — Per-template dossiers (canonical idioms, failure modes, defaults)
 - **remotion-templates/src/templates/** — Source code for all template components
 
 ---

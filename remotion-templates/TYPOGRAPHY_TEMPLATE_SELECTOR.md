@@ -111,12 +111,12 @@ Is the beat about IMAGES / visual evidence?
 
 | Template | Common flags / variants |
 |---|---|
-| KineticTypography | `variant: "quote" \| "bilingual" \| "definition" \| "statistic"`; `attribution`; `emphasis` (which words get accent) |
-| TitleTransition | `variant: "episode-title" \| "section" \| "end-card" \| "editorial"`; `kicker`; `dek`; `episodeNumber` |
-| SplitComposition | `protagonistMode` (which side is the focus); `tags[]` per side; `accentColor` per side |
-| ImageComposite | `variant: "full-bleed" \| "inset" \| "portrait"`; `treatment` (duotone/grain/vignette); text overlay positions |
-| AnnotatedImage | `callouts[]` (each with `x`, `y` as % of image, `label`, optional `detail`, `placement`); stagger is automatic by index |
-| PhotoMontage | `transitions: "dissolve" \| "wipe"`; per-image hold duration; optional date/name overlay |
+| KineticTypography | `variant: "quote" \| "definition" \| "bilingual" \| "statistic"`; variant-specific fields (quote: `text` + `attribution`; definition: `term` + `definitionText`; bilingual: `chineseText` + `englishText`; statistic: `statValue` + `statLabel`); `accentColor` for emphasis |
+| TitleTransition | `variant: "episode-title" \| "section" \| "end-card" \| "editorial-title"`; `kicker`, `dek`, `episodeLabel`, `sectionNumber`, `sectionTitle`, `nextEpisodeTeaser` (variant-specific); `brandMark` placement |
+| SplitComposition | exactly 2 sides (`left`/`right`); `cinematicMode: boolean` for hero treatment; per-side `accentColor`, `tag`, `bgTint`, `items[]` |
+| ImageComposite | `variant: "background" \| "inset" \| "portrait"`; `duotone: "standard" \| "conflict" \| "editorial"`; `grainOpacity?: number` |
+| AnnotatedImage | `callouts[]` (each with `x`, `y` as % of image, `label`, optional `detail`, `placement: "top" \| "bottom" \| "left" \| "right"`); stagger is automatic by index |
+| PhotoMontage | `transition: "cut" \| "dissolve" \| "wipe-left"` (singular, applies to all images); `transitionDurationSec`; per-image hold duration |
 
 ---
 
@@ -153,7 +153,7 @@ Is the beat about IMAGES / visual evidence?
 4. **TitleTransition with music sting on landing** → music enters AFTER, not WITH.
 5. **TitleTransition with accent color on title type** → accent reserved for ∴ glyph; reject.
 6. **SplitComposition with 3+ sides** → use FrameworkDiagram (comparison or matrix).
-7. **SplitComposition with identical visual weight on both sides when one is protagonist** → use `protagonistMode`.
+7. **SplitComposition with identical visual weight on both sides when one is protagonist** → set the protagonist side's `accentColor` (and/or enable `cinematicMode`) so the eye lands there.
 8. **ImageComposite with generic stock photo** → use specific image of the actual subject.
 9. **ImageComposite with cluttered overlays** → reduce to one primary text element.
 10. **AnnotatedImage with 7+ callouts** → leader-line collision even with auto-stagger; split into staged compositions.

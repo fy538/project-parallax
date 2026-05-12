@@ -142,9 +142,9 @@ These compose on top of any base template:
 | NetworkDiagram | hub-spoke layout default; ≤7 spokes for label legibility |
 | DecisionTree | `cameraPath` for autofocus; `nodes[].probability` for branch labels |
 | SankeyFlow | `linkOpacity`, `nodeColor`; conservation enforced by schema |
-| GameBoard | `equilibriumGlyph`, `bestResponseArrows`; variants for matrix / iterated-play / extensive-form |
-| EscalationLadder | `safeRungCount` 5-7; pagination NOT supported (cap rungs in data) |
-| PricingWaterfall | `accentSliver` for the smallest segment (editorial emphasis) |
+| GameBoard | `cells[].highlight: boolean` to mark Nash equilibrium; per-round `highlights: number[]` for iterated play |
+| EscalationLadder | Cap rungs to 5-7 in data (template has no `safeRungCount` field; ≥8 rungs is silently clipped — runtime warnIf at >7) |
+| PricingWaterfall | `stages[].hero: boolean` marks the editorial protagonist (renders in accent color) |
 
 ---
 
@@ -174,11 +174,11 @@ Every data-bearing diagram MUST include:
 2. **DecisionTree with simultaneous moves** → use GameBoard instead. The math is *Nash equilibrium*, not *expected value*.
 3. **SankeyFlow without a conserved total** → ribbons don't sum to a meaningful number; use FrameworkDiagram flow instead.
 4. **EscalationLadder with >7 rungs** → silent clipping below safe-area; cap rungs or split into multiple compositions.
-5. **GameBoard without Nash equilibrium highlight** → viewer can't find the analytical punchline; add `equilibriumGlyph` or best-response arrows.
+5. **GameBoard without Nash equilibrium highlight** → viewer can't find the analytical punchline; set `cells[].highlight: true` on the equilibrium cell.
 6. **FrameworkDiagram (comparison) with non-parallel rows** → one column padded with placeholder; if rows can't be parallel, use SplitComposition (visual) or DuelingFrameworks (conceptual).
 7. **FrameworkDiagram (matrix) with dependent axes** → matrix collapses to a line; should be DataChart or a single-axis form.
 8. **Payoff numbers without units or source** in GameBoard / DecisionTree → cite or omit. Invented probabilities are worse than no probabilities.
-9. **PricingWaterfall without a "smallest sliver" accent** → loses the editorial punch (the whole point is to highlight the disproportionate slice).
+9. **PricingWaterfall without any `stages[].hero: true`** → loses the editorial punch (the whole point is to highlight the disproportionate slice in accent color).
 10. **Diagram without a focal point / hero stage** → reads as inventory, not argument.
 
 ---
