@@ -55,6 +55,7 @@ import {
   ProbabilityGaugeShortComposition,
 } from "./templates/Shorts";
 import { SiliconTrapComposition, SiliconTrapFullComposition } from "./templates/Episodes";
+import { FilmOverlayCascadeTestComposition } from "./templates/Episodes/FilmOverlayCascadeTestComp";
 import { AudioPreviewComposition } from "./templates/AudioPreview";
 import { PrisonersDilemmaShowcaseComposition } from "./templates/Episodes/PrisonersDilemmaShowcase";
 import { PrisonersDilemmaFullComposition } from "./templates/Episodes/PrisonersDilemmaFull";
@@ -156,6 +157,8 @@ export const RemotionRoot: React.FC = () => {
         <PrisonersDilemmaShowcaseComposition />
         <PrisonersDilemmaFullComposition />
         <AudioPreviewComposition />
+        {/* Test fixture — NOT for production rendering; used by filmOverlay-cascade-integration.test.ts */}
+        <FilmOverlayCascadeTestComposition />
       </Folder>
 
       <Folder name="Maps">
