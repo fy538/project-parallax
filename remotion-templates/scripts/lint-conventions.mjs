@@ -379,6 +379,84 @@ const rules = [
     fix: "import { warnIf } from \"../../utils/dataWarnings\"; — then `warnIf(condition, \"TemplateName\", \"message\");`. " +
       "For legitimate one-shot cases (componentDidCatch, useEffect+setTimeout), add `// eslint-disable-next-line no-console` above the call.",
   },
+  // ── Rule 11: data.durationSec must have a fallback ────────────────────────
+  // `durationSec` is optional on many template Zod schemas (`z.number().optional()`
+  // or `z.number().positive().optional()`). Bare access produces `undefined`,
+  // which `sec()` then turns into `NaN` frames, which Remotion turns into a
+  // crash or an empty render. CLAUDE.md says: "Don't access data.durationSec
+  // without a ?? 0 fallback."
+  //
+  // The rule accepts either `?? N` (nullish coalescing) or `|| N` (logical OR)
+  // as valid fallbacks. Both short-circuit on `undefined`, which is the only
+  // shape that matters for `durationSec` (0 is rejected at the Zod level via
+  // `.positive()` in most schemas, so `||` doesn't accidentally short-circuit
+  // a real value). The codebase has standardized on `||`; allowing both
+  // avoids gratuitous stylistic churn.
+  //
+  // Skipped: dep-array context (the line contains `[` BEFORE the match and
+  // `]` AFTER), because `useMemo`/`useEffect`/`useCallback` deps must reference
+  // the raw value, not a fallback expression. Skipped: optional-chain reads
+  // (`?.durationSec`) — those yield undefined and the consumer handles it.
+  //
+  // Suppression: `// eslint-disable-next-line no-bare-durationSec` on the
+  // line above, for the rare case where the bare access is intentional.
+  {
+    id: "no-bare-durationSec",
+    description: "data.durationSec accessed without ?? or || fallback — undefined → NaN frames → render crash",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const lines = content.split("\n");
+      const issues = [];
+      // Match `data.durationSec` or `(props.data as Foo).durationSec`.
+      // Word-boundary on the left so `phase.durationSec`, `clip.durationSec`,
+      // `img.durationSec` (which are required Zod fields on sub-schemas)
+      // don't match — those are explicitly out of scope.
+      const accessRe =
+        /(?:\)|^|[^a-zA-Z_.])(?:data|props\.data)\.durationSec\b/g;
+      const suppressRe =
+        /eslint-disable(?:-next)?-line\s+no-bare-durationSec/;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        // Skip comment-only lines
+        if (/^\s*(\/\/|\*|\/\*)/.test(line)) continue;
+        // Above-line suppression on the previous non-blank line
+        const prev = lines[i - 1] ?? "";
+        if (suppressRe.test(prev) || suppressRe.test(line)) continue;
+
+        for (const m of line.matchAll(accessRe)) {
+          const matchStart = m.index ?? 0;
+          // Look ahead 30 chars for a fallback operator (?? or ||)
+          const after = line.slice(
+            matchStart + m[0].length,
+            matchStart + m[0].length + 30,
+          );
+          if (/\s*(\?\?|\|\|)/.test(after)) continue;
+
+          // Skip dep-array context: line has `[` before the match AND `]`
+          // after the match. Loose but matches useMemo/useEffect/useCallback
+          // deps which legitimately need the raw value.
+          const before = line.slice(0, matchStart);
+          if (/\[/.test(before) && /\]/.test(after)) continue;
+
+          // Skip optional-chain reads — `?.durationSec` yields undefined
+          // safely. The regex above doesn't match `?.` because the char
+          // class `[^a-zA-Z_.]` excludes `.`, but `?` slips through. Check
+          // explicitly.
+          if (/\?\.durationSec/.test(m[0])) continue;
+
+          issues.push({
+            line: i + 1,
+            message:
+              "data.durationSec accessed without `??` or `||` fallback — undefined turns into NaN frames in `sec()`. Use `data.durationSec ?? <default>` or `data.durationSec || <default>` (most templates use 5–14s).",
+          });
+        }
+      }
+      return issues;
+    },
+    severity: "warn",
+    fix: "Wrap the access with a fallback: `sec(data.durationSec ?? 8)` (or `|| 8`). Pick a default that matches the template's natural duration — most use 5–14s.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────

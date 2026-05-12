@@ -130,6 +130,6 @@ Full reference: [`LESSONS.md`](./LESSONS.md). Worth knowing without reading it:
 
 - Don't reintroduce `react-simple-maps` (replaced by Mapbox GL via `MapGL`).
 - Don't disable TypeScript strict mode.
-- Don't access `data.durationSec` without a `?? 0` fallback (optional in many Zod schemas).
+- Don't access `data.durationSec` without a fallback — bare access yields `undefined`, `sec()` turns it into `NaN` frames, Remotion crashes or renders empty. `durationSec` is optional on many Zod schemas (`z.number().optional()` or `z.number().positive().optional()`). Use `data.durationSec ?? <default>` or `data.durationSec || <default>` (most templates use 5–14s). Enforced by `lint-conventions.mjs` rule `no-bare-durationSec`; suppress with `// eslint-disable-next-line no-bare-durationSec` for the rare intentional case.
 - Don't paste hex colors when there's a palette token in `theme.ts`.
 - Don't hardcode `1.02`, `8`, or `15` for Ken Burns / pan / exit-fade — use the named constants.
