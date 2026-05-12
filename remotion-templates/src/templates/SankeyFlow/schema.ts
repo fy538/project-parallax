@@ -26,8 +26,12 @@ export const SankeyFlowSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    nodes: z.array(SankeyNodeSchema),
-    links: z.array(SankeyLinkSchema),
+    nodes: z.array(SankeyNodeSchema).min(2, {
+      message: "SankeyFlow requires at least 2 nodes (one source + one destination). A single-node Sankey has nothing to flow.",
+    }),
+    links: z.array(SankeyLinkSchema).min(1, {
+      message: "SankeyFlow requires at least one link. The form IS the flow — no links means there's nothing to visualize.",
+    }),
     showValues: z.boolean().optional(),
     valuePrefix: z.string().optional(),
     valueSuffix: z.string().optional(),
