@@ -62,8 +62,13 @@ import {
   BACKDROP_MANIFEST,
   EditorialSurface,
   SegmentBackdrop,
+  backdropMeta,
   backdropStaticFile,
 } from "../../components/EditorialSurface";
+import {
+  resolveFilmOverlay,
+  type FilmOverlayConfig,
+} from "../../utils/resolveFilmOverlay";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -125,6 +130,17 @@ interface TemplateInfo {
   dataFile?: string;
   /** Atmospheric PNG under this template only (ids from BACKDROP_MANIFEST). */
   backdropId?: string | null;
+  /**
+   * Per-segment FilmOverlay override. Each of preset/effects/intensity is
+   * INDEPENDENTLY optional — set just one to override that field; the others
+   * resolve via the cascade. See src/utils/resolveFilmOverlay.ts. Ignored when
+   * episode-level `manifest.filmOverlay` is absent (whole cascade is gated).
+   */
+  filmOverlay?: {
+    preset?: "clean" | "documentary" | "cinematic" | "dramatic" | "archival";
+    effects?: Array<"grain" | "vignette" | "light-leak" | "dust" | "scratch" | "flicker">;
+    intensity?: number;
+  };
 }
 
 interface HoldInfo {
@@ -275,8 +291,15 @@ interface AssemblyManifest {
   segments: ManifestSegment[];
   /** Episode-level music bed (Layer 1 — continuous ambient tracks). */
   musicBed?: MusicBedConfig;
-  /** Episode-level film overlay config. Wraps all visual layers. */
+  /**
+   * Episode-level film overlay config. PRESENCE is the activation gate for
+   * the per-segment cascade — when absent, no FilmOverlay renders anywhere
+   * (preserves dormant behavior for episodes that haven't opted in). When
+   * present (even as `{}`), each segment resolves its overlay via
+   * `resolveFilmOverlay()` in `src/utils/resolveFilmOverlay.ts`.
+   */
   filmOverlay?: {
+    preset?: "clean" | "documentary" | "cinematic" | "dramatic" | "archival";
     effects?: Array<"grain" | "vignette" | "light-leak" | "dust" | "scratch" | "flicker">;
     intensity?: number;
   };
@@ -388,6 +411,54 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   TimelineMorph,
 };
 
+// ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────
+//
+// Resolves the cascade and wraps children in <FilmOverlay> when episode-level
+// `manifest.filmOverlay` is present. When the episode has NOT opted in
+// (filmOverlay field absent on the manifest), this renders children directly
+// — the whole FilmOverlay system stays dormant, baselines unchanged.
+//
+// Per-field cascade (see resolveFilmOverlay.ts JSDoc for full chain):
+//   1. segment.template.filmOverlay
+//   2. backdrop.recommendedPreset (for `preset` only)
+//   3. TEMPLATE_PRESET_MAP[componentName] (for `preset` only)
+//   4. episodeFilmOverlay
+//   5. "documentary" default
+//
+// IMPORTANT — per-segment time semantics: FilmOverlay uses useCurrentFrame()
+// which is sequence-local inside Remotion <Sequence> wrappers. Effects that
+// interpolate over `durationInFrames` (light-leak, flicker) cycle PER SEGMENT,
+// not per episode. For most presets this is desirable (each archival moment
+// gets its own leak punctuation), but it's a semantic change from the
+// previous outer-wrap behavior worth flagging.
+
+const SegmentFilmOverlay: React.FC<{
+  episodeFilmOverlay: FilmOverlayConfig | undefined;
+  segmentOverride: FilmOverlayConfig | undefined;
+  backdropId: string | undefined;
+  componentName: string;
+  children: ReactNode;
+}> = ({ episodeFilmOverlay, segmentOverride, backdropId, componentName, children }) => {
+  // GATE: episode has not opted in → render children directly, FilmOverlay
+  // dormant. This preserves byte-identical baselines for any episode whose
+  // manifest doesn't set `filmOverlay`.
+  if (!episodeFilmOverlay) {
+    return <>{children}</>;
+  }
+  const backdrop = backdropId ? backdropMeta(backdropId) : null;
+  const resolved = resolveFilmOverlay(
+    segmentOverride,
+    backdrop,
+    componentName,
+    episodeFilmOverlay,
+  );
+  return (
+    <FilmOverlay effects={resolved.effects} intensity={resolved.intensity}>
+      {children}
+    </FilmOverlay>
+  );
+};
+
 // ── Background segment renderer ──────────────────────────────────────────────
 // Memoized to prevent SVG filter re-creation on every frame. Each segment
 // gets its own BrandImage filter instance, avoiding Chrome throttling when
@@ -396,11 +467,28 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
 const BackgroundSegment: React.FC<{
   segment: ManifestSegment;
   assetBasePath: string;
-}> = memo(({ segment, assetBasePath }) => {
+  episodeFilmOverlay: FilmOverlayConfig | undefined;
+}> = memo(({ segment, assetBasePath, episodeFilmOverlay }) => {
   const { asset, treatment } = segment;
 
   // Determine placeholder style based on asset status
   const assetStatus = asset?.status || (asset?.file ? "resolved" : "pending");
+
+  // Background segments don't have a backdrop concept (the asset IS the
+  // backdrop). Cascade resolves preset via TEMPLATE_PRESET_MAP ("" → skip
+  // level 3) → episodeFilmOverlay → documentary. In practice, footage
+  // backgrounds inherit the episode's preset unless an explicit segment
+  // override exists.
+  const wrap = (inner: ReactNode) => (
+    <SegmentFilmOverlay
+      episodeFilmOverlay={episodeFilmOverlay}
+      segmentOverride={undefined}
+      backdropId={undefined}
+      componentName=""
+    >
+      {inner}
+    </SegmentFilmOverlay>
+  );
 
   if (assetStatus !== "resolved" || !asset?.file) {
     // Asset not yet sourced — render branded placeholder
@@ -409,7 +497,7 @@ const BackgroundSegment: React.FC<{
       ? (asset?.fallbackColor || palette.paper)
       : palette.paper;
 
-    return (
+    return wrap(
       <AbsoluteFill
         style={{
           backgroundColor: bgColor,
@@ -450,7 +538,7 @@ const BackgroundSegment: React.FC<{
     // OffthreadVideo extracts frames outside the main thread, avoiding
     // cache eviction stalls that <Video> hits at 20-30% render progress
     // in long compositions with many short clips.
-    return (
+    return wrap(
       <AbsoluteFill style={{ opacity: opacity ?? COMPOSITE_DEFAULTS[composite] }}>
         <BrandImage
           src="" // BrandImage filter applied to the container; video below
@@ -472,7 +560,7 @@ const BackgroundSegment: React.FC<{
   }
 
   // IMAGE — still photo/archival with brand treatment
-  return (
+  return wrap(
     <BrandImage
       src={src}
       ramp={ramp as any}
@@ -678,14 +766,21 @@ const ForegroundSegment: React.FC<{
       segmentId={segment.id}
       componentName={template.component}
     >
-      <AbsoluteFill>
-        {showSegmentBackdrop && backdropId ? (
-          <SegmentBackdrop backdropId={backdropId} />
-        ) : null}
-        <AbsoluteFill style={{ zIndex: 1 }}>
-          <Component data={dataForTemplate} />
+      <SegmentFilmOverlay
+        episodeFilmOverlay={manifest.filmOverlay}
+        segmentOverride={template.filmOverlay}
+        backdropId={backdropId}
+        componentName={template.component}
+      >
+        <AbsoluteFill>
+          {showSegmentBackdrop && backdropId ? (
+            <SegmentBackdrop backdropId={backdropId} />
+          ) : null}
+          <AbsoluteFill style={{ zIndex: 1 }}>
+            <Component data={dataForTemplate} />
+          </AbsoluteFill>
         </AbsoluteFill>
-      </AbsoluteFill>
+      </SegmentFilmOverlay>
     </SegmentErrorBoundary>
   );
 });
@@ -846,7 +941,6 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       }));
   }, [manifest.segments]);
 
-  const filmOverlayConfig = manifest.filmOverlay;
   const lowerThirdConfig = manifest.lowerThird;
 
   // Build visual layers (shared between overlay and non-overlay paths)
@@ -879,6 +973,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                 <BackgroundSegment
                   segment={seg}
                   assetBasePath={assetBasePath}
+                  episodeFilmOverlay={manifest.filmOverlay}
                 />
               </TransitionWrapper>
             </SegmentErrorBoundary>
@@ -933,6 +1028,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                         <BackgroundSegment
                           segment={layeredBg}
                           assetBasePath={assetBasePath}
+                          episodeFilmOverlay={manifest.filmOverlay}
                         />
                       </SegmentErrorBoundary>
                     ),
@@ -1023,16 +1119,18 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
        * Intensity 0.6 = "felt, not seen" — warmth before texture.
        */}
       <EditorialSurface intensity={0.6}>
-        {filmOverlayConfig ? (
-          <FilmOverlay
-            effects={filmOverlayConfig.effects}
-            intensity={filmOverlayConfig.intensity}
-          >
-            {visualLayers}
-          </FilmOverlay>
-        ) : (
-          visualLayers
-        )}
+        {/*
+         * FilmOverlay was previously wrapped here at the outer-composition
+         * level (single instance for the whole video). As of the per-segment
+         * cascade landing, each BackgroundSegment / ForegroundSegment wraps
+         * its own content via <SegmentFilmOverlay>, gated on
+         * `manifest.filmOverlay` being present. EditorialSurface stays at
+         * the outer level — paper background + grain are episode-wide.
+         *
+         * `filmOverlayConfig` is no longer consumed here; kept on the
+         * manifest type as the activation gate + cascade fallback layer 4.
+         */}
+        {visualLayers}
 
         {/* Audio layers (always outside film overlay — audio isn't visual) */}
 
