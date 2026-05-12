@@ -83,8 +83,9 @@ function isPresetName(value: unknown): value is FilmOverlayPresetName {
  * @param backdrop       Backdrop entry whose `recommendedPreset` may drive level 2,
  *                       or `null` if the segment has no backdrop.
  * @param componentName  Remotion template component name (e.g. "DataChart") for
- *                       level-3 fallback via TEMPLATE_PRESET_MAP. Pass empty string
- *                       to skip this level.
+ *                       level-3 fallback via TEMPLATE_PRESET_MAP. Pass `null`
+ *                       (or undefined) to skip this level — used by background
+ *                       segments that don't have a template component.
  * @param episode        Episode-level config (`manifest.filmOverlay`). The CALLER
  *                       is responsible for the gating decision: when this is
  *                       null/undefined, the caller should not invoke this resolver
@@ -94,7 +95,7 @@ function isPresetName(value: unknown): value is FilmOverlayPresetName {
 export function resolveFilmOverlay(
   segment: FilmOverlayConfig | null | undefined,
   backdrop: BackdropPresetHint | null | undefined,
-  componentName: string,
+  componentName: string | null | undefined,
   episode: FilmOverlayConfig | null | undefined,
 ): ResolvedFilmOverlay {
   // ── preset resolves through all 5 levels ────────────────────────────────

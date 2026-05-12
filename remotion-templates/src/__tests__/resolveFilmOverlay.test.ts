@@ -67,7 +67,7 @@ describe("resolveFilmOverlay — preset cascade (5 levels)", () => {
     const result = resolveFilmOverlay(
       null,
       null,
-      "",                                        // no template name → skip level 3
+      null,                                      // no template name → skip level 3
       { preset: "archival" },
     );
     expect(result.preset).toBe("archival");
@@ -84,7 +84,7 @@ describe("resolveFilmOverlay — preset cascade (5 levels)", () => {
   });
 
   it("level 5: documentary default when all cascade layers are empty", () => {
-    const result = resolveFilmOverlay(null, null, "", null);
+    const result = resolveFilmOverlay(null, null, null, null);
     expect(result.preset).toBe("documentary");
   });
 
