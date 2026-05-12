@@ -8,6 +8,11 @@
  * Three variants, one dial from "rhetorical scaffolding dominates" to "data
  * dominates." Default is "minimal" — explicit opt-in required.
  *
+ * Mode: light (ink-on-paper, default) or dark (bone-on-near-black). Resolved
+ * via prop > context > "light". FullEpisode sets the context per segment from
+ * the active backdrop's `register` field — no script tag or episode toggle.
+ * See src/design/editorialModes.ts.
+ *
  * Animation sequencing (hero variant):
  *   0–15   kicker rule extends + label fades
  *   10–30  hero stat scales in (0.9 → 1.0) + Y-translate (5px → 0)
@@ -30,11 +35,16 @@
 import React, { type ReactNode } from "react";
 import { AbsoluteFill, Sequence, useCurrentFrame, interpolate } from "remotion";
 import {
-  palette,
   fonts,
   fontSizes,
   layout,
 } from "../design/theme";
+import {
+  type EditorialMode,
+  type EditorialModeColors,
+  editorialColors,
+  useEditorialMode,
+} from "../design/editorialModes";
 import { useEpisodeColorEmphasis } from "../hooks/useEpisodeColorEmphasis";
 import { CLAMP_CUBIC, CLAMP_SINE } from "../utils/animation";
 
@@ -56,6 +66,13 @@ export interface EditorialFrameProps {
    *   with an optional tiny ∴ mark in the lower-right corner.
    */
   variant?: EditorialVariant;
+  /**
+   * Foreground typography mode. When omitted, reads from EditorialModeContext
+   * (set by FullEpisode based on the active backdrop's `register`). Outside
+   * any provider, defaults to "light". Pass explicitly in standalone test
+   * compositions or for one-off overrides.
+   */
+  mode?: EditorialMode;
   /**
    * Small kicker label, top-left. Rendered in IBM Plex Mono lowercase with
    * tracked-out letter-spacing. Preceded by a short rule in the episode
@@ -108,7 +125,15 @@ const KICKER_FONT_SIZE = fontSizes.meta; // 11px — IBM Plex Mono register
  * Circle stroke draws from 0 to full circumference, then the glyph fades in.
  */
 const BrandMark = React.memo(
-  ({ radius, enterFrame }: { radius: number; enterFrame: number }) => {
+  ({
+    radius,
+    enterFrame,
+    colors,
+  }: {
+    radius: number;
+    enterFrame: number;
+    colors: EditorialModeColors;
+  }) => {
     const frame = useCurrentFrame();
     const circumference = 2 * Math.PI * radius;
 
@@ -144,7 +169,7 @@ const BrandMark = React.memo(
             cy={radius}
             r={radius - 1}
             fill="none"
-            stroke={palette.ink}
+            stroke={colors.brandMark}
             strokeWidth={1}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -162,7 +187,7 @@ const BrandMark = React.memo(
             fontFamily: fonts.heading,
             fontSize: glyphSize,
             fontWeight: 500,
-            color: palette.ink,
+            color: colors.brandMark,
             opacity: glyphOpacity,
             userSelect: "none",
           }}
@@ -187,9 +212,11 @@ const HeroLayout = React.memo(
     children,
     showBrandMark,
     kickerColor,
+    colors,
     flipped = false,
-  }: Omit<EditorialFrameProps, "variant"> & {
+  }: Omit<EditorialFrameProps, "variant" | "mode"> & {
     kickerColor: string;
+    colors: EditorialModeColors;
     /**
      * When true, mirror the layout horizontally: hero block on the right,
      * chart on the left, brand mark lower-left, byline bottom-right.
@@ -275,7 +302,7 @@ const HeroLayout = React.memo(
                 fontFamily: fonts.mono,
                 fontSize: KICKER_FONT_SIZE,
                 fontWeight: 400,
-                color: palette.ink,
+                color: colors.textSecondary,
                 letterSpacing: 2,
                 textTransform: "lowercase" as const,
                 opacity: kickerOpacity,
@@ -307,7 +334,7 @@ const HeroLayout = React.memo(
                 fontFamily: fonts.heading,
                 fontSize: HERO_FONT_SIZE,
                 fontWeight: 500,
-                color: palette.ink,
+                color: colors.text,
                 letterSpacing: -5,
                 lineHeight: 1,
                 maxWidth: HERO_LEFT_PANEL_WIDTH,
@@ -332,7 +359,7 @@ const HeroLayout = React.memo(
                 fontFamily: fonts.heading,
                 fontSize: HERO_HEADLINE_SIZE,
                 fontWeight: 500,
-                color: palette.ink,
+                color: colors.text,
                 letterSpacing: 0,
                 lineHeight: 1.3,
                 maxWidth: HERO_LEFT_PANEL_WIDTH,
@@ -358,7 +385,7 @@ const HeroLayout = React.memo(
                 fontFamily: fonts.heading,
                 fontSize: BODY_FONT_SIZE,
                 fontWeight: 400,
-                color: palette.ink,
+                color: colors.text,
                 letterSpacing: 0,
                 lineHeight: 1.55,
                 maxWidth: HERO_LEFT_PANEL_WIDTH,
@@ -373,7 +400,7 @@ const HeroLayout = React.memo(
             </div>
           )}
 
-          {/* Byline: ink rule + text, bottom-anchored to same side as hero */}
+          {/* Byline: rule + text, bottom-anchored to same side as hero */}
           {byline && (
             <div
               style={{
@@ -389,7 +416,7 @@ const HeroLayout = React.memo(
                 style={{
                   width: bylineRuleWidth,
                   height: 1,
-                  backgroundColor: palette.ink,
+                  backgroundColor: colors.rule,
                   opacity: 0.35,
                   marginBottom: layout.spacing.xs,
                 }}
@@ -399,7 +426,7 @@ const HeroLayout = React.memo(
                   fontFamily: fonts.mono,
                   fontSize: KICKER_FONT_SIZE,
                   fontWeight: 400,
-                  color: palette.ink,
+                  color: colors.textSecondary,
                   letterSpacing: 1,
                   textTransform: "lowercase" as const,
                   opacity: bylineOpacity * 0.6,
@@ -453,7 +480,7 @@ const HeroLayout = React.memo(
               bottom: layout.safeArea.bottom + layout.spacing.xs,
             }}
           >
-            <BrandMark radius={20} enterFrame={90} />
+            <BrandMark radius={20} enterFrame={90} colors={colors} />
           </div>
         )}
       </AbsoluteFill>
@@ -473,8 +500,10 @@ const AsideLayout = React.memo(
     children,
     showBrandMark,
     kickerColor,
-  }: Omit<EditorialFrameProps, "variant" | "headline"> & {
+    colors,
+  }: Omit<EditorialFrameProps, "variant" | "headline" | "mode"> & {
     kickerColor: string;
+    colors: EditorialModeColors;
   }) => {
     const frame = useCurrentFrame();
 
@@ -528,7 +557,7 @@ const AsideLayout = React.memo(
                   fontFamily: fonts.mono,
                   fontSize: KICKER_FONT_SIZE,
                   fontWeight: 400,
-                  color: palette.ink,
+                  color: colors.textSecondary,
                   letterSpacing: 2,
                   textTransform: "lowercase" as const,
                   opacity: kickerOpacity,
@@ -549,7 +578,7 @@ const AsideLayout = React.memo(
                 fontFamily: fonts.heading,
                 fontSize: ASIDE_HERO_FONT_SIZE,
                 fontWeight: 500,
-                color: palette.ink,
+                color: colors.text,
                 letterSpacing: -2,
                 lineHeight: 1.1,
                 maxWidth: ASIDE_LEFT_PANEL_WIDTH,
@@ -572,7 +601,7 @@ const AsideLayout = React.memo(
                 fontFamily: fonts.heading,
                 fontSize: BODY_FONT_SIZE,
                 fontWeight: 400,
-                color: palette.ink,
+                color: colors.text,
                 lineHeight: 1.55,
                 maxWidth: ASIDE_LEFT_PANEL_WIDTH,
                 overflow: "hidden",
@@ -597,7 +626,7 @@ const AsideLayout = React.memo(
                 style={{
                   width: bylineRuleWidth,
                   height: 1,
-                  backgroundColor: palette.ink,
+                  backgroundColor: colors.rule,
                   opacity: 0.35,
                   marginBottom: layout.spacing.xs,
                 }}
@@ -607,7 +636,7 @@ const AsideLayout = React.memo(
                   fontFamily: fonts.mono,
                   fontSize: KICKER_FONT_SIZE,
                   fontWeight: 400,
-                  color: palette.ink,
+                  color: colors.textSecondary,
                   letterSpacing: 1,
                   textTransform: "lowercase" as const,
                   opacity: bylineOpacity * 0.6,
@@ -646,7 +675,7 @@ const AsideLayout = React.memo(
               bottom: layout.safeArea.bottom + layout.spacing.xs,
             }}
           >
-            <BrandMark radius={15} enterFrame={50} />
+            <BrandMark radius={15} enterFrame={50} colors={colors} />
           </div>
         )}
       </AbsoluteFill>
@@ -661,9 +690,11 @@ const MinimalLayout = React.memo(
   ({
     children,
     showBrandMark,
+    colors,
   }: {
     children: ReactNode;
     showBrandMark: boolean;
+    colors: EditorialModeColors;
   }) => {
     const frame = useCurrentFrame();
     const markOpacity = showBrandMark
@@ -682,7 +713,7 @@ const MinimalLayout = React.memo(
               fontFamily: fonts.heading,
               fontSize: fontSizes.label,
               fontWeight: 500,
-              color: palette.ink,
+              color: colors.brandMark,
               opacity: markOpacity,
               pointerEvents: "none",
               userSelect: "none",
@@ -704,6 +735,10 @@ MinimalLayout.displayName = "MinimalLayout";
  * an inner template (chart, map, diagram). Three variants provide a single dial
  * from "rhetorical scaffolding dominates" (hero) to "data dominates" (minimal).
  *
+ * Mode resolution: `mode` prop > `EditorialModeContext` (set by FullEpisode
+ * from backdrop register) > `"light"`. The variant logic and animation
+ * sequencing are identical across modes — only colors change.
+ *
  * All scaffold animations use eased interpolation per BRAND.md timing principles.
  * The kicker rule color reads from the episode color emphasis context, adapting
  * to per-episode visual identity (Soviet → rust, american-modernist → gold, etc.).
@@ -711,6 +746,7 @@ MinimalLayout.displayName = "MinimalLayout";
 export const EditorialFrame = React.memo(
   ({
     variant = "minimal",
+    mode,
     kicker,
     hero,
     headline,
@@ -719,9 +755,16 @@ export const EditorialFrame = React.memo(
     children,
     showBrandMark,
   }: EditorialFrameProps) => {
+    const contextMode = useEditorialMode();
+    const resolvedMode: EditorialMode = mode ?? contextMode;
+    const colors = editorialColors(resolvedMode);
+
     const emphasis = useEpisodeColorEmphasis();
     // Kicker rule color follows episode accent — ties editorial scaffolding
     // to per-episode visual identity (rust for Soviet, gold for neutral/modernist).
+    // Same in both modes — episode accents already pass contrast on light AND
+    // dark backdrops per the palette discipline (rust/gold/dustblue all sit at
+    // muted ~40-50% saturation that reads on either ground).
     const kickerColor = emphasis.primaryAccent;
 
     const _showBrandMark = showBrandMark ?? variant !== "minimal";
@@ -736,6 +779,7 @@ export const EditorialFrame = React.memo(
           byline={byline}
           showBrandMark={_showBrandMark}
           kickerColor={kickerColor}
+          colors={colors}
           flipped={variant === "hero-flipped"}
         >
           {children}
@@ -752,6 +796,7 @@ export const EditorialFrame = React.memo(
           byline={byline}
           showBrandMark={_showBrandMark}
           kickerColor={kickerColor}
+          colors={colors}
         >
           {children}
         </AsideLayout>
@@ -760,7 +805,7 @@ export const EditorialFrame = React.memo(
 
     // minimal
     return (
-      <MinimalLayout showBrandMark={_showBrandMark}>
+      <MinimalLayout showBrandMark={_showBrandMark} colors={colors}>
         {children}
       </MinimalLayout>
     );

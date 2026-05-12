@@ -26,6 +26,7 @@ import React, { type ReactNode } from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import backdropManifest from "../../data/backdrop-manifest.json";
 import type { BackdropChartFit } from "../utils/backdropChartFit";
+import type { EditorialMode } from "../design/editorialModes";
 import { palette } from "../design/theme";
 
 export interface EditorialSurfaceProps {
@@ -207,6 +208,14 @@ export interface BackdropEntry {
   anchor: BackdropAnchor;
   /** Recommended EditorialFrame variant. */
   variant: "hero" | "hero-flipped";
+  /**
+   * Editorial mode this backdrop demands for foreground typography.
+   * Drives the EditorialFrame mode cascade in FullEpisode — `light` keeps
+   * ink-on-paper, `dark` flips to bone-on-near-black. Required for all
+   * entries since May 11, 2026; older callers that read manifest data
+   * directly must treat `undefined` as `"light"`.
+   */
+  register: EditorialMode;
   /** Short editorial description — what this backdrop says, when to use it. */
   notes: string;
   /** Agent-oriented: when to pick this id vs others (scripts, LLM tooling). */

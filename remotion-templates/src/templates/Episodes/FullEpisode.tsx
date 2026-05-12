@@ -69,6 +69,10 @@ import {
   resolveFilmOverlay,
   type FilmOverlayConfig,
 } from "../../utils/resolveFilmOverlay";
+import {
+  EditorialModeProvider,
+  modeFromBackdropRegister,
+} from "../../design/editorialModes";
 
 // ── Template imports ─��────────────────────────────────────────────────────────
 
@@ -756,6 +760,15 @@ const ForegroundSegment: React.FC<{
       ? { ...dataWithSync, transparentBackground: true as const }
       : dataWithSync;
 
+  // Editorial mode is FULLY DERIVED from the active backdrop's register
+  // (light vs dark), with `light` as the safe default when no backdrop is
+  // set or the manifest lookup misses. Any EditorialFrame in the subtree
+  // picks this up via context — no per-segment script tag, no episode
+  // toggle. See src/design/editorialModes.ts § modeFromBackdropRegister.
+  const editorialMode = modeFromBackdropRegister(
+    backdropId && backdropKnown ? backdropMeta(backdropId)?.register : undefined,
+  );
+
   return (
     <SegmentErrorBoundary
       segmentId={segment.id}
@@ -767,14 +780,16 @@ const ForegroundSegment: React.FC<{
         backdropId={backdropId}
         componentName={template.component}
       >
-        <AbsoluteFill>
-          {showSegmentBackdrop && backdropId ? (
-            <SegmentBackdrop backdropId={backdropId} />
-          ) : null}
-          <AbsoluteFill style={{ zIndex: 1 }}>
-            <Component data={dataForTemplate} />
+        <EditorialModeProvider mode={editorialMode}>
+          <AbsoluteFill>
+            {showSegmentBackdrop && backdropId ? (
+              <SegmentBackdrop backdropId={backdropId} />
+            ) : null}
+            <AbsoluteFill style={{ zIndex: 1 }}>
+              <Component data={dataForTemplate} />
+            </AbsoluteFill>
           </AbsoluteFill>
-        </AbsoluteFill>
+        </EditorialModeProvider>
       </SegmentFilmOverlay>
     </SegmentErrorBoundary>
   );

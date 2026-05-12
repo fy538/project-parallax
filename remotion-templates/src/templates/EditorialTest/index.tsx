@@ -1,15 +1,18 @@
 /**
  * EditorialTest compositions — Remotion Studio registrations.
  *
- * Three compositions demonstrating the EditorialFrame + EditorialSurface system:
- *   EditorialFrameHeroTest   — hero variant, prisoner's dilemma cooperation data
- *   EditorialFrameAsideTest  — aside variant, defection rate data
- *   EditorialFrameMinimalTest — minimal variant (passthrough + ∴ mark)
+ * Compositions demonstrating the EditorialFrame + EditorialSurface system:
+ *   EditorialFrameHeroTest      — hero variant, light mode, cartographic backdrop
+ *   EditorialFrameHeroDarkTest  — hero variant, dark mode, night-grid backdrop
+ *   EditorialFrameHeroFlippedTest — flipped hero, reading-room backdrop
+ *   EditorialFrameAsideTest     — aside variant, defection rate data
+ *   EditorialFrameMinimalTest   — minimal variant (passthrough + ∴ mark)
  */
 
 import { Composition } from "remotion";
 import { layout, sec } from "../../design/theme";
 import { EditorialFrameHeroTest } from "./EditorialFrameHeroTest";
+import { EditorialFrameHeroDarkTest } from "./EditorialFrameHeroDarkTest";
 import { EditorialFrameHeroFlippedTest } from "./EditorialFrameHeroFlippedTest";
 import { EditorialFrameAsideTest, EditorialFrameMinimalTest } from "./EditorialFrameVariantsTest";
 import { BACKDROP_MANIFEST } from "../../components/EditorialSurface";
@@ -19,6 +22,18 @@ export const EditorialFrameHeroTestComposition = () => (
   <Composition
     id="EditorialFrameHeroTest"
     component={EditorialFrameHeroTest}
+    width={layout.width}
+    height={layout.height}
+    fps={layout.fps}
+    durationInFrames={sec(14)}
+    defaultProps={{}}
+  />
+);
+
+export const EditorialFrameHeroDarkTestComposition = () => (
+  <Composition
+    id="EditorialFrameHeroDarkTest"
+    component={EditorialFrameHeroDarkTest}
     width={layout.width}
     height={layout.height}
     fps={layout.fps}
