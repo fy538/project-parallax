@@ -3,7 +3,7 @@
 > Every hard-won lesson from building and iterating on templates.
 > Read this before making changes — it prevents re-discovering known issues.
 >
-> Last updated: May 11, 2026
+> Last updated: May 12, 2026
 
 ## Visual-baseline honesty (calibration-drift audit)
 
@@ -658,6 +658,58 @@ boxShadow: shadows.accentGlowSm(ptColor)
 **Change:** `MapGL` default flipped to `terrain={false}`. Templates (`ChoroplethMap`, `RouteAnimation`) thread an optional `terrain?: boolean` schema field through to `<MapGL>`. Enable per-shot via the data file when relief is genuinely the editorial point (Himalayan supply route, alpine border dispute, etc.).
 **Migration:** Existing baseline-locked data files (silicon-trap's 4 maps + prisoners-dilemma's choropleth-ostrom) had `"terrain": true` added explicitly to preserve their look. New compositions get the flat-atlas register automatically.
 **Doctrine reference:** `BRAND.md` → "Cartographic doctrine" → "Terrain is opt-in, not default."
+
+### L101: Per-segment FilmOverlay — which presets are safe for episode-wide use
+
+**Context:** FilmOverlay is per-segment (each foreground TEMPLATE segment wraps itself in
+`<SegmentFilmOverlay>`, which places a new `<FilmOverlay>` inside a `<Sequence>`).
+The key Remotion mechanic: `<Sequence>` injects its own `durationInFrames` into
+`useVideoConfig()` context (Sequence.js line 72: `durationInFrames: actualDurationInFrames`).
+So inside any `<FilmOverlay>` instance, `useCurrentFrame()` resets to 0 AND
+`useVideoConfig().durationInFrames` equals the *segment's* duration — not the episode total.
+
+**Per-effect analysis at a segment boundary (values computed for 90-frame / 3-second
+segments at 30fps; confirmed by code inspection and mathematical model):**
+
+| Effect | Used by presets | Frame/time behavior | Seam at boundary |
+|---|---|---|---|
+| `GrainOverlay` | all | `seed = floor(frame/2)` — stochastic per-frame | ✅ **None** — grain is intentionally noisy, no continuity expectation |
+| `VignetteOverlay` | doc, cin, dramatic, archival | `breathe = sin(frame × 0.04) × 3` — period 5.2 s | ✅ **Imperceptible** — max phase jump 1.22% gradient shift |
+| `FlickerOverlay` | dramatic | `sin(frame × 0.05)`, max opacity **0.02** (2%) | ✅ **Imperceptible** — full-range jump is a 0.7% opacity change |
+| `ScratchOverlay` | archival | cycle reset per segment | ✅ **Imperceptible** — max opacity 2.4% |
+| `DustOverlay` | archival | positions fixed by string-seed random, cycle phase resets | ⚠️ **Low** — 7.2% max opacity; resets are visible if particle near peak at boundary |
+| `LightLeakOverlay` | cinematic | `posX = interpolate(frame, [0, durationInFrames], [startX, endX])` — traverses full frame width in **one segment** | ❌ **Hard seam** — jumps 3038 px (158% of frame width) at every boundary |
+
+**Why `LightLeakOverlay` seams are hard:** The implementation drifts the glow across the
+full composition in `durationInFrames` frames. With `durationInFrames` = segment duration
+(e.g., 90 frames), the leak travels from right off-screen to left off-screen in 3 seconds,
+then snaps back to the right side at the next segment boundary. In the old episode-wide
+architecture (one `<FilmOverlay>` wrapping all of FullEpisode), `durationInFrames` was the
+episode total and the drift was slow and continuous. Per-segment breaks this entirely.
+
+**Preset-level verdict for episode-wide `manifest.filmOverlay`:**
+
+| Preset | Effects | Safe for episode-wide use? |
+|---|---|---|
+| `clean` | grain | ✅ Yes |
+| `documentary` | grain, vignette | ✅ Yes — the default Parallax look, seams imperceptible |
+| `dramatic` | grain, vignette, flicker | ✅ Yes — all three effects have imperceptible boundary resets |
+| `archival` | grain, vignette, scratch, dust | ⚠️ Monitor — dust cycle resets can flicker at boundaries if particles happen to be at peak opacity; use per-climactic-segment rather than episode-wide |
+| `cinematic` | grain, vignette, light-leak | ❌ Do NOT use episode-wide — light-leak restarts every segment with a hard 3038px snap |
+
+**Fix if cinematic must be used episode-wide** (not yet implemented): Pass a `frameOffset`
+prop to `<FilmOverlay>` / `LightLeakOverlay` equal to `segment.startSec * fps`. The overlay
+would then sample `frame + frameOffset` in the interpolation range `[0, episodeTotalFrames]`
+for a continuous cross-segment drift. Track in a follow-up task before any episode ships
+`manifest.filmOverlay: { preset: "cinematic" }`.
+
+**Rule:** Use `manifest.filmOverlay: { preset: "documentary" }` for episode-wide opt-in.
+Reserve `cinematic` for short-sequence opt-in via per-segment override only
+(`segment.template.filmOverlay: { preset: "cinematic" }`), where there is only one
+segment so no boundary seam exists. Avoid `archival` at episode level.
+
+**Verification date: May 12, 2026.** Mathematical model (Sequence.js source + effect
+geometry computation). No visual render needed — 3038px jump is analytically conclusive.
 
 ### L100: Meridian Mapbox styles via env vars
 **Context:** Stock `mapbox/light-v11` and `mapbox/dark-v11` were designed for routing apps. Parallax wants atlas plates — IBM Plex typography, hidden POIs, muted hillshade, disputed boundaries dashed in rust.
