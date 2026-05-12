@@ -214,7 +214,7 @@
   "$defs": {
     "filmOverlayConfig": {
       "type": "object",
-      "description": "Film-overlay configuration shape. Used at episode level (manifest.filmOverlay) and per-segment (segment.template.filmOverlay). At segment level, each of `preset`, `effects`, `intensity` is INDEPENDENTLY optional — per-field cascade in resolveFilmOverlay.ts means you can override just intensity for one segment without disturbing the cascade-resolved preset and effects.",
+      "description": "Film-overlay configuration shape. Used at episode level (manifest.filmOverlay) and per-segment (segment.template.filmOverlay). At segment level, each of `preset`, `effects`, `intensity` is INDEPENDENTLY optional — per-field cascade in resolveFilmOverlay.ts means you can override just intensity for one segment without disturbing the cascade-resolved preset and effects. TS-SIDE SIBLING: `FilmOverlayConfig` in `src/utils/resolveFilmOverlay.ts` is the TypeScript source of truth. Both must be kept in sync by hand when adding fields — a future improvement is to generate this fragment from a Zod schema (see resolveFilmOverlay.ts header).",
       "additionalProperties": false,
       "properties": {
         "preset": {

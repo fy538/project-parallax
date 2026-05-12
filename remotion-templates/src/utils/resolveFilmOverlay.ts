@@ -33,7 +33,21 @@ import {
 } from "../components/FilmOverlayPresets";
 import type { FilmOverlayPresetName } from "../components/EditorialSurface";
 
-/** A film-overlay config payload — same shape at episode and segment levels. */
+/**
+ * A film-overlay config payload — same shape at episode and segment levels.
+ *
+ * SINGLE TS SOURCE OF TRUTH for the FilmOverlay shape across the codebase.
+ * Consumers: `AssemblyManifest.filmOverlay` and `TemplateInfo.filmOverlay`
+ * in `src/templates/Episodes/FullEpisode.tsx` both import this interface
+ * (no inline duplication).
+ *
+ * DATA-SIDE SIBLING: `$defs/filmOverlayConfig` in
+ * `data/assembly-manifest.schema.json` (referenced by both `manifest.filmOverlay`
+ * and `segment.template.filmOverlay` via `$ref`). The two definitions agree
+ * by hand — when adding a field here, mirror it there. A future improvement
+ * is to generate the JSON Schema from a Zod schema (see resolver header
+ * "Reference" link for the design spec); out of scope for the current sync.
+ */
 export interface FilmOverlayConfig {
   preset?: FilmOverlayPresetName;
   effects?: FilmOverlayPreset["effects"];

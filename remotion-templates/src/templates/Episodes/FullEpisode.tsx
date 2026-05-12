@@ -135,12 +135,13 @@ interface TemplateInfo {
    * INDEPENDENTLY optional — set just one to override that field; the others
    * resolve via the cascade. See src/utils/resolveFilmOverlay.ts. Ignored when
    * episode-level `manifest.filmOverlay` is absent (whole cascade is gated).
+   *
+   * Shape is `FilmOverlayConfig` (single TS source of truth — same interface
+   * at episode level below). Data-side equivalent: `$defs/filmOverlayConfig`
+   * in `data/assembly-manifest.schema.json` — keep both in sync when adding
+   * fields (see resolveFilmOverlay.ts header comment).
    */
-  filmOverlay?: {
-    preset?: "clean" | "documentary" | "cinematic" | "dramatic" | "archival";
-    effects?: Array<"grain" | "vignette" | "light-leak" | "dust" | "scratch" | "flicker">;
-    intensity?: number;
-  };
+  filmOverlay?: FilmOverlayConfig;
 }
 
 interface HoldInfo {
@@ -297,12 +298,12 @@ interface AssemblyManifest {
    * (preserves dormant behavior for episodes that haven't opted in). When
    * present (even as `{}`), each segment resolves its overlay via
    * `resolveFilmOverlay()` in `src/utils/resolveFilmOverlay.ts`.
+   *
+   * Shape is `FilmOverlayConfig` (same interface used at segment level above
+   * via `TemplateInfo.filmOverlay`). Data-side equivalent:
+   * `$defs/filmOverlayConfig` in `data/assembly-manifest.schema.json`.
    */
-  filmOverlay?: {
-    preset?: "clean" | "documentary" | "cinematic" | "dramatic" | "archival";
-    effects?: Array<"grain" | "vignette" | "light-leak" | "dust" | "scratch" | "flicker">;
-    intensity?: number;
-  };
+  filmOverlay?: FilmOverlayConfig;
   /** Episode-level lower-third config. If present, renders LowerThird per beat. */
   lowerThird?: {
     /** Label shown on all lower-thirds, e.g. "∴ PARALLAX · EP.01" */
