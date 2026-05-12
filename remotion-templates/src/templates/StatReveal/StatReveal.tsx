@@ -37,6 +37,7 @@ import {
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { warnIf } from "../../utils/dataWarnings";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
@@ -223,6 +224,14 @@ const BarItem: React.FC<BarItemProps> = ({
 // ── Main component ───────────────────────────────────────────────────────────
 
 export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
+  warnIf(
+    !data.comparisons || data.comparisons.length === 0,
+    "StatReveal",
+    `StatReveal called without comparison bars — context evaporates. ` +
+      `Either add comparisons[] (mandatory for this template) OR switch to ` +
+      `KineticTypography (statistic variant) for a context-free hero number. ` +
+      `See CHART_TEMPLATE_SELECTOR.md.`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);

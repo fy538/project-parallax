@@ -30,7 +30,15 @@ Before starting, familiarize yourself with:
 
 The templates cover the MG layer of visual needs. Grouped by **family** so the orphaned templates (the ones that exist but aren't in any author's working memory) stay visible. Shares are episode-typical proportions, not budget caps.
 
-**Wayfinding philosophy:** before picking a template, identify the FAMILY the script beat lives in, then use the family's SELECTOR doc (if it exists) or the in-skill table (if not) to choose the specific template. The Maps family has the canonical "if your beat says X, use Y" wall-table at `remotion-templates/MAP_TEMPLATE_SELECTOR.md`; other families have detailed prose in `remotion-templates/references/template-picker.md` (excellent reference but pre-decision-tree). The family-aware index `remotion-templates/TEMPLATE_FAMILIES.md` cross-references all of this in one page.
+**Wayfinding philosophy:** before picking a template, identify the FAMILY the script beat lives in, then open that family's SELECTOR wall-table to choose the specific template. All five Remotion families now have canonical "if your beat says X, use Y" wall-tables:
+
+- Maps → [`MAP_TEMPLATE_SELECTOR.md`](../../remotion-templates/MAP_TEMPLATE_SELECTOR.md)
+- Charts → [`CHART_TEMPLATE_SELECTOR.md`](../../remotion-templates/CHART_TEMPLATE_SELECTOR.md)
+- Diagrams → [`DIAGRAM_TEMPLATE_SELECTOR.md`](../../remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md)
+- Timelines → [`TIMELINE_TEMPLATE_SELECTOR.md`](../../remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md)
+- Typography → [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../../remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md)
+
+The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLATE_FAMILIES.md) cross-references all five plus the per-template dossiers. The long-form prose in `references/template-picker.md` is the deeper-dive reference; the wall-tables are the operating documents.
 
 ### Maps — 6 templates · ~25-30% episode share
 
@@ -49,9 +57,9 @@ The templates cover the MG layer of visual needs. Grouped by **family** so the o
 
 ### Charts / data visualizations — 6 templates · ~15-20% episode share
 
-**Selector doc:** ❌ no dedicated wall-table yet. Selection logic is in [`remotion-templates/references/template-picker.md`](../../remotion-templates/references/template-picker.md) (prose, lines 218-300) and the per-template dossiers under `references/template-research/`.
+**Selector doc:** [`remotion-templates/CHART_TEMPLATE_SELECTOR.md`](../../remotion-templates/CHART_TEMPLATE_SELECTOR.md) (wall-table). Cleveland-honesty rules grounded in Tufte + dossier conventions.
 
-**Audit skill:** ❌ no chart-audit yet. script-audit Lens 6 catches mode balance, not template-fit.
+**Audit skill:** `chart-audit` — sister to script-audit / visual-concept. Catches truncated y-axes (Tufte cardinal sin), rainbow bars, StatReveal without comparison bars, RadarChart density violations, BayesianUpdate vs. ProbabilityGauge mis-routing.
 
 | Template | Share | Purpose |
 |---|---|---|
@@ -64,9 +72,9 @@ The templates cover the MG layer of visual needs. Grouped by **family** so the o
 
 ### Diagrams / framework / strategic — 10 templates · ~10-15% episode share
 
-**Selector doc:** ❌ no dedicated wall-table. Most under-indexed family — 10 templates, only 6 currently routed through standard authoring. Selection logic is in `template-picker.md` lines 54-192.
+**Selector doc:** [`remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md`](../../remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md) (wall-table). Largest family with the heaviest sibling-confusion surface — sibling-disambiguation tables for DecisionTree vs. GameBoard, FrameworkDiagram-flow vs. SankeyFlow, comparison vs. matrix vs. DuelingFrameworks.
 
-**Audit skill:** ❌ no diagram-audit yet.
+**Audit skill:** `diagram-audit` — 8-lens audit catching sibling mis-routing, density-cap violations, missing focal hierarchy, invented payoff numbers.
 
 | Template | Share | Purpose |
 |---|---|---|
@@ -83,9 +91,9 @@ The templates cover the MG layer of visual needs. Grouped by **family** so the o
 
 ### Timelines — 4 templates · ~10-12% episode share
 
-**Selector doc:** ❌ no dedicated wall-table. Selection in `template-picker.md` lines 144-157.
+**Selector doc:** [`remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md`](../../remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md) (wall-table). TimelineComparison is Parallax's signature form (bounded analogy rendered as visual structure) — the selector grounds it in `project/CONTENT_IDENTITY.md`.
 
-**Audit skill:** ❌ no timeline-audit. Be especially wary of event density: most timelines fail by trying to fit 12+ events into one column.
+**Audit skill:** `timeline-audit` — 7-lens audit. Especially direct on bounded-analogy mis-routing (HorizontalTimeline used where TimelineComparison is correct dilutes the channel's editorial differentiator).
 
 | Template | Share | Purpose |
 |---|---|---|
@@ -96,9 +104,9 @@ The templates cover the MG layer of visual needs. Grouped by **family** so the o
 
 ### Typography / layout — 6 templates · ~10-15% episode share
 
-**Selector doc:** ❌ no dedicated wall-table. Selection in `template-picker.md` lines 354-424.
+**Selector doc:** [`remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../../remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md) (wall-table). Grounded in POLISH.md D1-D18 doctrine for TitleTransition chrome rules.
 
-**Audit skill:** ❌ no typography-audit. visual-concept Lens 4 touches treatment-narrative fit.
+**Audit skill:** `typography-audit` — 8-lens audit. Most consequential checks: KineticTypography vs. TitleTransition register confusion (canonical mistake), KineticTypography quote without attribution, TitleTransition motion entrance.
 
 | Template | Share | Purpose |
 |---|---|---|

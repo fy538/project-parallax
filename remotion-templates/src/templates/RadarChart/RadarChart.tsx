@@ -49,7 +49,7 @@ import {
 } from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
-import { checkChartDataCommon } from "../../utils/dataWarnings";
+import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -96,6 +96,21 @@ const lerpValues = (from: number[], to: number[], t: number): number[] =>
 
 export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   checkChartDataCommon("RadarChart", data);
+  warnIf(
+    (data.subjects?.length ?? 0) > 3,
+    "RadarChart",
+    `${data.subjects?.length} subjects — RadarChart caps at 3 overlapping ` +
+      `polygons. Above 3, the chart collapses into unreadable overlap. Use ` +
+      `DataChart small-multiples instead. See CHART_TEMPLATE_SELECTOR.md.`,
+  );
+  const longAxisLabel = (data.axes ?? []).find((a) => a.label && a.label.length > 25);
+  warnIf(
+    !!longAxisLabel,
+    "RadarChart",
+    `Axis label "${longAxisLabel?.label ?? ""}" exceeds 25 chars — radial ` +
+      `label collision around the perimeter. Abbreviate or restructure. ` +
+      `See CHART_TEMPLATE_SELECTOR.md.`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);

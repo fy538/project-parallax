@@ -17,10 +17,10 @@ The Remotion MG layer has **32 templates** organized into 5 families plus 3 non-
 | Family | Count | Selector doc | Audit skill | Status |
 |---|---|---|---|---|
 | **Maps** | 6 | ✅ [`MAP_TEMPLATE_SELECTOR.md`](MAP_TEMPLATE_SELECTOR.md) | ✅ `map-audit` | **Complete** |
-| **Charts** | 6 | ❌ (use `references/template-picker.md` § Data) | ❌ (use script-audit Lens 6) | Partial |
-| **Diagrams** | 10 | ❌ (use `references/template-picker.md` § Comparisons + Frameworks) | ❌ | Orphaned |
-| **Timelines** | 4 | ❌ (use `references/template-picker.md` § Timelines) | ❌ | Orphaned |
-| **Typography / layout** | 6 | ❌ (use `references/template-picker.md` § Typography + Images) | ❌ | Orphaned |
+| **Charts** | 6 | ✅ [`CHART_TEMPLATE_SELECTOR.md`](CHART_TEMPLATE_SELECTOR.md) | ✅ `chart-audit` | **Complete** |
+| **Diagrams** | 10 | ✅ [`DIAGRAM_TEMPLATE_SELECTOR.md`](DIAGRAM_TEMPLATE_SELECTOR.md) | ✅ `diagram-audit` | **Complete** |
+| **Timelines** | 4 | ✅ [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) | ✅ `timeline-audit` | **Complete** |
+| **Typography / layout** | 6 | ✅ [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](TYPOGRAPHY_TEMPLATE_SELECTOR.md) | ✅ `typography-audit` | **Complete** |
 | **Stock footage** | n/a | ✅ [`FOOTAGE_SOURCING.md`](../project/FOOTAGE_SOURCING.md) tier system | 🟡 visual-concept Lens 2 | Partial |
 | **AI illustration** (ILLUST) | n/a | 🟡 [`VISUAL_LANGUAGE.md`](../project/VISUAL_LANGUAGE.md) Register 2 | 🟡 visual-concept Lens 6 | Partial |
 | **AI video** (AI-GEN) | n/a | 🟡 [`VISUAL_LANGUAGE.md`](../project/VISUAL_LANGUAGE.md) Register 3 | 🟡 visual-concept Lenses 5+6 | Partial |
@@ -93,75 +93,59 @@ The Remotion MG layer has **32 templates** organized into 5 families plus 3 non-
 
 ---
 
-## Family detail — Charts (6 templates) 🟡
+## Family detail — Charts (6 templates) ✅
 
-**Status:** partial. DataChart + TimeSeriesChart have runtime warnIf checks; others don't. No dedicated audit skill or selector wall-table.
+**Status:** complete wayfinding stack.
 
-**Where to look for selection logic:**
-- [`references/template-picker.md`](references/template-picker.md) § "DATA & STATISTICS" (lines 218-300)
-- Per-template dossiers — `data-chart.md`, `time-series-chart.md` exist with canonical idioms
+**Selector:** [`CHART_TEMPLATE_SELECTOR.md`](CHART_TEMPLATE_SELECTOR.md) — wall-table with data-shape decision tree, sibling disambiguation, Cleveland-honest encoding rules.
 
-**Common failure modes (not yet auto-flagged):**
-- Bar chart with truncated y-axis (forbidden by Tufte)
-- DataChart with 8+ items in vertical mode (use horizontal lollipop)
-- TimeSeriesChart with no reference band on a forecast story
-- StatReveal used as the catch-all instead of KineticTypography for non-numeric "key word" moments
+**Audit:** `skills/chart-audit/SKILL.md` — 7-lens audit catching Tufte y-axis truncation, rainbow bars, StatReveal without comparison bars, RadarChart density caps, BayesianUpdate vs. ProbabilityGauge mis-routing.
+
+**Runtime heuristics:** DataChart + TimeSeriesChart (existing), plus StatReveal (missing comparisons[]), RadarChart (>3 subjects / >25-char axis labels).
+
+**Dossiers:** [`data-chart.md`](references/template-research/data-chart.md), [`time-series-chart.md`](references/template-research/time-series-chart.md).
 
 ---
 
-## Family detail — Diagrams (10 templates) ❌
+## Family detail — Diagrams (10 templates) ✅
 
-**Status:** orphaned. Largest family, most templates with overlapping purposes. No dedicated audit skill or selector wall-table.
+**Status:** complete wayfinding stack. Largest family, highest leverage.
 
-**Where to look for selection logic:**
-- [`references/template-picker.md`](references/template-picker.md) § "COMPARISONS" (lines 54-72), § "FRAMEWORKS" (lines 170-192)
-- Per-template dossiers — `framework-diagram.md`, `game-theory.md`, `sankey-flow.md`, `network-diagram.md` exist
+**Selector:** [`DIAGRAM_TEMPLATE_SELECTOR.md`](DIAGRAM_TEMPLATE_SELECTOR.md) — wall-table with structural-shape decision tree, sibling disambiguation tables (DecisionTree vs. GameBoard, flow vs. Sankey, comparison vs. matrix vs. DuelingFrameworks).
 
-**The most common decision question:** "I need to show a structure / relationship / framework — which?"
-- Static structure with named relationships → **FrameworkDiagram** (matrix or flow variant)
-- Web of connections, hub-spoke topology → **NetworkDiagram**
-- Branching choices with outcomes → **DecisionTree**
-- Flow / allocation (where things go) → **SankeyFlow**
-- 2×2 or position-on-axes strategic frame → **StrategicLandscape**
-- Game-theory matrix / payoff structure → **GameBoard**
-- Severity / escalation ladder → **EscalationLadder**
-- Two opposing frameworks compared → **DuelingFrameworks**
-- Single fork point → **BifurcationRoute**
-- Value chain decomposition → **PricingWaterfall**
+**Audit:** `skills/diagram-audit/SKILL.md` — 8-lens audit catching sibling mis-routing, density-cap violations (>7 spokes, >7 rungs, >10 Sankey nodes), missing focal hierarchy, missing source attribution, invented payoff numbers.
+
+**Runtime heuristics:** NetworkDiagram (>8 nodes), SankeyFlow (>10 nodes / >15 links), EscalationLadder (>7 rungs).
+
+**Dossiers:** [`framework-diagram.md`](references/template-research/framework-diagram.md), [`network-diagram.md`](references/template-research/network-diagram.md), [`sankey-flow.md`](references/template-research/sankey-flow.md), [`escalation-ladder.md`](references/template-research/escalation-ladder.md), [`game-theory.md`](references/template-research/game-theory.md).
 
 ---
 
-## Family detail — Timelines (4 templates) ❌
+## Family detail — Timelines (4 templates) ✅
 
-**Status:** orphaned. Common authoring failure: trying to fit too many events into a single column (TimelineComparison caps around 8 events per column; HorizontalTimeline around 10).
+**Status:** complete wayfinding stack. TimelineComparison is Parallax's signature form.
 
-**Where to look:**
-- [`references/template-picker.md`](references/template-picker.md) § "TIMELINES" (lines 144-157)
-- `references/template-research/timeline-comparison.md`
+**Selector:** [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) — wall-table with time-structure decision tree, bounded-analogy doctrine ground, sibling disambiguation.
 
-**Selection cheat:**
-- Single chronology → **HorizontalTimeline**
-- Two parallel chronologies (e.g., Western vs. Eastern Cold War events) → **DualTimeline**
-- "Then" vs. "now" structural comparison (2-3 events each, paired) → **TimelineComparison**
-- Animated transformation (one timeline morphing into another) → **TimelineMorph**
+**Audit:** `skills/timeline-audit/SKILL.md` — 7-lens audit catching bounded-analogy mis-routing (HorizontalTimeline where TimelineComparison is correct), phase-vs-calendar alignment errors, TimelineMorph guardrails, era-color discipline, connection-line choreography.
+
+**Runtime heuristics:** HorizontalTimeline (>32 events), TimelineComparison (>5 connections OR missing connections).
+
+**Dossier:** [`timeline-comparison.md`](references/template-research/timeline-comparison.md).
 
 ---
 
-## Family detail — Typography / layout (6 templates) ❌
+## Family detail — Typography / layout (6 templates) ✅
 
-**Status:** orphaned. Most common decision: KineticTypography vs. StatReveal for "the one number" moments — answer: StatReveal when the number IS the visual headline; KineticTypography when the text *around* the number is the headline.
+**Status:** complete wayfinding stack. Lowest cross-template overlap, highest register-confusion rate.
 
-**Where to look:**
-- [`references/template-picker.md`](references/template-picker.md) § "TYPOGRAPHY" (lines 354-369), § "IMAGES" (lines 385-424)
-- `references/template-research/title-card.md`
+**Selector:** [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](TYPOGRAPHY_TEMPLATE_SELECTOR.md) — wall-table with text-moment-kind decision tree, KineticTypography vs. TitleTransition disambiguation (the canonical confusion), POLISH D1-D18 grounded rules.
 
-**Selection cheat:**
-- Quote / definition / bilingual text → **KineticTypography**
-- Section / chapter / end-card title → **TitleTransition**
-- Two-pane comparison (image + text, image + image, text + text) → **SplitComposition**
-- Single photo with overlay text → **ImageComposite**
-- Multiple photos with phased reveal → **PhotoMontage**
-- Photo with positioned callout labels → **AnnotatedImage**
+**Audit:** `skills/typography-audit/SKILL.md` — 8-lens audit catching register confusion, TitleTransition motion/chrome violations, KineticTypography missing attribution, SplitComposition parallel-structure violations, image load-bearing failures, AnnotatedImage callout density and stagger.
+
+**Runtime heuristics:** SplitComposition (item-count imbalance ≥2), AnnotatedImage (>6 callouts).
+
+**Dossier:** [`title-card.md`](references/template-research/title-card.md).
 
 ---
 
@@ -195,22 +179,16 @@ Owned by visual-spec but rendered outside Remotion.
 
 ---
 
-## Future rollout
+## Rollout history
 
-The Maps family was upgraded in May 2026 with a complete wayfinding stack (selector + audit + heuristics + dossiers). The pattern is proven and replicable for the other 4 Remotion families.
+The Maps family was upgraded in May 2026 with a complete wayfinding stack (selector + audit + heuristics + dossiers). The pattern was rolled out to the remaining four Remotion families on May 11–12, 2026:
 
-Documented rollout cost (per family, post-episode-1):
-- ~2 hr — Build SELECTOR doc (restructure the existing `template-picker.md` prose into a wall-table)
-- ~3 hr — Add runtime `warnIf` heuristics on 3-5 templates per family for the obvious data-shape mismatches
-- ~5 hr — Build dedicated audit skill following the `map-audit` pattern
+- **Diagrams** — 10 templates, highest leverage (NetworkDiagram + SankeyFlow + EscalationLadder runtime heuristics)
+- **Timelines** — signature-form integrity (TimelineComparison bounded-analogy enforcement)
+- **Charts** — Cleveland-honesty enforcement (StatReveal + RadarChart heuristics added to existing DataChart + TimeSeriesChart)
+- **Typography** — POLISH D-rule enforcement (SplitComposition + AnnotatedImage heuristics)
 
-**Recommended sequencing** (most-orphaned first):
-1. Diagrams (10 templates, biggest leverage)
-2. Timelines (event-density warnings are highest-value)
-3. Charts (DataChart heuristics already exist; finish the others + add chart-audit)
-4. Typography (lowest priority — least overlap between templates)
-
-Defer until after episode 1 ships and real failure modes surface in the post-publish retrospective.
+Each family now has: SELECTOR wall-table + dedicated audit skill + at least one runtime warnIf on the most-misused templates. The visual-spec skill consumes all five SELECTOR docs as canonical template-selection references.
 
 ---
 

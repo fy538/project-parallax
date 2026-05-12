@@ -53,6 +53,7 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import type { SankeyFlowData, SankeyNode, SankeyLink } from "./types";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -702,6 +703,23 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   } = data;
 
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+
+  // ── Editorial heuristics (dev-only warnings) ─────────────────────────────
+  warnIf(
+    nodes && nodes.length > 10,
+    "SankeyFlow",
+    `${nodes.length} nodes — SankeyFlow becomes spaghetti above ~10 nodes. ` +
+      `If the editorial point is allocation, prune to the load-bearing flows; ` +
+      `if the structure is sequential causation, demote to FrameworkDiagram (flow). ` +
+      `See DIAGRAM_TEMPLATE_SELECTOR.md.`,
+  );
+  warnIf(
+    links && links.length > 15,
+    "SankeyFlow",
+    `${links.length} ribbons — above 15 ribbons cross-over crowding destroys ` +
+      `proportion readability. Collapse minor flows into an "other" node or ` +
+      `split into staged compositions.`,
+  );
 
   // Layout — `contentArea` already reserves the title clearance + 48px gap,
   // so chart-area top = area.top with no further offset (previous code

@@ -90,7 +90,7 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
-import { checkChartDataCommon } from "../../utils/dataWarnings";
+import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -349,6 +349,18 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   data,
 }) => {
   checkChartDataCommon("NetworkDiagram", data);
+  // Template-fit heuristic: hub-spoke layouts collide labels at ~3-o'clock
+  // and ~9-o'clock positions above 7 spokes. Past 8 entities the form
+  // reads as "many things" not "structured relationship." See
+  // DIAGRAM_TEMPLATE_SELECTOR.md.
+  warnIf(
+    data.nodes && data.nodes.length > 8,
+    "NetworkDiagram",
+    `${data.nodes.length} nodes — NetworkDiagram caps cleanly at ~7 spokes ` +
+    `around a hub. Above 8, label collisions emerge at 3/9 o'clock and the ` +
+    `form collapses into undifferentiated "many things". Demote to SankeyFlow ` +
+    `(if allocation) or DataChart tabular. See DIAGRAM_TEMPLATE_SELECTOR.md.`,
+  );
   const uid = useId().replace(/:/g, "");
   const filterId = (name: string) => `nd-${uid}-${name}`;
   const frame = useCurrentFrame();

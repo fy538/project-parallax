@@ -50,6 +50,7 @@ import { KenBurns } from "../../components/KenBurns";
 import { TitleBlock } from "../../components/TitleBlock";
 import { resolveAssetSrc } from "../../utils/assetPath";
 import type { AnnotatedImageData, Callout } from "./types";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Callout geometry ─────────────────────────────────────────────────────────
 
@@ -130,6 +131,14 @@ const computeCalloutPosition = (
 export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
   data,
 }) => {
+  warnIf(
+    (data.callouts?.length ?? 0) > 6,
+    "AnnotatedImage",
+    `${data.callouts?.length} callouts — AnnotatedImage caps at ~6. Above ` +
+      `that, leader lines collide and viewer is overwhelmed. Split into ` +
+      `staged compositions or demote to PhotoMontage with per-image focus. ` +
+      `See TYPOGRAPHY_TEMPLATE_SELECTOR.md.`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);

@@ -62,6 +62,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
+import { warnIf } from "../../utils/dataWarnings";
 import type {
   HorizontalTimelineData,
   TimelineEventData,
@@ -519,6 +520,18 @@ const PhaseAxisRender: React.FC<{
 export const HorizontalTimeline: React.FC<{
   data: HorizontalTimelineData;
 }> = ({ data }) => {
+  // Editorial heuristic: above ~32 events, narration outruns reading speed
+  // and event cards collide horizontally. Split into multiple compositions.
+  const totalEventCount =
+    (data.events?.length ?? 0) + (data.pairs?.length ?? 0) * 2;
+  warnIf(
+    totalEventCount > 32,
+    "HorizontalTimeline",
+    `${totalEventCount} events — HorizontalTimeline caps at ~32 total. Above ` +
+      `that, narration outruns reading speed and event cards collide. Split ` +
+      `into multiple compositions or demote minor events. ` +
+      `See TIMELINE_TEMPLATE_SELECTOR.md.`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const mode = (data.backgroundVariant || "light") as "light" | "dark";

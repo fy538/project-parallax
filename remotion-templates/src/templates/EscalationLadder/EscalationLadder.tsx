@@ -51,7 +51,7 @@ import {
 } from "../../utils/segmentBackdrop";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
-import { checkChartDataCommon } from "../../utils/dataWarnings";
+import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { AmbientParticles } from "../../components/AmbientParticles";
@@ -132,6 +132,13 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   data,
 }) => {
   checkChartDataCommon("EscalationLadder", data);
+  warnIf(
+    data.rungs && data.rungs.length > 7,
+    "EscalationLadder",
+    `${data.rungs.length} rungs — EscalationLadder caps at 5-7 rungs. ` +
+      `Above 7, rungs are silently clipped below the safe area. Cap in ` +
+      `data or split into multiple compositions. See DIAGRAM_TEMPLATE_SELECTOR.md.`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);

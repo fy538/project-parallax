@@ -33,6 +33,7 @@ import {
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TimelineComparisonData, TimelineEvent } from "./types";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Single event card ───────────────────────────────────────────────────────
 
@@ -144,6 +145,22 @@ const EventCard: React.FC<{
 export const TimelineComparison: React.FC<{
   data: TimelineComparisonData;
 }> = ({ data }) => {
+  warnIf(
+    (data.connections?.length ?? 0) > 5,
+    "TimelineComparison",
+    `${data.connections?.length} connection lines — TimelineComparison's ` +
+      `bounded-analogy form caps at 3-5 structural pairings. Above 5, the ` +
+      `connection lines collapse into spaghetti and the pairing argument ` +
+      `becomes unreadable. Reduce to the most-structural pairings. ` +
+      `See TIMELINE_TEMPLATE_SELECTOR.md.`,
+  );
+  warnIf(
+    !data.connections || data.connections.length === 0,
+    "TimelineComparison",
+    `TimelineComparison without connection lines reduces to two parallel ` +
+      `timelines and defeats the pairing form. If you don't have pairings, ` +
+      `use HorizontalTimeline (mode: "dual") instead.`,
+  );
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const theme = useThemeMode("light");

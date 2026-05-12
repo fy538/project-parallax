@@ -64,6 +64,7 @@ import { useDirection } from "../../hooks/useDirection";
 import { usePhase } from "../../hooks/usePhase";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import type { SplitCompositionData } from "./types";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Helper: detect Chinese characters ───────────────────────────────────
 const hasChinese = (text: string): boolean => {
@@ -887,6 +888,16 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
 export const SplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   data,
 }) => {
+  const leftItems = data.left?.items?.length ?? 0;
+  const rightItems = data.right?.items?.length ?? 0;
+  warnIf(
+    leftItems > 0 && rightItems > 0 && Math.abs(leftItems - rightItems) >= 2,
+    "SplitComposition",
+    `Item counts imbalanced (${leftItems} vs ${rightItems}) — parallel ` +
+      `structure breaks when one side is padded. Either match counts or use ` +
+      `FrameworkDiagram (comparison/matrix) for asymmetric typology. ` +
+      `See TYPOGRAPHY_TEMPLATE_SELECTOR.md.`,
+  );
   if (data.cinematicMode) {
     return <CinematicSplitComposition data={data} />;
   }
