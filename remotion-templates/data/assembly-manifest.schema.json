@@ -490,6 +490,35 @@
           "items": { "type": "string" },
           "description": "Key words from narration used for Whisper sync alignment in precise mode."
         },
+        "syncPoints": {
+          "type": "array",
+          "description": "Resolved Whisper-aligned word timestamps, produced by tools/assembly/generate_manifest.py `resolve_all_sync_points` from `syncWords` and the WhisperX phoneme-level alignment of the narration audio. Each entry maps a marked hero word to an episode-absolute timeSec + frame. `FullEpisode.ForegroundSegment` converts these to segment-relative coordinates before injecting into `data._direction.syncPoints` for templates to consume via `useDirection()`. Templates use the resolved frame with `anticipatoryStartFrame()` to land hero text/numbers ~150ms before the narrator says them (POLISH.md D17). When the manifest is in `estimate` mode (no audio yet), this field is absent — templates fall back to estimate entrance start frames and the visual baseline is unchanged.",
+          "items": {
+            "type": "object",
+            "required": ["word", "timeSec", "frame"],
+            "additionalProperties": false,
+            "properties": {
+              "word": {
+                "type": "string",
+                "description": "The hero word from `syncWords` that this entry resolves."
+              },
+              "timeSec": {
+                "type": ["number", "null"],
+                "description": "Episode-absolute time in seconds when the narrator says `word`. Null if the word was in `syncWords` but couldn't be matched against the WhisperX alignment (kept for editorial traceability)."
+              },
+              "frame": {
+                "type": ["integer", "null"],
+                "description": "Episode-absolute frame at the fps in `narration.fps`. Computed as `round(timeSec * fps)` when resolved; null when unresolved. Templates compute segment-relative frames via FullEpisode's promotion logic."
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Fuzzy-match confidence (0–1) of the WhisperX word against `syncWord`. 0 for unresolved entries."
+              }
+            }
+          }
+        },
         "soundCue": {
           "type": "object",
           "description": "Primary sound design marker for NLE editor (Layer 2 — transition SFX). Specifies which sound event should accompany this segment's entrance or key moment.",

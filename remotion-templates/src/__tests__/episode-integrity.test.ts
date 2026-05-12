@@ -549,6 +549,69 @@ for (const { slug, manifestPath } of EPISODES) {
       expect(failures).toHaveLength(0);
     });
 
+    // ── syncPoints shape (D17 anticipatory-reveal pipeline) ───────────────────
+    //
+    // When a segment has `syncPoints` (resolved by WhisperX alignment in
+    // tools/assembly/generate_manifest.py `resolve_all_sync_points`), each
+    // entry must match the contract documented in
+    // remotion-templates/data/assembly-manifest.schema.json and consumed by
+    // remotion-templates/src/hooks/useDirection.ts `DirectionSyncPoint`:
+    //   { word: string, timeSec: number|null, frame: integer|null, confidence?: number }
+    //
+    // FullEpisode.ForegroundSegment promotes these into `data._direction.syncPoints`
+    // with episode-relative timestamps; templates use the resolved frame with
+    // `anticipatoryStartFrame()` to land hero text ~150ms before the narrator's
+    // cue (POLISH.md D17). A broken syncPoint shape would either silently fail
+    // (frame undefined → templates fall back to estimate startFrame) or throw
+    // at promotion. This test catches drift in the generator output.
+
+    it("syncPoints (when present) match the DirectionSyncPoint contract", () => {
+      const failures: string[] = [];
+
+      for (const seg of manifest.segments ?? []) {
+        const syncPoints = seg.syncPoints;
+        if (syncPoints === undefined) continue; // Estimate mode, expected absent
+        if (!Array.isArray(syncPoints)) {
+          failures.push(`  ${seg.id}: syncPoints is not an array (got ${typeof syncPoints})`);
+          continue;
+        }
+        for (let i = 0; i < syncPoints.length; i++) {
+          const sp = syncPoints[i];
+          if (typeof sp !== "object" || sp === null) {
+            failures.push(`  ${seg.id}.syncPoints[${i}]: not an object`);
+            continue;
+          }
+          if (typeof sp.word !== "string" || sp.word.length === 0) {
+            failures.push(`  ${seg.id}.syncPoints[${i}].word: missing or empty string`);
+          }
+          if (sp.timeSec !== null && typeof sp.timeSec !== "number") {
+            failures.push(`  ${seg.id}.syncPoints[${i}].timeSec: must be number or null (got ${typeof sp.timeSec})`);
+          }
+          if (sp.frame !== null && (typeof sp.frame !== "number" || !Number.isInteger(sp.frame))) {
+            failures.push(`  ${seg.id}.syncPoints[${i}].frame: must be integer or null`);
+          }
+          // Either both null (unresolved) or both numeric (resolved). Catch
+          // mixed states early — they'd produce weird template behavior.
+          if ((sp.timeSec === null) !== (sp.frame === null)) {
+            failures.push(`  ${seg.id}.syncPoints[${i}]: timeSec and frame must be both resolved or both null`);
+          }
+          if (sp.confidence !== undefined &&
+              (typeof sp.confidence !== "number" || sp.confidence < 0 || sp.confidence > 1)) {
+            failures.push(`  ${seg.id}.syncPoints[${i}].confidence: must be number in [0, 1]`);
+          }
+        }
+      }
+
+      if (failures.length > 0) {
+        throw new Error(
+          `\n${failures.length} syncPoints contract violation(s):\n${failures.join("\n")}\n\n` +
+          `Fix: contract is { word, timeSec: number|null, frame: integer|null, confidence?: 0-1 }.\n` +
+          `See remotion-templates/src/hooks/useDirection.ts DirectionSyncPoint + assembly-manifest.schema.json segment.syncPoints.`
+        );
+      }
+      expect(failures).toHaveLength(0);
+    });
+
     // ── Visual coverage ───────────────────────────────────────────────────────
 
     it("no single-layer gap > 30s (dead visual air)", () => {
