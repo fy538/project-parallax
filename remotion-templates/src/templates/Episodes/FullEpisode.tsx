@@ -498,7 +498,15 @@ const BackgroundSegment: React.FC<{
   const assetStatus = asset?.status || (asset?.file ? "resolved" : "pending");
 
   if (assetStatus !== "resolved" || !asset?.file) {
-    // Asset not yet sourced — render branded placeholder
+    // Asset not yet sourced (or failed) — render branded placeholder.
+    // INTENTIONALLY not wrapped in SegmentFilmOverlay: placeholders and
+    // failed-asset markers must stay visually obvious as "needs sourcing."
+    // Film treatment (grain, vignette) would visually integrate the warning
+    // into the intended look and could cause a reviewer to miss an unsourced
+    // asset in an opted-in episode. BackgroundSegment as a whole never wraps
+    // (see comment above), so this is already true by construction — noted
+    // here to make the editorial intent explicit alongside the failed/pending
+    // indicator.
     const placeholderType = asset?.placeholder || "solid-color";
     const bgColor = placeholderType === "solid-color"
       ? (asset?.fallbackColor || palette.paper)
