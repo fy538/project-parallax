@@ -838,6 +838,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Phase title overlay — appears after camera settles. */}

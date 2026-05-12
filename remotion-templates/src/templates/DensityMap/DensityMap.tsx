@@ -392,6 +392,7 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Phase title overlay — bottom-left, mirrors AtlasPlate convention. */}
