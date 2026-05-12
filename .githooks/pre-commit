@@ -10,6 +10,7 @@ TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|ts
 PY_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
 JSON_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' | grep -v 'package-lock\.json' || true)
 MANIFEST_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'data/episodes/[^/]+/assembly-manifest\.json$' || true)
+CONCEPTS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^data/concepts\.json$' || true)
 
 if [ -n "$TS_CHANGED" ]; then
   echo "→ TypeScript typecheck (TS files changed)"
@@ -33,7 +34,12 @@ if [ -n "$MANIFEST_CHANGED" ]; then
   python3 tools/lint/manifest_lint.py $MANIFEST_CHANGED
 fi
 
-if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ]; then
+if [ -n "$CONCEPTS_CHANGED" ]; then
+  echo "→ Concept-registry validation (data/concepts.json changed)"
+  python3 tools/concepts/lookup.py validate
+fi
+
+if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ]; then
   echo "  (no .ts/.tsx/.py/.json changes, skipping checks)"
 fi
 
