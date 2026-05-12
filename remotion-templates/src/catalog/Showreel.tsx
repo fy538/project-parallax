@@ -17,6 +17,10 @@ import { layout, sec } from "../design/theme";
 // Templates
 import { ChoroplethMap } from "../templates/ChoroplethMap/ChoroplethMap";
 import { RouteAnimation } from "../templates/RouteAnimation/RouteAnimation";
+import { AtlasPlate } from "../templates/AtlasPlate/AtlasPlate";
+import { ProportionalSymbolMap } from "../templates/ProportionalSymbolMap/ProportionalSymbolMap";
+import { CartogramMap } from "../templates/CartogramMap/CartogramMap";
+import { DensityMap } from "../templates/DensityMap/DensityMap";
 import { StatReveal } from "../templates/StatReveal/StatReveal";
 import { DataChart } from "../templates/DataChart/DataChart";
 import { TimeSeriesChart } from "../templates/TimeSeriesChart/TimeSeriesChart";
@@ -55,6 +59,7 @@ import { catalogCinematicData } from "./Cinematic";
 import { EditorialHeroDemo, EditorialAsideDemo, EditorialMinimalDemo } from "./Editorial";
 
 import { Slate, SectionDivider } from "./Slate";
+import { FilmOverlay } from "../components/FilmOverlay";
 
 // ─── Duration helpers ─────────────────────────────────────────────────────
 
@@ -68,6 +73,10 @@ const choroplethDurationSec = (data: { phases: { durationSec: number }[] }) =>
 
 const routeDurationSec = (data: { phases: { durationSec: number }[] }) =>
   data.phases.reduce((sum, p) => sum + p.durationSec, 0) + 1;
+
+/** Generic phase-sum helper for AtlasPlate, ProportionalSymbolMap, CartogramMap, DensityMap. */
+const phaseDurationSec = (data: { phases: { durationSec: number }[] }) =>
+  data.phases.reduce((sum, p) => sum + p.durationSec, 0);
 
 // ─── Segment definitions ──────────────────────────────────────────────────
 
@@ -101,7 +110,10 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   },
 
   // ── Maps ──
-  sectionSegment("Maps", "ChoroplethMap × 3 · RouteAnimation × 3"),
+  sectionSegment(
+    "Maps",
+    "ChoroplethMap × 3 · RouteAnimation × 4 · AtlasPlate × 2 · ProportionalSymbol · Cartogram · Density"
+  ),
 
   slateSegment("Maps", "ChoroplethMap", "g7"),
   {
@@ -133,11 +145,41 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: routeDurationSec(catalogMapsData.routeChokepoints),
     render: () => <RouteAnimation data={catalogMapsData.routeChokepoints} />,
   },
+  slateSegment("Maps", "RouteAnimation", "rome-radial"),
+  {
+    durationSec: catalogMapsData.routeRomeRadial.durationSec ?? 9,
+    render: () => <RouteAnimation data={catalogMapsData.routeRomeRadial} />,
+  },
+  slateSegment("Maps", "AtlasPlate", "cocom"),
+  {
+    durationSec: phaseDurationSec(catalogMapsData.atlasCocom) || 18,
+    render: () => <AtlasPlate data={catalogMapsData.atlasCocom} />,
+  },
+  slateSegment("Maps", "AtlasPlate", "cold-war-vintage"),
+  {
+    durationSec: phaseDurationSec(catalogMapsData.atlasColdWarVintage) || 20,
+    render: () => <AtlasPlate data={catalogMapsData.atlasColdWarVintage} />,
+  },
+  slateSegment("Maps", "ProportionalSymbolMap", "fabs"),
+  {
+    durationSec: phaseDurationSec(catalogMapsData.proportionalFabs) || 12,
+    render: () => <ProportionalSymbolMap data={catalogMapsData.proportionalFabs} />,
+  },
+  slateSegment("Maps", "CartogramMap", "eu-population"),
+  {
+    durationSec: phaseDurationSec(catalogMapsData.cartogramEU) || 12,
+    render: () => <CartogramMap data={catalogMapsData.cartogramEU} />,
+  },
+  slateSegment("Maps", "DensityMap", "fab-sites"),
+  {
+    durationSec: phaseDurationSec(catalogMapsData.densityFabs) || 10,
+    render: () => <DensityMap data={catalogMapsData.densityFabs} />,
+  },
 
   // ── Data ──
   sectionSegment(
     "Data",
-    "StatReveal × 3 · DataChart × 2 · TimeSeriesChart × 2 · ProbabilityGauge × 2 · BayesianUpdate · RadarChart · SankeyFlow"
+    "StatReveal × 3 · DataChart × 4 · TimeSeriesChart × 4 · ProbabilityGauge × 2 · BayesianUpdate · RadarChart · SankeyFlow · PricingWaterfall"
   ),
 
   slateSegment("Data", "StatReveal", "apollo-cost"),
@@ -165,6 +207,16 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
     durationSec: catalogDataData.chartSpaceRace.durationSec ?? 8,
     render: () => <DataChart data={catalogDataData.chartSpaceRace} />,
   },
+  slateSegment("Data", "DataChart", "axelrod-lollipop"),
+  {
+    durationSec: catalogDataData.chartAxelrodRankings.durationSec ?? 10,
+    render: () => <DataChart data={catalogDataData.chartAxelrodRankings} />,
+  },
+  slateSegment("Data", "DataChart", "olympics-small-multiples"),
+  {
+    durationSec: catalogDataData.chartOlympicsSmallMultiples.durationSec ?? 10,
+    render: () => <DataChart data={catalogDataData.chartOlympicsSmallMultiples} />,
+  },
   slateSegment("Data", "TimeSeriesChart", "atmospheric-co2"),
   {
     durationSec: catalogDataData.tsCarbonDioxide.durationSec ?? 12,
@@ -174,6 +226,16 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogDataData.tsPopulation.durationSec ?? 10,
     render: () => <TimeSeriesChart data={catalogDataData.tsPopulation} />,
+  },
+  slateSegment("Data", "TimeSeriesChart", "life-expectancy-slope"),
+  {
+    durationSec: catalogDataData.tsLifeExpectancySlope.durationSec ?? 12,
+    render: () => <TimeSeriesChart data={catalogDataData.tsLifeExpectancySlope} />,
+  },
+  slateSegment("Data", "TimeSeriesChart", "population-small-multiples"),
+  {
+    durationSec: catalogDataData.tsPopulationSmallMultiples.durationSec ?? 12,
+    render: () => <TimeSeriesChart data={catalogDataData.tsPopulationSmallMultiples} />,
   },
   slateSegment("Data", "ProbabilityGauge", "weather"),
   {
@@ -204,6 +266,27 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogDataData.waterfallCoffee.durationSec ?? 10,
     render: () => <PricingWaterfall data={catalogDataData.waterfallCoffee} />,
+  },
+
+  // ── Motion-Identity ──
+  sectionSegment(
+    "Motion-Identity",
+    "PricingWaterfall — still / briefing / documentary motion registers"
+  ),
+  slateSegment("Motion-Identity", "PricingWaterfall", "motion-still"),
+  {
+    durationSec: catalogDataData.waterfallCoffee.durationSec ?? 10,
+    render: () => <PricingWaterfall data={{ ...catalogDataData.waterfallCoffee, motionIdentity: "still" as const }} />,
+  },
+  slateSegment("Motion-Identity", "PricingWaterfall", "motion-briefing"),
+  {
+    durationSec: catalogDataData.waterfallCoffee.durationSec ?? 10,
+    render: () => <PricingWaterfall data={{ ...catalogDataData.waterfallCoffee, motionIdentity: "briefing" as const }} />,
+  },
+  slateSegment("Motion-Identity", "PricingWaterfall", "motion-documentary"),
+  {
+    durationSec: catalogDataData.waterfallCoffee.durationSec ?? 10,
+    render: () => <PricingWaterfall data={{ ...catalogDataData.waterfallCoffee, motionIdentity: "documentary" as const }} />,
   },
 
   // ── Typography ──
@@ -250,7 +333,7 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   // ── Diagrams ──
   sectionSegment(
     "Diagrams",
-    "FrameworkDiagram × 3 · NetworkDiagram × 2 · SplitComposition × 2"
+    "FrameworkDiagram × 3 · NetworkDiagram · SplitComposition × 2 · DuelingFrameworks"
   ),
   slateSegment("Diagrams", "FrameworkDiagram", "comparison"),
   {
@@ -322,7 +405,7 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   // ── Timelines ──
   sectionSegment(
     "Timelines",
-    "HorizontalTimeline × 2 · EscalationLadder × 2"
+    "HorizontalTimeline × 3 · EscalationLadder × 2 · TimelineComparison · DualTimeline · TimelineMorph"
   ),
   slateSegment("Timelines", "HorizontalTimeline", "computers"),
   {
@@ -414,16 +497,18 @@ const TOTAL_DURATION_SEC = SHOWREEL_SEGMENTS.reduce(
 
 const Showreel: React.FC = () => {
   return (
-    <Series>
-      {SHOWREEL_SEGMENTS.map((segment, i) => (
-        <Series.Sequence
-          key={i}
-          durationInFrames={Math.max(1, sec(segment.durationSec))}
-        >
-          {segment.render()}
-        </Series.Sequence>
-      ))}
-    </Series>
+    <FilmOverlay effects={["grain", "vignette"]} intensity={0.45}>
+      <Series>
+        {SHOWREEL_SEGMENTS.map((segment, i) => (
+          <Series.Sequence
+            key={i}
+            durationInFrames={Math.max(1, sec(segment.durationSec))}
+          >
+            {segment.render()}
+          </Series.Sequence>
+        ))}
+      </Series>
+    </FilmOverlay>
   );
 };
 
