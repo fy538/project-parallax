@@ -3,7 +3,22 @@
 > Every hard-won lesson from building and iterating on templates.
 > Read this before making changes — it prevents re-discovering known issues.
 >
-> Last updated: May 10, 2026
+> Last updated: May 11, 2026
+
+## Visual-baseline honesty (calibration-drift audit)
+
+The visual regression suite has a 0.5% pixel-diff tolerance — calibration changes (stroke widths, opacities, fontSizes, durations) can drift inside that tolerance silently. The baseline doesn't get refreshed; the test reports PASS; the reference is stale. A later visual edit then compares against a wrong reference. Commit ac0ca91 (May 11, 2026 — TimeSeriesChart stroke widths 7/3/5 → 5/2/3.5) was the canonical example; commit 0adb109 caught + corrected it by regenerating all 22 frame-30 baselines.
+
+**Audit methodology** (re-run when concerned about drift):
+
+1. `git log --since="N months ago" --oneline -- src/templates/ src/design/theme.ts src/utils/animation.ts` to enumerate candidate commits.
+2. For each, check `git show --stat <hash> | grep baselines` — empty result = no baseline refresh in that commit.
+3. Cross-reference against the latest wholesale baseline-regen commit (currently `0adb109`, 2026-05-11). Commits BEFORE the most recent regen are captured by it; commits AFTER need individual review.
+4. For "after the last regen" suspects, run `npm run test:visual` and inspect per-test pixel-diff %. Anything > 0.0% but < 0.5% is drift-within-tolerance and needs an explicit refresh decision.
+
+**Last audit: 2026-05-11.** 16 drift candidates identified post-baseline-birth; all 16 fell before `0adb109`, which already regenerated the affected baselines wholesale. Post-`0adb109` commits (D17 `anticipatoryStartFrame` adoption across 5 templates, catalog-smoke addition, dossier doc-only commits) ran clean: `npm run test:visual` reports **0.000% pixel diff on every test** (32/32 passing, 6 map-skipped), and `npm run test:catalog` reports **0.000% on all 58 catalog-smoke tests**. The suite is honest.
+
+If a calibration commit lands after this date, update this entry with the new audit timestamp and re-run the methodology before claiming honesty.
 
 ## Shared infrastructure (use these — don't reinvent)
 
@@ -628,3 +643,24 @@ boxShadow: `0 0 8px ${ptColor}80`, // shadows.accentGlowSm (80% opacity variant)
 boxShadow: shadows.accentGlowSm(ptColor)
 ```
 **Rule:** Prefer true token substitution when the token matches. Use the suppression comment only when the effect is a deliberate extension that no token covers. Never suppress without the explanatory comment — the comment is the documentation.
+
+## Cartography (May 2026)
+
+### L98: `MapAnnotations` — editorial overlay layer for map templates
+**Context:** Default Mapbox renders look like "a Mapbox screenshot," not "an authored map." The FT/Reuters/NYT difference is an annotation layer: lon/lat-pinned labels with brand typography, optional leader lines, three hierarchies (primary uppercase, secondary sentence case, tertiary mono).
+**Component:** `src/components/MapAnnotations.tsx`. Accepts `MapAnnotation[]` via the `annotations` field on `RouteAnimation` and `ChoroplethMap` data. Phase shorthand resolves against the template's phase windows automatically.
+**Hierarchies:** `primary` → Plex Sans SemiBold uppercase, ink/bone (regions, countries). `secondary` → Plex Sans Medium sentence case (features, chokepoints). `tertiary` → Plex Mono Regular, taupe (source notes, asides). One annotation = one anchor dot + one label + optional leader.
+**Dossier:** `references/template-research/map-annotations.md` — five canonical idioms, three audit failure modes, doctrine.
+**Use case:** every data-bearing map ships with at least one `tertiary` source annotation; region/feature annotations as needed.
+
+### L99: Terrain hillshading is opt-in, not default
+**Context:** Through May 10, 2026, `MapGL` defaulted to `terrain={true}` with `mapbox-terrain-dem-v1` + 1.5× exaggeration. This is the single biggest "Google Earth" tell — 3D relief on by default reads as satellite app, not atlas plate. Reverse course May 11, 2026.
+**Change:** `MapGL` default flipped to `terrain={false}`. Templates (`ChoroplethMap`, `RouteAnimation`) thread an optional `terrain?: boolean` schema field through to `<MapGL>`. Enable per-shot via the data file when relief is genuinely the editorial point (Himalayan supply route, alpine border dispute, etc.).
+**Migration:** Existing baseline-locked data files (silicon-trap's 4 maps + prisoners-dilemma's choropleth-ostrom) had `"terrain": true` added explicitly to preserve their look. New compositions get the flat-atlas register automatically.
+**Doctrine reference:** `BRAND.md` → "Cartographic doctrine" → "Terrain is opt-in, not default."
+
+### L100: Meridian Mapbox styles via env vars
+**Context:** Stock `mapbox/light-v11` and `mapbox/dark-v11` were designed for routing apps. Parallax wants atlas plates — IBM Plex typography, hidden POIs, muted hillshade, disputed boundaries dashed in rust.
+**Wiring:** `mapConfig.styleUrl` / `darkStyleUrl` in `src/design/theme.ts` read `MAPBOX_STYLE_LIGHT_URL` / `MAPBOX_STYLE_DARK_URL` from env, falling back to stock Mapbox styles when unset. The fallback is intentional — the pipeline must function without a Studio account.
+**Setup:** Mapbox Studio recipe is in `tools/mapbox-meridian-setup.md` (~2 hr browser work). Once styles are published, paste URLs into `remotion-templates/.env` and re-baseline the map real-data PNG suite.
+**Doctrine reference:** `BRAND.md` → "Cartography — Meridian Map Styles."
