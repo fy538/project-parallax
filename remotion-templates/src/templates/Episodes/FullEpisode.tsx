@@ -786,9 +786,14 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
             // Without a preceding visual to sustain, it would render as a
             // placeholder; dropping it leaves a transparent gap, which is
             // strictly preferable.
-            // eslint-disable-next-line no-console
-            console.warn(
-              `[FullEpisode] HOLD segment ${seg.id} has no preceding segment on layer "${seg.layer}" to sustain. Dropping.`,
+            // Use `warnIf` (not `console.warn`) because this useMemo can
+            // re-run on prop changes, and Remotion renders every frame —
+            // a raw console.warn would fire 30×/sec under prop churn.
+            // warnIf dedupes by (template, message) tuple per session.
+            warnIf(
+              true,
+              "FullEpisode",
+              `HOLD segment ${seg.id} has no preceding segment on layer "${seg.layer}" to sustain. Dropping.`,
             );
             continue;
           }
