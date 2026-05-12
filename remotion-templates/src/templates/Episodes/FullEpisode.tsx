@@ -436,6 +436,14 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
 // not per episode. For most presets this is desirable (each archival moment
 // gets its own leak punctuation), but it's a semantic change from the
 // previous outer-wrap behavior worth flagging.
+//
+// NOT MEMOIZED — deliberate: React.memo's default shallow equality check
+// always fails on `children: ReactNode` because VDOM nodes are new references
+// every parent render, meaning the subtree is never actually skip-rendered.
+// The only work that would be saved is the resolveFilmOverlay() call (~μs),
+// which is insufficient justification. BackgroundSegment and ForegroundSegment
+// ARE memoized because they gate expensive SVG-filter and OffthreadVideo
+// re-creation; SegmentFilmOverlay has no such heavy work in its own body.
 
 const SegmentFilmOverlay: React.FC<{
   episodeFilmOverlay: FilmOverlayConfig | undefined;
