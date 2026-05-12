@@ -238,6 +238,19 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
   );
   if (windows.length === 0) return null;
 
+  // Template-fit heuristic: Dorling cartograms shine for 15+ dense-region
+  // data points. With <10 points there's no overlap to decollide; the
+  // sized circles + faint coastline could be ProportionalSymbolMap.
+  // See MAP_TEMPLATE_SELECTOR.md.
+  const totalData = windows.reduce((sum, w) => sum + w.phase.data.length, 0);
+  warnIf(
+    totalData > 0 && totalData < 10,
+    "CartogramMap",
+    `Only ${totalData} data points across all phases — Dorling decollision ` +
+    `does no useful work below ~10 points. Consider ProportionalSymbolMap ` +
+    `(sized circles at exact country centroids) instead. See MAP_TEMPLATE_SELECTOR.md.`,
+  );
+
   return (
     <Background
       variant={dark ? "dark" : "light"}

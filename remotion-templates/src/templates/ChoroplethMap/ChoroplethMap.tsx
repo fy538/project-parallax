@@ -41,6 +41,7 @@ import {
 } from "../../utils/animation";
 import { scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
+import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { Background } from "../../components/Background";
@@ -299,6 +300,44 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
     [data.phases]
   );
   const current = getCurrentPhase(frame, windows);
+
+  // ── Template-fit heuristics (dev-time warnings) ─────────────────────────
+  // ChoroplethMap is for quantitative rates / shares. Two common misuses:
+  //   1. CATEGORICAL data (all countries have a `fill` but no `value` /
+  //      `noData`) — those want AtlasPlate's modern register, which treats
+  //      categorical membership as the editorial point (no quantitative
+  //      colour ramp needed). Choropleth's atmospheric Mapbox basemap +
+  //      ColorBrewer ramp infrastructure is wasted on categorical data.
+  //   2. SPARSE COUNT data (1-3 countries highlighted with values) —
+  //      ProportionalSymbolMap's circles read more clearly than country
+  //      fills for sparse counts.
+  // See remotion-templates/MAP_TEMPLATE_SELECTOR.md for the full table.
+  const isAllCategorical = useMemo(() => {
+    if (data.phases.length === 0) return false;
+    let totalCountries = 0;
+    let withValueOrNoData = 0;
+    let withFill = 0;
+    for (const p of data.phases) {
+      for (const c of p.countries) {
+        totalCountries++;
+        if (c.value !== undefined || c.noData) withValueOrNoData++;
+        if (c.fill) withFill++;
+      }
+    }
+    return (
+      totalCountries > 0 &&
+      withValueOrNoData === 0 &&
+      withFill === totalCountries
+    );
+  }, [data.phases]);
+  warnIf(
+    isAllCategorical,
+    "ChoroplethMap",
+    "All countries have `fill` but none have `value` or `noData` — this is " +
+    "categorical data. Consider AtlasPlate (modern aesthetic) instead; " +
+    "it's the right form for `members of X` / `treaty signatories` stories. " +
+    "See MAP_TEMPLATE_SELECTOR.md.",
+  );
 
   // ── Camera ────────────────────────────────────────────────────────────
 

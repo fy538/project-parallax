@@ -197,6 +197,22 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
     `for bivariate (size + color) encoding.`,
   );
 
+  // Template-fit heuristic: DensityMap is designed for 100s of points.
+  // With <10 points there's no useful aggregation — ProportionalSymbolMap
+  // (sized circles at exact centroids) reads more clearly. See
+  // MAP_TEMPLATE_SELECTOR.md.
+  const totalPoints = useMemo(
+    () => data.phases.reduce((sum, p) => sum + p.points.length, 0),
+    [data.phases],
+  );
+  warnIf(
+    totalPoints > 0 && totalPoints < 10,
+    "DensityMap",
+    `Only ${totalPoints} total points across all phases — DensityMap is for ` +
+    `aggregation of 100s of points. Consider ProportionalSymbolMap (sized ` +
+    `circles at exact locations) for sparse data. See MAP_TEMPLATE_SELECTOR.md.`,
+  );
+
   // ── Aggregation layer (memoized per phase + config) ─────────────────────
   // Built once per phase + config. The `opacity` prop is NOT set here —
   // it's modulated per frame via `.clone({ opacity })` in the `layers`

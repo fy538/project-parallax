@@ -32,13 +32,17 @@ The templates cover the MG layer of visual needs:
 
 | Template | Share | Purpose |
 |----------|-------|---------|
-| ChoroplethMap | ~25% | Country highlighting, alliances, trade blocs |
-| RouteAnimation | ~20% | Supply chains, trade routes, resource flows |
-| TimelineComparison | ~15% | Historical parallels, before/after |
-| DataChart | ~15% | Statistics, comparisons, numerical data |
-| KineticTypography | ~10% | Quotes, definitions, bilingual text, key stats |
-| FrameworkDiagram | ~8% | Conceptual models, comparisons, flows |
-| TitleTransition | ~7% | Episode/section titles, end cards |
+| ChoroplethMap | ~15% | World map, country fills for **quantitative rates / shares / %** on Mapbox basemap. Default for "GDP per capita," "trade share," "election swing." Atmospheric register. |
+| RouteAnimation | ~15% | Trade routes, supply chains, hub-and-spoke (radial mode). Animated arcs on Mapbox basemap. |
+| AtlasPlate | ~10% | **Pure-SVG flat editorial cartography** via d3-geo. Use for **categorical** maps ("members of X bloc," "treaty signatories"), analytical register where Mapbox atmosphere distracts, OR cold-open globes via `projection: "orthographic"` + `phase.rotation`. Supports `aesthetic: "vintage"` for Cold-War / period-atlas register. |
+| TimelineComparison | ~12% | Historical parallels, before/after |
+| DataChart | ~12% | Statistics, comparisons, numerical data |
+| KineticTypography | ~8% | Quotes, definitions, bilingual text, key stats |
+| FrameworkDiagram | ~7% | Conceptual models, comparisons, flows |
+| TitleTransition | ~5% | Episode/section titles, end cards |
+| ProportionalSymbolMap | as needed | Country circles **sized by count data** (fabs, bases, GDP) on Mapbox basemap. Right form when areas mislead — Mercator-fix for ≤12 countries spread across continents. |
+| CartogramMap | as needed | **Dorling cartogram** — country circles de-collided via d3-force. Use for **15+ data points in dense regions** (EU-27, sub-Saharan Africa) where ProportionalSymbolMap overlaps illegibly. |
+| DensityMap | as needed | **deck.gl point-density** (hex / heatmap / grid) on Mapbox basemap. Use for individual facilities / events (100s of points) where the editorial point is *where they cluster*. Supports bivariate `colorWeight` for size+color independence. |
 | BayesianUpdate | as needed | Probability estimates updated by sequential evidence |
 | ProbabilityGauge | as needed | Single probability readout with gauge arc |
 | DecisionTree | as needed | Branching scenarios, decision points |
@@ -53,6 +57,39 @@ The templates cover the MG layer of visual needs:
 | RadarChart | as needed | Multi-axis polygon capability comparison |
 | AnnotatedImage | as needed | Image with animated callout labels |
 | EscalationLadder | as needed | Vertical event sequence with severity indicators |
+
+### Map template selection — wall-table
+
+Six map templates with overlapping purposes. **Read this table before assigning any map beat.** Full editorial rationale and failure modes live in `remotion-templates/MAP_TEMPLATE_SELECTOR.md` and the per-template dossiers under `remotion-templates/references/template-research/`.
+
+| If the script beat says... | Use template | Notes |
+|---|---|---|
+| "X percent / share / rate per country" | **ChoroplethMap** | The default for QUANTITATIVE country fills. Mapbox basemap. |
+| "X fabs / bases / billionaires per country" (count, ≤12 countries spread out) | **ProportionalSymbolMap** | Sized circles at centroids. Don't use ChoroplethMap for counts — area distortion misleads. |
+| "X people / GDP per country" (count, 15+ countries in a dense region like EU) | **CartogramMap** | Dorling decollision. ProportionalSymbolMap circles would overlap. |
+| "Where specific facilities cluster" (100s of points, lat/lon) | **DensityMap** | Hex bins or heatmap. The chip-fab-density story is the canonical case. |
+| "Members of NATO / OPEC / Five Eyes" (categorical fills) | **AtlasPlate** (modern) | Flat editorial register; categorical fills don't need quantitative-honesty projections. |
+| "In 1962, the Cold War split the world" (period reference) | **AtlasPlate** + `aesthetic: "vintage"` | Tea-stained paper, brown ink, paper grain. Direct fit for historical analogy. |
+| "Globe spins from Asia to North America" (cold-open) | **AtlasPlate** + `projection: "orthographic"` + per-phase `rotation: [lon, lat]` | Animated rotation; documented per-frame cost ~9ms so keep these shots ≤10s. |
+| "From A to B" / supply chain / military campaign | **RouteAnimation** | Phased arc reveal. |
+| "All roads led to Rome" / hub + N destinations | **RouteAnimation** + `radial: { hubIndex }` | Auto-generated segments from hub, bearing-sorted stagger. |
+| "Show the disputed line" (Taiwan, S China Sea, Kashmir, Crimea, W Sahara) | Any of the above + `disputedBoundaries: ["tag"]` | Dashed rust line layered over the base map. Curated tags in `src/utils/disputedBoundaries.ts`. |
+
+**Overlay decisions (apply to any map template):**
+
+- **Always add a source `annotation`** at the bottom-right with `hierarchy: "tertiary"`, `emphasis: "mute"`. Every data-bearing map ships with provenance.
+- **Add `inset: { show: true }`** when the camera focuses on one continent — the inset globe re-anchors the viewer.
+- **Add `graticule: { spacing: 15 }`** when the editorial register wants "atlas plate" (parallels-and-meridians signals coordinate system).
+- **Add named-region `annotations` (primary / secondary)** for any feature the narration names — Hsinchu, Strait of Malacca, Sahel. Don't rely on Mapbox's stock labels.
+
+**Failure modes to flag** during visual-spec (do NOT silently generate JSON):
+
+1. **ChoroplethMap for count data** (e.g., "5 fabs in Taiwan, 0 in Iceland"). → switch to ProportionalSymbolMap or DensityMap.
+2. **ChoroplethMap for categorical fills** with no `value` / `noData` semantics (all countries have a `fill` and that's it). → switch to AtlasPlate modern.
+3. **AtlasPlate modern for a Cold-War-period beat.** → switch to AtlasPlate vintage.
+4. **DensityMap with <10 points.** → no aggregation work; use ProportionalSymbolMap.
+5. **CartogramMap for globally-spread data** (countries across all continents, no dense region). → use ProportionalSymbolMap.
+6. **RouteAnimation with `segments: []` and no `radial` block.** Schema rejects this; you'll fail validation.
 
 ## Step 1 — Read the Script
 

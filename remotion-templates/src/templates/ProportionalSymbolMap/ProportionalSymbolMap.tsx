@@ -394,6 +394,24 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
   );
   if (windows.length === 0) return null;
 
+  // Template-fit heuristic: ProportionalSymbolMap circles are at TRUE
+  // country centroids (no decollision). In dense regions (Europe at 20+
+  // circles) they overlap into illegibility. CartogramMap's d3-force
+  // decollision is the right form there.
+  // See MAP_TEMPLATE_SELECTOR.md.
+  const maxSymbolsPerPhase = windows.reduce(
+    (max, w) => Math.max(max, w.phase.symbols.length),
+    0,
+  );
+  warnIf(
+    maxSymbolsPerPhase >= 20,
+    "ProportionalSymbolMap",
+    `Up to ${maxSymbolsPerPhase} symbols per phase — at this density circles ` +
+    `start overlapping at country-centroid positions. Consider CartogramMap ` +
+    `(Dorling decollision) if the symbols cluster in a dense region. See ` +
+    `MAP_TEMPLATE_SELECTOR.md.`,
+  );
+
   return (
     <Background
       variant={dark ? "dark" : "light"}
