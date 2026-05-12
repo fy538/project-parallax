@@ -450,8 +450,15 @@ const SegmentFilmOverlay: React.FC<{
   segmentOverride: FilmOverlayConfig | undefined;
   backdropId: string | undefined;
   componentName: string;
+  /** Episode-absolute frame at which this segment starts. Passed to FilmOverlay
+   * → LightLeakOverlay so the leak drifts continuously across episode time
+   * rather than restarting at each segment boundary. Pass 0 for standalone use. */
+  frameOffset: number;
+  /** Total episode duration in frames — used as the interpolation ceiling for
+   * LightLeakOverlay. Passed through from the manifest totalDurationSec * fps. */
+  episodeTotalFrames: number;
   children: ReactNode;
-}> = ({ episodeFilmOverlay, segmentOverride, backdropId, componentName, children }) => {
+}> = ({ episodeFilmOverlay, segmentOverride, backdropId, componentName, frameOffset, episodeTotalFrames, children }) => {
   // GATE: episode has not opted in → render children directly, FilmOverlay
   // dormant. This preserves byte-identical baselines for any episode whose
   // manifest doesn't set `filmOverlay`.
@@ -466,7 +473,12 @@ const SegmentFilmOverlay: React.FC<{
     episodeFilmOverlay,
   );
   return (
-    <FilmOverlay effects={resolved.effects} intensity={resolved.intensity}>
+    <FilmOverlay
+      effects={resolved.effects}
+      intensity={resolved.intensity}
+      frameOffset={frameOffset}
+      episodeTotalFrames={episodeTotalFrames}
+    >
       {children}
     </FilmOverlay>
   );
@@ -795,6 +807,8 @@ const ForegroundSegment: React.FC<{
         segmentOverride={template.filmOverlay}
         backdropId={backdropId}
         componentName={template.component}
+        frameOffset={Math.round(segment.startSec * fps)}
+        episodeTotalFrames={Math.round(manifest.totalDurationSec * manifest.fps)}
       >
         <EditorialModeProvider mode={editorialMode}>
           <AbsoluteFill>

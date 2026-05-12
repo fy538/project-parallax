@@ -56,6 +56,27 @@ interface FilmOverlayProps {
   children: React.ReactNode;
   /** Optional container style */
   style?: React.CSSProperties;
+  /**
+   * Absolute episode frame at which this segment starts.
+   * Added to `useCurrentFrame()` inside `LightLeakOverlay` so the leak
+   * drifts continuously across the episode timeline rather than restarting
+   * at each segment boundary. Pass 0 (or omit) for standalone compositions.
+   * Default: 0.
+   *
+   * Context: `<Sequence>` resets `useCurrentFrame()` to 0 inside each
+   * segment. Without this offset the leak traverses the full frame width
+   * every segment and snaps back at boundaries — a hard visible seam
+   * (LESSONS.md L101). Only affects `light-leak` effect; all other effects
+   * are either stochastic (grain) or short-period enough to be imperceptible.
+   */
+  frameOffset?: number;
+  /**
+   * Total episode duration in frames. Paired with `frameOffset` to set the
+   * correct interpolation range for `LightLeakOverlay`. When omitted, falls
+   * back to `useVideoConfig().durationInFrames` (standalone / non-episode
+   * use — the pre-per-segment behaviour). Default: undefined.
+   */
+  episodeTotalFrames?: number;
 }
 
 // Use the canonical palette from theme.ts (single source of truth)
@@ -158,14 +179,46 @@ VignetteOverlay.displayName = "VignetteOverlay";
 /**
  * Light leak effect: animated warm glow drifting across frame
  */
-const LightLeakOverlay = React.memo(({ intensity }: { intensity: number }) => {
+const LightLeakOverlay = React.memo(
+  ({
+    intensity,
+    frameOffset,
+    episodeTotalFrames,
+  }: {
+    intensity: number;
+    /**
+     * Episode-absolute frame offset — see FilmOverlayProps.frameOffset.
+     * When > 0, the drift is sampled at (useCurrentFrame() + frameOffset)
+     * so the position is continuous across segment boundaries instead of
+     * restarting from the right side each time a new Sequence mounts.
+     */
+    frameOffset: number;
+    /**
+     * Total episode frames to use as the interpolation ceiling.
+     * Undefined in standalone mode → falls back to durationInFrames from
+     * useVideoConfig() (which equals the segment duration inside a Sequence,
+     * the original per-composition behaviour).
+     */
+    episodeTotalFrames: number | undefined;
+  }) => {
   const frame = useCurrentFrame();
   const { durationInFrames, width, height } = useVideoConfig();
 
-  // Drift from right off-screen to left off-screen over full composition
+  // Drift from right off-screen to left off-screen.
+  //
+  // In per-segment mode (frameOffset > 0): sample the episode-absolute
+  // position (frame + frameOffset) against the full episode duration so the
+  // leak moves smoothly across segment boundaries. The Sequence context makes
+  // useCurrentFrame() reset to 0 at each segment start, but adding frameOffset
+  // restores the episode-level position.
+  //
+  // In standalone mode (frameOffset === 0, episodeTotalFrames undefined): the
+  // original behaviour — drift across the composition's own durationInFrames.
   const startX = width * 1.2;
   const endX = -width * 0.4;
-  const posX = interpolate(frame, [0, durationInFrames], [startX, endX]);
+  const absoluteFrame = frame + frameOffset;
+  const totalFrames = episodeTotalFrames ?? durationInFrames;
+  const posX = interpolate(absoluteFrame, [0, totalFrames], [startX, endX]);
 
   const centerY = height * 0.5;
   const leakWidth = width * 0.6;
@@ -334,13 +387,15 @@ export const FilmOverlay = React.memo(
     intensity = 0.5,
     children,
     style,
+    frameOffset = 0,
+    episodeTotalFrames,
   }: FilmOverlayProps) => {
     const clampedIntensity = clampValue(intensity, 0, 1);
 
     const effectMap = {
       grain: <GrainOverlay key="grain" intensity={clampedIntensity} />,
       vignette: <VignetteOverlay key="vignette" intensity={clampedIntensity} />,
-      "light-leak": <LightLeakOverlay key="light-leak" intensity={clampedIntensity} />,
+      "light-leak": <LightLeakOverlay key="light-leak" intensity={clampedIntensity} frameOffset={frameOffset} episodeTotalFrames={episodeTotalFrames} />,
       dust: <DustOverlay key="dust" intensity={clampedIntensity} />,
       scratch: <ScratchOverlay key="scratch" intensity={clampedIntensity} />,
       flicker: <FlickerOverlay key="flicker" intensity={clampedIntensity} />,
