@@ -42,7 +42,7 @@
  * - 1.0: Maximum saturation (use rarely, for shock or period-film effect)
  */
 
-import React, { useMemo } from "react";
+import React, { useId, useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { random } from "remotion";
 import { palette } from "../design/theme";
@@ -79,7 +79,12 @@ const GrainOverlay = React.memo(({ intensity }: { intensity: number }) => {
   // Update seed every 2 frames for filmic 15fps grain flicker
   const seed = Math.floor(frame / 2);
 
-  const filterId = `film-grain-${seed}`;
+  // Per-instance unique id prefix prevents collisions when multiple
+  // <FilmOverlay> mount simultaneously (e.g. per-segment wiring in
+  // FullEpisode.tsx, commit 09bb29a). Strip colons from useId() output
+  // (`:r0:`) — valid in HTML5 ids but noisy in SVG `url(#…)` refs.
+  const instanceId = useId().replace(/:/g, "");
+  const filterId = `film-grain-${instanceId}-${seed}`;
   const opacity = clampValue(intensity * 0.12, 0, 0.12);
 
   return (
