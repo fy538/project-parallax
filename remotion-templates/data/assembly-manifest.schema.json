@@ -111,27 +111,8 @@
       }
     },
     "filmOverlay": {
-      "type": "object",
-      "description": "Episode-level film overlay config. Wraps all visual layers with cinematic texture effects (grain, vignette, light-leak, etc.).",
-      "additionalProperties": false,
-      "properties": {
-        "preset": {
-          "type": "string",
-          "enum": ["clean", "documentary", "cinematic", "dramatic", "archival"],
-          "description": "Named preset from FilmOverlayPresets.ts. If specified, effects and intensity are derived from the preset."
-        },
-        "effects": {
-          "type": "array",
-          "items": { "type": "string", "enum": ["grain", "vignette", "light-leak", "dust", "scratch", "flicker"] },
-          "description": "Which effects to enable. Overrides preset if both specified."
-        },
-        "intensity": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 1,
-          "description": "Overall intensity (0-1). Overrides preset if both specified."
-        }
-      }
+      "$ref": "#/$defs/filmOverlayConfig",
+      "description": "Episode-level film overlay config. Presence of this field is the ACTIVATION GATE for the entire FilmOverlay system — when absent, no FilmOverlay renders anywhere (per-segment cascade is skipped too). When present (even as `{}`), each segment resolves its preset/effects/intensity via the cascade in `src/utils/resolveFilmOverlay.ts`: per-segment override → backdrop `recommendedPreset` → TEMPLATE_PRESET_MAP → episode-level field on this object → `documentary` default."
     },
     "lowerThird": {
       "type": "object",
@@ -231,6 +212,29 @@
     }
   },
   "$defs": {
+    "filmOverlayConfig": {
+      "type": "object",
+      "description": "Film-overlay configuration shape. Used at episode level (manifest.filmOverlay) and per-segment (segment.template.filmOverlay). At segment level, each of `preset`, `effects`, `intensity` is INDEPENDENTLY optional — per-field cascade in resolveFilmOverlay.ts means you can override just intensity for one segment without disturbing the cascade-resolved preset and effects.",
+      "additionalProperties": false,
+      "properties": {
+        "preset": {
+          "type": "string",
+          "enum": ["clean", "documentary", "cinematic", "dramatic", "archival"],
+          "description": "Named preset from FilmOverlayPresets.ts. When set, the preset defines the baseline effects + intensity; the other two fields then individually override."
+        },
+        "effects": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["grain", "vignette", "light-leak", "dust", "scratch", "flicker"] },
+          "description": "Which effects to enable. When set, replaces whatever effect list the cascade-resolved preset would provide."
+        },
+        "intensity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall intensity (0-1). When set, replaces whatever intensity the cascade-resolved preset would provide."
+        }
+      }
+    },
     "segment": {
       "type": "object",
       "required": ["id", "type", "startSec", "endSec", "layer"],
@@ -380,6 +384,10 @@
             "backdropId": {
               "type": ["string", "null"],
               "description": "Optional atmospheric PNG under this Remotion template only (Register 1). Must match an id from BACKDROP_MANIFEST in EditorialSurface.tsx (e.g. cartographic, reading-room). Omitted or null = solid paper from EditorialSurface. Ignored for TitleTransition and layered foreground segments in FullEpisode."
+            },
+            "filmOverlay": {
+              "$ref": "#/$defs/filmOverlayConfig",
+              "description": "Per-segment FilmOverlay override. Each field cascades independently — set just `preset` to override the auto-resolved choice for this segment, or just `intensity` to crank/dampen without changing preset. Resolution order (most-specific wins per field): segment field → backdrop `recommendedPreset` (for `preset` field only) → TEMPLATE_PRESET_MAP[component] → episode `manifest.filmOverlay` → `documentary`. Resolved at render time by `resolveFilmOverlay()`. The whole cascade is GATED on `manifest.filmOverlay` being present; when episode-level is unset, this field is ignored too."
             }
           }
         },

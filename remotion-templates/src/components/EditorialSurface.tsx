@@ -221,7 +221,26 @@ export interface BackdropEntry {
    * medium→medium, busy→low. See design-references/backdrops/BACKDROP_CHART_PAIRING.md.
    */
   chartFit?: BackdropChartFit;
+  /**
+   * FilmOverlay preset this backdrop pairs naturally with. Drives the
+   * filmOverlay-cascade resolver in `src/utils/resolveFilmOverlay.ts` —
+   * a segment that lands on a cinematic dark backdrop picks up the
+   * `cinematic` preset automatically (grain + leak + flicker), while a
+   * segment on `cartographic` paper gets the `clean` preset (no texture).
+   * Omitted → cascade falls through to TEMPLATE_PRESET_MAP for the
+   * segment's template component. See FilmOverlayPresets.ts for the 5
+   * preset definitions.
+   */
+  recommendedPreset?: FilmOverlayPresetName;
 }
+
+/** The five canonical FilmOverlay preset names. Sourced from FilmOverlayPresets.ts. */
+export type FilmOverlayPresetName =
+  | "clean"
+  | "documentary"
+  | "cinematic"
+  | "dramatic"
+  | "archival";
 
 export const BACKDROP_MANIFEST: readonly BackdropEntry[] =
   backdropManifest.backdrops as readonly BackdropEntry[];

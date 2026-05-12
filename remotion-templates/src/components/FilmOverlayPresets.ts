@@ -94,7 +94,10 @@ export const getPreset = (name: string): FilmOverlayPreset | undefined =>
 
 /**
  * Template category → recommended preset mapping.
- * Used by visual-spec skill when auto-assigning overlay presets.
+ * Used by visual-spec skill when auto-assigning overlay presets,
+ * and by `resolveFilmOverlay()` as cascade level 3 (template-derived
+ * fallback when neither a per-segment override nor a backdrop preset
+ * is in play). New templates default to `"documentary"` when missing.
  */
 export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   // Data-heavy templates — keep clean so numbers are legible
@@ -105,6 +108,7 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   StatReveal: "clean",
   ProbabilityGauge: "clean",
   SankeyFlow: "clean",
+  PricingWaterfall: "clean",
 
   // Editorial/structural — standard documentary look
   FrameworkDiagram: "documentary",
@@ -115,6 +119,7 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   TimelineComparison: "documentary",
   TimelineMorph: "documentary",
   DuelingFrameworks: "documentary",
+  HorizontalTimeline: "documentary",
 
   // Narrative/visual — richer cinematic texture
   KineticTypography: "cinematic",
@@ -127,11 +132,19 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   EscalationLadder: "dramatic",
   GameBoard: "documentary",
 
-  // Geographic — clean for readability
+  // Geographic — clean for readability. Maps-thread templates
+  // (AtlasPlate / ProportionalSymbolMap / CartogramMap / DensityMap)
+  // are cartographic by nature; they cascade to `clean` for label
+  // legibility unless a darker backdrop (e.g. night-operations,
+  // abyss-depth) overrides at level 2 to push them cinematic/dramatic.
   ChoroplethMap: "clean",
   RouteAnimation: "clean",
   BifurcationRoute: "clean",
   StrategicLandscape: "documentary",
+  AtlasPlate: "clean",
+  ProportionalSymbolMap: "clean",
+  CartogramMap: "clean",
+  DensityMap: "clean",
 };
 
 export default FILM_OVERLAY_PRESETS;
