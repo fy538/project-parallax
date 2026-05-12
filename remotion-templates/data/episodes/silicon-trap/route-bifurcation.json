@@ -1,6 +1,7 @@
 {
   "episode": "silicon-trap",
   "backgroundVariant": "light",
+  "terrain": true,
   "title": "The Bifurcation",
   "subtitle": "Two parallel ecosystems — one American, one Chinese",
   "routeColor": "#C4A747",

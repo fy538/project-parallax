@@ -594,12 +594,34 @@ export const staggers = {
   route: 200, // route segments
 } as const;
 
+// ── Mapbox style URL resolution ───────────────────────────────────────────
+//
+// "Meridian Light" / "Meridian Dark" are custom Mapbox Studio styles forked
+// from Monochrome and tuned to the Parallax palette + IBM Plex typography
+// (hidden POIs, muted hillshade, disputed-boundary dashes in rust). The
+// Studio setup procedure is documented at:
+//
+//   tools/mapbox-meridian-setup.md
+//
+// Once you have published the two styles, set their URLs via env vars in
+// remotion-templates/.env:
+//
+//   MAPBOX_STYLE_LIGHT_URL=mapbox://styles/<account>/<style-id>
+//   MAPBOX_STYLE_DARK_URL=mapbox://styles/<account>/<style-id>
+//
+// Until then the fallbacks below render the stock Mapbox light-v11 / dark-v11
+// (the "looks like Google Earth" default we want to leave behind). The
+// fallbacks are intentional — they keep the pipeline functional without a
+// Studio account and let new contributors see *something* on screen.
+const MERIDIAN_LIGHT_FALLBACK = "mapbox://styles/mapbox/light-v11";
+const MERIDIAN_DARK_FALLBACK = "mapbox://styles/mapbox/dark-v11";
+
 /** Mapbox GL configuration — see NEW_TEMPLATES_SPEC.md Section 0. */
 export const mapConfig = {
-  /** Light mode is primary. Replace with custom Meridian Light style after Mapbox Studio setup. */
-  styleUrl: "mapbox://styles/mapbox/light-v11",
-  /** Dark fallback for optional dark-mode compositions. */
-  darkStyleUrl: "mapbox://styles/mapbox/dark-v11",
+  /** Meridian Light if MAPBOX_STYLE_LIGHT_URL is set; else stock Mapbox light-v11. */
+  styleUrl: process.env.MAPBOX_STYLE_LIGHT_URL || MERIDIAN_LIGHT_FALLBACK,
+  /** Meridian Dark if MAPBOX_STYLE_DARK_URL is set; else stock Mapbox dark-v11. */
+  darkStyleUrl: process.env.MAPBOX_STYLE_DARK_URL || MERIDIAN_DARK_FALLBACK,
   terrain: {
     source: "mapbox-dem" as const,
     exaggeration: 1.5,

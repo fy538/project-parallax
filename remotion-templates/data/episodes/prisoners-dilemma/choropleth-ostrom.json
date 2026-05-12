@@ -2,6 +2,7 @@
   "episode": "prisoners-dilemma",
   "title": "Ostrom's Commons",
   "backgroundVariant": "dark",
+  "terrain": true,
   "durationSec": 14,
   "projection": "mercator",
   "center": [

@@ -18,6 +18,8 @@ export {
   CatalogRouteRomeRadial,
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
+  CatalogAtlasCocom,
+  CatalogProportionalFabs,
 } from "./Maps";
 
 export {

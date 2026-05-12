@@ -3,6 +3,8 @@
  */
 
 import { z } from "zod";
+import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
+import { GraticuleSchema } from "../../components/Graticule.types";
 
 const RoutePointSchema = z.object({
   name: z.string(),
@@ -53,6 +55,34 @@ export const RouteAnimationSchema = z.object({
     _direction: z.unknown().optional(),
     backgroundTint: z.string().optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
+    /**
+     * Enable terrain hillshading. Default false (atlas register). Set true
+     * per-shot when relief is the editorial point (Himalayan supply route,
+     * alpine border dispute, etc.). See: LESSONS.md L99.
+     */
+    terrain: z.boolean().optional(),
+    /**
+     * Editorial annotations layered on the map. See
+     * components/MapAnnotations.tsx and references/template-research/map-annotations.md
+     * for hierarchy, leader-line, and phase-scoping conventions.
+     */
+    annotations: z.array(MapAnnotationSchema).optional(),
+    /**
+     * Parallels-and-meridians overlay. Faint grid that reads as "atlas
+     * plate." On-brand because the channel is named *Parallax*. See:
+     * components/Graticule.tsx.
+     */
+    graticule: GraticuleSchema.optional(),
+    /**
+     * Locator inset — small overview map in a corner showing where the
+     * main map is zoomed. See: components/MapInset.tsx.
+     */
+    inset: z.object({
+      show: z.boolean().optional(),
+      position: z.enum(["tl", "tr", "bl", "br"]).optional(),
+      size: z.number().positive().optional(),
+      framed: z.boolean().optional(),
+    }).optional(),
   })
   .superRefine((d, ctx) => {
     // Radial mode auto-generates segments; non-radial requires explicit ones.

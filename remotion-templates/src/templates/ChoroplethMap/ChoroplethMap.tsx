@@ -50,6 +50,9 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { MapGL } from "../../components/MapGL";
+import { MapAnnotations } from "../../components/MapAnnotations";
+import { buildGraticuleLayers } from "../../components/Graticule";
+import { MapInset } from "../../components/MapInset";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -334,6 +337,25 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
     current?.startFrame || 0
   );
 
+  // Memoize graticule layers — deck.gl recreates layer objects each render
+  // by reference, which is expensive at 30fps. The layers only depend on
+  // the static config + theme.
+  const graticuleLayers = useMemo(
+    () => buildGraticuleLayers(data.graticule, { dark: data.backgroundVariant === "dark" }),
+    [data.graticule, data.backgroundVariant],
+  );
+
+  // Phase windows in SECONDS — memoized so the MapAnnotations useMemo
+  // actually hits cache (a fresh array reference per frame would bust it).
+  const phaseWindowsSec = useMemo(
+    () =>
+      windows.map((w) => ({
+        startSec: w.startFrame / layout.fps,
+        endSec: w.endFrame / layout.fps,
+      })),
+    [windows],
+  );
+
   return (
     <Background
       variant={resolveAnalyticalBackgroundVariant(
@@ -363,6 +385,8 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
           bearing={camera.bearing + bearingDrift}
           projection={data.projection}
           dark={data.backgroundVariant === "dark"}
+          terrain={data.terrain ?? false}
+          layers={graticuleLayers}
         >
           <Source
             id="country-boundaries"
@@ -407,7 +431,35 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
               }}
             />
           </Source>
+
+          {/* Editorial annotation overlay — Plex-typed labels with optional
+              leader lines, pinned to lon/lat. Phase shorthand resolves
+              against the same windows used for fill animation. */}
+          {data.annotations && data.annotations.length > 0 && (
+            <MapAnnotations
+              annotations={data.annotations}
+              compositionDurationSec={durationInFrames / layout.fps}
+              phaseWindows={phaseWindowsSec}
+              dark={data.backgroundVariant === "dark"}
+            />
+          )}
         </MapGL>
+
+        {/* Locator inset — small globe showing where the parent camera
+            is looking. Defaults to off; opt in via data.inset.show. */}
+        {data.inset?.show && (
+          <MapInset
+            parentCamera={{
+              longitude: camera.longitude,
+              latitude: camera.latitude,
+              zoom: camera.zoom,
+            }}
+            position={data.inset.position ?? "tl"}
+            size={data.inset.size}
+            framed={data.inset.framed}
+            dark={data.backgroundVariant === "dark"}
+          />
+        )}
 
         {/* Coordinate metadata now lives in HeaderStrip (top-right) */}
 

@@ -104,12 +104,31 @@ export interface MapGLProps {
    * See: references/template-research/choropleth-map.md § 6.1
    */
   projection?: "globe" | "mercator" | "equalEarth" | "naturalEarth" | "albers";
-  /** Enable terrain hillshading (default: true) */
+  /**
+   * Enable terrain hillshading (default: **false** as of May 11, 2026).
+   *
+   * Flipped from true→false to drop the single biggest "Google Earth" tell
+   * — 3D relief on by default reads as satellite app, not atlas plate.
+   * Enable per-shot via the template data field when relief is genuinely
+   * the editorial point (e.g., a Himalayan supply route, an alpine border
+   * dispute). See: remotion-templates/LESSONS.md L99 +
+   * references/template-research/map-annotations.md.
+   */
   terrain?: boolean;
   /** Use the dark Meridian style instead of light (default: false). Templates pass this when the episode is in dark mode. */
   dark?: boolean;
   /** Override the Mapbox style URL entirely (bypasses dark/light selection). */
   styleUrl?: string;
+  /**
+   * Override the rendered map width in pixels. Defaults to the full frame
+   * (layout.width). Set when composing a smaller map — e.g., MapInset
+   * renders a ~240px globe in a corner. The wrapping container must be
+   * positioned at this size; this prop only sets the inner Mapbox canvas
+   * dimensions so they don't bleed out of the container.
+   */
+  width?: number;
+  /** Override the rendered map height in pixels. See `width`. */
+  height?: number;
   /** Additional React children — Marker, Source, Layer from react-map-gl */
   children?: React.ReactNode;
 }
@@ -126,11 +145,15 @@ export const MapGL: React.FC<MapGLProps> = ({
   onLoad,
   globe,
   projection,
-  terrain = true,
+  terrain = false,
   dark = false,
   styleUrl,
+  width,
+  height,
   children,
 }) => {
+  const renderWidth = width ?? layout.width;
+  const renderHeight = height ?? layout.height;
   // Fail fast if the Mapbox token isn't configured — without this, every
   // tile request 401s and the render hangs for the delayRender timeout.
   assertMapboxToken();
@@ -187,8 +210,8 @@ export const MapGL: React.FC<MapGLProps> = ({
         doubleClickZoom={false}
         touchZoomRotate={false}
         touchPitch={false}
-        // Fill the Remotion frame
-        style={{ width: layout.width, height: layout.height }}
+        // Fill the Remotion frame (or the provided width/height override).
+        style={{ width: renderWidth, height: renderHeight }}
       >
         {/* Terrain DEM source — provides hillshading and 3D relief */}
         {terrain && (

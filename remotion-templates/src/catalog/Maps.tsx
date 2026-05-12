@@ -14,6 +14,14 @@ import type { ChoroplethMapData } from "../templates/ChoroplethMap/types";
 import { RouteAnimation } from "../templates/RouteAnimation/RouteAnimation";
 import { RouteAnimationSchema } from "../templates/RouteAnimation/schema";
 import type { RouteAnimationData } from "../templates/RouteAnimation/types";
+import { AtlasPlate } from "../templates/AtlasPlate/AtlasPlate";
+import { AtlasPlateSchema } from "../templates/AtlasPlate/schema";
+import type { AtlasPlateData } from "../templates/AtlasPlate/types";
+import { atlasPlateSampleData } from "../templates/AtlasPlate";
+import { ProportionalSymbolMap } from "../templates/ProportionalSymbolMap/ProportionalSymbolMap";
+import { ProportionalSymbolMapSchema } from "../templates/ProportionalSymbolMap/schema";
+import type { ProportionalSymbolMapData } from "../templates/ProportionalSymbolMap/types";
+import { proportionalSymbolMapSampleData } from "../templates/ProportionalSymbolMap";
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
@@ -288,6 +296,52 @@ const routeChokepoints: RouteAnimationData = {
     },
   ],
   routeColor: "#E5A544",
+  // Parallels-and-meridians overlay — reads as atlas plate. 15° spacing for
+  // a world-scale view; the 30° emphasis lands on the Equator and Tropics.
+  graticule: {
+    spacing: 15,
+    opacity: 0.12,
+    emphasize30: true,
+  },
+  // Locator inset — top-left corner, framed, ~12% of frame width.
+  inset: {
+    show: true,
+    position: "tl",
+  },
+  // Editorial annotation layer — demonstrates all three hierarchies + leader
+  // line + emphasis. Region labels (primary), water-body labels (secondary),
+  // source-note (tertiary, mute). See: references/template-research/map-annotations.md
+  annotations: [
+    {
+      at: [45, 24],
+      label: "Middle East",
+      hierarchy: "primary",
+    },
+    {
+      at: [105, 10],
+      label: "Southeast Asia",
+      hierarchy: "primary",
+    },
+    {
+      at: [73, -8],
+      label: "Indian Ocean",
+      hierarchy: "secondary",
+      leader: { dx: -80, dy: 40 },
+      align: "left",
+    },
+    {
+      at: [-40, 5],
+      label: "Atlantic",
+      hierarchy: "secondary",
+      emphasis: "mute",
+    },
+    {
+      at: [-160, -25],
+      label: "Source: UNCTAD 2024",
+      hierarchy: "tertiary",
+      emphasis: "mute",
+    },
+  ],
 };
 
 // ─── Composition registrations ─────────────────────────────────────────────
@@ -434,6 +488,67 @@ export const CatalogRouteChokepoints = () => (
   />
 );
 
+// ─── AtlasPlate variants ───────────────────────────────────────────────────
+//
+// AtlasPlate is the pure-SVG editorial cartography template (no Mapbox).
+// Catalog samples show the Tufte/Fortune register: flat, high-contrast,
+// brand-typed labels, no atmosphere.
+
+// Re-use the published sample data for the catalog showreel; tag with the
+// CATALOG_EPISODE so HeaderStrip reads "_catalog" alongside other showreel
+// items rather than the AtlasPlate-default episode tag.
+const atlasCocom: AtlasPlateData = {
+  ...atlasPlateSampleData,
+  episode: CATALOG_EPISODE,
+};
+
+const atlasDuration = (data: AtlasPlateData): number =>
+  data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
+
+export const CatalogAtlasCocom = () => (
+  <Composition
+    id={catalogId("AtlasPlate", "cocom")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: atlasCocom as unknown as AtlasPlateData }}
+  />
+);
+
+// ─── ProportionalSymbolMap variants ───────────────────────────────────────
+//
+// Country-anchored circles sized by a numeric value. The right form for
+// COUNT data — fabs, bases, GDP, anything where filling whole countries
+// would over-emphasize area at the expense of the actual number.
+
+const proportionalFabs: ProportionalSymbolMapData = {
+  ...proportionalSymbolMapSampleData,
+  episode: CATALOG_EPISODE,
+};
+
+const proportionalDuration = (data: ProportionalSymbolMapData): number =>
+  data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
+
+export const CatalogProportionalFabs = () => (
+  <Composition
+    id={catalogId("ProportionalSymbolMap", "fabs")}
+    component={ProportionalSymbolMap}
+    schema={ProportionalSymbolMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: proportionalDuration(props.data as ProportionalSymbolMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: proportionalFabs as unknown as ProportionalSymbolMapData }}
+  />
+);
+
 // Catalog data exports for Showreel composition
 export const catalogMapsData = {
   choroplethG7,
@@ -443,4 +558,6 @@ export const catalogMapsData = {
   routeMagellan,
   routeChokepoints,
   routeRomeRadial,
+  atlasCocom,
+  proportionalFabs,
 };

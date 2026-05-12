@@ -44,5 +44,6 @@
   "scale": 180,
   "durationSec": 8,
   "backgroundVariant": "light",
+  "terrain": true,
   "source": "COCOM records, 1949–1994"
 }

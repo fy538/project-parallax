@@ -76,6 +76,10 @@ New template only if the hub needs a tier-1 visual treatment (concentric rings, 
 
 **Projection rule:** great-circle arcs only when spans exceed ~3000km; below that, geodesic and rhumb look identical and the curve reads as decorative.
 
+**Basemap rule (May 11 2026):** terrain hillshading is **opt-in** via `terrain: true` in the data file — default is flat atlas register. The Google-Earth-style 3D relief is now reserved for shots where altitude is the *editorial point* (Himalayan supply routes, alpine border passes, naval ridge bathymetry). Routes across plains, deserts, or oceans render flatter and read more as cartographic argument. See LESSONS L99.
+
+**Annotation layer:** every route map should ship with at least a `tertiary` source annotation via the `annotations` field (see `MapAnnotations` and the [map-annotations dossier](./map-annotations.md)). Region labels (`primary`) and feature callouts (`secondary`) per the editorial frame.
+
 ## 5. Current template alignment
 
 The existing `RouteAnimation` template:

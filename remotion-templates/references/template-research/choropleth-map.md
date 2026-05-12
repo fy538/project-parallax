@@ -72,6 +72,8 @@ High information density but requires a legend the viewer must study — **avoid
 - Ocean: paper, not blue.
 - Date stamp + units in the legend, always.
 - Gray for "no data" — visually distinct from the lightest bin (use a hatching pattern if needed).
+- **Terrain off by default (May 11 2026).** Hillshading on every choropleth reads as Google Earth. Opt in via `terrain: true` only when relief is editorially relevant (mountain density, alpine geography). See LESSONS L99.
+- **Annotation layer mandatory for data-bearing maps.** Every choropleth with quantitative fills ships with at least a `tertiary` source annotation via `annotations`. Region/feature annotations via `primary`/`secondary` as the editorial frame calls for. See [map-annotations dossier](./map-annotations.md).
 
 ## 5. Current template alignment
 

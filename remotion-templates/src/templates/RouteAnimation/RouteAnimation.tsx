@@ -52,6 +52,9 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { MapGL } from "../../components/MapGL";
+import { MapAnnotations } from "../../components/MapAnnotations";
+import { buildGraticuleLayers } from "../../components/Graticule";
+import { MapInset } from "../../components/MapInset";
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -367,6 +370,18 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
   const currentPhase = data.phases[currentPhaseIdx];
   const phaseWindow = getPhaseWindow(data.phases, currentPhaseIdx);
+
+  // Phase windows in SECONDS — passed to MapAnnotations for phase-scoped
+  // annotations. Memoized so we don't allocate a fresh array per frame
+  // (used to bust MapAnnotations' useMemo on every render).
+  const phaseWindowsSec = useMemo(
+    () =>
+      data.phases.map((_, i) => {
+        const w = getPhaseWindow(data.phases, i);
+        return { startSec: w.start / layout.fps, endSec: w.end / layout.fps };
+      }),
+    [data.phases],
+  );
 
   // Collect all active segments/points up to and including current phase
   const allActiveSegments = useMemo(() => {
@@ -685,7 +700,20 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     },
   });
 
-  const layers = [arcLayer, flowParticleLayer, scatterHaloLayer, scatterMarkerLayer];
+  // Graticule rendered UNDER content so it reads as base reference, not
+  // overlay. Empty array when data.graticule is undefined.
+  const graticuleLayers = useMemo(
+    () => buildGraticuleLayers(data.graticule, { dark: data.backgroundVariant === "dark" }),
+    [data.graticule, data.backgroundVariant],
+  );
+
+  const layers = [
+    ...graticuleLayers,
+    arcLayer,
+    flowParticleLayer,
+    scatterHaloLayer,
+    scatterMarkerLayer,
+  ];
 
   // ── Render ────────────────────────────────────────────────────────────
 
@@ -718,6 +746,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           bearing={camera.bearing + bearingDrift}
           layers={layers}
           dark={data.backgroundVariant === "dark"}
+          terrain={data.terrain ?? false}
         >
           {/* Point labels — rendered as Markers for proper geo projection */}
           {pointData.map((pt) => {
@@ -855,7 +884,35 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
               </Marker>
             );
           })}
+
+          {/* Editorial annotation overlay — Plex-typed labels with optional
+              leader lines, pinned to lon/lat. Phase shorthand resolves
+              against the same getPhaseWindow used by point labels above. */}
+          {data.annotations && data.annotations.length > 0 && (
+            <MapAnnotations
+              annotations={data.annotations}
+              compositionDurationSec={durationInFrames / layout.fps}
+              phaseWindows={phaseWindowsSec}
+              dark={data.backgroundVariant === "dark"}
+            />
+          )}
         </MapGL>
+
+        {/* Locator inset — small globe showing where the parent camera
+            is looking. Defaults to off; opt in via data.inset.show. */}
+        {data.inset?.show && (
+          <MapInset
+            parentCamera={{
+              longitude: camera.longitude,
+              latitude: camera.latitude,
+              zoom: camera.zoom,
+            }}
+            position={data.inset.position ?? "tl"}
+            size={data.inset.size}
+            framed={data.inset.framed}
+            dark={data.backgroundVariant === "dark"}
+          />
+        )}
 
         {/* Title */}
         <TitleBlock

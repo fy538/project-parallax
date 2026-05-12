@@ -509,6 +509,61 @@ Content: `● REC · runtime` (left) + `scale or subject` (center) + `FILED date
 
 ---
 
+## Cartography — Meridian Map Styles
+
+Maps occupy the *Cartograph* lobe of the Meridian brand and need editorial cartography as much as charts need editorial typography. The default Mapbox styles (`light-v11`, `dark-v11`) are designed for routing apps — Parallax wants the opposite register: an **atlas plate** in the lineage of Bartholomew, mid-century Fortune, and contemporary FT/Reuters editorial cartography.
+
+### Custom Mapbox Studio styles
+
+Two custom styles forked from Mapbox **Monochrome** and tuned to the Parallax palette + IBM Plex typography:
+
+| Style | URL (after Studio setup) | Use case |
+|---|---|---|
+| **Meridian Light** | `mapbox://styles/<account>/<meridian-light-id>` | Default for analytical maps, light-mode episodes |
+| **Meridian Dark** | `mapbox://styles/<account>/<meridian-dark-id>` | Atmospheric maps, dark-mode episodes |
+
+Both URLs are wired via env var in `remotion-templates/.env` (`MAPBOX_STYLE_LIGHT_URL`, `MAPBOX_STYLE_DARK_URL`); `theme.ts:mapConfig` reads them with stock-Mapbox fallbacks so the pipeline runs even before the styles are published.
+
+**Setup procedure:** [`tools/mapbox-meridian-setup.md`](../tools/mapbox-meridian-setup.md) — full step-by-step Mapbox Studio recipe (~2 hr).
+
+### Cartographic palette
+
+Source of truth: `mapConfig.styleColors` / `mapConfig.darkStyleColors` in [`src/design/theme.ts`](./src/design/theme.ts).
+
+| Layer | Light | Dark | Rationale |
+|---|---|---|---|
+| Land fill | `#F5F0E8` (paper) | `#1C1814` (ink) | Reads as paper, not map |
+| Water | `#E4DDD3` (paper-tint) | `#100E0C` | Soft, no marketing blue |
+| Country border | `#1C1814` (ink) | `#5A5448` (muted) | Single ink-weight stroke, no glow |
+| Disputed border | `#C23B22` (rust) dashed | `#C23B22` (rust) dashed | Editorially-named contests render visually distinct |
+| Country label | `#1C1814` ink, IBM Plex Sans Medium, uppercase, letter-spacing 0.06em | `#F0E6D0` bone | Plex Sans matches the brand display register |
+| State/province | `#5A5448`, IBM Plex Sans Regular | `#8A8070` | One step below country; uppercase + tight tracking |
+| Water label | `#8A8070`, italic-feeling, sparse letter-spacing | `#5A5448` | Subtle — water is felt, not announced |
+| Hillshade exaggeration | 0.4 | 0.5 | Pencil-on-paper, not satellite imagery (default Mapbox is 1.0) |
+
+### Cartographic doctrine
+
+These rules apply to every Parallax map regardless of template:
+
+- **Terrain is opt-in, not default.** The single biggest "Google Earth" tell is on-by-default terrain hillshading. As of May 11 2026, `MapGL` defaults `terrain={false}`. Enable per-shot via the template data field when relief is genuinely the point (e.g., a Himalayan supply route). See LESSONS L99.
+- **POIs are off.** Atlases don't show coffee shops. The Meridian styles hide every POI label group.
+- **Disputed boundaries render dashed in rust.** Taiwan Strait, South China Sea nine-dash, Kashmir, Crimea — Parallax names these. Don't suppress them in styles.
+- **US worldview, disputed lines visible.** The bounded-analogy doctrine in cartographic form: show the recognized boundary *and* the contested claim.
+- **Major roads at 0.15 opacity, all other transit hidden.** Editorial corridors, not navigation.
+- **Annotations carry the editorial voice.** Base maps are substrate; `MapAnnotations` (see [`components/MapAnnotations.tsx`](./src/components/MapAnnotations.tsx) and the [map-annotations dossier](./references/template-research/map-annotations.md)) carry the named places, leaders, source notes.
+
+### When to use light vs. dark
+
+| Editorial mode | Style |
+|---|---|
+| Analytical (data-bearing maps, choropleths, supply chains, comparative geography) | **Meridian Light** |
+| Atmospheric (cold-war cartography, naval warfare, historical contest, geopolitical tension) | **Meridian Dark** |
+| Default if unspecified | **Meridian Light** (per Parallax's "Light is primary" rule across the brand) |
+
+Templates default to light; opt into dark via `backgroundVariant: "dark"` in the data file.
+
+---
+
 ## File Naming Convention
 
 Data files: `{template-type}-{descriptive-slug}.json`

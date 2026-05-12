@@ -6,6 +6,8 @@
  */
 
 import type { DirectionBlock } from "../../hooks/useDirection";
+import type { MapAnnotation } from "../../components/MapAnnotations.types";
+import type { GraticuleConfig } from "../../components/Graticule.types";
 
 export interface RoutePoint {
   /** Display name. */
@@ -114,6 +116,42 @@ export interface RouteAnimationData {
   backgroundTint?: string;
   /** Map style mode — selects Mapbox style (Meridian Light or Meridian Dark). Default "light". */
   backgroundVariant?: "light" | "dark";
+
+  /**
+   * Enable terrain hillshading. Default false (atlas register, May 11 2026).
+   * Set true per-shot when relief is the editorial point — Himalayan supply
+   * routes, alpine border disputes, etc. See: LESSONS.md L99.
+   */
+  terrain?: boolean;
+
+  /**
+   * Editorial annotations — labels pinned to lon/lat with optional leader
+   * lines. Use to name features, regions, or chokepoints that aren't route
+   * nodes. Use the `phase` shorthand to scope to a specific route phase.
+   *
+   * See: components/MapAnnotations.tsx
+   * See: references/template-research/map-annotations.md
+   */
+  annotations?: MapAnnotation[];
+
+  /**
+   * Parallels-and-meridians overlay. Faint grid that reads as "atlas
+   * plate." See: components/Graticule.tsx.
+   */
+  graticule?: GraticuleConfig;
+
+  /**
+   * Locator inset — small overview map in a corner showing where the
+   * main map is zoomed. See: components/MapInset.tsx.
+   *
+   * Default: hidden. Pass `{ show: true }` to display.
+   */
+  inset?: {
+    show?: boolean;
+    position?: "tl" | "tr" | "bl" | "br";
+    size?: number;
+    framed?: boolean;
+  };
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

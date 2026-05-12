@@ -30,5 +30,6 @@
   ],
   "durationSec": 10,
   "backgroundVariant": "light",
+  "terrain": true,
   "source": "Company filings, SEMI, 2024–2025"
 }

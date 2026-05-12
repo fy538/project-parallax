@@ -157,6 +157,7 @@
   "routeColor": "#C4A747",
   "durationSec": 14,
   "backgroundVariant": "light",
+  "terrain": true,
   "source": "SIA, SEMI, industry data",
   "_direction": {
     "paceProfile": "urgent"

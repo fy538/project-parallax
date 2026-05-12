@@ -15,6 +15,8 @@ import { BACKDROP_MANIFEST } from "./components/EditorialSurface";
 import { layout, sec } from "./design/theme";
 import { ChoroplethMapComposition } from "./templates/ChoroplethMap";
 import { RouteAnimationComposition } from "./templates/RouteAnimation";
+import { AtlasPlateComposition } from "./templates/AtlasPlate";
+import { ProportionalSymbolMapComposition } from "./templates/ProportionalSymbolMap";
 // DEPRECATED: TimelineComparison, TimelineMorph, DualTimeline — replaced by HorizontalTimeline
 // Kept in codebase for FullEpisode backward compat, but removed from Studio sidebar.
 import { DataChartComposition } from "./templates/DataChart";
@@ -76,6 +78,8 @@ import {
   CatalogRouteRomeRadial,
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
+  CatalogAtlasCocom,
+  CatalogProportionalFabs,
   CatalogStatApollo,
   CatalogStatMariana,
   CatalogStatHabitable,
@@ -151,6 +155,8 @@ export const RemotionRoot: React.FC = () => {
       <Folder name="Maps">
         <ChoroplethMapComposition />
         <RouteAnimationComposition />
+        <AtlasPlateComposition />
+        <ProportionalSymbolMapComposition />
       </Folder>
 
       <Folder name="Timelines">
@@ -250,6 +256,8 @@ export const RemotionRoot: React.FC = () => {
           <CatalogRouteRomeRadial />
           <CatalogRouteMagellan />
           <CatalogRouteChokepoints />
+          <CatalogAtlasCocom />
+          <CatalogProportionalFabs />
         </Folder>
 
         <Folder name="Data">

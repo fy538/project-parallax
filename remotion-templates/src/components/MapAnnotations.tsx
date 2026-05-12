@@ -59,7 +59,7 @@ const EXIT_FRAMES = sec(0.35);
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 /** Resolve appearAtSec / exitAtSec from explicit fields or phase shorthand. */
-const resolveTiming = (
+export const resolveTiming = (
   ann: MapAnnotation,
   phaseWindows: { startSec: number; endSec: number }[] | undefined,
   compositionDurationSec: number,
@@ -79,7 +79,7 @@ const resolveTiming = (
 };
 
 /** Pick the text color for a given hierarchy + emphasis + theme. */
-const resolveColor = (
+export const resolveColor = (
   hierarchy: MapAnnotation["hierarchy"],
   emphasis: MapAnnotation["emphasis"],
   dark: boolean,
@@ -92,7 +92,7 @@ const resolveColor = (
 };
 
 /** Resolve text alignment: explicit > inferred from leader direction > center. */
-const resolveAlign = (
+export const resolveAlign = (
   ann: MapAnnotation,
 ): "left" | "right" | "center" => {
   if (ann.align) return ann.align;
@@ -119,6 +119,161 @@ interface MapAnnotationsProps {
   dark?: boolean;
 }
 
+// ── Memoized marker sub-component ─────────────────────────────────────────
+
+interface MapAnnotationMarkerProps {
+  /** Stable annotation reference from the data file. */
+  annotation: MapAnnotation;
+  /** Pre-computed opacity (parent does the per-frame fade math). */
+  opacity: number;
+  dark: boolean;
+}
+
+/**
+ * One marker per annotation. Wrapped in React.memo: the parent
+ * MapAnnotations does the per-frame opacity computation and only renders
+ * markers that are actually visible (opacity > 0). When opacity is
+ * constant between frames (most of the time), this sub-component skips
+ * re-render entirely.
+ */
+const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
+  annotation,
+  opacity,
+  dark,
+}) => {
+  const color = resolveColor(annotation.hierarchy, annotation.emphasis, dark);
+  const align = resolveAlign(annotation);
+  const dotR = DOT_RADIUS[annotation.hierarchy];
+  const dx = annotation.leader?.dx ?? 0;
+  const dy = annotation.leader?.dy ?? DEFAULT_OFFSET_Y[annotation.hierarchy];
+  const hasLeader = !!annotation.leader;
+
+  const labelStyle: React.CSSProperties =
+    annotation.hierarchy === "primary"
+      ? {
+          fontFamily: fonts.display,
+          fontSize: fontSizes.h3,
+          fontWeight: fontWeights.semibold,
+          letterSpacing: `${letterSpacing.h3}px`,
+          textTransform: "uppercase",
+        }
+      : annotation.hierarchy === "secondary"
+      ? {
+          fontFamily: fonts.heading,
+          fontSize: fontSizes.body,
+          fontWeight: fontWeights.medium,
+          letterSpacing: `${letterSpacing.label}px`,
+        }
+      : {
+          fontFamily: fonts.metadata,
+          fontSize: fontSizes.caption,
+          fontWeight: fontWeights.regular,
+          letterSpacing: `${letterSpacing.caption}px`,
+        };
+
+  const labelTranslate =
+    align === "center"
+      ? "translate(-50%, -50%)"
+      : align === "left"
+      ? "translate(-100%, -50%)"
+      : "translate(0, -50%)";
+
+  return (
+    <Marker
+      longitude={annotation.at[0]}
+      latitude={annotation.at[1]}
+      anchor="center"
+    >
+      <div
+        style={{
+          position: "relative",
+          pointerEvents: "none",
+          opacity,
+        }}
+      >
+        {/* Anchor dot at (0, 0) — the lon/lat point. */}
+        <div
+          style={{
+            position: "absolute",
+            width: dotR * 2,
+            height: dotR * 2,
+            borderRadius: "50%",
+            backgroundColor: color,
+            transform: "translate(-50%, -50%)",
+            boxShadow: dark ? shadows.textLift : shadows.textLiftLight,
+          }}
+        />
+
+        {/* Leader line — drawn only when leader offset is given. */}
+        {hasLeader && (
+          <svg
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              width: 1,
+              height: 1,
+              overflow: "visible",
+              pointerEvents: "none",
+            }}
+          >
+            <line
+              x1={0}
+              y1={0}
+              x2={dx}
+              y2={dy}
+              stroke={color}
+              strokeOpacity={0.55}
+              strokeWidth={LEADER_STROKE[annotation.hierarchy]}
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
+
+        {/* Label — positioned at (dx, dy) with alignment-aware translate. */}
+        <div
+          style={{
+            position: "absolute",
+            left: dx,
+            top: dy,
+            transform: labelTranslate,
+            whiteSpace: "nowrap",
+            textAlign:
+              align === "left"
+                ? "right"
+                : align === "right"
+                ? "left"
+                : "center",
+            color,
+            textShadow: dark ? shadows.textLift : shadows.textLiftLight,
+            ...labelStyle,
+          }}
+        >
+          <div>{annotation.label}</div>
+          {annotation.sublabel && (
+            <div
+              style={{
+                marginTop: 2,
+                fontFamily: fonts.metadata,
+                fontSize: fontSizes.meta,
+                fontWeight: fontWeights.regular,
+                letterSpacing: `${letterSpacing.meta}px`,
+                textTransform: "uppercase",
+                color: palette.taupe,
+              }}
+            >
+              {annotation.sublabel}
+            </div>
+          )}
+        </div>
+      </div>
+    </Marker>
+  );
+});
+MapAnnotationMarker.displayName = "MapAnnotationMarker";
+
+// ── Top-level component ───────────────────────────────────────────────────
+
 export const MapAnnotations: React.FC<MapAnnotationsProps> = ({
   annotations,
   compositionDurationSec,
@@ -140,150 +295,30 @@ export const MapAnnotations: React.FC<MapAnnotationsProps> = ({
 
   return (
     <>
-      {resolved.map(({ ann, startSec, endSec }, i) => {
+      {resolved.map(({ ann, startSec, endSec }) => {
+        // Content-derived key — array index would cause stale-Marker reuse
+        // when authors reorder annotations during preview iteration.
+        const key = `ann-${ann.at[0].toFixed(3)},${ann.at[1].toFixed(3)}-${ann.label}`;
         const startFrame = Math.round(startSec * fps);
         const endFrame = Math.round(endSec * fps);
 
-        const opacityIn = fadeIn(frame, startFrame, ENTRANCE_FRAMES);
-        const opacityOut = fadeOut(frame, endFrame, EXIT_FRAMES);
-        const opacity = Math.min(opacityIn, opacityOut);
+        const opacity = Math.min(
+          fadeIn(frame, startFrame, ENTRANCE_FRAMES),
+          fadeOut(frame, endFrame, EXIT_FRAMES),
+        );
 
-        // Skip rendering when fully invisible (small perf win — many
-        // annotations may be off-window in long compositions).
+        // Skip rendering entirely when fully invisible. Big perf win when
+        // many annotations are spread across phases — only the visible ones
+        // are mounted at any given frame.
         if (opacity <= 0) return null;
 
-        const color = resolveColor(ann.hierarchy, ann.emphasis, dark);
-        const align = resolveAlign(ann);
-        const dotR = DOT_RADIUS[ann.hierarchy];
-        const dx = ann.leader?.dx ?? 0;
-        const dy = ann.leader?.dy ?? DEFAULT_OFFSET_Y[ann.hierarchy];
-        const hasLeader = !!ann.leader;
-
-        // Typography per hierarchy.
-        const labelStyle: React.CSSProperties =
-          ann.hierarchy === "primary"
-            ? {
-                fontFamily: fonts.display,
-                fontSize: fontSizes.h3,
-                fontWeight: fontWeights.semibold,
-                letterSpacing: `${letterSpacing.h3}px`,
-                textTransform: "uppercase",
-              }
-            : ann.hierarchy === "secondary"
-            ? {
-                fontFamily: fonts.heading,
-                fontSize: fontSizes.body,
-                fontWeight: fontWeights.medium,
-                letterSpacing: `${letterSpacing.label}px`,
-              }
-            : {
-                fontFamily: fonts.metadata,
-                fontSize: fontSizes.caption,
-                fontWeight: fontWeights.regular,
-                letterSpacing: `${letterSpacing.caption}px`,
-              };
-
-        // Label horizontal offset — align controls which side of (dx, dy) the
-        // text sits on. center: text centered on (dx, dy); left: right edge
-        // at (dx, dy); right: left edge at (dx, dy).
-        const labelTranslate =
-          align === "center"
-            ? "translate(-50%, -50%)"
-            : align === "left"
-            ? "translate(-100%, -50%)"
-            : "translate(0, -50%)";
-
         return (
-          <Marker
-            key={`ann-${i}`}
-            longitude={ann.at[0]}
-            latitude={ann.at[1]}
-            anchor="center"
-          >
-            <div
-              style={{
-                position: "relative",
-                pointerEvents: "none",
-                opacity,
-              }}
-            >
-              {/* Anchor dot at (0, 0) — the lon/lat point. */}
-              <div
-                style={{
-                  position: "absolute",
-                  width: dotR * 2,
-                  height: dotR * 2,
-                  borderRadius: "50%",
-                  backgroundColor: color,
-                  transform: "translate(-50%, -50%)",
-                  boxShadow: dark ? shadows.textLift : shadows.textLiftLight,
-                }}
-              />
-
-              {/* Leader line — drawn only when leader offset is given. */}
-              {hasLeader && (
-                <svg
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    width: 1,
-                    height: 1,
-                    overflow: "visible",
-                    pointerEvents: "none",
-                  }}
-                >
-                  <line
-                    x1={0}
-                    y1={0}
-                    x2={dx}
-                    y2={dy}
-                    stroke={color}
-                    strokeOpacity={0.55}
-                    strokeWidth={LEADER_STROKE[ann.hierarchy]}
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-
-              {/* Label — positioned at (dx, dy) with alignment-aware translate. */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: dx,
-                  top: dy,
-                  transform: labelTranslate,
-                  whiteSpace: "nowrap",
-                  textAlign:
-                    align === "left"
-                      ? "right"
-                      : align === "right"
-                      ? "left"
-                      : "center",
-                  color,
-                  textShadow: shadows.textLift,
-                  ...labelStyle,
-                }}
-              >
-                <div>{ann.label}</div>
-                {ann.sublabel && (
-                  <div
-                    style={{
-                      marginTop: 2,
-                      fontFamily: fonts.metadata,
-                      fontSize: fontSizes.meta,
-                      fontWeight: fontWeights.regular,
-                      letterSpacing: `${letterSpacing.meta}px`,
-                      textTransform: "uppercase",
-                      color: palette.taupe,
-                    }}
-                  >
-                    {ann.sublabel}
-                  </div>
-                )}
-              </div>
-            </div>
-          </Marker>
+          <MapAnnotationMarker
+            key={key}
+            annotation={ann}
+            opacity={opacity}
+            dark={dark}
+          />
         );
       })}
     </>
