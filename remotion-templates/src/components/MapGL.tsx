@@ -163,10 +163,18 @@ export const MapGL: React.FC<MapGLProps> = ({
   const [loaded, setLoaded] = useState(false);
   const mapRef = useRef<any>(null);
 
-  const handleLoad = useCallback(() => {
-    setLoaded(true);
-    continueRender(handle);
-    onLoad?.();
+  // Wait for 'idle' (all tiles downloaded + composited), NOT just 'load'
+  // (style JSON parsed). The delta is exactly the "warm-up" visible in
+  // Studio and renders: tiles are fetched after 'load', so firing
+  // continueRender on 'load' lets Remotion capture a frame with partially-
+  // blank tile slots. See: remotion.dev/docs/maps, LESSONS.md L102.
+  const handleLoad = useCallback((evt: { target: any }) => {
+    const map = evt.target as { once: (event: string, cb: () => void) => void };
+    map.once("idle", () => {
+      setLoaded(true);
+      continueRender(handle);
+      onLoad?.();
+    });
   }, [handle, onLoad]);
 
   // Safety: continue render after timeout to avoid infinite hang
@@ -213,6 +221,15 @@ export const MapGL: React.FC<MapGLProps> = ({
         doubleClickZoom={false}
         touchZoomRotate={false}
         touchPitch={false}
+        // Suppress Mapbox's built-in 300ms tile-fade-in animation.
+        // Without this, tiles are present in the framebuffer but opacity-
+        // animating toward 1 — producing the visible "warm-up" in renders.
+        // See: remotion.dev/docs/maps § "Disable animations".
+        fadeDuration={0}
+        // Prevent WebGL from clearing its framebuffer between paints.
+        // Required for Remotion's screenshot mechanism to read the canvas
+        // reliably; without it the captured frame may be all-black.
+        preserveDrawingBuffer={true}
         // Fill the Remotion frame (or the provided width/height override).
         style={{ width: renderWidth, height: renderHeight }}
       >

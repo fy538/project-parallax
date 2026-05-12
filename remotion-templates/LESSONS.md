@@ -710,6 +710,33 @@ Avoid `archival` at episode level (dust cycle resets still possible at boundarie
 geometry computation). No visual render needed — 3038px jump was analytically conclusive;
 fix confirmed by typecheck + cascade unit tests (18/18 pass).
 
+### L102: MapGL warm-up delay — three required props for correct Remotion rendering
+
+**Symptom:** Map tiles appear to "fade in" or the map is blank/incomplete for ~1 second at the start of every map segment, both in Studio preview and in rendered video.
+
+**Root causes (three separate bugs, all fixed in `src/components/MapGL.tsx`):**
+
+1. **`continueRender` gated on `'load'` not `'idle'`** — Mapbox fires `'load'` when the style JSON is parsed and sources are registered. Tiles are fetched *after* this event, in parallel. Calling `continueRender` on `'load'` lets Remotion capture a frame with partially-blank tile slots. The correct event is `'idle'`, which fires when all tiles have downloaded, decoded, and been composited.
+
+   Fix: chain `load → once('idle')`:
+   ```tsx
+   const handleLoad = useCallback((evt: { target: any }) => {
+     evt.target.once("idle", () => { continueRender(handle); });
+   }, [handle]);
+   ```
+
+2. **Missing `fadeDuration={0}`** — Mapbox animates tile opacity from 0→1 over 300ms by default. Even after tiles are fully loaded, they fade in. This is *exactly* the warm-up effect visible in the rendered video. `fadeDuration={0}` suppresses it entirely.
+
+3. **Missing `preserveDrawingBuffer={true}`** — Without this, the WebGL driver is free to clear the framebuffer between frames. Remotion's screenshot mechanism reads the canvas after each frame; on some GPU/driver combos it reads a cleared buffer, producing an all-black frame.
+
+**`remotion.config.ts` addition:**
+```ts
+Config.setChromiumOpenGlRenderer("angle");
+```
+Uses ANGLE-backed GPU for headless Chromium rather than software swiftshader. Swiftshader is extremely slow for WebGL and can produce blank tiles on complex styles. Lambda renders should use `--gl=swangle` (no GPU available).
+
+**Reference:** [remotion.dev/docs/maps](https://www.remotion.dev/docs/maps), [remotion-dev/maplibre-example](https://github.com/remotion-dev/maplibre-example)
+
 ### L100: Meridian Mapbox styles via env vars
 **Context:** Stock `mapbox/light-v11` and `mapbox/dark-v11` were designed for routing apps. Parallax wants atlas plates — IBM Plex typography, hidden POIs, muted hillshade, disputed boundaries dashed in rust.
 **Wiring:** `mapConfig.styleUrl` / `darkStyleUrl` in `src/design/theme.ts` read `MAPBOX_STYLE_LIGHT_URL` / `MAPBOX_STYLE_DARK_URL` from env, falling back to stock Mapbox styles when unset. The fallback is intentional — the pipeline must function without a Studio account.

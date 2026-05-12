@@ -15,3 +15,15 @@ Config.setVideoImageFormat("png");
 Config.setPixelFormat("yuv420p");
 
 Config.setOverwriteOutput(true);
+
+// WebGL renderer for map templates (ChoroplethMap, RouteAnimation, AtlasPlate, etc.).
+// "angle" (ANGLE layer over the system GPU) is the correct renderer for local
+// headless renders — it gives Mapbox GL a real GPU-backed WebGL context instead
+// of software swiftshader, so tiles render correctly and performance is acceptable.
+// Without this, Mapbox falls back to swiftshader which is extremely slow and
+// can produce blank tiles on complex styles.
+//
+// Lambda note: Lambda renders should use "swangle" (software ANGLE) since Lambda
+// has no GPU. Pass --gl=swangle explicitly via the Lambda invoke flags or
+// Config.setChromiumOpenGlRenderer("swangle") in a lambda-specific config.
+Config.setChromiumOpenGlRenderer("angle");
