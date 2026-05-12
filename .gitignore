@@ -35,6 +35,7 @@ htmlcov/
 
 # Test artifacts
 remotion-templates/src/__tests__/.temp-renders/
+remotion-templates/src/__tests__/.temp-renders-catalog/
 remotion-templates/test-results.json
 
 # Skill packages (built from SKILL.md source)

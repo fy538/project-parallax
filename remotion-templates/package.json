@@ -10,6 +10,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:baseline": "BASELINE_REGEN=1 vitest run",
+    "test:catalog": "vitest run src/__tests__/catalog-smoke.test.ts",
     "test:charts": "vitest run src/__tests__/chart-real-data.test.ts",
     "test:splits": "vitest run src/__tests__/split-real-data.test.ts",
     "test:timelines": "vitest run src/__tests__/horizontal-timeline-real-data.test.ts",
@@ -38,7 +39,10 @@
     "@remotion/player": "4.0.457",
     "@remotion/sfx": "4.0.457",
     "@remotion/transitions": "4.0.457",
+    "@types/d3-geo": "^3.1.0",
     "@types/react-dom": "^19.2.3",
+    "@types/topojson-specification": "^1.0.5",
+    "d3-geo": "^3.1.1",
     "d3-interpolate": "^3.0.0",
     "d3-scale": "^4.0.0",
     "d3-scale-chromatic": "^3.0.0",
@@ -48,6 +52,7 @@
     "react-map-gl": "^8.1.1",
     "remotion": "4.0.457",
     "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2",
     "zod": "4.3.6"
   },
   "devDependencies": {
