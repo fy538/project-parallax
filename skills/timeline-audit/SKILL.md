@@ -63,10 +63,11 @@ The most editorially consequential lens. If the script argues a **historical ana
 
 If the editorial argument is **structural rhyme**, the timeline must be **phase-aligned** (events at structurally analogous positions on a shared axis), not calendar-aligned (1812 events at 1812-position, 2022 events at 2022-position).
 
-Calendar alignment turns a structural argument into a chronology mismatch.
+Phase alignment is established by the SHAPE of the data, not a flag — there is no `phaseAligned` field on TimelineComparison or HorizontalTimeline. The relevant signal is `leftEvents[].phasePosition` / `rightEvents[].phasePosition` (TimelineComparison) or `pairs[].phasePosition` (HorizontalTimeline dual mode):
 
-→ Flag: TimelineComparison with `phaseAligned: false` (or missing) when narration argues structural rhyme.
-→ Replacement: set `phaseAligned: true`; map each era's events to a shared phase axis (e.g., "Phase 1: trigger event," "Phase 2: response," etc.).
+→ Flag: TimelineComparison where `leftEvents[]` and `rightEvents[]` index 1:1 by calendar year (e.g., both arrays sorted by date and connected by year-proximity), instead of by structural phase. Replacement: re-pair by phase (trigger → response → escalation → resolution), regardless of calendar gap.
+→ Flag: HorizontalTimeline (`mode: "dual"`) with pairs whose `phasePosition` is absent — the dual axis collapses to two unrelated chronologies. Replacement: assign each pair a shared phasePosition (e.g., both "Phase 1: opening move").
+→ Flag: Connection lines in TimelineComparison that connect events on the basis of calendar proximity rather than structural role.
 
 ### Lens 3 — Density cap violations
 
@@ -97,14 +98,12 @@ TimelineMorph is the analytical climax — use ONCE per episode at most, and onl
 → Flag: TimelineMorph used more than once in an episode.
 → Flag: TimelineMorph used for a coincidental parallel (no institutional through-line). Replacement: TimelineComparison.
 
-### Lens 6 — Connection-line choreography
+### Lens 6 — Connection-line presence
 
-Connection lines in TimelineComparison should draw AFTER both eras are established. Pre-revealing connections gives away the claim.
+Connection-line reveal timing is **template-managed** (drawn after both eras' events complete entrance, per the dossier-canonical choreography) — there is no per-connection `appearAt` field. So the audit's role is presence + density:
 
-→ Flag: data file with connections appearing before both eras' phase-windows complete.
-→ Replacement: defer `connections.appearAt` to after both eras' last event entrance.
-
-Also flag: TimelineComparison **without** connection lines. Reduces to two parallel timelines and defeats the pairing form.
+→ Flag: TimelineComparison **without** any entries in `connections[]`. Reduces to two parallel timelines and defeats the pairing form. (Already enforced by runtime warnIf; this lens catches it at script-review.)
+→ Flag: `connections[]` indexing events that don't structurally pair (e.g., `leftIndex: 0, rightIndex: 4` skipping the parallel phase). Replacement: re-index to match phase alignment (Lens 2).
 
 ### Lens 7 — Source attribution + schema health
 
@@ -127,7 +126,7 @@ Also flag: TimelineComparison **without** connection lines. Reduces to two paral
 ### Beat <N>, line <X> — <one-line summary>
 - **Current:** `TEMPLATE: HorizontalTimeline` with narration: "the 2022 sanctions echo the 1812 blockade"
 - **Problem:** Bounded-analogy beat routed to HorizontalTimeline dilutes Parallax's signature form. The pairing IS the argument.
-- **Replacement:** Switch to `TEMPLATE: TimelineComparison` with `phaseAligned: true`. Identify 3-5 structural pairings as connection lines (e.g., "naval blockade ↔ financial blockade").
+- **Replacement:** Switch to `TEMPLATE: TimelineComparison`. Map each era's events to a shared phase axis (trigger → response → escalation → resolution) and identify 3-5 structural pairings as `connections[]` entries (e.g., "naval blockade ↔ financial blockade").
 - **Reference:** TIMELINE_TEMPLATE_SELECTOR.md § Editorial register
 
 [... repeat per issue ...]
@@ -163,7 +162,7 @@ If no issues:
 ## Doctrine / failure modes to ALWAYS flag
 
 1. **HorizontalTimeline used for bounded-analogy beat** — P0 (use TimelineComparison).
-2. **TimelineComparison calendar-aligned when argument is structural rhyme** — P0.
+2. **TimelineComparison events paired by calendar instead of by structural phase** — P0.
 3. **TimelineMorph used >1× per episode** — P0 (erodes analytical punchline).
 4. **TimelineMorph for coincidental parallel** — P0 (false-causation implication).
 5. **TimelineComparison without connection lines** — P0 (defeats the pairing form).
@@ -171,7 +170,7 @@ If no issues:
 7. **HorizontalTimeline with >32 events** — P1 (narration outruns reading).
 8. **DualTimeline combined >20 events** — P1.
 9. **Events color-coded by type in multi-era timeline** — P1 (use era color).
-10. **Connection lines drawn before both eras established** — P1.
+10. **Connection lines indexing events that don't share a structural phase** — P1.
 11. **DualTimeline non-focus opacity below 0.35** — P1.
 12. **Missing source attribution on dated event** — P0.
 

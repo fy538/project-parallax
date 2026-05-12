@@ -108,7 +108,7 @@ Every diagram MUST have a focal point (POLISH D-rule):
 - FrameworkDiagram → `heroStage` set
 - NetworkDiagram → hub identified
 - EscalationLadder → current-rung-highlight or accent
-- GameBoard → equilibrium cell marked
+- GameBoard → equilibrium cell flagged via `cells[].highlight: true` (and/or per-round `highlights[]`)
 - DecisionTree → critical path emphasized
 - PricingWaterfall → smallest-sliver accent
 
@@ -167,7 +167,7 @@ For each diagram data file referenced in the script:
 ### Beat <N>, line <X> — <one-line summary>
 - **Current:** `TEMPLATE: DecisionTree` with simultaneous-choice narration
 - **Problem:** The math is Nash equilibrium, not expected value. Wrong analytical frame.
-- **Replacement:** Switch to `TEMPLATE: GameBoard`. Restructure data file: payoff matrix instead of branching tree; add `equilibriumGlyph` to highlight Nash cell.
+- **Replacement:** Switch to `TEMPLATE: GameBoard`. Restructure data file: payoff matrix in `cells[]` instead of branching tree; set `cells[].highlight: true` on the Nash equilibrium cell.
 - **Reference:** DIAGRAM_TEMPLATE_SELECTOR.md § DecisionTree vs. GameBoard
 
 [... repeat per issue ...]
@@ -206,7 +206,7 @@ If no issues:
 2. **DecisionTree with simultaneous moves** — P0 (wrong analytical frame; use GameBoard).
 3. **SankeyFlow without conserved total** — P0 (use FrameworkDiagram flow).
 4. **EscalationLadder with >7 rungs** — P0 (silent clipping).
-5. **GameBoard without Nash equilibrium highlight** — P0 (analytical punchline missing).
+5. **GameBoard without `cells[].highlight: true` on the equilibrium cell** — P0 (analytical punchline missing).
 6. **FrameworkDiagram comparison with non-parallel rows** — P1 (placeholder padding; use SplitComposition or DuelingFrameworks).
 7. **FrameworkDiagram matrix with dependent axes** — P1 (matrix collapses to a line).
 8. **Payoff numbers without source** — P0 (cite or omit).

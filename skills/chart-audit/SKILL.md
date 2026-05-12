@@ -118,10 +118,12 @@ For TimeSeriesChart: reference bands (era highlights) should use brand era-color
 Every chart MUST cite its source (FooterStrip OR tertiary annotation).
 → Flag: any data file without `source`. P0.
 
-### Lens 6 — Hero-stat placement (TimeSeriesChart)
+### Lens 6 — Hero-stat fit (TimeSeriesChart)
 
-Hero stat overlays should be POSITIONED (anchored to a point on the line), not floating independently. Floating hero stats decouple from the data.
-→ Flag: TimeSeriesChart with `heroStat` but no `heroStatAnchor` / position.
+`heroStat: { value, label }` overlays the chart in a fixed position defined by the template (see `time-series-chart.md` dossier § hero-stat). There is no per-data anchor field — placement is template-managed. So this lens is about *whether the hero stat fits at all*, not where it's placed:
+
+→ Flag: TimeSeriesChart with `heroStat` set but the value isn't actually referenced in the narration. Decorative hero stats clutter the chart without earning the visual real estate.
+→ Flag: TimeSeriesChart with `heroStat` where the value would be obvious from the line itself (e.g., final-point value already read by the eye). Replacement: drop the hero stat or use an annotation pointing to the inflection it names.
 
 ### Lens 7 — Schema / data-file health
 

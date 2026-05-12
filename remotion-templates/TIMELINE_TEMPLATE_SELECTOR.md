@@ -94,10 +94,10 @@ Use TimelineComparison early in any episode that names a historical analogy. Use
 
 | Template | Common flags / variants |
 |---|---|
-| TimelineComparison | `eras[]` (2 required); `connections[]` (paired events); `eraColors`; `phaseAligned` (default true; vs. calendar-aligned) |
-| HorizontalTimeline | `mode: "single" \| "dual"`; `eraSpine` (foil-mute color for era band); `pacing.eventDensity` |
-| DualTimeline | `tracks[]` (2 required); `focusEra` (which era opacity 1.0; other 0.4); `attentionShifts[]` (transition points) |
-| TimelineMorph | `from` timeline + `to` timeline + `morphEvents[]` (pairs) |
+| TimelineComparison | `leftEvents[]` + `rightEvents[]`; `connections[]` (paired events with `leftIndex`/`rightIndex`); `leftColor`/`rightColor`; phase alignment is established by event ordering, not a flag |
+| HorizontalTimeline | `mode: "single" \| "dual" \| "morph"`; `events[]` (single) or `pairs[]` (dual); `eraAColor`/`eraBColor`; `eraWeight` for opacity foiling — the modern canonical timeline; supersedes DualTimeline/TimelineMorph for new authoring |
+| DualTimeline | `pairs[]` of `{ eraA, eraB }`; `eraATitle`/`eraBTitle`; `eraAColor`/`eraBColor`. Deprecated for new authoring; use HorizontalTimeline `mode: "dual"`. Still wired in FullEpisode for legacy manifests. |
+| TimelineMorph | `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText }`; `holdDurationSec`, `morphDurationSec`. Deprecated for new authoring; use HorizontalTimeline `mode: "morph"`. |
 
 ---
 

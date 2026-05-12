@@ -115,7 +115,7 @@ Is the beat about IMAGES / visual evidence?
 | TitleTransition | `variant: "episode-title" \| "section" \| "end-card" \| "editorial"`; `kicker`; `dek`; `episodeNumber` |
 | SplitComposition | `protagonistMode` (which side is the focus); `tags[]` per side; `accentColor` per side |
 | ImageComposite | `variant: "full-bleed" \| "inset" \| "portrait"`; `treatment` (duotone/grain/vignette); text overlay positions |
-| AnnotatedImage | `callouts[]` (each with `at: [x%, y%]`, `label`, `appearAtSec`); leader-line styling |
+| AnnotatedImage | `callouts[]` (each with `x`, `y` as % of image, `label`, optional `detail`, `placement`); stagger is automatic by index |
 | PhotoMontage | `transitions: "dissolve" \| "wipe"`; per-image hold duration; optional date/name overlay |
 
 ---
@@ -127,7 +127,7 @@ Is the beat about IMAGES / visual evidence?
 3. **TitleTransition hold duration** is 2.0s (default) — shorter feels flashed, longer feels forgotten.
 4. **KineticTypography quote MUST have attribution.** Quote without attribution = context evaporates.
 5. **KineticTypography bilingual** never animates Chinese + English simultaneously. Stagger so the eye knows where to land.
-6. **AnnotatedImage callouts stagger** (don't all appear at once). Otherwise viewer is overwhelmed.
+6. **AnnotatedImage callouts** stagger automatically by index — so over-density (>6) is the failure to flag, not simultaneity.
 7. **SplitComposition is exactly 2 sides.** Three or more breaks the stark-division register; use FrameworkDiagram comparison.
 8. **ImageComposite avoids generic stock.** The image should be the actual moment/person, not decoration.
 
@@ -156,7 +156,7 @@ Is the beat about IMAGES / visual evidence?
 7. **SplitComposition with identical visual weight on both sides when one is protagonist** → use `protagonistMode`.
 8. **ImageComposite with generic stock photo** → use specific image of the actual subject.
 9. **ImageComposite with cluttered overlays** → reduce to one primary text element.
-10. **AnnotatedImage with all callouts appearing simultaneously** → stagger reveal.
+10. **AnnotatedImage with 7+ callouts** → leader-line collision even with auto-stagger; split into staged compositions.
 11. **AnnotatedImage with callouts on low-contrast image regions** → relocate or add scrim.
 12. **PhotoMontage with transitions too fast to absorb** → minimum 1.5s per image at scrub speed.
 13. **PhotoMontage with decorative stock images** → demote to ILLUST or FOOTAGE register; reserve PhotoMontage for load-bearing evidence.

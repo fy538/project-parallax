@@ -64,10 +64,12 @@ The canonical mistake. KineticTypography is for **emphasis moments mid-essay**. 
 
 POLISH doctrine: TitleTransition is **fade-only entrance, fade-only exit, no motion, no music-on-landing, no accent on title type**.
 
-→ Flag: TitleTransition with `entrance: "slide"` / `"scale"` / any motion flag. Replacement: `entrance: "fade"` only.
-→ Flag: TitleTransition with music sting on landing (check audio-spec or `_direction.musicCue` on landing frame). Replacement: music enters AFTER the card exits.
-→ Flag: TitleTransition title with accent color (rust/amber on the title type itself). Replacement: accent is reserved for the ∴ glyph; demote title to ink/bone.
-→ Flag: TitleTransition hold duration ≠ 2.0s default (without explicit editorial reason). Shorter = flashed; longer = forgotten.
+The template itself enforces fade-only — there is no schema field that would let a data file request motion entrance. So this lens is a **cross-doc check**, not a data-file field check:
+
+→ Flag: any `DIR:` annotation in the script asking for `slide-in`, `scale-in`, `whip`, or other motion entrance on a TitleTransition beat. The DIR will be dropped by the renderer; flag so the script author either accepts fade or switches templates.
+→ Flag: TitleTransition beat where the audio-spec or `_direction.musicCue` lands music ON the title frame. Music should enter AFTER the card exits. Replacement: shift the music cue +2.0s (card hold duration).
+→ Flag: TitleTransition data file with `accentColor` applied to the title type (vs. the ∴ glyph). Replacement: remove `accentColor` from title; the ∴ already carries the accent.
+→ Flag: TitleTransition with explicit `holdSec` deviation from 2.0s without an editorial-reason note in `_direction.notes`. Shorter feels flashed; longer feels forgotten.
 
 ### Lens 3 — KineticTypography attribution + bilingual rules
 
@@ -109,17 +111,16 @@ The image must carry editorial meaning, not decoration. Generic stock photograph
 
 ### Lens 7 — AnnotatedImage callout discipline
 
-**7a. Stagger reveal.**
-All callouts appearing simultaneously overwhelms the viewer.
-→ Flag: callouts with identical or missing `appearAtSec`. Replacement: stagger by 0.3-0.5s.
+Callout stagger is **automatic** in the template (each callout enters at `index × stagger` frames) — there is no per-callout `appearAtSec` flag and stagger cannot be disabled. So the audit's role here is density + placement, not timing.
 
-**7b. Density cap.**
-AnnotatedImage caps at ~6 callouts. Above that, leader lines collide.
-→ Flag: data file with 7+ callouts. Replacement: split into staged compositions or demote to PhotoMontage with per-image focus.
+**7a. Density cap.**
+AnnotatedImage caps at ~6 callouts. Above that, leader lines collide and viewer is overwhelmed even with auto-stagger.
+→ Flag: data file with 7+ callouts in `callouts[]`. Replacement: split into staged compositions or demote to PhotoMontage with per-image focus.
 
-**7c. Low-contrast callout regions.**
-Callouts placed over low-contrast image regions become illegible.
-→ Flag: callouts on busy/low-contrast backgrounds without `scrim` or `bgPanel`. Replacement: add scrim or reposition.
+**7b. Placement collisions / low-contrast regions.**
+Multiple callouts clustered in the same image quadrant produce leader-line overlap that auto-stagger doesn't fix. Callouts on busy/low-contrast image regions become illegible (the template has no per-callout scrim).
+→ Flag: 3+ callouts with `(x, y)` positions within 15% of each other. Replacement: redistribute around the image, or split into two compositions with different focus regions.
+→ Flag: callouts with `(x, y)` positioned over the script-named "busy" regions of the image (when known from visual-concept). Replacement: relocate to image margins or pick a different reference image.
 
 ### Lens 8 — PhotoMontage pacing + transitions
 
