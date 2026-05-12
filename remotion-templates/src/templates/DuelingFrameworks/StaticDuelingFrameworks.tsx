@@ -241,6 +241,7 @@ export const StaticDuelingFrameworks: React.FC<{
           subtitle={data.subtitle}
           mode={isDark ? "dark" : "light"}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {data.episode && (

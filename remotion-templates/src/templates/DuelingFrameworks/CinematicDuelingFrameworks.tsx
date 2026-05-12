@@ -488,6 +488,7 @@ export const CinematicDuelingFrameworks: React.FC<{
           subtitle={data.subtitle}
           mode={isDark ? "dark" : "light"}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
       </AbsoluteFill>
       {/* Brand strips */}

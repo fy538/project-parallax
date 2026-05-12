@@ -920,6 +920,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           subtitle={data.subtitle}
           mode="light"
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Phase title overlay — appears after camera settles.

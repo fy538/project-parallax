@@ -551,6 +551,7 @@ const MultiVariant: React.FC<{
             subtitle={data.subtitle}
             mode={data.backgroundVariant}
             safeAreaTier="generous"
+            syncPoints={syncPoints}
           />
 
           {/* Main content area */}
@@ -1008,6 +1009,7 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
           subtitle={data.subtitle}
           mode={data.backgroundVariant}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* ── Main content area ──────────────────────────────────────── */}

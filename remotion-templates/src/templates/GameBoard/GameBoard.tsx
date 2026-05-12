@@ -1537,6 +1537,7 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
             align="top-center"
             noAnimation
             safeAreaTier="generous"
+            syncPoints={direction.syncPoints}
           />
         </div>
 

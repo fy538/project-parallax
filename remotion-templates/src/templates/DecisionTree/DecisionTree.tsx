@@ -58,7 +58,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
-import { useDirection } from "../../hooks/useDirection";
+import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
@@ -316,7 +316,8 @@ const LadderVariant: React.FC<{
   data: DecisionTreeData;
   frame: number;
   totalFrames: number;
-}> = React.memo(({ data, frame, totalFrames }) => {
+  syncPoints?: DirectionSyncPoint[];
+}> = React.memo(({ data, frame, totalFrames, syncPoints }) => {
   const mode = (data.backgroundVariant || "light") as "light" | "dark";
   const theme = useThemeMode(mode);
   const emphasis = useEpisodeColorEmphasis();
@@ -459,6 +460,7 @@ const LadderVariant: React.FC<{
         subtitle={data.subtitle}
         mode={mode}
         safeAreaTier="generous"
+        syncPoints={syncPoints}
       />
       <div
         style={{
@@ -523,7 +525,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         <AbsoluteFill style={compStyle}>
           <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
           <FooterStrip mode={backgroundVariant} />
-          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} />
+          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} syncPoints={direction.syncPoints} />
         </AbsoluteFill>
       </Background>
     );
@@ -778,6 +780,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
             mode={backgroundVariant}
             safeAreaTier="generous"
             noAnimation
+            syncPoints={direction.syncPoints}
           />
         </div>
 

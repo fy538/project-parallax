@@ -393,6 +393,7 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
         subtitle={data.subtitle}
         mode={bgVariant}
         safeAreaTier="generous"
+        syncPoints={direction.syncPoints}
       />
 
       <svg

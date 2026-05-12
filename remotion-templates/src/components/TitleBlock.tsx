@@ -26,6 +26,7 @@ import React, { useMemo } from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { measureText } from "@remotion/layout-utils";
 import {
+  durations,
   fonts,
   fontSizes,
   fontWeights,
@@ -38,8 +39,9 @@ import {
 } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { useEpisodeColorEmphasis } from "../hooks/useEpisodeColorEmphasis";
+import type { DirectionSyncPoint } from "../hooks/useDirection";
 import { FadeIn } from "./FadeIn";
-import { CLAMP } from "../utils/animation";
+import { CLAMP, anticipatoryStartFrame } from "../utils/animation";
 
 interface TitleBlockProps {
   /** Main title text */
@@ -61,6 +63,25 @@ interface TitleBlockProps {
   noAnimation?: boolean;
   /** Show an accent underline that draws in beneath the title (brand signature). Default: false. */
   underline?: boolean;
+  /**
+   * Narration sync points from `useDirection(data._direction).syncPoints`.
+   * When provided AND `syncPoints[0]` carries a Whisper-resolved cue frame,
+   * the entrance start is computed via `anticipatoryStartFrame()` so the
+   * block lands ~150ms BEFORE the narrator says the title — POLISH.md D17.
+   *
+   * When absent (the common case today, before the visual-spec pipeline
+   * emits sync points), the entrance falls back to the `startFrame` prop,
+   * preserving the existing visual baseline byte-for-byte.
+   *
+   * Note: only `syncPoints[0]` is consumed. The title and subtitle land
+   * together as a single block (single FadeIn wrapper); per-element
+   * anticipation of the subtitle would require splitting the wrapper,
+   * which would shift the baseline for every consumer. Templates that need
+   * fine-grained title-vs-subtitle anticipation should use the
+   * `TitleTransition.editorial-title` variant's split pattern (commit 1da5a49)
+   * instead of `TitleBlock`.
+   */
+  syncPoints?: DirectionSyncPoint[];
   /** Additional content rendered below subtitle (e.g., legend) */
   children?: React.ReactNode;
 }
@@ -75,6 +96,7 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   startFrame = 0,
   noAnimation = false,
   underline = false,
+  syncPoints,
   children,
 }) => {
   const theme = useThemeMode(mode);
@@ -113,10 +135,22 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
     return Math.max(fontSizes.h3, fontSizes.h2 * Math.max(scale, minScale));
   }, [title, titleFontFamily, safe.left, safe.right]);
 
+  // ── Anticipatory-reveal adoption (POLISH.md D17, motion-design.md § 3) ──
+  // When `syncPoints[0]` carries a Whisper-resolved cue, the block lands
+  // ~150ms before the narrator says the title. Fall back to the `startFrame`
+  // prop otherwise — preserves byte-identical baseline in the no-sync case.
+  // Settle envelope matches `durations.fadeIn` (the FadeIn wrapper's opacity
+  // envelope below). See TitleTransition.editorial-title (commit 1da5a49)
+  // for the canonical idiom this mirrors.
+  const effectiveStartFrame =
+    syncPoints?.[0]?.frame !== undefined
+      ? anticipatoryStartFrame(syncPoints[0].frame, durations.fadeIn)
+      : startFrame;
+
   // Underline scale-in animation (after title fade-in completes)
   const underlineProgress = interpolate(
     frame,
-    [startFrame + sec(0.4), startFrame + sec(1.0)],
+    [effectiveStartFrame + sec(0.4), effectiveStartFrame + sec(1.0)],
     [0, 1],
     { ...CLAMP, easing: Easing.out(Easing.cubic) }
   );
@@ -191,7 +225,7 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
   }
 
   return (
-    <FadeIn startFrame={startFrame} direction="up" distance={30} cinematic>
+    <FadeIn startFrame={effectiveStartFrame} direction="up" distance={30} cinematic>
       {content}
     </FadeIn>
   );

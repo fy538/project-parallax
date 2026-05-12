@@ -324,6 +324,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
         subtitle={data.subtitle}
         mode={data.backgroundVariant}
         safeAreaTier="generous"
+        syncPoints={direction.syncPoints}
       />
 
       {/* Content area — hero stat left, comparison bars right */}

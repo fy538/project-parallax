@@ -498,6 +498,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
           subtitle={data.subtitle}
           mode={data.backgroundVariant}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Camera label */}

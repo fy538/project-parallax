@@ -828,6 +828,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             subtitle={data.subtitle}
             mode={data.backgroundVariant || "light"}
             safeAreaTier="generous"
+            syncPoints={direction.syncPoints}
           />
         </div>
       </AbsoluteFill>

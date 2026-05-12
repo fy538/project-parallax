@@ -1024,7 +1024,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
       <HeaderStrip metadata={data.episode} mode="light" />
       <FooterStrip scale={data.unit ? `SCALE · ${data.unit}` : undefined} mode="light" />
 
-      <TitleBlock title={data.title} subtitle={data.subtitle} safeAreaTier="generous" />
+      <TitleBlock title={data.title} subtitle={data.subtitle} safeAreaTier="generous" syncPoints={direction.syncPoints} />
 
       {/* ── Chart area — with gridlines + focus pull ──────────────────── */}
       <div

@@ -1194,6 +1194,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
           subtitle={data.subtitle}
           mode={bgVariant}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Content Area */}

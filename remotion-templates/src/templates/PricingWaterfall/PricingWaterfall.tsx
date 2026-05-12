@@ -156,6 +156,7 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
             subtitle={data.subtitle}
             mode={bgVariant}
             safeAreaTier="generous"
+            syncPoints={direction.syncPoints}
           />
         </div>
 

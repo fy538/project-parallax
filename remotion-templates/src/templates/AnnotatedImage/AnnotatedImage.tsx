@@ -210,6 +210,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
           subtitle={data.subtitle}
           mode={data.backgroundVariant || "dark"}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
       </div>
 

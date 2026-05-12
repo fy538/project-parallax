@@ -477,6 +477,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
               safeAreaTier="generous"
               startFrame={current.startFrame}
               accentColor={emphasis.primaryAccent}
+              syncPoints={direction.syncPoints}
             />
           </div>
         )}

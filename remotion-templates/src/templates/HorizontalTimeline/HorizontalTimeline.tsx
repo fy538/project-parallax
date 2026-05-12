@@ -749,6 +749,7 @@ export const HorizontalTimeline: React.FC<{
           subtitle={data.subtitle}
           mode={mode}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Camera viewport — contains all timeline content */}

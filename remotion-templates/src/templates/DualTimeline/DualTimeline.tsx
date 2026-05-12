@@ -238,6 +238,7 @@ export const DualTimeline: React.FC<{
             subtitle={data.subtitle}
             mode={data.backgroundVariant || "light"}
             safeAreaTier="generous"
+            syncPoints={direction.syncPoints}
           />
 
           {/* ── Era column headers — uses zones.content top ────── */}

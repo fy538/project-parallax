@@ -299,6 +299,7 @@ const CinematicBifurcationRoute: React.FC<{ data: BifurcationRouteData }> = ({ d
           subtitle={data.subtitle}
           mode={mode}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Camera viewport */}

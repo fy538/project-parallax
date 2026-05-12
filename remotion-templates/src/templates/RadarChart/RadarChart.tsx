@@ -304,6 +304,7 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
           subtitle={data.subtitle}
           mode={data.backgroundVariant}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
       {/* Chart area */}

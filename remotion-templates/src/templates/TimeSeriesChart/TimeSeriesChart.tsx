@@ -887,7 +887,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             transformOrigin: "center center",
           }}
         >
-          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" syncPoints={direction.syncPoints} />
           <SlopeChart
             lines={data.lines}
             chartLeft={chartLeft}
@@ -931,7 +931,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             transformOrigin: "center center",
           }}
         >
-          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+          <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" syncPoints={direction.syncPoints} />
           <SmallMultiplesChart
             lines={data.lines}
             yMin={yMin}
@@ -974,7 +974,7 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
         }}
       >
         {/* ── Title ──────────────────────────────────────────────────────────*/}
-        <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" />
+        <TitleBlock title={data.title} subtitle={data.subtitle} mode={bgVariant} safeAreaTier="generous" syncPoints={direction.syncPoints} />
 
         {/* ── Legend (only when there are multiple series) ──────────────────
             Positioned above the chart area, right-aligned. Shows a colored

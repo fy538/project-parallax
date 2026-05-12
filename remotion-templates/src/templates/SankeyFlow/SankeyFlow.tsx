@@ -835,7 +835,7 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
         )}
 
       {/* Title */}
-      <TitleBlock title={title} subtitle={subtitle} mode="light" safeAreaTier="generous" />
+      <TitleBlock title={title} subtitle={subtitle} mode="light" safeAreaTier="generous" syncPoints={direction.syncPoints} />
 
       {/* Source attribution — was missing entirely from this template;
           now uses the shared component so position + style match the

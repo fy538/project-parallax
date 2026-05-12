@@ -1358,6 +1358,7 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
           subtitle={data.subtitle}
           mode={bgVariant}
           safeAreaTier="generous"
+          syncPoints={direction.syncPoints}
         />
 
         {/* Diagram content */}
