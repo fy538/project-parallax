@@ -463,32 +463,26 @@ const SegmentFilmOverlay: React.FC<{
 // Memoized to prevent SVG filter re-creation on every frame. Each segment
 // gets its own BrandImage filter instance, avoiding Chrome throttling when
 // multiple video+SVG-filter combos overlap during transitions.
+//
+// FilmOverlay note: background segments are NOT wrapped in <SegmentFilmOverlay>.
+// Most BG windows are covered by a foreground TEMPLATE segment that carries
+// its own FilmOverlay wrap (see ForegroundSegment below). Wrapping here too
+// caused additive double-treatment (~2× grain, double-dark vignette, two
+// overlapping leak cycles) during the bg+fg overlap window — the standard
+// case in every manifest. Trade-off: pure-bg breather windows (FOOTAGE/IMAGE
+// with no foreground overlay) render without film treatment. If editorial
+// review of a real opt-in shows that's wrong, lift the wrap to the parent
+// Sequence so each fg+bg pair shares one wrap. Surfaced by review of
+// commits 09bb29a (wiring) and 3863b81 (schema).
 
 const BackgroundSegment: React.FC<{
   segment: ManifestSegment;
   assetBasePath: string;
-  episodeFilmOverlay: FilmOverlayConfig | undefined;
-}> = memo(({ segment, assetBasePath, episodeFilmOverlay }) => {
+}> = memo(({ segment, assetBasePath }) => {
   const { asset, treatment } = segment;
 
   // Determine placeholder style based on asset status
   const assetStatus = asset?.status || (asset?.file ? "resolved" : "pending");
-
-  // Background segments don't have a backdrop concept (the asset IS the
-  // backdrop). Cascade resolves preset via TEMPLATE_PRESET_MAP ("" → skip
-  // level 3) → episodeFilmOverlay → documentary. In practice, footage
-  // backgrounds inherit the episode's preset unless an explicit segment
-  // override exists.
-  const wrap = (inner: ReactNode) => (
-    <SegmentFilmOverlay
-      episodeFilmOverlay={episodeFilmOverlay}
-      segmentOverride={undefined}
-      backdropId={undefined}
-      componentName=""
-    >
-      {inner}
-    </SegmentFilmOverlay>
-  );
 
   if (assetStatus !== "resolved" || !asset?.file) {
     // Asset not yet sourced — render branded placeholder
@@ -497,7 +491,7 @@ const BackgroundSegment: React.FC<{
       ? (asset?.fallbackColor || palette.paper)
       : palette.paper;
 
-    return wrap(
+    return (
       <AbsoluteFill
         style={{
           backgroundColor: bgColor,
@@ -538,7 +532,7 @@ const BackgroundSegment: React.FC<{
     // OffthreadVideo extracts frames outside the main thread, avoiding
     // cache eviction stalls that <Video> hits at 20-30% render progress
     // in long compositions with many short clips.
-    return wrap(
+    return (
       <AbsoluteFill style={{ opacity: opacity ?? COMPOSITE_DEFAULTS[composite] }}>
         <BrandImage
           src="" // BrandImage filter applied to the container; video below
@@ -560,7 +554,7 @@ const BackgroundSegment: React.FC<{
   }
 
   // IMAGE — still photo/archival with brand treatment
-  return wrap(
+  return (
     <BrandImage
       src={src}
       ramp={ramp as any}
@@ -973,7 +967,6 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                 <BackgroundSegment
                   segment={seg}
                   assetBasePath={assetBasePath}
-                  episodeFilmOverlay={manifest.filmOverlay}
                 />
               </TransitionWrapper>
             </SegmentErrorBoundary>
@@ -1028,7 +1021,6 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                         <BackgroundSegment
                           segment={layeredBg}
                           assetBasePath={assetBasePath}
-                          episodeFilmOverlay={manifest.filmOverlay}
                         />
                       </SegmentErrorBoundary>
                     ),
