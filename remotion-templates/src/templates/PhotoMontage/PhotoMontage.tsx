@@ -49,13 +49,8 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { KenBurns } from "../../components/KenBurns";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { resolveAssetSrc } from "../../utils/assetPath";
 import type { PhotoMontageData, MontageImage } from "./types";
-
-/** Resolves image src: https:// passes through; relative paths use staticFile(). */
-const resolveAssetSrc = (src: string): string =>
-  src.startsWith("http://") || src.startsWith("https://")
-    ? src
-    : staticFile(src);
 
 // ── Helper: Compute frame ranges for each image accounting for transitions ──
 

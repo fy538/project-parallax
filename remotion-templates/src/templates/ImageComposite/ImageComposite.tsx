@@ -50,18 +50,8 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { resolveAssetSrc } from "../../utils/assetPath";
 import type { ImageCompositeData } from "./types";
-
-/**
- * Resolves an image src to a render-safe URL.
- * - https:// / http:// paths pass through as-is (Remotion <Img> handles them natively).
- * - Relative paths are wrapped with staticFile() to resolve from public/.
- * Without this guard, passing a URL to staticFile() throws a TypeError synchronously.
- */
-const resolveAssetSrc = (src: string): string =>
-  src.startsWith("http://") || src.startsWith("https://")
-    ? src
-    : staticFile(src);
 
 /**
  * Variant: Background — Full-bleed image with Ken Burns drift and duotone overlay.

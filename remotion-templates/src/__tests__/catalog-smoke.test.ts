@@ -157,19 +157,11 @@ const CATALOG_ASSET_DEPS: Record<string, string> = {
 // templates.test.ts (which exercises the base composition with different
 // default-props). Each entry must cite the bug — the skip is documentation,
 // not a perpetual hiding mechanism.
-const KNOWN_BROKEN_CATALOG_COMPS: Record<string, string> = {
-  // The catalog data passes a relative path ("assets/sample-historical.png")
-  // directly via `data.imageSrc` → `BrandImage src={data.imageSrc}`, but
-  // AnnotatedImage.tsx does NOT wrap with `staticFile()` the way ImageComposite
-  // does (which has a `resolveAssetSrc` guard at the top of the file). At
-  // render time the Remotion bundle's webserver returns 404 for the bare
-  // relative path. The base `AnnotatedImage` test in templates.test.ts passes
-  // because its default-props uses a path that happens to round-trip; the
-  // catalog-specific data path doesn't. Fix is one line in AnnotatedImage.tsx
-  // (mirror ImageComposite's resolveAssetSrc). Tracking as follow-up.
-  "catalog-annotated-image-callout-demo":
-    "AnnotatedImage doesn't wrap data.imageSrc with staticFile() the way ImageComposite does — relative path 404s at render time",
-};
+//
+// (Currently empty — the prior entry `catalog-annotated-image-callout-demo`
+// was fixed by extracting `resolveAssetSrc` to `src/utils/assetPath.ts` and
+// routing AnnotatedImage through it. See the un-skip commit for context.)
+const KNOWN_BROKEN_CATALOG_COMPS: Record<string, string> = {};
 
 function getSkipReason(compositionId: string, template: string): string | null {
   if (MAPBOX_SKIPPED_TEMPLATES.has(template)) {

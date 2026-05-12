@@ -48,6 +48,7 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { BrandImage } from "../../components/BrandImage";
 import { KenBurns } from "../../components/KenBurns";
 import { TitleBlock } from "../../components/TitleBlock";
+import { resolveAssetSrc } from "../../utils/assetPath";
 import type { AnnotatedImageData, Callout } from "./types";
 
 // ── Callout geometry ─────────────────────────────────────────────────────────
@@ -188,7 +189,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
       >
         <KenBurns direction="drift" intensity={2}>
           <BrandImage
-            src={data.imageSrc}
+            src={resolveAssetSrc(data.imageSrc)}
             ramp={ramp}
             composite="background"
             alt={data.imageAlt}
