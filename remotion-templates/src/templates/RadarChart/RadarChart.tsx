@@ -265,6 +265,16 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
     return data.subjects;
   }, [data.subjects, data.morphFrom, morphProgress]);
 
+  // Defensive guard — schema's `axes.min(3)` + `subjects.min(1)` should catch
+  // this at validation time, but template code paths that bypass Zod (e.g.,
+  // direct prop spread via composition tooling, programmatic construction
+  // where TS can't express minimum array length) could still produce empty
+  // arrays. Without this guard, `polarToCartesian` divides by `numAxes` and
+  // produces NaN-valued SVG points. Mirrors the 17af733 belt-and-suspenders
+  // pattern from TimeSeriesChart / DataChart small-multiples.
+  // Placed after all hooks (last useMemo: `currentSubjects`) for Rules-of-Hooks.
+  if (data.axes.length < 3 || data.subjects.length === 0) return null;
+
   // ── Grid lines color ───────────────────────────────────────────────────
   const gridColor = theme.isDark ? "rgba(240,230,208,0.10)" : "rgba(28,24,20,0.06)";
   const axisColor = theme.isDark ? "rgba(240,230,208,0.15)" : "rgba(28,24,20,0.12)";
