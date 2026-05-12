@@ -52,7 +52,9 @@ export const NetworkDiagramSchema = z.object({
     subtitle: z.string().optional(),
     layout: z.enum(["horizontal-chain", "hub-spoke", "grid", "vertical-chain"]),
     gridColumns: z.number().optional(),
-    nodes: z.array(NetworkNodeSchema),
+    nodes: z.array(NetworkNodeSchema).min(1, {
+      message: "NetworkDiagram requires at least one node. An empty diagram has nothing to render.",
+    }),
     edges: z.array(NetworkEdgeSchema),
     controls: z.array(NetworkControlSchema).optional(),
     callouts: z.array(NetworkCalloutSchema).optional(),
