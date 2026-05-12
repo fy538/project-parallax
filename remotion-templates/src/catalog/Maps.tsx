@@ -22,7 +22,15 @@ import { ProportionalSymbolMap } from "../templates/ProportionalSymbolMap/Propor
 import { ProportionalSymbolMapSchema } from "../templates/ProportionalSymbolMap/schema";
 import type { ProportionalSymbolMapData } from "../templates/ProportionalSymbolMap/types";
 import { proportionalSymbolMapSampleData } from "../templates/ProportionalSymbolMap";
-import { layout, sec } from "../design/theme";
+import { CartogramMap } from "../templates/CartogramMap/CartogramMap";
+import { CartogramMapSchema } from "../templates/CartogramMap/schema";
+import type { CartogramMapData } from "../templates/CartogramMap/types";
+import { cartogramMapSampleData } from "../templates/CartogramMap";
+import { DensityMap } from "../templates/DensityMap/DensityMap";
+import { DensityMapSchema } from "../templates/DensityMap/schema";
+import type { DensityMapData } from "../templates/DensityMap/types";
+import { densityMapSampleData } from "../templates/DensityMap";
+import { layout, mapConfig, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
 // ─── ChoroplethMap variants ────────────────────────────────────────────────
@@ -520,6 +528,88 @@ export const CatalogAtlasCocom = () => (
   />
 );
 
+// Vintage variant — Cold War NATO vs Warsaw Pact, period-atlas register.
+// The same content as a modern Atlas plate would look different — tea-
+// stained paper, brown borders, paper-grain texture, faded political
+// fills. Closest match to a 1962 Bartholomew or Soviet Atlas Mira plate.
+// Direct editorial fit for any Cold War / deterrence / prisoners-dilemma
+// analogy episode.
+//
+// Fill colors pull from mapConfig.vintageStyleColors so the editorial
+// register stays consistent if those tokens are tuned later (single
+// source of truth for the vintage palette).
+const VINTAGE_WEST = mapConfig.vintageStyleColors.westernHighlight;
+const VINTAGE_EAST = mapConfig.vintageStyleColors.easternHighlight;
+
+const atlasColdWarVintage: AtlasPlateData = {
+  episode: CATALOG_EPISODE,
+  title: "Two blocs, 1962",
+  subtitle: "NATO + signatories vs. Warsaw Pact + allies",
+  projection: "naturalEarth",
+  aesthetic: "vintage",
+  source: "Cold War archives, simplified",
+  framePadding: 100,
+  graticule: {
+    spacing: 15,
+    opacity: 0.08,
+    emphasize30: true,
+  },
+  phases: [
+    {
+      title: "The blocs",
+      subtitle: "Aligned states, 1962",
+      durationSec: 9,
+      countries: [
+        // NATO + Western-bloc signatories — muted navy (vintage token)
+        { iso3: "USA", fill: VINTAGE_WEST },
+        { iso3: "CAN", fill: VINTAGE_WEST },
+        { iso3: "GBR", fill: VINTAGE_WEST },
+        { iso3: "FRA", fill: VINTAGE_WEST },
+        { iso3: "DEU", fill: VINTAGE_WEST }, // West Germany (TopoJSON has unified DEU)
+        { iso3: "ITA", fill: VINTAGE_WEST },
+        { iso3: "NLD", fill: VINTAGE_WEST },
+        { iso3: "BEL", fill: VINTAGE_WEST },
+        { iso3: "DNK", fill: VINTAGE_WEST },
+        { iso3: "NOR", fill: VINTAGE_WEST },
+        { iso3: "PRT", fill: VINTAGE_WEST },
+        { iso3: "LUX", fill: VINTAGE_WEST },
+        { iso3: "TUR", fill: VINTAGE_WEST },
+        { iso3: "GRC", fill: VINTAGE_WEST },
+        { iso3: "JPN", fill: VINTAGE_WEST },
+        { iso3: "AUS", fill: VINTAGE_WEST },
+        { iso3: "NZL", fill: VINTAGE_WEST },
+        // Warsaw Pact + Soviet-bloc allies — faded oxblood (vintage token)
+        { iso3: "RUS", fill: VINTAGE_EAST },
+        { iso3: "POL", fill: VINTAGE_EAST },
+        { iso3: "CZE", fill: VINTAGE_EAST }, // covers historical Czechoslovakia
+        { iso3: "HUN", fill: VINTAGE_EAST },
+        { iso3: "ROU", fill: VINTAGE_EAST },
+        { iso3: "BGR", fill: VINTAGE_EAST },
+        { iso3: "CHN", fill: VINTAGE_EAST },
+        { iso3: "PRK", fill: VINTAGE_EAST },
+        { iso3: "MNG", fill: VINTAGE_EAST },
+        { iso3: "CUB", fill: VINTAGE_EAST },
+        { iso3: "VNM", fill: VINTAGE_EAST }, // North Vietnam approximation
+      ],
+    },
+  ],
+};
+
+export const CatalogAtlasColdWarVintage = () => (
+  <Composition
+    id={catalogId("AtlasPlate", "cold-war-vintage")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: atlasColdWarVintage as unknown as AtlasPlateData }}
+  />
+);
+
 // ─── ProportionalSymbolMap variants ───────────────────────────────────────
 //
 // Country-anchored circles sized by a numeric value. The right form for
@@ -549,6 +639,63 @@ export const CatalogProportionalFabs = () => (
   />
 );
 
+// ─── CartogramMap variants ────────────────────────────────────────────────
+//
+// Dorling cartogram — country circles, force-decollided, abstract register.
+// The right form for dense data (EU-27, sub-Saharan Africa) where
+// ProportionalSymbolMap circles would overlap into illegibility.
+
+const cartogramEU: CartogramMapData = {
+  ...cartogramMapSampleData,
+  episode: CATALOG_EPISODE,
+};
+
+const cartogramDuration = (data: CartogramMapData): number =>
+  data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
+
+export const CatalogCartogramEU = () => (
+  <Composition
+    id={catalogId("CartogramMap", "eu-population")}
+    component={CartogramMap}
+    schema={CartogramMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: cartogramDuration(props.data as CartogramMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: cartogramEU as unknown as CartogramMapData }}
+  />
+);
+
+// ─── DensityMap variants ──────────────────────────────────────────────────
+//
+// Point-density on Mapbox basemap. For "where things concentrate" stories
+// where individual points are the unit of analysis (fabs, bases, events).
+
+const densityFabs: DensityMapData = {
+  ...densityMapSampleData,
+  episode: CATALOG_EPISODE,
+};
+
+const densityDuration = (data: DensityMapData): number =>
+  data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
+
+export const CatalogDensityFabs = () => (
+  <Composition
+    id={catalogId("DensityMap", "fab-sites")}
+    component={DensityMap}
+    schema={DensityMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: densityDuration(props.data as DensityMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: densityFabs as unknown as DensityMapData }}
+  />
+);
+
 // Catalog data exports for Showreel composition
 export const catalogMapsData = {
   choroplethG7,
@@ -559,5 +706,8 @@ export const catalogMapsData = {
   routeChokepoints,
   routeRomeRadial,
   atlasCocom,
+  atlasColdWarVintage,
   proportionalFabs,
+  cartogramEU,
+  densityFabs,
 };

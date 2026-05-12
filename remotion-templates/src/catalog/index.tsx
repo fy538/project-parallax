@@ -19,7 +19,10 @@ export {
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
   CatalogAtlasCocom,
+  CatalogAtlasColdWarVintage,
   CatalogProportionalFabs,
+  CatalogCartogramEU,
+  CatalogDensityFabs,
 } from "./Maps";
 
 export {

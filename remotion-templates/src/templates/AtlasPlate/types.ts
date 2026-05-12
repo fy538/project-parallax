@@ -55,6 +55,49 @@ export interface AtlasPhase {
     center?: [number, number];
     scaleHint?: number;
   };
+
+  /**
+   * Orthographic-only: which point should face the viewer in this phase.
+   * `[longitude, latitude]` — the projection rotates so this point is at
+   * the apparent center of the globe. Ignored when `projection` is not
+   * `"orthographic"`.
+   *
+   * Cinematic use: phase 1 facing [-100, 40] (North America), phase 2
+   * facing [115, 35] (East Asia) → the globe rotates ~215° between phases,
+   * giving a "spinning earth" cold-open effect.
+   *
+   * When unset on phase 0: defaults to `[0, 20]` (Greenwich, slightly
+   * north of equator). When unset on phase N > 0: holds previous phase's
+   * rotation.
+   */
+  rotation?: [number, number];
+
+  /**
+   * Cinematic camera transition INTO this phase. Default `"linear"`
+   * (cubic ease — current behavior, no opt-in needed).
+   *
+   * - `"cinematic"` — cubic Bezier (0.65, 0, 0.35, 1) — accelerates hard
+   *   through the middle. Good for dramatic phase changes.
+   * - `"via-globe"` — pulls the camera OUT (zoom decreases) at the
+   *   midpoint of the transition, then back IN. The NYT/Apple Maps
+   *   "fly to" motion. Use when this phase's focus is far from the
+   *   previous phase's (different continent / hemisphere).
+   *
+   * See: src/utils/mapUtils.ts (`easeCameraT`, `viaGlobePoseInterpolate`).
+   */
+  cameraTransition?: "linear" | "cinematic" | "via-globe";
+
+  /**
+   * Optional dwell windows (in fraction-of-transition, 0-1) at the start
+   * and/or end of the transition. Use to hold the previous pose for a
+   * beat before motion, or hold the new pose to settle before the next
+   * phase's animation begins.
+   *
+   * Example: `{ before: 0.2 }` holds the previous pose for the first 20%
+   * of the transition window, then moves to this phase's pose in the
+   * remaining 80%.
+   */
+  cameraDwell?: { before?: number; after?: number };
 }
 
 /** Full data input for an AtlasPlate composition. */
@@ -101,8 +144,41 @@ export interface AtlasPlateData {
    * components/Graticule.types.ts.
    */
   graticule?: GraticuleConfig;
+
+  /**
+   * Disputed-boundary overlay (Taiwan Strait, S China Sea nine-dash,
+   * Kashmir LoC, Crimea, Western Sahara berm). Rendered as dashed rust
+   * lines layered above country borders.
+   *
+   * Use cases — *editorial* (not legal):
+   *   - `true`: show all curated disputes (good for a "contested world" map).
+   *   - `["nine-dash"]`: just the specific disputes the script names.
+   *   - omit: no dispute lines (a clean recognized-only world).
+   *
+   * The curated set + per-dispute notes live in
+   * `src/utils/disputedBoundaries.ts`. Add new disputes there.
+   */
+  disputedBoundaries?: true | string[];
   /** Map mode — light (default) or dark. */
   backgroundVariant?: "light" | "dark";
+
+  /**
+   * Visual register. Default `"atlas"` — modern Tufte/Fortune flat
+   * cartography (current default behavior, unchanged).
+   *
+   * `"vintage"` — mid-century period-atlas register: tea-stained paper,
+   * brown ink borders, paper-grain SVG filter, soft vignette. Use for
+   * Cold-War / historical-analogy episodes where the map should signal
+   * "period reference," not "live data." Per-phase highlight colors
+   * default to the muted cold-war navy/oxblood palette.
+   *
+   * Ignored when `backgroundVariant: "dark"` (vintage is a light-register
+   * aesthetic; no dark-vintage equivalent yet).
+   *
+   * Reference: references/template-research/atlas-plate.md § Aesthetic register.
+   */
+  aesthetic?: "atlas" | "vintage";
+
   /** Subtle color tint for emotional temperature. Hex. */
   backgroundTint?: string;
 

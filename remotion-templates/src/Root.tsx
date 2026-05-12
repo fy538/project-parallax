@@ -17,6 +17,8 @@ import { ChoroplethMapComposition } from "./templates/ChoroplethMap";
 import { RouteAnimationComposition } from "./templates/RouteAnimation";
 import { AtlasPlateComposition } from "./templates/AtlasPlate";
 import { ProportionalSymbolMapComposition } from "./templates/ProportionalSymbolMap";
+import { CartogramMapComposition } from "./templates/CartogramMap";
+import { DensityMapComposition } from "./templates/DensityMap";
 // DEPRECATED: TimelineComparison, TimelineMorph, DualTimeline — replaced by HorizontalTimeline
 // Kept in codebase for FullEpisode backward compat, but removed from Studio sidebar.
 import { DataChartComposition } from "./templates/DataChart";
@@ -79,7 +81,10 @@ import {
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
   CatalogAtlasCocom,
+  CatalogAtlasColdWarVintage,
   CatalogProportionalFabs,
+  CatalogCartogramEU,
+  CatalogDensityFabs,
   CatalogStatApollo,
   CatalogStatMariana,
   CatalogStatHabitable,
@@ -157,6 +162,8 @@ export const RemotionRoot: React.FC = () => {
         <RouteAnimationComposition />
         <AtlasPlateComposition />
         <ProportionalSymbolMapComposition />
+        <CartogramMapComposition />
+        <DensityMapComposition />
       </Folder>
 
       <Folder name="Timelines">
@@ -257,7 +264,10 @@ export const RemotionRoot: React.FC = () => {
           <CatalogRouteMagellan />
           <CatalogRouteChokepoints />
           <CatalogAtlasCocom />
+          <CatalogAtlasColdWarVintage />
           <CatalogProportionalFabs />
+          <CatalogCartogramEU />
+          <CatalogDensityFabs />
         </Folder>
 
         <Folder name="Data">

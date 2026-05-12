@@ -47,6 +47,10 @@ export interface ProportionalPhase {
     center?: [number, number];
     scaleHint?: number;
   };
+
+  /** Cinematic camera transition. See AtlasPlate types for details. */
+  cameraTransition?: "linear" | "cinematic" | "via-globe";
+  cameraDwell?: { before?: number; after?: number };
 }
 
 export interface ProportionalSymbolMapData {

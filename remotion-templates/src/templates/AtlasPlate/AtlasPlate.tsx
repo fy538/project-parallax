@@ -24,7 +24,7 @@
  * Dossier: references/template-research/atlas-plate.md
  */
 
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useId } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { geoGraticule } from "d3-geo";
 import type { Feature, Geometry } from "geojson";
@@ -57,7 +57,13 @@ import {
   type ProjectionName,
   type CountryFeature,
 } from "../../utils/atlasProjection";
+import { getDisputedBoundaries, densifyPolyline } from "../../utils/disputedBoundaries";
 import { CLAMP_CUBIC_INOUT, exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import {
+  easeCameraT,
+  applyDwell,
+  viaGlobePoseInterpolate,
+} from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
 import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
 import type { AtlasPlateData, AtlasPhase } from "./types";
@@ -153,18 +159,27 @@ const computePhasePose = (
   }
 
   // Orthographic = globe projection. The outer-<g> scale+translate trick
-  // assumes the projection scales LINEARLY around its center — true for
-  // equalEarth/naturalEarth/mercator/equirectangular, FALSE for the
-  // sphere (rotating the globe changes which faces are visible). Hold
-  // the world-fit pose and warn at dev time. Documented in the dossier
-  // (§ "Animation transitions on orthographic projection").
+  // doesn't apply — the orthographic render path animates the projection's
+  // ROTATION per frame instead (see `currentRotation` + `rotatedCountryPaths`
+  // in the component body). Return identity so `focus` settings on
+  // orthographic phases are ignored without crashing; use `phase.rotation`
+  // instead. R3 audit fix: warn loudly so authors don't silently lose
+  // their focus config.
   if (projectionName === "orthographic") {
     warnIf(
-      true,
+      !!phase.focus,
       "AtlasPlate",
-      `Phase "${phase.title}" sets focus on orthographic projection — ` +
-      `not supported in v1 (globe rotation isn't animated). ` +
-      `Holding world-fit pose. Switch projection or drop focus to silence.`,
+      `Phase "${phase.title}" has \`focus\` on orthographic projection — ` +
+      `focus is IGNORED for orthographic. Use \`phase.rotation: [lon, lat]\` ` +
+      `instead to spin the globe to face that point.`,
+    );
+    warnIf(
+      phase.cameraTransition === "via-globe",
+      "AtlasPlate",
+      `Phase "${phase.title}" has \`cameraTransition: "via-globe"\` on ` +
+      `orthographic projection — the pull-back-then-push-in pose curve has ` +
+      `no effect on the globe (outer transform is identity). Use ` +
+      `"cinematic" or "linear" for the rotation easing instead.`,
     );
     return { scale: 1, translate: [0, 0] };
   }
@@ -274,6 +289,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
   const dark = data.backgroundVariant === "dark";
   const framePadding = data.framePadding ?? DEFAULT_FRAME_PADDING;
+  const isOrthographic = data.projection === "orthographic";
 
   // ── Base projection (world fit) ─────────────────────────────────────────
   // Computed once. All paths derive from this. Camera animation rides on
@@ -292,7 +308,15 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
   const basePathGen = useMemo(() => makePathGenerator(baseProjection), [baseProjection]);
 
-  // ── Country paths (memoized) ────────────────────────────────────────────
+  // ── Country paths (memoized for non-orthographic) ───────────────────────
+  // For non-orthographic projections, paths are computed ONCE from the
+  // base (world-fit) projection. Camera animation rides on an outer
+  // <g transform> applied to the country group — no per-frame re-projection.
+  //
+  // For orthographic, this memo is computed but UNUSED — the render path
+  // generates fresh paths per frame from the rotated projection (see
+  // `rotatedCountryPaths` below). Keeping the memo non-conditional avoids
+  // a Rules-of-Hooks violation.
   const countryPaths = useMemo(() => {
     const features = getAllCountries();
     return features.map((c: CountryFeature) => ({
@@ -302,13 +326,11 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     }));
   }, [basePathGen]);
 
-  // ── Graticule paths (memoized) ──────────────────────────────────────────
-  const graticulePaths = useMemo(() => {
-    if (!data.graticule) return null;
-    const spacing = data.graticule.spacing ?? 10;
-    const emphasize30 = data.graticule.emphasize30 ?? true;
-    return buildGraticulePaths(basePathGen, spacing, emphasize30);
-  }, [data.graticule, basePathGen]);
+  // ── Graticule paths ─────────────────────────────────────────────────────
+  // For orthographic, the graticule re-projects per frame so it follows the
+  // globe rotation. For other projections, memoized on basePathGen.
+  // Either way, we use `activePathGen` which delegates appropriately.
+  // (Defined AFTER the rotated-projection logic below so it can read it.)
 
   // ── Phase windows + camera ──────────────────────────────────────────────
   const windows = useMemo(() => computePhaseWindows(data.phases), [data.phases]);
@@ -333,14 +355,163 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     if (safeIdx === 0) return phasePoses[0];
     const prev = phasePoses[safeIdx - 1];
     const next = phasePoses[safeIdx];
-    const transitionT = interpolate(
+
+    // Raw transition progress (frames → 0..1).
+    const rawT = interpolate(
       frame,
       [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
       [0, 1],
       CLAMP_CUBIC_INOUT,
     );
-    return interpolatePose(prev, next, transitionT);
-  }, [safeIdx, phasePoses, frame, currentWindow?.startFrame]);
+
+    // Apply optional dwell clamps, then the per-phase easing curve.
+    const dwellBefore = currentWindow.phase.cameraDwell?.before ?? 0;
+    const dwellAfter = currentWindow.phase.cameraDwell?.after ?? 0;
+    const dwelled = dwellBefore + dwellAfter > 0
+      ? applyDwell(rawT, dwellBefore, dwellAfter)
+      : rawT;
+    const transition = currentWindow.phase.cameraTransition ?? "linear";
+    const easedT = easeCameraT(dwelled, transition);
+
+    // "via-globe" uses a Bezier-shaped pose curve in scale-space (the
+    // camera pulls out then back in). All others use linear pose
+    // interpolation with the eased t.
+    return transition === "via-globe"
+      ? viaGlobePoseInterpolate(prev, next, easedT)
+      : interpolatePose(prev, next, easedT);
+  }, [
+    safeIdx,
+    phasePoses,
+    frame,
+    currentWindow?.startFrame,
+    currentWindow?.phase.cameraTransition,
+    currentWindow?.phase.cameraDwell?.before,
+    currentWindow?.phase.cameraDwell?.after,
+  ]);
+
+  // ── Orthographic rotation animation ─────────────────────────────────────
+  // Orthographic = globe. The outer-<g> scale+translate trick doesn't work
+  // for the sphere (rotating changes which faces are visible). Instead we
+  // compute a per-frame rotated projection and re-project all paths.
+  //
+  // Cost: 177 countries × ~50μs/projection ≈ 9ms per frame. At 30fps
+  // that's ~270ms per second on projection alone — significant but
+  // acceptable for short cinematic globe shots (cold-opens, 3-5s).
+  // For longer compositions, prefer non-orthographic projections.
+  //
+  // Rotation per phase comes from `phase.rotation` (defaults to [0, 20]
+  // for phase 0, or holds previous phase's rotation when undefined).
+  const phaseRotations = useMemo<[number, number][]>(() => {
+    let last: [number, number] = [0, 20];
+    return data.phases.map((p) => {
+      if (p.rotation) last = p.rotation;
+      return last;
+    });
+  }, [data.phases]);
+
+  const currentRotation = useMemo<[number, number]>(() => {
+    if (!isOrthographic) return [0, 0];
+    if (safeIdx === 0) return phaseRotations[0];
+    const prev = phaseRotations[safeIdx - 1];
+    const next = phaseRotations[safeIdx];
+
+    // Raw 0→1 progress through the transition window.
+    const rawT = interpolate(
+      frame,
+      [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
+      [0, 1],
+      CLAMP_CUBIC_INOUT,
+    );
+    // Apply optional dwell windows and the per-phase easing curve so
+    // orthographic rotations honor `cameraTransition` + `cameraDwell`
+    // exactly like non-orthographic camera transitions do.
+    const dwellBefore = currentWindow.phase.cameraDwell?.before ?? 0;
+    const dwellAfter = currentWindow.phase.cameraDwell?.after ?? 0;
+    const dwelled = dwellBefore + dwellAfter > 0
+      ? applyDwell(rawT, dwellBefore, dwellAfter)
+      : rawT;
+    const transition = currentWindow.phase.cameraTransition ?? "linear";
+    const t = easeCameraT(dwelled, transition);
+
+    // Shortest-arc interpolation for longitude (handle wrap-around at ±180°)
+    let lonDelta = next[0] - prev[0];
+    if (lonDelta > 180) lonDelta -= 360;
+    if (lonDelta < -180) lonDelta += 360;
+    return [
+      prev[0] + lonDelta * t,
+      prev[1] + (next[1] - prev[1]) * t,
+    ];
+  }, [
+    isOrthographic,
+    safeIdx,
+    phaseRotations,
+    frame,
+    currentWindow?.startFrame,
+    currentWindow?.phase.cameraTransition,
+    currentWindow?.phase.cameraDwell?.before,
+    currentWindow?.phase.cameraDwell?.after,
+  ]);
+
+  // Per-frame rotated projection for orthographic. For non-orthographic,
+  // returns the memoized base projection so consumers (annotations,
+  // disputes, country labels) all use the same projection regardless of
+  // mode. d3-geo's rotate is [lambda, phi, gamma] — lambda is longitude
+  // (negated, since rotation moves the world OPPOSITE to the apparent
+  // camera). Gamma is omitted (no roll).
+  const activeProjection = useMemo(() => {
+    if (!isOrthographic) return baseProjection;
+    const p = resolveProjection("orthographic");
+    fitProjectionToWorld(p, VIEWPORT, framePadding);
+    p.rotate([-currentRotation[0], -currentRotation[1]]);
+    return p;
+  }, [isOrthographic, baseProjection, currentRotation, framePadding]);
+
+  // Per-frame path generator from the active projection.
+  const activePathGen = useMemo(
+    () => (isOrthographic ? makePathGenerator(activeProjection) : basePathGen),
+    [isOrthographic, activeProjection, basePathGen],
+  );
+
+  // Per-frame country paths for orthographic — bypassed for other projections.
+  const rotatedCountryPaths = useMemo(() => {
+    if (!isOrthographic) return countryPaths;
+    return getAllCountries().map((c: CountryFeature) => ({
+      alpha3: c.alpha3,
+      name: c.name,
+      d: activePathGen(c.feature) ?? "",
+    }));
+  }, [isOrthographic, activePathGen, countryPaths]);
+
+  // ── Graticule paths (uses activePathGen — auto-rotates for orthographic) ──
+  const graticulePaths = useMemo(() => {
+    if (!data.graticule) return null;
+    const spacing = data.graticule.spacing ?? 10;
+    const emphasize30 = data.graticule.emphasize30 ?? true;
+    return buildGraticulePaths(activePathGen, spacing, emphasize30);
+  }, [data.graticule, activePathGen]);
+
+  // ── Disputed-boundary paths (uses activePathGen) ────────────────────────
+  // For orthographic projections, dispute polylines are densified to 1°
+  // max segment so the sphere clip can correctly find the day/night
+  // terminator crossing (B1 audit fix). For other projections, raw coords
+  // are sufficient — d3-geo's clip math is simpler off the sphere.
+  const disputedPaths = useMemo(() => {
+    if (!data.disputedBoundaries) return [];
+    const boundaries = getDisputedBoundaries(
+      data.disputedBoundaries === true ? true : data.disputedBoundaries,
+    );
+    return boundaries.map((b) => {
+      const coords = isOrthographic ? densifyPolyline(b.coords, 1) : b.coords;
+      return {
+        tag: b.tag,
+        d: activePathGen({
+          type: "Feature",
+          geometry: { type: "LineString" as const, coordinates: coords },
+          properties: {},
+        } as any),
+      };
+    });
+  }, [data.disputedBoundaries, activePathGen, isOrthographic]);
 
   // ── Per-country fill (built per phase) ──────────────────────────────────
   const currentFillMap = useMemo(
@@ -360,17 +531,55 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   );
 
   // ── Theme tokens ────────────────────────────────────────────────────────
-  const landFill = dark ? palette.ink : palette.bone;
-  const borderColor = dark ? palette.bone : palette.ink;
-  // Ocean uses the canonical Meridian style ocean tokens — a paper-tinted
-  // wash on light, near-ink on dark. Single source of truth: mapConfig.styleColors.
-  const oceanColor = dark ? mapConfig.darkStyleColors.ocean : mapConfig.styleColors.ocean;
+  // Vintage aesthetic is a *light-mode* register only — there's no
+  // dark-vintage equivalent. When `aesthetic: "vintage"` is set on a dark
+  // composition, dark wins and vintage is ignored. Warn at dev time
+  // (B3 audit fix) so the silent fallthrough is visible.
+  warnIf(
+    data.aesthetic === "vintage" && dark,
+    "AtlasPlate",
+    "aesthetic: 'vintage' is a LIGHT-mode register; backgroundVariant: " +
+    "'dark' takes precedence and vintage is ignored. Drop one or the " +
+    "other to silence this warning.",
+  );
+  const isVintage = data.aesthetic === "vintage" && !dark;
+  const vintage = mapConfig.vintageStyleColors;
+
+  const landFill = isVintage
+    ? vintage.land
+    : (dark ? palette.ink : palette.bone);
+  const borderColor = isVintage
+    ? vintage.landBorder
+    : (dark ? palette.bone : palette.ink);
+  const oceanColor = isVintage
+    ? vintage.ocean
+    : (dark ? mapConfig.darkStyleColors.ocean : mapConfig.styleColors.ocean);
+
+  // Per-mount unique SVG filter IDs. We previously derived these from
+  // `data.episode`, but `episode` is the SAME slug across multiple
+  // catalog samples (all "_catalog") so two vintage compositions on one
+  // page (the showreel) would share filter definitions. If we ever vary
+  // the grain config per composition, that collision becomes a bug.
+  // `useId()` gives a per-component-instance unique string. B4 audit fix.
+  // React's useId() format includes colons (e.g., `:r1:`) which technically
+  // are valid in SVG IDs but confuse some legacy XML tooling; strip them.
+  const reactId = useId().replace(/[^a-zA-Z0-9-]/g, "");
+  const grainFilterId = `paper-grain-${reactId}`;
+  const vignetteId = `vintage-vignette-${reactId}`;
 
   // ── Stroke scaling — narrower borders when zoomed in ────────────────────
   const borderStroke = BORDER_STROKE_BASE / Math.max(1, Math.sqrt(camera.scale));
 
+  // For orthographic, the outer transform is identity (rotation is baked
+  // into the projection). For other projections, scale+translate from
+  // camera animation. Centralizing here avoids `isOrthographic ? "" : ...`
+  // in three places.
+  const outerTransform = isOrthographic
+    ? "translate(0 0) scale(1)"
+    : `translate(${camera.translate[0]} ${camera.translate[1]}) scale(${camera.scale})`;
+
   // ── Transform string for the outer group ────────────────────────────────
-  const transformStr = `translate(${camera.translate[0]} ${camera.translate[1]}) scale(${camera.scale})`;
+  const transformStr = outerTransform;
 
   // ── Annotation projection (live, accounts for camera) ───────────────────
   // For SVG annotations, project lon/lat under the BASE projection, then
@@ -381,6 +590,14 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   // because they aren't memoized; that's the next-tier perf pass).
   const projectAnnotation = useCallback(
     (lonLat: [number, number]): [number, number] | null => {
+      if (isOrthographic) {
+        // For orthographic, the projection ALREADY incorporates rotation.
+        // No outer transform is applied. Also: d3-geo's orthographic
+        // returns null for points on the far side of the globe — those
+        // annotations correctly skip render.
+        const projected = activeProjection(lonLat);
+        return projected ?? null;
+      }
       const projected = baseProjection(lonLat);
       if (!projected) return null;
       const [x0, y0] = projected;
@@ -389,7 +606,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
         y0 * camera.scale + camera.translate[1],
       ];
     },
-    [baseProjection, camera],
+    [isOrthographic, activeProjection, baseProjection, camera],
   );
 
   // Memoized list of countries with labels in the current phase.
@@ -440,6 +657,44 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             pointerEvents: "none",
           }}
         >
+          {/* SVG filter + gradient definitions for vintage aesthetic.
+              Only emitted when isVintage; otherwise omitted entirely so
+              the `<defs>` block doesn't add render cost. */}
+          {isVintage && (
+            <defs>
+              {/* Paper grain — feTurbulence noise pushed toward warm brown
+                  via colorMatrix. The result is a sepia-toned noise texture
+                  applied as a multiply overlay at ~10% opacity. */}
+              <filter id={grainFilterId} x="0" y="0" width="100%" height="100%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.65"
+                  numOctaves="3"
+                  seed="7"
+                  result="noise"
+                />
+                <feColorMatrix
+                  in="noise"
+                  type="matrix"
+                  values="
+                    0.30 0 0 0 0.18
+                    0.20 0 0 0 0.12
+                    0.12 0 0 0 0.07
+                    0 0 0 0.45 0
+                  "
+                />
+              </filter>
+              {/* Soft vignette: warm-toned radial gradient that darkens the
+                  frame corners. Period atlases were almost always darker at
+                  the edges from photographic-print falloff. */}
+              <radialGradient id={vignetteId} cx="50%" cy="50%" r="75%">
+                <stop offset="0%" stopColor="#000000" stopOpacity="0" />
+                <stop offset="70%" stopColor="#3A2510" stopOpacity="0.06" />
+                <stop offset="100%" stopColor="#3A2510" stopOpacity="0.22" />
+              </radialGradient>
+            </defs>
+          )}
+
           {/* Ocean rect — atlas plates have a colored "water" background
               behind the land. Fills the frame so countries float on it. */}
           <rect width={layout.width} height={layout.height} fill={oceanColor} />
@@ -466,8 +721,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
               />
             )}
 
-            {/* Countries */}
-            {countryPaths.map((c, i) => {
+            {/* Countries — `rotatedCountryPaths` switches to per-frame
+                re-projection when orthographic, otherwise returns the
+                memoized `countryPaths` unchanged. */}
+            {rotatedCountryPaths.map((c, i) => {
               const fill = (c.alpha3 && currentFillMap[c.alpha3]) || landFill;
               return (
                 <path
@@ -480,7 +737,47 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 />
               );
             })}
+
+            {/* Disputed boundaries — dashed rust lines layered over borders. */}
+            {disputedPaths.map(
+              ({ tag, d }) =>
+                d && (
+                  <path
+                    key={`dispute-${tag}`}
+                    d={d}
+                    fill="none"
+                    stroke={palette.rust}
+                    strokeWidth={1.6 / Math.max(1, Math.sqrt(camera.scale))}
+                    strokeDasharray="6 4"
+                    strokeOpacity={0.85}
+                    strokeLinecap="round"
+                  />
+                ),
+            )}
           </g>
+
+          {/* Vintage aesthetic overlays — paper grain (multiply) + vignette.
+              Layered ABOVE the map content but BELOW the annotations so
+              labels stay legible against the grain. The grain rect uses
+              `mix-blend-mode: multiply` so it tints lights and darkens
+              shadows like a real paper texture. */}
+          {isVintage && (
+            <>
+              <rect
+                width={layout.width}
+                height={layout.height}
+                fill="#3A2510"
+                filter={`url(#${grainFilterId})`}
+                style={{ mixBlendMode: "multiply", opacity: 0.5 }}
+              />
+              <rect
+                width={layout.width}
+                height={layout.height}
+                fill={`url(#${vignetteId})`}
+                style={{ pointerEvents: "none" }}
+              />
+            </>
+          )}
 
           {/* Annotations — projected per-frame so they track the camera.
               Rendered as SVG <text>, NOT inside the transform group, so

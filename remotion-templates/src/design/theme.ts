@@ -651,6 +651,30 @@ export const mapConfig = {
     waterLabel: "#5A5448",
     countryLabel: palette.bone,
   },
+  /**
+   * "Vintage" palette — period-atlas register for AtlasPlate's
+   * `aesthetic: "vintage"` mode. Reads as a mid-century Bartholomew /
+   * Fortune-atlas plate: tea-stained paper, warmer land, brown-ink
+   * borders, faded political-color highlights.
+   *
+   * Use case: episodes with a Cold War / historical analogy where the
+   * map register should signal "this is a period reference," not
+   * "this is a live-data map." The Prisoners' Dilemma episode's
+   * deterrence framing is the canonical fit.
+   *
+   * Reference: David Rumsey collection, Bartholomew Times Atlas (1955-72
+   * editions), mid-century Fortune editorial plates (Burtin/Bayer).
+   */
+  vintageStyleColors: {
+    ocean: "#DDD0B3",       // tea-stained water
+    land: "#E8DCC0",         // aged paper
+    landBorder: "#4A3320",   // brown ink
+    countryLabel: "#3A2510", // darker brown for labels
+    waterLabel: "#7A6448",
+    /** Highlight tones tuned to faded-print look. Use for political fills. */
+    westernHighlight: "#5F7DA0", // muted navy (cold-war blue)
+    easternHighlight: "#9B4B3F", // faded oxblood (cold-war red)
+  },
 } as const;
 
 // ── Duotone Ramps (Image Treatment Pipeline) ──────────────────────────────

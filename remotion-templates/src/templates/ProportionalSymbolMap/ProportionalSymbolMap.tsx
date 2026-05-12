@@ -57,6 +57,11 @@ import {
   sortSymbolsLargestFirst,
 } from "../../utils/proportionalSymbol";
 import { CLAMP_CUBIC_INOUT, exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import {
+  easeCameraT,
+  applyDwell,
+  viaGlobePoseInterpolate,
+} from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
 import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
 import type { ProportionalSymbolMapData, ProportionalPhase } from "./types";
@@ -301,14 +306,34 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
     if (safeIdx === 0) return phasePoses[0];
     const prev = phasePoses[safeIdx - 1];
     const next = phasePoses[safeIdx];
-    const t = interpolate(
+
+    const rawT = interpolate(
       frame,
       [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
       [0, 1],
       CLAMP_CUBIC_INOUT,
     );
-    return interpolatePose(prev, next, t);
-  }, [safeIdx, phasePoses, frame, currentWindow.startFrame]);
+
+    const dwellBefore = currentWindow.phase.cameraDwell?.before ?? 0;
+    const dwellAfter = currentWindow.phase.cameraDwell?.after ?? 0;
+    const dwelled = dwellBefore + dwellAfter > 0
+      ? applyDwell(rawT, dwellBefore, dwellAfter)
+      : rawT;
+    const transition = currentWindow.phase.cameraTransition ?? "linear";
+    const easedT = easeCameraT(dwelled, transition);
+
+    return transition === "via-globe"
+      ? viaGlobePoseInterpolate(prev, next, easedT)
+      : interpolatePose(prev, next, easedT);
+  }, [
+    safeIdx,
+    phasePoses,
+    frame,
+    currentWindow.startFrame,
+    currentWindow.phase.cameraTransition,
+    currentWindow.phase.cameraDwell?.before,
+    currentWindow.phase.cameraDwell?.after,
+  ]);
 
   // Per-phase max value — drives the radius normalization
   const phaseMaxValue = useMemo(() => {

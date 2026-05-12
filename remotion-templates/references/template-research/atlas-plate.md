@@ -96,7 +96,7 @@ The design-theory backbone:
 - Camera animation via SVG outer `<g transform="...">` — does NOT re-project per frame.
 - Graticule paths memoized.
 - Per-frame cost: ~177 `<path>` reconciliations (fill only changes per phase). Should comfortably hold 30fps in Remotion's render pipeline.
-- `orthographic` projection holds its world-fit pose (rotating the globe changes visible faces; v1 doesn't animate globe rotation).
+- `orthographic` projection animates rotation via `phase.rotation` (added May 11 2026). The outer-`<g>` transform is bypassed; the projection is re-rotated per frame. `focus` settings are ignored for orthographic — use `rotation` instead.
 
 **Divergences from canon:**
 - No automatic compass rose or scale bar. Editorial decision — Parallax's compositions aren't navigation aids. Add if a specific shot calls for it.
@@ -116,11 +116,11 @@ Ranked by effort/impact:
 3. **Color-tween at phase boundaries.** (~2 hr)
    Currently fills swap instantly at phase boundaries. For highlight-color *changes* (same country in two phases with different fills), lerp the hex over `sec(0.4)` for a smoother editorial feel.
 
-4. **Disputed-boundary support.** (~half day)
-   Render disputed boundaries as dashed rust lines, like the planned Meridian Mapbox style does. Requires a second TopoJSON for disputed admin lines (Natural Earth provides one).
+4. **Disputed-boundary support.** ~~(~half day)~~ **Closed May 11, 2026.**
+   Set `disputedBoundaries: true` (or pass an array of tags like `["taiwan-strait", "nine-dash"]`) and AtlasPlate renders dashed rust polylines for the curated set in `src/utils/disputedBoundaries.ts` — Taiwan Strait median line, S China Sea nine-dash, Kashmir LoC, Crimea post-2014 line, Western Sahara berm. Each carries an editorial `notes` field explaining what the line is. Schema validates against `ALL_DISPUTE_TAGS` so typos fail fast at validation.
 
-5. **Globe rotation for `orthographic`.** (~half day)
-   Animate the projection's rotate parameter between phases so the globe spins from one region to another. Cinematic effect for cold-open shots.
+5. **Globe rotation for `orthographic`.** ~~(~half day)~~ **Closed May 11, 2026.**
+   Set `projection: "orthographic"` and `phase.rotation: [lon, lat]` for each phase. The projection's rotate parameter animates between phases (shortest-arc longitude, linear latitude), giving the RealLifeLore-style spinning-earth cold-open effect. Per-frame re-projection cost is ~9ms (177 paths × ~50μs); acceptable for short cinematic shots, document for longer compositions.
 
 6. **Higher-resolution base map for tight zooms.** (~1 hr to wire, optional)
    `world-atlas/countries-50m.json` (~740kb) instead of 110m (~105kb) when zoomed in past a threshold. Adds detail but bloats bundle.
@@ -136,9 +136,36 @@ These should always trigger an audit finding when seen:
 - **Graticule opacity > 20%.** The grid becomes a cage. Default 10%.
 - **Highlight color in the rust family on bone land WITHOUT a non-rust ocean.** The default ocean color is also bone-tinted; rust highlights merge into the ocean's halo. Pick higher-saturation rust (closer to `#A64D46`) or use a different ocean shade.
 - **Country `iso3` codes that aren't in ISO 3166-1.** Common typos: `UK` (use `GBR`), `IRN` not `IRA`, `BAH` not in the standard (use `BHR` Bahrain or `BHS` Bahamas). The `getCountryByAlpha3` lookup returns null for unknown codes; the country silently doesn't highlight.
-- **Animation transitions on `orthographic` projection.** v1 doesn't animate globe rotation. Either accept the static globe pose or pick a different projection.
+- **Long compositions (>10s) on `orthographic` projection.** Per-frame re-projection costs ~9ms/frame; multiplied across a long composition the render time adds up. For globe shots > 10s, accept the cost or switch to a non-orthographic projection (which uses cheap outer-`<g>` transform animation instead).
 
 ---
+
+## Adjacent register — Vintage / period-atlas aesthetic
+
+AtlasPlate gains a `aesthetic: "atlas" | "vintage"` flag (May 11, 2026). Default `"atlas"` is the modern Tufte/Fortune flat cartography we ship; `"vintage"` invokes a mid-century period-atlas register for Cold War / historical-analogy episodes.
+
+**What vintage swaps:**
+- **Palette** (`mapConfig.vintageStyleColors`): tea-stained paper ocean (`#DDD0B3`), aged paper land (`#E8DCC0`), brown ink borders (`#4A3320`).
+- **Paper grain**: SVG `feTurbulence` filter pushed toward warm brown via `feColorMatrix`, applied as a `mix-blend-mode: multiply` overlay at ~50% opacity. The result is sepia-toned grain texture that tints lights and darkens shadows like real aged paper.
+- **Vignette**: warm radial gradient that darkens the frame corners, mimicking photographic-print falloff in period reproductions.
+
+**Highlight palette** (`vintageStyleColors.westernHighlight` / `easternHighlight`): muted cold-war navy (`#5F7DA0`) and faded oxblood (`#9B4B3F`). Authors can use either the vintage pair (for Cold War analogies) or any palette token (for other periods).
+
+**When to use:**
+- Cold War analogy episodes — prisoners-dilemma's deterrence framing is the canonical fit.
+- "Period reference" shots — showing a *historical* map as historical, not as live data.
+- Atmospheric chapter cards that should signal era.
+
+**When NOT to use:**
+- Live-data shots (current-year choropleths, real-time event maps). Vintage register reads as "old artifact"; don't apply it to current data.
+- Dark-mode compositions. Vintage is a light-mode-only register; the code silently honors `backgroundVariant: "dark"` over `aesthetic: "vintage"`.
+
+**Reference samples:** see `catalog/Maps.tsx → atlasColdWarVintage` for the canonical Cold War blocs treatment.
+
+**Failure modes:**
+- **Vintage on live data** (e.g., 2024 election results). The register lies about the data's age. Pick a single register per shot; never mix.
+- **Aggressive grain opacity** (>60%). Reads as Instagram filter, not period reference. Default 50% is at the upper end; reduce, never increase.
+- **Vintage WITHOUT period-appropriate content.** A vintage map of 2025 trade flows looks weird. If the data isn't historical, the aesthetic isn't either.
 
 ## References
 
