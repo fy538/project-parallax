@@ -24,6 +24,7 @@
     "create-template": "node scripts/create-template.mjs",
     "lint": "node scripts/lint-conventions.mjs",
     "lint:fix": "node scripts/lint-conventions.mjs --fix",
+    "lint:manifest": "python3 ../tools/lint/manifest_lint.py",
     "deploy": "node scripts/deploy-lambda.mjs",
     "deploy:teardown": "node scripts/deploy-lambda.mjs --teardown",
     "render:lambda": "node scripts/render-lambda.mjs"
