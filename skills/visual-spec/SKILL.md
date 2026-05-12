@@ -28,35 +28,96 @@ Before starting, familiarize yourself with:
 
 ## How This Works
 
-The templates cover the MG layer of visual needs:
+The templates cover the MG layer of visual needs. Grouped by **family** so the orphaned templates (the ones that exist but aren't in any author's working memory) stay visible. Shares are episode-typical proportions, not budget caps.
+
+**Wayfinding philosophy:** before picking a template, identify the FAMILY the script beat lives in, then use the family's SELECTOR doc (if it exists) or the in-skill table (if not) to choose the specific template. The Maps family has the canonical "if your beat says X, use Y" wall-table at `remotion-templates/MAP_TEMPLATE_SELECTOR.md`; other families have detailed prose in `remotion-templates/references/template-picker.md` (excellent reference but pre-decision-tree). The family-aware index `remotion-templates/TEMPLATE_FAMILIES.md` cross-references all of this in one page.
+
+### Maps — 6 templates · ~25-30% episode share
+
+**Selector doc:** [`remotion-templates/MAP_TEMPLATE_SELECTOR.md`](../../remotion-templates/MAP_TEMPLATE_SELECTOR.md) (wall-table). Read it before assigning any map beat. The detailed selection table also lives below this section.
+
+**Audit skill:** `map-audit` — sister to script-audit / visual-concept. Runs after script-draft, before visual-spec, to catch template-data mismatches.
 
 | Template | Share | Purpose |
-|----------|-------|---------|
+|---|---|---|
 | ChoroplethMap | ~15% | World map, country fills for **quantitative rates / shares / %** on Mapbox basemap. Default for "GDP per capita," "trade share," "election swing." Atmospheric register. |
 | RouteAnimation | ~15% | Trade routes, supply chains, hub-and-spoke (radial mode). Animated arcs on Mapbox basemap. |
 | AtlasPlate | ~10% | **Pure-SVG flat editorial cartography** via d3-geo. Use for **categorical** maps ("members of X bloc," "treaty signatories"), analytical register where Mapbox atmosphere distracts, OR cold-open globes via `projection: "orthographic"` + `phase.rotation`. Supports `aesthetic: "vintage"` for Cold-War / period-atlas register. |
-| TimelineComparison | ~12% | Historical parallels, before/after |
-| DataChart | ~12% | Statistics, comparisons, numerical data |
-| KineticTypography | ~8% | Quotes, definitions, bilingual text, key stats |
-| FrameworkDiagram | ~7% | Conceptual models, comparisons, flows |
-| TitleTransition | ~5% | Episode/section titles, end cards |
 | ProportionalSymbolMap | as needed | Country circles **sized by count data** (fabs, bases, GDP) on Mapbox basemap. Right form when areas mislead — Mercator-fix for ≤12 countries spread across continents. |
 | CartogramMap | as needed | **Dorling cartogram** — country circles de-collided via d3-force. Use for **15+ data points in dense regions** (EU-27, sub-Saharan Africa) where ProportionalSymbolMap overlaps illegibly. |
 | DensityMap | as needed | **deck.gl point-density** (hex / heatmap / grid) on Mapbox basemap. Use for individual facilities / events (100s of points) where the editorial point is *where they cluster*. Supports bivariate `colorWeight` for size+color independence. |
-| BayesianUpdate | as needed | Probability estimates updated by sequential evidence |
-| ProbabilityGauge | as needed | Single probability readout with gauge arc |
-| DecisionTree | as needed | Branching scenarios, decision points |
-| NetworkDiagram | as needed | Relationship webs, alliance structures |
-| TimeSeriesChart | as needed | Multi-series line charts over time |
-| SankeyFlow | as needed | Flow/allocation diagrams (trade, resources) |
-| GameBoard | as needed | Strategic game theory visualizations |
-| SplitComposition | as needed | Side-by-side comparisons |
-| ImageComposite | as needed | Brand-treated photo with overlay text |
-| PhotoMontage | as needed | Multi-photo grid with reveal animation |
-| StatReveal | as needed | Dramatic single-statistic with comparison bars |
-| RadarChart | as needed | Multi-axis polygon capability comparison |
-| AnnotatedImage | as needed | Image with animated callout labels |
-| EscalationLadder | as needed | Vertical event sequence with severity indicators |
+
+### Charts / data visualizations — 6 templates · ~15-20% episode share
+
+**Selector doc:** ❌ no dedicated wall-table yet. Selection logic is in [`remotion-templates/references/template-picker.md`](../../remotion-templates/references/template-picker.md) (prose, lines 218-300) and the per-template dossiers under `references/template-research/`.
+
+**Audit skill:** ❌ no chart-audit yet. script-audit Lens 6 catches mode balance, not template-fit.
+
+| Template | Share | Purpose |
+|---|---|---|
+| DataChart | ~12% | Statistics, comparisons, numerical data. Default for bar / lollipop / dot plot. |
+| TimeSeriesChart | as needed | Multi-series line charts over time. Use when the editorial point is "trend." |
+| BayesianUpdate | as needed | Probability estimates updated by sequential evidence. The forecast-cascade form. |
+| ProbabilityGauge | as needed | Single probability readout with gauge arc. Use for "X% likely" beats. |
+| RadarChart | as needed | Multi-axis polygon capability comparison. Use when 4-6 attributes need parity comparison. |
+| StatReveal | as needed | Dramatic single-statistic with comparison bars. Use for the "one number that matters" beat. |
+
+### Diagrams / framework / strategic — 10 templates · ~10-15% episode share
+
+**Selector doc:** ❌ no dedicated wall-table. Most under-indexed family — 10 templates, only 6 currently routed through standard authoring. Selection logic is in `template-picker.md` lines 54-192.
+
+**Audit skill:** ❌ no diagram-audit yet.
+
+| Template | Share | Purpose |
+|---|---|---|
+| FrameworkDiagram | ~7% | Conceptual models, comparisons, flows (matrix / comparison / flow variants). |
+| NetworkDiagram | as needed | Relationship webs, alliance structures, hub-spoke topologies. |
+| DecisionTree | as needed | Branching scenarios, decision points. Use the ladder variant for stacked options. |
+| SankeyFlow | as needed | Flow/allocation diagrams (trade, resources, where-the-dollar-goes). |
+| GameBoard | as needed | Strategic game theory visualizations (Prisoners' Dilemma matrix, Axelrod tournament). |
+| EscalationLadder | as needed | Vertical event sequence with severity indicators. |
+| StrategicLandscape | as needed | Position-on-axes strategic frame (e.g., capability vs. intent). |
+| BifurcationRoute | as needed | "Two paths diverged" form for fork-point narratives. |
+| DuelingFrameworks | as needed | Two opposing frameworks compared side by side. |
+| PricingWaterfall | as needed | Value-chain decomposition ($1 of price → segments of cost). |
+
+### Timelines — 4 templates · ~10-12% episode share
+
+**Selector doc:** ❌ no dedicated wall-table. Selection in `template-picker.md` lines 144-157.
+
+**Audit skill:** ❌ no timeline-audit. Be especially wary of event density: most timelines fail by trying to fit 12+ events into one column.
+
+| Template | Share | Purpose |
+|---|---|---|
+| TimelineComparison | ~8% | Historical parallels, before/after, "this happened, then this happened." |
+| HorizontalTimeline | as needed | Single-axis chronology with phased reveal. |
+| DualTimeline | as needed | Two parallel chronologies in stacked tracks. |
+| TimelineMorph | as needed | One timeline morphing into another (transformation reveal). |
+
+### Typography / layout — 6 templates · ~10-15% episode share
+
+**Selector doc:** ❌ no dedicated wall-table. Selection in `template-picker.md` lines 354-424.
+
+**Audit skill:** ❌ no typography-audit. visual-concept Lens 4 touches treatment-narrative fit.
+
+| Template | Share | Purpose |
+|---|---|---|
+| KineticTypography | ~8% | Quotes, definitions, bilingual text, key stats. The "make the words the visual" template. |
+| TitleTransition | ~5% | Episode/section titles, end cards, kicker → title → subtitle reveals. |
+| SplitComposition | as needed | Side-by-side comparisons. |
+| ImageComposite | as needed | Brand-treated photo with overlay text. |
+| PhotoMontage | as needed | Multi-photo grid with reveal animation. |
+| AnnotatedImage | as needed | Image with animated callout labels. |
+
+### Other asset types (not Remotion templates)
+
+These three sit OUTSIDE the Remotion MG layer but are owned by the same visual-spec skill. Detailed editorial logic in [`project/VISUAL_LANGUAGE.md`](../../project/VISUAL_LANGUAGE.md).
+
+| Asset type | Skill section / generator | Selector logic | Audit |
+|---|---|---|---|
+| **Stock footage** (`[FOOTAGE:]`) | visual-spec Step 6 + `tools/asset-source/source.py` | `FOOTAGE_SOURCING.md` sourcability tiers | visual-concept Lens 2 (likelihood); script-audit Lens 6 (mode balance) |
+| **AI illustration** (`[ILLUST:]`) | visual-spec Step 5 + `tools/recraft/recraft.py` | `VISUAL_LANGUAGE.md` Register 2 | visual-concept Lens 6 (register fit) |
+| **AI video** (`[AI-GEN:]`) | visual-spec Step 4 + Kling/Sora/Runway briefs | `VISUAL_LANGUAGE.md` Register 3 ("unsourceable spaces only") | visual-concept Lenses 5+6 (tool assignment + register) |
 
 ### Map template selection — wall-table
 
