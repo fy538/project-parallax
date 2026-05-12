@@ -695,21 +695,20 @@ episode total and the drift was slow and continuous. Per-segment breaks this ent
 | `documentary` | grain, vignette | ✅ Yes — the default Parallax look, seams imperceptible |
 | `dramatic` | grain, vignette, flicker | ✅ Yes — all three effects have imperceptible boundary resets |
 | `archival` | grain, vignette, scratch, dust | ⚠️ Monitor — dust cycle resets can flicker at boundaries if particles happen to be at peak opacity; use per-climactic-segment rather than episode-wide |
-| `cinematic` | grain, vignette, light-leak | ❌ Do NOT use episode-wide — light-leak restarts every segment with a hard 3038px snap |
+| `cinematic` | grain, vignette, light-leak | ✅ **Fixed** (commit a7cbe83) — `frameOffset` + `episodeTotalFrames` now thread through `FilmOverlay` → `LightLeakOverlay`; drift samples episode-absolute time, seam eliminated |
 
-**Fix if cinematic must be used episode-wide** (not yet implemented): Pass a `frameOffset`
-prop to `<FilmOverlay>` / `LightLeakOverlay` equal to `segment.startSec * fps`. The overlay
-would then sample `frame + frameOffset` in the interpolation range `[0, episodeTotalFrames]`
-for a continuous cross-segment drift. Track in a follow-up task before any episode ships
-`manifest.filmOverlay: { preset: "cinematic" }`.
+**Fix shipped (commit a7cbe83, May 12 2026):** `FilmOverlayProps` now accepts `frameOffset?: number` and
+`episodeTotalFrames?: number`. `LightLeakOverlay` uses `absoluteFrame = frame + frameOffset` as the
+interpolation input over `[0, episodeTotalFrames ?? durationInFrames]`. `SegmentFilmOverlay` computes
+`frameOffset = Math.round(segment.startSec * fps)` and `episodeTotalFrames = Math.round(manifest.totalDurationSec * manifest.fps)` at the call site. Defaults are 0 / undefined — standalone compositions are unaffected.
 
 **Rule:** Use `manifest.filmOverlay: { preset: "documentary" }` for episode-wide opt-in.
-Reserve `cinematic` for short-sequence opt-in via per-segment override only
-(`segment.template.filmOverlay: { preset: "cinematic" }`), where there is only one
-segment so no boundary seam exists. Avoid `archival` at episode level.
+`cinematic` is now safe for episode-wide use with the frameOffset fix in place.
+Avoid `archival` at episode level (dust cycle resets still possible at boundaries).
 
 **Verification date: May 12, 2026.** Mathematical model (Sequence.js source + effect
-geometry computation). No visual render needed — 3038px jump is analytically conclusive.
+geometry computation). No visual render needed — 3038px jump was analytically conclusive;
+fix confirmed by typecheck + cascade unit tests (18/18 pass).
 
 ### L100: Meridian Mapbox styles via env vars
 **Context:** Stock `mapbox/light-v11` and `mapbox/dark-v11` were designed for routing apps. Parallax wants atlas plates — IBM Plex typography, hidden POIs, muted hillshade, disputed boundaries dashed in rust.
