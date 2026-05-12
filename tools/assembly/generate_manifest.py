@@ -51,6 +51,25 @@ DEFAULT_BROLL_INTERVAL = 4.0  # seconds per visual change for auto-fill gaps
 
 BACKDROP_TAG_RE = re.compile(r"\[BACKDROP:\s*([a-z0-9-]+)\]", re.IGNORECASE)
 
+# ── FilmOverlay tags ([OVERLAY: preset]) ────────────────────────────────────
+#
+# Rare. Most segments resolve their FilmOverlay preset via the cascade in
+# `src/utils/resolveFilmOverlay.ts` from backdrop choice + template kind —
+# script writers usually don't need to specify anything. Use [OVERLAY:] only
+# when a specific moment needs to break from the auto-resolved preset
+# (e.g. force `dramatic` on an otherwise documentary-toned segment for an
+# editorial peak).
+#
+# Enum mirrors the schema's `$defs.filmOverlayConfig.preset` field. The
+# whole FilmOverlay system is GATED on episode-level `manifest.filmOverlay`
+# being set — if the episode hasn't opted in, [OVERLAY:] tags are emitted
+# into the manifest but ignored at render time.
+
+OVERLAY_TAG_RE = re.compile(
+    r"\[OVERLAY:\s*(clean|documentary|cinematic|dramatic|archival)\]",
+    re.IGNORECASE,
+)
+
 _VALID_BACKDROP_IDS: frozenset[str] | None = None
 
 
@@ -381,6 +400,14 @@ def parse_visual_spec(spec: str):
     bd_m = BACKDROP_TAG_RE.search(spec)
     if bd_m:
         result["backdropId"] = bd_m.group(1).strip().lower()
+
+    # FilmOverlay preset override — surfaced as template.filmOverlay.preset
+    # on the segment. Absent → cascade resolves at render time.
+    ov_m = OVERLAY_TAG_RE.search(spec)
+    if ov_m:
+        result["overlayPreset"] = ov_m.group(1).strip().lower()
+    else:
+        result["overlayPreset"] = None
 
     return result
 
@@ -1670,6 +1697,18 @@ def _build_segment(
                 )
             seg["template"]["backdropId"] = bid
             warn_clutter_backdrop_mismatch(bid, parsed["component"])
+
+        # [OVERLAY: preset] — per-segment FilmOverlay preset override.
+        # Emitted as template.filmOverlay.preset when present; consumed at
+        # render time by resolveFilmOverlay() (cascade level 1). When absent,
+        # the cascade picks via backdrop.recommendedPreset → TEMPLATE_PRESET_MAP
+        # → episode default → "documentary". The whole system is GATED on
+        # episode-level manifest.filmOverlay being set; this tag is emitted
+        # unconditionally and silently ignored at render time if the episode
+        # hasn't opted in.
+        preset = parsed.get("overlayPreset")
+        if preset:
+            seg["template"]["filmOverlay"] = {"preset": preset}
 
     # Hold info
     if seg_type == "HOLD":
