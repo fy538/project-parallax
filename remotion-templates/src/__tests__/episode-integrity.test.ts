@@ -25,6 +25,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
+import Ajv2020 from "ajv/dist/2020";
 import { TEMPLATE_COMPONENTS } from "../templates/Episodes/FullEpisode";
 import { TEMPLATE_SCHEMAS } from "../templates/Episodes/templateSchemas";
 
@@ -34,6 +35,7 @@ const REMOTION_ROOT = path.resolve(__dirname, "../..");
 const DATA_EPISODES_DIR = path.resolve(REMOTION_ROOT, "data/episodes");
 const PUBLIC_DIR = path.resolve(REMOTION_ROOT, "public");
 const BACKDROP_MANIFEST_PATH = path.join(REMOTION_ROOT, "data/backdrop-manifest.json");
+const ASSEMBLY_SCHEMA_PATH = path.join(REMOTION_ROOT, "data/assembly-manifest.schema.json");
 
 /** Same registry FullEpisode uses via EditorialSurface — ids must match exactly. */
 const VALID_BACKDROP_IDS: ReadonlySet<string> = (() => {
@@ -647,3 +649,108 @@ for (const { slug, manifestPath } of EPISODES) {
     });
   });
 }
+
+// ── JSON Schema end-to-end validation ─────────────────────────────────────────
+//
+// Validates each discovered manifest against assembly-manifest.schema.json via
+// AJV (JSON Schema 2020-12). This catches:
+//   - Broken $ref linkage (e.g. typo in $defs/filmOverlayConfig $ref path)
+//   - Invalid enum values (e.g. unknown filmOverlay preset)
+//   - Missing required fields added to the schema but not yet in data
+//   - additionalProperties violations after schema additions
+//
+// The hand-rolled checks above remain — they catch SEMANTIC issues (overlaps,
+// missing files) that a structural schema can't express. This block adds the
+// STRUCTURAL complement that the schema itself is valid and the data passes it.
+//
+// Note: these tests agree with `python3 tools/validate_data.py` (which uses
+// Python's jsonschema library). If they disagree, the JSON file has an issue
+// the two validators handle differently — investigate before fixing either.
+
+// Compile the AJV validator once for the entire test run.
+const _ajv = new Ajv2020({ strict: false });
+const _assemblySchema = JSON.parse(fs.readFileSync(ASSEMBLY_SCHEMA_PATH, "utf-8"));
+const _validate = _ajv.compile(_assemblySchema);
+
+/** Format AJV errors into a readable multiline string. */
+function formatAjvErrors(errors: typeof _validate.errors): string {
+  if (!errors || errors.length === 0) return "(no details)";
+  return errors
+    .slice(0, 5) // cap at 5 to keep output readable
+    .map((e) => `  ${e.instancePath || "/"} — ${e.message}${e.params ? ` (${JSON.stringify(e.params)})` : ""}`)
+    .join("\n") +
+    (errors.length > 5 ? `\n  … and ${errors.length - 5} more` : "");
+}
+
+describe("manifest schema (assembly-manifest.schema.json)", () => {
+  // ── Positive control: bad fixture must FAIL ─────────────────────────────────
+  //
+  // Asserts the validator is actually checking constraints — not silently
+  // accepting everything. Uses an invalid filmOverlay preset to exercise the
+  // $defs/filmOverlayConfig $ref at the episode level (commit 3863b81).
+
+  it("rejects a manifest with an invalid filmOverlay.preset", () => {
+    const badManifest = {
+      version: "1.0",
+      episode: "test-fixture",
+      fps: 30,
+      narration: { totalDurationSec: 10, words: [] },
+      segments: [],
+      filmOverlay: { preset: "fake-preset" }, // not in the enum
+    };
+    const valid = _validate(badManifest);
+    expect(valid).toBe(false);
+    // Sanity: error should mention the invalid preset
+    const errText = formatAjvErrors(_validate.errors);
+    expect(errText).toMatch(/preset|enum|fake-preset/i);
+  });
+
+  it("rejects a manifest with an invalid segment filmOverlay.preset", () => {
+    const badManifest = {
+      version: "1.0",
+      episode: "test-fixture",
+      fps: 30,
+      narration: { totalDurationSec: 10, words: [] },
+      segments: [
+        {
+          id: "seg01",
+          type: "TEMPLATE",
+          layer: "foreground",
+          startSec: 0,
+          endSec: 5,
+          template: {
+            component: "KineticTypography",
+            filmOverlay: { preset: "not-a-preset" }, // exercices $defs $ref at segment level
+          },
+        },
+      ],
+    };
+    const valid = _validate(badManifest);
+    expect(valid).toBe(false);
+  });
+
+  // ── Every discovered manifest must PASS ────────────────────────────────────
+
+  if (EPISODES.length === 0) {
+    it("has at least one episode to validate", () => {
+      expect(EPISODES.length, "No episodes discovered — add an assembly-manifest.json").toBeGreaterThan(0);
+    });
+  }
+
+  for (const { slug, manifestPath } of EPISODES) {
+    it(`"${slug}" validates against assembly-manifest.schema.json`, () => {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf-8"));
+      const valid = _validate(manifest);
+      if (!valid) {
+        throw new Error(
+          `\n"${slug}" failed JSON Schema validation:\n` +
+          `${formatAjvErrors(_validate.errors)}\n\n` +
+          `Schema: ${ASSEMBLY_SCHEMA_PATH}\n` +
+          `Manifest: ${manifestPath}\n` +
+          `Fix: correct the manifest to match the schema, or update the schema if the manifest is intentionally new.`
+        );
+      }
+      expect(valid).toBe(true);
+    });
+  }
+});
