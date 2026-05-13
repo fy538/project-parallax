@@ -32,8 +32,24 @@ import type { RadarChartData } from "../templates/RadarChart/types";
 import { SankeyFlow } from "../templates/SankeyFlow/SankeyFlow";
 import { SankeyFlowSchema } from "../templates/SankeyFlow/schema";
 import type { SankeyFlowData } from "../templates/SankeyFlow/types";
+import { BumpChart } from "../templates/BumpChart/BumpChart";
+import { BumpChartSchema } from "../templates/BumpChart/schema";
+import type { BumpChartData } from "../templates/BumpChart/types";
+import { PopulationPyramid } from "../templates/PopulationPyramid/PopulationPyramid";
+import { PopulationPyramidSchema } from "../templates/PopulationPyramid/schema";
+import type { PopulationPyramidData } from "../templates/PopulationPyramid/types";
+import { RankChangeDotPlot } from "../templates/RankChangeDotPlot/RankChangeDotPlot";
+import { RankChangeDotPlotSchema } from "../templates/RankChangeDotPlot/schema";
+import type { RankChangeDotPlotData } from "../templates/RankChangeDotPlot/types";
+import rankChangeSemiconductors from "../../data/episodes/catalog/rank-change-semiconductors.json";
+import { IsotypeChart } from "../templates/IsotypeChart/IsotypeChart";
+import { IsotypeChartSchema } from "../templates/IsotypeChart/schema";
+import type { IsotypeChartData } from "../templates/IsotypeChart/types";
+import isotypeChipsData from "../../data/episodes/catalog/isotype-chips.json";
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
+import bumpGdpData from "../../data/episodes/catalog/bump-chart-gdp.json";
+import pyramidChinaData from "../../data/episodes/catalog/population-pyramid-china.json";
 
 // ─── StatReveal — three different scale categories ────────────────────────
 
@@ -672,6 +688,74 @@ export const CatalogWaterfallMotionDocumentary = () => (
       height: layout.height,
     })}
     defaultProps={{ data: { ...waterfallCoffee, motionIdentity: "documentary" as const } }}
+  />
+);
+
+// ─── BumpChart — GDP power-transition demo ───────────────────────────────
+
+export const CatalogBumpGDP = () => (
+  <Composition
+    id={catalogId("BumpChart", "gdp-power-transition")}
+    component={BumpChart}
+    schema={BumpChartSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as BumpChartData).durationSec ?? 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: bumpGdpData as BumpChartData }}
+  />
+);
+
+// ─── PopulationPyramid — China 1990 vs 2025 ─────────────────────────────────
+
+export const CatalogPyramidChina = () => (
+  <Composition
+    id={catalogId("PopulationPyramid", "china-morph")}
+    component={PopulationPyramid}
+    schema={PopulationPyramidSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as PopulationPyramidData).durationSec ?? 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: pyramidChinaData as PopulationPyramidData }}
+  />
+);
+
+// ─── RankChangeDotPlot — semiconductor foundry rankings after export controls
+
+export const CatalogRankChangeSemiconductors = () => (
+  <Composition
+    id={catalogId("RankChangeDotPlot", "semiconductors")}
+    component={RankChangeDotPlot}
+    schema={RankChangeDotPlotSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as RankChangeDotPlotData).durationSec ?? 11),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: rankChangeSemiconductors as RankChangeDotPlotData }}
+  />
+);
+
+// ─── IsotypeChart — TSMC leading-edge chip share ──────────────────────────
+
+export const CatalogIsotypeChips = () => (
+  <Composition
+    id={catalogId("IsotypeChart", "tsmc-chip-share")}
+    component={IsotypeChart}
+    schema={IsotypeChartSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as IsotypeChartData).durationSec ?? 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: isotypeChipsData as IsotypeChartData }}
   />
 );
 

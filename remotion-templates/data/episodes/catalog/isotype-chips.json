@@ -1,0 +1,15 @@
+{
+  "episode": "",
+  "title": "One Company Makes 92% of the World's Most Advanced Chips",
+  "subtitle": "Share of global leading-edge semiconductor production (≤5nm node), 2024",
+  "variant": "proportion",
+  "total": 100,
+  "highlighted": 92,
+  "highlightLabel": "TSMC",
+  "totalLabel": "global leading-edge output",
+  "icon": "chip",
+  "iconSize": 36,
+  "unitLabel": "= 1% of global leading-edge chip production",
+  "source": "TechInsights, SEMI, company filings 2024",
+  "durationSec": 10
+}

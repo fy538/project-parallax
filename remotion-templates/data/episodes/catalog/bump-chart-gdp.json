@@ -1,0 +1,112 @@
+{
+  "episode": "",
+  "title": "China Overtakes Japan to Become World #2 Economy",
+  "subtitle": "GDP rank by nominal value, 1990–2025",
+  "source": "World Bank, IMF World Economic Outlook",
+  "durationSec": 16,
+  "holdAfterRevealSec": 2,
+  "periods": ["1990", "1995", "2000", "2005", "2010", "2015", "2020", "2025"],
+  "rankDirection": "desc",
+  "highlightIds": ["china", "us"],
+  "unit": "GDP in current USD",
+  "entities": [
+    {
+      "id": "us",
+      "label": "United States",
+      "values": [
+        { "period": "1990", "value": 5963 },
+        { "period": "1995", "value": 7640 },
+        { "period": "2000", "value": 10285 },
+        { "period": "2005", "value": 13040 },
+        { "period": "2010", "value": 14992 },
+        { "period": "2015", "value": 18206 },
+        { "period": "2020", "value": 20936 },
+        { "period": "2025", "value": 29000 }
+      ]
+    },
+    {
+      "id": "china",
+      "label": "China",
+      "values": [
+        { "period": "1990", "value": 360 },
+        { "period": "1995", "value": 734 },
+        { "period": "2000", "value": 1215 },
+        { "period": "2005", "value": 2290 },
+        { "period": "2010", "value": 6087 },
+        { "period": "2015", "value": 11016 },
+        { "period": "2020", "value": 14688 },
+        { "period": "2025", "value": 19500 }
+      ]
+    },
+    {
+      "id": "japan",
+      "label": "Japan",
+      "values": [
+        { "period": "1990", "value": 3132 },
+        { "period": "1995", "value": 5449 },
+        { "period": "2000", "value": 4888 },
+        { "period": "2005", "value": 4755 },
+        { "period": "2010", "value": 5700 },
+        { "period": "2015", "value": 4395 },
+        { "period": "2020", "value": 5040 },
+        { "period": "2025", "value": 4100 }
+      ]
+    },
+    {
+      "id": "germany",
+      "label": "Germany",
+      "values": [
+        { "period": "1990", "value": 1574 },
+        { "period": "1995", "value": 2525 },
+        { "period": "2000", "value": 1950 },
+        { "period": "2005", "value": 2861 },
+        { "period": "2010", "value": 3398 },
+        { "period": "2015", "value": 3357 },
+        { "period": "2020", "value": 3806 },
+        { "period": "2025", "value": 4600 }
+      ]
+    },
+    {
+      "id": "uk",
+      "label": "United Kingdom",
+      "values": [
+        { "period": "1990", "value": 1090 },
+        { "period": "1995", "value": 1330 },
+        { "period": "2000", "value": 1484 },
+        { "period": "2005", "value": 2495 },
+        { "period": "2010", "value": 2480 },
+        { "period": "2015", "value": 2861 },
+        { "period": "2020", "value": 2708 },
+        { "period": "2025", "value": 3500 }
+      ]
+    },
+    {
+      "id": "france",
+      "label": "France",
+      "values": [
+        { "period": "1990", "value": 1254 },
+        { "period": "1995", "value": 1572 },
+        { "period": "2000", "value": 1361 },
+        { "period": "2005", "value": 2194 },
+        { "period": "2010", "value": 2646 },
+        { "period": "2015", "value": 2421 },
+        { "period": "2020", "value": 2631 },
+        { "period": "2025", "value": 3200 }
+      ]
+    },
+    {
+      "id": "india",
+      "label": "India",
+      "values": [
+        { "period": "1990", "value": 320 },
+        { "period": "1995", "value": 363 },
+        { "period": "2000", "value": 477 },
+        { "period": "2005", "value": 834 },
+        { "period": "2010", "value": 1676 },
+        { "period": "2015", "value": 2103 },
+        { "period": "2020", "value": 2623 },
+        { "period": "2025", "value": 4270 }
+      ]
+    }
+  ]
+}

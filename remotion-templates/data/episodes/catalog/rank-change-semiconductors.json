@@ -1,0 +1,25 @@
+{
+  "episode": "",
+  "title": "Export Controls Reshuffled the Foundry Rankings",
+  "subtitle": "Global semiconductor foundry market share rank, 2018 vs 2023",
+  "beforeLabel": "2018",
+  "afterLabel": "2023",
+  "sortBy": "change",
+  "unit": "market share rank",
+  "isRankData": true,
+  "highlightIds": ["SMIC", "TSMC"],
+  "items": [
+    { "label": "TSMC",            "before": 1,  "after": 1  },
+    { "label": "Samsung",         "before": 2,  "after": 2  },
+    { "label": "GlobalFoundries", "before": 3,  "after": 3  },
+    { "label": "UMC",             "before": 4,  "after": 4  },
+    { "label": "SMIC",            "before": 5,  "after": 6  },
+    { "label": "Tower Semi",      "before": 6,  "after": 5  },
+    { "label": "PSMC",            "before": 8,  "after": 7  },
+    { "label": "Hua Hong",        "before": 7,  "after": 8  },
+    { "label": "DB HiTek",        "before": 9,  "after": 9  },
+    { "label": "VIS",             "before": 10, "after": 10 }
+  ],
+  "source": "TechInsights Foundry Market Tracker; BIS export controls effective Oct 2022",
+  "durationSec": 11
+}

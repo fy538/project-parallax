@@ -19,7 +19,9 @@ import { AtlasPlateComposition } from "./templates/AtlasPlate";
 import { ProportionalSymbolMapComposition } from "./templates/ProportionalSymbolMap";
 import { CartogramMapComposition } from "./templates/CartogramMap";
 import { DensityMapComposition } from "./templates/DensityMap";
-// DEPRECATED: TimelineComparison, TimelineMorph, DualTimeline — replaced by HorizontalTimeline
+// DEPRECATED: TimelineComparison, DualTimeline — replaced by HorizontalTimeline.
+// REMOVED (May 13, 2026): TimelineMorph — its single use case (Blockade,
+// Reinvented) migrated to DuelingFrameworks as a structural comparison.
 // Kept in codebase for FullEpisode backward compat, but removed from Studio sidebar.
 import { DataChartComposition } from "./templates/DataChart";
 import { KineticTypographyComposition } from "./templates/KineticTypography";
@@ -35,12 +37,20 @@ import { TimeSeriesChartComposition } from "./templates/TimeSeriesChart";
 import { SankeyFlowComposition } from "./templates/SankeyFlow";
 import { GameBoardComposition } from "./templates/GameBoard";
 import { BayesianUpdateComposition, BayesianUpdateMultiComposition } from "./templates/BayesianUpdate";
-import { BifurcationRouteComposition } from "./templates/BifurcationRoute";
+// BifurcationRoute template removed May 13, 2026 — phylogenetic-tree
+// rendering didn't fit Parallax's editorial register; no episodes in the
+// queue required it. Future institutional-bifurcation stories can use
+// DuelingFrameworks or HorizontalTimeline dual mode (e.g., the COCOM
+// successor regimes migrated to those forms).
 import { DuelingFrameworksComposition } from "./templates/DuelingFrameworks";
 import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
+import { IsotypeChartComposition } from "./templates/IsotypeChart";
+import { BumpChartComposition } from "./templates/BumpChart";
+import { PopulationPyramidComposition } from "./templates/PopulationPyramid";
 import { RadarChartComposition } from "./templates/RadarChart";
+import { RankChangeDotPlotComposition } from "./templates/RankChangeDotPlot";
 import { AnnotatedImageComposition } from "./templates/AnnotatedImage";
 import { EscalationLadderComposition } from "./templates/EscalationLadder";
 import { HorizontalTimelineComposition } from "./templates/HorizontalTimeline";
@@ -104,6 +114,10 @@ import {
   CatalogRadarAthletes,
   CatalogSankeyEnergy,
   CatalogWaterfallCoffee,
+  CatalogIsotypeChips,
+  CatalogBumpGDP,
+  CatalogPyramidChina,
+  CatalogRankChangeSemiconductors,
   CatalogWaterfallMotionStill,
   CatalogWaterfallMotionBriefing,
   CatalogWaterfallMotionDocumentary,
@@ -132,7 +146,7 @@ import {
   CatalogGamePayoff,
   CatalogGamePDCanonical,
   CatalogGameIteratedPD,
-  CatalogBifurcationLatin,
+  // CatalogBifurcationCocom removed May 13, 2026 with BifurcationRoute template.
   CatalogEditorialHero,
   CatalogEditorialAside,
   CatalogEditorialMinimal,
@@ -140,9 +154,9 @@ import {
   CatalogEmphasisShowcase,
   CatalogTemplatePreview,
   CatalogDuelingEmpireFall,
+  CatalogDuelingBlockadesSubstrate,
   CatalogTimelineComparisonRevolutions,
   CatalogDualImperialTransitions,
-  CatalogMorphBlockades,
   CatalogImageArchive,
   CatalogMontageTreatments,
   CatalogAnnotatedDemo,
@@ -185,6 +199,10 @@ export const RemotionRoot: React.FC = () => {
         <StatRevealComposition />
         <RadarChartComposition />
         <PricingWaterfallComposition />
+        <IsotypeChartComposition />
+        <BumpChartComposition />
+        <PopulationPyramidComposition />
+        <RankChangeDotPlotComposition />
       </Folder>
 
       <Folder name="Typography">
@@ -202,7 +220,7 @@ export const RemotionRoot: React.FC = () => {
       <Folder name="Scenarios">
         <DecisionTreeComposition />
         <GameBoardComposition />
-        <BifurcationRouteComposition />
+        {/* BifurcationRouteComposition removed May 13, 2026 — see import comment. */}
       </Folder>
 
       <Folder name="Transitions">
@@ -293,6 +311,10 @@ export const RemotionRoot: React.FC = () => {
           <CatalogRadarAthletes />
           <CatalogSankeyEnergy />
           <CatalogWaterfallCoffee />
+          <CatalogIsotypeChips />
+          <CatalogBumpGDP />
+          <CatalogPyramidChina />
+          <CatalogRankChangeSemiconductors />
         </Folder>
 
         <Folder name="Motion-Identity">
@@ -323,6 +345,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogSplitMaps />
           <CatalogSplitTime />
           <CatalogDuelingEmpireFall />
+          <CatalogDuelingBlockadesSubstrate />
         </Folder>
 
         <Folder name="Timelines">
@@ -333,7 +356,6 @@ export const RemotionRoot: React.FC = () => {
           <CatalogLadderArms />
           <CatalogTimelineComparisonRevolutions />
           <CatalogDualImperialTransitions />
-          <CatalogMorphBlockades />
         </Folder>
 
         <Folder name="Cinematic">
@@ -349,7 +371,6 @@ export const RemotionRoot: React.FC = () => {
           <CatalogGamePayoff />
           <CatalogGamePDCanonical />
           <CatalogGameIteratedPD />
-          <CatalogBifurcationLatin />
         </Folder>
 
         <Folder name="Editorial">

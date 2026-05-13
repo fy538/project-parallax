@@ -43,9 +43,13 @@ export {
   CatalogRadarAthletes,
   CatalogSankeyEnergy,
   CatalogWaterfallCoffee,
+  CatalogIsotypeChips,
   CatalogWaterfallMotionStill,
   CatalogWaterfallMotionBriefing,
   CatalogWaterfallMotionDocumentary,
+  CatalogBumpGDP,
+  CatalogPyramidChina,
+  CatalogRankChangeSemiconductors,
 } from "./Data";
 
 export {
@@ -70,6 +74,7 @@ export {
   CatalogSplitMaps,
   CatalogSplitTime,
   CatalogDuelingEmpireFall,
+  CatalogDuelingBlockadesSubstrate,
 } from "./Diagrams";
 
 export {
@@ -80,7 +85,8 @@ export {
   CatalogLadderArms,
   CatalogTimelineComparisonRevolutions,
   CatalogDualImperialTransitions,
-  CatalogMorphBlockades,
+  // CatalogMorphBlockades retired May 13, 2026 — migrated to
+  // CatalogDuelingBlockadesSubstrate (exported above from Diagrams).
 } from "./Timelines";
 
 export {
@@ -96,7 +102,7 @@ export {
   CatalogGamePayoff,
   CatalogGamePDCanonical,
   CatalogGameIteratedPD,
-  CatalogBifurcationLatin,
+  // CatalogBifurcationCocom removed May 13, 2026 with BifurcationRoute template.
 } from "./Scenarios";
 
 export {
