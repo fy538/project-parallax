@@ -22,7 +22,6 @@ import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
-  useVideoConfig,
   interpolate,
 } from "remotion";
 import {
@@ -43,7 +42,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
-import { fadeIn, exitFade, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import type { BumpChartData } from "./types";
 
@@ -105,11 +104,10 @@ function computeRanks(
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
-  const { durationInFrames } = useVideoConfig();
   const frame = useCurrentFrame();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
-  const { style: compStyle } = useCompositionAnimation();
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
   const { entities, periods } = data;
   const rankDirection = data.rankDirection ?? "desc";
@@ -131,6 +129,13 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
     "BumpChart",
     "BumpChart: entity value count doesn't match periods length; check data",
     { entityValueCounts: entities.map((e) => ({ id: e.id, count: e.values.length })) }
+  );
+  // holdAfterRevealSec is accepted in schema but not yet implemented as a hold phase;
+  // warn script writers so they know it has no effect yet.
+  warnIf(
+    (data.holdAfterRevealSec ?? 0) > 0,
+    "BumpChart",
+    "BumpChart: holdAfterRevealSec is not yet implemented — no hold phase will be applied"
   );
 
   // ── Rank computation (memoized) ──────────────────────────────────────────
@@ -177,12 +182,6 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
     return segStart(entityIndex, numPeriods - 2) + segDuration;
   };
 
-  // Latest finish frame across all entities (for end-label timing)
-  const allLinesFinishFrame = useMemo(
-    () => Math.max(...entities.map((_, i) => lineFinishFrame(i))),
-    [entities, numPeriods, segDuration, entityStagger]
-  );
-
   // ── End-label anti-collision ─────────────────────────────────────────────
   // Sort by final rank y-position, then push down overlapping labels
   const endLabelPositions = useMemo(() => {
@@ -220,12 +219,7 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
 
   return (
     <Background variant="light">
-      <AbsoluteFill
-        style={{
-          ...compStyle,
-          opacity: exitFade(frame, durationInFrames, 15),
-        }}
-      >
+      <AbsoluteFill style={compStyle}>
         {/* Brand strips */}
         <HeaderStrip metadata={data.episode} mode="light" />
         <FooterStrip scale={data.unit ? `· ${data.unit}` : undefined} mode="light" />

@@ -96,7 +96,6 @@ function countUp(target: number, progress: number): number {
 interface ProportionGridProps {
   data: IsotypeChartData;
   frame: number;
-  durationInFrames: number;
   accentColor: string;
   theme: ReturnType<typeof useThemeMode>;
   exit: number;
@@ -105,7 +104,6 @@ interface ProportionGridProps {
 const ProportionGrid: React.FC<ProportionGridProps> = ({
   data,
   frame,
-  durationInFrames,
   accentColor,
   theme,
   exit,
@@ -493,7 +491,6 @@ export const IsotypeChart: React.FC<{ data: IsotypeChartData }> = ({ data }) => 
             <ProportionGrid
               data={data}
               frame={frame}
-              durationInFrames={durationInFrames}
               accentColor={accentColor}
               theme={theme}
               exit={exit}

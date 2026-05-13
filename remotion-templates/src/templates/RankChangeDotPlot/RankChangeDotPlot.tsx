@@ -16,7 +16,6 @@ import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
-  useVideoConfig,
   interpolate,
 } from "remotion";
 import {
@@ -39,7 +38,6 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   stagger,
-  exitFade,
   CLAMP_SINE,
   CLAMP_CUBIC,
 } from "../../utils/animation";
@@ -70,7 +68,6 @@ function resolveColor(item: RankChangeDotPlotItem, isRankData: boolean): string 
 export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
   data,
 }) => {
-  const { durationInFrames } = useVideoConfig();
   const frame = useCurrentFrame();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
@@ -153,12 +150,7 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
 
   return (
     <Background variant="light">
-      <AbsoluteFill
-        style={{
-          ...compStyle,
-          opacity: exitFade(frame, durationInFrames, 15),
-        }}
-      >
+      <AbsoluteFill style={compStyle}>
         {/* Brand strips */}
         <HeaderStrip metadata={data.episode} mode="light" />
         <FooterStrip
@@ -369,7 +361,7 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
                 width: labelColRight - labelColLeft,
                 textAlign: "right",
                 paddingRight: layout.spacing.md,
-                fontSize: isHighlighted ? fontSizes.body : fontSizes.body,
+                fontSize: isHighlighted ? fontSizes.body : fontSizes.caption,
                 fontFamily: fonts.body,
                 fontWeight: isHighlighted ? 700 : 400,
                 color: isMuted ? `${palette.ink}80` : theme.text.primary,

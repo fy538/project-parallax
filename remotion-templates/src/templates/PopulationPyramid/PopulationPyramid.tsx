@@ -21,7 +21,6 @@ import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
-  useVideoConfig,
   interpolate,
 } from "remotion";
 import {
@@ -42,7 +41,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, exitFade, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, stagger, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import type { PopulationPyramidData, PyramidCohort } from "./types";
 
@@ -410,7 +409,6 @@ const YearLabel: React.FC<YearLabelProps> = React.memo(({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ data }) => {
-  const { durationInFrames } = useVideoConfig();
   const frame = useCurrentFrame();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
@@ -492,12 +490,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
 
   return (
     <Background variant="light">
-      <AbsoluteFill
-        style={{
-          ...compStyle,
-          opacity: exitFade(frame, durationInFrames, 15),
-        }}
-      >
+      <AbsoluteFill style={compStyle}>
         <HeaderStrip metadata={data.episode} mode="light" />
         <FooterStrip scale={unit ? `UNIT · ${unit}` : undefined} mode="light" />
 
