@@ -165,14 +165,34 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
     return { baseProjection: p, basePathGen: makePathGenerator(p) };
   }, [data.projection, data.phases, fitToData, framePadding]);
 
-  // ── Coastline paths (memoized, optional) ────────────────────────────────
+  // ── Land paths (memoized, optional) ─────────────────────────────────────
+  // Filtered to countries whose projected centroid falls within the viewport
+  // + a 300px buffer. This prevents stray path segments from far-off countries
+  // (e.g. Russia's east coast, South America) from bleeding through the frame
+  // when the projection is region-fitted.
   const coastlinePaths = useMemo(() => {
     if (!showCoastlines) return [];
-    return getAllCountries().map((c: CountryFeature) => ({
-      alpha3: c.alpha3,
-      d: basePathGen(c.feature) ?? "",
-    }));
-  }, [basePathGen, showCoastlines]);
+    const BUFFER = 300;
+    return getAllCountries()
+      .filter((c: CountryFeature) => {
+        if (!c.alpha3) return true; // no code → can't centroid-test, keep
+        const geo = getCountryCentroid(c.alpha3);
+        if (!geo) return true;
+        const screen = baseProjection(geo);
+        if (!screen) return false;
+        return (
+          screen[0] >= -BUFFER &&
+          screen[0] <= VIEWPORT.width + BUFFER &&
+          screen[1] >= -BUFFER &&
+          screen[1] <= VIEWPORT.height + BUFFER
+        );
+      })
+      .map((c: CountryFeature) => ({
+        alpha3: c.alpha3,
+        d: basePathGen(c.feature) ?? "",
+      }))
+      .filter((c) => c.d !== "");
+  }, [basePathGen, baseProjection, showCoastlines]);
 
   // ── Phase windows + decollided layouts ──────────────────────────────────
   const windows = useMemo(() => computePhaseWindows(data.phases), [data.phases]);
@@ -259,8 +279,11 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
 
   const legendTicks = useMemo(() => generateLegendTicks(phaseMaxValue), [phaseMaxValue]);
 
-  // Theme tokens
-  const coastlineColor = dark ? palette.bone : palette.taupe;
+  // Theme tokens — land/sea contrast that reads at video resolution.
+  // Light: warm tan land (#D4CAB8) on slightly darker sea (#E4DDD3).
+  // Dark: muted near-black land on very dark sea.
+  const landFillColor = dark ? mapConfig.darkStyleColors.landBorder : mapConfig.styleColors.landBorder;
+  const landStrokeColor = dark ? palette.bone : palette.umber;
   const oceanColor = dark ? mapConfig.darkStyleColors.ocean : mapConfig.styleColors.ocean;
 
   // Defensive null-render (B4 pattern).
@@ -310,18 +333,21 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
           {/* Ocean / paper background. */}
           <rect width={layout.width} height={layout.height} fill={oceanColor} />
 
-          {/* Faint coastline reference (optional). NOT under a camera
-              transform — cartogram is fully world-fit, no per-phase
-              camera. Subtle, low opacity, no fill. */}
+          {/* Land reference layer (optional). Filled polygons give sea/land
+              contrast so circles read against visible geography. Stroke draws
+              country borders — thicker than a typical atlas to survive video
+              compression. Filtered to the current region so far-off countries
+              don't contribute stray path segments. */}
           {showCoastlines &&
             coastlinePaths.map((c, i) => (
               <path
                 key={c.alpha3 ?? `coast-${i}`}
                 d={c.d}
-                fill="none"
-                stroke={coastlineColor}
-                strokeOpacity={0.18}
-                strokeWidth={0.4}
+                fill={landFillColor}
+                fillOpacity={dark ? 0.55 : 0.65}
+                stroke={landStrokeColor}
+                strokeOpacity={dark ? 0.28 : 0.40}
+                strokeWidth={0.7}
                 strokeLinejoin="round"
               />
             ))}
