@@ -67,6 +67,19 @@ export interface CartogramMapData {
   showCoastlines?: boolean;
 
   /**
+   * Fit the projection to the bounding box of the DATA COUNTRIES rather
+   * than the full world graticule. Default `true`.
+   *
+   * Leave `true` (the common case) — it zooms the map to your region so
+   * circles start near their correct relative positions and the
+   * force-simulation spreads them naturally across the frame.
+   *
+   * Set `false` only when the data spans the entire globe and world-scale
+   * reference geography is the editorial point.
+   */
+  fitToData?: boolean;
+
+  /**
    * Force-simulation strength pulling each circle toward its true
    * centroid. Higher = more geographic faithfulness, lower = more
    * aggressive decollision. Default 0.1 (Dorling-canonical).

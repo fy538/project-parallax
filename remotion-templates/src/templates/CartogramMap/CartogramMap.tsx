@@ -40,8 +40,10 @@ import {
 import {
   resolveProjection,
   fitProjectionToWorld,
+  fitProjectionToFeatures,
   makePathGenerator,
   getAllCountries,
+  getCountryByAlpha3,
   getCountryCentroid,
   type CountryFeature,
 } from "../../utils/atlasProjection";
@@ -54,6 +56,7 @@ import {
 import { runDorlingLayout } from "../../utils/dorling";
 import { warnIf } from "../../utils/dataWarnings";
 import { exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import type { FeatureCollection } from "geojson";
 import type { CartogramMapData, CartogramPhase } from "./types";
 
 // ── Constants ─────────────────────────────────────────────────────────────
@@ -124,13 +127,43 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
   const xyStrength = data.xyStrength ?? DEFAULT_XY_STRENGTH;
   const defaultSymbolColor = data.symbolColor ?? palette.rust;
   const showCoastlines = data.showCoastlines ?? true;
+  const fitToData = data.fitToData ?? true;
 
-  // ── Base projection (world fit, used to project centroids) ──────────────
+  // ── Base projection (fit to data region or world) ────────────────────────
+  // When fitToData=true (default): project only the data countries' bounding
+  // box into the viewport. This is the correct behaviour for regional datasets
+  // (EU-27, NATO, ASEAN) — the force-sim receives centroid targets that are
+  // already spread across the full frame, so decollision spreads circles
+  // naturally without fighting the xyStrength gravity pulling them back to
+  // a tiny geographic cluster.
+  //
+  // When fitToData=false: classic world-scale fit (global datasets).
   const { baseProjection, basePathGen } = useMemo(() => {
     const p = resolveProjection(data.projection);
-    fitProjectionToWorld(p, VIEWPORT, framePadding);
+    if (fitToData) {
+      // Collect ALL data country features across all phases so projection
+      // is stable when phases transition (same fit extent throughout).
+      const allIso3s = new Set(data.phases.flatMap((ph) => ph.data.map((d) => d.iso3)));
+      const features = Array.from(allIso3s)
+        .map((iso3) => getCountryByAlpha3(iso3))
+        .filter((c): c is CountryFeature => c !== null)
+        .map((c) => c.feature);
+      if (features.length > 0) {
+        fitProjectionToFeatures(
+          p,
+          { type: "FeatureCollection", features } as FeatureCollection,
+          VIEWPORT,
+          framePadding
+        );
+      } else {
+        // Fallback: no recognisable countries — fit world so something renders.
+        fitProjectionToWorld(p, VIEWPORT, framePadding);
+      }
+    } else {
+      fitProjectionToWorld(p, VIEWPORT, framePadding);
+    }
     return { baseProjection: p, basePathGen: makePathGenerator(p) };
-  }, [data.projection, framePadding]);
+  }, [data.projection, data.phases, fitToData, framePadding]);
 
   // ── Coastline paths (memoized, optional) ────────────────────────────────
   const coastlinePaths = useMemo(() => {

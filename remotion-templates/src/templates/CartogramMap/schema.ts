@@ -44,6 +44,13 @@ export const CartogramMapSchema = z.object({
     scaleType: z.enum(["sqrt", "linear"]).optional(),
     symbolColor: z.string().optional(),
     showCoastlines: z.boolean().optional(),
+    fitToData: z
+      .boolean()
+      .optional()
+      .describe(
+        "Fit the projection to data-country bounding box instead of the full world. " +
+        "Default true — use false only for truly global datasets."
+      ),
     xyStrength: z.number().min(0).max(1).optional(),
     annotations: z.array(MapAnnotationSchema).optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
