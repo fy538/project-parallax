@@ -59,6 +59,8 @@ export interface RadarChartData {
   /** Source attribution */
   source?: string;
   durationSec?: number;
+  /** Deliberate pause in seconds after radar polygons finish drawing, before exit fade. Default: 0. */
+  holdAfterRevealSec?: number;
   backgroundVariant?: "dark" | "light";
 
   // ── Directing language overrides ──────────────────────────────────────

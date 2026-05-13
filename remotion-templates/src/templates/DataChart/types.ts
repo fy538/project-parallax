@@ -90,6 +90,13 @@ export interface DataChartData {
   source?: string;
   /** Total duration in seconds. */
   durationSec?: number;
+  /**
+   * Deliberate pause in seconds after all chart elements have finished animating
+   * in, before exit fade begins. Consumes part of durationSec — ensure
+   * entranceEndSec + holdAfterRevealSec < durationSec - 0.5 (for exit fade).
+   * Default: 0 (no explicit hold gap).
+   */
+  holdAfterRevealSec?: number;
 
   // ── Information Design (POLISH Layer 1) ────────────────────────────────
   /** Optional horizontal reference line — e.g. a target, threshold, or comparison baseline. */

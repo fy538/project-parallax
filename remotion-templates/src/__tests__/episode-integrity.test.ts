@@ -647,6 +647,52 @@ for (const { slug, manifestPath } of EPISODES) {
       }
       expect(criticalGaps).toHaveLength(0);
     });
+
+    it("no more than 3 consecutive TEMPLATE segments on the same layer without a FOOTAGE/HOLD break", () => {
+      const MAX_CONSECUTIVE_TEMPLATES = 3;
+      const byLayer: Record<string, any[]> = {};
+      for (const seg of manifest.segments ?? []) {
+        const layer = seg.layer ?? "background";
+        (byLayer[layer] ??= []).push(seg);
+      }
+
+      const violations: string[] = [];
+
+      for (const [layer, segs] of Object.entries(byLayer)) {
+        const sorted = segs.slice().sort((a: any, b: any) => a.startSec - b.startSec);
+        let consecutiveTemplates = 0;
+        let runStart: string | null = null;
+
+        for (const seg of sorted) {
+          if (seg.type === "TEMPLATE") {
+            if (consecutiveTemplates === 0) runStart = seg.id;
+            consecutiveTemplates++;
+            if (consecutiveTemplates > MAX_CONSECUTIVE_TEMPLATES) {
+              violations.push(
+                `  [${layer}] ${consecutiveTemplates} consecutive TEMPLATE segments ` +
+                `starting at ${runStart} — insert a FOOTAGE or HOLD segment to break the run`
+              );
+              consecutiveTemplates = -Infinity; // report once per run, not per excess segment
+            }
+          } else {
+            consecutiveTemplates = 0;
+            runStart = null;
+          }
+        }
+      }
+
+      if (violations.length > 0) {
+        throw new Error(
+          `\n${violations.length} layer(s) with >${MAX_CONSECUTIVE_TEMPLATES} consecutive TEMPLATE segments:\n` +
+          `${violations.join("\n")}\n\n` +
+          `Fix: insert a FOOTAGE or HOLD segment to break the run. ` +
+          `More than ${MAX_CONSECUTIVE_TEMPLATES} consecutive graphics without a footage/hold break ` +
+          `is a pacing violation (VISUAL_LANGUAGE.md register alternation rule).`
+        );
+      }
+
+      expect(violations).toHaveLength(0);
+    });
   });
 }
 

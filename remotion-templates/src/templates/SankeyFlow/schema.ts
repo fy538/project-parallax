@@ -24,7 +24,7 @@ const SankeyLinkSchema = z.object({
 export const SankeyFlowSchema = z.object({
   data: z.object({
     episode: z.string(),
-    title: z.string(),
+    title: z.string().describe("State where value concentrates, not what the flow shows. Write: 'ASML captures 85% of the value in the EUV supply chain' not 'EUV supply chain flow'. The title IS the editorial argument."),
     subtitle: z.string().optional(),
     nodes: z.array(SankeyNodeSchema).min(2, {
       message: "SankeyFlow requires at least 2 nodes (one source + one destination). A single-node Sankey has nothing to flow.",

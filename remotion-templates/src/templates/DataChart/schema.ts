@@ -38,14 +38,14 @@ export const DataChartSchema = z.object({
   data: z
     .object({
       episode: z.string(),
-      title: z.string(),
+      title: z.string().describe("State the finding, not the topic. Write: 'TSMC controls 90% of cutting-edge chip production' not 'Chip production shares'. The title IS the editorial argument."),
       subtitle: z.string().optional(),
       variant: z.enum(["bar", "comparison", "horizontal", "lollipop", "small-multiples"]),
       unit: z.string().optional(),
       dataPoints: z.array(DataPointSchema).optional(),
       comparisonPairs: z.array(ComparisonPairSchema).optional(),
       panels: z.array(z.object({
-        title: z.string(),
+        title: z.string().describe("State the finding, not the topic — even for panel titles."),
         subtitle: z.string().optional(),
         dataPoints: z.array(DataPointSchema),
       })).optional(),
@@ -57,6 +57,8 @@ export const DataChartSchema = z.object({
       formatAsYear: z.boolean().optional(),
       source: z.string().optional(),
       durationSec: z.number().positive().optional(),
+      holdAfterRevealSec: z.number().min(0).max(10).optional()
+        .describe("Deliberate pause (seconds) after all chart elements finish animating in, before exit fade. Must fit within durationSec. Default: 0 (no explicit hold)."),
       referenceLine: ReferenceLineSchema.optional(),
       highlightIndex: z.number().optional(),
       contextNote: z.string().optional(),

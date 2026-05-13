@@ -156,6 +156,8 @@ export interface TimeSeriesChartData {
 
   source?: string;
   durationSec?: number;
+  /** Deliberate pause in seconds after all lines finish drawing, before exit fade. Default: 0. */
+  holdAfterRevealSec?: number;
   backgroundVariant?: "dark" | "light";
   backgroundTint?: string;
 

@@ -38,6 +38,7 @@ import {
   CLAMP,
   CLAMP_QUARTIC,
   CLAMP_CUBIC_INOUT,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
@@ -215,7 +216,7 @@ function buildCountryFillExpression(
 
   const t = interpolate(
     frame,
-    [phaseStart, phaseStart + sec(0.8)],
+    [phaseStart + sec(0.5), phaseStart + sec(0.5) + sec(0.8)],
     [0, 1],
     CLAMP_QUARTIC
   );
@@ -251,7 +252,7 @@ function buildCountryOpacityExpression(
 
   const t = interpolate(
     frame,
-    [phaseStart, phaseStart + sec(0.8)],
+    [phaseStart + sec(0.5), phaseStart + sec(0.5) + sec(0.8)],
     [0, 0.75],
     CLAMP_QUARTIC
   );
@@ -416,73 +417,81 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
           mode={data.backgroundVariant === "dark" ? "dark" : "light"}
         />
 
-        <MapGL
-          longitude={camera.longitude}
-          latitude={camera.latitude}
-          zoom={camera.zoom}
-          pitch={camera.pitch}
-          bearing={camera.bearing + bearingDrift}
-          projection={data.projection}
-          dark={data.backgroundVariant === "dark"}
-          terrain={data.terrain ?? false}
-          layers={graticuleLayers}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: interpolate(frame, [0, sec(0.5)], [0, 1], CLAMP_SINE),
+          }}
         >
-          <Source
-            id="country-boundaries"
-            type="vector"
-            url="mapbox://mapbox.country-boundaries-v1"
+          <MapGL
+            longitude={camera.longitude}
+            latitude={camera.latitude}
+            zoom={camera.zoom}
+            pitch={camera.pitch}
+            bearing={camera.bearing + bearingDrift}
+            projection={data.projection}
+            dark={data.backgroundVariant === "dark"}
+            terrain={data.terrain ?? false}
+            layers={graticuleLayers}
           >
-            <Layer
-              id="country-highlight-fills"
-              type="fill"
-              source-layer="country_boundaries"
-              paint={{
-                "fill-color": fillExpression as any,
-                "fill-opacity": opacityExpression as any,
-              }}
-            />
-            {/* Fill-extrusion — Nat Geo signature: highlighted countries push up subtly */}
-            <Layer
-              id="country-highlight-extrude"
-              type="fill-extrusion"
-              source-layer="country_boundaries"
-              paint={{
-                "fill-extrusion-color": fillExpression as any,
-                "fill-extrusion-opacity": 0.35,
-                "fill-extrusion-height": [
-                  "case",
-                  ["==", ["typeof", opacityExpression], "number"],
-                  ["*", ["literal", 30000], opacityExpression],
-                  30000,
-                ] as any,
-                "fill-extrusion-base": 0,
-              }}
-            />
-            <Layer
-              id="country-highlight-borders"
-              type="line"
-              source-layer="country_boundaries"
-              paint={{
-                "line-color": fillExpression as any,
-                "line-width": 1.5,
-                "line-opacity": opacityExpression as any,
-                "line-blur": 3,
-              }}
-            />
-          </Source>
+            <Source
+              id="country-boundaries"
+              type="vector"
+              url="mapbox://mapbox.country-boundaries-v1"
+            >
+              <Layer
+                id="country-highlight-fills"
+                type="fill"
+                source-layer="country_boundaries"
+                paint={{
+                  "fill-color": fillExpression as any, // no-as-any-ok: mapbox-expression — TS types for paint properties don't accept dynamic expression arrays
+                  "fill-opacity": opacityExpression as any, // no-as-any-ok: mapbox-expression
+                }}
+              />
+              {/* Fill-extrusion — Nat Geo signature: highlighted countries push up subtly */}
+              <Layer
+                id="country-highlight-extrude"
+                type="fill-extrusion"
+                source-layer="country_boundaries"
+                paint={{
+                  "fill-extrusion-color": fillExpression as any, // no-as-any-ok: mapbox-expression
+                  "fill-extrusion-opacity": 0.35,
+                  "fill-extrusion-height": [
+                    "case",
+                    ["==", ["typeof", opacityExpression], "number"],
+                    ["*", ["literal", 30000], opacityExpression],
+                    30000,
+                  ] as any, // no-as-any-ok: mapbox-expression — nested expression array
+                  "fill-extrusion-base": 0,
+                }}
+              />
+              <Layer
+                id="country-highlight-borders"
+                type="line"
+                source-layer="country_boundaries"
+                paint={{
+                  "line-color": fillExpression as any, // no-as-any-ok: mapbox-expression
+                  "line-width": 1.5,
+                  "line-opacity": opacityExpression as any, // no-as-any-ok: mapbox-expression
+                  "line-blur": 3,
+                }}
+              />
+            </Source>
 
-          {/* Editorial annotation overlay — Plex-typed labels with optional
-              leader lines, pinned to lon/lat. Phase shorthand resolves
-              against the same windows used for fill animation. */}
-          {data.annotations && data.annotations.length > 0 && (
-            <MapAnnotations
-              annotations={data.annotations}
-              compositionDurationSec={durationInFrames / layout.fps}
-              phaseWindows={phaseWindowsSec}
-              dark={data.backgroundVariant === "dark"}
-            />
-          )}
-        </MapGL>
+            {/* Editorial annotation overlay — Plex-typed labels with optional
+                leader lines, pinned to lon/lat. Phase shorthand resolves
+                against the same windows used for fill animation. */}
+            {data.annotations && data.annotations.length > 0 && (
+              <MapAnnotations
+                annotations={data.annotations}
+                compositionDurationSec={durationInFrames / layout.fps}
+                phaseWindows={phaseWindowsSec}
+                dark={data.backgroundVariant === "dark"}
+              />
+            )}
+          </MapGL>
+        </div>
 
         {/* Locator inset — small globe showing where the parent camera
             is looking. Defaults to off; opt in via data.inset.show. */}

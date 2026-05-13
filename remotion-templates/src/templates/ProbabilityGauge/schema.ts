@@ -39,7 +39,7 @@ const ForecastDataSchema = z.object({
 export const ProbabilityGaugeSchema = z.object({
   data: z.object({
     episode: z.string(),
-    title: z.string(),
+    title: z.string().describe("State the forecast outcome, not the topic. Write: 'Markets price a 71% chance of TSMC expansion disruption by 2028' not 'Disruption probability'. The title IS the editorial argument."),
     subtitle: z.string().optional(),
     variant: z.enum(["gauge", "strip", "shift", "scorecard", "forecast"]),
     gauges: z.array(GaugeItemSchema).optional(),

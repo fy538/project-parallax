@@ -27,7 +27,7 @@ const MultiHypothesisSchema = z.object({
 export const BayesianUpdateSchema = z.object({
   data: z.object({
     episode: z.string(),
-    title: z.string(),
+    title: z.string().describe("State the reasoning outcome, not the topic. Write: 'Each sanction wave raises the probability of domestic substitution' not 'Export controls analysis'. The title IS the editorial argument."),
     subtitle: z.string().optional(),
     variant: z.enum(["single", "compare", "multi"]),
     prior: z.number().min(0).max(100).optional(),

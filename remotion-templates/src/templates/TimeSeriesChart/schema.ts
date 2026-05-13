@@ -55,7 +55,7 @@ const TimeSeriesReferenceBandSchema = z.object({
 export const TimeSeriesChartSchema = z.object({
   data: z.object({
     episode: z.string(),
-    title: z.string(),
+    title: z.string().describe("State the finding, not the topic. Write: 'China semiconductor investment doubled in five years' not 'Semiconductor investment trends'. The title IS the editorial argument."),
     subtitle: z.string().optional(),
     variant: z.enum(["line", "slope", "small-multiples"]).optional(),
     lines: z.array(TimeSeriesLineSchema).min(1, {
@@ -75,6 +75,8 @@ export const TimeSeriesChartSchema = z.object({
     }).optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
+    holdAfterRevealSec: z.number().min(0).max(10).optional()
+      .describe("Deliberate pause (seconds) after all lines finish drawing, before exit fade. Must fit within durationSec. Default: 0."),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
     _direction: z.unknown().optional(),

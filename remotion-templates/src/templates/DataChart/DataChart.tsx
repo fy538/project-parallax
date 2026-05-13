@@ -20,7 +20,6 @@ import { formatNumber } from "../../utils/numberFormat";
 import { niceDomain, niceTicks, formatTick } from "../../utils/niceTicks";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
-import { Legend } from "../../components/Legend";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
@@ -291,6 +290,9 @@ const ComparisonBars: React.FC<{
   pairWidth: number;
   maxHeight: number;
   formatAsYear?: boolean;
+  isFirstPair?: boolean;
+  leftGroupLabel?: string;
+  rightGroupLabel?: string;
 }> = React.memo((props) => {
   const theme = useThemeMode("light");
   const barWidth = useMemo(() => props.pairWidth * 0.35, [props.pairWidth]);
@@ -312,6 +314,50 @@ const ComparisonBars: React.FC<{
         width: props.pairWidth,
       }}
     >
+      {/* Direct series column headers — only on first pair; replaces the floating Legend */}
+      {props.isFirstPair && (props.leftGroupLabel || props.rightGroupLabel) && (
+        <div
+          style={{
+            display: "flex",
+            gap: barWidth * 0.3,
+            marginBottom: layout.spacing.xs,
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          {[
+            { label: props.leftGroupLabel, color: props.leftColor },
+            { label: props.rightGroupLabel, color: props.rightColor },
+          ].map(
+            (side, idx) =>
+              side.label ? (
+                <div
+                  key={idx}
+                  style={{
+                    fontSize: fontSizes.small,
+                    fontFamily: fonts.data,
+                    fontWeight: 700,
+                    color: side.color,
+                    opacity: interpolate(
+                      props.frame,
+                      [props.startFrame + sec(0.8), props.startFrame + sec(1.2)],
+                      [0, 1],
+                      CLAMP_SINE
+                    ),
+                    textAlign: "center",
+                    width: barWidth,
+                    whiteSpace: "nowrap",
+                    letterSpacing: 1,
+                    textTransform: "uppercase",
+                    textShadow: shadows.textLift,
+                  }}
+                >
+                  {side.label}
+                </div>
+              ) : null
+          )}
+        </div>
+      )}
       <div style={{ display: "flex", gap: layout.spacing.xs, alignItems: "flex-end", position: "relative" }}>
         <AnimatedBar
           value={props.leftValue}
@@ -860,7 +906,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // inside the bar container's `maxHeight + 80` height, NOT in chartLayout —
   // so we don't double-count it as extraPad.bottom.
   const VALUE_LABEL_HEADROOM = 80;
-  const hasTopBand = data.variant === "comparison" || hasSpotlight;
+  const hasTopBand = hasSpotlight;
   const hasBottomBand = !!data.source || !!data.contextNote;
   const chartBoxes = useMemo(
     () =>
@@ -884,6 +930,13 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     "DataChart",
     `Chart layout integrity failed: ${chartLayoutIssues.join("; ")}`,
     chartBoxes
+  );
+
+  const holdFrames = sec(data.holdAfterRevealSec ?? 0);
+  warnIf(
+    holdFrames > 0 && durationInFrames - holdFrames < sec(2.5),
+    "DataChart",
+    `holdAfterRevealSec=${data.holdAfterRevealSec} leaves less than 2.5s for entrances + exit fade. Increase durationSec or reduce holdAfterRevealSec.`
   );
 
   // Vertical bars saturate the canvas past ~6 items at video resolution — the
@@ -1276,6 +1329,9 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               pairWidth={comparisonData.pairWidth}
               maxHeight={maxHeight}
               formatAsYear={data.formatAsYear}
+              isFirstPair={i === 0}
+              leftGroupLabel={data.leftGroupLabel}
+              rightGroupLabel={data.rightGroupLabel}
             />
           ))}
 
@@ -1375,23 +1431,6 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               </div>
             );
           })()}
-
-          {data.variant === "comparison" && (
-            <Legend
-              items={[
-                { label: data.leftGroupLabel ?? "", color: data.leftGroupColor || semantic.us },
-                { label: data.rightGroupLabel ?? "", color: data.rightGroupColor || semantic.china },
-              ]}
-              frame={frame}
-              exit={exitFade(frame, durationInFrames, 15)}
-              theme={theme}
-              startFrame={sec(0.5)}
-              fadeInDuration={sec(0.5)}
-              style={{
-                marginLeft: "auto",
-              }}
-            />
-          )}
 
           {hasSpotlight && spotlightCamera.currentLabel && (
             <div

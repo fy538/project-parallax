@@ -39,6 +39,7 @@ import {
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
+  CLAMP_SINE,
 } from "../../utils/animation";
 import { hexToRgba, scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
@@ -738,16 +739,23 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           mode={data.backgroundVariant === "dark" ? "dark" : "light"}
         />
 
-        <MapGL
-          longitude={camera.longitude}
-          latitude={camera.latitude}
-          zoom={camera.zoom}
-          pitch={camera.pitch}
-          bearing={camera.bearing + bearingDrift}
-          layers={layers}
-          dark={data.backgroundVariant === "dark"}
-          terrain={data.terrain ?? false}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            opacity: interpolate(frame, [0, sec(0.5)], [0, 1], CLAMP_SINE),
+          }}
         >
+          <MapGL
+            longitude={camera.longitude}
+            latitude={camera.latitude}
+            zoom={camera.zoom}
+            pitch={camera.pitch}
+            bearing={camera.bearing + bearingDrift}
+            layers={layers}
+            dark={data.backgroundVariant === "dark"}
+            terrain={data.terrain ?? false}
+          >
           {/* Point labels — rendered as Markers for proper geo projection */}
           {pointData.map((pt) => {
             // Find which phase first activated this point
@@ -896,7 +904,8 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
               dark={data.backgroundVariant === "dark"}
             />
           )}
-        </MapGL>
+          </MapGL>
+        </div>
 
         {/* Locator inset — small globe showing where the parent camera
             is looking. Defaults to off; opt in via data.inset.show. */}
