@@ -170,6 +170,29 @@ const getYPosition = (
 //
 // Reference: references/template-research/time-series-chart.md § 6.2
 
+// ── Slope label anti-collision ────────────────────────────────────────────────
+// Pushes labels down until no adjacent pair is closer than minGap px.
+// Returns a map from line index → adjusted screen-y for label top.
+function resolveSlopeLabelYs(
+  lines: TimeSeriesLine[],
+  yScale: (y: number) => number,
+  pickY: (l: TimeSeriesLine) => number,
+  minGap: number,
+): Record<number, number> {
+  const entries = lines.map((l, i) => ({ i, y: yScale(pickY(l)) }));
+  const sorted = [...entries].sort((a, b) => a.y - b.y);
+  for (let k = 1; k < sorted.length; k++) {
+    const prev = sorted[k - 1];
+    const cur = sorted[k];
+    if (cur.y - prev.y < minGap) {
+      sorted[k] = { ...cur, y: prev.y + minGap };
+    }
+  }
+  const map: Record<number, number> = {};
+  for (const e of sorted) map[e.i] = e.y;
+  return map;
+}
+
 const SlopeChart: React.FC<{
   lines: TimeSeriesLine[];
   chartLeft: number;
@@ -225,6 +248,32 @@ const SlopeChart: React.FC<{
   const ordered = [...lines]
     .map((l, originalIdx) => ({ l, originalIdx }))
     .sort((a, b) => (b.l.points[0]?.y ?? 0) - (a.l.points[0]?.y ?? 0));
+
+  // ── Label anti-collision ─────────────────────────────────────────────────
+  // Left side: gap must fit body font (non-hero) plus breathing room.
+  // Right side: gap must fit h3 font (hero) since the hero label is larger.
+  const LEFT_GAP = fontSizes.body + 8;
+  const RIGHT_GAP = fontSizes.h3 + 10;
+
+  const leftLabelYs = useMemo(
+    () => resolveSlopeLabelYs(
+      lines,
+      (y) => chartTop + chartHeight - ((y - domainMin) / Math.max(1e-9, domainMax - domainMin)) * chartHeight,
+      (l) => l.points[0]?.y ?? 0,
+      LEFT_GAP,
+    ),
+    [lines, chartTop, chartHeight, domainMin, domainMax], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
+  const rightLabelYs = useMemo(
+    () => resolveSlopeLabelYs(
+      lines,
+      (y) => chartTop + chartHeight - ((y - domainMin) / Math.max(1e-9, domainMax - domainMin)) * chartHeight,
+      (l) => l.points[l.points.length - 1]?.y ?? 0,
+      RIGHT_GAP,
+    ),
+    [lines, chartTop, chartHeight, domainMin, domainMax], // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   return (
     <>
@@ -318,8 +367,10 @@ const SlopeChart: React.FC<{
       {ordered.map(({ l, originalIdx }) => {
         const y0 = l.points[0]?.y ?? 0;
         const y1 = l.points[l.points.length - 1]?.y ?? 0;
-        const cy0 = yScale(y0);
         const cy1 = yScale(y1);
+        // Use anti-collided y positions for labels; fall back to raw y if missing.
+        const leftY = leftLabelYs[originalIdx] ?? yScale(y0);
+        const rightY = rightLabelYs[originalIdx] ?? cy1;
         const labelOpacity = fadeIn(frame, stagger(originalIdx, sec(0.1), sec(0.4)), sec(0.5));
         const endLabelOpacity = fadeIn(frame, sec(1.5) + stagger(originalIdx, sec(0.06), 0), sec(0.5));
         const isHero = !!l.hero;
@@ -330,7 +381,7 @@ const SlopeChart: React.FC<{
               style={{
                 position: "absolute",
                 left: 0,
-                top: cy0 - fontSizes.body / 2,
+                top: leftY - fontSizes.body / 2,
                 width: xStart - 18,
                 maxWidth: xStart - 18,
                 textAlign: "right",
@@ -357,7 +408,7 @@ const SlopeChart: React.FC<{
               style={{
                 position: "absolute",
                 left: xEnd + 18,
-                top: cy1 - fontSizes.body / 2,
+                top: rightY - fontSizes.body / 2,
                 width: chartLeft + chartWidth - xEnd - 18,
                 fontSize: isHero ? fontSizes.h3 : fontSizes.body,
                 fontFamily: fonts.data,

@@ -277,24 +277,29 @@ const tsCarbonDioxide: TimeSeriesChartData = {
 // See: references/template-research/time-series-chart.md § 6.2
 const tsLifeExpectancySlope: TimeSeriesChartData = {
   episode: CATALOG_EPISODE,
-  title: "Life Expectancy at Birth",
-  subtitle: "Four countries, 1900 vs 2020",
+  title: "Japan Overtook the West",
+  subtitle: "Life expectancy at birth — 1900 vs 2020",
   variant: "slope",
   xLabel: "1900 → 2020",
   yUnit: " yrs",
   lines: [
+    // Japan: war-devastated, behind Europe in 1900 → world leader by 2020.
+    // The crossing is the editorial argument.
     {
       label: "Japan", color: "#C23B22", hero: true,
       points: [{ x: 1900, y: 44 }, { x: 2020, y: 84 }],
     },
-    {
-      label: "South Korea", color: "#E5A544",
-      points: [{ x: 1900, y: 24 }, { x: 2020, y: 83 }],
-    },
+    // United States: started highest, fell to third — the stagnation story.
     {
       label: "United States", color: "#3266AD",
       points: [{ x: 1900, y: 47 }, { x: 2020, y: 77 }],
     },
+    // France: European peer, clear mid-position in 2020 (83) — distinct from Japan.
+    {
+      label: "France", color: "#E5A544",
+      points: [{ x: 1900, y: 45 }, { x: 2020, y: 83 }],
+    },
+    // India: the dramatic catch-up from abject poverty, still trailing.
     {
       label: "India", color: "#5DAA68",
       points: [{ x: 1900, y: 24 }, { x: 2020, y: 70 }],
