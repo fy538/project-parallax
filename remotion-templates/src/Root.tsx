@@ -180,6 +180,7 @@ import {
   CatalogEditorialAside,
   CatalogEditorialMinimal,
   CatalogShowreel,
+  CatalogShowreelBackdrops,
   CatalogEmphasisShowcase,
   CatalogTemplatePreview,
   CatalogDuelingEmpireFall,
@@ -315,6 +316,7 @@ export const RemotionRoot: React.FC = () => {
       */}
       <Folder name="Catalog">
         <CatalogShowreel />
+        <CatalogShowreelBackdrops />
         <CatalogEmphasisShowcase />
         <CatalogTemplatePreview />
 

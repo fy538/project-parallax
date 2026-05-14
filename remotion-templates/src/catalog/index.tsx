@@ -131,6 +131,7 @@ export {
 } from "./Editorial";
 
 export { CatalogShowreel } from "./Showreel";
+export { CatalogShowreelBackdrops } from "./ShowreelBackdrops";
 
 export { CatalogEmphasisShowcase } from "./EmphasisShowcase";
 
