@@ -103,7 +103,9 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 ## Things NOT to do
 
 - Don't reintroduce `react-simple-maps` (replaced by Mapbox GL via `MapGL` shared component).
-- Don't write to `.durationSec` without `?? 0` fallback (optional in many Zod schemas).
+- Don't write to `.durationSec` without `?? 0` fallback (optional in many Zod schemas). Enforced by `lint-conventions.mjs` rule `no-bare-durationSec`; suppress with `// eslint-disable-next-line no-bare-durationSec` for rare intentional cases.
+- Don't use `as any` in template files. Disables TypeScript safety and the bug surfaces only at render time. Enforced by `lint-conventions.mjs` rule `no-as-any-in-templates`; suppress with `// no-as-any-ok: <reason>` on the same line for documented exceptions (Mapbox expression arrays, d3-geo interop). The existing `// eslint-disable-next-line @typescript-eslint/no-explicit-any` pattern is also accepted.
+- Don't use `console.warn/error/log` in render bodies — fires 30× per second. Use `warnIf()` from `utils/dataWarnings.ts` instead. Enforced by `lint-conventions.mjs` rule `no-console-in-render`.
 - Don't put hooks (`useMemo`, `useState`, `useId`) **after** an early return.
 - Don't catch with bare `except Exception: pass` in Python.
 - Don't paste hex colors when there's a palette token.

@@ -1,5 +1,7 @@
 # New Remotion Templates — Specification
 
+> ⚠️ **HISTORICAL — pre-May 11, 2026.** This document was the design spec when the original batch of templates was being built. All templates described here have shipped; the canonical reference for current schemas is now [`references/template-schemas.md`](./references/template-schemas.md). Any **"Space Grotesk"** mention in this file is also stale per D40 (May 10, 2026 — display face migrated to IBM Plex Sans). Keep this file for design-rationale history; do not use it as authoritative spec for new work.
+>
 > Design spec for 5 new templates + map infrastructure migration. Each template section defines: purpose, data schema (TypeScript types), animation behavior, variants, and silicon-trap usage. Follows existing patterns: types in `types.ts`, component in `TemplateName.tsx`, barrel export in `index.tsx`.
 >
 > All templates share existing infrastructure: `theme.ts` (palette, fonts, spacing), `animation.ts` (fadeIn, stagger, exitFade, spring), `Background` component, `FadeIn` component, `MetadataStrip`.

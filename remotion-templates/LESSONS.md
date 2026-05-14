@@ -3,7 +3,94 @@
 > Every hard-won lesson from building and iterating on templates.
 > Read this before making changes — it prevents re-discovering known issues.
 >
-> Last updated: May 12, 2026
+> Last updated: May 14, 2026
+
+## Drift / motion-budget lessons (May 14, 2026)
+
+### LM1: `contentArea()` reserve must be decoupled from `motionBudget` defaults
+
+**Problem:** `contentArea()` originally read `motionBudget.panX / panY` to subtract from the safe-area edges, reserving room for Ken Burns drift. When the May 2026 editorial-register revision dropped `motionBudget.panX = 0`, the reserve also dropped to 0 — but episodes that explicitly opt into `driftPreset: "documentary"` (panX=18) would have content at the contentArea edge **drift past the safe-area boundary**.
+
+**Fix:** Hardcode the safety reserve to the worst-case-across-all-presets envelope (`DRIFT_RESERVE_X = 18, DRIFT_RESERVE_Y = 8`) in `contentArea()`. Decouple it from the current default. The 18×8px reserve is invisible at 1920×1080 but prevents a real safe-area overflow whenever an episode picks documentary drift.
+
+**Rule:** When introducing a new "default less aggressive than the previous default" pattern, separate the SAFETY ENVELOPE from the DEFAULT VALUES. The envelope must accommodate any preset users might opt into.
+
+**Reference:** `src/design/theme.ts → contentArea()`, commit landing alongside the drift-preset system (May 14, 2026).
+
+### LM2: Catalog showreel needs `still()` wrapping for drift opt-out
+
+**Problem:** Even with the editorial default (scale 1.02, no pan, no rotation), playing 33 catalog demos back-to-back in `<Series>` still shows visible cycling — each segment runs its own scale-up over its 10-14s duration, then snaps back to scale 1.0 when the next segment starts. The reset is jarring across the showreel.
+
+**Fix:** A `still()` helper in `src/catalog/Showreel.tsx` overrides each segment's `_direction.driftPreset` to `"none"`, regardless of what the catalog data declares. Catalog individual compositions (for Studio preview) keep editorial drift; only the showreel suppresses it.
+
+**Pattern:**
+```ts
+const still = <T extends { _direction?: unknown }>(data: T): T => ({
+  ...data,
+  _direction: {
+    ...(typeof data._direction === "object" && data._direction !== null
+      ? (data._direction as Record<string, unknown>)
+      : {}),
+    driftPreset: "none" as const,
+  },
+});
+// Usage: <BeeswarmChart data={still(catalogDataData.beeswarmMilitarySpending)} />
+```
+
+**Rule:** Wherever multiple compositions chain back-to-back (showreels, contact sheets, demo grids), wrap with `still()`. Drift is for narrative context, not for evaluation.
+
+**Reference:** `src/catalog/Showreel.tsx → still()` (May 14, 2026).
+
+### LM4: Browser-side `warnIf` doesn't reach the CLI by default
+
+**Problem:** Templates call `warnIf(...)` from `utils/dataWarnings.ts` which writes to `console.warn`. In Remotion Studio (dev) the warnings appear in the browser devtools. But `npx remotion still` and `renderStill()` run inside a headless Chromium whose `console.*` output isn't piped to the CLI's stdout/stderr by default — warnings fire correctly inside the browser but disappear silently from CI / pre-publish renders.
+
+This bit us in the May 2026 RidgelinePlot substrate-contrast pass: the warning logic was correct (verified by direct math), but rendering with a bad color produced no terminal output. The bug was invisible to the test harness.
+
+**Fix:** Pass `onBrowserLog` to `renderStill()`. The render-helper at `src/__tests__/render-helper.ts` does this for every test render:
+
+```ts
+await renderStill({
+  serveUrl: url,
+  composition,
+  output: outputPath,
+  // ...
+  onBrowserLog: (log) => {
+    if (log.type === "warn" || log.type === "error") {
+      console.warn(`[browser:${log.type}] ${compositionId} frame ${frame}:`, log.text);
+    }
+  },
+});
+```
+
+This forwards browser-side warnings to the test stdout so `warnIf` messages surface in CI runs.
+
+For manual CLI renders, use `--log=verbose` on the `remotion` CLI to surface browser logs ad-hoc.
+
+**Rule:** When adding a new template-level runtime check (substrate contrast, data-shape sanity, etc.), prefer `warnIf` over `console.warn` — but assume CI captures the output ONLY when the render path passes through `onBrowserLog` plumbing. Manual `npx remotion still` invocations still need `--log=verbose` for terminal visibility.
+
+**Reference:** `src/__tests__/render-helper.ts`, May 14, 2026.
+
+### LM3: `stagger(index, perItem, baseDelay)` — third arg is base, NOT max
+
+**Problem:** `stagger()`'s third parameter is `baseDelay`, added to every item. Common mistake (caught in agent-built code multiple times): treating it as a max-cap and ALSO adding the result to a separate baseStart frame. The two compound, doubling the offset.
+
+**Trap:**
+```ts
+// WRONG — first item starts at columnStart + baseDelay = 0.6 + 0.6 = 1.2s
+const colStart = columnStart + stagger(colIdx, perItem, sec(0.6));
+
+// RIGHT — first item starts at columnStart = 0.6s
+const colStart = columnStart + stagger(colIdx, perItem);
+
+// ALSO RIGHT — if you want to use baseDelay, don't ALSO add columnStart
+const colStart = stagger(colIdx, perItem, sec(0.6));
+```
+
+**Rule:** When in doubt, compute `start(i=0)` and `start(i=N-1)` manually and check they fit within `durationSec`. The function signature is `(index, delayPerItem, baseDelay)` — read it from `src/utils/animation.ts` before using the 3-arg form.
+
+**Reference:** Caught in ArcDiagram (initial implementation), MarimekkoChart (May 2026 visual-review pass).
+
 
 ## Visual-baseline honesty (calibration-drift audit)
 
@@ -132,7 +219,7 @@ When building a new template or polishing an existing one, prefer these shared b
 **Gotcha:** Decimals work but animate in integer steps. For "3.5nm", it counts 0, 1, 2, 3, 3.5 — which looks slightly uneven.
 
 ### L12: Chinese text needs explicit font-family
-**Rule:** Any `<span>` or `<div>` rendering Chinese characters must explicitly set `fontFamily: fonts.chinese` ("Noto Sans SC, PingFang SC, sans-serif"). The brand fonts (Space Grotesk, IBM Plex Mono, JetBrains Mono) do not contain CJK glyphs and will fall back to system fonts inconsistently across render environments.
+**Rule:** Any `<span>` or `<div>` rendering Chinese characters must explicitly set `fontFamily: fonts.chinese` ("Noto Sans SC, PingFang SC, sans-serif"). The brand fonts (IBM Plex Sans, IBM Plex Serif, IBM Plex Mono, JetBrains Mono — per D40, May 10, 2026) do not contain CJK glyphs and will fall back to system fonts inconsistently across render environments.
 
 ---
 

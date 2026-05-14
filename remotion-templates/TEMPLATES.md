@@ -123,14 +123,14 @@ When you next touch a template, do these checks (in order, most→least impactfu
 
 `src/catalog/` is the toolkit view — every template registered with multiple variants of evergreen demo data. Open Studio → expand `Catalog/` in the sidebar to see them. The Showreel (`catalog-showreel`) is a single 6-minute mega-comp that walks through every variant.
 
-**Coverage:**
-- Maps: ChoroplethMap × 3, RouteAnimation × 3
-- Data: StatReveal × 3, DataChart × 2, TimeSeriesChart × 2, ProbabilityGauge × 2, BayesianUpdate, RadarChart, SankeyFlow
+**Coverage** (last reconciled May 13, 2026 — counts updated post-AtlasPlate migration + new-template additions; see `MAP_TEMPLATE_SELECTOR.md` for the Mapbox→AtlasPlate doctrine):
+- Maps: **AtlasPlate × 5** (cocom, cold-war-vintage, g7, cold-war-blocs, tordesillas), **RouteAnimation × 4** (silk-road, magellan, chokepoints, rome-radial), ProportionalSymbolMap, CartogramMap, DensityMap, TilegramUSMap. *ChoroplethMap removed from the catalog post-migration — template still exists in `src/templates/ChoroplethMap/` for atmospheric / terrain-required shots only.*
+- Data: StatReveal × 3, DataChart × 4 (bar, comparison, lollipop, small-multiples), TimeSeriesChart × 4, ProbabilityGauge × 2, BayesianUpdate, RadarChart, SankeyFlow, PricingWaterfall × 4, IsotypeChart, BumpChart, PopulationPyramid, RankChangeDotPlot, BeeswarmChart, CalendarHeatmap, ConnectedScatterplot, Streamgraph, RidgelinePlot, MarimekkoChart × 2, TernaryPlot, HorizonChart × 2, DumbbellPlot
 - Typography: KineticTypography × 4
-- Titles: TitleTransition × 3
-- Diagrams: FrameworkDiagram × 3, NetworkDiagram × 2, SplitComposition × 2
-- Timelines: HorizontalTimeline × 2, EscalationLadder × 2
-- Scenarios: DecisionTree, GameBoard × 2, BifurcationRoute
+- Titles: TitleTransition × 4
+- Diagrams: FrameworkDiagram × 3, NetworkDiagram × 2, SplitComposition × 2, ArcDiagram, StrategicLandscape, DuelingFrameworks × 2
+- Timelines: HorizontalTimeline × 3, EscalationLadder × 2, TimelineComparison, DualTimeline
+- Scenarios: DecisionTree × 2, GameBoard × 4 (chess-endgame, stag-hunt, pd-canonical, iterated-pd). *BifurcationRoute retired May 13, 2026 — institutional-bifurcation stories migrated to DuelingFrameworks or HorizontalTimeline dual mode.*
 
 **Not yet covered:** ImageComposite, PhotoMontage, AnnotatedImage (need image assets), DuelingFrameworks, StrategicLandscape.
 

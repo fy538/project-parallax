@@ -18,7 +18,16 @@
 | `silicon-trap` | Queued | Production-ready: script v5, 21-asset shot list, 24 Remotion data files, assembly manifest (53 segments, 13.1 min). Stock footage and narration not yet sourced. |
 | `blockades-leak` | Draft | v1 script, needs viability re-check for historical depth. |
 
-**Not yet built:** AI video style reference library (7 anchor images), Mapbox Studio "Meridian Dark" custom style (using dark-v11 fallback), automated Shorts rendering, thumbnail image generator, full Agent SDK orchestration.
+**Built but pending manual deployment:** Mapbox Studio "Meridian Dark" custom style — code wired in `MapGL.tsx`, preset JSON ready at `remotion-templates/meridian-dark-preset.json`, 15-step guide at `tools/mapbox-meridian-setup.md`. Remaining work is the 2–3 hour manual procedure in Mapbox Studio web UI (fork + customize + publish + paste URL into `.env`). Until then, fallback is dark-v11.
+
+**Shipped May 14, 2026:**
+- Thumbnail image generator: `remotion-templates/scripts/generate-thumbnails.mjs` + `npm run thumbnails -- --episode=<slug>` renders all concepts from `episodes/<slug>/thumbnail-spec.json`.
+- Automated Shorts rendering: `remotion-templates/scripts/render-shorts.mjs` + `npm run shorts -- --episode=<slug>` renders 9:16 clips from `episodes/<slug>/shorts-manifest.json`.
+- AI reference library (Recraft side): 7 anchor categories at `tools/recraft/anchor-library.json` with prompts + generation script. The complementary Flux/fal.ai style-reference library at `tools/ai-video/style-references/` (15 images by typography tradition) was already shipped; they form a 2-tier cascade documented in `tools/recraft/ANCHOR_LIBRARY.md`.
+
+**Backlog (deferred):**
+- BL-03 RAG fact-checking pipeline (P2) — substantial new infra; not blocking pre-launch.
+- BL-04 full Agent SDK orchestration (P3) — current skill-based workflow handles the pipeline; promote to orchestrated only when scale demands it (see `project/DECISIONS.md`).
 
 ## Channel identity
 

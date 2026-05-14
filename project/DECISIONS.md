@@ -98,6 +98,7 @@ Last updated: April 26, 2026
 **Date:** April 26, 2026
 **Rationale:** Evaluated 18 visual identity directions generated in Claude Design across fit, technical feasibility, thumbnail distinctiveness, and sustainability. Narrowed to top 3 (Cartograph, Dialectic, Tectonic), then created 3 hybrid directions (Meridian, Antipode, Stratum). Final system: Meridian as default (Cartograph-led, crosshair reticle, coordinate metadata), with Antipode variant (Dialectic-led, vertical split comparisons) and Stratum variant (Tectonic-led, historical layering). Dual-mode registers: Dark (cinematic, in-video) and Light (editorial, title cards, social). Palette: ink/amber/rust/bone/paper/oxblood. Typography: Space Grotesk (display) + IBM Plex Mono (body/metadata) + JetBrains Mono (data). Brand mark: ∴ (therefore symbol). Image treatment: 4-step pipeline (desaturate → duotone remap → grain/vignette → composite) normalizing all images into brand language. All codified in BRAND.md, implemented in theme.ts, skill updated.
 **Resolves:** OQ4 (Channel Branding / Visual Identity) and D21 (Visual identity upstream before polish).
+**Superseded in part by D40 (May 10, 2026):** the display face was migrated Space Grotesk → IBM Plex Sans, and the Plex superfamily (Sans + Serif + Mono) replaced the original two-family split. All other elements of D22 (palette, ∴ mark, dual-mode registers, image treatment pipeline) remain canonical.
 
 ### D23: Format repertoire over single format — 8 identity directions, 7 episode types
 **Date:** April 26, 2026
@@ -184,7 +185,7 @@ Last updated: April 26, 2026
 
 **Details:**
 - ~~Color palette (functional)~~ → RESOLVED: Data encoding colors in BRAND.md (see D17)
-- ~~Typography (functional)~~ → RESOLVED: Space Grotesk (display) + IBM Plex Mono (body/metadata) + JetBrains Mono (data)
+- ~~Typography (functional)~~ → RESOLVED: IBM Plex Sans (display) + IBM Plex Serif (long-form body) + IBM Plex Mono (metadata/kicker) + JetBrains Mono (data) — superseded D22's original Space Grotesk choice per D40 (May 10, 2026)
 - ~~Channel visual personality/mood~~ → RESOLVED: Meridian default system (Cartograph-led, crosshair reticle, coordinate metadata) + Antipode variant (Dialectic-led vertical splits) + Stratum variant (Tectonic-led layering)
 - ~~Brand color palette~~ → RESOLVED: ink/amber/rust/bone/paper/oxblood
 - ~~Gradient/shadow/depth system~~ → RESOLVED: Dual-mode registers (Dark cinematic for in-video, Light editorial for title cards/social)

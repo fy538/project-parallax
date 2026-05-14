@@ -2,9 +2,18 @@
 
 > One page. Pin it. When a script beat needs a map, look here BEFORE writing visual-spec JSON.
 >
-> Last updated: May 11, 2026
+> Last updated: May 13, 2026
 
 Six map templates with overlapping-but-distinct purposes. Picking wrong wastes hours of render time and produces visuals that mislead. This doc is the canonical "if your data looks like X, use template Y" lookup.
+
+> **May 13, 2026 — AtlasPlate is the default for editorial work.**
+> A research pass on canonical outlets (NYT Graphics, FT Visual + Data, Bloomberg Originals, Reuters Graphics, Economist Graphic Detail) found that **all of them use D3 + TopoJSON SVG for static editorial maps** — *not* Mapbox. Mapbox at those outlets lives inside interactive web products with user-manipulated basemaps. AtlasPlate is structurally identical to the canonical D3+TopoJSON stack ported into Remotion. **Treat AtlasPlate as the default for analytical / titled / categorical map work; reserve Mapbox templates for the two narrow cases below.**
+>
+> **Use Mapbox only when:**
+> 1. **Terrain hillshading is the editorial point** — Himalayan supply route, Arctic shipping bathymetry, alpine border dispute. Relief reads as the substantive geography.
+> 2. **Cinematic atmospheric globe pivot** — a cold-open shot where the photographic earth (atmospheric haze, vector-tile surface texture) is rhetorically right.
+>
+> **Mapbox templates render WITHOUT a title overlay** (May 13, 2026 doctrine — `RouteAnimation`, `ChoroplethMap`, `DensityMap` all strip the `TitleBlock`). The map fills the visual; titles come from voice-over context or a preceding `TitleTransition` composition. Forcing a title onto a Mapbox raster produces the "rotating-paper / title-plate-cut-into-map" artifact the visual review flagged.
 
 Full editorial rationale, canonical idioms, and failure modes live in the per-template dossiers under `references/template-research/`:
 - [`choropleth-map.md`](references/template-research/choropleth-map.md)
@@ -27,13 +36,13 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 
 | Data shape | Geographic attribute | Template |
 |---|---|---|
-| **Rate / share / %** (per-region quantitative) | "Where is it high vs. low" | **ChoroplethMap** |
+| **Rate / share / %** (per-region quantitative) | "Where is it high vs. low" | **AtlasPlate** (preferred) · ChoroplethMap if terrain matters |
 | **Count / magnitude per country** (5-12 countries, geographically spread) | "Which country has how many" | **ProportionalSymbolMap** |
 | **Count / magnitude per country** (15+ countries in a dense region) | "Weight ≠ size" | **CartogramMap** (Dorling) |
-| **Individual events / facilities** (100s of points) | "Where do they cluster" | **DensityMap** (hex / heatmap) |
+| **Individual events / facilities** (100s of points) | "Where do they cluster" | **DensityMap** (hex / heatmap) — Mapbox; reserved for atmospheric / terrain shots |
 | **Categorical membership** ("X bloc," "Y treaty") | "Who's in, who's out" | **AtlasPlate** (modern) |
 | **Categorical in a historical period** | "In 1962, the world looked like…" | **AtlasPlate** + `aesthetic: "vintage"` |
-| **Flow / direction** (A → B, supply chain) | "How things move" | **RouteAnimation** |
+| **Flow / direction** (A → B, supply chain) | "How things move" | **RouteAnimation** (atmospheric — no overlay title) |
 | **Hub-and-spoke** (one center, N destinations) | "All roads lead to…" | **RouteAnimation** + radial mode |
 | **Cinematic globe** (cold-open, dramatic pivot) | "Here's our planet" | **AtlasPlate** orthographic + rotation |
 
@@ -44,7 +53,7 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 ```
 What does the script say?
 │
-├─ "% / rate / share per country" ─────────────────── ChoroplethMap
+├─ "% / rate / share per country" ─────────────────── AtlasPlate (default); ChoroplethMap only if terrain
 │
 ├─ "X count per country"
 │   ├─ 5-12 countries, geographically spread ──────── ProportionalSymbolMap
@@ -88,6 +97,7 @@ These compose on top of any base template:
 | `cameraTransition: "via-globe"` | Pull-back-then-push-in pose curve | Long-distance camera moves |
 | `cameraDwell: { before: 0.2 }` | Hold start pose for 20% of transition | Add breath before motion |
 | `aesthetic: "vintage"` (AtlasPlate only) | Tea-stained paper, brown ink, grain | Cold War / historical analogy |
+| `labelDensity: "atlas" \| "editorial" \| "minimal" \| "off"` | Mapbox auto-label suppression register | Default `"editorial"` — country labels at globe scale (orientation), auto-suppress at zoom ≥ 4 where MapAnnotations dominate. Per-shot override only |
 
 ---
 
@@ -126,6 +136,27 @@ These produce technically-valid renders that visually mislead. The new `map-audi
 6. **RouteAnimation with empty segments and no radial.** Schema rejection — but worth catching upstream so you don't waste visual-spec cycles.
 7. **No source annotation on a data-bearing map.** Auto-flag; every data map needs provenance.
 8. **Modern map of a region with named disputes, no `disputedBoundaries`.** Map covers Taiwan but doesn't show the median line; map covers South Asia but doesn't show LoC. Editorial omission worth flagging.
+
+---
+
+## Label-density register (May 13, 2026)
+
+Mapbox-based templates expose a `labelDensity` data field that controls how aggressively Mapbox's automatic labels suppress when the composition has editorial annotations. **Default `"editorial"` is the right answer for ~90% of shots — don't override unless you know why.**
+
+| Register | What it does | When |
+|---|---|---|
+| `"atlas"` | Full Mapbox defaults at every zoom — POI, transit, roads, country labels | Geographic context IS the editorial point; no overlay annotations |
+| `"editorial"` (default) | Country labels at globe scale (zoom < 4), auto-suppress at regional (≥ 4) | FT supply-chain idiom — most route / choropleth / density maps |
+| `"minimal"` | Hide all Mapbox-generated text regardless of zoom — **including ocean / sea labels** (verified empirically May 13, 2026 at zoom 5) | NYT explainer idiom — when explicit MapAnnotations + MapTextArc name everything that matters |
+| `"off"` | Total suppression — every Mapbox label layer hidden (functionally equivalent to `"minimal"` for now; reserved for future granular suppression) | 100% editorial cartography; period or art-directed shots |
+
+Implementation: `MapGL` watches the live camera zoom in a React effect and re-applies the register on every threshold crossing via Mapbox Standard's `setConfigProperty` API. Per-frame correctness is automatic — no per-shot data tuning needed for camera-animating compositions. See `src/components/MapGL.tsx` `resolveEffectiveLabelDensity()` + `applyLabelDensity()`.
+
+**Ocean / sea labels (verified May 13, 2026):** A zoom-5 probe render confirmed that Mapbox Standard's `showPlaceLabels=false` is **comprehensive** — it also suppresses water-body labels ("Indian Ocean", "South China Sea", strait names, etc.) along with administrative places. The implication: in `minimal` / `off` registers (and `editorial` at zoom >= 4), the script author must explicitly author every textual element via `<MapAnnotations>` (named points) and `<MapTextArc>` (ocean / sea names along an arc). This is the NYT / National-Geographic canonical workflow anyway — ocean names are hand-placed across an arc, not algorithmically positioned by a basemap. The probe render is at `/tmp/parallax-smoke/zoom5-probe.png` for reference.
+
+Editorial doctrine: **annotations carry the argument, Mapbox carries the context.** The register controls how much context is allowed to compete. When a script names a specific place, the author should add a `MapAnnotation` for it — don't rely on Mapbox's automatic label to do editorial work.
+
+Sibling polish: MapAnnotations now render with an 8-direction paper-color halo (`haloShadow()` in `src/components/MapAnnotations.tsx`) so editorial labels unambiguously win even at the same pixel as a Mapbox auto-label. Plus dot anchors gain a matching halo via `haloBoxShadow()`.
 
 ---
 

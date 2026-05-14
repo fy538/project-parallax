@@ -7,7 +7,7 @@
 > and Tectonic (historical layering). Two registers: **Dark** (cinematic, in-video) and
 > **Light** (editorial, title cards, social). Both pass through the same design system.
 >
-> Last updated: April 26, 2026
+> Last updated: May 14, 2026 (Motion Register section added)
 
 ---
 
@@ -208,6 +208,51 @@ Bands are 80-120px wide, full height of frame, with era labels in IBM Plex Mono 
 
 ---
 
+## Motion Register
+
+The brand reads as **print-newsroom + film**, not as handheld documentary camera. The default motion register is intentionally restrained: charts stay level, axes stay perpendicular, content does not slip toward the bottom-right. Movement is for moments where motion *carries editorial weight*, not for adding texture to static information.
+
+### The eight drift presets
+
+Templates set their drift via `_direction: { driftPreset: "<name>" }`. The default (when no preset is specified) is `editorial`, defined by `motionBudget` in `theme.ts`.
+
+| Preset | Mode | Scale | Pan X | Pan Y | Rotation | Use for |
+|---|---|---|---|---|---|---|
+| `none` | — | — | — | — | — | Maps, interactive comps, showreel/catalog evaluation |
+| `editorial` *(default)* | linear | 1.02 | 0 | 0 | 0 | Charts, all data-visualization templates |
+| `slow` | linear | 1.03 | 8 | 4 | 0.15 | Pre-May-2026 episodes (back-compat) |
+| `normal` | linear | 1.06 | 18 | 8 | 0.3 | Pre-May-2026 episodes (back-compat) |
+| `documentary` | linear | 1.06 | 18 | 8 | 0.3 | Atmospheric photo segments — NEVER charts |
+| `breathing` | breathing | 1.008 | 0 | 0 | 0 | Long-held stats — sinusoidal scale on 8s cycle |
+| `settle` | settle | 1.025 | 0 | 0 | 0 | Title cards, section dividers — settle then HOLD |
+| `sway` | sway | 1.0 | 6 | 4 | 0 | Photo plates — bidirectional pan, no net drift |
+
+### Hard rules
+
+1. **Charts use `editorial` or `none`.** The 0.3° rotation in `documentary` tilts axis baselines visibly even when "imperceptible." Rotation is reserved for photo-driven segments where axes don't exist.
+2. **Showreels and contact sheets use `none`.** Wrap each segment with the `still()` helper in `src/catalog/Showreel.tsx` so all demos render drift-free for back-to-back evaluation.
+3. **Pan direction is editorially neutral.** When pan is non-zero (slow/normal/documentary), the convention is right + down (descended from documentary photography). For new motion choices, prefer no-pan or bidirectional `sway` — the directional slip works for photos, not for charts.
+4. **`contentArea()` reserves 18×8px regardless of current default.** This protects opt-in `documentary` users from drifting past the safe-area boundary. The reserve is decoupled from `motionBudget`.
+
+### Editorial intent per preset
+
+- **`editorial`** — "The camera is watching." Barely-perceptible inward zoom that says the frame is alive but doesn't slip. Default for every chart.
+- **`breathing`** — "This number is alive." Use for stat reveals held for 4+ seconds where you want presence without slip.
+- **`settle`** — "The camera lands." Title cards, section dividers, anything that should establish then hold.
+- **`sway`** — "Subtle handheld feel." Atmospheric photo plates, paper-texture title backgrounds. Net displacement zero — life without drift.
+- **`documentary`** — "Documentary register." Archival photos, scenic establishing shots, anywhere the chart isn't the point.
+- **`slow` / `normal`** — kept at their original values for episodes built before the May 2026 editorial revision. New work should not reach for these by name.
+- **`none`** — used by maps (which have their own narrated camera systems) and by every showreel/contact-sheet rendering path.
+
+### Where this lives in code
+
+- **`src/design/theme.ts`** — `motionBudget` (the default envelope) + `contentArea()` (safe-area reserve)
+- **`src/hooks/useCompositionAnimation.ts`** — the four interpolation modes (`linear`, `breathing`, `settle`, `sway`)
+- **`src/hooks/useDirection.ts`** — `DRIFT_PRESETS` (maps preset names → envelope + mode)
+- **POLISH.md A6** — the checkable rule version of this section
+
+---
+
 ## Image Treatment Pipeline
 
 Every image — archival photograph, satellite imagery, technical photography, AI generation — passes through the same 4-step pipeline before entering any composition. The pipeline IS the brand. No exceptions.
@@ -359,6 +404,7 @@ The reverse test: "If I saw this next to a constructivist illustration cover, wo
 - **Layered reveal:** Structure (axes, grids, bg) → data (bars, map fills) → labels (values, annotations).
 - **Ken Burns on holds >3s.** Subtle scale (1.00 → 1.02) or slow pan (5-10px) to prevent frozen-slide syndrome.
 - **Exit animations exist.** Last 15-20 frames fade out key elements. Background can hold.
+- **Anticipatory entrance — the Economist 150ms rule.** When an element is sync'd to a narrated word (via `_direction.syncPoints[]` parsed from `DIR: cam(sync:"word")` / `DIR: reveal(sync:"word")`), it starts settling ~5 frames (≈150ms at 30fps) *before* the word lands. The viewer reads the element as already-present-and-settled when the spoken word arrives — not landing on the word, not appearing afterward. This is what separates editorial video from PowerPoint reveals. Implemented in `src/utils/animation.ts` → `anticipatoryStartFrame()`, consumed by `useEntrance()` and applied automatically by TitleTransition, KineticTypography, StatReveal, BayesianUpdate, TitleBlock. You don't opt in — every sync'd reveal gets it. See `references/template-research/motion-design.md` § 3.
 
 ### Timing Reference
 

@@ -259,10 +259,115 @@ The version-bump path is recommended for any change you couldn't reverse in 5 mi
 | Disputed boundaries don't render | Worldview not set, or filter on the layer | Re-check Step 7 |
 | Hillshade still looks 3D | Exaggeration too high, or terrain DEM still attached at template level | Confirm hillshade exaggeration ≤ 0.5 in style; separately confirm template data files don't force `terrain: true` (see LESSONS L99) |
 
+## Procedure — Meridian Sepia (optional, for period episodes)
+
+For episodes whose register is *historical analogy* — Cold War, mid-century imperial briefings, anything where the map should signal "this is a period reference" rather than "this is live data" — fork a third style.
+
+This is the Mapbox equivalent of AtlasPlate's `aesthetic: "vintage"` mode. Bartholomew Times Atlas (1955–72 editions), Fortune editorial plates (Burtin/Bayer), David Rumsey collection mid-century plates are the canonical references.
+
+### 1. Fork Meridian Light
+
+1. In Mapbox Studio, open **Meridian Light v1** → **Duplicate** → rename **Meridian Sepia v1**.
+
+### 2. Apply the vintage palette
+
+From `mapConfig.vintageStyleColors` in `theme.ts`:
+
+| Layer | Hex | Notes |
+|---|---|---|
+| `water` fill | `#DDD0B3` | Tea-stained water |
+| `land` fill | `#E8DCC0` | Aged paper |
+| `landuse-park` | `#E2D4B5` | Slightly darker than land |
+| `admin-0-boundary` | `#4A3320` | Brown ink |
+| `admin-0-boundary-disputed` | `#6B1D1D` | Faded oxblood (Cold War red) |
+| `admin-0-boundary-bg` (halo) | `#E8DCC0` | Same as land |
+| `admin-1-boundary` | `#9B7849` | Sepia muted |
+
+### 3. Typography — keep IBM Plex but tint to brown
+
+- `country-label` color: `#3A2510` (darker brown)
+- `state-label` color: `#7A6448`
+- `water-label` color: `#7A6448`
+
+### 4. Sky / atmosphere (vintage)
+
+- **Atmosphere color:** `#E8DCC0`
+- **Halo color:** `#9B7849`
+
+### 5. Hillshade
+
+Match Meridian Light's quiet hillshade, but warmer:
+- Highlight: `#F0E0BE`
+- Shadow: `#9B7849`
+- Exaggeration: 0.4
+
+### 6. Publish
+
+1. Rename: **Meridian Sepia v1**.
+2. Publish + make public.
+3. Add to `.env`:
+```bash
+MAPBOX_STYLE_SEPIA_URL=mapbox://styles/<account>/<meridian-sepia-style-id>
+```
+
+Without this env var, `<MapGL vintage>` falls back to light-v11 with a runtime CSS `sepia()` + `saturate()` + `hue-rotate()` filter. Workable but the published Studio style is the real deal.
+
+---
+
+## MapGL editorial-register props
+
+After executing this recipe, the published Mapbox styles do the heavy lifting (palette, fonts, layer cull, disputed dashes). But several editorial moves still happen at template render time. `<MapGL>` exposes them as props:
+
+```tsx
+<MapGL
+  longitude={20}
+  latitude={25}
+  zoom={1.8}
+  // Tints the globe atmosphere halo away from the default cyan.
+  // editorial (default) — paper-tinted, kills the "globe floating in space" feel
+  // atmospheric — cinematic cold-open globe (dark space, warmer halo)
+  // vintage — brown tea-stained atmosphere (auto when `vintage` prop set)
+  // none — no atmosphere at all
+  fogPreset="editorial"
+  // Soft paper-darken overlay to blend the Mapbox canvas into FooterStrip /
+  // HeaderStrip chrome. "editorial" (default in templates) | "atlas" | false
+  vignette="editorial"
+  // Editorial attribution chip (MAPBOX · OSM, small Plex Mono small-caps,
+  // bottom-right) replaces the default white attribution pill. Default ON.
+  // Pass extras={["NATURAL EARTH", "ECMWF"]} to append data-source credits.
+  attribution={{ extras: ["NATURAL EARTH"] }}
+  // Period-episode mode — uses Meridian Sepia style URL + vintage fog + vintage vignette.
+  vintage={false}
+  // Graticule overlay (deck.gl GeoJsonLayer) when set. true for editorial
+  // defaults, or pass GraticuleConfig { spacing, opacity, emphasize30 }.
+  // Most templates already accept data.graticule and pipe it through their
+  // own layers array — only set this prop on templates that don't.
+  graticule={false}
+/>
+```
+
+Defaults: `fogPreset="editorial"`, `vignette={false}` (set per-template), `attribution={undefined}` (renders chip), `vintage={false}`, `graticule={false}`. Map templates (`ChoroplethMap`, `RouteAnimation`, `DensityMap`) now set `vignette="editorial"` by default; opt out with `vignette={false}` on shots that need to fill the frame edge-to-edge (e.g., a Mercator world rectangle).
+
+### Quick wins WITHOUT executing the Studio recipe
+
+If you haven't done the Studio session yet, the props above already close some of the gap on stock `mapbox/light-v11`:
+- The default cyan globe halo is gone (`fogPreset="editorial"` overrides `setFog` at runtime).
+- The white "Improve this map" pill is hidden; the editorial chip renders in its place.
+- The vignette blends the rectangular canvas into the chrome.
+
+What you still get from doing the Studio session:
+- Plex Sans labels (the single biggest "not Google Earth" lever — Mapbox loads glyphs from the style; can't override at runtime).
+- POI / transit / road-shield cull.
+- Rust-dashed disputed boundary lines (the Parallax cartographic signature).
+- Bone/paper ocean and ink hairline borders.
+
 ## Reference
 
 - [`mapConfig.styleColors` in theme.ts](../remotion-templates/src/design/theme.ts) — single source of truth for the intended palette
 - [`remotion-templates/BRAND.md`](../remotion-templates/BRAND.md) — typography + palette rationale
 - [`remotion-templates/references/template-research/map-annotations.md`](../remotion-templates/references/template-research/map-annotations.md) — editorial cartography canon
+- [`remotion-templates/references/template-research/atlas-plate.md`](../remotion-templates/references/template-research/atlas-plate.md) — atlas register doctrine (single-color highlights, graticule, vignette canon)
 - Bartholomew, J. *The Times Atlas of the World*. House typography + admin hierarchy reference.
+- Stamen Toner — public editorial-Mapbox reference style (https://docs.stadiamaps.com/map-styles/stamen-toner/)
+- Mapbox Fog/Atmosphere reference — https://docs.mapbox.com/style-spec/reference/fog/
 - FT Visual & Data Journalism style guide (informal, observed from published work).

@@ -10,6 +10,8 @@
 >
 > This file is kept for reference but should not drive new production. The original pre-May 4 content follows.
 >
+> **Note on typography references inside this file:** any "Space Grotesk" reference is also stale per D40 (May 10, 2026) — the display face has migrated to IBM Plex Sans. Do not copy typography specs from this file into new work; use BRAND.md instead.
+>
 > ---
 >
 > How to identify, generate, polish, and integrate SVG illustrations into Parallax video production using Claude. Companion to IMAGES.md (stock photography) and BRAND.md (design system). Together, these three documents cover all visual sourcing.

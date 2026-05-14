@@ -7,7 +7,7 @@
 >
 > **Companion doc:** [`POLISH_IMPLEMENTATION.md`](./POLISH_IMPLEMENTATION.md) — the 4-layer architecture spec (per-element / animation / composition / brand) showing *which infrastructure* makes each rule below cheap to follow. Read this file for *what* must pass; read implementation for *how* the system is built to make it easy.
 >
-> Last updated: May 5, 2026
+> Last updated: May 14, 2026 (A6 rewritten for the editorial drift register)
 
 ---
 
@@ -27,7 +27,24 @@ The goal: every movement should feel **intentional and weighted**, like objects 
 
 **A5: Subtle secondary motion on data elements.** After a bar finishes growing, add a 100ms micro-settle (spring with high damping). After a statistic finishes counting, hold 200ms then subtly pulse the number (scale 1.0→1.02→1.0 over 300ms). These details register subconsciously.
 
-**A6: Ken Burns on static compositions.** Any screen held for >3 seconds gets a slow drift via `useCompositionAnimation()`. Canonical values live in `motionBudget` (theme.ts): scale 1.00→1.06, panX 0→18px, panY 0→8px, rotation 0→0.3°. `contentArea()` already subtracts the pan budget from layout margins, so content placed within the content area is safe from viewport-edge clipping at peak drift. Use `noDrift: true` when applying manual Ken Burns to avoid compounding.
+**A6: Editorial drift register (revised May 14, 2026).** Any screen held for >3 seconds gets a slow drift via `useCompositionAnimation()`. The **default register is `editorial`**: a barely-perceptible inward zoom only (scale 1.00→1.02, no pan, no rotation). Charts stay level, content does not slip toward the bottom-right, axis baselines never tilt — the channel reads as print-newsroom + film, not as handheld documentary camera.
+
+Eight presets are available via `_direction: { driftPreset: "<name>" }`:
+
+| Preset | Mode | Scale | Pan X | Pan Y | Rotation | Use case |
+|---|---|---|---|---|---|---|
+| `none` | — | — | — | — | — | Maps, interactive comps, catalog showreel |
+| `editorial` *(default)* | linear | 1.02 | 0 | 0 | 0 | Charts, all dataviz (the new safe default) |
+| `slow` | linear | 1.03 | 8 | 4 | 0.15 | Back-compat — kept for existing episodes |
+| `normal` | linear | 1.06 | 18 | 8 | 0.3 | Back-compat — kept for existing episodes |
+| `documentary` | linear | 1.06 | 18 | 8 | 0.3 | **Explicit Ken Burns** — atmospheric / photo segments only, NEVER charts |
+| `breathing` | breathing | 1.008 | 0 | 0 | 0 | Long-held stat reveals — 8s sinusoidal scale oscillation |
+| `settle` | settle | 1.025 | 0 | 0 | 0 | Title cards, dividers — one-time settle in 0.6s, then HOLD |
+| `sway` | sway | 1.0 | 6 | 4 | 0 | Atmospheric photo plates — bidirectional pan, no net displacement |
+
+**Hard rule:** charts use `editorial` (default) or `none`. Documentary register (the 0.3° rotation in particular) tilts axis baselines visibly even when "imperceptible"; it's reserved for photo-driven segments where axes don't exist. The catalog showreel wraps every demo in `still()` to render all 33 demos drift-free for evaluation.
+
+`contentArea()` reserves an 18×8px safety margin regardless of the current default — this means episodes that opt into `documentary` still can't drift past the safe-area boundary. The reserve is decoupled from `motionBudget`. Use `noDrift: true` directly only when applying manual Ken Burns to avoid compounding.
 
 **A7: Exit animations exist.** Elements don't just cut. If a composition transitions, the last 15-20 frames should fade out key elements (opacity 1→0 with ease-in). Background can hold.
 
@@ -79,7 +96,7 @@ spacing: { xs: 8, sm: 16, md: 24, lg: 32, xl: 48, xxl: 64, safe: 80 }
 
 **L12: No hardcoded shadow strings.** Use shadow tokens from theme.ts: `shadows.subtle`, `shadows.medium`, `shadows.accentGlow(color)`, `shadows.textLift`. Never write `"0 1px 3px rgba(0,0,0,0.5)"` inline.
 
-**L13: Use `<TitleBlock>`, don't hand-build title blocks.** Every data template (DataChart, FrameworkDiagram, TimeSeriesChart, GameBoard, DecisionTree, SankeyFlow, ProbabilityGauge) uses the shared `TitleBlock` component from `../../components/TitleBlock`. It enforces L5 (48px gap), L9 (maxWidth), T1-T3 (typography hierarchy), and L14 (mode-aware colors) in a single import. Props: `title`, `subtitle`, `mode` (pass `backgroundVariant`). Exceptions: KineticTypography (IS the text), TitleTransition (full-screen), ChoroplethMap (overlay-style), TimelineComparison (dual column headers), NetworkDiagram (SVG text).
+**L13: Use `<TitleBlock>`, don't hand-build title blocks.** Every data template (DataChart, FrameworkDiagram, TimeSeriesChart, GameBoard, DecisionTree, SankeyFlow, ProbabilityGauge) uses the shared `TitleBlock` component from `../../components/TitleBlock`. It enforces L5 (48px gap), L9 (maxWidth), T1-T3 (typography hierarchy), and L14 (mode-aware colors) in a single import. Props: `title`, `subtitle`, `mode` (pass `backgroundVariant`). Exceptions: KineticTypography (IS the text), TitleTransition (full-screen), TimelineComparison (dual column headers), NetworkDiagram (SVG text), and **Mapbox templates** (`RouteAnimation`, `ChoroplethMap`, `DensityMap`) — these render the map edge-to-edge with **no title overlay** per the May 13, 2026 Mapbox→AtlasPlate doctrine. Titles for Mapbox-rendered shots come from script voice-over or a preceding `TitleTransition` composition; see `MAP_TEMPLATE_SELECTOR.md`.
 
 **L14: Use `useThemeMode()`, never reference `light.text.*` or `dark.text.*` directly.** Import `useThemeMode` from `../../hooks/useThemeMode`. Pass `data.backgroundVariant` and destructure `{ text, accent, bg }`. This prevents contrast bugs when a dark-tinted composition uses light-mode text colors. TitleBlock uses this internally — templates only need the hook for their own content elements.
 
@@ -482,6 +499,92 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 - Opener narration is substantive (first line is a claim or question, NOT "in this video we'll...")
 
 **Where it lands:** `TitleTransition` `editorial-title` variant enforces the visual side (2.0s hold, fade-only, ∴ corner mark). Music and SFX are audio-track decisions made downstream in NLE assembly; this doctrine governs both.
+
+---
+
+## Timeline Visual Discipline (added May 12, 2026)
+
+Six rules specific to timeline templates (`HorizontalTimeline`, `EscalationLadder`). Catches the "looks unprofessional" failure mode that survives the template-fit pass. The `timeline-audit` skill checks these alongside template-fit rules; cite the rule ID (T1–T6) when filing a finding.
+
+### T1. Entrance settled by frame 30
+
+**Observation:** Title or era-label entrance animation still in motion at frame 30 (1 second in) — chromatic kick, slide-in, scale pulse — produces still-preview captures that look unstable.
+
+**Fix:** Cap entrance easing duration so all chrome (title, subtitle, era labels, spine reveal) reaches its rest state by frame 30. Anything past 1s of entrance reads as "loading" in stills.
+
+**Verify:** `npx remotion still <comp-id> /tmp/check.png --frame=30`. Title must be at full opacity, no transform, no shadow-double.
+
+---
+
+### T2. Spanning title names the parallel
+
+**Observation:** Two side-by-side H1s (e.g., "First Industrial Revolution" + "Information Revolution") with no spanning frame above them. Reader can't tell what's being compared or why.
+
+**Fix:** Every comparison timeline (`mode: "dual"` or `mode: "morph"`) gets a **single spanning `title`** that names the comparison's claim, plus a one-line `subtitle` that declares the framing.
+
+Examples that earn it:
+- ✅ "How Empires Hand Off" / "Two transitions, four centuries apart"
+- ✅ "Two Revolutions, One Cadence" / "Aligned by phase, not by calendar"
+- ❌ "First Industrial Revolution" + "Information Revolution" as parallel H1s with no spanning frame
+
+**Why:** Two parallel H1s read as "two unrelated articles, not a comparison." The reader has to invent the parallel themselves.
+
+---
+
+### T3. Connection labels are the spine of the argument
+
+**Observation:** A `mode: "dual"` timeline with no `connection` per pair, or with connection labels rendered as tiny gray afterthoughts floating in dead space between the columns.
+
+**Fix:** Every pair in `mode: "dual"` declares a `connection: "..."` label (4-6 short phrases that name the structural rhyme: *Center divides → New center named → Old guarantor collapses → Handoff complete*). These ARE the editorial hypothesis. Render them prominently — on or near the spine, not as chrome between the rows.
+
+**Why:** Without connection labels, a dual timeline reads as two parallel lists. The connection text *names* what the parallel is. Tiny gray text floating mid-canvas doesn't carry the editorial weight.
+
+---
+
+### T4. Date typography is the row anchor
+
+**Observation:** Date labels rendered in body-weight warm-brown, same color as the description — they read as descriptors, not anchors.
+
+**Fix:** Dates use:
+- `fonts.mono` (Plex Mono)
+- Small caps
+- 600 weight (bold)
+- Era's accent color (rust for historical era, navy for contemporary, etc.)
+- Visually the **first** thing the eye reads on each row
+
+**Why:** Dates anchor the row. If they read as "another piece of body text," the row has no anchor; everything floats. Mono caps + bold + era color makes the year the first read, the rest of the row clusters around it.
+
+---
+
+### T5. No row chrome in `dual` / `morph` modes
+
+**Observation:** Heavy cream / tinted-blue panels per event row. Vertical pin-bar sidebar markers next to each card. Reads as form-field UI, not editorial layout.
+
+**Fix:** Render on paper white with:
+- One thin spine per timeline (1-2px),
+- A dot on the spine per event,
+- Clean type for the event itself.
+
+No row backgrounds. No tinted card surfaces. No pin-bar sidebars.
+
+**Why:** Editorial timelines (Economist, NYT Upshot, FT, Reuters) all use minimal chrome — the visual weight comes from the type and the dot pattern, not from filled rectangles. Heavy row chrome is the visual register of an org-chart UI, not a magazine spread.
+
+**Exception:** `EscalationLadder` legitimately uses severity-color card backgrounds because the color IS the editorial encoding (low/moderate/high/critical). Other timeline templates have no such justification.
+
+---
+
+### T6. Use the canvas
+
+**Observation:** Timeline content squeezed into one third of the canvas (commonly: vertical ladder left-aligned with 60% empty paper to the right).
+
+**Fix:** Either —
+- Widen content to the safe area (for horizontal spines), OR
+- Center the content column horizontally so whitespace is symmetric (for vertical ladders), OR
+- Fill the right side with editorial context (a small inset map, a portrait, a pull-quote annotation).
+
+**Bias:** vertical ladders → *center*. Horizontal spines → *widen*. Never leave the canvas half-empty.
+
+**Why:** At full-screen video rates, 60% empty paper reads as either "loading" or "underbuilt slide." Editorial outlets fill the canvas with intentional content; if there's nothing to fill it, narrow the content's *visual block* so the whitespace is balanced rather than lopsided.
 
 ---
 

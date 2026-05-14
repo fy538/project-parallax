@@ -183,6 +183,8 @@ DIR: reveal(draw, over:2s)
 DIR: reveal(stagger:300ms, hero:0, pulse)
 ```
 
+**Anticipatory entrance timing (automatic).** When `reveal()` is paired with `cam(sync:"word")` — or when the segment has `_direction.syncPoints[]` — TitleTransition, KineticTypography, StatReveal, BayesianUpdate, and TitleBlock all apply *anticipatory* entrance timing per D17 (May 11, 2026). The visual element starts settling ~5 frames (≈150ms) *before* the narration word lands, so the viewer reads the element as already-present-and-settled when the spoken word arrives. This is the Economist 150ms rule, baked into the templates via `useEntrance()` consuming the syncPoint at the hook layer. You don't have to opt in — every sync'd reveal gets it automatically. Practical implication: when you write `cam(sync:"single island")`, the visual is at full opacity ~150ms before "single" is spoken, not landing on the word. This produces the "settled-not-arriving" feel that separates editorial video from PowerPoint reveals. See `remotion-templates/src/utils/animation.ts` → `anticipatoryStartFrame()` and `remotion-templates/references/template-research/motion-design.md` § 3.
+
 **How it generates JSON:**
 ```json
 {
@@ -334,24 +336,37 @@ DIR: mood(<atmosphere>, [modifiers])
 |-----------|--------|---------|------------|
 | Atmosphere | `none`, `subtle`, `normal`, `dense` | `Background` component's density preset | `atmosphere` |
 | Particles | `particles:<N>` (8–25 range) | Ambient particle count | `ambientParticles` |
-| Drift | `drift:none`, `drift:slow`, `drift:normal` | Ken Burns intensity | `driftPreset` |
+| Drift | `drift:<preset>` — see preset table below | Camera motion register | `driftPreset` |
 | Dim | `dim:<0-1>` | Global dimming of non-focus elements | `globalDim` |
 | Tint | `tint:<palette-name or hex>` | Background color temperature | `backgroundTint` |
 
-**Drift presets → useCompositionAnimation mapping:**
+**Drift presets → useCompositionAnimation mapping (May 14, 2026 revision):**
 
-| Preset | maxScale | maxPanX | maxPanY | maxRotation |
-|--------|----------|---------|---------|-------------|
-| `drift:none` | 1.0 (noDrift) | 0 | 0 | 0 |
-| `drift:slow` | 1.03 | 8 | 4 | 0.15 |
-| `drift:normal` | 1.06 | 18 | 8 | 0.3 |
+The default register (when `drift:` is omitted) is `editorial` — barely-perceptible inward zoom, no pan, no rotation. Charts stay level; the channel reads as print-newsroom + film, not as handheld documentary camera. Eight presets cover the editorial range:
+
+| Preset | Mode | maxScale | maxPanX | maxPanY | maxRotation | Editorial intent |
+|--------|------|----------|---------|---------|-------------|------------------|
+| `drift:none` | — | (noDrift) | 0 | 0 | 0 | Maps, interactive comps, showreel evaluation |
+| `drift:editorial` *(default)* | linear | 1.02 | 0 | 0 | 0 | Charts, all dataviz — "the camera is watching" |
+| `drift:slow` | linear | 1.03 | 8 | 4 | 0.15 | Pre-May-2026 episodes (back-compat) |
+| `drift:normal` | linear | 1.06 | 18 | 8 | 0.3 | Pre-May-2026 episodes (back-compat) |
+| `drift:documentary` | linear | 1.06 | 18 | 8 | 0.3 | Photo / archival segments — **NEVER charts** |
+| `drift:breathing` | breathing | 1.008 | 0 | 0 | 0 | Long-held stats — "this number is alive" |
+| `drift:settle` | settle | 1.025 | 0 | 0 | 0 | Title cards — "the camera lands" |
+| `drift:sway` | sway | 1.0 | 6 | 4 | 0 | Photo plates — subtle handheld feel, no net drift |
+
+**Hard rule:** charts use `drift:editorial` (default) or `drift:none`. The 0.3° rotation in `drift:documentary` tilts axis baselines visibly — reserved for photo-driven segments where axes don't exist.
+
+**Naming note:** `drift:normal` and `drift:documentary` resolve to identical envelopes. The former is kept for backward-compat with episodes built before the May 2026 editorial revision; new work should reach for `drift:documentary` (when cinematic Ken Burns is the intent) or `drift:editorial` (the new safe default).
 
 **Examples:**
 ```
-DIR: mood(dense, particles:20, drift:slow)
-DIR: mood(subtle, dim:0.6)
-DIR: mood(none, drift:none)
-DIR: mood(normal, tint:oxblood)
+DIR: mood(dense, particles:20, drift:editorial)   # default for charts
+DIR: mood(subtle, dim:0.6)                        # editorial drift implied
+DIR: mood(none, drift:none)                       # maps, interactive
+DIR: mood(normal, tint:oxblood, drift:documentary) # archival photo segment
+DIR: mood(subtle, drift:breathing)                # held stat reveal
+DIR: mood(subtle, drift:settle)                   # title card / section divider
 ```
 
 **Editorial logic:**

@@ -96,7 +96,7 @@ These are the text labels for countries — the most visible text on the map.
 2. Set **Text color** to: **`#1C1814`** (ink)
 3. Set **Text size**: min **10**, max **16** (Mapbox will interpolate by zoom)
 4. Set **Text halo color** to: **`#F5F0E8`** with **1.5px** width
-5. Set **Text font** to: **"DIN Pro Medium"** (closest available to Space Grotesk)
+5. Set **Text font** to: **"DIN Pro Medium"** (closest Mapbox Studio match to IBM Plex Sans — the display face per D40, May 10, 2026; was Space Grotesk previously)
 6. Set **Text opacity** to: **0.85** (slightly dimmed — labels shouldn't dominate)
 7. Optionally reduce **Max text width** to show fewer labels at low zoom
 

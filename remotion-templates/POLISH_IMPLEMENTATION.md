@@ -146,7 +146,7 @@ Full spec: `references/transition-rules.md`
 
 Background component accepts `tint` prop — a hex color overlaid as a subtle radial wash (~6% opacity) that shifts ambient mood without changing content colors.
 
-All 7 core templates expose `backgroundTint` in their data types.
+All core templates expose `backgroundTint` in their data types.
 
 | Narrative Focus | Tint | Hex |
 |----------------|------|-----|
