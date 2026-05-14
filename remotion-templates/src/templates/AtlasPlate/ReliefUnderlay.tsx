@@ -1,3 +1,9 @@
+// @composition-animation: delegated
+// ReliefUnderlay is a pure SVG sub-component of AtlasPlate — it renders
+// inside AtlasPlate's camera-transformed <g> and inherits the parent's
+// useCompositionAnimation (Ken Burns drift applied to the outer SVG).
+// No independent animation hook needed here.
+
 /**
  * ReliefUnderlay — Tom Patterson hand-painted shaded-relief raster
  * underlay for AtlasPlate.
@@ -14,27 +20,37 @@
  *
  * ## Render order
  *
- *   ocean rect              (background)
+ *   Background paper (outside the SVG)
  *   ↓
- *   ReliefUnderlay          ← this component
- *   ↓
- *   graticule
- *   ↓
- *   country fills           (land color, semi-opaque to let relief peek)
- *   ↓
- *   country borders
- *   ↓
- *   disputed boundaries
+ *   <svg> root
+ *     ocean rect                 (fills viewport, OUTSIDE <g transform>)
+ *     ↓
+ *     <g transform={camera}>     (camera scale+translate applied to everything below)
+ *       ReliefUnderlay           ← this component (inside the transform group)
+ *       ↓
+ *       graticule
+ *       ↓
+ *       country fills            (solid, on top of relief)
+ *       ↓
+ *       country borders
+ *       ↓
+ *       disputed boundaries
+ *     </g>
  *
- * The component is placed INSIDE AtlasPlate's `<g transform>` group so
- * it pans / zooms with the camera in lockstep with the country paths.
+ * Critical: ReliefUnderlay lives INSIDE the camera transform so it pans
+ * / zooms in lockstep with the country paths. The ocean rect stays
+ * OUTSIDE so the viewport stays filled when the camera pulls away from
+ * the projected world bbox. Mixing those two layers up would either:
+ *   • ocean inside transform → corners go transparent on zoom-out
+ *   • relief outside transform → relief stays fixed while countries pan
  *
  * ## Projection support
  *
- * v1 supports `equalEarth`, `naturalEarth`, `equirectangular`. The warp
- * script produces one pre-baked PNG per projection (~2 MB each, served
- * from `public/geo/relief/{projection}.png`). Orthographic / albersUsa
- * are not supported — emit a one-shot console warn and render nothing.
+ * v1 supports the projections listed in `reliefProjections.ts`
+ * (equalEarth, naturalEarth, equirectangular). The warp script reads
+ * the SAME constant, so adding support for a new projection is a single
+ * edit (plus rerunning the warp). Orthographic / albersUsa are not
+ * supported — emit a one-shot console warn and render nothing.
  *
  * ## Tinting
  *
@@ -49,37 +65,36 @@
  */
 
 import React, { useId } from "react";
+import { staticFile } from "remotion";
 import { warnIf } from "../../utils/dataWarnings";
 import type { ProjectionName } from "../../utils/atlasProjection";
+import { RELIEF_SUPPORTED_PROJECTIONS } from "./reliefProjections";
 
 // Module-level guard so the missing-asset warning only fires once per
 // projection per session, not 30 × per frame for the full duration.
-const warnedProjections = new Set<string>();
+// Keyed by projection NAME (the stable input), not by URL (the output —
+// `staticFile()` returns different absolute URLs under Studio vs.
+// Lambda, so URL-keying could leak the dedupe across environments).
+const warnedProjections = new Set<ProjectionName>();
 
-// Module-level set tracking which relief assets have failed to load
-// (e.g., 404 because the user hasn't run the prepare script). Once we've
-// seen the failure for a given projection, the SVG `<image>` falls back
-// to omitting the href, which suppresses the broken-image rect in Chrome.
-const failedAssets = new Set<string>();
+// Module-level set tracking which projections' assets have failed to
+// load (e.g., 404 because the user hasn't run the prepare script). Once
+// we've seen the failure, subsequent renders for the same projection
+// skip the `<image>` element entirely to suppress the broken-image rect.
+const failedProjections = new Set<ProjectionName>();
 
 export interface ReliefUnderlayProps {
   /**
    * The AtlasPlate projection name. We expect a pre-warped raster at
-   * `/geo/relief/{projection}.png`. Unsupported projections (orthographic,
-   * albersUsa) cause the component to warn-and-render-nothing.
+   * `geo/relief/{projection}.png` resolved via Remotion's `staticFile()`.
+   * Unsupported projections (orthographic, albersUsa) cause the
+   * component to warn-and-render-nothing.
    */
   projection: ProjectionName;
   /** Viewport width — should match AtlasPlate's `layout.width`. */
   width: number;
   /** Viewport height — should match AtlasPlate's `layout.height`. */
   height: number;
-  /**
-   * Opacity of the relief layer. Default 0.55 — relief is BACKGROUND
-   * texture, not a focal element. Country fills sit on top at full
-   * opacity; the relief peeks through ocean rectangles and along
-   * country edges where the stroke meets the ocean.
-   */
-  opacity?: number;
   /**
    * Dark mode. When true, the filter inverts the relief so highlights
    * become darks (still warm, but reads as "topographic plate on ink").
@@ -88,25 +103,24 @@ export interface ReliefUnderlayProps {
   dark?: boolean;
 }
 
-const SUPPORTED_PROJECTIONS: ReadonlyArray<ProjectionName> = [
-  "equalEarth",
-  "naturalEarth",
-  "equirectangular",
-];
-
 /**
  * Public URL for the pre-warped relief PNG for a given projection.
- * Exported so the asset-acquisition script can use the same path
- * convention.
+ * Routes through Remotion's `staticFile()` so the path resolves
+ * correctly under both the local dev server (which mounts `public/` at
+ * a per-render base) AND Lambda renders (which serve the bundle from a
+ * different root). Exported so the asset-acquisition script can use the
+ * same path convention.
  */
 export const reliefAssetUrl = (projection: ProjectionName): string =>
-  `/geo/relief/${projection}.png`;
+  staticFile(`geo/relief/${projection}.png`);
+
+const isSupportedProjection = (p: ProjectionName): boolean =>
+  (RELIEF_SUPPORTED_PROJECTIONS as ReadonlyArray<string>).includes(p);
 
 export const ReliefUnderlay: React.FC<ReliefUnderlayProps> = ({
   projection,
   width,
   height,
-  opacity = 0.55,
   dark = false,
 }) => {
   const reactId = useId().replace(/[^a-zA-Z0-9-]/g, "");
@@ -116,29 +130,30 @@ export const ReliefUnderlay: React.FC<ReliefUnderlayProps> = ({
   // would need a separate per-frame rasterizer (3D sphere rotation);
   // albersUsa is a regional projection that doesn't map to the world
   // raster we ship.
-  if (!SUPPORTED_PROJECTIONS.includes(projection)) {
+  if (!isSupportedProjection(projection)) {
     warnIf(
       !warnedProjections.has(projection),
       "ReliefUnderlay",
       `Projection "${projection}" is not supported for "atlas-relief" ` +
         `aesthetic in v1. Falls back to plain atlas (no relief). ` +
-        `Supported: ${SUPPORTED_PROJECTIONS.join(", ")}. To add support ` +
-        `for this projection, run \`node tools/prepare-shaded-relief.mjs ` +
-        `--projection=${projection}\` after the initial Natural Earth ` +
-        `asset download.`,
+        `Supported: ${RELIEF_SUPPORTED_PROJECTIONS.join(", ")}. To add ` +
+        `support for this projection, append the name to ` +
+        `src/templates/AtlasPlate/reliefProjections.ts and rerun ` +
+        `scripts/prepare-shaded-relief.mjs.`,
     );
     warnedProjections.add(projection);
     return null;
   }
 
   // If the asset previously failed to load (per-session), don't keep
-  // emitting broken image references. Render the filter defs only —
-  // they're free and let other components dependent on this filter
-  // (none today, but a future stroke-on-relief variant could) still work.
-  const url = reliefAssetUrl(projection);
-  if (failedAssets.has(url)) {
+  // emitting broken image references. Render nothing — the filter defs
+  // are also skipped because they're an unused render cost when no
+  // <image> consumes them.
+  if (failedProjections.has(projection)) {
     return null;
   }
+
+  const url = reliefAssetUrl(projection);
 
   // Filter matrix — different polarity for light vs. dark.
   //
@@ -203,18 +218,18 @@ export const ReliefUnderlay: React.FC<ReliefUnderlayProps> = ({
         width={width}
         height={height}
         preserveAspectRatio="none"
-        opacity={opacity}
+        opacity={0.55}
         filter={`url(#${filterId})`}
         // SVG image has no native onerror in React 18 type defs, but the
         // browser fires it. Track failures so subsequent frames skip.
         onError={() => {
-          if (!failedAssets.has(url)) {
-            failedAssets.add(url);
+          if (!failedProjections.has(projection)) {
+            failedProjections.add(projection);
             if (typeof console !== "undefined") {
               // eslint-disable-next-line no-console
               console.warn(
                 `[ReliefUnderlay] Failed to load relief raster at ${url}. ` +
-                  `Run \`node tools/prepare-shaded-relief.mjs\` to generate ` +
+                  `Run \`node scripts/prepare-shaded-relief.mjs\` to generate ` +
                   `the pre-warped PNG. See tools/shaded-relief-setup.md ` +
                   `for the source raster download step.`,
               );
@@ -227,10 +242,33 @@ export const ReliefUnderlay: React.FC<ReliefUnderlayProps> = ({
 };
 
 /**
- * Reset the module-level caches. Exported for tests; production code has
- * no reason to call this.
+ * Reset the module-level caches. Exported for tests so the dedupe state
+ * can be asserted before / after by toggling the same projection name
+ * across multiple calls in one test run. Production code has no reason
+ * to call this.
  */
 export const __resetReliefCachesForTest = (): void => {
   warnedProjections.clear();
-  failedAssets.clear();
+  failedProjections.clear();
+};
+
+/**
+ * Inspect the warn-dedupe cache. Test-only helper — production code has
+ * no reason to read this.
+ */
+export const __hasWarnedForTest = (projection: ProjectionName): boolean =>
+  warnedProjections.has(projection);
+
+/**
+ * Inspect the failed-asset cache. Test-only helper.
+ */
+export const __hasFailedForTest = (projection: ProjectionName): boolean =>
+  failedProjections.has(projection);
+
+/**
+ * Force a projection into the failed-asset cache. Test-only — used to
+ * verify the reset helper actually clears the entry.
+ */
+export const __markFailedForTest = (projection: ProjectionName): void => {
+  failedProjections.add(projection);
 };
