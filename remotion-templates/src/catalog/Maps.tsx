@@ -37,7 +37,7 @@ import { densityMapSampleData } from "../templates/DensityMap";
 import { TilegramUSMap } from "../templates/TilegramUSMap/TilegramUSMap";
 import { TilegramUSMapSchema } from "../templates/TilegramUSMap/schema";
 import type { TilegramUSMapData, USStateCode } from "../templates/TilegramUSMap/types";
-import { layout, mapConfig, sec } from "../design/theme";
+import { layout, mapConfig, palette, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
 // ─── AtlasPlate variants (G7 / Tordesillas / Blocs) ─────────────────────────
@@ -512,6 +512,31 @@ export const CatalogRouteSilkRoad = () => (
   />
 );
 
+// Toner register demo — same Silk Road dataset, but with the atmospheric
+// Stamen Toner basemap (via Stadia Maps; fallback to grayscale-filtered
+// light-v11 when MAPBOX_STYLE_TONER_URL is unset). Side-by-side comparison
+// against CatalogRouteSilkRoad shows the register shift: stark B+W
+// editorial restraint vs. Mapbox Standard's warm vector basemap.
+const routeSilkRoadToner: RouteAnimationData = {
+  ...routeSilkRoad,
+  toner: true,
+};
+
+export const CatalogRouteSilkRoadToner = () => (
+  <Composition
+    id={catalogId("RouteAnimation", "silk-road-toner")}
+    component={RouteAnimation}
+    schema={RouteAnimationSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: routeDuration(props.data as RouteAnimationData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: routeSilkRoadToner as unknown as RouteAnimationData }}
+  />
+);
+
 export const CatalogRouteMagellan = () => (
   <Composition
     id={catalogId("RouteAnimation", "magellan")}
@@ -696,7 +721,9 @@ const atlasReliefHimalaya: AtlasPlateData = {
   projection: "equalEarth",
   aesthetic: "atlas-relief",
   source: "Natural Earth (Tom Patterson, public domain) + Natural Earth countries",
-  framePadding: 60,
+  // framePadding intentionally omitted — atlas-relief requires the default
+  // padding (80px) to keep the warped relief raster aligned with the
+  // country paths. Overriding it triggers a runtime warn from AtlasPlate.
   graticule: {
     spacing: 10,
     opacity: 0.06,

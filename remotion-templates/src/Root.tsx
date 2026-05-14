@@ -100,11 +100,13 @@ import {
   CatalogAtlasBlocs,
   CatalogAtlasTordesillas,
   CatalogRouteSilkRoad,
+  CatalogRouteSilkRoadToner,
   CatalogRouteRomeRadial,
   CatalogRouteMagellan,
   CatalogRouteChokepoints,
   CatalogAtlasCocom,
   CatalogAtlasColdWarVintage,
+  CatalogAtlasReliefHimalaya,
   CatalogProportionalFabs,
   CatalogCartogramEU,
   CatalogDensityFabs,
@@ -325,11 +327,13 @@ export const RemotionRoot: React.FC = () => {
           <CatalogAtlasBlocs />
           <CatalogAtlasTordesillas />
           <CatalogRouteSilkRoad />
+          <CatalogRouteSilkRoadToner />
           <CatalogRouteRomeRadial />
           <CatalogRouteMagellan />
           <CatalogRouteChokepoints />
           <CatalogAtlasCocom />
           <CatalogAtlasColdWarVintage />
+          <CatalogAtlasReliefHimalaya />
           <CatalogProportionalFabs />
           <CatalogCartogramEU />
           <CatalogDensityFabs />

@@ -36,7 +36,7 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 
 | Data shape | Geographic attribute | Template |
 |---|---|---|
-| **Rate / share / %** (per-region quantitative) | "Where is it high vs. low" | **AtlasPlate** (preferred) · ChoroplethMap if terrain matters |
+| **Rate / share / %** (per-region quantitative) | "Where is it high vs. low" | **AtlasPlate** (preferred) · AtlasPlate + `aesthetic: "atlas-relief"` if terrain matters · ChoroplethMap last resort |
 | **Count / magnitude per country** (5-12 countries, geographically spread) | "Which country has how many" | **ProportionalSymbolMap** |
 | **Count / magnitude per country** (15+ countries in a dense region) | "Weight ≠ size" | **CartogramMap** (Dorling) |
 | **Individual events / facilities** (100s of points) | "Where do they cluster" | **DensityMap** (hex / heatmap) — Mapbox; reserved for atmospheric / terrain shots |
@@ -53,7 +53,8 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 ```
 What does the script say?
 │
-├─ "% / rate / share per country" ─────────────────── AtlasPlate (default); ChoroplethMap only if terrain
+├─ "% / rate / share per country" ─────────────────── AtlasPlate (default)
+│   └─ terrain matters (mountain frontier, supply route) ─ AtlasPlate + aesthetic: "atlas-relief"
 │
 ├─ "X count per country"
 │   ├─ 5-12 countries, geographically spread ──────── ProportionalSymbolMap
@@ -92,7 +93,9 @@ These compose on top of any base template:
 | `graticule: { spacing: 15 }` | Parallels/meridians overlay | Atlas-plate register |
 | `inset: { show: true }` | Locator globe in corner | Regional zooms |
 | `disputedBoundaries: ["taiwan-strait", ...]` | Dashed rust polylines | Any geopolitics map |
-| `terrain: true` | Mapbox 3D hillshade | Rare — when relief is the editorial point |
+| `terrain: true` | Mapbox 3D hillshade | Last resort — when relief is editorial AND globe register required (else use `aesthetic: "atlas-relief"`) |
+| `aesthetic: "atlas-relief"` (AtlasPlate only) | Tom Patterson hand-painted shaded relief under country layer | Default for terrain-relevant analytical maps (Himalayan corridor, alpine frontier, mountain supply route). Public-domain Natural Earth raster. Requires one-time asset prep (`cd remotion-templates && node scripts/prepare-shaded-relief.mjs`) — see `tools/shaded-relief-setup.md` |
+| `toner: true` (MapGL templates) | Stamen Toner via Stadia Maps, retinted to bone/amber | Atmospheric atlas register — closer to FT/NYT static-print than Mapbox Standard reaches. Use when basemap is supporting context (annotations + arcs carry the editorial point). Free tier 200k tiles/mo. One-time setup — see `tools/meridian-toner-setup.md` |
 | `cameraTransition: "cinematic"` | Bezier easing between phase cameras | Dramatic phase transitions |
 | `cameraTransition: "via-globe"` | Pull-back-then-push-in pose curve | Long-distance camera moves |
 | `cameraDwell: { before: 0.2 }` | Hold start pose for 20% of transition | Add breath before motion |
