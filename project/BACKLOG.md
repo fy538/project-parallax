@@ -18,23 +18,15 @@
 
 ## Open items
 
-### [BL-01] Thumbnail image generator
-**Priority:** P1  
-**What it is:** Remotion compositions that render final thumbnail images automatically. The `thumbnail-concept` skill already generates composition briefs (visual layout, text overlay, A/B variants), but the actual image is created manually.  
-**Why it matters:** Thumbnails are the highest-leverage CTR lever. Manual creation is the current bottleneck between brief and YouTube upload.  
-**Current workaround:** Manual design from the thumbnail-concept brief.  
-**Dependencies:** Thumbnail-concept skill (done). Remotion template (not started).  
-**Notes:** Should produce 1280×720 PNG. Three compositions per episode (Juxtaposition, Data Provocation, Symbolic) with A/B text variants.
+### [BL-01] Thumbnail image generator — **DONE May 14, 2026**
+**Priority:** P1 (shipped)
+**Shipped:** `remotion-templates/scripts/generate-thumbnails.mjs` reads `episodes/<slug>/thumbnail-spec.json` (schema at `remotion-templates/data/episodes/_schemas/thumbnail-spec.schema.json`) and batch-renders every concept to `episodes/<slug>/thumbnails/concept-<id>.png` at 1280×720 via the existing `Thumbnail` composition. CLI: `npm run thumbnails -- --episode=<slug> [--only=a,c]`. All three layouts wired (juxtaposition, data-provocation, symbolic); each concept's `data` block is a complete `ThumbnailData` object. Non-zero exit on any failure. Verified end-to-end on `silicon-trap` (3 concepts, ~3-4s each, output bytes-distinct).
 
 ---
 
-### [BL-02] Shorts platform adapter
-**Priority:** P1  
-**What it is:** Automated Remotion rendering of Shorts from `shorts-adaptation` briefs into 9:16 video (1080×1920). The `shorts-adaptation` skill generates 3-4 standalone Shorts briefs per episode, but rendering to vertical video is manual.  
-**Why it matters:** Shorts are the discovery engine for the channel. Manual rendering creates a bottleneck that limits Shorts output to 1-2/week instead of the target 3-5/week.  
-**Current workaround:** Manual NLE export from brief.  
-**Dependencies:** shorts-adaptation skill (done). Remotion 9:16 templates (3 Shorts variants exist but not wired to briefs end-to-end).  
-**Notes:** See `remotion-templates/` — Shorts template variants are built; the missing piece is a brief-to-JSON-to-render pipeline mirroring the long-form flow.
+### [BL-02] Shorts platform adapter — **DONE May 14, 2026**
+**Priority:** P1 (shipped)
+**Shipped:** `remotion-templates/scripts/render-shorts.mjs` reads `episodes/<slug>/shorts-manifest.json` (schema at `remotion-templates/data/episodes/_schemas/shorts-manifest.schema.json`) and renders each entry to 1080×1920 MP4 in `episodes/<slug>/shorts/short-NN.mp4`. CLI: `npm run shorts -- --episode=<slug> [--preview] [--only=01,02] [--from=03]`. All 9 Shorts compositions (KineticShort, DataChartShort, SplitShort, StatRevealShort, FrameworkDiagram-Short, TimelineComparison-Short, ChoroplethMap-Short, SplitComposition-Short, ProbabilityGauge-Short) wired through. Verified end-to-end with 3 silicon-trap shorts (stat reveal, Morris Chang quote, chips-by-node chart).
 
 ---
 

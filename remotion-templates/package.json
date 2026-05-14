@@ -16,7 +16,7 @@
     "test:timelines": "vitest run src/__tests__/horizontal-timeline-real-data.test.ts",
     "test:visual": "vitest run src/__tests__/templates.test.ts",
     "test:real-data": "vitest run src/__tests__/*-real-data.test.ts",
-    "test:unit": "vitest run src/__tests__/lint-conventions.test.ts src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/useBeatSync.test.ts src/__tests__/useEpisodeColorEmphasis.test.ts src/__tests__/useDirection.test.ts src/__tests__/episode-integrity.test.ts src/__tests__/remotion-version-lock.test.ts",
+    "test:unit": "vitest run src/__tests__/lint-conventions.test.ts src/__tests__/useCameraStagger.test.ts src/__tests__/EpisodeSeries.test.ts src/__tests__/useBeatSync.test.ts src/__tests__/useEpisodeColorEmphasis.test.ts src/__tests__/useDirection.test.ts src/__tests__/episode-integrity.test.ts src/__tests__/remotion-version-lock.test.ts src/__tests__/animation.test.ts src/__tests__/mapUtils-labelStack.test.ts src/__tests__/useCompositionAnimation.test.ts src/__tests__/MapGL.props.test.ts",
     "test:episode": "vitest run src/__tests__/episode-integrity.test.ts",
     "test:episode-smoke": "vitest run src/__tests__/full-episode-smoke.test.ts --testNamePattern='frame 0'",
     "test:episode-smoke-deep": "vitest run src/__tests__/full-episode-smoke.test.ts",
@@ -28,7 +28,9 @@
     "lint:concepts": "python3 ../tools/concepts/lookup.py validate",
     "deploy": "node scripts/deploy-lambda.mjs",
     "deploy:teardown": "node scripts/deploy-lambda.mjs --teardown",
-    "render:lambda": "node scripts/render-lambda.mjs"
+    "render:lambda": "node scripts/render-lambda.mjs",
+    "thumbnails": "node scripts/generate-thumbnails.mjs",
+    "shorts": "node scripts/render-shorts.mjs"
   },
   "dependencies": {
     "@deck.gl/core": "^9.3.1",

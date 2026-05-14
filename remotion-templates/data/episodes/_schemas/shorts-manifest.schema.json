@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://parallax.video/schemas/shorts-manifest.schema.json",
+  "title": "ShortsManifest",
+  "description": "Per-episode manifest describing each Short to render. Consumed by remotion-templates/scripts/render-shorts.mjs to produce 1080x1920 MP4s (or frame-30 PNGs in --preview mode).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["episode", "shorts"],
+  "properties": {
+    "episode": {
+      "type": "string",
+      "description": "Episode slug. Must match the parent directory under episodes/. Used for output filenames and provenance only — the renderer does NOT cross-reference data/episodes/<slug>/ to resolve `data` blocks (those are inline)."
+    },
+    "version": {
+      "type": "string",
+      "description": "Optional manifest schema version. Bump when fields change."
+    },
+    "shorts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/short" }
+    }
+  },
+  "definitions": {
+    "short": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "template", "data"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[0-9]{2,3}$",
+          "description": "Zero-padded ordinal (\"01\", \"02\", ...). Used in output filename short-<id>.mp4 and in CLI --only/--from filters."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable description of the short. Logged at render time; not consumed by the template."
+        },
+        "template": {
+          "type": "string",
+          "enum": [
+            "KineticShort",
+            "DataChartShort",
+            "SplitShort",
+            "StatRevealShort",
+            "FrameworkDiagram-Short",
+            "ChoroplethMap-Short",
+            "SplitComposition-Short",
+            "ProbabilityGauge-Short",
+            "TimelineComparison-Short"
+          ],
+          "description": "Remotion composition ID for one of the 9 Shorts templates. Must match exactly what's registered in src/templates/Shorts/index.tsx."
+        },
+        "data": {
+          "type": "object",
+          "description": "Template-specific data shape. Same JSON the long-form composition would accept (e.g. StatRevealData, QuoteData, DataChartData). The renderer passes this through to the composition as `{ data: ... }` props.",
+          "additionalProperties": true
+        },
+        "durationSec": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 60,
+          "description": "Optional override of the duration (in seconds) for this short. If present, it is injected into `data.durationSec` before render so calculateMetadata picks it up. If absent, the template's own `data.durationSec` or built-in default applies. YouTube Shorts max 60s."
+        },
+        "sourceBeat": {
+          "type": "string",
+          "description": "Optional provenance — which beat of the source episode this short adapts (e.g. \"Beat 3: The Other Side of the Wall\"). Documentation only."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../remotion-templates/data/episodes/_schemas/thumbnail-spec.schema.json",
+  "episode": "silicon-trap",
+  "notes": "Scaffold example concepts — one per layout mode. Image fields point at the bundled sample-historical.png placeholder until brand-treated stills land.",
+  "concepts": [
+    {
+      "id": "a",
+      "label": "Juxtaposition — fab vs map",
+      "data": {
+        "layout": "juxtaposition",
+        "episode": "silicon-trap",
+        "episodeLabel": "EP01 · GEOPOLITICS",
+        "imageSrc": "assets/sample-historical.png",
+        "imageRamp": "standard",
+        "titleText": "TRIUMPH & TRAP",
+        "statPrimary": "92%",
+        "statPrimaryLabel": "of advanced-node chips",
+        "statContrast": "1",
+        "statContrastLabel": "island chokepoint"
+      }
+    },
+    {
+      "id": "b",
+      "label": "Data Provocation — hero stat",
+      "data": {
+        "layout": "data-provocation",
+        "episode": "silicon-trap",
+        "episodeLabel": "EP01 · GEOPOLITICS",
+        "imageSrc": "assets/sample-historical.png",
+        "imageRamp": "editorial",
+        "heroText": "92%",
+        "subText": "of advanced-node chips"
+      }
+    },
+    {
+      "id": "c",
+      "label": "Symbolic — illustration + title",
+      "data": {
+        "layout": "symbolic",
+        "episode": "silicon-trap",
+        "episodeLabel": "EP01 · GEOPOLITICS",
+        "symbolTitle": "THE SILICON TRAP"
+      }
+    }
+  ]
+}

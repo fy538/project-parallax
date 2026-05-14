@@ -7,7 +7,7 @@ Tiger has 5-10 hours/week alongside a full-time senior data scientist role. The 
 
 ---
 
-## Pipeline Overview (Actual — as of May 4, 2026)
+## Pipeline Overview (Actual — as of May 12, 2026)
 
 ```
 TOOL                          STAGE                         HUMAN TIME
@@ -273,7 +273,7 @@ Four parallel tracks feed into final assembly:
 
 **Tool:** Cowork → visual-spec skill → Remotion + source.py
 
-1. Run **visual-spec** skill on the approved script → Step 1.5 checks `data/concepts.json` for prior-episode concepts (use `tools/concepts/lookup.py reuse-check` as CLI shortcut) and marks callbacks with 🔄 → produces visual breakdown table covering ALL five visual modes (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), with mode balance check against targets and direction column showing parsed `DIR:` annotations
+1. Run **visual-spec** skill on the approved script → Step 1.5 checks `data/concepts.json` for prior-episode concepts (use `tools/concepts/lookup.py reuse-check` as CLI shortcut) and marks callbacks with 🔄 → produces visual breakdown table covering all content-type modes (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`, `[SCENE:]`, `[ARCHIVAL:]`) plus special-purpose tags (`[FORECAST:]`, `[BACKDROP:]`, `[OVERLAY:]`), with mode balance check against targets and direction column showing parsed `DIR:` annotations
 2. Human approves the visual plan (~5 min)
 3. Skill generates four outputs: (a) Remotion JSON data files for all MG compositions — including `_direction` blocks parsed from `DIR:` annotations (camera paths, reveal modes, hold timing, transition specs, atmosphere); (b) `footage-manifest.json` with `_direction` for hold/mood/cut per clip; (c) Recraft illustration specs for `[ILLUST:]` segments with direction-informed treatment and mood; (d) AI video briefs for `[AI-GEN:]` segments with `cam()` translated to natural-language camera direction and `mood()` to scene atmosphere
 4. **Validate JSON data files before rendering:** `python3 tools/validate_data.py remotion-templates/data/episodes/<slug>/` — all files must pass schema validation. Fix any errors before proceeding. A malformed data file reaching Remotion causes silent composition failures that are hard to diagnose.
@@ -285,16 +285,27 @@ Four parallel tracks feed into final assembly:
    - AI video (if used): `python3 tools/cost_tracker.py add --episode <slug> --service kling --amount <X> --note "AI-GEN clips"` (or `--service sora`)
    - Lambda renders (if used): `python3 tools/cost_tracker.py add --episode <slug> --service lambda --amount <X> --note "Remotion Lambda render"`
 
-**Templates (7 types, all built):**
-1. **ChoroplethMap** — Phase-based country highlighting on world maps
-2. **RouteAnimation** — Animated trade/supply route lines between geographic points
-3. **TimelineComparison** — Dual-column historical comparison timelines
-4. **DataChart** — Animated bar charts and comparisons
-5. **KineticTypography** — Quotes, definitions (with pinyin), bilingual text, statistics
-6. **FrameworkDiagram** — Comparison columns, flow diagrams, matrices
-7. **TitleTransition** — Episode titles, section headers, end cards
+**Templates (32 core + 9 Shorts, all built — see `remotion-templates/CLAUDE.md` and `references/template-schemas.md` for canonical field definitions):**
 
-Plus 4 format-specific templates: DecisionTree, SplitComposition, ProbabilityGauge, ImageComposite. Plus 3 Shorts variants (vertical 9:16).
+- **Maps (6):** ChoroplethMap, RouteAnimation, AtlasPlate, ProportionalSymbolMap, CartogramMap, DensityMap — all share the `MapGL` shared component (Mapbox GL + deck.gl). RouteAnimation now supports a `radial` field (hub-with-N-destinations). ChoroplethMap + RouteAnimation + AtlasPlate accept a `MapAnnotations` overlay layer for editorial labels. Terrain hillshading is opt-in (was default-on; flipped May 11, 2026).
+- **Charts (6):** DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal. DataChart and TimeSeriesChart support a `small-multiples` variant; TimeSeriesChart supports `referenceBands`, `eraBands`, `inflectionAnnotations`, `heroStat`.
+- **Diagrams (10):** FrameworkDiagram, NetworkDiagram, DecisionTree, EscalationLadder, GameBoard, SankeyFlow, BifurcationRoute, PricingWaterfall, DuelingFrameworks, StrategicLandscape. GameBoard now supports `pd-canonical` and `iterated-play` variants. DecisionTree supports a `ladder` variant.
+- **Timelines (4):** HorizontalTimeline, DualTimeline, TimelineMorph, TimelineComparison.
+- **Typography & layout (6):** KineticTypography, TitleTransition, SplitComposition, ImageComposite, AnnotatedImage, PhotoMontage.
+- **Editorial (1):** EditorialTest (a showcase composition that demonstrates the light/dark hero variants of the `EditorialFrame` *component* — note: `EditorialFrame` itself is a shared component at `src/components/EditorialFrame.tsx`, not a standalone template, and is documented in template-schemas.md for completeness).
+- **Episodes:** FullEpisode.tsx (manifest-driven), per-episode `<Series>` compositions.
+- **Shorts (9):** KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort + 5 others, all 1080×1920.
+
+**Backdrop + FilmOverlay system (added May 11–12, 2026):** Every segment can declare an editorial backdrop image via `[BACKDROP: id]` in the script. Backdrops live in `remotion-templates/data/backdrop-manifest.json` (browse via `python tools/assembly/print_backdrop_catalog.py`). Each backdrop declares a `recommendedPreset` that drives FilmOverlay's 5-priority cascade resolution — most segments need nothing beyond `[BACKDROP: id]` because preset, effects, and intensity all resolve automatically. The whole system is GATED on `manifest.filmOverlay: {}` being non-empty at the episode level. Set `{ preset: "documentary" }` (safe default) or `{ preset: "cinematic" }` (now seam-safe per May 12 fix) to opt in. See `remotion-templates/CLAUDE.md` → FilmOverlay cascade for the 5-priority resolution table.
+
+**Per-family audit skills (Stage 7 polish gate):** After `visual-spec` generates JSON data files, run the family-specific audit skill that matches the segment's primary register:
+- `map-audit` — for any segment using a map template (the 6 map types)
+- `chart-audit` — for chart-template segments (the 6 chart types)
+- `diagram-audit` — for diagram-template segments (the 10 diagram types)
+- `timeline-audit` — for timeline-template segments
+- `typography-audit` — for KineticTypography / TitleTransition / SplitComposition / ImageComposite segments
+
+These run between `visual-spec` and `render-qa`. Each skill applies its family's editorial dossier from `remotion-templates/references/template-research/` and checks register fit (vintage vs. modern map, position-along-common-scale vs. angle judgment, etc.).
 
 **Render pipeline:**
 - Local: `scripts/render-episode.mjs` (supports `--only`, `--from`, `--preview`, `--concat`)
@@ -587,7 +598,8 @@ Maintain three planning horizons:
 - **shorts-adaptation** — 6 series, standalone Shorts briefs from full script (also at `skills/shorts-adaptation/SKILL.md`)
 
 ### Visual Production (built)
-- **Remotion** — React-based video renderer (7 core + 4 format-specific + 3 Shorts templates)
+- **Remotion** — React-based video renderer (32 core + 9 Shorts templates). Full inventory in `remotion-templates/CLAUDE.md` and canonical schemas in `remotion-templates/references/template-schemas.md`. Per-family audit skills: `map-audit`, `chart-audit`, `diagram-audit`, `timeline-audit`, `typography-audit`.
+- **FilmOverlay cascade** — `manifest.filmOverlay: {}` opt-in + `[BACKDROP: id]` per-segment + `backdrop-manifest.json` catalog. 5-priority preset/effects/intensity resolution per segment. Browse backdrops: `python tools/assembly/print_backdrop_catalog.py`.
 - **Design system** — `remotion-templates/BRAND.md` (canonical) + `remotion-templates/src/design/theme.ts` (code)
 - **Brand treatment CLI (images)** — `tools/brand-treatment/treat.py`
 - **Brand treatment CLI (video)** — `tools/brand-treatment/treat_video.py` (ffmpeg + 3D LUT)
@@ -598,7 +610,7 @@ Maintain three planning horizons:
 
 ### Script Format (designed)
 - **Two-column production script** — SCRIPT_FORMAT.md
-- Narration (left) + visual production specs with mode tags (right): `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`
+- Narration (left) + visual production specs with mode tags (right): `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`, `[SCENE:]` (multi-frame chained scene, ~20–50s), `[ARCHIVAL:]`, `[FORECAST:]`, `[BACKDROP: id]` (editorial backdrop image; resolves FilmOverlay preset via cascade), `[OVERLAY: preset]` (rare, per-segment FilmOverlay override)
 - **DIR: annotations** — inline directing language (`cam()`, `reveal()`, `hold()`, `cut()`, `mood()`) embedded in the visual column for P1/P2 moments. Spec: DIRECTING_LANGUAGE.md. Target density: ~25% of compositions directed, ~20-35 DIR: lines per episode
 - **PACE: annotations** — visual density markers (`urgent`/`analytical`/`breathing`) controlling visual change rate via duration multipliers (0.7/1.0/1.4). 2-4 per episode. Spec: PACING_SYSTEM.md
 - Visual mode balance targets: MG 40-55%, FOOTAGE 30-40%, LAYERED 5-15%, AI-GEN/ILLUST as needed
@@ -615,7 +627,7 @@ Maintain three planning horizons:
 ### Publishing
 - YouTube Studio for long-form
 - TikTok/YouTube Shorts for short-form
-- Thumbnail generation: planned, not built
+- Thumbnail generation: built (May 14, 2026) — `cd remotion-templates && npm run thumbnails -- --episode=<slug>` batch-renders every concept in `episodes/<slug>/thumbnail-spec.json` to `episodes/<slug>/thumbnails/concept-<id>.png` at 1280×720. See BL-01.
 
 ---
 
@@ -623,4 +635,4 @@ Maintain three planning horizons:
 
 See [`project/BACKLOG.md`](./BACKLOG.md) for the full prioritized list of unbuilt tools with current workarounds, dependencies, and "when to revisit" notes.
 
-**Summary:** BL-01 thumbnail image generator (P1), BL-02 Shorts platform adapter (P1), BL-03 RAG fact-checking pipeline (P2), BL-04 full Agent SDK orchestration (P3).
+**Summary:** ~~BL-01 thumbnail image generator (P1)~~ — **DONE May 14, 2026** (`remotion-templates/scripts/generate-thumbnails.mjs` + `data/episodes/_schemas/thumbnail-spec.schema.json`; `npm run thumbnails -- --episode=<slug>`), ~~BL-02 Shorts platform adapter (P1)~~ — **DONE May 14, 2026** (`remotion-templates/scripts/render-shorts.mjs` + `data/episodes/_schemas/shorts-manifest.schema.json`; `npm run shorts -- --episode=<slug>`), BL-03 RAG fact-checking pipeline (P2), BL-04 full Agent SDK orchestration (P3).

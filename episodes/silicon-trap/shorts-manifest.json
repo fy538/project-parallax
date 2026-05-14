@@ -1,0 +1,69 @@
+{
+  "$schema": "../../remotion-templates/data/episodes/_schemas/shorts-manifest.schema.json",
+  "episode": "silicon-trap",
+  "version": "1.0",
+  "shorts": [
+    {
+      "id": "01",
+      "label": "TSMC 92% chokepoint — hero stat",
+      "sourceBeat": "Beat 1: The Chokepoint",
+      "template": "StatRevealShort",
+      "durationSec": 30,
+      "data": {
+        "episode": "silicon-trap",
+        "title": "The Chokepoint",
+        "subtitle": "Advanced chips, one island",
+        "stat": {
+          "value": 92,
+          "suffix": "%",
+          "label": "of advanced chips made on Taiwan"
+        },
+        "comparisons": [
+          { "label": "Taiwan (TSMC)", "value": 92, "color": "#C4A747" },
+          { "label": "South Korea (Samsung)", "value": 6, "color": "#3266AD" },
+          { "label": "Everyone else", "value": 2, "color": "#A64D46" }
+        ],
+        "source": "TrendForce, 2024",
+        "backgroundVariant": "dark"
+      }
+    },
+    {
+      "id": "02",
+      "label": "Morris Chang quote — globalization is dead",
+      "sourceBeat": "Beat 2: The Logic of Denial",
+      "template": "KineticShort",
+      "durationSec": 30,
+      "data": {
+        "episode": "silicon-trap",
+        "variant": "quote",
+        "text": "Globalization is almost dead. Free trade is almost dead.",
+        "attribution": "Morris Chang",
+        "attributionContext": "Founder of TSMC, 2022",
+        "accentColor": "#C4A747",
+        "backgroundVariant": "dark"
+      }
+    },
+    {
+      "id": "03",
+      "label": "Chips by node share — 7nm vs leading edge",
+      "sourceBeat": "Beat 3: The Other Side of the Wall",
+      "template": "DataChartShort",
+      "durationSec": 45,
+      "data": {
+        "episode": "silicon-trap",
+        "title": "Where the Chips Are Made",
+        "subtitle": "Share of leading-edge wafer capacity",
+        "variant": "bar",
+        "unit": "%",
+        "dataPoints": [
+          { "label": "≤3nm", "value": 100, "color": "#C4A747" },
+          { "label": "5nm", "value": 100, "color": "#C4A747" },
+          { "label": "7nm", "value": 90, "color": "#3266AD" },
+          { "label": "10nm+", "value": 60, "color": "#A64D46" }
+        ],
+        "source": "Industry estimates, 2025",
+        "backgroundVariant": "light"
+      }
+    }
+  ]
+}

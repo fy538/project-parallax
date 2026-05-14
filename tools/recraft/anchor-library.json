@@ -1,0 +1,152 @@
+{
+  "$schema": "./anchor-library.schema.json",
+  "version": "1.0.0",
+  "updated": "2026-05-13",
+  "purpose": "Recraft-side anchor stills used as --style-ref for per-episode batch generations. Complements the Flux/fal.ai 15-image library at tools/ai-video/style-references/ (which serves the Kling/Sora animation pipeline). The 7 anchors here cover the cross-episode visual ground a Parallax episode reliably needs, indexed by use-case rather than by typography tradition.",
+  "pipeline": {
+    "tier1_channel_refs": "tools/ai-video/style-references/ (Flux, 15 images, animation anchors)",
+    "tier1_recraft_anchors": "tools/recraft/anchor-library/ (Recraft, 7 images, this file)",
+    "tier2_episode_style": "create-style from a subset of Tier 1 per episode mood",
+    "tier3_production_stills": "batch generate with --style-id <tier-2-id>"
+  },
+  "anchors": [
+    {
+      "id": "A1",
+      "name": "Imperial transition",
+      "register": "atmospheric",
+      "realism": "flat",
+      "textTreatment": "none",
+      "treatment": "editorial",
+      "useCases": [
+        "civilizational decline",
+        "fall of empire",
+        "succession crisis",
+        "post-imperial geography",
+        "Roman / Ottoman / Qing analogies"
+      ],
+      "prompt": "Monumental ruins of a fallen empire at dusk, constructivist illustration in restricted warm palette. Crumbling colonnade and shattered triumphal arch in middle ground, a single low horizon line bisecting the composition. Long diagonal shadows raked from a setting sun off-frame. Stylized smoke or haze drifting across the architecture suggesting time, dust, and exhaustion. No figures or silhouette-scale only. Composition: monumentalist scale, propaganda-poster geometry but inverted to register collapse — the diagonals fall rather than rise. Used as background at 30-40% opacity behind narration about civilizational decline.",
+      "negativePrompt": "no photorealism, no continuous gradients, no soft shading, no modern signage, no logos, no people in foreground, no contemporary clothing, no bright saturated color, no green or blue",
+      "outputPath": "tools/recraft/anchor-library/A1-imperial-transition.svg",
+      "notes": "Editorial LUT (rather than standard) signals historical reconstruction register; pairs naturally with Roman/Ottoman/Qing analogy beats."
+    },
+    {
+      "id": "A2",
+      "name": "Industrial chokepoint",
+      "register": "atmospheric",
+      "realism": "flat",
+      "textTreatment": "none",
+      "treatment": "standard",
+      "useCases": [
+        "supply chain dependency",
+        "chip fab / fabrication interior",
+        "shipping lane / port",
+        "energy infrastructure",
+        "Silicon Trap-style chokepoint visuals"
+      ],
+      "prompt": "Vast industrial interior dominated by repeating mechanical infrastructure — towering parallel gantries, pipework arrays, or stamping presses receding into one-point perspective. Constructivist illustration in restricted warm palette: ink, walnut, umber, gold and amber accents on paper background. No figures, or workers at distant silhouette scale only. Composition: low camera, dramatic vanishing point, propaganda-poster verticality. The space reads as monumentally productive and quietly trapping at once — abundance and capture in the same frame. Used as background at 30-40% opacity behind narration about industrial dependency.",
+      "negativePrompt": "no photorealism, no skin detail, no logos, no modern brand marks, no readable signage, no soft shading, no bright saturated color, no green or blue accents, no rendered faces",
+      "outputPath": "tools/recraft/anchor-library/A2-industrial-chokepoint.svg",
+      "notes": "Workhorse atmospheric anchor — most geopolitics episodes need at least one industrial/dependency backdrop. Standard LUT keeps it contemporary."
+    },
+    {
+      "id": "A3",
+      "name": "Strategic plate",
+      "register": "grounding",
+      "realism": "balanced",
+      "textTreatment": "english_minimal",
+      "treatment": "standard",
+      "useCases": [
+        "war room / situation board",
+        "decision-maker tableau",
+        "central bank / policy committee",
+        "game-theoretic deliberation scene",
+        "executive negotiation"
+      ],
+      "prompt": "Group of 4-5 depersonalized figures (decision-makers, advisors) gathered around a large strategic table covered with maps, plotting tokens, and printed memos in a wood-panelled briefing room. Figures rendered in the Rodchenko/Lissitzky constructivist photomontage tradition: faces composed of 4-5 color-blocked planes with no continuous skin tonality, no rendered features, eyes obscured by lens shadow or hair fall, hands as flat color planes. Period-appropriate suits in walnut and ink. Single warm pool of light from an overhead lamp catches the table; ambient room sinks into umber shadow. Minimal English signage on documents only (no slogans). Composition: medium wide, the room frames the figures from slightly above, the table is the gravitational center.",
+      "negativePrompt": "no photorealism on figures, no rendered faces, no skin tonality, no individual finger detail, no logos, no contemporary brand marks, no bright saturated color, no green or blue, no smiling figures, no expressive gestures",
+      "outputPath": "tools/recraft/anchor-library/A3-strategic-plate.svg",
+      "notes": "Anchors the recurring 'decision-maker tableau' scene — Cold War commands, central-bank rooms, policy committees. Balanced realism (flat figures, lightly textured environment) is the channel default for stills."
+    },
+    {
+      "id": "A4",
+      "name": "Archival document",
+      "register": "atmospheric",
+      "realism": "balanced",
+      "textTreatment": "english_minimal",
+      "treatment": "editorial",
+      "useCases": [
+        "declassified file / treaty draft",
+        "intelligence briefing pages",
+        "newspaper front page reveal",
+        "policy memo / executive order",
+        "footnote / source provenance moment"
+      ],
+      "prompt": "Overhead flat-lay of a single archival document on a worn paper desk surface: typewritten page with redaction bars, faint official letterhead, a hand-drawn margin annotation, a partially visible stamp in oxblood ink at one corner. Constructivist illustration tightened to graphic clarity — no photorealistic fiber texture, but selective paper-grain at the page edges. Restricted warm palette: ink type on bone-toned paper, walnut desk, a single amber arc of lamp light glancing across the upper-right of the document. No figures. English text is suggested through typewriter-period sans-serif glyphs at small scale; the page reads as a document without any specific readable sentence.",
+      "negativePrompt": "no real signatures of named persons, no legible proper nouns, no logos, no modern fonts, no laser-print sharpness, no fluorescent lighting, no green or blue, no bright saturated color, no photorealistic skin or hands",
+      "outputPath": "tools/recraft/anchor-library/A4-archival-document.svg",
+      "notes": "Editorial LUT positions it as historical record. Use as backdrop for archival reveals, source citations, declassified-file beats. The 'no legible proper nouns' negative prompt is critical to avoid hallucinating named signatures."
+    },
+    {
+      "id": "A5",
+      "name": "Solitary thinker",
+      "register": "grounding",
+      "realism": "balanced",
+      "textTreatment": "none",
+      "treatment": "standard",
+      "useCases": [
+        "philosopher / strategist alone",
+        "Philosopher's Lens episode cold open",
+        "framework introduction beat",
+        "Nash / Schelling / Tetlock-style intellectual scene",
+        "audience-surrogate contemplation moment"
+      ],
+      "prompt": "Single depersonalized figure seated at a wooden desk in a quiet study at night, leaning slightly forward over an open notebook with a fountain pen poised. The figure rendered in the Rodchenko/Lissitzky constructivist tradition: face composed of 4-5 color-blocked planes, no continuous skin tonality, no rendered features, eyes obscured by spectacle-lens shadow or hair fall. Period-appropriate plain shirt, ink. Behind the figure, a bookshelf wall sinks into umber shadow; a single brass lamp casts a warm amber pool across the desk and notebook. Composition: medium close, slight three-quarter view, the figure's stillness is the subject. The room is small, contemplative, mid-century scholar's study.",
+      "negativePrompt": "no photorealism on the figure, no rendered face, no skin tonality, no legible book titles, no contemporary tech, no laptop, no phone, no logos, no bright saturated color, no green or blue, no expressive gesture",
+      "outputPath": "tools/recraft/anchor-library/A5-solitary-thinker.svg",
+      "notes": "Philosopher's Lens cold-open workhorse. Replaces the cliched 'stock footage of someone typing' opener with a brand-coherent contemplative scene."
+    },
+    {
+      "id": "A6",
+      "name": "Conceptual corridor",
+      "register": "atmospheric",
+      "realism": "flat",
+      "textTreatment": "none",
+      "treatment": "standard",
+      "useCases": [
+        "abstract concept as physical metaphor",
+        "trap / lock-in / one-way path",
+        "bifurcation / branching futures",
+        "sanctioned / sealed-off space",
+        "Silicon Trap / Prisoner's Dilemma metaphor visuals"
+      ],
+      "prompt": "Long architectural corridor receding sharply to a vanishing point, walls and floor rendered as flat color-blocked planes. The corridor narrows visibly as it recedes, the far end nearly closed. A single doorway in middle-ground hangs open, a second doorway further down is sealed shut. Constructivist illustration, restricted warm palette: ink walls, walnut floor, amber light source at the near end casting long parallel shadows down the corridor. No figures. Composition: dead-center one-point perspective for maximum entrapment grammar, propaganda-poster diagonals from light angles. Reads as a physical metaphor for being structurally committed to a single direction.",
+      "negativePrompt": "no photorealism, no soft shading, no gradient walls, no modern signage, no logos, no exit signs, no people, no bright saturated color, no green or blue, no continuous tonality",
+      "outputPath": "tools/recraft/anchor-library/A6-conceptual-corridor.svg",
+      "notes": "The recurring 'lock-in/trap as physical space' visual. Pairs well with [SCENE:] chained-morph blocks where the corridor progressively narrows across the chain."
+    },
+    {
+      "id": "A7",
+      "name": "Civic crowd",
+      "register": "atmospheric",
+      "realism": "flat",
+      "textTreatment": "none",
+      "treatment": "standard",
+      "useCases": [
+        "anonymous masses / populace",
+        "mobilization / public sentiment",
+        "legitimacy / consent of the governed",
+        "demographic structural force",
+        "post-event street scene"
+      ],
+      "prompt": "Wide elevated view of an anonymous urban crowd filling a public square or boulevard at dusk. Hundreds of depersonalized figures rendered as flat color-blocked silhouettes — heads as ink ovals, bodies as walnut and umber rectangles with minimal coat-shoulder geometry, no faces, no individual detail. The crowd reads as a collective texture rather than a set of persons. A single low-angle amber light from a streetlamp casts long diagonal shadows across the paving stones. Period-neutral coats and hats so the scene reads as civic-anytime rather than tied to a specific decade. No banners with readable text, no flags with specific national markings.",
+      "negativePrompt": "no photorealism, no rendered faces, no skin detail, no identifiable national flag, no readable banner text, no logos, no contemporary brand marks, no bright saturated color, no green or blue, no violence, no weapons",
+      "outputPath": "tools/recraft/anchor-library/A7-civic-crowd.svg",
+      "notes": "Population-scale anchor for legitimacy/mobilization beats. Negative prompt deliberately excludes national flags and protest banners so the same anchor serves multiple geographies — supply cultural specificity via per-episode prompt overrides at batch time."
+    }
+  ],
+  "refreshPolicy": {
+    "cadence": "Regenerate the full library on any of: (1) a brand color change in palette.json, (2) a major Recraft model version bump, (3) a shift in the channel's base aesthetic (e.g. the May 4 mannequin → constructivist migration), or (4) every ~12 months as a freshness pass. Individual anchors may be regenerated singly when a specific use-case underperforms in production review.",
+    "versioning": "On regeneration, bump the version field in this file (semver: major for aesthetic shifts, minor for prompt refinements, patch for re-renders of the same prompt). Keep the prior PNG/SVG in git history; do not delete.",
+    "humanCuration": "Each generation produces 2-4 candidates per anchor. A human selects the canonical one before it overwrites the existing anchor file. Never auto-promote a generation to canonical."
+  }
+}

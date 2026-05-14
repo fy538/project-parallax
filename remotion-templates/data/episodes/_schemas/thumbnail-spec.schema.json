@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "thumbnail-spec.schema.json",
+  "title": "Parallax Thumbnail Spec",
+  "description": "Per-episode thumbnail authoring file. Lists 1+ concept variants (A/B/C/...) for the Remotion `Thumbnail` composition. Consumed by `remotion-templates/scripts/generate-thumbnails.mjs`; outputs land in `episodes/<slug>/thumbnails/concept-<id>.png` for A/B selection before YouTube upload. Each concept's `data` block is a complete `ThumbnailData` object (see `src/templates/Thumbnail/types.ts`); the script does not synthesize fields, so anything the chosen layout needs must be present.",
+  "type": "object",
+  "required": ["episode", "concepts"],
+  "additionalProperties": false,
+  "properties": {
+    "episode": {
+      "type": "string",
+      "description": "Episode slug, must match the directory name under `episodes/`. Used to resolve the output directory."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional free-form note (e.g. which concept Tiger prefers, what variant the next round should try). Ignored by the renderer."
+    },
+    "concepts": {
+      "type": "array",
+      "description": "Ordered list of thumbnail concepts to render. Each becomes one PNG.",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/concept" }
+    }
+  },
+  "$defs": {
+    "concept": {
+      "type": "object",
+      "required": ["id", "data"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+$",
+          "description": "Short concept identifier (typically a single lowercase letter: 'a', 'b', 'c'). Used as the output filename suffix — `concept-<id>.png`. Must be unique within the spec."
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable description of the concept (e.g. 'Juxtaposition — fab vs map'). Shown in render logs; ignored by the composition itself."
+        },
+        "data": {
+          "type": "object",
+          "description": "Full `ThumbnailData` object passed as `props.data` to the Remotion Thumbnail composition. Required fields depend on `layout`: see `src/templates/Thumbnail/types.ts` for the field reference and which fields each layout consumes.",
+          "required": ["layout", "episode"],
+          "properties": {
+            "layout": {
+              "type": "string",
+              "enum": ["juxtaposition", "data-provocation", "symbolic"],
+              "description": "Layout mode. Determines which fields are read: juxtaposition uses titleText/statPrimary/statContrast/imageSrc; data-provocation uses heroText/subText/imageSrc; symbolic uses illustrationSrc/symbolTitle."
+            },
+            "episode": {
+              "type": "string",
+              "description": "Episode identifier, typically matching the top-level `episode` slug."
+            }
+          },
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
