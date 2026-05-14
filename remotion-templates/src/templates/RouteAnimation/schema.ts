@@ -6,7 +6,7 @@ import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
-import { LabelDensitySchema } from "../../components/MapGL.types";
+import { LabelDensitySchema, LightPresetSchema } from "../../components/MapGL.types";
 import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const RoutePointSchema = z.object({
@@ -71,6 +71,23 @@ export const RouteAnimationSchema = z.object({
      * schema lives at `src/components/MapGL.types.ts`.
      */
     labelDensity: LabelDensitySchema.optional(),
+    /**
+     * Mapbox Standard scene lighting preset (`day` | `dawn` | `dusk` |
+     * `night`). When set, applied via setConfigProperty so the basemap
+     * shifts sun angle / shadow direction. Use `dawn` for "at first
+     * light" cold opens, `dusk` for twilight register, `night` for
+     * diegetic late-hour narration. See: components/MapGL.types.ts.
+     */
+    lightPreset: LightPresetSchema.optional(),
+    /**
+     * Atmospheric atlas register — Stamen Toner via Stadia Maps,
+     * retinted to the Parallax palette (Path B Studio fork) or raw
+     * Stadia (Path A). Use for atmospheric beats where Mapbox Standard
+     * reads too web-y. Falls back to light-v11 + a grayscale CSS filter
+     * when `MAPBOX_STYLE_TONER_URL` is unset. See
+     * `tools/meridian-toner-setup.md`.
+     */
+    toner: z.boolean().optional(),
     /**
      * Editorial annotations layered on the map. See
      * components/MapAnnotations.tsx and references/template-research/map-annotations.md

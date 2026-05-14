@@ -6,7 +6,7 @@ import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
-import { LabelDensitySchema } from "../../components/MapGL.types";
+import { LabelDensitySchema, LightPresetSchema } from "../../components/MapGL.types";
 import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const CountryDataSchema = z.object({
@@ -66,6 +66,8 @@ export const ChoroplethMapSchema = z.object({
      *  clean at zoom-in. Per-shot override to `"minimal"` for shots
      *  where country labels duplicate explicit MapAnnotations. */
     labelDensity: LabelDensitySchema.optional(),
+    /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
+    lightPreset: LightPresetSchema.optional(),
     /**
      * Editorial annotations layered on the map. See
      * components/MapAnnotations.tsx and references/template-research/map-annotations.md

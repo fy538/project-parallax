@@ -5,7 +5,7 @@
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
-import { LabelDensitySchema } from "../../components/MapGL.types";
+import { LabelDensitySchema, LightPresetSchema } from "../../components/MapGL.types";
 import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const DensityPointSchema = z.object({
@@ -63,6 +63,8 @@ export const DensityMapSchema = z.object({
      *  dominates. Per-shot override to `"minimal"` when explicit
      *  MapAnnotations name everything that matters. */
     labelDensity: LabelDensitySchema.optional(),
+    /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
+    lightPreset: LightPresetSchema.optional(),
     annotations: z.array(MapAnnotationSchema).optional(),
     inset: z
       .object({

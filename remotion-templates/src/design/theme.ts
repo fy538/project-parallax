@@ -621,6 +621,17 @@ const MERIDIAN_DARK_FALLBACK = "mapbox://styles/mapbox/dark-v11";
 // requires a published "Meridian Sepia" Studio style (see
 // tools/mapbox-meridian-setup.md § "Meridian Sepia").
 const MERIDIAN_SEPIA_FALLBACK = "mapbox://styles/mapbox/light-v11";
+// Meridian Toner — Stamen Toner via Stadia Maps (2024 rebuild on MapLibre
+// vector tiles), forked + retinted to the bone/amber palette. Off-the-
+// shelf editorial register that gets closer to FT/NYT typographic
+// restraint than Mapbox Standard ever can. Fallback is light-v11 with a
+// runtime high-contrast filter as a stopgap. See:
+//   tools/meridian-toner-setup.md
+//
+// Env vars:
+//   MAPBOX_STYLE_TONER_URL=<stadia or mapbox style URL>
+//   STADIA_API_KEY=<key from Stadia dashboard> (only if using a Stadia URL)
+const MERIDIAN_TONER_FALLBACK = "mapbox://styles/mapbox/light-v11";
 
 /** Mapbox GL configuration — see NEW_TEMPLATES_SPEC.md Section 0. */
 export const mapConfig = {
@@ -631,6 +642,12 @@ export const mapConfig = {
   /** Meridian Sepia if MAPBOX_STYLE_SEPIA_URL is set; else light-v11 + runtime tint.
    *  Used by MapGL when `vintage` prop is true (period episodes). */
   sepiaStyleUrl: process.env.MAPBOX_STYLE_SEPIA_URL || MERIDIAN_SEPIA_FALLBACK,
+  /** Meridian Toner via Stadia Maps if MAPBOX_STYLE_TONER_URL is set;
+   *  else light-v11 + runtime contrast filter. Used by MapGL when the
+   *  `aesthetic="toner"` prop is true (atmospheric atlas register —
+   *  closer to FT/NYT than Mapbox Standard reaches). See
+   *  tools/meridian-toner-setup.md. */
+  tonerStyleUrl: process.env.MAPBOX_STYLE_TONER_URL || MERIDIAN_TONER_FALLBACK,
   terrain: {
     source: "mapbox-dem" as const,
     exaggeration: 1.5,

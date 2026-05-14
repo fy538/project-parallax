@@ -47,3 +47,19 @@ export const LabelDensitySchema = z.enum([
 ]);
 
 export type LabelDensity = z.infer<typeof LabelDensitySchema>;
+
+/**
+ * Mapbox Standard scene lighting preset. Shifts sun angle, ambient color,
+ * shadow direction across the entire basemap. Applied at runtime via
+ * `setConfigProperty('basemap', 'lightPreset', value)` in MapGL.
+ *
+ *   • day   — neutral analytical light (default for Meridian Light)
+ *   • dawn  — warm low-angle, long shadows; cold-open / "at first light"
+ *   • dusk  — twilight register; matches `fogPreset: "atmospheric"` well
+ *   • night — diegetic late-hour register (use with Meridian Dark)
+ *
+ * No-op on non-Standard styles. See MapGL.tsx § "Light presets".
+ */
+export const LightPresetSchema = z.enum(["day", "dawn", "dusk", "night"]);
+
+export type LightPreset = z.infer<typeof LightPresetSchema>;

@@ -153,6 +153,9 @@ export interface DensityMapData {
    */
   labelDensity?: "atlas" | "editorial" | "minimal" | "off";
 
+  /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
+  lightPreset?: "day" | "dawn" | "dusk" | "night";
+
   /** Editorial annotations. Same schema as other map templates. */
   annotations?: MapAnnotation[];
 

@@ -465,6 +465,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
             fogPreset="none"
             vignette={false}
             labelDensity={data.labelDensity ?? "editorial"}
+            lightPreset={data.lightPreset}
           >
             <Source
               id="country-boundaries"

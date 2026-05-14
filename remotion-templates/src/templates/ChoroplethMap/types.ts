@@ -164,6 +164,9 @@ export interface ChoroplethMapData {
    */
   labelDensity?: "atlas" | "editorial" | "minimal" | "off";
 
+  /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
+  lightPreset?: "day" | "dawn" | "dusk" | "night";
+
   /**
    * Editorial annotations — labels pinned to lon/lat with optional leader
    * lines. Use to name regions, chokepoints, or label countries with values

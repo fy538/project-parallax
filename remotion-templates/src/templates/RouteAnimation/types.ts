@@ -142,6 +142,22 @@ export interface RouteAnimationData {
   labelDensity?: "atlas" | "editorial" | "minimal" | "off";
 
   /**
+   * Mapbox Standard scene lighting preset (`day` | `dawn` | `dusk` |
+   * `night`). When set, applied via setConfigProperty so the basemap
+   * shifts sun angle / shadow direction. Use `dawn` for "at first light"
+   * cold opens, `dusk` for twilight register, `night` for diegetic
+   * late-hour narration. See MapGL.types.ts.
+   */
+  lightPreset?: "day" | "dawn" | "dusk" | "night";
+
+  /**
+   * Atmospheric atlas register — Stamen Toner via Stadia Maps. Falls
+   * back to light-v11 + grayscale CSS filter when
+   * `MAPBOX_STYLE_TONER_URL` is unset. See tools/meridian-toner-setup.md.
+   */
+  toner?: boolean;
+
+  /**
    * Editorial annotations — labels pinned to lon/lat with optional leader
    * lines. Use to name features, regions, or chokepoints that aren't route
    * nodes. Use the `phase` shorthand to scope to a specific route phase.

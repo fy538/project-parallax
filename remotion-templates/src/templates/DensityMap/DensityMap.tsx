@@ -358,6 +358,7 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           fogPreset="editorial"
           vignette="editorial"
           labelDensity={data.labelDensity ?? "editorial"}
+          lightPreset={data.lightPreset}
         >
           {data.annotations && data.annotations.length > 0 && (
             <MapAnnotations

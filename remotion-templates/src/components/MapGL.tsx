@@ -29,7 +29,7 @@ import { buildGraticuleLayers } from "./Graticule";
 import type { GraticuleConfig } from "./Graticule.types";
 import { MapVignette } from "./MapVignette";
 import { MapAttribution } from "./MapAttribution";
-import type { LabelDensity } from "./MapGL.types";
+import type { LabelDensity, LightPreset } from "./MapGL.types";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // ── deck.gl ↔ Mapbox bridge ────────────────────────────────────────────
@@ -60,6 +60,9 @@ export const MAP_CONFIG = {
   darkStyleUrl: mapConfig.darkStyleUrl,
   /** Sepia variant — Meridian Sepia if configured, else light-v11 + runtime tint. */
   sepiaStyleUrl: mapConfig.sepiaStyleUrl,
+  /** Toner variant — Meridian Toner via Stadia if configured, else
+   *  light-v11 + runtime contrast filter. The atmospheric atlas register. */
+  tonerStyleUrl: mapConfig.tonerStyleUrl,
   /** Read from .env at build time. Never commit this token. */
   accessToken: process.env.MAPBOX_ACCESS_TOKEN || "",
   terrain: mapConfig.terrain,
@@ -126,6 +129,69 @@ const FOG_PRESETS = {
 } as const;
 
 type FogPreset = keyof typeof FOG_PRESETS;
+
+// ── Light presets ─────────────────────────────────────────────────────
+//
+// Mapbox Standard's basemap import exposes a `lightPreset` config that
+// shifts the entire scene's lighting model (sun angle, ambient color,
+// shadow direction). The four built-in values are `day`, `dawn`, `dusk`,
+// `night`. We expose them as a typed prop on MapGL so templates can:
+//
+//   • Match an episode's diegetic time-of-day ("at dawn, the convoy
+//     crossed the strait" → `lightPreset="dawn"`)
+//   • Shift register between segments without restyling the entire map
+//   • Combine with fog presets for compound moods (atmospheric + dusk =
+//     editorial twilight cold-open)
+//
+// Applied via `map.setConfigProperty('basemap', 'lightPreset', value)`.
+// Like labelDensity, this is a no-op on classic non-Standard styles —
+// the one-shot warning in `applyLabelDensity` covers the graceful-fallback
+// case for that whole config family.
+//
+// The `LightPreset` type + Zod schema live in MapGL.types.ts so map
+// template schemas can validate the field without dragging in MapGL's
+// React render code at validation time.
+
+const LIGHT_PRESETS: ReadonlyArray<LightPreset> = [
+  "day",
+  "dawn",
+  "dusk",
+  "night",
+] as const;
+
+/**
+ * Apply the lightPreset to Mapbox Standard's basemap import via
+ * setConfigProperty. Returns `true` when the API was available, `false`
+ * when the style doesn't support it. Exported for unit tests + audit.
+ */
+export const applyLightPreset = (
+  map: {
+    setConfigProperty?: (
+      importId: string,
+      configName: string,
+      value: unknown,
+    ) => void;
+    getStyle?: () => { imports?: Array<{ id: string }> };
+  },
+  preset: LightPreset,
+): boolean => {
+  if (typeof map.setConfigProperty !== "function") return false;
+  let importId = "basemap";
+  try {
+    const imports = map.getStyle?.()?.imports ?? [];
+    if (imports.length > 0) {
+      importId = imports.find((i) => i.id === "basemap")?.id ?? imports[0].id;
+    }
+  } catch {
+    // getStyle() throws pre-style-load; fall through to default.
+  }
+  try {
+    map.setConfigProperty(importId, "lightPreset", preset);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 // ── Label density: zoom threshold for `editorial` mode ────────────────
 //
@@ -294,6 +360,18 @@ export interface MapGLProps {
   onMapReady?: (map: {
     project: (lonLat: [number, number]) => { x: number; y: number };
     unproject?: (xy: [number, number]) => { lng: number; lat: number };
+    // FreeCamera API surface — exposed so the `<CinematicCamera>`
+    // wrapper can drive `setFreeCameraOptions()` directly from the same
+    // map instance. Optional because non-Mapbox-Standard styles / older
+    // mapbox-gl builds may not expose it; CinematicCamera falls back to
+    // `jumpTo()` when missing.
+    setFreeCameraOptions?: (opts: unknown) => void;
+    jumpTo?: (opts: {
+      center?: [number, number];
+      zoom?: number;
+      bearing?: number;
+      pitch?: number;
+    }) => void;
   }) => void;
   /** Whether to use globe projection (default: true for zoom < 3) */
   globe?: boolean;
@@ -327,6 +405,22 @@ export interface MapGLProps {
    */
   vintage?: boolean;
   /**
+   * Use the Meridian Toner style (Stamen Toner via Stadia Maps, 2024
+   * rebuild, forked + retinted to the bone/amber palette). The
+   * atmospheric atlas register — closer to FT / NYT static-print
+   * editorial than Mapbox Standard reaches. Use for:
+   *
+   *   • Atmospheric globe pivots where Mapbox Standard reads too web-y
+   *   • Country / regional shots where the basemap is supporting context
+   *     (annotations + arcs carry the editorial point)
+   *
+   * Overrides `dark` / `vintage` when set. Falls back to a light-v11 +
+   * runtime high-contrast CSS filter when `MAPBOX_STYLE_TONER_URL` is
+   * not published. See: tools/meridian-toner-setup.md for the Stadia
+   * Maps signup + Studio fork procedure.
+   */
+  toner?: boolean;
+  /**
    * Atmospheric / fog preset — controls the globe halo via Mapbox's
    * `setFog()` API. Default `editorial` (paper-tinted, no stars, muted
    * horizon). Set `atmospheric` for cinematic cold-open globes;
@@ -335,6 +429,24 @@ export interface MapGLProps {
    * projections ignore fog). See: docs.mapbox.com/style-spec/reference/fog/
    */
   fogPreset?: FogPreset;
+  /**
+   * Mapbox Standard scene lighting preset. Shifts the entire basemap's
+   * lighting model (sun angle, ambient color, shadow direction). Default
+   * unset — uses whatever the style's `lightPreset` config defaults to
+   * (typically `day` for Meridian Light, `night` for Meridian Dark).
+   *
+   * Use cases:
+   *   • `dawn` / `dusk` — twilight register for cold-open globes or
+   *     historical episodes ("at dawn the convoy crossed…")
+   *   • `night` — diegetic match for late-night narration or covert ops
+   *   • `day` — explicit reset when an upstream segment used a different
+   *     preset and you want neutral analytical light
+   *
+   * No-op on classic non-Standard styles (graceful fallback shared with
+   * labelDensity). See: docs.mapbox.com/style-spec/reference/imports/
+   * (Standard style config) and tools/mapbox-meridian-setup.md.
+   */
+  lightPreset?: LightPreset;
   /**
    * Show Mapbox's default attribution control (the white "© Mapbox © OSM"
    * pill, bottom-right). Default **false** — license-compliant because
@@ -420,7 +532,9 @@ export const MapGL: React.FC<MapGLProps> = ({
   terrain = false,
   dark = false,
   vintage = false,
+  toner = false,
   fogPreset = "editorial",
+  lightPreset,
   showDefaultAttribution = false,
   attribution,
   graticule = false,
@@ -505,6 +619,25 @@ export const MapGL: React.FC<MapGLProps> = ({
     }
   }, [loaded, fogPreset]);
 
+  // ── Light-preset effect — Mapbox Standard `setConfigProperty` for the
+  // basemap import's `lightPreset` config. Reactive so a script can
+  // transition `day → dusk` between segments without remounting the map.
+  // Skipped entirely when the prop is undefined (lets the style's own
+  // default win — typically `day` for Meridian Light).
+  const lastLightRef = useRef<LightPreset | null>(null);
+  useEffect(() => {
+    if (!loaded || !mapRef.current) return;
+    if (!lightPreset) return;
+    if (lastLightRef.current === lightPreset) return;
+    if (!LIGHT_PRESETS.includes(lightPreset)) return;
+    const wrapper = mapRef.current;
+    const mapInstance =
+      typeof wrapper.getMap === "function" ? wrapper.getMap() : wrapper;
+    if (!mapInstance) return;
+    const ok = applyLightPreset(mapInstance, lightPreset);
+    if (ok) lastLightRef.current = lightPreset;
+  }, [loaded, lightPreset]);
+
   // ── Label-density effect — re-apply as camera zoom crosses the editorial
   // threshold. Tracks the last applied register in a ref so we only call
   // setConfigProperty on TRANSITIONS, not every frame — setConfigProperty
@@ -567,28 +700,39 @@ export const MapGL: React.FC<MapGLProps> = ({
   // Explicit projection prop wins over the globe/mercator auto-choice.
   const resolvedProjection = projection ?? (useGlobe ? "globe" : "mercator");
 
-  // Style URL precedence: explicit styleUrl prop → vintage → dark → light.
-  // Vintage takes precedence over dark because period episodes set both
-  // (vintage register, dark background) and the sepia style is the
-  // editorial intent. The sepia fallback (when MAPBOX_STYLE_SEPIA_URL is
-  // unset) is light-v11 with a runtime warm-tint via wrapper filter.
+  // Style URL precedence: explicit styleUrl prop → toner → vintage →
+  // dark → light. Toner sits at the top of the auto-chain because it's
+  // the strongest editorial register signal — a script that asks for
+  // toner means "I want the FT/NYT typographic restraint, not Standard."
+  // After that: vintage takes precedence over dark because period
+  // episodes set both (vintage register, dark background) and the sepia
+  // style is the editorial intent.
   const resolvedStyleUrl =
     styleUrl ??
-    (vintage
-      ? MAP_CONFIG.sepiaStyleUrl
-      : dark
-        ? MAP_CONFIG.darkStyleUrl
-        : MAP_CONFIG.styleUrl);
-  // CSS filter applied to the map wrapper when vintage is on AND the sepia
-  // style URL hasn't been published yet (i.e., we're falling back to
-  // light-v11). The filter mimics the AtlasPlate vintage palette: warm
-  // saturation reduction + sepia overlay. When MAPBOX_STYLE_SEPIA_URL is
-  // set, this filter is bypassed (the style itself is sepia-correct).
+    (toner
+      ? MAP_CONFIG.tonerStyleUrl
+      : vintage
+        ? MAP_CONFIG.sepiaStyleUrl
+        : dark
+          ? MAP_CONFIG.darkStyleUrl
+          : MAP_CONFIG.styleUrl);
+  // CSS filter applied to the map wrapper when a custom Meridian style
+  // URL isn't published yet (i.e., we fall through to light-v11). Each
+  // fallback gets a register-appropriate filter so the visual signal
+  // approximates the intended look until the Studio fork is published.
+  //   • vintage  — warm sepia overlay
+  //   • toner    — high-contrast grayscale (Stamen Toner approximation)
+  // When the matching env var IS set, no filter is applied (the style
+  // itself carries the register correctly).
   const usesVintageFallback =
     vintage && MAP_CONFIG.sepiaStyleUrl === MAP_CONFIG.styleUrl;
-  const wrapperFilter = usesVintageFallback
-    ? "sepia(0.55) saturate(0.85) contrast(0.95) hue-rotate(-8deg)"
-    : undefined;
+  const usesTonerFallback =
+    toner && MAP_CONFIG.tonerStyleUrl === MAP_CONFIG.styleUrl;
+  const wrapperFilter = usesTonerFallback
+    ? "grayscale(1) contrast(1.35) brightness(1.05)"
+    : usesVintageFallback
+      ? "sepia(0.55) saturate(0.85) contrast(0.95) hue-rotate(-8deg)"
+      : undefined;
 
   return (
     <AbsoluteFill style={{ overflow: "hidden", filter: wrapperFilter }}>
