@@ -1113,6 +1113,187 @@
           "Big Fund III capital deployment pace"
         ]
       }
+    },
+    {
+      "_status": "draft",
+      "id": "the-wrong-game",
+      "term": {
+        "en": "the wrong game"
+      },
+      "type": "named-concept",
+      "definition": "The structural error of applying a model built for anonymous one-shot encounters to repeated interactions with identifiable partners — and the self-confirming cycle this creates when the model becomes the default lens.",
+      "insight": "Most negotiations the Prisoner's Dilemma is used to model are not Prisoner's Dilemmas at all — they are iterated games, often stag hunts. The PD framing creates the very defection it predicts. It's not that the model is always wrong; it's that it's the wrong default. Playing the wrong game makes the wrong game real.",
+      "introduced": {
+        "episode": "prisoners-dilemma",
+        "beat": 3,
+        "timestamp": "8:30-9:30",
+        "template": "KineticTypography",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "prisoners-dilemma-as-pattern",
+        "model-colonization",
+        "ostromian-cooperation"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "game-theory",
+        "epistemics",
+        "self-confirming-bias"
+      ],
+      "callbackVisual": "2s KineticTypography — 'THE WRONG GAME' large amber on ink, centered"
+    },
+    {
+      "_status": "draft",
+      "id": "model-colonization",
+      "term": {
+        "en": "model colonization"
+      },
+      "type": "framework",
+      "definition": "How a special-case model gets canonized through institutional momentum and stretched beyond its validated domain — until its ideological function (making the world legible to the institutions paying for the research) becomes load-bearing.",
+      "insight": "The diffusion of the Prisoner's Dilemma from a 1950 RAND experiment that failed its own test, into 2,000+ scholarly articles by 1975, is not the story of a model that predicted well. It's the story of a model that fit one institution's funding needs (Cold War game-theoretic strategy at RAND), then became canonical through citation momentum, then changed behavior by becoming canonical. This is a general pattern — Black-Scholes did the same thing in finance — not a conspiracy.",
+      "introduced": {
+        "episode": "prisoners-dilemma",
+        "beat": 2,
+        "timestamp": "5:00-7:00",
+        "template": "FrameworkDiagram",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-wrong-game",
+        "prisoners-dilemma-as-pattern"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "epistemics",
+        "institutional-momentum",
+        "performativity"
+      ],
+      "callbackVisual": "3s FrameworkDiagram — narrowing-gates motif showing assumption stripping"
+    },
+    {
+      "_status": "draft",
+      "id": "ostromian-cooperation",
+      "term": {
+        "en": "Ostromian cooperation"
+      },
+      "type": "named-concept",
+      "definition": "Cooperation sustained by institutional design principles — clear boundaries, graduated sanctions, monitoring, the right to self-organize — rather than by overcoming a model's predicted defection.",
+      "insight": "Elinor Ostrom's 800+ documented cases of communities managing commons sustainably (Valencia huertas for 600+ years, Swiss alpine grazing since the 13th century, Japanese iriaichi forest cooperatives, Maine lobster fisheries) demonstrate that cooperation isn't a miracle — it's designed. Each of Ostrom's eight principles builds something the Prisoner's Dilemma assumes away.",
+      "introduced": {
+        "episode": "prisoners-dilemma",
+        "beat": 4,
+        "timestamp": "11:30-13:00",
+        "template": "ChoroplethMap",
+        "treatment": "cold-intro",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "ostrom-governance-principles",
+        "the-wrong-game",
+        "tragedy-of-the-commons"
+      ],
+      "pillar": [
+        "philosophical-framework"
+      ],
+      "tags": [
+        "governance",
+        "game-theory",
+        "institutional-design"
+      ],
+      "callbackVisual": "3s ChoroplethMap — Valencia/Switzerland/Japan/Maine highlighted with leader-line labels"
+    },
+    {
+      "_status": "draft",
+      "id": "cooperation-residual",
+      "term": {
+        "en": "cooperation residual"
+      },
+      "type": "mental-model",
+      "definition": "The persistent gap between a defection-predicting model's forecasts and observed cooperative outcomes — treated by the field as anomaly to be explained away rather than as refutation of the model's default assumption.",
+      "insight": "Flood and Dresher's 1950 experiment produced mutual cooperation in 60 of 100 rounds and mutual defection in 14. Nash's response was to note that the players 'would have been more rational if they couldn't see each other' — preserving the model by faulting the data. Every subsequent iterated-PD finding has been similarly absorbed. The residual is the evidence the field is structurally unable to update on.",
+      "introduced": {
+        "episode": "prisoners-dilemma",
+        "beat": 1,
+        "timestamp": "1:30-3:30",
+        "template": "GameBoard",
+        "treatment": "cold-intro",
+        "accentColor": "#C4A747"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-wrong-game",
+        "model-colonization",
+        "bayesian-updating"
+      ],
+      "pillar": [
+        "philosophical-framework",
+        "psychology"
+      ],
+      "tags": [
+        "epistemics",
+        "game-theory",
+        "anomaly-handling"
+      ],
+      "callbackVisual": "2s GameBoard — Flood-Dresher scoreboard with 60 amber cooperate rounds glowing"
+    },
+    {
+      "_status": "draft",
+      "id": "us-china-ai-communique-shared-vocab-2026",
+      "term": {
+        "en": "US-China AI communiqué with shared vocabulary by Dec 2026"
+      },
+      "type": "prediction",
+      "definition": "The probability that the United States and China produce a joint AI safety communiqué with shared technical vocabulary for model evaluations or compute thresholds by December 31, 2026.",
+      "insight": "The structural test of the 'wrong game' thesis. If both establishments are playing the wrong game — Prisoner's Dilemma framing instead of stag hunt — they cannot produce the shared vocabulary a coordination problem requires. 30% is below even odds: the structural incentives are stacked against it, not because cooperation is irrational, but because neither side has the linguistic scaffolding to ask the coordination question.",
+      "introduced": {
+        "episode": "prisoners-dilemma",
+        "beat": 5,
+        "timestamp": "14:30-16:00",
+        "template": "ProbabilityGauge",
+        "treatment": "organic",
+        "accentColor": "#E5A544"
+      },
+      "appearances": [],
+      "relatedConcepts": [
+        "the-wrong-game",
+        "ostromian-cooperation",
+        "ostrom-governance-principles"
+      ],
+      "pillar": [
+        "geopolitics",
+        "philosophical-framework"
+      ],
+      "tags": [
+        "arc-3",
+        "us-china",
+        "ai-governance",
+        "oracle",
+        "coordination"
+      ],
+      "prediction": {
+        "claim": "A US-China joint AI safety communiqué with shared technical vocabulary for model evaluations or compute thresholds is produced by December 31, 2026.",
+        "probability": 0.30,
+        "timeframe": "2026-12",
+        "falsification": "Joint US-China AI safety statement is issued by Dec 31, 2026 containing shared technical definitions for at least one of: model evaluations, compute thresholds, training-run thresholds, or red-team protocols.",
+        "whatWouldChangeMyMind": "A major actor publicly reframes the AI governance conflict as a coordination problem (stag-hunt language, common-security framing) and either side begins building the institutional scaffolding Ostrom describes. Conversely, if such reframing occurs and outcomes don't shift, the 'wrong game' thesis is *weakened* — the model would be descriptive, not constructive.",
+        "status": "open",
+        "watchSignals": [
+          "NPT Review Conference language: 'reciprocal restraint' (PD vocabulary) vs 'shared standards' (stag-hunt vocabulary)",
+          "AI Safety Institute publications from both countries",
+          "Bilateral AI communiqué language and technical depth",
+          "Track-2 dialogue read-outs (Brookings, CSIS, CICIR)"
+        ]
+      }
     }
   ]
 }

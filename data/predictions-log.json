@@ -86,10 +86,28 @@
       "outcome": null,
       "brierFinal": null,
       "lesson": null
+    },
+    {
+      "id": "us-china-ai-communique-shared-vocab-2026",
+      "episode": "prisoners-dilemma",
+      "publishDate": null,
+      "claim": "The United States and China will not produce a joint AI safety communiqué with shared technical vocabulary for model evaluations or compute thresholds by December 31, 2026.",
+      "probabilityAtPrediction": 0.70,
+      "kalshiPriceAtPrediction": null,
+      "metaculusPriceAtPrediction": null,
+      "status": "open",
+      "lastReviewed": "2026-05-12",
+      "currentProbability": 0.70,
+      "brierPartial": null,
+      "resolutionDate": "2027-01-31",
+      "outcome": null,
+      "brierFinal": null,
+      "lesson": null,
+      "note": "Script frames this as 30% probability of a joint communiqué emerging. Inverted here to the 'will not occur' form for Brier-scoring consistency with the rest of the log (which scores 'event will not happen' claims). 70% = 1 - 30%. Watch signals: NPT RevCon vocabulary (reciprocal restraint vs shared standards), AISI joint publications, bilateral AI communiqué language. Disconfirmer: a major actor publicly reframes the conflict as a coordination problem and outcomes shift in the predicted direction. Episode falsification clause: if a reframing occurs and outcomes don't shift, the 'wrong game' thesis weakens."
     }
   ],
   "calibrationSummary": {
-    "totalPredictions": 5,
+    "totalPredictions": 6,
     "closed": 0,
     "runningBrier": null,
     "kalshiBrier": null,
