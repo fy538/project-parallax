@@ -110,13 +110,22 @@ export const AtlasInsetLocator: React.FC<AtlasInsetLocatorProps> = ({
       properties: {},
     };
     const [[x0, y0], [x1, y1]] = pathGen.bounds(merged as any);
+
+    // C3: detect antimeridian-spanning bbox. geoPath().bounds() returns a
+    // near-full-width rect for Russia, USA, and other countries that cross
+    // the antimeridian — the rect spans most of the inset horizontally and
+    // is misleading rather than informative. Suppress it; no rect is better
+    // than a rect that covers >80% of the inset width.
+    const rawBboxWidth = x1 - x0;
+    if (rawBboxWidth > width * 0.8) return null;
+
     // Add a small inset padding around the bbox so the rust rectangle
     // visually "contains" the highlighted countries with breathing room.
     const pad = 3;
     return {
       x: Math.max(0, x0 - pad),
       y: Math.max(0, y0 - pad),
-      width: Math.min(width, x1 - x0 + pad * 2),
+      width: Math.min(width, rawBboxWidth + pad * 2),
       height: Math.min(height, y1 - y0 + pad * 2),
     };
   }, [focusIso3, projection, width, height]);

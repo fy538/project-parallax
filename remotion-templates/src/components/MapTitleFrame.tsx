@@ -199,13 +199,23 @@ export const MapTitleFrame: React.FC<MapTitleFrameProps> = ({
   const titleFontSize = useMemo(() => {
     const target = fontSizes.h2;
     const available = MAP_TITLE_FOOTPRINT_WIDTH - 16;
-    const { width: measured } = measureText({
-      text: title,
-      fontFamily: titleFontFamily,
-      fontSize: target,
-      fontWeight: fontWeights.semibold,
-      letterSpacing: `${letterSpacing.h2}px`,
-    });
+    // N3: guard against test environments without a canvas context — the
+    // Remotion measureText helper throws when there is no canvas API
+    // (Vitest jsdom or SSR). Use a character-count heuristic (~0.55× fontSize
+    // per char) as the fallback so the component still renders a reasonable
+    // font size rather than crashing the test suite.
+    let measured: number;
+    try {
+      measured = measureText({
+        text: title,
+        fontFamily: titleFontFamily,
+        fontSize: target,
+        fontWeight: fontWeights.semibold,
+        letterSpacing: `${letterSpacing.h2}px`,
+      }).width;
+    } catch {
+      measured = title.length * target * 0.55;
+    }
     const scale = Math.min(1, available / Math.max(1, measured));
     return Math.max(fontSizes.h3, target * scale);
   }, [title, titleFontFamily]);

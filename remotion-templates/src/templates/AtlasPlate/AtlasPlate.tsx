@@ -365,7 +365,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   );
 
   const camera = useMemo(() => {
-    if (safeIdx === 0) return phasePoses[0];
+    // B2: defensive guard — phasePoses derives from data.phases, which the
+    // Zod schema requires to be non-empty (.min(1)). If empty bypasses
+    // schema, return identity so downstream hooks run before null-guard fires.
+    if (safeIdx === 0) return phasePoses[0] ?? { scale: 1, translate: [0, 0] as [number, number] };
     const prev = phasePoses[safeIdx - 1];
     const next = phasePoses[safeIdx];
 
@@ -424,7 +427,8 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
   const currentRotation = useMemo<[number, number]>(() => {
     if (!isOrthographic) return [0, 0];
-    if (safeIdx === 0) return phaseRotations[0];
+    // B2: same defensive guard as the camera memo above.
+    if (safeIdx === 0) return phaseRotations[0] ?? ([0, 20] as [number, number]);
     const prev = phaseRotations[safeIdx - 1];
     const next = phaseRotations[safeIdx];
 
@@ -553,6 +557,11 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   // phase to lerp from); the resolver short-circuits to current fill.
   const prevFillMap = useMemo(() => {
     if (safeIdx === 0) return {} as Record<string, string>;
+    // N4: skip building the prev-phase fill map when fillTransition is
+    // "instant" — fillTransitionT is 1 for the whole phase so the lerp
+    // resolver never reads prevFillMap. Saves one buildPhaseFillMap call
+    // per phase on compositions that use instant transitions.
+    if (currentWindow.phase.fillTransition === "instant") return {} as Record<string, string>;
     const prev = windows[safeIdx - 1].phase;
     return buildPhaseFillMap(
       prev.countries.map((c) => ({
@@ -562,7 +571,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
       })),
       fillMapOptions,
     );
-  }, [windows, safeIdx, fillMapOptions]);
+  }, [windows, safeIdx, fillMapOptions, currentWindow.phase.fillTransition]);
 
   // Crossfade progress (0 → 1) over the CAMERA_TRANSITION_FRAMES window at
   // the start of each new phase. Eased so color motion matches camera
@@ -635,6 +644,23 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
       "Falls back to plain atlas — the orthographic globe renders with " +
       "no relief. Pick equalEarth / naturalEarth / equirectangular if " +
       "relief is required.",
+  );
+  // framePadding mismatch — the warp script bakes in DEFAULT_FRAME_PADDING
+  // when it fits the relief raster to the viewport. If a script overrides
+  // `data.framePadding`, the country layer's world fit will diverge from
+  // the relief's world fit by a few percent, producing visible coastline
+  // misalignment at world / continental scale. Warn loudly so authors
+  // don't ship a silently-broken still.
+  warnIf(
+    isRelief &&
+      data.framePadding !== undefined &&
+      data.framePadding !== DEFAULT_FRAME_PADDING,
+    "AtlasPlate",
+    `aesthetic: 'atlas-relief' requires \`framePadding: ${DEFAULT_FRAME_PADDING}\` ` +
+      `(the value the warp script bakes in). Override at ` +
+      `${data.framePadding} will misalign the relief raster against the ` +
+      `country paths. Either drop the override OR rerun ` +
+      `scripts/prepare-shaded-relief.mjs with --framePadding=${data.framePadding}.`,
   );
   const vintage = mapConfig.vintageStyleColors;
 
@@ -727,10 +753,18 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const countryLabelPlacements = useMemo(() => {
     if (labelledCountries.length === 0) return [];
 
+    // C1: use the SETTLED camera pose for this phase (not the animated per-
+    // frame camera). Previously depended on `camera.scale` and
+    // `projectAnnotation` — both change every frame during transitions,
+    // triggering per-frame d3-geo .area() on large country geometries +
+    // O(N²) collision detection. Placements are stable per phase anyway;
+    // only the display position (applied in the render) needs per-frame coords.
+    const settledPose = phasePoses[safeIdx] ?? { scale: 1, translate: [0, 0] as [number, number] };
+    const settledScale = settledPose.scale;
+
     // Per-label bbox via measureText, accounting for the country-label
     // typography (fonts.display, fontSizes.label, uppercase + tracking).
-    // Cached at module scope via measureText's own memoization wouldn't
-    // help here because the label text varies; recompute per phase.
+    // Recomputed per phase (label texts vary between phases).
     const items: Array<{
       iso3: string;
       label: string;
@@ -746,13 +780,15 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
       const centroid = getCountryCentroid(c.iso3);
       if (!centroid) continue;
 
-      // Project polygon area in BASE projection (pre-camera-scale) to
-      // gauge how big the country actually renders. d3-geo's
-      // `geoPath().area()` returns pixels² of the projected feature.
+      // Use basePathGen for polygon area — stable, not per-frame.
+      // For non-orthographic, activePathGen === basePathGen anyway.
+      // For orthographic, base-projection area is an acceptable approximation
+      // for the placement decision (we're deciding if a label can fit, not
+      // rendering an exact outline).
       const country = getCountryByAlpha3(c.iso3);
       if (!country) continue;
-      const rawAreaPx = activePathGen.area(country.feature as any); // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
-      const screenAreaPx = rawAreaPx * camera.scale * camera.scale;
+      const rawAreaPx = basePathGen.area(country.feature as any); // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
+      const screenAreaPx = rawAreaPx * settledScale * settledScale;
 
       // Auto-skip threshold: polygons smaller than ~120 px² can't host a
       // label at all (Andorra-, Vatican-, Monaco-scale on world view).
@@ -800,12 +836,18 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
       bboxOverride: item.bbox,
     }));
 
-    // placeLabels expects a `{ x, y } | null` projector; wrap our tuple-returning one.
-    const projectXY = (lonLat: [number, number]) => {
-      const p = projectAnnotation(lonLat);
-      return p ? { x: p[0], y: p[1] } : null;
+    // C1: project through the SETTLED pose (not the animated camera) for
+    // consistent placements across the full transition window.
+    const projectSettled = (lonLat: [number, number]) => {
+      const p = baseProjection(lonLat);
+      if (!p) return null;
+      const [x0, y0] = p;
+      return {
+        x: x0 * settledScale + settledPose.translate[0],
+        y: y0 * settledScale + settledPose.translate[1],
+      };
     };
-    const placements = placeLabels(placeInput, projectXY);
+    const placements = placeLabels(placeInput, projectSettled);
 
     // Auto-promotion to leader: when label bbox is wider than the polygon
     // is in screen-space, push it outside the polygon even if the placer
@@ -827,9 +869,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     });
   }, [
     labelledCountries,
-    activePathGen,
-    camera.scale,
-    projectAnnotation,
+    safeIdx,
+    phasePoses,
+    baseProjection,
+    basePathGen,
   ]);
 
   // ── Sea-label paths (projected to SCREEN space per frame) ────────────────
@@ -845,28 +888,53 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     const resolved = resolveSeaLabels(data.seaLabels);
     const out: {
       tag: string;
+      /** N1: tag sanitized for SVG id — spaces/dots/slashes → hyphens. */
+      sanitizedTag: string;
       label: string;
       hierarchy: SeaLabel["hierarchy"];
       d: string;
     }[] = [];
     for (const s of resolved) {
       const coords = isOrthographic ? densifyPolyline(s.arc, 1) : s.arc;
-      const screenPts: [number, number][] = [];
+
+      // B1: split arc at null projections (orthographic terminator crossings,
+      // or any projection returning null for out-of-bounds coords). The old
+      // single-run approach emitted an "L" after each null, drawing a chord
+      // straight across the back of the globe. Instead collect contiguous
+      // visible runs and join them as separate M..L sub-paths — the gap
+      // between invisible points renders as no stroke, not as a chord.
+      const segments: [number, number][][] = [];
+      let run: [number, number][] = [];
       for (const lonLat of coords) {
         const p = projectAnnotation(lonLat);
-        if (p) screenPts.push(p);
+        if (p) {
+          run.push(p);
+        } else {
+          if (run.length >= 2) segments.push(run);
+          run = [];
+        }
       }
-      if (screenPts.length < 2) continue;
-      const d = screenPts
-        .map(
-          (pt, i) =>
-            (i === 0 ? "M" : "L") +
-            pt[0].toFixed(1) +
-            " " +
-            pt[1].toFixed(1),
+      if (run.length >= 2) segments.push(run);
+      if (segments.length === 0) continue;
+
+      const d = segments
+        .map((pts) =>
+          pts
+            .map(
+              (pt, i) =>
+                (i === 0 ? "M" : "L") +
+                pt[0].toFixed(1) +
+                " " +
+                pt[1].toFixed(1),
+            )
+            .join(" "),
         )
         .join(" ");
-      out.push({ tag: s.tag, label: s.label, hierarchy: s.hierarchy, d });
+
+      // N1: sanitize tag → valid XML Name token (SVG id must not contain
+      // spaces, dots, slashes, etc. — replace with hyphens).
+      const sanitizedTag = s.tag.replace(/[^a-zA-Z0-9-]/g, "-");
+      out.push({ tag: s.tag, sanitizedTag, label: s.label, hierarchy: s.hierarchy, d });
     }
     return out;
   }, [data.seaLabels, projectAnnotation, isOrthographic]);
@@ -887,9 +955,24 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     // entire basemap — if nothing's highlighted, every corner is equally
     // fine and the editorial-reading-order default wins.)
     if (highlighted.length === 0) return "top-left" as const;
-    const points = projectPointsForPlacement(highlighted, projectAnnotation);
+    // C2: project through the SETTLED camera pose (not the animated per-frame
+    // pose). Previously depended on `projectAnnotation`, which changes every
+    // frame during transitions → mid-transition corner flips were jarring.
+    // Settled pose gives the right answer for where the view is heading and
+    // is stable for the full transition window.
+    const settledPose = phasePoses[safeIdx] ?? { scale: 1, translate: [0, 0] as [number, number] };
+    const projectSettled = (lonLat: [number, number]): [number, number] | null => {
+      const p = baseProjection(lonLat);
+      if (!p) return null;
+      const [x0, y0] = p;
+      return [
+        x0 * settledPose.scale + settledPose.translate[0],
+        y0 * settledPose.scale + settledPose.translate[1],
+      ];
+    };
+    const points = projectPointsForPlacement(highlighted, projectSettled);
     return resolveCartoucheCorner(points);
-  }, [data.mapTitle, currentWindow.phase.countries, projectAnnotation]);
+  }, [data.mapTitle, currentWindow.phase.countries, safeIdx, phasePoses, baseProjection]);
 
   // Defensive null-render — happens AFTER all hooks (Rules of Hooks). If
   // schema validation ever lets through an empty phases array, render
@@ -1101,10 +1184,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
               stays constant under zoom. */}
           {seaLabelPaths.length > 0 && (
             <g aria-hidden="true">
-              {seaLabelPaths.map((s) => (
+              {seaLabelPaths.map((s, i) => (
                 <SeaLabelText
-                  key={`sea-${s.tag}`}
-                  pathId={`sea-arc-${reactId}-${s.tag}`}
+                  key={`sea-${i}-${s.sanitizedTag}`}
+                  pathId={`sea-arc-${reactId}-${s.sanitizedTag}`}
                   d={s.d}
                   label={s.label}
                   hierarchy={s.hierarchy}
