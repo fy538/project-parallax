@@ -18,6 +18,15 @@ import { SplitCompositionSchema } from "../templates/SplitComposition/schema";
 import type { SplitCompositionData } from "../templates/SplitComposition/types";
 import { DuelingFrameworks } from "../templates/DuelingFrameworks/DuelingFrameworks";
 import type { DuelingFrameworksData } from "../templates/DuelingFrameworks/types";
+import { ArcDiagram } from "../templates/ArcDiagram/ArcDiagram";
+import { ArcDiagramSchema } from "../templates/ArcDiagram/schema";
+import type { ArcDiagramData } from "../templates/ArcDiagram/types";
+import { StrategicLandscape } from "../templates/StrategicLandscape/StrategicLandscape";
+import { StrategicLandscapeSchema } from "../templates/StrategicLandscape/schema";
+import type { StrategicLandscapeData } from "../templates/StrategicLandscape/types";
+import { TernaryPlot } from "../templates/TernaryPlot/TernaryPlot";
+import { TernaryPlotSchema } from "../templates/TernaryPlot/schema";
+import type { TernaryPlotData } from "../templates/TernaryPlot/types";
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
@@ -121,6 +130,40 @@ const nwHubSpoke: NetworkDiagramData = {
     { from: "tsmc", to: "amd", style: "solid" },
     { from: "tsmc", to: "qualcomm", style: "solid" },
     { from: "tsmc", to: "broadcom", style: "solid" },
+  ],
+  callouts: [
+    { value: "1 supplier", label: "for every leading-edge chip outside Samsung's foundry", position: "bottom-right" },
+  ],
+  durationSec: 12,
+};
+
+// Bipartite variant of the chokepoint argument. Same data substance —
+// five designers depend on one foundry — but rendered as two columns
+// with straight connectors instead of a radial hub-spoke. Reads cleaner
+// at video-scrubbing speed: "five things on the left, one thing on the
+// right, every line converges." No bubble/curve idiom, no glossy
+// circles competing with the editorial number. Use when the story is
+// dependency direction (A's depend on B), not concentric concentration.
+const nwBipartite: NetworkDiagramData = {
+  episode: CATALOG_EPISODE,
+  title: "TSMC: The Chip-Supply Chokepoint",
+  subtitle: "Five leading-edge designers, one foundry on the receiving end",
+  layout: "bipartite",
+  nodes: [
+    { id: "apple", label: "Apple", sublabel: "M & A-series", type: "institution", color: "#888780", side: "left" },
+    { id: "nvidia", label: "Nvidia", sublabel: "AI accelerators", type: "institution", color: "#E5A544", side: "left" },
+    { id: "amd", label: "AMD", sublabel: "CPU · GPU", type: "institution", color: "#888780", side: "left" },
+    { id: "qualcomm", label: "Qualcomm", sublabel: "Mobile SoC", type: "institution", color: "#3266AD", side: "left" },
+    { id: "broadcom", label: "Broadcom", sublabel: "Networking", type: "institution", color: "#888780", side: "left" },
+    { id: "tsmc", label: "TSMC", type: "nation", color: "#6B1D1D", importance: "primary", side: "right",
+      stat: { value: "92%", label: "of advanced-node chips" } },
+  ],
+  edges: [
+    { from: "apple", to: "tsmc", style: "solid" },
+    { from: "nvidia", to: "tsmc", style: "solid" },
+    { from: "amd", to: "tsmc", style: "solid" },
+    { from: "qualcomm", to: "tsmc", style: "solid" },
+    { from: "broadcom", to: "tsmc", style: "solid" },
   ],
   callouts: [
     { value: "1 supplier", label: "for every leading-edge chip outside Samsung's foundry", position: "bottom-right" },
@@ -239,6 +282,49 @@ const duelingEmpireFall: DuelingFrameworksData = {
   },
 };
 
+// Migrated from TimelineMorph (May 13, 2026). The blockades story is a
+// structural comparison — same 4 dimensions (Object / Mechanism / Evasion
+// / Counter-bloc) persist across 200 years with different content. Showing
+// both eras side-by-side simultaneously (the DuelingFrameworks form) makes
+// the structural-persistence claim visible at every frame. Row labels are
+// prepended to each tenet text since DuelingFrameworks renders flat tenet
+// lists. Equal scores (84/84) signal that the editorial point is parallel
+// persistence, not "which framework wins."
+const duelingBlockadesSubstrate: DuelingFrameworksData = {
+  episode: CATALOG_EPISODE,
+  title: "Blockade, Reinvented",
+  subtitle: "Same instrument, different substrate",
+  phenomenon: "Economic isolation as coercive instrument",
+  verdictLabel: "Same structural pattern, 200 years apart",
+  cinematicMode: false,
+  ambientParticles: true,
+  durationSec: 20,
+  frameworkA: {
+    name: "1806 · Continental System",
+    color: "#7B5E3A",
+    score: 84,
+    verdict: "Same scaffold — different mechanism",
+    tenets: [
+      { text: "Object — British goods kept off European ports" },
+      { text: "Mechanism — Customs cordons enforced by armies on land" },
+      { text: "Evasion — Smuggling fleets through the Baltic and Iberian peninsula" },
+      { text: "Counter-bloc — Russia leaves the system in 1810; Spain rebels" },
+    ],
+  },
+  frameworkB: {
+    name: "2022 · Financial Sanctions",
+    color: "#3266AD",
+    score: 84,
+    verdict: "Same scaffold — different mechanism",
+    tenets: [
+      { text: "Object — Russian state assets frozen across SWIFT and the dollar system" },
+      { text: "Mechanism — Compliance by foreign banks under threat of secondary sanctions" },
+      { text: "Evasion — Shadow tanker fleets, ruble-yuan swap lines, crypto rails" },
+      { text: "Counter-bloc — BRICS nations build settlement infrastructure outside the dollar" },
+    ],
+  },
+};
+
 // ─── Composition registrations ────────────────────────────────────────────
 
 const fwComp = (id: string, data: FrameworkDiagramData) => (
@@ -276,6 +362,7 @@ const nwComp = (id: string, data: NetworkDiagramData) => (
 );
 
 export const CatalogNwHubSpoke = () => nwComp(catalogId("NetworkDiagram", "hub-spoke"), nwHubSpoke);
+export const CatalogNwBipartite = () => nwComp(catalogId("NetworkDiagram", "bipartite"), nwBipartite);
 
 const splitComp = (id: string, data: SplitCompositionData) => (
   <Composition
@@ -310,10 +397,228 @@ const duelingComp = (id: string, data: DuelingFrameworksData) => (
 );
 
 export const CatalogDuelingEmpireFall = () => duelingComp(catalogId("DuelingFrameworks", "empire-fall"), duelingEmpireFall);
+export const CatalogDuelingBlockadesSubstrate = () =>
+  duelingComp(catalogId("DuelingFrameworks", "blockades-substrate"), duelingBlockadesSubstrate);
+
+// ─── ArcDiagram × 1 — intellectual lineage of grand strategy ──────────────
+
+const arcDiagramGrandStrategy: ArcDiagramData = {
+  episode: CATALOG_EPISODE,
+  title: "The Lineage of American Grand Strategy",
+  subtitle:
+    "Five strategic thinkers, eighty years — each generation extending, rebutting, or recovering the last",
+  nodes: [
+    { id: "mahan", label: "Mahan", sublabel: "Sea Power", axisStamp: "1890", importance: "primary" },
+    { id: "mackinder", label: "Mackinder", sublabel: "Heartland", axisStamp: "1904" },
+    { id: "spykman", label: "Spykman", sublabel: "Rimland", axisStamp: "1942" },
+    { id: "kennan", label: "Kennan", sublabel: "Containment", axisStamp: "1947", importance: "primary", color: "accent" },
+    { id: "brzezinski", label: "Brzezinski", sublabel: "Grand Chessboard", axisStamp: "1997" },
+  ],
+  connections: [
+    { from: "mahan", to: "mackinder", label: "inverted", strength: 0.7 },
+    { from: "mackinder", to: "spykman", label: "rebutted", strength: 0.8, style: "dashed" },
+    { from: "mahan", to: "spykman", label: "recovered", strength: 0.9 },
+    { from: "spykman", to: "kennan", label: "operationalized", strength: 1.0, color: "accent" },
+    { from: "kennan", to: "brzezinski", label: "extended", strength: 0.8 },
+    { from: "mackinder", to: "brzezinski", label: "rehabilitated", strength: 0.6, style: "dashed" },
+  ],
+  axisTitle: "Century",
+  source: "Standard surveys of strategic-studies historiography",
+  durationSec: 14,
+};
+
+export const CatalogArcDiagram = () => (
+  <Composition
+    id={catalogId("ArcDiagram", "grand-strategy")}
+    component={ArcDiagram}
+    schema={ArcDiagramSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as ArcDiagramData).durationSec ?? 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: arcDiagramGrandStrategy as ArcDiagramData }}
+  />
+);
+
+// ─── StrategicLandscape × 1 — semiconductor strategy 2D matrix ────────────
+//
+// NOTE (May 14, 2026): The actor positions below are an illustrative
+// PLACEHOLDER generated for the catalog showcase — they demonstrate the
+// template form, not a canonical Parallax framework. Before any episode
+// reaches for `<StrategicLandscape>`, the visual-spec stage should replace
+// this with a defended editorial framework (real actor positions on a
+// named 2D model). The `source` field labels it "illustrative" downstream
+// but this upstream comment is the gate.
+
+const strategicLandscapeDemo: StrategicLandscapeData = {
+  episode: CATALOG_EPISODE,
+  title: "Semiconductor Strategy Landscape",
+  subtitle: "Major actors positioned by approach and time horizon",
+  xAxisLabel: "Defensive",
+  xAxisLabelEnd: "Offensive",
+  yAxisLabel: "Short-term",
+  yAxisLabelEnd: "Long-term",
+  actors: [
+    { name: "United States", icon: "US", x: 70, y: 65, color: "#3266AD" },
+    { name: "China", icon: "CN", x: 75, y: 80, color: "#C23B22" },
+    { name: "TSMC", icon: "TW", x: 40, y: 70 },
+    { name: "EU", icon: "EU", x: 35, y: 45, color: "#5DAA68" },
+    { name: "Japan", icon: "JP", x: 50, y: 55, color: "#E5A544" },
+    { name: "South Korea", icon: "KR", x: 55, y: 60 },
+  ],
+  quadrantLabels: ["Strategic patience", "Long-term offensive", "Reactive defense", "Tactical strike"],
+  source: "Parallax analysis (illustrative)",
+  durationSec: 10,
+};
+
+export const CatalogStrategicLandscape = () => (
+  <Composition
+    id={catalogId("StrategicLandscape", "semiconductor-strategy")}
+    component={StrategicLandscape}
+    schema={StrategicLandscapeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as StrategicLandscapeData).durationSec || 10),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: strategicLandscapeDemo }}
+  />
+);
+
+// ─── TernaryPlot × 1 — first-ternary reference (Brexit voter clusters) ────
+//
+// The Brexit-era YouGov-style three-camp voter ternary is THE canonical
+// "first-ternary" reference in editorial newsroom dataviz — it's the
+// diagram newsroom dataviz teams reach for when introducing the form to
+// general readers (cited in `references/template-research/ternary-plot.md`).
+// This catalog entry exists alongside `un-votes` for two distinct
+// teaching moments:
+//
+//   - `un-votes` shows the form at maturity: 30 resolutions, three
+//     committed corner clusters, a centroid mean — the lens at full
+//     editorial weight.
+//   - `uk-voter-brexit` shows the form on first contact: a `readingCue`
+//     spelling out what corners and centroids mean, three named
+//     demographic clusters anchored to their corner of the triangle,
+//     and one centrist cluster sitting near the centroid.
+//
+// Numbers are illustrative reconstructions, not survey output. The
+// Fransham et al. (2019) paper on the Brexit electorate is the
+// inspiration, not the source of these specific points. The point of
+// the catalog entry is to teach the FORM, not to argue about Brexit.
+const ternaryUKVoter: TernaryPlotData = {
+  episode: CATALOG_EPISODE,
+  title: "How the 2016 Brexit Electorate Split",
+  subtitle: "Modeled voter clusters by Leave / Remain / Undecided share",
+  axisLabels: { a: "Leave", b: "Remain", c: "Undecided" },
+  readingCue:
+    "Each point is a voter cluster; corners are 100% commitment to that camp",
+  points: [
+    // ── Committed-Leave cluster (corner A) ──────────────────────────
+    {
+      id: "northern-working-class",
+      label: "Northern working class",
+      a: 78,
+      b: 12,
+      c: 10,
+      highlight: true,
+    },
+    {
+      id: "conservative-heartlands",
+      label: "Conservative heartlands",
+      a: 72,
+      b: 18,
+      c: 10,
+      highlight: true,
+    },
+    { id: "leave-c1", a: 80, b: 10, c: 10 },
+    { id: "leave-c2", a: 76, b: 14, c: 10 },
+    { id: "leave-c3", a: 74, b: 16, c: 10 },
+    { id: "leave-c4", a: 82, b: 8, c: 10 },
+    { id: "leave-c5", a: 70, b: 20, c: 10 },
+    { id: "leave-c6", a: 68, b: 22, c: 10 },
+    { id: "leave-c7", a: 75, b: 13, c: 12 },
+    { id: "leave-c8", a: 71, b: 17, c: 12 },
+    { id: "leave-c9", a: 65, b: 23, c: 12 },
+    { id: "leave-c10", a: 67, b: 21, c: 12 },
+    // ── Committed-Remain cluster (corner B) ─────────────────────────
+    {
+      id: "london-graduates",
+      label: "London graduates",
+      a: 12,
+      b: 78,
+      c: 10,
+      highlight: true,
+    },
+    {
+      id: "scottish-urban",
+      label: "Scottish urban",
+      a: 18,
+      b: 72,
+      c: 10,
+      highlight: true,
+    },
+    { id: "remain-c1", a: 10, b: 80, c: 10 },
+    { id: "remain-c2", a: 14, b: 76, c: 10 },
+    { id: "remain-c3", a: 16, b: 74, c: 10 },
+    { id: "remain-c4", a: 8, b: 82, c: 10 },
+    { id: "remain-c5", a: 20, b: 70, c: 10 },
+    { id: "remain-c6", a: 22, b: 68, c: 10 },
+    { id: "remain-c7", a: 13, b: 75, c: 12 },
+    { id: "remain-c8", a: 17, b: 71, c: 12 },
+    { id: "remain-c9", a: 23, b: 65, c: 12 },
+    { id: "remain-c10", a: 21, b: 67, c: 12 },
+    // ── Centrist / undecided cluster (centroid) ────────────────────
+    {
+      id: "midlands-swing",
+      label: "Midlands swing seats",
+      a: 36,
+      b: 34,
+      c: 30,
+      highlight: true,
+    },
+    { id: "center-c1", a: 35, b: 35, c: 30 },
+    { id: "center-c2", a: 32, b: 38, c: 30 },
+    { id: "center-c3", a: 38, b: 32, c: 30 },
+    { id: "center-c4", a: 40, b: 30, c: 30 },
+    { id: "center-c5", a: 30, b: 40, c: 30 },
+    { id: "center-c6", a: 34, b: 34, c: 32 },
+    { id: "center-c7", a: 36, b: 36, c: 28 },
+    { id: "center-c8", a: 33, b: 33, c: 34 },
+  ],
+  gridlines: true,
+  centroid: true,
+  source:
+    "Modeled after YouGov / Fransham et al. (2019) Brexit electorate ternary; illustrative reconstruction",
+  durationSec: 14,
+};
+
+export const CatalogTernaryUKVoter = () => (
+  <Composition
+    id={catalogId("TernaryPlot", "uk-voter-brexit")}
+    component={TernaryPlot}
+    schema={TernaryPlotSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as TernaryPlotData).durationSec ?? 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: ternaryUKVoter }}
+  />
+);
 
 export const catalogDiagramsData = {
   fwComparison, fwFlow, fwMatrix,
   nwHubSpoke,
+  nwBipartite,
   splitMaps, splitTime,
   duelingEmpireFall,
+  duelingBlockadesSubstrate,
+  arcDiagramGrandStrategy,
+  strategicLandscapeDemo,
+  ternaryUKVoter,
 };

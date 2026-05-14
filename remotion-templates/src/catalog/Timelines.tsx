@@ -14,12 +14,13 @@ import type { HorizontalTimelineData } from "../templates/HorizontalTimeline/typ
 import { EscalationLadder } from "../templates/EscalationLadder/EscalationLadder";
 import { EscalationLadderSchema } from "../templates/EscalationLadder/schema";
 import type { EscalationLadderData } from "../templates/EscalationLadder/types";
-import { TimelineComparison } from "../templates/TimelineComparison/TimelineComparison";
-import type { TimelineComparisonData } from "../templates/TimelineComparison/types";
-import { DualTimeline } from "../templates/DualTimeline/DualTimeline";
-import type { DualTimelineData } from "../templates/DualTimeline/types";
-import { TimelineMorph } from "../templates/TimelineMorph/TimelineMorph";
-import type { TimelineMorphData } from "../templates/TimelineMorph/types";
+// TimelineComparison + DualTimeline are deprecated (use HorizontalTimeline).
+// Kept as type-only import for nothing — catalog uses HorizontalTimeline for
+// what used to be TimelineComparison + DualTimeline demos. See May 12, 2026
+// timeline visual-register migration.
+// TimelineMorph template deleted May 13, 2026 — its single use case
+// ("Blockade, Reinvented") was migrated to DuelingFrameworks because
+// the editorial form was structural comparison, not chronological morph.
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
@@ -119,6 +120,20 @@ const timelineDualRevolutionsPhase: HorizontalTimelineData = {
       connection: "Consolidation",
     },
   ],
+  // Explicit camera path: start with a 2.5s settled pullback (so frame 30 /
+  // any cold thumbnail renders the whole comparison legibly), then track
+  // through each phase pair, dwelling longer on the Terror/Kronstadt purge
+  // (climax), and end on a pullback that reveals the full cadence. Without
+  // this, the auto-generated camera path starts mid-track at frame 30 and
+  // catches the layout in a transient overlap state. See POLISH.md T1.
+  cameraPath: [
+    { focus: "pullback", zoom: 0.7, duration: 2.5, behavior: "hold", dimOthers: false },
+    { focus: 0, zoom: 1.4, duration: 3, behavior: "track" },
+    { focus: 1, zoom: 1.4, duration: 3, behavior: "track" },
+    { focus: 2, zoom: 1.4, duration: 4, behavior: "track" },
+    { focus: 3, zoom: 1.4, duration: 3, behavior: "track" },
+    { focus: "pullback", zoom: 0.65, duration: 2.5, behavior: "track", dimOthers: false },
+  ],
   durationSec: 18,
 };
 
@@ -144,6 +159,8 @@ const ladderColdWar: EscalationLadderData = {
       detail: "Thirteen days at the edge", current: true },
   ],
   source: "Federation of American Scientists archive",
+  // Default centering handled by EscalationLadder's DEFAULT_OFFSET_X/Y.
+  // Add `contentOffset: { x, y }` here only for episode-specific tuning.
   durationSec: 14,
 };
 
@@ -170,107 +187,100 @@ const ladderArms: EscalationLadderData = {
 
 // ─── TimelineComparison × 1 ───────────────────────────────────────────────
 
-const comparisonRevolutions: TimelineComparisonData = {
+// Migrated to HorizontalTimeline dual mode (May 12, 2026). TimelineComparison
+// is deprecated; HorizontalTimeline replaces it. The four `connection` labels
+// per pair become the editorial spine of the parallel — they're what tells
+// the viewer "we're not just showing two lists, we're claiming a structural
+// rhyme." See the May 12 timeline visual-register pass + timeline-audit
+// SKILL.md → Visual Discipline.
+const timelineDualIndustrialInfo: HorizontalTimelineData = {
   episode: CATALOG_EPISODE,
-  leftLabel: "First Industrial Revolution",
-  rightLabel: "Information Revolution",
-  leftColor: "#7B5E3A",
-  rightColor: "#3266AD",
-  leftEvents: [
-    { year: "1760", title: "Watt's separate condenser", description: "Steam becomes economically viable" },
-    { year: "1779", title: "Crompton's mule", description: "Cotton spinning at 100× hand-loom speed" },
-    { year: "1825", title: "Stockton–Darlington Railway", description: "First public steam line" },
-    { year: "1840", title: "Telegraph commercialized", description: "Information and goods decouple" },
+  title: "Two Revolutions, One Substrate-Shift",
+  subtitle: "First Industrial vs. Information — paired by editorial role",
+  mode: "dual",
+  eraATitle: "First Industrial Revolution, 1760–1840",
+  eraBTitle: "Information Revolution, 1947–2007",
+  eraAColor: "#7B5E3A",
+  eraBColor: "#3266AD",
+  pairs: [
+    {
+      eraA: { year: "1760", title: "Watt's separate condenser", description: "Steam becomes economically viable", weight: 2 },
+      eraB: { year: "1947", title: "Transistor at Bell Labs", description: "Solid-state computing becomes viable", weight: 2 },
+      connection: "Enabling primitive",
+    },
+    {
+      eraA: { year: "1779", title: "Crompton's mule", description: "Cotton spinning at 100× hand-loom speed" },
+      eraB: { year: "1971", title: "Intel 4004 microprocessor", description: "Computation at 100× minicomputer density" },
+      connection: "Density leap",
+    },
+    {
+      eraA: { year: "1825", title: "Stockton–Darlington Railway", description: "First public steam line" },
+      eraB: { year: "1989", title: "Web at CERN", description: "First public hypertext network" },
+      connection: "Public network",
+    },
+    {
+      eraA: { year: "1840", title: "Telegraph commercialized", description: "Information and goods decouple", weight: 2 },
+      eraB: { year: "2007", title: "Smartphone era", description: "Information and bodies recouple", weight: 3 },
+      connection: "Information layer",
+    },
   ],
-  rightEvents: [
-    { year: "1947", title: "Transistor at Bell Labs", description: "Solid-state computing becomes viable" },
-    { year: "1971", title: "Intel 4004 microprocessor", description: "Computation at 100× minicomputer density" },
-    { year: "1989", title: "Web at CERN", description: "First public hypertext network" },
-    { year: "2007", title: "Smartphone era", description: "Information and bodies recouple" },
-  ],
-  connections: [
-    { leftIndex: 0, rightIndex: 0, label: "Enabling primitive" },
-    { leftIndex: 1, rightIndex: 1, label: "Density leap" },
-    { leftIndex: 2, rightIndex: 2, label: "Public network" },
-    { leftIndex: 3, rightIndex: 3, label: "Information layer" },
-  ],
-  secondsPerEvent: 3,
+  // TODO: HorizontalTimelineData doesn't expose `source` yet — when it does,
+  // restore: "Author's synthesis from standard histories of technology".
+  durationSec: 16,
 };
 
 // ─── DualTimeline × 1 ─────────────────────────────────────────────────────
 
-const dualImperialTransitions: DualTimelineData = {
+// Migrated to HorizontalTimeline dual mode (May 12, 2026). DualTimeline is
+// deprecated; HorizontalTimeline's connection-per-pair surfaces the four
+// beat markers ("Center divides → Handoff complete") that ARE the editorial
+// claim of this composition. Note: date labels normalized to bare years (was
+// "284 CE" + bare numerals — inconsistent). See timeline-audit SKILL.md
+// → Visual Discipline § 4 (date typography).
+const timelineDualImperialTransitions: HorizontalTimelineData = {
+  episode: CATALOG_EPISODE,
   title: "How Empires Hand Off",
   subtitle: "Two transitions, four centuries apart",
-  eraATitle: "Rome → Byzantium, c. 284–410",
+  mode: "dual",
+  eraATitle: "Rome → Byzantium, c. 284–410 CE",
   eraBTitle: "Britain → America, c. 1898–1956",
-  eraAColor: "#C23B22",
+  // Muted brand colors — rust is read by default as historical, navy as
+  // contemporary (per timeline-comparison.md § 4). Pre-migration values were
+  // brand-saturated, which made the parallel feel hot rather than analytical.
+  eraAColor: "#A64D46",
   eraBColor: "#3266AD",
-  episode: CATALOG_EPISODE,
-  durationSec: 16,
   pairs: [
     {
-      eraA: { label: "284 CE", text: "Diocletian's Tetrarchy splits administration east and west" },
-      eraB: { label: "1898", text: "Spanish-American War — US enters imperial bookkeeping" },
+      eraA: { year: "284", title: "Tetrarchy splits administration", description: "Diocletian divides east and west", weight: 2 },
+      eraB: { year: "1898", title: "Spanish-American War", description: "US enters imperial bookkeeping", weight: 2 },
       connection: "Center divides",
     },
     {
-      eraA: { label: "330", text: "Constantinople founded as the new strategic capital" },
-      eraB: { label: "1944", text: "Bretton Woods anchors the dollar as reserve currency" },
+      eraA: { year: "330", title: "Constantinople founded", description: "New strategic capital named" },
+      eraB: { year: "1944", title: "Bretton Woods", description: "Dollar anchored as reserve currency" },
       connection: "New center named",
     },
     {
-      eraA: { label: "395", text: "Theodosius dies — division becomes permanent" },
-      eraB: { label: "1947", text: "British India partitioned, sterling area cracking" },
+      eraA: { year: "395", title: "Theodosius dies", description: "Division becomes permanent" },
+      eraB: { year: "1947", title: "British India partitioned", description: "Sterling area cracking" },
       connection: "Old guarantor collapses",
     },
     {
-      eraA: { label: "410", text: "Sack of Rome — eastern half outlives the western" },
-      eraB: { label: "1956", text: "Suez crisis — Britain pulls back, US underwrites the order" },
+      eraA: { year: "410", title: "Sack of Rome", description: "Eastern half outlives the western", weight: 3 },
+      eraB: { year: "1956", title: "Suez crisis", description: "Britain pulls back, US underwrites the order", weight: 3 },
       connection: "Handoff complete",
     },
   ],
-};
-
-// ─── TimelineMorph × 1 ────────────────────────────────────────────────────
-
-const morphBlockades: TimelineMorphData = {
-  episode: CATALOG_EPISODE,
-  title: "Blockade, Reinvented",
-  subtitle: "A tactic that persists by changing its substrate",
-  eraATitle: "1806 · Continental System",
-  eraBTitle: "2022 · Financial Sanctions",
-  eraAColor: "#7B5E3A",
-  eraBColor: "#3266AD",
+  // TODO: HorizontalTimelineData doesn't expose `source` yet — when it does,
+  // restore: "Author's synthesis from Heather (2006) + Brendon (2007)".
   durationSec: 16,
-  events: [
-    {
-      eraALabel: "Object",
-      eraAText: "British goods kept off European ports",
-      eraBLabel: "Object",
-      eraBText: "Russian state assets frozen across SWIFT and the dollar system",
-    },
-    {
-      eraALabel: "Mechanism",
-      eraAText: "Customs cordons enforced by armies on land",
-      eraBLabel: "Mechanism",
-      eraBText: "Compliance by foreign banks under threat of secondary sanctions",
-    },
-    {
-      eraALabel: "Evasion",
-      eraAText: "Smuggling fleets through the Baltic and the Iberian peninsula",
-      eraBLabel: "Evasion",
-      eraBText: "Shadow tanker fleets, ruble-yuan swap lines, crypto rails",
-    },
-    {
-      eraALabel: "Counter-bloc",
-      eraAText: "Russia leaves the system in 1810; Spain rebels",
-      eraBLabel: "Counter-bloc",
-      eraBText: "BRICS nations build settlement infrastructure outside the dollar",
-    },
-  ],
-  source: "Hilger; Drezner; ECB working papers",
 };
+
+// Blockade comparison moved to DuelingFrameworks (May 13, 2026) — see
+// `duelingBlockadesSubstrate` in `src/catalog/Diagrams.tsx`. The TimelineMorph
+// template was the wrong fit ("Blockade, Reinvented" is a structural
+// comparison, not a chronological timeline). Template deleted in the same
+// pass — see commit log.
 
 // ─── Composition registrations ────────────────────────────────────────────
 
@@ -310,64 +320,26 @@ const ladderComp = (id: string, data: EscalationLadderData) => (
 export const CatalogLadderColdWar = () => ladderComp(catalogId("EscalationLadder", "cold-war"), ladderColdWar);
 export const CatalogLadderArms = () => ladderComp(catalogId("EscalationLadder", "arms-treaties"), ladderArms);
 
-const comparisonComp = (id: string, data: TimelineComparisonData) => (
-  <Composition
-    id={id}
-    component={TimelineComparison}
-    calculateMetadata={({ props }) => {
-      const d = props.data as TimelineComparisonData;
-      const events = Math.max(d.leftEvents.length, d.rightEvents.length);
-      const fallback = Math.max(events, 1) * (d.secondsPerEvent ?? 3) + 4;
-      return {
-        durationInFrames: sec(fallback),
-        fps: layout.fps,
-        width: layout.width,
-        height: layout.height,
-      };
-    }}
-    defaultProps={{ data }}
-  />
-);
-
+// CatalogTimelineComparisonRevolutions migrated to HorizontalTimeline dual
+// mode (May 12, 2026). The catalogId namespace ("TimelineComparison",
+// "revolutions") is kept so existing baselines + showreel slates resolve;
+// the underlying template is now HorizontalTimeline. See timelineDualIndustrialInfo.
 export const CatalogTimelineComparisonRevolutions = () =>
-  comparisonComp(catalogId("TimelineComparison", "revolutions"), comparisonRevolutions);
+  timelineComp(catalogId("TimelineComparison", "revolutions"), timelineDualIndustrialInfo);
 
-const dualComp = (id: string, data: DualTimelineData) => (
-  <Composition
-    id={id}
-    component={DualTimeline}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as DualTimelineData).durationSec || 16),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
-    defaultProps={{ data }}
-  />
-);
-
+// CatalogDualImperialTransitions migrated to HorizontalTimeline dual mode
+// (May 12, 2026). DualTimeline is deprecated; HorizontalTimeline replaces it.
+// The catalogId namespace ("DualTimeline", "imperial-transitions") is kept
+// so existing baselines + showreel slates resolve.
 export const CatalogDualImperialTransitions = () =>
-  dualComp(catalogId("DualTimeline", "imperial-transitions"), dualImperialTransitions);
+  timelineComp(catalogId("DualTimeline", "imperial-transitions"), timelineDualImperialTransitions);
 
-const morphComp = (id: string, data: TimelineMorphData) => (
-  <Composition
-    id={id}
-    component={TimelineMorph}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as TimelineMorphData).durationSec || 16),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
-    defaultProps={{ data }}
-  />
-);
-
-export const CatalogMorphBlockades = () =>
-  morphComp(catalogId("TimelineMorph", "blockades"), morphBlockades);
+// CatalogMorphBlockades export retired (May 13, 2026). The TimelineMorph
+// template was deleted; the blockades comparison now lives at
+// `CatalogDuelingBlockadesSubstrate` in `src/catalog/Diagrams.tsx`.
 
 export const catalogTimelinesData = {
   timelineComputers, timelineDualPandemics, timelineDualRevolutionsPhase,
+  timelineDualImperialTransitions, timelineDualIndustrialInfo,
   ladderColdWar, ladderArms,
-  comparisonRevolutions, dualImperialTransitions, morphBlockades,
 };

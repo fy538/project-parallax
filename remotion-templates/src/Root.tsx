@@ -33,6 +33,17 @@ import { ProbabilityGaugeComposition } from "./templates/ProbabilityGauge";
 import { ImageCompositeComposition } from "./templates/ImageComposite";
 import { PhotoMontageComposition } from "./templates/PhotoMontage";
 import { NetworkDiagramComposition } from "./templates/NetworkDiagram";
+import { ArcDiagramComposition } from "./templates/ArcDiagram";
+import { BeeswarmChartComposition } from "./templates/BeeswarmChart";
+import { TilegramUSMapComposition } from "./templates/TilegramUSMap";
+import { CalendarHeatmapComposition } from "./templates/CalendarHeatmap";
+import { ConnectedScatterplotComposition } from "./templates/ConnectedScatterplot";
+import { StreamgraphComposition } from "./templates/Streamgraph";
+import { RidgelinePlotComposition } from "./templates/RidgelinePlot";
+import { MarimekkoChartComposition } from "./templates/MarimekkoChart";
+import { TernaryPlotComposition } from "./templates/TernaryPlot";
+import { HorizonChartComposition } from "./templates/HorizonChart";
+import { DumbbellPlotComposition } from "./templates/DumbbellPlot";
 import { TimeSeriesChartComposition } from "./templates/TimeSeriesChart";
 import { SankeyFlowComposition } from "./templates/SankeyFlow";
 import { GameBoardComposition } from "./templates/GameBoard";
@@ -85,9 +96,9 @@ import {
 
 // Catalog — toolkit view (multi-variant demos, never tied to a real episode)
 import {
-  CatalogChoroplethG7,
-  CatalogChoroplethBlocs,
-  CatalogChoroplethTordesillas,
+  CatalogAtlasG7,
+  CatalogAtlasBlocs,
+  CatalogAtlasTordesillas,
   CatalogRouteSilkRoad,
   CatalogRouteRomeRadial,
   CatalogRouteMagellan,
@@ -97,6 +108,7 @@ import {
   CatalogProportionalFabs,
   CatalogCartogramEU,
   CatalogDensityFabs,
+  CatalogTilegramElectoral,
   CatalogStatApollo,
   CatalogStatMariana,
   CatalogStatHabitable,
@@ -133,8 +145,25 @@ import {
   CatalogFwFlow,
   CatalogFwMatrix,
   CatalogNwHubSpoke,
+  CatalogNwBipartite,
   CatalogSplitMaps,
   CatalogSplitTime,
+  CatalogArcDiagram,
+  CatalogStrategicLandscape,
+  CatalogTernaryUKVoter,
+  CatalogBeeswarmMilitary,
+  CatalogCalendarIsraelIran,
+  CatalogCalendarFedRates,
+  CatalogScatterPhillips,
+  CatalogStreamgraphOil,
+  CatalogStreamgraphFlags,
+  CatalogRidgelineLifeExpectancy,
+  CatalogMarimekkoEnergy,
+  CatalogMarimekkoEnergyEmphasis,
+  CatalogTernaryUN,
+  CatalogHorizonBRICS,
+  CatalogHorizonBRICSShared,
+  CatalogDumbbellIncome,
   CatalogTimelineComputers,
   CatalogTimelineDualPandemics,
   CatalogTimelineDualRevolutionsPhase,
@@ -182,6 +211,7 @@ export const RemotionRoot: React.FC = () => {
         <ProportionalSymbolMapComposition />
         <CartogramMapComposition />
         <DensityMapComposition />
+        <TilegramUSMapComposition />
       </Folder>
 
       <Folder name="Timelines">
@@ -203,6 +233,15 @@ export const RemotionRoot: React.FC = () => {
         <BumpChartComposition />
         <PopulationPyramidComposition />
         <RankChangeDotPlotComposition />
+        <BeeswarmChartComposition />
+        <CalendarHeatmapComposition />
+        <ConnectedScatterplotComposition />
+        <StreamgraphComposition />
+        <RidgelinePlotComposition />
+        <MarimekkoChartComposition />
+        <TernaryPlotComposition />
+        <HorizonChartComposition />
+        <DumbbellPlotComposition />
       </Folder>
 
       <Folder name="Typography">
@@ -213,6 +252,7 @@ export const RemotionRoot: React.FC = () => {
         <FrameworkDiagramComposition />
         <DuelingFrameworksComposition />
         <NetworkDiagramComposition />
+        <ArcDiagramComposition />
         <SplitCompositionComposition />
         <StrategicLandscapeComposition />
       </Folder>
@@ -279,9 +319,9 @@ export const RemotionRoot: React.FC = () => {
         <CatalogTemplatePreview />
 
         <Folder name="Maps">
-          <CatalogChoroplethG7 />
-          <CatalogChoroplethBlocs />
-          <CatalogChoroplethTordesillas />
+          <CatalogAtlasG7 />
+          <CatalogAtlasBlocs />
+          <CatalogAtlasTordesillas />
           <CatalogRouteSilkRoad />
           <CatalogRouteRomeRadial />
           <CatalogRouteMagellan />
@@ -291,6 +331,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogProportionalFabs />
           <CatalogCartogramEU />
           <CatalogDensityFabs />
+          <CatalogTilegramElectoral />
         </Folder>
 
         <Folder name="Data">
@@ -315,6 +356,19 @@ export const RemotionRoot: React.FC = () => {
           <CatalogBumpGDP />
           <CatalogPyramidChina />
           <CatalogRankChangeSemiconductors />
+          <CatalogBeeswarmMilitary />
+          <CatalogCalendarIsraelIran />
+          <CatalogCalendarFedRates />
+          <CatalogScatterPhillips />
+          <CatalogStreamgraphOil />
+          <CatalogStreamgraphFlags />
+          <CatalogRidgelineLifeExpectancy />
+          <CatalogMarimekkoEnergy />
+          <CatalogMarimekkoEnergyEmphasis />
+          <CatalogTernaryUN />
+          <CatalogHorizonBRICS />
+          <CatalogHorizonBRICSShared />
+          <CatalogDumbbellIncome />
         </Folder>
 
         <Folder name="Motion-Identity">
@@ -342,10 +396,14 @@ export const RemotionRoot: React.FC = () => {
           <CatalogFwFlow />
           <CatalogFwMatrix />
           <CatalogNwHubSpoke />
+          <CatalogNwBipartite />
           <CatalogSplitMaps />
           <CatalogSplitTime />
           <CatalogDuelingEmpireFall />
           <CatalogDuelingBlockadesSubstrate />
+          <CatalogArcDiagram />
+          <CatalogStrategicLandscape />
+          <CatalogTernaryUKVoter />
         </Folder>
 
         <Folder name="Timelines">

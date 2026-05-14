@@ -13,28 +13,34 @@ import type { DecisionTreeData } from "../templates/DecisionTree/types";
 import { GameBoard } from "../templates/GameBoard/GameBoard";
 import { GameBoardSchema } from "../templates/GameBoard/schema";
 import type { GameBoardData } from "../templates/GameBoard/types";
-import { BifurcationRoute } from "../templates/BifurcationRoute/BifurcationRoute";
-import type { BifurcationRouteData } from "../templates/BifurcationRoute/types";
+// BifurcationRoute template removed May 13, 2026.
 import { layout, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
 // ─── DecisionTree × 1 ─────────────────────────────────────────────────────
 
+// Italian Opening — edgeLabels carry the qualitative branch character
+// ("Quiet", "Sharp", "Tactical"); node labels carry the move/move-name. NYT
+// / FT extensive-form canon places transition labels on edges, state labels
+// on nodes. Removed numeric "100%" probability on root (it's a tautology and
+// numeric, which the new gate strips anyway). `highlightColor` removed so
+// the per-episode `useEpisodeColorEmphasis` accent (defaults to oxblood)
+// drives the chosen-path color — the prior #5DAA68 green was off-palette.
+// May 13, 2026 polish refactor.
 const treeChessOpening: DecisionTreeData = {
   episode: CATALOG_EPISODE,
   title: "The Italian Opening",
   subtitle: "How a 16th-century chess opening branches",
   nodes: [
-    { id: "root", label: "1. e4 e5 2. Nf3 Nc6 3. Bc4", probability: "100%", children: ["italian", "evans", "two-knights"] },
-    { id: "italian", label: "Bc5 — Giuoco Piano", probability: "Quiet game", color: "#3266AD", children: ["italian-classic", "italian-modern"] },
-    { id: "evans", label: "Bc5 4. b4 — Evans Gambit", probability: "Sharp", color: "#C23B22", children: [] },
-    { id: "two-knights", label: "Nf6 — Two Knights", probability: "Tactical", color: "#E5A544", children: [] },
-    { id: "italian-classic", label: "Classical c3+d3", probability: "Mainline" },
-    { id: "italian-modern", label: "Modern d3 setup", probability: "Modern", highlighted: true },
+    { id: "root", label: "1. e4 e5 2. Nf3 Nc6 3. Bc4", children: ["italian", "evans", "two-knights"] },
+    { id: "italian", label: "Bc5 — Giuoco Piano", edgeLabel: "Quiet game", children: ["italian-classic", "italian-modern"] },
+    { id: "evans", label: "Bc5 4. b4 — Evans Gambit", edgeLabel: "Sharp", children: [] },
+    { id: "two-knights", label: "Nf6 — Two Knights", edgeLabel: "Tactical", children: [] },
+    { id: "italian-classic", label: "Classical c3+d3", edgeLabel: "Mainline" },
+    { id: "italian-modern", label: "Modern d3 setup", edgeLabel: "Modern", highlighted: true, active: true },
   ],
   rootId: "root",
   highlightedPath: ["root", "italian", "italian-modern"],
-  highlightColor: "#5DAA68",
   source: "ECO opening encyclopedia",
   durationSec: 12,
 };
@@ -72,6 +78,13 @@ const treeExCommLadder: DecisionTreeData = {
 
 // ─── GameBoard × 2 ────────────────────────────────────────────────────────
 
+// Chess piece colors: white pieces use brand bone (#F0E6D0) so the
+// PieceCircle component's `isLightPiece` heuristic detects them and
+// renders ink-colored glyph on bone bg (standard editorial chess
+// register). Black pieces use brand ink (#1C1814), rendering bone glyph
+// on ink bg. Pre-May 13 the data used ink for white AND rust for black,
+// which collapsed both into "dark piece" rendering and forced the raw-text
+// fallback ("bK" / "wK" on colored disks — looked like UI debug badges).
 const gameChess: GameBoardData = {
   episode: CATALOG_EPISODE,
   title: "An Endgame Study",
@@ -79,18 +92,18 @@ const gameChess: GameBoardData = {
   variant: "chess",
   boardSize: 8,
   initialPieces: [
-    { position: [7, 7], label: "wK", color: "#1C1814" },
-    { position: [0, 5], label: "wP", color: "#1C1814" },
-    { position: [0, 0], label: "bK", color: "#C23B22" },
-    { position: [7, 1], label: "bP", color: "#C23B22" },
+    { position: [7, 7], label: "wK", color: "#F0E6D0" },
+    { position: [0, 5], label: "wP", color: "#F0E6D0" },
+    { position: [0, 0], label: "bK", color: "#1C1814" },
+    { position: [7, 1], label: "bP", color: "#1C1814" },
   ],
   phases: [
     { label: "1. Kg7", durationSec: 2.5,
-      pieces: [{ position: [6, 6], label: "wK", color: "#1C1814" }] },
+      pieces: [{ position: [6, 6], label: "wK", color: "#F0E6D0" }] },
     { label: "2. Kf6 — diagonal pursuit", durationSec: 2.5,
-      pieces: [{ position: [5, 5], label: "wK", color: "#1C1814" }] },
+      pieces: [{ position: [5, 5], label: "wK", color: "#F0E6D0" }] },
     { label: "3. Ke5 — both queens reachable", durationSec: 3,
-      pieces: [{ position: [4, 4], label: "wK", color: "#1C1814" }] },
+      pieces: [{ position: [4, 4], label: "wK", color: "#F0E6D0" }] },
   ],
   source: "Richard Réti, 1921",
   durationSec: 10,
@@ -202,38 +215,12 @@ const gameIteratedPD: GameBoardData = {
   backgroundVariant: "light",
 };
 
-// ─── BifurcationRoute × 1 ─────────────────────────────────────────────────
-
-const bifurcationLatin: BifurcationRouteData = {
-  episode: CATALOG_EPISODE,
-  title: "When Latin Forked",
-  subtitle: "One language splits into the Romance family",
-  nodes: [
-    { id: "latin", label: "Vulgar Latin", x: 50, y: 15, network: "unified" },
-    { id: "ibero", label: "Iberian", x: 20, y: 40, network: "networkA" },
-    { id: "italo", label: "Italo", x: 50, y: 40, network: "networkA" },
-    { id: "gallo", label: "Gallo", x: 80, y: 40, network: "networkB" },
-    { id: "spanish", label: "Spanish", x: 10, y: 75, network: "networkA" },
-    { id: "portuguese", label: "Portuguese", x: 30, y: 75, network: "networkA" },
-    { id: "italian", label: "Italian", x: 50, y: 75, network: "networkA" },
-    { id: "french", label: "French", x: 75, y: 75, network: "networkB" },
-    { id: "occitan", label: "Occitan", x: 88, y: 75, network: "networkB" },
-  ],
-  links: [
-    { from: "latin", to: "ibero", phase: "unified" },
-    { from: "latin", to: "italo", phase: "unified" },
-    { from: "latin", to: "gallo", phase: "unified" },
-    { from: "ibero", to: "spanish", phase: "split", network: "networkA" },
-    { from: "ibero", to: "portuguese", phase: "split", network: "networkA" },
-    { from: "italo", to: "italian", phase: "split", network: "networkA" },
-    { from: "gallo", to: "french", phase: "split", network: "networkB" },
-    { from: "gallo", to: "occitan", phase: "split", network: "networkB" },
-  ],
-  forkNodeId: "latin",
-  networkALabel: "Southern Branch",
-  networkBLabel: "Northern Branch",
-  source: "Standard Romance philology",
-};
+// BifurcationRoute template was deleted May 13, 2026 after the
+// COCOM-bifurcation demo failed the visual register pass — the
+// phylogenetic-tree form (nodes + arcs floating on paper) didn't fit
+// Parallax's editorial voice. Institutional-bifurcation stories now use
+// DuelingFrameworks (side-by-side structural comparison) or
+// HorizontalTimeline dual mode (cadence-aligned parallel tracks).
 
 // ─── Composition registrations ────────────────────────────────────────────
 
@@ -327,18 +314,8 @@ export const CatalogGameIteratedPD = () => (
   />
 );
 
-export const CatalogBifurcationLatin = () => (
-  <Composition
-    id={catalogId("BifurcationRoute", "latin-romance")}
-    component={BifurcationRoute}
-    durationInFrames={sec(12)}
-    fps={layout.fps}
-    width={layout.width}
-    height={layout.height}
-    defaultProps={{ data: bifurcationLatin }}
-  />
-);
+// CatalogBifurcationCocom export removed May 13, 2026 with BifurcationRoute.
 
 export const catalogScenariosData = {
-  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD, bifurcationLatin,
+  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
 };

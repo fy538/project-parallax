@@ -1,16 +1,20 @@
 /**
  * Catalog — Maps category.
  *
- * ChoroplethMap × 3 variants: simple-highlight, multi-phase-blocs, treaty-split
- * RouteAnimation × 3 variants: silk-road, magellan, naval-chokepoints
+ * AtlasPlate × 5 variants: cocom, cold-war-vintage, g7, cold-war-blocs, tordesillas
+ * RouteAnimation × 4 variants: silk-road, magellan, chokepoints, rome-radial
+ * ProportionalSymbolMap × 1 (fabs) · CartogramMap × 1 (eu) · DensityMap × 1 (fabs)
+ * TilegramUSMap × 1 (electoral-2024)
  *
  * Subjects are historical/cartographic — Parallax-toned but not episode candidates.
+ *
+ * May 13, 2026 — G7 / Cold War Blocs / Tordesillas migrated from
+ * ChoroplethMap (Mapbox) to AtlasPlate (pure SVG); ChoroplethMap is now
+ * reserved for atmospheric / terrain-required shots per the
+ * Mapbox→AtlasPlate doctrine. See MAP_TEMPLATE_SELECTOR.md.
  */
 
 import { Composition } from "remotion";
-import { ChoroplethMap } from "../templates/ChoroplethMap/ChoroplethMap";
-import { ChoroplethMapSchema } from "../templates/ChoroplethMap/schema";
-import type { ChoroplethMapData } from "../templates/ChoroplethMap/types";
 import { RouteAnimation } from "../templates/RouteAnimation/RouteAnimation";
 import { RouteAnimationSchema } from "../templates/RouteAnimation/schema";
 import type { RouteAnimationData } from "../templates/RouteAnimation/types";
@@ -30,59 +34,73 @@ import { DensityMap } from "../templates/DensityMap/DensityMap";
 import { DensityMapSchema } from "../templates/DensityMap/schema";
 import type { DensityMapData } from "../templates/DensityMap/types";
 import { densityMapSampleData } from "../templates/DensityMap";
+import { TilegramUSMap } from "../templates/TilegramUSMap/TilegramUSMap";
+import { TilegramUSMapSchema } from "../templates/TilegramUSMap/schema";
+import type { TilegramUSMapData, USStateCode } from "../templates/TilegramUSMap/types";
 import { layout, mapConfig, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
-// ─── ChoroplethMap variants ────────────────────────────────────────────────
-
-const choroplethG7: ChoroplethMapData = {
+// ─── AtlasPlate variants (G7 / Tordesillas / Blocs) ─────────────────────────
+//
+// May 13, 2026 — these three were ported from ChoroplethMap (Mapbox) to
+// AtlasPlate (pure SVG). The Mapbox version produced "rotating-paper-with-
+// a-title" artifacts that fought the editorial register; AtlasPlate is the
+// canonical NYT / FT / Bloomberg approach for static editorial maps. See:
+// research memo + MAP_TEMPLATE_SELECTOR.md.
+// Two-tier copy convention for single-phase AtlasPlate comps: composition
+// title states the analytical CLAIM, phase title shows the SPECIFIC
+// MOMENT / data. Matches the convention in `atlasPlateSampleData` (cocom):
+// composition "The COCOM Members" / phase "Western signatories". Without
+// this split, single-phase comps render the same string twice (top-left
+// header + bottom-left big phase title) — visible dup in the May 13, 2026
+// review.
+const atlasG7: AtlasPlateData = {
   episode: CATALOG_EPISODE,
-  title: "The G7 — A Single-Phase Highlight",
+  title: "Wealth concentration",
+  subtitle: "How seven industrialized economies command global output",
   projection: "naturalEarth",
-  center: [10, 30],
-  scale: 180,
+  source: "IMF / World Bank",
   phases: [
     {
       title: "Group of Seven",
       subtitle: "47% of global GDP, 10% of population",
       durationSec: 6,
       countries: [
-        { name: "United States of America", iso3: "USA", fill: "#3266AD", label: "US" },
-        { name: "Canada", iso3: "CAN", fill: "#3266AD" },
-        { name: "United Kingdom", iso3: "GBR", fill: "#3266AD" },
-        { name: "France", iso3: "FRA", fill: "#3266AD" },
-        { name: "Germany", iso3: "DEU", fill: "#3266AD" },
-        { name: "Italy", iso3: "ITA", fill: "#3266AD" },
-        { name: "Japan", iso3: "JPN", fill: "#3266AD", label: "Japan" },
+        { iso3: "USA", fill: "#3266AD", label: "US" },
+        { iso3: "CAN", fill: "#3266AD" },
+        { iso3: "GBR", fill: "#3266AD" },
+        { iso3: "FRA", fill: "#3266AD" },
+        { iso3: "DEU", fill: "#3266AD" },
+        { iso3: "ITA", fill: "#3266AD" },
+        { iso3: "JPN", fill: "#3266AD", label: "Japan" },
       ],
     },
   ],
 };
 
-const choroplethBlocs: ChoroplethMapData = {
+const atlasBlocs: AtlasPlateData = {
   episode: CATALOG_EPISODE,
   title: "Bloc Architecture, 1955–1990",
   projection: "naturalEarth",
-  center: [20, 40],
-  scale: 220,
+  source: "Allied / Soviet treaty archives, simplified",
   phases: [
     {
       title: "Phase I — Founding NATO",
       subtitle: "April 1949",
       durationSec: 4,
       countries: [
-        { name: "United States of America", iso3: "USA", fill: "#3266AD", label: "NATO" },
-        { name: "Canada", iso3: "CAN", fill: "#3266AD" },
-        { name: "United Kingdom", iso3: "GBR", fill: "#3266AD" },
-        { name: "France", iso3: "FRA", fill: "#3266AD" },
-        { name: "Italy", iso3: "ITA", fill: "#3266AD" },
-        { name: "Belgium", iso3: "BEL", fill: "#3266AD" },
-        { name: "Netherlands", iso3: "NLD", fill: "#3266AD" },
-        { name: "Norway", iso3: "NOR", fill: "#3266AD" },
-        { name: "Denmark", iso3: "DNK", fill: "#3266AD" },
-        { name: "Portugal", iso3: "PRT", fill: "#3266AD" },
-        { name: "Iceland", iso3: "ISL", fill: "#3266AD" },
-        { name: "Luxembourg", iso3: "LUX", fill: "#3266AD" },
+        { iso3: "USA", fill: "#3266AD", label: "NATO" },
+        { iso3: "CAN", fill: "#3266AD" },
+        { iso3: "GBR", fill: "#3266AD" },
+        { iso3: "FRA", fill: "#3266AD" },
+        { iso3: "ITA", fill: "#3266AD" },
+        { iso3: "BEL", fill: "#3266AD" },
+        { iso3: "NLD", fill: "#3266AD" },
+        { iso3: "NOR", fill: "#3266AD" },
+        { iso3: "DNK", fill: "#3266AD" },
+        { iso3: "PRT", fill: "#3266AD" },
+        { iso3: "ISL", fill: "#3266AD" },
+        { iso3: "LUX", fill: "#3266AD" },
       ],
     },
     {
@@ -90,18 +108,18 @@ const choroplethBlocs: ChoroplethMapData = {
       subtitle: "May 1955, response to West German rearmament",
       durationSec: 4,
       countries: [
-        { name: "Russia", iso3: "RUS", fill: "#C23B22", label: "Warsaw Pact" },
-        { name: "Poland", iso3: "POL", fill: "#C23B22" },
-        { name: "Czech Republic", iso3: "CZE", fill: "#C23B22" },
-        { name: "Slovakia", iso3: "SVK", fill: "#C23B22" },
-        { name: "Hungary", iso3: "HUN", fill: "#C23B22" },
-        { name: "Romania", iso3: "ROU", fill: "#C23B22" },
-        { name: "Bulgaria", iso3: "BGR", fill: "#C23B22" },
+        { iso3: "RUS", fill: "#C23B22", label: "Warsaw Pact" },
+        { iso3: "POL", fill: "#C23B22" },
+        { iso3: "CZE", fill: "#C23B22" }, // covers historical Czechoslovakia
+        { iso3: "SVK", fill: "#C23B22" },
+        { iso3: "HUN", fill: "#C23B22" },
+        { iso3: "ROU", fill: "#C23B22" },
+        { iso3: "BGR", fill: "#C23B22" },
         // NATO countries persist
-        { name: "United States of America", iso3: "USA", fill: "#3266AD" },
-        { name: "United Kingdom", iso3: "GBR", fill: "#3266AD" },
-        { name: "France", iso3: "FRA", fill: "#3266AD" },
-        { name: "West Germany", iso3: "DEU", fill: "#3266AD", label: "FRG" },
+        { iso3: "USA", fill: "#3266AD" },
+        { iso3: "GBR", fill: "#3266AD" },
+        { iso3: "FRA", fill: "#3266AD" },
+        { iso3: "DEU", fill: "#3266AD", label: "FRG" }, // West Germany approximation
       ],
     },
     {
@@ -110,50 +128,50 @@ const choroplethBlocs: ChoroplethMapData = {
       durationSec: 5,
       countries: [
         // Warsaw Pact
-        { name: "Russia", iso3: "RUS", fill: "#C23B22" },
-        { name: "Poland", iso3: "POL", fill: "#C23B22" },
-        { name: "Czech Republic", iso3: "CZE", fill: "#C23B22" },
-        { name: "Hungary", iso3: "HUN", fill: "#C23B22" },
-        { name: "Romania", iso3: "ROU", fill: "#C23B22" },
-        { name: "Bulgaria", iso3: "BGR", fill: "#C23B22" },
+        { iso3: "RUS", fill: "#C23B22" },
+        { iso3: "POL", fill: "#C23B22" },
+        { iso3: "CZE", fill: "#C23B22" },
+        { iso3: "HUN", fill: "#C23B22" },
+        { iso3: "ROU", fill: "#C23B22" },
+        { iso3: "BGR", fill: "#C23B22" },
         // NATO
-        { name: "United States of America", iso3: "USA", fill: "#3266AD" },
-        { name: "Canada", iso3: "CAN", fill: "#3266AD" },
-        { name: "United Kingdom", iso3: "GBR", fill: "#3266AD" },
-        { name: "France", iso3: "FRA", fill: "#3266AD" },
-        { name: "Italy", iso3: "ITA", fill: "#3266AD" },
-        { name: "Norway", iso3: "NOR", fill: "#3266AD" },
+        { iso3: "USA", fill: "#3266AD" },
+        { iso3: "CAN", fill: "#3266AD" },
+        { iso3: "GBR", fill: "#3266AD" },
+        { iso3: "FRA", fill: "#3266AD" },
+        { iso3: "ITA", fill: "#3266AD" },
+        { iso3: "NOR", fill: "#3266AD" },
         // Non-aligned (gray)
-        { name: "India", iso3: "IND", fill: "#888780", label: "Non-aligned" },
-        { name: "Yugoslavia", iso3: "SRB", fill: "#888780" },
-        { name: "Egypt", iso3: "EGY", fill: "#888780" },
+        { iso3: "IND", fill: "#888780", label: "Non-aligned" },
+        { iso3: "SRB", fill: "#888780" }, // covers historical Yugoslavia
+        { iso3: "EGY", fill: "#888780" },
       ],
     },
   ],
 };
 
-const choroplethTordesillas: ChoroplethMapData = {
+const atlasTordesillas: AtlasPlateData = {
   episode: CATALOG_EPISODE,
   title: "The Treaty of Tordesillas, 1494",
   projection: "naturalEarth",
-  center: [-30, 0],
-  scale: 200,
+  source: "Treaty of Tordesillas, post-1494 claims (simplified)",
   phases: [
     {
       title: "Drawing a Line on the Atlantic",
       subtitle: "The world divided between Spain and Portugal",
       durationSec: 7,
       countries: [
-        { name: "Spain", iso3: "ESP", fill: "#E5A544", label: "Castile & León" },
-        { name: "Portugal", iso3: "PRT", fill: "#6B1D1D", label: "Portugal" },
+        { iso3: "ESP", fill: "#E5A544", label: "Castile & León" },
+        { iso3: "PRT", fill: "#6B1D1D", label: "Portugal" },
         // Approximate post-treaty claims
-        { name: "Brazil", iso3: "BRA", fill: "#6B1D1D" },
-        { name: "Mexico", iso3: "MEX", fill: "#E5A544" },
-        { name: "Peru", iso3: "PER", fill: "#E5A544" },
-        { name: "Colombia", iso3: "COL", fill: "#E5A544" },
-        { name: "Argentina", iso3: "ARG", fill: "#E5A544" },
-        { name: "Chile", iso3: "CHL", fill: "#E5A544" },
+        { iso3: "BRA", fill: "#6B1D1D" },
+        { iso3: "MEX", fill: "#E5A544" },
+        { iso3: "PER", fill: "#E5A544" },
+        { iso3: "COL", fill: "#E5A544" },
+        { iso3: "ARG", fill: "#E5A544" },
+        { iso3: "CHL", fill: "#E5A544" },
       ],
+      focus: { center: [-30, 0], scaleHint: 1.4 },
     },
   ],
 };
@@ -354,9 +372,6 @@ const routeChokepoints: RouteAnimationData = {
 
 // ─── Composition registrations ─────────────────────────────────────────────
 
-const choroplethDuration = (data: ChoroplethMapData): number =>
-  data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
-
 const routeDuration = (data: RouteAnimationData): number =>
   sec((data.phases.length > 0 ? data.phases.reduce((sum, p) => sum + p.durationSec, 0) : (data.durationSec ?? 8)) + 1);
 
@@ -391,48 +406,57 @@ const routeRomeRadial: RouteAnimationData = {
   source: "Smith's Atlas of Ancient & Classical Geography (1872), simplified",
 };
 
-export const CatalogChoroplethG7 = () => (
+// G7 / Blocs / Tordesillas — migrated from ChoroplethMap (Mapbox) to
+// AtlasPlate (pure SVG) on May 13, 2026. Mapbox produced unwanted
+// "rotating-paper" / "title-plate cutting into map" artifacts; AtlasPlate
+// is the canonical industry approach for static editorial choropleths
+// (NYT graphics, FT visual journalism, Bloomberg Opinion, Reuters, the
+// Economist — all use D3 + TopoJSON SVG, which is what AtlasPlate is).
+// Exports renamed to `CatalogAtlas*` + catalog IDs to `catalog-atlas-plate-*`
+// to reflect the underlying template. See MAP_TEMPLATE_SELECTOR.md
+// "Mapbox → AtlasPlate doctrine" section.
+export const CatalogAtlasG7 = () => (
   <Composition
-    id={catalogId("ChoroplethMap", "g7")}
-    component={ChoroplethMap}
-    schema={ChoroplethMapSchema}
+    id={catalogId("AtlasPlate", "g7")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
     calculateMetadata={({ props }) => ({
-      durationInFrames: choroplethDuration(props.data as ChoroplethMapData),
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: choroplethG7 as unknown as ChoroplethMapData }}
+    defaultProps={{ data: atlasG7 as unknown as AtlasPlateData }}
   />
 );
 
-export const CatalogChoroplethBlocs = () => (
+export const CatalogAtlasBlocs = () => (
   <Composition
-    id={catalogId("ChoroplethMap", "cold-war-blocs")}
-    component={ChoroplethMap}
-    schema={ChoroplethMapSchema}
+    id={catalogId("AtlasPlate", "cold-war-blocs")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
     calculateMetadata={({ props }) => ({
-      durationInFrames: choroplethDuration(props.data as ChoroplethMapData),
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: choroplethBlocs as unknown as ChoroplethMapData }}
+    defaultProps={{ data: atlasBlocs as unknown as AtlasPlateData }}
   />
 );
 
-export const CatalogChoroplethTordesillas = () => (
+export const CatalogAtlasTordesillas = () => (
   <Composition
-    id={catalogId("ChoroplethMap", "tordesillas")}
-    component={ChoroplethMap}
-    schema={ChoroplethMapSchema}
+    id={catalogId("AtlasPlate", "tordesillas")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
     calculateMetadata={({ props }) => ({
-      durationInFrames: choroplethDuration(props.data as ChoroplethMapData),
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: choroplethTordesillas as unknown as ChoroplethMapData }}
+    defaultProps={{ data: atlasTordesillas as unknown as AtlasPlateData }}
   />
 );
 
@@ -496,11 +520,12 @@ export const CatalogRouteChokepoints = () => (
   />
 );
 
-// ─── AtlasPlate variants ───────────────────────────────────────────────────
+// ─── AtlasPlate variants (COCOM / Cold War vintage) ────────────────────────
 //
 // AtlasPlate is the pure-SVG editorial cartography template (no Mapbox).
 // Catalog samples show the Tufte/Fortune register: flat, high-contrast,
-// brand-typed labels, no atmosphere.
+// brand-typed labels, no atmosphere. (G7 / Tordesillas / Blocs also use
+// AtlasPlate now — see the AtlasPlate-G7/Tordesillas/Blocs section above.)
 
 // Re-use the published sample data for the catalog showreel; tag with the
 // CATALOG_EPISODE so HeaderStrip reads "_catalog" alongside other showreel
@@ -696,11 +721,69 @@ export const CatalogDensityFabs = () => (
   />
 );
 
+// ─── TilegramUSMap variants ───────────────────────────────────────────────
+//
+// Equal-weight U.S. tilegram — every state as a same-size hex/tile. The
+// right form when the editorial point is "who counted, not where they
+// lived" (electoral votes, state-level votes, ratification status).
+
+const TRUMP_STATES_2024: Record<string, number> = {
+  AK: 3, AL: 9, AR: 6, AZ: 11, FL: 30, GA: 16, IA: 6, ID: 4, IN: 11,
+  KS: 6, KY: 8, LA: 8, MI: 15, MO: 10, MS: 6, MT: 4, NC: 16, ND: 3,
+  NE: 5, NV: 6, OH: 17, OK: 7, PA: 19, SC: 9, SD: 3, TN: 11,
+  TX: 40, UT: 6, WI: 10, WV: 4, WY: 3,
+};
+
+const HARRIS_STATES_2024: Record<string, number> = {
+  CA: 54, CO: 10, CT: 7, DC: 3, DE: 3, HI: 4, IL: 19, MA: 11, MD: 10,
+  ME: 4, MN: 10, NH: 4, NJ: 14, NM: 5, NY: 28, OR: 8, RI: 4, VA: 13, VT: 3,
+  WA: 12,
+};
+
+const buildTilegramElectoralStates = (): TilegramUSMapData["states"] => {
+  const out: TilegramUSMapData["states"] = [];
+  for (const [code, ev] of Object.entries(TRUMP_STATES_2024)) {
+    out.push({ state: code as USStateCode, value: -1, label: `${ev}` });
+  }
+  for (const [code, ev] of Object.entries(HARRIS_STATES_2024)) {
+    out.push({ state: code as USStateCode, value: 1, label: `${ev}` });
+  }
+  return out;
+};
+
+const tilegramElectoral2024: TilegramUSMapData = {
+  episode: CATALOG_EPISODE,
+  title: "2024 Presidential Electoral Map",
+  subtitle:
+    "Every state, equal weight — the map without geographic distortion",
+  states: buildTilegramElectoralStates(),
+  colorScale: "diverging",
+  valueLabel: "2024 result (Trump ← → Harris)",
+  source: "Associated Press final tally",
+  durationSec: 12,
+};
+
+export const CatalogTilegramElectoral = () => (
+  <Composition
+    id={catalogId("TilegramUSMap", "electoral-2024")}
+    component={TilegramUSMap}
+    schema={TilegramUSMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as TilegramUSMapData).durationSec ?? 12),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: tilegramElectoral2024 as unknown as TilegramUSMapData }}
+  />
+);
+
 // Catalog data exports for Showreel composition
 export const catalogMapsData = {
-  choroplethG7,
-  choroplethBlocs,
-  choroplethTordesillas,
+  // ChoroplethMap-shaped comps migrated to AtlasPlate May 13, 2026.
+  atlasG7,
+  atlasBlocs,
+  atlasTordesillas,
   routeSilkRoad,
   routeMagellan,
   routeChokepoints,
@@ -710,4 +793,5 @@ export const catalogMapsData = {
   proportionalFabs,
   cartogramEU,
   densityFabs,
+  tilegramElectoral2024,
 };

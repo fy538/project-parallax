@@ -34,7 +34,7 @@ import { DataChart } from "../templates/DataChart/DataChart";
 import { FrameworkDiagram } from "../templates/FrameworkDiagram/FrameworkDiagram";
 import { StatReveal } from "../templates/StatReveal/StatReveal";
 import { TitleTransition } from "../templates/TitleTransition/TitleTransition";
-import { ChoroplethMap } from "../templates/ChoroplethMap/ChoroplethMap";
+import { AtlasPlate } from "../templates/AtlasPlate/AtlasPlate";
 
 import { catalogDataData } from "./Data";
 import { catalogDiagramsData } from "./Diagrams";
@@ -48,8 +48,10 @@ import { catalogId } from "./helpers";
 // The contact sheet covers 5 representative templates that span the visual
 // spectrum: a chart (DataChart), a framework comparison (FrameworkDiagram),
 // a hero stat (StatReveal), a title card (TitleTransition), and a map
-// (ChoroplethMap). Adding more templates here makes them available to the
-// contact-sheet script automatically.
+// (AtlasPlate — migrated from ChoroplethMap May 13, 2026 per the
+// Mapbox→AtlasPlate doctrine; see MAP_TEMPLATE_SELECTOR.md). Adding more
+// templates here makes them available to the contact-sheet script
+// automatically.
 
 interface PreviewEntry {
   // Loose typing — each template has its own data shape and the union
@@ -76,9 +78,9 @@ const PREVIEW_REGISTRY: Record<string, PreviewEntry> = {
     Component: TitleTransition,
     data: catalogTitlesData.titleEpisode,
   },
-  ChoroplethMap: {
-    Component: ChoroplethMap,
-    data: catalogMapsData.choroplethG7,
+  AtlasPlate: {
+    Component: AtlasPlate,
+    data: catalogMapsData.atlasG7,
   },
 };
 

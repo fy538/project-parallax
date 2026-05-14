@@ -11,9 +11,10 @@
  */
 
 export {
-  CatalogChoroplethG7,
-  CatalogChoroplethBlocs,
-  CatalogChoroplethTordesillas,
+  // G7 / Blocs / Tordesillas migrated to AtlasPlate May 13, 2026.
+  CatalogAtlasG7,
+  CatalogAtlasBlocs,
+  CatalogAtlasTordesillas,
   CatalogRouteSilkRoad,
   CatalogRouteRomeRadial,
   CatalogRouteMagellan,
@@ -23,6 +24,7 @@ export {
   CatalogProportionalFabs,
   CatalogCartogramEU,
   CatalogDensityFabs,
+  CatalogTilegramElectoral,
 } from "./Maps";
 
 export {
@@ -50,6 +52,19 @@ export {
   CatalogBumpGDP,
   CatalogPyramidChina,
   CatalogRankChangeSemiconductors,
+  CatalogBeeswarmMilitary,
+  CatalogCalendarIsraelIran,
+  CatalogCalendarFedRates,
+  CatalogScatterPhillips,
+  CatalogStreamgraphOil,
+  CatalogStreamgraphFlags,
+  CatalogRidgelineLifeExpectancy,
+  CatalogMarimekkoEnergy,
+  CatalogMarimekkoEnergyEmphasis,
+  CatalogTernaryUN,
+  CatalogHorizonBRICS,
+  CatalogHorizonBRICSShared,
+  CatalogDumbbellIncome,
 } from "./Data";
 
 export {
@@ -71,10 +86,14 @@ export {
   CatalogFwFlow,
   CatalogFwMatrix,
   CatalogNwHubSpoke,
+  CatalogNwBipartite,
   CatalogSplitMaps,
   CatalogSplitTime,
   CatalogDuelingEmpireFall,
   CatalogDuelingBlockadesSubstrate,
+  CatalogArcDiagram,
+  CatalogStrategicLandscape,
+  CatalogTernaryUKVoter,
 } from "./Diagrams";
 
 export {

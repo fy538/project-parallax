@@ -69,12 +69,25 @@ const CATALOG_COMPS: ReadonlyArray<readonly [string, string]> = [
   ["AnnotatedImage", "callout-demo"],
   ["ImageComposite", "archive"],
   ["PhotoMontage", "treatments"],
-  // Data (20)
+  // Data (33) — May 14 2026: extended with 13 new variants
+  // (9 new templates + 4 previously-orphaned pre-existing templates).
   ["BayesianUpdate", "venice-floods"],
+  ["BeeswarmChart", "military-spending"],
+  ["BumpChart", "gdp-power-transition"],
+  ["CalendarHeatmap", "israel-iran-2024"],
+  ["CalendarHeatmap", "fed-rates-2024"],
+  ["ConnectedScatterplot", "phillips-curve"],
   ["DataChart", "axelrod-lollipop"],
   ["DataChart", "olympics-small-multiples"],
   ["DataChart", "space-race-comparison"],
   ["DataChart", "speeds-bar"],
+  ["DumbbellPlot", "income-spread"],
+  ["HorizonChart", "brics-fx"],
+  ["HorizonChart", "brics-fx-shared"],
+  ["IsotypeChart", "tsmc-chip-share"],
+  ["MarimekkoChart", "g7-energy"],
+  ["MarimekkoChart", "g7-energy-emphasis"],
+  ["PopulationPyramid", "china-morph"],
   ["PricingWaterfall", "coffee-cup"],
   ["PricingWaterfall", "motion-briefing"],
   ["PricingWaterfall", "motion-documentary"],
@@ -82,32 +95,47 @@ const CATALOG_COMPS: ReadonlyArray<readonly [string, string]> = [
   ["ProbabilityGauge", "scorecard"],
   ["ProbabilityGauge", "weather"],
   ["RadarChart", "track-specialists"],
+  ["RankChangeDotPlot", "semiconductors"],
+  ["RidgelinePlot", "life-expectancy"],
   ["SankeyFlow", "plastic-fate"],
   ["StatReveal", "apollo-cost"],
   ["StatReveal", "habitable-land"],
   ["StatReveal", "mariana-depth"],
+  ["Streamgraph", "us-oil-imports"],
+  ["Streamgraph", "tanker-flags-2024"],
+  ["TernaryPlot", "un-votes"],
+  ["TernaryPlot", "uk-voter-brexit"],
   ["TimeSeriesChart", "atmospheric-co2"],
   ["TimeSeriesChart", "life-expectancy-slope"],
   ["TimeSeriesChart", "population-small-multiples"],
   ["TimeSeriesChart", "world-population"],
-  // Diagrams (7)
+  // Diagrams (10) — added ArcDiagram, NetworkDiagram bipartite,
+  // StrategicLandscape May 2026
+  ["ArcDiagram", "grand-strategy"],
   ["DuelingFrameworks", "empire-fall"],
   ["FrameworkDiagram", "comparison"],
   ["FrameworkDiagram", "flow"],
   ["FrameworkDiagram", "matrix"],
   ["NetworkDiagram", "hub-spoke"],
+  ["NetworkDiagram", "bipartite"],
   ["SplitComposition", "maps"],
   ["SplitComposition", "time"],
+  ["StrategicLandscape", "semiconductor-strategy"],
   // Editorial / showcase / preview (5)
   ["Editorial", "aside"],
   ["Editorial", "hero"],
   ["Editorial", "minimal"],
   ["EmphasisShowcase", "all-six"],
   ["TemplatePreview", "emphasis-grid"],
-  // Maps — local-TopoJSON only (1)
+  // Maps — local-TopoJSON only / no MapGL dep (5).
+  // TilegramUSMap renders pure SVG hex grid — no Mapbox dependency.
   ["AtlasPlate", "cocom"],
+  ["AtlasPlate", "cold-war-vintage"],
+  ["ProportionalSymbolMap", "fabs"],
+  ["CartogramMap", "eu-population"],
+  ["TilegramUSMap", "electoral-2024"],
   // Scenarios (7)
-  ["BifurcationRoute", "latin-romance"],
+  // ["BifurcationRoute", "cocom-split"] removed May 13, 2026 — template deleted.
   ["DecisionTree", "chess-opening"],
   ["DecisionTree", "excomm-ladder"],
   ["GameBoard", "chess-endgame"],
@@ -122,7 +150,9 @@ const CATALOG_COMPS: ReadonlyArray<readonly [string, string]> = [
   ["HorizontalTimeline", "pandemics-dual"],
   ["HorizontalTimeline", "revolutions-phase"],
   ["TimelineComparison", "revolutions"],
-  ["TimelineMorph", "blockades"],
+  // ["TimelineMorph", "blockades"] — TimelineMorph template removed May 13, 2026.
+  // The blockades comparison migrated to DuelingFrameworks ("blockades-substrate").
+  ["DuelingFrameworks", "blockades-substrate"],
   // Titles (4)
   ["TitleTransition", "editorial"],
   ["TitleTransition", "end-card"],
@@ -142,6 +172,11 @@ const CATALOG_COMPS: ReadonlyArray<readonly [string, string]> = [
 const MAPBOX_SKIPPED_TEMPLATES: ReadonlySet<string> = new Set([
   "ChoroplethMap",
   "RouteAnimation",
+  // DensityMap uses MapGL (Mapbox tiles); the catalog-density-map-fab-sites
+  // comp exists but is intentionally not exercised by catalog-smoke for the
+  // same Mapbox-token-env-bundle reason. Real-data tests should cover it
+  // when the Mapbox token is present (see map-real-data.test.ts).
+  "DensityMap",
 ]);
 
 // Catalog comp → required asset path (relative to remotion-templates/public).
