@@ -1,69 +1,60 @@
 {
   "episode": "prisoners-dilemma",
   "title": "The Self-Confirming Trap",
-  "variant": "payoff-matrix",
+  "variant": "pd-canonical",
   "rowPlayer": "You",
   "colPlayer": "Counterpart",
-  "rowOptions": [
-    "Cooperate",
-    "Defect"
-  ],
-  "colOptions": [
-    "Cooperate",
-    "Defect"
-  ],
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
   "cells": [
     {
       "row": 0,
       "col": 0,
       "value": "3, 3",
-      "highlight": false
+      "cellType": "R",
+      "heroRole": "moral"
     },
     {
       "row": 0,
       "col": 1,
       "value": "0, 5",
-      "highlight": false
+      "cellType": "S"
     },
     {
       "row": 1,
       "col": 0,
       "value": "5, 0",
-      "highlight": false
+      "cellType": "T"
     },
     {
       "row": 1,
       "col": 1,
       "value": "1, 1",
-      "highlight": true,
-      "color": "#C4A747"
+      "cellType": "P",
+      "heroRole": "analytical"
     }
   ],
+  "showTPRSLegend": true,
+  "showBestResponseArrows": true,
+  "showNashGlyph": true,
   "phases": [
     {
       "label": "You defect first",
       "durationSec": 3,
-      "highlights": [
-        2,
-        3
-      ],
-      "annotation": "Trained to assume defection is rational \u2192"
+      "highlights": [2, 3],
+      "annotation": "Trained to assume defection is rational →"
     },
     {
       "label": "They see your defection",
       "durationSec": 3,
-      "highlights": [
-        3
-      ],
-      "annotation": "They conclude the model was right \u2192"
+      "highlights": [3],
+      "annotation": "They conclude the model was right →"
     },
     {
       "label": "\"Model confirmed\"",
       "durationSec": 4,
-      "highlights": [
-        3
-      ],
-      "annotation": "The prediction came true \u2014 because you believed it"
+      "highlights": [3],
+      "annotation": "The prediction came true — because you believed it"
     }
   ],
   "durationSec": 10,

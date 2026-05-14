@@ -5,6 +5,10 @@
   "fps": 30,
   "totalDurationSec": 891.8,
   "mode": "estimate",
+  "filmOverlay": {
+    "preset": "documentary",
+    "intensity": 0.45
+  },
   "pacing": {
     "multipliers": {
       "urgent": 0.7,
@@ -1694,9 +1698,53 @@
       ]
     },
     {
-      "id": "beat4-seg41-hold",
-      "type": "HOLD",
+      "id": "beat4-seg41b-iterated-play",
+      "type": "TEMPLATE",
       "startSec": 538.0,
+      "endSec": 548.5,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "holdAfter": 0.7,
+      "holdBehavior": "land",
+      "narrationRef": "The cooperative outcome is an equilibrium. It always was.",
+      "template": {
+        "component": "GameBoard",
+        "dataFile": "gameboard-iterated-play.json",
+        "backdropId": "constellation-grid"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.4
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 0,
+        "intensity": "normal"
+      },
+      "textureCues": [
+        {
+          "type": "dot-click",
+          "offsetSec": 2.5,
+          "volume": 0.05
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 5.0,
+          "volume": 0.05
+        },
+        {
+          "type": "dot-click",
+          "offsetSec": 7.5,
+          "volume": 0.05
+        }
+      ]
+    },
+    {
+      "id": "beat4-seg41b-hold",
+      "type": "HOLD",
+      "startSec": 548.5,
       "endSec": 549.2,
       "layer": "foreground",
       "beat": "beat4",

@@ -1,0 +1,41 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Iterated PD ≡ Stag Hunt",
+  "subtitle": "Brian Skyrms (2004) — the cooperative outcome was always an equilibrium",
+  "variant": "iterated-play",
+  "rowPlayer": "A",
+  "colPlayer": "B",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3" },
+    { "row": 0, "col": 1, "value": "0, 5" },
+    { "row": 1, "col": 0, "value": "5, 0" },
+    { "row": 1, "col": 1, "value": "1, 1" }
+  ],
+  "rounds": [
+    {
+      "label": "Round 1",
+      "highlights": [3],
+      "annotation": "The one-shot Nash: both defect. The model holds — for a single round."
+    },
+    {
+      "label": "Round 10",
+      "highlights": [3, 0],
+      "annotation": "Memory enters the game. Trust starts probing."
+    },
+    {
+      "label": "Round 50",
+      "highlights": [0, 3],
+      "annotation": "Tit-for-tat outscores Always-Defect. Cooperation spreads."
+    },
+    {
+      "label": "Round 200",
+      "highlights": [0],
+      "annotation": "Mutual cooperation is the stable equilibrium. It always was."
+    }
+  ],
+  "durationSec": 10,
+  "backgroundVariant": "light",
+  "source": "Skyrms, The Stag Hunt and the Evolution of Social Structure (2004)"
+}

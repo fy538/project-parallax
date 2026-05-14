@@ -170,6 +170,8 @@ Visual pipeline updated: ChatGPT image generation + Pika 2.5 (chained morphs) fo
 |  | DIR: cam(overview → element:0, sync:"cooperation", track) |
 |  | DIR: hold(land) |
 | The philosopher Brian Skyrms proved something remarkable. {✅} An iterated Prisoner's Dilemma — the version people actually encounter, where you meet the same counterpart repeatedly — is mathematically equivalent to a stag hunt. The cooperative outcome is an equilibrium. It always was. {✅} | **P2** · [MG:] KineticTypography — "Iterated PD ≡ Stag Hunt" · Skyrms (2004) citation · amber · 6s |
+|  | **P1** · [MG:] GameBoard — `iterated-play` variant. Same PD payoffs (3,3 / 0,5 / 5,0 / 1,1) replicated across rounds 1, 10, 50, 200 in small multiples. Highlight migrates from defect-defect (R1) → mixed (R10) → cooperation gaining (R50) → mutual cooperation locked (R200). Visual proof of "it always was" — the equilibrium emerges as memory accumulates. · [prisoners-dilemma/gameboard-iterated-play.json] · 10s |
+|  | DIR: reveal(stagger:rounds, hero:final-round) |
 |  | DIR: hold(land) |
 | Which means the question was never "how do you escape the logic of defection?" It was always "how do you coordinate on the outcome you both prefer?" | **P2** · [MG:] FrameworkDiagram — Old question struck through: "How to escape defection?" → New question in amber: "How to coordinate on cooperation?" · [prisoners-dilemma/framework-reframe.json] · 6s |
 |  | DIR: reveal(instant, hero:1, glow) |

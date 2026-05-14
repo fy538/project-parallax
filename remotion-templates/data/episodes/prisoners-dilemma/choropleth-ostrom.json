@@ -87,5 +87,97 @@
       ],
       "scale": 130
     }
+  ],
+  "annotations": [
+    {
+      "at": [-0.4, 39.5],
+      "label": "VALENCIA",
+      "sublabel": "Huertas — 600+ years",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "left",
+      "leader": { "dx": -60, "dy": -30 },
+      "phase": 0
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "SWISS ALPS",
+      "sublabel": "Alpine grazing — 13th c.",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "right",
+      "leader": { "dx": 70, "dy": -30 },
+      "phase": 0
+    },
+    {
+      "at": [-0.4, 39.5],
+      "label": "Valencia",
+      "hierarchy": "secondary",
+      "align": "left",
+      "phase": 1
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "Swiss Alps",
+      "hierarchy": "secondary",
+      "align": "right",
+      "phase": 1
+    },
+    {
+      "at": [138.2, 36.2],
+      "label": "JAPAN",
+      "sublabel": "Iriaichi forest cooperatives",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "left",
+      "leader": { "dx": -60, "dy": -40 },
+      "phase": 1
+    },
+    {
+      "at": [-69.0, 44.7],
+      "label": "MAINE",
+      "sublabel": "Lobster fisheries",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "right",
+      "leader": { "dx": 60, "dy": -40 },
+      "phase": 1
+    },
+    {
+      "at": [-0.4, 39.5],
+      "label": "Valencia",
+      "hierarchy": "tertiary",
+      "align": "left",
+      "phase": 2
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "Swiss Alps",
+      "hierarchy": "tertiary",
+      "align": "right",
+      "phase": 2
+    },
+    {
+      "at": [138.2, 36.2],
+      "label": "Japan",
+      "hierarchy": "tertiary",
+      "align": "left",
+      "phase": 2
+    },
+    {
+      "at": [-69.0, 44.7],
+      "label": "Maine",
+      "hierarchy": "tertiary",
+      "align": "right",
+      "phase": 2
+    },
+    {
+      "at": [100, -5],
+      "label": "Source: Ostrom (1990, 2009) — 800+ documented cases",
+      "hierarchy": "tertiary",
+      "emphasis": "mute",
+      "align": "center",
+      "phase": 2
+    }
   ]
 }

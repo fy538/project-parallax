@@ -2,45 +2,44 @@
   "episode": "prisoners-dilemma",
   "title": "Nuclear Strategy in Miniature",
   "subtitle": "RAND Corporation's operating premise",
-  "variant": "payoff-matrix",
+  "variant": "pd-canonical",
   "rowPlayer": "United States",
   "colPlayer": "Soviet Union",
-  "rowOptions": [
-    "Restrain",
-    "Strike"
-  ],
-  "colOptions": [
-    "Restrain",
-    "Strike"
-  ],
+  "rowOptions": ["Restrain", "Strike"],
+  "colOptions": ["Restrain", "Strike"],
   "cells": [
     {
       "row": 0,
       "col": 0,
       "value": "Peace",
-      "highlight": false
+      "cellType": "R",
+      "heroRole": "moral"
     },
     {
       "row": 0,
       "col": 1,
       "value": "Annihilation",
-      "highlight": false,
+      "cellType": "S",
       "color": "#A64D46"
     },
     {
       "row": 1,
       "col": 0,
       "value": "Dominance",
-      "highlight": false
+      "cellType": "T"
     },
     {
       "row": 1,
       "col": 1,
       "value": "MAD",
-      "highlight": true,
-      "color": "#A64D46"
+      "cellType": "P",
+      "color": "#A64D46",
+      "heroRole": "analytical"
     }
   ],
+  "showTPRSLegend": true,
+  "showBestResponseArrows": true,
+  "showNashGlyph": true,
   "phases": [
     {
       "label": "The Cold War Game",
@@ -51,9 +50,7 @@
     {
       "label": "Nash Equilibrium",
       "durationSec": 4,
-      "highlights": [
-        3
-      ],
+      "highlights": [3],
       "annotation": "The 'rational' outcome: mutual escalation"
     }
   ],

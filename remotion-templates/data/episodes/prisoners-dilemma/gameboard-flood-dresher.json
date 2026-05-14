@@ -2,43 +2,42 @@
   "episode": "prisoners-dilemma",
   "title": "The First Experiment",
   "subtitle": "Flood & Dresher, RAND Corporation, 1950",
-  "variant": "payoff-matrix",
+  "variant": "pd-canonical",
   "rowPlayer": "Alchian",
   "colPlayer": "Williams",
-  "rowOptions": [
-    "Cooperate",
-    "Defect"
-  ],
-  "colOptions": [
-    "Cooperate",
-    "Defect"
-  ],
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
   "cells": [
     {
       "row": 0,
       "col": 0,
       "value": "3, 3",
-      "highlight": false
+      "cellType": "R",
+      "heroRole": "moral"
     },
     {
       "row": 0,
       "col": 1,
       "value": "0, 5",
-      "highlight": false
+      "cellType": "S"
     },
     {
       "row": 1,
       "col": 0,
       "value": "5, 0",
-      "highlight": false
+      "cellType": "T"
     },
     {
       "row": 1,
       "col": 1,
       "value": "1, 1",
-      "highlight": false
+      "cellType": "P",
+      "heroRole": "analytical"
     }
   ],
+  "showTPRSLegend": true,
+  "showBestResponseArrows": true,
+  "showNashGlyph": true,
   "phases": [
     {
       "label": "100 rounds played",
@@ -49,9 +48,7 @@
     {
       "label": "Result",
       "durationSec": 4,
-      "highlights": [
-        0
-      ],
+      "highlights": [0],
       "annotation": "Mutual cooperation: 60 out of 100 rounds",
       "counterAnimation": {
         "cooperate": 60,
@@ -63,9 +60,7 @@
     {
       "label": "Mutual defection",
       "durationSec": 3,
-      "highlights": [
-        3
-      ],
+      "highlights": [3],
       "annotation": "The 'only rational outcome': 14 out of 100 rounds"
     }
   ],
