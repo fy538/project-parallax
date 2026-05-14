@@ -8,6 +8,12 @@ dist
 src/__tests__/.temp-renders/
 test-results.json
 
+# Shaded-relief assets — source GeoTIFF + pre-warped PNGs are NOT
+# committed; run `node tools/prepare-shaded-relief.mjs` after the
+# one-time download. See tools/shaded-relief-setup.md.
+public/geo/relief/_source/
+public/geo/relief/*.png
+
 # Environment
 .env
 .env.local

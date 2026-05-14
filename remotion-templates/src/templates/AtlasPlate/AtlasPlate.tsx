@@ -1103,6 +1103,16 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 key={c.alpha3 ?? `c${i}`}
                 d={c.d}
                 fill={resolveCountryFill(c.alpha3)}
+                // atlas-relief register — country fills go semi-transparent
+                // so the shaded-relief raster (rendered BELOW in
+                // ReliefUnderlay, inside the same camera transform) peeks
+                // through. 0.78 keeps the data color clearly identifiable
+                // (amber India, rust China) while letting Himalayan
+                // terrain texture read through the fill. Non-focus
+                // countries inherit landFill = palette.bone, which at
+                // 0.78 over the relief produces a warm paper-on-relief
+                // composite — the canonical NatGeo register.
+                fillOpacity={isRelief ? 0.78 : undefined}
                 stroke={borderColor}
                 strokeWidth={borderStroke}
                 strokeLinejoin="round"

@@ -251,7 +251,7 @@ export interface AtlasPlateData {
    * argument (mountain frontiers, Himalayan supply routes, alpine border
    * disputes) — i.e., the cases that historically escaped to Mapbox
    * terrain. Falls back to plain `"atlas"` when the projection-warped
-   * raster asset is missing (run `node tools/prepare-shaded-relief.mjs`
+   * raster asset is missing (run `cd remotion-templates && node scripts/prepare-shaded-relief.mjs`
    * after the initial Natural Earth download — see
    * `tools/shaded-relief-setup.md`).
    *
