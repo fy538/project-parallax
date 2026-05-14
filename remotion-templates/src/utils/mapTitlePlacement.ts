@@ -1,33 +1,47 @@
 /**
- * mapTitlePlacement — smart placement algorithm for cartouche-mode title blocks.
+ * mapTitlePlacement — smart placement for the floating MapTitleFrame.
  *
- * Given a set of country (or generic point) centroids in a d3-geo projection,
- * pick the corner of the canvas with the LOWEST data density. The cartouche
- * (~600x140px inset 32px from the corner) is then placed there, minimizing
- * occlusion of the actual map content.
+ * Given a set of HIGHLIGHTED-feature centroids in screen space (countries
+ * with data fills, route waypoints, symbol locations — NOT all countries on
+ * the basemap), pick the corner with the maximum clearance.
  *
- * Algorithm:
- *   1. For each of 4 corner regions (~600x140px inset 32px from the edge):
- *   2. Count how many supplied points fall inside it
- *   3. Pick the corner with the LEAST coverage
- *   4. Tie-break preference: top-left → bottom-left → top-right → bottom-right
- *      (editorial reading-order bias — eyes land top-left first)
+ * ## Algorithm (v3 — May 14, 2026)
+ *
+ * Distance-based: for each of 4 corner anchor points, compute the MINIMUM
+ * euclidean distance to any highlighted-feature centroid. Pick the corner
+ * with the LARGEST minimum distance (the corner whose nearest signal is
+ * farthest away).
+ *
+ * The corner "anchor" is the inner-corner of the title's footprint — the
+ * point furthest INSIDE the canvas. This gives the algorithm a better
+ * sense of where the title's bounding box would actually overlap with a
+ * country fill, vs. just using the corner of the canvas itself.
+ *
+ * ## Why distance-based, not in-box count
+ *
+ * v2 used "count points inside corner rect" — but country fills extend far
+ * beyond their centroids (USA's centroid is in Kansas; its fill covers from
+ * Maine to California). A corner box that doesn't *contain* the centroid
+ * can still be entirely covered by the country's polygon. Distance-based
+ * scoring rewards corners that are FAR from highlighted features, which
+ * correlates better with "the title doesn't sit on top of a color fill."
+ *
+ * Tie-break preference: top-left → bottom-left → top-right → bottom-right
+ * (editorial reading-order bias — eyes land top-left first).
  *
  * Mapbox-based templates (ChoroplethMap, RouteAnimation, DensityMap) don't
  * have access to projected screen coordinates in the same precomputed way,
- * so they short-circuit to "top-left" with a `warnIf` advisory at the call
- * site (the caller already knows it's a Mapbox template).
- *
- * Reference: this module is the SVG-template companion to the smart-placement
- * fallback behavior documented in MapTitleFrame.tsx.
+ * so they short-circuit to "top-left" at the call site.
  */
 
 import {
-  MAP_TITLE_CARTOUCHE_WIDTH,
-  MAP_TITLE_CARTOUCHE_HEIGHT,
-  MAP_TITLE_CARTOUCHE_INSET,
+  MAP_TITLE_FOOTPRINT_WIDTH,
+  MAP_TITLE_FOOTPRINT_HEIGHT,
 } from "../components/MapTitleFrame";
 import { layout } from "../design/theme";
+
+/** Margin from the canvas edge that the footprint sits within. */
+const FOOTPRINT_INSET = 32;
 
 export type CartoucheCorner =
   | "top-left"
@@ -40,31 +54,25 @@ export interface ScreenPoint {
   y: number;
 }
 
-/** A corner rectangle in screen space (x, y, w, h). */
-interface CornerRect {
-  corner: CartoucheCorner;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-const buildCornerRects = (): CornerRect[] => {
-  const w = MAP_TITLE_CARTOUCHE_WIDTH;
-  const h = MAP_TITLE_CARTOUCHE_HEIGHT;
-  const inset = MAP_TITLE_CARTOUCHE_INSET;
+/**
+ * The "anchor" point for a corner is the INNER corner of the title
+ * footprint — the diagonal point furthest into the canvas. This is the
+ * point we measure clearance from: if a highlighted feature is far from
+ * this anchor, it's far from the title's full bounding box.
+ */
+const buildCornerAnchors = (): { corner: CartoucheCorner; x: number; y: number }[] => {
+  const w = MAP_TITLE_FOOTPRINT_WIDTH;
+  const h = MAP_TITLE_FOOTPRINT_HEIGHT;
+  const inset = FOOTPRINT_INSET;
   const W = layout.width;
   const H = layout.height;
   return [
-    { corner: "top-left", x: inset, y: inset, w, h },
-    { corner: "top-right", x: W - inset - w, y: inset, w, h },
-    { corner: "bottom-left", x: inset, y: H - inset - h, w, h },
-    { corner: "bottom-right", x: W - inset - w, y: H - inset - h, w, h },
+    { corner: "top-left", x: inset + w, y: inset + h },
+    { corner: "top-right", x: W - inset - w, y: inset + h },
+    { corner: "bottom-left", x: inset + w, y: H - inset - h },
+    { corner: "bottom-right", x: W - inset - w, y: H - inset - h },
   ];
 };
-
-const isInside = (p: ScreenPoint, r: CornerRect): boolean =>
-  p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 
 /** Tie-break preference (editorial reading order bias). */
 const TIE_BREAK_ORDER: readonly CartoucheCorner[] = [
@@ -74,36 +82,50 @@ const TIE_BREAK_ORDER: readonly CartoucheCorner[] = [
   "bottom-right",
 ];
 
+const sqDist = (ax: number, ay: number, bx: number, by: number): number => {
+  const dx = ax - bx;
+  const dy = ay - by;
+  return dx * dx + dy * dy;
+};
+
 /**
- * Pick the lowest-density corner from a set of pre-projected screen points.
+ * Pick the corner with maximum clearance from a set of pre-projected screen
+ * points. Falls back to "top-left" when `points` is empty.
  *
- * @param points  Screen-space (x, y) centroids of currently rendered data
- *                (countries, symbols, route waypoints, etc.). Already in the
- *                canvas's 1920x1080 coordinate space.
- * @returns       The corner with the least overlap. Falls back to "top-left"
- *                when `points` is empty.
+ * @param points  Screen-space (x, y) centroids of HIGHLIGHTED features only
+ *                (countries with data fills, symbol locations, route
+ *                waypoints) — not all-country centroids.
  */
 export function resolveCartoucheCorner(points: ScreenPoint[]): CartoucheCorner {
   if (!points || points.length === 0) {
     return "top-left";
   }
-  const rects = buildCornerRects();
-  const counts = rects.map((r) => {
-    let c = 0;
-    for (const p of points) if (isInside(p, r)) c++;
-    return { rect: r, count: c };
+  const anchors = buildCornerAnchors();
+  // For each anchor: the squared distance to its NEAREST highlighted point.
+  // We want to maximize this — the corner whose nearest signal is farthest
+  // away is the corner with the most breathing room.
+  const scores = anchors.map((a) => {
+    let nearest = Infinity;
+    for (const p of points) {
+      const d = sqDist(a.x, a.y, p.x, p.y);
+      if (d < nearest) nearest = d;
+    }
+    return { corner: a.corner, nearest };
   });
 
-  // Find the minimum count.
-  let min = Infinity;
-  for (const c of counts) if (c.count < min) min = c.count;
+  // Find the maximum.
+  let max = -Infinity;
+  for (const s of scores) if (s.nearest > max) max = s.nearest;
 
-  // Tie-break by editorial preference.
+  // Tie-break: when corners score within ~5% of the max, prefer the
+  // editorial reading-order winner.
+  const tolerance = max * 0.05;
   for (const preferred of TIE_BREAK_ORDER) {
-    const hit = counts.find((c) => c.rect.corner === preferred && c.count === min);
+    const hit = scores.find(
+      (s) => s.corner === preferred && s.nearest >= max - tolerance,
+    );
     if (hit) return preferred;
   }
-  // Should be unreachable, but fall back deterministically.
   return "top-left";
 }
 

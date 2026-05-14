@@ -60,14 +60,10 @@ const atlasG7: AtlasPlateData = {
   subtitle: "How seven industrialized economies command global output",
   projection: "naturalEarth",
   source: "IMF / World Bank",
-  // MapTitleFrame demo — atlas treatment with right-aligned masthead.
-  // Atlas-plate convention: amber rule + thin ink hairline beneath it,
-  // mimics atlas neatline. Date/scope/note render as monospaced caps.
-  mapTitle: {
-    mode: "banner",
-    treatment: "atlas",
-    masthead: { date: "2024", scope: "7 NATIONS", note: "47% GLOBAL GDP" },
-  },
+  // Title floats at the corner with maximum clearance from highlighted
+  // countries (auto-resolved each phase). Phase label sits in the opposite
+  // corner.
+  mapTitle: { placement: "auto" },
   phases: [
     {
       title: "Group of Seven",
@@ -91,10 +87,7 @@ const atlasBlocs: AtlasPlateData = {
   title: "Bloc Architecture, 1955–1990",
   projection: "naturalEarth",
   source: "Allied / Soviet treaty archives, simplified",
-  // MapTitleFrame demo — minimalist banner. Default treatment: paper-color
-  // band with single amber bottom rule. The safe choice when the title
-  // doesn't need metadata callouts.
-  mapTitle: { mode: "banner", treatment: "minimalist" },
+  mapTitle: { placement: "auto" },
   phases: [
     {
       title: "Phase I — Founding NATO",
@@ -571,11 +564,11 @@ export const CatalogRouteChokepoints = () => (
 const atlasCocom: AtlasPlateData = {
   ...atlasPlateSampleData,
   episode: CATALOG_EPISODE,
-  // MapTitleFrame demo — cartouche with smart placement. The algorithm
-  // counts country centroids inside each ~600×140px corner region and
-  // places the title in the LEAST populated corner (tie-break favors
-  // top-left for editorial reading-order bias).
-  mapTitle: { mode: "cartouche", placement: "auto" },
+  // Smart placement: count highlighted-country centroids inside each
+  // ~640×140px corner region and float the title at the LEAST populated
+  // corner (tie-break favors top-left for editorial reading order). Phase
+  // label renders in the opposite corner.
+  mapTitle: { placement: "auto" },
 };
 
 const atlasDuration = (data: AtlasPlateData): number =>

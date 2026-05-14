@@ -26,17 +26,8 @@ import { FooterStrip } from "../../components/FooterStrip";
 import { MapTitleFrame } from "../../components/MapTitleFrame";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
-import {
-  layout,
-  palette,
-  fonts,
-  fontSizes,
-  fontWeights,
-  letterSpacing,
-  sec,
-  shadows,
-} from "../../design/theme";
-import { exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import { layout, palette, sec } from "../../design/theme";
+import { fadeIn, fadeOut } from "../../utils/animation";
 import { hexToRgba } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
 import type { DensityMapData, DensityPhase } from "./types";
@@ -395,17 +386,17 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           />
         )}
 
-        {/* Title overlay — OPT-IN. Mapbox templates default to no title
-            (atmospheric register, May 13 2026 doctrine). Set `mapTitle`
-            to render a banner / cartouche / inline title via MapTitleFrame.
-            Smart cartouche placement falls back to "top-left" + warnIf. */}
+        {/* Title — OPT-IN for Mapbox-backed templates (atmospheric-register
+            doctrine: maps tell their story through terrain, not chrome).
+            Mapbox templates can't compute smart placement (no projection
+            access at render time), so "auto" falls back to "top-left" with
+            a dev warning. Phase label → footerTitle (opposite corner).
+            Source → FooterStrip.scale (brand chrome layer). */}
         {data.mapTitle && (
           (() => {
-            const isAutoOnMapbox =
-              data.mapTitle.mode === "cartouche" &&
-              data.mapTitle.placement === "auto";
+            const isAuto = (data.mapTitle.placement ?? "auto") === "auto";
             warnIf(
-              isAutoOnMapbox,
+              isAuto,
               "DensityMap",
               "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
               "templates. Falling back to 'top-left'.",
@@ -416,57 +407,13 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
                 subtitle={data.subtitle}
                 mode={dark ? "dark" : "light"}
                 config={data.mapTitle}
-                footerCaption={
-                  data.source ? `Source: ${data.source}` : currentWindow.phase.title
-                }
+                footerTitle={currentWindow.phase.title}
+                footerSubtitle={currentWindow.phase.subtitle}
                 syncPoints={direction.syncPoints}
-                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+                resolvedCartoucheCorner={isAuto ? "top-left" : undefined}
               />
             );
           })()
-        )}
-
-        {/* Phase title overlay — bottom-left, mirrors AtlasPlate convention. */}
-        {currentWindow.phase.title && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              left: layout.safeAreaTier.generous.left,
-              maxWidth: 720,
-              opacity: Math.min(
-                fadeIn(frame, currentWindow.startFrame + sec(0.6), sec(0.5)),
-                exitFade(frame, durationInFrames, 15),
-              ),
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fonts.display,
-                fontSize: fontSizes.h2,
-                fontWeight: fontWeights.semibold,
-                letterSpacing: `${letterSpacing.h2}px`,
-                color: dark ? palette.bone : palette.ink,
-                textShadow: dark ? shadows.textLift : shadows.textLiftLight,
-              }}
-            >
-              {currentWindow.phase.title}
-            </div>
-            {currentWindow.phase.subtitle && (
-              <div
-                style={{
-                  marginTop: 8,
-                  fontFamily: fonts.metadata,
-                  fontSize: fontSizes.label,
-                  letterSpacing: `${letterSpacing.label}px`,
-                  textTransform: "uppercase",
-                  color: palette.taupe,
-                }}
-              >
-                {currentWindow.phase.subtitle}
-              </div>
-            )}
-          </div>
         )}
       </AbsoluteFill>
     </Background>

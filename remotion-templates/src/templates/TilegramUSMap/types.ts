@@ -122,9 +122,9 @@ export interface TilegramUSMapData {
   backgroundVariant?: "dark" | "light";
 
   /**
-   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
-   * Smart cartouche placement uses hex-tile centroid density.
-   * See `MapTitleFrame` JSDoc.
+   * Title placement. Default `{ placement: "auto" }` — floats the title at
+   * the corner with max clearance from the hex-tile grid. See
+   * `MapTitleFrame` JSDoc.
    */
   mapTitle?: MapTitleConfig;
 

@@ -93,8 +93,9 @@ export interface CartogramMapData {
   backgroundTint?: string;
 
   /**
-   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
-   * See `MapTitleFrame` JSDoc for opt-in cartouche / inline modes.
+   * Title placement. Default `{ placement: "auto" }` — floats the title at
+   * the corner with maximum clearance from the de-collided circle positions.
+   * See `MapTitleFrame` JSDoc.
    */
   mapTitle?: MapTitleConfig;
 

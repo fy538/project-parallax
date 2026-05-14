@@ -42,7 +42,6 @@ import {
   fontWeights,
   letterSpacing,
   sec,
-  shadows,
 } from "../../design/theme";
 import {
   resolveProjection,
@@ -60,7 +59,7 @@ import {
   formatLegendValue,
   sortSymbolsLargestFirst,
 } from "../../utils/proportionalSymbol";
-import { CLAMP_CUBIC_INOUT, exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import { CLAMP_CUBIC_INOUT, fadeIn, fadeOut } from "../../utils/animation";
 import {
   easeCameraT,
   applyDwell,
@@ -393,13 +392,14 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
   // are the data visible to the viewer; placing the cartouche away from
   // them minimizes occlusion.
   const resolvedCartoucheCorner = useMemo(() => {
-    if (data.mapTitle?.mode !== "cartouche") return undefined;
-    if (data.mapTitle.placement !== "auto") return undefined;
+    const placement = data.mapTitle?.placement ?? "auto";
+    if (placement !== "auto") return undefined;
     const lonLats: [number, number][] = [];
     for (const s of currentWindow.phase.symbols) {
       const centroid = getCountryCentroid(s.iso3);
       if (centroid) lonLats.push(centroid);
     }
+    if (lonLats.length === 0) return "top-left" as const;
     const points = projectPointsForPlacement(lonLats, projectScreen);
     return resolveCartoucheCorner(points);
   }, [data.mapTitle, currentWindow.phase.symbols, projectScreen]);
@@ -578,58 +578,18 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
           />
         </svg>
 
+        {/* Phase label routed through MapTitleFrame footer slot (opposite
+            corner from the title). Source attribution → FooterStrip.scale. */}
         <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
           config={data.mapTitle}
-          footerCaption={data.source ? `Source: ${data.source}` : undefined}
+          footerTitle={currentWindow.phase.title}
+          footerSubtitle={currentWindow.phase.subtitle}
           syncPoints={direction.syncPoints}
           resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
-
-        {/* Phase title overlay — bottom-left, mirrors AtlasPlate */}
-        {currentWindow.phase.title && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              left: layout.safeAreaTier.generous.left,
-              maxWidth: 720,
-              opacity: Math.min(
-                fadeIn(frame, currentWindow.startFrame + sec(0.6), sec(0.5)),
-                exitFade(frame, durationInFrames, 15),
-              ),
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fonts.display,
-                fontSize: fontSizes.h2,
-                fontWeight: fontWeights.semibold,
-                letterSpacing: `${letterSpacing.h2}px`,
-                color: dark ? palette.bone : palette.ink,
-                textShadow: dark ? shadows.textLift : shadows.textLiftLight,
-              }}
-            >
-              {currentWindow.phase.title}
-            </div>
-            {currentWindow.phase.subtitle && (
-              <div
-                style={{
-                  marginTop: 8,
-                  fontFamily: fonts.metadata,
-                  fontSize: fontSizes.label,
-                  letterSpacing: `${letterSpacing.label}px`,
-                  textTransform: "uppercase",
-                  color: palette.taupe,
-                }}
-              >
-                {currentWindow.phase.subtitle}
-              </div>
-            )}
-          </div>
-        )}
       </AbsoluteFill>
     </Background>
   );

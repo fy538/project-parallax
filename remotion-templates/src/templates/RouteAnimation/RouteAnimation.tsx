@@ -178,20 +178,25 @@ function computeAutoCamera(
     centerLat = latSum / targetIndices.length;
   }
 
-  // Compute zoom based on geographic spread
+  // Compute zoom based on geographic spread.
+  // May 14, 2026 — bumped all default zooms by ~0.3-0.4 so the globe /
+  // continent fills more of the canvas (was reading as a small floating
+  // sphere on a paper background; now feels editorial-magazine-cover-
+  // scale). FT / NYT globe shots typically occupy 50-60% of the frame
+  // area; the prior zoom 2.0 default put the globe at ~30%.
   let zoom: number;
   if (targetIndices.length === 1) {
-    zoom = 4.5; // Single city — close
+    zoom = 4.5; // Single city — close (unchanged; already tight)
   } else if (maxSpread > 100) {
-    zoom = 2.0; // Global spread — wide view showing the route
+    zoom = 2.3; // Global spread — was 2.0; bumped to fill more frame
   } else if (maxSpread > 60) {
-    zoom = 2.5;
+    zoom = 2.8; // Was 2.5
   } else if (maxSpread < 15) {
-    zoom = 4.0; // Tight cluster
+    zoom = 4.2; // Tight cluster — was 4.0
   } else if (maxSpread < 40) {
-    zoom = 3.2; // Regional
+    zoom = 3.4; // Regional — was 3.2
   } else {
-    zoom = 2.8; // Continental
+    zoom = 3.0; // Continental — was 2.8
   }
 
   // Progressive bearing rotation: globe turns between phases
@@ -944,7 +949,13 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                         {pt.label && (
                           <div
                             style={{
-                              fontSize: fontSizes.h3,
+                              // May 14, 2026 — was fontSizes.h3 (36); reduced
+                              // to 24 to match the FT/NYT editorial register
+                              // for point labels at globe/regional zoom. The
+                              // 36 read as "billboard"; 24 stays editorial
+                              // without dominating the geography. Bold +
+                              // textShadow lift preserves legibility.
+                              fontSize: 24,
                               maxWidth: textMaxWidth.label,
                               fontFamily: fonts.heading,
                               fontWeight: 600,
@@ -959,7 +970,10 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                         {pt.sublabel && (
                           <div
                             style={{
-                              fontSize: fontSizes.body,
+                              // Sublabel: 14 (was 22 / body); proportional
+                              // to the 24 label size — keeps the
+                              // label/sublabel ratio editorial.
+                              fontSize: 14,
                               maxWidth: textMaxWidth.label,
                               fontFamily: fonts.body,
                               color: theme.text.muted,
@@ -1008,18 +1022,15 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           />
         )}
 
-        {/* Title overlay — OPT-IN. Mapbox-backed: defaults to no title
-            (atmospheric register, May 13 2026 doctrine). When `mapTitle`
-            is provided, MapTitleFrame renders the requested mode.
-            Smart cartouche placement isn't supported here; falls back
-            to "top-left" + warnIf. */}
+        {/* Title — OPT-IN for Mapbox-backed templates (atmospheric-register
+            doctrine, May 13 2026). Phase label routed through footerTitle
+            (opposite corner). Source is rendered separately below for now
+            (RouteAnimation's FooterStrip carries zoom, not source). */}
         {data.mapTitle && (
           (() => {
-            const isAutoOnMapbox =
-              data.mapTitle.mode === "cartouche" &&
-              data.mapTitle.placement === "auto";
+            const isAuto = (data.mapTitle.placement ?? "auto") === "auto";
             warnIf(
-              isAutoOnMapbox,
+              isAuto,
               "RouteAnimation",
               "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
               "templates. Falling back to 'top-left'.",
@@ -1030,19 +1041,20 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                 subtitle={data.subtitle}
                 mode={data.backgroundVariant === "dark" ? "dark" : "light"}
                 config={data.mapTitle}
-                footerCaption={data.source ? `Source: ${data.source}` : undefined}
+                footerTitle={currentPhase.title}
+                footerSubtitle={currentPhase.subtitle}
                 syncPoints={direction.syncPoints}
-                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+                resolvedCartoucheCorner={isAuto ? "top-left" : undefined}
               />
             );
           })()
         )}
 
-        {/* Phase title overlay — appears after camera settles.
-            Suppressed when the phase has no title (e.g., radial mode's
-            auto-derived single phase, which inherits the chart title via
-            TitleBlock at the top and shouldn't duplicate it here). */}
-        {currentPhase.title && <div
+        {/* Legacy phase-title overlay — only rendered when `mapTitle` is
+            NOT set (so RouteAnimation's atmospheric-default behavior still
+            surfaces phase labels). Keeps the route-colored accent bar that
+            distinguishes route phases from generic map phases. */}
+        {!data.mapTitle && currentPhase.title && <div
           style={{
             position: "absolute",
             bottom: contentArea("content", "generous").bottom + layout.spacing.md,

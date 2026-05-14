@@ -107,8 +107,9 @@ export interface ProportionalSymbolMapData {
   backgroundTint?: string;
 
   /**
-   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
-   * See `MapTitleFrame` JSDoc for opt-in cartouche / inline modes.
+   * Title placement. Default `{ placement: "auto" }` — floats the title at
+   * the corner with max clearance from highlighted symbol locations.
+   * See `MapTitleFrame` JSDoc.
    */
   mapTitle?: MapTitleConfig;
 

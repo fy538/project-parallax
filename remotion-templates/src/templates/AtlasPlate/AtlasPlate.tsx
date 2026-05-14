@@ -620,26 +620,23 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     [currentWindow.phase.countries],
   );
 
-  // ── Smart cartouche placement ─────────────────────────────────────────────
-  // When `mapTitle.mode === "cartouche"` and `placement === "auto"`, compute
-  // the corner with the LEAST country-centroid density in the current phase.
-  // Uses the active projection so the placement tracks camera transitions.
+  // ── Smart title placement ─────────────────────────────────────────────────
+  // Resolve the title's corner anchor: the corner with maximum clearance
+  // from HIGHLIGHTED-feature centroids in the current phase (countries with
+  // data fills, not all countries). The projection accounts for camera zoom
+  // / pan, so the placement tracks phase transitions automatically.
+  // Default is "auto" — set `mapTitle.placement` to a corner to override.
   const resolvedCartoucheCorner = useMemo(() => {
-    if (data.mapTitle?.mode !== "cartouche") return undefined;
-    if (data.mapTitle.placement !== "auto") return undefined;
-    // Project each highlighted country centroid through the active
-    // projection (which already accounts for camera zoom/pan). Falls back
-    // to all-country centroids when the phase has no highlights.
+    const placement = data.mapTitle?.placement ?? "auto";
+    if (placement !== "auto") return undefined;
     const highlighted = currentWindow.phase.countries
       .map((c) => getCountryCentroid(c.iso3))
       .filter((c): c is [number, number] => c !== null);
-    const pool: [number, number][] =
-      highlighted.length > 0
-        ? highlighted
-        : (getAllCountries()
-            .map((c) => (c.alpha3 ? getCountryCentroid(c.alpha3) : null))
-            .filter((c): c is [number, number] => c !== null));
-    const points = projectPointsForPlacement(pool, projectAnnotation);
+    // No highlights → default to top-left. (No need to score against the
+    // entire basemap — if nothing's highlighted, every corner is equally
+    // fine and the editorial-reading-order default wins.)
+    if (highlighted.length === 0) return "top-left" as const;
+    const points = projectPointsForPlacement(highlighted, projectAnnotation);
     return resolveCartoucheCorner(points);
   }, [data.mapTitle, currentWindow.phase.countries, projectAnnotation]);
 
@@ -858,11 +855,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           })}
         </svg>
 
-        {/* Title block — MapTitleFrame solves the title-overlapping-map
-            problem with band/cartouche/inline placement modes. Default
-            `{ mode: "banner", treatment: "minimalist" }` puts the title
-            in a paper-color band at the top of the canvas. See JSDoc on
-            `mapTitle` in types.ts for opt-in / back-compat options. */}
+        {/* Title floats on the map at the corner with maximum clearance
+            from highlighted features (see `resolvedCartoucheCorner` above).
+            Phase label sits in the opposite corner. Source caption is
+            already routed through FooterStrip.scale — no duplication. */}
         <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
@@ -870,15 +866,9 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           config={data.mapTitle}
           footerTitle={currentWindow.phase.title}
           footerSubtitle={currentWindow.phase.subtitle}
-          footerCaption={data.source ? `Source: ${data.source}` : undefined}
           syncPoints={direction.syncPoints}
           resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
-        {/* Phase title routed through MapTitleFrame's footerTitle slot above
-            (May 14, 2026). The legacy floating overlay collided with the new
-            bottom band; routing through the band gives it the same backing
-            fill as the source caption, eliminating the collision and the
-            need for textShadow lifts on top of country fills. */}
       </AbsoluteFill>
     </Background>
   );

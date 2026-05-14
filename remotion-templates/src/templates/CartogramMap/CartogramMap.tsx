@@ -36,7 +36,6 @@ import {
   fontWeights,
   letterSpacing,
   sec,
-  shadows,
 } from "../../design/theme";
 import {
   resolveProjection,
@@ -56,7 +55,7 @@ import {
 } from "../../utils/proportionalSymbol";
 import { runDorlingLayout } from "../../utils/dorling";
 import { warnIf } from "../../utils/dataWarnings";
-import { exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import { fadeIn, fadeOut } from "../../utils/animation";
 import type { FeatureCollection } from "geojson";
 import type { CartogramMapData, CartogramPhase } from "./types";
 
@@ -261,13 +260,14 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
     // convention favors listing direct usages even when redundant.
   }, [currentWindow.phase.data, baseProjection, maxRadiusPx, scaleType, framePadding, xyStrength]);
 
-  // ── Smart cartouche placement ─────────────────────────────────────────────
+  // ── Smart title placement ─────────────────────────────────────────────────
   // The Dorling layout already has each circle in screen space — use the
-  // de-collided positions directly so the cartouche avoids the actual
-  // rendered (not the geographic-centroid) location of every circle.
+  // de-collided positions directly so the title anchors to the corner with
+  // max clearance from the rendered (not geographic-centroid) circles.
   const resolvedCartoucheCorner = useMemo(() => {
-    if (data.mapTitle?.mode !== "cartouche") return undefined;
-    if (data.mapTitle.placement !== "auto") return undefined;
+    const placement = data.mapTitle?.placement ?? "auto";
+    if (placement !== "auto") return undefined;
+    if (dorlingLayout.length === 0) return "top-left" as const;
     const points = dorlingLayout.map((n) => ({ x: n.x, y: n.y }));
     return resolveCartoucheCorner(points);
   }, [data.mapTitle, dorlingLayout]);
@@ -398,58 +398,19 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
           />
         </svg>
 
+        {/* Phase title routed through MapTitleFrame's footerTitle slot (it
+            renders in the corner opposite the title). Source attribution
+            lives in FooterStrip.scale at the brand-chrome layer. */}
         <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
           config={data.mapTitle}
-          footerCaption={data.source ? `Source: ${data.source}` : undefined}
+          footerTitle={currentWindow.phase.title}
+          footerSubtitle={currentWindow.phase.subtitle}
           syncPoints={direction.syncPoints}
           resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
-
-        {/* Phase title overlay */}
-        {currentWindow.phase.title && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              left: layout.safeAreaTier.generous.left,
-              maxWidth: 720,
-              opacity: Math.min(
-                fadeIn(frame, currentWindow.startFrame + sec(0.6), sec(0.5)),
-                exitFade(frame, durationInFrames, 15),
-              ),
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fonts.display,
-                fontSize: fontSizes.h2,
-                fontWeight: fontWeights.semibold,
-                letterSpacing: `${letterSpacing.h2}px`,
-                color: dark ? palette.bone : palette.ink,
-                textShadow: dark ? shadows.textLift : shadows.textLiftLight,
-              }}
-            >
-              {currentWindow.phase.title}
-            </div>
-            {currentWindow.phase.subtitle && (
-              <div
-                style={{
-                  marginTop: 8,
-                  fontFamily: fonts.metadata,
-                  fontSize: fontSizes.label,
-                  letterSpacing: `${letterSpacing.label}px`,
-                  textTransform: "uppercase",
-                  color: palette.taupe,
-                }}
-              >
-                {currentWindow.phase.subtitle}
-              </div>
-            )}
-          </div>
-        )}
       </AbsoluteFill>
     </Background>
   );

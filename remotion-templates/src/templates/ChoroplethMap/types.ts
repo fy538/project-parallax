@@ -198,13 +198,12 @@ export interface ChoroplethMapData {
    * OPTIONAL title placement. ChoroplethMap is Mapbox-backed; by doctrine
    * the title comes from the script's voice-over or a preceding
    * TitleTransition composition (the "atmospheric register only" policy
-   * established May 13, 2026). Setting `mapTitle` opts INTO an overlay
-   * title — the banner mode is the safe choice (paper band keeps the
-   * title from cutting into the map).
+   * established May 13, 2026). Setting `mapTitle` opts INTO a floating
+   * title overlay.
    *
-   * Smart placement (`mode: "cartouche", placement: "auto"`) is NOT
-   * supported on Mapbox-backed templates — falls back to "top-left" with
-   * a dev warning. Use AtlasPlate for cartouche placement.
+   * Smart placement (`placement: "auto"`) is NOT supported on Mapbox-backed
+   * templates (no projection access outside GL); falls back to "top-left"
+   * with a dev warning. Use AtlasPlate for smart placement.
    */
   mapTitle?: MapTitleConfig;
 

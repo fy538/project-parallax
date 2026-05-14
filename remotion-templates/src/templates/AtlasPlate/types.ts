@@ -184,19 +184,15 @@ export interface AtlasPlateData {
   backgroundTint?: string;
 
   /**
-   * Title placement system — see `MapTitleFrame` in components/.
+   * Title placement — see `MapTitleFrame` in components/.
    *
-   * Default when omitted: `{ mode: "banner", treatment: "minimalist" }`.
-   * That places title + subtitle inside a horizontal paper-color band at
-   * the top of the canvas (and a matching bottom band when there's a
-   * phase label or source caption), so the map content never overlaps the
-   * title.
+   * Default when omitted: `{ placement: "auto" }`. The title floats at the
+   * corner with maximum clearance from highlighted (data-bearing) country
+   * centroids in the current phase. Phase label (`phase.title` /
+   * `phase.subtitle`) stacks below it in the same corner.
    *
-   * Pass `{ mode: "inline" }` to preserve the pre-May-2026 look (title in
-   * the safe-area corner with a heavy paper-color text-stroke punching
-   * through the map). Pass `{ mode: "cartouche", placement: "auto" }` to
-   * use the smart-placement algorithm (corner with lowest country
-   * centroid density wins).
+   * Override `placement` to one of `top-left | top-right | bottom-left |
+   * bottom-right` to pin the title to a fixed corner instead.
    *
    * @see src/components/MapTitleFrame.tsx
    */

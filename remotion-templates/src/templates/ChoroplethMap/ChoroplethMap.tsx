@@ -542,35 +542,32 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
 
         {/* Coordinate metadata now lives in HeaderStrip (top-right) */}
 
-        {/* Title overlay — OPT-IN. ChoroplethMap (Mapbox) defaults to no
-            title (atmospheric register, May 13 2026 doctrine). When the
-            author explicitly sets `mapTitle`, MapTitleFrame renders the
-            band/cartouche/inline treatment. Smart cartouche placement
-            isn't supported on Mapbox-backed templates — the projection
-            isn't available outside the GL context. The runtime falls
-            back to "top-left" + warnIf when "auto" is requested.
+        {/* Title — OPT-IN. ChoroplethMap (Mapbox) defaults to no title
+            (atmospheric-register doctrine, May 13 2026). When the author
+            sets `mapTitle`, MapTitleFrame floats it at a corner. Smart
+            placement isn't supported on Mapbox-backed templates (no
+            projection available outside GL); falls back to "top-left".
+            Use AtlasPlate when you need smart placement.
             See MAP_TEMPLATE_SELECTOR.md. */}
         {data.mapTitle && (
           (() => {
-            const isAutoOnMapbox =
-              data.mapTitle.mode === "cartouche" &&
-              data.mapTitle.placement === "auto";
+            const isAuto = (data.mapTitle.placement ?? "auto") === "auto";
             warnIf(
-              isAutoOnMapbox,
+              isAuto,
               "ChoroplethMap",
               "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
               "templates (no projection available outside GL). Falling back " +
-              "to 'top-left'. Use AtlasPlate for smart-placement cartouche.",
+              "to 'top-left'. Use AtlasPlate for smart placement.",
             );
             return (
               <MapTitleFrame
                 title={data.title}
-                subtitle={current?.phase.subtitle}
                 mode={data.backgroundVariant === "dark" ? "dark" : "light"}
                 config={data.mapTitle}
-                footerCaption={current?.phase.title}
+                footerTitle={current?.phase.title}
+                footerSubtitle={current?.phase.subtitle}
                 syncPoints={direction.syncPoints}
-                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+                resolvedCartoucheCorner={isAuto ? "top-left" : undefined}
               />
             );
           })()
