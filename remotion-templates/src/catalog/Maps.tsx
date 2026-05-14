@@ -88,6 +88,12 @@ const atlasBlocs: AtlasPlateData = {
   projection: "naturalEarth",
   source: "Allied / Soviet treaty archives, simplified",
   mapTitle: { placement: "auto" },
+  // Sea labels — atlas-plate signature. The PACIFIC / ATLANTIC arcs
+  // declare "this is an atlas" rather than a data-vis frame.
+  seaLabels: ["pacific", "atlantic", "indian"],
+  // Locator inset — small Equal Earth world map at top-right. World view
+  // (no focus.iso3), so it shows the basemap without an extent rectangle.
+  inset: { show: true, corner: "top-right" },
   phases: [
     {
       title: "Phase I — Founding NATO",
@@ -569,6 +575,7 @@ const atlasCocom: AtlasPlateData = {
   // corner (tie-break favors top-left for editorial reading order). Phase
   // label renders in the opposite corner.
   mapTitle: { placement: "auto" },
+  seaLabels: ["pacific", "atlantic", "indian"],
 };
 
 const atlasDuration = (data: AtlasPlateData): number =>
@@ -668,6 +675,61 @@ export const CatalogAtlasColdWarVintage = () => (
       height: layout.height,
     })}
     defaultProps={{ data: atlasColdWarVintage as unknown as AtlasPlateData }}
+  />
+);
+
+// Atlas-relief variant — the National Geographic register. Modern
+// Tufte/Fortune flat cartography PLUS Tom Patterson's hand-painted
+// shaded relief raster under the country layer (gated by
+// `aesthetic: "atlas-relief"`; falls back to plain atlas when the
+// pre-warped PNG asset is missing — see tools/shaded-relief-setup.md
+// for the one-time asset prep).
+//
+// Example uses the Himalayan supply-route case that historically
+// escaped to Mapbox-terrain — Equal Earth projection, focus on the
+// India / China / Pakistan / Nepal area, terrain texture visible at
+// regional zoom.
+const atlasReliefHimalaya: AtlasPlateData = {
+  episode: CATALOG_EPISODE,
+  title: "The Himalayan corridor",
+  subtitle: "Where terrain dictates strategy",
+  projection: "equalEarth",
+  aesthetic: "atlas-relief",
+  source: "Natural Earth (Tom Patterson, public domain) + Natural Earth countries",
+  framePadding: 60,
+  graticule: {
+    spacing: 10,
+    opacity: 0.06,
+  },
+  phases: [
+    {
+      title: "Mountain frontier",
+      subtitle: "India · China · Pakistan · Nepal · Bhutan",
+      durationSec: 8,
+      focus: { iso3: ["IND", "CHN", "PAK", "NPL", "BTN"], scaleHint: 1.0 },
+      countries: [
+        { iso3: "IND", fill: palette.amber, label: "INDIA" },
+        { iso3: "CHN", fill: palette.rust, label: "CHINA" },
+        { iso3: "PAK", fill: palette.taupe, label: "PAKISTAN" },
+        { iso3: "NPL", fill: palette.taupe, label: "NEPAL" },
+        { iso3: "BTN", fill: palette.taupe, label: "BHUTAN" },
+      ],
+    },
+  ],
+};
+
+export const CatalogAtlasReliefHimalaya = () => (
+  <Composition
+    id={catalogId("AtlasPlate", "relief-himalaya")}
+    component={AtlasPlate}
+    schema={AtlasPlateSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: atlasDuration(props.data as AtlasPlateData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: atlasReliefHimalaya as unknown as AtlasPlateData }}
   />
 );
 

@@ -661,6 +661,20 @@ export const mapConfig = {
     countryLabel: palette.bone,
   },
   /**
+   * Editorial-atlas register — deeper ocean tone for clear land/water
+   * contrast on SVG atlas plates (AtlasPlate, CartogramMap,
+   * ProportionalSymbolMap). The Mapbox `styleColors.ocean` is tuned to
+   * match the Meridian Light Studio style and reads as bone-on-bone when
+   * the basemap is also bone — visible in catalog renders (May 14 2026
+   * audit). The editorial-atlas ocean is ~7% darker than bone to give
+   * the 6–10% luminance gap FT / Economist / Bartholomew atlas plates
+   * conventionally use. Not used by Mapbox-backed templates.
+   */
+  editorialOcean: {
+    light: "#DDD3C5", // ~7% darker than bone (#F0E6D0)
+    dark: "#0A0907",  // ~25% darker than ink (#1C1814)
+  },
+  /**
    * "Vintage" palette — period-atlas register for AtlasPlate's
    * `aesthetic: "vintage"` mode. Reads as a mid-century Bartholomew /
    * Fortune-atlas plate: tea-stained paper, warmer land, brown-ink

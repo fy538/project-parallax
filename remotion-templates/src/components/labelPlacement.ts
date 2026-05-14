@@ -111,9 +111,13 @@ function typographyFor(
 ): TypographyForHierarchy {
   switch (hierarchy) {
     case "primary":
+      // 28 hardcoded — matches the May 14, 2026 MapAnnotations marker
+      // render. Tracking the rendered size keeps measureText's bbox
+      // estimate accurate; if the rendered size diverged, the placer's
+      // collision detection would be off.
       return {
         fontFamily: fonts.display,
-        fontSize: fontSizes.h3,
+        fontSize: 28,
         fontWeight: fontWeights.bold,
         textTransform: "uppercase",
         letterSpacing: letterSpacing.h3,
@@ -335,6 +339,18 @@ export interface PlaceableAnnotation {
    *  caller so the placer agrees with the component's DEFAULT_OFFSET_Y
    *  convention per hierarchy. */
   defaultDy: number;
+  /**
+   * Optional bbox override for this label. When set, the placer uses the
+   * provided pixel-space `{w, h}` instead of inferring from
+   * `ann.hierarchy` via `estimateBboxPx`.
+   *
+   * Use case: AtlasPlate's country labels render with `fonts.display +
+   * fontSizes.label` (not the metadata-style "tertiary" typography that
+   * `estimateBboxPx` returns for that hierarchy). Passing the measured
+   * country-label bbox makes the placer's collision detection accurate
+   * to what's actually rendered.
+   */
+  bboxOverride?: { w: number; h: number };
 }
 
 /**
@@ -393,7 +409,7 @@ export function placeLabels(
   const placed: Bbox[] = [];
 
   for (const { idx } of order) {
-    const { ann, defaultDy } = items[idx];
+    const { ann, defaultDy, bboxOverride } = items[idx];
     const anchor = project(ann.at);
     if (!anchor) {
       results[idx] = {
@@ -409,7 +425,7 @@ export function placeLabels(
     // Manual override always wins — author had a reason; honor it.
     if (ann.leader) {
       const { dx, dy } = ann.leader;
-      const bbox = estimateBboxPx(ann);
+      const bbox = bboxOverride ?? estimateBboxPx(ann);
       placed.push({
         cx: anchor.x + dx,
         cy: anchor.y + dy,
@@ -429,7 +445,7 @@ export function placeLabels(
       continue;
     }
 
-    const bbox = estimateBboxPx(ann);
+    const bbox = bboxOverride ?? estimateBboxPx(ann);
     const candList = candidates(bbox, defaultDy);
 
     // Find first non-overlapping candidate; fall back to least-overlap.

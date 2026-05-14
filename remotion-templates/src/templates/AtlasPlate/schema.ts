@@ -8,12 +8,26 @@ import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
 import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 import { ALL_DISPUTE_TAGS } from "../../utils/disputedBoundaries";
+import { ALL_SEA_LABEL_TAGS } from "../../utils/seaLabels";
 
 const AtlasCountryFillSchema = z.object({
   iso3: z.string().min(2),
   fill: z.string().optional(),
   label: z.string().optional(),
   noData: z.boolean().optional(),
+  /**
+   * Country-label placement strategy:
+   *   - "auto" (default) — let the collision-aware placer decide. Tiny
+   *     countries auto-skip, small countries get leader-out, others sit
+   *     inside.
+   *   - "inside" — force the label INSIDE the polygon at centroid; no
+   *     leader. Use when the polygon is large enough to host the label.
+   *   - "leader" — force a leader-out placement (label outside the
+   *     polygon with a thin line connecting). Use for tiny countries
+   *     where label-inside is illegible.
+   *   - "skip" — render no label at all.
+   */
+  labelStrategy: z.enum(["auto", "inside", "leader", "skip"]).optional(),
 });
 
 const AtlasPhaseSchema = z.object({
@@ -36,6 +50,14 @@ const AtlasPhaseSchema = z.object({
       after: z.number().min(0).max(1).optional(),
     })
     .optional(),
+  /**
+   * How country fills transition INTO this phase from the previous one.
+   * - "lerp" (default): sRGB interpolation over the camera-transition window.
+   *   Soft, editorial — the right default for analogy / phase reveals.
+   * - "instant": hard swap at the phase boundary. Use for dramatic beats
+   *   ("the bloc collapses") where the suddenness IS the editorial point.
+   */
+  fillTransition: z.enum(["lerp", "instant"]).optional(),
 });
 
 export const AtlasPlateSchema = z.object({
@@ -81,8 +103,60 @@ export const AtlasPlateSchema = z.object({
           }
         }
       }),
+    /**
+     * Sea-label opt-in. Renders major water bodies as tracked uppercase
+     * text following a projected geodesic arc — the atlas-plate convention
+     * that makes an editorial atlas read as an atlas rather than data-vis.
+     *
+     * Pass an array of tag strings (curated set; see `seaLabels.ts`) or
+     * inline `SeaLabel` objects for episode-specific labels.
+     *
+     * Example: `seaLabels: ["pacific", "atlantic", "mediterranean"]`.
+     */
+    seaLabels: z
+      .array(
+        z.union([
+          z.string(),
+          z.object({
+            tag: z.string(),
+            label: z.string(),
+            arc: z.array(z.tuple([z.number(), z.number()])).min(2),
+            hierarchy: z.enum(["primary", "secondary"]),
+          }),
+        ]),
+      )
+      .optional()
+      .superRefine((val, ctx) => {
+        if (!val) return;
+        for (const item of val) {
+          if (typeof item === "string" && !ALL_SEA_LABEL_TAGS.includes(item)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Unknown sea-label tag "${item}". Valid: ${ALL_SEA_LABEL_TAGS.join(", ")}`,
+            });
+          }
+        }
+      }),
+    /**
+     * Locator inset — a small Equal Earth world map showing where the
+     * camera is currently focused. Anchors the viewer when the main view
+     * is zoomed in on a region. Standard editorial-atlas device.
+     *
+     * When `phase.focus.iso3` is set, the inset draws a rust extent
+     * rectangle around those countries' world-space bbox. Otherwise
+     * (world view), no rectangle.
+     */
+    inset: z
+      .object({
+        show: z.literal(true),
+        corner: z
+          .enum(["top-left", "top-right", "bottom-left", "bottom-right"])
+          .optional(),
+        size: z.number().positive().optional(),
+      })
+      .optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
-    aesthetic: z.enum(["atlas", "vintage"]).optional(),
+    aesthetic: z.enum(["atlas", "vintage", "atlas-relief"]).optional(),
     backgroundTint: z.string().optional(),
     mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),

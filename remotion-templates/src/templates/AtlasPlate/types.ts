@@ -14,6 +14,7 @@ import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { ProjectionName } from "../../utils/atlasProjection";
 import type { MapTitleConfig } from "../../components/MapTitleFrame";
+import type { SeaLabelInput } from "../../utils/seaLabels";
 
 /** A country's fill assignment within a phase. */
 export interface AtlasCountryFill {
@@ -29,6 +30,20 @@ export interface AtlasCountryFill {
    * as ChoroplethMap → choropleth-map.md § 6.5.
    */
   noData?: boolean;
+  /**
+   * Country-label placement strategy.
+   *
+   * - `"auto"` (default) — collision-aware placer decides. Tiny countries
+   *   auto-skip, small countries get leader-out placement, others sit
+   *   inside the polygon at centroid.
+   * - `"inside"` — force label inside the polygon at centroid; no leader.
+   *   Use when polygon is large enough to host the label.
+   * - `"leader"` — force a leader-out placement (label outside polygon
+   *   with a thin connector line). Use for tiny countries where
+   *   inside-placement is illegible.
+   * - `"skip"` — render no label at all.
+   */
+  labelStrategy?: "auto" | "inside" | "leader" | "skip";
 }
 
 /** A single phase of the atlas animation. */
@@ -99,6 +114,21 @@ export interface AtlasPhase {
    * remaining 80%.
    */
   cameraDwell?: { before?: number; after?: number };
+
+  /**
+   * How country fills transition INTO this phase from the previous phase's
+   * fills.
+   *
+   * - `"lerp"` (default) — sRGB color interpolation over the camera
+   *   transition window. Soft, editorial — countries crossfade between
+   *   their previous-phase fill and this-phase fill. Right default for
+   *   analogy / structural-reveal beats.
+   * - `"instant"` — hard color swap at the phase boundary. Use for
+   *   dramatic moments where the suddenness IS the editorial point
+   *   ("the bloc collapses," "Russia invades"). Matches the v1 (pre-May
+   *   14 2026) behavior of all phases.
+   */
+  fillTransition?: "lerp" | "instant";
 }
 
 /** Full data input for an AtlasPlate composition. */
@@ -160,6 +190,43 @@ export interface AtlasPlateData {
    * `src/utils/disputedBoundaries.ts`. Add new disputes there.
    */
   disputedBoundaries?: true | string[];
+
+  /**
+   * Sea/ocean labels — opt-in tracked-uppercase labels along projected
+   * geodesic arcs. Atlas-plate convention; the single highest-impact
+   * "this reads as an atlas, not data-vis" addition.
+   *
+   * Pass tag strings from the curated set (Pacific, Atlantic, Indian,
+   * Arctic, Southern, Mediterranean, Caribbean, North Sea, Baltic, Red
+   * Sea, Persian Gulf, S. China Sea, Bay of Bengal, Gulf of Mexico, Sea
+   * of Japan) OR inline `SeaLabel` objects for niche labels not in the
+   * curated registry.
+   *
+   * Example: `seaLabels: ["pacific", "atlantic", "mediterranean"]`.
+   *
+   * Curated registry: `src/utils/seaLabels.ts`.
+   */
+  seaLabels?: SeaLabelInput[];
+
+  /**
+   * Locator inset — a small Equal Earth world map at a corner, showing
+   * the camera's current focus as a rust extent rectangle. Standard
+   * editorial-atlas device that anchors the viewer when the main view
+   * is zoomed in on a region.
+   *
+   * - `show: true` — render the inset.
+   * - `corner` — anchor position. Default `"top-right"`.
+   * - `size` — width in px. Default 180. Height auto-scales (3:2 aspect).
+   *
+   * When `phase.focus.iso3` is set, the inset draws a rust rectangle
+   * around those countries' world-space bbox. Otherwise no rectangle.
+   */
+  inset?: {
+    show: true;
+    corner?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+    size?: number;
+  };
+
   /** Map mode — light (default) or dark. */
   backgroundVariant?: "light" | "dark";
 
@@ -176,9 +243,26 @@ export interface AtlasPlateData {
    * Ignored when `backgroundVariant: "dark"` (vintage is a light-register
    * aesthetic; no dark-vintage equivalent yet).
    *
+   * `"atlas-relief"` — modern atlas register PLUS a Tom Patterson hand-
+   * painted shaded-relief raster underlay (public-domain Natural Earth).
+   * The relief sits under country fills + strokes, tinted into the bone/
+   * paper palette so it reads as "atlas plate with terrain" rather than
+   * "satellite photo." Use when terrain is structurally relevant to the
+   * argument (mountain frontiers, Himalayan supply routes, alpine border
+   * disputes) — i.e., the cases that historically escaped to Mapbox
+   * terrain. Falls back to plain `"atlas"` when the projection-warped
+   * raster asset is missing (run `node tools/prepare-shaded-relief.mjs`
+   * after the initial Natural Earth download — see
+   * `tools/shaded-relief-setup.md`).
+   *
+   * Today supports `projection: "equalEarth" | "naturalEarth" |
+   * "equirectangular"`. Orthographic globe relief is deferred (would need
+   * a separate per-rotation rasterizer); a warn-and-skip path fires when
+   * combined with orthographic.
+   *
    * Reference: references/template-research/atlas-plate.md § Aesthetic register.
    */
-  aesthetic?: "atlas" | "vintage";
+  aesthetic?: "atlas" | "vintage" | "atlas-relief";
 
   /** Subtle color tint for emotional temperature. Hex. */
   backgroundTint?: string;

@@ -61,7 +61,9 @@ import {
   type CountryFeature,
 } from "../../utils/atlasProjection";
 import { getDisputedBoundaries, densifyPolyline } from "../../utils/disputedBoundaries";
+import { resolveSeaLabels, type SeaLabel } from "../../utils/seaLabels";
 import { CLAMP_CUBIC_INOUT, exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import { lerpHex } from "../../utils/colorUtils";
 import {
   easeCameraT,
   applyDwell,
@@ -69,8 +71,16 @@ import {
 } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
 import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
+import {
+  placeLabels,
+  type PlaceableAnnotation,
+  type Placement,
+} from "../../components/labelPlacement";
+import { measureText } from "@remotion/layout-utils";
 import type { AtlasPlateData, AtlasPhase } from "./types";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
+import { AtlasInsetLocator } from "../../components/AtlasInsetLocator";
+import { ReliefUnderlay } from "./ReliefUnderlay";
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -516,7 +526,14 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     });
   }, [data.disputedBoundaries, activePathGen, isOrthographic]);
 
-  // ── Per-country fill (built per phase) ──────────────────────────────────
+  // ── Per-country fill maps (current phase + previous, for crossfade) ─────
+  const fillMapOptions = useMemo(
+    () => ({
+      landFill: dark ? palette.ink : palette.bone,
+      noDataFill: palette.umber,
+    }),
+    [dark],
+  );
   const currentFillMap = useMemo(
     () =>
       buildPhaseFillMap(
@@ -525,12 +542,67 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           fill: c.fill,
           noData: c.noData,
         })),
-        {
-          landFill: dark ? palette.ink : palette.bone,
-          noDataFill: palette.umber,
-        },
+        fillMapOptions,
       ),
-    [currentWindow.phase.countries, dark],
+    [currentWindow.phase.countries, fillMapOptions],
+  );
+
+  // Previous-phase fill map for the phase-boundary crossfade. The fill
+  // resolver below lerps from `prevFillMap[iso3]` to `currentFillMap[iso3]`
+  // over the camera transition window. Empty `{}` on phase 0 (no source
+  // phase to lerp from); the resolver short-circuits to current fill.
+  const prevFillMap = useMemo(() => {
+    if (safeIdx === 0) return {} as Record<string, string>;
+    const prev = windows[safeIdx - 1].phase;
+    return buildPhaseFillMap(
+      prev.countries.map((c) => ({
+        alpha3: c.iso3,
+        fill: c.fill,
+        noData: c.noData,
+      })),
+      fillMapOptions,
+    );
+  }, [windows, safeIdx, fillMapOptions]);
+
+  // Crossfade progress (0 → 1) over the CAMERA_TRANSITION_FRAMES window at
+  // the start of each new phase. Eased so color motion matches camera
+  // motion (both use the same cubic curve in `easeCameraT`). Skipped
+  // entirely when `currentWindow.phase.fillTransition === "instant"` —
+  // returns 1 so the lerp resolves directly to the target fill.
+  const fillTransitionT = useMemo(() => {
+    if (safeIdx === 0) return 1;
+    if (currentWindow.phase.fillTransition === "instant") return 1;
+    const sinceStart = frame - currentWindow.startFrame;
+    if (sinceStart <= 0) return 0;
+    if (sinceStart >= CAMERA_TRANSITION_FRAMES) return 1;
+    // Match the camera's transition curve so color motion stays in sync.
+    return easeCameraT(
+      sinceStart / CAMERA_TRANSITION_FRAMES,
+      currentWindow.phase.cameraTransition ?? "linear",
+    );
+  }, [
+    frame,
+    currentWindow.startFrame,
+    currentWindow.phase.fillTransition,
+    currentWindow.phase.cameraTransition,
+    safeIdx,
+  ]);
+
+  /**
+   * Resolve a country's fill at the current frame, including the
+   * phase-boundary crossfade. Closes over the current/prev fill maps and
+   * the eased transition progress.
+   */
+  const resolveCountryFill = useCallback(
+    (alpha3: string | null | undefined): string => {
+      const landFill = fillMapOptions.landFill;
+      const target = (alpha3 && currentFillMap[alpha3]) || landFill;
+      if (fillTransitionT >= 1) return target;
+      const source = (alpha3 && prevFillMap[alpha3]) || landFill;
+      if (source === target) return target;
+      return lerpHex(source, target, fillTransitionT);
+    },
+    [currentFillMap, prevFillMap, fillTransitionT, fillMapOptions.landFill],
   );
 
   // ── Theme tokens ────────────────────────────────────────────────────────
@@ -546,6 +618,24 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     "other to silence this warning.",
   );
   const isVintage = data.aesthetic === "vintage" && !dark;
+  // `atlas-relief` register — shaded-relief raster underlay sits below the
+  // country fills inside the camera-transformed `<g>`. Country fills must
+  // be semi-transparent so the relief peeks through (otherwise the relief
+  // is wasted; the visible texture is only at the ocean rim). We do that
+  // by mixing landFill with the ocean color downstream — but for v1 the
+  // fills stay solid and the relief shows only where graticule + ocean
+  // are visible. That's the National-Geographic register; full
+  // semi-transparent fills are a v2 polish pass.
+  const isRelief = data.aesthetic === "atlas-relief";
+  warnIf(
+    isRelief && isOrthographic,
+    "AtlasPlate",
+    "aesthetic: 'atlas-relief' is not supported with orthographic " +
+      "projection in v1 (no per-frame globe-rotation rasterizer yet). " +
+      "Falls back to plain atlas — the orthographic globe renders with " +
+      "no relief. Pick equalEarth / naturalEarth / equirectangular if " +
+      "relief is required.",
+  );
   const vintage = mapConfig.vintageStyleColors;
 
   const landFill = isVintage
@@ -554,9 +644,13 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const borderColor = isVintage
     ? vintage.landBorder
     : (dark ? palette.bone : palette.ink);
+  // Editorial-atlas ocean is deeper than the Mapbox `styleColors.ocean`
+  // token so the land/water boundary reads cleanly on a bone basemap —
+  // see `editorialOcean` JSDoc and May 14 2026 atlas audit. Vintage uses
+  // its own tea-stained tone; not overridden.
   const oceanColor = isVintage
     ? vintage.ocean
-    : (dark ? mapConfig.darkStyleColors.ocean : mapConfig.styleColors.ocean);
+    : (dark ? mapConfig.editorialOcean.dark : mapConfig.editorialOcean.light);
 
   // Per-mount unique SVG filter IDs. We previously derived these from
   // `data.episode`, but `episode` is the SAME slug across multiple
@@ -619,6 +713,163 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     () => currentWindow.phase.countries.filter((c) => c.label),
     [currentWindow.phase.countries],
   );
+
+  // ── Country-label placement (collision-aware) ────────────────────────────
+  // Run the greedy 8-position placer (`placeLabels`, shared with
+  // MapAnnotations) over the current phase's country labels. Replaces the
+  // v1 "render at centroid, ignore collisions" pass that caused the
+  // NLD/BEL/LUX/DEU pileup in catalog renders.
+  //
+  // Skip handling — auto-decision per country:
+  //   • `labelStrategy: "skip"` → omitted entirely from the placer input.
+  //   • `labelStrategy: "auto"` + tiny screen-space polygon → skipped.
+  //   • Anything else → included; placer decides inside-vs-leader.
+  const countryLabelPlacements = useMemo(() => {
+    if (labelledCountries.length === 0) return [];
+
+    // Per-label bbox via measureText, accounting for the country-label
+    // typography (fonts.display, fontSizes.label, uppercase + tracking).
+    // Cached at module scope via measureText's own memoization wouldn't
+    // help here because the label text varies; recompute per phase.
+    const items: Array<{
+      iso3: string;
+      label: string;
+      lonLat: [number, number];
+      strategy: "auto" | "inside" | "leader";
+      bbox: { w: number; h: number };
+      polygonAreaPx: number;
+    }> = [];
+
+    for (const c of labelledCountries) {
+      const strategy = c.labelStrategy ?? "auto";
+      if (strategy === "skip") continue;
+      const centroid = getCountryCentroid(c.iso3);
+      if (!centroid) continue;
+
+      // Project polygon area in BASE projection (pre-camera-scale) to
+      // gauge how big the country actually renders. d3-geo's
+      // `geoPath().area()` returns pixels² of the projected feature.
+      const country = getCountryByAlpha3(c.iso3);
+      if (!country) continue;
+      const rawAreaPx = activePathGen.area(country.feature as any); // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
+      const screenAreaPx = rawAreaPx * camera.scale * camera.scale;
+
+      // Auto-skip threshold: polygons smaller than ~120 px² can't host a
+      // label at all (Andorra-, Vatican-, Monaco-scale on world view).
+      // Authors with `labelStrategy: "inside"` / `"leader"` opt past this.
+      if (strategy === "auto" && screenAreaPx < 120) continue;
+
+      // Estimate label bbox in pixels.
+      let bbox: { w: number; h: number };
+      try {
+        const m = measureText({
+          text: c.label!.toUpperCase(),
+          fontFamily: fonts.display,
+          fontSize: fontSizes.label,
+          fontWeight: fontWeights.medium,
+          letterSpacing: `${letterSpacing.label}px`,
+        });
+        bbox = { w: Math.min(280, m.width), h: m.height };
+      } catch {
+        // Test env without canvas — heuristic fallback.
+        bbox = { w: Math.min(280, c.label!.length * fontSizes.label * 0.55), h: fontSizes.label * 1.2 };
+      }
+
+      items.push({
+        iso3: c.iso3,
+        label: c.label!,
+        lonLat: centroid,
+        strategy,
+        bbox,
+        polygonAreaPx: screenAreaPx,
+      });
+    }
+
+    // Build the placer input. Higher priority on smaller polygons so
+    // tiny-country labels claim their preferred candidate first (they
+    // have fewer escape routes than huge USA/RUS-class labels).
+    const placeInput: PlaceableAnnotation[] = items.map((item) => ({
+      ann: {
+        label: item.label,
+        at: item.lonLat,
+        hierarchy: "tertiary" as const,
+        // Higher priority for smaller features (inverse-area).
+        priority: 10_000 / Math.max(1, item.polygonAreaPx),
+      },
+      defaultDy: 0,
+      bboxOverride: item.bbox,
+    }));
+
+    // placeLabels expects a `{ x, y } | null` projector; wrap our tuple-returning one.
+    const projectXY = (lonLat: [number, number]) => {
+      const p = projectAnnotation(lonLat);
+      return p ? { x: p[0], y: p[1] } : null;
+    };
+    const placements = placeLabels(placeInput, projectXY);
+
+    // Auto-promotion to leader: when label bbox is wider than the polygon
+    // is in screen-space, push it outside the polygon even if the placer
+    // didn't displace it. Approximates polygon-width by sqrt(area).
+    return items.map((item, i) => {
+      const placement = placements[i];
+      const polyHalfDim = Math.sqrt(item.polygonAreaPx) * 0.5;
+      const labelWidth = item.bbox.w;
+      const tooBigForInside =
+        item.strategy === "auto" && labelWidth > polyHalfDim * 1.8;
+      const forceLeader = item.strategy === "leader" || tooBigForInside;
+      return {
+        iso3: item.iso3,
+        label: item.label,
+        lonLat: item.lonLat,
+        placement,
+        forceLeader,
+      };
+    });
+  }, [
+    labelledCountries,
+    activePathGen,
+    camera.scale,
+    projectAnnotation,
+  ]);
+
+  // ── Sea-label paths (projected to SCREEN space per frame) ────────────────
+  // Each sea label projects its arc through `projectAnnotation` (which
+  // accounts for the camera transform) to get screen-space coordinates,
+  // then renders the arc as an SVG path OUTSIDE the camera-transformed
+  // group. This keeps font-size constant under zoom — only the arc's
+  // position tracks the camera. Orthographic densifies first so the
+  // sphere-clip math finds visible-hemisphere terminator crossings on
+  // long arcs (same pattern as disputedPaths).
+  const seaLabelPaths = useMemo(() => {
+    if (!data.seaLabels || data.seaLabels.length === 0) return [];
+    const resolved = resolveSeaLabels(data.seaLabels);
+    const out: {
+      tag: string;
+      label: string;
+      hierarchy: SeaLabel["hierarchy"];
+      d: string;
+    }[] = [];
+    for (const s of resolved) {
+      const coords = isOrthographic ? densifyPolyline(s.arc, 1) : s.arc;
+      const screenPts: [number, number][] = [];
+      for (const lonLat of coords) {
+        const p = projectAnnotation(lonLat);
+        if (p) screenPts.push(p);
+      }
+      if (screenPts.length < 2) continue;
+      const d = screenPts
+        .map(
+          (pt, i) =>
+            (i === 0 ? "M" : "L") +
+            pt[0].toFixed(1) +
+            " " +
+            pt[1].toFixed(1),
+        )
+        .join(" ");
+      out.push({ tag: s.tag, label: s.label, hierarchy: s.hierarchy, d });
+    }
+    return out;
+  }, [data.seaLabels, projectAnnotation, isOrthographic]);
 
   // ── Smart title placement ─────────────────────────────────────────────────
   // Resolve the title's corner anchor: the corner with maximum clearance
@@ -724,6 +975,20 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
           {/* Camera-transformed group — countries + graticule + annotations */}
           <g transform={transformStr}>
+            {/* Shaded-relief underlay — `atlas-relief` aesthetic only.
+                Sits inside the camera transform so it pans/zooms with
+                the country layer. Skipped on orthographic (warn fired
+                above) and on missing asset (component handles 404
+                internally). Renders BELOW everything else inside the
+                transform group. */}
+            {isRelief && data.projection && !isOrthographic && (
+              <ReliefUnderlay
+                projection={data.projection as ProjectionName}
+                width={layout.width}
+                height={layout.height}
+                dark={dark}
+              />
+            )}
             {/* Graticule — minor first, major on top, BOTH under countries */}
             {graticulePaths?.minor && (
               <path
@@ -746,20 +1011,20 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
             {/* Countries — `rotatedCountryPaths` switches to per-frame
                 re-projection when orthographic, otherwise returns the
-                memoized `countryPaths` unchanged. */}
-            {rotatedCountryPaths.map((c, i) => {
-              const fill = (c.alpha3 && currentFillMap[c.alpha3]) || landFill;
-              return (
-                <path
-                  key={c.alpha3 ?? `c${i}`}
-                  d={c.d}
-                  fill={fill}
-                  stroke={borderColor}
-                  strokeWidth={borderStroke}
-                  strokeLinejoin="round"
-                />
-              );
-            })}
+                memoized `countryPaths` unchanged. Fill resolves through
+                `resolveCountryFill` which handles the phase-boundary
+                color crossfade (sRGB lerp from prev-phase fill → current
+                over the camera transition window). */}
+            {rotatedCountryPaths.map((c, i) => (
+              <path
+                key={c.alpha3 ?? `c${i}`}
+                d={c.d}
+                fill={resolveCountryFill(c.alpha3)}
+                stroke={borderColor}
+                strokeWidth={borderStroke}
+                strokeLinejoin="round"
+              />
+            ))}
 
             {/* Disputed boundaries — dashed rust lines layered over borders. */}
             {disputedPaths.map(
@@ -830,24 +1095,61 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             );
           })}
 
-          {/* Per-phase country labels — centroid lookup is cached; parent
-              computes screen+opacity so the sub-component memo-skips. */}
-          {labelledCountries.map((c) => {
-            const centroid = getCountryCentroid(c.iso3);
-            if (!centroid) return null;
-            const screen = projectAnnotation(centroid);
-            if (!screen) return null;
+          {/* Sea labels — projected arcs, text rendered along path. Layered
+              UNDER country labels and annotations so editorial markup wins
+              when they collide. Below the camera-transform group; font-size
+              stays constant under zoom. */}
+          {seaLabelPaths.length > 0 && (
+            <g aria-hidden="true">
+              {seaLabelPaths.map((s) => (
+                <SeaLabelText
+                  key={`sea-${s.tag}`}
+                  pathId={`sea-arc-${reactId}-${s.tag}`}
+                  d={s.d}
+                  label={s.label}
+                  hierarchy={s.hierarchy}
+                  dark={dark}
+                  isVintage={isVintage}
+                />
+              ))}
+            </g>
+          )}
+
+          {/* Per-phase country labels — collision-aware via `placeLabels`.
+              The parent memo (`countryLabelPlacements`) handles auto-skip
+              (tiny countries), leader-out (small ones), and inside (the
+              rest). When the placer displaced a label, a thin leader line
+              connects the centroid anchor to the displaced text. */}
+          {countryLabelPlacements.map(({ iso3, label, lonLat, placement, forceLeader }) => {
+            const anchor = projectAnnotation(lonLat);
+            if (!anchor) return null;
             const opacity = Math.min(
               fadeIn(frame, currentWindow.startFrame + sec(0.4), sec(0.4)),
               fadeOut(frame, currentWindow.endFrame, sec(0.3)),
             );
             if (opacity <= 0) return null;
+
+            const useLeader = placement.displaced || forceLeader;
+            // When auto-promoting to leader (forceLeader) but the placer
+            // chose dx=dy=0, push outward (N by default) so the label
+            // actually clears the polygon.
+            const dx = useLeader && placement.dx === 0 && placement.dy === 0
+              ? 0
+              : placement.dx;
+            const dy = useLeader && placement.dx === 0 && placement.dy === 0
+              ? -Math.max(18, fontSizes.label + 8)
+              : placement.dy;
+
             return (
               <CountryLabel
-                key={`lbl-${c.iso3}`}
-                label={c.label!}
-                screenX={screen[0]}
-                screenY={screen[1]}
+                key={`lbl-${iso3}`}
+                label={label}
+                anchorX={anchor[0]}
+                anchorY={anchor[1]}
+                dx={dx}
+                dy={dy}
+                showLeader={useLeader}
+                align={placement.align}
                 opacity={opacity}
                 dark={dark}
               />
@@ -869,6 +1171,17 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           syncPoints={direction.syncPoints}
           resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
+
+        {/* Locator inset — Equal Earth world map with a rust extent box
+            highlighting the focused region. Opt-in via `data.inset`. */}
+        {data.inset?.show && (
+          <AtlasInsetLocator
+            corner={data.inset.corner ?? "top-right"}
+            size={data.inset.size}
+            focusIso3={currentWindow.phase.focus?.iso3}
+            dark={dark}
+          />
+        )}
       </AbsoluteFill>
     </Background>
   );
@@ -1015,42 +1328,146 @@ AtlasAnnotation.displayName = "AtlasAnnotation";
 
 // ── Sub-component: country label at centroid (React.memo'd) ───────────────
 
+// ── Sea-label sub-component ───────────────────────────────────────────────
+
+interface SeaLabelTextProps {
+  /** Unique SVG id for the path the textPath references. */
+  pathId: string;
+  /** SVG path data string (screen-space; pre-projected). */
+  d: string;
+  /** The label text (rendered uppercase). */
+  label: string;
+  hierarchy: "primary" | "secondary";
+  dark: boolean;
+  isVintage: boolean;
+}
+
+/**
+ * Sea/ocean label rendered as `<textPath>` along a projected screen-space
+ * arc. Atlas-plate convention: tracked uppercase, muted color so the
+ * water-body name reads as figure-ground reference rather than data.
+ *
+ * Defines a `<defs>` path the `<textPath>` follows. The path itself
+ * stays invisible (stroke="none"); only the text along it renders.
+ *
+ * Hierarchy controls size + letterspacing — ocean basins get more
+ * presence than seas/gulfs, matching atlas convention.
+ */
+const SeaLabelText = React.memo<SeaLabelTextProps>(({
+  pathId,
+  d,
+  label,
+  hierarchy,
+  dark,
+  isVintage,
+}) => {
+  // Muted color — water labels should read as cartographic chrome, not
+  // editorial emphasis. Vintage register uses its own faded-brown tone.
+  const color = isVintage
+    ? "#7A6448"
+    : dark
+    ? "#5A5448"
+    : "#9A8E78";
+  const fontSize =
+    hierarchy === "primary" ? fontSizes.label : fontSizes.caption;
+  // Wide letterspacing is the atlas convention — labels SHOULD feel
+  // stretched out across the water. Primary (oceans) gets more tracking.
+  const tracking = hierarchy === "primary" ? 6 : 4;
+
+  return (
+    <>
+      <defs>
+        <path id={pathId} d={d} fill="none" stroke="none" />
+      </defs>
+      <text
+        style={{
+          fontFamily: fonts.display,
+          fontSize,
+          fontWeight: fontWeights.regular,
+          letterSpacing: `${tracking}px`,
+          textTransform: "uppercase",
+          fill: color,
+          opacity: 0.85,
+          pointerEvents: "none",
+        }}
+      >
+        <textPath
+          href={`#${pathId}`}
+          startOffset="50%"
+          textAnchor="middle"
+        >
+          {label}
+        </textPath>
+      </text>
+    </>
+  );
+});
+SeaLabelText.displayName = "SeaLabelText";
+
 interface CountryLabelProps {
   label: string;
-  /** Projected centroid screen position. Primitives → React.memo works. */
-  screenX: number;
-  screenY: number;
+  /** Anchor (centroid) screen position. The leader, when shown, starts here. */
+  anchorX: number;
+  anchorY: number;
+  /** Offset from anchor to label center, from the collision placer. */
+  dx: number;
+  dy: number;
+  /** When true, render a thin leader line from anchor to label position. */
+  showLeader: boolean;
+  /** Text alignment from the placer (matches displacement direction). */
+  align: "left" | "right" | "center";
   opacity: number;
   dark: boolean;
 }
 
 const CountryLabel = React.memo<CountryLabelProps>(({
   label,
-  screenX,
-  screenY,
+  anchorX,
+  anchorY,
+  dx,
+  dy,
+  showLeader,
+  align,
   opacity,
   dark,
 }) => {
   const color = dark ? palette.bone : palette.ink;
+  const x = anchorX + dx;
+  const y = anchorY + dy;
+  const textAnchor =
+    align === "left" ? "start" : align === "right" ? "end" : "middle";
   return (
-    <text
-      x={screenX}
-      y={screenY}
-      dominantBaseline="middle"
-      textAnchor="middle"
-      opacity={opacity}
-      style={{
-        fontFamily: fonts.display,
-        fontSize: fontSizes.label,
-        fontWeight: fontWeights.medium,
-        letterSpacing: `${letterSpacing.label}px`,
-        textTransform: "uppercase",
-        fill: color,
-        pointerEvents: "none",
-      }}
-    >
-      {label}
-    </text>
+    <g opacity={opacity} style={{ pointerEvents: "none" }}>
+      {showLeader && (
+        // Thin leader from polygon-edge-near-anchor toward the label.
+        // Stops 6 px short of the label so it doesn't punch through text.
+        <line
+          x1={anchorX}
+          y1={anchorY}
+          x2={x - Math.sign(dx) * 6}
+          y2={y - Math.sign(dy) * 4}
+          stroke={color}
+          strokeWidth={0.6}
+          strokeOpacity={0.5}
+        />
+      )}
+      <text
+        x={x}
+        y={y}
+        dominantBaseline="middle"
+        textAnchor={textAnchor}
+        style={{
+          fontFamily: fonts.display,
+          fontSize: fontSizes.label,
+          fontWeight: fontWeights.medium,
+          letterSpacing: `${letterSpacing.label}px`,
+          textTransform: "uppercase",
+          fill: color,
+        }}
+      >
+        {label}
+      </text>
+    </g>
   );
 });
 CountryLabel.displayName = "CountryLabel";
