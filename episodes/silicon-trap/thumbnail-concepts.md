@@ -1,5 +1,7 @@
 # THUMBNAIL CONCEPTS
 
+> ⚠️ Typography references below predate D40 (May 10, 2026). "Space Grotesk" mentions in this file are stale — the display face is now **IBM Plex Sans** (Plex Bold/Black for headlines). Substitute when implementing; the layout and color guidance is otherwise current.
+
 ## Episode: EP01 — The Silicon Trap / 硅陷阱
 ## Date: May 2, 2026
 

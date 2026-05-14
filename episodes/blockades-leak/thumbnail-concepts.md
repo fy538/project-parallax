@@ -1,5 +1,7 @@
 # THUMBNAIL CONCEPTS
 
+> ⚠️ Typography references below predate D40 (May 10, 2026). "Space Grotesk" mentions in this file are stale — the display face is now **IBM Plex Sans** (Plex Bold/Black for headlines). Substitute when implementing; the layout and color guidance is otherwise current.
+
 ## Episode: EP02 — Why Technological Blockades Always Leak
 ## Date: May 2, 2026
 
