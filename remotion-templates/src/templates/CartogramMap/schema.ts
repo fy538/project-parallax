@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 
 const CartogramDatumSchema = z.object({
@@ -55,6 +56,6 @@ export const CartogramMapSchema = z.object({
     annotations: z.array(MapAnnotationSchema).optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     backgroundTint: z.string().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

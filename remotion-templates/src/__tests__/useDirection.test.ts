@@ -169,6 +169,46 @@ describe("resolveDirection", () => {
       expect(normal.driftOptions.maxScale!).toBeGreaterThan(slow.driftOptions.maxScale!);
       expect(normal.driftOptions.maxPanX!).toBeGreaterThan(slow.driftOptions.maxPanX!);
     });
+
+    // ── Editorial-revision presets (May 13, 2026) ────────────────────
+    it("editorial → no pan, no rotation, subtle scale", () => {
+      const result = resolveDirection({ driftPreset: "editorial" });
+      expect(result.driftOptions.maxScale).toBe(1.02);
+      expect(result.driftOptions.maxPanX).toBe(0);
+      expect(result.driftOptions.maxPanY).toBe(0);
+      expect(result.driftOptions.maxRotation).toBe(0);
+      expect(result.driftOptions.mode).toBe("linear");
+    });
+
+    it("documentary → full Ken Burns register (explicit opt-in)", () => {
+      const result = resolveDirection({ driftPreset: "documentary" });
+      expect(result.driftOptions.maxScale).toBe(1.06);
+      expect(result.driftOptions.maxPanX).toBe(18);
+      expect(result.driftOptions.maxRotation).toBe(0.3);
+    });
+
+    it("breathing → sinusoidal scale, no pan, no rotation", () => {
+      const result = resolveDirection({ driftPreset: "breathing" });
+      expect(result.driftOptions.mode).toBe("breathing");
+      expect(result.driftOptions.maxScale).toBe(1.008);
+      expect(result.driftOptions.maxPanX).toBe(0);
+      expect(result.driftOptions.maxRotation).toBe(0);
+    });
+
+    it("settle → one-time scale settle, no continuous drift", () => {
+      const result = resolveDirection({ driftPreset: "settle" });
+      expect(result.driftOptions.mode).toBe("settle");
+      expect(result.driftOptions.maxScale).toBe(1.025);
+      expect(result.driftOptions.maxPanX).toBe(0);
+    });
+
+    it("sway → bidirectional pan, no scale drift", () => {
+      const result = resolveDirection({ driftPreset: "sway" });
+      expect(result.driftOptions.mode).toBe("sway");
+      expect(result.driftOptions.maxPanX).toBe(6);
+      expect(result.driftOptions.maxPanY).toBe(4);
+      expect(result.driftOptions.maxScale).toBe(1.0);
+    });
   });
 
   describe("syncPoints passthrough", () => {

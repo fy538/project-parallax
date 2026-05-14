@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const RankChangeDotPlotItemSchema = z.object({
   label: z.string(),
@@ -60,6 +61,6 @@ export const RankChangeDotPlotSchema = z.object({
       .describe(
         "Set to false if before/after are values (higher=better) rather than ranks (lower=better). Affects up/down color auto-assignment."
       ),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

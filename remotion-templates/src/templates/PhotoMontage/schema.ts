@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const MontageImageSchema = z.object({
   src: z.string(),
@@ -36,6 +37,6 @@ export const PhotoMontageSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundTint: z.string().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

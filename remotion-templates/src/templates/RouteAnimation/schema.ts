@@ -3,8 +3,10 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
+import { LabelDensitySchema } from "../../components/MapGL.types";
 
 const RoutePointSchema = z.object({
   name: z.string(),
@@ -52,7 +54,7 @@ export const RouteAnimationSchema = z.object({
     routeColor: z.string().optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
     backgroundTint: z.string().optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     /**
@@ -61,6 +63,13 @@ export const RouteAnimationSchema = z.object({
      * alpine border dispute, etc.). See: LESSONS.md L99.
      */
     terrain: z.boolean().optional(),
+    /**
+     * Label-density register — see MapGL `labelDensity`. Default
+     * `"editorial"` for RouteAnimation: country labels at globe, suppress
+     * at regional zoom (>= 4) where MapAnnotations dominate. Shared
+     * schema lives at `src/components/MapGL.types.ts`.
+     */
+    labelDensity: LabelDensitySchema.optional(),
     /**
      * Editorial annotations layered on the map. See
      * components/MapAnnotations.tsx and references/template-research/map-annotations.md

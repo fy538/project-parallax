@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const LadderRungSchema = z.object({
   label: z.string(),
@@ -22,6 +23,22 @@ export const EscalationLadderSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: z.unknown().optional(),
+    /**
+     * Fine-tune the ladder block's visual centering. The default centering
+     * splits surplus area as left/right padding mathematically, but the
+     * visible mass is asymmetric (short dates left, longer card text right),
+     * so the optical center sits slightly left of the geometric center.
+     * `contentOffset.x` adds px to the right; `contentOffset.y` adds px
+     * downward (use negative to push UP). Typical episode-side tuning:
+     * `{ x: 100–160, y: -40 to -60 }` to optically center on a 1920×1080
+     * canvas with 6 rungs. See POLISH.md T6 (Use the canvas).
+     */
+    contentOffset: z
+      .object({
+        x: z.number().optional(),
+        y: z.number().optional(),
+      })
+      .optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

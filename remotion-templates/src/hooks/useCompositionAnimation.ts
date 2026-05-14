@@ -27,35 +27,64 @@ import { useCurrentFrame, useVideoConfig } from "remotion";
 import { interpolate, Easing } from "remotion";
 import { motionBudget } from "../design/theme";
 
+/**
+ * Drift interpolation mode. Each mode produces a different motion character:
+ *
+ *   - `"linear"` (default): one-way ease-in-out drift from 0 → max over the
+ *     full composition. Reads as a slow camera move in one direction. Default
+ *     for episode segments.
+ *
+ *   - `"breathing"`: scale oscillates sinusoidally between 1.0 and maxScale
+ *     on a slow cycle (~8s period). No pan, no rotation. The chart looks
+ *     "alive" without moving anywhere — useful for held stat reveals where
+ *     you want presence without slip.
+ *
+ *   - `"settle"`: scale settles from 1.0 → maxScale during the first ~0.6s
+ *     as part of the entrance, then HOLDS at maxScale for the rest of the
+ *     composition. No continuous drift. The camera lands and stops.
+ *
+ *   - `"sway"`: bidirectional sinusoidal pan around the origin (±maxPanX/2,
+ *     ±maxPanY/2) on a slow cycle. Net displacement zero. Useful for
+ *     atmospheric segments where you want subtle life without directional
+ *     slip toward the edge.
+ */
+export type DriftMode = "linear" | "breathing" | "settle" | "sway";
+
 export interface CompositionAnimationOptions {
   /** Exit fade duration in frames. Default: 15 (POLISH.md A7) */
   exitFrames?: number;
   /** Enter fade duration in frames. Default: 8 */
   enterFrames?: number;
   /**
-   * Max scale for Ken Burns drift. 0 to disable.
-   * Default: motionBudget.scale (1.06). The 6% zoom is subtle enough to not
-   * distort text but visible enough to make the composition feel filmed with
-   * a slowly moving camera. contentArea() is sized to absorb this movement.
+   * Drift interpolation mode. Default: "linear" (back-compat with old
+   * Ken Burns drift behavior). See `DriftMode` type docs for alternatives.
+   */
+  mode?: DriftMode;
+  /**
+   * Max scale ceiling. 0 to disable scale drift.
+   * Default: motionBudget.scale (1.02 — editorial). For "breathing" mode,
+   * this is the peak of the oscillation. For "settle" mode, the held
+   * value after entrance.
    */
   maxScale?: number;
   /**
    * Max horizontal pan drift in px. 0 to disable.
-   * Default: motionBudget.panX (18). contentArea() subtracts this from
-   * left/right margins so layout content never drifts toward the viewport edge.
+   * Default: motionBudget.panX (0 — editorial). For "sway" mode, the
+   * amplitude of horizontal oscillation.
    */
   maxPanX?: number;
   /**
    * Max vertical pan drift in px. 0 to disable.
-   * Default: motionBudget.panY (8). contentArea() subtracts this from bottom.
+   * Default: motionBudget.panY (0 — editorial).
    */
   maxPanY?: number;
   /**
    * Max rotation drift in degrees. 0 to disable.
-   * Default: motionBudget.rotation (0.3°). Barely perceptible organic tilt.
+   * Default: motionBudget.rotation (0 — editorial; charts stay level).
+   * Non-zero only for the "documentary" preset.
    */
   maxRotation?: number;
-  /** Disable Ken Burns entirely (for maps, interactive compositions) */
+  /** Disable drift entirely (for maps, interactive compositions) */
   noDrift?: boolean;
   /** Disable exit fade (for compositions that handle their own exit) */
   noExit?: boolean;
@@ -93,6 +122,7 @@ export const useCompositionAnimation = (
   const {
     exitFrames = 15,
     enterFrames = 8,
+    mode = "linear",
     maxScale = motionBudget.scale,
     maxPanX = motionBudget.panX,
     maxPanY = motionBudget.panY,
@@ -121,42 +151,73 @@ export const useCompositionAnimation = (
         }
       );
 
-  // ── Cinematic camera drift ─────────────────────────────────────────────
-  // Scale: slow zoom in over the full composition
-  const driftScale = noDrift
-    ? 1
-    : interpolate(frame, [0, totalFrames], [1.0, maxScale], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: Easing.inOut(Easing.quad),
-      });
+  // ── Camera drift ──────────────────────────────────────────────────────
+  // Each mode produces a different motion character. See the DriftMode
+  // type docs at the top of this file for editorial guidance on when to
+  // use each. Rotation is mode-agnostic — it always rides the linear ramp
+  // when present (only documentary preset uses non-zero rotation).
 
-  // Horizontal pan: slow crawl right (or left for negative maxPanX)
-  const driftX = noDrift
-    ? 0
-    : interpolate(frame, [0, totalFrames], [0, maxPanX], {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: Easing.inOut(Easing.quad),
-      });
+  let driftScale = 1;
+  let driftX = 0;
+  let driftY = 0;
+  let driftRotation = 0;
 
-  // Vertical pan: gentle diagonal feel
-  const driftY = noDrift
-    ? 0
-    : interpolate(frame, [0, totalFrames], [0, maxPanY], {
+  if (!noDrift) {
+    if (mode === "breathing") {
+      // Sinusoidal scale oscillation around 1.0 ↔ maxScale.
+      // Period = 8 seconds (≈ a slow human breath cycle).
+      // y = 1.0 + (maxScale - 1) * (1 - cos(t)) / 2   gives y(0) = 1.0,
+      // y(period/2) = maxScale, y(period) = 1.0. Starts at rest, gentle
+      // wave from there.
+      const periodFrames = fps * 8;
+      const t = (frame / periodFrames) * Math.PI * 2;
+      driftScale = 1 + (maxScale - 1) * (1 - Math.cos(t)) / 2;
+      // No pan, no rotation in breathing mode (independent of maxPan/Rotation).
+    } else if (mode === "settle") {
+      // One-time scale settle during the first 0.6s, then HOLD.
+      const settleEnd = Math.max(1, Math.round(fps * 0.6));
+      driftScale = interpolate(frame, [0, settleEnd], [1.0, maxScale], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.out(Easing.cubic),
+      });
+      // No continuous pan/rotation in settle mode.
+    } else if (mode === "sway") {
+      // Bidirectional sinusoidal pan. Amplitude = maxPan{X,Y} / 2, so the
+      // pan reaches ±maxPan{X,Y}/2 at the peaks. Period = 6 seconds for X,
+      // 9 seconds for Y (slightly offset so the motion isn't a perfect
+      // ellipse — feels less robotic).
+      const tX = (frame / (fps * 6)) * Math.PI * 2;
+      const tY = (frame / (fps * 9)) * Math.PI * 2;
+      driftX = Math.sin(tX) * (maxPanX / 2);
+      driftY = Math.sin(tY) * (maxPanY / 2);
+      // Scale stays at maxScale (held, not animated) — sway is purely pan.
+      driftScale = maxScale;
+    } else {
+      // "linear" mode (default) — the classic Ken Burns one-way drift.
+      // Scale: slow zoom in over the full composition.
+      driftScale = interpolate(frame, [0, totalFrames], [1.0, maxScale], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
         easing: Easing.inOut(Easing.quad),
       });
-
-  // Rotation: barely perceptible tilt — organic handheld quality
-  const driftRotation = noDrift
-    ? 0
-    : interpolate(frame, [0, totalFrames], [0, maxRotation], {
+      driftX = interpolate(frame, [0, totalFrames], [0, maxPanX], {
         extrapolateLeft: "clamp",
         extrapolateRight: "clamp",
         easing: Easing.inOut(Easing.quad),
       });
+      driftY = interpolate(frame, [0, totalFrames], [0, maxPanY], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.inOut(Easing.quad),
+      });
+      driftRotation = interpolate(frame, [0, totalFrames], [0, maxRotation], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.inOut(Easing.quad),
+      });
+    }
+  }
 
   // ── Combined style ──────────────────────────────────────────────────────
   const opacity = enterOpacity * exitOpacity;

@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const TimelineEventSchema = z.object({
   year: z.string(),
@@ -29,7 +30,7 @@ export const TimelineComparisonSchema = z.object({
     rightEvents: z.array(TimelineEventSchema).min(1),
     connections: z.array(ConnectionSchema).optional(),
     secondsPerEvent: z.number().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
     backgroundTint: z.string().optional(),
   }),
 });

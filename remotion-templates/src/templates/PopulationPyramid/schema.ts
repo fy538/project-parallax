@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const PyramidCohortSchema = z.object({
   ageGroup: z.string().describe("Age group label, e.g. '0–4', '15–19', '75+'"),
@@ -61,6 +62,6 @@ export const PopulationPyramidSchema = z.object({
       .positive()
       .optional()
       .describe("Override auto-computed max value for bar scaling. Useful when comparing two pyramids."),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

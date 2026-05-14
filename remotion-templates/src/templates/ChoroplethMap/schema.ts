@@ -3,8 +3,10 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
+import { LabelDensitySchema } from "../../components/MapGL.types";
 
 const CountryDataSchema = z.object({
   name: z.string(),
@@ -22,6 +24,11 @@ const AnimationPhaseSchema = z.object({
   countries: z.array(CountryDataSchema),
   center: z.tuple([z.number(), z.number()]).optional(),
   scale: z.number().optional(),
+  /** Per-phase camera pitch override (degrees). Defaults to 0 for flat
+   *  projections, 30 for globe. */
+  pitch: z.number().optional(),
+  /** Per-phase camera bearing override (degrees). Defaults to 0. */
+  bearing: z.number().optional(),
 });
 
 export const ChoroplethMapSchema = z.object({
@@ -43,7 +50,7 @@ export const ChoroplethMapSchema = z.object({
     ]).optional(),
     phases: z.array(AnimationPhaseSchema).min(1),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
     backgroundTint: z.string().optional(),
     /**
      * Enable terrain hillshading. Default false (atlas register). Set true
@@ -51,6 +58,13 @@ export const ChoroplethMapSchema = z.object({
      * etc.). See: LESSONS.md L99.
      */
     terrain: z.boolean().optional(),
+    /** Label-density register — see MapGL `labelDensity`. ChoroplethMap
+     *  defaults to `"editorial"`. Country fills already carry the
+     *  argument, so suppression at regional zoom (the editorial register)
+     *  is the right balance — full atlas at globe scale for orientation,
+     *  clean at zoom-in. Per-shot override to `"minimal"` for shots
+     *  where country labels duplicate explicit MapAnnotations. */
+    labelDensity: LabelDensitySchema.optional(),
     /**
      * Editorial annotations layered on the map. See
      * components/MapAnnotations.tsx and references/template-research/map-annotations.md

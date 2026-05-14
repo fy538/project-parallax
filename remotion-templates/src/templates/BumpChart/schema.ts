@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const BumpChartEntitySchema = z.object({
   id: z.string().describe("Unique identifier for this entity — used for highlightIds matching."),
@@ -60,6 +61,6 @@ export const BumpChartSchema = z.object({
       .string()
       .optional()
       .describe("Context annotation, e.g. 'GDP in current USD'. Shown in FooterStrip scale field."),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

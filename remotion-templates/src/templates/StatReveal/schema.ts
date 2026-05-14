@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const ComparisonBarSchema = z.object({
   label: z.string(),
@@ -30,6 +31,6 @@ export const StatRevealSchema = z.object({
     holdAfterRevealSec: z.number().min(0).max(10).optional()
       .describe("Deliberate pause (seconds) after stat and comparisons finish animating in, before exit fade. Must fit within durationSec. Default: 0."),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

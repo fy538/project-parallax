@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const NetworkNodeSchema = z.object({
   id: z.string(),
@@ -23,6 +24,7 @@ const NetworkNodeSchema = z.object({
       y: z.number(),
     })
     .optional(),
+  side: z.enum(["left", "right"]).optional(),
 });
 
 const NetworkEdgeSchema = z.object({
@@ -50,7 +52,7 @@ export const NetworkDiagramSchema = z.object({
     episode: z.string(),
     title: z.string(),
     subtitle: z.string().optional(),
-    layout: z.enum(["horizontal-chain", "hub-spoke", "grid", "vertical-chain"]),
+    layout: z.enum(["horizontal-chain", "hub-spoke", "grid", "vertical-chain", "bipartite"]),
     gridColumns: z.number().optional(),
     nodes: z.array(NetworkNodeSchema).min(1, {
       message: "NetworkDiagram requires at least one node. An empty diagram has nothing to render.",
@@ -62,6 +64,6 @@ export const NetworkDiagramSchema = z.object({
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

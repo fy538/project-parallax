@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 // ── Sub-schemas ─────────────────────────────────────────────────────────────
 
@@ -100,6 +101,31 @@ export const HorizontalTimelineSchema = z.object({
     /** Era weight ratio for dual mode. */
     eraWeight: z.enum(["equal", "foil-old", "foil-new"]).optional(),
 
+    /**
+     * Focus isolation behavior during camera tracking.
+     *
+     * - `"cinematic"`: off-focus events render dot+year only (card text hidden),
+     *   focused event renders fully. Removes the "double card overlap" effect
+     *   when two events are close together on the spine. Default when
+     *   `cameraPath` is provided.
+     * - `"settled"`: all events render their full card content with mild
+     *   dimming. Use for static / pullback contexts where the viewer should
+     *   read multiple events at once. Default when `cameraPath` is absent.
+     *
+     * Can also be set as an object for fine-tuning (`dimOpacity`, etc.).
+     * See: May 13, 2026 timeline visual-register pass + POLISH.md T-rules.
+     */
+    focusMode: z
+      .union([
+        z.enum(["cinematic", "settled"]),
+        z.object({
+          mode: z.enum(["cinematic", "settled"]),
+          dimOpacity: z.number().min(0).max(1).optional(),
+          hideOffFocusCards: z.boolean().optional(),
+        }),
+      ])
+      .optional(),
+
     // ── Morph mode events ──
     /** Events that morph between eras */
     morphEvents: z.array(TimelineMorphEventDataSchema).optional(),
@@ -130,7 +156,7 @@ export const HorizontalTimelineSchema = z.object({
 
     // ── Directing language overrides ──
     /** Per-composition direction block from visual-spec _direction namespace. */
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   })
   .superRefine((d, ctx) => {
     if (d.mode === "single" && (!d.events || d.events.length === 0)) {

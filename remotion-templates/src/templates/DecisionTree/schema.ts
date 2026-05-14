@@ -3,10 +3,12 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const TreeNodeSchema = z.object({
   id: z.string(),
   label: z.string(),
+  edgeLabel: z.string().optional(),
   probability: z.string().optional(),
   color: z.string().optional(),
   children: z.array(z.string()).optional(),
@@ -29,6 +31,6 @@ export const DecisionTreeSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

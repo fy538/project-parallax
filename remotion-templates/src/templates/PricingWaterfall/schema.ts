@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const PricingWaterfallStageSchema = z.object({
   label: z.string(),
@@ -22,6 +23,6 @@ export const PricingWaterfallSchema = z.object({
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

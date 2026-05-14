@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const DataPointSchema = z.object({
   label: z.string(),
@@ -64,7 +65,7 @@ export const DataChartSchema = z.object({
       contextNote: z.string().optional(),
       spotlightSequence: z.array(SpotlightStepSchema).optional(),
       ambientParticles: z.boolean().optional(),
-      _direction: z.unknown().optional(),
+      _direction: DirectionBlockSchema.optional(),
       backgroundTint: z.string().optional(),
       transparentBackground: z.boolean().optional(),
     })

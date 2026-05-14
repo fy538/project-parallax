@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const ComparisonColumnSchema = z.object({
   title: z.string(),
@@ -56,7 +57,7 @@ export const FrameworkDiagramSchema = z.object({
       accentColor: z.string().optional(),
       backgroundVariant: z.enum(["dark", "light"]).optional(),
       durationSec: z.number().positive().optional(),
-      _direction: z.unknown().optional(),
+      _direction: DirectionBlockSchema.optional(),
       backgroundTint: z.string().optional(),
     })
     .superRefine((d, ctx) => {

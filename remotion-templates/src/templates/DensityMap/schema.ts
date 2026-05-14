@@ -3,7 +3,9 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
+import { LabelDensitySchema } from "../../components/MapGL.types";
 
 const DensityPointSchema = z.object({
   at: z.tuple([z.number(), z.number()]),
@@ -54,6 +56,12 @@ export const DensityMapSchema = z.object({
       .optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     backgroundTint: z.string().optional(),
+    /** Label-density register — see MapGL `labelDensity`. DensityMap
+     *  defaults to `"editorial"` — country labels at globe scale for
+     *  orientation, auto-suppress at regional zoom where the heatmap
+     *  dominates. Per-shot override to `"minimal"` when explicit
+     *  MapAnnotations name everything that matters. */
+    labelDensity: LabelDensitySchema.optional(),
     annotations: z.array(MapAnnotationSchema).optional(),
     inset: z
       .object({
@@ -63,6 +71,6 @@ export const DensityMapSchema = z.object({
         framed: z.boolean().optional(),
       })
       .optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

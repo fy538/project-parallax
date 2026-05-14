@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const ChessPieceSchema = z.object({
   position: z.tuple([z.number(), z.number()]),
@@ -68,7 +69,7 @@ export const GameBoardSchema = z.object({
     durationSec: z.number().positive().optional(),
     backgroundTint: z.string().optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   })
   .superRefine((d, ctx) => {
     // Phases / rounds requirement gates by variant:

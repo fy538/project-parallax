@@ -615,6 +615,12 @@ export const staggers = {
 // Studio account and let new contributors see *something* on screen.
 const MERIDIAN_LIGHT_FALLBACK = "mapbox://styles/mapbox/light-v11";
 const MERIDIAN_DARK_FALLBACK = "mapbox://styles/mapbox/dark-v11";
+// Sepia/vintage fallback: there is no stock Mapbox sepia, so we fall back
+// to light-v11 which we then tint via a runtime overlay + (when present)
+// a CSS sepia/saturate filter on the map wrapper. The "real" sepia register
+// requires a published "Meridian Sepia" Studio style (see
+// tools/mapbox-meridian-setup.md § "Meridian Sepia").
+const MERIDIAN_SEPIA_FALLBACK = "mapbox://styles/mapbox/light-v11";
 
 /** Mapbox GL configuration — see NEW_TEMPLATES_SPEC.md Section 0. */
 export const mapConfig = {
@@ -622,6 +628,9 @@ export const mapConfig = {
   styleUrl: process.env.MAPBOX_STYLE_LIGHT_URL || MERIDIAN_LIGHT_FALLBACK,
   /** Meridian Dark if MAPBOX_STYLE_DARK_URL is set; else stock Mapbox dark-v11. */
   darkStyleUrl: process.env.MAPBOX_STYLE_DARK_URL || MERIDIAN_DARK_FALLBACK,
+  /** Meridian Sepia if MAPBOX_STYLE_SEPIA_URL is set; else light-v11 + runtime tint.
+   *  Used by MapGL when `vintage` prop is true (period episodes). */
+  sepiaStyleUrl: process.env.MAPBOX_STYLE_SEPIA_URL || MERIDIAN_SEPIA_FALLBACK,
   terrain: {
     source: "mapbox-dem" as const,
     exaggeration: 1.5,
@@ -946,20 +955,32 @@ export const crosshair = {
 // the pan values to shrink the usable rect so content never drifts toward
 // the viewport edge.
 //
-// POLISH.md A6 target: scale 1.06, panX 18px, panY 8px, rotation 0.3°.
-// At scale 1.06 centered on the 1920×1080 canvas, content at safe.left (120px)
-// shifts to ~68px — still inside the viewport. The pan budget then takes that
-// another 18px inward, landing at ~50px. contentArea() subtracts panX/panY so
-// the layout rect stays comfortably clear of that worst-case boundary.
+// ── Default motion register: editorial (May 13, 2026 revision) ────────────
+//
+// The new conservative default for data-viz templates. The previous Ken Burns
+// register (scale 1.06, pan 18/8, rotation 0.3°) was inherited from
+// documentary photography but reads as restless on charts: axes tilt, content
+// slips toward bottom-right, and an entrance-animation chart gets a second
+// concurrent motion stacked on top. Print-canonical dataviz (FT, NYT, Bloomberg)
+// doesn't drift — it lands and holds. We split the difference: a barely
+// perceptible inward zoom (1.02) tells the viewer "the camera is watching"
+// without slipping, tilting, or stacking a second motion on the data.
+//
+// Templates that explicitly want the old cinematic register can opt in via
+// `_direction: { driftPreset: "documentary" }`. The full preset menu lives
+// in useDirection.ts (none / editorial / slow / normal / documentary /
+// breathing / settle / sway).
+//
+// POLISH.md A6 was rewritten alongside this change.
 export const motionBudget = {
-  /** Ken Burns scale ceiling. Content scales up by this factor toward center. */
-  scale: 1.06,
-  /** Max horizontal pan in px (composition drifts this far across full duration). */
-  panX: 18,
-  /** Max vertical pan in px. */
-  panY: 8,
-  /** Max rotation in degrees. Barely perceptible — organic handheld feel. */
-  rotation: 0.3,
+  /** Editorial scale ceiling. Content scales up to this factor over duration. */
+  scale: 1.02,
+  /** Max horizontal pan in px. Editorial default is 0 (no directional slip). */
+  panX: 0,
+  /** Max vertical pan in px. Editorial default is 0. */
+  panY: 0,
+  /** Max rotation in degrees. Editorial default is 0 (charts stay level). */
+  rotation: 0,
 } as const;
 
 // ── Layout Primitives (POLISH.md enforcement) ─────────────────────────────
@@ -1011,11 +1032,20 @@ export const contentArea = (
   const safe = layout.safeAreaTier[safeAreaTier];
   const top =
     safe.top + titleHeight[titleVariant] + layout.spacing.xl; // 48px title-to-content gap
-  // Pan budget: motionBudget.panX/panY subtracted so content placed at these
-  // edges never drifts past the viewport boundary during Ken Burns motion.
-  const left = safe.left + motionBudget.panX;
-  const right = safe.right + motionBudget.panX;
-  const bottom = safe.bottom + motionBudget.panY;
+  // Pan-budget reserve. The current motionBudget default (post May 2026
+  // editorial revision) is panX=0/panY=0, but episodes that opt into the
+  // `documentary` preset still need this safety margin so content placed
+  // at the contentArea edge can't drift past the viewport safe area. We
+  // hardcode the WORST-CASE preset budget (documentary: 18px X / 8px Y)
+  // here regardless of the current default — making the reserve a function
+  // of the available preset menu, not the current default. Cheap insurance:
+  // an 18×8 reserve is invisible on a 1920×1080 canvas but prevents a real
+  // safe-area overflow whenever an episode picks documentary drift.
+  const DRIFT_RESERVE_X = 18;
+  const DRIFT_RESERVE_Y = 8;
+  const left = safe.left + DRIFT_RESERVE_X;
+  const right = safe.right + DRIFT_RESERVE_X;
+  const bottom = safe.bottom + DRIFT_RESERVE_Y;
   return {
     top,
     left,

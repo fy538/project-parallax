@@ -137,6 +137,17 @@ export async function renderCompositionFrame(
         frame,
         browserExecutable,
         inputProps,
+        // Forward browser-side console.warn / .error to the test stdout
+        // so `warnIf(...)` warnings from inside templates (substrate-contrast
+        // checks, semantic data warnings, etc.) surface during visual
+        // regression runs. Without this, the warnings fire inside headless
+        // Chromium but disappear silently. See LESSONS.md LM4 for context.
+        onBrowserLog: (log) => {
+          if (log.type === "warn" || log.type === "error") {
+            const stamp = `[browser:${log.type}] ${compositionId} frame ${frame}`;
+            console.warn(`${stamp}:`, log.text);
+          }
+        },
       });
 
       console.log(`[Render] Successfully saved: ${outputPath}`);

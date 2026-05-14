@@ -21,7 +21,40 @@ import type { CompositionAnimationOptions } from "./useCompositionAnimation";
 // ── Types ──────────────────────────────────────────────────────────────
 
 type AtmosphereDensity = "none" | "subtle" | "normal" | "dense";
-type DriftPreset = "none" | "slow" | "normal";
+/**
+ * Drift presets — named motion registers. Each maps to a set of
+ * `CompositionAnimationOptions` (mode + max envelope).
+ *
+ * Default register (when `driftPreset` is omitted): `motionBudget` from
+ * theme.ts, which since May 2026 is the editorial conservative setting
+ * (scale 1.02, no pan, no rotation). Templates that want explicit life or
+ * documentary-cinematic motion opt in below.
+ *
+ *   - `none`         No drift. For maps, interactive comps, catalog/showreel.
+ *   - `editorial`    Explicit editorial register. Same values as the default.
+ *   - `slow`         Restrained directional drift. Kept for back-compat.
+ *   - `normal`       Mid-strength directional drift. Kept for back-compat.
+ *   - `documentary`  Full Ken Burns: scale 1.06, pan 18/8, rotation 0.3°.
+ *                    Use for atmospheric / photo-driven segments, NOT charts.
+ *   - `breathing`    Sinusoidal scale oscillation 1.0 ↔ 1.008 on an 8s cycle.
+ *                    Frame feels alive without slipping. For held stats /
+ *                    quiet panels with long durations.
+ *   - `settle`       One-time scale settle during entrance (1.0 → 1.025),
+ *                    then HOLD. Camera lands and stops. For frames that
+ *                    establish then hold their composition.
+ *   - `sway`         Bidirectional sinusoidal pan (±3px X, ±2px Y) on slow
+ *                    cycles. Net displacement zero — atmospheric life
+ *                    without directional slip.
+ */
+type DriftPreset =
+  | "none"
+  | "editorial"
+  | "slow"
+  | "normal"
+  | "documentary"
+  | "breathing"
+  | "settle"
+  | "sway";
 
 /** Resolved sync point from Whisper alignment */
 export interface DirectionSyncPoint {
@@ -73,6 +106,15 @@ export interface DirectionBlock {
 
   // Pace (from PACE: annotations — controls animation speed)
   paceProfile?: PaceProfile;
+
+  /**
+   * Forward-compat escape hatch. The corresponding Zod schema
+   * (`DirectionBlockSchema` in `./directionBlock.schema`) uses
+   * `.passthrough()` so experimental direction fields not yet typed here
+   * round-trip cleanly through validation. The index signature keeps the
+   * TS shape compatible with `z.output<typeof DirectionBlockSchema>`.
+   */
+  [k: string]: unknown;
 }
 
 type PaceProfile = "urgent" | "analytical" | "breathing";
@@ -116,9 +158,73 @@ export interface DirectionResult {
 // ── Drift preset → useCompositionAnimation options ──────────────────
 
 const DRIFT_PRESETS: Record<DriftPreset, Partial<CompositionAnimationOptions>> = {
+  // ── Off ─────────────────────────────────────────────────────────────
   none: { noDrift: true },
-  slow: { maxScale: 1.03, maxPanX: 8, maxPanY: 4, maxRotation: 0.15 },
-  normal: { maxScale: 1.06, maxPanX: 18, maxPanY: 8, maxRotation: 0.3 },
+
+  // ── Editorial register (the new conservative default) ──────────────
+  // Same envelope as motionBudget — explicit opt-in for readability in
+  // data files that want to declare their motion intent.
+  editorial: {
+    mode: "linear",
+    maxScale: 1.02,
+    maxPanX: 0,
+    maxPanY: 0,
+    maxRotation: 0,
+  },
+
+  // ── Back-compat presets — values locked by useDirection.test.ts ────
+  // These predate the editorial-register revision and stay at their
+  // original envelopes so existing episodes render identically. Note
+  // rotation is preserved here for back-compat; new authors should
+  // prefer `editorial` (no rotation) for charts.
+  slow: { mode: "linear", maxScale: 1.03, maxPanX: 8, maxPanY: 4, maxRotation: 0.15 },
+  normal: { mode: "linear", maxScale: 1.06, maxPanX: 18, maxPanY: 8, maxRotation: 0.3 },
+
+  // ── Documentary (the full Ken Burns, explicit) ─────────────────────
+  // For atmospheric segments, archival photo plates, paper-textured
+  // title cards. NOT for charts — the rotation tilts axis baselines.
+  documentary: {
+    mode: "linear",
+    maxScale: 1.06,
+    maxPanX: 18,
+    maxPanY: 8,
+    maxRotation: 0.3,
+  },
+
+  // ── Alternative motion modes (back-of-pocket) ──────────────────────
+  // Breathing: sinusoidal scale oscillation, no pan, no rotation. The
+  // chart feels alive but doesn't move anywhere. For long-held stat
+  // reveals and quiet establishing frames.
+  breathing: {
+    mode: "breathing",
+    maxScale: 1.008,
+    maxPanX: 0,
+    maxPanY: 0,
+    maxRotation: 0,
+  },
+
+  // Settle: one-time scale settle during the first 0.6s of the segment,
+  // then HOLD. Camera lands and stops. For frames that should establish
+  // their composition cleanly then sit still.
+  settle: {
+    mode: "settle",
+    maxScale: 1.025,
+    maxPanX: 0,
+    maxPanY: 0,
+    maxRotation: 0,
+  },
+
+  // Sway: bidirectional sinusoidal pan on slow cycles (6s X, 9s Y) so
+  // the motion doesn't trace a perfect ellipse. Net displacement zero.
+  // For atmospheric segments where you want subtle life without slip
+  // toward the viewport edge. Use sparingly.
+  sway: {
+    mode: "sway",
+    maxScale: 1.0,
+    maxPanX: 6,
+    maxPanY: 4,
+    maxRotation: 0,
+  },
 };
 
 // ── Pace → timing scale factors ────────────────────────────────────

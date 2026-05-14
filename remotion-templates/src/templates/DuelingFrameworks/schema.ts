@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const FrameworkTenetSchema = z.object({
   text: z.string(),
@@ -34,6 +35,6 @@ export const DuelingFrameworksSchema = z.object({
     episode: z.string().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     durationSec: z.number().optional(),
-    _direction: z.unknown().optional(),
+    _direction: DirectionBlockSchema.optional(),
   }),
 });

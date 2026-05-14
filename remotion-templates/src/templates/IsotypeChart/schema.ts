@@ -3,6 +3,7 @@
  */
 
 import { z } from "zod";
+import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 const IsotypeRowSchema = z.object({
   label: z.string(),
@@ -93,7 +94,7 @@ export const IsotypeChartSchema = z.object({
         .string()
         .optional()
         .describe('Shown below the grid. e.g. "= 1 aircraft carrier" or "= 10,000 people". Use to anchor the icon to a real-world unit.'),
-      _direction: z.unknown().optional(),
+      _direction: DirectionBlockSchema.optional(),
     })
     .superRefine((d, ctx) => {
       if (d.variant === "proportion") {
