@@ -1,7 +1,7 @@
 ---
 name: script-draft
 description: >
-  Draft a two-column production script (narration + visual specs + direction annotations) from a research brief and angle memo using a 3-phase process: narration draft, radio edit test, then visual + direction layer addition. Use whenever someone asks to 'draft a script', 'write the script', 'script this episode', 'turn the brief into a script', 'start scripting', 'ready to script', or when an angle memo exists and the next pipeline step is scripting. Output follows SCRIPT_FORMAT.md with visual mode tags ([FOOTAGE:], [MG:], [LAYERED:], [AI-GEN:], [ILLUST:]) and DIR: annotations for camera, reveals, timing, transitions, and mood. This creates scripts — distinct from script-audit (which reviews them) and angle-memo (which plans the narrative strategy).
+  Draft a two-column production script (narration + visual specs + direction annotations) from a research brief and angle memo using a 3-phase process: narration draft, radio edit test, then visual + direction layer addition. Use whenever someone asks to 'draft a script', 'write the script', 'script this episode', 'turn the brief into a script', 'start scripting', 'ready to script', or when an angle memo exists and the next pipeline step is scripting. Output follows SCRIPT_FORMAT.md with visual mode tags ([FOOTAGE:], [MG:], [LAYERED:], [AI-GEN:], [ILLUST:], [SCENE:], [ARCHIVAL:], [FORECAST:], [BACKDROP: id], [OVERLAY: preset]) and DIR: annotations for camera, reveals, timing, transitions, and mood. This creates scripts — distinct from script-audit (which reviews them) and angle-memo (which plans the narrative strategy).
 ---
 
 # Script Drafting Skill
@@ -256,6 +256,25 @@ DIR: hold(until:"but")                                        # hold this visual
 - Grounding → Atmospheric: `cut(blur-through)`
 - Atmospheric → Analytical: `cut(iris, origin:center)`
 - Same register: `cut(fade)` or `cut(dissolve)` or omit (default cut)
+
+**Backdrop selection (`[BACKDROP: id]`).** Per-segment editorial backdrop image — sits behind the template and silently drives the FilmOverlay film-treatment cascade. Each backdrop in `backdrop-manifest.json` declares its own `recommendedPreset` (e.g. a vintage-photo backdrop recommends `archival`, a constellation-grid backdrop recommends `documentary`), so picking the right backdrop is the *primary* lever for film-treatment mood. Most segments need *nothing beyond `[BACKDROP: id]`* — the cascade handles preset, effects, and intensity automatically.
+
+To browse the backdrop catalog: `python tools/assembly/print_backdrop_catalog.py`. Pair backdrops to register per `remotion-templates/design-references/backdrops/BACKDROP_CHART_PAIRING.md`.
+
+Guidance:
+- Pick one backdrop per editorially distinct segment cluster — *not* per cell. A 4-cell argument arc usually wants one backdrop covering the arc, not 4 different ones.
+- Most templates render fine without a backdrop; add one when the segment carries editorial weight (P1/P2 register moments, transition into a new register, emotional peak).
+- For Philosopher's Lens episodes, AI-GEN cells *are* their own visuals — backdrops generally go on the analytical-register `[MG:]` cells that link them.
+- The whole FilmOverlay system is GATED on `manifest.filmOverlay: {}` being non-empty at the episode level. If the episode hasn't opted in, `[BACKDROP:]` tags are preserved but no backdrop renders. Visual-spec handles the opt-in; you just emit the tags.
+- `[OVERLAY: preset]` is the rare per-segment override (five values: `clean`, `documentary`, `cinematic`, `dramatic`, `archival`) — use only when one moment needs to break from its backdrop's resolved preset. Example: forcing `[OVERLAY: dramatic]` on an editorial peak inside an otherwise documentary-toned arc.
+
+```
+| The entire world's advanced chips    | **P1** · [MG:] ChoroplethMap · supply-chain.json · 12s |
+| come from a single island.           | [BACKDROP: constellation-grid] |
+|                                       | DIR: cam(wide → tight:Taiwan, sync:"single island", track) |
+```
+
+See `remotion-templates/CLAUDE.md` → FilmOverlay cascade and SCRIPT_FORMAT.md → `[BACKDROP:]` / `[OVERLAY:]` for the full resolution chain.
 
 **Sourcability check.** Before writing a `[FOOTAGE:]` spec, verify against FOOTAGE_SOURCING.md:
 - Can a camera physically capture this? If not → `[MG:]`

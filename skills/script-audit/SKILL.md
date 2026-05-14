@@ -143,7 +143,7 @@ This lens applies only to two-column production scripts (with a right-column vis
 
 The visual layer has its own editorial logic, documented in `project/VISUAL_LANGUAGE.md` and `project/FOOTAGE_SOURCING.md`. This lens checks whether the script follows that logic. Read those docs if you haven't already.
 
-**Visual mode balance.** Count all mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`) across the full script. Calculate approximate screen time percentages. Check against target ranges:
+**Visual mode balance.** Count all mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`, `[SCENE:]`, `[ARCHIVAL:]`) across the full script. Calculate approximate screen time percentages. Check against target ranges:
 - MG: 40-55% (analytical video essays are naturally MG-dominant; if above 60%, it's a slideshow)
 - FOOTAGE: 25-40% (if below 25%, the analysis feels disconnected from reality)
 - ILLUST: 5-15% (atmospheric illustrations for emotional texture; if 0% in a 10+ min episode, flag as opportunity)
@@ -195,6 +195,12 @@ Beat 2: [MG:Map 12s] [MG:Chart 8s] [MG:FW 10s] [MG:Typo 4s]  ⚠️ all Analytic
 Beat 3: [F 25s] [F 15s] [F 10s]  ⚠️ 50s footage without MG — analysis feels absent
 Beat 4: [MG:Chart 8s] [AI-GEN 7s] [ILLUST 5s] [MG:FW 10s]  ✅ register variety
 ```
+
+**Backdrop coverage (`[BACKDROP: id]`) check.** Per-segment editorial backdrops drive the FilmOverlay film-treatment cascade (see SCRIPT_FORMAT.md → `[BACKDROP:]`). Each backdrop in `backdrop-manifest.json` declares its own `recommendedPreset`, so the right backdrop choice silently resolves preset/effects/intensity. Audit:
+- Are P1 / register-transition / emotional-peak moments tagged with `[BACKDROP: id]`? Flag P1 segments that have no backdrop *and* no clear reason (e.g., maps and full-screen kinetic typography sometimes legitimately don't need one).
+- Does the script use *too many different* backdrops? Anti-pattern: every cell has a different backdrop. The cascade is most effective when one backdrop covers an editorial arc (3-5 connected cells). Flag if more than ~8 distinct backdrop ids appear in a 12-14 min episode.
+- Is the script using `[OVERLAY: preset]` correctly — only as a rare per-segment override on editorial peaks? If `[OVERLAY:]` appears more than ~3 times in an episode, the script writer is using it as a substitute for `[BACKDROP:]`. Flag and suggest the backdrop-driven cascade is the right primary mechanism.
+- Confirm that if any `[BACKDROP:]` / `[OVERLAY:]` tags appear, the visual-spec stage will need to set `manifest.filmOverlay: { preset: ... }` to opt the episode into the system. (Not a script-level issue but worth noting in the audit for handoff.)
 
 **Visual density annotations (`PACE:`) check.** If the script uses `PACE:` annotations, verify:
 - Total PACE changes are 2-4 per episode (more than 4 fragments the rhythm rather than shaping it)

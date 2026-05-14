@@ -161,21 +161,101 @@ If no issues:
 
 ## Doctrine / failure modes to ALWAYS flag
 
-1. **HorizontalTimeline used for bounded-analogy beat** — P0 (use TimelineComparison).
-2. **TimelineComparison events paired by calendar instead of by structural phase** — P0.
-3. **TimelineMorph used >1× per episode** — P0 (erodes analytical punchline).
-4. **TimelineMorph for coincidental parallel** — P0 (false-causation implication).
-5. **TimelineComparison without connection lines** — P0 (defeats the pairing form).
-6. **TimelineComparison with >5 connections** — P1 (spaghetti).
-7. **HorizontalTimeline with >32 events** — P1 (narration outruns reading).
-8. **DualTimeline combined >20 events** — P1.
-9. **Events color-coded by type in multi-era timeline** — P1 (use era color).
-10. **Connection lines indexing events that don't share a structural phase** — P1.
-11. **DualTimeline non-focus opacity below 0.35** — P1.
-12. **Missing source attribution on dated event** — P0.
+> **Template-architecture note (May 12, 2026):** `HorizontalTimeline` with `mode: "single" | "dual" | "morph"` is the canonical timeline template. The pre-May-12 templates `TimelineComparison`, `DualTimeline`, and `TimelineMorph` are DEPRECATED — they remain in the source tree for legacy episodes but new work routes to `HorizontalTimeline`. The rules below name the modes; if you find data using a deprecated template, flag it for migration to `HorizontalTimeline` first, then apply the rules.
+
+### Template-fit failures
+
+1. **HorizontalTimeline `mode: "single"` used for bounded-analogy beat** — P0 (use `mode: "dual"`; bounded analogy is the channel's signature form).
+2. **`mode: "dual"` events paired by calendar instead of by structural phase** — P0 (set `phaseAxis` + `phasePosition` per pair; otherwise the parallel is decorative).
+3. **`mode: "morph"` used >1× per episode** — P0 (erodes the analytical-climax punch).
+4. **`mode: "morph"` for coincidental parallel** — P0 (morph implies institutional continuity; reserve for *same instrument, different substrate* claims).
+5. **`mode: "dual"` without `connection` labels per pair** — P0 (the connection labels ARE the editorial claim; without them, two lists side by side don't read as a comparison).
+
+### Density / scale failures
+
+6. **`mode: "dual"` with >5 connections** — P1 (spaghetti; consider dropping to ~4 anchor beats).
+7. **`mode: "single"` with >32 events** — P1 (narration outruns reading speed).
+8. **`mode: "dual"` combined >20 events** — P1.
+9. **EscalationLadder with >7 rungs** — P1 (silently clipped below safe area; cap or split).
+
+### Color + register failures
+
+10. **Events color-coded by type in a multi-era timeline** — P1 (era color is the encoding; type is noise).
+11. **Era colors at full brand saturation** — P1 (mute by ~30%; rust+navy at 100% reads hot, not analytical).
+12. **`mode: "dual"` non-focus opacity below 0.35** — P1 (kills the parallel-reading affordance).
+13. **Severity legend on EscalationLadder shows tiers not used in the data** — P1 (drop unused tiers from the legend, or add at least one event at that severity).
+
+### Editorial-chrome failures
+
+14. **Missing source attribution on dated events** — P0 (every analytical chart cites; even "Author's synthesis from [textbook]" is better than nothing).
+15. **Inconsistent date formatting within one timeline** — P1 (mixing "284 CE" with bare "330" reads as oversight; pick a rule).
+16. **No spanning title naming the parallel** — P0 in `dual`/`morph` modes (title must declare *what's being compared and why*, not just the two subjects).
+
+## Visual Discipline (POLISH.md T-prefix rules)
+
+These six rules catch the failure modes that survived the template-fit pass but ship as "looks unprofessional" anyway. Each maps to a rule in POLISH.md under the **T** (Timeline) prefix.
+
+### T1 — Settled by frame 30
+
+Title and era-label entrance animations must be **complete** by frame 30 (1 second in at 30fps). Anything still moving — chromatic kick, slide-in, scale pulse — at the still-preview frame reads as unstable. If frame-30 capture shows residual motion, the entrance easing is too long. Check with `npx remotion still ... --frame=30`.
+
+### T2 — Spanning title names the parallel
+
+Every timeline beyond a bare chronology gets a single title that **names the comparison's claim** (`title`), plus a one-line subtitle that **declares the framing** (`subtitle`). Examples:
+
+- ✅ "How Empires Hand Off" / "Two transitions, four centuries apart"
+- ✅ "Two Revolutions, One Cadence" / "Aligned by phase, not by calendar"
+- ❌ "First Industrial Revolution" + "Information Revolution" as parallel H1s with no spanning title
+
+Two side-by-side H1s without a spanning frame read as "two unrelated articles, not a comparison."
+
+### T3 — Connection labels are the spine of the argument
+
+In `mode: "dual"`, every pair declares a `connection: "..."` label. These four-to-six phrases (Center divides → Handoff complete; Onset → Endemic; Enabling primitive → Information layer) ARE the editorial hypothesis. Render them prominently on or near the spine — never as gray afterthoughts floating in dead space between columns. A `dual` timeline without `connection` labels is two unrelated lists.
+
+### T4 — Date typography is the row anchor
+
+Date labels should be:
+- Plex Mono small caps,
+- Bold (600 weight),
+- In the era's accent color (rust for historical era, navy for contemporary, etc.),
+- Visually the **first** thing the eye reads on each row.
+
+Dates as warm-brown body-weight descriptors (the prior DualTimeline default) bury the row's anchor.
+
+### T5 — No row chrome in `dual`/`morph` modes
+
+Avoid filled background rows / tinted panels per event. Editorial timelines (Economist, NYT Upshot, FT) render on paper white with a thin spine and clean type — no row backgrounds, no pin-bar sidebars, no per-row tinted card surfaces. Heavy row chrome reads as org-chart UI, not magazine spread. Severity-color cards on `EscalationLadder` are the lone justified exception (the color encoding is editorial).
+
+### T6 — Use the canvas
+
+A timeline that uses <50% of the canvas (content squeezed into one third with the rest empty) is undersized. Either:
+
+- Widen the content to the safe area, OR
+- Add a contextual right-side annotation (a small map, a portrait, a pull-quote), OR
+- Center the column horizontally so whitespace is balanced.
+
+Bias toward centering for vertical ladders (EscalationLadder); bias toward widening for horizontal spines (HorizontalTimeline). Never let the canvas sit half-empty.
+
+### Visual-discipline scan (run alongside template-fit)
+
+When auditing a script + data file pair, additionally run these checks on each timeline beat:
+
+```
+□ T1 — Entrance settled by frame 30? (spot-check render: `npx remotion still --frame=30`)
+□ T2 — Spanning title + subtitle that name the comparison?
+□ T3 — `mode: "dual"` has `connection` per pair?
+□ T4 — Dates rendered in mono caps + era color, bold?
+□ T5 — No row chrome / no pin-bar sidebar markers?
+□ T6 — Content fills or centers the canvas? (≥50% used or symmetric whitespace)
+□ Source attribution present?
+□ Date formatting consistent within the timeline?
+```
+
+If any item flags, name the specific row + field in the audit output. Cross-cutting failures (e.g., the whole timeline lacks a spanning title) get one verdict at the top.
 
 ## Tone
 
-Match the Parallax skill set: terse, surgical. Quote the script line. Cite the selector or dossier reference. Suggest the specific replacement.
+Match the Parallax skill set: terse, surgical. Quote the script line. Cite the selector or dossier reference. Suggest the specific replacement. The T1–T6 visual-discipline rules each map to POLISH.md by ID — cite both when filing a finding.
 
 TimelineComparison is the signature form — be especially direct when it's mis-routed. The whole channel's editorial differentiator depends on this template being used correctly when the argument calls for it.
