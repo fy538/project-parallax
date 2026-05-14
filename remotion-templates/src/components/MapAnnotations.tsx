@@ -243,11 +243,18 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
   // unambiguously dominate Mapbox's automatic country labels even when the
   // typographic registers are close. May 13, 2026 polish pass — paired
   // with the new haloShadow below.
+  //
+  // May 14, 2026 — primary font size REDUCED from `fontSizes.h3` (36) to
+  // 28 px to match the FT / NYT editorial register at globe/regional zoom.
+  // 36 read as "billboard" overlay; 28 stays editorial while bold + halo
+  // preserves dominance over Mapbox auto-labels. Hardcoded (not a token)
+  // because no intermediate between h3 (36) and body (22) exists in
+  // fontSizes — bespoke per-component sizing is correct here.
   const labelStyle: React.CSSProperties =
     annotation.hierarchy === "primary"
       ? {
           fontFamily: fonts.display,
-          fontSize: fontSizes.h3,
+          fontSize: 28,
           fontWeight: fontWeights.bold,
           letterSpacing: `${letterSpacing.h3}px`,
           textTransform: "uppercase",
