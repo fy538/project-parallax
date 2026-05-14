@@ -53,6 +53,12 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { MapGL } from "../../components/MapGL";
+import {
+  CinematicCamera,
+  CinematicDirectiveSchema,
+  buildKeyframesFromDirectives,
+  type CinematicMapInstance,
+} from "../../components/CinematicCamera";
 import { MapAnnotations } from "../../components/MapAnnotations";
 import {
   placeLabels,
@@ -684,9 +690,16 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   // direction ("above" | "below" | "left" | "right"). Explicit
   // labelPosition values always win (authors get the last word on stubborn
   // cases). See: src/components/labelPlacement.ts.
-  const [mapInstance, setMapInstance] = useState<{
-    project: (lonLat: [number, number]) => { x: number; y: number };
-  } | null>(null);
+  // The shape we accept matches MapGL's `onMapReady` callback — `project`
+  // for label-collision placement (greedy auto-placer) AND the FreeCamera
+  // surface for CinematicCamera. Both are optional because non-Mapbox
+  // backends could one day fulfill this contract.
+  const [mapInstance, setMapInstance] = useState<
+    | (CinematicMapInstance & {
+        project: (lonLat: [number, number]) => { x: number; y: number };
+      })
+    | null
+  >(null);
   const autoLabelPositions = useMemo(() => {
     const positions = new Map<number, "above" | "below" | "left" | "right">();
     if (!mapInstance) return positions;
@@ -735,6 +748,37 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     return positions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pointData, mapInstance, frame]);
+
+  // ── CinematicCamera keyframes ────────────────────────────────────────
+  // When the data file authors a `_direction.cameraPath` array of
+  // CinematicDirective objects, we translate them into the
+  // <CinematicCamera> component's keyframe format and let it drive the
+  // Mapbox FreeCamera per frame. The phase-based declarative MapGL
+  // camera (longitude/latitude/zoom props) still runs — CinematicCamera
+  // calls setFreeCameraOptions AFTER MapGL's declarative props are
+  // applied, so it wins the final word per frame.
+  //
+  // Validation: we Zod-parse each directive defensively. Bad shapes get
+  // logged + dropped. Empty / missing array → CinematicCamera is not
+  // rendered at all (phase camera holds).
+  const cinematicKeyframes = useMemo(() => {
+    const raw = rawData._direction?.cameraPath;
+    if (!Array.isArray(raw) || raw.length === 0) return [];
+    const directives: import("../../components/CinematicCamera").CinematicDirective[] = [];
+    for (const entry of raw) {
+      const parsed = CinematicDirectiveSchema.safeParse(entry);
+      if (parsed.success) {
+        directives.push(parsed.data);
+      } else if (typeof console !== "undefined") {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "[RouteAnimation] dropping malformed _direction.cameraPath " +
+            `entry: ${parsed.error.message}`,
+        );
+      }
+    }
+    return buildKeyframesFromDirectives(directives, layout.fps);
+  }, [rawData._direction?.cameraPath]);
 
   // Outer atmospheric glow halo (14px, low alpha)
   const scatterHaloLayer = new ScatterplotLayer({
@@ -836,6 +880,8 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             fogPreset="editorial"
             vignette="editorial"
             labelDensity={data.labelDensity ?? "editorial"}
+            lightPreset={data.lightPreset}
+            toner={data.toner}
             onMapReady={setMapInstance}
           >
           {/* Point labels — rendered as Markers for proper geo projection */}
@@ -1004,6 +1050,15 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             />
           )}
           </MapGL>
+
+          {/* Cinematic camera override — when `_direction.cameraPath` is
+              authored, drives Mapbox FreeCamera per frame. No-op (renders
+              nothing) when the array is empty or mapInstance hasn't
+              attached yet. Phase-based MapGL camera props still run; this
+              writes setFreeCameraOptions AFTER, so it wins. */}
+          {cinematicKeyframes.length > 0 && (
+            <CinematicCamera map={mapInstance} keyframes={cinematicKeyframes} />
+          )}
         </div>
 
         {/* Locator inset — small globe showing where the parent camera
