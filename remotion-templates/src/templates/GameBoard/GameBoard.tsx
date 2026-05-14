@@ -136,48 +136,25 @@ const ChessBoard: React.FC<{
         width: 600,
         height: 600,
         background: theme.bg.surface,
-        border: `${radii.sm}px solid ${accent}`,
-        boxShadow: `inset 0 0 20px rgba(0, 0, 0, 0.1)`, // shadows.none equivalent — inset vignette (no token)
+        // Thin ink border — replaces the previous accent (amber) ring that
+        // made the board look like a generic game-token board rather than a
+        // chess diagram. NYT / FT chess columns use a 1 px dark stroke (or
+        // nothing) — never a colored ring. May 13, 2026 polish pass.
+        border: `1px solid ${palette.ink}33`,
+        // Soft outer shadow lifts the board off the paper (chess diagrams
+        // in print typically have a subtle shadow, like the board is laid
+        // on a table). Replaces the previous inset vignette which fought
+        // with the alternating-square pattern.
+        boxShadow: shadows.medium,
       }}
     >
-      {/* Grid lines */}
-      <svg
-        style={{
-          position: "absolute",
-          inset: 0,
-          opacity: gridOpacity,
-        }}
-        viewBox={`0 0 ${boardSize} ${boardSize}`}
-      >
-        {/* Vertical lines */}
-        {Array.from({ length: boardSize + 1 }).map((_, i) => (
-          <line
-            key={`v-${i}`}
-            x1={i}
-            y1={0}
-            x2={i}
-            y2={boardSize}
-            stroke={accent}
-            strokeWidth="0.02"
-            opacity="0.3"
-          />
-        ))}
-        {/* Horizontal lines */}
-        {Array.from({ length: boardSize + 1 }).map((_, i) => (
-          <line
-            key={`h-${i}`}
-            x1={0}
-            y1={i}
-            x2={boardSize}
-            y2={i}
-            stroke={accent}
-            strokeWidth="0.02"
-            opacity="0.3"
-          />
-        ))}
-      </svg>
-
-      {/* Alternating squares — warm wood-board palette */}
+      {/* Alternating squares — warm wood-board palette.
+          Bronze at full opacity (was 0.7) so the light/dark contrast reads
+          clearly at scrubbing speed; same for paper (was 0.85). Without
+          enough contrast the board reads as a flat grid, not a chess board.
+          The grid-lines SVG was dropped — the alternating fills ARE the
+          grid; drawing accent lines over them produced a wireframe-on-paint
+          look characteristic of amateur diagrams. May 13, 2026 polish pass. */}
       {Array.from({ length: boardSize * boardSize }).map((_, idx) => {
         const row = Math.floor(idx / boardSize);
         const col = idx % boardSize;
@@ -192,9 +169,8 @@ const ChessBoard: React.FC<{
               top: row * squareSize,
               width: squareSize,
               height: squareSize,
-              // Light squares = paper, dark squares = bronze (wood feel)
               backgroundColor: isLight ? palette.paper : palette.bronze,
-              opacity: isLight ? 0.85 : 0.7,
+              opacity: isLight ? 1 : 0.95 * gridOpacity + 0.05,
             }}
           />
         );
@@ -437,8 +413,12 @@ const PayoffMatrix: React.FC<{
   // Per-episode primary accent for active-cell highlight + glow.
   const accent = useEpisodeColorEmphasis().primaryAccent;
   const cols = data.colOptions?.length || 2;
-  const cellSize = 140;
-  const labelWidth = 120;
+  // Bumped cellSize 140 → 200 (May 13, 2026) so 2×2 matrices like Stag Hunt
+  // carry editorial weight on a 1920×1080 canvas. Previous size made the
+  // matrix occupy ~21% of canvas width, reading as a small floating chip
+  // rather than the load-bearing analytical element.
+  const cellSize = 200;
+  const labelWidth = 140;
   const headerHeight = 60;
 
   const cells = data.cells || [];
@@ -451,7 +431,12 @@ const PayoffMatrix: React.FC<{
         gap: layout.spacing.md,
       }}
     >
-      {/* Header row (column options) */}
+      {/* Header row (column options).
+          Empty corner placeholders on BOTH sides (labelWidth) so the
+          GRID cells visually center within the flex bounding box. Without
+          the right-side phantom, the row-label column on the left makes
+          the bounding box wider on the left → grid sits right-of-center
+          when the bounding box centers. May 13, 2026 visual-register pass. */}
       <div style={{ display: "flex", alignItems: "flex-end", gap: 0 }}>
         <div style={{ width: labelWidth }} />
         {data.colOptions?.map((option, i) => (
@@ -472,6 +457,8 @@ const PayoffMatrix: React.FC<{
             {option}
           </div>
         ))}
+        {/* Phantom right-side gutter to balance the row-label column. */}
+        <div style={{ width: labelWidth }} />
       </div>
 
       {/* Rows */}
@@ -550,6 +537,8 @@ const PayoffMatrix: React.FC<{
               </div>
             );
           })}
+          {/* Phantom right-side gutter to balance the row-label column. */}
+          <div style={{ width: labelWidth }} />
         </div>
       ))}
     </div>
@@ -687,22 +676,26 @@ const PDCanonicalMatrix: React.FC<{
   });
 
   // Account for external labels in the visual bounding box so the matrix
-  // visually centers under the title (the rotated row-player label sits
-  // 60px to the left of the grid; the column-player label sits 28px above).
-  // The outer wrapper carries the full visual width including label gutters;
-  // the inner relative container holds the grid + its absolute external labels
-  // and is offset by the gutter amount so children at left:-60 fall at x=0
-  // of the outer bounding box.
+  // visually centers under the title. The rotated rowPlayer label sits 60px
+  // LEFT of the grid; the colPlayer label sits 28px ABOVE. Previously only
+  // the left/top gutters were added to the wrapper width/height, which made
+  // the GRID itself sit shifted right + down by half-the-gutter inside its
+  // centered flex parent. Fix: add phantom right + bottom gutters of equal
+  // size so the grid is visually centered within its wrapper. See May 13,
+  // 2026 GameBoard visual-register pass + POLISH T6 (use the canvas).
   const labelGutterLeft = data.rowPlayer ? 60 : 0;
   const labelGutterTop = data.colPlayer ? 28 : 0;
+  // Phantom matching gutters keep the grid optically centered in its wrapper.
+  const labelGutterRight = labelGutterLeft;
+  const labelGutterBottom = labelGutterTop;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: layout.spacing.lg }}>
       <div
         style={{
           position: "relative",
-          width: gridWidth + labelGutterLeft,
-          height: gridHeight + labelGutterTop,
+          width: gridWidth + labelGutterLeft + labelGutterRight,
+          height: gridHeight + labelGutterTop + labelGutterBottom,
         }}
       >
        <div
@@ -1264,6 +1257,10 @@ const IteratedPlayMatrix: React.FC<{
 // Map data labels (case-insensitive) to filled chess Unicode glyphs.
 // Filled glyphs read better at video scale than outline ones.
 
+// Filled (black-style) glyphs for the SHAPE — color-recoloring happens in
+// `PieceCircle` based on the piece's own color. Using filled forms across
+// the board gives consistent stroke weight at video scale; the outline
+// (white-style) variants ♔♕♖♗♘♙ are too light/thin to read cleanly.
 const CHESS_GLYPHS: Record<string, string> = {
   king: "♚",
   queen: "♛",
@@ -1279,13 +1276,46 @@ const CHESS_GLYPHS: Record<string, string> = {
   p: "♟",
 };
 
+/**
+ * Normalize a piece label to a Unicode chess glyph. Handles common forms:
+ *   - Single letters: "K", "Q", "R", "B", "N", "P"
+ *   - Full words: "king", "queen", ...
+ *   - Color-prefixed: "wK" / "bK" / "wQ" / "bQ" / etc. — the leading "w" or
+ *     "b" is stripped before lookup so the same glyph is used for both
+ *     colors (color rendering is handled at the `PieceCircle` level).
+ *   - Long-form prefixed: "white king" / "black queen" — same stripping.
+ * Returns the original label unchanged when no match is found (raw text
+ * fallback for non-chess uses).
+ */
 const toChessGlyph = (label: string): string => {
   const norm = label.trim().toLowerCase();
-  return CHESS_GLYPHS[norm] || label;
+  // Strip "w"/"b" color prefix if it's followed by a known piece letter or word.
+  // Handles "wk" → "k", "bking" → "king", "white king" → "king".
+  const colorStripped = norm
+    .replace(/^(white\s+|black\s+)/, "")
+    .replace(/^[wb](?=[kqrbnp]\b|[kqrbnp]$|king|queen|rook|bishop|knight|pawn)/, "");
+  return CHESS_GLYPHS[colorStripped] || CHESS_GLYPHS[norm] || label;
 };
 
 // ── Piece Circle Component ───────────────────────────────────────────────────
 
+/**
+ * Piece renderer — two distinct visual registers:
+ *
+ *  • CHESS register (label resolves to a Unicode chess glyph): no disk, no
+ *    ring. The glyph is rendered as a 64 px silhouette directly on the
+ *    square, NYT-chess-column / FT-editorial-style. White pieces get a thin
+ *    ink stroke via `-webkit-text-stroke` so they read distinctly against
+ *    both light (paper) and dark (bronze) squares; black pieces are solid
+ *    ink fills. A soft drop-shadow lifts the piece off the board, mimicking
+ *    a real chess piece casting a shadow. This is the canonical professional
+ *    look — disks + rings make pieces read as checkers / poker tokens, not
+ *    chess pieces. May 13, 2026 polish pass.
+ *
+ *  • TOKEN register (raw text label, e.g. iterated-play strategy markers):
+ *    the original disk-with-ring treatment — appropriate for matrix tokens
+ *    where pieces are abstract markers, not chess pieces.
+ */
 const PieceCircle: React.FC<{
   label: string;
   color: string;
@@ -1293,47 +1323,83 @@ const PieceCircle: React.FC<{
 }> = ({ label, color, mode = "light" }) => {
   const theme = useThemeMode(mode);
   const glyph = toChessGlyph(label);
-  // Determine if this is a recognized chess glyph (vs raw text fallback)
   const isGlyph = glyph !== label;
-  // White-piece logic: dark color on bone bg; black-piece: bone color on ink bg.
-  // Detect via color luminance heuristic.
-  const isLightPiece = color.toLowerCase() === palette.bone.toLowerCase()
-    || color.toLowerCase() === palette.paper.toLowerCase();
-  const glyphColor = isLightPiece ? palette.ink : palette.bone;
-  const bgColor = isLightPiece ? palette.bone : palette.ink;
+  // White-piece logic: matches bone/paper color → render as outlined silhouette.
+  const isLightPiece =
+    color.toLowerCase() === palette.bone.toLowerCase() ||
+    color.toLowerCase() === palette.paper.toLowerCase();
+
+  // ─── Chess register: silhouette only, no disk, no ring ─────────────────
+  if (isGlyph) {
+    return (
+      <div
+        style={{
+          // Square footprint slightly larger than the glyph so the drop
+          // shadow doesn't clip; transform-origin centers on the square.
+          width: 72,
+          height: 72,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          // Drop shadow — soft, slightly offset down-right to suggest the
+          // piece is sitting on the board with raked light from upper-left.
+          filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.35))",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 64,
+            fontFamily: "'DejaVu Sans', 'Segoe UI Symbol', sans-serif",
+            // Black pieces: solid ink fill.
+            // White pieces: paper fill with ink stroke so they read against
+            // both paper (light) and bronze (dark) squares — the stroke is
+            // what makes the white piece SHAPE-readable without a disk.
+            color: isLightPiece ? palette.paper : palette.ink,
+            WebkitTextStroke: isLightPiece
+              ? `1.5px ${palette.ink}`
+              : undefined,
+            textAlign: "center",
+            lineHeight: 1,
+            fontWeight: 400,
+            // No textShadow — drop-shadow on the wrapper handles lift.
+          }}
+        >
+          {glyph}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Token register: disk + ring (matrix markers, abstract pieces) ─────
   return (
-  <div
-    style={{
-      width: 56,
-      height: 56,
-      borderRadius: "50%",
-      // Subtle radial gradient for ceramic-stone feel: highlight upper-left → shadow lower-right
-      background: isGlyph
-        ? `radial-gradient(circle at 35% 30%, ${bgColor} 0%, ${bgColor} 55%, ${isLightPiece ? "#D8CDB6" : "#0E0B09"} 100%)`
-        : color,
-      border: `2px solid ${palette.amber}`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: `${shadows.subtle}, inset -2px -2px 6px rgba(0,0,0,0.18), inset 2px 2px 4px rgba(255,255,255,0.12)`,
-    }}
-  >
     <div
       style={{
-        fontSize: isGlyph ? 36 : fontSizes.label,
-        fontFamily: isGlyph ? "'DejaVu Sans', 'Segoe UI Symbol', sans-serif" : fonts.body,
-        color: isGlyph ? glyphColor : theme.text.primary,
-        textAlign: "center",
-        fontWeight: 600,
-        lineHeight: 1,
-        maxWidth: "90%",
-        textShadow: isGlyph ? shadows.textLift : undefined,
+        width: 56,
+        height: 56,
+        borderRadius: "50%",
+        background: color,
+        border: `2px solid ${palette.amber}`,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: `${shadows.subtle}, inset -2px -2px 6px rgba(0,0,0,0.18), inset 2px 2px 4px rgba(255,255,255,0.12)`,
       }}
     >
-      {glyph}
+      <div
+        style={{
+          fontSize: fontSizes.label,
+          fontFamily: fonts.body,
+          color: theme.text.primary,
+          textAlign: "center",
+          fontWeight: 600,
+          lineHeight: 1,
+          maxWidth: "90%",
+        }}
+      >
+        {glyph}
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 // ── Counter Animation Component ─────────────────────────────────────────────
@@ -1541,8 +1607,25 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
           />
         </div>
 
-        {/* Board variants */}
-        <div style={{ marginBottom: layout.spacing.xxl }}>
+        {/* Board variants.
+            Per-variant vertical nudge (May 13, 2026 visual-register pass):
+            with the title block centered at safe.top, the flex justify=center
+            placed boards too high against the title for chess and pd-canonical
+            (boards are visually heavier, need more breathing room below the
+            title). PD also drifts slightly right because the Nash glyph and
+            best-response arrows extend rightward from the matrix — pull it
+            left a touch to optically center the whole compound. */}
+        <div
+          style={{
+            marginBottom: layout.spacing.xxl,
+            transform:
+              data.variant === "pd-canonical"
+                ? "translate(-32px, 48px)"
+                : data.variant === "chess"
+                  ? "translate(0, 48px)"
+                  : "none",
+          }}
+        >
           {data.variant === "chess" && (
             <ChessBoard data={data} frame={frame} state={state} mode={mode} />
           )}

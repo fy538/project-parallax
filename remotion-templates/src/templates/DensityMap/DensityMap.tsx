@@ -21,7 +21,6 @@ import { Background } from "../../components/Background";
 import { MapGL } from "../../components/MapGL";
 import { MapAnnotations } from "../../components/MapAnnotations";
 import { MapInset } from "../../components/MapInset";
-import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -359,6 +358,14 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           dark={dark}
           terrain={false}
           layers={layers}
+          // Editorial Mapbox register defaults (see MapGL fog preset docs).
+          // Label density: `editorial` — country labels at globe scale,
+          // auto-suppress at regional zoom where the heatmap dominates.
+          // Per-shot override to `"minimal"` when explicit annotations
+          // name everything that matters.
+          fogPreset="editorial"
+          vignette="editorial"
+          labelDensity={data.labelDensity ?? "editorial"}
         >
           {data.annotations && data.annotations.length > 0 && (
             <MapAnnotations
@@ -387,13 +394,9 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           />
         )}
 
-        <TitleBlock
-          title={data.title}
-          subtitle={data.subtitle}
-          mode={dark ? "dark" : "light"}
-          safeAreaTier="generous"
-          syncPoints={direction.syncPoints}
-        />
+        {/* No TitleBlock overlay — Mapbox templates are atmospheric register
+            only (May 13, 2026 doctrine). Title comes from script voice-over
+            or preceding TitleTransition. See MAP_TEMPLATE_SELECTOR.md. */}
 
         {/* Phase title overlay — bottom-left, mirrors AtlasPlate convention. */}
         {currentWindow.phase.title && (

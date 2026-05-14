@@ -56,7 +56,6 @@ import { MapGL } from "../../components/MapGL";
 import { MapAnnotations } from "../../components/MapAnnotations";
 import { buildGraticuleLayers } from "../../components/Graticule";
 import { MapInset } from "../../components/MapInset";
-import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { RouteAnimationData, RoutePhase, RouteSegment } from "./types";
@@ -755,6 +754,19 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             layers={layers}
             dark={data.backgroundVariant === "dark"}
             terrain={data.terrain ?? false}
+            // Editorial register defaults — fog tinted to brand palette
+            // (kills the default cyan globe halo), attribution chip in
+            // bottom-right, soft editorial vignette blending the Mapbox
+            // canvas into the surrounding page chrome. Graticule continues
+            // to flow through the existing `data.graticule` →
+            // `buildGraticuleLayers` pipeline above (added to `layers`),
+            // so we don't double-route it through MapGL's graticule prop.
+            // Label density: editorial register by default — country
+            // labels at globe scale (orientation), auto-suppress at
+            // regional zoom so editorial MapAnnotations dominate.
+            fogPreset="editorial"
+            vignette="editorial"
+            labelDensity={data.labelDensity ?? "editorial"}
           >
           {/* Point labels — rendered as Markers for proper geo projection */}
           {pointData.map((pt) => {
@@ -923,14 +935,16 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           />
         )}
 
-        {/* Title */}
-        <TitleBlock
-          title={data.title}
-          subtitle={data.subtitle}
-          mode="light"
-          safeAreaTier="generous"
-          syncPoints={direction.syncPoints}
-        />
+        {/* NO TITLE / NO TITLE PLATE — May 13, 2026 doctrine: Mapbox
+            templates are "atmospheric register only" (cinematic globe
+            pivots, terrain-heavy shots). The map fills the entire visual.
+            Titles for Mapbox-rendered shots live in the SCRIPT context
+            (voice-over names what we're looking at) or in a preceding
+            TitleTransition composition, NOT painted over the map. This
+            matches NYT/FT convention for cinematic map shots — the map
+            speaks for itself, no overlaid header rectangle "cutting into"
+            the cartography. Analytical / titled choropleth work moved
+            to AtlasPlate (pure SVG, paper-native). */}
 
         {/* Phase title overlay — appears after camera settles.
             Suppressed when the phase has no title (e.g., radial mode's

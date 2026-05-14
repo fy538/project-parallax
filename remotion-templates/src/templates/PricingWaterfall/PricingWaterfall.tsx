@@ -68,8 +68,20 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
   const barWidth = 220;
   const kickerHeight = 120;
   const barTop = area.top + kickerHeight + 24;
-  const barHeight = Math.min(area.height - kickerHeight - 60, 540);
-  const barLeft = area.left + (area.width - barWidth) / 2 - 240;
+  // Hard cap: bar must not extend past the footer safe area (generous = 120px
+  // from bottom). Reserve an extra 32px breathing room above the footer strip.
+  const barMaxBottom = layout.height - layout.safeAreaTier.generous.bottom - 32;
+  const barHeight = Math.min(
+    area.height - kickerHeight - 60,
+    barMaxBottom - barTop,
+    460,
+  );
+  // Horizontal centering: the visual group is bar (220px) + leader gap (72px)
+  // + label area (~270px) ≈ 562px total. Center it on screen (x=960) rather
+  // than centering just the bar column within the content area.
+  const labelAreaWidth = 270;
+  const groupWidth = barWidth + 72 + labelAreaWidth;
+  const barLeft = Math.round((layout.width - groupWidth) / 2);
   const kickerLeft = barLeft - 40;
 
   // Pre-compute segment positions (bottom-up).

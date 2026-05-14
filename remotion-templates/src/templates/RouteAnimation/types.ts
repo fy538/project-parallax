@@ -125,6 +125,22 @@ export interface RouteAnimationData {
   terrain?: boolean;
 
   /**
+   * Label-density register — controls how aggressively Mapbox's automatic
+   * place/road/transit labels are suppressed so editorial annotations win
+   * the typographic hierarchy. See MapGL `labelDensity` for the full
+   * register taxonomy. Defaults to `"editorial"` for RouteAnimation:
+   * country labels visible at globe scale (orientation), auto-suppress at
+   * regional zoom (>= 4) where MapAnnotations dominate. Override per shot
+   * if you want a different register.
+   *
+   * - `"atlas"` — full Mapbox labels at every zoom
+   * - `"editorial"` (default) — country labels at globe, suppress at regional
+   * - `"minimal"` — hide all place/road/transit labels regardless of zoom
+   * - `"off"` — total suppression (every label on canvas is editorial)
+   */
+  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
+
+  /**
    * Editorial annotations — labels pinned to lon/lat with optional leader
    * lines. Use to name features, regions, or chokepoints that aren't route
    * nodes. Use the `phase` shorthand to scope to a specific route phase.

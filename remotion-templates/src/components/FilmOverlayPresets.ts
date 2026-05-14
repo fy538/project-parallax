@@ -117,7 +117,6 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   NetworkDiagram: "documentary",
   DualTimeline: "documentary",
   TimelineComparison: "documentary",
-  TimelineMorph: "documentary",
   DuelingFrameworks: "documentary",
   HorizontalTimeline: "documentary",
 
@@ -139,7 +138,6 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   // abyss-depth) overrides at level 2 to push them cinematic/dramatic.
   ChoroplethMap: "clean",
   RouteAnimation: "clean",
-  BifurcationRoute: "clean",
   StrategicLandscape: "documentary",
   AtlasPlate: "clean",
   ProportionalSymbolMap: "clean",

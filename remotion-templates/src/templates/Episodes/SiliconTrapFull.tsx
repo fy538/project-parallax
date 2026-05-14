@@ -33,7 +33,7 @@ import { TEMPLATE_DATA } from "./silicon-trap-data";
 
 export const SiliconTrapFull: React.FC = () => (
   <FullEpisode
-    manifest={manifest as any}
+    manifest={manifest as any} // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
     templateData={TEMPLATE_DATA}
     assetBasePath="assets/silicon-trap"
   />
@@ -48,7 +48,7 @@ export const SiliconTrapFullComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: manifest as any,
+          manifest: manifest as any, // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
           templateData: TEMPLATE_DATA,
           assetBasePath: "assets/silicon-trap",
         },

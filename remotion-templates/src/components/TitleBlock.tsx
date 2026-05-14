@@ -166,7 +166,14 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
       }}
     >
       {/* Title — h2, heading font, primary text color.
-          Font size is pre-computed via measureText() — see titleFontSize above. */}
+          Font size is pre-computed via measureText() — see titleFontSize above.
+          For align="top-center": the title <div> is a block element with
+          `maxWidth: textMaxWidth.h2` (~1100px). Without auto margins it would
+          sit left-of-container even though the parent has textAlign center
+          (textAlign only centers INLINE content within the block, not the
+          block itself). Auto margins center the block within the safe-area
+          absolute container so the title visually centers on canvas center.
+          May 13, 2026 — caught by GameBoard title-centering visual review. */}
       <div
         style={{
           fontSize: titleFontSize,
@@ -175,6 +182,8 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
           fontFamily: titleFontFamily,
           textShadow: theme.textShadow,
           maxWidth: textMaxWidth.h2,
+          marginLeft: align === "top-center" ? "auto" : 0,
+          marginRight: align === "top-center" ? "auto" : 0,
           letterSpacing: letterSpacing.h2,
           lineHeight: 1.1,
         }}
@@ -200,13 +209,16 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
         />
       )}
 
-      {/* Subtitle — body, muted text color */}
+      {/* Subtitle — body, muted text color. Same block-centering rationale
+          as the title above when align="top-center". */}
       {subtitle && (
         <div
           style={{
             fontSize: fontSizes.body,
             color: theme.text.muted,
             marginTop: layout.spacing.xs,
+            marginLeft: align === "top-center" ? "auto" : 0,
+            marginRight: align === "top-center" ? "auto" : 0,
             textShadow: theme.textShadow,
             maxWidth: textMaxWidth.body,
           }}

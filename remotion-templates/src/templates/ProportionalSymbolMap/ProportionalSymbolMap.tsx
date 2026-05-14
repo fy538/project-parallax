@@ -169,7 +169,7 @@ const computePhasePose = (
       features.length === 1
         ? features[0]
         : { type: "FeatureCollection" as const, features };
-    fitProjectionToFeatures(proj, fc as any, viewport, framePadding);
+    fitProjectionToFeatures(proj, fc as any, viewport, framePadding); // no-as-any-ok: d3-geo interop — TopoJSON converter output type doesn't match d3's FeatureCollection exactly
   } else if (phase.focus.center) {
     fitProjectionToWorld(proj, viewport, framePadding);
     const [lon, lat] = phase.focus.center;

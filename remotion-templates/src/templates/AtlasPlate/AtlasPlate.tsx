@@ -199,7 +199,7 @@ const computePhasePose = (
       features.length === 1
         ? features[0]
         : { type: "FeatureCollection", features };
-    fitProjectionToFeatures(proj, fc as any, viewport, framePadding);
+    fitProjectionToFeatures(proj, fc as any, viewport, framePadding); // no-as-any-ok: d3-geo interop — TopoJSON converter output type doesn't match d3's FeatureCollection exactly
   } else if (phase.focus.center) {
     fitProjectionToWorld(proj, viewport, framePadding);
     const [lon, lat] = phase.focus.center;
@@ -508,7 +508,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           type: "Feature",
           geometry: { type: "LineString" as const, coordinates: coords },
           properties: {},
-        } as any),
+        } as any), // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
       };
     });
   }, [data.disputedBoundaries, activePathGen, isOrthographic]);

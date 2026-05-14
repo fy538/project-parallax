@@ -76,6 +76,7 @@ const COMPOSITIONS = [
   "FrameworkDiagram",
   "DuelingFrameworks",
   "NetworkDiagram",
+  "ArcDiagram",
   // Scenarios
   "DecisionTree",
   "GameBoard",
@@ -83,6 +84,7 @@ const COMPOSITIONS = [
   "ChoroplethMap",
   "RouteAnimation",
   "StrategicLandscape",
+  "TilegramUSMap",
   // Cinematic
   "ImageComposite",
   "PhotoMontage",
@@ -93,6 +95,21 @@ const COMPOSITIONS = [
   // Multi-segment
   "SplitComposition",
   "ProbabilityGauge",
+  // Data — added May 14, 2026 (catalog completion sweep)
+  "BumpChart",
+  "PopulationPyramid",
+  "RankChangeDotPlot",
+  "IsotypeChart",
+  // Data — new templates from the May 2026 build-out
+  "BeeswarmChart",
+  "CalendarHeatmap",
+  "ConnectedScatterplot",
+  "Streamgraph",
+  "RidgelinePlot",
+  "MarimekkoChart",
+  "TernaryPlot",
+  "HorizonChart",
+  "DumbbellPlot",
 ];
 
 // Shorts compositions — IDs match the Root.tsx registrations (note the

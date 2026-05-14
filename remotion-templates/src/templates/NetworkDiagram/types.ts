@@ -19,7 +19,14 @@ export interface NetworkNode {
   type: "nation" | "institution" | "actor" | "concept";
   /** Semantic color token from theme.ts (e.g., "amber", "rust", "bone") or hex */
   color: string;
-  /** Primary = larger (default), secondary = smaller */
+  /**
+   * Editorial hierarchy. Default `secondary` (small ~36px radius).
+   * Set to `primary` only for the editorial hub of a hub-spoke layout —
+   * it blooms to a much larger radius (~96px), gains a gravity-well
+   * ring, an inner detail ring, and an in-circle stat numeral. For
+   * flows / chains / grids where there is no central hub, leave every
+   * node `undefined` so they read at a uniform satellite size.
+   */
   importance?: "primary" | "secondary";
   /** Stat callout below node */
   stat?: { value: string; label: string };
@@ -27,6 +34,12 @@ export interface NetworkNode {
   position?: { x: number; y: number };
   /** Group tag for multi-node camera focus (e.g., "us-allies", "china-bloc") */
   group?: string;
+  /**
+   * Side assignment for `bipartite` layout. Required when layout is
+   * "bipartite" — nodes get sorted into two columns and connector lines
+   * drawn between them. Ignored by other layouts.
+   */
+  side?: "left" | "right";
 }
 
 export interface NetworkEdge {
@@ -57,7 +70,7 @@ export interface NetworkDiagramData {
   title: string;
   subtitle?: string;
 
-  layout: "horizontal-chain" | "hub-spoke" | "grid" | "vertical-chain";
+  layout: "horizontal-chain" | "hub-spoke" | "grid" | "vertical-chain" | "bipartite";
   /** For grid layout: number of columns */
   gridColumns?: number;
 

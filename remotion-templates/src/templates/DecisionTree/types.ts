@@ -18,7 +18,23 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 export interface TreeNode {
   id: string;
   label: string;
-  /** Optional probability label (e.g., "65%", "Likely") */
+  /**
+   * Optional qualitative or numeric label sitting ON the incoming edge
+   * (parent → this node), mid-segment. NYT/FT canon: edge labels describe
+   * the *transition*; node labels describe the *state*. Common forms:
+   *   - "Drift away" / "Sharp" / "Mainline" (qualitative branch character)
+   *   - "12% chance" / "65% Likely" (numeric, gated by probabilityWeights)
+   *   - "Reject" / "Accept" (binary decision label)
+   *
+   * Replaces the old `probability` field's floating-pill placement above
+   * the node. Probability strings can still be passed via `probability`
+   * for backwards compatibility — they're rendered on the edge alongside
+   * (or in place of) edgeLabel. May 13, 2026 polish pass.
+   */
+  edgeLabel?: string;
+  /** Optional probability label (e.g., "65%", "Likely"). Renders on the
+   *  edge mid-segment (mono, paper-haloed) — same gate as before
+   *  (`probabilityWeights`). */
   probability?: string;
   /** Optional color override for this node */
   color?: string;

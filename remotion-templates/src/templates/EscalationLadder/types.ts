@@ -63,6 +63,21 @@ export interface EscalationLadderData {
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
 
+  /**
+   * Fine-tune the ladder block's visual centering. The default centering
+   * is geometric (splits surplus area as equal left/right padding), but the
+   * visible mass is asymmetric — short dates on the left, longer card text
+   * on the right — so the optical center sits slightly left of geometric
+   * center. Use this to nudge.
+   *
+   * - `x`: px to shift right (negative = left)
+   * - `y`: px to shift DOWN (negative = up)
+   *
+   * Typical episode-side values for a 6-rung ladder on a 1920×1080 canvas:
+   * `{ x: 100–160, y: -40 to -60 }`. See POLISH.md T6 (Use the canvas).
+   */
+  contentOffset?: { x?: number; y?: number };
+
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;

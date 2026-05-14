@@ -358,73 +358,169 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
 
 /**
  * Generate a default camera path from tree topology.
- * Sequence: root close-up → zoom out for branches → each leaf path → full pullback.
+ *
+ * Two sequences depending on whether a `highlightedPath` is provided:
+ *
+ * 1. **Highlighted-path mode (the editorial default)** — the camera ARGUES
+ *    rather than inventories. Establish on root → reveal the fork (level-1
+ *    children visible) → drive the chosen path leaf-by-leaf → glance at one
+ *    named counterfactual (the most-visually-adjacent unchosen leaf, for
+ *    the "bounded analogy" beat) → return to the chosen leaf and hold.
+ *    This matches Parallax's bounded-analogy doctrine: name the structural
+ *    pattern, acknowledge one place it breaks, return to the argument.
+ *
+ * 2. **No-highlighted-path mode** — a simpler inventory tour: establish →
+ *    pullback. This is the fallback for trees whose author hasn't yet named
+ *    a protagonist branch; the audit-skill flags this as a failure mode
+ *    (see decision-tree.md "tree with no highlightedPath" failure).
+ *
+ * The previous default (root close-up → branch reveal → each leaf path →
+ * full pullback) was an inventory tour — it presented all branches as
+ * equally weighted possibilities. Editorial canon: the camera embodies the
+ * argument. May 13, 2026 polish pass — see references/template-research/
+ * decision-tree.md § 3 item 9.
  */
 export function generateDefaultCameraPath(
   rootId: string,
   nodes: Array<{ id: string; children?: string[] }>,
-  totalDurationSec: number
+  totalDurationSec: number,
+  highlightedPath?: string[],
 ): CameraTarget[] {
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
 
-  // Find leaf paths (root → each leaf)
-  const leafPaths: string[][] = [];
-  const findLeaves = (id: string, path: string[]) => {
-    const node = nodeMap.get(id);
-    const currentPath = [...path, id];
-    if (!node?.children || node.children.length === 0) {
-      leafPaths.push(currentPath);
-      return;
+  // ── Highlighted-path mode: the editorial argument camera ───────────────
+  if (highlightedPath && highlightedPath.length >= 2) {
+    const chosenLeaf = highlightedPath[highlightedPath.length - 1];
+    const pathIds = new Set(highlightedPath);
+
+    // Pick the "glance" target — an unchosen leaf to briefly look at. We
+    // prefer a level-1 unchosen sibling of the chosen path's first step
+    // (the most editorially-comparable counterfactual). If none exists,
+    // fall back to any leaf not on the path.
+    const root = nodeMap.get(rootId);
+    const level1Chosen = highlightedPath[1];
+    const level1Unchosen = (root?.children ?? []).filter(
+      (c) => c !== level1Chosen,
+    );
+    // Find a leaf descending from the first unchosen sibling.
+    let glanceTarget: string | undefined;
+    const descendToLeaf = (id: string): string => {
+      const n = nodeMap.get(id);
+      if (!n?.children || n.children.length === 0) return id;
+      return descendToLeaf(n.children[0]);
+    };
+    if (level1Unchosen.length > 0) {
+      glanceTarget = descendToLeaf(level1Unchosen[0]);
+    } else {
+      // Fallback: any leaf not on the chosen path
+      const allLeaves: string[] = [];
+      const findLeaves = (id: string) => {
+        const n = nodeMap.get(id);
+        if (!n?.children || n.children.length === 0) {
+          allLeaves.push(id);
+          return;
+        }
+        for (const c of n.children) findLeaves(c);
+      };
+      findLeaves(rootId);
+      glanceTarget = allLeaves.find((l) => !pathIds.has(l));
     }
-    for (const childId of node.children) {
-      findLeaves(childId, currentPath);
-    }
-  };
-  findLeaves(rootId, []);
 
-  const numPaths = leafPaths.length;
-  // Time budget: 20% establish, 60% explore paths, 20% pullback
-  const establishDur = totalDurationSec * 0.15;
-  const branchDur = totalDurationSec * 0.12;
-  const pathDur = (totalDurationSec * 0.53) / Math.max(numPaths, 1);
-  const pullbackDur = totalDurationSec * 0.2;
+    // Time budget: establish 12% / fork 14% / drive 50% (split across path
+    // nodes after root) / glance 12% / return-and-hold 12%.
+    const establishDur = totalDurationSec * 0.12;
+    const forkDur = totalDurationSec * 0.14;
+    const driveDur = totalDurationSec * 0.50;
+    const glanceDur = glanceTarget ? totalDurationSec * 0.12 : 0;
+    const holdDur =
+      totalDurationSec * 0.12 + (glanceTarget ? 0 : totalDurationSec * 0.12);
 
-  const steps: CameraTarget[] = [];
+    const driveSteps = highlightedPath.slice(1); // skip root, already established
+    const perDriveDur = driveDur / Math.max(driveSteps.length, 1);
 
-  // 1. Establish: zoom in on root
-  steps.push({
-    focus: rootId,
-    zoom: 2.2,
-    duration: establishDur,
-    label: undefined,
-  });
+    const steps: CameraTarget[] = [];
 
-  // 2. Branch reveal: zoom out to show immediate children
-  steps.push({
-    focus: rootId,
-    zoom: 1.4,
-    duration: branchDur,
-  });
+    // Zoom budget — capped at 1.35 to keep the tree from extending into
+    // the title safe area (title block at y≈80–280; at zoom > 1.4 a 3-level
+    // tree's mid-level row crashes into the title). The argument-camera
+    // works through framing and dimming, not through aggressive zoom.
+    const ESTABLISH_ZOOM = 1.8;
+    const FORK_ZOOM = 1.1;
+    const DRIVE_ZOOM_MIN = 1.2;
+    const DRIVE_ZOOM_MAX = 1.35;
+    const GLANCE_ZOOM = 1.2;
+    const HOLD_ZOOM = 1.35;
 
-  // 3. Each leaf path: zoom to the leaf, dim others
-  for (const path of leafPaths) {
-    const leafId = path[path.length - 1];
+    // 1. ESTABLISH on root — close-up framing. "One question."
     steps.push({
-      focus: leafId,
-      zoom: 1.6,
-      duration: pathDur,
+      focus: rootId,
+      zoom: ESTABLISH_ZOOM,
+      duration: establishDur,
+    });
+
+    // 2. FORK — pull back to fit the whole decision space. The branches
+    //    become visible; camera frames the choice.
+    steps.push({
+      focus: rootId,
+      zoom: FORK_ZOOM,
+      duration: forkDur,
+    });
+
+    // 3. DRIVE — walk down the chosen path, dim others. Each node held for
+    //    perDriveDur seconds. Zoom tightens slightly as we descend toward
+    //    the leaf — the analogy is sharpening into focus.
+    driveSteps.forEach((nodeId, i) => {
+      const zoom =
+        DRIVE_ZOOM_MIN +
+        (i / Math.max(driveSteps.length - 1, 1)) *
+          (DRIVE_ZOOM_MAX - DRIVE_ZOOM_MIN);
+      steps.push({
+        focus: nodeId,
+        zoom,
+        duration: perDriveDur,
+        dimOthers: true,
+      });
+    });
+
+    // 4. GLANCE — brief pan to one named counterfactual leaf. Bounded
+    //    analogy: "...but here's where this analogy breaks." Short budget,
+    //    enough for the eye to land + register the contrast, not enough to
+    //    inventory possibilities.
+    if (glanceTarget) {
+      steps.push({
+        focus: glanceTarget,
+        zoom: GLANCE_ZOOM,
+        duration: glanceDur,
+        dimOthers: true,
+      });
+    }
+
+    // 5. RETURN & HOLD on the chosen leaf — the argument's destination.
+    steps.push({
+      focus: chosenLeaf,
+      zoom: HOLD_ZOOM,
+      duration: holdDur,
       dimOthers: true,
     });
+
+    return steps;
   }
 
-  // 4. Full pullback
-  steps.push({
-    focus: rootId,
-    zoom: 1.0,
-    duration: pullbackDur,
-  });
-
-  return steps;
+  // ── Fallback: no highlightedPath → simpler inventory tour ─────────────
+  // (The audit-skill should have flagged this; here we render a coherent
+  // sequence anyway so the comp doesn't break in early drafts.)
+  return [
+    {
+      focus: rootId,
+      zoom: 2.0,
+      duration: totalDurationSec * 0.3,
+    },
+    {
+      focus: rootId,
+      zoom: 1.0,
+      duration: totalDurationSec * 0.7,
+    },
+  ];
 }
 
 /**

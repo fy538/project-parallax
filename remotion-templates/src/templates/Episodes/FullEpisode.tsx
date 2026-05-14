@@ -99,10 +99,12 @@ import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
 import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
-import { BifurcationRoute } from "../BifurcationRoute/BifurcationRoute";
+// BifurcationRoute template removed May 13, 2026 (phylogenetic-tree
+// register didn't fit Parallax; no episodes in queue required it).
 import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
 import { StrategicLandscape } from "../StrategicLandscape/StrategicLandscape";
-import { TimelineMorph } from "../TimelineMorph/TimelineMorph";
+// TimelineMorph template deleted May 13, 2026 (its single use case
+// migrated to DuelingFrameworks). Removed from FullEpisode template map.
 import { warnIf } from "../../utils/dataWarnings";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
@@ -410,10 +412,8 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   EscalationLadder,
   DualTimeline,
   HorizontalTimeline,
-  BifurcationRoute,
   DuelingFrameworks,
   StrategicLandscape,
-  TimelineMorph,
 };
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────

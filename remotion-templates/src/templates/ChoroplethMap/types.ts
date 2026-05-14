@@ -50,6 +50,16 @@ export interface AnimationPhase {
   center?: [number, number];
   /** Optional zoom/scale override. */
   scale?: number;
+  /**
+   * Optional camera pitch override (degrees). When omitted, defaults to
+   * `0` for flat projections (naturalEarth / equalEarth / mercator / albers)
+   * and `30` for globe — analytical maps render flat; globes get a slight
+   * tilt for the 3D atmospheric register. Per-phase override here for
+   * deliberate transitions (e.g., easing INTO a tilted close-up).
+   */
+  pitch?: number;
+  /** Optional camera bearing override (degrees). Defaults to 0. */
+  bearing?: number;
 }
 
 /** Full data input for the ChoroplethMap composition. */
@@ -142,6 +152,16 @@ export interface ChoroplethMapData {
    * Set true per-shot when relief is the editorial point. See: LESSONS.md L99.
    */
   terrain?: boolean;
+
+  /**
+   * Label-density register. ChoroplethMap defaults to `"editorial"` —
+   * country labels at globe scale for orientation, auto-suppress at
+   * regional zoom (>= 4) where the choropleth fill is the editorial
+   * point. Per-shot override to `"minimal"` for shots where country
+   * labels would duplicate explicit MapAnnotations.
+   * See MapGL `labelDensity` for the full taxonomy.
+   */
+  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
 
   /**
    * Editorial annotations — labels pinned to lon/lat with optional leader

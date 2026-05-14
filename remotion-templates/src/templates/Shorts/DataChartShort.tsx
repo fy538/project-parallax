@@ -140,7 +140,7 @@ export const DataChartShort: React.FC<{ data: DataChartData }> = ({
     <ShortsWrapper
       title={data.title}
       subtitle={data.subtitle}
-      mode={(data as any).backgroundVariant}
+      mode={(data as any).backgroundVariant} // no-as-any-ok: backgroundVariant not in DataChartData type yet; ShortsWrapper accepts optional mode
     >
       {(vl, theme, frame, exit) => (
         <>

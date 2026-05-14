@@ -27,7 +27,7 @@
  * - Count-up overshoot on statistics (102%→100% settle)
  * - Smooth bloom envelope (no hard seam)
  * - No naked fades — all elements get slideIn
- * - Stat numbers use Space Grotesk (warmer editorial feel)
+ * - Stat numbers use the display face (IBM Plex Sans per D40; was Space Grotesk pre-May 10, 2026)
  *
  * Four variants: quote, definition, bilingual, statistic
  * silicon-trap use cases: Morris Chang quote, 卡脖子 definition, key statistics.
@@ -633,7 +633,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
         }}
       />
 
-      {/* Big number — Space Grotesk + overshoot + bloom + chromatic-kick on lock-in */}
+      {/* Big number — display face (IBM Plex Sans per D40) + overshoot + bloom + chromatic-kick on lock-in */}
       <div
         style={{
           position: "relative",

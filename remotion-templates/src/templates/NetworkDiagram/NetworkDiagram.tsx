@@ -143,82 +143,85 @@ interface NodeRenderProps {
   isFocused: boolean;
   /** Subtle fill alpha for stroke shapes (V1.5 — removes wireframe feel) */
   fillAlpha?: number;
+  importance?: "primary" | "secondary";
   /** Scoped SVG filter ID resolver — prevents collisions when multiple instances render in the same DOM. */
   filterId: (name: string) => string;
 }
 
 const CircleNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, filterId }) => (
-    <g
-      opacity={opacity}
-      transform={`translate(${x}, ${y}) scale(${scale}) translate(${-x}, ${-y})`}
-      filter={blur > 0 ? `blur(${blur}px)` : undefined}
-    >
-      {/* Glow ring for focused nodes */}
-      {isFocused && (
-        <circle cx={x} cy={y} r={radius + 6} fill="none" stroke={color} strokeWidth={1.5} opacity={0.3} />
-      )}
-      {/* Base subtle fill — removes wireframe feel */}
-      <circle cx={x} cy={y} r={radius} fill={color} opacity={fillAlpha} />
-      <circle cx={x} cy={y} r={radius} fill="none" stroke={color} strokeWidth={3} />
-      {/* Inner fill glow when focused (additive over base fill) */}
-      {isFocused && (
-        <circle cx={x} cy={y} r={radius - 2} fill={color} opacity={0.08} />
-      )}
-      {/* Specular highlight — small bright spot upper-left (catches light, suggests volume) */}
-      <circle
-        cx={x - radius * 0.35}
-        cy={y - radius * 0.35}
-        r={radius * 0.18}
-        fill="white"
-        opacity={0.18}
-      />
-      <text
-        x={x}
-        y={y + radius + 28}
-        textAnchor="middle"
-        fill={textPrimary}
-        fontSize={fontSizes.label}
-        fontFamily={fonts.mono}
-        fontWeight={600}
-        letterSpacing={1}
-        filter={`url(#${filterId("text-shadow")})`}
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, importance, filterId }) => {
+    const isPrimary = importance === "primary";
+    return (
+      <g
+        opacity={opacity}
+        transform={`translate(${x}, ${y}) scale(${scale}) translate(${-x}, ${-y})`}
+        filter={blur > 0 ? `blur(${blur}px)` : undefined}
       >
-        {label}
-      </text>
-      {sublabel && (
-        <text
-          x={x}
-          y={y + radius + 50}
-          textAnchor="middle"
-          fill={textSecondary}
-          fontSize={fontSizes.caption}
-          fontFamily={fonts.mono}
-          fontWeight={400}
-          letterSpacing={0.5}
-          filter={`url(#${filterId("text-shadow-caption")})`}
-        >
-          {sublabel}
-        </text>
-      )}
-      {stat && (
-        <>
+        {/* Flat editorial disc: a filled circle + a clean stroke. No
+            glossy specular, no concentric rings, no inner detail
+            shapes — those treatments read as 3D UI mockup ("marbles
+            and bubbles") rather than print-newsroom diagram. The hub
+            earns its presence through SIZE (radius 96 vs 36) and the
+            display-weight stat inside, not through ornament. */}
+        <circle cx={x} cy={y} r={radius} fill={color} opacity={fillAlpha} />
+        <circle cx={x} cy={y} r={radius} fill="none" stroke={color} strokeWidth={isPrimary ? 2 : 1.5} />
+        {/* Stat value inside circle — primary nodes.
+            Display-weight numeral is the editorial hero: the chokepoint
+            argument lives in this number. h1 (64px) lands solid inside
+            a 96-radius hub without crowding the ring chrome. */}
+        {stat && isPrimary && (
           <text
             x={x}
-            y={y + radius + 80}
+            y={y + 4}
             textAnchor="middle"
+            dominantBaseline="middle"
             fill={color}
-            fontSize={fontSizes.h3}
+            fontSize={fontSizes.h1}
             fontFamily={fonts.data}
             fontWeight={700}
-            letterSpacing={1}
+            letterSpacing={0}
             filter={`url(#${filterId("text-shadow-stat")})`}
           >
             {stat.value}
           </text>
+        )}
+        {/* Node label */}
+        <text
+          x={x}
+          y={y + radius + 28}
+          textAnchor="middle"
+          fill={textPrimary}
+          fontSize={fontSizes.label}
+          fontFamily={fonts.mono}
+          fontWeight={600}
+          letterSpacing={1}
+          filter={`url(#${filterId("text-shadow")})`}
+        >
+          {label}
+        </text>
+        {sublabel && (
           <text
             x={x}
-            y={y + radius + 100}
+            y={y + radius + 50}
+            textAnchor="middle"
+            fill={textSecondary}
+            fontSize={fontSizes.caption}
+            fontFamily={fonts.mono}
+            fontWeight={400}
+            letterSpacing={0.5}
+            filter={`url(#${filterId("text-shadow-caption")})`}
+          >
+            {sublabel}
+          </text>
+        )}
+        {/* Stat label below node label — primary: at +58 (or +78 if sublabel exists).
+            28px gap between label (18px) and caption (14px) gives one
+            full line of breathing room; tighter than this and they read
+            as a single typographic block. */}
+        {stat && isPrimary && (
+          <text
+            x={x}
+            y={sublabel ? y + radius + 78 : y + radius + 58}
             textAnchor="middle"
             fill={textMuted}
             fontSize={fontSizes.caption}
@@ -229,10 +232,41 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
           >
             {stat.label}
           </text>
-        </>
-      )}
-    </g>
-  )
+        )}
+        {/* Stat value + label below circle — non-primary nodes */}
+        {stat && !isPrimary && (
+          <>
+            <text
+              x={x}
+              y={y + radius + 80}
+              textAnchor="middle"
+              fill={color}
+              fontSize={fontSizes.h3}
+              fontFamily={fonts.data}
+              fontWeight={700}
+              letterSpacing={1}
+              filter={`url(#${filterId("text-shadow-stat")})`}
+            >
+              {stat.value}
+            </text>
+            <text
+              x={x}
+              y={y + radius + 100}
+              textAnchor="middle"
+              fill={textMuted}
+              fontSize={fontSizes.caption}
+              fontFamily={fonts.mono}
+              fontWeight={400}
+              letterSpacing={0.5}
+              filter={`url(#${filterId("text-shadow-caption")})`}
+            >
+              {stat.label}
+            </text>
+          </>
+        )}
+      </g>
+    );
+  }
 );
 
 const HexagonNode: React.FC<NodeRenderProps> = React.memo(
@@ -387,8 +421,9 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     return computeLayout(data.layout, data.nodes.length, {
       columns: data.gridColumns,
       padding: 0.1,
+      sides: data.nodes.map((n) => n.side),
     });
-  }, [data.layout, data.nodes.length, data.gridColumns]);
+  }, [data.layout, data.nodes, data.gridColumns]);
 
   const positions = useMemo(() => {
     // Use contentArea to keep nodes below TitleBlock — defaultSafeArea.top (180px)
@@ -439,13 +474,31 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   const tokenMap = useMemo(() => createTokenMap(), []);
 
   // Helper functions
-  // Hub-and-spoke compositions need a clear hierarchy: the protagonist
-  // node (importance "primary") wants noticeable visual mass, satellites
-  // a quieter weight. Bumping primary to 56 gives the hub real presence
-  // without dwarfing the diagram; secondary stays small so the hub reads
-  // as the obvious center.
-  const nodeRadius = (importance?: "primary" | "secondary"): number =>
-    importance === "secondary" ? 30 : 56;
+  // Hub-and-spoke compositions need a CLEAR mass hierarchy. The hub
+  // (`importance: "primary"`) must dwarf the satellites — otherwise the
+  // form reads as "5 logos in a flower" rather than "one chokepoint
+  // everyone routes through." Sizing is mode-aware:
+  //
+  //   • Hub-mode (any node marked `primary`):
+  //       primary → 96 (the chokepoint blooms)
+  //       others  → 36 (satellites stay quiet — ~2.7× differential, the
+  //                     ratio FT / Bloomberg / NYT Upshot use)
+  //
+  //   • Flat mode (no node marked primary — chain / grid / mesh):
+  //       all nodes → 52 (uniform medium size, no false hierarchy)
+  //
+  // Old behavior defaulted undefined to 56 always, which collapsed the
+  // hub hierarchy when authors forgot to mark satellites.
+  const hasPrimaryHub = useMemo(
+    () => data.nodes.some((n) => n.importance === "primary"),
+    [data.nodes]
+  );
+  const nodeRadius = (importance?: "primary" | "secondary"): number => {
+    if (hasPrimaryHub) {
+      return importance === "primary" ? 96 : 36;
+    }
+    return 52;
+  };
 
   const nodeById = useMemo(() => {
     const map: Record<string, typeof data.nodes[number]> = {};
@@ -556,9 +609,13 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             edgeCameraOpacity = fromFocused || toFocused ? 1 : camera.getElementOpacity(fromIdx);
           }
 
-          // Curved edge — quadratic bezier with subtle perpendicular arc
-          // Curvature 0.18 reads as "designed" without becoming whimsical.
-          const edgePath = bezierEdge(ep.x1, ep.y1, ep.x2, ep.y2, 0.18);
+          // Curved edge — quadratic bezier with subtle perpendicular arc.
+          // Curvature 0.18 reads as "designed" without becoming whimsical;
+          // 0 (straight line) reads sharper for the bipartite layout where
+          // every edge runs diagonally between two clean columns. Curves
+          // there add visual noise without information.
+          const curvature = data.layout === "bipartite" ? 0 : 0.18;
+          const edgePath = bezierEdge(ep.x1, ep.y1, ep.x2, ep.y2, curvature);
 
           if (edge.style === "blocked") {
             const midX = (ep.x1 + ep.x2) / 2;
@@ -578,8 +635,32 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
               <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} strokeDasharray="8 4" opacity={progress * edgeCameraOpacity * 0.7} strokeLinecap="round" />
             );
           } else {
+            // Hub-spoke convergence terminator: small filled dot where
+            // the edge meets the hub side. Reads as "this dependency
+            // lands HERE" and visually pulls the eye inward to the
+            // chokepoint. Drawn at the FROM endpoint by convention
+            // (hub-spoke data canonically has hub as `from`).
+            const fromIsPrimary = nodeById[edge.from]?.importance === "primary";
+            const terminatorX = fromIsPrimary ? ep.x1 : ep.x2;
+            const terminatorY = fromIsPrimary ? ep.y1 : ep.y2;
             return (
-              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} opacity={progress * edgeCameraOpacity * 0.7} strokeLinecap="round" />
+              <g key={`edge-${edgeIdx}`}>
+                {/* Soft glow halo — wider, slightly more present so the
+                    edge feels like a flow, not a wire. */}
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={20} opacity={progress * edgeCameraOpacity * 0.09} strokeLinecap="round" />
+                {/* Main edge line — bumped from 2.5 to 3.25 for editorial confidence */}
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3.25} opacity={progress * edgeCameraOpacity * 0.92} strokeLinecap="round" />
+                {/* Hub-side convergence dot — only when a primary hub exists */}
+                {(fromIsPrimary || nodeById[edge.to]?.importance === "primary") && (
+                  <circle
+                    cx={terminatorX}
+                    cy={terminatorY}
+                    r={3.5}
+                    fill={edgeColor}
+                    opacity={progress * edgeCameraOpacity * 0.9}
+                  />
+                )}
+              </g>
             );
           }
         })}
@@ -640,7 +721,12 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
               textSecondary={theme.text.secondary}
               textMuted={theme.text.muted}
               isFocused={isFocused}
-              fillAlpha={isFocused ? 0.12 : 0.08}
+              importance={node.importance}
+              fillAlpha={
+                node.importance === "primary"
+                  ? (isFocused ? 0.42 : 0.30)
+                  : (isFocused ? 0.14 : 0.08)
+              }
               filterId={filterId}
             />
           );

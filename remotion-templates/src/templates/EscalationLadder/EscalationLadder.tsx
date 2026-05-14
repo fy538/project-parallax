@@ -156,11 +156,49 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   const showParticles = data.ambientParticles ?? hasCameraPath;
 
   // ── Layout constants ────────────────────────────────────────────────────
+  // Center the ladder block on the canvas (was: left-aligned inside the safe
+  // area, leaving ~60% of canvas empty on the right). The block is
+  // `dateColumn + spine + card` wide; we cap card width at a comfortable
+  // editorial reading width (~720px) and split the surplus area as left/right
+  // padding so the whole composition lands in the visual center. See May 12,
+  // 2026 timeline visual-register pass.
+  //
+  // `contentOffset` lets the data file nudge the optical center. Reserved
+  // column widths > visible content widths (short dates left-aligned to the
+  // right edge of a 180px column; cards shrinking to text width), so the
+  // geometric center sits LEFT of the visual mass. Episodes optically center
+  // by setting `contentOffset.x` (typical ~120) and shift up by setting
+  // `contentOffset.y` (typical -50). See POLISH.md T6.
   const dateColumnWidth = 180;
   const dotColumnWidth = 48;
-  const spineX = area.left + dateColumnWidth + dotColumnWidth / 2;
+  const CARD_MAX_WIDTH = 720;
+
+  // Auto-tuned default offsets so the ladder lands at the OPTICAL center,
+  // not the geometric center. Why a default offset is needed at all:
+  //   - The date column reserves 180 px but typical date text is ~80 px wide
+  //     (and right-aligned, so the leftmost ~100 px is empty padding).
+  //   - The card column reserves 720 px (CARD_MAX_WIDTH) but typical content
+  //     is 240–420 px. Cards shrink to content width — they don't fill.
+  // → the visible content mass sits ~120 px right of geometric center.
+  //   Similarly, the title block reserves vertical space that produces a
+  //   ~50 px empty band above the first rung, so the visual mass also
+  //   sits below the geometric vertical center.
+  // Default offsets are tuned to put the AVERAGE card's visual center at
+  // canvas center. The card shrinks to its content width (not the reserved
+  // CARD_MAX_WIDTH), so the visible mass lives just right of the spine.
+  // 150 = midpoint between centering the long-card case (Hiroshima, ~155)
+  // and the short-card case (SALT I, ~195). Verified empirically via
+  // `timeline-visual-centering.test.ts` bbox midpoint measurement.
+  const DEFAULT_OFFSET_X = 150;
+  const DEFAULT_OFFSET_Y = 0;
+  const offsetX = data.contentOffset?.x ?? DEFAULT_OFFSET_X;
+  const offsetY = data.contentOffset?.y ?? DEFAULT_OFFSET_Y;
+  const ladderInnerWidth =
+    dateColumnWidth + dotColumnWidth + CARD_MAX_WIDTH + layout.spacing.lg;
+  const centerPad = Math.max(0, (area.width - ladderInnerWidth) / 2) + offsetX;
+  const spineX = area.left + centerPad + dateColumnWidth + dotColumnWidth / 2;
   const labelLeft = spineX + dotColumnWidth / 2 + layout.spacing.md;
-  const maxLabelWidth = area.width - dateColumnWidth - dotColumnWidth - layout.spacing.lg;
+  const maxLabelWidth = CARD_MAX_WIDTH;
 
   // ── Rung vertical spacing ───────────────────────────────────────────────
   const rungHeight = Math.min(
@@ -168,7 +206,11 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
     96
   );
   const totalLadderHeight = rungHeight * numRungs;
-  const ladderTopOffset = (area.height - totalLadderHeight) / 2;
+  // Default: geometric vertical center. `contentOffset.y` shifts the whole
+  // ladder up (negative) or down (positive) — useful when the title block
+  // leaves more empty space above the ladder than below, making the optical
+  // center sit too low.
+  const ladderTopOffset = (area.height - totalLadderHeight) / 2 + offsetY;
 
   // ── Camera elements (rung positions) ────────────────────────────────────
   const rungPositions: CameraElement[] = useMemo(() => {
@@ -345,12 +387,14 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
               />
             )}
 
-            {/* Date label (left) */}
+            {/* Date label (left) — offset by centerPad so it stays aligned
+                with the centered ladder block instead of sitting flush against
+                the safe-area left edge. */}
             {rung.date && (
               <div
                 style={{
                   position: "absolute",
-                  left: 0,
+                  left: centerPad,
                   top: dotY - 10,
                   width: dateColumnWidth - layout.spacing.md,
                   textAlign: "right",

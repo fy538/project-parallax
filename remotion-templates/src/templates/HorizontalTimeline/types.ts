@@ -189,6 +189,30 @@ export interface HorizontalTimelineData {
    */
   eraWeight?: "equal" | "foil-old" | "foil-new";
 
+  /**
+   * Focus isolation behavior during camera tracking.
+   *
+   * - `"cinematic"` (default when `cameraPath` is provided): off-focus events
+   *   render dot+year only — full card text is hidden. Eliminates the
+   *   "double card overlap" effect when two events sit close together on
+   *   the spine. The camera focuses the viewer on ONE event at a time.
+   * - `"settled"` (default when `cameraPath` is absent): all events render
+   *   their full card content with mild dimming on non-focused events.
+   *   Use for pullback / context shots where multiple events should be
+   *   readable simultaneously.
+   *
+   * Pass an object for fine-tuning: `{ mode, dimOpacity?, hideOffFocusCards? }`.
+   * See: May 13, 2026 timeline visual-register pass.
+   */
+  focusMode?:
+    | "cinematic"
+    | "settled"
+    | {
+        mode: "cinematic" | "settled";
+        dimOpacity?: number;
+        hideOffFocusCards?: boolean;
+      };
+
   // ── Morph mode events ──
   /** Events that morph between eras */
   morphEvents?: TimelineMorphEventData[];

@@ -55,7 +55,6 @@ import { MapGL } from "../../components/MapGL";
 import { MapAnnotations } from "../../components/MapAnnotations";
 import { buildGraticuleLayers } from "../../components/Graticule";
 import { MapInset } from "../../components/MapInset";
-import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { ChoroplethMapData, AnimationPhase, CountryData } from "./types";
@@ -143,16 +142,32 @@ function getCurrentPhase(
 
 function phaseToCamera(
   phase: AnimationPhase | null,
-  defaults: { center?: [number, number]; scale?: number }
+  defaults: {
+    center?: [number, number];
+    scale?: number;
+    projection?: string;
+  },
 ): CameraState {
   const center = phase?.center || defaults.center || [0, 20];
   const scale = phase?.scale || defaults.scale || 150;
+  // Pitch default depends on projection register:
+  //   • globe → 30° (atmospheric 3D register; the sphere should tilt slightly
+  //     to read as a globe rather than a flat circle)
+  //   • flat projections (naturalEarth, equalEarth, mercator, albers) → 0°
+  //     ChoroplethMap is an analytical template; flat projections must
+  //     render flat. A 30° pitch on a flat world projection creates a
+  //     perspective tilt that reads as "satellite-photo-style 3D map"
+  //     rather than an editorial choropleth (May 13, 2026 visual review
+  //     surfaced this on the G7 catalog comp).
+  // Per-phase override via `phase.pitch` if a script needs a deliberate
+  // tilt (e.g., transitioning into a dramatic close-up).
+  const defaultPitch = defaults.projection === "globe" ? 30 : 0;
   return {
     longitude: center[0],
     latitude: center[1],
     zoom: scaleToZoom(scale),
-    pitch: 30,
-    bearing: 0,
+    pitch: phase?.pitch ?? defaultPitch,
+    bearing: phase?.bearing ?? 0,
   };
 }
 
@@ -434,6 +449,21 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
             dark={data.backgroundVariant === "dark"}
             terrain={data.terrain ?? false}
             layers={graticuleLayers}
+            // Editorial Mapbox register defaults:
+            //   • fog NONE — ChoroplethMap renders flat projections that
+            //     fill the canvas. Atmospheric fog blending (paper-color
+            //     "high-color" bleeding into the top of the canvas) creates
+            //     the unwanted "rotating paper" / "page curl" appearance
+            //     the May 13, 2026 visual review flagged. Atmospheric
+            //     blending belongs to globe shots, not flat editorial maps.
+            //   • vignette FALSE — see ChoroplethMap below, same rationale.
+            //     The map fills the canvas; the page-edge blend has no
+            //     work to do and only darkens the actual map content.
+            //   • labelDensity editorial — country labels at globe scale,
+            //     auto-suppress at zoom >= 4.
+            fogPreset="none"
+            vignette={false}
+            labelDensity={data.labelDensity ?? "editorial"}
           >
             <Source
               id="country-boundaries"
@@ -511,24 +541,16 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
 
         {/* Coordinate metadata now lives in HeaderStrip (top-right) */}
 
-        {/* Phase title overlay — now using TitleBlock component */}
-        {current && (
-          <div
-            style={{
-              opacity: exitFade(frame, durationInFrames, 15),
-            }}
-          >
-            <TitleBlock
-              title={current.phase.title}
-              subtitle={current.phase.subtitle}
-              mode="dark"
-              safeAreaTier="generous"
-              startFrame={current.startFrame}
-              accentColor={emphasis.primaryAccent}
-              syncPoints={direction.syncPoints}
-            />
-          </div>
-        )}
+        {/* NO TITLE / NO TITLE PLATE — May 13, 2026 doctrine: ChoroplethMap
+            (Mapbox) is reserved for atmospheric / terrain-heavy shots only.
+            Static editorial choropleth work moved to AtlasPlate (the
+            NYT/FT/Bloomberg canonical D3+TopoJSON SVG path). For the
+            rare Mapbox choropleth shot, the map fills the entire visual
+            and the title comes from the script's voice-over / preceding
+            TitleTransition composition. See MAP_TEMPLATE_SELECTOR.md.
+            (Previously: title plate + TitleBlock overlay — produced the
+            "rotating paper with a header slab" artifact the visual review
+            flagged.) */}
 
         {/* Episode info now consolidated into HeaderStrip (top) */}
 

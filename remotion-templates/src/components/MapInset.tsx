@@ -23,7 +23,7 @@
 import React from "react";
 import { Marker } from "react-map-gl/mapbox";
 import { MapGL } from "./MapGL";
-import { layout, palette, shadows } from "../design/theme";
+import { layout, palette, shadows, titleHeight } from "../design/theme";
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -43,9 +43,17 @@ export type InsetPosition = "tl" | "tr" | "bl" | "br";
  * tests — the math is small but worth covering since corner-positioning
  * errors land *exactly* on the brand chrome (HeaderStrip / FooterStrip).
  *
- * Default position is **top-left** — it's the only corner that doesn't
- * collide with brand chrome (HeaderStrip lives top-right with metadata;
- * FooterStrip lives bottom with REC indicator and scale).
+ * Default position is **top-left**. When the parent composition renders
+ * a TitleBlock (which most map templates do), the inset must clear the
+ * title's vertical footprint — otherwise the inset sits BEHIND the title
+ * (collision visible in the May 13, 2026 chokepoints review). The
+ * `clearTitle` flag adds `titleHeight.content + spacing.xl` to the top
+ * offset for `tl` and `tr` positions, defaulting to TRUE because most
+ * editorial map shots render with a top-anchored title.
+ *
+ * When the composition has NO title block (rare, e.g. an inset-only
+ * cinematic shot), pass `clearTitle={false}` to recover the original
+ * top-of-frame placement.
  */
 export const resolveInsetPosition = (
   position: InsetPosition,
@@ -53,14 +61,23 @@ export const resolveInsetPosition = (
   frameWidth: number = layout.width,
   frameHeight: number = layout.height,
   padding: number = SAFE_PADDING,
+  clearTitle: boolean = true,
 ): { top: number; left: number } => {
   const fromBottom = frameHeight - size - padding;
   const fromRight = frameWidth - size - padding;
+  // Title clearance: when an editorial title sits at the top of the
+  // composition, the inset's top-anchored positions need to slide down
+  // past it. titleHeight.content (~180) + spacing.xl (~48) clears both
+  // title + subtitle + breathing room.
+  const titleClearance = clearTitle
+    ? titleHeight.content + layout.spacing.xl
+    : 0;
+  const topAnchored = padding + titleClearance;
   switch (position) {
     case "tl":
-      return { top: padding, left: padding };
+      return { top: topAnchored, left: padding };
     case "tr":
-      return { top: padding, left: fromRight };
+      return { top: topAnchored, left: fromRight };
     case "bl":
       return { top: fromBottom, left: padding };
     case "br":
@@ -81,6 +98,13 @@ export interface MapInsetProps {
   dark?: boolean;
   /** Frame around the inset. Default true. */
   framed?: boolean;
+  /**
+   * When TRUE (default), top-anchored positions (`tl` / `tr`) shift down
+   * past where an editorial TitleBlock would sit. Set FALSE only for
+   * compositions that render WITHOUT a top-anchored title (e.g.,
+   * inset-only cinematic shots, full-bleed maps).
+   */
+  clearTitle?: boolean;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -91,8 +115,16 @@ export const MapInset: React.FC<MapInsetProps> = ({
   size = DEFAULT_SIZE,
   dark = false,
   framed = true,
+  clearTitle = true,
 }) => {
-  const { top, left } = resolveInsetPosition(position, size);
+  const { top, left } = resolveInsetPosition(
+    position,
+    size,
+    layout.width,
+    layout.height,
+    SAFE_PADDING,
+    clearTitle,
+  );
 
   // Pin emphasis: small filled dot + ring. Rust on light, rust on dark
   // (works against both palettes — that's why we picked it as accent).

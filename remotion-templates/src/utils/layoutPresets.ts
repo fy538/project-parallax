@@ -10,7 +10,7 @@
 
 import { layout } from "../design/theme";
 
-export type LayoutPreset = "horizontal-chain" | "hub-spoke" | "grid" | "vertical-chain";
+export type LayoutPreset = "horizontal-chain" | "hub-spoke" | "grid" | "vertical-chain" | "bipartite";
 
 export interface LayoutPosition {
   x: number; // 0–1 normalized
@@ -32,6 +32,12 @@ export const computeLayout = (
     columns?: number;
     /** Padding from edges (0–0.5). Default: 0.08 */
     padding?: number;
+    /**
+     * For bipartite: per-node side assignment, in the same order as
+     * the caller's node array. Nodes without an explicit side default
+     * to "left". Length should match nodeCount.
+     */
+    sides?: ReadonlyArray<"left" | "right" | undefined>;
   }
 ): LayoutPosition[] => {
   const pad = options?.padding ?? 0.08;
@@ -46,6 +52,8 @@ export const computeLayout = (
       return hubSpoke(nodeCount, pad, usable);
     case "grid":
       return gridLayout(nodeCount, pad, usable, options?.columns);
+    case "bipartite":
+      return bipartite(nodeCount, pad, usable, options?.sides);
     default:
       return horizontalChain(nodeCount, pad, usable);
   }
@@ -104,6 +112,57 @@ const hubSpoke = (
     });
   }
 
+  return positions;
+};
+
+// ── Bipartite: two columns with connectors between them ───────────────
+//
+// The editorial form for "many → one" / "A's vs B's" / supplier-buyer
+// stories. Lines run as clean diagonals from one column to the other —
+// no radial geometry, no circle-on-circle overlap, no glossy "5 logos
+// in a flower." Bloomberg / NYT Upshot use this constantly for trade,
+// alliance, and exposure stories where one set of entities sits over
+// against another.
+//
+// Each side packs tightly: the y-positions span ~80% of the safe area
+// so single-node sides land at the vertical centerline and multi-node
+// sides distribute evenly along it.
+
+const bipartite = (
+  count: number,
+  pad: number,
+  usable: number,
+  sides?: ReadonlyArray<"left" | "right" | undefined>
+): LayoutPosition[] => {
+  if (count <= 1) return [{ x: 0.5, y: 0.5 }];
+
+  // Resolve side per index — default "left" if missing.
+  const resolved: ("left" | "right")[] = Array.from({ length: count }, (_, i) => {
+    return sides?.[i] === "right" ? "right" : "left";
+  });
+  const leftIndices = resolved.map((s, i) => (s === "left" ? i : -1)).filter((i) => i >= 0);
+  const rightIndices = resolved.map((s, i) => (s === "right" ? i : -1)).filter((i) => i >= 0);
+
+  // Slightly inset from the safe-area edges so labels have horizontal
+  // room beside each column without bleeding into the gutter.
+  const leftX = pad + usable * 0.18;
+  const rightX = pad + usable * 0.82;
+
+  const yFor = (i: number, total: number): number => {
+    if (total <= 1) return 0.5;
+    // Spread across 80% of usable height, centered.
+    const span = usable * 0.80;
+    const top = pad + (usable - span) / 2;
+    return top + (i / (total - 1)) * span;
+  };
+
+  const positions: LayoutPosition[] = new Array(count);
+  leftIndices.forEach((idx, i) => {
+    positions[idx] = { x: leftX, y: yFor(i, leftIndices.length) };
+  });
+  rightIndices.forEach((idx, i) => {
+    positions[idx] = { x: rightX, y: yFor(i, rightIndices.length) };
+  });
   return positions;
 };
 

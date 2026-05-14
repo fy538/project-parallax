@@ -24,7 +24,11 @@ export const ThumbnailComposition = () => (
       width: 1280,
       height: 720,
       fps: 30,
-      durationInFrames: 1,
+      // Must exceed useCompositionAnimation's enter (8) + exit (15) ramps;
+      // otherwise frame 0 (the only frame) sees enterOpacity=0 AND
+      // exitOpacity=0 and the PNG comes out blank. 30 frames gives a 7-frame
+      // window where opacity=1; the renderer picks frame 15.
+      durationInFrames: 30,
     })}
     defaultProps={{ data: sampleData }}
   />

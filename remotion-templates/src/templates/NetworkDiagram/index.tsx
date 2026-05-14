@@ -11,13 +11,15 @@ const sampleData: NetworkDiagramData = {
   subtitle: "No country can replicate this alone",
   layout: "horizontal-chain",
   nodes: [
+    // Chain has no editorial hub — every node renders at the uniform
+    // satellite size. `importance: "primary"` is reserved for the
+    // hub-spoke layout's chokepoint node (see CircleNode for what blooms).
     {
       id: "us",
       label: "USA",
       sublabel: "EDA Software",
       type: "nation",
       color: "#3266AD",
-      importance: "primary",
     },
     {
       id: "nl",
@@ -25,7 +27,6 @@ const sampleData: NetworkDiagramData = {
       sublabel: "ASML (EUV)",
       type: "nation",
       color: "#E5A544",
-      importance: "primary",
     },
     {
       id: "tw",
@@ -33,7 +34,6 @@ const sampleData: NetworkDiagramData = {
       sublabel: "TSMC (Fab)",
       type: "nation",
       color: "#E5A544",
-      importance: "primary",
     },
     {
       id: "jp",
@@ -48,7 +48,6 @@ const sampleData: NetworkDiagramData = {
       sublabel: "Assembly + Rare Earths",
       type: "nation",
       color: "#C23B22",
-      importance: "primary",
     },
   ],
   edges: [

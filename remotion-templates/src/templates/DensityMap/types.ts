@@ -143,6 +143,15 @@ export interface DensityMapData {
   /** Subtle color tint. */
   backgroundTint?: string;
 
+  /**
+   * Label-density register. DensityMap defaults to `"editorial"` —
+   * country labels at globe scale for orientation, auto-suppress at
+   * regional zoom (>= 4) where the heatmap dominates. Per-shot override
+   * to `"minimal"` when explicit MapAnnotations name everything that
+   * matters. See MapGL `labelDensity`.
+   */
+  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
+
   /** Editorial annotations. Same schema as other map templates. */
   annotations?: MapAnnotation[];
 

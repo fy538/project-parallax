@@ -229,9 +229,10 @@ const SlopeChart: React.FC<{
   const yScale = (y: number): number =>
     chartTop + chartHeight - ((y - domainMin) / Math.max(1e-9, domainMax - domainMin)) * chartHeight;
 
-  // Two x-positions: inset 28% from each edge so labels have room.
+  // Two x-positions: left column holds "value label" pairs, right holds just
+  // the end value. Right gets less inset to feel less cramped.
   const leftInset = chartWidth * 0.28;
-  const rightInset = chartWidth * 0.28;
+  const rightInset = chartWidth * 0.20;
   const xStart = chartLeft + leftInset;
   const xEnd = chartLeft + chartWidth - rightInset;
 
@@ -274,6 +275,24 @@ const SlopeChart: React.FC<{
     ),
     [lines, chartTop, chartHeight, domainMin, domainMax], // eslint-disable-line react-hooks/exhaustive-deps
   );
+
+  // ── Slope reference grid ticks ─────────────────────────────────────────────
+  // Compute round y values within the domain for horizontal reference gridlines
+  // and y-axis labels. Excludes ticks too close to the domain edges so they
+  // don't crowd the period-column header labels at the top.
+  const slopeTicks = useMemo(() => {
+    const range = domainMax - domainMin;
+    const candidates = [1, 2, 5, 10, 20, 25, 50, 100];
+    let step = 10;
+    for (const c of candidates) {
+      if (range / c <= 6) { step = c; break; }
+    }
+    const margin = step * 0.3;
+    const first = Math.ceil((domainMin + margin) / step) * step;
+    const ticks: number[] = [];
+    for (let v = first; v <= domainMax - margin; v += step) ticks.push(v);
+    return ticks;
+  }, [domainMin, domainMax]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -324,6 +343,48 @@ const SlopeChart: React.FC<{
           pointerEvents: "none",
         }}
       >
+        {/* ── Reference gridlines + y-axis tick labels ───────────────────────
+            Thin dashed horizontal lines at round y values give the viewer a
+            numerical scale across the blank space between the two slope poles.
+            Tick labels appear to the left of xStart at the same y positions. */}
+        {slopeTicks.map((tick) => {
+          const cy = yScale(tick);
+          const gridOpacity = fadeIn(frame, sec(0.15), sec(0.4));
+          return (
+            <g key={`slope-grid-${tick}`} opacity={gridOpacity}>
+              {/* Gridline spans from the true chart-left edge to the right pole.
+                  Starting at chartLeft (not xStart) means the line extends into
+                  the left margin, visually anchoring the y-axis. */}
+              <line
+                x1={chartLeft}
+                y1={cy}
+                x2={xEnd}
+                y2={cy}
+                stroke={theme.text.muted}
+                strokeWidth={0.75}
+                strokeDasharray="3 4"
+                opacity={0.20}
+              />
+              {/* Tick label sits at chartLeft — well clear of the country-name
+                  HTML divs that are right-aligned against xStart. */}
+              <text
+                x={chartLeft - 8}
+                y={cy}
+                fill={theme.text.muted}
+                fontSize={fontSizes.caption}
+                fontFamily={fonts.mono}
+                fontWeight={500}
+                textAnchor="end"
+                dominantBaseline="middle"
+                opacity={0.55}
+              >
+                {tick}{yUnit}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* ── Slope lines + endpoint dots ──────────────────────────────────── */}
         {ordered.map(({ l, originalIdx }) => {
           const y0 = l.points[0]?.y ?? 0;
           const y1 = l.points[l.points.length - 1]?.y ?? 0;
@@ -359,6 +420,53 @@ const SlopeChart: React.FC<{
                 fill={l.color}
               />
             </g>
+          );
+        })}
+
+        {/* ── Delta annotations at midpoint of each slope ────────────────────
+            Shows "+N unit" perpendicular-offset from each line centre so the
+            viewer can read the magnitude of change without arithmetic.
+            Uses the CW perpendicular direction so labels always sit on the
+            "above-line" side regardless of slope sign. */}
+        {ordered.map(({ l, originalIdx }) => {
+          const y0 = l.points[0]?.y ?? 0;
+          const y1 = l.points[l.points.length - 1]?.y ?? 0;
+          const delta = y1 - y0;
+          if (Math.abs(delta) < 0.5) return null;
+          const cy0 = yScale(y0);
+          const cy1 = yScale(y1);
+          const midX = (xStart + xEnd) / 2;
+          const midY = (cy0 + cy1) / 2;
+          // CW perpendicular: (dy, -dx) / len  →  always points "above" the line.
+          const dx = xEnd - xStart;
+          const dy = cy1 - cy0;
+          const len = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+          const offsetDist = 18;
+          const perpX = (dy / len) * offsetDist;
+          const perpY = (-dx / len) * offsetDist;
+          const deltaLabel = `${delta > 0 ? "+" : ""}${Math.round(delta)}${yUnit}`;
+          const isHero = !!l.hero;
+          const deltaOpacity = fadeIn(
+            frame,
+            sec(1.5) + stagger(originalIdx, sec(0.08), 0),
+            sec(0.5),
+          );
+          return (
+            <text
+              key={`slope-delta-${originalIdx}`}
+              x={midX + perpX}
+              y={midY + perpY}
+              fill={l.color}
+              fontSize={isHero ? fontSizes.body : fontSizes.label}
+              fontFamily={fonts.data}
+              fontWeight={isHero ? 700 : 600}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              opacity={deltaOpacity}
+              style={{ filter: `drop-shadow(0 1px 3px ${palette.paper})` }}
+            >
+              {deltaLabel}
+            </text>
           );
         })}
       </svg>
@@ -472,29 +580,56 @@ const SmallMultiplesChart: React.FC<{
 }) => {
   const theme = useThemeMode(mode);
 
+  // Improvement 4: dark-mode flag for card background color selection.
+  const dark = mode === "dark";
+
+  // Compute y-axis ticks (shared scale) — must be before any conditional
+  // return to satisfy Rules of Hooks.
+  const yTicks = useMemo(() => {
+    const range = yMax - yMin || 1;
+    const steps = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500, 1000];
+    let step = steps[steps.length - 1];
+    for (const s of steps) {
+      if (range / s <= 5) { step = s; break; }
+    }
+    const first = Math.ceil(yMin / step) * step;
+    const ticks: number[] = [];
+    for (let v = first; v <= yMax + 1e-9; v += step) ticks.push(v);
+    return ticks;
+  }, [yMin, yMax]);
+
   // Defensive guard — schema's `lines.min(1)` should catch this at validation
   // time, but template code paths that bypass Zod (e.g., direct prop spread
   // via composition tooling) could still produce an empty lines array.
   // Without this guard, `cols = 0` below produces divide-by-zero → Infinity.
   if (lines.length === 0) return null;
 
-  // Grid dimensions: aim for ~2:1 aspect ratio per panel. For 4-6 series,
-  // 3 columns × ceil(n/3) rows reads well at video scale.
+  // Grid dimensions: aim for ~2:1 aspect ratio per panel. For 4 panels, use
+  // a 1×4 horizontal strip so there's no empty bottom-right quadrant.
+  // For 5-6 series, 3 columns × ceil(n/3) rows reads well at video scale.
   const numPanels = lines.length;
-  const cols = numPanels <= 3 ? numPanels : numPanels <= 6 ? 3 : 4;
+  const cols = numPanels <= 3 ? numPanels : numPanels === 4 ? 4 : numPanels <= 6 ? 3 : 4;
   const rows = Math.ceil(numPanels / cols);
-  const colGap = 24;
+  // Improvement 1: wider col gap for 4-panel strip so panels breathe.
+  const colGap = numPanels === 4 ? 40 : 24;
   const rowGap = 36;
   const panelWidth = (chartWidth - colGap * (cols - 1)) / cols;
   const panelHeight = (chartHeight - rowGap * (rows - 1)) / rows;
-  // Reserve top of each panel for title, bottom for x-axis baseline.
-  const titleH = 32;
-  const baselineH = 4;
+  // Reserve top of each panel for title, bottom for x-axis year labels.
+  const titleH = 36;
+  // Improvement 5: x-axis year labels below each panel baseline.
+  const xAxisH = 28;
   const plotW = panelWidth;
-  const plotH = panelHeight - titleH - baselineH;
+  const plotH = panelHeight - titleH - xAxisH;
+
+  // Improvement 4: card padding for panel background rect.
+  const cardPad = 12;
 
   // Find hero panel index (first line marked hero, else none).
   const heroIdx = lines.findIndex((l) => l.hero);
+
+  // Topmost tick for unit suffix labeling.
+  const topmostTick = yTicks.length > 0 ? yTicks[yTicks.length - 1] : null;
 
   return (
     <>
@@ -510,12 +645,23 @@ const SmallMultiplesChart: React.FC<{
         // Convert each point to pixel coordinates within this panel's plot box.
         const xRange = xMax - xMin || 1;
         const yRange = yMax - yMin || 1;
-        const pointStrings = line.points.map((p) => {
+
+        // Build pixel point objects for area fill closing.
+        const pixelPoints = line.points.map((p) => {
           const xVal = typeof p.x === "string" ? parseFloat(p.x) : p.x;
           const cx = plotX0 + ((xVal - xMin) / xRange) * plotW;
           const cy = plotY0 + plotH - ((p.y - yMin) / yRange) * plotH;
-          return `${cx},${cy}`;
-        }).join(" ");
+          return { cx, cy };
+        });
+
+        const pointStrings = pixelPoints.map((pt) => `${pt.cx},${pt.cy}`).join(" ");
+
+        // Improvement 3: area fill polygon — close along the baseline.
+        const firstPx = pixelPoints[0];
+        const lastPx = pixelPoints[pixelPoints.length - 1];
+        const areaPoints = firstPx && lastPx
+          ? `${pointStrings} ${lastPx.cx},${plotY0 + plotH} ${firstPx.cx},${plotY0 + plotH}`
+          : "";
 
         // Line stagger reveal (left → right).
         const lineStart = sec(0.4) + idx * sec(0.15);
@@ -555,7 +701,7 @@ const SmallMultiplesChart: React.FC<{
               {line.label}
             </div>
 
-            {/* Panel baseline (x-axis) + sparse y-axis tick */}
+            {/* Panel SVG: card background, gridlines/ticks, area fill, baseline, line, dot */}
             <svg
               style={{
                 position: "absolute",
@@ -566,6 +712,71 @@ const SmallMultiplesChart: React.FC<{
                 pointerEvents: "none",
               }}
             >
+              {/* Improvement 4: subtle panel card background */}
+              <rect
+                x={plotX0 - cardPad}
+                y={plotY0 - cardPad}
+                width={plotW + cardPad * 2}
+                height={plotH + cardPad * 2}
+                fill={dark ? palette.ink : palette.bone}
+                opacity={dark ? 0.18 : 0.35}
+                rx={4}
+              />
+
+              {/* Improvement 2: shared y-axis reference lines across ALL panels;
+                  tick marks + labels only on the leftmost column so the scale
+                  is stated once and implied by the aligned gridlines elsewhere. */}
+              {yTicks.map((tick) => {
+                const tickY = plotY0 + plotH - ((tick - yMin) / yRange) * plotH;
+                if (tickY < plotY0 - 2 || tickY > plotY0 + plotH + 2) return null;
+                const axisOpacity = fadeIn(frame, lineStart - sec(0.3), sec(0.4));
+                const isTopmost = tick === topmostTick;
+                const tickLabel = formatNumber(tick, {
+                  decimals: 0,
+                  style: tick >= 1000 ? "abbreviated" : "decimal",
+                }) + (isTopmost && yUnit ? ` ${yUnit}` : "");
+                return (
+                  <g key={`ytick-${idx}-${tick}`}>
+                    {/* Gridline across the full panel width — all panels */}
+                    <line
+                      x1={plotX0}
+                      y1={tickY}
+                      x2={plotX0 + plotW}
+                      y2={tickY}
+                      stroke={theme.text.muted}
+                      strokeWidth={0.75}
+                      strokeDasharray="3 4"
+                      opacity={0.22 * axisOpacity}
+                    />
+                    {/* Tick mark + label — leftmost column only */}
+                    {col === 0 && (
+                      <g opacity={0.70 * axisOpacity}>
+                        <line
+                          x1={plotX0 - 5}
+                          y1={tickY}
+                          x2={plotX0}
+                          y2={tickY}
+                          stroke={theme.text.muted}
+                          strokeWidth={1}
+                          opacity={0.6}
+                        />
+                        <text
+                          x={plotX0 - 9}
+                          y={tickY}
+                          fill={theme.text.muted}
+                          fontSize={fontSizes.caption}
+                          fontFamily={fonts.mono}
+                          textAnchor="end"
+                          dominantBaseline="middle"
+                        >
+                          {tickLabel}
+                        </text>
+                      </g>
+                    )}
+                  </g>
+                );
+              })}
+
               {/* Baseline */}
               <line
                 x1={plotX0}
@@ -576,6 +787,16 @@ const SmallMultiplesChart: React.FC<{
                 strokeWidth={1}
                 opacity={0.35 * fadeIn(frame, lineStart - sec(0.3), sec(0.4))}
               />
+
+              {/* Improvement 3: area fill under the line — renders before polyline */}
+              {areaPoints && (
+                <polygon
+                  points={areaPoints}
+                  fill={line.color}
+                  opacity={0.10 * Math.min(lineProgress, 1)}
+                />
+              )}
+
               {/* Polyline path with progressive reveal via stroke-dasharray */}
               <polyline
                 points={pointStrings}
@@ -617,6 +838,27 @@ const SmallMultiplesChart: React.FC<{
             >
               {Math.round(lastPoint.y)}
               {yUnit && <span style={{ fontSize: fontSizes.caption, color: theme.text.muted, marginLeft: 2 }}>{yUnit}</span>}
+            </div>
+
+            {/* Improvement 5: x-axis year labels (start + end) */}
+            <div
+              style={{
+                position: "absolute",
+                top: plotY0 + plotH + 8,
+                left: plotX0,
+                width: plotW,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                fontSize: fontSizes.caption,
+                fontFamily: fonts.mono,
+                color: theme.text.muted,
+                opacity: 0.65 * fadeIn(frame, lineStart - sec(0.1), sec(0.4)),
+                pointerEvents: "none",
+              }}
+            >
+              <span>{Math.round(xMin)}</span>
+              <span>{Math.round(xMax)}</span>
             </div>
           </React.Fragment>
         );

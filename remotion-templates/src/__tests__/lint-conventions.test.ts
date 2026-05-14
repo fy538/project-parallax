@@ -441,6 +441,86 @@ describe("lint rule: hardcoded-brand-color (Rule 9)", () => {
   });
 });
 
+// ── Rule 12: no-as-any-in-templates ─────────────────────────────────────────
+
+describe("lint rule: no-as-any-in-templates (Rule 12)", () => {
+  it("flags bare `as any` in template source", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        const val = (data.items as any).length;
+        return <div>{val}</div>;
+      };
+    `);
+    expect(hasRule(issues, "no-as-any-in-templates")).toBe(true);
+  });
+
+  it("does not flag `as any` with no-as-any-ok inline comment", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        const val = (data.items as any).length; // no-as-any-ok: mapbox-expression
+        return <div>{val}</div>;
+      };
+    `);
+    expect(hasRule(issues, "no-as-any-in-templates")).toBe(false);
+  });
+
+  it("does not flag `as any` with eslint-disable-next-line no-as-any-in-templates above", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        // eslint-disable-next-line no-as-any-in-templates
+        const val = (data.items as any).length;
+        return <div>{val}</div>;
+      };
+    `);
+    expect(hasRule(issues, "no-as-any-in-templates")).toBe(false);
+  });
+
+  it("does not flag `as any` with @typescript-eslint/no-explicit-any suppression above", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const val = (data.items as any).length;
+        return <div>{val}</div>;
+      };
+    `);
+    expect(hasRule(issues, "no-as-any-in-templates")).toBe(false);
+  });
+
+  it("does not flag comment lines that mention 'as any'", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      // Use as any for Mapbox expressions only
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        return <div>{data.title}</div>;
+      };
+    `);
+    expect(hasRule(issues, "no-as-any-in-templates")).toBe(false);
+  });
+
+  it("flags multiple as-any on different lines", () => {
+    const issues = lint(`
+      import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+      export const Foo = ({ data }: { data: any }) => {
+        useCompositionAnimation();
+        const a = data.foo as any;
+        const b = data.bar as any;
+        return <div>{a}{b}</div>;
+      };
+    `);
+    const asAnyIssues = issues.filter((i) => i.rule === "no-as-any-in-templates");
+    expect(asAnyIssues.length).toBe(2);
+  });
+});
+
 describe("rules array integrity", () => {
   it("every rule has id, description, severity", () => {
     // Smoke test that the export shape is consistent — protects against accidental

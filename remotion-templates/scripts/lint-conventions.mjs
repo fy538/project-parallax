@@ -457,6 +457,72 @@ const rules = [
     severity: "warn",
     fix: "Wrap the access with a fallback: `sec(data.durationSec ?? 8)` (or `|| 8`). Pick a default that matches the template's natural duration — most use 5–14s.",
   },
+  // ── Rule 12: No `as any` in template files ────────────────────────────────
+  // `as any` silently disables TypeScript's type safety. In templates this
+  // manifests as runtime crashes that never surface until render time. Common
+  // symptoms: wrong data shape passed to a child component, Mapbox layer
+  // expressions accepted by TS but rejected at runtime, deck.gl prop mismatches.
+  //
+  // Legitimate exceptions (Mapbox GL expression arrays that TypeScript can't
+  // type-check against the runtime expression grammar, fitProjectionToFeatures
+  // d3-geo interop) should be suppressed individually with an inline comment:
+  //   `// no-as-any-ok: <reason>` on the SAME line, or
+  //   `// eslint-disable-next-line no-as-any-in-templates` on the line ABOVE.
+  //
+  // Exceptions that have been reviewed and allowed:
+  //   - ChoroplethMap.tsx: Mapbox GL expression arrays — the TS types for
+  //     layer `paint`/`layout` properties don't accept dynamic expression
+  //     arrays even though they're valid at runtime. Each occurrence is
+  //     individually suppressed with `// no-as-any-ok: mapbox-expression`.
+  //   - AtlasPlate.tsx / ProportionalSymbolMap.tsx: fitProjectionToFeatures
+  //     d3-geo interop (GeoJSON type mismatch between TopoJSON converter
+  //     output and d3's expected FeatureCollection).
+  //   - Episodes/*Full.tsx / FilmOverlayCascadeTestComp.tsx: manifest cast —
+  //     AssemblyManifest type not yet exported from FullEpisode public surface.
+  //   - Shorts/DataChartShort.tsx: backgroundVariant accessed on generic type.
+  {
+    id: "no-as-any-in-templates",
+    description: "Avoid `as any` — disables TypeScript safety; suppress with `// no-as-any-ok: <reason>` on the same line",
+    fileLevel: true,
+    check: (content) => {
+      const lines = content.split("\n");
+      const issues = [];
+      // Accepts both our custom tag and the standard @typescript-eslint suppression.
+      const suppressSameLine =
+        /\/\/\s*(no-as-any-ok:|eslint-disable(?:-next)?-line\s+(no-as-any-in-templates|@typescript-eslint\/no-explicit-any))/;
+      // Preceding-line suppression (eslint-disable-next-line pattern)
+      const suppressPrevLine =
+        /eslint-disable-next-line\s+(no-as-any-in-templates|@typescript-eslint\/no-explicit-any)/;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        // Skip comment-only lines
+        if (/^\s*(\/\/|\*|\/\*)/.test(line)) continue;
+        // Check if this line uses `as any`
+        if (!/\bas\s+any\b/.test(line)) continue;
+
+        // Allow if the same line has a suppression comment
+        if (suppressSameLine.test(line)) continue;
+
+        // Allow if the immediately preceding non-blank line has an above-line
+        // suppression (eslint-disable-next-line style)
+        const prev = lines[i - 1] ?? "";
+        if (suppressPrevLine.test(prev)) continue;
+
+        issues.push({
+          line: i + 1,
+          message:
+            "`as any` found — this disables TypeScript type safety. " +
+            "Add `// no-as-any-ok: <reason>` on the same line if this cast " +
+            "is genuinely unavoidable (e.g. Mapbox expression array, d3 interop), " +
+            "or fix the type to avoid the cast.",
+        });
+      }
+      return issues;
+    },
+    severity: "warn",
+    fix: "Either (a) fix the type to avoid the cast, (b) add `// no-as-any-ok: <reason>` on the same line for documented exceptions, or (c) use `as unknown as TargetType` for two-step casts where the intermediate type is verifiable.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────

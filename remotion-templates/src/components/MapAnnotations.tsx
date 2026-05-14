@@ -56,6 +56,75 @@ const LEADER_STROKE = { primary: 1.25, secondary: 1, tertiary: 0.75 } as const;
 const ENTRANCE_FRAMES = sec(0.5);
 const EXIT_FRAMES = sec(0.35);
 
+/**
+ * Paint a multi-directional halo around label text so editorial
+ * annotations unambiguously win against any Mapbox auto-label they collide
+ * with. The 8-direction `text-shadow` stack is the canonical CSS halo
+ * trick — paints the halo color at ±r offset in every direction, giving
+ * crisp readable text on any background.
+ *
+ * Halo color matches the editorial surface (paper / ink-dark in dark mode)
+ * — so the effect reads as "the annotation is cut out of the page above
+ * the map" rather than "the annotation has a colored outline." NYT /
+ * FT / Bloomberg editorial convention.
+ *
+ * Memoized via a `(haloColor, radius) -> string` cache because
+ * annotations render every frame at 30 FPS — recomputing the 9-element
+ * shadow string per render is wasteful. With only ~4 distinct (color,
+ * radius) pairs in flight (paper/ink × primary/secondary/tertiary),
+ * cache size is bounded.
+ *
+ * Exported for unit testing.
+ *
+ * @param haloColor base color of the halo (paper or ink). Hex string.
+ * @param radius halo thickness in pixels. 2 for primary, 1.5 secondary, 1.25 tertiary.
+ */
+const HALO_CACHE = new Map<string, string>();
+export const haloShadow = (haloColor: string, radius: number): string => {
+  const cacheKey = `${haloColor}@${radius}`;
+  const cached = HALO_CACHE.get(cacheKey);
+  if (cached !== undefined) return cached;
+
+  // 8 cardinal + diagonal offsets so the halo is uniform around glyphs.
+  const r = radius;
+  const built = [
+    `${-r}px ${-r}px 0 ${haloColor}`,
+    `${r}px ${-r}px 0 ${haloColor}`,
+    `${-r}px ${r}px 0 ${haloColor}`,
+    `${r}px ${r}px 0 ${haloColor}`,
+    `${-r}px 0 0 ${haloColor}`,
+    `${r}px 0 0 ${haloColor}`,
+    `0 ${-r}px 0 ${haloColor}`,
+    `0 ${r}px 0 ${haloColor}`,
+    // One soft outer drop for lift — keeps it from looking like a sticker.
+    `0 1px 3px rgba(0,0,0,0.18)`,
+  ].join(", ");
+  HALO_CACHE.set(cacheKey, built);
+  return built;
+};
+
+/**
+ * Equivalent halo for the dot anchor — a `boxShadow` (vs `textShadow` for
+ * labels). Without it, the dot is the one part of the annotation that
+ * can be visually muddied by a Mapbox label landing at the same pixel.
+ */
+export const haloBoxShadow = (haloColor: string, radius: number): string => {
+  const r = radius;
+  return [
+    `0 0 0 ${r}px ${haloColor}`,
+    `0 1px 3px rgba(0,0,0,0.22)`,
+  ].join(", ");
+};
+
+/** Halo radius (px) per hierarchy. Primary is largest so the country-scale
+ *  label remains crisp even at full saturation. */
+const HALO_RADIUS = { primary: 2, secondary: 1.5, tertiary: 1.25 } as const;
+
+/** Dot-halo radius (px) per hierarchy. Narrower than label halo so the
+ *  dot doesn't appear ringed; just enough to cut through a Mapbox label
+ *  at the same coordinate. */
+const DOT_HALO_RADIUS = { primary: 1.5, secondary: 1.25, tertiary: 1 } as const;
+
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 /** Resolve appearAtSec / exitAtSec from explicit fields or phase shorthand. */
@@ -148,12 +217,16 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
   const dy = annotation.leader?.dy ?? DEFAULT_OFFSET_Y[annotation.hierarchy];
   const hasLeader = !!annotation.leader;
 
+  // Primary annotations get bumped to `bold` weight (was semibold) so they
+  // unambiguously dominate Mapbox's automatic country labels even when the
+  // typographic registers are close. May 13, 2026 polish pass — paired
+  // with the new haloShadow below.
   const labelStyle: React.CSSProperties =
     annotation.hierarchy === "primary"
       ? {
           fontFamily: fonts.display,
           fontSize: fontSizes.h3,
-          fontWeight: fontWeights.semibold,
+          fontWeight: fontWeights.bold,
           letterSpacing: `${letterSpacing.h3}px`,
           textTransform: "uppercase",
         }
@@ -161,15 +234,22 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
       ? {
           fontFamily: fonts.heading,
           fontSize: fontSizes.body,
-          fontWeight: fontWeights.medium,
+          fontWeight: fontWeights.semibold,
           letterSpacing: `${letterSpacing.label}px`,
         }
       : {
           fontFamily: fonts.metadata,
           fontSize: fontSizes.caption,
-          fontWeight: fontWeights.regular,
+          fontWeight: fontWeights.medium,
           letterSpacing: `${letterSpacing.caption}px`,
         };
+
+  // Paper-color halo in light mode, ink-color halo in dark mode. Halo width
+  // scales with hierarchy. This is the move that makes editorial
+  // annotations cut out of the map background so they're never visually
+  // muddied by Mapbox's auto-labels at the same pixel.
+  const haloColor = dark ? palette.ink : palette.paper;
+  const labelHalo = haloShadow(haloColor, HALO_RADIUS[annotation.hierarchy]);
 
   const labelTranslate =
     align === "center"
@@ -191,7 +271,9 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
           opacity,
         }}
       >
-        {/* Anchor dot at (0, 0) — the lon/lat point. */}
+        {/* Anchor dot at (0, 0) — the lon/lat point. Paper-color halo
+            mirrors the label halo so the dot doesn't get visually muddied
+            when it lands on top of a Mapbox auto-label at the same pixel. */}
         <div
           style={{
             position: "absolute",
@@ -200,7 +282,10 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
             borderRadius: "50%",
             backgroundColor: color,
             transform: "translate(-50%, -50%)",
-            boxShadow: dark ? shadows.textLift : shadows.textLiftLight,
+            boxShadow: haloBoxShadow(
+              haloColor,
+              DOT_HALO_RADIUS[annotation.hierarchy],
+            ),
           }}
         />
 
@@ -245,7 +330,12 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
                 ? "left"
                 : "center",
             color,
-            textShadow: dark ? shadows.textLift : shadows.textLiftLight,
+            // Paper-color halo so the editorial annotation cuts out of the
+            // map and unambiguously wins against Mapbox auto-labels at the
+            // same pixel. Replaces the prior `shadows.textLift` drop, which
+            // was atmospheric (drop shadow for "depth") rather than
+            // collision-resistant (halo for "win over other typography").
+            textShadow: labelHalo,
             ...labelStyle,
           }}
         >
@@ -260,6 +350,7 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
                 letterSpacing: `${letterSpacing.meta}px`,
                 textTransform: "uppercase",
                 color: palette.taupe,
+                textShadow: haloShadow(haloColor, 1),
               }}
             >
               {annotation.sublabel}

@@ -105,7 +105,7 @@ const FIXTURE_TEMPLATE_DATA: Record<string, unknown> = {
 
 export const FilmOverlayCascadeTest: React.FC = () => (
   <FullEpisode
-    manifest={FIXTURE_MANIFEST as any}
+    manifest={FIXTURE_MANIFEST as any} // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
     templateData={FIXTURE_TEMPLATE_DATA as Record<string, any>}
   />
 );
@@ -119,7 +119,7 @@ export const FilmOverlayCascadeTestComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: FIXTURE_MANIFEST as any,
+          manifest: FIXTURE_MANIFEST as any, // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
           templateData: FIXTURE_TEMPLATE_DATA as Record<string, any>,
         },
       })

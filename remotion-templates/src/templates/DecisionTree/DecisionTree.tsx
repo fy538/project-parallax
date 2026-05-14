@@ -34,8 +34,6 @@ import {
   layout,
   sec,
   radii,
-  cardPresets,
-  getCategoricalColor,
   shadows,
   textMaxWidth,
   titleHeight,
@@ -44,7 +42,6 @@ import {
   fadeIn,
   exitFade,
   slideIn,
-  CLAMP,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { smoothStepEdge } from "../../utils/edges";
@@ -59,7 +56,6 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
-import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -152,6 +148,16 @@ function edgePath(
 }
 
 // ── TreeNode Component ─────────────────────────────────────────────────────
+//
+// May 13, 2026 polish refactor: dropped card chrome (rounded rectangle +
+// inset fill + drop shadow + accent glow) in favor of typography-only nodes
+// per NYT 512-Paths and FT scenario-tree canon. Card chrome reads as
+// dashboard UX (Notion/Linear/Figma); editorial decision trees render nodes
+// as text on the surface, with emphasis carried by a thin accent rule under
+// the active node. Probability and edge-label rendering moved OUT of this
+// component and ONTO the edges in the main SVG layer — extensive-form
+// canon places transition labels on edges, state labels on nodes. See
+// research memo at references/template-research/decision-tree.md.
 
 const TreeNodeComponent: React.FC<{
   node: TreeNode;
@@ -164,12 +170,8 @@ const TreeNodeComponent: React.FC<{
   dimAmount: number;
   /** Scale multiplier from camera focus */
   focusScale: number;
-  /** Stable index for default categorical color when node.color is missing. */
-  defaultColorIndex?: number;
-  /** Audio-reactive pulse from useBeatSync — amplifies the active-node glow. 0 = no effect. */
-  beatPulse?: number;
-  /** When false (default), numeric percentage labels are suppressed. */
-  probabilityWeights?: boolean;
+  /** Per-episode accent for active-node underline. */
+  highlightColor: string;
 }> = React.memo(({
   node,
   position,
@@ -179,27 +181,27 @@ const TreeNodeComponent: React.FC<{
   mode,
   dimAmount,
   focusScale,
-  defaultColorIndex = 0,
-  probabilityWeights = false,
-  beatPulse = 0,
+  highlightColor,
 }) => {
   const theme = useThemeMode(mode);
   const nodeOpacity = fadeIn(frame, startFrame, sec(0.5));
   const nodeScale = interpolate(
     frame,
     [startFrame, startFrame + sec(0.5)],
-    [0.85, 1],
+    [0.92, 1],
     CLAMP_CUBIC
   );
   const exitOp = exitFade(frame, totalFrames, sec(0.5));
 
-  const nodeColor = node.color || getCategoricalColor(defaultColorIndex);
-  const isDark = mode === "dark";
   const isHighlighted = node.highlighted ?? false;
   const isActive = node.active ?? false;
-  const nodeBoxStyle = isHighlighted || isActive
-    ? cardPresets.accentEdge(nodeColor, isDark)
-    : cardPresets.inset(isDark);
+  // Underline draw-in animation for the active "you are here" node.
+  const underlineProgress = interpolate(
+    frame,
+    [startFrame + sec(0.3), startFrame + sec(0.9)],
+    [0, 1],
+    CLAMP_CUBIC,
+  );
 
   // Effective opacity: base animation × exit × inverse dim
   const effectiveOpacity = nodeOpacity * exitOp * (1 - dimAmount);
@@ -216,84 +218,67 @@ const TreeNodeComponent: React.FC<{
         transform: `scale(${nodeScale * focusScale})`,
         transformOrigin: "center",
         transition: "opacity 0.3s ease",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
       }}
     >
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          ...nodeBoxStyle,
-          boxShadow: isActive
-            ? `${shadows.subtle}, ${shadows.accentGlow(nodeColor, 24 + Math.round(beatPulse * 8))}`
-            : shadows.subtle,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          boxSizing: "border-box",
+          fontSize: fontSizes.body,
+          maxWidth: textMaxWidth.node,
+          fontFamily: fonts.display,
+          // Active gets semibold display weight; highlighted (on path) gets
+          // medium weight; off-path nodes stay regular. Hierarchy via weight,
+          // not color or chrome — the NYT/FT editorial idiom.
+          fontWeight: isActive
+            ? fontWeights.semibold
+            : isHighlighted
+              ? fontWeights.medium
+              : fontWeights.regular,
+          lineHeight: 1.3,
+          textAlign: "center",
+          color: theme.text.primary,
+          padding: `0 ${layout.spacing.sm}px`,
         }}
       >
-        <div
-          style={{
-            fontSize: fontSizes.body,
-            maxWidth: textMaxWidth.node,
-            fontFamily: fonts.display,
-            fontWeight: fontWeights.semibold,
-            lineHeight: 1.3,
-            textAlign: "center",
-            color: theme.text.primary,
-            padding: `0 ${layout.spacing.sm}px`,
-          }}
-        >
-          {node.label}
-        </div>
+        {node.label}
       </div>
 
-      {/* Probability badge (above node). Editorial gate: numeric percentages
-          are suppressed unless `probabilityWeights` is explicitly true.
-          Qualitative labels ("Mainline", "Sharp", "Likely") always render.
-          See: references/template-research/game-theory.md § A4 — "Decision
-          tree with invented probabilities — worse than no probabilities;
-          cite or omit." */}
-      {node.probability && (probabilityWeights || !/\d+\s*%/.test(node.probability)) && (
+      {/* Active-node accent rule — replaces the prior accent-glow boxShadow.
+          A 2px underline in the highlight color, draw-in animation. This is
+          the single visual signal that says "you are here," and it carries
+          the entire emphasis hierarchy at the node level. */}
+      {isActive && (
         <div
           style={{
-            position: "absolute",
-            top: -layout.spacing.xl - 4,
-            left: "50%",
-            transform: "translateX(-50%)",
-            fontSize: fontSizes.caption,
-            fontFamily: fonts.mono,
-            fontWeight: fontWeights.medium,
-            color: theme.text.muted,
-            backgroundColor: theme.bg.surface,
-            padding: `${layout.spacing.xs}px ${layout.spacing.md}px`,
-            borderRadius: `${radii.sm}px`,
-            whiteSpace: "nowrap",
-            opacity: effectiveOpacity,
+            marginTop: layout.spacing.xs,
+            height: 2,
+            width: 64,
+            background: highlightColor,
+            transform: `scaleX(${underlineProgress})`,
+            transformOrigin: "center",
+            opacity: underlineProgress,
           }}
-        >
-          {node.probability}
-        </div>
+        />
       )}
 
-      {/* Market price badge (below node) */}
+      {/* Market price chip (below node) — Kalshi-style, kept for the
+          forecasting use case. Same mono register, no surface fill, just
+          a thin top rule so it reads as metadata rather than a button. */}
       {node.marketPrice && (
         <div
           style={{
-            position: "absolute",
-            bottom: -layout.spacing.xl - 4,
-            left: "50%",
-            transform: "translateX(-50%)",
+            marginTop: layout.spacing.xs,
+            paddingTop: 4,
+            borderTop: `1px solid ${palette.amber}55`,
             fontSize: fontSizes.caption,
             fontFamily: fonts.mono,
             fontWeight: fontWeights.medium,
             color: palette.amber,
-            backgroundColor: theme.bg.surface,
-            padding: `${layout.spacing.xs}px ${layout.spacing.md}px`,
-            borderRadius: `${radii.sm}px`,
             whiteSpace: "nowrap",
-            opacity: effectiveOpacity,
           }}
         >
           ${node.marketPrice}
@@ -303,14 +288,25 @@ const TreeNodeComponent: React.FC<{
   );
 });
 
-// ── Decision-ladder variant (Allison-style nested rectangles) ──────────────
+// ── Decision-ladder variant (Allison-style options list) ───────────────────
 //
-// Privileges the decision-maker's deliberative frame rather than abstract
-// probability space. Top-level options stack vertically as panels; sub-
-// consequences nest inside their parent option, indented. Right for ExComm-
-// class scenes where the editorial frame is "actor X weighed these options."
+// May 13, 2026 polish refactor — committed to Allison's actual book layout:
+// a FLAT stack of option panels, one per option the decision-maker weighed,
+// with consequence/gloss prose rendered INSIDE the panel as a single
+// paragraph. The previous implementation supported arbitrary nesting via
+// recursion — dead weight, since (a) no episode in the queue uses deeper
+// nesting and (b) Allison's *Essence of Decision* itself doesn't nest:
+// each option is a single panel with descriptive prose. RAND escalation
+// studies and FP/Economist option-tables follow the same form.
 //
-// Reference: references/template-research/game-theory.md § A2
+// If a node has children in the data, we render the FIRST child's `label`
+// as the option's prose gloss inside the panel (Allison treats this as the
+// "consequence statement"). Additional children are ignored at this
+// register — if a script needs branching consequences, it should use the
+// `extensive` variant instead.
+//
+// Reference: references/template-research/decision-tree.md § 3 item 10;
+// game-theory.md § A2.
 
 const LadderVariant: React.FC<{
   data: DecisionTreeData;
@@ -329,122 +325,115 @@ const LadderVariant: React.FC<{
   const root = nodeMap.get(data.rootId);
   if (!root) return null;
   const optionIds = root.children ?? [];
+  const optionCount = optionIds.length;
 
-  // Recursively render an option and its nested consequences as a
-  // bordered panel with indented children.
-  const renderLadderNode = (
-    nodeId: string,
-    level: number,
-    indexInLevel: number,
-    levelCount: number,
-  ): React.ReactNode => {
-    const node = nodeMap.get(nodeId);
-    if (!node) return null;
+  const renderOption = (optionId: string, idx: number): React.ReactNode => {
+    const option = nodeMap.get(optionId);
+    if (!option) return null;
 
-    const isHighlighted = node.highlighted || data.highlightedPath?.includes(nodeId);
+    const isHighlighted =
+      option.highlighted || data.highlightedPath?.includes(optionId);
     const accent = isHighlighted ? highlightColor : theme.text.muted;
 
-    // Stagger reveal by level + position within level.
-    const revealStart = sec(0.4) + level * sec(0.35) + indexInLevel * sec(0.18);
-    const opacity = fadeIn(frame, revealStart, sec(0.5));
-    const slide = slideIn(frame, revealStart, 12, sec(0.5));
+    // Collect prose gloss(es) — every direct child's label rendered as a
+    // sentence inside the panel. Allison's canon: one short prose
+    // paragraph per option, naming the consequence. Multiple children
+    // become multiple sentences in the same paragraph.
+    const glossParts = (option.children ?? [])
+      .map((cid) => nodeMap.get(cid)?.label)
+      .filter((s): s is string => Boolean(s));
+    const gloss = glossParts.join(" ");
 
-    // Top-level options get heavier panel chrome; nested consequences get
-    // lighter inline rows.
-    const isTopLevel = level === 0;
+    // Stagger reveal across options. Within-option staggering is no longer
+    // needed since each option renders as a single block.
+    const revealStart = sec(0.4) + idx * sec(0.22);
+    const opacity = fadeIn(frame, revealStart, sec(0.55));
+    const slide = slideIn(frame, revealStart, 14, sec(0.55));
 
     return (
       <div
-        key={nodeId}
+        key={optionId}
         style={{
           opacity,
           transform: `translateY(${slide}px)`,
-          marginTop: isTopLevel
-            ? indexInLevel === 0
-              ? 0
-              : layout.spacing.sm
-            : layout.spacing.xs,
-          marginLeft: level > 0 ? layout.spacing.lg : 0,
-          padding: isTopLevel
-            ? `${layout.spacing.xs}px ${layout.spacing.md}px`
-            : `${layout.spacing.xs}px ${layout.spacing.md}px`,
-          border: isTopLevel
-            ? `${isHighlighted ? 2.5 : 1.5}px solid ${accent}`
-            : "none",
-          borderLeft: !isTopLevel
-            ? `2px solid ${accent}40`
-            : undefined,
-          borderRadius: isTopLevel ? radii.sm : 0,
-          background: isTopLevel
-            ? isHighlighted
-              ? `${accent}10`
-              : `${theme.text.muted}06`
+          marginTop: idx === 0 ? 0 : layout.spacing.md,
+          padding: `${layout.spacing.sm}px ${layout.spacing.lg}px`,
+          // Highlighted option gets a 2.5px accent border + tinted fill;
+          // unchosen options get a 1px muted hairline + transparent fill.
+          // Weight + saturation carry the hierarchy — not brightness.
+          border: `${isHighlighted ? 2.5 : 1}px solid ${isHighlighted ? accent : `${theme.text.muted}55`}`,
+          borderRadius: radii.sm,
+          background: isHighlighted
+            ? `${accent}10`
             : "transparent",
-          // Use a row layout for top-level so ordinal + label are inline,
-          // saving vertical space.
-          display: isTopLevel ? "flex" : "block",
-          alignItems: isTopLevel ? "baseline" : undefined,
-          gap: isTopLevel ? layout.spacing.md : undefined,
+          display: "flex",
+          gap: layout.spacing.lg,
+          alignItems: "baseline",
         }}
       >
-        {/* Ordinal marker for top-level options — inline kicker */}
-        {isTopLevel && (
-          <div
-            style={{
-              fontSize: fontSizes.caption,
-              fontFamily: fonts.metadata,
-              color: accent,
-              letterSpacing: 2,
-              textTransform: "uppercase",
-              fontWeight: 600,
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              minWidth: 64,
-            }}
-          >
-            {String(indexInLevel + 1).padStart(2, "0")} / {String(levelCount).padStart(2, "0")}
-          </div>
-        )}
+        {/* Ordinal marker — quiet kicker, regular weight, muted color.
+            Reduced from semibold uppercase letterSpacing-2 (which competed
+            with the option title) to regular weight letterSpacing-1.5,
+            sized down. May 13, 2026 polish pass. */}
+        <div
+          style={{
+            fontSize: fontSizes.caption,
+            fontFamily: fonts.metadata,
+            color: theme.text.muted,
+            letterSpacing: 1.5,
+            fontWeight: fontWeights.regular,
+            whiteSpace: "nowrap",
+            flexShrink: 0,
+            minWidth: 52,
+            opacity: 0.65,
+          }}
+        >
+          {String(idx + 1).padStart(2, "0")} / {String(optionCount).padStart(2, "0")}
+        </div>
 
-        {/* Node label + children container */}
-        <div style={{ flex: isTopLevel ? 1 : undefined, maxWidth: textMaxWidth.body }}>
+        {/* Option title + prose gloss */}
+        <div style={{ flex: 1, maxWidth: textMaxWidth.body }}>
           <div
             style={{
-              fontSize: isTopLevel ? fontSizes.body : fontSizes.caption,
-              fontFamily: isTopLevel ? fonts.display : fonts.body,
-              fontWeight: isTopLevel ? 600 : 500,
+              fontSize: fontSizes.body,
+              fontFamily: fonts.display,
+              fontWeight: isHighlighted ? fontWeights.semibold : fontWeights.medium,
               color: isHighlighted ? accent : theme.text.primary,
               lineHeight: 1.3,
             }}
           >
-            {node.label}
+            {option.label}
           </div>
-
-        {/* Probability badge — gated by probabilityWeights for percentages */}
-        {node.probability &&
-          (data.probabilityWeights || !/\d+\s*%/.test(node.probability)) && (
-          <div
-            style={{
-              fontSize: fontSizes.caption,
-              fontFamily: fonts.metadata,
-              color: theme.text.muted,
-              marginTop: 4,
-              letterSpacing: 1.5,
-              textTransform: "uppercase",
-            }}
-          >
-            {node.probability}
-          </div>
-        )}
-
-        {/* Recursively render children inside this panel */}
-        {node.children && node.children.length > 0 && (
-          <div style={{ marginTop: isTopLevel ? 4 : 2 }}>
-            {node.children.map((childId, ci) =>
-              renderLadderNode(childId, level + 1, ci, node.children!.length),
+          {gloss && (
+            <div
+              style={{
+                fontSize: fontSizes.caption,
+                fontFamily: fonts.body,
+                fontWeight: fontWeights.regular,
+                color: theme.text.secondary,
+                marginTop: 4,
+                lineHeight: 1.45,
+              }}
+            >
+              {gloss}
+            </div>
+          )}
+          {/* Probability — gated for numeric %, renders as mono kicker below
+              the gloss. */}
+          {option.probability &&
+            (data.probabilityWeights || !/\d+\s*%/.test(option.probability)) && (
+              <div
+                style={{
+                  fontSize: fontSizes.caption,
+                  fontFamily: fonts.mono,
+                  color: theme.text.muted,
+                  marginTop: 4,
+                  letterSpacing: 1.2,
+                }}
+              >
+                {option.probability}
+              </div>
             )}
-          </div>
-        )}
         </div>
       </div>
     );
@@ -465,8 +454,6 @@ const LadderVariant: React.FC<{
       <div
         style={{
           position: "absolute",
-          // Below the title block — reads `titleHeight.content` from theme so
-          // this stays in sync if the title-block height ever changes.
           top: safe.top + titleHeight.content + layout.spacing.lg,
           left: safe.left,
           right: safe.right,
@@ -476,10 +463,28 @@ const LadderVariant: React.FC<{
           maxWidth: textMaxWidth.body * 1.6,
         }}
       >
-        {optionIds.map((optionId, idx) =>
-          renderLadderNode(optionId, 0, idx, optionIds.length),
-        )}
+        {optionIds.map((optionId, idx) => renderOption(optionId, idx))}
       </div>
+
+      {/* Source attribution — was previously rendered only in the extensive
+          variant return path, leaving the ladder variant without visible
+          citation. Allison-class ladders particularly need the source
+          visible. May 13, 2026 polish pass. */}
+      {data.source && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: safe.bottom,
+            left: safe.left,
+            fontSize: fontSizes.caption,
+            color: theme.text.muted,
+            opacity: fadeIn(frame, 0, sec(1)) * exitOp,
+            transform: `translateY(${slideIn(frame, 0, 10, sec(0.8))}px)`,
+          }}
+        >
+          {data.source}
+        </div>
+      )}
     </>
   );
 });
@@ -490,13 +495,6 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation({ noExit: true, ...direction.driftOptions });
-  // Audio-reactive amplification for the active-node glow. Passed down to
-  // every TreeNodeComponent — only the active node uses it (the boxShadow
-  // condition gates it on isActive).
-  const beat = useBeatSync({
-    markers: (direction.syncPoints ?? []).map((p) => p.timeSec),
-    pulseDecay: 0.3,
-  });
   // Pace-aware scaling for tree reveal cadence (per-level + within-level
   // stagger gaps + initial timing offsets).
   const t = direction.paceTimingScale;
@@ -548,9 +546,10 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     return generateDefaultCameraPath(
       data.rootId,
       data.nodes,
-      data.durationSec || 12
+      data.durationSec || 12,
+      data.highlightedPath,
     );
-  }, [data.cameraPath, data.rootId, data.nodes, data.durationSec]);
+  }, [data.cameraPath, data.rootId, data.nodes, data.durationSec, data.highlightedPath]);
 
   // ── Virtual camera ────────────────────────────────────────────────────
   const camera = useTreeCamera({
@@ -565,12 +564,25 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   });
 
   // ── Edge list ─────────────────────────────────────────────────────────
+  // Each edge carries the mid-segment coordinates of its rendered path so
+  // we can place edge labels (and the probability label) right on the edge,
+  // NYT/FT canon. Mid-point of a smoothStep cubic at t=0.5 lands on the
+  // x-axis midpoint between parent + child columns; that's where the
+  // editorial label sits. May 13, 2026 polish refactor.
   const edges = useMemo(() => {
+    const nodeMap = new Map(data.nodes.map((n) => [n.id, n]));
     const result: Array<{
       parentId: string;
       childId: string;
       pathData: string;
       isHighlighted: boolean;
+      midX: number;
+      midY: number;
+      /** Combined edge label: edgeLabel ?? probability (only one renders). */
+      label?: string;
+      /** Whether `label` came from `node.probability` (so probabilityWeights
+       *  gate applies). */
+      labelFromProbability: boolean;
     }> = [];
     const highlighted = new Set(data.highlightedPath || []);
 
@@ -582,12 +594,29 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
       for (const childId of node.children) {
         const childPos = positions.get(childId);
         if (!childPos) continue;
+        const child = nodeMap.get(childId);
+
+        // Mid-segment label coordinates (between parent bottom + child top,
+        // centered horizontally). On a smooth-step cubic this is also where
+        // the curve is roughly horizontal, so non-rotated text reads cleanly.
+        const midX =
+          (parentPos.x + childPos.x) / 2 + NODE_WIDTH / 2;
+        const midY =
+          (parentPos.y + NODE_HEIGHT + childPos.y) / 2;
+
+        const edgeLabel = child?.edgeLabel;
+        const probability = child?.probability;
+        const label = edgeLabel ?? probability;
 
         result.push({
           parentId: node.id,
           childId,
           pathData: edgePath(parentPos, childPos),
           isHighlighted: highlighted.has(node.id) && highlighted.has(childId),
+          midX,
+          midY,
+          label,
+          labelFromProbability: !edgeLabel && Boolean(probability),
         });
       }
     }
@@ -625,7 +654,24 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         <div style={camera.viewportStyle}>
           <div style={camera.contentStyle}>
 
-            {/* SVG edge layer (behind nodes) */}
+            {/* SVG edge layer (behind nodes).
+                May 13, 2026 polish refactor — NYT/FT/Economist canon:
+                  • Solid strokes for all edges. Dashes are reserved for
+                    explicitly hypothetical / counterfactual edges (a future
+                    `edge.speculative` flag if needed); using dashes for the
+                    chosen path inverts the convention (dashed = "didn't
+                    happen") which was the single most-wrong-register
+                    choice in the prior implementation.
+                  • Emphasis is via WEIGHT (chosen 2.5px / unchosen 1.25px)
+                    and SATURATION (chosen ink/oxblood / unchosen muted at
+                    30%), not BRIGHTNESS or GLOW. Glow filter dropped — it
+                    read as motion-graphics / video-game, not editorial.
+                  • Edge labels (qualitative branch character, e.g. "Sharp"
+                    / "Mainline") render as SVG <text> mid-segment in the
+                    metadata mono register with a paper-color halo for
+                    legibility — extensive-form canon places transition
+                    labels on edges, not nodes.
+                See: references/template-research/decision-tree.md § 1. */}
             <svg
               style={{
                 position: "absolute",
@@ -636,28 +682,21 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 pointerEvents: "none",
               }}
             >
-              {/* Non-highlighted edges.
-                  When a highlightedPath is set, recede non-chosen branches to
-                  1.5px @ 30% opacity so the chosen path becomes editorially
-                  unambiguous. The chosen-path treatment is the whole point —
-                  it answers "what did the actor actually do" vs. the
-                  hypothetical alternatives. See:
-                  references/template-research/game-theory.md § A4
-                  POLISH.md doctrine D5 (hero/supporting hierarchy). */}
+              {/* Non-highlighted edges. */}
               {edges
                 .filter((e) => !e.isHighlighted)
                 .map((edge, i) => {
                   const childLevel = positions.get(edge.childId)?.level ?? 0;
                   const startFrame = sec(0.6 * t) + childLevel * sec(0.4 * s);
                   const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
-                  // Dim edges when their nodes are dimmed
                   const parentDim = camera.getNodeDim(edge.parentId);
                   const childDim = camera.getNodeDim(edge.childId);
                   const edgeDim = Math.max(parentDim, childDim);
-                  // Recede unchosen branches when a chosen path is named.
                   const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
-                  const muteFactor = someHighlighted ? 0.3 : 1.0;
-                  const strokeWidth = someHighlighted ? 1.5 : 2.5;
+                  // Unchosen edges recede via opacity + weight. The 30% mute
+                  // factor + 1.25px stroke is the FT scenario-tree default.
+                  const muteFactor = someHighlighted ? 0.3 : 0.7;
+                  const strokeWidth = someHighlighted ? 1.25 : 1.75;
 
                   return (
                     <path
@@ -666,62 +705,100 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       stroke={theme.text.muted}
                       strokeWidth={strokeWidth}
                       fill="none"
-                      strokeDasharray="8 6"
-                      strokeDashoffset={interpolate(
-                        frame,
-                        [startFrame, startFrame + sec(0.8)],
-                        [300, 0],
-                        CLAMP // linear-ok: dash draw speed is visually neutral for dashed connector lines
-                      )}
                       opacity={edgeOpacity * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
                     />
                   );
                 })}
 
-              {/* Highlighted edges with glow */}
+              {/* Highlighted (chosen-path) edges — solid, full weight, no glow. */}
               {edges
                 .filter((e) => e.isHighlighted)
                 .map((edge, i) => {
                   const childLevel = positions.get(edge.childId)?.level ?? 0;
-                  const startFrame = sec(1) + childLevel * sec(0.4) + sec(0.8);
-                  const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
-
+                  const startFrame = sec(1) + childLevel * sec(0.4) + sec(0.5);
+                  const edgeOpacity = fadeIn(frame, startFrame, sec(0.6));
+                  const parentDim = camera.getNodeDim(edge.parentId);
+                  const childDim = camera.getNodeDim(edge.childId);
+                  const edgeDim = Math.max(parentDim, childDim);
                   return (
-                    <g key={`edge-hl-${i}`}>
-                      {/* Glow */}
-                      <path
-                        d={edge.pathData}
-                        stroke={highlightColor}
-                        strokeWidth={6}
-                        fill="none"
-                        opacity={edgeOpacity * 0.25 * exitFade(frame, totalFrames, sec(0.5))}
-                        filter="url(#edge-glow)"
-                      />
-                      {/* Main */}
-                      <path
-                        d={edge.pathData}
-                        stroke={highlightColor}
-                        strokeWidth={3}
-                        fill="none"
-                        strokeDasharray="8 6"
-                        strokeDashoffset={interpolate(
-                          frame,
-                          [startFrame, startFrame + sec(0.8)],
-                          [300, 0],
-                          CLAMP // linear-ok: dash draw speed is visually neutral for dashed connector lines
-                        )}
-                        opacity={edgeOpacity * 0.9 * exitFade(frame, totalFrames, sec(0.5))}
-                      />
-                    </g>
+                    <path
+                      key={`edge-hl-${i}`}
+                      d={edge.pathData}
+                      stroke={highlightColor}
+                      strokeWidth={2.5}
+                      fill="none"
+                      strokeLinecap="round"
+                      opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
+                    />
                   );
                 })}
 
-              {/* SVG filter for edge glow */}
-              <defs>
-                <filter id="edge-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="6" />
-                </filter>
-              </defs>
+              {/* Edge labels — mid-segment, mono register, paper-color halo
+                  for legibility against any edge color. The double-rendered
+                  text (halo stroke under fill) is the standard SVG halo
+                  trick — no per-character text-shadow needed. */}
+              {edges.map((edge, i) => {
+                if (!edge.label) return null;
+                // Apply probability gate when label was sourced from
+                // node.probability (numeric % suppressed unless opted in).
+                const isNumericPct = /\d+\s*%/.test(edge.label);
+                if (
+                  edge.labelFromProbability &&
+                  isNumericPct &&
+                  !data.probabilityWeights
+                ) {
+                  return null;
+                }
+
+                const childLevel = positions.get(edge.childId)?.level ?? 0;
+                const startFrame = sec(0.8 * t) + childLevel * sec(0.4 * s);
+                const labelOp = fadeIn(frame, startFrame, sec(0.5));
+                const parentDim = camera.getNodeDim(edge.parentId);
+                const childDim = camera.getNodeDim(edge.childId);
+                const edgeDim = Math.max(parentDim, childDim);
+                const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
+                const muteFactor = !edge.isHighlighted && someHighlighted ? 0.4 : 1.0;
+                const fillColor = edge.isHighlighted
+                  ? highlightColor
+                  : theme.text.muted;
+
+                return (
+                  <g
+                    key={`edge-lbl-${i}`}
+                    opacity={labelOp * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
+                  >
+                    {/* Halo (paper-color stroke) */}
+                    <text
+                      x={edge.midX}
+                      y={edge.midY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      stroke={theme.bg.base}
+                      strokeWidth={6}
+                      strokeLinejoin="round"
+                      fontFamily={fonts.mono}
+                      fontSize={fontSizes.caption}
+                      letterSpacing={1.2}
+                    >
+                      {edge.label}
+                    </text>
+                    {/* Fill */}
+                    <text
+                      x={edge.midX}
+                      y={edge.midY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fill={fillColor}
+                      fontFamily={fonts.mono}
+                      fontSize={fontSizes.caption}
+                      fontWeight={edge.isHighlighted ? fontWeights.medium : fontWeights.regular}
+                      letterSpacing={1.2}
+                    >
+                      {edge.label}
+                    </text>
+                  </g>
+                );
+              })}
             </svg>
 
             {/* Node layer */}
@@ -757,9 +834,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     mode={backgroundVariant as "light" | "dark"}
                     dimAmount={dimAmount}
                     focusScale={camera.getNodeScale(node.id)}
-                    defaultColorIndex={data.nodes.indexOf(node)}
-                    beatPulse={beat.pulse}
-                    probabilityWeights={data.probabilityWeights}
+                    highlightColor={highlightColor}
                   />
                 );
               })}

@@ -20,7 +20,7 @@ import { TEMPLATE_DATA } from "./prisoners-dilemma-data";
 
 export const PrisonersDilemmaFull: React.FC = () => (
   <FullEpisode
-    manifest={manifest as any}
+    manifest={manifest as any} // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
     templateData={TEMPLATE_DATA}
     assetBasePath="episodes/prisoners-dilemma"
   />
@@ -33,7 +33,7 @@ export const PrisonersDilemmaFullComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: manifest as any,
+          manifest: manifest as any, // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
           templateData: TEMPLATE_DATA,
           assetBasePath: "episodes/prisoners-dilemma",
         },
