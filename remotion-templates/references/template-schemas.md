@@ -1,7 +1,7 @@
 # Template Schemas Reference
 
 > Canonical field definitions for every Remotion template's JSON data file.
-> Visual-spec reads this before generating any JSON. Last updated: May 4, 2026.
+> Visual-spec reads this before generating any JSON. Last updated: May 12, 2026.
 
 ## Universal conventions (apply to every cartesian chart)
 
@@ -12,6 +12,10 @@ These behaviors now apply automatically — you don't need to opt in:
 - **Source attribution**: every chart that has a `source` field renders it consistently bottom-right via the shared `<SourceAttribution>` component. No need to hand-position.
 - **Title overflow**: `<TitleBlock>` auto-shrinks long titles down to h3 size before they overflow. You can still split into title + subtitle for very long headings.
 - **Dev warnings**: when a chart's data is suspect (title > 80 chars, empty series, missing source), Studio will emit a one-time `console.warn` per template per session. Watch the DevTools console.
+
+### Anticipatory entrance timing (`anticipatoryStartFrame`)
+
+Parallax follows the Economist's 150ms anticipatory-reveal pattern: text begins settling *before* the narration word lands, so that by the time the viewer hears the word, the type is already at rest. Landing on the word reads as a caption; settling before it reads as a reveal. The `useEntrance()` hook and the `_direction.syncPoints[]` block both consume an `anticipatoryStartFrame` offset that shifts the entrance ~5 frames (150ms at 30fps) earlier than the literal sync point. This is applied automatically by **TitleTransition**, **KineticTypography**, **StatReveal**, **BayesianUpdate**, and **TitleBlock**. Don't author this field by hand — the pattern is on by default. If a moment needs the type to land *on* the beat instead of before it (rare; usually for percussive stat reveals), set `anticipatoryStartFrame: 0` in the `_direction` override.
 
 ## Common Fields
 
@@ -84,6 +88,7 @@ Country highlighting, alliances, trade blocs. Multi-phase animation with map cam
 - `countries[].iso3` — ISO 3166-1 alpha-3 code
 - `countries[].value` — numeric for color-ramp scaling (alternative to `fill`)
 - `countries[].fill` — direct hex color override
+- `terrain` — boolean. Default: `false` as of May 11, 2026 (was `true` previously). Enable per-shot when relief is the editorial point (mountain choropleth, alpine border dispute, etc.) — see LESSONS.md L99. The default-off shift puts the template back in atlas register; opt in only when terrain is doing narrative work.
 
 ---
 
@@ -119,6 +124,561 @@ Supply chains, trade routes, resource flows. Phased segment reveal with map came
 - `points[].coordinates` — `[longitude, latitude]`
 - `segments[].from/to` — indices into `points` array
 - `phases[].camera` — preferred over legacy `center/scale`
+- `terrain` — boolean (default `false`). Enable per-shot when relief is the editorial point (Himalayan supply route, alpine border dispute). Same default-off convention as ChoroplethMap.
+- `annotations[]` — `MapAnnotation[]` overlay labels with leader lines and per-phase gating. See the **MapAnnotations overlay** section below.
+
+**Variants:**
+
+- **`radial` mode** (added May 11, 2026) — closes the "hub with N destinations on a real basemap" gap. Set `radial: { hubIndex, staggerSec?, hubColor?, arcColor? }` and **omit `segments`** entirely. Segments + a default phase are auto-derived; destinations are sorted clockwise by bearing from the hub for a "broadcast outward" reveal. Use for trade-route hubs, military campaigns radiating from a command center, supply lanes from a single port.
+
+```jsonc
+{
+  "episode": "rome",
+  "title": "All Roads Lead From Rome",
+  "points": [
+    { "name": "Rome", "coordinates": [12.49, 41.90] },
+    { "name": "Londinium", "coordinates": [-0.13, 51.51] },
+    { "name": "Lugdunum", "coordinates": [4.83, 45.76] },
+    { "name": "Alexandria", "coordinates": [29.92, 31.20] },
+    { "name": "Antioch", "coordinates": [36.16, 36.20] }
+  ],
+  "segments": [],
+  "phases": [],
+  "radial": {
+    "hubIndex": 0,
+    "staggerSec": 0.4,
+    "hubColor": "#C4A747",
+    "arcColor": "#A64D46"
+  }
+}
+```
+
+---
+
+## MapAnnotations overlay
+
+Editorial overlay labels for any MapGL-based template. This is the FT/Reuters/NYT signature that separates an "atlas plate" from a "Mapbox screenshot." Labels are pinned to lon/lat anchors (they track the camera through phase changes), rendered with brand typography, and can include leader lines pulling the label off the dot toward whitespace. Not a standalone composition — passed in as `annotations: [...]` on **ChoroplethMap**, **RouteAnimation**, and **AtlasPlate**.
+
+```jsonc
+{
+  "annotations": [
+    {
+      "at": [121.00, 24.80],
+      "label": "TAIWAN",
+      "sublabel": "92% of advanced fab capacity",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "leader": { "dx": 120, "dy": -40 },
+      "align": "left",
+      "phase": 0
+    },
+    {
+      "at": [5.46, 51.44],
+      "label": "ASML",
+      "hierarchy": "secondary",
+      "appearAtSec": 4,
+      "exitAtSec": 9
+    }
+  ]
+}
+```
+
+**Key fields:**
+- `at: [lon, lat]` — anchor point; label tracks the map camera.
+- `label` — primary line text.
+- `sublabel` — optional secondary line (Plex Mono, taupe).
+- `hierarchy` — `"primary"` (uppercase Plex Sans SemiBold, country/region scale, maps to entrance role `hero`), `"secondary"` (sentence-case Plex Sans Medium, city/feature scale, role `content`), `"tertiary"` (Plex Mono Regular, source notes, role `label`).
+- `leader` — `{ dx, dy }` pixel offset from the anchor. When set, renders a leader line from the anchor dot to the offset label. When omitted, the label sits directly above the anchor with a small gap.
+- `align` — `"left" | "right" | "center"` (default `"center"`). Text alignment relative to the label position.
+- `emphasis` — `"default"` (ink/bone), `"accent"` (rust), `"mute"` (taupe).
+- `phase` — non-negative integer phase index. Authoring shorthand: the template resolves it against its own phase windows to drive `appearAtSec` / `exitAtSec` automatically.
+- `appearAtSec` / `exitAtSec` — explicit time-window override (mutually exclusive with `phase`). When the annotation should persist across the whole composition, omit all three of `phase` / `appearAtSec` / `exitAtSec`.
+
+---
+
+## AtlasPlate
+
+Fixed-register atlas plate for orthographic globes, equal-earth world plates, or regional spreads — the "this is the world; here is what we are pointing at" register. Choose `aesthetic: "atlas"` (modern flat) or `"vintage"` (paper-warm with halftone). Phase-driven country fills with optional graticule, disputed-boundary overlays, and the shared `MapAnnotations` overlay for labels. Use AtlasPlate when the editorial point is the geographic register itself (orient the viewer, establish the theater); use ChoroplethMap when value encoding is doing the work.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "The COCOM Members",
+  "subtitle": "1949–1994 — Western export-control regime against the Soviet bloc",
+  "projection": "equalEarth",
+  "aesthetic": "atlas",
+  "framePadding": 100,
+  "graticule": { "spacing": 15, "opacity": 0.1, "emphasize30": true },
+  "disputedBoundaries": ["taiwan-strait", "nine-dash"],
+  "phases": [
+    {
+      "title": "Western signatories",
+      "subtitle": "17 nations, NATO + Japan",
+      "durationSec": 6,
+      "countries": [
+        { "iso3": "USA", "fill": "#4A7BA7" },
+        { "iso3": "GBR", "fill": "#4A7BA7" },
+        { "iso3": "JPN", "fill": "#4A7BA7" }
+      ]
+    },
+    {
+      "title": "The Soviet bloc",
+      "durationSec": 5,
+      "countries": [
+        { "iso3": "RUS", "fill": "#A64D46" },
+        { "iso3": "CHN", "fill": "#A64D46" }
+      ],
+      "focus": { "center": [50, 45], "scaleHint": 1.6 },
+      "cameraTransition": "cinematic"
+    }
+  ],
+  "source": "Mastanduno (1992); COCOM records"
+}
+```
+
+**Key fields:**
+- `projection` — `"equalEarth"` (default world plate), `"naturalEarth"`, `"mercator"`, `"orthographic"` (globe), `"albersUsa"`, `"equirectangular"`.
+- `aesthetic` — `"atlas"` (modern, default) or `"vintage"` (paper-warm halftone register).
+- `phases[].countries[].iso3` — ISO 3166-1 alpha-3 (no `name` lookup unlike ChoroplethMap; iso3 is authoritative here).
+- `phases[].focus` — optional camera target: `{ iso3?: string[], center?: [lon, lat], scaleHint?: number }`. Camera fits the iso3 set OR centers on the explicit coords.
+- `phases[].rotation` — `[lambda, phi]` rotation for orthographic globe.
+- `phases[].cameraTransition` — `"linear"` (default), `"cinematic"` (ease-in-out), `"via-globe"` (route through globe pose for dramatic continental swings).
+- `phases[].cameraDwell` — `{ before?: 0-1, after?: 0-1 }` portion of phase duration to hold static before/after the transition.
+- `framePadding` — pixel padding around the fitted geometry (default ~80).
+- `graticule` — parallels-and-meridians overlay. On-brand because the channel is named Parallax.
+- `disputedBoundaries` — `true` (render all) or `string[]` of named tags (e.g., `["taiwan-strait", "nine-dash"]`). Renders as dashed rust lines. See `src/utils/disputedBoundaries.ts` for the curated tag set.
+- `annotations[]` — `MapAnnotation[]` (see the MapAnnotations section above).
+
+---
+
+## ProportionalSymbolMap
+
+Point-based map where each circle's *area* is proportional to a numeric value. The canonical alternative to ChoroplethMap when the story is count data (capacity, population, troops, exports in $) and you don't want geographic area to over-encode the variable. Circles sit at country centroids; sqrt scaling is the editorial default (perceptually linear for area).
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "Where Chips Are Made",
+  "subtitle": "Monthly wafer-fab capacity by country, 2024",
+  "projection": "equalEarth",
+  "unit": "M wafers/mo",
+  "valueLabel": "Wafer-fab capacity",
+  "maxRadiusPx": 56,
+  "scaleType": "sqrt",
+  "symbolColor": "#C23B22",
+  "framePadding": 100,
+  "graticule": { "spacing": 15, "opacity": 0.1, "emphasize30": true },
+  "phases": [
+    {
+      "title": "Concentrated production",
+      "subtitle": "Top six fab nations",
+      "durationSec": 8,
+      "symbols": [
+        { "iso3": "TWN", "value": 5.4, "label": "TWN" },
+        { "iso3": "KOR", "value": 4.8, "label": "KOR" },
+        { "iso3": "JPN", "value": 3.2, "label": "JPN" },
+        { "iso3": "CHN", "value": 3.0, "label": "CHN" },
+        { "iso3": "USA", "value": 1.8, "label": "USA" }
+      ]
+    }
+  ],
+  "source": "SEMI Industry Statistics 2024"
+}
+```
+
+**Key fields:**
+- `phases[].symbols[].iso3` — ISO 3166-1 alpha-3; circle anchors at the country centroid.
+- `phases[].symbols[].value` — numeric magnitude (positive). Drives circle radius via `scaleType`.
+- `phases[].symbols[].label` — optional inline label inside or beside the circle (typically a short iso3-style abbreviation).
+- `phases[].symbols[].color` — per-symbol override; otherwise uses `symbolColor`.
+- `scaleType` — `"sqrt"` (default, perceptually linear for area) or `"linear"` (radius proportional to value — only use for tightly-clustered ranges).
+- `maxRadiusPx` — largest-value circle radius in pixels; smaller values scale down proportionally.
+- `symbolColor` — fill color for all symbols when per-symbol `color` is unset. Default: rust (`#C23B22`).
+- `phases[].focus` / `cameraTransition` / `cameraDwell` — same shape as AtlasPlate.
+- `annotations[]` — `MapAnnotation[]` (see MapAnnotations).
+
+---
+
+## CartogramMap
+
+Distorted-geography map where each country becomes a circle (Dorling-style) sized by value, packed to roughly preserve adjacency. Use when ProportionalSymbolMap would jumble (dense clusters like Europe) — the cartogram says "Germany is the biggest" without making it visually dominate via land area. Canonical for population, GDP, or vote-share at country level.
+
+```jsonc
+{
+  "episode": "_catalog",
+  "title": "European Union by population",
+  "subtitle": "EU-27 member states, 2024 (millions)",
+  "projection": "equalEarth",
+  "unit": "M",
+  "valueLabel": "Population",
+  "maxRadiusPx": 64,
+  "scaleType": "sqrt",
+  "symbolColor": "#4A7BA7",
+  "showCoastlines": true,
+  "xyStrength": 0.7,
+  "phases": [
+    {
+      "title": "Population weight",
+      "subtitle": "Each circle is a member state, sized by people",
+      "durationSec": 8,
+      "data": [
+        { "iso3": "DEU", "value": 84.7, "label": "DEU" },
+        { "iso3": "FRA", "value": 68.4, "label": "FRA" },
+        { "iso3": "ITA", "value": 58.8, "label": "ITA" },
+        { "iso3": "ESP", "value": 48.6, "label": "ESP" },
+        { "iso3": "POL", "value": 36.8, "label": "POL" }
+      ]
+    }
+  ],
+  "source": "Eurostat 2024"
+}
+```
+
+**Key fields:**
+- `phases[].data[].iso3` / `value` / `label` / `color` — same shape as ProportionalSymbolMap symbols.
+- `scaleType` — `"sqrt"` (default) or `"linear"`. Sqrt is almost always correct.
+- `maxRadiusPx` — sets the scale of the largest circle.
+- `showCoastlines` — render faint geographic coastlines underneath the packed circles to anchor the cartogram in real geography. Default false.
+- `xyStrength` — 0–1, how strongly circles snap toward their true centroid vs. pack freely. Lower = more packing freedom (better for dense clusters); higher = closer to true geography (better when adjacency must read).
+- `symbolColor` — uniform fill for circles when per-datum `color` is unset.
+- `annotations[]` — `MapAnnotation[]`.
+
+---
+
+## DensityMap
+
+Point clusters or heatmap density on a Mapbox basemap (deck.gl HexagonLayer / HeatmapLayer / GridLayer). Use when the story is *where the dots cluster*, not country-level aggregates — individual fab sites, troop deployments, earthquake epicenters, protest locations. Each point has a lon/lat and optional `weight`; the layer aggregates into hex bins (or heatmap kernels) at render time.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "Where chips are made",
+  "subtitle": "Individual fab sites, 2024 — hex bins aggregate by region",
+  "mode": "hex",
+  "cellSize": 250000,
+  "coverage": 0.92,
+  "opacity": 0.78,
+  "colorAggregation": "sum",
+  "camera": { "longitude": 100, "latitude": 30, "zoom": 2.5, "pitch": 0 },
+  "phases": [
+    {
+      "title": "Global fab geography",
+      "subtitle": "Where wafers actually start",
+      "durationSec": 8,
+      "points": [
+        { "at": [121.00, 24.80], "weight": 5, "tag": "tsmc-hsinchu" },
+        { "at": [127.04, 37.20], "weight": 5, "tag": "samsung-giheung" },
+        { "at": [-111.94, 33.45], "weight": 4, "tag": "tsmc-arizona" },
+        { "at": [13.69, 51.05], "weight": 3, "tag": "globalfoundries-dresden" }
+      ]
+    }
+  ],
+  "source": "SEMI Industry Statistics 2024"
+}
+```
+
+**Key fields:**
+- `mode` — `"hex"` (HexagonLayer, default for editorial work), `"heatmap"` (smooth kernel-density), `"grid"` (square bins). Hex reads as "aggregated truth"; heatmap reads as "intensity field."
+- `cellSize` — bin size in meters (e.g., `250000` = 250km hexes for continent-scale views; `5000` = 5km for city-scale).
+- `coverage` — 0–1 fraction of each cell filled (0.92 leaves a faint hairline gap between hexes that reads as a grid). Default ~1.
+- `colorRamp` — array of hex colors low→high. Default uses warm ramp from palette.
+- `colorAggregation` — `"sum"` (default), `"mean"`, `"max"` — how `weight` aggregates within a bin.
+- `opacity` — overall layer opacity (default ~0.78 so the basemap reads through).
+- `phases[].points[].at` — `[lon, lat]`.
+- `phases[].points[].weight` — numeric, default 1. Drives bin intensity via `colorAggregation`.
+- `phases[].points[].colorWeight` — optional bivariate second dimension. When set, drives bin *color* independently from bin *height/intensity* (which still tracks `weight`).
+- `phases[].camera` — per-phase camera override.
+- `inset` — `{ show, position: "tl"|"tr"|"bl"|"br", size, framed }` locator inset.
+- `annotations[]` — `MapAnnotation[]`.
+
+---
+
+## BifurcationRoute
+
+Network split / lineage divergence. One unified network forks at a single node into two post-split networks (US-aligned vs. China-aligned, Indo-European → Germanic vs. Romance, etc.). Three phases: unified state holds → split animates → two-network steady state. Not a map — a node-graph laid out in percentage-of-canvas coords.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "The Bifurcation",
+  "subtitle": "One supply chain becomes two",
+  "nodes": [
+    { "id": "tsmc", "label": "TSMC", "x": 50, "y": 15, "network": "unified", "icon": "🏭" },
+    { "id": "asml", "label": "ASML", "x": 20, "y": 35, "network": "networkA" },
+    { "id": "smic", "label": "SMIC", "x": 80, "y": 35, "network": "networkB" },
+    { "id": "us",   "label": "US Market",    "x": 25, "y": 85, "network": "networkA" },
+    { "id": "cn",   "label": "China Market", "x": 75, "y": 85, "network": "networkB" }
+  ],
+  "links": [
+    { "from": "tsmc", "to": "asml", "phase": "unified" },
+    { "from": "tsmc", "to": "smic", "phase": "unified" },
+    { "from": "asml", "to": "us",   "phase": "split", "network": "networkA" },
+    { "from": "smic", "to": "cn",   "phase": "split", "network": "networkB" }
+  ],
+  "forkNodeId": "tsmc",
+  "networkALabel": "US-Aligned",
+  "networkBLabel": "China-Aligned",
+  "unifiedDurationSec": 3,
+  "cinematicMode": true,
+  "ambientParticles": true
+}
+```
+
+**Key fields:**
+- `nodes[].x` / `y` — canvas position as percentages (0–100). Hand-place to control the visual fork shape.
+- `nodes[].network` — `"unified"` (pre-split, shown in phase 1), `"networkA"` or `"networkB"` (post-split membership).
+- `nodes[].icon` — optional emoji/glyph rendered inside the node.
+- `links[].phase` — `"unified"` (shown in phase 1, then fade) or `"split"` (appears after the fork animation).
+- `links[].network` — for split links, which post-split branch they belong to (drives color).
+- `forkNodeId` — id of the node where the split visually originates (camera zooms here in cinematic mode).
+- `networkALabel` / `networkBLabel` — required human-readable branch labels.
+- `networkAColor` / `networkBColor` — branch accent overrides; default to `semantic.us` / `semantic.china`.
+- `unifiedDurationSec` — how long the unified state displays before the split animation begins.
+- `cinematicMode` — boolean. Adds camera zoom-to-fork + spatial separation between the two branches as they diverge.
+- `ambientParticles` — boolean. Adds atmospheric particle layer for depth (use sparingly).
+
+---
+
+## PricingWaterfall
+
+Fixed-total value-chain decomposition. A single denominator the viewer already understands ($1, $5, $100) split horizontally into stage segments, with the smallest sliver typically in accent color to draw the eye to the "value capture" punchline. The canonical form for value-extraction stories — supply-chain margin, where-your-tax-dollar-goes, cost-of-goods decomposition. Built May 2026; converges with FT (iPhone breakdowns), Bloomberg (oil/cocoa decompositions), Specialty Coffee Association farmgate reports. Cleveland's perceptual hierarchy backs the form: position-along-a-common-scale on a fixed denominator.
+
+```jsonc
+{
+  "episode": "_catalog",
+  "title": "Where Your $5 Cup Goes",
+  "subtitle": "The coffee bean's journey from Yirgacheffe to Williamsburg",
+  "total": { "value": "$5", "label": "specialty coffee, retail" },
+  "stages": [
+    { "label": "Farm",        "share": 3,  "descriptor": "Yirgacheffe, Ethiopia", "hero": true },
+    { "label": "Cooperative", "share": 5,  "descriptor": "Wash & dry" },
+    { "label": "Exporter",    "share": 8,  "descriptor": "Addis Ababa" },
+    { "label": "Importer",    "share": 14, "descriptor": "Hamburg" },
+    { "label": "Roaster",     "share": 25, "descriptor": "Brooklyn" },
+    { "label": "Café",        "share": 45, "descriptor": "Williamsburg" }
+  ],
+  "source": "Specialty Coffee Association reports",
+  "durationSec": 10
+}
+```
+
+**Key fields:**
+- `total.value` — display string for the full denominator (e.g., `"$5"`, `"$1"`, `"$100"`). Rendered prominently.
+- `total.label` — what the total represents (e.g., `"specialty coffee, retail"`).
+- `stages[].label` — stage name (Farm, Cooperative, Roaster…).
+- `stages[].share` — numeric share. Conventionally percentages summing to 100; the renderer normalizes whatever you pass, but staying on 100 keeps the math legible if a viewer pauses.
+- `stages[].descriptor` — optional short geographic or contextual subtitle below the stage label.
+- `stages[].hero` — boolean. The "punchline" stage (typically the smallest sliver — the farmer's share) renders in accent color and gets entrance emphasis. Set on exactly one stage.
+- `stages[].color` — per-stage override; otherwise uses the sequential warm ramp with the `hero` stage in rust.
+
+---
+
+## DuelingFrameworks
+
+Two competing intellectual frames placed side-by-side with their core tenets, a numeric "explanatory score" out of 100, and an optional verdict line per framework. The canonical Parallax "bounded analogy" template at the framework level: realism vs. liberalism, Confucian vs. Legalist, structural vs. agentic, etc. Bilingual fields (`titleCn`, `nameCn`, etc.) supported throughout for episodes that thread Chinese-language framing alongside English.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "Realism vs. Liberalism",
+  "phenomenon": "Great power competition",
+  "verdictLabel": "Explanatory power",
+  "durationSec": 12,
+  "backgroundVariant": "dark",
+  "frameworkA": {
+    "name": "Realism",
+    "color": "#C23B22",
+    "tenets": [
+      { "text": "Power politics" },
+      { "text": "Security dilemma" },
+      { "text": "Self-help system" }
+    ],
+    "score": 72,
+    "verdict": "Explains escalation logic"
+  },
+  "frameworkB": {
+    "name": "Liberalism",
+    "color": "#3266AD",
+    "tenets": [
+      { "text": "Interdependence" },
+      { "text": "Institutions" },
+      { "text": "Democratic peace" }
+    ],
+    "score": 55,
+    "verdict": "Explains restraint signals"
+  }
+}
+```
+
+**Key fields:**
+- `phenomenon` — the thing both frameworks are trying to explain (e.g., "Great power competition"). Sits between the two columns.
+- `frameworkA` / `frameworkB.name` — framework name (e.g., "Realism").
+- `frameworkA` / `frameworkB.color` — accent color for the column (required).
+- `frameworkA` / `frameworkB.tenets[]` — array of `{ text, textCn? }` core principles, rendered as bullet items.
+- `frameworkA` / `frameworkB.score` — 0–100 explanatory score, rendered as a large numeric. Editorial — not a real metric; the viewer reads it as the channel's verdict.
+- `frameworkA` / `frameworkB.verdict` — short one-line summary of where the framework lands.
+- `verdictLabel` — label above the score columns (default "Explanatory power" or similar).
+- `titleCn` / `subtitleCn` / `phenomenonCn` / `verdictLabelCn` / per-framework `nameCn` / `verdictCn` / per-tenet `textCn` — bilingual overlays.
+
+---
+
+## StrategicLandscape
+
+2D actor-positioning matrix. Two axes the channel defines (defensive↔offensive, short-term↔long-term, low-influence↔high-influence, etc.), four quadrants with editorial labels, and N actors placed at `(x, y)` percentage coords. The canonical "where does everyone sit" template for geopolitical analysis. Different from FrameworkDiagram's `matrix` variant because the cells aren't fixed cases — actors move freely in the continuous 2D space.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "Semiconductor Strategy Landscape",
+  "subtitle": "Major actors positioned by approach and time horizon",
+  "xAxisLabel": "Defensive",
+  "xAxisLabelEnd": "Offensive",
+  "yAxisLabel": "Short-term",
+  "yAxisLabelEnd": "Long-term",
+  "actors": [
+    { "name": "United States", "icon": "US", "x": 70, "y": 65, "color": "#3266AD" },
+    { "name": "China",         "icon": "CN", "x": 75, "y": 80, "color": "#C23B22" },
+    { "name": "TSMC",          "icon": "TW", "x": 40, "y": 70 },
+    { "name": "EU",            "icon": "EU", "x": 35, "y": 45, "color": "#5DAA68" },
+    { "name": "Japan",         "icon": "JP", "x": 50, "y": 55, "color": "#E5A544" }
+  ],
+  "quadrantLabels": ["Strategic patience", "Long-term offensive", "Reactive defense", "Tactical strike"],
+  "source": "Parallax analysis",
+  "durationSec": 10
+}
+```
+
+**Key fields:**
+- `xAxisLabel` / `xAxisLabelEnd` — left and right axis endpoints (e.g., "Defensive" ↔ "Offensive").
+- `yAxisLabel` / `yAxisLabelEnd` — bottom and top axis endpoints.
+- `actors[].x` / `y` — 0–100 percentage position in the 2D space.
+- `actors[].size` — 0.5–3 size multiplier (default 1). Use for "this actor matters more."
+- `actors[].icon` — short 2-letter glyph rendered inside the marker (typically a country code: "US", "CN", "TW").
+- `actors[].color` — per-actor color; auto-assigned from the categorical sequence if omitted.
+- `actors[].nameCn` — optional Chinese name for bilingual episodes.
+- `quadrantLabels` — `[topLeft, topRight, bottomLeft, bottomRight]` 4-tuple of quadrant titles. Optional but strongly editorial — without them, the matrix is just dots.
+
+---
+
+## HorizontalTimeline
+
+Year-based event ribbon — the canonical Parallax timeline template, replacing the older standalone DualTimeline and TimelineMorph compositions (both deprecated; kept for backward compatibility). Three modes share a single schema: `"single"` (one spine of events along an x-axis), `"dual"` (two stacked spines for historical parallels, with optional phase-aligned connections), and `"morph"` (events animate from era A state to era B state in place). Supports an authored camera path for ride-the-rail pacing, importance weights for hierarchy, era foil treatments, and an optional phase axis that *enforces* shared phase alignment rather than calendar-spaced layout.
+
+```jsonc
+// Dual mode (the workhorse — historical parallel)
+{
+  "episode": "silicon-trap",
+  "title": "The Oil-Chip Parallel",
+  "subtitle": "Two resource denials, eight decades apart",
+  "mode": "dual",
+  "eraATitle": "1940s PACIFIC",
+  "eraBTitle": "2020s SEMICONDUCTORS",
+  "eraAColor": "#4A7BA7",
+  "eraBColor": "#A64D46",
+  "eraWeight": "foil-old",
+  "connectionRevealStart": 8,
+  "phaseAxis": {
+    "label": "Phase",
+    "ticks": [0, 1, 2, 3],
+    "min": 0,
+    "max": 3
+  },
+  "pairs": [
+    {
+      "eraA": { "year": "1939", "title": "Growing dependence", "weight": 1 },
+      "eraB": { "year": "2015", "title": "Growing dependence", "weight": 1 },
+      "connection": "Resource concentration",
+      "phasePosition": 0
+    },
+    {
+      "eraA": { "year": "Jul 1941", "title": "Asset freeze & oil embargo", "weight": 3 },
+      "eraB": { "year": "Oct 2022", "title": "Export controls", "weight": 3 },
+      "connection": "Denial trigger",
+      "phasePosition": 1
+    }
+  ],
+  "durationSec": 15
+}
+
+// Single mode
+{
+  "episode": "silicon-trap",
+  "title": "Semiconductor escalation, 2018–2024",
+  "mode": "single",
+  "events": [
+    { "year": "May 2019", "title": "Huawei added to Entity List", "weight": 2 },
+    { "year": "Oct 2022", "title": "October 7 controls", "weight": 3, "icon": "⚡" },
+    { "year": "Oct 2023", "title": "Controls tightened",  "weight": 2 }
+  ]
+}
+
+// Morph mode
+{
+  "mode": "morph",
+  "morphEraATitle": "Oil Age",
+  "morphEraBTitle": "Silicon Age",
+  "morphEvents": [
+    { "eraAYear": "1941", "eraATitle": "Oil embargo",
+      "eraBYear": "2022", "eraBTitle": "Chip controls", "weight": 3 }
+  ]
+}
+```
+
+**Key fields:**
+- `mode` — `"single"` | `"dual"` | `"morph"` (required).
+- **Single mode**: `events[]` (`year`, `title`, `description?`, `weight: 1|2|3`, `icon?`, `color?`).
+- **Dual mode**: `pairs[]` (`eraA`, `eraB`, `connection?`, `phasePosition?`), plus `eraATitle` / `eraBTitle`.
+- **Morph mode**: `morphEvents[]` (`eraAYear` + `eraATitle` + `eraBYear` + `eraBTitle`), plus `morphEraATitle` / `morphEraBTitle`.
+- `weight` — `1` (light), `2` (medium), `3` (heavy). Controls node size and card prominence.
+- `eraWeight` — `"equal"` (default), `"foil-old"` (era A muted to taupe, era B emphasized — past-as-foil-to-present), `"foil-new"` (inverse). Foil-mute is the editorial default when one era is the analytical anchor and the other is the contemporary subject.
+- `phaseAxis` — when set, **every pair must declare `phasePosition`** and events lay out on the shared phase axis rather than calendar dates. Schema enforces this via superRefine. Required for honest "Phase 1 of X mirrors Phase 1 of Y" claims; without it the layout falsifies phase alignment by accident. Dual mode only.
+- `connectionRevealStart` — seconds-from-start when connection lines render (dual mode).
+- `cameraPath[]` — keyframe sequence `{ focus: number | "pullback", zoom, duration, behavior?: "track"|"snap"|"hold", label?, dimOthers? }`. Auto-generated if omitted; author by hand for narrated walk-throughs.
+
+---
+
+## DualTimeline
+
+> **Deprecated** — use **HorizontalTimeline** with `mode: "dual"` for all new work. Kept registered for backward compatibility with existing silicon-trap data files. Schema is a simpler subset: `pairs[]` with `eraA` / `eraB` `{ label, text, textCn? }` plus optional `connection` label, `eraATitle` / `eraBTitle` / `eraAColor` / `eraBColor`. No phase axis, no camera path, no weights — migrate to HorizontalTimeline when adding any of these.
+
+---
+
+## TimelineMorph
+
+> **Deprecated** — use **HorizontalTimeline** with `mode: "morph"` for all new work. Kept registered for backward compatibility. Schema: `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText, icon? }`, plus `eraATitle` / `eraBTitle` / `eraAColor` / `eraBColor`, with `holdDurationSec` and `morphDurationSec` controlling the animated topology shift between the two states.
+
+---
+
+## EditorialFrame
+
+> **Not a standalone composition** — `EditorialFrame` is a *wrapper component* (`src/components/EditorialFrame.tsx`) that adds magazine-spread typographic scaffolding (kicker → hero stat → headline → body → byline → ∴ brand mark) around an inner template (chart, map, diagram). Pulls the analytical layer toward the channel's Fortune-1955 editorial register. Use for cold opens, hero moments, and any beat where the data needs editorial framing rather than living on its own.
+
+```tsx
+<EditorialSurface backdrop={pickBackdrop("library")}>
+  <EditorialFrame
+    variant="hero"
+    mode="light"
+    kicker="iterated prisoner's dilemma"
+    hero="23%"
+    headline="Does cooperation need memory?"
+    body="Cooperation rate after 200 rounds when players cannot recall prior moves."
+    byline="parallax · prisoner's dilemma · 2026"
+  >
+    <DataChart data={cooperationData} />
+  </EditorialFrame>
+</EditorialSurface>
+```
+
+**Key props:**
+- `variant` — `"hero"` (full editorial layout: text panel left ~38%, chart right two-thirds), `"hero-flipped"` (mirror — text right, chart left; pair with right-anchored atmospheric backdrops), `"aside"` (chart-dominant: narrower text panel, smaller hero, chart claims primary real estate), `"minimal"` (pure passthrough with optional ∴ corner mark). Default `"minimal"` — explicit opt-in to scaffolding.
+- `mode` — `"light"` (ink-on-paper, default) or `"dark"` (bone-on-near-black). When omitted, reads from `EditorialModeContext` set by `FullEpisode` per segment from the active backdrop's `register` field. Pass explicitly only in standalone test compositions.
+- `kicker` — small lowercase label, top-left, IBM Plex Mono tracked-out. Preceded by a short rule in the episode's emphasis accent.
+- `hero` — large display value (number, percentage, payoff pair, short name). Plex Sans Medium — size carries impact, not weight. ~120pt in `hero`, ~56pt in `aside`.
+- `headline` — 1–2 line subhead. Sentence case. Question form preferred for Parallax voice.
+- `body` — 1–2 line supporting context, smaller scale, slightly reduced opacity.
+- `byline` — bottom-left attribution string, IBM Plex Mono lowercase, preceded by short ink rule.
+- `showBrandMark` — render ∴ in a hairline circle at lower-right. Default `true` for hero/aside, `false` for minimal.
+- `children` — the inner template (DataChart, ChoroplethMap, TimeSeriesChart, etc.). Mounts at frame 60 in hero mode via Remotion `<Sequence>` so its own entrance animations start after the editorial scaffolding has settled.
 
 ---
 
@@ -201,6 +761,14 @@ Use `formatAsYear: true` when values are years, postal codes, or 4-digit IDs tha
 
 **Y-axis behavior:** y-axis ticks are now real data values (e.g. 0 / 2,000 / 4,000 / 6,000 / 8,000) computed via `niceTicks`. Previously the axis was hardcoded 0–100% with the unit appended. Pass `yRange: [min, max]` only if you specifically need to override the inferred domain.
 
+**Variants:**
+
+- **`bar`** — vertical bars. Pass `dataPoints[]`. Default workhorse.
+- **`horizontal`** — horizontal bars. Pass `dataPoints[]`. Use when labels are long or there are many categories.
+- **`lollipop`** — dot-on-stem variant of bar. Pass `dataPoints[]`. Reduces ink for many-category comparisons.
+- **`comparison`** — paired left/right bars. Pass `comparisonPairs[]` + `leftGroupLabel` / `rightGroupLabel` / colors.
+- **`small-multiples`** — grid of mini bar charts sharing axes. Pass `panels[]: [{ title, subtitle?, dataPoints[] }]`. Schema requires at least one panel. Use when comparing the same metric across N categories (countries, decades, scenarios) and a single chart would muddle.
+
 ---
 
 ## KineticTypography
@@ -282,6 +850,9 @@ Conceptual models, comparisons, matrix layouts, process flows.
 }
 ```
 
+**Key fields:**
+- `heroStage` — (flow variant) zero-based index of the stage to render in hero mode: enlarged node, accent color, anchored entrance. Use to single out the "punchline" stage in a process flow (the choke point, the value-capture step). Independent from `protagonist`, which highlights a comparison-variant column.
+
 ---
 
 ## TitleTransition
@@ -340,6 +911,11 @@ Branching scenarios, decision points. Tree structure via flat array + ID referen
 - `rootId` — entry point for tree traversal
 - `highlightedPath` — ordered IDs forming the emphasized decision path
 - `nodes[].marketPrice` — optional Kalshi annotation
+
+**Variants:**
+
+- **`extensive`** (default) — classic extensive-form tree with branches radiating from `rootId`. Each node renders as a labeled card; edges show parent→child relationships with optional probabilities.
+- **`ladder`** — Graham Allison nested-rectangles style. Decisions render as concentric / stacked rectangles where the chosen path drills inward, rather than branching outward. Pairs naturally with `highlightedPath` (the chosen-path receives accent treatment; alternative branches mute to taupe) and `probabilityWeights: true` (rectangle sizes scale with `probability`, so the editorial weight of each branch reads at a glance). Use for "the decision-maker faced N options and picked this one" stories — Cuban missile crisis OPTIONS A through F, October 7 controls vs. lighter alternatives.
 
 ---
 
@@ -482,6 +1058,12 @@ Multi-series line charts with annotations, eras, and reference lines.
 - **Leading-edge marker**: a glowing dot tracks the tip of each line as it draws, then fades when the line completes. Adds NYT-style "recording instrument" feel without configuration.
 - **Niced y-axis**: clamps at 0 for all-positive data, snaps min/max to round numbers, generates ticks at multiples of nice spacing. Pass `yRange` to override.
 
+**Variants:**
+
+- **`line`** (default) — multi-series line chart with all lines on a shared axis. Default behavior; omit `variant` field.
+- **`slope`** — two-point slope chart (start value → end value per series). Use for "rank shuffle" or "before vs. after" stories where the in-between trajectory doesn't matter and the slope itself is the punchline.
+- **`small-multiples`** — grid of mini line charts, one per series, with shared y-axis scaling. Use when N is large (≥ 4 series) and overlapping lines turn into a spaghetti plot. Each line gets its own panel; `referenceBands` and `eras` apply across all panels.
+
 ---
 
 ## SankeyFlow
@@ -565,7 +1147,56 @@ Strategic game theory: chess, go, payoff matrix.
     { "label": "Nash Equilibrium", "durationSec": 4, "highlights": [0] }
   ]
 }
+
+// Canonical prisoner's dilemma variant
+{
+  "variant": "pd-canonical",
+  "rowPlayer": "You",
+  "colPlayer": "Them",
+  "rowOptions": ["Cooperate", "Defect"],
+  "colOptions": ["Cooperate", "Defect"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3",  "cellType": "R", "heroRole": "moral" },
+    { "row": 0, "col": 1, "value": "0, 5",  "cellType": "S" },
+    { "row": 1, "col": 0, "value": "5, 0",  "cellType": "T" },
+    { "row": 1, "col": 1, "value": "1, 1",  "cellType": "P", "heroRole": "analytical" }
+  ],
+  "showTPRSLegend": true,
+  "showBestResponseArrows": true,
+  "showNashGlyph": true,
+  "phases": [
+    { "label": "Payoffs revealed",        "durationSec": 3 },
+    { "label": "Nash equilibrium",         "durationSec": 4, "highlights": [3] }
+  ]
+}
+
+// Iterated play variant — N rounds of an iterated game
+{
+  "variant": "iterated-play",
+  "rowPlayer": "Tit-for-Tat",
+  "colPlayer": "Always Defect",
+  "rowOptions": ["C", "D"],
+  "colOptions": ["C", "D"],
+  "cells": [
+    { "row": 0, "col": 0, "value": "3, 3" },
+    { "row": 0, "col": 1, "value": "0, 5" },
+    { "row": 1, "col": 0, "value": "5, 0" },
+    { "row": 1, "col": 1, "value": "1, 1" }
+  ],
+  "rounds": [
+    { "label": "Round 1", "highlights": [1], "annotation": "Sucker payoff" },
+    { "label": "Round 2", "highlights": [3], "annotation": "Mutual defection locks in" }
+  ]
+}
 ```
+
+**Variants:**
+
+- **`chess`** — chess board with `initialPieces` + per-phase `pieces` arrays. For positional / power-projection stories.
+- **`go`** — go board with `initialStones` + per-phase `stones` arrays. For encirclement / territorial-control stories. Default `boardSize: 9` or `19`.
+- **`payoff-matrix`** — generic 2×N game matrix. Pass `rowPlayer` / `colPlayer` / `rowOptions` / `colOptions` / `cells[]`, with `phases[].highlights` indexing into `cells`.
+- **`pd-canonical`** — the textbook prisoner's dilemma form. Cells carry `cellType: "T" | "R" | "P" | "S"` (Temptation, Reward, Punishment, Sucker — the standard PD payoff labels) and `heroRole: "moral" | "analytical"` (which cell is the moral pull — mutual cooperation — and which is the analytical conclusion — mutual defection). Three optional render flags: `showTPRSLegend` (legend for the T/R/P/S corner labels), `showBestResponseArrows` (arrows showing each player's dominant strategy), `showNashGlyph` (highlight the Nash equilibrium cell with the channel's ∴ glyph). Use whenever the episode invokes the canonical PD; the structural payoff labels are the whole point.
+- **`iterated-play`** — same payoff matrix, but the timeline is `rounds[]` instead of `phases[]`. Each round has a `label`, `highlights[]` (which cells fire that round), and an optional `annotation`. Schema requires non-empty `rounds`. Use for Axelrod-style iterated tournaments, repeated games, evolving strategy.
 
 ---
 

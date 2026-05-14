@@ -2,6 +2,11 @@
 
 > Created: May 10, 2026. Research delegated to web-research agent; integrated and Parallax-aligned by claude. Update when new outlet conventions are observed.
 
+> **⚠️ May 13, 2026 — Doctrine update: ChoroplethMap is now RESERVED.**
+> A research pass on canonical outlets (NYT Graphics, FT Visual + Data, Bloomberg Originals, Reuters Graphics, Economist) confirmed that **all of them use D3 + TopoJSON SVG for static editorial choropleths** — *not* Mapbox. Parallax's **AtlasPlate template is the canonical choice** for analytical / categorical / titled choropleth work; ChoroplethMap (Mapbox-based) is reserved for the narrow case where **terrain hillshading is the editorial point** (Himalayan supply route, alpine border dispute, Arctic shipping). All catalog choropleth demos (G7, Cold War Blocs, Tordesillas) migrated to AtlasPlate. ChoroplethMap renders without a title overlay (map fills the visual; titles come from a preceding `TitleTransition` or voice-over). See [`MAP_TEMPLATE_SELECTOR.md`](../../MAP_TEMPLATE_SELECTOR.md) → "Mapbox → AtlasPlate doctrine."
+>
+> The rest of this dossier remains the canonical reference for choropleth idioms, perceptual rationale, and failure modes. Apply them via AtlasPlate for analytical work; via ChoroplethMap only when terrain matters.
+
 ## 1. The form's editorial purpose
 
 Reach for choropleth when **the region itself is the unit of analysis** and the variable is **intensive** (rate, ratio, percentage, index) — not extensive (raw counts, totals). Choropleth answers *"how does this quality vary across space?"*

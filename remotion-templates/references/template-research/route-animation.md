@@ -2,6 +2,13 @@
 
 > Created: May 10, 2026. Research delegated to web-research agent; integrated and Parallax-aligned by claude. Update when new outlet conventions are observed.
 
+> **⚠️ May 13, 2026 — Doctrine update: RouteAnimation renders WITHOUT a title overlay.**
+> RouteAnimation (Mapbox-based) is now framed as **atmospheric register only** — cinematic flow shots, supply chains, voyages-through-terrain. The map fills the entire visual; **no `TitleBlock` is rendered on top**. Titles for route shots come from a preceding `TitleTransition` composition or from the script's voice-over context — never overlaid on the Mapbox raster (which produced "title-plate-cut-into-map" artifacts in the May 13 visual review).
+>
+> Phase titles (rendered bottom-left, smaller) are still appropriate when a phase represents a distinct narrative beat (e.g., "Atlantic Crossing" / "The Pacific — Larger Than Anyone Knew"). The composition-level `data.title` field is still read for `HeaderStrip` metadata + `MAP · ROUTE` chrome but NOT rendered as overlaid editorial typography.
+>
+> See [`MAP_TEMPLATE_SELECTOR.md`](../../MAP_TEMPLATE_SELECTOR.md) → "Mapbox → AtlasPlate doctrine." For analytical / static editorial route work that needs a title, render an `AtlasPlate` with annotation arrows instead, OR precede the RouteAnimation with a `TitleTransition` slate.
+
 ## 1. The form's editorial purpose
 
 A route map is the right form when **the story is about movement across geography that matters** — the path's shape, length, chokepoints, or detours carry argumentative weight.
