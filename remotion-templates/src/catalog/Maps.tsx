@@ -60,6 +60,14 @@ const atlasG7: AtlasPlateData = {
   subtitle: "How seven industrialized economies command global output",
   projection: "naturalEarth",
   source: "IMF / World Bank",
+  // MapTitleFrame demo — atlas treatment with right-aligned masthead.
+  // Atlas-plate convention: amber rule + thin ink hairline beneath it,
+  // mimics atlas neatline. Date/scope/note render as monospaced caps.
+  mapTitle: {
+    mode: "banner",
+    treatment: "atlas",
+    masthead: { date: "2024", scope: "7 NATIONS", note: "47% GLOBAL GDP" },
+  },
   phases: [
     {
       title: "Group of Seven",
@@ -83,6 +91,10 @@ const atlasBlocs: AtlasPlateData = {
   title: "Bloc Architecture, 1955–1990",
   projection: "naturalEarth",
   source: "Allied / Soviet treaty archives, simplified",
+  // MapTitleFrame demo — minimalist banner. Default treatment: paper-color
+  // band with single amber bottom rule. The safe choice when the title
+  // doesn't need metadata callouts.
+  mapTitle: { mode: "banner", treatment: "minimalist" },
   phases: [
     {
       title: "Phase I — Founding NATO",
@@ -182,6 +194,9 @@ const routeSilkRoad: RouteAnimationData = {
   episode: CATALOG_EPISODE,
   title: "The Silk Road",
   subtitle: "Trade corridor, c. 130 BCE – 1453 CE",
+  // Greedy auto-placer handles label collision per-frame (May 14, 2026 —
+  // see labelPlacement.ts). Authors can still pin a specific position by
+  // adding `labelPosition` to any point — explicit values always win.
   points: [
     { name: "Chang'an", coordinates: [108.95, 34.27], label: "Chang'an", sublabel: "Tang capital" },
     { name: "Dunhuang", coordinates: [94.66, 40.14], label: "Dunhuang" },
@@ -295,6 +310,11 @@ const routeChokepoints: RouteAnimationData = {
   episode: CATALOG_EPISODE,
   title: "The World's Maritime Chokepoints",
   subtitle: "Six narrow passages through which most global trade must pass",
+  // No explicit labelPosition — the greedy auto-placer (May 14, 2026,
+  // labelPlacement.ts) picks a non-colliding cardinal direction per point
+  // based on the live camera projection. Authors can still pin a specific
+  // position by adding `labelPosition: "above" | "below" | "left" | "right"`
+  // on any point — explicit values always win over auto.
   points: [
     { name: "Strait of Hormuz", coordinates: [56.25, 26.57], label: "Hormuz", sublabel: "21% of oil" },
     { name: "Bab-el-Mandeb", coordinates: [43.32, 12.58], label: "Bab-el-Mandeb" },
@@ -312,12 +332,30 @@ const routeChokepoints: RouteAnimationData = {
     { from: 0, to: 4, dashed: true },
     { from: 4, to: 5, dashed: true },
   ],
+  // Phased narrative reveal — Layer C of the label-collision defense.
+  // Three beats: Middle East corridor → European entry → Asian gateway +
+  // Americas. Spreads the 6 labels across 3 phases instead of cramming
+  // them all on frame 60 (which produced the May 13 visual-review bunch).
   phases: [
+    {
+      title: "Middle East Corridor",
+      subtitle: "Where oil leaves the Gulf and trade enters the Red Sea",
+      durationSec: 3,
+      activePoints: [0, 1, 2], // Hormuz + Bab-el-Mandeb + Suez
+      activeSegments: [0, 1],
+    },
+    {
+      title: "European Entry",
+      subtitle: "Bosphorus carries grain from the Black Sea steppe",
+      durationSec: 2.5,
+      activePoints: [0, 1, 2, 3], // + Bosphorus
+      activeSegments: [0, 1, 2],
+    },
     {
       title: "Six Narrow Passages",
       subtitle: "The geography of global trade dependence",
-      durationSec: 8,
-      activePoints: [0, 1, 2, 3, 4, 5],
+      durationSec: 4,
+      activePoints: [0, 1, 2, 3, 4, 5], // + Malacca + Panama
       activeSegments: [0, 1, 2, 3, 4],
     },
   ],
@@ -533,6 +571,11 @@ export const CatalogRouteChokepoints = () => (
 const atlasCocom: AtlasPlateData = {
   ...atlasPlateSampleData,
   episode: CATALOG_EPISODE,
+  // MapTitleFrame demo — cartouche with smart placement. The algorithm
+  // counts country centroids inside each ~600×140px corner region and
+  // places the title in the LEAST populated corner (tie-break favors
+  // top-left for editorial reading-order bias).
+  mapTitle: { mode: "cartouche", placement: "auto" },
 };
 
 const atlasDuration = (data: AtlasPlateData): number =>

@@ -156,13 +156,17 @@ const rules = [
       if (content.includes("@deprecated")) return [];
       if (isMissingTitleBlockRuleSkipped(content, filePath)) return [];
 
-      // Check if it renders a title but doesn't use TitleBlock
+      // Check if it renders a title but doesn't use TitleBlock or MapTitleFrame.
+      // MapTitleFrame is the title component for full-bleed map templates
+      // (banner/cartouche/inline placement modes that solve the map-overlap
+      // problem TitleBlock can't). Either component satisfies the rule.
       const hasTitle = content.includes("data.title");
       const hasTitleBlock = content.includes("TitleBlock");
+      const hasMapTitleFrame = content.includes("MapTitleFrame");
       const hasSubComponents = content.includes("React.memo"); // might be a sub-component file
 
-      if (hasTitle && !hasTitleBlock && !hasSubComponents) {
-        return [{ line: 1, message: "Has title data but doesn't use TitleBlock component" }];
+      if (hasTitle && !hasTitleBlock && !hasMapTitleFrame && !hasSubComponents) {
+        return [{ line: 1, message: "Has title data but doesn't use TitleBlock or MapTitleFrame component" }];
       }
       return [];
     },

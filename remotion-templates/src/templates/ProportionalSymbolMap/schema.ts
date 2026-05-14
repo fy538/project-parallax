@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
+import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const SymbolDatumSchema = z.object({
   iso3: z.string().min(2),
@@ -63,6 +64,7 @@ export const ProportionalSymbolMapSchema = z.object({
     graticule: GraticuleSchema.optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     backgroundTint: z.string().optional(),
+    mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

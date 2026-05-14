@@ -49,7 +49,8 @@ import {
   resolveAnalyticalBackgroundVariant,
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
-import { TitleBlock } from "../../components/TitleBlock";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
+import { resolveCartoucheCorner } from "../../utils/mapTitlePlacement";
 import { SourceAttribution } from "../../components/SourceAttribution";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -323,6 +324,24 @@ export const TilegramUSMap: React.FC<{ data: TilegramUSMapData }> = ({
   // value bin. A muted neutral works well in both modes.
   const noDataFill = bgVariant === "dark" ? palette.midnight : palette.sand;
 
+  // ── Smart cartouche placement ─────────────────────────────────────────────
+  // Tilegram hex centers in screen space — used to compute the lowest-
+  // density corner when `mapTitle.placement === "auto"`.
+  const resolvedCartoucheCorner = useMemo(() => {
+    if (data.mapTitle?.mode !== "cartouche") return undefined;
+    if (data.mapTitle.placement !== "auto") return undefined;
+    const pts = ALL_STATE_CODES.map((code) => {
+      const pos = HEX_GRID[code];
+      const cx =
+        gridOriginX +
+        pos.col * SQRT3 * hexSize +
+        (pos.row % 2 === 1 ? (SQRT3 * hexSize) / 2 : 0);
+      const cy = gridOriginY + pos.row * 1.5 * hexSize;
+      return { x: cx, y: cy };
+    });
+    return resolveCartoucheCorner(pts);
+  }, [data.mapTitle, gridOriginX, gridOriginY, hexSize]);
+
   return (
     <Background
       variant={resolveAnalyticalBackgroundVariant(
@@ -338,12 +357,14 @@ export const TilegramUSMap: React.FC<{ data: TilegramUSMapData }> = ({
         <FooterStrip mode={bgVariant} />
 
         <div style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-          <TitleBlock
+          <MapTitleFrame
             title={data.title}
             subtitle={data.subtitle}
             mode={bgVariant}
-            safeAreaTier="generous"
+            config={data.mapTitle}
+            footerCaption={data.source ? `Source: ${data.source}` : undefined}
             syncPoints={direction.syncPoints}
+            resolvedCartoucheCorner={resolvedCartoucheCorner}
           />
         </div>
 

@@ -23,6 +23,7 @@ import { MapAnnotations } from "../../components/MapAnnotations";
 import { MapInset } from "../../components/MapInset";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import {
@@ -394,9 +395,36 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           />
         )}
 
-        {/* No TitleBlock overlay — Mapbox templates are atmospheric register
-            only (May 13, 2026 doctrine). Title comes from script voice-over
-            or preceding TitleTransition. See MAP_TEMPLATE_SELECTOR.md. */}
+        {/* Title overlay — OPT-IN. Mapbox templates default to no title
+            (atmospheric register, May 13 2026 doctrine). Set `mapTitle`
+            to render a banner / cartouche / inline title via MapTitleFrame.
+            Smart cartouche placement falls back to "top-left" + warnIf. */}
+        {data.mapTitle && (
+          (() => {
+            const isAutoOnMapbox =
+              data.mapTitle.mode === "cartouche" &&
+              data.mapTitle.placement === "auto";
+            warnIf(
+              isAutoOnMapbox,
+              "DensityMap",
+              "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
+              "templates. Falling back to 'top-left'.",
+            );
+            return (
+              <MapTitleFrame
+                title={data.title}
+                subtitle={data.subtitle}
+                mode={dark ? "dark" : "light"}
+                config={data.mapTitle}
+                footerCaption={
+                  data.source ? `Source: ${data.source}` : currentWindow.phase.title
+                }
+                syncPoints={direction.syncPoints}
+                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+              />
+            );
+          })()
+        )}
 
         {/* Phase title overlay — bottom-left, mirrors AtlasPlate convention. */}
         {currentWindow.phase.title && (

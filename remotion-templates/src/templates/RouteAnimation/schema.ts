@@ -7,6 +7,7 @@ import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
 import { LabelDensitySchema } from "../../components/MapGL.types";
+import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const RoutePointSchema = z.object({
   name: z.string(),
@@ -92,6 +93,7 @@ export const RouteAnimationSchema = z.object({
       size: z.number().positive().optional(),
       framed: z.boolean().optional(),
     }).optional(),
+    mapTitle: MapTitleConfigSchema.optional(),
   })
   .superRefine((d, ctx) => {
     // Radial mode auto-generates segments; non-radial requires explicit ones.

@@ -26,7 +26,11 @@ import type { Feature, Geometry } from "geojson";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { TitleBlock } from "../../components/TitleBlock";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
+import {
+  resolveCartoucheCorner,
+  projectPointsForPlacement,
+} from "../../utils/mapTitlePlacement";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import {
@@ -383,6 +387,23 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
 
   const transformStr = `translate(${camera.translate[0]} ${camera.translate[1]}) scale(${camera.scale})`;
 
+  // ── Smart cartouche placement ─────────────────────────────────────────────
+  // When `mapTitle.mode === "cartouche"` and `placement === "auto"`, pick
+  // the corner with the LEAST symbol density in the current phase. Symbols
+  // are the data visible to the viewer; placing the cartouche away from
+  // them minimizes occlusion.
+  const resolvedCartoucheCorner = useMemo(() => {
+    if (data.mapTitle?.mode !== "cartouche") return undefined;
+    if (data.mapTitle.placement !== "auto") return undefined;
+    const lonLats: [number, number][] = [];
+    for (const s of currentWindow.phase.symbols) {
+      const centroid = getCountryCentroid(s.iso3);
+      if (centroid) lonLats.push(centroid);
+    }
+    const points = projectPointsForPlacement(lonLats, projectScreen);
+    return resolveCartoucheCorner(points);
+  }, [data.mapTitle, currentWindow.phase.symbols, projectScreen]);
+
   // Legend math (computed against the phase's max value)
   const legendTicks = useMemo(() => generateLegendTicks(phaseMaxValue), [phaseMaxValue]);
 
@@ -557,12 +578,14 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
           />
         </svg>
 
-        <TitleBlock
+        <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
-          safeAreaTier="generous"
+          config={data.mapTitle}
+          footerCaption={data.source ? `Source: ${data.source}` : undefined}
           syncPoints={direction.syncPoints}
+          resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
 
         {/* Phase title overlay — bottom-left, mirrors AtlasPlate */}

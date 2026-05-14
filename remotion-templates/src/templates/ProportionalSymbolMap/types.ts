@@ -14,6 +14,7 @@ import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { ProjectionName } from "../../utils/atlasProjection";
 import type { ScaleType } from "../../utils/proportionalSymbol";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /** A single symbol — one circle on the map, anchored at a country's centroid. */
 export interface SymbolDatum {
@@ -104,6 +105,12 @@ export interface ProportionalSymbolMapData {
   backgroundVariant?: "light" | "dark";
   /** Subtle color tint for emotional temperature. */
   backgroundTint?: string;
+
+  /**
+   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
+   * See `MapTitleFrame` JSDoc for opt-in cartouche / inline modes.
+   */
+  mapTitle?: MapTitleConfig;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

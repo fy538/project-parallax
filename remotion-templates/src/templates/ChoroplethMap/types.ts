@@ -8,6 +8,7 @@
 import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /** A single country's data for one phase of the animation. */
 export interface CountryData {
@@ -192,6 +193,20 @@ export interface ChoroplethMapData {
     size?: number;
     framed?: boolean;
   };
+
+  /**
+   * OPTIONAL title placement. ChoroplethMap is Mapbox-backed; by doctrine
+   * the title comes from the script's voice-over or a preceding
+   * TitleTransition composition (the "atmospheric register only" policy
+   * established May 13, 2026). Setting `mapTitle` opts INTO an overlay
+   * title — the banner mode is the safe choice (paper band keeps the
+   * title from cutting into the map).
+   *
+   * Smart placement (`mode: "cartouche", placement: "auto"`) is NOT
+   * supported on Mapbox-backed templates — falls back to "top-left" with
+   * a dev warning. Use AtlasPlate for cartouche placement.
+   */
+  mapTitle?: MapTitleConfig;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

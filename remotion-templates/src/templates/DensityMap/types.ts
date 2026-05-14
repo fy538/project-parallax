@@ -16,6 +16,7 @@
 
 import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /** A single point. Optional `weight` aggregates the value (sum of weights). */
 export interface DensityPoint {
@@ -169,6 +170,14 @@ export interface DensityMapData {
     size?: number;
     framed?: boolean;
   };
+
+  /**
+   * OPTIONAL title overlay — opt-in for Mapbox-backed templates per the
+   * atmospheric-register doctrine. See `MapTitleFrame`. Smart cartouche
+   * placement is unsupported on Mapbox; "auto" falls back to "top-left"
+   * with a dev warning.
+   */
+  mapTitle?: MapTitleConfig;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block. */

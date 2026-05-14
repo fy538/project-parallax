@@ -285,6 +285,16 @@ export interface MapGLProps {
   layers?: any[];
   /** Callback when map + terrain are fully loaded */
   onLoad?: () => void;
+  /**
+   * Callback fired with the underlying Mapbox GL map instance once tiles
+   * are idle. Parent templates can use this to call `map.project()` for
+   * auto-label collision avoidance (see RouteAnimation greedy point-label
+   * placement, May 14, 2026). Fires AFTER `onLoad`.
+   */
+  onMapReady?: (map: {
+    project: (lonLat: [number, number]) => { x: number; y: number };
+    unproject?: (xy: [number, number]) => { lng: number; lat: number };
+  }) => void;
   /** Whether to use globe projection (default: true for zoom < 3) */
   globe?: boolean;
   /**
@@ -404,6 +414,7 @@ export const MapGL: React.FC<MapGLProps> = ({
   bearing = 0,
   layers = [],
   onLoad,
+  onMapReady,
   globe,
   projection,
   terrain = false,
@@ -456,8 +467,17 @@ export const MapGL: React.FC<MapGLProps> = ({
       setLoaded(true);
       continueRender(handle);
       onLoad?.();
+      // Fire onMapReady with the underlying Mapbox instance once tiles
+      // are idle. Parent templates use this to access map.project() for
+      // greedy label-collision avoidance.
+      try {
+        onMapReady?.(map as never);
+      } catch {
+        // onMapReady is an optional consumer hook; failures shouldn't
+        // affect tile rendering.
+      }
     });
-  }, [handle, onLoad]);
+  }, [handle, onLoad, onMapReady]);
 
   // ── Fog-preset effect — symmetric with labelDensity. Re-applies when
   // the fogPreset prop changes after mount. Most templates don't change

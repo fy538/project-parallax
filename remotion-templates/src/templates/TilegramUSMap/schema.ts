@@ -5,6 +5,7 @@
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const US_STATE_CODES = [
   "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
@@ -52,6 +53,7 @@ export const TilegramUSMapSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().positive().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
+    mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

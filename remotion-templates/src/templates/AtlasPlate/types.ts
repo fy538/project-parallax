@@ -13,6 +13,7 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { ProjectionName } from "../../utils/atlasProjection";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /** A country's fill assignment within a phase. */
 export interface AtlasCountryFill {
@@ -181,6 +182,25 @@ export interface AtlasPlateData {
 
   /** Subtle color tint for emotional temperature. Hex. */
   backgroundTint?: string;
+
+  /**
+   * Title placement system — see `MapTitleFrame` in components/.
+   *
+   * Default when omitted: `{ mode: "banner", treatment: "minimalist" }`.
+   * That places title + subtitle inside a horizontal paper-color band at
+   * the top of the canvas (and a matching bottom band when there's a
+   * phase label or source caption), so the map content never overlaps the
+   * title.
+   *
+   * Pass `{ mode: "inline" }` to preserve the pre-May-2026 look (title in
+   * the safe-area corner with a heavy paper-color text-stroke punching
+   * through the map). Pass `{ mode: "cartouche", placement: "auto" }` to
+   * use the smart-placement algorithm (corner with lowest country
+   * centroid density wins).
+   *
+   * @see src/components/MapTitleFrame.tsx
+   */
+  mapTitle?: MapTitleConfig;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

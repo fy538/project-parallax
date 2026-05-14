@@ -23,7 +23,8 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { TitleBlock } from "../../components/TitleBlock";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
+import { resolveCartoucheCorner } from "../../utils/mapTitlePlacement";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import {
@@ -260,6 +261,17 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
     // convention favors listing direct usages even when redundant.
   }, [currentWindow.phase.data, baseProjection, maxRadiusPx, scaleType, framePadding, xyStrength]);
 
+  // ── Smart cartouche placement ─────────────────────────────────────────────
+  // The Dorling layout already has each circle in screen space — use the
+  // de-collided positions directly so the cartouche avoids the actual
+  // rendered (not the geographic-centroid) location of every circle.
+  const resolvedCartoucheCorner = useMemo(() => {
+    if (data.mapTitle?.mode !== "cartouche") return undefined;
+    if (data.mapTitle.placement !== "auto") return undefined;
+    const points = dorlingLayout.map((n) => ({ x: n.x, y: n.y }));
+    return resolveCartoucheCorner(points);
+  }, [data.mapTitle, dorlingLayout]);
+
   /** Per-phase max for the legend. */
   const phaseMaxValue = useMemo(() => {
     if (currentWindow.phase.data.length === 0) return 1;
@@ -386,12 +398,14 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
           />
         </svg>
 
-        <TitleBlock
+        <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
-          safeAreaTier="generous"
+          config={data.mapTitle}
+          footerCaption={data.source ? `Source: ${data.source}` : undefined}
           syncPoints={direction.syncPoints}
+          resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
 
         {/* Phase title overlay */}

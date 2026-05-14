@@ -57,6 +57,7 @@ import { buildGraticuleLayers } from "../../components/Graticule";
 import { MapInset } from "../../components/MapInset";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
 import type { ChoroplethMapData, AnimationPhase, CountryData } from "./types";
 
 // ── Color ramp lookup ───────────────────────────────────────────────────────
@@ -541,16 +542,39 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
 
         {/* Coordinate metadata now lives in HeaderStrip (top-right) */}
 
-        {/* NO TITLE / NO TITLE PLATE — May 13, 2026 doctrine: ChoroplethMap
-            (Mapbox) is reserved for atmospheric / terrain-heavy shots only.
-            Static editorial choropleth work moved to AtlasPlate (the
-            NYT/FT/Bloomberg canonical D3+TopoJSON SVG path). For the
-            rare Mapbox choropleth shot, the map fills the entire visual
-            and the title comes from the script's voice-over / preceding
-            TitleTransition composition. See MAP_TEMPLATE_SELECTOR.md.
-            (Previously: title plate + TitleBlock overlay — produced the
-            "rotating paper with a header slab" artifact the visual review
-            flagged.) */}
+        {/* Title overlay — OPT-IN. ChoroplethMap (Mapbox) defaults to no
+            title (atmospheric register, May 13 2026 doctrine). When the
+            author explicitly sets `mapTitle`, MapTitleFrame renders the
+            band/cartouche/inline treatment. Smart cartouche placement
+            isn't supported on Mapbox-backed templates — the projection
+            isn't available outside the GL context. The runtime falls
+            back to "top-left" + warnIf when "auto" is requested.
+            See MAP_TEMPLATE_SELECTOR.md. */}
+        {data.mapTitle && (
+          (() => {
+            const isAutoOnMapbox =
+              data.mapTitle.mode === "cartouche" &&
+              data.mapTitle.placement === "auto";
+            warnIf(
+              isAutoOnMapbox,
+              "ChoroplethMap",
+              "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
+              "templates (no projection available outside GL). Falling back " +
+              "to 'top-left'. Use AtlasPlate for smart-placement cartouche.",
+            );
+            return (
+              <MapTitleFrame
+                title={data.title}
+                subtitle={current?.phase.subtitle}
+                mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+                config={data.mapTitle}
+                footerCaption={current?.phase.title}
+                syncPoints={direction.syncPoints}
+                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+              />
+            );
+          })()
+        )}
 
         {/* Episode info now consolidated into HeaderStrip (top) */}
 

@@ -35,6 +35,7 @@
  */
 
 import type { DirectionBlock } from "../../hooks/useDirection";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /**
  * Valid US postal abbreviations (50 states + DC).
@@ -119,5 +120,13 @@ export interface TilegramUSMapData {
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
+
+  /**
+   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
+   * Smart cartouche placement uses hex-tile centroid density.
+   * See `MapTitleFrame` JSDoc.
+   */
+  mapTitle?: MapTitleConfig;
+
   _direction?: DirectionBlock;
 }

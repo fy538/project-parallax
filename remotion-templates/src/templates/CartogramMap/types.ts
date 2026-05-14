@@ -18,6 +18,7 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { ProjectionName } from "../../utils/atlasProjection";
 import type { ScaleType } from "../../utils/proportionalSymbol";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 /** One country circle. Same shape as ProportionalSymbolMap's SymbolDatum. */
 export interface CartogramDatum {
@@ -90,6 +91,12 @@ export interface CartogramMapData {
   annotations?: MapAnnotation[];
   backgroundVariant?: "light" | "dark";
   backgroundTint?: string;
+
+  /**
+   * Title placement system. Default `{ mode: "banner", treatment: "minimalist" }`.
+   * See `MapTitleFrame` JSDoc for opt-in cartouche / inline modes.
+   */
+  mapTitle?: MapTitleConfig;
 
   /** Per-composition direction block. */
   _direction?: DirectionBlock;

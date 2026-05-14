@@ -31,7 +31,11 @@ import type { Feature, Geometry } from "geojson";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { TitleBlock } from "../../components/TitleBlock";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
+import {
+  resolveCartoucheCorner,
+  projectPointsForPlacement,
+} from "../../utils/mapTitlePlacement";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import {
@@ -43,7 +47,6 @@ import {
   fontWeights,
   letterSpacing,
   sec,
-  shadows,
 } from "../../design/theme";
 import {
   resolveProjection,
@@ -617,6 +620,29 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     [currentWindow.phase.countries],
   );
 
+  // ── Smart cartouche placement ─────────────────────────────────────────────
+  // When `mapTitle.mode === "cartouche"` and `placement === "auto"`, compute
+  // the corner with the LEAST country-centroid density in the current phase.
+  // Uses the active projection so the placement tracks camera transitions.
+  const resolvedCartoucheCorner = useMemo(() => {
+    if (data.mapTitle?.mode !== "cartouche") return undefined;
+    if (data.mapTitle.placement !== "auto") return undefined;
+    // Project each highlighted country centroid through the active
+    // projection (which already accounts for camera zoom/pan). Falls back
+    // to all-country centroids when the phase has no highlights.
+    const highlighted = currentWindow.phase.countries
+      .map((c) => getCountryCentroid(c.iso3))
+      .filter((c): c is [number, number] => c !== null);
+    const pool: [number, number][] =
+      highlighted.length > 0
+        ? highlighted
+        : (getAllCountries()
+            .map((c) => (c.alpha3 ? getCountryCentroid(c.alpha3) : null))
+            .filter((c): c is [number, number] => c !== null));
+    const points = projectPointsForPlacement(pool, projectAnnotation);
+    return resolveCartoucheCorner(points);
+  }, [data.mapTitle, currentWindow.phase.countries, projectAnnotation]);
+
   // Defensive null-render — happens AFTER all hooks (Rules of Hooks). If
   // schema validation ever lets through an empty phases array, render
   // nothing and surface a dev warning instead of crashing.
@@ -832,57 +858,27 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           })}
         </svg>
 
-        {/* Title block — outside SVG to keep brand chrome consistent. */}
-        <TitleBlock
+        {/* Title block — MapTitleFrame solves the title-overlapping-map
+            problem with band/cartouche/inline placement modes. Default
+            `{ mode: "banner", treatment: "minimalist" }` puts the title
+            in a paper-color band at the top of the canvas. See JSDoc on
+            `mapTitle` in types.ts for opt-in / back-compat options. */}
+        <MapTitleFrame
           title={data.title}
           subtitle={data.subtitle}
           mode={dark ? "dark" : "light"}
-          safeAreaTier="generous"
+          config={data.mapTitle}
+          footerTitle={currentWindow.phase.title}
+          footerSubtitle={currentWindow.phase.subtitle}
+          footerCaption={data.source ? `Source: ${data.source}` : undefined}
           syncPoints={direction.syncPoints}
+          resolvedCartoucheCorner={resolvedCartoucheCorner}
         />
-
-        {/* Phase title overlay — appears after camera settles. */}
-        {currentWindow.phase.title && (
-          <div
-            style={{
-              position: "absolute",
-              bottom: layout.safeAreaTier.generous.bottom,
-              left: layout.safeAreaTier.generous.left,
-              maxWidth: 720,
-              opacity: Math.min(
-                fadeIn(frame, currentWindow.startFrame + sec(0.6), sec(0.5)),
-                exitFade(frame, durationInFrames, 15),
-              ),
-            }}
-          >
-            <div
-              style={{
-                fontFamily: fonts.display,
-                fontSize: fontSizes.h2,
-                fontWeight: fontWeights.semibold,
-                letterSpacing: `${letterSpacing.h2}px`,
-                color: dark ? palette.bone : palette.ink,
-                textShadow: dark ? shadows.textLift : shadows.textLiftLight,
-              }}
-            >
-              {currentWindow.phase.title}
-            </div>
-            {currentWindow.phase.subtitle && (
-              <div
-                style={{
-                  marginTop: 8,
-                  fontFamily: fonts.metadata,
-                  fontSize: fontSizes.label,
-                  letterSpacing: `${letterSpacing.label}px`,
-                  textTransform: "uppercase",
-                  color: palette.taupe,
-                }}
-              >
-                {currentWindow.phase.subtitle}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Phase title routed through MapTitleFrame's footerTitle slot above
+            (May 14, 2026). The legacy floating overlay collided with the new
+            bottom band; routing through the band gives it the same backing
+            fill as the source caption, eliminating the collision and the
+            need for textShadow lifts on top of country fills. */}
       </AbsoluteFill>
     </Background>
   );

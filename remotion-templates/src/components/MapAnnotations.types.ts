@@ -54,6 +54,21 @@ export const MapAnnotationSchema = z.object({
   appearAtSec: z.number().nonnegative().optional(),
   /** Explicit exit time in seconds (overrides phase shorthand). */
   exitAtSec: z.number().nonnegative().optional(),
+  /**
+   * Priority for the greedy auto-placer (May 13, 2026 — Layer A + D of the
+   * label-collision defense). Higher numbers place FIRST and get the
+   * preferred (center) position; lower numbers get pushed to surrounding
+   * positions or dropped when the layout is over-constrained. Default 0.
+   * Use 10+ for must-show labels (the focal-region annotations), 1-5 for
+   * supporting context, 0 for "show if there's room."
+   *
+   * The auto-placer sorts annotations by `priority` DESC, places each at
+   * one of 9 candidate positions (center + 8 around), and picks the first
+   * non-overlapping slot. Manual `leader.dx/dy` always wins (when set).
+   *
+   * See: references/template-research/map-annotations.md § Auto-placement.
+   */
+  priority: z.number().optional(),
 });
 
 export type MapAnnotation = z.infer<typeof MapAnnotationSchema>;

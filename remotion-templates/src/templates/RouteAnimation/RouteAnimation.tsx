@@ -10,7 +10,7 @@
  * RoutePhase for full Mapbox camera control (backward-compatible).
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -54,10 +54,16 @@ import {
 } from "../../utils/segmentBackdrop";
 import { MapGL } from "../../components/MapGL";
 import { MapAnnotations } from "../../components/MapAnnotations";
+import {
+  placeLabels,
+  placementToLabelPosition,
+} from "../../components/labelPlacement";
 import { buildGraticuleLayers } from "../../components/Graticule";
 import { MapInset } from "../../components/MapInset";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { MapTitleFrame } from "../../components/MapTitleFrame";
+import { warnIf } from "../../utils/dataWarnings";
 import type { RouteAnimationData, RoutePhase, RouteSegment } from "./types";
 
 // ── Phase time calculator ──────────────────────────────────────────────────
@@ -667,6 +673,64 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       .filter((pt) => allActivePoints.has(pt.index));
   }, [data.points, allActivePoints]);
 
+  // Auto-label placement for point labels — May 14, 2026 extension of the
+  // MapAnnotations greedy placer to RouteAnimation point labels. When a
+  // point omits `labelPosition`, the placer picks a non-colliding cardinal
+  // direction ("above" | "below" | "left" | "right"). Explicit
+  // labelPosition values always win (authors get the last word on stubborn
+  // cases). See: src/components/labelPlacement.ts.
+  const [mapInstance, setMapInstance] = useState<{
+    project: (lonLat: [number, number]) => { x: number; y: number };
+  } | null>(null);
+  const autoLabelPositions = useMemo(() => {
+    const positions = new Map<number, "above" | "below" | "left" | "right">();
+    if (!mapInstance) return positions;
+    // Only points that are visible (in `pointData`, which already filters
+    // by allActivePoints) AND lack an explicit labelPosition participate.
+    const candidates = pointData.filter(
+      (pt) => !pt.labelPosition && pt.label,
+    );
+    if (candidates.length === 0) return positions;
+    const placements = placeLabels(
+      candidates.map((pt) => ({
+        ann: {
+          at: pt.coordinates,
+          label: pt.label!,
+          sublabel: pt.sublabel,
+          hierarchy: "secondary" as const,
+          priority: 0,
+        },
+        defaultDy: -22, // matches DEFAULT_OFFSET_Y.secondary in MapAnnotations
+      })),
+      (lonLat) => {
+        try {
+          const p = mapInstance.project(lonLat);
+          if (
+            !Number.isFinite(p.x) ||
+            !Number.isFinite(p.y) ||
+            p.x < -200 ||
+            p.x > 2200 ||
+            p.y < -200 ||
+            p.y > 1300
+          ) {
+            return null;
+          }
+          return { x: p.x, y: p.y };
+        } catch {
+          return null;
+        }
+      },
+    );
+    candidates.forEach((pt, i) => {
+      const p = placements[i];
+      if (!p.offscreen && p.displaced) {
+        positions.set(pt.index, placementToLabelPosition(p));
+      }
+    });
+    return positions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pointData, mapInstance, frame]);
+
   // Outer atmospheric glow halo (14px, low alpha)
   const scatterHaloLayer = new ScatterplotLayer({
     id: "point-glow",
@@ -767,6 +831,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             fogPreset="editorial"
             vignette="editorial"
             labelDensity={data.labelDensity ?? "editorial"}
+            onMapReady={setMapInstance}
           >
           {/* Point labels — rendered as Markers for proper geo projection */}
           {pointData.map((pt) => {
@@ -827,7 +892,15 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                   />
                   {/* Labels container — positioned based on labelPosition */}
                   {(pt.label || pt.sublabel) && (() => {
-                    const pos = pt.labelPosition || "above";
+                    // Position resolution priority:
+                    //   1. Explicit pt.labelPosition (author chose it)
+                    //   2. Auto-placer output (greedy collision avoidance,
+                    //      May 14, 2026 — Layer A extended to route points)
+                    //   3. Default "above"
+                    const pos =
+                      pt.labelPosition ||
+                      autoLabelPositions.get(pt.index) ||
+                      "above";
                     const isVertical = pos === "above" || pos === "below";
                     const isLeft = pos === "left";
                     const isRight = pos === "right";
@@ -935,16 +1008,35 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
           />
         )}
 
-        {/* NO TITLE / NO TITLE PLATE — May 13, 2026 doctrine: Mapbox
-            templates are "atmospheric register only" (cinematic globe
-            pivots, terrain-heavy shots). The map fills the entire visual.
-            Titles for Mapbox-rendered shots live in the SCRIPT context
-            (voice-over names what we're looking at) or in a preceding
-            TitleTransition composition, NOT painted over the map. This
-            matches NYT/FT convention for cinematic map shots — the map
-            speaks for itself, no overlaid header rectangle "cutting into"
-            the cartography. Analytical / titled choropleth work moved
-            to AtlasPlate (pure SVG, paper-native). */}
+        {/* Title overlay — OPT-IN. Mapbox-backed: defaults to no title
+            (atmospheric register, May 13 2026 doctrine). When `mapTitle`
+            is provided, MapTitleFrame renders the requested mode.
+            Smart cartouche placement isn't supported here; falls back
+            to "top-left" + warnIf. */}
+        {data.mapTitle && (
+          (() => {
+            const isAutoOnMapbox =
+              data.mapTitle.mode === "cartouche" &&
+              data.mapTitle.placement === "auto";
+            warnIf(
+              isAutoOnMapbox,
+              "RouteAnimation",
+              "`mapTitle.placement: 'auto'` is not supported on Mapbox-backed " +
+              "templates. Falling back to 'top-left'.",
+            );
+            return (
+              <MapTitleFrame
+                title={data.title}
+                subtitle={data.subtitle}
+                mode={data.backgroundVariant === "dark" ? "dark" : "light"}
+                config={data.mapTitle}
+                footerCaption={data.source ? `Source: ${data.source}` : undefined}
+                syncPoints={direction.syncPoints}
+                resolvedCartoucheCorner={isAutoOnMapbox ? "top-left" : undefined}
+              />
+            );
+          })()
+        )}
 
         {/* Phase title overlay — appears after camera settles.
             Suppressed when the phase has no title (e.g., radial mode's

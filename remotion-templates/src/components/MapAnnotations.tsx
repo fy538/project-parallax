@@ -28,7 +28,8 @@
 
 import React, { useMemo } from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
-import { Marker } from "react-map-gl/mapbox";
+import { Marker, useMap } from "react-map-gl/mapbox";
+import { placeLabels, type Placement } from "./labelPlacement";
 import {
   fonts,
   fontSizes,
@@ -196,6 +197,11 @@ interface MapAnnotationMarkerProps {
   /** Pre-computed opacity (parent does the per-frame fade math). */
   opacity: number;
   dark: boolean;
+  /** Auto-placement output from the parent's greedy placer. When the
+   *  annotation has a manual `leader.dx/dy`, this is ignored (manual
+   *  override wins). When unset and no manual leader, falls back to the
+   *  hierarchy-default dy. */
+  placement?: Placement;
 }
 
 /**
@@ -209,13 +215,29 @@ const MapAnnotationMarker = React.memo<MapAnnotationMarkerProps>(({
   annotation,
   opacity,
   dark,
+  placement,
 }) => {
   const color = resolveColor(annotation.hierarchy, annotation.emphasis, dark);
-  const align = resolveAlign(annotation);
+  // Align resolution: explicit annotation.align wins; otherwise the placer's
+  // computed align (matches displacement direction — E-displaced labels read
+  // better with "left" text-align so text starts near the anchor); otherwise
+  // fall back to inferred-from-leader-direction; otherwise center.
+  const align: "left" | "right" | "center" =
+    annotation.align ?? placement?.align ?? resolveAlign(annotation);
   const dotR = DOT_RADIUS[annotation.hierarchy];
-  const dx = annotation.leader?.dx ?? 0;
-  const dy = annotation.leader?.dy ?? DEFAULT_OFFSET_Y[annotation.hierarchy];
-  const hasLeader = !!annotation.leader;
+
+  // Offset resolution priority:
+  //   1. Manual annotation.leader.dx/dy (author had a reason — always wins)
+  //   2. Auto-placer output (greedy collision avoidance)
+  //   3. Hierarchy default (DEFAULT_OFFSET_Y — small gap above anchor)
+  const manualDx = annotation.leader?.dx;
+  const manualDy = annotation.leader?.dy;
+  const dx = manualDx ?? placement?.dx ?? 0;
+  const dy =
+    manualDy ?? placement?.dy ?? DEFAULT_OFFSET_Y[annotation.hierarchy];
+  // Leader-line trigger: explicit manual leader OR the auto-placer
+  // displaced this label from its default position.
+  const hasLeader = !!annotation.leader || !!placement?.displaced;
 
   // Primary annotations get bumped to `bold` weight (was semibold) so they
   // unambiguously dominate Mapbox's automatic country labels even when the
@@ -373,6 +395,12 @@ export const MapAnnotations: React.FC<MapAnnotationsProps> = ({
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  // useMap() yields the parent <MapGL>'s react-map-gl Map instance. The
+  // greedy placer needs map.project([lon, lat]) to convert anchors to pixel
+  // coords before checking bbox overlap. May 13, 2026 — Layer A of the
+  // label-collision defense (Mapbox-native `text-variable-anchor` idiom
+  // adapted to our editorial MapAnnotations).
+  const { current: mapRef } = useMap();
 
   // Stable resolved-timing array — recomputed only when inputs change.
   const resolved = useMemo(
@@ -384,31 +412,95 @@ export const MapAnnotations: React.FC<MapAnnotationsProps> = ({
     [annotations, phaseWindows, compositionDurationSec],
   );
 
+  // Filter to visible annotations BEFORE running the placer — invisible
+  // labels shouldn't push visible ones around (they're not actually
+  // competing for pixel space at this frame).
+  const visible = resolved.flatMap(({ ann, startSec, endSec }) => {
+    const startFrame = Math.round(startSec * fps);
+    const endFrame = Math.round(endSec * fps);
+    const opacity = Math.min(
+      fadeIn(frame, startFrame, ENTRANCE_FRAMES),
+      fadeOut(frame, endFrame, EXIT_FRAMES),
+    );
+    if (opacity <= 0) return [];
+    return [{ ann, startSec, endSec, opacity }];
+  });
+
+  // Run the greedy placer once per frame. Per-frame is correct because the
+  // map camera changes per frame (route animations, choropleth phase
+  // transitions) — pixel coords of each anchor shift, so collision
+  // arbitration must re-run. Cost: O(N²) with N ≤ ~10 typical → sub-ms.
+  //
+  // No useMemo wrap: `visible` is a fresh array reference every frame
+  // (filter result), so any memoization keyed on it would always miss.
+  // Just compute inline.
+  const placements: Placement[] = (() => {
+    const map = mapRef?.getMap?.();
+    if (!map || typeof map.project !== "function") {
+      return visible.map(
+        (): Placement => ({
+          dx: 0,
+          dy: 0,
+          displaced: false,
+          offscreen: false,
+          align: "center",
+        }),
+      );
+    }
+    return placeLabels(
+      visible.map(({ ann }) => ({
+        ann,
+        defaultDy: DEFAULT_OFFSET_Y[ann.hierarchy],
+      })),
+      (lonLat) => {
+        const p = map.project(lonLat);
+        if (
+          !Number.isFinite(p.x) ||
+          !Number.isFinite(p.y) ||
+          // Anchors way off-screen don't participate in placement —
+          // their labels would never be visible anyway.
+          p.x < -200 ||
+          p.x > 2200 ||
+          p.y < -200 ||
+          p.y > 1300
+        ) {
+          return null;
+        }
+        // Back-of-globe detection (Issue 5 from May 14 review): in
+        // orthographic / globe projection, points on the far hemisphere
+        // project to FINITE in-range pixel coords but are visually behind
+        // the planet. Round-trip via unproject() — if the unproject
+        // result doesn't match the input lon/lat within a small epsilon,
+        // we're looking at the back. Skip those anchors so the placer
+        // doesn't push visible labels around for invisible competitors.
+        try {
+          if (typeof map.unproject === "function") {
+            const rt = map.unproject([p.x, p.y]);
+            const lonDiff = Math.abs(((rt.lng - lonLat[0] + 540) % 360) - 180);
+            const latDiff = Math.abs(rt.lat - lonLat[1]);
+            if (lonDiff > 1 || latDiff > 1) return null;
+          }
+        } catch {
+          // unproject can throw at extreme camera state; treat as visible.
+        }
+        return { x: p.x, y: p.y };
+      },
+    );
+  })();
+
   return (
     <>
-      {resolved.map(({ ann, startSec, endSec }) => {
+      {visible.map(({ ann, opacity }, i) => {
         // Content-derived key — array index would cause stale-Marker reuse
         // when authors reorder annotations during preview iteration.
         const key = `ann-${ann.at[0].toFixed(3)},${ann.at[1].toFixed(3)}-${ann.label}`;
-        const startFrame = Math.round(startSec * fps);
-        const endFrame = Math.round(endSec * fps);
-
-        const opacity = Math.min(
-          fadeIn(frame, startFrame, ENTRANCE_FRAMES),
-          fadeOut(frame, endFrame, EXIT_FRAMES),
-        );
-
-        // Skip rendering entirely when fully invisible. Big perf win when
-        // many annotations are spread across phases — only the visible ones
-        // are mounted at any given frame.
-        if (opacity <= 0) return null;
-
         return (
           <MapAnnotationMarker
             key={key}
             annotation={ann}
             opacity={opacity}
             dark={dark}
+            placement={placements[i]}
           />
         );
       })}

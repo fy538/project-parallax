@@ -8,6 +8,7 @@
 import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
+import type { MapTitleConfig } from "../../components/MapTitleFrame";
 
 export interface RoutePoint {
   /** Display name. */
@@ -168,6 +169,14 @@ export interface RouteAnimationData {
     size?: number;
     framed?: boolean;
   };
+
+  /**
+   * OPTIONAL title overlay — opt-in for Mapbox-backed templates per the
+   * atmospheric-register doctrine. See `MapTitleFrame`. Smart cartouche
+   * placement (`placement: "auto"`) is unsupported here — falls back to
+   * "top-left" with a dev warning.
+   */
+  mapTitle?: MapTitleConfig;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

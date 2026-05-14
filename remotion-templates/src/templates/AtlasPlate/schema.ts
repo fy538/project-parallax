@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { GraticuleSchema } from "../../components/Graticule.types";
+import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 import { ALL_DISPUTE_TAGS } from "../../utils/disputedBoundaries";
 
 const AtlasCountryFillSchema = z.object({
@@ -83,6 +84,7 @@ export const AtlasPlateSchema = z.object({
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     aesthetic: z.enum(["atlas", "vintage"]).optional(),
     backgroundTint: z.string().optional(),
+    mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

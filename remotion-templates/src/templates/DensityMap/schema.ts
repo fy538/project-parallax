@@ -6,6 +6,7 @@ import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { MapAnnotationSchema } from "../../components/MapAnnotations.types";
 import { LabelDensitySchema } from "../../components/MapGL.types";
+import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 
 const DensityPointSchema = z.object({
   at: z.tuple([z.number(), z.number()]),
@@ -71,6 +72,7 @@ export const DensityMapSchema = z.object({
         framed: z.boolean().optional(),
       })
       .optional(),
+    mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });
