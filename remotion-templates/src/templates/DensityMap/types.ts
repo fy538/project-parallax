@@ -17,6 +17,7 @@
 import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { MapTitleConfig } from "../../components/MapTitleFrame";
+import type { LabelDensity, LightPreset } from "../../components/MapGL.types";
 
 /** A single point. Optional `weight` aggregates the value (sum of weights). */
 export interface DensityPoint {
@@ -151,10 +152,10 @@ export interface DensityMapData {
    * to `"minimal"` when explicit MapAnnotations name everything that
    * matters. See MapGL `labelDensity`.
    */
-  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
+  labelDensity?: LabelDensity;
 
   /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
-  lightPreset?: "day" | "dawn" | "dusk" | "night";
+  lightPreset?: LightPreset;
 
   /** Editorial annotations. Same schema as other map templates. */
   annotations?: MapAnnotation[];

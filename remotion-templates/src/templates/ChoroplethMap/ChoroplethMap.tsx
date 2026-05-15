@@ -447,7 +447,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
             pitch={camera.pitch}
             bearing={camera.bearing + bearingDrift}
             projection={data.projection}
-            dark={data.backgroundVariant === "dark"}
+            register={data.backgroundVariant === "dark" ? "dark" : "light"}
             terrain={data.terrain ?? false}
             layers={graticuleLayers}
             // Editorial Mapbox register defaults:

@@ -70,33 +70,11 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { MapTitleFrame } from "../../components/MapTitleFrame";
 import { warnIf } from "../../utils/dataWarnings";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+} from "../../utils/stepFramework";
 import type { RouteAnimationData, RoutePhase, RouteSegment } from "./types";
-
-// ── Phase time calculator ──────────────────────────────────────────────────
-
-function getPhaseWindow(
-  phases: RoutePhase[],
-  index: number
-): { start: number; end: number } {
-  let start = sec(0.5); // initial delay
-  for (let i = 0; i < index; i++) {
-    start += sec(phases[i].durationSec);
-  }
-  return { start, end: start + sec(phases[index].durationSec) };
-}
-
-function getCurrentPhaseIndex(
-  phases: RoutePhase[],
-  frame: number
-): number {
-  let cursor = sec(0.5);
-  for (let i = 0; i < phases.length; i++) {
-    const end = cursor + sec(phases[i].durationSec);
-    if (frame < end) return i;
-    cursor = end;
-  }
-  return phases.length - 1;
-}
 
 // ── Camera conversion ───────────────────────────────────────────────────────
 
@@ -366,6 +344,19 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     };
   }, [rawData]);
 
+  // ── Phase boundaries ─────────────────────────────────────────────────────
+  // Pre-compute all phase [start, end) windows once per data change.
+  // The sec(0.5) base offset matches the original "initial delay" that
+  // getPhaseWindow/getCurrentPhaseIndex hard-coded on every call.
+  const phaseBoundaries = useMemo(
+    () =>
+      computeStepBoundaries(
+        data.phases.map((p) => sec(p.durationSec ?? 0)),
+        sec(0.5),
+      ),
+    [data.phases],
+  );
+
   // Path-style hierarchy: all arcs share the route color (visual cohesion
   // — the route is the same trip across phases). The CURRENT (just-animated)
   // segment renders at full alpha; SETTLED (past-phase) segments fade to
@@ -384,20 +375,20 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   // See: references/template-research/route-animation.md § 6.2
   const routeColor = data.routeColor || emphasis.primaryAccent;
 
-  const currentPhaseIdx = getCurrentPhaseIndex(data.phases, frame);
+  const currentPhaseIdx = getCurrentStepIndex(frame, phaseBoundaries);
   const currentPhase = data.phases[currentPhaseIdx];
-  const phaseWindow = getPhaseWindow(data.phases, currentPhaseIdx);
+  const phaseWindow = phaseBoundaries[currentPhaseIdx];
 
   // Phase windows in SECONDS — passed to MapAnnotations for phase-scoped
   // annotations. Memoized so we don't allocate a fresh array per frame
   // (used to bust MapAnnotations' useMemo on every render).
   const phaseWindowsSec = useMemo(
     () =>
-      data.phases.map((_, i) => {
-        const w = getPhaseWindow(data.phases, i);
-        return { startSec: w.start / layout.fps, endSec: w.end / layout.fps };
-      }),
-    [data.phases],
+      phaseBoundaries.map((w) => ({
+        startSec: w.start / layout.fps,
+        endSec: w.end / layout.fps,
+      })),
+    [phaseBoundaries],
   );
 
   // Collect all active segments/points up to and including current phase
@@ -769,11 +760,14 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
       const parsed = CinematicDirectiveSchema.safeParse(entry);
       if (parsed.success) {
         directives.push(parsed.data);
-      } else if (typeof console !== "undefined") {
-        // eslint-disable-next-line no-console
-        console.warn(
-          "[RouteAnimation] dropping malformed _direction.cameraPath " +
-            `entry: ${parsed.error.message}`,
+      } else {
+        // warnIf dedupes by (template, message) so re-runs of this memo
+        // don't fire multiple warnings for the same malformed entry —
+        // important because the memo re-evaluates on data change.
+        warnIf(
+          true,
+          "RouteAnimation",
+          `dropping malformed _direction.cameraPath entry: ${parsed.error.message}`,
         );
       }
     }
@@ -865,7 +859,18 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             pitch={camera.pitch}
             bearing={camera.bearing + bearingDrift}
             layers={layers}
-            dark={data.backgroundVariant === "dark"}
+            // Register resolution: explicit `toner` opt-in wins (it's a
+            // discrete editorial-register signal), else dark/light follows
+            // the episode's backgroundVariant. Vintage isn't exposed on
+            // RouteAnimation today; add a `data.vintage` field if a route
+            // ever needs the period register.
+            register={
+              data.toner
+                ? "toner"
+                : data.backgroundVariant === "dark"
+                  ? "dark"
+                  : "light"
+            }
             terrain={data.terrain ?? false}
             // Editorial register defaults — fog tinted to brand palette
             // (kills the default cyan globe halo), attribution chip in
@@ -881,7 +886,6 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
             vignette="editorial"
             labelDensity={data.labelDensity ?? "editorial"}
             lightPreset={data.lightPreset}
-            toner={data.toner}
             onMapReady={setMapInstance}
           >
           {/* Point labels — rendered as Markers for proper geo projection */}
@@ -894,7 +898,7 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
                 break;
               }
             }
-            const ptWindow = getPhaseWindow(data.phases, activatedPhase);
+            const ptWindow = phaseBoundaries[activatedPhase];
             const ptColor = pt.color || routeColor;
             // Labels appear AFTER camera settles (CONTENT_DELAY into phase)
             const ptDelay = activatedPhase > 0 ? sec(0.8) : sec(1.0);

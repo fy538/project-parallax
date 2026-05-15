@@ -347,7 +347,7 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
           zoom={camera.zoom}
           pitch={camera.pitch ?? 0}
           bearing={camera.bearing ?? 0}
-          dark={dark}
+          register={dark ? "dark" : "light"}
           terrain={false}
           layers={layers}
           // Editorial Mapbox register defaults (see MapGL fog preset docs).

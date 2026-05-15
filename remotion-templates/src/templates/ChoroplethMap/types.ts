@@ -9,6 +9,7 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { MapTitleConfig } from "../../components/MapTitleFrame";
+import type { LabelDensity, LightPreset } from "../../components/MapGL.types";
 
 /** A single country's data for one phase of the animation. */
 export interface CountryData {
@@ -162,10 +163,10 @@ export interface ChoroplethMapData {
    * labels would duplicate explicit MapAnnotations.
    * See MapGL `labelDensity` for the full taxonomy.
    */
-  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
+  labelDensity?: LabelDensity;
 
   /** Mapbox Standard scene lighting preset. See MapGL.types.ts. */
-  lightPreset?: "day" | "dawn" | "dusk" | "night";
+  lightPreset?: LightPreset;
 
   /**
    * Editorial annotations — labels pinned to lon/lat with optional leader

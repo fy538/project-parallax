@@ -9,6 +9,7 @@ import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { MapTitleConfig } from "../../components/MapTitleFrame";
+import type { LabelDensity, LightPreset } from "../../components/MapGL.types";
 
 export interface RoutePoint {
   /** Display name. */
@@ -139,7 +140,7 @@ export interface RouteAnimationData {
    * - `"minimal"` — hide all place/road/transit labels regardless of zoom
    * - `"off"` — total suppression (every label on canvas is editorial)
    */
-  labelDensity?: "atlas" | "editorial" | "minimal" | "off";
+  labelDensity?: LabelDensity;
 
   /**
    * Mapbox Standard scene lighting preset (`day` | `dawn` | `dusk` |
@@ -148,7 +149,7 @@ export interface RouteAnimationData {
    * cold opens, `dusk` for twilight register, `night` for diegetic
    * late-hour narration. See MapGL.types.ts.
    */
-  lightPreset?: "day" | "dawn" | "dusk" | "night";
+  lightPreset?: LightPreset;
 
   /**
    * Atmospheric atlas register — Stamen Toner via Stadia Maps. Falls
