@@ -516,9 +516,14 @@ const PhaseAxisRender: React.FC<{
   mode: "light" | "dark";
 }> = React.memo(({ config, pairs, pairXs, spineY, totalWidth, color, primaryColor, frame, mode }) => {
   const theme = useThemeMode(mode);
-  const phasePositions = pairs.map((p) => p.phasePosition as number);
-  const domainMin = config.min ?? Math.min(...phasePositions);
-  const domainMax = config.max ?? Math.max(...phasePositions);
+  const { phasePositions, domainMin, domainMax } = useMemo(() => {
+    const positions = pairs.map((p) => p.phasePosition as number);
+    return {
+      phasePositions: positions,
+      domainMin: config.min ?? Math.min(...positions),
+      domainMax: config.max ?? Math.max(...positions),
+    };
+  }, [pairs, config.min, config.max]);
   const span = Math.max(1e-9, domainMax - domainMin);
   const spanPx = Math.max(1, (pairs.length - 1) * EVENT_SPACING);
 

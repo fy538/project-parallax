@@ -706,6 +706,11 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
 
   // ── Editorial heuristics (dev-only warnings) ─────────────────────────────
   warnIf(
+    !!data.flowParticles && (data.durationSec ?? 8) < 6,
+    "SankeyFlow",
+    "flowParticles should only be enabled for durationSec >= 6s — at shorter durations particles distract from the ribbon reveal",
+  );
+  warnIf(
     nodes && nodes.length > 10,
     "SankeyFlow",
     `${nodes.length} nodes — SankeyFlow becomes spaghetti above ~10 nodes. ` +

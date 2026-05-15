@@ -67,8 +67,10 @@ const LABEL_GUTTER = 200;
 
 // ── Rank computation ────────────────────────────────────────────────────────
 
+// RankMap values are `number | null` — null means the entity has no value
+// for that period (sparse data) and the line should be broken there.
 interface RankMap {
-  [entityId: string]: number[];
+  [entityId: string]: Array<number | null>;
 }
 
 function computeRanks(
@@ -83,20 +85,39 @@ function computeRanks(
 
   for (let p = 0; p < periods.length; p++) {
     const period = periods[p];
-    // Build (entityId, value) pairs for this period
-    const vals: Array<{ id: string; value: number }> = entities.map((e) => {
+    // Build (entityId, value | null) pairs for this period.
+    // null means the entity has no data for this period — sparse gap.
+    const vals: Array<{ id: string; value: number | null }> = entities.map((e) => {
       const entry = e.values.find((v) => String(v.period) === String(period));
-      return { id: e.id, value: entry?.value ?? 0 };
+      return { id: e.id, value: entry?.value ?? null };
     });
 
-    // Sort by value: desc → highest is rank 1; asc → lowest is rank 1
-    const sorted = [...vals].sort((a, b) =>
+    // Only rank entities with defined values for this period.
+    const defined = vals.filter((v): v is { id: string; value: number } => v.value !== null);
+
+    // Sort by value: desc → highest is rank 1; asc → lowest is rank 1.
+    const sorted = [...defined].sort((a, b) =>
       rankDirection === "desc" ? b.value - a.value : a.value - b.value
     );
 
-    sorted.forEach((item, rankIdx) => {
-      rankMap[item.id].push(rankIdx + 1);
+    // Standard competition ranking (1224): rank = number of entities with
+    // strictly higher value + 1. Tied values receive the same rank and the
+    // next rank is skipped (e.g. [100,80,80,60] → [1,2,2,4]).
+    const rankOf = new Map<string, number>();
+    sorted.forEach((item) => {
+      // Count how many have strictly better value (already sorted, so it's
+      // the index of the first occurrence of this value in the sorted list).
+      const firstIdx = sorted.findIndex((s) =>
+        rankDirection === "desc"
+          ? s.value === item.value
+          : s.value === item.value
+      );
+      rankOf.set(item.id, firstIdx + 1);
     });
+
+    for (const v of vals) {
+      rankMap[v.id]!.push(v.value === null ? null : (rankOf.get(v.id) ?? null));
+    }
   }
 
   return rankMap;
@@ -190,7 +211,15 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   // Sort by final rank y-position, then push down overlapping labels
   const endLabelPositions = useMemo(() => {
     const entries = entities.map((entity, i) => {
-      const finalRank = rankMap[entity.id]?.[numPeriods - 1] ?? i + 1;
+      // Walk backwards to find last defined rank (handles trailing gaps).
+      const ranks = rankMap[entity.id] ?? [];
+      let finalRank: number = i + 1;
+      for (let k = numPeriods - 1; k >= 0; k--) {
+        if (ranks[k] !== null && ranks[k] !== undefined) {
+          finalRank = ranks[k] as number;
+          break;
+        }
+      }
       return { i, entity, finalY: getY(finalRank) };
     });
     // Sort by y ascending (top to bottom)
@@ -312,12 +341,19 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
 
             const ranks = rankMap[entity.id] ?? [];
 
-            // Draw one cubic bezier segment per column transition
+            // Draw one cubic bezier segment per column transition.
+            // E2 sparse-gap fix: skip segments where either endpoint rank is
+            // null (entity has no data for that period). This breaks the line
+            // at gaps rather than drawing a false connection to rank 0/1.
             return (
               <g key={`entity-${entity.id}`}>
                 {Array.from({ length: numPeriods - 1 }).map((_, colIdx) => {
-                  const rank0 = ranks[colIdx] ?? 1;
-                  const rank1 = ranks[colIdx + 1] ?? 1;
+                  const rank0 = ranks[colIdx] ?? null;
+                  const rank1 = ranks[colIdx + 1] ?? null;
+
+                  // Skip this segment entirely if either endpoint is missing.
+                  if (rank0 === null || rank1 === null) return null;
+
                   const x0 = getX(colIdx);
                   const y0 = getY(rank0);
                   const x1 = getX(colIdx + 1);
@@ -336,12 +372,6 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
                   );
 
                   if (segProgress <= 0) return null;
-
-                  // Approximate path length for strokeDashoffset reveal
-                  const dx = x1 - x0;
-                  const dy = y1 - y0;
-                  // Bezier arc length approximation: straight + curve penalty
-                  const approxLen = Math.sqrt(dx * dx + dy * dy) * (1 + Math.abs(dy) / (Math.abs(dx) + 1) * 0.3);
 
                   return (
                     <path
@@ -366,7 +396,9 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
 
                 {/* ── Node dots at each period ────────────────────────────── */}
                 {Array.from({ length: numPeriods }).map((_, colIdx) => {
-                  const rank = ranks[colIdx] ?? 1;
+                  const rank = ranks[colIdx] ?? null;
+                  // Skip dot when entity has no data for this period.
+                  if (rank === null) return null;
                   const cx = getX(colIdx);
                   const cy = getY(rank);
 
@@ -439,7 +471,7 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
 
           if (labelOpacity < 0.01) return null;
 
-          const adjustedY = endLabelPositions[entity.id] ?? getY(rankMap[entity.id]?.[numPeriods - 1] ?? 1);
+          const adjustedY = endLabelPositions[entity.id] ?? getY(entityIdx + 1);
 
           return (
             <div

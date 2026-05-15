@@ -22,6 +22,7 @@ const ArcConnectionSchema = z.object({
   strength: z.number().min(0).max(2).optional(),
   style: z.enum(["solid", "dashed"]).optional(),
   color: z.string().optional(),
+  emphasis: z.enum(["accent", "muted", "rebut"]).optional(),
 });
 
 export const ArcDiagramSchema = z.object({

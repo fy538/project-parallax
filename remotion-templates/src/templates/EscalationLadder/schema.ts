@@ -39,6 +39,15 @@ export const EscalationLadderSchema = z.object({
         y: z.number().optional(),
       })
       .optional(),
+    thresholds: z
+      .array(
+        z.object({
+          afterRungIndex: z.number().int().min(0),
+          label: z.string(),
+          color: z.string().optional(),
+        }),
+      )
+      .optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

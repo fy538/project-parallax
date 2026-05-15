@@ -332,6 +332,76 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         );
       })}
 
+      {/* ── Threshold markers ───────────────────────────────────────────
+          Dashed horizontal rules drawn BETWEEN rungs at configurable
+          positions. Animate in with the same entrance timing as the rung
+          at afterRungIndex so the threshold appears as each level is
+          reached. */}
+      {data.thresholds && data.thresholds.map((threshold, ti) => {
+        const rungIdx = threshold.afterRungIndex;
+        if (rungIdx < 0 || rungIdx >= numRungs) return null;
+        // Default color: severity color of the rung at afterRungIndex.
+        const thresholdColor = threshold.color ?? SEVERITY_COLORS[data.rungs[rungIdx]!.severity];
+        // Y position: midpoint between rung[rungIdx] bottom and rung[rungIdx+1] top.
+        const rungCenterY = rungIdx * rungHeight + rungHeight / 2;
+        const nextCenterY = (rungIdx + 1) * rungHeight + rungHeight / 2;
+        const lineY = (rungCenterY + nextCenterY) / 2;
+        // Animate in with the same timing as the rung at afterRungIndex.
+        const rungStart = ladderStart + rungIdx * rungStagger;
+        const thresholdOpacity = fadeIn(frame, rungStart + rungFadeIn, sec(0.4)) * exit;
+        const ladderBlockWidth = dateColumnWidth + dotColumnWidth + CARD_MAX_WIDTH + layout.spacing.lg;
+        const lineLeft = centerPad;
+        const lineWidth = ladderBlockWidth;
+
+        return (
+          <div
+            key={`threshold-${ti}`}
+            style={{
+              position: "absolute",
+              top: lineY,
+              left: lineLeft,
+              width: lineWidth,
+              opacity: thresholdOpacity,
+              pointerEvents: "none",
+            }}
+          >
+            {/* Dashed rule spanning the full ladder width */}
+            <svg
+              width={lineWidth}
+              height={2}
+              style={{ display: "block", overflow: "visible" }}
+            >
+              <line
+                x1={0}
+                y1={1}
+                x2={lineWidth}
+                y2={1}
+                stroke={thresholdColor}
+                strokeWidth={1}
+                strokeDasharray="6 4"
+                opacity={0.7}
+              />
+            </svg>
+            {/* Label at the right end */}
+            <div
+              style={{
+                position: "absolute",
+                right: 0,
+                top: -12,
+                fontSize: fontSizes.label,
+                fontFamily: fonts.mono,
+                color: thresholdColor,
+                letterSpacing: 1.5,
+                whiteSpace: "nowrap",
+                textShadow: theme.textShadow,
+              }}
+            >
+              {threshold.label}
+            </div>
+          </div>
+        );
+      })}
+
       {/* Rungs */}
       {data.rungs.map((rung, i) => {
         const rungStart = ladderStart + i * rungStagger;

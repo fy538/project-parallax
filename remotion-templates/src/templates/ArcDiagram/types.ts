@@ -77,6 +77,17 @@ export interface ArcConnection {
    * any hex / palette token. Defaults to theme.text.muted.
    */
   color?: string;
+  /**
+   * Editorial emphasis for this connection:
+   * - `"accent"` — the load-bearing arc the narration is about; rendered at
+   *   full opacity in amber.
+   * - `"muted"` — context arc; rendered at reduced opacity so accent arcs dominate.
+   * - `"rebut"` — a challenged or rebutted connection; rendered in rust.
+   *
+   * Default (omitted) treats all connections equally. When ANY connection sets
+   * `"accent"`, other connections automatically read as muted relative to it.
+   */
+  emphasis?: "accent" | "muted" | "rebut";
 }
 
 export interface ArcDiagramData {

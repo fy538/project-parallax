@@ -78,6 +78,27 @@ export interface EscalationLadderData {
    */
   contentOffset?: { x?: number; y?: number };
 
+  /**
+   * Optional dashed boundary markers rendered between rungs — typically used
+   * for doctrinal thresholds like "NUCLEAR THRESHOLD" or "ESCALATION DOMINANCE".
+   * Each entry draws a dashed rule after the specified rung with a right-aligned
+   * label.
+   */
+  thresholds?: Array<{
+    /**
+     * Draw the threshold line AFTER this rung index (0-based).
+     * The line appears between rungs[afterRungIndex] and rungs[afterRungIndex + 1].
+     */
+    afterRungIndex: number;
+    /** Label shown at the right end of the rule, e.g. "NUCLEAR THRESHOLD". */
+    label: string;
+    /**
+     * Color for the rule and label. Defaults to the severity color of
+     * rungs[afterRungIndex].
+     */
+    color?: string;
+  }>;
+
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;

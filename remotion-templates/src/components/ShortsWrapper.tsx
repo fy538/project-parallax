@@ -65,7 +65,7 @@ export const ShortsWrapper: React.FC<ShortsWrapperProps> = ({
   const { durationInFrames } = useVideoConfig();
   const vl = useVerticalLayout();
   const theme = useThemeMode(mode);
-  const { style: compStyle } = useCompositionAnimation();
+  const { style: compStyle } = useCompositionAnimation({ noDrift: true });
 
   const exit = exitFade(frame, durationInFrames, 30); // ~1s exit
   const titleOpacity = fadeIn(frame, 0, 15) * exit;

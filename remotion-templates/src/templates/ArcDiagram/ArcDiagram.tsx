@@ -60,16 +60,18 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
 import type { ArcDiagramData, ArcConnection } from "./types";
 
-// Brand-token resolver — keeps "accent" / "muted" semantic in data files.
+// Brand-token resolver — keeps "accent" / "muted" / "rebut" semantic in data files.
 const resolveArcColor = (
   raw: string | undefined,
   fallback: string,
   accent: string,
   muted: string,
+  rebut: string,
 ): string => {
   if (!raw) return fallback;
   if (raw === "accent") return accent;
   if (raw === "muted") return muted;
+  if (raw === "rebut") return rebut;
   return raw;
 };
 
@@ -91,6 +93,7 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
   const accent = palette.amber;
+  const rebut = palette.rust;
 
   // Layout. Content area gives us a bounded region beneath the title;
   // baseline sits about 65% down so arcs above have room and labels
@@ -222,7 +225,45 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
               so strokeDashoffset can sweep cleanly from full to 0
               without needing path.getTotalLength() (which is unreliable
               during SSR / first-frame render). */}
-          {data.connections.map((conn: ArcConnection, i) => {
+          {(() => {
+            // Pre-compute emphasis state for the whole connection set so
+            // the mute hierarchy activates when ANY connection is "accent".
+            const someAccentConn = data.connections.some(c => c.emphasis === "accent");
+
+            // E4 — arc-label collision detection.
+            // After all arc geometries are known, deconflict labels that share
+            // a similar apex-x position so they don't overlap.
+            const apexEntries: Array<{ apexX: number; apex: number; label: string; connIdx: number }> = [];
+            data.connections.forEach((conn, i) => {
+              if (!conn.label) return;
+              const fromIdx = nodeIndex[conn.from];
+              const toIdx = nodeIndex[conn.to];
+              if (fromIdx === undefined || toIdx === undefined) return;
+              const [leftIdx, rightIdx] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+              const aX = nodeXs[leftIdx];
+              const bX = nodeXs[rightIdx];
+              if (Math.abs(bX - aX) < 1) return;
+              const halfSpan = (bX - aX) / 2;
+              const apex = Math.max(24, Math.min(halfSpan, maxArcHeight));
+              apexEntries.push({ apexX: (aX + bX) / 2, apex, label: conn.label, connIdx: i });
+            });
+            // Sort by apexX, then compute verticalOffset per label.
+            const sorted = [...apexEntries].sort((a, b) => a.apexX - b.apexX);
+            const verticalOffsets: Record<number, number> = {};
+            for (let k = 0; k < sorted.length; k++) {
+              const cur = sorted[k]!;
+              const labelWidth = Math.max(cur.label.length * 7, 60);
+              let collides = false;
+              if (k > 0) {
+                const prev = sorted[k - 1]!;
+                if (Math.abs(cur.apexX - prev.apexX) < labelWidth / 2) {
+                  collides = true;
+                }
+              }
+              verticalOffsets[cur.connIdx] = collides ? -22 : 0;
+            }
+
+            return data.connections.map((conn: ArcConnection, i) => {
             const fromIdx = nodeIndex[conn.from];
             const toIdx = nodeIndex[conn.to];
             if (fromIdx === undefined || toIdx === undefined) return null;
@@ -254,12 +295,23 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
 
             const strength = conn.strength ?? 1;
             const isDashed = conn.style === "dashed";
-            const arcColor = resolveArcColor(
+
+            // E1 — emphasis hierarchy.
+            const isAccent = conn.emphasis === "accent";
+            const isRebut = conn.emphasis === "rebut";
+            const isMuted = conn.emphasis === "muted" || (someAccentConn && !isAccent && !isRebut);
+            const emphasisOpacity = isMuted ? 0.30 : 1.0;
+
+            // Rebut connections use palette.rust; accent uses amber;
+            // otherwise fall through to the color field or theme.text.muted.
+            const baseArcColor = resolveArcColor(
               conn.color,
               theme.text.muted,
               accent,
               theme.text.muted,
+              rebut,
             );
+            const arcColor = isRebut ? rebut : baseArcColor;
 
             // stagger(index, perItem) — third arg is `baseDelay` added
             // to every item, NOT a max cap. We already add arcStart
@@ -282,10 +334,14 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
             const arcOpacity =
               (isDashed ? progress : 1) *
               exitOp *
-              (0.45 + Math.min(1, strength) * 0.50);
+              (0.45 + Math.min(1, strength) * 0.50) *
+              emphasisOpacity;
 
             const labelOpacity =
-              fadeIn(frame, start + sec(0.5), sec(0.35)) * exitOp;
+              fadeIn(frame, start + sec(0.5), sec(0.35)) * exitOp * emphasisOpacity;
+
+            // E4 — label vertical offset from collision detection pass.
+            const labelVOffset = verticalOffsets[i] ?? 0;
 
             return (
               <g key={`arc-${i}`}>
@@ -296,7 +352,7 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
                     fill="none"
                     stroke={arcColor}
                     strokeWidth={10}
-                    opacity={progress * exitOp * 0.10}
+                    opacity={progress * exitOp * 0.10 * emphasisOpacity}
                     strokeLinecap="round"
                   />
                 )}
@@ -312,12 +368,26 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
                 />
                 {/* Arc label — sits at the apex with a small backing
                     rect (text-on-line collisions are the main
-                    legibility failure of arc diagrams). */}
+                    legibility failure of arc diagrams).
+                    E4: verticalOffset pushes colliding labels up 22px
+                    and a small tick connects them back to the arc apex. */}
                 {conn.label && (
                   <g opacity={labelOpacity}>
+                    {/* Tick line from apex to pushed label (only when offset) */}
+                    {labelVOffset !== 0 && (
+                      <line
+                        x1={midX}
+                        y1={baselineY - apex - 4}
+                        x2={midX}
+                        y2={baselineY - apex - 4 + labelVOffset}
+                        stroke={arcColor}
+                        strokeWidth={1}
+                        opacity={0.5}
+                      />
+                    )}
                     <rect
                       x={midX - conn.label.length * 4}
-                      y={baselineY - apex - 18}
+                      y={baselineY - apex - 18 + labelVOffset}
                       width={conn.label.length * 8}
                       height={18}
                       fill={theme.bg.base}
@@ -326,7 +396,7 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
                     />
                     <text
                       x={midX}
-                      y={baselineY - apex - 4}
+                      y={baselineY - apex - 4 + labelVOffset}
                       textAnchor="middle"
                       fill={arcColor}
                       fontSize={fontSizes.caption}
@@ -341,7 +411,8 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
                 )}
               </g>
             );
-          })}
+          });
+          })()}
 
           {/* ── Nodes ────────────────────────────────────────────────
               Small filled discs anchored on the baseline. Primary nodes
