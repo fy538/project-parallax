@@ -220,10 +220,11 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   // ── Render ───────────────────────────────────────────────────────────────
   const isAnyHighlighted = highlightIds.length > 0;
 
-  // Hold phase: delay exit fade by holdFrames after all lines finish drawing.
-  // exitFade starts from (durationInFrames - holdFrames) so the hold is
-  // preserved at full opacity and only then the fade-out begins.
-  const holdExitOpacity = exitFade(frame, durationInFrames - holdFrames, 15);
+  // Hold phase: the content stays at full opacity until the last 15 frames,
+  // then fades out. The "hold" is implicit — the visual content just stays on
+  // screen. exitFade(frame, startFrame, 15) returns 1 for frame < startFrame,
+  // then linearly fades 1→0 over the next 15 frames.
+  const holdExitOpacity = exitFade(frame, durationInFrames - 15, 15);
 
   return (
     <Background variant="light">

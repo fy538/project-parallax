@@ -84,12 +84,29 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
   // projection family — consistent visual vocabulary across both insets.
   const projection = useMemo(() => {
     if (focusFeatures.length === 0) return null;
+
+    // R1: Antimeridian-spanning check. Use a temporary un-fitted projection to
+    // get raw bounds for each focus feature. If the combined width exceeds 75%
+    // of the canvas, filter out antimeridian-spanning features from the fit
+    // (still rendered, just not used for fitExtent). If ALL features span the
+    // antimeridian, fall back to fit-all but add a minimum-scale guard below.
+    const tempPathGen = geoPath(geoEqualEarth());
+    let fitFeatures = focusFeatures;
+    const nonSpanning = focusFeatures.filter((f) => {
+      const b = tempPathGen.bounds(f as any);
+      return isFinite(b[0][0]) && (b[1][0] - b[0][0]) <= insetW * 0.75;
+    });
+    if (nonSpanning.length > 0) {
+      fitFeatures = nonSpanning;
+    }
+    // else: all features are antimeridian-spanning — fall back to fit-all.
+
     const p = geoEqualEarth();
     const combinedFeature: Feature<Geometry> = {
       type: "Feature",
       geometry: {
         type: "GeometryCollection",
-        geometries: focusFeatures.map((f) => f.geometry),
+        geometries: fitFeatures.map((f) => f.geometry),
       } as Geometry, // d3-geo accepts GeometryCollection at runtime
       properties: {},
     };
@@ -100,13 +117,33 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
       ],
       combinedFeature as unknown as FeatureCollection,
     );
+
+    // R1: Guard against degenerate fitExtent results (infinite or absurd scale).
+    if (!isFinite(p.scale()) || p.scale() > 1e6) return null;
+
     return p;
   }, [focusFeatures, insetW, insetH]);
 
+  // R5: memoize pathGen so it's not recreated every frame.
+  const pathGen = useMemo(() => {
+    if (!projection) return null;
+    return geoPath(projection);
+  }, [projection]);
+
+  // R5: pre-compute all country path strings so they aren't re-projected
+  // 30× per second on a static geometry.
+  const countryPaths = useMemo(() => {
+    if (!pathGen) return [];
+    return allCountries.map((c: CountryFeature) => ({
+      alpha3: c.alpha3 ?? "",
+      name: c.name ?? "",
+      d: pathGen(c.feature) ?? "",
+    }));
+  }, [pathGen, allCountries]);
+
   // Screen-space bbox of the focus countries (for the dashed rust rect).
   const focusBbox = useMemo(() => {
-    if (!projection || focusFeatures.length === 0) return null;
-    const pathGen = geoPath(projection);
+    if (!projection || !pathGen || focusFeatures.length === 0) return null;
     const merged: Feature<Geometry> = {
       type: "Feature",
       geometry: {
@@ -123,7 +160,7 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
       width: Math.min(insetW, x1 - x0 + pad * 2),
       height: Math.min(insetH, y1 - y0 + pad * 2),
     };
-  }, [projection, focusFeatures, insetW, insetH]);
+  }, [projection, pathGen, focusFeatures, insetW, insetH]);
 
   // Country name label — up to 3 names, then "+N more".
   const labelText = useMemo(() => {
@@ -157,9 +194,7 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
   const frameStroke = dark ? palette.bone + "40" : palette.ink + "30";
   const oceanFill = dark ? "#0A0907" : "#DDD3C5";
 
-  if (!projection) return null;
-
-  const pathGen = geoPath(projection);
+  if (!projection || !pathGen) return null;
 
   return (
     <div style={cornerStyle} aria-hidden="true">
@@ -190,17 +225,16 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
           rx={3}
         />
         {/* All countries — highlighted in amber (or fillMap color), others in bone */}
-        {allCountries.map((c: CountryFeature) => {
-          const iso3 = c.alpha3 ?? "";
+        {countryPaths.map(({ alpha3, name, d }) => {
+          const iso3 = alpha3;
           const isFocus = focusIso3.includes(iso3);
           const fill = isFocus
             ? (fillMap?.[iso3] ?? palette.amber)
             : (dark ? "#2A2620" : palette.bone);
-          const d = pathGen(c.feature) ?? "";
           if (!d) return null;
           return (
             <path
-              key={iso3 || c.name}
+              key={iso3 || name}
               d={d}
               fill={fill}
               stroke={palette.ink}

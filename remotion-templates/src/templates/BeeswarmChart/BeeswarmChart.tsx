@@ -42,6 +42,7 @@ import {
   useVideoConfig,
   interpolate,
 } from "remotion";
+import { measureText } from "@remotion/layout-utils";
 import {
   palette,
   fonts,
@@ -544,9 +545,21 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
               {Object.entries(groupColorMap).map(([groupLabel, color], i) => {
                 const swatchW = 10;
                 const gap = 8;
+                // R10: use measureText for accurate label widths (handles CJK
+                // characters which are ~14px wide, not 7px like Latin). Fall
+                // back to the character-count heuristic in test environments
+                // that lack canvas.
                 const xOff = Object.entries(groupColorMap)
                   .slice(0, i)
-                  .reduce((acc, [gl]) => acc + gl.length * 7 + gap + swatchW + 20, 0);
+                  .reduce((acc, [gl]) => {
+                    let w: number;
+                    try {
+                      w = measureText({ text: gl, fontFamily: fonts.mono, fontSize: 10, fontWeight: "400" }).width;
+                    } catch {
+                      w = gl.length * 7; // fallback for test environments without canvas
+                    }
+                    return acc + swatchW + gap + w + 20;
+                  }, 0);
                 const legendOp = fadeIn(frame, itemsStart + sec(0.5), sec(0.4)) * exitOp;
                 return (
                   <g key={groupLabel} transform={`translate(${xOff}, 0)`} opacity={legendOp}>

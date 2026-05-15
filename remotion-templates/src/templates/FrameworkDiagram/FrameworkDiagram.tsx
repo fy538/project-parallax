@@ -522,9 +522,9 @@ const FlowVariant: React.FC<{
   const markerRadius = 13;
 
   warnIf(
-    data.flowSpacing === "proportional" && nodes.every(n => !n.weight),
+    data.flowSpacing === "proportional" && nodes.some(n => !n.weight),
     "FrameworkDiagram",
-    "flowSpacing='proportional' is set but no nodes have weight values — falling back to equal spacing. Set weight on each FlowNode to activate proportional stage widths."
+    `flowSpacing='proportional' requires ALL nodes to have a positive weight, but ${nodes.filter(n => !n.weight).map(n => n.label).join(", ")} ${nodes.filter(n => !n.weight).length === 1 ? "is" : "are"} missing weight — falling back to equal spacing.`
   );
 
   // Per-node slot center x positions. When flowSpacing="proportional" AND
@@ -920,7 +920,8 @@ const FlowVariant: React.FC<{
 const MatrixVariant: React.FC<{
   data: FrameworkDiagramData;
   frame: number;
-}> = React.memo(({ data, frame }) => {
+  durationInFrames: number;
+}> = React.memo(({ data, frame, durationInFrames }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const emphasis = useEpisodeColorEmphasis();
   const rowHeaders = data.rowHeaders || [];
@@ -969,7 +970,7 @@ const MatrixVariant: React.FC<{
     return { verb: label };
   };
 
-  const exitOp = exitFade(frame, 99999, 15); // matrix doesn't compute durationInFrames here
+  const exitOp = exitFade(frame, durationInFrames - 15, 15);
   const fade = fadeIn(frame, sec(0.2), sec(0.5));
 
   return (
@@ -1330,6 +1331,7 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
   data,
 }) => {
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
@@ -1369,7 +1371,7 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
           <FlowVariant data={data} frame={frame} />
         )}
         {data.variant === "matrix" && (
-          <MatrixVariant data={data} frame={frame} />
+          <MatrixVariant data={data} frame={frame} durationInFrames={durationInFrames} />
         )}
 
         {/* Episode label — slideIn (no naked fade) */}

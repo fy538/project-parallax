@@ -152,9 +152,12 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
   // Absolute mode: scale so the largest column hits a target fraction of
   // wallWidth (we still need a horizontal scale; "absolute" preserves
   // proportions but anchors to the widest column).
+  const widthMax = useMemo(
+    () => Math.max(...data.columns.map((c) => c.width), 0),
+    [data.columns],
+  );
   const columnLayouts = useMemo(() => {
     const widthSum = data.columns.reduce((s, c) => s + c.width, 0);
-    const widthMax = Math.max(...data.columns.map((c) => c.width));
     // Reserve 2px gutter between adjacent columns (n-1 gaps).
     const gutterX = 2;
     const totalGutter = gutterX * Math.max(0, data.columns.length - 1);
@@ -486,7 +489,11 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
                 );
               })}
 
-              {/* Width-percent stamp (bottom of column) */}
+              {/* Width stamp (bottom of column).
+                  Percent mode: "N% of total" using shareWidth × 100.
+                  Absolute mode: raw column.width value with valueFormat unit
+                  suffix (shareWidth is a ratio of widthMax, not % of total,
+                  so showing it as "N%" would be factually wrong). */}
               <div
                 style={{
                   position: "absolute",
@@ -510,7 +517,14 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
                     lineHeight: 1,
                   }}
                 >
-                  {applyValueFormat(Math.round(col.shareWidth * 100), data.valueFormat)}
+                  {widthMode === "percent"
+                    ? applyValueFormat(Math.round(col.shareWidth * 100), data.valueFormat)
+                    : (() => {
+                        const rawVal = Math.round(col.width);
+                        const fmt = data.valueFormat;
+                        if (!fmt || fmt === "percent" || fmt === "%") return String(rawVal);
+                        return `${rawVal} ${fmt}`;
+                      })()}
                 </div>
               </div>
             </div>

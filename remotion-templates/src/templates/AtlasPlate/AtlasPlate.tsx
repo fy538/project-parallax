@@ -828,9 +828,11 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
   // ── Extent box (showExtentBox) ──────────────────────────────────────────
   // When the current phase has `showExtentBox: true`, compute the bounding
-  // box of the NEXT phase's focus countries in the CURRENT phase's settled
-  // camera coordinates. Rendered as a dashed rust rectangle to signal
-  // "here is where we zoom next." Standard FT / NatGeo editorial device.
+  // box of the NEXT phase's focus countries in BASE-PROJECTION space (no
+  // camera transform). The rect is rendered INSIDE the <g transform> group
+  // so the group's live camera transform (which IS the animated camera)
+  // correctly scales and positions it at every frame. Using settledPose
+  // coordinates here would cause double-transformation during transitions.
   const extentBoxRect = useMemo((): { x: number; y: number; w: number; h: number } | null => {
     const currentPhase = data.phases[safeIdx];
     if (!currentPhase?.showExtentBox) return null;
@@ -839,31 +841,29 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     if (!nextIso3 || nextIso3.length === 0) return null;
 
     // Collect all features matching next phase's iso3 list.
-    const allCountries = getAllCountries();
-    const nextFeatures = allCountries.filter(c => nextIso3.includes(c.alpha3 ?? ""));
+    const allCountriesForBox = getAllCountries();
+    const nextFeatures = allCountriesForBox.filter(c => nextIso3.includes(c.alpha3 ?? ""));
     if (nextFeatures.length === 0) return null;
 
-    // Project using the SETTLED pose of the current phase (not animated).
-    const settledPose = phasePoses[safeIdx] ?? { scale: 1, translate: [0, 0] as [number, number] };
-
+    // R3: Use raw base-projection coordinates — no settledPose scale/translate.
+    // The rect lives inside the <g transform> camera group, so the group's
+    // live transform positions it correctly at all animation frames.
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const country of nextFeatures) {
       const bounds = basePathGen.bounds(country.feature as any); // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
       if (!isFinite(bounds[0][0])) continue;
-      const bx0 = bounds[0][0] * settledPose.scale + settledPose.translate[0];
-      const by0 = bounds[0][1] * settledPose.scale + settledPose.translate[1];
-      const bx1 = bounds[1][0] * settledPose.scale + settledPose.translate[0];
-      const by1 = bounds[1][1] * settledPose.scale + settledPose.translate[1];
-      minX = Math.min(minX, bx0, bx1);
-      minY = Math.min(minY, by0, by1);
-      maxX = Math.max(maxX, bx0, bx1);
-      maxY = Math.max(maxY, by0, by1);
+      // R3: antimeridian guard — skip features whose raw bbox spans >80% of canvas width.
+      if (bounds[1][0] - bounds[0][0] > layout.width * 0.8) continue;
+      minX = Math.min(minX, bounds[0][0], bounds[1][0]);
+      minY = Math.min(minY, bounds[0][1], bounds[1][1]);
+      maxX = Math.max(maxX, bounds[0][0], bounds[1][0]);
+      maxY = Math.max(maxY, bounds[0][1], bounds[1][1]);
     }
     if (!isFinite(minX)) return null;
 
     const pad = 12;
     return { x: minX - pad, y: minY - pad, w: maxX - minX + pad * 2, h: maxY - minY + pad * 2 };
-  }, [data.phases, safeIdx, phasePoses, basePathGen]);
+  }, [data.phases, safeIdx, basePathGen]);
 
   // Defensive null-render — happens AFTER all hooks (Rules of Hooks). If
   // schema validation ever lets through an empty phases array, render

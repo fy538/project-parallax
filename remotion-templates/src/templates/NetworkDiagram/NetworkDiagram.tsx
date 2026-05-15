@@ -421,11 +421,17 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     `form collapses into undifferentiated "many things". Demote to SankeyFlow ` +
     `(if allocation) or DataChart tabular. See DIAGRAM_TEMPLATE_SELECTOR.md.`,
   );
-  warnIf(
-    data.layout === "bipartite" && data.nodes.some(n => !n.side),
-    "NetworkDiagram",
-    `layout="bipartite" requires every node to have side="left" or side="right". Nodes missing side: ${data.nodes.filter(n => !n.side).map(n => n.id).join(", ")}. Bipartite will render as single column.`
-  );
+  // R9: avoid building the node-ID list string every frame (eager argument
+  // evaluation). Gate the whole block on `data.layout === "bipartite"` so
+  // the filter + join only runs for bipartite compositions.
+  if (data.layout === "bipartite") {
+    const missingBipartiteSide = data.nodes.filter(n => !n.side);
+    warnIf(
+      missingBipartiteSide.length > 0,
+      "NetworkDiagram",
+      `layout="bipartite" requires every node to have side="left" or side="right". Nodes missing side: ${missingBipartiteSide.map(n => n.id).join(", ")}. Bipartite will render as single column.`
+    );
+  }
   const uid = useId().replace(/:/g, "");
   const filterId = (name: string) => `nd-${uid}-${name}`;
   const frame = useCurrentFrame();
@@ -673,13 +679,15 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             );
           } else {
             // Hub-spoke convergence terminator: small filled dot where
-            // the edge meets the hub side. Reads as "this dependency
-            // lands HERE" and visually pulls the eye inward to the
-            // chokepoint. Drawn at the FROM endpoint by convention
-            // (hub-spoke data canonically has hub as `from`).
+            // the edge meets the hub side. The hub (primary) node is
+            // where the terminator dot renders — it must land AT the hub,
+            // not at the satellite end. ep.x1/y1 = FROM endpoint,
+            // ep.x2/y2 = TO endpoint. When hub is `to`, the dot goes to
+            // ep.x2/y2; when hub is `from`, to ep.x1/y1.
             const fromIsPrimary = nodeById[edge.from]?.importance === "primary";
-            const terminatorX = fromIsPrimary ? ep.x1 : ep.x2;
-            const terminatorY = fromIsPrimary ? ep.y1 : ep.y2;
+            const toIsPrimary = nodeById[edge.to]?.importance === "primary";
+            const terminatorX = fromIsPrimary ? ep.x1 : toIsPrimary ? ep.x2 : ep.x2;
+            const terminatorY = fromIsPrimary ? ep.y1 : toIsPrimary ? ep.y2 : ep.y2;
             return (
               <g key={`edge-${edgeIdx}`}>
                 {/* Soft glow halo — wider, slightly more present so the
