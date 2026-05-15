@@ -131,7 +131,7 @@ interface TreatmentInfo {
   opacity?: number;
 }
 
-interface TemplateInfo {
+export interface TemplateInfo {
   component: string;
   dataFile?: string;
   /** Atmospheric PNG under this template only (ids from BACKDROP_MANIFEST). */
@@ -214,7 +214,7 @@ interface SyncPoint {
   confidence: number;
 }
 
-interface ManifestSegment {
+export interface ManifestSegment {
   id: string;
   type: SegmentType;
   startSec: number;
@@ -243,20 +243,20 @@ interface ManifestSegment {
   _direction?: Record<string, unknown>;
 }
 
-interface NarrationInfo {
+export interface NarrationInfo {
   audioFile?: string;
   totalDurationSec: number;
   words?: Array<{ word: string; start: number; end: number }>;
 }
 
-interface BeatInfo {
+export interface BeatInfo {
   id: string;
   title: string;
   startSec: number;
   endSec?: number;
 }
 
-interface MusicBedTrack {
+export interface MusicBedTrack {
   id: string;
   file: string;
   startSec: number;
@@ -268,11 +268,11 @@ interface MusicBedTrack {
   beat?: string;
 }
 
-interface MusicBedConfig {
+export interface MusicBedConfig {
   tracks: MusicBedTrack[];
 }
 
-interface AssemblyManifest {
+export interface AssemblyManifest {
   version: string;
   episode: string;
   title?: string;
@@ -327,7 +327,7 @@ interface AssemblyManifest {
 
 // ── Props ────────────────────────────���────────────────────────────────────────
 
-interface FullEpisodeProps {
+export interface FullEpisodeProps {
   /** The assembly manifest data (passed as inputProps or loaded inline). */
   manifest: AssemblyManifest;
   /**

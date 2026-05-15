@@ -78,6 +78,7 @@ import {
 import { measureText } from "@remotion/layout-utils";
 import type { AtlasPlateData, AtlasPhase } from "./types";
 import { AtlasInsetLocator } from "../../components/AtlasInsetLocator";
+import { AtlasDetailInset } from "../../components/AtlasDetailInset";
 import { ReliefUnderlay } from "./ReliefUnderlay";
 import {
   DEFAULT_FRAME_PADDING,
@@ -1184,6 +1185,20 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             size={data.inset.size}
             focusIso3={currentWindow.phase.focus?.iso3}
             dark={dark}
+          />
+        )}
+
+        {/* Detail inset — zoomed corner view of specific countries.
+            The NatGeo / FT regional-supplement idiom: main view gives world
+            context; inset shows the editorial subject at readable scale.
+            Opt-in via `data.detailInset`. Distinct from `inset` above. */}
+        {data.detailInset && (
+          <AtlasDetailInset
+            focusIso3={data.detailInset.iso3}
+            corner={data.detailInset.corner ?? "bottom-right"}
+            size={data.detailInset.size}
+            dark={dark}
+            opacity={fadeIn(frame, currentWindow.startFrame, sec(0.5)) * exitFade(frame, durationInFrames, 15)}
           />
         )}
       </AbsoluteFill>

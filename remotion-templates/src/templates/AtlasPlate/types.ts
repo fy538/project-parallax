@@ -237,6 +237,26 @@ export interface AtlasPlateData {
     size?: number;
   };
 
+  /**
+   * Detail inset — a small zoomed corner panel showing a specific set of
+   * countries in close-up while the main view holds its own camera.
+   * The NatGeo / FT regional-supplement idiom: main view provides
+   * geographic context; inset shows the editorial subject at readable scale.
+   *
+   * Distinct from `inset` (which shows the world-map "you are here" box).
+   * Use both together when you want: main=world context, detail=zoomed
+   * subject, AND the "you are here" locator.
+   *
+   * - `iso3`: countries to fit the detail projection around.
+   * - `corner`: anchor position. Default `"bottom-right"`.
+   * - `size`: width in px. Default 220.
+   */
+  detailInset?: {
+    iso3: string[];
+    corner?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+    size?: number;
+  };
+
   /** Map mode — light (default) or dark. */
   backgroundVariant?: "light" | "dark";
 

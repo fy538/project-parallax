@@ -15,6 +15,9 @@ import { layout, sec } from "../../design/theme";
 // Re-export the full-episode composition
 export { SiliconTrapFullComposition } from "./SiliconTrapFull";
 
+// Re-export manifest types for consumer files
+export type { AssemblyManifest, ManifestSegment, TemplateInfo, NarrationInfo, BeatInfo } from "./FullEpisode";
+
 // ── Duration calculation ──────────────────────────────────────────────────────
 
 // silicon-trap: 15-frame overlaps between clips.

@@ -169,6 +169,22 @@ export const AtlasPlateSchema = z.object({
         size: z.number().positive().optional(),
       })
       .optional(),
+    /**
+     * Detail inset — a small zoomed corner panel showing specific countries
+     * in close-up. The NatGeo / FT regional-supplement idiom. Distinct from
+     * `inset` (the world-map "you are here" locator). Use both together for
+     * maximum editorial context: main=world, detail=editorial subject,
+     * locator=where in the world.
+     */
+    detailInset: z
+      .object({
+        iso3: z.array(z.string()).min(1),
+        corner: z
+          .enum(["top-left", "top-right", "bottom-left", "bottom-right"])
+          .optional(),
+        size: z.number().positive().optional(),
+      })
+      .optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
     aesthetic: AtlasAestheticSchema.optional(),
     backgroundTint: z.string().optional(),

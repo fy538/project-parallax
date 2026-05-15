@@ -15,12 +15,13 @@
 import React from "react";
 import { Composition } from "remotion";
 import { FullEpisode, calculateFullEpisodeMetadata } from "./FullEpisode";
+import type { AssemblyManifest } from "./FullEpisode";
 import manifest from "../../../data/episodes/prisoners-dilemma/assembly-manifest.json";
 import { TEMPLATE_DATA } from "./prisoners-dilemma-data";
 
 export const PrisonersDilemmaFull: React.FC = () => (
   <FullEpisode
-    manifest={manifest as any} // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
+    manifest={manifest as unknown as AssemblyManifest}
     templateData={TEMPLATE_DATA}
     assetBasePath="episodes/prisoners-dilemma"
   />
@@ -33,7 +34,7 @@ export const PrisonersDilemmaFullComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: manifest as any, // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
+          manifest: manifest as unknown as AssemblyManifest,
           templateData: TEMPLATE_DATA,
           assetBasePath: "episodes/prisoners-dilemma",
         },

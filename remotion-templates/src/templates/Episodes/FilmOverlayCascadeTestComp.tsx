@@ -23,13 +23,11 @@
 import React from "react";
 import { Composition } from "remotion";
 import { FullEpisode, calculateFullEpisodeMetadata } from "./FullEpisode";
+import type { AssemblyManifest } from "./FullEpisode";
 
 // ── Inline fixture manifest ──────────────────────────────────────────────────
-// AssemblyManifest is not exported from FullEpisode.tsx (internal type).
-// The object is cast to `any` when passed to FullEpisode; TypeScript catches
-// structural mismatches at the pass-site anyway.
 
-const FIXTURE_MANIFEST = {
+const FIXTURE_MANIFEST: AssemblyManifest = {
   version: "1.0",
   episode: "film-overlay-cascade-test",
   title: "FilmOverlay Cascade Integration Test Fixture",
@@ -105,7 +103,7 @@ const FIXTURE_TEMPLATE_DATA: Record<string, unknown> = {
 
 export const FilmOverlayCascadeTest: React.FC = () => (
   <FullEpisode
-    manifest={FIXTURE_MANIFEST as any} // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
+    manifest={FIXTURE_MANIFEST}
     templateData={FIXTURE_TEMPLATE_DATA as Record<string, any>}
   />
 );
@@ -119,7 +117,7 @@ export const FilmOverlayCascadeTestComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: FIXTURE_MANIFEST as any, // no-as-any-ok: AssemblyManifest not yet exported from FullEpisode public surface
+          manifest: FIXTURE_MANIFEST,
           templateData: FIXTURE_TEMPLATE_DATA as Record<string, any>,
         },
       })
