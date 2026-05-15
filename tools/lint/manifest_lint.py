@@ -11,6 +11,7 @@ for violations of editorial doctrine that aren't structurally enforced by
   - M-OVERLAP: foreground segments overlap without an explicit transition
   - M-DATAFILE: segment `template.dataFile` references exist on disk
   - M-CUE: soundCue / textureCue types are in the canonical schema enum
+  - M-DURATION: max(segments[].endSec) matches totalDurationSec (±0.5s)
 
 Usage:
     python3 tools/lint/manifest_lint.py
@@ -336,6 +337,64 @@ def check_cue_types_canonical(manifest: dict, _: str) -> list[Violation]:
     return violations
 
 
+# ─── Rule: M-DURATION (segment timeline matches declared totalDurationSec) ───
+# Source: render-time invariant. `totalDurationSec` drives the Remotion
+# composition's `durationInFrames`. If segments extend past that boundary the
+# tail gets clipped; if segments don't reach it the final video has padding
+# silence (or, more commonly, a stale segment freezes for the gap).
+#
+# What we actually compare:
+#   max(segments[].endSec)  vs  manifest.totalDurationSec
+# Tolerance: 0.5s (the smallest editorial cut a viewer would notice).
+# We don't compare against narration.totalDurationSec — narration can lead
+# or trail segments by design (cold opens, outro stings).
+
+DURATION_TOLERANCE_SEC = 0.5
+
+
+def check_duration_drift(manifest: dict, _: str) -> list[Violation]:
+    """M-DURATION: max(segments[].endSec) must equal manifest.totalDurationSec ± tolerance."""
+    violations: list[Violation] = []
+    declared = manifest.get("totalDurationSec")
+    segments = manifest.get("segments") or []
+
+    if declared is None:
+        # totalDurationSec is optional in the schema. Skip silently — the
+        # composition will derive its duration from another source (e.g. narration).
+        return violations
+    if not segments:
+        return violations
+
+    end_secs = [s.get("endSec") for s in segments if isinstance(s.get("endSec"), (int, float))]
+    if not end_secs:
+        return violations
+
+    actual = max(end_secs)
+    diff = actual - declared
+
+    if abs(diff) > DURATION_TOLERANCE_SEC:
+        if diff > 0:
+            verdict = (
+                f"segments extend {diff:.2f}s past the declared totalDurationSec "
+                f"(max segment endSec = {actual:.2f}s, declared = {declared:.2f}s). "
+                f"The final {diff:.2f}s will be clipped from the render."
+            )
+        else:
+            verdict = (
+                f"segments end {-diff:.2f}s before the declared totalDurationSec "
+                f"(max segment endSec = {actual:.2f}s, declared = {declared:.2f}s). "
+                f"The last segment will freeze for {-diff:.2f}s of trailing dead air."
+            )
+        violations.append(Violation(
+            rule="M-DURATION",
+            file="",
+            pointer=f"totalDurationSec ({declared:.2f}s) vs max(segments[].endSec) ({actual:.2f}s)",
+            message=verdict,
+            severity="error",
+        ))
+    return violations
+
+
 # ─── Driver ──────────────────────────────────────────────────────────────────
 
 ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
@@ -344,6 +403,7 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     lambda m, p: check_foreground_overlap_without_transition(m, str(p)),
     check_datafile_exists,  # needs the path
     lambda m, p: check_cue_types_canonical(m, str(p)),
+    lambda m, p: check_duration_drift(m, str(p)),
 ]
 
 

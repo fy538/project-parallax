@@ -411,3 +411,40 @@ def test_predictions_empty_registry_prints_message(capsys):
     lookup.cmd_predictions(args, _registry([_concept("a", "X", type_="framework")]))
     out = capsys.readouterr().out
     assert "No predictions" in out
+
+
+# ─── Real-registry regression guard ──────────────────────────────────────────
+# Closes a CI-vs-check-episode.sh parity gap: check-episode.sh runs
+# `python3 tools/concepts/lookup.py validate` against the SHIPPED
+# data/concepts.json on every episode. Without this test, that invocation
+# never runs in CI — the synthetic-registry tests above don't exercise the
+# real-data path. Broken cross-refs would only surface when someone next
+# runs check-episode.sh locally.
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+REAL_REGISTRY = REPO_ROOT / "data" / "concepts.json"
+
+
+def test_validate_against_real_concepts_json(capsys):
+    """The shipped data/concepts.json must pass `lookup.py validate`."""
+    if not REAL_REGISTRY.is_file():
+        # In a freshly-checked-out repo without the registry, skip — but
+        # the file IS committed today, so this is defensive only.
+        import pytest
+        pytest.skip(f"real concepts registry not found at {REAL_REGISTRY}")
+
+    reg = json.loads(REAL_REGISTRY.read_text())
+    # cmd_validate reads args.json — pass it explicitly. cmd_validate exits(0)
+    # on success and exits(1) on failure — catch the SystemExit so pytest
+    # sees an assertion failure instead of getting killed.
+    try:
+        lookup.cmd_validate(Namespace(json=False), reg)
+        exit_code = 0
+    except SystemExit as e:
+        exit_code = int(e.code) if e.code is not None else 0
+
+    out = capsys.readouterr()
+    assert exit_code == 0, (
+        f"data/concepts.json failed validation (exit {exit_code}):\n"
+        f"--- stdout ---\n{out.out}\n--- stderr ---\n{out.err}"
+    )
