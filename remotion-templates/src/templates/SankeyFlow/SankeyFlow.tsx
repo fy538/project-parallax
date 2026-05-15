@@ -329,6 +329,11 @@ const bezierPoint = (
 const FlowParticlesLayer: React.FC<{
   links: LayoutLink[];
   frame: number;
+  /**
+   * Frame at which the particle fade-in begins.
+   * Callers should pass `allLinksDrawnFrame` so particles only appear
+   * after every ribbon has finished drawing. (I7)
+   */
   startFrame: number;
   speed: number;
   density: number;
@@ -343,7 +348,10 @@ const FlowParticlesLayer: React.FC<{
     [links]
   );
 
-  const opacity = fadeIn(frame, startFrame + sec(1.2), sec(0.5));
+  // startFrame is now the frame when all ribbons finish drawing (I7).
+  // Fade in at that point — no additional internal offset so the semantic
+  // of startFrame is "begin fade-in."
+  const opacity = fadeIn(frame, startFrame, sec(0.5));
   if (opacity <= 0) return null;
 
   return (
@@ -725,10 +733,12 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
   // ── Editorial heuristics (dev-only warnings) ─────────────────────────────
+  // Threshold raised from 6s → 8s (I7): the ribbon draw itself consumes ~2–3s,
+  // so particles need the full 8s window to have time to breathe after drawing.
   warnIf(
-    !!data.flowParticles && (data.durationSec ?? 8) < 6,
+    !!data.flowParticles && (data.durationSec ?? 8) < 8,
     "SankeyFlow",
-    "flowParticles should only be enabled for durationSec >= 6s — at shorter durations particles distract from the ribbon reveal",
+    "flowParticles should only be enabled for durationSec >= 8s — the ribbon draw takes ~2-3s; at shorter durations particles have no room to breathe after the draw completes",
   );
   warnIf(
     nodes && nodes.length > 10,
@@ -859,6 +869,32 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
     "SankeyFlow",
     "nodeAlign has no effect on single-column Sankey diagrams",
   );
+
+  // ── All-links-drawn frame (I7) ─────────────────────────────────────────
+  // Replicate the per-link stagger formula from SankeyLinkComponent so we
+  // know the frame at which every ribbon finishes drawing. Particles are
+  // gated to this frame — they won't flow over undrawn ribbons.
+  //
+  // Per-link draw:  linkStartFrame = linksStart + sec(0.2 + colDistance * 0.15)
+  //                 draw duration  = sec(0.8)
+  // where colDistance = Math.abs(link.from.charCodeAt(0) - link.to.charCodeAt(0))
+  //
+  // Single-layer approach: compute max end frame over all links and use it
+  // as the single particle-emitter gate.
+  const allLinksDrawnFrame = useMemo(() => {
+    if (!data.flowParticles || layoutLinks.length === 0) return linksStart;
+    const maxEnd = Math.max(
+      ...layoutLinks.map((link) => {
+        const colDistance = Math.abs(
+          link.from.charCodeAt(0) - link.to.charCodeAt(0)
+        );
+        const drawEnd =
+          linksStart + sec(0.2 + colDistance * 0.15) + sec(0.8);
+        return drawEnd;
+      })
+    );
+    return maxEnd;
+  }, [data.flowParticles, layoutLinks, linksStart]);
 
   // Render
 
@@ -1041,12 +1077,15 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
           );
         })}
 
-        {/* Flow particles — animated dots along link paths */}
+        {/* Flow particles — animated dots along link paths.
+            I7: startFrame = allLinksDrawnFrame so particles only appear
+            after every ribbon finishes drawing, preventing particles from
+            flowing over undrawn ribbons. */}
         {data.flowParticles && (
           <FlowParticlesLayer
             links={layoutLinks}
             frame={frame}
-            startFrame={linksStart}
+            startFrame={allLinksDrawnFrame}
             speed={data.particleSpeed ?? 1.0}
             density={data.particleDensity ?? 1.0}
           />

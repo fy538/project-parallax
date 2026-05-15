@@ -67,6 +67,74 @@ import {
 } from "../../hooks/useTreeCamera";
 import type { DecisionTreeData, TreeNode } from "./types";
 
+// ── Probability helpers (I6) ───────────────────────────────────────────────
+
+/**
+ * Parse an edge probability label into a 0–1 number.
+ *
+ * Accepts three forms:
+ *   "60%"  → 0.60   (strips % suffix, divides by 100)
+ *   "0.6"  → 0.60   (raw decimal)
+ *   "60"   → 0.60   (bare integer treated as percentage)
+ *
+ * Returns null for non-numeric strings (e.g. "Likely", "Sharp").
+ */
+function parseEdgeProbability(label: string): number | null {
+  const trimmed = label.trim();
+  const isPct = trimmed.endsWith("%");
+  const numeric = parseFloat(isPct ? trimmed.slice(0, -1) : trimmed);
+  if (isNaN(numeric)) return null;
+  // Heuristic: values > 1 that aren't percentages (e.g. "60") also divide by 100.
+  // Values 0–1 that look like decimals (e.g. "0.6") stay as-is.
+  if (isPct) return numeric / 100;
+  if (numeric > 1) return numeric / 100;
+  return numeric;
+}
+
+/**
+ * Walk the tree DFS from rootId, multiplying edge probabilities.
+ * Records the accumulated posterior at each leaf node (no outgoing edges).
+ *
+ * Returns a Map<leafNodeId, posterior> where posterior is in [0, 1].
+ * Only edges whose label parses as a numeric probability contribute to
+ * the product — non-numeric labels (e.g. "Mainline") are treated as
+ * weight-1 (passthrough) so the partial product still accrues.
+ */
+function computeLeafPosteriors(
+  nodes: TreeNode[],
+  rootId: string,
+): Map<string, number> {
+  const nodeMap = new Map(nodes.map((n) => [n.id, n]));
+  const result = new Map<string, number>();
+
+  const dfs = (nodeId: string, accumulated: number): void => {
+    const node = nodeMap.get(nodeId);
+    if (!node) return;
+
+    const children = node.children ?? [];
+    if (children.length === 0) {
+      // Leaf node — record accumulated posterior.
+      result.set(nodeId, accumulated);
+      return;
+    }
+
+    for (const childId of children) {
+      const child = nodeMap.get(childId);
+      if (!child) continue;
+
+      // The edge probability lives on the CHILD node: edgeLabel ?? probability.
+      const label = child.edgeLabel ?? child.probability;
+      const p = label != null ? parseEdgeProbability(label) : null;
+      // Multiply when numeric; pass through when non-numeric.
+      const factor = p !== null ? p : 1;
+      dfs(childId, accumulated * factor);
+    }
+  };
+
+  dfs(rootId, 1);
+  return result;
+}
+
 // ── Constants ──────────────────────────────────────────────────────────────
 
 // Tighter node cards (220×88, golden-ratio-ish) — feels editorial vs billboard
@@ -526,6 +594,31 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     `${data.nodes.length} nodes — above 12 the camera cannot establish and detail individual nodes legibly in a single composition; consider splitting into sub-trees`,
   );
 
+  // ── Leaf posterior probabilities (I6) ────────────────────────────────────
+  // Compute only when probabilityWeights is opted in — skipped for all other
+  // compositions so there's no runtime cost.
+  const leafPosteriors = useMemo(() => {
+    if (!data.probabilityWeights) return new Map<string, number>();
+    return computeLeafPosteriors(data.nodes, data.rootId);
+  }, [data.probabilityWeights, data.nodes, data.rootId]);
+
+  // Guard: probabilityWeights is true but no edges have parseable probabilities.
+  const hasParseable = useMemo(() => {
+    if (!data.probabilityWeights) return true; // gate doesn't apply
+    return data.nodes.some((n) => {
+      const label = n.edgeLabel ?? n.probability;
+      return label != null && parseEdgeProbability(label) !== null;
+    });
+  }, [data.probabilityWeights, data.nodes]);
+
+  warnIf(
+    !!data.probabilityWeights && !hasParseable,
+    "DecisionTree",
+    "probabilityWeights: true but no edge has a parseable numeric probability " +
+      "(e.g. \"60%\", \"0.6\"). Either add numeric probabilities to node.edgeLabel " +
+      "or node.probability fields, or set probabilityWeights: false to suppress.",
+  );
+
   // ── Ladder variant early return — Allison-style nested rectangles ──────
   // Right for ExComm-class deliberation scenes. See LadderVariant component
   // and references/template-research/game-theory.md § A2.
@@ -819,6 +912,74 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                   </g>
                 );
               })}
+              {/* ── Posterior probability chips (I6) ─────────────────────────
+                  Rendered BELOW each leaf node when probabilityWeights === true
+                  and the tree-walk produced a posterior for that node.
+                  SVG <text> + <rect> chip in the amber/mono metadata register.
+                  Amber at 15% fill + 1px border follows the Kalshi chip pattern
+                  established by node.marketPrice. */}
+              {data.probabilityWeights && leafPosteriors.size > 0 && (
+                <g>
+                  {Array.from(leafPosteriors.entries()).map(([nodeId, posterior]) => {
+                    const pos = positions.get(nodeId);
+                    if (!pos) return null;
+
+                    // Chip positioned below the node card, centered on node x.
+                    const chipText = `${(posterior * 100).toFixed(0)}%`;
+                    const chipCx = pos.x + NODE_WIDTH / 2;
+                    const chipCy = pos.y + NODE_HEIGHT + 20; // 20px gap below node bottom
+                    const chipW = 44;
+                    const chipH = 20;
+                    const chipX = chipCx - chipW / 2;
+                    const chipY = chipCy - chipH / 2;
+
+                    // Fade in after the node itself, then exit.
+                    const level = pos.level;
+                    const chipStart =
+                      nodeRevealBase + level * sec(0.4 * s) + sec(0.4);
+                    const chipOpacity =
+                      fadeIn(frame, chipStart, sec(0.5)) *
+                      exitFade(frame, totalFrames, sec(0.5));
+
+                    // Camera-aware dim: inherit the node's dim amount.
+                    const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
+                    const onPath = someHighlighted && data.highlightedPath!.includes(nodeId);
+                    const pathDim = someHighlighted && !onPath ? 0.5 : 0;
+                    const dimAmount = Math.max(camera.getNodeDim(nodeId), pathDim);
+                    const effectiveOpacity = chipOpacity * (1 - dimAmount);
+
+                    return (
+                      <g key={`posterior-${nodeId}`} opacity={effectiveOpacity}>
+                        {/* Chip background */}
+                        <rect
+                          x={chipX}
+                          y={chipY}
+                          width={chipW}
+                          height={chipH}
+                          rx={4}
+                          fill={`${palette.amber}26`}
+                          stroke={palette.amber}
+                          strokeWidth={1}
+                        />
+                        {/* Chip text */}
+                        <text
+                          x={chipCx}
+                          y={chipCy}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          fontFamily={fonts.mono}
+                          fontSize={10}
+                          fill={palette.amber}
+                          fontWeight={500}
+                          letterSpacing={0.5}
+                        >
+                          {chipText}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </g>
+              )}
             </svg>
 
             {/* Node layer */}
