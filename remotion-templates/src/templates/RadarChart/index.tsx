@@ -20,13 +20,13 @@ const sampleData: RadarChartData = {
     {
       name: "United States",
       values: [95, 85, 92, 80, 88, 60],
-      color: "#3266AD",
+      color: "#3266AD", // episode-specific — not a brand token
       fillOpacity: 0.15,
     },
     {
       name: "China",
       values: [70, 78, 75, 55, 65, 90],
-      color: "#C23B22",
+      color: "#C23B22", // episode-specific — not a brand token
       fillOpacity: 0.15,
     },
   ],

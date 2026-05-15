@@ -32,11 +32,24 @@
 import React from "react";
 import { CinematicDuelingFrameworks } from "./CinematicDuelingFrameworks";
 import { StaticDuelingFrameworks } from "./StaticDuelingFrameworks";
+import { warnIf } from "../../utils/dataWarnings";
 import type { DuelingFrameworksData } from "./types";
 
 export const DuelingFrameworks: React.FC<{ data: DuelingFrameworksData }> = ({
   data,
 }) => {
+  warnIf(!data.phenomenon, "DuelingFrameworks", "phenomenon field is missing — the framing question will be blank");
+  warnIf(
+    Math.abs((data.frameworkA?.tenets?.length ?? 0) - (data.frameworkB?.tenets?.length ?? 0)) > 2,
+    "DuelingFrameworks",
+    "frameworkA and frameworkB tenet counts differ by more than 2 — the visual comparison will appear unbalanced"
+  );
+  warnIf(
+    (data.frameworkA?.score ?? 0) > 90 && (data.frameworkB?.score ?? 0) > 90,
+    "DuelingFrameworks",
+    "both framework scores are above 90 — this compresses all visual differentiation; scores should differ meaningfully"
+  );
+
   if (data.cinematicMode) {
     return <CinematicDuelingFrameworks data={data} />;
   }

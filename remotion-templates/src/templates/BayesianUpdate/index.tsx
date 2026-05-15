@@ -58,22 +58,22 @@ const multiSampleData: BayesianUpdateData = {
     {
       label: "Controls succeed",
       prior: 28,
-      color: "#5DAA68",
+      color: "#5DAA68", // episode-specific — not a brand token
     },
     {
       label: "Controls backfire",
       prior: 24,
-      color: "#D64545",
+      color: "#D64545", // episode-specific — not a brand token
     },
     {
       label: "Partial effectiveness",
       prior: 32,
-      color: "#E5A544",
+      color: "#E5A544", // episode-specific — not a brand token
     },
     {
       label: "Technological leapfrog",
       prior: 16,
-      color: "#3266AD",
+      color: "#3266AD", // episode-specific — not a brand token
     },
   ],
   evidence: [

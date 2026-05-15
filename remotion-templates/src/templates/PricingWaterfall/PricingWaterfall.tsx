@@ -46,11 +46,28 @@ import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { TextureFilters } from "../../utils/textures";
+import { warnIf } from "../../utils/dataWarnings";
 import type { PricingWaterfallData } from "./types";
 
 export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
   data,
 }) => {
+  warnIf(
+    data.stages.filter(s => s.hero).length > 1,
+    "PricingWaterfall",
+    "multiple stages have hero: true — only the accent-stage should be marked hero"
+  );
+  warnIf(
+    Math.abs(data.stages.reduce((sum, s) => sum + s.share, 0) - 100) > 5,
+    "PricingWaterfall",
+    `stages shares sum to ${data.stages.reduce((sum, s) => sum + s.share, 0).toFixed(1)}% — expected ~100%`
+  );
+  warnIf(
+    data.stages.length > 7,
+    "PricingWaterfall",
+    `${data.stages.length} stages exceeds the 7-stage legibility limit — consider merging smaller stages`
+  );
+
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const direction = useDirection(data._direction);

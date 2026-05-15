@@ -61,6 +61,10 @@ export const BumpChartSchema = z.object({
       .string()
       .optional()
       .describe("Context annotation, e.g. 'GDP in current USD'. Shown in FooterStrip scale field."),
+    backgroundVariant: z
+      .enum(["light", "dark"])
+      .optional()
+      .describe("Background theme variant — 'light' (default) or 'dark'."),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

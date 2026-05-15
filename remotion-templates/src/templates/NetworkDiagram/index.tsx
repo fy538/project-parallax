@@ -19,35 +19,35 @@ const sampleData: NetworkDiagramData = {
       label: "USA",
       sublabel: "EDA Software",
       type: "nation",
-      color: "#3266AD",
+      color: "#3266AD", // episode-specific — not a brand token
     },
     {
       id: "nl",
       label: "Netherlands",
       sublabel: "ASML (EUV)",
       type: "nation",
-      color: "#E5A544",
+      color: "#E5A544", // episode-specific — not a brand token
     },
     {
       id: "tw",
       label: "Taiwan",
       sublabel: "TSMC (Fab)",
       type: "nation",
-      color: "#E5A544",
+      color: "#E5A544", // episode-specific — not a brand token
     },
     {
       id: "jp",
       label: "Japan",
       sublabel: "Photoresist",
       type: "nation",
-      color: "#E5A544",
+      color: "#E5A544", // episode-specific — not a brand token
     },
     {
       id: "cn",
       label: "China",
       sublabel: "Assembly + Rare Earths",
       type: "nation",
-      color: "#C23B22",
+      color: "#C23B22", // episode-specific — not a brand token
     },
   ],
   edges: [
@@ -80,7 +80,7 @@ const sampleData: NetworkDiagramData = {
     {
       edge: ["tw", "cn"],
       label: "EXPORT CONTROLS",
-      color: "#C23B22",
+      color: "#C23B22", // episode-specific — not a brand token
     },
   ],
   callouts: [

@@ -35,6 +35,8 @@ export interface BumpChartData {
   highlightIds?: string[];
   /** Context shown in annotation, e.g. "GDP in current USD" */
   unit?: string;
+  /** Background theme variant — "light" (default) or "dark". */
+  backgroundVariant?: "light" | "dark";
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;
 }

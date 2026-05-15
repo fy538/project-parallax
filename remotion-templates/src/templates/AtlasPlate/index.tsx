@@ -26,25 +26,25 @@ export const atlasPlateSampleData: AtlasPlateData = {
       durationSec: 6,
       countries: [
         // NATO core
-        { iso3: "USA", fill: "#4A7BA7" },
-        { iso3: "GBR", fill: "#4A7BA7" },
-        { iso3: "FRA", fill: "#4A7BA7" },
-        { iso3: "DEU", fill: "#4A7BA7" },
-        { iso3: "ITA", fill: "#4A7BA7" },
-        { iso3: "CAN", fill: "#4A7BA7" },
-        { iso3: "BEL", fill: "#4A7BA7" },
-        { iso3: "NLD", fill: "#4A7BA7" },
-        { iso3: "DNK", fill: "#4A7BA7" },
-        { iso3: "NOR", fill: "#4A7BA7" },
-        { iso3: "PRT", fill: "#4A7BA7" },
-        { iso3: "LUX", fill: "#4A7BA7" },
-        { iso3: "TUR", fill: "#4A7BA7" },
-        { iso3: "GRC", fill: "#4A7BA7" },
-        { iso3: "ESP", fill: "#4A7BA7" },
+        { iso3: "USA", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "GBR", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "FRA", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "DEU", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "ITA", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "CAN", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "BEL", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "NLD", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "DNK", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "NOR", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "PRT", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "LUX", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "TUR", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "GRC", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "ESP", fill: "#4A7BA7" }, // episode-specific — not a brand token
         // Asia
-        { iso3: "JPN", fill: "#4A7BA7" },
+        { iso3: "JPN", fill: "#4A7BA7" }, // episode-specific — not a brand token
         // Australia joined later but in the family for visual completeness
-        { iso3: "AUS", fill: "#4A7BA7" },
+        { iso3: "AUS", fill: "#4A7BA7" }, // episode-specific — not a brand token
       ],
     },
     {
@@ -53,18 +53,18 @@ export const atlasPlateSampleData: AtlasPlateData = {
       durationSec: 5,
       countries: [
         // Western highlights faded
-        { iso3: "USA", fill: "#4A7BA7" },
-        { iso3: "JPN", fill: "#4A7BA7" },
-        { iso3: "DEU", fill: "#4A7BA7" },
-        { iso3: "GBR", fill: "#4A7BA7" },
+        { iso3: "USA", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "JPN", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "DEU", fill: "#4A7BA7" }, // episode-specific — not a brand token
+        { iso3: "GBR", fill: "#4A7BA7" }, // episode-specific — not a brand token
         // Soviet bloc highlighted
-        { iso3: "RUS", fill: "#A64D46" },
-        { iso3: "POL", fill: "#A64D46" },
-        { iso3: "CZE", fill: "#A64D46" },
-        { iso3: "HUN", fill: "#A64D46" },
-        { iso3: "ROU", fill: "#A64D46" },
-        { iso3: "BGR", fill: "#A64D46" },
-        { iso3: "CHN", fill: "#A64D46" },
+        { iso3: "RUS", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "POL", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "CZE", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "HUN", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "ROU", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "BGR", fill: "#A64D46" }, // episode-specific — not a brand token
+        { iso3: "CHN", fill: "#A64D46" }, // episode-specific — not a brand token
       ],
       focus: { center: [50, 45], scaleHint: 1.6 },
     },

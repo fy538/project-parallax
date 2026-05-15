@@ -68,12 +68,16 @@ const SEVERITY_COLORS: Record<SeverityLevel, string> = {
   critical: semantic.danger,
 };
 
+const hexAlpha = (hex: string, alpha: number): string => {
+  const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
+  return `${hex}${a}`;
+};
 const SEVERITY_BG: Record<SeverityLevel, string> = {
-  low: "rgba(93,170,104,0.12)",
-  moderate: "rgba(229,165,68,0.12)",
-  elevated: "rgba(229,165,68,0.18)",
-  high: "rgba(194,59,34,0.15)",
-  critical: "rgba(214,69,69,0.20)",
+  low: hexAlpha(SEVERITY_COLORS.low, 0.12),
+  moderate: hexAlpha(SEVERITY_COLORS.moderate, 0.12),
+  elevated: hexAlpha(SEVERITY_COLORS.elevated, 0.18),
+  high: hexAlpha(SEVERITY_COLORS.high, 0.15),
+  critical: hexAlpha(SEVERITY_COLORS.critical, 0.20),
 };
 
 const SEVERITY_SHAKE: Record<SeverityLevel, number> = {
@@ -138,6 +142,16 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
     `${data.rungs.length} rungs — EscalationLadder caps at 5-7 rungs. ` +
       `Above 7, rungs are silently clipped below the safe area. Cap in ` +
       `data or split into multiple compositions. See DIAGRAM_TEMPLATE_SELECTOR.md.`,
+  );
+  warnIf(
+    data.rungs.filter(r => r.current).length > 1,
+    "EscalationLadder",
+    `${data.rungs.filter(r => r.current).length} rungs marked current — only one rung should be the current position`
+  );
+  warnIf(
+    data.rungs.some(r => r.severity === "high") && !data.rungs.some(r => r.severity === "critical"),
+    "EscalationLadder",
+    "ladder has 'high' severity rungs but no 'critical' — this implies a false ceiling; add a critical rung or verify the editorial intent"
   );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -248,8 +262,8 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
 
   // ── Spine color (progressive — gets redder as we climb in camera mode) ──
   const baseSpineColor = theme.isDark
-    ? "rgba(240,230,208,0.15)"
-    : "rgba(28,24,20,0.10)";
+    ? `${palette.bone}26`
+    : `${palette.ink}1A`;
 
   // ── Tension-based background tint (camera mode only) ────────────────────
   const currentSeverityIndex = hasCameraPath

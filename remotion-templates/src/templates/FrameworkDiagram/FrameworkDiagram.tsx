@@ -84,16 +84,11 @@ const ComparisonVariant: React.FC<{
     pulseDecay: 0.4,
   });
   const columns = data.columns || [];
-  const cols = useMemo(
-    () => columnLayout(columns.length, { titleVariant: "content", safeAreaTier: "generous" }),
-    [columns.length]
-  );
-
-  // Editorial column comparison — items sit directly on the paper with thin
-  // row dividers, ordinal numbering for pair-alignment, and a subtle accent
-  // rule under each column header. No card chrome, no VS interlude — the eye
-  // reads down each column then across, supported by the row numbers.
-  const maxItems = Math.max(...columns.map((c) => c.items.length), 0);
+  const { cols, maxItems } = useMemo(() => {
+    const computed = columnLayout(columns.length, { titleVariant: "content", safeAreaTier: "generous" });
+    const max = Math.max(...columns.map((c) => c.items.length), 0);
+    return { cols: computed, maxItems: max };
+  }, [columns]);
 
   // Parse "Title (中文)" pattern so we can render the parenthetical at lighter
   // weight. Also tolerates titles without a parenthetical.

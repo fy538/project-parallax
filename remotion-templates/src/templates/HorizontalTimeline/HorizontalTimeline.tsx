@@ -1304,10 +1304,7 @@ export const HorizontalTimeline: React.FC<{
                           style={{
                             width: "100%",
                             height: "100%",
-                            ...cardPresets.accentEdge(morphColor, mode === "dark"),
-                            boxShadow: isFocused
-                              ? `0 8px 32px rgba(0,0,0,0.25)`
-                              : `0 4px 16px rgba(0,0,0,0.12)`,
+                            background: "transparent",
                             position: "relative",
                           }}
                         >

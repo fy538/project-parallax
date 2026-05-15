@@ -471,8 +471,8 @@ const SankeyNodeComponent: React.FC<{
           // when they sit on top of the incoming-ribbon termination zone.
           // Three stacked shadows = subtle paper glow + bottom drop-shadow.
           const labelHalo = mode === "dark"
-            ? "0 0 8px rgba(0,0,0,0.85), 0 0 4px rgba(0,0,0,0.85), 0 1px 2px rgba(0,0,0,0.5)"
-            : "0 0 8px rgba(245,240,232,0.95), 0 0 4px rgba(245,240,232,0.95), 0 1px 2px rgba(0,0,0,0.15)";
+            ? `0 0 8px ${palette.ink}D9, 0 0 4px ${palette.ink}D9, 0 1px 2px ${palette.ink}80`
+            : `0 0 8px ${palette.paper}F2, 0 0 4px ${palette.paper}F2, 0 1px 2px rgba(0,0,0,0.15)`;
           const labelText = (
             <div
               style={{

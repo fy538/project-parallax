@@ -31,14 +31,13 @@ const formatNumber = (
 export const StatRevealShort: React.FC<{ data: StatRevealData }> = ({
   data,
 }) => {
-  const allValues = useMemo(
-    () => [
+  const maxValue = useMemo(() => {
+    const allValues = [
       data.heroIsMax !== false ? data.stat.value : 0,
       ...data.comparisons.map((c) => c.value),
-    ],
-    [data.stat.value, data.comparisons, data.heroIsMax]
-  );
-  const maxValue = Math.max(...allValues);
+    ];
+    return Math.max(...allValues);
+  }, [data.stat.value, data.comparisons, data.heroIsMax]);
 
   return (
     <ShortsWrapper

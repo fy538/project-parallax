@@ -107,7 +107,8 @@ function computeRanks(
 export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const theme = useThemeMode("light");
+  const bgVariant = data.backgroundVariant ?? "light";
+  const theme = useThemeMode(bgVariant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation({ ...direction.driftOptions, noExit: true });
 
@@ -227,15 +228,16 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   const holdExitOpacity = exitFade(frame, durationInFrames - 15, 15);
 
   return (
-    <Background variant="light">
+    <Background variant={bgVariant}>
       <AbsoluteFill style={{ ...compStyle, opacity: holdExitOpacity }}>
         {/* Brand strips */}
-        <HeaderStrip metadata={data.episode} mode="light" />
-        <FooterStrip scale={data.unit ? `· ${data.unit}` : undefined} mode="light" />
+        <HeaderStrip metadata={data.episode} mode={bgVariant} />
+        <FooterStrip scale={data.unit ? `· ${data.unit}` : undefined} mode={bgVariant} />
 
         <TitleBlock
           title={data.title}
           subtitle={data.subtitle}
+          mode={bgVariant}
           safeAreaTier="generous"
         />
 
@@ -467,7 +469,7 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
         {/* ── Source attribution ───────────────────────────────────────────── */}
         <SourceAttribution
           source={data.source}
-          mode="light"
+          mode={bgVariant}
           prefix="Source: "
           startSec={2}
         />

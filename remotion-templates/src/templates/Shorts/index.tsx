@@ -77,7 +77,7 @@ const splitSample: SplitCompositionData = {
       "DeepSeek proves chip access isn't needed",
       "Domestic production growing 30% YoY",
     ],
-    accentColor: "#C23B22",
+    accentColor: "#C23B22", // episode-specific — not a brand token
   },
   right: {
     tag: "SIDE B",
@@ -86,7 +86,7 @@ const splitSample: SplitCompositionData = {
       "Still 5+ years behind on cutting edge",
       "Export controls tightening every quarter",
     ],
-    accentColor: "#3266AD",
+    accentColor: "#3266AD", // episode-specific — not a brand token
   },
   dividerLabel: "vs",
   source: "The real question is about supply chain topology",
@@ -152,9 +152,9 @@ const statRevealSample: StatRevealData = {
     label: "CHIPS Act + private commitments",
   },
   comparisons: [
-    { label: "Apollo (adj.)", value: 194, color: "#3266AD" },
-    { label: "Marshall Plan", value: 173, color: "#5DAA68" },
-    { label: "Manhattan Proj.", value: 30, color: "#C23B22" },
+    { label: "Apollo (adj.)", value: 194, color: "#3266AD" }, // episode-specific — not a brand token
+    { label: "Marshall Plan", value: 173, color: "#5DAA68" }, // episode-specific — not a brand token
+    { label: "Manhattan Proj.", value: 30, color: "#C23B22" }, // episode-specific — not a brand token
   ],
   source: "CBO, 2025",
   durationSec: 10,
@@ -190,7 +190,7 @@ const frameworkDiagramSample: FrameworkDiagramData = {
         "Semiconductor supply chain seamless",
         "Tech competition on features, not policy",
       ],
-      color: "#5DAA68",
+      color: "#5DAA68", // episode-specific — not a brand token
     },
     {
       title: "After Export Controls",
@@ -200,7 +200,7 @@ const frameworkDiagramSample: FrameworkDiagramData = {
         "Fragmented supply chains emerge",
         "Tech competition becomes geopolitical",
       ],
-      color: "#C23B22",
+      color: "#C23B22", // episode-specific — not a brand token
     },
   ],
   durationSec: 12,
@@ -210,8 +210,8 @@ const timelineComparisonSample: TimelineComparisonData = {
   episode: "SHORT",
   leftLabel: "Historical",
   rightLabel: "Modern",
-  leftColor: "#3266AD",
-  rightColor: "#C23B22",
+  leftColor: "#3266AD", // episode-specific — not a brand token
+  rightColor: "#C23B22", // episode-specific — not a brand token
   leftEvents: [
     {
       year: "1960",
@@ -251,10 +251,10 @@ const choroplethMapSample: ChoroplethMapData = {
       subtitle: "US policy vs. China access",
       durationSec: 10,
       countries: [
-        { name: "United States", iso3: "USA", value: 100, fill: "#3266AD" },
-        { name: "China", iso3: "CHN", value: 0, fill: "#C23B22" },
-        { name: "Taiwan", iso3: "TWN", value: 100, fill: "#5DAA68" },
-        { name: "South Korea", iso3: "KOR", value: 80, fill: "#E5A544" },
+        { name: "United States", iso3: "USA", value: 100, fill: "#3266AD" }, // episode-specific — not a brand token
+        { name: "China", iso3: "CHN", value: 0, fill: "#C23B22" }, // episode-specific — not a brand token
+        { name: "Taiwan", iso3: "TWN", value: 100, fill: "#5DAA68" }, // episode-specific — not a brand token
+        { name: "South Korea", iso3: "KOR", value: 80, fill: "#E5A544" }, // episode-specific — not a brand token
       ],
     },
   ],
@@ -267,13 +267,13 @@ const splitCompositionSample: SplitCompositionData = {
     tag: "STRUCTURAL",
     title: "Supply Chain Vulnerability",
     items: ["TSMC concentrates 90% of advanced fab capacity", "Taiwan Strait dependency"],
-    accentColor: "#3266AD",
+    accentColor: "#3266AD", // episode-specific — not a brand token
   },
   right: {
     tag: "RESPONSE",
     title: "Reshoring Gambit",
     items: ["$165B CHIPS Act", "10-year ROI unclear"],
-    accentColor: "#C23B22",
+    accentColor: "#C23B22", // episode-specific — not a brand token
   },
   dividerLabel: "vs",
   durationSec: 12,

@@ -12,7 +12,7 @@ const sampleData = {
     backgroundVariant: "dark" as const,
     frameworkA: {
       name: "Realism",
-      color: "#C23B22",
+      color: "#C23B22", // episode-specific — not a brand token
       tenets: [
         { text: "Power politics" },
         { text: "Security dilemma" },
@@ -23,7 +23,7 @@ const sampleData = {
     },
     frameworkB: {
       name: "Liberalism",
-      color: "#3266AD",
+      color: "#3266AD", // episode-specific — not a brand token
       tenets: [
         { text: "Interdependence" },
         { text: "Institutions" },
