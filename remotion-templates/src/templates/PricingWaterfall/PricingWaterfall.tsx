@@ -367,7 +367,6 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
           const segStart = barStart + stagger(i, sec(0.18), sec(0.6));
           const labelOpacity =
             fadeIn(frame, segStart + sec(0.4), sec(0.4)) * exitOp;
-          const labelSlide = slideIn(frame, segStart + sec(0.4), 8, sec(0.4));
           const labelLeft = barLeft + barWidth + 72;
           const yCenter = labelPositions[i];
 
@@ -378,7 +377,7 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
                 position: "absolute",
                 top: yCenter,
                 left: labelLeft,
-                transform: `translateY(calc(-50% + ${labelSlide}px))`,
+                transform: `translateY(-50%)`,
                 opacity: labelOpacity,
                 display: "flex",
                 alignItems: "baseline",

@@ -22,6 +22,7 @@ import React, { useMemo } from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
+  useVideoConfig,
   interpolate,
 } from "remotion";
 import {
@@ -42,7 +43,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
-import { fadeIn, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, exitFade, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import type { BumpChartData } from "./types";
 
@@ -105,9 +106,10 @@ function computeRanks(
 
 export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);
-  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  const { style: compStyle } = useCompositionAnimation({ ...direction.driftOptions, noExit: true });
 
   const { entities, periods } = data;
   const rankDirection = data.rankDirection ?? "desc";
@@ -130,12 +132,13 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
     "BumpChart: entity value count doesn't match periods length; check data",
     { entityValueCounts: entities.map((e) => ({ id: e.id, count: e.values.length })) }
   );
-  // holdAfterRevealSec is accepted in schema but not yet implemented as a hold phase;
-  // warn script writers so they know it has no effect yet.
+  // holdAfterRevealSec: after all lines finish drawing, hold for this many
+  // seconds before beginning the exit fade. Mirrors the pattern in DataChart.
+  const holdFrames = sec(data.holdAfterRevealSec ?? 0);
   warnIf(
-    (data.holdAfterRevealSec ?? 0) > 0,
+    holdFrames > 0 && durationInFrames - holdFrames < sec(2.5),
     "BumpChart",
-    "BumpChart: holdAfterRevealSec is not yet implemented — no hold phase will be applied"
+    `holdAfterRevealSec=${data.holdAfterRevealSec} leaves less than 2.5s for entrances + exit fade. Increase durationSec or reduce holdAfterRevealSec.`
   );
 
   // ── Rank computation (memoized) ──────────────────────────────────────────
@@ -217,9 +220,14 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   // ── Render ───────────────────────────────────────────────────────────────
   const isAnyHighlighted = highlightIds.length > 0;
 
+  // Hold phase: delay exit fade by holdFrames after all lines finish drawing.
+  // exitFade starts from (durationInFrames - holdFrames) so the hold is
+  // preserved at full opacity and only then the fade-out begins.
+  const holdExitOpacity = exitFade(frame, durationInFrames - holdFrames, 15);
+
   return (
     <Background variant="light">
-      <AbsoluteFill style={compStyle}>
+      <AbsoluteFill style={{ ...compStyle, opacity: holdExitOpacity }}>
         {/* Brand strips */}
         <HeaderStrip metadata={data.episode} mode="light" />
         <FooterStrip scale={data.unit ? `· ${data.unit}` : undefined} mode="light" />

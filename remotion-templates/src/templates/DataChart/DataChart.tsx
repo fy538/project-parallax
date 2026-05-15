@@ -23,7 +23,7 @@ import { SourceAttribution } from "../../components/SourceAttribution";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, slideIn, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
+import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -694,7 +694,6 @@ const SmallMultiplesPanels: React.FC<{
               width: panelW,
               height: panelH,
               opacity: panelOpacity,
-              transform: `translateY(${slideIn(frame, panelStart, 8, sec(0.5))}px)`,
             }}
           >
             {/* Panel header */}

@@ -228,7 +228,6 @@ const ComparisonVariant: React.FC<{
               if (!item) return null;
               const itemStart = colStart + stagger(ii, sec(0.12 * s), sec(0.4));
               const itemOpacity = fadeIn(frame, itemStart, sec(0.4));
-              const itemSlide = slideIn(frame, itemStart, 16, sec(0.5));
               const itemExit = exitFade(frame, durationInFrames, 15);
               const ordinal = String(ii + 1).padStart(2, "0");
 
@@ -237,7 +236,6 @@ const ComparisonVariant: React.FC<{
                   key={ii}
                   style={{
                     opacity: itemOpacity * itemExit,
-                    transform: `translateY(${itemSlide}px)`,
                     display: "flex",
                     alignItems: "baseline",
                     gap: layout.spacing.md,
@@ -785,7 +783,6 @@ const FlowVariant: React.FC<{
           if (!isVisible) return null;
           const nodeStart = stagger(i, sec(0.8), sec(0.5));
           const nodeOpacity = fadeIn(frame, nodeStart, sec(0.4));
-          const nodeSlide = slideIn(frame, nodeStart, 16, sec(0.4));
           // Hero stage: data.heroStage, or last stage by default. Allows
           // slope-flow framing where the inflection is mid-flow.
           const heroIdxStage = data.heroStage ?? numNodes - 1;
@@ -805,7 +802,6 @@ const FlowVariant: React.FC<{
                 width: slotWidth,
                 height: 360,
                 opacity: nodeOpacity * exitOp,
-                transform: `translateY(${nodeSlide}px)`,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -1088,7 +1084,6 @@ const MatrixVariant: React.FC<{
             sec(0.6)
           );
           const cellOpacity = fadeIn(frame, cellStart, sec(0.4));
-          const cellSlideY = slideIn(frame, cellStart, 16, sec(0.4));
           const cellColor = cell?.color || theme.text.muted;
           const isHero = cell?.highlight === true;
           const heroColor = isHero ? accentColor : cellColor;
@@ -1105,7 +1100,6 @@ const MatrixVariant: React.FC<{
                 width: cellW,
                 height: cellH,
                 opacity: cellOpacity * exitOp,
-                transform: `translateY(${cellSlideY}px)`,
               }}
             >
               {/* Cell background — subtle accent tint, no card chrome.

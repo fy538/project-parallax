@@ -146,11 +146,29 @@ interface NodeRenderProps {
   importance?: "primary" | "secondary";
   /** Scoped SVG filter ID resolver — prevents collisions when multiple instances render in the same DOM. */
   filterId: (name: string) => string;
+  /**
+   * Label placement override. Default "below" (standard hub-spoke / grid).
+   * "right" positions label to the right of the node for vertical-chain
+   * layout — the Economist convention: x = node.x + radius + gap, y = node.y,
+   * textAnchor = "start".
+   */
+  labelPlacement?: "below" | "right";
 }
 
 const CircleNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, importance, filterId }) => {
+  ({ x, y, label, sublabel, color, radius, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, isFocused, fillAlpha = 0.1, importance, filterId, labelPlacement = "below" }) => {
     const isPrimary = importance === "primary";
+    // The Economist convention for vertical-chain layouts: label sits to the
+    // right of the node circle. x = node.x + radius + 12 gap, y = node.y,
+    // textAnchor = "start". For all other layouts: label sits below the node.
+    const labelGap = 12;
+    const labelX = labelPlacement === "right" ? x + radius + labelGap : x;
+    const labelY = labelPlacement === "right" ? y + fontSizes.label / 3 : y + radius + 28;
+    const labelAnchor = labelPlacement === "right" ? "start" : "middle";
+    const sublabelX = labelPlacement === "right" ? x + radius + labelGap : x;
+    const sublabelY = labelPlacement === "right" ? y + fontSizes.label / 3 + 20 : y + radius + 50;
+    const sublabelAnchor = labelPlacement === "right" ? "start" : "middle";
+
     return (
       <g
         opacity={opacity}
@@ -187,9 +205,9 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
         )}
         {/* Node label */}
         <text
-          x={x}
-          y={y + radius + 28}
-          textAnchor="middle"
+          x={labelX}
+          y={labelY}
+          textAnchor={labelAnchor}
           fill={textPrimary}
           fontSize={fontSizes.label}
           fontFamily={fonts.mono}
@@ -201,9 +219,9 @@ const CircleNode: React.FC<NodeRenderProps> = React.memo(
         </text>
         {sublabel && (
           <text
-            x={x}
-            y={y + radius + 50}
-            textAnchor="middle"
+            x={sublabelX}
+            y={sublabelY}
+            textAnchor={sublabelAnchor}
             fill={textSecondary}
             fontSize={fontSizes.caption}
             fontFamily={fonts.mono}
@@ -383,6 +401,14 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   data,
 }) => {
   checkChartDataCommon("NetworkDiagram", data);
+  // A7 deprecation guard: hexagon on nation/institution nodes reads as
+  // blockchain/mesh UI — use circle instead (intelligence-briefing register).
+  // `shape` is not in NetworkNode types yet — cast to detect legacy/untyped JSON.
+  warnIf(
+    data.nodes.some((n) => (n as any).shape === "hexagon" && (n.type === "nation" || n.type === "institution")), // no-as-any-ok: shape not yet in NetworkNode type; guard for untyped JSON input
+    "NetworkDiagram",
+    "shape='hexagon' on nation/institution nodes reads as blockchain/mesh UI — use 'circle' instead"
+  );
   // Template-fit heuristic: hub-spoke layouts collide labels at ~3-o'clock
   // and ~9-o'clock positions above 7 spokes. Past 8 entities the form
   // reads as "many things" not "structured relationship." See
@@ -728,6 +754,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
                   : (isFocused ? 0.14 : 0.08)
               }
               filterId={filterId}
+              labelPlacement={data.layout === "vertical-chain" ? "right" : "below"}
             />
           );
         })}

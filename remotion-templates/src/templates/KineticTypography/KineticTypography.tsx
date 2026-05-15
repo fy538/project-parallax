@@ -55,6 +55,7 @@ import {
 import { AnimatedText } from "../../components/AnimatedText";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { warnIf } from "../../utils/dataWarnings";
 import type { QuoteData } from "./types";
 
 // ── Smooth bloom: single 3-point curve ────────────────────────────────────
@@ -742,6 +743,13 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
   });
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
+
+  // ── A6 data-quality guards ───────────────────────────────────────────────
+  // Guard 1: statistic variant with comparisonBars — use StatReveal instead.
+  warnIf(data.variant === "statistic" && ((data as any).comparisonBars?.length ?? 0) > 0, "KineticTypography", "variant='statistic' with comparisonBars — use StatReveal instead (StatReveal is purpose-built for stat + comparison bar compositions)"); // no-as-any-ok: comparisonBars not in QuoteData type; guard for untyped JSON input
+  // Guard 2: quote variant without attribution — every quote must cite its source.
+  warnIf(data.variant === "quote" && !data.attribution, "KineticTypography", "variant='quote' without attribution — every quote must cite its source (add data.attribution)");
+  // Guard 3: backgroundTintReason not present in QuoteData type — skipped per A6 spec.
 
   return (
     <Background

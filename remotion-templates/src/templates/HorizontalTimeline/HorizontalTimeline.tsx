@@ -326,7 +326,6 @@ const EventCard: React.FC<{
 }> = React.memo(({ event, x, position, spineY = SPINE_Y, lane = 0, color, dim, scale, blur, frame, revealFrame, isFocused, hideText = false, mode }) => {
   const theme = useThemeMode(mode);
   const revealOpacity = fadeIn(frame, revealFrame, sec(0.5));
-  const slideOffset = slideIn(frame, revealFrame, 20, sec(0.5));
 
   // Hide text entirely when in cinematic focus mode and off-focus.
   if (hideText) return null;
@@ -351,7 +350,7 @@ const EventCard: React.FC<{
         top: typeBlockTop,
         width: CARD_WIDTH,
         opacity: revealOpacity * (1 - dim * 0.75),
-        transform: `scale(${scale}) translateY(${position === "above" ? slideOffset : -slideOffset}px)`,
+        transform: `scale(${scale})`,
         filter: blur > 0 ? `blur(${blur}px)` : undefined,
         willChange: "transform, opacity, filter",
       }}
