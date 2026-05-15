@@ -35,8 +35,13 @@
  */
 
 import { useMemo } from "react";
-import { useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
+import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { sec } from "../design/theme";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+  cinematicEasings,
+} from "../utils/stepFramework";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -166,16 +171,9 @@ export interface NarratedCameraState {
   cameraPosition: { x: number; y: number };
 }
 
-// ── Easing presets ─────────────────────────────────────────────────────────
-
-/** Cinematic tracking: smooth acceleration and deceleration */
-const TRACK_EASE = Easing.bezier(0.25, 0.1, 0.25, 1);
-
-/** Snap: fast arrival with soft settle */
-const SNAP_EASE = Easing.bezier(0.16, 1, 0.3, 1);
-
-/** Zoom: slightly leads pan for natural feel */
-const ZOOM_EASE = Easing.bezier(0.22, 0.68, 0.36, 1);
+// ── Easing presets — imported from stepFramework ────────────────────────────
+// cinematicEasings.track / .snap / .zoom — defined once in stepFramework.ts
+// so calibration changes propagate to all camera hooks automatically.
 
 const CLAMP_OPTS = {
   extrapolateLeft: "clamp" as const,
@@ -288,16 +286,14 @@ export const useNarratedCamera = (
 
   // ── Build cumulative frame boundaries ──────────────────────────────
   const stepBoundaries = useMemo(() => {
-    const boundaries: Array<{ start: number; end: number }> = [];
-    let cumulative = 0;
-
-    for (const step of cameraPath) {
-      const stepFrames = isProportional
+    // Convert each step duration to frames, then build boundaries via
+    // the shared primitive (stepFramework.ts).
+    const frameDurations = cameraPath.map((step) =>
+      isProportional
         ? Math.round(step.duration * durationInFrames) // fraction of total
-        : sec(step.duration); // absolute seconds
-      boundaries.push({ start: cumulative, end: cumulative + stepFrames });
-      cumulative += stepFrames;
-    }
+        : sec(step.duration), // absolute seconds
+    );
+    const boundaries = computeStepBoundaries(frameDurations);
 
     // Auto-fill: if absolute mode and last step ends before composition,
     // extend the last step to fill remaining time (camera holds final position)
@@ -365,12 +361,7 @@ export const useNarratedCamera = (
   }
 
   // ── Determine current step ─────────────────────────────────────────
-  let stepIndex = 0;
-  for (let i = 0; i < stepBoundaries.length; i++) {
-    if (frame >= stepBoundaries[i].start) {
-      stepIndex = i;
-    }
-  }
+  const stepIndex = getCurrentStepIndex(frame, stepBoundaries);
 
   const currentStep = cameraPath[stepIndex];
   const currentBounds = stepBoundaries[stepIndex];
@@ -435,7 +426,7 @@ export const useNarratedCamera = (
   const isTransitioning =
     frame >= currentBounds.start && frame < transitionEnd && stepIndex > 0;
 
-  const ease = currentStep.behavior === "snap" ? SNAP_EASE : TRACK_EASE;
+  const ease = currentStep.behavior === "snap" ? cinematicEasings.snap : cinematicEasings.track;
 
   const prevTarget = resolveTarget(prevStep.target);
   const currTarget = resolveTarget(currentStep.target);
@@ -476,7 +467,7 @@ export const useNarratedCamera = (
           frame,
           [currentBounds.start, zoomTransitionEnd],
           [prevZoom, currZoom],
-          { ...CLAMP_OPTS, easing: ZOOM_EASE }
+          { ...CLAMP_OPTS, easing: cinematicEasings.zoom }
         );
 
   // ── Shake ──────────────────────────────────────────────────────────

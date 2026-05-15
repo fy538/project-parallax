@@ -30,8 +30,13 @@
  */
 
 import { useMemo } from "react";
-import { useCurrentFrame, interpolate, Easing } from "remotion";
+import { useCurrentFrame, interpolate } from "remotion";
 import { sec } from "../design/theme";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+  cinematicEasings,
+} from "../utils/stepFramework";
 import type { TimelineCameraStep } from "../templates/HorizontalTimeline/types";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -77,16 +82,8 @@ export interface TimelineCameraState {
   isTransitioning: boolean;
 }
 
-// ── Easing presets ─────────────────────────────────────────────────────────
-
-/** Cinematic horizontal track: smooth acceleration and deceleration */
-const TRACK_EASE = Easing.bezier(0.25, 0.1, 0.25, 1);
-
-/** Snap zoom: fast in, soft settle */
-const SNAP_EASE = Easing.bezier(0.16, 1, 0.3, 1);
-
-/** Zoom ease: slightly leads pan for natural feel */
-const ZOOM_EASE = Easing.bezier(0.22, 0.68, 0.36, 1);
+// ── Easing presets — imported from stepFramework ────────────────────────────
+// cinematicEasings.track / .snap / .zoom — defined once in stepFramework.ts.
 
 const CLAMP_OPTS = {
   extrapolateLeft: "clamp" as const,
@@ -156,24 +153,13 @@ export const useTimelineCamera = (
   const transitionFrames = sec(transitionSec);
 
   // ── Build cumulative frame boundaries ──────────────────────────────
-  const stepBoundaries = useMemo(() => {
-    const boundaries: Array<{ start: number; end: number }> = [];
-    let cumulative = 0;
-    for (const step of cameraPath) {
-      const stepFrames = sec(step.duration);
-      boundaries.push({ start: cumulative, end: cumulative + stepFrames });
-      cumulative += stepFrames;
-    }
-    return boundaries;
-  }, [cameraPath]);
+  const stepBoundaries = useMemo(
+    () => computeStepBoundaries(cameraPath.map((s) => sec(s.duration))),
+    [cameraPath],
+  );
 
   // ── Determine current step ─────────────────────────────────────────
-  let stepIndex = 0;
-  for (let i = 0; i < stepBoundaries.length; i++) {
-    if (frame >= stepBoundaries[i].start) {
-      stepIndex = i;
-    }
-  }
+  const stepIndex = getCurrentStepIndex(frame, stepBoundaries);
 
   const currentStep = cameraPath[stepIndex];
   const currentBounds = stepBoundaries[stepIndex];
@@ -212,7 +198,7 @@ export const useTimelineCamera = (
 
   // Choose easing based on behavior
   const ease =
-    currentStep.behavior === "snap" ? SNAP_EASE : TRACK_EASE;
+    currentStep.behavior === "snap" ? cinematicEasings.snap : cinematicEasings.track;
 
   // Camera X: interpolate from previous target to current target
   const prevTargetX = getTargetX(prevStep);
@@ -246,7 +232,7 @@ export const useTimelineCamera = (
           frame,
           [currentBounds.start, zoomTransitionEnd],
           [prevZoom, currZoom],
-          { ...CLAMP_OPTS, easing: ZOOM_EASE }
+          { ...CLAMP_OPTS, easing: cinematicEasings.zoom }
         );
 
   // ── Compute transform ──────────────────────────────────────────────

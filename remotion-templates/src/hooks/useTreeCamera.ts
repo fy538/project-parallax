@@ -40,6 +40,7 @@
 import { useMemo } from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { sec } from "../design/theme";
+import { computeStepBoundaries, cinematicEasings } from "../utils/stepFramework";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -99,13 +100,9 @@ export interface TreeCameraState {
   currentLabel: string | undefined;
 }
 
-// ── Easing presets ─────────────────────────────────────────────────────────
-
-/** Cinematic camera move: smooth start and end */
-const CAMERA_EASE = Easing.bezier(0.25, 0.1, 0.25, 1);
-
-/** Zoom ease: slightly faster out for snappy settle */
-const ZOOM_EASE = Easing.bezier(0.22, 0.68, 0.36, 1);
+// ── Easing presets — imported from stepFramework ────────────────────────────
+// cinematicEasings.track / .zoom — defined once in stepFramework.ts.
+// Easing is still imported directly for getNodeScale's spring-settle curve.
 
 const CLAMP_OPTS = {
   extrapolateLeft: "clamp" as const,
@@ -164,20 +161,10 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
   const transitionFrames = sec(transitionSec);
 
   // ── Build cumulative frame boundaries for each step ────────────────
-  const stepBoundaries = useMemo(() => {
-    const boundaries: Array<{ start: number; end: number; holdEnd: number }> = [];
-    let cumulative = 0;
-    for (const step of cameraPath) {
-      const stepFrames = sec(step.duration);
-      boundaries.push({
-        start: cumulative,
-        end: cumulative + stepFrames,
-        holdEnd: cumulative + stepFrames,
-      });
-      cumulative += stepFrames;
-    }
-    return boundaries;
-  }, [cameraPath]);
+  const stepBoundaries = useMemo(
+    () => computeStepBoundaries(cameraPath.map((s) => sec(s.duration))),
+    [cameraPath],
+  );
 
   // ── Find current step and compute camera position ──────────────────
   let stepIndex = cameraPath.length - 1;
@@ -219,7 +206,7 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
     frame,
     [stepStart, stepStart + transitionFrames],
     [0, 1],
-    { ...CLAMP_OPTS, easing: CAMERA_EASE }
+    { ...CLAMP_OPTS, easing: cinematicEasings.track }
   );
 
   // Zoom interpolates slightly faster (settles before pan completes)
@@ -227,7 +214,7 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
     frame,
     [stepStart, stepStart + Math.max(transitionFrames * 0.75, sec(0.3))],
     [0, 1],
-    { ...CLAMP_OPTS, easing: ZOOM_EASE }
+    { ...CLAMP_OPTS, easing: cinematicEasings.zoom }
   );
 
   const prevZoom = prevStep.zoom;
@@ -302,7 +289,7 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
     frame,
     [stepStart, stepStart + transitionFrames],
     [0, 1],
-    { ...CLAMP_OPTS, easing: CAMERA_EASE }
+    { ...CLAMP_OPTS, easing: cinematicEasings.track }
   );
 
   const getNodeDim = (nodeId: string): number => {

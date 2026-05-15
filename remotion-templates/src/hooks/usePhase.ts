@@ -29,6 +29,7 @@
 import { useMemo, useCallback } from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import { CLAMP } from "../utils/animation";
+import { computeStepBoundaries } from "../utils/stepFramework";
 
 export interface PhaseDefinition {
   /** Unique phase name (used as discriminant) */
@@ -95,14 +96,10 @@ export function computePhaseState(
     };
   }
 
-  // Build cumulative start frames.
-  const starts: number[] = [];
-  let cumulative = 0;
-  for (const p of phases) {
-    starts.push(cumulative);
-    cumulative += p.duration;
-  }
-  const totalDuration = cumulative;
+  // Build cumulative start frames via the shared primitive.
+  const boundaries = computeStepBoundaries(phases.map((p) => p.duration));
+  const starts = boundaries.map((b) => b.start);
+  const totalDuration = boundaries[boundaries.length - 1].end;
 
   const adjustedFrame = frame - baseDelay;
 
@@ -180,10 +177,11 @@ export const usePhase = (
 
   // Memoize start-frame array — pure from phases, never changes between frames.
   const { starts, totalDuration } = useMemo(() => {
-    const s: number[] = [];
-    let cum = 0;
-    for (const p of phases) { s.push(cum); cum += p.duration; }
-    return { starts: s, totalDuration: cum };
+    const bs = computeStepBoundaries(phases.map((p) => p.duration));
+    return {
+      starts: bs.map((b) => b.start),
+      totalDuration: bs.length > 0 ? bs[bs.length - 1].end : 0,
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phasesKey]);
 
