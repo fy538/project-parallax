@@ -49,7 +49,7 @@ import {
   OffthreadVideo,
   staticFile,
 } from "remotion";
-import { layout, sec } from "../../design/theme";
+import { layout, palette, semantic, sec } from "../../design/theme";
 
 // ── Template components ─────────────────────────────────────────────────────
 
@@ -73,7 +73,7 @@ const CLIP_NATIVE_SEC = 6; // Hailuo free tier: all clips are 6s
 const ArchivalPlaceholder: React.FC<{ label: string }> = ({ label }) => (
   <AbsoluteFill
     style={{
-      backgroundColor: "#1C1814",
+      backgroundColor: palette.ink,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -81,11 +81,11 @@ const ArchivalPlaceholder: React.FC<{ label: string }> = ({ label }) => (
       fontFamily: '"IBM Plex Sans", Inter, Arial, sans-serif',
     }}
   >
-    <div style={{ color: "#E5A544", fontSize: 48, marginBottom: 16 }}>🖼️</div>
-    <div style={{ color: "#F0E6D0", fontSize: 28, marginBottom: 8 }}>
+    <div style={{ color: palette.amber, fontSize: 48, marginBottom: 16 }}>🖼️</div>
+    <div style={{ color: palette.bone, fontSize: 28, marginBottom: 8 }}>
       {label}
     </div>
-    <div style={{ color: "#888780", fontSize: 18 }}>
+    <div style={{ color: semantic.neutral, fontSize: 18 }}>
       Archival still — not yet sourced
     </div>
   </AbsoluteFill>
@@ -95,7 +95,7 @@ const ArchivalPlaceholder: React.FC<{ label: string }> = ({ label }) => (
 const ChoroplethMapPlaceholder: React.FC<{ data: any }> = ({ data }) => (
   <AbsoluteFill
     style={{
-      backgroundColor: "#1C1814",
+      backgroundColor: palette.ink,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -103,11 +103,11 @@ const ChoroplethMapPlaceholder: React.FC<{ data: any }> = ({ data }) => (
       fontFamily: '"IBM Plex Sans", Inter, Arial, sans-serif',
     }}
   >
-    <div style={{ color: "#E5A544", fontSize: 48, marginBottom: 16 }}>🗺️</div>
-    <div style={{ color: "#F0E6D0", fontSize: 32, marginBottom: 8 }}>
+    <div style={{ color: palette.amber, fontSize: 48, marginBottom: 16 }}>🗺️</div>
+    <div style={{ color: palette.bone, fontSize: 32, marginBottom: 8 }}>
       {(data as any).title}
     </div>
-    <div style={{ color: "#888780", fontSize: 20 }}>
+    <div style={{ color: semantic.neutral, fontSize: 20 }}>
       ChoroplethMap — preview in Remotion Studio (requires WebGL)
     </div>
   </AbsoluteFill>

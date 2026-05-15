@@ -1,3 +1,7 @@
+// @hardcoded-duration: fixture
+// These are editorial-frame demo fixtures with no data-driven duration —
+// each composition exercises a fixed-length frame variant for visual review.
+// See lint-conventions.mjs `composition-hardcoded-duration` rule.
 /**
  * EditorialTest compositions — Remotion Studio registrations.
  *
