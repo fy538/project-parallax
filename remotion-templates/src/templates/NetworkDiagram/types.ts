@@ -49,6 +49,16 @@ export interface NetworkEdge {
   /** Optional label on the edge */
   label?: string;
   color?: string;
+  /**
+   * Editorial emphasis for this edge.
+   * - `"accent"`: full opacity in the edge's color — draws the eye here.
+   * - `"muted"`: reduced opacity (0.35) — deliberately recedes.
+   *
+   * Default (omitted) treats all edges equally. When ANY edge sets
+   * `emphasis: "accent"`, other edges automatically read as muted.
+   * Mirror of SankeyFlow's `link.emphasis` pattern.
+   */
+  emphasis?: "accent" | "muted";
 }
 
 export interface NetworkControl {

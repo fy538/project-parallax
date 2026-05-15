@@ -421,6 +421,11 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     `form collapses into undifferentiated "many things". Demote to SankeyFlow ` +
     `(if allocation) or DataChart tabular. See DIAGRAM_TEMPLATE_SELECTOR.md.`,
   );
+  warnIf(
+    data.layout === "bipartite" && data.nodes.some(n => !n.side),
+    "NetworkDiagram",
+    `layout="bipartite" requires every node to have side="left" or side="right". Nodes missing side: ${data.nodes.filter(n => !n.side).map(n => n.id).join(", ")}. Bipartite will render as single column.`
+  );
   const uid = useId().replace(/:/g, "");
   const filterId = (name: string) => `nd-${uid}-${name}`;
   const frame = useCurrentFrame();
@@ -616,7 +621,9 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
 
       {/* ── Edges ──────────────────────────────────────────────────────── */}
       <g opacity={exitOpacity}>
-        {data.edges.map((edge, edgeIdx) => {
+        {(() => {
+          const someAccentEdge = data.edges.some(e => e.emphasis === "accent");
+          return data.edges.map((edge, edgeIdx) => {
           const fromPos = positionMap[edge.from];
           const toPos = positionMap[edge.to];
           if (!fromPos || !toPos) return null;
@@ -624,6 +631,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           const progress = getEdgeProgress(edgeIdx);
           const edgeColor = resolveColor(edge.color || theme.text.secondary, tokenMap);
           const ep = edgeEndpoints(edge.from, edge.to);
+
+          const isEdgeAccent = edge.emphasis === "accent";
+          const isEdgeMuted = edge.emphasis === "muted" || (someAccentEdge && !isEdgeAccent);
+          const emphasisMultiplier = isEdgeMuted ? 0.35 : 1.0;
 
           // In camera mode, edges connected to focused nodes get full opacity
           let edgeCameraOpacity = 1;
@@ -648,7 +659,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             const midY = (ep.y1 + ep.y2) / 2;
             const angle = Math.atan2(ep.y2 - ep.y1, ep.x2 - ep.x1);
             return (
-              <g key={`edge-${edgeIdx}`} opacity={progress * edgeCameraOpacity}>
+              <g key={`edge-${edgeIdx}`} opacity={progress * edgeCameraOpacity * emphasisMultiplier}>
                 <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={2} />
                 <g transform={`translate(${midX}, ${midY}) rotate(${(angle * 180) / Math.PI})`}>
                   <line x1={-12} y1={-12} x2={12} y2={12} stroke={palette.rust} strokeWidth={3} />
@@ -658,7 +669,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             );
           } else if (edge.style === "dashed") {
             return (
-              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} strokeDasharray="8 4" opacity={progress * edgeCameraOpacity * 0.7} strokeLinecap="round" />
+              <path key={`edge-${edgeIdx}`} d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3} strokeDasharray="8 4" opacity={progress * edgeCameraOpacity * 0.7 * emphasisMultiplier} strokeLinecap="round" />
             );
           } else {
             // Hub-spoke convergence terminator: small filled dot where
@@ -673,9 +684,9 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
               <g key={`edge-${edgeIdx}`}>
                 {/* Soft glow halo — wider, slightly more present so the
                     edge feels like a flow, not a wire. */}
-                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={20} opacity={progress * edgeCameraOpacity * 0.09} strokeLinecap="round" />
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={20} opacity={progress * edgeCameraOpacity * 0.09 * emphasisMultiplier} strokeLinecap="round" />
                 {/* Main edge line — bumped from 2.5 to 3.25 for editorial confidence */}
-                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3.25} opacity={progress * edgeCameraOpacity * 0.92} strokeLinecap="round" />
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3.25} opacity={progress * edgeCameraOpacity * 0.92 * emphasisMultiplier} strokeLinecap="round" />
                 {/* Hub-side convergence dot — only when a primary hub exists */}
                 {(fromIsPrimary || nodeById[edge.to]?.importance === "primary") && (
                   <circle
@@ -683,13 +694,14 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
                     cy={terminatorY}
                     r={3.5}
                     fill={edgeColor}
-                    opacity={progress * edgeCameraOpacity * 0.9}
+                    opacity={progress * edgeCameraOpacity * 0.9 * emphasisMultiplier}
                   />
                 )}
               </g>
             );
           }
-        })}
+        });
+        })()}
       </g>
 
       {/* ── Nodes ───────────────────────────────────────────��────────── */}

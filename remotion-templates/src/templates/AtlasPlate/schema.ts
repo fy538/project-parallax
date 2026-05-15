@@ -10,6 +10,19 @@ import { MapTitleConfigSchema } from "../../components/mapTitleFrame.schema";
 import { ALL_DISPUTE_TAGS } from "../../utils/disputedBoundaries";
 import { ALL_SEA_LABEL_TAGS } from "../../utils/seaLabels";
 
+/**
+ * Canonical aesthetic register enum for AtlasPlate. Re-exported as a
+ * named symbol so `types.ts` can `z.infer` the type from the SAME source
+ * the schema validates against. Avoids the silent-drift bug where the
+ * hand-typed union and the Zod enum disagree.
+ */
+export const AtlasAestheticSchema = z.enum([
+  "atlas",
+  "vintage",
+  "atlas-relief",
+]);
+export type AtlasAesthetic = z.infer<typeof AtlasAestheticSchema>;
+
 const AtlasCountryFillSchema = z.object({
   iso3: z.string().min(2),
   fill: z.string().optional(),
@@ -58,6 +71,7 @@ const AtlasPhaseSchema = z.object({
    *   ("the bloc collapses") where the suddenness IS the editorial point.
    */
   fillTransition: z.enum(["lerp", "instant"]).optional(),
+  showExtentBox: z.boolean().optional(),
 });
 
 export const AtlasPlateSchema = z.object({
@@ -156,7 +170,7 @@ export const AtlasPlateSchema = z.object({
       })
       .optional(),
     backgroundVariant: z.enum(["light", "dark"]).optional(),
-    aesthetic: z.enum(["atlas", "vintage", "atlas-relief"]).optional(),
+    aesthetic: AtlasAestheticSchema.optional(),
     backgroundTint: z.string().optional(),
     mapTitle: MapTitleConfigSchema.optional(),
     _direction: DirectionBlockSchema.optional(),

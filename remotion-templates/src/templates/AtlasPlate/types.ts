@@ -15,6 +15,7 @@ import type { GraticuleConfig } from "../../components/Graticule.types";
 import type { ProjectionName } from "../../utils/atlasProjection";
 import type { MapTitleConfig } from "../../components/MapTitleFrame";
 import type { SeaLabelInput } from "../../utils/seaLabels";
+import type { AtlasAesthetic } from "./schema";
 
 /** A country's fill assignment within a phase. */
 export interface AtlasCountryFill {
@@ -129,6 +130,15 @@ export interface AtlasPhase {
    *   14 2026) behavior of all phases.
    */
   fillTransition?: "lerp" | "instant";
+
+  /**
+   * When true, render a dashed rust rectangle on THIS phase's view showing
+   * the NEXT phase's focus countries' bounding box. Standard editorial
+   * cartography device (FT, NatGeo) for "here is where we're zooming next."
+   * Only meaningful when the NEXT phase has `focus.iso3` set; silently
+   * ignored otherwise.
+   */
+  showExtentBox?: boolean;
 }
 
 /** Full data input for an AtlasPlate composition. */
@@ -262,7 +272,7 @@ export interface AtlasPlateData {
    *
    * Reference: references/template-research/atlas-plate.md § Aesthetic register.
    */
-  aesthetic?: "atlas" | "vintage" | "atlas-relief";
+  aesthetic?: AtlasAesthetic;
 
   /** Subtle color tint for emotional temperature. Hex. */
   backgroundTint?: string;

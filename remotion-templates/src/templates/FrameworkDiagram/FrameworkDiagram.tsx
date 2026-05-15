@@ -521,6 +521,12 @@ const FlowVariant: React.FC<{
   const slotWidth = numNodes > 0 ? flowWidth / numNodes : flowWidth;
   const markerRadius = 13;
 
+  warnIf(
+    data.flowSpacing === "proportional" && nodes.every(n => !n.weight),
+    "FrameworkDiagram",
+    "flowSpacing='proportional' is set but no nodes have weight values — falling back to equal spacing. Set weight on each FlowNode to activate proportional stage widths."
+  );
+
   // Per-node slot center x positions. When flowSpacing="proportional" AND
   // every node has `weight` set, gaps between successive nodes scale with
   // their weight. Otherwise equal-spaced (legacy behavior).

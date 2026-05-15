@@ -335,6 +335,23 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
     [data.items, scaleX, baselineY],
   );
 
+  // ── Group color map ─────────────────────────────────────────────────
+  const groupColorMap = useMemo((): Record<string, string> => {
+    // Collect unique group values in insertion order.
+    const seen: string[] = [];
+    for (const item of data.items) {
+      if (item.group && !seen.includes(item.group)) seen.push(item.group);
+    }
+    if (seen.length === 0) return {};
+    // Cycle through a small editorial ramp derived from palette tokens.
+    // Cap at 6 groups — more than 6 categories in a beeswarm is a data problem.
+    const ramp = [palette.amber, palette.rust, "#5B8DB8", "#6DB33F", "#9B59B6", "#E67E22"];
+    const map: Record<string, string> = {};
+    seen.forEach((g, i) => { map[g] = ramp[i % ramp.length]; });
+    return map;
+  }, [data.items]);
+  const hasGroups = Object.keys(groupColorMap).length > 0;
+
   // ── Timing ─────────────────────────────────────────────────────────
   const axisStart = sec(0.4);
   const itemsStart = sec(0.9);
@@ -485,6 +502,8 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
           {/* ── Items (dots) ────────────────────────────────────────── */}
           {placed.map((p) => {
             const isHighlight = p.highlight === true;
+            const item = data.items[p.origIndex];
+            const groupColor = item?.group ? groupColorMap[item.group] : undefined;
             const itemStart =
               itemsStart + stagger(p.origIndex, sec(0.04));
             const settleDur = sec(0.35);
@@ -496,10 +515,10 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
               CLAMP_CUBIC,
             );
             const fill = isHighlight
-              ? p.color || accent
-              : p.color || theme.text.muted;
+              ? p.color || groupColor || accent
+              : p.color || groupColor || theme.text.muted;
             const stroke = isHighlight
-              ? p.color || accent
+              ? p.color || groupColor || accent
               : theme.text.muted;
             const opacity =
               opProgress * exitOp * (isHighlight ? 1 : 0.55);
@@ -518,6 +537,32 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
               />
             );
           })}
+
+          {/* ── Group legend strip ──────────────────────────────────── */}
+          {hasGroups && (
+            <g transform={`translate(${axisLeft}, ${baselineY + 56})`}>
+              {Object.entries(groupColorMap).map(([groupLabel, color], i) => {
+                const swatchW = 10;
+                const gap = 8;
+                const xOff = Object.entries(groupColorMap)
+                  .slice(0, i)
+                  .reduce((acc, [gl]) => acc + gl.length * 7 + gap + swatchW + 20, 0);
+                const legendOp = fadeIn(frame, itemsStart + sec(0.5), sec(0.4)) * exitOp;
+                return (
+                  <g key={groupLabel} transform={`translate(${xOff}, 0)`} opacity={legendOp}>
+                    <rect x={0} y={-8} width={swatchW} height={swatchW} fill={color} rx={2} />
+                    <text
+                      x={swatchW + gap}
+                      y={0}
+                      fill={theme.text.secondary}
+                      fontSize={fontSizes.caption}
+                      fontFamily={fonts.mono}
+                    >{groupLabel}</text>
+                  </g>
+                );
+              })}
+            </g>
+          )}
 
           {/* ── Highlight callouts: leader line + label ─────────────── */}
           {placed.map((p) => {

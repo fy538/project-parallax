@@ -47,7 +47,7 @@ export interface BeeswarmItem {
   color?: string;
   /** When true, item gets larger radius + leader-line label. */
   highlight?: boolean;
-  /** Optional grouping tag (currently informational; future legend hook). */
+  /** group label — items with the same group string share a color and appear in the legend strip. */
   group?: string;
 }
 

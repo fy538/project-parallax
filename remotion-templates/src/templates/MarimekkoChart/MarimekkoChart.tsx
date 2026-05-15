@@ -84,6 +84,19 @@ const LABEL_AREA_THRESHOLD = 6500;
 const LABEL_MIN_WIDTH = 70;
 const LABEL_MIN_HEIGHT = 36;
 
+/**
+ * Format the width-percent stamp and any numeric value labels using
+ * `valueFormat`. Returns the formatted string.
+ *   - `"percent"` / `"%"`: confirm percent mode (default behavior).
+ *   - anything else: treat as a unit suffix appended to the number.
+ */
+function applyValueFormat(numericValue: number, valueFormat?: string): string {
+  if (!valueFormat || valueFormat === "percent" || valueFormat === "%") {
+    return `${numericValue}% of total`;
+  }
+  return `${numericValue} ${valueFormat}`;
+}
+
 // When `emphasisKey` is set, non-emphasized segments multiply their base
 // cell opacity by this factor. 0.45 lands in the dossier-recommended
 // 0.4–0.6 muted register — readable as context, clearly demoted against
@@ -497,7 +510,7 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
                     lineHeight: 1,
                   }}
                 >
-                  {Math.round(col.shareWidth * 100)}% of total
+                  {applyValueFormat(Math.round(col.shareWidth * 100), data.valueFormat)}
                 </div>
               </div>
             </div>

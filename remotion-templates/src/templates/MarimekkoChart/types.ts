@@ -110,8 +110,9 @@ export interface MarimekkoChartData {
   emphasisKey?: string;
 
   /**
-   * Optional display formatter hint for the width % label. Currently
-   * unused by the renderer (kept for future numeric formatting hooks).
+   * Display formatter hint for the width % and segment value labels.
+   * Use `%` or `percent` to confirm percent mode; any other string is
+   * appended as a unit suffix (e.g., `$B`).
    */
   valueFormat?: string;
 

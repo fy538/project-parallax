@@ -70,7 +70,6 @@ import {
   viaGlobePoseInterpolate,
 } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
-import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
 import {
   placeLabels,
   type PlaceableAnnotation,
@@ -78,196 +77,44 @@ import {
 } from "../../components/labelPlacement";
 import { measureText } from "@remotion/layout-utils";
 import type { AtlasPlateData, AtlasPhase } from "./types";
-import type { MapAnnotation } from "../../components/MapAnnotations.types";
 import { AtlasInsetLocator } from "../../components/AtlasInsetLocator";
 import { ReliefUnderlay } from "./ReliefUnderlay";
+import {
+  DEFAULT_FRAME_PADDING,
+  CAMERA_TRANSITION_FRAMES,
+  FALLBACK_PHASE_WINDOW,
+  computePhaseWindows,
+  computePhasePose,
+  getCurrentPhaseIndex,
+  interpolatePose,
+  type PhaseWindow,
+} from "./atlasCamera";
+import {
+  annotationKey,
+  resolveAnnotationFrames,
+} from "./atlasAnnotationHelpers";
+import { AtlasAnnotation } from "./AtlasAnnotation";
+import { SeaLabelText } from "./SeaLabelText";
+import { CountryLabel } from "./CountryLabel";
 
 // ── Constants ─────────────────────────────────────────────────────────────
-
-/** Default padding (px) inside which countries are fit when focused. */
-const DEFAULT_FRAME_PADDING = 80;
-
-/** Camera transition duration (frames). */
-const CAMERA_TRANSITION_FRAMES = sec(1.2);
+//
+// Camera + phase utilities (PhaseWindow, computePhaseWindows,
+// getCurrentPhaseIndex, FALLBACK_PHASE_WINDOW, CameraPose, computePhasePose,
+// interpolatePose, DEFAULT_FRAME_PADDING, CAMERA_TRANSITION_FRAMES) live
+// in `./atlasCamera`. Annotation helpers (annotationKey,
+// resolveAnnotationFrames) live in `./atlasAnnotationHelpers`. Sub-
+// components (AtlasAnnotation, SeaLabelText, CountryLabel) live in
+// sibling files. Imports below.
 
 /** Country border stroke width (px) at world fit — scales inversely with zoom. */
 const BORDER_STROKE_BASE = 0.6;
-
-/** Disputed-boundary stroke width (px). Currently unused; reserved for future. */
-// const DISPUTED_STROKE_BASE = 0.8;
 
 /**
  * Frame viewport — `layout.width` × `layout.height` is constant per project,
  * so hoisting avoids reallocating the literal each render.
  */
 const VIEWPORT = { width: layout.width, height: layout.height } as const;
-
-// ── Phase windows ─────────────────────────────────────────────────────────
-
-interface PhaseWindow {
-  phase: AtlasPhase;
-  index: number;
-  startFrame: number;
-  endFrame: number;
-}
-
-/**
- * Fallback phase window — used when `data.phases` is somehow empty (the
- * schema enforces .min(1), so this should be unreachable, but a fallback
- * keeps all hooks executable until the early-return at the bottom of the
- * component runs. See B4 defensive-guard pattern in the audit.
- */
-const FALLBACK_PHASE_WINDOW: PhaseWindow = {
-  phase: { title: "", durationSec: 0, countries: [] },
-  index: 0,
-  startFrame: 0,
-  endFrame: 0,
-};
-
-const computePhaseWindows = (phases: AtlasPhase[]): PhaseWindow[] => {
-  let cursor = 0;
-  return phases.map((phase, index) => {
-    const startFrame = cursor;
-    const endFrame = cursor + sec(phase.durationSec);
-    cursor = endFrame;
-    return { phase, index, startFrame, endFrame };
-  });
-};
-
-const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number => {
-  for (const w of windows) {
-    if (frame < w.endFrame) return w.index;
-  }
-  return windows.length - 1;
-};
-
-// ── Camera pose ───────────────────────────────────────────────────────────
-
-interface CameraPose {
-  /** Multiplicative scale relative to the base (world-fit) projection. */
-  scale: number;
-  /** Pixel translate after scaling. */
-  translate: [number, number];
-}
-
-/**
- * Compute a camera pose for a phase. Result is in "outer transform" space —
- * SVG group transform = translate(...) scale(s).
- *
- * - When `focus.iso3` is set, fits to those countries' bounds with padding.
- * - When `focus.center` is set, recenters the projection on that point and
- *   applies `scaleHint` (1.0 = world fit, 2.0 = 2× zoom).
- * - Without focus, returns the identity pose (world fit, scale 1.0).
- */
-const computePhasePose = (
-  phase: AtlasPhase,
-  projectionName: ProjectionName | undefined,
-  viewport: { width: number; height: number },
-  framePadding: number,
-  baseScale: number,
-  baseTranslate: [number, number],
-): CameraPose => {
-  if (!phase.focus) {
-    return { scale: 1, translate: [0, 0] };
-  }
-
-  // Orthographic = globe projection. The outer-<g> scale+translate trick
-  // doesn't apply — the orthographic render path animates the projection's
-  // ROTATION per frame instead (see `currentRotation` + `rotatedCountryPaths`
-  // in the component body). Return identity so `focus` settings on
-  // orthographic phases are ignored without crashing; use `phase.rotation`
-  // instead. R3 audit fix: warn loudly so authors don't silently lose
-  // their focus config.
-  if (projectionName === "orthographic") {
-    warnIf(
-      !!phase.focus,
-      "AtlasPlate",
-      `Phase "${phase.title}" has \`focus\` on orthographic projection — ` +
-      `focus is IGNORED for orthographic. Use \`phase.rotation: [lon, lat]\` ` +
-      `instead to spin the globe to face that point.`,
-    );
-    warnIf(
-      phase.cameraTransition === "via-globe",
-      "AtlasPlate",
-      `Phase "${phase.title}" has \`cameraTransition: "via-globe"\` on ` +
-      `orthographic projection — the pull-back-then-push-in pose curve has ` +
-      `no effect on the globe (outer transform is identity). Use ` +
-      `"cinematic" or "linear" for the rotation easing instead.`,
-    );
-    return { scale: 1, translate: [0, 0] };
-  }
-
-  const proj = resolveProjection(projectionName);
-
-  if (phase.focus.iso3 && phase.focus.iso3.length > 0) {
-    const features: Feature<Geometry>[] = [];
-    for (const code of phase.focus.iso3) {
-      const c = getCountryByAlpha3(code);
-      if (c) features.push(c.feature);
-    }
-    if (features.length === 0) {
-      return { scale: 1, translate: [0, 0] };
-    }
-    const fc: Feature<Geometry> | { type: "FeatureCollection"; features: typeof features } =
-      features.length === 1
-        ? features[0]
-        : { type: "FeatureCollection", features };
-    fitProjectionToFeatures(proj, fc as any, viewport, framePadding); // no-as-any-ok: d3-geo interop — TopoJSON converter output type doesn't match d3's FeatureCollection exactly
-  } else if (phase.focus.center) {
-    fitProjectionToWorld(proj, viewport, framePadding);
-    const [lon, lat] = phase.focus.center;
-    const scaleHint = phase.focus.scaleHint ?? 1;
-    proj.scale(proj.scale() * scaleHint);
-    const projected = proj([lon, lat]);
-    if (projected) {
-      const [cx, cy] = projected;
-      const [tx0, ty0] = proj.translate();
-      proj.translate([tx0 + (viewport.width / 2 - cx), ty0 + (viewport.height / 2 - cy)]);
-    }
-  } else {
-    return { scale: 1, translate: [0, 0] };
-  }
-
-  const targetScale = proj.scale();
-  const targetTranslate = proj.translate() as [number, number];
-
-  // Convert (targetScale, targetTranslate) into an outer-group transform
-  // applied AFTER the base projection. For any point (x0, y0) projected
-  // under the base, its position under the target is:
-  //   (x1, y1) = ((x0 - T0x) * s + T1x, (y0 - T0y) * s + T1y)
-  // where s = targetScale / baseScale.
-  //
-  // Equivalent outer transform: translate(T1x - T0x*s, T1y - T0y*s) scale(s).
-  const s = targetScale / baseScale;
-  return {
-    scale: s,
-    translate: [
-      targetTranslate[0] - baseTranslate[0] * s,
-      targetTranslate[1] - baseTranslate[1] * s,
-    ],
-  };
-};
-
-/** Linear interpolation of two poses. */
-const interpolatePose = (a: CameraPose, b: CameraPose, t: number): CameraPose => ({
-  scale: a.scale + (b.scale - a.scale) * t,
-  translate: [
-    a.translate[0] + (b.translate[0] - a.translate[0]) * t,
-    a.translate[1] + (b.translate[1] - a.translate[1]) * t,
-  ],
-});
-
-// ── Stable annotation key ─────────────────────────────────────────────────
-
-/**
- * Content-derived key for an annotation. Array-index keys cause React to
- * reuse sub-components incorrectly when the data file's annotation order
- * changes during preview iteration (visible as: edit one annotation, a
- * *different* one appears to move). Anchor + label is unique enough in
- * practice.
- */
-const annotationKey = (ann: MapAnnotation): string =>
-  `ann-${ann.at[0].toFixed(3)},${ann.at[1].toFixed(3)}-${ann.label}`;
 
 // ── SVG graticule path ────────────────────────────────────────────────────
 
@@ -578,6 +425,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   // motion (both use the same cubic curve in `easeCameraT`). Skipped
   // entirely when `currentWindow.phase.fillTransition === "instant"` —
   // returns 1 so the lerp resolves directly to the target fill.
+  //
+  // A4 audit (May 2026): "lerp" is already the DEFAULT when fillTransition
+  // is undefined — the `=== "instant"` check gates the skip, so undefined
+  // falls through to the lerp path. No default-change needed.
   const fillTransitionT = useMemo(() => {
     if (safeIdx === 0) return 1;
     if (currentWindow.phase.fillTransition === "instant") return 1;
@@ -974,6 +825,45 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     return resolveCartoucheCorner(points);
   }, [data.mapTitle, currentWindow.phase.countries, safeIdx, phasePoses, baseProjection]);
 
+  // ── Extent box (showExtentBox) ──────────────────────────────────────────
+  // When the current phase has `showExtentBox: true`, compute the bounding
+  // box of the NEXT phase's focus countries in the CURRENT phase's settled
+  // camera coordinates. Rendered as a dashed rust rectangle to signal
+  // "here is where we zoom next." Standard FT / NatGeo editorial device.
+  const extentBoxRect = useMemo((): { x: number; y: number; w: number; h: number } | null => {
+    const currentPhase = data.phases[safeIdx];
+    if (!currentPhase?.showExtentBox) return null;
+    const nextPhase = data.phases[safeIdx + 1];
+    const nextIso3 = nextPhase?.focus?.iso3;
+    if (!nextIso3 || nextIso3.length === 0) return null;
+
+    // Collect all features matching next phase's iso3 list.
+    const allCountries = getAllCountries();
+    const nextFeatures = allCountries.filter(c => nextIso3.includes(c.alpha3 ?? ""));
+    if (nextFeatures.length === 0) return null;
+
+    // Project using the SETTLED pose of the current phase (not animated).
+    const settledPose = phasePoses[safeIdx] ?? { scale: 1, translate: [0, 0] as [number, number] };
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const country of nextFeatures) {
+      const bounds = basePathGen.bounds(country.feature as any); // no-as-any-ok: d3-geo interop — GeoJSON Feature nominal type
+      if (!isFinite(bounds[0][0])) continue;
+      const bx0 = bounds[0][0] * settledPose.scale + settledPose.translate[0];
+      const by0 = bounds[0][1] * settledPose.scale + settledPose.translate[1];
+      const bx1 = bounds[1][0] * settledPose.scale + settledPose.translate[0];
+      const by1 = bounds[1][1] * settledPose.scale + settledPose.translate[1];
+      minX = Math.min(minX, bx0, bx1);
+      minY = Math.min(minY, by0, by1);
+      maxX = Math.max(maxX, bx0, bx1);
+      maxY = Math.max(maxY, by0, by1);
+    }
+    if (!isFinite(minX)) return null;
+
+    const pad = 12;
+    return { x: minX - pad, y: minY - pad, w: maxX - minX + pad * 2, h: maxY - minY + pad * 2 };
+  }, [data.phases, safeIdx, phasePoses, basePathGen]);
+
   // Defensive null-render — happens AFTER all hooks (Rules of Hooks). If
   // schema validation ever lets through an empty phases array, render
   // nothing and surface a dev warning instead of crashing.
@@ -1135,6 +1025,27 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                   />
                 ),
             )}
+
+            {/* Extent box — dashed rust rect showing next phase's focus bbox.
+                Fades in at the start of the current phase. The rect is inside
+                the camera-transform group so it pans/zooms with the countries.
+                Rect coords were computed in settled-pose space (no animation),
+                so they align with countries at the fully-settled view. */}
+            {extentBoxRect && (
+              <rect
+                x={extentBoxRect.x}
+                y={extentBoxRect.y}
+                width={extentBoxRect.w}
+                height={extentBoxRect.h}
+                fill="none"
+                stroke={palette.rust}
+                strokeWidth={2}
+                strokeDasharray="8 5"
+                strokeDashoffset={(frame * 0.4) % 13}
+                opacity={0.75 * fadeIn(frame, currentWindow.startFrame, sec(0.6))}
+                rx={3}
+              />
+            )}
           </g>
 
           {/* Vintage aesthetic overlays — paper grain (multiply) + vignette.
@@ -1279,288 +1190,3 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     </Background>
   );
 };
-
-// ── Annotation timing resolver (parent-side, lifted from sub-component) ──
-
-/**
- * Resolve appear/exit frames for an annotation. Lifted to module scope so
- * the parent can compute it inline and decide whether to mount the
- * sub-component at all (annotations outside their window skip render
- * entirely — a real win when a composition has 20+ annotations spread
- * across phases). Same semantics as MapAnnotations.resolveTiming.
- */
-const resolveAnnotationFrames = (
-  annotation: MapAnnotation,
-  compositionDurationFrames: number,
-  phaseWindows: PhaseWindow[],
-): { startFrame: number; endFrame: number } => {
-  if (annotation.appearAtSec !== undefined || annotation.exitAtSec !== undefined) {
-    return {
-      startFrame: annotation.appearAtSec !== undefined ? Math.round(annotation.appearAtSec * layout.fps) : 0,
-      endFrame: annotation.exitAtSec !== undefined ? Math.round(annotation.exitAtSec * layout.fps) : compositionDurationFrames,
-    };
-  }
-  if (annotation.phase !== undefined && phaseWindows[annotation.phase]) {
-    return {
-      startFrame: phaseWindows[annotation.phase].startFrame,
-      endFrame: phaseWindows[annotation.phase].endFrame,
-    };
-  }
-  return { startFrame: 0, endFrame: compositionDurationFrames };
-};
-
-// ── Sub-component: SVG annotation (React.memo'd) ──────────────────────────
-
-interface AtlasAnnotationProps {
-  annotation: MapAnnotation;
-  /** Projected screen position — passed as primitives so React.memo shallowEqual works. */
-  screenX: number;
-  screenY: number;
-  /** Pre-computed by parent so the sub-component is a pure presentation. */
-  opacity: number;
-  dark: boolean;
-}
-
-/**
- * React.memo's default shallow compare skips re-render when annotation
- * (stable from data), screenX/Y/opacity (primitives), and dark (primitive)
- * are unchanged from last render. Outside camera transitions, screen
- * coords are constant; outside fade windows, opacity is constant. The
- * sub-component then skips re-render entirely for those frames.
- */
-const AtlasAnnotation = React.memo<AtlasAnnotationProps>(({
-  annotation,
-  screenX,
-  screenY,
-  opacity,
-  dark,
-}) => {
-  const color = resolveAnnotationColor(annotation.hierarchy, annotation.emphasis, dark);
-  const x = screenX;
-  const y = screenY;
-  const dx = annotation.leader?.dx ?? 0;
-  const dy = annotation.leader?.dy ?? (annotation.hierarchy === "primary" ? -28 : annotation.hierarchy === "secondary" ? -22 : -16);
-  const hasLeader = !!annotation.leader;
-
-  const fontSize =
-    annotation.hierarchy === "primary" ? fontSizes.h3
-    : annotation.hierarchy === "secondary" ? fontSizes.body
-    : fontSizes.caption;
-  const fontWeight =
-    annotation.hierarchy === "primary" ? fontWeights.semibold
-    : annotation.hierarchy === "secondary" ? fontWeights.medium
-    : fontWeights.regular;
-  const fontFamily =
-    annotation.hierarchy === "tertiary" ? fonts.metadata : fonts.display;
-  const textTransform = annotation.hierarchy === "primary" ? "uppercase" : "none";
-  const textAnchor =
-    annotation.align === "left" ? "end"
-    : annotation.align === "right" ? "start"
-    : dx > 4 ? "start"
-    : dx < -4 ? "end"
-    : "middle";
-
-  return (
-    <g opacity={opacity} style={{ pointerEvents: "none" }}>
-      {/* Anchor dot — small filled dot at the lon/lat. */}
-      <circle cx={x} cy={y} r={annotation.hierarchy === "tertiary" ? 2 : 3.5} fill={color} />
-
-      {/* Leader line. */}
-      {hasLeader && (
-        <line
-          x1={x}
-          y1={y}
-          x2={x + dx}
-          y2={y + dy}
-          stroke={color}
-          strokeOpacity={0.55}
-          strokeWidth={annotation.hierarchy === "primary" ? 1.25 : annotation.hierarchy === "secondary" ? 1 : 0.75}
-          strokeLinecap="round"
-        />
-      )}
-
-      {/* Label. */}
-      <text
-        x={x + dx}
-        y={y + dy}
-        dominantBaseline="middle"
-        textAnchor={textAnchor}
-        style={{
-          fontFamily,
-          fontSize,
-          fontWeight,
-          letterSpacing: `${annotation.hierarchy === "primary" ? letterSpacing.h3 : letterSpacing.label}px`,
-          textTransform,
-          fill: color,
-        }}
-      >
-        {annotation.label}
-      </text>
-      {annotation.sublabel && (
-        <text
-          x={x + dx}
-          y={y + dy + fontSize * 0.9}
-          dominantBaseline="middle"
-          textAnchor={textAnchor}
-          style={{
-            fontFamily: fonts.metadata,
-            fontSize: fontSizes.meta,
-            fontWeight: fontWeights.regular,
-            letterSpacing: `${letterSpacing.meta}px`,
-            textTransform: "uppercase",
-            fill: palette.taupe,
-          }}
-        >
-          {annotation.sublabel}
-        </text>
-      )}
-    </g>
-  );
-});
-AtlasAnnotation.displayName = "AtlasAnnotation";
-
-// ── Sub-component: country label at centroid (React.memo'd) ───────────────
-
-// ── Sea-label sub-component ───────────────────────────────────────────────
-
-interface SeaLabelTextProps {
-  /** Unique SVG id for the path the textPath references. */
-  pathId: string;
-  /** SVG path data string (screen-space; pre-projected). */
-  d: string;
-  /** The label text (rendered uppercase). */
-  label: string;
-  hierarchy: "primary" | "secondary";
-  dark: boolean;
-  isVintage: boolean;
-}
-
-/**
- * Sea/ocean label rendered as `<textPath>` along a projected screen-space
- * arc. Atlas-plate convention: tracked uppercase, muted color so the
- * water-body name reads as figure-ground reference rather than data.
- *
- * Defines a `<defs>` path the `<textPath>` follows. The path itself
- * stays invisible (stroke="none"); only the text along it renders.
- *
- * Hierarchy controls size + letterspacing — ocean basins get more
- * presence than seas/gulfs, matching atlas convention.
- */
-const SeaLabelText = React.memo<SeaLabelTextProps>(({
-  pathId,
-  d,
-  label,
-  hierarchy,
-  dark,
-  isVintage,
-}) => {
-  // Muted color — water labels should read as cartographic chrome, not
-  // editorial emphasis. Vintage register uses its own faded-brown tone.
-  const color = isVintage
-    ? "#7A6448"
-    : dark
-    ? "#5A5448"
-    : "#9A8E78";
-  const fontSize =
-    hierarchy === "primary" ? fontSizes.label : fontSizes.caption;
-  // Wide letterspacing is the atlas convention — labels SHOULD feel
-  // stretched out across the water. Primary (oceans) gets more tracking.
-  const tracking = hierarchy === "primary" ? 6 : 4;
-
-  return (
-    <>
-      <defs>
-        <path id={pathId} d={d} fill="none" stroke="none" />
-      </defs>
-      <text
-        style={{
-          fontFamily: fonts.display,
-          fontSize,
-          fontWeight: fontWeights.regular,
-          letterSpacing: `${tracking}px`,
-          textTransform: "uppercase",
-          fill: color,
-          opacity: 0.85,
-          pointerEvents: "none",
-        }}
-      >
-        <textPath
-          href={`#${pathId}`}
-          startOffset="50%"
-          textAnchor="middle"
-        >
-          {label}
-        </textPath>
-      </text>
-    </>
-  );
-});
-SeaLabelText.displayName = "SeaLabelText";
-
-interface CountryLabelProps {
-  label: string;
-  /** Anchor (centroid) screen position. The leader, when shown, starts here. */
-  anchorX: number;
-  anchorY: number;
-  /** Offset from anchor to label center, from the collision placer. */
-  dx: number;
-  dy: number;
-  /** When true, render a thin leader line from anchor to label position. */
-  showLeader: boolean;
-  /** Text alignment from the placer (matches displacement direction). */
-  align: "left" | "right" | "center";
-  opacity: number;
-  dark: boolean;
-}
-
-const CountryLabel = React.memo<CountryLabelProps>(({
-  label,
-  anchorX,
-  anchorY,
-  dx,
-  dy,
-  showLeader,
-  align,
-  opacity,
-  dark,
-}) => {
-  const color = dark ? palette.bone : palette.ink;
-  const x = anchorX + dx;
-  const y = anchorY + dy;
-  const textAnchor =
-    align === "left" ? "start" : align === "right" ? "end" : "middle";
-  return (
-    <g opacity={opacity} style={{ pointerEvents: "none" }}>
-      {showLeader && (
-        // Thin leader from polygon-edge-near-anchor toward the label.
-        // Stops 6 px short of the label so it doesn't punch through text.
-        <line
-          x1={anchorX}
-          y1={anchorY}
-          x2={x - Math.sign(dx) * 6}
-          y2={y - Math.sign(dy) * 4}
-          stroke={color}
-          strokeWidth={0.6}
-          strokeOpacity={0.5}
-        />
-      )}
-      <text
-        x={x}
-        y={y}
-        dominantBaseline="middle"
-        textAnchor={textAnchor}
-        style={{
-          fontFamily: fonts.display,
-          fontSize: fontSizes.label,
-          fontWeight: fontWeights.medium,
-          letterSpacing: `${letterSpacing.label}px`,
-          textTransform: "uppercase",
-          fill: color,
-        }}
-      >
-        {label}
-      </text>
-    </g>
-  );
-});
-CountryLabel.displayName = "CountryLabel";

@@ -33,6 +33,7 @@ const NetworkEdgeSchema = z.object({
   style: z.enum(["solid", "dashed", "blocked"]),
   label: z.string().optional(),
   color: z.string().optional(),
+  emphasis: z.enum(["accent", "muted"]).optional(),
 });
 
 const NetworkControlSchema = z.object({
@@ -65,5 +66,16 @@ export const NetworkDiagramSchema = z.object({
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
     _direction: DirectionBlockSchema.optional(),
+  }).superRefine((val, ctx) => {
+    if (val.layout === "bipartite") {
+      const missing = val.nodes.filter(n => !n.side).map(n => n.id);
+      if (missing.length > 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `NetworkDiagram layout="bipartite" requires every node to have side="left" or side="right". Nodes missing side: ${missing.join(", ")}. Without side, bipartite renders as a single column.`,
+          path: ["nodes"],
+        });
+      }
+    }
   }),
 });
