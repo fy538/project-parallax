@@ -231,17 +231,22 @@ describe("MapGL editorial-register props", () => {
     expect(mapGLSource).toMatch(/<MapAttribution\b/);
   });
 
-  it("MapVignette is rendered when vignette || vintage truthy", () => {
+  it("MapVignette is rendered when vignette || isVintage truthy", () => {
     // The vignette overlay blends the rectangular Mapbox canvas into
     // the surrounding editorial chrome. Suppressed by default; templates
-    // opt in via vignette="editorial" or vintage=true.
+    // opt in via vignette="editorial" or register="vintage".
     expect(mapGLSource).toMatch(/<MapVignette\b/);
   });
 
-  it("vintage mode swaps to sepiaStyleUrl when set", () => {
-    // The Style URL resolution must prefer vintage > dark > light when
-    // the vintage prop is true.
-    expect(mapGLSource).toMatch(/vintage\s*\?\s*MAP_CONFIG\.sepiaStyleUrl/);
+  it("style URL resolution goes through MAP_STYLES[register]", () => {
+    // The October 2026 register-discriminator refactor replaced the
+    // implicit precedence chain (`toner ? sepia : vintage ? sepia :
+    // dark ? dark : light`) with a dict lookup. This assertion locks
+    // the new pattern so a future regression doesn't quietly
+    // reintroduce the mutex-boolean precedence.
+    expect(mapGLSource).toMatch(/MAP_STYLES\[register\]/);
+    // And the OLD precedence chain must be gone.
+    expect(mapGLSource).not.toMatch(/vintage\s*\?\s*MAP_CONFIG\.sepiaStyleUrl/);
   });
 
   it("graticule prop is destructured and routes through buildGraticuleLayers", () => {

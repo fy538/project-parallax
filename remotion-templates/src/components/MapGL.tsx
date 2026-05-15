@@ -29,7 +29,7 @@ import { buildGraticuleLayers } from "./Graticule";
 import type { GraticuleConfig } from "./Graticule.types";
 import { MapVignette } from "./MapVignette";
 import { MapAttribution } from "./MapAttribution";
-import type { LabelDensity, LightPreset } from "./MapGL.types";
+import type { LabelDensity, LightPreset, Register } from "./MapGL.types";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 // ── deck.gl ↔ Mapbox bridge ────────────────────────────────────────────
@@ -68,6 +68,41 @@ export const MAP_CONFIG = {
   terrain: mapConfig.terrain,
   projection: mapConfig.projection,
 } as const;
+
+/**
+ * Register → style-URL dict. Single source of truth that replaces the
+ * implicit precedence chain (`toner ? toner : vintage ? sepia : dark ?
+ * dark : light`) that lived in MapGL's body. Adding a new register
+ * means appending one entry here + extending RegisterSchema in
+ * MapGL.types.ts.
+ */
+export const MAP_STYLES: Record<Register, string> = {
+  light: mapConfig.styleUrl,
+  dark: mapConfig.darkStyleUrl,
+  vintage: mapConfig.sepiaStyleUrl,
+  toner: mapConfig.tonerStyleUrl,
+};
+
+/**
+ * Register → fallback CSS filter applied to the map wrapper when the
+ * matching `MAPBOX_STYLE_*_URL` env var is unset (i.e., we're falling
+ * through to a stock Mapbox style). Approximates the register visually
+ * until the Studio fork is published.
+ *
+ *   • `light` / `dark` — no filter (stock looks register-appropriate enough)
+ *   • `vintage`        — warm sepia overlay
+ *   • `toner`          — high-contrast grayscale
+ *
+ * Resolved against `MAP_STYLES[register] === mapConfig.styleUrl` (i.e.,
+ * we're in fallback because the env var collapsed to the same URL as
+ * the default Light style).
+ */
+const REGISTER_FALLBACK_FILTERS: Record<Register, string | undefined> = {
+  light: undefined,
+  dark: undefined,
+  vintage: "sepia(0.55) saturate(0.85) contrast(0.95) hue-rotate(-8deg)",
+  toner: "grayscale(1) contrast(1.35) brightness(1.05)",
+};
 
 // ── Fog / atmosphere presets ──────────────────────────────────────────
 //
@@ -394,32 +429,29 @@ export interface MapGLProps {
    * references/template-research/map-annotations.md.
    */
   terrain?: boolean;
-  /** Use the dark Meridian style instead of light (default: false). Templates pass this when the episode is in dark mode. */
-  dark?: boolean;
   /**
-   * Use the sepia / vintage Meridian style — for period / historical
-   * episodes (Cold War, mid-century analogies). Overrides `dark`. Falls
-   * back to a light-v11 + warm CSS tint if `MAPBOX_STYLE_SEPIA_URL` isn't
-   * published yet. Same register decision as AtlasPlate's
-   * `aesthetic: "vintage"`. See: tools/mapbox-meridian-setup.md § Sepia.
-   */
-  vintage?: boolean;
-  /**
-   * Use the Meridian Toner style (Stamen Toner via Stadia Maps, 2024
-   * rebuild, forked + retinted to the bone/amber palette). The
-   * atmospheric atlas register — closer to FT / NYT static-print
-   * editorial than Mapbox Standard reaches. Use for:
+   * Visual register — one of `light`, `dark`, `vintage`, `toner`.
    *
-   *   • Atmospheric globe pivots where Mapbox Standard reads too web-y
-   *   • Country / regional shots where the basemap is supporting context
-   *     (annotations + arcs carry the editorial point)
+   * Default `"light"`. Replaces the previous mutex booleans (`dark`,
+   * `vintage`, `toner`) that allowed contradictory combinations. The
+   * register chooses both the Mapbox style URL AND a fallback CSS
+   * filter to apply when the matching `MAPBOX_STYLE_*_URL` env var is
+   * unset (so stock-Mapbox renders approximate the intended look).
    *
-   * Overrides `dark` / `vintage` when set. Falls back to a light-v11 +
-   * runtime high-contrast CSS filter when `MAPBOX_STYLE_TONER_URL` is
-   * not published. See: tools/meridian-toner-setup.md for the Stadia
-   * Maps signup + Studio fork procedure.
+   * Orthogonal modulators stay separate (`fogPreset`, `lightPreset`,
+   * `labelDensity`, `vignette`, `terrain`) — they compose on top.
+   *
+   *   • `light`   — default Meridian Light atlas register
+   *   • `dark`    — Meridian Dark (typically passed when
+   *                 `data.backgroundVariant === "dark"`)
+   *   • `vintage` — Meridian Sepia (period episodes; same intent as
+   *                 AtlasPlate's `aesthetic: "vintage"`)
+   *   • `toner`   — Stadia × Stamen Toner (atmospheric atlas — closer
+   *                 to FT / NYT static-print than Mapbox Standard reaches)
+   *
+   * See: MapGL.types.ts § Register, tools/meridian-toner-setup.md.
    */
-  toner?: boolean;
+  register?: Register;
   /**
    * Atmospheric / fog preset — controls the globe halo via Mapbox's
    * `setFog()` API. Default `editorial` (paper-tinted, no stars, muted
@@ -530,9 +562,7 @@ export const MapGL: React.FC<MapGLProps> = ({
   globe,
   projection,
   terrain = false,
-  dark = false,
-  vintage = false,
-  toner = false,
+  register = "light",
   fogPreset = "editorial",
   lightPreset,
   showDefaultAttribution = false,
@@ -682,6 +712,12 @@ export const MapGL: React.FC<MapGLProps> = ({
     return () => clearTimeout(timeout);
   }, [handle, loaded]);
 
+  // Register-derived shorthands — locals consumed by sub-components
+  // (Graticule, Vignette, Attribution) that need "is this dark / vintage
+  // context?" without re-implementing the register taxonomy.
+  const isDark = register === "dark";
+  const isVintage = register === "vintage";
+
   // Merge user `layers` with graticule layers (when graticule prop is set).
   // The graticule layers come first so they render UNDER the user's content
   // (arcs, scatter, country fills) but OVER the base tiles.
@@ -690,7 +726,7 @@ export const MapGL: React.FC<MapGLProps> = ({
       ? []
       : buildGraticuleLayers(
           graticule === true ? {} : graticule,
-          { dark },
+          { dark: isDark },
         );
   const composedLayers = graticuleLayers.length
     ? [...graticuleLayers, ...layers]
@@ -700,39 +736,21 @@ export const MapGL: React.FC<MapGLProps> = ({
   // Explicit projection prop wins over the globe/mercator auto-choice.
   const resolvedProjection = projection ?? (useGlobe ? "globe" : "mercator");
 
-  // Style URL precedence: explicit styleUrl prop → toner → vintage →
-  // dark → light. Toner sits at the top of the auto-chain because it's
-  // the strongest editorial register signal — a script that asks for
-  // toner means "I want the FT/NYT typographic restraint, not Standard."
-  // After that: vintage takes precedence over dark because period
-  // episodes set both (vintage register, dark background) and the sepia
-  // style is the editorial intent.
-  const resolvedStyleUrl =
-    styleUrl ??
-    (toner
-      ? MAP_CONFIG.tonerStyleUrl
-      : vintage
-        ? MAP_CONFIG.sepiaStyleUrl
-        : dark
-          ? MAP_CONFIG.darkStyleUrl
-          : MAP_CONFIG.styleUrl);
-  // CSS filter applied to the map wrapper when a custom Meridian style
-  // URL isn't published yet (i.e., we fall through to light-v11). Each
-  // fallback gets a register-appropriate filter so the visual signal
-  // approximates the intended look until the Studio fork is published.
-  //   • vintage  — warm sepia overlay
-  //   • toner    — high-contrast grayscale (Stamen Toner approximation)
-  // When the matching env var IS set, no filter is applied (the style
-  // itself carries the register correctly).
-  const usesVintageFallback =
-    vintage && MAP_CONFIG.sepiaStyleUrl === MAP_CONFIG.styleUrl;
-  const usesTonerFallback =
-    toner && MAP_CONFIG.tonerStyleUrl === MAP_CONFIG.styleUrl;
-  const wrapperFilter = usesTonerFallback
-    ? "grayscale(1) contrast(1.35) brightness(1.05)"
-    : usesVintageFallback
-      ? "sepia(0.55) saturate(0.85) contrast(0.95) hue-rotate(-8deg)"
-      : undefined;
+  // Style URL: `styleUrl` override wins; otherwise lookup by register.
+  // The dict-driven model replaced an implicit precedence chain
+  // (`toner ? sepia : vintage ? sepia : dark ? dark : light`) where
+  // simultaneous booleans were silently resolved. Now the register IS
+  // the choice — the type system enforces "one at a time."
+  const resolvedStyleUrl = styleUrl ?? MAP_STYLES[register];
+  // Fallback CSS filter — when the register's style URL collapsed to
+  // the default Light style (i.e., `MAPBOX_STYLE_<REGISTER>_URL` env
+  // var unset), apply a register-appropriate filter so renders
+  // approximate the intended register until the Studio fork is published.
+  // Light + Dark have no filter (stock light-v11 / dark-v11 look
+  // register-appropriate enough); Vintage + Toner get the warm sepia /
+  // grayscale tints respectively.
+  const usesFallback = register !== "light" && MAP_STYLES[register] === MAP_STYLES.light;
+  const wrapperFilter = usesFallback ? REGISTER_FALLBACK_FILTERS[register] : undefined;
 
   return (
     <AbsoluteFill style={{ overflow: "hidden", filter: wrapperFilter }}>
@@ -797,12 +815,12 @@ export const MapGL: React.FC<MapGLProps> = ({
         {children}
       </Map>
       {/* Editorial overlay: paper vignette to blend the map canvas into
-          the page chrome. Auto-applies vintage variant when `vintage` is
-          set; otherwise uses the requested `vignette` value (or none). */}
-      {(vignette || vintage) && (
+          the page chrome. Auto-applies vintage variant when register is
+          `vintage`; otherwise uses the requested `vignette` value (or none). */}
+      {(vignette || isVintage) && (
         <MapVignette
-          variant={vintage ? "vintage" : (vignette as "editorial" | "atlas")}
-          dark={dark}
+          variant={isVintage ? "vintage" : (vignette as "editorial" | "atlas")}
+          dark={isDark}
         />
       )}
       {/* Editorial attribution chip (MAPBOX · OSM · …). Opt-out by passing
@@ -811,7 +829,7 @@ export const MapGL: React.FC<MapGLProps> = ({
       {attribution !== false && (
         <MapAttribution
           extras={attribution?.extras}
-          dark={dark}
+          dark={isDark}
           placement="bottom-right"
         />
       )}

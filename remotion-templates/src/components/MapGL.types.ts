@@ -63,3 +63,27 @@ export type LabelDensity = z.infer<typeof LabelDensitySchema>;
 export const LightPresetSchema = z.enum(["day", "dawn", "dusk", "night"]);
 
 export type LightPreset = z.infer<typeof LightPresetSchema>;
+
+/**
+ * Visual register — discriminated alternative to the previous mutex
+ * booleans (`dark`, `vintage`, `toner`). One register at a time:
+ *
+ *   • `light`   — default Meridian Light atlas register (FALLBACK: stock light-v11)
+ *   • `dark`    — Meridian Dark (FALLBACK: stock dark-v11)
+ *   • `vintage` — Meridian Sepia for period episodes (FALLBACK: light-v11 + warm CSS tint)
+ *   • `toner`   — Stadia × Stamen Toner for atmospheric atlas
+ *                 (FALLBACK: light-v11 + grayscale CSS filter)
+ *
+ * Picking ONE register at a time prevents the bug where a caller passes
+ * `dark: true, vintage: true` and the precedence resolution is implicit
+ * in the component body. The mutex is enforced by the type system.
+ *
+ * Orthogonal modulators stay separate props on MapGL:
+ *   • `fogPreset`   — atmosphere halo (editorial / atmospheric / vintage / none)
+ *   • `lightPreset` — Mapbox Standard scene lighting (day / dawn / dusk / night)
+ *   • `labelDensity` — Mapbox label suppression register
+ * These compose ON TOP of the register choice. A `vintage` register can
+ * still have `lightPreset: "dusk"`.
+ */
+export const RegisterSchema = z.enum(["light", "dark", "vintage", "toner"]);
+export type Register = z.infer<typeof RegisterSchema>;

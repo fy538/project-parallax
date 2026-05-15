@@ -22,6 +22,7 @@
 
 import React from "react";
 import { AbsoluteFill, OffthreadVideo } from "remotion";
+import { palette } from "../design/theme";
 
 interface AiGenClipProps {
   /** staticFile() path to the clip */
@@ -37,7 +38,7 @@ export const AiGenClip: React.FC<AiGenClipProps> = ({
   playbackRate = 1,
   objectFit = "cover",
 }) => (
-  <AbsoluteFill style={{ backgroundColor: "#1C1814" }}>
+  <AbsoluteFill style={{ backgroundColor: palette.ink }}>
     <OffthreadVideo
       src={src}
       playbackRate={playbackRate}

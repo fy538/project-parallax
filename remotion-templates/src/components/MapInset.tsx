@@ -158,7 +158,7 @@ export const MapInset: React.FC<MapInsetProps> = ({
         bearing={0}
         globe
         terrain={false}
-        dark={dark}
+        register={dark ? "dark" : "light"}
         width={size}
         height={size}
       >
