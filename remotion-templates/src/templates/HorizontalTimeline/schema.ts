@@ -154,6 +154,19 @@ export const HorizontalTimelineSchema = z.object({
     /** Total duration in seconds */
     durationSec: z.number().positive().optional(),
 
+    // ── Era/bracket groupings (single mode only) ──
+    /** Era brackets rendered above the spine spanning a range of events. */
+    eras: z
+      .array(
+        z.object({
+          label: z.string(),
+          startIndex: z.number().int().min(0),
+          endIndex: z.number().int().min(0),
+          color: z.string().optional(),
+        }),
+      )
+      .optional(),
+
     // ── Directing language overrides ──
     /** Per-composition direction block from visual-spec _direction namespace. */
     _direction: DirectionBlockSchema.optional(),

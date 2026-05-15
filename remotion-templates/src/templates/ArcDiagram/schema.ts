@@ -37,6 +37,18 @@ export const ArcDiagramSchema = z.object({
     connections: z.array(ArcConnectionSchema),
     showBaseline: z.boolean().optional(),
     axisTitle: z.string().optional(),
+    eras: z
+      .array(
+        z.object({
+          label: z.string(),
+          range: z.tuple([
+            z.number().int().min(0),
+            z.number().int().min(0),
+          ]),
+          color: z.string().optional(),
+        }),
+      )
+      .optional(),
     source: z.string().optional(),
     durationSec: z.number().positive().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),

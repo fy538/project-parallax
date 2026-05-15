@@ -241,6 +241,17 @@ export interface HorizontalTimelineData {
   /** Total duration in seconds */
   durationSec?: number;
 
+  /**
+   * Era/bracket groupings for single mode — draws a bracket above the spine
+   * spanning a range of events with a label. Only rendered in mode "single".
+   */
+  eras?: Array<{
+    label: string;
+    startIndex: number;  // index into the events array (inclusive)
+    endIndex: number;    // index into the events array (inclusive)
+    color?: string;      // defaults to palette.amber
+  }>;
+
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;

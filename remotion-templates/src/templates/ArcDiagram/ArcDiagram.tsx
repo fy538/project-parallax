@@ -86,6 +86,16 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
       `splitting into two segments or moving to HorizontalTimeline for purely ` +
       `temporal data.`,
   );
+  if (data.eras) {
+    data.eras.forEach((era, ei) => {
+      warnIf(
+        era.range[0] >= era.range[1],
+        "ArcDiagram",
+        `era[${ei}] "${era.label}" has degenerate range [${era.range[0]}, ${era.range[1]}] — ` +
+          `startNodeIndex must be less than endNodeIndex.`,
+      );
+    });
+  }
 
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
@@ -181,6 +191,52 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
             overflow: "visible",
           }}
         >
+          {/* ── Era bands — behind baseline, arcs, and nodes ────────────
+              Faint filled rectangles spanning a node range. Guard both
+              indices against array bounds. Label sits near the baseline
+              (between baseline and node labels) centered in the band. */}
+          {data.eras && data.eras.map((era, ei) => {
+            const maxNodeIdx = data.nodes.length - 1;
+            if (era.range[0] < 0 || era.range[0] > maxNodeIdx) return null;
+            if (era.range[1] < 0 || era.range[1] > maxNodeIdx) return null;
+            const xLeft = nodeXs[era.range[0]];
+            const xRight = nodeXs[era.range[1]];
+            if (xLeft === undefined || xRight === undefined) return null;
+            // Node radius upper bound for band padding
+            const bandPad = 9;
+            const bandX = xLeft - bandPad;
+            const bandWidth = xRight - xLeft + bandPad * 2;
+            const eraColor = era.color ?? palette.amber;
+            const midX = (xLeft + xRight) / 2;
+            return (
+              <g key={`era-band-${ei}`}>
+                <rect
+                  x={bandX}
+                  y={0}
+                  width={bandWidth}
+                  height={layout.height}
+                  fill={eraColor}
+                  opacity={0.08}
+                />
+                {/* Era label near the baseline, above node labels */}
+                <text
+                  x={midX}
+                  y={baselineY + 18}
+                  textAnchor="middle"
+                  fill={eraColor}
+                  fontSize={10}
+                  fontFamily={fonts.mono}
+                  fontWeight={400}
+                  letterSpacing={2}
+                  opacity={0.5}
+                  style={{ textTransform: "uppercase" } as React.CSSProperties}
+                >
+                  {era.label}
+                </text>
+              </g>
+            );
+          })}
+
           {/* ── Baseline ──────────────────────────────────────────────
               Single thin horizontal rule anchoring the lineage. Draws
               in left-to-right so it feels like an axis being laid down,

@@ -8,6 +8,17 @@ A connected scatterplot's job is to make the *shape of a joint trajectory* legib
 
 The form's home use case is the **Phillips curve** (unemployment × inflation), but the same idiom carries productivity-vs-wages, growth-vs-emissions, deficit-vs-yields, cases-vs-positivity, and any "is the historical relationship still holding?" question. FT Chart-Doctor lists it explicitly under **Correlation** in the Visual Vocabulary poster (Smith, 2018, `ft-interactive/chart-doctor`), distinguishing it from plain scatter precisely because the *path* — not just the cloud — is what's being argued about.
 
+### When *not* to reach for it
+
+| Alternative | When it wins over ConnectedScatterplot |
+|---|---|
+| **TimeSeriesChart** | The story is about the *level* of one variable over time — "US GDP grew from $5T to $25T." Use TimeSeriesChart when you have one variable; use ConnectedScatterplot only when the *relationship between two variables* is the argument. |
+| **DataChart scatter** | Two variables are plotted, but there is no temporal ordering — the editorial point is the correlation at a single moment, not the trajectory over time. |
+| **BumpChart** | The story is about relative rank shifts across time, not absolute two-variable co-movement. |
+| **SankeyFlow** | The relationship between the two variables is a flow (one variable is a source, one is a destination) rather than a joint trajectory. |
+
+**ConnectedScatterplot's superpower fires when:** the editorial point is the *shape* of the trajectory — a loop means "we came back to where we started," a jag means "regime break," a diagonal sweep means "monotone change" — and neither variable alone tells that story.
+
 ## 2. Canonical idioms
 
 ### a. Single trajectory with pivot labels + arrowhead
@@ -33,6 +44,23 @@ Short time window (weeks/months, not decades), heavy smoothing so the loop reads
 - **The Economist** "Decoupling growth from emissions" (2023) — six-country small-multiples grid of the same income-emissions trajectory.
 
 Each panel shows one country's path; identical axes let the eye compare shapes across panels. *Works because:* it answers the comparative question ("did the US decouple faster than China?") without the spaghetti of overlapping trajectories. *Fails when:* axes are independently scaled, killing the comparison.
+
+### e. Bloomberg "era-fill" trajectory
+
+Bloomberg Opinion uses filled translucent bands behind named sub-paths to highlight eras: the US Federal Reserve hiking cycle is a warm amber fill; the pause period is a muted grey fill; the cutting cycle is a cool teal fill. The path itself remains a single neutral line; the fills provide the regime context.
+
+- **Bloomberg Opinion** "The Fed's Rate Cycle" (various, 2022–2024) — interest rate × inflation trajectory with shaded bands for "hiking," "pause," "cutting."
+- **Bloomberg Economics** "Petrodollar recycling" charts (2023) — oil price × current-account balance with geopolitical event fills.
+
+*Works because:* the filled bands are legible at thumbnail size and at print — the viewer sees "three eras" before reading any label. *Fails when:* bands are used without editorial justification for the periodization — the viewer will assume the fill means something and be confused if the breakpoints are arbitrary.
+
+### f. The Economist "cyclical return" dotted path
+
+The Economist occasionally distinguishes a *return path* (the second pass through the same territory) from the *initial path* using a dashed or dotted line. Used in inflation cycle stories: the solid line shows the 2021–2022 inflation surge; the dotted return path shows the 2023–2024 disinflation, revealing that the return trajectory follows almost the same curve as the rise.
+
+- **The Economist** "Inflation: The Return Journey" (2023) — CPI × unemployment, solid line for the surge, dotted line for the retreat, labeled loop with directional arrows at each segment.
+
+*Works because:* when the path literally retraces itself (a cycle), the overlap would be illegible as a single solid line — the dashed/dotted convention separates the two passes without resorting to color. *Fails when:* the paths don't actually overlap and the dashed line just looks like a rendering artifact.
 
 ## 3. General principles
 
@@ -99,4 +127,4 @@ The existing `ConnectedScatterplot` template (sample data: Phillips curve 1973�
 
 **Single amber trajectory through every observation, pivot-only year labels, arrowhead at the most recent point.** The current implementation matches the NYT Upshot / FT / Economist canonical Phillips-curve idiom. Era-segmentation variant is the highest-value extension; small-multiples can wait for an episode that needs it.
 
-Last updated: May 14, 2026.
+Last updated: May 15, 2026 (added when-not-to-use table; Bloomberg era-fill and Economist cyclical-return idioms added to § 2).

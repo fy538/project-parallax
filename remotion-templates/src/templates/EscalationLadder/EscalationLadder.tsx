@@ -278,6 +278,12 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
 
   // ── Ladder content ─────────────────────────────────────────────────────
 
+  // Ladder block pixel width (same as the threshold line logic below)
+  const ladderBlockWidth = dateColumnWidth + dotColumnWidth + CARD_MAX_WIDTH + layout.spacing.lg;
+  // SVG coordinate extents for the heat gradient (userSpaceOnUse)
+  const gradientLadderTop = 0;           // y=0 = top of ladder div
+  const gradientLadderBottom = totalLadderHeight;
+
   const ladderContent = (
     <div
       style={{
@@ -288,6 +294,46 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         height: totalLadderHeight,
       }}
     >
+      {/* ── Heat gradient — vertical background behind entire ladder ──────
+          Green at bottom (low rung), red at top (critical rung): the
+          Kahn/RAND escalation convention. Rendered first (lowest z-order)
+          so all rung elements sit above it. Low opacities keep it legible
+          in both light and dark mode without competing with severity colors.
+      */}
+      <svg
+        width={ladderBlockWidth}
+        height={totalLadderHeight}
+        style={{
+          position: "absolute",
+          left: centerPad,
+          top: 0,
+          pointerEvents: "none",
+          overflow: "visible",
+        }}
+      >
+        <defs>
+          <linearGradient
+            id="escalation-heat-gradient"
+            gradientUnits="userSpaceOnUse"
+            x1="0"
+            y1={gradientLadderBottom}
+            x2="0"
+            y2={gradientLadderTop}
+          >
+            <stop offset="0%" stopColor={semantic.success} stopOpacity={0.08} />
+            <stop offset="50%" stopColor={palette.amber} stopOpacity={0.06} />
+            <stop offset="100%" stopColor={semantic.danger} stopOpacity={0.10} />
+          </linearGradient>
+        </defs>
+        <rect
+          x={0}
+          y={0}
+          width={ladderBlockWidth}
+          height={totalLadderHeight}
+          fill="url(#escalation-heat-gradient)"
+        />
+      </svg>
+
       {/* Spine — vertical connecting line */}
       {data.rungs.map((_, i) => {
         if (i === numRungs - 1) return null;
@@ -354,7 +400,6 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         // Animate in with the same timing as the rung at afterRungIndex.
         const rungStart = ladderStart + rungIdx * rungStagger;
         const thresholdOpacity = fadeIn(frame, rungStart + rungFadeIn, sec(0.4)) * exit;
-        const ladderBlockWidth = dateColumnWidth + dotColumnWidth + CARD_MAX_WIDTH + layout.spacing.lg;
         const lineLeft = centerPad;
         const lineWidth = ladderBlockWidth;
 

@@ -113,6 +113,17 @@ export interface ArcDiagramData {
    */
   axisTitle?: string;
 
+  /**
+   * Era bands — faint filled rectangles behind the arc area spanning a range
+   * of nodes, with a small label at the bottom of the band. Rendered behind
+   * all arcs and nodes in z-order.
+   */
+  eras?: Array<{
+    label: string;
+    range: [number, number];  // [startNodeIndex, endNodeIndex] inclusive
+    color?: string;            // defaults to palette.amber at 0.08 opacity
+  }>;
+
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";

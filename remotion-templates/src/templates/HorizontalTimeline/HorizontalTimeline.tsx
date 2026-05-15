@@ -664,6 +664,12 @@ export const HorizontalTimeline: React.FC<{
       `into multiple compositions or demote minor events. ` +
       `See TIMELINE_TEMPLATE_SELECTOR.md.`,
   );
+  warnIf(
+    !!data.eras && data.mode !== "single",
+    "HorizontalTimeline",
+    `'eras' brackets are only rendered in mode "single" — found mode "${data.mode}". ` +
+      `Remove 'eras' or switch to mode "single".`,
+  );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const mode = (data.backgroundVariant || "light") as "light" | "dark";
@@ -1087,6 +1093,80 @@ export const HorizontalTimeline: React.FC<{
                 })()}
               </>
             )}
+
+            {/* ── Era brackets (single mode only) ─────────────────── */}
+            {/* Bracket shape: left tick + horizontal bar + right tick + label.
+                Animates in with a subtle fadeIn. Only rendered when we have
+                valid event positions for both startIndex and endIndex. */}
+            {data.mode === "single" && data.eras && data.eras.map((era, ei) => {
+              const maxIdx = (data.events?.length ?? 0) - 1;
+              if (era.startIndex < 0 || era.startIndex > maxIdx) return null;
+              if (era.endIndex < 0 || era.endIndex > maxIdx) return null;
+              const xStart = eventData.positions[era.startIndex];
+              const xEnd = eventData.positions[era.endIndex];
+              if (xStart === undefined || xEnd === undefined) return null;
+              const eraColor = era.color ?? palette.amber;
+              // Bracket sits above the spine; cards hang above at SPINE_Y-40
+              // so place the bracket well above to avoid card overlap.
+              const bracketY = SPINE_Y - 32;
+              const tickHeight = 8;
+              const labelY = bracketY - 4;
+              const midX = (xStart + xEnd) / 2;
+              const bracketOpacity = fadeIn(frame, sec(0.2), sec(0.3));
+              return (
+                <svg
+                  key={`era-bracket-${ei}`}
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: eventData.totalWidth,
+                    height: CANVAS_HEIGHT,
+                    pointerEvents: "none",
+                    overflow: "visible",
+                    opacity: bracketOpacity,
+                  }}
+                >
+                  {/* Left vertical tick */}
+                  <line
+                    x1={xStart} y1={bracketY}
+                    x2={xStart} y2={bracketY + tickHeight}
+                    stroke={eraColor}
+                    strokeWidth={1.5}
+                    opacity={0.8}
+                  />
+                  {/* Horizontal top bar */}
+                  <line
+                    x1={xStart} y1={bracketY}
+                    x2={xEnd} y2={bracketY}
+                    stroke={eraColor}
+                    strokeWidth={1.5}
+                    opacity={0.8}
+                  />
+                  {/* Right vertical tick */}
+                  <line
+                    x1={xEnd} y1={bracketY}
+                    x2={xEnd} y2={bracketY + tickHeight}
+                    stroke={eraColor}
+                    strokeWidth={1.5}
+                    opacity={0.8}
+                  />
+                  {/* Era label — centered between xStart and xEnd, above bar */}
+                  <text
+                    x={midX}
+                    y={labelY}
+                    textAnchor="middle"
+                    fill={eraColor}
+                    fontSize={10}
+                    fontFamily={fonts.mono}
+                    letterSpacing={2}
+                    style={{ textTransform: "uppercase" } as React.CSSProperties}
+                  >
+                    {era.label}
+                  </text>
+                </svg>
+              );
+            })}
 
             {/* ── Dual mode: paired events ─────────────────────────── */}
             {data.mode === "dual" && data.pairs && (
