@@ -829,3 +829,10 @@ Uses ANGLE-backed GPU for headless Chromium rather than software swiftshader. Sw
 **Wiring:** `mapConfig.styleUrl` / `darkStyleUrl` in `src/design/theme.ts` read `MAPBOX_STYLE_LIGHT_URL` / `MAPBOX_STYLE_DARK_URL` from env, falling back to stock Mapbox styles when unset. The fallback is intentional — the pipeline must function without a Studio account.
 **Setup:** Mapbox Studio recipe is in `tools/mapbox-meridian-setup.md` (~2 hr browser work). Once styles are published, paste URLs into `remotion-templates/.env` and re-baseline the map real-data PNG suite.
 **Doctrine reference:** `BRAND.md` → "Cartography — Meridian Map Styles."
+
+### L101: Map style env vars read once at module init — restart on `.env` change
+**Problem:** `MAP_CONFIG` in `src/components/MapGL.tsx` (and `mapConfig` in `theme.ts`) reads `process.env.MAPBOX_STYLE_*` and `process.env.MAPBOX_ACCESS_TOKEN` at MODULE INITIALIZATION, not per render. Editing `.env` between renders of a running Remotion Studio session will NOT pick up the new values — the bundle has already captured the old values into closure.
+**Symptom:** You publish a new Meridian Toner style, paste the URL into `.env`, refresh the browser — and the old Stadia URL is still rendering. Or worse: you set `MAPBOX_ACCESS_TOKEN` for the first time, expecting tiles to start loading, and keep getting the unset-token error.
+**Fix:** After ANY edit to `remotion-templates/.env`, fully stop `npm start` (Ctrl+C) and restart. Browser refresh / page reload / "Re-render" buttons are NOT sufficient. For Lambda renders the env is captured at deploy time — re-run `npm run deploy` to refresh.
+**Why this hasn't been fixed:** moving the env reads to per-component runtime would force `MapGL` to re-validate the token + restyle on every prop change. The module-init pattern is correct for the production render path; the gotcha only bites during local Studio iteration. Documented rather than fixed.
+**Diagnostic:** `cd remotion-templates && node -e "console.log(process.env.MAPBOX_STYLE_TONER_URL)"` tells you what the next-started Studio session would see. Compare against what's in `.env`.
