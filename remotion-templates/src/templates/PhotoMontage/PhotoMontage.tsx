@@ -29,6 +29,7 @@ import {
   duotone,
   contentArea,
   textMaxWidth,
+  shadows,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -194,7 +195,7 @@ const ImageOverlay: React.FC<{
       fontSize: fontSizes.h2,
       fontWeight: 700,
       color: theme.text.primary,
-      textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`, // shadows.textLift (8px variant)
+      textShadow: shadows.textLift, // shadows.textLift
       lineHeight: 1.0,
       letterSpacing: 0,
       maxWidth: textMaxWidth.h2,
@@ -206,14 +207,14 @@ const ImageOverlay: React.FC<{
       color: theme.text.primary,
       textTransform: "uppercase",
       letterSpacing: 2,
-      textShadow: `0 1px 4px rgba(0, 0, 0, 0.5)`, // shadows.textLift (4px variant)
+      textShadow: shadows.textLift, // shadows.textLift
     },
     caption: {
       fontFamily: fonts.body,
       fontSize: fontSizes.caption,
       fontWeight: 400,
       color: theme.text.secondary,
-      textShadow: `0 1px 3px rgba(0, 0, 0, 0.4)`, // shadows.textLift (40% opacity variant)
+      textShadow: shadows.textLift, // shadows.textLift
     },
   }[overlayStyle];
 

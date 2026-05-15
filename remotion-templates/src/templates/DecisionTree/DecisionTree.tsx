@@ -55,6 +55,7 @@ import {
 import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
+import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
@@ -513,6 +514,17 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const { durationInFrames: totalFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
+
+  warnIf(
+    !data.nodes.find((n) => n.id === data.rootId),
+    "DecisionTree",
+    `rootId "${data.rootId}" not found in nodes array — tree will be empty`,
+  );
+  warnIf(
+    data.nodes.length > 12,
+    "DecisionTree",
+    `${data.nodes.length} nodes — above 12 the camera cannot establish and detail individual nodes legibly in a single composition; consider splitting into sub-trees`,
+  );
 
   // ── Ladder variant early return — Allison-style nested rectangles ──────
   // Right for ExComm-class deliberation scenes. See LadderVariant component

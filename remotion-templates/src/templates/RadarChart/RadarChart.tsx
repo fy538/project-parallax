@@ -288,11 +288,25 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   // produces NaN-valued SVG points. Mirrors the 17af733 belt-and-suspenders
   // pattern from TimeSeriesChart / DataChart small-multiples.
   // Placed after all hooks (last useMemo: `currentSubjects`) for Rules-of-Hooks.
+  warnIf(
+    data.axes.length < 3,
+    "RadarChart",
+    `${data.axes.length} axes — radar requires ≥ 3 axes to form a valid polygon; returning null`,
+  );
+  warnIf(
+    data.axes.length > 8,
+    "RadarChart",
+    `${data.axes.length} axes — perimeter crowding degrades legibility above 8; consider pruning to 5–7 canonical dimensions`,
+  );
   if (data.axes.length < 3 || data.subjects.length === 0) return null;
 
   // ── Grid lines color ───────────────────────────────────────────────────
-  const gridColor = theme.isDark ? "rgba(240,230,208,0.10)" : "rgba(28,24,20,0.06)";
-  const axisColor = theme.isDark ? "rgba(240,230,208,0.15)" : "rgba(28,24,20,0.12)";
+  const gridColor = theme.isDark
+    ? `${palette.bone}1A`   // bone at ~10% opacity
+    : `${palette.ink}0F`;   // ink at ~6% opacity
+  const axisColor = theme.isDark
+    ? `${palette.bone}26`   // bone at ~15% opacity
+    : `${palette.ink}1F`;   // ink at ~12% opacity
 
   const gridOpacity = fadeIn(frame, gridStart, sec(0.4)) * exit;
   const polygonOpacity = fadeIn(frame, polygonStart, sec(0.4)) * exit;

@@ -43,7 +43,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
-import { checkChartDataCommon } from "../../utils/dataWarnings";
+import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -1153,6 +1153,16 @@ const ForecastCard: React.FC<{
 
 export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ data }) => {
   checkChartDataCommon("ProbabilityGauge", data);
+  warnIf(
+    (data.gauges ?? []).some((g) => g.value < 0 || g.value > 100),
+    "ProbabilityGauge",
+    "gauge value outside [0, 100] — arc strokeDashoffset math will overflow or underflow",
+  );
+  warnIf(
+    (data.gauges?.length ?? 0) > 4,
+    "ProbabilityGauge",
+    `${data.gauges?.length ?? 0} gauges exceeds the 4-gauge legibility cap — arc labels will collide; cap at 4 or switch to the strip variant`,
+  );
   const frame = useCurrentFrame();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);

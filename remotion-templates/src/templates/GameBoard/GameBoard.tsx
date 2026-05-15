@@ -51,6 +51,7 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
+import { warnIf } from "../../utils/dataWarnings";
 import type { GameBoardData, ChessPiece, GoStone, CounterAnimation } from "./types";
 
 // ── Helper: Get all pieces/stones/highlights active by frame ──────────────────
@@ -1507,6 +1508,22 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
   // GameBoard/schema.ts superRefine). Coerce to [] for the variants that
   // don't use it (iterated-play uses `rounds` instead).
   const phases = data.phases ?? [];
+
+  warnIf(
+    data.variant === "chess" && !data.initialPieces?.length && !phases.length,
+    "GameBoard",
+    "chess variant has no piece data and no phases — board will be empty",
+  );
+  warnIf(
+    (data.variant === "payoff-matrix" || data.variant === "pd-canonical") && !data.cells?.length,
+    "GameBoard",
+    "payoff matrix variant has no cell data — grid will be empty",
+  );
+  warnIf(
+    data.variant === "iterated-play" && !data.rounds?.length,
+    "GameBoard",
+    "iterated-play variant has no rounds data — no animation will occur",
+  );
 
   // Total duration: sum of all phases
   const totalDuration = data.durationSec || phases.reduce((sum, p) => sum + p.durationSec, 0);

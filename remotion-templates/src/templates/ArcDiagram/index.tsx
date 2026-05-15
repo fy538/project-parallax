@@ -58,6 +58,18 @@ const sampleData: ArcDiagramData = {
     { from: "kennan", to: "brzezinski", label: "extended", strength: 0.8 },
     { from: "mackinder", to: "brzezinski", label: "rehabilitated", strength: 0.6, style: "dashed" },
   ],
+  eras: [
+    {
+      label: "Sea Power Era",
+      range: [0, 1],
+      color: "#E5A544",
+    },
+    {
+      label: "Containment Era",
+      range: [2, 3],
+      color: "#C23B22",
+    },
+  ],
   axisTitle: "Century",
   source: "Standard surveys of strategic-studies historiography",
   durationSec: 14,

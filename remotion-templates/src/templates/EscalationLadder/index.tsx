@@ -54,6 +54,16 @@ const sampleData: EscalationLadderData = {
       current: true,
     },
   ],
+  thresholds: [
+    {
+      afterRungIndex: 1,
+      label: "COMPREHENSIVE CONTROLS THRESHOLD",
+    },
+    {
+      afterRungIndex: 3,
+      label: "ADVERSARY ADAPTATION THRESHOLD",
+    },
+  ],
   source: "Bureau of Industry and Security, compiled",
   durationSec: 14,
 };

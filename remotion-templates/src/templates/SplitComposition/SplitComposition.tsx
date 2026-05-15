@@ -27,8 +27,6 @@ import {
   Easing,
 } from "remotion";
 import {
-  dark,
-  light,
   fonts,
   fontSizes,
   fontWeights,
@@ -63,6 +61,7 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { usePhase } from "../../hooks/usePhase";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
+import { useThemeMode } from "../../hooks/useThemeMode";
 import type { SplitCompositionData } from "./types";
 import { warnIf } from "../../utils/dataWarnings";
 
@@ -123,7 +122,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const t = direction.paceTimingScale;
 
   const isDark = data.backgroundVariant === "dark";
-  const mode = isDark ? dark : light;
+  const theme = useThemeMode(data.backgroundVariant);
 
   const leftAccent = data.left.accentColor || semantic.us;
   const rightAccent = data.right.accentColor || semantic.china;
@@ -319,7 +318,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 fontSize: fontSizes.h2,
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
-                color: mode.text.primary,
+                color: theme.text.primary,
                 margin: 0,
                 marginBottom: data.left.subtitle ? layout.spacing.sm : layout.spacing.md,
                 maxWidth: textMaxWidth.h2,
@@ -336,7 +335,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 style={{
                   fontSize: fontSizes.body,
                   maxWidth: textMaxWidth.body,
-                  color: mode.text.secondary,
+                  color: theme.text.secondary,
                   marginBottom: layout.spacing.lg,
                   fontFamily: getFontFamily(data.left.subtitle),
                   lineHeight: lineHeight.body,
@@ -354,7 +353,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                     key={idx}
                     style={{
                       fontSize: fontSizes.body,
-                      color: mode.text.secondary,
+                      color: theme.text.secondary,
                       fontFamily: getFontFamily(item),
                       lineHeight: lineHeight.body,
                       maxWidth: "90%",
@@ -403,7 +402,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 fontSize: fontSizes.h2,
                 fontWeight: fontWeights.bold,
                 letterSpacing: letterSpacing.h2,
-                color: mode.text.primary,
+                color: theme.text.primary,
                 textAlign: "right",
                 margin: 0,
                 marginBottom: data.right.subtitle ? layout.spacing.sm : layout.spacing.md,
@@ -421,7 +420,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 style={{
                   fontSize: fontSizes.body,
                   maxWidth: textMaxWidth.body,
-                  color: mode.text.secondary,
+                  color: theme.text.secondary,
                   textAlign: "right",
                   marginBottom: layout.spacing.lg,
                   fontFamily: getFontFamily(data.right.subtitle),
@@ -440,7 +439,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                     key={idx}
                     style={{
                       fontSize: fontSizes.body,
-                      color: mode.text.secondary,
+                      color: theme.text.secondary,
                       fontFamily: getFontFamily(item),
                       lineHeight: lineHeight.body,
                       maxWidth: "90%",
@@ -476,7 +475,7 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                     top: 0,
                     width: "100%",
                     height: "100%",
-                    background: `linear-gradient(to bottom, transparent, ${mode.text.muted}${dividerEmphasis > 0.7 ? "AA" : "66"}, transparent)`,
+                    background: `linear-gradient(to bottom, transparent, ${theme.text.muted}${dividerEmphasis > 0.7 ? "AA" : "66"}, transparent)`,
                   }}
                 />
               </div>
@@ -489,13 +488,13 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                   width: layout.spacing.lg,
                   height: layout.spacing.lg,
                   borderRadius: `${radii.pill}px`,
-                  border: `1px solid ${mode.text.muted}`,
+                  border: `1px solid ${theme.text.muted}`,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: fontSizes.label,
                   fontWeight: fontWeights.semibold,
-                  color: mode.text.accent,
+                  color: theme.text.accent,
                   fontFamily: fonts.display,
                   opacity: fadeIn(frame, dividerStart + sec(0.3), sec(0.3)) * exitOpacity,
                   pointerEvents: "none",
@@ -533,7 +532,7 @@ const SplitSideContent: React.FC<{
   isDark: boolean;
   panelRect: SplitPanelRect;
 }> = ({ side, data, frame, totalFrames, isDark, panelRect }) => {
-  const mode = isDark ? dark : light;
+  const theme = useThemeMode(isDark ? "dark" : "light");
   const isLeft = side === "left";
 
   const baseDelay = isLeft ? 10 : 40;
@@ -573,7 +572,7 @@ const SplitSideContent: React.FC<{
           gap: layout.spacing.md,
           marginBottom: layout.spacing.lg,
           paddingBottom: layout.spacing.sm,
-          borderBottom: `1px solid ${mode.text.muted}40`,
+          borderBottom: `1px solid ${theme.text.muted}40`,
           opacity: fadeIn(frame, tagDelay, sec(0.4)),
           transform: `translateY(${slideIn(frame, tagDelay, layout.spacing.xs, sec(0.4))}px)`,
         }}
@@ -582,7 +581,7 @@ const SplitSideContent: React.FC<{
           style={{
             fontSize: fontSizes.h3,
             fontWeight: fontWeights.regular,
-            color: mode.text.muted,
+            color: theme.text.muted,
             fontFamily: fonts.heading,
             fontStyle: "italic",
             lineHeight: 1,
@@ -613,7 +612,7 @@ const SplitSideContent: React.FC<{
           fontSize: fontSizes.h1,
           fontWeight: fontWeights.bold,
           letterSpacing: letterSpacing.h2,
-          color: mode.text.primary,
+          color: theme.text.primary,
           textAlign: "left",
           margin: 0,
           marginBottom: data.subtitle ? layout.spacing.md : layout.spacing.lg,
@@ -636,7 +635,7 @@ const SplitSideContent: React.FC<{
             fontSize: fontSizes.h3,
             maxWidth: textMaxWidth.body,
             fontWeight: fontWeights.regular,
-            color: mode.text.secondary,
+            color: theme.text.secondary,
             textAlign: "left",
             marginBottom: layout.spacing.xl,
             fontFamily: getFontFamily(data.subtitle),
@@ -677,7 +676,7 @@ const SplitSideContent: React.FC<{
                 paddingLeft: isLeadItem ? 0 : layout.spacing.md,
                 fontSize: isLeadItem ? fontSizes.h3 : fontSizes.body,
                 fontWeight: isLeadItem ? fontWeights.medium : fontWeights.regular,
-                color: isLeadItem ? mode.text.primary : mode.text.secondary,
+                color: isLeadItem ? theme.text.primary : theme.text.secondary,
                 fontFamily: getFontFamily(item),
                 fontStyle: isLeadItem ? "italic" : "normal",
                 lineHeight: 1.4,
@@ -720,7 +719,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
   const { durationInFrames: totalFrames } = useVideoConfig();
 
   const isDark = data.backgroundVariant === "dark";
-  const mode = isDark ? dark : light;
+  const theme = useThemeMode(data.backgroundVariant);
 
   const leftAccent = data.left.accentColor || semantic.us;
   const rightAccent = data.right.accentColor || semantic.china;
@@ -838,7 +837,7 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
                 top: 0,
                 width: "100%",
                 height: `${dividerProgress * 100}%`,
-                background: mode.text.muted,
+                background: theme.text.muted,
                 opacity: 0.45,
               }}
             />

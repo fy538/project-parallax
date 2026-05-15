@@ -218,16 +218,21 @@ const SlopeChart: React.FC<{
 }) => {
   const theme = useThemeMode(mode);
 
-  // Compute y-domain across all lines' two points.
-  const yValues = lines.flatMap((l) => [l.points[0]?.y ?? 0, l.points[l.points.length - 1]?.y ?? 0]);
-  const yMin = Math.min(...yValues);
-  const yMax = Math.max(...yValues);
-  // Pad the domain 5% so dots don't sit on the edge.
-  const pad = (yMax - yMin) * 0.08;
-  const domainMin = yMin - pad;
-  const domainMax = yMax + pad;
-  const yScale = (y: number): number =>
-    chartTop + chartHeight - ((y - domainMin) / Math.max(1e-9, domainMax - domainMin)) * chartHeight;
+  // Compute y-domain across all lines' two points. Memoized on [lines,
+  // chartTop, chartHeight] so the flatMap + Math.min/max + yScale closure
+  // don't re-run on every frame (frame changes every render at 30fps).
+  const { domainMin, domainMax, yScale } = useMemo(() => {
+    const yValues = lines.flatMap((l) => [l.points[0]?.y ?? 0, l.points[l.points.length - 1]?.y ?? 0]);
+    const yMin = Math.min(...yValues);
+    const yMax = Math.max(...yValues);
+    // Pad the domain 8% so dots don't sit on the edge.
+    const pad = (yMax - yMin) * 0.08;
+    const dMin = yMin - pad;
+    const dMax = yMax + pad;
+    const scale = (y: number): number =>
+      chartTop + chartHeight - ((y - dMin) / Math.max(1e-9, dMax - dMin)) * chartHeight;
+    return { domainMin: dMin, domainMax: dMax, yScale: scale };
+  }, [lines, chartTop, chartHeight]);
 
   // Two x-positions: left column holds "value label" pairs, right holds just
   // the end value. Right gets less inset to feel less cramped.
@@ -245,10 +250,15 @@ const SlopeChart: React.FC<{
   );
 
   // Order lines by start-y descending so labels stack readably top-to-bottom
-  // by initial rank.
-  const ordered = [...lines]
-    .map((l, originalIdx) => ({ l, originalIdx }))
-    .sort((a, b) => (b.l.points[0]?.y ?? 0) - (a.l.points[0]?.y ?? 0));
+  // by initial rank. Memoized on [lines] — sort is O(n log n) and depends
+  // only on data, not on frame.
+  const ordered = useMemo(
+    () =>
+      [...lines]
+        .map((l, originalIdx) => ({ l, originalIdx }))
+        .sort((a, b) => (b.l.points[0]?.y ?? 0) - (a.l.points[0]?.y ?? 0)),
+    [lines],
+  );
 
   // ── Label anti-collision ─────────────────────────────────────────────────
   // Left side: gap must fit body font (non-hero) plus breathing room.

@@ -629,9 +629,9 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
             maxOpacity={0.08 + tensionProgress * 0.1}
             color={
               tensionProgress > 0.7
-                ? "rgba(194,59,34,0.06)"
+                ? "rgba(194,59,34,0.06)" // palette.rust at 0.06 opacity
                 : tensionProgress > 0.4
-                ? "rgba(229,165,68,0.06)"
+                ? "rgba(229,165,68,0.06)" // palette.amber at 0.06 opacity
                 : undefined
             }
           />

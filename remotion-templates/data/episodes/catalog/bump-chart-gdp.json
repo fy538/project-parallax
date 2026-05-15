@@ -107,6 +107,13 @@
         { "period": "2020", "value": 2623 },
         { "period": "2025", "value": 4270 }
       ]
+    },
+    {
+      "id": "ussr",
+      "label": "Soviet Union",
+      "values": [
+        { "period": "1990", "value": 2660 }
+      ]
     }
   ]
 }
