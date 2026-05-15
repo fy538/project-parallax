@@ -121,6 +121,11 @@ const SHORTS_COMPOSITIONS = [
   "SplitShort",
   "StatRevealShort",
   "FrameworkDiagram-Short",
+  // Added May 15, 2026 — flagged by template-coverage.test.ts as
+  // registered-without-baseline. Both shipped in BL-02 (May 14) but were
+  // missed from this list. Baselines auto-create on next BASELINE_REGEN run.
+  "SplitComposition-Short",
+  "ProbabilityGauge-Short",
   // TimelineComparison-Short relies on the deprecated TimelineComparison
   // template; removed from this list when the parent was retired.
 ];

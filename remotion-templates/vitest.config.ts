@@ -11,9 +11,12 @@ export default defineConfig({
     // hook timeout when several real-data suites initialize in one run.
     hookTimeout: 180000,
 
-    // Run tests sequentially to avoid browser contention
-    threads: false,
-    singleThread: true,
+    // Run tests sequentially to avoid Chromium-instance contention in the
+    // visual-regression suite. Vitest 4 removed nested `poolOptions` in favour
+    // of top-level pool options (`maxWorkers`/`minWorkers` = 1 for serial).
+    pool: "threads",
+    maxWorkers: 1,
+    minWorkers: 1,
 
     // Output configuration
     reporters: ["default"],

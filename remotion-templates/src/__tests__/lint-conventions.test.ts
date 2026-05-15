@@ -388,7 +388,7 @@ describe("lint rule: missing-direction-wiring (Rule 8)", () => {
 });
 
 describe("lint rule: hardcoded-brand-color (Rule 9)", () => {
-  it("warns on hardcoded palette.ink hex", () => {
+  it("errors on hardcoded palette.ink hex", () => {
     const issues = lint(`
       import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
       export const Foo = ({ data }: { data: any }) => {
@@ -399,7 +399,7 @@ describe("lint rule: hardcoded-brand-color (Rule 9)", () => {
     expect(hasRule(issues, "hardcoded-brand-color")).toBe(true);
   });
 
-  it("warns on hardcoded legacy amber (#E5A544)", () => {
+  it("errors on hardcoded legacy amber (#E5A544)", () => {
     const issues = lint(`
       import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
       export const Foo = ({ data }: { data: any }) => {
@@ -518,6 +518,139 @@ describe("lint rule: no-as-any-in-templates (Rule 12)", () => {
     `);
     const asAnyIssues = issues.filter((i) => i.rule === "no-as-any-in-templates");
     expect(asAnyIssues.length).toBe(2);
+  });
+});
+
+// ── Rule 10: composition-hardcoded-duration (L48) ───────────────────────────
+
+describe("lint rule: composition-hardcoded-duration (L48)", () => {
+  const indexPath = "src/templates/Foo/index.tsx";
+
+  it("flags <Composition> with hardcoded durationInFrames={sec(N)} and no calculateMetadata", () => {
+    const issues = lint(
+      `
+      import { Composition } from "remotion";
+      export const FooComposition = () => (
+        <Composition
+          id="Foo"
+          component={Foo}
+          durationInFrames={sec(8)}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+          defaultProps={{ data: sampleData }}
+        />
+      );
+      `,
+      indexPath,
+    );
+    expect(hasRule(issues, "composition-hardcoded-duration")).toBe(true);
+  });
+
+  it("does not flag <Composition> with calculateMetadata even if sec(...) appears near it", () => {
+    // The canonical pattern: durationInFrames lives INSIDE calculateMetadata's
+    // return, which itself contains a sec(...) call. The rule must not trip on
+    // the legitimate pattern.
+    const issues = lint(
+      `
+      import { Composition } from "remotion";
+      export const FooComposition = () => (
+        <Composition
+          id="Foo"
+          component={Foo}
+          calculateMetadata={({ props }) => ({
+            durationInFrames: sec((props.data as FooData).durationSec ?? 8),
+            fps: layout.fps,
+            width: layout.width,
+            height: layout.height,
+          })}
+          defaultProps={{ data: sampleData }}
+        />
+      );
+      `,
+      indexPath,
+    );
+    expect(hasRule(issues, "composition-hardcoded-duration")).toBe(false);
+  });
+
+  it("respects the @hardcoded-duration: fixture pragma", () => {
+    const issues = lint(
+      `
+      // @hardcoded-duration: fixture
+      import { Composition } from "remotion";
+      export const FixtureComposition = () => (
+        <Composition
+          id="Fixture"
+          component={Fixture}
+          durationInFrames={sec(14)}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+      );
+      `,
+      indexPath,
+    );
+    expect(hasRule(issues, "composition-hardcoded-duration")).toBe(false);
+  });
+
+  it("does not run on non-index files", () => {
+    // The pattern would technically match in a non-index file but the rule's
+    // intent is composition-level. Component files don't register compositions.
+    const issues = lint(
+      `<Composition id="x" durationInFrames={sec(5)} />`,
+      "src/templates/Foo/Foo.tsx",
+    );
+    expect(hasRule(issues, "composition-hardcoded-duration")).toBe(false);
+  });
+
+  it("does not flag files that don't contain <Composition>", () => {
+    const issues = lint(
+      `export const helper = () => sec(8);`,
+      indexPath,
+    );
+    expect(hasRule(issues, "composition-hardcoded-duration")).toBe(false);
+  });
+});
+
+// ── Rule 11: template-missing-schema (L47) ──────────────────────────────────
+
+describe("lint rule: template-missing-schema (L47)", () => {
+  it("flags a types.ts in a template dir with no sibling schema.ts", () => {
+    // Use a deliberately-unique fake template name that won't exist on disk.
+    // The rule checks fs.existsSync(schemaPath) — for a directory that doesn't
+    // exist, the schema certainly doesn't exist either, so the rule fires.
+    const fakeTypesPath =
+      "/tmp/parallax-lint-fixture-no-schema-xyz123/types.ts";
+    const issues = lint(`export interface FooData { title: string; }`, fakeTypesPath);
+    expect(hasRule(issues, "template-missing-schema")).toBe(true);
+  });
+
+  it("does not flag wrapper directories (Shorts/Episodes/EditorialTest)", () => {
+    for (const dirName of ["Shorts", "Episodes", "EditorialTest"]) {
+      const issues = lint(
+        `export type Foo = string;`,
+        `src/templates/${dirName}/types.ts`,
+      );
+      expect(hasRule(issues, "template-missing-schema")).toBe(false);
+    }
+  });
+
+  it("does not flag non-types.ts files", () => {
+    const issues = lint(
+      `export const x = 1;`,
+      "/tmp/parallax-lint-fixture-no-schema-xyz123/helper.ts",
+    );
+    expect(hasRule(issues, "template-missing-schema")).toBe(false);
+  });
+
+  it("does not flag a types.ts when schema.ts exists alongside (real template)", () => {
+    // Use a real template's types.ts path — these all have schema.ts siblings.
+    const issues = lint(
+      `export interface DataChartData { title: string; }`,
+      "src/templates/DataChart/types.ts",
+    );
+    expect(hasRule(issues, "template-missing-schema")).toBe(false);
   });
 });
 
