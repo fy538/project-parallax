@@ -21,6 +21,8 @@
  *   7. Composition IDs in Root.tsx must be unique (L20)
  *   8. Animated templates must call useDirection(data._direction) for manifest direction wiring
  *   9. No hardcoded brand palette hex values — use palette.* / semantic.* constants
+ *  10. Compositions derive durationInFrames from data via calculateMetadata, not hardcoded (L48)
+ *  11. Template directories with types.ts must also have schema.ts (L47)
  */
 
 import fs from "fs";
@@ -33,7 +35,11 @@ const COMPONENTS_DIR = path.resolve(__dirname, "../src/components");
 const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
-const EXCLUDE_DIRS = ["Episodes", "__tests__"];
+const EXCLUDE_DIRS = ["__tests__"];
+// Episodes/ is excluded from the full template scan (avoids false positives on
+// missing-composition-animation for complex master compositions), but is covered
+// by the targeted "components-too" scan below that includes hardcoded-brand-color.
+const EXCLUDE_DIRS_EPISODES = ["Episodes", "__tests__"];
 
 /**
  * Long-form templates must use <TitleBlock>; these paths use different title
@@ -325,7 +331,8 @@ const rules = [
       }
       return issues;
     },
-    severity: "warn",
+    severity: "error",
+    scope: "components-too",  // also runs in component + episode scan passes
     fix: "Replace the hex literal with the palette/semantic constant (e.g. palette.ink, semantic.danger). Import from ../../design/theme.",
   },
   // ── Rule 10: No console.warn/error/log in render bodies ───────────────────
@@ -527,6 +534,97 @@ const rules = [
     severity: "warn",
     fix: "Either (a) fix the type to avoid the cast, (b) add `// no-as-any-ok: <reason>` on the same line for documented exceptions, or (c) use `as unknown as TargetType` for two-step casts where the intermediate type is verifiable.",
   },
+
+  // ── L48: Composition durationInFrames must derive from data, not be hardcoded ──
+  // Hardcoded `durationInFrames={sec(N)}` on a <Composition> desyncs whenever
+  // an episode's JSON `data.durationSec` changes. The canonical pattern is
+  // `calculateMetadata={({ props }) => ({ durationInFrames: sec(props.data.durationSec ?? FALLBACK), ... })}`.
+  // Genuine fixtures with no data-driven duration opt out with the pragma
+  // `// @hardcoded-duration: fixture` at the top of the file.
+  {
+    id: "composition-hardcoded-duration",
+    description: "Compositions must derive durationInFrames from data via calculateMetadata, not hardcode it (L48)",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (basename !== "index.tsx") return [];
+      if (!content.includes("<Composition")) return [];
+      // Opt-out pragma for fixtures (EditorialTest frame demos, etc.)
+      if (content.includes("@hardcoded-duration: fixture")) return [];
+
+      const issues = [];
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        // Match the form `durationInFrames={sec(...)}` — the literal one,
+        // not `durationInFrames: sec(...)` inside a calculateMetadata return
+        // (which is the correct pattern).
+        const match = lines[i].match(/durationInFrames\s*=\s*\{\s*sec\(/);
+        if (!match) continue;
+
+        // Look in a window around this line for a matching `calculateMetadata`
+        // in the SAME <Composition> block. ±20 lines covers every existing
+        // composition block in the codebase.
+        const windowStart = Math.max(0, i - 20);
+        const windowEnd = Math.min(lines.length, i + 20);
+        const windowText = lines.slice(windowStart, windowEnd).join("\n");
+        if (windowText.includes("calculateMetadata")) continue;
+
+        issues.push({
+          line: i + 1,
+          col: match.index + 1,
+          message:
+            "Hardcoded `durationInFrames={sec(...)}` will desync when the JSON's " +
+            "data.durationSec changes. Switch to calculateMetadata.",
+        });
+      }
+      return issues;
+    },
+    severity: "warn",
+    fix:
+      "Replace with `calculateMetadata={({ props }) => ({ durationInFrames: " +
+      "sec((props.data as YourDataType).durationSec ?? 8), fps: layout.fps, " +
+      "width: layout.width, height: layout.height })}`. " +
+      "For fixtures without data-driven duration, add `// @hardcoded-duration: fixture` " +
+      "as a comment near the top of the file.",
+  },
+
+  // ── L47: Template directories with types.ts must also have schema.ts ──
+  // Without schema.ts the Composition can't be Zod-validated (invalid data
+  // renders silently broken instead of failing loudly) and Remotion Studio's
+  // visual prop editor falls back to a generic JSON editor.
+  // Triggered on `types.ts` so we fire exactly once per template directory.
+  {
+    id: "template-missing-schema",
+    description: "Template directories with types.ts must also have schema.ts (L47)",
+    fileLevel: true,
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (basename !== "types.ts") return [];
+
+      // Skip collection / wrapper directories whose children are
+      // independently-checked templates, and skip episode + fixture dirs.
+      const dir = path.dirname(filePath);
+      const dirName = path.basename(dir);
+      if (["Shorts", "Episodes", "EditorialTest"].includes(dirName)) return [];
+
+      const schemaPath = path.join(dir, "schema.ts");
+      if (fs.existsSync(schemaPath)) return [];
+
+      return [{
+        line: 1,
+        col: 1,
+        message:
+          `Template directory \`${dirName}\` has types.ts but no schema.ts. ` +
+          "Without it the Composition can't be Zod-validated at render time and " +
+          "Studio's visual prop editor falls back to raw JSON.",
+      }];
+    },
+    severity: "warn",
+    fix:
+      "Create `schema.ts` in this directory exporting a Zod schema that mirrors " +
+      "the type in `types.ts`. Wrap in `z.object({ data: z.object({...}) })` to " +
+      "match the `defaultProps={{ data: ... }}` shape used by the Composition.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────
@@ -537,7 +635,9 @@ function getTemplateFiles() {
   function walk(dir) {
     if (!fs.existsSync(dir)) return;
     const dirName = path.basename(dir);
-    if (EXCLUDE_DIRS.includes(dirName)) return;
+    // Episodes/ excluded from full scan (complex master compositions would
+    // false-positive on missing-composition-animation). Covered separately below.
+    if (EXCLUDE_DIRS_EPISODES.includes(dirName)) return;
 
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of entries) {
@@ -545,13 +645,28 @@ function getTemplateFiles() {
       if (entry.isDirectory()) {
         walk(fullPath);
       } else if (entry.name.endsWith(".tsx") || entry.name.endsWith(".ts")) {
-        // Skip type-only files and index files for pattern rules
         files.push(fullPath);
       }
     }
   }
 
   walk(TEMPLATES_DIR);
+  return files;
+}
+
+/**
+ * Files in `src/templates/Episodes/` — excluded from the full template scan
+ * but checked for brand-color violations via the "components-too" scope filter.
+ */
+function getEpisodeFiles() {
+  const episodesDir = path.join(TEMPLATES_DIR, "Episodes");
+  const files = [];
+  if (!fs.existsSync(episodesDir)) return files;
+  for (const entry of fs.readdirSync(episodesDir, { withFileTypes: true })) {
+    if (entry.name.endsWith(".tsx") || entry.name.endsWith(".ts")) {
+      files.push(path.join(episodesDir, entry.name));
+    }
+  }
   return files;
 }
 
@@ -687,6 +802,15 @@ for (const file of files) {
 // console-in-render drift hazard with templates, but they legitimately
 // don't call useCompositionAnimation/useDirection/TitleBlock themselves.
 for (const file of getComponentFiles()) {
+  const issues = lintFile(file, "components-too");
+  allIssues.push(...issues);
+}
+
+// Apply `scope: "components-too"` rules to src/templates/Episodes/ —
+// master compositions (FullEpisode, PrisonersDilemmaFull, etc.) are too
+// complex for the full template-rule set, but must still obey brand-color
+// and console-in-render hygiene.
+for (const file of getEpisodeFiles()) {
   const issues = lintFile(file, "components-too");
   allIssues.push(...issues);
 }

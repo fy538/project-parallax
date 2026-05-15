@@ -1,15 +1,23 @@
 #!/usr/bin/env node
 /**
- * lint-templates.mjs — Automated POLISH.md enforcement
+ * lint-templates.mjs — Opt-in POLISH.md source-code lint.
  *
- * Checks all template .tsx files against the most common layout/quality
- * violations. This is NOT a substitute for visual QA (you still need to
- * render and look) — but it catches the 80% of issues that are detectable
- * from source code alone.
+ * Not the canonical CI gate — that's `scripts/lint-conventions.mjs`
+ * (run by `npm run lint`). This file covers a distinct rule set
+ * (B1-B6, focused on POLISH.md visual conventions) that hasn't been
+ * promoted to the conventions linter. Run on-demand via:
+ *
+ *   npm run lint:source
+ *
+ * If a B1-B6 rule here proves valuable, promote it to
+ * `lint-conventions.mjs` and remove it from here.
+ *
+ * Companion: `scripts/lint-templates.py` lints DATA files (JSON) — a
+ * different concern. Run via `npm run lint:polish`.
  *
  * Usage:
- *   node scripts/lint-templates.mjs              # Check all templates
- *   node scripts/lint-templates.mjs RouteAnimation  # Check one template
+ *   npm run lint:source                              # All templates
+ *   node scripts/lint-templates.mjs RouteAnimation   # One template
  *
  * Exit code: 0 = clean, 1 = warnings found
  *

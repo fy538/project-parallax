@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """
-Remotion Template Linter — automated visual polish enforcement.
+Remotion Template Linter — JSON-DATA polish enforcement.
 
-Scans template .tsx files and JSON data files for common anti-patterns
-that cause visual quality issues. Run before every render.
+Not the canonical CI gate — that's `scripts/lint-conventions.mjs`
+(run by `npm run lint`). This file's unique value is the data-file
+side: scanning per-episode JSON for common anti-patterns that the
+JS-side linters don't see. Run on-demand via:
+
+    npm run lint:polish
+
+The source-code companion is `scripts/lint-templates.mjs` (B1-B6 visual
+rules). Run via `npm run lint:source`.
 
 Usage:
-    python scripts/lint-templates.py                    # lint everything
+    npm run lint:polish                                 # everything
     python scripts/lint-templates.py --templates-only   # just code checks
     python scripts/lint-templates.py --data-only        # just data checks
     python scripts/lint-templates.py --fix-suggestions  # include fix hints

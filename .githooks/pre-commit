@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Pre-commit gate: typecheck on changed *.ts/*.tsx, pytest on changed *.py.
+# Pre-commit gate: typecheck on changed *.ts/*.tsx, pytest on changed *.py,
+# convention lint on changed template/component files, JSON validation on
+# changed JSON, manifest doctrine + concept registry on their dedicated files.
 # Activate once with:
 #   git config core.hooksPath .githooks
 set -euo pipefail
@@ -7,6 +9,7 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+TEMPLATE_TS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^remotion-templates/src/(templates|components)/.*\.(ts|tsx)$' || true)
 PY_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' || true)
 JSON_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' | grep -v 'package-lock\.json' || true)
 MANIFEST_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'data/episodes/[^/]+/assembly-manifest\.json$' || true)
@@ -15,6 +18,16 @@ CONCEPTS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^d
 if [ -n "$TS_CHANGED" ]; then
   echo "→ TypeScript typecheck (TS files changed)"
   (cd remotion-templates && npx tsc --noEmit)
+fi
+
+if [ -n "$TEMPLATE_TS_CHANGED" ]; then
+  echo "→ Convention lint (template/component files changed)"
+  # lint-conventions.mjs is fast (<1s) and scans the whole tree; running it
+  # here catches hex literals, hook misuse, and bare durationSec at commit
+  # time instead of waiting for CI. It doesn't accept per-file args (whole-
+  # tree scan is the design), so we invoke it once whenever any template or
+  # component file changed.
+  (cd remotion-templates && node scripts/lint-conventions.mjs)
 fi
 
 if [ -n "$PY_CHANGED" ]; then
@@ -39,7 +52,7 @@ if [ -n "$CONCEPTS_CHANGED" ]; then
   python3 tools/concepts/lookup.py validate
 fi
 
-if [ -z "$TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ]; then
+if [ -z "$TS_CHANGED" ] && [ -z "$TEMPLATE_TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ]; then
   echo "  (no .ts/.tsx/.py/.json changes, skipping checks)"
 fi
 
