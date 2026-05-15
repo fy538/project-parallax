@@ -32,7 +32,7 @@ import {
   textMaxWidth,
   shadows,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, exitFade, pulse, CLAMP, CLAMP_CUBIC, CLAMP_SINE } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, pulse, anticipatoryStartFrame, CLAMP, CLAMP_CUBIC, CLAMP_SINE } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import {
   analyticalBackgroundBase,
@@ -157,7 +157,7 @@ const GaugeArc: React.FC<{
         {/* Specular highlight — thin bright line along the top of the arc (catches light) */}
         <path
           d={`M ${strokeWidth / 2} ${arcRadius + strokeWidth / 2} A ${arcRadius} ${arcRadius} 0 0 1 ${arcRadius * 2 + strokeWidth / 2} ${arcRadius + strokeWidth / 2}`}
-          stroke="rgba(255,255,255,0.45)"
+          stroke="rgba(255,255,255,0.45)" // specular highlight — not a brand color
           strokeWidth={1.5}
           fill="none"
           strokeLinecap="round"
@@ -1174,6 +1174,11 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
   });
   // Pace-aware stagger scale for the per-gauge entrance.
   const s = direction.paceStaggerScale;
+  // Anticipatory start: first gauge arc reveal lands settled at sync point 0.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const firstRevealFrame = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.3);
   // Per-episode color emphasis — gauge fallback color now follows the
   // episode's primary accent instead of the channel default.
   const emphasis = useEpisodeColorEmphasis();
@@ -1240,7 +1245,7 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
                   marketSource={gauge.marketSource}
                   color={gauge.color || emphasis.primaryAccent}
                   frame={frame}
-                  startFrame={stagger(i, sec(0.4 * s), sec(0.3))}
+                  startFrame={stagger(i, sec(0.4 * s), firstRevealFrame)}
                   arcRadius={100}
                   mode={bgVariant as "light" | "dark"}
                   beatPulse={beat.pulse}

@@ -34,6 +34,7 @@ import {
   exitFade,
   kenBurnsDrift,
   heroSpring,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
   CLAMP,
 } from "../../utils/animation";
@@ -108,12 +109,13 @@ const getStateAtFrame = (
 
 // ── Chess Variant ────────────────────────────────────────────────────────────
 
-const ChessBoard: React.FC<{
+const ChessBoard = React.memo<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
   mode: "light" | "dark";
-}> = ({ data, frame, state, mode }) => {
+  firstRevealFrame: number;
+}>(function ChessBoard({ data, frame, state, mode, firstRevealFrame }) {
   const theme = useThemeMode(mode);
   // Per-episode primary accent for active-state markers (selected square,
   // last-move highlight, threat overlay). A Soviet-emphasis chess board
@@ -127,8 +129,8 @@ const ChessBoard: React.FC<{
   // Grid draw: lines appear quickly (frames 0-20)
   const gridOpacity = fadeIn(frame, 0, sec(0.4));
 
-  // Initial pieces appear with stagger (frames 15-35)
-  const initialPiecesStart = sec(0.5);
+  // Initial pieces appear with stagger — driven by firstRevealFrame.
+  const initialPiecesStart = firstRevealFrame;
 
   return (
     <div
@@ -239,16 +241,17 @@ const ChessBoard: React.FC<{
       })}
     </div>
   );
-};
+});
 
 // ── Go Variant ───────────────────────────────────────────────────────────────
 
-const GoBoard: React.FC<{
+const GoBoard = React.memo<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
   mode: "light" | "dark";
-}> = ({ data, frame, state, mode }) => {
+  firstRevealFrame: number;
+}>(function GoBoard({ data, frame, state, mode, firstRevealFrame }) {
   const theme = useThemeMode(mode);
   // Per-episode primary accent for last-move highlight + capture markers.
   const accent = useEpisodeColorEmphasis().primaryAccent;
@@ -347,7 +350,7 @@ const GoBoard: React.FC<{
 
         const isInitial = data.initialStones?.includes(stone) || false;
         const stoneStart = isInitial
-          ? sec(0.5) + idx * sec(0.15)
+          ? firstRevealFrame + idx * sec(0.15)
           : frame;
         const stoneSpring = heroSpring(frame, 30, stoneStart);
         const stoneScale = 0.4 + 0.6 * stoneSpring;
@@ -376,7 +379,9 @@ const GoBoard: React.FC<{
                 height: 24,
                 borderRadius: "50%",
                 background: stoneGradient,
-                border: isBlack ? "none" : `1px solid rgba(28,24,20,0.4)`,
+                border: isBlack ? "none" : `1px solid rgba(28,24,20,0.4)`, // palette.ink at 0.4 opacity — stone edge
+                // rgba(0,0,0,0.3) = glass shadow — not a brand color
+                // rgba(255,255,255,0.4) = glass refraction highlight — not a brand color
                 boxShadow: `${shadows.subtle}, inset -1px -1px 2px rgba(0,0,0,0.3), inset 1px 1px 2px rgba(255,255,255,${isBlack ? 0.08 : 0.4})`,
               }}
             />
@@ -400,16 +405,17 @@ const GoBoard: React.FC<{
       })}
     </div>
   );
-};
+});
 
 // ── Payoff Matrix Variant ────────────────────────────────────────────────────
 
-const PayoffMatrix: React.FC<{
+const PayoffMatrix = React.memo<{
   data: GameBoardData;
   frame: number;
   state: StateSnapshot;
   mode: "light" | "dark";
-}> = ({ data, frame, state, mode }) => {
+  firstRevealFrame: number;
+}>(function PayoffMatrix({ data, frame, state, mode, firstRevealFrame }) {
   const theme = useThemeMode(mode);
   // Per-episode primary accent for active-cell highlight + glow.
   const accent = useEpisodeColorEmphasis().primaryAccent;
@@ -490,7 +496,7 @@ const PayoffMatrix: React.FC<{
             const isHighlighted =
               state.highlights.includes(cellIdx);
 
-            const cellStartFrame = sec(1) + cellIdx * sec(0.15);
+            const cellStartFrame = firstRevealFrame + cellIdx * sec(0.15);
             const cellOpacity = fadeIn(frame, cellStartFrame, sec(0.4));
 
             // Cell entrance scale for highlighted cells (subtle pop)
@@ -544,7 +550,7 @@ const PayoffMatrix: React.FC<{
       ))}
     </div>
   );
-};
+});
 
 // ── PD-Canonical Matrix Variant ──────────────────────────────────────────────
 // Tucker-framing 2×2 with T/R/P/S labels, Nash-marked equilibrium, best-response
@@ -629,7 +635,8 @@ const PDCanonicalMatrix: React.FC<{
   frame: number;
   state: StateSnapshot;
   mode: "light" | "dark";
-}> = ({ data, frame, state, mode }) => {
+  firstRevealFrame: number;
+}> = ({ data, frame, state, mode, firstRevealFrame }) => {
   const theme = useThemeMode(mode);
   const rows = data.rowOptions?.length || 2;
   const cols = data.colOptions?.length || 2;
@@ -811,7 +818,7 @@ const PDCanonicalMatrix: React.FC<{
           const c = idx % cols;
           const cell = cells.find((x) => x.row === r && x.col === c);
           const isActive = state.highlights.includes(idx);
-          const cellStartFrame = sec(0.9) + idx * sec(0.15);
+          const cellStartFrame = firstRevealFrame + idx * sec(0.15);
           const cellOpacity = fadeIn(frame, cellStartFrame, sec(0.4));
 
           const isMoral = cell?.heroRole === "moral";
@@ -1317,11 +1324,11 @@ const toChessGlyph = (label: string): string => {
  *    the original disk-with-ring treatment — appropriate for matrix tokens
  *    where pieces are abstract markers, not chess pieces.
  */
-const PieceCircle: React.FC<{
+const PieceCircle = React.memo<{
   label: string;
   color: string;
   mode?: "light" | "dark";
-}> = ({ label, color, mode = "light" }) => {
+}>(function PieceCircle({ label, color, mode = "light" }) {
   const theme = useThemeMode(mode);
   const glyph = toChessGlyph(label);
   const isGlyph = glyph !== label;
@@ -1401,7 +1408,7 @@ const PieceCircle: React.FC<{
       </div>
     </div>
   );
-};
+});
 
 // ── Counter Animation Component ─────────────────────────────────────────────
 
@@ -1525,6 +1532,12 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
     "iterated-play variant has no rounds data — no animation will occur",
   );
 
+  // Anticipatory start: first board/piece/cell reveal lands settled at sync point 0.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const firstRevealFrame = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.5))
+    : sec(0.5);
+
   // Total duration: sum of all phases
   const totalDuration = data.durationSec || phases.reduce((sum, p) => sum + p.durationSec, 0);
 
@@ -1644,16 +1657,16 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
           }}
         >
           {data.variant === "chess" && (
-            <ChessBoard data={data} frame={frame} state={state} mode={mode} />
+            <ChessBoard data={data} frame={frame} state={state} mode={mode} firstRevealFrame={firstRevealFrame} />
           )}
           {data.variant === "go" && (
-            <GoBoard data={data} frame={frame} state={state} mode={mode} />
+            <GoBoard data={data} frame={frame} state={state} mode={mode} firstRevealFrame={firstRevealFrame} />
           )}
           {data.variant === "payoff-matrix" && (
-            <PayoffMatrix data={data} frame={frame} state={state} mode={mode} />
+            <PayoffMatrix data={data} frame={frame} state={state} mode={mode} firstRevealFrame={firstRevealFrame} />
           )}
           {data.variant === "pd-canonical" && (
-            <PDCanonicalMatrix data={data} frame={frame} state={state} mode={mode} />
+            <PDCanonicalMatrix data={data} frame={frame} state={state} mode={mode} firstRevealFrame={firstRevealFrame} />
           )}
           {data.variant === "iterated-play" && (
             <IteratedPlayMatrix data={data} frame={frame} mode={mode} />

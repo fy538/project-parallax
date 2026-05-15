@@ -49,6 +49,7 @@ import {
   gridlineDraw,
   kenBurnsDrift,
   heroSpring,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
 } from "../../utils/animation";
@@ -1059,7 +1060,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   const s = direction.paceStaggerScale;
   const axesStart = sec(0.2 * t);
   const eraStart = sec(0.5 * t);
-  const lineDrawStart = sec(0.8 * t);
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const lineDrawStart = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.8 * t);
   const lineDrawDuration = sec(1.3 * t);
   const areaFillStart = sec(1.8 * t);
   const annotationStart = sec(2 * t);

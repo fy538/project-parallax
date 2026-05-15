@@ -46,6 +46,7 @@ export const SankeyFlowSchema = z.object({
       label: z.string().optional(),
       color: z.string().optional(),
     }).optional(),
+    nodeAlign: z.enum(["left", "right", "center", "justify"]).optional(),
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),

@@ -93,7 +93,8 @@ const layoutSankey = (
   nodes: SankeyNode[],
   links: SankeyLink[],
   chartWidth: number,
-  chartHeight: number
+  chartHeight: number,
+  nodeAlign: "left" | "right" | "center" | "justify" = "center"
 ): { nodes: LayoutNode[]; links: LayoutLink[] } => {
   // Group nodes by column
   const byColumn = new Map<number, SankeyNode[]>();
@@ -119,8 +120,26 @@ const layoutSankey = (
   const nodeWidth = 18;
   const colXOffsets = new Map<number, number>();
   columns.forEach((col, idx) => {
-    // Center each bar within its slot.
-    colXOffsets.set(col, idx * colWidth + (colWidth - nodeWidth) / 2);
+    // Position each bar within its slot according to nodeAlign.
+    // "justify" has the same horizontal meaning as "center" in a custom
+    // layout (d3-sankey's justify spreads nodes *vertically*; here we map
+    // it to center to avoid misleading x-drift).
+    const slotLeft = idx * colWidth;
+    let xOffset: number;
+    switch (nodeAlign) {
+      case "left":
+        xOffset = slotLeft;
+        break;
+      case "right":
+        xOffset = slotLeft + colWidth - nodeWidth;
+        break;
+      case "center":
+      case "justify":
+      default:
+        xOffset = slotLeft + (colWidth - nodeWidth) / 2;
+        break;
+    }
+    colXOffsets.set(col, xOffset);
   });
 
   // Compute node positions within each column.
@@ -799,8 +818,8 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   }, [nodes, links, data.aggregateOther, theme.text.muted]);
 
   const { nodes: layoutNodes, links: layoutLinks } = useMemo(
-    () => layoutSankey(aggregatedNodes, aggregatedLinks, chartWidth, chartHeight),
-    [aggregatedNodes, aggregatedLinks, chartWidth, chartHeight]
+    () => layoutSankey(aggregatedNodes, aggregatedLinks, chartWidth, chartHeight, data.nodeAlign),
+    [aggregatedNodes, aggregatedLinks, chartWidth, chartHeight, data.nodeAlign]
   );
 
   // True when any link declares emphasis="accent" — activates the mute
@@ -833,6 +852,12 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   const lastColumn = useMemo(
     () => (layoutNodes.length > 0 ? Math.max(...layoutNodes.map((n) => n.column)) : 0),
     [layoutNodes]
+  );
+
+  warnIf(
+    data.nodeAlign != null && columnCount < 2,
+    "SankeyFlow",
+    "nodeAlign has no effect on single-column Sankey diagrams",
   );
 
   // Render

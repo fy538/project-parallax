@@ -32,6 +32,7 @@ import {
   fadeIn,
   exitFade,
   pulse,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
@@ -137,7 +138,10 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
   const morphFrames = sec(2 * t);
   const outroFrames = sec(1.5);
 
-  const gridStart = sec(0.3 * t);
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const gridStart = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.5))
+    : sec(0.3 * t);
   const polygonStart = gridStart + gridDrawFrames;
   const morphStart = polygonStart + polygonGrowFrames + sec(0.5);
 

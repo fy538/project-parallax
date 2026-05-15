@@ -64,7 +64,7 @@ import { RadarChartComposition } from "./templates/RadarChart";
 import { RankChangeDotPlotComposition } from "./templates/RankChangeDotPlot";
 import { AnnotatedImageComposition } from "./templates/AnnotatedImage";
 import { EscalationLadderComposition } from "./templates/EscalationLadder";
-import { HorizontalTimelineComposition } from "./templates/HorizontalTimeline";
+import { HorizontalTimelineComposition, HorizontalTimelineSingleComposition } from "./templates/HorizontalTimeline";
 import {
   KineticShortComposition,
   DataChartShortComposition,
@@ -219,6 +219,7 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Timelines">
         <HorizontalTimelineComposition />
+        <HorizontalTimelineSingleComposition />
         <EscalationLadderComposition />
       </Folder>
 

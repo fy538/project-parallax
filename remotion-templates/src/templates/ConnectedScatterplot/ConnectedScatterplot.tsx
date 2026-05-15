@@ -233,7 +233,7 @@ export const ConnectedScatterplot: React.FC<{
         y: yScale(p.y),
         src: p,
       })),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- xScale/yScale are plain functions recreated every render; their inputs are the primitive values already listed here
     [orderedPoints, xMin, xMax, yMin, yMax, chart.left, chart.top, chart.width, chart.height],
   );
 
@@ -308,7 +308,7 @@ export const ConnectedScatterplot: React.FC<{
     const rightX = baseX - px * headHalfWidth;
     const rightY = baseY - py * headHalfWidth;
     return `${tipX},${tipY} ${leftX},${leftY} ${rightX},${rightY}`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lastPx/prevPx are object refs from pixelPoints.map(); deps use their primitive components to avoid recomputing on identity-different but value-equal objects
   }, [lastPx?.x, lastPx?.y, prevPx?.x, prevPx?.y]);
 
   const arrowOpacity =
@@ -345,9 +345,9 @@ export const ConnectedScatterplot: React.FC<{
       const angle = Math.acos(Math.max(-1, Math.min(1, dot)));
       pivots.push({ i, angle });
     }
-    pivots.sort((a, b) => b.angle - a.angle);
+    const sortedPivots = [...pivots].sort((a, b) => b.angle - a.angle);
     let added = 0;
-    for (const { i, angle } of pivots) {
+    for (const { i, angle } of sortedPivots) {
       if (added >= 2) break;
       if (angle < (2 * Math.PI) / 3) break; // require ≥120° turn
       set.add(i);

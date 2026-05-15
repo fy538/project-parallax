@@ -130,6 +130,21 @@ export interface SankeyFlowData {
   /** Show ambient background particles (default: false) */
   ambientParticles?: boolean;
 
+  /**
+   * Horizontal alignment of node bars within their column slot.
+   *
+   * - `"left"`:    node bar at the left edge of the column slot
+   * - `"right"`:   node bar at the right edge of the column slot
+   * - `"center"`:  node bar centered within the column slot (current default)
+   * - `"justify"`: same as center for the custom layout (d3-sankey justify
+   *                spreads nodes vertically — horizontal analogue is center)
+   *
+   * Default: `"center"`.
+   *
+   * Has no visual effect on single-column diagrams.
+   */
+  nodeAlign?: "left" | "right" | "center" | "justify";
+
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
