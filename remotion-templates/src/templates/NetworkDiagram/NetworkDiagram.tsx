@@ -75,6 +75,7 @@ import {
   stagger,
   exitFade,
   lockOnPulse,
+  anticipatoryStartFrame,
   CLAMP_SINE,
 } from "../../utils/animation";
 import {
@@ -562,9 +563,13 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     };
   };
 
-  // ── Static mode timing ────────��────────────────────────────────────
+  // ── Static mode timing ────────────────────────────────────────────
   const structureStartFrame = sec(0.2 * t);
-  const nodeStartFrame = sec(0.5 * t);
+  // D17 anticipatory reveal: first node settled when narrator names it.
+  const firstSyncFrameND = direction.syncPoints?.[0]?.frame;
+  const nodeStartFrame = firstSyncFrameND != null
+    ? anticipatoryStartFrame(firstSyncFrameND, sec(0.5))
+    : sec(0.5 * t); // existing default
   const edgeStartFrame = sec(1.2 * t);
   const controlStartFrame = sec(1.8 * t);
   const calloutStartFrame = sec(2.2 * t);

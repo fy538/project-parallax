@@ -33,6 +33,7 @@ import {
   fadeIn,
   slideIn,
   easings,
+  anticipatoryStartFrame,
   CLAMP_SINE,
 } from "../../utils/animation";
 import { lineDrawProgress } from "../../utils/drawLine";
@@ -812,7 +813,11 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
   // Animation timeline
   // titleFrameStart = 0 (implicit)
   const titleFrameEnd = sec(0.8);
-  const sourceNodesStart = sec(0.3);
+  // D17 anticipatory reveal: source nodes settled when narrator names them.
+  const firstSyncFrameSF = direction.syncPoints?.[0]?.frame;
+  const sourceNodesStart = firstSyncFrameSF != null
+    ? anticipatoryStartFrame(firstSyncFrameSF, sec(0.4))
+    : sec(0.3); // existing default
   const linksStart = sec(1.2);
   const otherNodesStart = sec(1.5);
 

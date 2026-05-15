@@ -23,7 +23,7 @@ import { SourceAttribution } from "../../components/SourceAttribution";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
+import { fadeIn, stagger, pulse, exitFade, bloomIntensity, gridlineDraw, focusPull, easings, anticipatoryStartFrame, CLAMP, CLAMP_CUBIC, CLAMP_SINE, CLAMP_CUBIC_INOUT } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -931,6 +931,13 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     chartBoxes
   );
 
+  // D17 anticipatory reveal: when syncPoints[0] is defined, back-calculate the
+  // chart reveal start so the first bar is settled just as the narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const chartRevealBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.8 * t); // existing default
+
   const holdFrames = sec(data.holdAfterRevealSec ?? 0);
   warnIf(
     holdFrames > 0 && durationInFrames - holdFrames < sec(2.5),
@@ -1048,7 +1055,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // ── Focus pull: compute highlight bar's finish frame ────────────────────
   const highlightBarIndex = data.highlightIndex ?? -1;
   const highlightFinishFrame = highlightBarIndex >= 0
-    ? stagger(highlightBarIndex, sec(0.15 * s), sec(0.8 * t)) + sec(1.4) // hero bar duration
+    ? stagger(highlightBarIndex, sec(0.15 * s), chartRevealBase) + sec(1.4) // hero bar duration
     : sec(1.5); // fallback: halfway through first bar stagger
 
   return (
@@ -1196,7 +1203,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                 color={dp.color || getCategoricalColor(i)}
                 unit={unit}
                 frame={frame}
-                startFrame={stagger(i, sec(0.15 * s), sec(0.8 * t))}
+                startFrame={stagger(i, sec(0.15 * s), chartRevealBase)}
                 barWidth={barWidth}
                 maxHeight={maxHeight}
                 isHighlighted={data.highlightIndex === i}
@@ -1324,7 +1331,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
               maxValue={comparisonData.maxVal}
               unit={unit}
               frame={frame}
-              startFrame={stagger(i, sec(0.15 * s), sec(0.8 * t))}
+              startFrame={stagger(i, sec(0.15 * s), chartRevealBase)}
               pairWidth={comparisonData.pairWidth}
               maxHeight={maxHeight}
               formatAsYear={data.formatAsYear}

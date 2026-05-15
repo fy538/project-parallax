@@ -49,7 +49,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, CLAMP_QUAD } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, anticipatoryStartFrame, CLAMP_QUAD } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -76,6 +76,11 @@ const ComparisonVariant: React.FC<{
   // avoids duplicating the PACE_TIMING table here). Cheap to call twice.
   const direction = useDirection(data._direction);
   const s = direction.paceStaggerScale;
+  // D17 anticipatory reveal: first column appears settled when narrator names it.
+  const firstSyncFrameFW = direction.syncPoints?.[0]?.frame;
+  const firstColumnRevealBase = firstSyncFrameFW != null
+    ? anticipatoryStartFrame(firstSyncFrameFW, sec(0.5))
+    : sec(0.5); // existing default
   // Audio-reactive amplification for the VS divider glow oscillation. Hook
   // is called unconditionally; the conditional VS render below uses
   // `vsBeat.pulse` only when columns.length === 2.
@@ -112,7 +117,7 @@ const ComparisonVariant: React.FC<{
       }}
     >
       {columns.map((col, ci) => {
-        const colStart = stagger(ci, sec(0.6 * s), sec(0.5));
+        const colStart = stagger(ci, sec(0.6 * s), firstColumnRevealBase);
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
         const colScale = 0.96 + 0.04 * heroSpring(frame, layout.fps, colStart);
         const colColor = col.color || emphasis.primaryAccent;

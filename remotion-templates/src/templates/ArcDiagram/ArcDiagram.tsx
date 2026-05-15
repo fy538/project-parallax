@@ -42,6 +42,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
@@ -130,7 +131,11 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
 
   // ── Timing ──────────────────────────────────────────────────────────
   const baselineStart = sec(0.4);
-  const nodeStart = sec(0.7);
+  // D17 anticipatory reveal: first node settled when narrator names it.
+  const firstSyncFrameAD = direction.syncPoints?.[0]?.frame;
+  const nodeStart = firstSyncFrameAD != null
+    ? anticipatoryStartFrame(firstSyncFrameAD, sec(0.5))
+    : sec(0.7); // existing default
   const arcStart = sec(1.4);
   const exitOp = exitFade(frame, durationInFrames, 15);
 

@@ -42,6 +42,7 @@ import {
   fadeIn,
   exitFade,
   slideIn,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { smoothStepEdge } from "../../utils/edges";
@@ -313,7 +314,8 @@ const LadderVariant: React.FC<{
   frame: number;
   totalFrames: number;
   syncPoints?: DirectionSyncPoint[];
-}> = React.memo(({ data, frame, totalFrames, syncPoints }) => {
+  firstRevealBase?: number;
+}> = React.memo(({ data, frame, totalFrames, syncPoints, firstRevealBase }) => {
   const mode = (data.backgroundVariant || "light") as "light" | "dark";
   const theme = useThemeMode(mode);
   const emphasis = useEpisodeColorEmphasis();
@@ -344,9 +346,10 @@ const LadderVariant: React.FC<{
       .filter((s): s is string => Boolean(s));
     const gloss = glossParts.join(" ");
 
-    // Stagger reveal across options. Within-option staggering is no longer
-    // needed since each option renders as a single block.
-    const revealStart = sec(0.4) + idx * sec(0.22);
+    // Stagger reveal across options. D17: first option uses anticipatory base
+    // when syncPoints[0] is defined; subsequent options stagger from there.
+    const baseReveal = firstRevealBase ?? sec(0.4);
+    const revealStart = baseReveal + idx * sec(0.22);
     const opacity = fadeIn(frame, revealStart, sec(0.55));
     const slide = slideIn(frame, revealStart, 14, sec(0.55));
 
@@ -499,6 +502,11 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   // stagger gaps + initial timing offsets).
   const t = direction.paceTimingScale;
   const s = direction.paceStaggerScale;
+  // D17 anticipatory reveal: first node/option settled when narrator names it.
+  const firstSyncFrameDT = direction.syncPoints?.[0]?.frame;
+  const nodeRevealBase = firstSyncFrameDT != null
+    ? anticipatoryStartFrame(firstSyncFrameDT, sec(0.5))
+    : sec(0.5 * t); // existing default
   // Per-episode color emphasis — highlightColor (used for path highlights
   // and active-node accent) falls back to episode primary accent.
   const emphasis = useEpisodeColorEmphasis();
@@ -523,7 +531,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         <AbsoluteFill style={compStyle}>
           <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
           <FooterStrip mode={backgroundVariant} />
-          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} syncPoints={direction.syncPoints} />
+          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} syncPoints={direction.syncPoints} firstRevealBase={nodeRevealBase} />
         </AbsoluteFill>
       </Background>
     );
@@ -812,7 +820,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                   (n) => positions.get(n.id)?.level === level
                 );
                 const indexInLevel = levelNodes.findIndex((n) => n.id === node.id);
-                const startFrame = sec(0.5 * t) + level * sec(0.4 * s) + indexInLevel * sec(0.1 * s);
+                const startFrame = nodeRevealBase + level * sec(0.4 * s) + indexInLevel * sec(0.1 * s);
 
                 // Chosen-path hierarchy: when a highlightedPath is set, recede
                 // off-path nodes to 0.5 dim alongside their dimmed edges so the

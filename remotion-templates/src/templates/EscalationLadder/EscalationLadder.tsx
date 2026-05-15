@@ -37,6 +37,7 @@ import {
   exitFade,
   pulse,
   bloomIntensity,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
 } from "../../utils/animation";
@@ -255,7 +256,11 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
   const rungFadeIn = sec(0.4 * t);
   const spineDrawPerRung = sec(0.6 * t);
   const outroFrames = sec(1.5);
-  const ladderStart = sec(0.5 * t);
+  // D17 anticipatory reveal: first rung settled when narrator names it.
+  const firstSyncFrameEL = direction.syncPoints?.[0]?.frame;
+  const ladderStart = firstSyncFrameEL != null
+    ? anticipatoryStartFrame(firstSyncFrameEL, sec(0.5))
+    : sec(0.5 * t); // existing default
 
   // ── Exit ────────────────────────────────────────────────────────────────
   const exit = exitFade(frame, durationInFrames, outroFrames);

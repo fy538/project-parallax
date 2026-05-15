@@ -43,7 +43,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
-import { fadeIn, exitFade, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, exitFade, anticipatoryStartFrame, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import type { BumpChartData } from "./types";
 
@@ -195,10 +195,16 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   const segDuration = sec(0.3);
   const entityStagger = sec(0.05);
 
+  // D17 anticipatory reveal: first line segment settled when narrator names it.
+  const firstSyncFrameBC = direction.syncPoints?.[0]?.frame;
+  const lineRevealBase = firstSyncFrameBC != null
+    ? anticipatoryStartFrame(firstSyncFrameBC, sec(0.4))
+    : sec(0.5); // existing default
+
   // Get the frame at which entity i's segment from col (c) to col (c+1) starts
   const segStart = (entityIndex: number, colIndex: number): number => {
-    // Overall column phase starts at sec(0.5)
-    const colPhaseStart = sec(0.5) + colIndex * segDuration;
+    // Overall column phase starts at lineRevealBase
+    const colPhaseStart = lineRevealBase + colIndex * segDuration;
     return colPhaseStart + entityIndex * entityStagger;
   };
 
