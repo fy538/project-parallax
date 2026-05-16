@@ -84,7 +84,7 @@ DIR: cam(<position>, [modifiers])          # hold at position (static framing)
 |-----------|--------|-------|
 | Position | `wide`, `tight:<element>`, `element:<id>`, `group:<name>`, `overview`, `[lng,lat]` | Where to point |
 | Zoom | `zoom:1.0` (default), `zoom:1.3` (close), `zoom:1.6` (detail), `zoom:2.0` (extreme) | Always keyword form |
-| Timing | `sync:"word"`, `at:3s`, `over:4s` | When/how long |
+| Timing | `sync:"word"`, `syncs:["w1","w2"]`, `at:3s`, `over:4s` | When/how long (use `syncs:[…]` for per-element D17 — one cue per node/rung/callout) |
 | Behavior | `track` (smooth glide), `snap` (instant cut) | Easing style |
 | Shake | `shake:0.3` (subtle tension), `shake:0.7` (conflict) | Vibration overlay |
 
@@ -185,6 +185,14 @@ DIR: reveal(stagger:300ms, hero:0, pulse)
 ```
 
 **Anticipatory entrance timing (automatic).** When `reveal()` is paired with `cam(sync:"word")` — or when the segment has `_direction.syncPoints[]` — TitleTransition, KineticTypography, StatReveal, BayesianUpdate, and TitleBlock all apply *anticipatory* entrance timing per D17 (May 11, 2026). The visual element starts settling ~5 frames (≈150ms) *before* the narration word lands, so the viewer reads the element as already-present-and-settled when the spoken word arrives. This is the Economist 150ms rule, baked into the templates via `useEntrance()` consuming the syncPoint at the hook layer. You don't have to opt in — every sync'd reveal gets it automatically. Practical implication: when you write `cam(sync:"single island")`, the visual is at full opacity ~150ms before "single" is spoken, not landing on the word. This produces the "settled-not-arriving" feel that separates editorial video from PowerPoint reveals. See `remotion-templates/src/utils/animation.ts` → `anticipatoryStartFrame()` and `remotion-templates/references/template-research/motion-design.md` § 3.
+
+**Per-element anticipatory reveals (May 16, 2026).** Templates that surface multiple labeled entities — NetworkDiagram nodes, ArcDiagram entities, EscalationLadder rungs, HorizontalTimeline events, AnnotatedImage callouts (image at index 0, callouts at 1..N), FrameworkDiagram columns/cells, BumpChart entities — extend D17 to per-element anticipation: each entity settles before its OWN narration cue lands. Vocabulary:
+
+```
+DIR: reveal(syncs:["sixty", "three percent", "fifteen years"], stagger)
+```
+
+The list maps 1:1 to `syncPoints[i]` consumed by the template. Use this whenever the narrator names multiple entities in sequence — supply-chain chokepoints, escalation-ladder rungs, succession lineage on an arc diagram. Falls through pixel-identically to the legacy stagger when the list is absent. The singular `sync:"word"` form is still supported for templates with a single hero element (StatReveal, hero ChoroplethMap callout). When BOTH forms appear in the same directive, the plural list resolves first, then the singular appends.
 
 **How it generates JSON:**
 ```json

@@ -368,6 +368,36 @@ def test_parse_dir_multiple_sync_words():
     assert "TSMC" in result["syncWords"]
 
 
+def test_parse_dir_reveal_syncs_plural():
+    """Per-element D17 vocabulary — `syncs:[...]` for templates with multiple entities."""
+    result = parse_dir_lines([
+        'DIR: reveal(stagger, syncs:["sixty", "three percent", "fifteen years"])',
+    ])
+    assert result["syncWords"] == ["sixty", "three percent", "fifteen years"]
+
+
+def test_parse_dir_cam_syncs_plural():
+    result = parse_dir_lines([
+        'DIR: cam(overview, syncs:["Apple", "Nvidia", "AMD"], track)',
+    ])
+    assert result["syncWords"] == ["Apple", "Nvidia", "AMD"]
+
+
+def test_parse_dir_syncs_then_sync_both_accepted():
+    """Defensive: if both plural and singular appear, plural wins first."""
+    result = parse_dir_lines([
+        'DIR: reveal(syncs:["a","b"], sync:"c")',
+    ])
+    # Plural extracts first (a, b), singular appends (c).
+    assert result["syncWords"] == ["a", "b", "c"]
+
+
+def test_parse_dir_no_sync_returns_no_synckey():
+    """Absence: directives without sync clauses don't add a syncWords key."""
+    result = parse_dir_lines(['DIR: cam(overview → element:0, track)'])
+    assert "syncWords" not in result
+
+
 def test_parse_dir_multiple_lines_combined():
     result = parse_dir_lines([
         "DIR: hold(breathe)",

@@ -434,6 +434,45 @@ def parse_visual_spec(spec: str):
     return result
 
 
+def _extract_sync_words(params_str: str) -> list[str]:
+    """
+    Extract sync words from a DIR directive's parameter string.
+
+    Grammar:
+        sync:"word"             — single word (legacy, still supported)
+        syncs:["word1","word2"] — list, maps 1:1 to syncPoints[i] in the
+                                  template (per-element D17 — POLISH.md D19,
+                                  L103). Use for templates that surface
+                                  multiple labeled entities and want each
+                                  to anticipate its own narration cue:
+                                  NetworkDiagram, ArcDiagram, EscalationLadder
+                                  rungs, HorizontalTimeline events,
+                                  AnnotatedImage callouts (indexed 1..N
+                                  with image at 0), FrameworkDiagram
+                                  columns/cells, BumpChart entities.
+
+    Returns the list of sync words in order. Empty list if neither form
+    is present. If BOTH forms are present, returns the plural list first
+    then the singular (defensive — shouldn't happen in well-formed scripts).
+    """
+    words: list[str] = []
+
+    # Plural form — `syncs:["a","b",...]`
+    syncs_m = re.search(r'syncs:\s*\[([^\]]+)\]', params_str)
+    if syncs_m:
+        words.extend(re.findall(r'"([^"]+)"', syncs_m.group(1)))
+
+    # Singular form — `sync:"a"`. Use a negative-lookahead to not match
+    # `syncs:` (which would already be handled above). Without `(?!s:)`,
+    # `syncs:` would be matched as `sync:` with `s:["..."]` parsed as part
+    # of the value (corrupted).
+    sync_m = re.search(r'sync(?!s:)\s*:\s*"([^"]+)"', params_str)
+    if sync_m:
+        words.append(sync_m.group(1))
+
+    return words
+
+
 def parse_dir_lines(dir_lines: list[str]) -> dict:
     """
     Parse DIR: annotation lines into a direction dict for assembly manifest use.
@@ -513,16 +552,19 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                     result["washColor"] = PALETTE_COLORS[color_name]
 
         elif dtype == "cam":
-            # Extract sync words for Whisper alignment
-            sync_m = re.search(r'sync:\s*"([^"]+)"', params_str)
-            if sync_m:
-                result.setdefault("syncWords", []).append(sync_m.group(1))
+            # Extract sync words for Whisper alignment.
+            # Supports both singular `sync:"word"` and plural `syncs:["w1","w2"]`.
+            # The plural form is for per-element D17 templates (NetworkDiagram,
+            # ArcDiagram, EscalationLadder, AnnotatedImage, etc.) where each
+            # entity/rung/callout has its own narration cue. List order maps
+            # 1:1 to `syncPoints[i]` indices consumed by the template.
+            for sw in _extract_sync_words(params_str):
+                result.setdefault("syncWords", []).append(sw)
 
         elif dtype == "reveal":
-            # Extract sync words from reveal() too
-            sync_m = re.search(r'sync:\s*"([^"]+)"', params_str)
-            if sync_m:
-                result.setdefault("syncWords", []).append(sync_m.group(1))
+            # Extract sync words from reveal() — same grammar as cam().
+            for sw in _extract_sync_words(params_str):
+                result.setdefault("syncWords", []).append(sw)
 
         elif dtype == "type":
             # Parse type() — text-animation register for text-bearing
