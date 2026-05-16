@@ -127,8 +127,20 @@ export const StaticDuelingFrameworks: React.FC<{
           />
         )}
 
-        {/* Center divider — hidden for magazine (accent sidebar bars replace it) */}
-        {!isAsymmetric && (
+        {/* Center divider — hidden for magazine (accent sidebar bars replace it).
+            Hero mode: thin 1px rule at 10% opacity instead of the 2px gradient bar. */}
+        {data.cardStyle === "hero" ? (
+          <div style={{
+            position: "absolute",
+            left: "50%",
+            top: zones.content?.rect?.top ?? 160,
+            bottom: zones.footer?.rect?.bottom ?? 80,
+            width: 1,
+            backgroundColor: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
+            transform: "translateX(-0.5px)",
+            opacity: dividerProgress * exitOpacity,
+          }} />
+        ) : !isAsymmetric && (
           <div
             style={{
               position: "absolute",
@@ -189,7 +201,7 @@ export const StaticDuelingFrameworks: React.FC<{
             the tenets — no opacity hacks needed.
             Magazine variant skips the split verdict and renders a full-width
             centered synthesis block instead. */}
-        {isPast("frameworkB") && data.cardStyle !== "magazine" && (
+        {isPast("frameworkB") && data.cardStyle !== "magazine" && data.cardStyle !== "hero" && (
           <div
             style={{
               position: "absolute",
@@ -254,6 +266,39 @@ export const StaticDuelingFrameworks: React.FC<{
                 {data.verdictLabel}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Hero variant: full-width centered verdict — amber bar + large bold italic label */}
+        {data.cardStyle === "hero" && data.verdictLabel && isPast("frameworkB") && (
+          <div style={{
+            position: "absolute",
+            bottom: (zones.footer?.rect?.bottom ?? 80) + 8,
+            left: 0,
+            width: layout.width,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 10,
+            opacity: fadeIn(frame, scoringStartFrame + sec(0.3), sec(0.5)) * exitOpacity,
+          }}>
+            <div style={{
+              width: 40,
+              height: 2,
+              backgroundColor: palette.amber,
+            }} />
+            <div style={{
+              fontFamily: fonts.heading,
+              fontSize: 32,
+              fontWeight: fontWeights.bold,
+              fontStyle: "italic",
+              color: isDark ? "rgba(255,255,255,0.92)" : palette.ink,
+              textAlign: "center",
+              letterSpacing: "-0.015em",
+              lineHeight: 1.2,
+            }}>
+              {data.verdictLabel}
+            </div>
           </div>
         )}
 

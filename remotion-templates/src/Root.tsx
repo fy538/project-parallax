@@ -53,7 +53,7 @@ import { BayesianUpdateComposition, BayesianUpdateMultiComposition } from "./tem
 // queue required it. Future institutional-bifurcation stories can use
 // DuelingFrameworks or HorizontalTimeline dual mode (e.g., the COCOM
 // successor regimes migrated to those forms).
-import { DuelingFrameworksComposition, DuelingFrameworksEditorialComposition, DuelingFrameworksMagazineComposition } from "./templates/DuelingFrameworks";
+import { DuelingFrameworksComposition, DuelingFrameworksEditorialComposition, DuelingFrameworksMagazineComposition, DuelingFrameworksHeroComposition } from "./templates/DuelingFrameworks";
 import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
@@ -257,6 +257,7 @@ export const RemotionRoot: React.FC = () => {
         <DuelingFrameworksComposition />
         <DuelingFrameworksEditorialComposition />
         <DuelingFrameworksMagazineComposition />
+        <DuelingFrameworksHeroComposition />
         <NetworkDiagramComposition />
         <ArcDiagramComposition />
         <SplitCompositionComposition />

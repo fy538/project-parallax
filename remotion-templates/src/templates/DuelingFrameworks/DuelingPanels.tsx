@@ -144,7 +144,7 @@ export const FrameworkPanel: React.FC<{
   /** Zone style from useTemplateLayout — no manual positioning needed */
   zoneStyle: React.CSSProperties;
   /** Visual card style. Default "inset". */
-  cardStyle?: "inset" | "editorial" | "magazine";
+  cardStyle?: "inset" | "editorial" | "magazine" | "hero";
 }> = React.memo(({ side, data, frame, startFrame, theme, isDimmed, isDark, zoneStyle, cardStyle = "inset" }) => {
   const isLeft = side === "left";
   const alignText: "left" | "right" = isLeft ? "left" : "right";
@@ -153,6 +153,11 @@ export const FrameworkPanel: React.FC<{
   const tenetBaseDelay = startFrame + sec(0.3);
 
   const contentOpacity = isDimmed ? 0.3 : 1;
+
+  // Hero variant: larger title size + tighter tracking
+  const titleFontSize = cardStyle === "hero" ? 72 : fontSizes.h2;
+  const titleLetterSpacing = cardStyle === "hero" ? "-0.025em" : letterSpacing.h2;
+  const titleMarginBottom = cardStyle === "hero" ? 6 : layout.spacing.md;
 
   return (
     <div
@@ -164,13 +169,13 @@ export const FrameworkPanel: React.FC<{
       {/* Framework name */}
       <h3
         style={{
-          fontSize: fontSizes.h2,
+          fontSize: titleFontSize,
           fontWeight: fontWeights.bold,
-          letterSpacing: letterSpacing.h2,
+          letterSpacing: titleLetterSpacing,
           color: data.color,
           textAlign: alignText,
           margin: 0,
-          marginBottom: layout.spacing.md,
+          marginBottom: titleMarginBottom,
           maxWidth: textMaxWidth.h2,
           fontFamily: getFontFamily(data.name),
           lineHeight: lineHeight.h2,
@@ -185,12 +190,54 @@ export const FrameworkPanel: React.FC<{
         {data.name}
       </h3>
 
+      {/* Hero accent underline — compact bar in framework color */}
+      {cardStyle === "hero" && (
+        <div style={{
+          width: 32,
+          height: 2.5,
+          backgroundColor: data.color,
+          marginBottom: layout.spacing.lg,
+          opacity: fadeIn(frame, nameDelay + sec(0.1), sec(0.3)),
+          alignSelf: isLeft ? "flex-start" : "flex-end",
+          marginLeft: isLeft ? 0 : "auto",
+        }} />
+      )}
+
       {/* Tenets (staggered list) */}
       <div style={{ display: "flex", flexDirection: "column", gap: cardStyle === "editorial" ? 0 : layout.spacing.sm }}>
         {data.tenets.map((tenet, idx) => {
           const tenetStart = stagger(idx, sec(0.12), tenetBaseDelay);
           const tenetOpacity = fadeIn(frame, tenetStart, sec(0.4));
           const tenetSlide = slideIn(frame, tenetStart, 16, sec(0.4));
+
+          if (cardStyle === "hero") {
+            // Hero variant: plain text rows — no borders, no chips, no background
+            return (
+              <div
+                key={idx}
+                style={{
+                  opacity: tenetOpacity * 0.78,
+                  transform: isLeft
+                    ? `translateX(${tenetSlide}px)`
+                    : `translateX(${-tenetSlide}px)`,
+                  paddingTop: 7,
+                  paddingBottom: 7,
+                }}
+              >
+                <span style={{
+                  fontFamily: fonts.body,
+                  fontSize: 19,
+                  color: isDark ? "rgba(255,255,255,0.82)" : "rgba(28,24,20,0.78)",
+                  lineHeight: 1.35,
+                  textAlign: isLeft ? "left" : "right",
+                  display: "block",
+                  letterSpacing: "0.005em",
+                }}>
+                  {tenet.text}
+                </span>
+              </div>
+            );
+          }
 
           if (cardStyle === "editorial") {
             // Editorial variant: hairline top rule + ordinal chip, no card box
