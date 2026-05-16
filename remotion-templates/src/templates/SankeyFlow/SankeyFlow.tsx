@@ -655,12 +655,8 @@ const SankeyLinkComponent: React.FC<{
           <stop offset="0%" stopColor={fromColor} stopOpacity={0.55} />
           <stop offset="100%" stopColor={toColor} stopOpacity={0.4} />
         </linearGradient>
-        {/* Multiply-blend noise filter for ink-on-paper density variation */}
-        <filter id={`tx-link-${link.from}-${link.to}`} x="-5%" y="-5%" width="110%" height="110%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves={3} seed={5} result="n" />
-          <feColorMatrix in="n" values="0 0 0 0 0.85  0 0 0 0 0.85  0 0 0 0 0.85  0 0 0 4 -2.5" result="m" />
-          <feBlend in="SourceGraphic" in2="m" mode="multiply" />
-        </filter>
+        {/* Noise filter removed — baseFrequency 1.2 was visibly grainy.
+            The gradient fill (line below) is sufficient for ribbon differentiation. */}
       </defs>
 
       {/* Filled ribbon — drawn via clip-path so it reveals left-to-right.
@@ -684,7 +680,6 @@ const SankeyLinkComponent: React.FC<{
           fill={`url(#link-fill-${link.from}-${link.to})`}
           stroke="none"
           opacity={opacity}
-          filter={`url(#tx-link-${link.from}-${link.to})`}
         />
       </g>
 
