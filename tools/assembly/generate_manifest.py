@@ -123,9 +123,26 @@ VALID_DRIFT_PRESETS = {
 # Canonical doctrine: project/TRANSITION_GRAMMAR.md (May 16, 2026).
 # Deprecated values remain in VALID_CUT_TYPES for back-compat with shipped
 # manifests but are flagged on parse (see DEPRECATED_CUT_TYPES below).
+# `match-cut-still` was added in Phase 4 (composition-locked variant).
 VALID_CUT_TYPES = {
     "cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up",
-    "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom",
+    "blur-through", "color-wash", "iris", "match-cut", "match-cut-still",
+    "whip-pan", "spatial-zoom",
+}
+
+# Per-template-pair defaults — when the implicit-default engine sees two
+# consecutive segments with the same component name AND the component is
+# in this set AND no DIR override + no beat change, it defaults the in-
+# transition to `match-cut-still` (composition-locked crossfade) instead
+# of the legacy 0.3s dissolve. Promotes match-cut from unused to first-
+# class for cartographic / historical-photo sequences where the two
+# segments genuinely share composition. Phase 4 of TRANSITION_GRAMMAR.md.
+MATCH_CUT_STILL_TEMPLATES = {
+    "AtlasPlate",
+    "ChoroplethMap",
+    "AnnotatedImage",
+    "RouteAnimation",
+    "PhotoMontage",
 }
 
 # Deprecated transitions per Phase 3 of TRANSITION_GRAMMAR.md. Each entry
@@ -962,6 +979,15 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
        layers — the template overlays). But when a TEMPLATE is followed by
        another TEMPLATE in the same layer, use a brief dissolve (0.3s).
 
+    4a. MATCH-CUT PROMOTION (Phase 4 of TRANSITION_GRAMMAR.md): when the
+        two consecutive same-layer templates are the SAME component AND the
+        component is in MATCH_CUT_STILL_TEMPLATES (AtlasPlate, ChoroplethMap,
+        AnnotatedImage, RouteAnimation, PhotoMontage), prefer
+        `match-cut-still` (0.35s opacity-only crossfade) over `dissolve` —
+        the composition genuinely carries between segments, so the seam
+        reads as a layer-swap on the same scene rather than two different
+        scenes softly resolving into each other.
+
     5. HOLD SEGMENTS: No transition — they sustain the previous visual.
        A fade on a hold defeats its purpose.
 
@@ -1031,14 +1057,35 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
             dur = 0.8
 
         # Rule 4: Template → Template (same layer) → brief dissolve
+        # Refinement 4a (Phase 4): when both segments are the SAME template
+        # AND the component is in MATCH_CUT_STILL_TEMPLATES (AtlasPlate,
+        # ChoroplethMap, AnnotatedImage, RouteAnimation, PhotoMontage),
+        # default to `match-cut-still` instead — the composition genuinely
+        # carries from one segment to the next, so an opacity-only crossfade
+        # reads as a layer-swap on the same scene rather than a "soft scene
+        # change." See TRANSITION_GRAMMAR.md Section 4 Context A.
+        # A DIR override (`prev._dirTransitionOut`) always wins; Rule 4
+        # only fires when no override exists (consistent with Rule 1).
         if (
             prev_is_template
             and curr_is_template
             and not is_title
             and not beat_changed
+            and not (prev and prev.get("_dirTransitionOut"))
         ):
-            trans_in = "dissolve"
-            dur = 0.3
+            prev_component = prev.get("template", {}).get("component") if prev else None
+            curr_component = seg.get("template", {}).get("component")
+            same_template_match_cut = (
+                prev_component is not None
+                and prev_component == curr_component
+                and prev_component in MATCH_CUT_STILL_TEMPLATES
+            )
+            if same_template_match_cut:
+                trans_in = "match-cut-still"
+                dur = 0.35
+            else:
+                trans_in = "dissolve"
+                dur = 0.3
 
         # Rule 7: Pace-driven transition adjustments (applied last before write)
         # Pace context modifies durations and may upgrade/downgrade transition types.

@@ -49,7 +49,8 @@ When the seam's editorial intent matches a transition's implicit claim, the tran
 | 01 | Hard cut | `cut` | 0s | ✅ heavily (default within-beat) |
 | 02 | Cross-dissolve | `dissolve` | 0.5s | ✅ heavily (default beat-boundary) |
 | 03 | Fade-through-black | `fade` | 0.6s | ✅ for title cards |
-| 04 | Match cut | `match-cut` (in palette) | 0.4s | ❌ **unused — promote** |
+| 04a | Match cut (zoom) | `match-cut` | 0.4s | ✅ Phase 4 — opt-in via `DIR: cut(match-cut)` |
+| 04b | Match cut (composition-locked) | `match-cut-still` | 0.35s | ✅ Phase 4 — implicit default for same-template AtlasPlate / ChoroplethMap / AnnotatedImage / RouteAnimation / PhotoMontage seams in same beat |
 | 05 | Color-wash | `color-wash` | 0.7s | ✅ rare register-shifts |
 | 06 | Iris-in / Iris-out | `iris` | 0.8s | ✅ rare cinematic moments |
 | 07 | Audio-bridged cut | **not a `TransitionType`** — audio-spec | 0.5–1.0s overlap | ❌ doctrine missing — wire in audio-spec |
@@ -202,15 +203,25 @@ Used as a generic dissolve = devalues every other fade in the episode. The fade-
 - **NYT "Greenland Is Melting Away"** (Derek Watkins, 2015) — match-cut between archival photographs and modern drone footage of the same Greenland landscape.
 - **FT Visual Storytelling** — supply-chain pieces use match-cuts to bridge between an MG diagram and the photo of the actual factory it represents.
 
-### Technical brief
+### Technical brief — two variants (Phase 4 split, May 16, 2026)
+
+Two `TransitionType` entries cover the editorial range:
+
+**`match-cut` (zoom)** — 0.4s synced zoom (push-in on exit, pull-out on entry).
 - Data: `_direction.transitionOut: "match-cut"`.
 - Script: `DIR: cut(match-cut)`.
-- Current implementation: 0.4s synced zoom (push-in on exit, pull-out on entry). Works for *scale-shift* match-cuts.
-- **Doctrine gap**: editorial match-cuts also include *match-cut-still* — no zoom, just shared composition. Current implementation forces a zoom even when the seam wants stillness. Phase-3 refinement: split `match-cut` into `match-cut-zoom` (current) and `match-cut-still` (no zoom, just transform-matched). Until then, use `match-cut` for zoom cases and `dissolve` for still cases.
-- Authoring requirement: the two segments must share a visual subject. If they don't, the match-cut reads as forced cleverness.
+- Use for: *scale-shift* match-cuts where the second segment is the same subject at a different magnification (wide world map → close on Taiwan; cleanroom wafer footage → MG diagram of the same wafer).
+
+**`match-cut-still` (composition-locked)** — 0.35s opacity-only crossfade, no scale.
+- Data: `_direction.transitionOut: "match-cut-still"`.
+- Script: `DIR: cut(match-cut-still)`.
+- Use for: *layer-swap* match-cuts where the two segments share an exact composition (same map crop with a different overlay; same photo subject framed identically in both segments).
+- **Implicit-default promotion**: `apply_default_transitions()` Rule 4a now defaults same-template same-beat seams on **AtlasPlate / ChoroplethMap / AnnotatedImage / RouteAnimation / PhotoMontage** to `match-cut-still` instead of the legacy 0.3s dissolve. Authoring requirement: those consecutive segments must genuinely share composition (same projection / crop / subject framing). If they don't, override with `DIR: cut(dissolve)` on the prior segment.
+
+Authoring requirement (both variants): the two segments must share a visual subject. If they don't, the match-cut reads as forced cleverness.
 
 ### Failure mode
-Forced match-cut on unrelated content (a chart and a photo with no shared subject) = gimmicky. The technique only works when the visual continuity is *real*.
+Forced match-cut on unrelated content (a chart and a photo with no shared subject) = gimmicky. The technique only works when the visual continuity is *real*. `match-cut-still` is especially intolerant of composition drift — even a small reframe between the two segments will read as a jump cut, not a seam.
 
 ---
 
@@ -511,8 +522,8 @@ Per NYT VI doctrine, every hard cut should have ~0.5-1.0s of next-segment audio 
 
 ### Coverage gaps (Phases 3-9 of the transition-grammar work)
 
-- **Phase 3 (deprecate 6 transitions)**: mark `wipe-left`, `wipe-right`, `wipe-up`, `whip-pan`, `blur-through`, `spatial-zoom` as deprecated in `TRANSITION_CATALOG`; `parse_dir_lines` warns on use; M-TRANSITION-DEFAULT lint surfaces in real episodes (currently zero usage — safe deprecation).
-- **Phase 4 (promote match-cut)**: split into `match-cut-zoom` (current) and `match-cut-still` (no zoom, just composition match); add per-template defaults so historical-analogy seams use match-cut by default.
+- ✅ **Phase 3 (deprecate 6 transitions, shipped May 16, 2026, commit `95258f1`)**: marked `wipe-left`, `wipe-right`, `wipe-up`, `whip-pan`, `blur-through`, `spatial-zoom` as deprecated in `TRANSITION_CATALOG` (TS) + `DEPRECATED_CUT_TYPES` (Python); `parse_dir_lines` emits one-shot stderr deprecation notice with canonical-replacement suggestion; `assembly-manifest.schema.json` descriptions split canonical / deprecated.
+- ✅ **Phase 4 (promote match-cut, shipped May 16, 2026)**: split `match-cut` into the original zoom variant + new `match-cut-still` (composition-locked, opacity-only). Added Rule 4a to `apply_default_transitions()`: same-template same-beat seams on **AtlasPlate / ChoroplethMap / AnnotatedImage / RouteAnimation / PhotoMontage** now default to `match-cut-still` (0.35s) instead of dissolve (0.3s). Also fixed a pre-existing bug where Rule 4 wasn't checking for DIR overrides. Zero existing manifest pairs would shift (purely additive for future authoring).
 - **Phase 5 (revise `apply_default_transitions` Rule 4)**: same-beat template-to-template → cut by default; only escalate to dissolve when visual-spec sets it explicitly.
 - **Phase 6 (`DIR: chapter("…")` sugar)**: parser desugars to `[TRANSITION] TitleTransition` + fade pair; reduces 4 lines of authoring boilerplate to one.
 - **Phase 7 (audio-spec J/L-cut wiring)**: per-segment `narrationLeadIn` / `narrationLagOut` fields; default `narrationLeadIn: 0.7` for all hard cuts unless overridden.

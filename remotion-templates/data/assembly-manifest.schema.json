@@ -411,13 +411,13 @@
             "in": {
               "type": "string",
               "description": "In-transition. Canonical: cut, dissolve, fade, color-wash, iris, match-cut. Deprecated: wipe-left, wipe-right, wipe-up, blur-through, whip-pan, spatial-zoom (see TRANSITION_GRAMMAR.md).",
-              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
+              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "match-cut-still", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },
             "out": {
               "type": "string",
               "description": "Out-transition. Canonical: cut, dissolve, fade, color-wash, iris, match-cut. Deprecated: wipe-left, wipe-right, wipe-up, blur-through, whip-pan, spatial-zoom (see TRANSITION_GRAMMAR.md).",
-              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
+              "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "match-cut-still", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },
             "durationSec": {

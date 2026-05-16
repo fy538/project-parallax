@@ -12,11 +12,12 @@
  *   - cut: instant switch — "same thought, next breath"
  *   - dissolve: opacity + subtle scale — "elaboration of same thought"
  *   - fade: opacity crossfade — currently the closest in-code surrogate
- *     for fade-through-black (a future Phase 4 split may introduce
- *     a dedicated `fade-through-black` type)
+ *     for fade-through-black
  *   - color-wash: brief color flood — "register shift"
  *   - iris: circular reveal — "cinematic open or close"
  *   - match-cut: synced zoom — "same subject, different scale"
+ *   - match-cut-still: composition-locked crossfade — "same composition,
+ *     layer change" (Phase 4 split, May 16, 2026)
  *
  * Deprecated (mark, don't remove — back-compat for already-shipped data):
  *   - wipe-left, wipe-right, wipe-up: PowerPoint signature. Use `dissolve`.
@@ -67,7 +68,13 @@ export type TransitionType =
   // ────────────────────────────────────────────────────────────────────
   | "color-wash"
   | "iris"
-  | "match-cut";
+  | "match-cut"
+  // match-cut-still: composition-locked crossfade. No scale change —
+  // implies the two segments share an exact composition (same map crop,
+  // same photo subject in same frame position). Phase 4 of
+  // TRANSITION_GRAMMAR.md split the original `match-cut` (zoom variant)
+  // from this composition-match variant.
+  | "match-cut-still";
 
 /**
  * Transitions deprecated by `project/TRANSITION_GRAMMAR.md` (Phase 3,
@@ -334,6 +341,16 @@ const computeTransition = (
       state.transform = `scale(${1 + 0.15 * (1 - progress)})`;
       break;
 
+    case "match-cut-still":
+      // Composition-locked variant — no scale, only opacity. Implies the
+      // two segments already share the same crop / subject placement so
+      // the seam reads as a layer-swap, not a scale-shift. Used by the
+      // implicit-default engine for same-template seams on AtlasPlate /
+      // ChoroplethMap / AnnotatedImage / RouteAnimation (see Phase 4 of
+      // TRANSITION_GRAMMAR.md).
+      state.opacity = progress;
+      break;
+
     case "whip-pan": {
       // Fast horizontal sweep with motion blur
       if (phase === "in") {
@@ -535,10 +552,16 @@ export const TRANSITION_CATALOG: Record<TransitionType, TransitionCatalogEntry> 
     implicitClaim: "cinematic open or close, deliberately theatrical",
   },
   "match-cut": {
-    label: "Match Cut",
+    label: "Match Cut (zoom)",
     description: "Synced zoom creates visual continuity — push in on exit, pull out on entry",
     defaultDurationSec: 0.4,
     implicitClaim: "same subject, different scale — continuity across a logical seam",
+  },
+  "match-cut-still": {
+    label: "Match Cut (composition-locked)",
+    description: "Opacity-only crossfade implying the two segments share an exact composition (same map crop, same photo subject placement)",
+    defaultDurationSec: 0.35,
+    implicitClaim: "same composition, layer change — invisible seam",
   },
   "whip-pan": {
     label: "Whip Pan (deprecated)",

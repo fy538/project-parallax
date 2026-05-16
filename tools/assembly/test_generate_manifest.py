@@ -636,6 +636,93 @@ def test_transitions_template_to_template_dissolve():
     assert result[1]["transition"]["durationSec"] == 0.3
 
 
+def test_transitions_same_template_match_cut_still_atlas_plate():
+    """Rule 4a (Phase 4 of TRANSITION_GRAMMAR.md): two consecutive
+    AtlasPlate segments in the same beat default to match-cut-still."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
+        _make_seg("s2", "TEMPLATE", "beat1", component="AtlasPlate"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "match-cut-still"
+    assert result[1]["transition"]["durationSec"] == 0.35
+
+
+def test_transitions_same_template_match_cut_still_route_animation():
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1", component="RouteAnimation"),
+        _make_seg("s2", "TEMPLATE", "beat1", component="RouteAnimation"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "match-cut-still"
+
+
+def test_transitions_same_template_not_in_match_cut_set_falls_back_to_dissolve():
+    """DataChart→DataChart is NOT in MATCH_CUT_STILL_TEMPLATES, so it
+    keeps the legacy 0.3s dissolve default."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
+        _make_seg("s2", "TEMPLATE", "beat1", component="DataChart"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "dissolve"
+    assert result[1]["transition"]["durationSec"] == 0.3
+
+
+def test_transitions_different_templates_in_match_cut_set_fall_back_to_dissolve():
+    """AtlasPlate→ChoroplethMap are BOTH in the set, but they're not the
+    SAME template — same-component is the trigger, not just both-eligible."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
+        _make_seg("s2", "TEMPLATE", "beat1", component="ChoroplethMap"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "dissolve"
+
+
+def test_transitions_match_cut_still_does_not_fire_at_beat_boundary():
+    """Beat-boundary AtlasPlate→AtlasPlate stays on Rule 1 (dissolve 0.5s)
+    — match-cut-still is for within-beat continuation only."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
+        _make_seg("s2", "TEMPLATE", "beat2", component="AtlasPlate"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "dissolve"
+    assert result[1]["transition"]["durationSec"] == 0.5
+
+
+def test_transitions_match_cut_still_is_overridden_by_dir():
+    """Rule 0 (DIR override) always wins over the match-cut promotion."""
+    segs = [
+        {**_make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
+         "_dirTransitionOut": "color-wash"},
+        _make_seg("s2", "TEMPLATE", "beat1", component="AtlasPlate"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["transition"]["in"] == "color-wash"
+
+
+def test_parse_dir_cut_match_cut_still_accepted():
+    """The split variant parses through cut() like any canonical type."""
+    result = parse_dir_lines(["DIR: cut(match-cut-still, 0.35s)"])
+    assert result["transitionOut"] == "match-cut-still"
+    assert result["transitionDuration"] == 0.35
+
+
+def test_match_cut_still_templates_set_is_canonical():
+    """Lock the set so accidental edits get caught."""
+    from generate_manifest import MATCH_CUT_STILL_TEMPLATES
+
+    assert MATCH_CUT_STILL_TEMPLATES == {
+        "AtlasPlate",
+        "ChoroplethMap",
+        "AnnotatedImage",
+        "RouteAnimation",
+        "PhotoMontage",
+    }
+
+
 def test_transitions_dir_override_beats_rule1():
     segs = [
         {**_make_seg("s1", "FOOTAGE", "beat1"), "_dirTransitionOut": "iris"},
