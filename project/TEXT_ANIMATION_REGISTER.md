@@ -508,51 +508,46 @@ The mask wipes in, AND the typography tracks in within the same animation. Used 
 
 ---
 
-## Implementation status & extraction roadmap
+## Implementation status (May 16, 2026)
 
-**Extracted primitives** (`src/components/textAnimation.tsx`):
+All three originally-planned phases have shipped. The doctrine above is the live register; nothing in this section is forward-looking.
+
+**Extracted primitives** ([`src/components/textAnimation.tsx`](../remotion-templates/src/components/textAnimation.tsx)):
 - `useNumberTicker(target, startFrame, options)` — eased count-up hook
 - `<Typewriter text startFrame cps cursor />` — char-by-char with cursor + punctuation pauses
 - `useTrackingIn(startFrame, durationFrames, fromPx, toPx)` — letter-spacing collapse
 - `<UnderlineDraw width startFrame ... />` — hairline emphasis grows under text
 
-**Composite patterns** (`src/components/CompositePatterns.tsx`):
-- `<DefinitionReveal>` — term + pinyin + translation + citation choreography (the 卡脖子 pattern)
+**Composite patterns** ([`src/components/CompositePatterns.tsx`](../remotion-templates/src/components/CompositePatterns.tsx)):
+- `<DefinitionReveal>` — term + pinyin + translation + citation choreography (the 卡脖子 / *juguo* pattern)
 - `<StatCaption>` — NumberTicker + caption + source with eased stagger
 - `<QuoteAttribution>` — Typewriter quote + serif-italic attribution (display OR archival register)
 
-**Cross-episode continuity** (`src/components/ConceptCallback.tsx`):
-- `<ConceptCallback isCallback accentColor>` — pulse wrapper for terms that recur from prior episodes. Composes inside any text node; passthrough when `isCallback=false`. Visual-spec skill determines `isCallback` by checking `data/concepts.json` for prior `appearances[]` entries.
+**Cross-episode continuity** ([`src/components/ConceptCallback.tsx`](../remotion-templates/src/components/ConceptCallback.tsx)):
+- `<ConceptCallback isCallback accentColor>` — pulse wrapper for terms that recur from prior episodes. Composes inside any text node; passthrough when `isCallback=false`. Visual-spec determines `isCallback` via `python tools/concepts/lookup.py callback-check`.
+
+**Schema integration** ([`src/hooks/directionBlock.schema.ts`](../remotion-templates/src/hooks/directionBlock.schema.ts)):
+- `_direction.textAnimation` — Zod-validated enum of all 11 names. KineticTypography dispatches to the right composite component automatically; archival quotes (year 1900–1979 + document markers) auto-route to the archival sub-register.
+- `_direction.isCallback` — boolean, drives `<ConceptCallback>` pulse.
+
+**Script-side directive** ([`tools/assembly/generate_manifest.py`](../tools/assembly/generate_manifest.py)):
+- `DIR: type(<technique>)` and bare `callback` directives parse into the `_direction.textAnimation` / `isCallback` fields. `VALID_TEXT_ANIMATIONS` constant validates the technique name at parse time.
+
+**Lint enforcement** ([`tools/lint/manifest_lint.py`](../tools/lint/manifest_lint.py)):
+- **M-TEXT-ANIM** rule validates technique vocabulary + composite ↔ KineticTypography variant coherence (`quote-attribution`↔`quote`, `definition-reveal`↔`definition`, `stat-caption`↔`statistic`). 10 unit tests in `test_manifest_lint.py`.
+
+**Skill wiring:**
+- [`skills/visual-spec/SKILL.md`](../skills/visual-spec/SKILL.md) → "Text-animation register" — selection-rule table, archival auto-detection note, concept-callback rule, anti-patterns.
+- [`skills/audio-spec/SKILL.md`](../skills/audio-spec/SKILL.md) — technique → SFX cue mapping (typewriter → quote-bell, etc.).
+- [`skills/script-audit/SKILL.md`](../skills/script-audit/SKILL.md) Lens 6 — register check + callback-check CLI reference.
+
+**Episode backfills** (silicon-trap, prisoners-dilemma): 8 existing KineticTypography segments annotated with the new register so production templates dispatch correctly.
 
 **Catalog showcases** (live in Studio under Catalog → Editorial):
 - `TextAnimation-showcase` — all 8 atomic techniques side-by-side
 - `CompositePatterns-showcase` — 5 high-level patterns (Definition reveal × 2 registers, Stat+caption, Quote × 2 registers)
 
-**Still inline-only** (not yet extracted as components): Reveal Mask, Backspace, Scramble, Word Cascade (which exists as the older `AnimatedText` component).
-
-**Phase 1 (next):** Extract the remaining techniques into proper APIs.
-
-Recommended order:
-1. `useNumberTicker(target, startFrame, options)` — already partially exists in `DataChart.tsx`; consolidate
-2. `<Typewriter>` component — high-value, archival-quote register
-3. `<Backspace>` component — unlocks the bounded-analogy beat
-4. `useTrackingIn(startFrame, durationFrames, fromSpacingPx, toSpacingPx)`
-5. `<UnderlineDraw>` component
-6. `<RevealMask>` wrapper
-7. `<Scramble>` component
-8. (Word Cascade already exists as `AnimatedText`)
-
-**Phase 2 (later):** Add `DIR: type(...)` directive to the directing language so scripts can specify technique inline:
-
-```
-[MG:] KineticTypography · nash-quote.json · 7s
-DIR: type(typewriter, cursor:blink, attribution-delay:0.4s)
-DIR: hold(2s)
-```
-
-This extends `DIRECTING_LANGUAGE.md` § directives and would be parsed by `tools/assembly/generate_manifest.py` into a `_direction.textAnimation` field.
-
-**Phase 3 (eventually):** Per-template defaults. Each template type has a sensible default text-animation register (KineticTypography → Word Cascade by default, KineticTypography quote variant → Typewriter by default, etc.) so most segments don't need explicit `DIR: type()` at all.
+Commits that landed this work: `7f3c3ac` (catalog files), `bdbbd59` (Phase 1 schema + template dispatch), `c149f3b` (Phase 2 skill + 8 episode backfills), `ac28029` (Phase 3 CLI + parser + lint + audio-spec + script-audit).
 
 ---
 

@@ -1,7 +1,7 @@
 # Template Schemas Reference
 
 > Canonical field definitions for every Remotion template's JSON data file.
-> Visual-spec reads this before generating any JSON. Last updated: May 12, 2026.
+> Visual-spec reads this before generating any JSON. Last updated: May 16, 2026.
 
 ## Universal conventions (apply to every cartesian chart)
 
@@ -16,6 +16,34 @@ These behaviors now apply automatically — you don't need to opt in:
 ### Anticipatory entrance timing (`anticipatoryStartFrame`)
 
 Parallax follows the Economist's 150ms anticipatory-reveal pattern: text begins settling *before* the narration word lands, so that by the time the viewer hears the word, the type is already at rest. Landing on the word reads as a caption; settling before it reads as a reveal. The `useEntrance()` hook and the `_direction.syncPoints[]` block both consume an `anticipatoryStartFrame` offset that shifts the entrance ~5 frames (150ms at 30fps) earlier than the literal sync point. This is applied automatically by **TitleTransition**, **KineticTypography**, **StatReveal**, **BayesianUpdate**, and **TitleBlock**. Don't author this field by hand — the pattern is on by default. If a moment needs the type to land *on* the beat instead of before it (rare; usually for percussive stat reveals), set `anticipatoryStartFrame: 0` in the `_direction` override.
+
+### Text-animation register (`_direction.textAnimation`)
+
+Selects which named text-animation technique a segment uses. Eight atomic primitives + three composite patterns; the composite name implies an editorial register (`quote-attribution` = Typewriter + serif-italic attribution + cursor, not just any quote rendering). Pick by editorial intent, not aesthetic — every technique makes an implicit claim about the text. Full doctrine: [`project/TEXT_ANIMATION_REGISTER.md`](../../project/TEXT_ANIMATION_REGISTER.md). Selection rules + anti-patterns: [`skills/visual-spec/SKILL.md`](../../skills/visual-spec/SKILL.md) → "Text-animation register".
+
+| Value | Family | Use for |
+|---|---|---|
+| `typewriter` | atomic | Char-by-char reveal — quotes, witness testimony, archival cables. Implicit claim: "this is being said". |
+| `tracking-in` | atomic | Letter-spacing collapse — proper nouns, place reveals. Implicit claim: "this entity matters". |
+| `reveal-mask` | atomic | Gradient wipe — headline-weight reveals, single-word punchlines. Implicit claim: "this is the moment". |
+| `underline-draw` | atomic | Hairline grows under text — quiet emphasis on a coined term or proper noun. |
+| `number-ticker` | atomic | Eased count-up — stat reveals, vote tallies, market figures. Implicit claim: "this is the magnitude". |
+| `scramble` | atomic | Glyph-shuffle into final string — cryptic / cipher / spy-thriller register. Reserve for ≤2× per episode. |
+| `backspace` | atomic | Type-then-delete-then-retype — the bounded-analogy "actually" beat. Implicit claim: "I want to revise that". |
+| `word-cascade` | atomic | Word-by-word fade-in stagger — editorial-safe default. |
+| `definition-reveal` | composite | term + pinyin + translation + citation choreography (the 卡脖子 / *juguo* pattern). |
+| `stat-caption` | composite | NumberTicker + caption + source with eased stagger. |
+| `quote-attribution` | composite | Typewriter quote + serif-italic attribution (display OR archival register). |
+
+Authored at the segment level: `"_direction": { "textAnimation": "quote-attribution" }`. KineticTypography dispatches automatically; archival quotes (year 1900–1979 + document markers in attribution) auto-route to the archival sub-register without authoring intervention.
+
+### Cross-episode callbacks (`_direction.isCallback`)
+
+Boolean flag — when `true`, the rendered text/term receives a one-time accent pulse (color overlay + underline flash + indicator dot) that marks it as a recurring concept introduced in a prior episode. Visual-spec determines this by checking `data/concepts.json` for prior `appearances[]` entries via the [`tools/concepts/lookup.py callback-check`](../../tools/concepts/lookup.py) CLI. Authors don't usually set this by hand; let the skill emit it. Pulse peaks at 0.75 opacity (deliberately under 1.0) so it reads as continuity, not interruption.
+
+### Per-element sync (`_direction.syncPoints[]`)
+
+`syncPoints` is positionally indexed against the template's rendered elements. The seven analytical templates that adopted per-element D17 (AnnotatedImage, ArcDiagram, BumpChart, EscalationLadder, FrameworkDiagram, HorizontalTimeline, NetworkDiagram) consume `syncPoints[i]` as the narration cue for the `i`th entity (node, callout, row). Templates falling back to legacy single-cue behaviour use `syncPoints[0]` only. Authors emit syncPoints from PACE annotations in the script; see [`project/DIRECTING_LANGUAGE.md`](../../project/DIRECTING_LANGUAGE.md) → "Per-element anticipatory reveals".
 
 ## Common Fields
 

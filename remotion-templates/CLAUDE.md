@@ -2,7 +2,7 @@
 
 > Read top-level [`AGENTS.md`](../AGENTS.md) and [`CLAUDE.md`](../CLAUDE.md) first for build commands, dev conventions, and project context. This file is Remotion-specific.
 >
-> Last updated: May 5, 2026
+> Last updated: May 16, 2026
 
 ## What this is
 

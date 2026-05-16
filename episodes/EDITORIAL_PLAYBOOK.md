@@ -42,7 +42,8 @@ Source: May 9, 2026 doctrine session, derived from §17 (Verification Architectu
 
 | # | Proposed by | Episode | Domain | Candidate rule (one line) | Evidence summary |
 |---|---|---|---|---|---|
-| — | — | — | — | *No pending rules* | — |
+| 1 | pipeline-alignment-audit | (cross-cutting) | VIS | **Anticipatory reveals must complete BEFORE the narrator names the element** — reuse `anticipatoryStartFrame(...)` from `utils/animation.ts`; on multi-entity templates emit `_direction.syncPoints[]` positionally so each entity settles before its own word, not just the first | Economist's 150ms convention; D17 + D17.1 in `remotion-templates/POLISH.md`; 7 analytical templates extended May 16 (AnnotatedImage, ArcDiagram, BumpChart, EscalationLadder, FrameworkDiagram, HorizontalTimeline, NetworkDiagram). Compounding rule — every future multi-entity template should adopt the per-element form by default. |
+| 2 | pipeline-alignment-audit | (cross-cutting) | VIS | **Pick a text-animation technique whose implicit claim matches editorial intent, not aesthetic preference** — every named technique (typewriter / tracking-in / reveal-mask / number-ticker / scramble / backspace / word-cascade + the three composite patterns) carries a register signal; defaulting to `word-cascade` when no register fits is the editorial-safe path | Eight atomic + three composite techniques shipped May 15–16; doctrine + use/avoid table in `project/TEXT_ANIMATION_REGISTER.md`; selection rules in `skills/visual-spec/SKILL.md` → "Text-animation register"; M-TEXT-ANIM lint catches vocabulary drift. Anti-pattern: `scramble` more than 1–2× per episode (drifts into spy-thriller register); `backspace` outside a bounded-analogy "actually" beat. |
 
 **Format for new entries:**
 ```

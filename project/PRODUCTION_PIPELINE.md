@@ -355,6 +355,8 @@ python tools/asset-source/source.py --batch episodes/silicon-trap/shot-list.json
 
 **Skill location:** `skills/source-feedback/SKILL.md`
 
+**Workspace brief (companion to source.py):** `python tools/sourcing_brief.py --episode=<slug>` joins the assembly manifest with `episodes/<slug>/shot-list.json` to emit a per-shot sourcing brief (Markdown or CSV) with platform search URLs (Pexels / Pixabay / Unsplash / Wikimedia / Internet Archive / Openverse). Filters: `--pending-only`, `--priority`, `--source`, `--segment-type`. Use when triaging the shot list before running `source.py`, or when handing the brief to a human asset sourcer working outside the API path.
+
 ### Track C: Image Treatment
 
 **Tool:** Python CLI → `tools/brand-treatment/treat.py` (offline) or Remotion BrandImage component (at render time)

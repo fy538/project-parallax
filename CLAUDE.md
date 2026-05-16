@@ -2,7 +2,7 @@
 
 > **For build/test/lint commands and dev conventions, read [AGENTS.md](./AGENTS.md) first.** This file is the project context (what Parallax is, what's queued, voice anchors).
 >
-> Last updated: May 9, 2026
+> Last updated: May 16, 2026
 
 ## What this is
 
@@ -24,6 +24,13 @@
 - Thumbnail image generator: `remotion-templates/scripts/generate-thumbnails.mjs` + `npm run thumbnails -- --episode=<slug>` renders all concepts from `episodes/<slug>/thumbnail-spec.json`.
 - Automated Shorts rendering: `remotion-templates/scripts/render-shorts.mjs` + `npm run shorts -- --episode=<slug>` renders 9:16 clips from `episodes/<slug>/shorts-manifest.json`.
 - AI reference library (Recraft side): 7 anchor categories at `tools/recraft/anchor-library.json` with prompts + generation script. The complementary Flux/fal.ai style-reference library at `tools/ai-video/style-references/` (15 images by typography tradition) was already shipped; they form a 2-tier cascade documented in `tools/recraft/ANCHOR_LIBRARY.md`.
+
+**Shipped May 15–16, 2026:**
+- **Text-animation register** — 8 atomic primitives + 3 composite patterns (`typewriter`, `tracking-in`, `reveal-mask`, `underline-draw`, `number-ticker`, `scramble`, `backspace`, `word-cascade` + `definition-reveal`, `stat-caption`, `quote-attribution`). Doctrine: [`project/TEXT_ANIMATION_REGISTER.md`](./project/TEXT_ANIMATION_REGISTER.md). Schema field: `_direction.textAnimation` (Zod-validated enum). KineticTypography dispatches to composite components automatically; archival quotes auto-detect. Lint rule: M-TEXT-ANIM. visual-spec / script-audit / audio-spec skills updated.
+- **Cross-episode concept callbacks** — `_direction.isCallback` triggers a one-time accent pulse (color overlay + underline flash + indicator dot, peak 0.75 opacity). Determined automatically by visual-spec via `python tools/concepts/lookup.py callback-check`.
+- **Per-element anticipatory reveal (D17 per-element)** — `syncPoints[]` is now positionally indexed across the 7 analytical templates that surface multiple labeled entities (AnnotatedImage, ArcDiagram, BumpChart, EscalationLadder, FrameworkDiagram, HorizontalTimeline, NetworkDiagram). Each entity settles ~150ms before the narrator names it; legacy single-cue fallback preserved.
+- **Sourcing brief generator** — `python tools/sourcing_brief.py --episode=<slug>` joins the assembly manifest with `episodes/<slug>/shot-list.json` to emit a Markdown (or CSV) brief listing pending shots with platform search URLs (Pexels / Pixabay / Unsplash / Wikimedia / Internet Archive / Openverse). 38 unit tests; entry in `AGENTS.md`.
+- **Camera-primitive consolidation (internal hygiene)** — `src/utils/stepFramework.ts` (`computeStepBoundaries` / `getCurrentStepIndex` / `getStepProgress` / `motionEasings` / `EMPTY_BOUNDARY`) and `src/hooks/useStepFramework.ts` (React wrapper + pure `computeStepFrameworkState`). 6 hook/template consumers migrated + 3 sister map templates. 486 unit tests pass. External research: [`project/CAMERA_CONSOLIDATION_RESEARCH.md`](./project/CAMERA_CONSOLIDATION_RESEARCH.md).
 
 **Backlog (deferred):**
 - BL-03 RAG fact-checking pipeline (P2) — substantial new infra; not blocking pre-launch.

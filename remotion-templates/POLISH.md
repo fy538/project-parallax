@@ -483,6 +483,20 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 
 **Where it lands:** Threaded through templates as Whisper-resolved narration cues come online. Per-template adoption tracked in `references/template-research/motion-design.md` § 8.
 
+#### D17.1 Per-element variant — each entity settles before its OWN word
+
+**Observation:** Single-cue D17 anchors the first element's reveal to the first narration word — but in templates that surface multiple labeled entities (callouts, nodes, rows), the LATER entities still drift relative to the narrator. By the third callout, the viewer hears "Taiwan" while a Korea node is still settling.
+
+**Fix:** Authoring layer emits `_direction.syncPoints[]` positionally indexed against the rendered entities — `syncPoints[i]` is the narration cue for `data.nodes[i]` (or callouts, or rows). Each entity calls `anticipatoryStartFrame(syncPoints[i].frame, SETTLE)` independently. When per-element cues are absent, the template falls back pixel-identically to the legacy single-cue + stagger formula, so existing manifests are unaffected.
+
+**Where it lands:** Shipped May 16, 2026 across seven analytical templates:
+- **AnnotatedImage** — `syncPoints[0]` is the image cue, `syncPoints[1..N]` map to callouts 1..N
+- **ArcDiagram, BumpChart, EscalationLadder, FrameworkDiagram, HorizontalTimeline, NetworkDiagram** — `syncPoints[i]` maps 1:1 to the i-th entity in the template's primary data array (nodes, rows, rungs)
+
+DIR vocabulary: `DIR: syncs:["taiwan","korea","japan"]` in scripts emits the per-element `syncPoints` block via `generate_manifest.py`. Lint enforcement: **M-SYNC** rules in `tools/lint/manifest_lint.py`. Per-element conventions documented per-template in [`references/template-schemas.md`](./references/template-schemas.md) → "Per-element sync".
+
+**Why care about the variant:** Multi-entity templates are where Parallax's argument density actually lives — a Network Diagram of alliances, a Framework matrix of stakeholders, an Escalation Ladder with seven rungs. Single-cue D17 was the prototype; per-element D17 is the production-ready form.
+
 ### D18. Episode openings hold music until AFTER the title card lands
 
 **Observation:** Music starts in the first 3 seconds of the cold open. Reads as YouTube-explainer register, not editorial-essay register.
