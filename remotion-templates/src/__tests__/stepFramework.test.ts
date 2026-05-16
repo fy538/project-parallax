@@ -7,8 +7,7 @@
  *   3. getStepProgress       — clamped 0–1 inside a boundary (incl. exact-end)
  *   4. motionEasings         — callable easing functions, output in [0,1]
  *   5. EMPTY_BOUNDARY        — sentinel identity and immutability
- *   6. cinematicEasings      — deprecated alias still works
- *   7. Pipeline regression   — full computeStepBoundaries → index → progress
+ *   6. Pipeline regression   — full computeStepBoundaries → index → progress
  *      pipeline on inputs matching the AtlasPlate tests.
  */
 
@@ -18,7 +17,6 @@ import {
   getCurrentStepIndex,
   getStepProgress,
   motionEasings,
-  cinematicEasings,
   EMPTY_BOUNDARY,
   type StepBoundary,
 } from "../utils/stepFramework";
@@ -295,21 +293,7 @@ describe("EMPTY_BOUNDARY", () => {
   });
 });
 
-// ── 6. cinematicEasings (deprecated alias) ─────────────────────────────────
-
-describe("cinematicEasings (deprecated alias)", () => {
-  it("points to motionEasings (same identity)", () => {
-    expect(cinematicEasings).toBe(motionEasings);
-  });
-
-  it("exposes the same three keys", () => {
-    expect(cinematicEasings.track).toBe(motionEasings.track);
-    expect(cinematicEasings.snap).toBe(motionEasings.snap);
-    expect(cinematicEasings.zoom).toBe(motionEasings.zoom);
-  });
-});
-
-// ── 7. Pipeline regression ──────────────────────────────────────────────────
+// ── 6. Pipeline regression ──────────────────────────────────────────────────
 
 describe("computeStepBoundaries → getCurrentStepIndex → getStepProgress pipeline", () => {
   it("full pipeline: progress is continuous across boundary transitions", () => {

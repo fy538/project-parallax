@@ -2,13 +2,21 @@
  * stepFramework — domain-neutral step/phase boilerplate shared across every
  * camera hook and phase manager in the template library.
  *
- * Five primitives appear verbatim in atlasCamera.ts, useNarratedCamera,
+ * Five primitives now consumed across atlasCamera.ts, useNarratedCamera,
  * useTimelineCamera, useTreeCamera, usePhase, and RouteAnimation:
  *   1. computeStepBoundaries — cumulative [start, end] frame windows
  *   2. getCurrentStepIndex   — active-step finder
  *   3. getStepProgress       — clamped 0–1 progress within an active boundary
  *   4. motionEasings         — three shared Bezier easing presets
  *   5. EMPTY_BOUNDARY        — sentinel for empty-boundaries guards
+ *
+ * usePhase (hooks/usePhase.ts) is a higher-level named-phase manager that
+ * uses these primitives internally — it adds `isPhase("intro")` /
+ * `isPast("labels")` / per-phase easing on top of the boundary math. It was
+ * NOT folded into a generic useStepFramework hook (see commit 5/5 of the
+ * camera-consolidation series): its named-phase API is meaningfully richer
+ * than just `{boundaries, index, progress, boundary}`, and 5 templates depend
+ * on those semantics.
  *
  * Extracted here (May 2026) so a single fix (e.g., switching to binary
  * search on very long sequences) propagates everywhere instead of
@@ -172,20 +180,13 @@ export function getStepProgress(frame: number, boundary: StepBoundary): number {
  *         (Parallax-specific curve; no standard library name.)
  *
  * Naming note: this constant was originally `cinematicEasings`. Renamed to
- * `motionEasings` after external research (see CAMERA_CONSOLIDATION_RESEARCH.md
- * §3) showed industry vocabulary prefers motion-intent names over aesthetic
- * register. The `cinematicEasings` export is kept as a deprecated alias for
- * one migration cycle; consumers should destructure from `motionEasings`.
+ * `motionEasings` (see CAMERA_CONSOLIDATION_RESEARCH.md §3) because industry
+ * vocabulary prefers motion-intent names over aesthetic register. The
+ * deprecated alias was removed in commit 5/5 once all camera-hook consumers
+ * destructured from `motionEasings` directly.
  */
 export const motionEasings = {
   track: Easing.bezier(0.25, 0.1, 0.25, 1),
   snap:  Easing.bezier(0.16, 1,   0.3,  1),
   zoom:  Easing.bezier(0.22, 0.68, 0.36, 1),
 } as const;
-
-/**
- * @deprecated Renamed to `motionEasings`. Will be removed once all consumers
- * migrate (target: commit 5 of the camera-consolidation series). Kept here so
- * intermediate commits stay green during the rolling migration.
- */
-export const cinematicEasings = motionEasings;
