@@ -68,7 +68,7 @@ project-parallax/
 ├── project/              # Strategy, pipeline, vision docs
 ├── episodes/             # Per-episode work (slug-based, not numbered until publish)
 ├── remotion-templates/   # Remotion (React→MP4) video templates
-├── tools/                # Python CLIs: assembly, brand-treatment, asset-source, recraft, concepts
+├── tools/                # Python CLIs: assembly, brand-treatment, asset-source, recraft, concepts, lint, sourcing_brief, preflight/postflight, pipeline_validator, cost_tracker, render_log, migrate_manifest (see AGENTS.md for full list)
 ├── data/                 # Cross-episode data (concept registry)
 ├── skills/               # Production skills (research-audit and version-controlled siblings)
 ├── prompts/              # Reusable prompt templates

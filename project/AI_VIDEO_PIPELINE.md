@@ -685,19 +685,21 @@ These would replace 6 segments currently using either hard-to-source footage or 
 
 ## Iteration Plan
 
-### Phase 1: Style Lock (before EP01 records)
+> **Naming note:** episode numbers are assigned at publish time; during development everything is identified by slug (`prisoners-dilemma`, `silicon-trap`, etc. — see top-level `CLAUDE.md` § Status). The "EP01" / "EP02+" labels below predate that convention. Read them as "first launch candidate" / "subsequent episodes" respectively.
+
+### Phase 1: Style Lock (before the first launch episode records)
 - Generate style reference library (7 images)
 - Test 3-4 clips through full pipeline (generate → treat → review)
 - Confirm mannequin-face aesthetic reads correctly at YouTube resolution
 - Verify LUT pass produces consistent Meridian look on AI-generated source
 
-### Phase 2: EP01 Integration
+### Phase 2: Launch-episode integration
 - Generate 6 candidate segments from the table above
 - A/B compare against current footage/MG alternatives in the script
 - Tiger reviews: does AI-GEN enhance or distract?
 - Final call on which segments use AI-GEN vs. original plan
 
-### Phase 3: Pipeline Automation (EP02+)
+### Phase 3: Pipeline automation (subsequent episodes)
 - visual-spec skill outputs AI video briefs automatically
 - Standardize prompting patterns per use case
 - Build quality rubric for render-qa to evaluate AI-GEN clips

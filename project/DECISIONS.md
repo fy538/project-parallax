@@ -3,7 +3,7 @@
 ## Purpose
 Running log of decisions made (with rationale) and questions still to resolve. Helps future conversations understand what's been decided and what needs work.
 
-Last updated: April 26, 2026
+Last updated: May 10, 2026 (matches the most recent entry — D40)
 
 ---
 

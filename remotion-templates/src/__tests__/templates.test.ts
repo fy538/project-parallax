@@ -3,19 +3,13 @@
  *
  * Tests render frame 30 of each composition and compare against baseline PNGs.
  * On the FIRST run, baselines are created.
- * On subsequent runs, renders are compared with file-size tolerance (5%).
+ * On subsequent runs, renders are compared with pixelmatch at a 0.5%
+ * pixel-diff threshold (see `render-helper.ts` → `compareFramesPixel`).
  *
- * Landscape compositions (22):
- *   ChoroplethMap, RouteAnimation, TimelineComparison, DataChart,
- *   KineticTypography, FrameworkDiagram, TitleTransition, DecisionTree,
- *   SplitComposition, ProbabilityGauge, ImageComposite, PhotoMontage,
- *   NetworkDiagram, TimeSeriesChart, SankeyFlow, GameBoard, BayesianUpdate,
- *   StatReveal, RadarChart, AnnotatedImage, EscalationLadder, DualTimeline,
- *   HorizontalTimeline, DuelingFrameworks, StrategicLandscape
- *
- * Shorts (6):
- *   KineticShort, DataChartShort, SplitShort, StatRevealShort,
- *   FrameworkDiagramShort, TimelineComparisonShort
+ * The composition set is maintained as the `COMPOSITIONS` array below.
+ * Deprecated compositions (TimelineComparison, DualTimeline, etc. — migrated
+ * to HorizontalTimeline / DuelingFrameworks per `docs/migration-*.md`)
+ * are deliberately omitted from the array; don't re-add them.
  */
 
 import { describe, it, beforeAll, afterAll, expect } from "vitest";

@@ -89,7 +89,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 
 - Repo root **`./scripts/test.sh`** runs Python, `tsc`, and a **narrow Vitest subset** (fast checks). It does **not** run `*-real-data` PNG suites; use `cd remotion-templates && npm run test:real-data` locally, or rely on the **`macos-real-data`** CI job (main / nightly / manual — see GitHub Actions above).
 - Python tests are <1s. **New parsing/state logic must come with a test.** Patterns to copy: `tools/assembly/test_generate_manifest.py` (parsing-heavy), `tools/test_cost_tracker.py` (markdown round-trip), `tools/brand-treatment/test_treat.py` (numeric image processing invariants).
-- **Visual regression baselines** live in `remotion-templates/src/__tests__/baselines/`. Run `./scripts/regen-baselines.sh` after any intentional visual change (palette, animation timing, template refactor) and commit the resulting PNGs. `cd remotion-templates && npm test` then catches future drift via 5% file-size tolerance.
+- **Visual regression baselines** live in `remotion-templates/src/__tests__/baselines/`. Run `./scripts/regen-baselines.sh` after any intentional visual change (palette, animation timing, template refactor) and commit the resulting PNGs. `cd remotion-templates && npm test` then catches future drift via pixelmatch at a 0.5% pixel-diff threshold (see `render-helper.ts → compareFramesPixel`).
 - Visual regression baselines live in `remotion-templates/src/__tests__/baselines/`. After intentional visual changes, regenerate with `npm run test:baseline`.
 - Pre-commit hook runs typecheck on changed `.ts/.tsx` and Python tests on changed `.py`. Don't skip with `--no-verify` unless you have a specific reason worth stating.
 

@@ -7,7 +7,7 @@
 >
 > **Companion doc:** [`POLISH_IMPLEMENTATION.md`](./POLISH_IMPLEMENTATION.md) — the 4-layer architecture spec (per-element / animation / composition / brand) showing *which infrastructure* makes each rule below cheap to follow. Read this file for *what* must pass; read implementation for *how* the system is built to make it easy.
 >
-> Last updated: May 14, 2026 (A6 rewritten for the editorial drift register)
+> Last updated: May 16, 2026 (added D17.1 per-element anticipatory-reveal sub-rule; aligned drift Phase numbering with HOLD_MOTION_REGISTER.md)
 
 ---
 
@@ -557,7 +557,7 @@ Default-on-every-template is itself a wrong choice. Charts use `editorial`. Phot
 - Rotation drift on charts (tilts axis baselines; `documentary` preset notes call this out explicitly)
 - Visible breathing on multi-element charts (bars appear to be "growing"; false data signal)
 
-**Reference implementation:** `DRIFT_PRESETS` + `useCompositionAnimation()` already wire the technical surface. Phase 3 wires `TEMPLATE_DRIFT_DEFAULTS` so each template uses its register's preset by default; Phase 4 adds `DIR: drift(<preset>)` and `DIR: hold(stillness)` script directives for per-segment overrides; Phase 5 ships a catalog showcase of all eight techniques on identical content.
+**Reference implementation:** `DRIFT_PRESETS` + `useCompositionAnimation()` already wire the technical surface. Per-template defaults via `TEMPLATE_DRIFT_DEFAULTS`, per-segment script directives (`DIR: drift(<preset>)` and `DIR: hold(stillness)`), and the catalog showcase are sequenced inside the ongoing HOLD_MOTION work — see `project/HOLD_MOTION_REGISTER.md` for the current implementation status and roadmap. (The Phase 3/4/5 numbering that previously appeared in this section was non-standard relative to the canonical doctrine; refer to HOLD_MOTION_REGISTER.md instead.)
 
 **Canonical doctrine:** `project/HOLD_MOTION_REGISTER.md` (May 16, 2026) — full register doc with per-template recommendations, decision matrix, and per-technique editorial register. `references/template-research/hold-motion.md` is the outlet-research dossier (NYT VI, FT, Economist, Bloomberg, Reuters, Vox Atlas, PBS Frontline, Cinemagraphs 2011, Ken Burns) the doctrine derives from.
 
