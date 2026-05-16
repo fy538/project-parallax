@@ -59,7 +59,37 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
-import type { ArcDiagramData, ArcConnection } from "./types";
+import type { ArcDiagramData, ArcConnection, ArcNode } from "./types";
+
+// ── ArcNodeAnnotation geometry ──────────────────────────────────────────────
+// Mirrors NetworkDiagram's HUB_*/SAT_* pattern. Each entity on the baseline is
+// a small precision dot + horizontal crosshair hairlines + a short vertical
+// leader line connecting the dot to its identity label. The aesthetic is
+// "intelligence-briefing annotation," not "filled marble." Geometry constants
+// live here so the coupling between dot size, crosshair extent, and leader
+// length is explicit.
+const NODE_PRIMARY_R = 5;
+const NODE_SECONDARY_R = 3.5;
+// Crosshair: short hairlines extending laterally from the dot. Vertical
+// crosshairs are omitted because the leader line itself sits on the vertical
+// axis through the dot — adding more vertical hairlines would visually compete
+// with the leader.
+const NODE_CROSSHAIR_GAP_FROM_DOT = 5;  // dot rim → crosshair start
+const NODE_CROSSHAIR_LEN = 9;           // crosshair segment length
+const NODE_CROSSHAIR_OPACITY = 0.45;
+// Leader line: extends downward from the dot to the identity label cluster.
+// axisStamp continues to sit ABOVE the dot (date-on-axis convention); label
+// + sublabel sit BELOW the dot at the leader endpoint.
+const NODE_LEADER_GAP_FROM_DOT = 4;     // dot rim → leader start
+const NODE_LEADER_LEN_SECONDARY = 16;   // baseline → end of leader for secondaries
+const NODE_LEADER_LEN_PRIMARY = 20;     // slightly longer for protagonists
+const NODE_LEADER_OPACITY = 0.55;
+const NODE_DOT_OPACITY = 0.92;
+const NODE_RING_OPACITY = 0.35;
+// Halo: a faint outer ring for primary (protagonist) nodes only — the analog
+// of the SAT_INNER_RING_R in NetworkDiagram. Communicates importance without
+// inflating the dot itself.
+const NODE_PRIMARY_RING_R = 11;
 
 // Brand-token resolver — keeps "accent" / "muted" / "rebut" semantic in data files.
 const resolveArcColor = (
@@ -75,6 +105,126 @@ const resolveArcColor = (
   if (raw === "rebut") return rebut;
   return raw;
 };
+
+/**
+ * ArcNodeAnnotation — precision-marker node for ArcDiagram.
+ *
+ * Each node on the baseline is rendered as a small dot + lateral crosshair
+ * hairlines + a vertical leader line connecting the dot to the identity-
+ * label cluster below. Geometry is fixed (NODE_* constants at top of file);
+ * the only data-driven branch is primary vs. secondary, which affects dot
+ * radius, adds a faint halo ring, and slightly extends the leader.
+ *
+ * Note: this component is for the ENTITY MARKER ONLY. The axisStamp (date /
+ * era marker above the dot) is rendered by the parent at the same z-layer
+ * because its vertical position is conceptually independent of the marker
+ * cluster — it sits on the "x-axis" of the diagram.
+ */
+interface ArcNodeAnnotationProps {
+  x: number;
+  baselineY: number;
+  label: string;
+  sublabel?: string;
+  fill: string;
+  textPrimary: string;
+  textMuted: string;
+  bgBase: string;
+  isPrimary: boolean;
+  opacity: number;
+}
+
+const ArcNodeAnnotation: React.FC<ArcNodeAnnotationProps> = React.memo(
+  ({ x, baselineY, label, sublabel, fill, textPrimary, textMuted, bgBase, isPrimary, opacity }) => {
+    const r = isPrimary ? NODE_PRIMARY_R : NODE_SECONDARY_R;
+    const leaderLen = isPrimary ? NODE_LEADER_LEN_PRIMARY : NODE_LEADER_LEN_SECONDARY;
+    const leaderStartY = baselineY + NODE_LEADER_GAP_FROM_DOT;
+    const leaderEndY = baselineY + leaderLen;
+    // Label baseline sits below the leader endpoint with a small gap so the
+    // top of the cap-height clears the leader cleanly.
+    const labelY = leaderEndY + fontSizes.label - 2;
+    const sublabelY = labelY + (isPrimary ? 20 : 18);
+
+    return (
+      <g opacity={opacity}>
+        {/* Lateral crosshair hairlines — only horizontal, since the vertical
+            axis through the dot is occupied by the leader line. */}
+        <line
+          x1={x - r - NODE_CROSSHAIR_GAP_FROM_DOT}
+          y1={baselineY}
+          x2={x - r - NODE_CROSSHAIR_GAP_FROM_DOT - NODE_CROSSHAIR_LEN}
+          y2={baselineY}
+          stroke={fill}
+          strokeWidth={0.6}
+          opacity={NODE_CROSSHAIR_OPACITY}
+        />
+        <line
+          x1={x + r + NODE_CROSSHAIR_GAP_FROM_DOT}
+          y1={baselineY}
+          x2={x + r + NODE_CROSSHAIR_GAP_FROM_DOT + NODE_CROSSHAIR_LEN}
+          y2={baselineY}
+          stroke={fill}
+          strokeWidth={0.6}
+          opacity={NODE_CROSSHAIR_OPACITY}
+        />
+        {/* Halo ring for protagonist nodes — faint hairline communicates
+            editorial importance without inflating the dot itself. */}
+        {isPrimary && (
+          <circle
+            cx={x}
+            cy={baselineY}
+            r={NODE_PRIMARY_RING_R}
+            fill="none"
+            stroke={fill}
+            strokeWidth={0.8}
+            opacity={NODE_RING_OPACITY}
+          />
+        )}
+        {/* Backing knockout so the dot reads cleanly when it sits atop the
+            baseline rule and arc strokes. */}
+        <circle cx={x} cy={baselineY} r={r + 1.5} fill={bgBase} />
+        {/* Precision dot */}
+        <circle cx={x} cy={baselineY} r={r} fill={fill} opacity={NODE_DOT_OPACITY} />
+        {/* Vertical leader line from dot to label cluster */}
+        <line
+          x1={x}
+          y1={leaderStartY}
+          x2={x}
+          y2={leaderEndY}
+          stroke={fill}
+          strokeWidth={0.8}
+          opacity={NODE_LEADER_OPACITY}
+        />
+        {/* Identity label at leader endpoint */}
+        <text
+          x={x}
+          y={labelY}
+          textAnchor="middle"
+          fill={textPrimary}
+          fontSize={isPrimary ? fontSizes.label : fontSizes.caption}
+          fontFamily={fonts.mono}
+          fontWeight={isPrimary ? 600 : 500}
+          letterSpacing={1}
+        >
+          {label}
+        </text>
+        {sublabel && (
+          <text
+            x={x}
+            y={sublabelY}
+            textAnchor="middle"
+            fill={textMuted}
+            fontSize={fontSizes.caption}
+            fontFamily={fonts.mono}
+            fontWeight={400}
+            letterSpacing={letterSpacing.caption}
+          >
+            {sublabel}
+          </text>
+        )}
+      </g>
+    );
+  },
+);
 
 export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
   checkChartDataCommon("ArcDiagram", data);
@@ -406,22 +556,16 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
 
             return (
               <g key={`arc-${i}`}>
-                {/* Soft glow underlay for hero connections (strength ≥ 1) */}
-                {strength >= 1 && !isDashed && (
-                  <path
-                    d={path}
-                    fill="none"
-                    stroke={arcColor}
-                    strokeWidth={10}
-                    opacity={progress * exitOp * 0.10 * emphasisOpacity}
-                    strokeLinecap="round"
-                  />
-                )}
+                {/* Arcs are visually subordinate to the precision markers —
+                    no glow halo, single thin stroke. Stroke weight still
+                    encodes strength but in a tighter range (0.8–2.0) so
+                    even the hero arc reads as a "hairline trace" rather
+                    than a heavy rope. */}
                 <path
                   d={path}
                   fill="none"
                   stroke={arcColor}
-                  strokeWidth={1 + Math.min(1.5, strength * 1.2)}
+                  strokeWidth={0.8 + Math.min(1.2, strength * 1.0)}
                   opacity={arcOpacity}
                   strokeLinecap="round"
                   strokeDasharray={strokeDasharray}
@@ -476,13 +620,18 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
           })()}
 
           {/* ── Nodes ────────────────────────────────────────────────
-              Small filled discs anchored on the baseline. Primary nodes
-              get a slightly larger radius and a heavier label weight
-              to mark the editorial protagonist(s) of the lineage. */}
-          {data.nodes.map((node, i) => {
+              Precision-marker annotation aesthetic: small dot anchored on
+              the baseline, lateral crosshair hairlines, vertical leader
+              line down to the identity label. Primary nodes get a faint
+              halo ring + a slightly larger dot to mark the editorial
+              protagonist(s) of the lineage. The axis-stamp (date / era
+              marker) sits ABOVE the dot — that role is structurally
+              different from the identity label (it annotates the x-axis,
+              not the entity), so it's rendered alongside the marker
+              cluster rather than inside it. */}
+          {data.nodes.map((node: ArcNode, i) => {
             const x = nodeXs[i];
             const isPrimary = node.importance === "primary";
-            const r = isPrimary ? 9 : 6;
             const start = nodeStart + stagger(i, sec(0.1));
             const op = fadeIn(frame, start, sec(0.3)) * exitOp;
             const fill =
@@ -490,65 +639,42 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
                 ? accent
                 : node.color || theme.text.primary;
 
+            // axisStamp y: above the dot. Use NODE_PRIMARY_R as the upper
+            // bound so the stamp doesn't drift closer to the baseline for
+            // secondary nodes (the date row should read as aligned).
+            const axisStampY = baselineY - NODE_PRIMARY_RING_R - 8;
+
             return (
-              <g key={`node-${node.id}`} opacity={op}>
-                {/* Axis stamp ABOVE the disc — the date/era marker */}
+              <g key={`node-${node.id}`}>
+                {/* Axis stamp ABOVE the dot — the date / era marker */}
                 {node.axisStamp && (
                   <text
                     x={x}
-                    y={baselineY - r - 12}
+                    y={axisStampY}
                     textAnchor="middle"
                     fill={theme.text.muted}
                     fontSize={fontSizes.meta}
                     fontFamily={fonts.mono}
                     fontWeight={400}
                     letterSpacing={letterSpacing.meta}
+                    opacity={op}
                     style={{ textTransform: "uppercase" }}
                   >
                     {node.axisStamp}
                   </text>
                 )}
-                {/* The disc */}
-                <circle cx={x} cy={baselineY} r={r + 3} fill={theme.bg.base} />
-                <circle cx={x} cy={baselineY} r={r} fill={fill} />
-                {isPrimary && (
-                  <circle
-                    cx={x}
-                    cy={baselineY}
-                    r={r + 4}
-                    fill="none"
-                    stroke={fill}
-                    strokeWidth={1}
-                    opacity={0.35}
-                  />
-                )}
-                {/* Label below baseline */}
-                <text
+                <ArcNodeAnnotation
                   x={x}
-                  y={baselineY + r + 22}
-                  textAnchor="middle"
-                  fill={theme.text.primary}
-                  fontSize={isPrimary ? fontSizes.label : fontSizes.caption}
-                  fontFamily={fonts.heading}
-                  fontWeight={isPrimary ? 700 : 600}
-                  letterSpacing={0.5}
-                >
-                  {node.label}
-                </text>
-                {node.sublabel && (
-                  <text
-                    x={x}
-                    y={baselineY + r + 22 + (isPrimary ? 22 : 18)}
-                    textAnchor="middle"
-                    fill={theme.text.muted}
-                    fontSize={fontSizes.caption}
-                    fontFamily={fonts.mono}
-                    fontWeight={400}
-                    letterSpacing={letterSpacing.caption}
-                  >
-                    {node.sublabel}
-                  </text>
-                )}
+                  baselineY={baselineY}
+                  label={node.label}
+                  sublabel={node.sublabel}
+                  fill={fill}
+                  textPrimary={theme.text.primary}
+                  textMuted={theme.text.muted}
+                  bgBase={theme.bg.base}
+                  isPrimary={isPrimary}
+                  opacity={op}
+                />
               </g>
             );
           })}
