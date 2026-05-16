@@ -59,7 +59,7 @@ import {
   formatLegendValue,
   sortSymbolsLargestFirst,
 } from "../../utils/proportionalSymbol";
-import { CLAMP_CUBIC_INOUT, fadeIn, fadeOut } from "../../utils/animation";
+import { CLAMP_CUBIC_INOUT, anticipatoryStartFrame, fadeIn, fadeOut } from "../../utils/animation";
 import {
   easeCameraT,
   applyDwell,
@@ -354,12 +354,22 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
     [currentWindow.phase.symbols],
   );
 
+  // D17 anticipatory reveal: first-phase symbols settled when narrator
+  // names them. Later phases keep `currentWindow.startFrame + sec(0.4)` so
+  // each phase's symbol entrance composes from its own window.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.6))
+    : sec(0.4); // existing default offset from phase start
+
   // Per-frame entrance opacity for the symbols in the current phase
   const symbolOpacity = useMemo(() => {
-    const enter = fadeIn(frame, currentWindow.startFrame + sec(0.4), sec(0.6));
+    const enterCue =
+      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
+    const enter = fadeIn(frame, enterCue, sec(0.6));
     const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
 
   // Theme tokens
   const landFill = dark ? palette.ink : palette.bone;

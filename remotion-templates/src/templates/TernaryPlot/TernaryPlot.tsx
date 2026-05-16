@@ -45,6 +45,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
   CLAMP_QUARTIC,
 } from "../../utils/animation";
@@ -210,7 +211,12 @@ export const TernaryPlot: React.FC<{ data: TernaryPlotData }> = ({ data }) => {
   }, [projectedPoints, showCentroid, cornerA.x, cornerA.y, cornerB.x, cornerB.y, cornerC.x, cornerC.y]);
 
   // ── Timing ───────────────────────────────────────────────────────────
-  const outlineStart = sec(0.3 * t);
+  // D17 anticipatory reveal: triangle outline settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.3 * t); // existing default
+  const outlineStart = entranceBase;
   const outlineDur = sec(0.9 * t);
   const cornerLabelStart = outlineStart + sec(0.5 * t);
   const gridStart = outlineStart + outlineDur;

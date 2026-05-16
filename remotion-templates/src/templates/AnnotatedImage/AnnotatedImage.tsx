@@ -31,6 +31,7 @@ import {
   slideIn,
   kenBurnsDrift,
   lockOnPulse,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -164,7 +165,12 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
   const labelFrames = sec(0.3);
   const outroFrames = sec(1.5);
 
-  const imageStart = sec(0.2);
+  // D17 anticipatory reveal: first image settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.2); // existing default
+  const imageStart = entranceBase;
   const calloutsStart = imageStart + imageRevealFrames + sec(0.3);
 
   // ── Image fade ──────────────────────────────────────────────────────────

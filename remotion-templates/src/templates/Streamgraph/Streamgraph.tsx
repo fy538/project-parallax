@@ -52,6 +52,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
 } from "../../utils/animation";
@@ -467,7 +468,12 @@ export const Streamgraph: React.FC<{ data: StreamgraphData }> = ({ data }) => {
 
   // ── Timing ───────────────────────────────────────────────────────────
   const structureStart = timing.entrance.snap;     //  6 — axis fade
-  const bandsStart = sec(0.6);
+  // D17 anticipatory reveal: first band settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.6); // existing default
+  const bandsStart = entranceBase;
   const bandStagger = sec(0.18);
   const bandGrow = sec(0.9);
   const exitOp = exitFade(frame, durationInFrames, 15);

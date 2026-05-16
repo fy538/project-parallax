@@ -35,6 +35,7 @@ import {
   fadeIn,
   slideIn,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_QUARTIC,
   CLAMP_CUBIC_INOUT,
@@ -224,15 +225,18 @@ function buildCountryFillExpression(
   phase: AnimationPhase | null,
   frame: number,
   phaseStart: number,
-  colorRamp: readonly string[]
+  colorRamp: readonly string[],
+  /** D17 override — anticipatory first-entrance frame for phase 0. */
+  entranceFrame?: number,
 ): any[] {
   if (!phase || !phase.countries.length) {
     return ["literal", "rgba(0,0,0,0)"];
   }
 
+  const startFrame = entranceFrame ?? phaseStart + sec(0.5);
   const t = interpolate(
     frame,
-    [phaseStart + sec(0.5), phaseStart + sec(0.5) + sec(0.8)],
+    [startFrame, startFrame + sec(0.8)],
     [0, 1],
     CLAMP_QUARTIC
   );
@@ -260,15 +264,18 @@ function buildCountryFillExpression(
 function buildCountryOpacityExpression(
   phase: AnimationPhase | null,
   frame: number,
-  phaseStart: number
+  phaseStart: number,
+  /** D17 override — anticipatory first-entrance frame for phase 0. */
+  entranceFrame?: number,
 ): any[] {
   if (!phase || !phase.countries.length) {
     return ["literal", 0];
   }
 
+  const startFrame = entranceFrame ?? phaseStart + sec(0.5);
   const t = interpolate(
     frame,
-    [phaseStart + sec(0.5), phaseStart + sec(0.5) + sec(0.8)],
+    [startFrame, startFrame + sec(0.8)],
     [0, 0.75],
     CLAMP_QUARTIC
   );
@@ -380,17 +387,29 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
 
   // ── Country highlight expressions ─────────────────────────────────────
 
+  // D17 anticipatory reveal: first-phase country fills settled when narrator
+  // names them. Only phase 0 is back-calculated — later phases retain the
+  // existing `phaseStart + sec(0.5)` offset so per-phase reveals compose.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.8))
+    : sec(0.5); // existing default offset from phase start
+  const firstPhaseEntrance =
+    current?.index === 0 ? entranceBase : undefined;
+
   const fillExpression = buildCountryFillExpression(
     current?.phase || null,
     frame,
     current?.startFrame || 0,
-    colorRamp
+    colorRamp,
+    firstPhaseEntrance,
   );
 
   const opacityExpression = buildCountryOpacityExpression(
     current?.phase || null,
     frame,
-    current?.startFrame || 0
+    current?.startFrame || 0,
+    firstPhaseEntrance,
   );
 
   // Memoize graticule layers — deck.gl recreates layer objects each render

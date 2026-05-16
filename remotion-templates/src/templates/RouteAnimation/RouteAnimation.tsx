@@ -36,6 +36,7 @@ import {
   exitFade,
   scaleIn,
   lockOnPulse,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
@@ -558,10 +559,21 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
 
   // Animate new arcs: start slightly after camera begins moving,
   // finish just as labels appear (visual sequence: camera moves → arcs draw → labels pop)
+  // D17 anticipatory reveal: first-phase arc settled when narrator names it.
+  // Later phases keep the existing `phaseWindow.start + sec(0.4)` offset so
+  // per-phase staggers compose.
   const arcDelay = currentPhaseIdx > 0 ? sec(0.4) : sec(0.6);
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const firstArcEntranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(1))
+    : sec(0.6); // existing default for phase 0
+  const newArcStart =
+    currentPhaseIdx === 0
+      ? firstArcEntranceBase
+      : phaseWindow.start + arcDelay;
   const newArcProgress = interpolate(
     frame,
-    [phaseWindow.start + arcDelay, phaseWindow.start + arcDelay + sec(1)],
+    [newArcStart, newArcStart + sec(1)],
     [0, 1],
     CLAMP_CUBIC
   );

@@ -41,7 +41,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import { fadeIn, stagger, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, stagger, anticipatoryStartFrame, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import type { PopulationPyramidData, PyramidCohort } from "./types";
 
@@ -497,7 +497,12 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
   const compPyramidWidth = (area.width - compGap) / 2;
 
   // J10: use first syncPoint frame (if any) to anchor bar reveal onset
+  // D17 anticipatory reveal: first bar settled when narrator names it.
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : 0; // existing default
+
 
   return (
     <Background
@@ -545,7 +550,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
               totalHeight={pyramidHeight}
               frame={frame}
               highlightAgeGroups={highlightSet}
-              entranceOffset={firstSyncFrame ?? 0}
+              entranceOffset={entranceBase}
               showLegend
               maleColor={maleBarColor}
               femaleColor={femaleBarColor}
@@ -673,7 +678,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
                 totalHeight={pyramidHeight}
                 frame={frame}
                 highlightAgeGroups={highlightSet}
-                entranceOffset={firstSyncFrame ?? 0}
+                entranceOffset={entranceBase}
                 maleColor={data.left.color ?? maleBarColor}
                 femaleColor={data.left.color ?? femaleBarColor}
                 showLegend
@@ -727,7 +732,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
                 totalHeight={pyramidHeight}
                 frame={frame}
                 highlightAgeGroups={highlightSet}
-                entranceOffset={(firstSyncFrame ?? 0) + sec(0.2)}
+                entranceOffset={entranceBase + sec(0.2)}
                 maleColor={data.right.color ?? maleBarColor}
                 femaleColor={data.right.color ?? femaleBarColor}
                 showLegend={false}

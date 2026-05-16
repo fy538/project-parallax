@@ -39,6 +39,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { niceDomain, niceTicks, formatTick } from "../../utils/niceTicks";
@@ -254,7 +255,12 @@ export const RidgelinePlot: React.FC<{ data: RidgelinePlotData }> = ({
   // ── Timing ────────────────────────────────────────────────────────────
   const axisStart = sec(0.3);
   const labelStart = sec(0.5);
-  const ridgeStart = sec(0.7);
+  // D17 anticipatory reveal: first ridge settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.7); // existing default
+  const ridgeStart = entranceBase;
   const exitOp = exitFade(frame, durationInFrames, 15);
 
   const axisProgress = interpolate(

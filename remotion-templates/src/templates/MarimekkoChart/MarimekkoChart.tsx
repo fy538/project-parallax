@@ -43,6 +43,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
@@ -274,7 +275,12 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
   }, [data.columns, segmentColorByKey]);
 
   // ── Timing ─────────────────────────────────────────────────────────────
-  const columnStart = sec(0.6);
+  // D17 anticipatory reveal: first column settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.6); // existing default
+  const columnStart = entranceBase;
   const perColumn = sec(0.15);
   const segmentReveal = sec(0.5);
   const labelReveal = sec(0.35);

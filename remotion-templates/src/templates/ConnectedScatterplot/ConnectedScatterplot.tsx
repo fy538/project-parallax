@@ -45,6 +45,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
@@ -242,7 +243,12 @@ export const ConnectedScatterplot: React.FC<{
   );
 
   // ── Timing ──────────────────────────────────────────────────────────
-  const axesStart = timing.entrance.fast; // sec(0.3)
+  // D17 anticipatory reveal: first axes settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : timing.entrance.fast; // existing default — sec(0.3)
+  const axesStart = entranceBase;
   const pointsStart = sec(0.8);
   const perPoint = timing.stagger.normal; // sec(0.15) — clear enough to read
   const exitOp = exitFade(frame, durationInFrames, timing.exit.medium);

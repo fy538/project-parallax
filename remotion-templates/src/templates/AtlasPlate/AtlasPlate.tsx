@@ -62,7 +62,7 @@ import {
 } from "../../utils/atlasProjection";
 import { getDisputedBoundaries, densifyPolyline } from "../../utils/disputedBoundaries";
 import { resolveSeaLabels, type SeaLabel } from "../../utils/seaLabels";
-import { CLAMP_CUBIC_INOUT, exitFade, fadeIn, fadeOut } from "../../utils/animation";
+import { CLAMP_CUBIC_INOUT, anticipatoryStartFrame, exitFade, fadeIn, fadeOut } from "../../utils/animation";
 import { lerpHex } from "../../utils/colorUtils";
 import {
   easeCameraT,
@@ -865,6 +865,15 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     return { x: minX - pad, y: minY - pad, w: maxX - minX + pad * 2, h: maxY - minY + pad * 2 };
   }, [data.phases, safeIdx, basePathGen]);
 
+  // D17 anticipatory reveal: first-phase country labels settled when the
+  // narrator names the region. Later phases stick with
+  // `currentWindow.startFrame + sec(0.4)` so each phase's label entrance
+  // composes from its own window.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.4); // existing default offset from phase start
+
   // Defensive null-render — happens AFTER all hooks (Rules of Hooks). If
   // schema validation ever lets through an empty phases array, render
   // nothing and surface a dev warning instead of crashing.
@@ -1128,8 +1137,12 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
           {countryLabelPlacements.map(({ iso3, label, lonLat, placement, forceLeader }) => {
             const anchor = projectAnnotation(lonLat);
             if (!anchor) return null;
+            // First phase uses the anticipatory entranceBase; subsequent
+            // phases keep the existing per-window offset.
+            const enterCue =
+              safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
             const opacity = Math.min(
-              fadeIn(frame, currentWindow.startFrame + sec(0.4), sec(0.4)),
+              fadeIn(frame, enterCue, sec(0.4)),
               fadeOut(frame, currentWindow.endFrame, sec(0.3)),
             );
             if (opacity <= 0) return null;

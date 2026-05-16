@@ -38,7 +38,7 @@ import {
   contentArea,
   timing,
 } from "../../design/theme";
-import { fadeIn, exitFade } from "../../utils/animation";
+import { fadeIn, exitFade, anticipatoryStartFrame } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import {
   analyticalBackgroundBase,
@@ -288,7 +288,12 @@ export const CalendarHeatmap: React.FC<{ data: CalendarHeatmapData }> = ({
   }, [data.year, weekStart]);
 
   // ── Timing ────────────────────────────────────────────────────────────
-  const structureStart = timing.entrance.crisp; // ~0.4s
+  // D17 anticipatory reveal: first structure element settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, timing.entrance.crisp)
+    : timing.entrance.crisp; // existing default (~0.4s)
+  const structureStart = entranceBase;
   const cellsStart = structureStart + timing.entrance.medium; // ~0.9s
   // Each column reveals over `colReveal` frames; total sweep ~3.5s.
   const sweepDurationFrames = Math.max(60, Math.min(120, totalCols * 1.8));

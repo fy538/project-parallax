@@ -43,6 +43,7 @@ import {
   slideIn,
   exitFade,
   lockOnPulse,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_QUAD,
 } from "../../utils/animation";
@@ -676,6 +677,11 @@ export const HorizontalTimeline: React.FC<{
   const theme = useThemeMode(mode);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  // D17 anticipatory reveal: first event settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.5); // existing default
   const footerHeight =
     data.mode === "dual"
       ? fontSizes.label * 2 + layout.spacing.xl
@@ -1037,7 +1043,7 @@ export const HorizontalTimeline: React.FC<{
                     const eventBlur = camera.getEventBlur(i);
                     const isFocused = camera.focusIndex === i;
                     const position = (i % 2 === 0 ? "above" : "below") as "above" | "below";
-                    const revealFrame = sec(0.5) + i * sec(0.15);
+                    const revealFrame = entranceBase + i * sec(0.15);
                     // focusIndex === -1 means "pullback" (overview shot) — show all cards.
                     const isPullback = camera.focusIndex === -1;
                     const hideText =
@@ -1187,7 +1193,7 @@ export const HorizontalTimeline: React.FC<{
                     const eventBlur = camera.getEventBlur(i);
                     const isFocused = camera.focusIndex === i;
                     const isPullback = camera.focusIndex === -1;
-                    const revealFrame = sec(0.5) + i * sec(0.15);
+                    const revealFrame = entranceBase + i * sec(0.15);
                     const hideText =
                       shouldHideOffFocusCards && !isFocused && !isPullback;
                     // In cinematic mode, off-focus neighbors are hidden so
@@ -1326,7 +1332,7 @@ export const HorizontalTimeline: React.FC<{
                   const eventBlur = camera.getEventBlur(i);
                   const isFocused = camera.focusIndex === i;
                   const position = (i % 2 === 0 ? "above" : "below") as "above" | "below";
-                  const revealFrame = sec(0.5) + i * sec(0.15);
+                  const revealFrame = entranceBase + i * sec(0.15);
 
                   // Morph color
                   const morphColor = interpolateColors(

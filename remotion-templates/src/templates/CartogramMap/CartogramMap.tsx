@@ -55,7 +55,7 @@ import {
 } from "../../utils/proportionalSymbol";
 import { runDorlingLayout } from "../../utils/dorling";
 import { warnIf } from "../../utils/dataWarnings";
-import { fadeIn, fadeOut } from "../../utils/animation";
+import { fadeIn, fadeOut, anticipatoryStartFrame } from "../../utils/animation";
 import type { FeatureCollection } from "geojson";
 import type { CartogramMapData, CartogramPhase } from "./types";
 
@@ -282,12 +282,23 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
     return max || 1;
   }, [currentWindow.phase.data]);
 
+  // D17 anticipatory reveal: first-phase symbols settled when narrator names them.
+  // For phase 0 we back-calc from syncPoints[0]; later phases keep the
+  // existing `currentWindow.startFrame + sec(0.4)` offset (the staggering
+  // composes from each phase's own window).
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.6))
+    : sec(0.4); // existing default offset from phase start
+
   /** Symbol entrance/exit fade. */
   const symbolOpacity = useMemo(() => {
-    const enter = fadeIn(frame, currentWindow.startFrame + sec(0.4), sec(0.6));
+    const enterCue =
+      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
+    const enter = fadeIn(frame, enterCue, sec(0.6));
     const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
 
   const legendTicks = useMemo(() => generateLegendTicks(phaseMaxValue), [phaseMaxValue]);
 

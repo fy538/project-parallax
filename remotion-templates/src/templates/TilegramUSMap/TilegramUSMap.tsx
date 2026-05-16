@@ -42,6 +42,7 @@ import {
   fadeIn,
   exitFade,
   CLAMP_CUBIC,
+  anticipatoryStartFrame,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import {
@@ -299,7 +300,12 @@ export const TilegramUSMap: React.FC<{ data: TilegramUSMapData }> = ({
   const rowStagger = sec(0.12);
   const colJitter = sec(0.02);
   const tileEntrance = timing.entrance.crisp; // sec(0.4)
-  const baseStart = sec(0.4);
+  // D17 anticipatory reveal: first-row tile settled when narrator names it.
+  // Row staggers compose downstream from `baseStart`.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const baseStart = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.4); // existing default
   const lastTileStart = baseStart + (GRID_ROWS - 1) * rowStagger;
   const legendStart = lastTileStart + tileEntrance + sec(0.1);
 

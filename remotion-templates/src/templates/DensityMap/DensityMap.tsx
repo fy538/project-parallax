@@ -27,7 +27,7 @@ import { MapTitleFrame } from "../../components/MapTitleFrame";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { layout, palette, sec } from "../../design/theme";
-import { fadeIn, fadeOut } from "../../utils/animation";
+import { fadeIn, fadeOut, anticipatoryStartFrame } from "../../utils/animation";
 import { hexToRgba } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
 import type { DensityMapData, DensityPhase } from "./types";
@@ -283,12 +283,23 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
     colorAggregation,
   ]);
 
+  // D17 anticipatory reveal: first-phase aggregation layer settled when
+  // narrator names the density. Later phases keep the existing
+  // `currentWindow.startFrame + sec(0.3)` offset (subsequent phase staggers
+  // compose from each phase's own window).
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.7))
+    : sec(0.3); // existing default offset from phase start
+
   // ── Symbol-style entrance fade for the aggregation layer ────────────────
   const layerOpacity = useMemo(() => {
-    const enter = fadeIn(frame, currentWindow.startFrame + sec(0.3), sec(0.7));
+    const enterCue =
+      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.3);
+    const enter = fadeIn(frame, enterCue, sec(0.7));
     const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
 
   // Phase windows in seconds for MapAnnotations (memoized → MapAnnotations
   // doesn't bust its internal memo). Same pattern as ChoroplethMap +

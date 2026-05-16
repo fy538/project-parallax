@@ -56,6 +56,7 @@ import {
   fadeIn,
   stagger,
   exitFade,
+  anticipatoryStartFrame,
   CLAMP_CUBIC,
 } from "../../utils/animation";
 import { Background } from "../../components/Background";
@@ -359,7 +360,12 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
   const hasGroups = Object.keys(groupColorMap).length > 0;
 
   // ── Timing ─────────────────────────────────────────────────────────
-  const axisStart = sec(0.4);
+  // D17 anticipatory reveal: first axis settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.4); // existing default
+  const axisStart = entranceBase;
   const itemsStart = sec(0.9);
   const referenceStart = sec(1.5);
   const exitOp = exitFade(frame, durationInFrames, 15);

@@ -48,6 +48,7 @@ import {
   stagger,
   exitFade,
   kenBurnsDrift,
+  anticipatoryStartFrame,
   CLAMP,
   CLAMP_CUBIC_INOUT,
   CLAMP_SINE,
@@ -311,6 +312,19 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
 
   // ── Render actor positions ──────────────────────────────────────────────
 
+  // D17 anticipatory reveal: first actor settled when narrator names it.
+  // Pre-existing first-actor frame is 2 * getPhaseStart("populate") because
+  // stagger() takes phaseStart as baseDelay and is then added to phaseStart
+  // again at actorStartFrame; the entranceShift below preserves that legacy
+  // arithmetic when no syncPoints are present (entranceShift = 0).
+  const populateStart = phaseState.getPhaseStart("populate");
+  const legacyFirstActorFrame = populateStart * 2;
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : legacyFirstActorFrame;
+  const entranceShift = entranceBase - legacyFirstActorFrame;
+
   // Computed per-frame — no useMemo (frame in deps would defeat caching)
   const actorElements = data.actors.map((actor, index) => {
       const colorIdx = index % DEFAULT_ACTOR_COLORS.length;
@@ -326,7 +340,7 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
         sec(0.15),
         phaseState.getPhaseStart("populate")
       );
-      const actorStartFrame = phaseState.getPhaseStart("populate") + staggerOffset;
+      const actorStartFrame = phaseState.getPhaseStart("populate") + staggerOffset + entranceShift;
 
       const actorFadeIn = fadeIn(frame, actorStartFrame, sec(0.4));
 

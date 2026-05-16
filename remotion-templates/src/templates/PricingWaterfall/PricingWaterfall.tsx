@@ -30,7 +30,7 @@ import {
   textMaxWidth,
   shadows,
 } from "../../design/theme";
-import { fadeIn, slideIn, stagger, exitFade, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, anticipatoryStartFrame, CLAMP_CUBIC } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import {
   analyticalBackgroundBase,
@@ -156,10 +156,15 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
   }, [segments, barTop, barHeight]);
 
   // Animation timeline
+  // D17 anticipatory reveal: first kicker settled when narrator names it.
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const entranceBase = firstSyncFrame != null
+    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    : sec(0.4); // existing default
   const titleEnd = sec(0.8);
-  const totalKickerStart = sec(0.4);
-  const barStart = sec(1.0);
-  const labelStart = sec(1.4);
+  const totalKickerStart = entranceBase;
+  const barStart = totalKickerStart + sec(0.6);
+  const labelStart = totalKickerStart + sec(1.0);
   const exitOp = exitFade(frame, durationInFrames, 15);
 
   return (
