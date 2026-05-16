@@ -157,6 +157,12 @@ export { CatalogTextAnimationShowcase } from "./TextAnimationShowcase";
 // QuoteAttribution + ConceptCallback pulse for cross-episode continuity).
 export { CatalogCompositePatternsShowcase } from "./CompositePatternsShowcase";
 
+// Hold-motion register showcase — 3×2 mosaic of the six drift presets on
+// identical content. The visual-vocabulary card script writers consult
+// before reaching for `DIR: drift(<preset>)`. See HOLD_MOTION_REGISTER.md
+// + POLISH.md D20.
+export { CatalogDriftRegisterShowcase } from "./DriftRegisterShowcase";
+
 export { CatalogShowreel } from "./Showreel";
 export { CatalogShowreelBackdrops } from "./ShowreelBackdrops";
 

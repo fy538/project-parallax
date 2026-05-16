@@ -196,6 +196,9 @@ import {
   // Five composite editorial patterns (DefinitionReveal + callback,
   // StatCaption, QuoteAttribution × 2 registers).
   CatalogCompositePatternsShowcase,
+  // 3×2 mosaic of the six drift presets on identical content — visual
+  // reference for HOLD_MOTION_REGISTER / POLISH D20.
+  CatalogDriftRegisterShowcase,
   CatalogShowreel,
   CatalogShowreelBackdrops,
   CatalogEmphasisShowcase,
@@ -338,6 +341,7 @@ export const RemotionRoot: React.FC = () => {
         <CatalogShowreelBackdrops />
         <CatalogEmphasisShowcase />
         <CatalogTemplatePreview />
+        <CatalogDriftRegisterShowcase />
 
         <Folder name="Maps">
           <CatalogAtlasG7 />

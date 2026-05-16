@@ -47,7 +47,7 @@ type AtmosphereDensity = "none" | "subtle" | "normal" | "dense";
  *                    cycles. Net displacement zero — atmospheric life
  *                    without directional slip.
  */
-type DriftPreset =
+export type DriftPreset =
   | "none"
   | "editorial"
   | "slow"
