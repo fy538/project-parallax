@@ -120,10 +120,30 @@ VALID_DRIFT_PRESETS = {
 }
 
 # Transition type mappings for cut()
+# Canonical doctrine: project/TRANSITION_GRAMMAR.md (May 16, 2026).
+# Deprecated values remain in VALID_CUT_TYPES for back-compat with shipped
+# manifests but are flagged on parse (see DEPRECATED_CUT_TYPES below).
 VALID_CUT_TYPES = {
     "cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up",
     "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom",
 }
+
+# Deprecated transitions per Phase 3 of TRANSITION_GRAMMAR.md. Each entry
+# maps the deprecated name to (canonical-replacement, reason). The parser
+# emits a one-shot stderr warning when these are encountered. Mirror of
+# DEPRECATED_TRANSITIONS in remotion-templates/src/components/Transitions.tsx —
+# keep in sync.
+DEPRECATED_CUT_TYPES = {
+    "wipe-left":     ("dissolve",  "PowerPoint signature"),
+    "wipe-right":    ("dissolve",  "PowerPoint signature"),
+    "wipe-up":       ("dissolve",  "PowerPoint signature"),
+    "blur-through":  ("dissolve",  "YouTube-explainer signature"),
+    "whip-pan":      ("cut",       "sports-broadcast / Vice News tell"),
+    "spatial-zoom":  ("match-cut", "gimmicky depth-flight"),
+}
+
+# One-shot dedup so a script using many deprecated cuts only warns once each.
+_warned_deprecated_cuts: set[str] = set()
 
 # Palette name → hex for color-wash
 PALETTE_COLORS = {
@@ -575,6 +595,23 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
             if tokens:
                 cut_type = tokens[0].lower()
                 if cut_type in VALID_CUT_TYPES:
+                    # Emit one-shot deprecation notice per TRANSITION_GRAMMAR.md
+                    if cut_type in DEPRECATED_CUT_TYPES and cut_type not in _warned_deprecated_cuts:
+                        replacement, reason = DEPRECATED_CUT_TYPES[cut_type]
+                        # "cut(cut)" reads awkwardly — use a plain hard-cut
+                        # phrase when the canonical replacement is `cut`.
+                        replacement_phrase = (
+                            "a plain hard cut (omit the cut() directive)"
+                            if replacement == "cut"
+                            else f"cut({replacement})"
+                        )
+                        print(
+                            f"⚠  cut({cut_type}) is deprecated — {reason}. "
+                            f"Use {replacement_phrase} instead. "
+                            f"(project/TRANSITION_GRAMMAR.md)",
+                            file=sys.stderr,
+                        )
+                        _warned_deprecated_cuts.add(cut_type)
                     result["transitionOut"] = cut_type
 
             # Look for duration and color in remaining tokens

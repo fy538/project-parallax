@@ -110,9 +110,9 @@
       "properties": {
         "analyticalToGroundingDefault": {
           "type": "string",
-          "enum": ["color-wash-amber", "color-wash-rust", "blur-through", "iris", "dissolve"],
+          "enum": ["color-wash-amber", "color-wash-rust", "color-wash-ink", "color-wash-oxblood", "iris", "dissolve", "match-cut"],
           "default": "color-wash-amber",
-          "description": "Default transition when crossing from Remotion (Register 1) to AI-GEN (Register 3) or atmospheric (Register 2)."
+          "description": "Default transition when crossing from Remotion (Register 1) to AI-GEN (Register 3) or atmospheric (Register 2). 'blur-through' is deprecated per project/TRANSITION_GRAMMAR.md — use 'dissolve' or a 'color-wash-*' variant instead."
         },
         "groundingToAnalyticalDefault": {
           "type": "string",

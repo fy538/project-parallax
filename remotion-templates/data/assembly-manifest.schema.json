@@ -405,16 +405,18 @@
         },
         "transition": {
           "type": "object",
-          "description": "Transition behavior at segment boundaries.",
+          "description": "Transition behavior at segment boundaries. Canonical doctrine: project/TRANSITION_GRAMMAR.md. DEPRECATED values kept in enum for back-compat: wipe-left/right/up (use dissolve), blur-through (use dissolve), whip-pan (use cut), spatial-zoom (use match-cut).",
           "additionalProperties": false,
           "properties": {
             "in": {
               "type": "string",
+              "description": "In-transition. Canonical: cut, dissolve, fade, color-wash, iris, match-cut. Deprecated: wipe-left, wipe-right, wipe-up, blur-through, whip-pan, spatial-zoom (see TRANSITION_GRAMMAR.md).",
               "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },
             "out": {
               "type": "string",
+              "description": "Out-transition. Canonical: cut, dissolve, fade, color-wash, iris, match-cut. Deprecated: wipe-left, wipe-right, wipe-up, blur-through, whip-pan, spatial-zoom (see TRANSITION_GRAMMAR.md).",
               "enum": ["cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up", "blur-through", "color-wash", "iris", "match-cut", "whip-pan", "spatial-zoom"],
               "default": "cut"
             },

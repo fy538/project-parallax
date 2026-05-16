@@ -1,31 +1,35 @@
 /**
  * Transition Grammar — context-aware default transitions for assembly.
  *
+ * @deprecated SUPERSEDED (May 16, 2026, Phase 3 of TRANSITION_GRAMMAR doctrine).
+ * This file has zero consumers — it predates the canonical doctrine and bakes
+ * in wipe-based defaults that the doctrine now deprecates (wipe-left, wipe-right
+ * for map transitions). The active implicit-default engine is
+ * `apply_default_transitions()` in `tools/assembly/generate_manifest.py`.
+ *
+ * Canonical doctrine: `project/TRANSITION_GRAMMAR.md`.
+ * Replacement defaults (per doctrine):
+ *   - Within-beat seam → cut (not dissolve)
+ *   - Beat-boundary seam → dissolve
+ *   - Title-card boundary → fade-through-black (currently `fade`)
+ *   - Map → Map → match-cut (NOT wipe-left)
+ *   - Register shift → color-wash with explicit color token
+ *
+ * DO NOT add new consumers of `recommendTransition` /
+ * `recommendSequenceTransitions` exports. They remain only to avoid breaking
+ * any out-of-tree tooling that may have imported them. Phase 4 will either
+ * rewrite this file to align with the doctrine or delete it entirely.
+ *
  * Maps segment context (template type, beat role, preceding/following
  * segment types) to recommended transition types and durations.
  *
- * Used by:
- *   - generate_manifest.py (via JSON export) for auto-populating transitions
- *   - visual-spec skill for transition recommendations in data files
- *   - FullEpisode.tsx at runtime if no explicit transition is specified
- *
- * Design principles:
+ * Original design principles (now superseded):
  *   1. Cuts are the default — they're invisible and fast
  *   2. Dissolves for thematic shifts (era change, perspective switch)
- *   3. Wipes for geographic movement (map transitions)
+ *   3. Wipes for geographic movement (map transitions)  ← obsolete per doctrine
  *   4. Fade for emotional moments (human stories, revelations)
  *   5. Iris for dramatic reveals (key statistics, turning points)
  *   6. No more than 2 non-cut transitions per 60s (avoid music video feel)
- *
- * Grammar:
- *   Same template type → cut (continuity)
- *   Map → Map → wipe-left (geographic progression)
- *   Map → non-Map → dissolve (context shift)
- *   Any → StatReveal → iris (dramatic reveal)
- *   TimelineComparison in/out → dissolve (temporal shift)
- *   KineticTypography → anything → fade (emotional beat)
- *   Section boundary → dissolve (structural break)
- *   Everything else → cut
  */
 
 import type { TransitionType } from "../components/Transitions";

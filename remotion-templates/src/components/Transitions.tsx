@@ -5,24 +5,36 @@
  * FullEpisode when segments specify a transition type, and available
  * to any composition that needs inter-segment transitions.
  *
- * Transition types:
- *   - cut: instant switch (no animation)
- *   - fade: opacity crossfade
- *   - dissolve: fade + subtle scale shift (depth)
- *   - wipe-left: horizontal wipe from right to left
- *   - wipe-right: horizontal wipe from left to right
- *   - wipe-up: vertical wipe from bottom to top
- *   - blur-through: content blurs out, new content blurs in
- *   - color-wash: brief solid color flood between segments
- *   - iris: circular reveal from center
- *   - match-cut: synced zoom for visual continuity between segments
- *   - whip-pan: fast horizontal blur sweep (energetic)
+ * Canonical doctrine: `project/TRANSITION_GRAMMAR.md` (May 16, 2026)
+ * defines 8 canonical transitions, each with an implicit editorial claim.
+ *
+ * Canonical transitions:
+ *   - cut: instant switch — "same thought, next breath"
+ *   - dissolve: opacity + subtle scale — "elaboration of same thought"
+ *   - fade: opacity crossfade — currently the closest in-code surrogate
+ *     for fade-through-black (a future Phase 4 split may introduce
+ *     a dedicated `fade-through-black` type)
+ *   - color-wash: brief color flood — "register shift"
+ *   - iris: circular reveal — "cinematic open or close"
+ *   - match-cut: synced zoom — "same subject, different scale"
+ *
+ * Deprecated (mark, don't remove — back-compat for already-shipped data):
+ *   - wipe-left, wipe-right, wipe-up: PowerPoint signature. Use `dissolve`.
+ *   - whip-pan: sports-broadcast / Vice News tell. Use `cut`.
+ *   - blur-through: YouTube-explainer signature. Use `dissolve`.
+ *   - spatial-zoom: gimmicky. Use `match-cut`.
+ *
+ * See {@link DEPRECATED_TRANSITIONS} for the machine-readable set and
+ * {@link TRANSITION_CATALOG} for per-entry deprecation metadata.
+ *
+ * Audio-bridged cuts (J/L) and chapter cards live at different layers
+ * (audio-spec narration lead-in/lag-out, and `TitleTransition` segments
+ * respectively) and don't appear in this union.
  *
  * Usage:
  *   <TransitionWrapper
- *     type="wipe-left"
- *     durationSec={0.6}
- *     phase="in"
+ *     transitionIn="dissolve"
+ *     durationSec={0.5}
  *     durationInFrames={totalSegmentFrames}
  *   >
  *     <MyContent />
@@ -45,15 +57,59 @@ export type TransitionType =
   | "cut"
   | "fade"
   | "dissolve"
+  // ── Deprecated — see DEPRECATED_TRANSITIONS / TRANSITION_GRAMMAR.md ──
   | "wipe-left"
   | "wipe-right"
   | "wipe-up"
   | "blur-through"
+  | "whip-pan"
+  | "spatial-zoom"
+  // ────────────────────────────────────────────────────────────────────
   | "color-wash"
   | "iris"
-  | "match-cut"
-  | "whip-pan"
-  | "spatial-zoom";
+  | "match-cut";
+
+/**
+ * Transitions deprecated by `project/TRANSITION_GRAMMAR.md` (Phase 3,
+ * May 16, 2026). Kept in {@link TransitionType} for back-compat with
+ * already-shipped manifests; new authoring should pick the replacement.
+ *
+ * Each entry: { replacement, reason } — the M-TRANSITION lint rule
+ * (Phase 9) reads this map to flag deprecated values in manifests.
+ */
+export const DEPRECATED_TRANSITIONS = {
+  "wipe-left": {
+    replacement: "dissolve" as const,
+    reason: "PowerPoint signature — wipes carry no editorial meaning Parallax wants to inherit.",
+  },
+  "wipe-right": {
+    replacement: "dissolve" as const,
+    reason: "PowerPoint signature — wipes carry no editorial meaning Parallax wants to inherit.",
+  },
+  "wipe-up": {
+    replacement: "dissolve" as const,
+    reason: "PowerPoint signature — wipes carry no editorial meaning Parallax wants to inherit.",
+  },
+  "blur-through": {
+    replacement: "dissolve" as const,
+    reason: "YouTube-explainer signature — competes with the channel's editorial register.",
+  },
+  "whip-pan": {
+    replacement: "cut" as const,
+    reason: "Sports-broadcast / Vice News tell — wrong register for analytical essays.",
+  },
+  "spatial-zoom": {
+    replacement: "match-cut" as const,
+    reason: "Gimmicky depth-flight — match-cut achieves the 'same subject, different scale' intent without the camera-fly affectation.",
+  },
+} as const satisfies Record<string, { replacement: TransitionType; reason: string }>;
+
+export type DeprecatedTransition = keyof typeof DEPRECATED_TRANSITIONS;
+
+/** Type guard — is this transition deprecated per TRANSITION_GRAMMAR.md? */
+export const isDeprecatedTransition = (
+  t: TransitionType,
+): t is DeprecatedTransition => t in DEPRECATED_TRANSITIONS;
 
 interface TransitionWrapperProps {
   children: React.ReactNode;
@@ -402,69 +458,100 @@ export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({
 /**
  * Transition metadata for assembly manifests.
  * Describes available transitions so generate_manifest.py can reference them.
+ *
+ * Deprecated entries carry `deprecated: true` + a `replacement` field;
+ * the M-TRANSITION lint rule (Phase 9) flags any segment using these
+ * with a "use <replacement> instead" message. See TRANSITION_GRAMMAR.md.
  */
-export const TRANSITION_CATALOG: Record<
-  TransitionType,
-  { label: string; description: string; defaultDurationSec: number }
-> = {
+export interface TransitionCatalogEntry {
+  label: string;
+  description: string;
+  defaultDurationSec: number;
+  /** Editorial claim this transition makes about the seam (TRANSITION_GRAMMAR.md). */
+  implicitClaim?: string;
+  /** True if deprecated by TRANSITION_GRAMMAR.md Phase 3 (May 16, 2026). */
+  deprecated?: true;
+  /** Canonical replacement when this transition is deprecated. */
+  replacement?: TransitionType;
+}
+
+export const TRANSITION_CATALOG: Record<TransitionType, TransitionCatalogEntry> = {
   cut: {
-    label: "Cut",
+    label: "Hard cut",
     description: "Instant switch — no animation",
     defaultDurationSec: 0,
+    implicitClaim: "same thought, next breath",
   },
   fade: {
     label: "Fade",
-    description: "Simple opacity crossfade",
+    description: "Simple opacity crossfade (closest current surrogate for fade-through-black)",
     defaultDurationSec: 0.5,
+    implicitClaim: "new chapter / time-jump / silence beat",
   },
   dissolve: {
-    label: "Dissolve",
+    label: "Cross-dissolve",
     description: "Opacity crossfade with subtle scale shift for depth",
     defaultDurationSec: 0.6,
+    implicitClaim: "elaboration of the same thought, gentler delivery",
   },
   "wipe-left": {
-    label: "Wipe Left",
-    description: "Content reveals from right edge moving left",
+    label: "Wipe Left (deprecated)",
+    description: "DEPRECATED — PowerPoint signature; use `dissolve` instead",
     defaultDurationSec: 0.6,
+    deprecated: true,
+    replacement: "dissolve",
   },
   "wipe-right": {
-    label: "Wipe Right",
-    description: "Content reveals from left edge moving right",
+    label: "Wipe Right (deprecated)",
+    description: "DEPRECATED — PowerPoint signature; use `dissolve` instead",
     defaultDurationSec: 0.6,
+    deprecated: true,
+    replacement: "dissolve",
   },
   "wipe-up": {
-    label: "Wipe Up",
-    description: "Content reveals from bottom edge moving up",
+    label: "Wipe Up (deprecated)",
+    description: "DEPRECATED — PowerPoint signature; use `dissolve` instead",
     defaultDurationSec: 0.6,
+    deprecated: true,
+    replacement: "dissolve",
   },
   "blur-through": {
-    label: "Blur Through",
-    description: "Content blurs out, new content blurs in — dreamlike",
+    label: "Blur Through (deprecated)",
+    description: "DEPRECATED — YouTube-explainer signature; use `dissolve` instead",
     defaultDurationSec: 0.8,
+    deprecated: true,
+    replacement: "dissolve",
   },
   "color-wash": {
     label: "Color Wash",
-    description: "Brief solid color flood between segments",
+    description: "Brief solid color flood between segments — register shift",
     defaultDurationSec: 0.7,
+    implicitClaim: "register shift — new editorial mode",
   },
   iris: {
     label: "Iris",
-    description: "Circular reveal from center — cinematic opener",
+    description: "Circular reveal from center — cinematic open or close",
     defaultDurationSec: 0.8,
+    implicitClaim: "cinematic open or close, deliberately theatrical",
   },
   "match-cut": {
     label: "Match Cut",
     description: "Synced zoom creates visual continuity — push in on exit, pull out on entry",
     defaultDurationSec: 0.4,
+    implicitClaim: "same subject, different scale — continuity across a logical seam",
   },
   "whip-pan": {
-    label: "Whip Pan",
-    description: "Fast horizontal sweep with motion blur — energetic beat transition",
+    label: "Whip Pan (deprecated)",
+    description: "DEPRECATED — sports-broadcast / Vice News tell; use `cut` instead",
     defaultDurationSec: 0.5,
+    deprecated: true,
+    replacement: "cut",
   },
   "spatial-zoom": {
-    label: "Spatial Zoom",
-    description: "Camera flies through depth — zoom in on exit, emerge from zoom on entry",
+    label: "Spatial Zoom (deprecated)",
+    description: "DEPRECATED — gimmicky depth-flight; use `match-cut` instead",
     defaultDurationSec: 0.7,
+    deprecated: true,
+    replacement: "match-cut",
   },
 };

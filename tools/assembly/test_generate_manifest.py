@@ -351,6 +351,73 @@ def test_parse_dir_cut_invalid_type():
     assert "transitionOut" not in result
 
 
+def test_parse_dir_cut_deprecated_emits_warning(capsys, monkeypatch):
+    """Deprecated cut types per TRANSITION_GRAMMAR.md Phase 3 still parse
+    (back-compat) but emit a one-shot stderr deprecation notice."""
+    import generate_manifest as gm
+
+    # Reset the one-shot dedup state so this test is isolated.
+    monkeypatch.setattr(gm, "_warned_deprecated_cuts", set())
+
+    result = parse_dir_lines(["DIR: cut(whip-pan)"])
+    assert result["transitionOut"] == "whip-pan"  # parses (back-compat)
+
+    captured = capsys.readouterr()
+    assert "deprecated" in captured.err.lower()
+    assert "whip-pan" in captured.err
+    # `cut` replacement uses the special "plain hard cut" phrasing.
+    assert "plain hard cut" in captured.err
+    assert "TRANSITION_GRAMMAR" in captured.err
+
+
+def test_parse_dir_cut_deprecated_warning_replacement_phrase(capsys, monkeypatch):
+    """Non-`cut` replacements appear as cut(<replacement>) in the warning."""
+    import generate_manifest as gm
+
+    monkeypatch.setattr(gm, "_warned_deprecated_cuts", set())
+
+    parse_dir_lines(["DIR: cut(spatial-zoom)"])
+    captured = capsys.readouterr()
+    assert "cut(match-cut)" in captured.err
+
+
+def test_parse_dir_cut_deprecated_warning_is_one_shot(capsys, monkeypatch):
+    """A second use of the same deprecated cut() does not re-warn."""
+    import generate_manifest as gm
+
+    monkeypatch.setattr(gm, "_warned_deprecated_cuts", set())
+
+    parse_dir_lines(["DIR: cut(wipe-left)"])
+    first = capsys.readouterr()
+    assert "wipe-left" in first.err
+
+    parse_dir_lines(["DIR: cut(wipe-left)"])
+    second = capsys.readouterr()
+    assert second.err == ""  # no re-warn for same type
+
+
+def test_deprecated_cut_types_map_to_canonical_replacements():
+    """Lock the deprecation map so accidental edits get caught."""
+    from generate_manifest import DEPRECATED_CUT_TYPES, VALID_CUT_TYPES
+
+    # Every deprecated type is still parseable (back-compat).
+    for dep in DEPRECATED_CUT_TYPES:
+        assert dep in VALID_CUT_TYPES
+
+    # Every replacement is itself a canonical, non-deprecated type.
+    for dep, (replacement, _reason) in DEPRECATED_CUT_TYPES.items():
+        assert replacement in VALID_CUT_TYPES
+        assert replacement not in DEPRECATED_CUT_TYPES, (
+            f"{dep} replacement {replacement} is itself deprecated"
+        )
+
+    # Lock the canonical set per TRANSITION_GRAMMAR.md Phase 3.
+    assert set(DEPRECATED_CUT_TYPES) == {
+        "wipe-left", "wipe-right", "wipe-up",
+        "blur-through", "whip-pan", "spatial-zoom",
+    }
+
+
 def test_parse_dir_cam_sync():
     result = parse_dir_lines(['DIR: cam(pan:right, sync:"Taiwan")'])
     assert result["syncWords"] == ["Taiwan"]

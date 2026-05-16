@@ -32,6 +32,9 @@ export const PhotoMontageSchema = z.object({
     title: z.string().optional(),
     subtitle: z.string().optional(),
     images: z.array(MontageImageSchema),
+    // Between-photo transition (NOT segment-to-segment — independent of
+    // TRANSITION_GRAMMAR.md). `wipe-left` is retained here for back-compat
+    // with shipped data; new montages should pick `cut` or `dissolve`.
     transition: z.enum(["cut", "dissolve", "wipe-left"]),
     transitionDurationSec: z.number().optional(),
     source: z.string().optional(),
