@@ -10,12 +10,31 @@
 | NARRATION | VISUAL PRODUCTION |
 |-----------|-------------------|
 | *(Measured, establishing tone)* | **P1 — FOOTAGE** · "TSMC Arizona construction site aerial drone" > "semiconductor factory aerial desert" > "large factory construction aerial" · Pexels · standard · background @ 40% · 6s · *Opening shot — needs to be cinematic* |
+|  | DIR: mood(subtle, drift:documentary) |
+|  | DIR: hold(breathe) |
 | In December 2025, TSMC's first Arizona fab hit a 92% chip yield — four percentage points higher than the equivalent line in Taiwan. | **P1 — LAYERED** · "92% YIELD" with subtext "4 points above Taiwan" composited over continuing cleanroom footage · amber accent · KineticTypography overlay @ 85% opacity · 3s hold · *Stat fused to the world it describes* |
+|  | DIR: reveal(count-up, sync:"ninety-two percent", pulse) |
+|  | DIR: cam(push-in, sync:"four percentage points", over:2s) |
+|  | DIR: mood(subtle, drift:breathing) |
+|  | DIR: hold(land) |
 | A fab — a fabrication plant — is where chips are physically made. Not designed, not packaged. Made. Buildings that cost tens of billions of dollars, where the air is a thousand times cleaner than a hospital operating room, where a single speck of dust can ruin a wafer worth hundreds of thousands of dollars. There are only a handful of companies on earth that can build one. And now there was one in the Arizona desert, and it was working. | **P1 — FOOTAGE** · "semiconductor cleanroom wafer handling" > "chip factory cleanroom workers" > "cleanroom manufacturing" · Pexels · standard · inset @ 70% · match narration (~18s) · *Macro footage of wafer handling, lithography machines. Slow, deliberate shots.* |
+|  | DIR: mood(subtle, drift:documentary) |
 | One hundred and sixty-five billion dollars in total investment. The most expensive foreign direct investment project in American history. By every engineering metric, it was a success. | **P1 — LAYERED** · "$165 BILLION" with subtext "Largest FDI greenfield project in US history" composited over TSMC Arizona aerial drone footage (continuing from opening) · amber accent · KineticTypography overlay @ 85% opacity · 4s hold · *Channel's visual signature from frame one — the number lives in the landscape it bought* |
+|  | DIR: reveal(count-up, sync:"one hundred and sixty-five billion", pulse) |
+|  | DIR: cam(push-in, sync:"most expensive", over:2.5s) |
+|  | DIR: mood(subtle, drift:breathing) |
+|  | DIR: hold(land) |
+|  | DIR: cut(dissolve) |
 | By every strategic metric, it was a rounding error. That fab covers about seven percent of US chip demand. The chips cost fifty percent more than the ones made in Taiwan. And to get it running, TSMC flew in thousands of Taiwanese engineers — many of them living in temporary housing blocks in the desert, working the same twelve-hour shifts they'd worked in Hsinchu, because there weren't enough trained American technicians to operate the machines. | **P2 — FOOTAGE** · "Arizona desert housing construction workers" > "temporary worker housing desert" > "Arizona suburban construction" · Pexels · standard · background @ 35% · match narration (~20s) · *Transition from high-tech cleanroom to mundane desert housing — the contrast IS the point* |
+|  | DIR: mood(normal, dim:0.3, drift:documentary) |
 | *(Pull back, wider perspective)* | **P1 — DataChart** · Bar comparison: "7% of US chip demand" vs remaining 93% · rust for gap, amber for TSMC share · [generate via visual-spec] · 4s |
+|  | DIR: reveal(stagger:250ms, hero:0, pulse) |
+|  | DIR: cam(overview → element:0, sync:"seven percent", track) |
+|  | DIR: hold(breathe) |
+|  | DIR: cut(color-wash, ink) |
 | The flagship achievement of American semiconductor reshoring is both a technical triumph and a strategic drop in the ocean. America can make chips. The question is whether anyone — any country — can rewire the most complex supply chain humans have ever built without breaking it in the process. | **P3 — FOOTAGE** · "world map connections network global" > "global supply chain visualization" · Pexels · standard · background @ 30% · match narration (~10s) |
+|  | DIR: mood(subtle, drift:editorial) |
+|  | DIR: hold(breathe) |
 
 ---
 
