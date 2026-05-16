@@ -192,7 +192,7 @@ function computeTreeLayout(
     // ── Horizontal layout: depth → X, sibling index → Y ────────────────
     // Title safe area is ~180px from top.
     const TITLE_SAFE = 180;
-    const LEFT_MARGIN = canvasWidth * 0.08;
+    const LEFT_MARGIN = canvasWidth * 0.12;
 
     // Find the tallest column to vertically center the whole tree.
     let maxCount = 0;
@@ -293,7 +293,8 @@ function horizontalEdgeMid(
   const cp1y = sy;
   const cp2x = tx - HORIZ_LEVEL_GAP * 0.5;
   const cp2y = ty;
-  const t = 0.5;
+  // t=0.2 places the label close to the source fork rather than mid-edge
+  const t = 0.2;
   const mt = 1 - t;
   const midX =
     mt * mt * mt * sx +
