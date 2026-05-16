@@ -56,6 +56,12 @@ import {
 import { runDorlingLayout } from "../../utils/dorling";
 import { warnIf } from "../../utils/dataWarnings";
 import { fadeIn, fadeOut, anticipatoryStartFrame } from "../../utils/animation";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+  EMPTY_BOUNDARY,
+  type StepBoundary,
+} from "../../utils/stepFramework";
 import type { FeatureCollection } from "geojson";
 import type { CartogramMapData, CartogramPhase } from "./types";
 
@@ -70,36 +76,24 @@ const VIEWPORT = { width: layout.width, height: layout.height } as const;
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow {
+interface PhaseWindow extends StepBoundary {
   phase: CartogramPhase;
   index: number;
-  startFrame: number;
-  endFrame: number;
 }
 
 const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+  ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, data: [] },
   index: 0,
-  startFrame: 0,
-  endFrame: 0,
 };
 
 const computePhaseWindows = (phases: CartogramPhase[]): PhaseWindow[] => {
-  let cursor = 0;
-  return phases.map((phase, index) => {
-    const startFrame = cursor;
-    const endFrame = cursor + sec(phase.durationSec);
-    cursor = endFrame;
-    return { phase, index, startFrame, endFrame };
-  });
+  const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));
+  return boundaries.map((b, index) => ({ ...b, phase: phases[index], index }));
 };
 
-const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number => {
-  for (const w of windows) {
-    if (frame < w.endFrame) return w.index;
-  }
-  return windows.length - 1;
-};
+const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number =>
+  getCurrentStepIndex(frame, windows);
 
 // ── Color helper ──────────────────────────────────────────────────────────
 
@@ -284,7 +278,7 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
 
   // D17 anticipatory reveal: first-phase symbols settled when narrator names them.
   // For phase 0 we back-calc from syncPoints[0]; later phases keep the
-  // existing `currentWindow.startFrame + sec(0.4)` offset (the staggering
+  // existing `currentWindow.start + sec(0.4)` offset (the staggering
   // composes from each phase's own window).
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
   const entranceBase = firstSyncFrame != null
@@ -294,11 +288,11 @@ export const CartogramMap: React.FC<{ data: CartogramMapData }> = ({ data }) => 
   /** Symbol entrance/exit fade. */
   const symbolOpacity = useMemo(() => {
     const enterCue =
-      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
+      safeIdx === 0 ? entranceBase : currentWindow.start + sec(0.4);
     const enter = fadeIn(frame, enterCue, sec(0.6));
-    const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
+    const exit = fadeOut(frame, currentWindow.end, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.start, currentWindow.end]);
 
   const legendTicks = useMemo(() => generateLegendTicks(phaseMaxValue), [phaseMaxValue]);
 

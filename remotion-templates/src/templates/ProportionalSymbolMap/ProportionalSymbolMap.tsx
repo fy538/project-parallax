@@ -66,6 +66,12 @@ import {
   viaGlobePoseInterpolate,
 } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+  EMPTY_BOUNDARY,
+  type StepBoundary,
+} from "../../utils/stepFramework";
 import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
 import type { ProportionalSymbolMapData, ProportionalPhase } from "./types";
 import type { MapAnnotation } from "../../components/MapAnnotations.types";
@@ -88,11 +94,9 @@ const annotationKey = (ann: MapAnnotation): string =>
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow {
+interface PhaseWindow extends StepBoundary {
   phase: ProportionalPhase;
   index: number;
-  startFrame: number;
-  endFrame: number;
 }
 
 /**
@@ -101,28 +105,18 @@ interface PhaseWindow {
  * early-return at the bottom of the component runs).
  */
 const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+  ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, symbols: [] },
   index: 0,
-  startFrame: 0,
-  endFrame: 0,
 };
 
 const computePhaseWindows = (phases: ProportionalPhase[]): PhaseWindow[] => {
-  let cursor = 0;
-  return phases.map((phase, index) => {
-    const startFrame = cursor;
-    const endFrame = cursor + sec(phase.durationSec);
-    cursor = endFrame;
-    return { phase, index, startFrame, endFrame };
-  });
+  const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));
+  return boundaries.map((b, index) => ({ ...b, phase: phases[index], index }));
 };
 
-const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number => {
-  for (const w of windows) {
-    if (frame < w.endFrame) return w.index;
-  }
-  return windows.length - 1;
-};
+const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number =>
+  getCurrentStepIndex(frame, windows);
 
 // ── Camera pose ───────────────────────────────────────────────────────────
 //
@@ -312,7 +306,7 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
 
     const rawT = interpolate(
       frame,
-      [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
+      [currentWindow.start, currentWindow.start + CAMERA_TRANSITION_FRAMES],
       [0, 1],
       CLAMP_CUBIC_INOUT,
     );
@@ -332,7 +326,7 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
     safeIdx,
     phasePoses,
     frame,
-    currentWindow.startFrame,
+    currentWindow.start,
     currentWindow.phase.cameraTransition,
     currentWindow.phase.cameraDwell?.before,
     currentWindow.phase.cameraDwell?.after,
@@ -355,7 +349,7 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
   );
 
   // D17 anticipatory reveal: first-phase symbols settled when narrator
-  // names them. Later phases keep `currentWindow.startFrame + sec(0.4)` so
+  // names them. Later phases keep `currentWindow.start + sec(0.4)` so
   // each phase's symbol entrance composes from its own window.
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
   const entranceBase = firstSyncFrame != null
@@ -365,11 +359,11 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
   // Per-frame entrance opacity for the symbols in the current phase
   const symbolOpacity = useMemo(() => {
     const enterCue =
-      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
+      safeIdx === 0 ? entranceBase : currentWindow.start + sec(0.4);
     const enter = fadeIn(frame, enterCue, sec(0.6));
-    const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
+    const exit = fadeOut(frame, currentWindow.end, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.start, currentWindow.end]);
 
   // Theme tokens
   const landFill = dark ? palette.ink : palette.bone;
@@ -733,8 +727,8 @@ const resolveAnnotationFrames = (
   }
   if (annotation.phase !== undefined && phaseWindows[annotation.phase]) {
     return {
-      startFrame: phaseWindows[annotation.phase].startFrame,
-      endFrame: phaseWindows[annotation.phase].endFrame,
+      startFrame: phaseWindows[annotation.phase].start,
+      endFrame: phaseWindows[annotation.phase].end,
     };
   }
   return { startFrame: 0, endFrame: compositionDurationFrames };

@@ -30,6 +30,12 @@ import { layout, palette, sec } from "../../design/theme";
 import { fadeIn, fadeOut, anticipatoryStartFrame } from "../../utils/animation";
 import { hexToRgba } from "../../utils/mapUtils";
 import { warnIf } from "../../utils/dataWarnings";
+import {
+  computeStepBoundaries,
+  getCurrentStepIndex,
+  EMPTY_BOUNDARY,
+  type StepBoundary,
+} from "../../utils/stepFramework";
 import type { DensityMapData, DensityPhase } from "./types";
 
 // ── Constants ─────────────────────────────────────────────────────────────
@@ -59,36 +65,24 @@ const DEFAULT_RAMP_HEX = [
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow {
+interface PhaseWindow extends StepBoundary {
   phase: DensityPhase;
-  startFrame: number;
-  endFrame: number;
   index: number;
 }
 
 const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+  ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, points: [] },
-  startFrame: 0,
-  endFrame: 0,
   index: 0,
 };
 
 const computePhaseWindows = (phases: DensityPhase[]): PhaseWindow[] => {
-  let cursor = 0;
-  return phases.map((phase, index) => {
-    const startFrame = cursor;
-    const endFrame = cursor + sec(phase.durationSec);
-    cursor = endFrame;
-    return { phase, startFrame, endFrame, index };
-  });
+  const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));
+  return boundaries.map((b, index) => ({ ...b, phase: phases[index], index }));
 };
 
-const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number => {
-  for (const w of windows) {
-    if (frame < w.endFrame) return w.index;
-  }
-  return windows.length - 1;
-};
+const getCurrentPhaseIndex = (frame: number, windows: PhaseWindow[]): number =>
+  getCurrentStepIndex(frame, windows);
 
 // ── Color ramp resolution ─────────────────────────────────────────────────
 
@@ -285,7 +279,7 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
 
   // D17 anticipatory reveal: first-phase aggregation layer settled when
   // narrator names the density. Later phases keep the existing
-  // `currentWindow.startFrame + sec(0.3)` offset (subsequent phase staggers
+  // `currentWindow.start + sec(0.3)` offset (subsequent phase staggers
   // compose from each phase's own window).
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
   const entranceBase = firstSyncFrame != null
@@ -295,11 +289,11 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
   // ── Symbol-style entrance fade for the aggregation layer ────────────────
   const layerOpacity = useMemo(() => {
     const enterCue =
-      safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.3);
+      safeIdx === 0 ? entranceBase : currentWindow.start + sec(0.3);
     const enter = fadeIn(frame, enterCue, sec(0.7));
-    const exit = fadeOut(frame, currentWindow.endFrame, sec(0.4));
+    const exit = fadeOut(frame, currentWindow.end, sec(0.4));
     return Math.min(enter, exit);
-  }, [frame, safeIdx, entranceBase, currentWindow.startFrame, currentWindow.endFrame]);
+  }, [frame, safeIdx, entranceBase, currentWindow.start, currentWindow.end]);
 
   // Phase windows in seconds for MapAnnotations (memoized → MapAnnotations
   // doesn't bust its internal memo). Same pattern as ChoroplethMap +
@@ -307,8 +301,8 @@ export const DensityMap: React.FC<{ data: DensityMapData }> = ({ data }) => {
   const phaseWindowsSec = useMemo(
     () =>
       windows.map((w) => ({
-        startSec: w.startFrame / layout.fps,
-        endSec: w.endFrame / layout.fps,
+        startSec: w.start / layout.fps,
+        endSec: w.end / layout.fps,
       })),
     [windows],
   );
