@@ -194,13 +194,19 @@ export async function renderCompositionFrame(
  *
  * Behavior:
  *   - Read both PNGs (must be same dimensions; throws if not).
- *   - Run pixelmatch with threshold 0.1 (looser than default 0.1 to
- *     tolerate font rasterization noise across CI/local boundaries).
- *   - Default pass criterion: < 0.5% of pixels differ. Tunable via
+ *   - Run pixelmatch with per-pixel color-distance threshold 0.1 (the
+ *     pixelmatch default; chosen to tolerate font rasterization noise
+ *     across CI/local boundaries). Tune via `pixelThreshold` only when a
+ *     specific template's noise floor is documented.
+ *   - Default pass criterion: ≤ 0.5% of pixels differ. Tunable via
  *     `pixelDiffPct` option for templates with known rasterization noise.
- *   - On mismatch, writes a side-by-side diff PNG to `<currentPath>.diff
- *     .png` so visual inspection doesn't require manually opening both
- *     baseline and current files.
+ *   - On mismatch, writes a difference visualization PNG to
+ *     `<currentPath>.diff.png` (differing pixels rendered in red against
+ *     the original) so visual inspection doesn't require opening both
+ *     baseline and current files in another tool.
+ *   - On successful match, removes any stale `<currentPath>.diff.png`
+ *     left behind by a previous failing run. Otherwise a fixed regression
+ *     leaves a misleading diff file on disk.
  *
  * Returns metrics the test caller can log + assert against.
  */
@@ -209,7 +215,7 @@ import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 
 export interface ComparePNGsOptions {
-  /** Per-pixel color-distance threshold passed to pixelmatch (0–1). Lower = stricter. Default 0.1. */
+  /** Per-pixel color-distance threshold passed to pixelmatch (0–1). Lower = stricter. Default 0.1 (matches pixelmatch's own default). */
   pixelThreshold?: number;
   /** Maximum acceptable percentage of differing pixels before match=false. Default 0.5. */
   pixelDiffPct?: number;
@@ -217,24 +223,24 @@ export interface ComparePNGsOptions {
   writeDiffOnMismatch?: boolean;
 }
 
+export interface ComparePNGsResult {
+  /** True when diffPct ≤ pixelDiffPct option (default 0.5). */
+  match: boolean;
+  /** Total differing pixels. */
+  diffPixels: number;
+  /** Percentage of pixels that differ (0–100). */
+  diffPct: number;
+  /** Total pixels compared (width × height). */
+  totalPixels: number;
+  /** Path to the diff PNG written on mismatch; null otherwise. */
+  diffPath: string | null;
+}
+
 export function comparePNGs(
   baselinePath: string,
   currentPath: string,
   options: ComparePNGsOptions = {},
-): {
-  match: boolean;
-  /** Total differing pixels. */
-  diffPixels: number;
-  /** Percentage of pixels that differ (0-100). */
-  diffPct: number;
-  /** Total pixels compared (width × height). */
-  totalPixels: number;
-  /** Baseline + current file sizes — kept for logging continuity. */
-  baselineSize: number;
-  currentSize: number;
-  /** Path to the diff PNG written on mismatch; null otherwise. */
-  diffPath: string | null;
-} {
+): ComparePNGsResult {
   if (!fs.existsSync(baselinePath)) {
     throw new Error(`Baseline PNG not found: ${baselinePath}`);
   }
@@ -276,11 +282,22 @@ export function comparePNGs(
 
   const diffPct = (diffPixels / totalPixels) * 100;
   const match = diffPct <= pixelDiffPct;
+  const diffTargetPath = `${currentPath}.diff.png`;
 
   let diffPath: string | null = null;
   if (!match && writeDiffOnMismatch) {
-    diffPath = `${currentPath}.diff.png`;
+    diffPath = diffTargetPath;
     fs.writeFileSync(diffPath, PNG.sync.write(diff));
+  } else if (match) {
+    // Clean up stale diff PNG from a previous failing run so a fixed
+    // regression doesn't leave a misleading red-pixel image on disk.
+    if (fs.existsSync(diffTargetPath)) {
+      try {
+        fs.unlinkSync(diffTargetPath);
+      } catch {
+        // Ignore — best-effort cleanup; not load-bearing for correctness.
+      }
+    }
   }
 
   return {
@@ -288,8 +305,6 @@ export function comparePNGs(
     diffPixels,
     diffPct,
     totalPixels,
-    baselineSize: fs.statSync(baselinePath).size,
-    currentSize: fs.statSync(currentPath).size,
     diffPath,
   };
 }
