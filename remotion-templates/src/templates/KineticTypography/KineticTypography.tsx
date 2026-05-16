@@ -53,6 +53,11 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { AnimatedText } from "../../components/AnimatedText";
+import {
+  DefinitionReveal,
+  QuoteAttribution,
+  StatCaption,
+} from "../../components/CompositePatterns";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { warnIf } from "../../utils/dataWarnings";
@@ -726,6 +731,157 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
   );
 };
 
+// ── Composite-pattern dispatch wrappers ────────────────────────────────────
+//
+// Each adapts the legacy QuoteData shape to the matching composite
+// component's props. Wrapped in their own components so they have their
+// own render scope and don't pollute the main render with extra hooks.
+// Opt-in via `_direction.textAnimation`.
+
+const QuoteAttributionDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
+  // Build attribution string from authored fields. `attribution` carries
+  // the speaker name; `attributionContext` (optional) adds role + date
+  // (e.g. "Founder of TSMC, 2024"). We render the speaker via QuoteAttribution's
+  // `attribution` prop and pass the context as `year` (it gets the mono
+  // letter-tracked styling that suits "context" metadata).
+  //
+  // Archival auto-detection: if attributionContext references a pre-1980
+  // year or archival document markers (RAND, RM-..., declassified, cable,
+  // memo), switch QuoteAttribution to archival register (Plex Mono). This
+  // matches the doctrine doc's "transcribed historical document" register
+  // for figures like Nash (1950), von Neumann, Schelling, FDR.
+  const archival = isArchivalAttribution(data.attributionContext);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "0 12%",
+      }}
+    >
+      <QuoteAttribution
+        text={data.text ?? ""}
+        attribution={data.attribution ?? ""}
+        year={data.attributionContext}
+        archival={archival}
+        align="center"
+      />
+    </div>
+  );
+};
+
+/**
+ * Decide whether a quote's `attributionContext` reads as archival (use
+ * Plex Mono) vs modern (use Plex Sans display).
+ *
+ * Archival signals:
+ *   - Year 1900–1979 (typewriters were the editorial register of that era)
+ *   - Document markers: RAND, RM-..., declassified, classified, cable,
+ *     memo, telegram, telex, archive
+ *
+ * Modern signals (defaults): any context lacking the above. Morris Chang
+ * 2022 → modern. Nash 1950 → archival. Schelling textbook 1960 → archival.
+ */
+function isArchivalAttribution(context: string | undefined): boolean {
+  if (!context) return false;
+  const yearMatch = context.match(/\b(19[0-7]\d|18\d\d)\b/);
+  if (yearMatch) return true;
+  return /\b(RAND|RM-\d|declassified|classified|cable|memo|telegram|telex|archive)\b/i.test(
+    context,
+  );
+}
+
+const DefinitionRevealDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "0 12%",
+      }}
+    >
+      <DefinitionReveal
+        term={data.term ?? ""}
+        pinyin={data.termPinyin}
+        translation={data.termTranslation ?? data.definitionText ?? ""}
+        accentColor={data.accentColor}
+        isCallback={!!data._direction?.isCallback}
+        align="center"
+      />
+    </div>
+  );
+};
+
+const StatCaptionDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
+  // statValue is authored as a string ("7%", "$165B", "0"). Extract a
+  // numeric value + unit/prefix so StatCaption's ticker can drive the
+  // animation. Falls back to value=0 with the full string as the caption
+  // prefix if parsing fails — never crashes.
+  const parsed = React.useMemo(
+    () => parseStatValueString(data.statValue ?? "0"),
+    [data.statValue],
+  );
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "0 10%",
+      }}
+    >
+      <StatCaption
+        value={parsed.value}
+        unit={parsed.unit}
+        caption={data.statLabel ?? ""}
+        source={data.statContext}
+        accentColor={data.accentColor}
+        align="center"
+      />
+    </div>
+  );
+};
+
+/**
+ * Parse an authored statValue string into { value, unit }.
+ *
+ *   "82%"   → { value: 82,   unit: "%" }
+ *   "$165B" → { value: 165,  unit: "$ B" }  // both prefix and suffix collapsed
+ *   "0"     → { value: 0,    unit: "" }
+ *   "1,500" → { value: 1500, unit: "" }
+ *
+ * Failure mode (non-parseable): returns { value: 0, unit: original }, so
+ * the StatCaption ticker becomes a no-op and the unit displays the full
+ * original string. Editorial intent preserved even when format is unusual.
+ */
+function parseStatValueString(s: string): { value: number; unit: string } {
+  const match = s.match(/^\s*([^\d\-+.]*)\s*(-?[\d,]+(?:\.\d+)?)\s*(.*)$/);
+  if (!match) return { value: 0, unit: s };
+  const prefix = match[1].trim();
+  const numStr = match[2].replace(/,/g, "");
+  const suffix = match[3].trim();
+  const value = parseFloat(numStr);
+  if (!Number.isFinite(value)) return { value: 0, unit: s };
+  const unit =
+    prefix && suffix
+      ? `${prefix} ${suffix}`
+      : prefix || suffix;
+  return { value, unit };
+}
+
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
@@ -766,17 +922,37 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
         <HeaderStrip metadata={data.episode} mode={bgVariant} />
         <FooterStrip mode={bgVariant} hideRec={data.variant === "quote"} />
 
+        {/* Variant dispatch.
+         *
+         * When `data._direction.textAnimation` names a composite pattern
+         * matching this variant ("quote-attribution" / "definition-reveal"
+         * / "stat-caption"), the new composable component renders instead
+         * of the legacy variant block. Backward-compatible: any data file
+         * without `_direction.textAnimation` continues to render through
+         * the legacy variants — bitwise-identical output. New episodes
+         * opt in by setting the field via visual-spec.
+         *
+         * See project/TEXT_ANIMATION_REGISTER.md for the editorial
+         * rationale and `_direction.textAnimation` ↔ variant mapping.
+         */}
         {data.variant === "quote" && (
-          <QuoteVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
+          data._direction?.textAnimation === "quote-attribution"
+            ? <QuoteAttributionDispatch data={data} />
+            : <QuoteVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "definition" && (
-          <DefinitionVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
+          data._direction?.textAnimation === "definition-reveal"
+            ? <DefinitionRevealDispatch data={data} />
+            : <DefinitionVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "bilingual" && (
+          // No composite pattern for bilingual yet — falls through to legacy.
           <BilingualVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "statistic" && (
-          <StatisticVariant data={data} frame={frame} />
+          data._direction?.textAnimation === "stat-caption"
+            ? <StatCaptionDispatch data={data} />
+            : <StatisticVariant data={data} frame={frame} />
         )}
 
         {/* Episode label — slideIn (was naked fade) */}

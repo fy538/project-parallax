@@ -42,6 +42,7 @@ import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
 import { Background } from "../../components/Background";
+import { useNumberTicker } from "../../components/textAnimation";
 import {
   analyticalBackgroundBase,
   resolveAnalyticalBackgroundVariant,
@@ -71,7 +72,10 @@ interface HeroStatProps {
   suffix?: string;
   label: string;
   decimals?: number;
-  progress: number;
+  /** Frame at which the count-up animation begins. */
+  startFrame: number;
+  /** Total frames for the count-up animation. */
+  countUpFrames: number;
   opacity: number;
   /** Cinematic scale reveal — number arrives at 1.3× and eases to 1.0× */
   revealScale: number;
@@ -91,14 +95,24 @@ const HeroStat: React.FC<HeroStatProps> = ({
   suffix,
   label,
   decimals,
-  progress,
+  startFrame,
+  countUpFrames,
   opacity,
   revealScale,
   theme,
   accentColor = palette.amber,
   countUp = true,
 }) => {
-  const currentValue = countUp ? value * progress : value;
+  // Use the canonical useNumberTicker hook from textAnimation primitives.
+  // Preserves the previous count-up behaviour (quartic ease-out — identical
+  // curve to the default poly(4)-out) while consolidating the ticker logic
+  // into a single source of truth. When countUp=false, we still call the
+  // hook (Rules of Hooks) but ignore its output in favour of the static value.
+  const ticked = useNumberTicker(value, startFrame, {
+    durationFrames: countUpFrames,
+    decimals,
+  });
+  const currentValue = countUp ? ticked : value;
   const displayValue = formatNumber(currentValue, decimals, prefix, suffix);
 
   return (
@@ -289,13 +303,11 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
       : HERO_START_DEFAULT;
   const barsStart = heroStart + heroCountFrames + heroHoldFrames;
 
-  // ── Hero count-up progress ──────────────────────────────────────────────
-  const heroProgress = interpolate(
-    frame,
-    [heroStart, heroStart + heroCountFrames],
-    [0, 1],
-    CLAMP_QUARTIC
-  );
+  // (The hero count-up progression is owned by useNumberTicker inside
+  // HeroStat as of May 15, 2026 — single source of truth in
+  // src/components/textAnimation.tsx. Previously this file inlined the
+  // interpolate; the easing is bitwise-identical (quartic ease-out via
+  // CLAMP_QUARTIC == poly(4) ease-out, the useNumberTicker default).)
 
   const heroOpacity = fadeIn(frame, heroStart, sec(0.4));
 
@@ -385,7 +397,8 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
             suffix={data.stat.suffix}
             label={data.stat.label}
             decimals={data.stat.decimals}
-            progress={heroProgress}
+            startFrame={heroStart}
+            countUpFrames={heroCountFrames}
             opacity={heroOpacity * exit}
             revealScale={scaleReveal(frame, heroStart, sec(0.8), 1.3, 1.0) * (1 + beat.pulse * 0.05)}
             theme={theme}

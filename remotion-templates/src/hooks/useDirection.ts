@@ -17,6 +17,7 @@
  */
 
 import type { CompositionAnimationOptions } from "./useCompositionAnimation";
+import type { TextAnimationTechnique } from "./directionBlock.schema";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -108,6 +109,22 @@ export interface DirectionBlock {
   paceProfile?: PaceProfile;
 
   /**
+   * Text-animation register for text-bearing templates (Phase 1
+   * integration, May 2026). See `project/TEXT_ANIMATION_REGISTER.md` for
+   * the technique catalog and editorial decision rules. When set,
+   * templates dispatch to the matching atomic or composite component.
+   * When unset, templates use their existing default animations.
+   */
+  textAnimation?: TextAnimationTechnique;
+  /**
+   * Cross-episode concept callback flag. When true and the template
+   * renders a known concept term, the term receives a ConceptCallback
+   * pulse on arrival. Visual-spec sets this based on
+   * `data/concepts.json` appearances[] lookup.
+   */
+  isCallback?: boolean;
+
+  /**
    * Forward-compat escape hatch. The corresponding Zod schema
    * (`DirectionBlockSchema` in `./directionBlock.schema`) uses
    * `.passthrough()` so experimental direction fields not yet typed here
@@ -116,6 +133,9 @@ export interface DirectionBlock {
    */
   [k: string]: unknown;
 }
+
+/** Re-export so consumers don't need to import from two locations. */
+export type { TextAnimationTechnique };
 
 type PaceProfile = "urgent" | "analytical" | "breathing";
 

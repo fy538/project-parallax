@@ -107,6 +107,8 @@ describe("audit-direction-fields: schema parser", () => {
       "driftPreset", "globalDim", "backgroundTint",
       // pace
       "paceProfile",
+      // text-animation register (Phase 1, May 2026)
+      "textAnimation", "isCallback",
     ]);
 
     for (const key of expectedKeys) {

@@ -48,6 +48,42 @@ export const PaceProfileSchema = z.enum(["urgent", "analytical", "breathing"]);
 /** Hold behavior at end of a segment. */
 export const HoldBehaviorSchema = z.enum(["breathe", "land", "linger"]);
 
+/**
+ * Canonical text-animation techniques.
+ *
+ * Eight atomic primitives + three composite patterns. See
+ * `project/TEXT_ANIMATION_REGISTER.md` for editorial register, use cases,
+ * and anti-patterns. Templates that accept a `_direction.textAnimation`
+ * value should pick from this set; bare strings will fail Zod validation.
+ *
+ * Atomic primitives ARE the underlying techniques (`typewriter` reveals
+ * char-by-char regardless of content). Composite patterns combine atoms
+ * with editorial defaults appropriate to a specific content register
+ * (`quote-attribution` = Typewriter + serif italic attribution + cursor).
+ *
+ * Visual-spec skill should prefer composite names for known content
+ * registers (quote → "quote-attribution"; definition → "definition-reveal";
+ * hero stat → "stat-caption") and reserve atomic names for one-off
+ * editorial moments outside the standard patterns.
+ */
+export const TextAnimationTechniqueSchema = z.enum([
+  // Atomic primitives
+  "typewriter",
+  "tracking-in",
+  "reveal-mask",
+  "underline-draw",
+  "number-ticker",
+  "scramble",
+  "backspace",
+  "word-cascade",
+  // Composite patterns
+  "definition-reveal",
+  "stat-caption",
+  "quote-attribution",
+]);
+
+export type TextAnimationTechnique = z.infer<typeof TextAnimationTechniqueSchema>;
+
 /** Resolved sync point from Whisper word-level alignment. */
 export const DirectionSyncPointSchema = z.object({
   word: z.string(),
@@ -98,6 +134,24 @@ export const DirectionBlockSchema = z
 
     // Pace
     paceProfile: PaceProfileSchema.optional(),
+
+    // Text animation register (Phase 1 integration, May 2026)
+    // See project/TEXT_ANIMATION_REGISTER.md
+    /**
+     * Choreography technique for text-bearing template content. When set,
+     * the template dispatches to the matching atomic primitive (e.g.
+     * Typewriter) or composite pattern (e.g. QuoteAttribution). When
+     * unset, templates fall back to their existing default animations —
+     * so this field is fully backward-compatible.
+     */
+    textAnimation: TextAnimationTechniqueSchema.optional(),
+    /**
+     * Whether the term/concept this segment renders is a cross-episode
+     * callback (per data/concepts.json appearances[]). When true, terms
+     * rendered through ConceptCallback receive a brief recurrence pulse.
+     * Visual-spec sets this based on registry lookup.
+     */
+    isCallback: z.boolean().optional(),
   })
   .passthrough();
 
