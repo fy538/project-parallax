@@ -31,6 +31,7 @@ export const DecisionTreeSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
+    layout: z.enum(["vertical", "horizontal"]).optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

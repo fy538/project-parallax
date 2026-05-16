@@ -143,6 +143,10 @@ const NODE_HEIGHT = 88;
 const LEVEL_GAP = 200;
 const NODE_GAP = layout.spacing.xl * 2;
 
+// Horizontal layout constants — depth drives X, sibling index drives Y.
+const HORIZ_LEVEL_GAP = 300; // horizontal distance between depth columns
+const HORIZ_NODE_GAP = 120;  // vertical distance between siblings in a column
+
 // ── Positioning ────────────────────────────────────────────────────────────
 
 interface NodePosition {
@@ -154,12 +158,17 @@ interface NodePosition {
 /**
  * Compute tree layout — nodes positioned for the full canvas.
  * The camera handles which part is visible; layout uses full space.
+ *
+ * When `horizontal` is true, depth → X and sibling index → Y (left-to-right
+ * extensive form). When false (default), depth → Y and sibling index → X
+ * (top-to-bottom, the original layout).
  */
 function computeTreeLayout(
   nodes: TreeNode[],
   rootId: string,
   canvasWidth: number,
   canvasHeight: number,
+  horizontal = false,
 ): Map<string, NodePosition> {
   const positions = new Map<string, NodePosition>();
   const nodeMap = new Map(nodes.map((n) => [n.id, n]));
@@ -179,23 +188,56 @@ function computeTreeLayout(
   };
   buildLevels(rootId, 0);
 
-  // Center tree vertically in canvas
-  const numLevels = levels.size;
-  const totalTreeHeight = (numLevels - 1) * LEVEL_GAP + NODE_HEIGHT;
-  const topY = Math.max(
-    layout.spacing.xl * 3, // Leave space for title
-    (canvasHeight - totalTreeHeight) / 2
-  );
+  if (horizontal) {
+    // ── Horizontal layout: depth → X, sibling index → Y ────────────────
+    // Title safe area is ~180px from top.
+    const TITLE_SAFE = 180;
+    const LEFT_MARGIN = canvasWidth * 0.08;
 
-  for (const [level, nodeIds] of levels) {
-    const y = topY + level * LEVEL_GAP;
-    const numSiblings = nodeIds.length;
-    const totalWidth = numSiblings * NODE_WIDTH + (numSiblings - 1) * NODE_GAP;
-    const startX = (canvasWidth - totalWidth) / 2;
+    // Find the tallest column to vertically center the whole tree.
+    let maxCount = 0;
+    for (const nodeIds of levels.values()) {
+      if (nodeIds.length > maxCount) maxCount = nodeIds.length;
+    }
+    const tallestColumnHeight =
+      maxCount * NODE_HEIGHT + Math.max(0, maxCount - 1) * HORIZ_NODE_GAP;
+    const availableHeight = canvasHeight - TITLE_SAFE;
+    const treeTop =
+      TITLE_SAFE + Math.max(0, (availableHeight - tallestColumnHeight) / 2);
 
-    for (let i = 0; i < nodeIds.length; i++) {
-      const x = startX + i * (NODE_WIDTH + NODE_GAP);
-      positions.set(nodeIds[i], { x, y, level });
+    for (const [level, nodeIds] of levels) {
+      const nodeX = LEFT_MARGIN + level * (NODE_WIDTH + HORIZ_LEVEL_GAP);
+      // Vertically center this column's nodes relative to treeTop.
+      const columnHeight =
+        nodeIds.length * NODE_HEIGHT +
+        Math.max(0, nodeIds.length - 1) * HORIZ_NODE_GAP;
+      const columnTop =
+        treeTop + (tallestColumnHeight - columnHeight) / 2;
+
+      for (let i = 0; i < nodeIds.length; i++) {
+        const nodeY = columnTop + i * (NODE_HEIGHT + HORIZ_NODE_GAP);
+        positions.set(nodeIds[i], { x: nodeX, y: nodeY, level });
+      }
+    }
+  } else {
+    // ── Vertical layout (original): depth → Y, sibling index → X ───────
+    const numLevels = levels.size;
+    const totalTreeHeight = (numLevels - 1) * LEVEL_GAP + NODE_HEIGHT;
+    const topY = Math.max(
+      layout.spacing.xl * 3, // Leave space for title
+      (canvasHeight - totalTreeHeight) / 2,
+    );
+
+    for (const [level, nodeIds] of levels) {
+      const y = topY + level * LEVEL_GAP;
+      const numSiblings = nodeIds.length;
+      const totalWidth = numSiblings * NODE_WIDTH + (numSiblings - 1) * NODE_GAP;
+      const startX = (canvasWidth - totalWidth) / 2;
+
+      for (let i = 0; i < nodeIds.length; i++) {
+        const x = startX + i * (NODE_WIDTH + NODE_GAP);
+        positions.set(nodeIds[i], { x, y, level });
+      }
     }
   }
 
@@ -215,6 +257,55 @@ function edgePath(
   const x2 = childPos.x + NODE_WIDTH / 2;
   const y2 = childPos.y;
   return smoothStepEdge(x1, y1, x2, y2, 0.5);
+}
+
+/**
+ * Horizontal bezier edge path — S-curve going left to right.
+ * Source: right-center of parent; target: left-center of child.
+ * Control points pull horizontally into the gap between columns.
+ */
+function edgePathHorizontal(
+  parentPos: NodePosition,
+  childPos: NodePosition,
+): string {
+  const sx = parentPos.x + NODE_WIDTH;
+  const sy = parentPos.y + NODE_HEIGHT / 2;
+  const tx = childPos.x;
+  const ty = childPos.y + NODE_HEIGHT / 2;
+  const cp1x = sx + HORIZ_LEVEL_GAP * 0.5;
+  const cp1y = sy;
+  const cp2x = tx - HORIZ_LEVEL_GAP * 0.5;
+  const cp2y = ty;
+  return `M ${sx} ${sy} C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${tx} ${ty}`;
+}
+
+/** Returns the mid-segment point on a horizontal bezier at t=0.5. */
+function horizontalEdgeMid(
+  parentPos: NodePosition,
+  childPos: NodePosition,
+): { midX: number; midY: number; tx: number; ty: number } {
+  const sx = parentPos.x + NODE_WIDTH;
+  const sy = parentPos.y + NODE_HEIGHT / 2;
+  const tx = childPos.x;
+  const ty = childPos.y + NODE_HEIGHT / 2;
+  // Cubic bezier at t=0.5
+  const cp1x = sx + HORIZ_LEVEL_GAP * 0.5;
+  const cp1y = sy;
+  const cp2x = tx - HORIZ_LEVEL_GAP * 0.5;
+  const cp2y = ty;
+  const t = 0.5;
+  const mt = 1 - t;
+  const midX =
+    mt * mt * mt * sx +
+    3 * mt * mt * t * cp1x +
+    3 * mt * t * t * cp2x +
+    t * t * t * tx;
+  const midY =
+    mt * mt * mt * sy +
+    3 * mt * mt * t * cp1y +
+    3 * mt * t * t * cp2y +
+    t * t * t * ty;
+  return { midX, midY, tx, ty };
 }
 
 // ── TreeNode Component ─────────────────────────────────────────────────────
@@ -242,6 +333,10 @@ const TreeNodeComponent: React.FC<{
   focusScale: number;
   /** Per-episode accent for active-node underline. */
   highlightColor: string;
+  /** When true, left-align text and apply stronger off-path dimming. */
+  isHorizontal?: boolean;
+  /** Whether this node is on the highlightedPath (for horizontal dimming). */
+  isOnPathNode?: boolean;
 }> = React.memo(({
   node,
   position,
@@ -252,6 +347,8 @@ const TreeNodeComponent: React.FC<{
   dimAmount,
   focusScale,
   highlightColor,
+  isHorizontal = false,
+  isOnPathNode = false,
 }) => {
   const theme = useThemeMode(mode);
   const nodeOpacity = fadeIn(frame, startFrame, sec(0.5));
@@ -273,8 +370,11 @@ const TreeNodeComponent: React.FC<{
     CLAMP_CUBIC,
   );
 
+  // Horizontal layout: off-path nodes dim more aggressively (0.3 opacity cap).
+  const horizontalPathDim = isHorizontal && !isOnPathNode ? 0.7 : 0;
+  const combinedDim = Math.max(dimAmount, horizontalPathDim);
   // Effective opacity: base animation × exit × inverse dim
-  const effectiveOpacity = nodeOpacity * exitOp * (1 - dimAmount);
+  const effectiveOpacity = nodeOpacity * exitOp * (1 - combinedDim);
 
   return (
     <div
@@ -290,7 +390,7 @@ const TreeNodeComponent: React.FC<{
         transition: "opacity 0.3s ease",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: isHorizontal ? "flex-start" : "center",
         justifyContent: "center",
         boxSizing: "border-box",
       }}
@@ -309,7 +409,7 @@ const TreeNodeComponent: React.FC<{
               ? fontWeights.medium
               : fontWeights.regular,
           lineHeight: 1.3,
-          textAlign: "center",
+          textAlign: isHorizontal ? "left" : "center",
           color: theme.text.primary,
           padding: `0 ${layout.spacing.sm}px`,
         }}
@@ -583,6 +683,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const theme = useThemeMode(data.backgroundVariant || "light");
   const backgroundVariant = data.backgroundVariant || "light";
 
+  const isHorizontal = data.layout === "horizontal";
+
   warnIf(
     !data.nodes.find((n) => n.id === data.rootId),
     "DecisionTree",
@@ -644,8 +746,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
 
   // ── Layout ────────────────────────────────────────────────────────────
   const positions = useMemo(
-    () => computeTreeLayout(data.nodes, data.rootId, layout.width, layout.height),
-    [data.nodes, data.rootId]
+    () => computeTreeLayout(data.nodes, data.rootId, layout.width, layout.height, isHorizontal),
+    [data.nodes, data.rootId, isHorizontal]
   );
 
   // ── Parent map for path-based dimming ─────────────────────────────────
@@ -676,6 +778,13 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     transitionSec: 0.6,
   });
 
+  // ── On-path edge check (horizontal layout track system) ───────────────
+  const isOnPath = (parentId: string, childId: string): boolean => {
+    if (!data.highlightedPath || data.highlightedPath.length === 0) return false;
+    const pIdx = data.highlightedPath.indexOf(parentId);
+    return pIdx !== -1 && data.highlightedPath[pIdx + 1] === childId;
+  };
+
   // ── Edge list ─────────────────────────────────────────────────────────
   // Each edge carries the mid-segment coordinates of its rendered path so
   // we can place edge labels (and the probability label) right on the edge,
@@ -689,8 +798,13 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
       childId: string;
       pathData: string;
       isHighlighted: boolean;
+      /** Horizontal layout: whether this edge is on the precise highlighted path sequence */
+      isOnPathEdge: boolean;
       midX: number;
       midY: number;
+      /** Horizontal layout: arrowhead target point (left-center of child) */
+      arrowTx: number;
+      arrowTy: number;
       /** Combined edge label: edgeLabel ?? probability (only one renders). */
       label?: string;
       /** Whether `label` came from `node.probability` (so probabilityWeights
@@ -709,13 +823,29 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         if (!childPos) continue;
         const child = nodeMap.get(childId);
 
-        // Mid-segment label coordinates (between parent bottom + child top,
-        // centered horizontally). On a smooth-step cubic this is also where
-        // the curve is roughly horizontal, so non-rotated text reads cleanly.
-        const midX =
-          (parentPos.x + childPos.x) / 2 + NODE_WIDTH / 2;
-        const midY =
-          (parentPos.y + NODE_HEIGHT + childPos.y) / 2;
+        let midX: number;
+        let midY: number;
+        let pathData: string;
+        let arrowTx: number;
+        let arrowTy: number;
+
+        if (isHorizontal) {
+          const horiz = horizontalEdgeMid(parentPos, childPos);
+          midX = horiz.midX;
+          midY = horiz.midY;
+          arrowTx = horiz.tx;
+          arrowTy = horiz.ty;
+          pathData = edgePathHorizontal(parentPos, childPos);
+        } else {
+          // Mid-segment label coordinates (between parent bottom + child top,
+          // centered horizontally). On a smooth-step cubic this is also where
+          // the curve is roughly horizontal, so non-rotated text reads cleanly.
+          midX = (parentPos.x + childPos.x) / 2 + NODE_WIDTH / 2;
+          midY = (parentPos.y + NODE_HEIGHT + childPos.y) / 2;
+          arrowTx = childPos.x + NODE_WIDTH / 2;
+          arrowTy = childPos.y;
+          pathData = edgePath(parentPos, childPos);
+        }
 
         const edgeLabel = child?.edgeLabel;
         const probability = child?.probability;
@@ -724,17 +854,21 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         result.push({
           parentId: node.id,
           childId,
-          pathData: edgePath(parentPos, childPos),
+          pathData,
           isHighlighted: highlighted.has(node.id) && highlighted.has(childId),
+          isOnPathEdge: isOnPath(node.id, childId),
           midX,
           midY,
+          arrowTx,
+          arrowTy,
           label,
           labelFromProbability: !edgeLabel && Boolean(probability),
         });
       }
     }
     return result;
-  }, [data.nodes, positions, data.highlightedPath]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.nodes, positions, data.highlightedPath, isHorizontal]);
 
   const highlightColor = data.highlightColor || emphasis.primaryAccent;
 
@@ -795,56 +929,122 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 pointerEvents: "none",
               }}
             >
-              {/* Non-highlighted edges. */}
-              {edges
-                .filter((e) => !e.isHighlighted)
-                .map((edge, i) => {
-                  const childLevel = positions.get(edge.childId)?.level ?? 0;
-                  const startFrame = sec(0.6 * t) + childLevel * sec(0.4 * s);
-                  const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
-                  const parentDim = camera.getNodeDim(edge.parentId);
-                  const childDim = camera.getNodeDim(edge.childId);
-                  const edgeDim = Math.max(parentDim, childDim);
-                  const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
-                  // Unchosen edges recede via opacity + weight. The 30% mute
-                  // factor + 1.25px stroke is the FT scenario-tree default.
-                  const muteFactor = someHighlighted ? 0.3 : 0.7;
-                  const strokeWidth = someHighlighted ? 1.25 : 1.75;
+              {isHorizontal ? (
+                /* ── Horizontal track-style edges ──────────────────────────
+                   On-path: thick (7px) ribbon in highlightColor.
+                   Off-path: thin (1px) muted lines at 60% opacity.
+                   Render off-path first so on-path ribbon sits on top. */
+                <>
+                  {/* Off-path edges (thin, muted) */}
+                  {edges
+                    .filter((e) => !e.isOnPathEdge)
+                    .map((edge, i) => {
+                      const childLevel = positions.get(edge.childId)?.level ?? 0;
+                      const startFrame = sec(0.6 * t) + childLevel * sec(0.4 * s);
+                      const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
+                      const parentDim = camera.getNodeDim(edge.parentId);
+                      const childDim = camera.getNodeDim(edge.childId);
+                      const edgeDim = Math.max(parentDim, childDim);
+                      const isDark = data.backgroundVariant === "dark";
+                      return (
+                        <path
+                          key={`hedge-off-${i}`}
+                          d={edge.pathData}
+                          stroke={isDark ? "rgba(255,255,255,0.22)" : "rgba(0,0,0,0.18)"}
+                          strokeWidth={1}
+                          fill="none"
+                          opacity={edgeOpacity * (1 - edgeDim) * 0.6 * exitFade(frame, totalFrames, sec(0.5))}
+                        />
+                      );
+                    })}
+                  {/* On-path edges (thick ribbon) */}
+                  {edges
+                    .filter((e) => e.isOnPathEdge)
+                    .map((edge, i) => {
+                      const childLevel = positions.get(edge.childId)?.level ?? 0;
+                      const startFrame = sec(1) + childLevel * sec(0.4) + sec(0.5);
+                      const edgeOpacity = fadeIn(frame, startFrame, sec(0.6));
+                      const parentDim = camera.getNodeDim(edge.parentId);
+                      const childDim = camera.getNodeDim(edge.childId);
+                      const edgeDim = Math.max(parentDim, childDim);
+                      const effectiveOpacity = edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5));
+                      return (
+                        <g key={`hedge-on-${i}`}>
+                          <path
+                            d={edge.pathData}
+                            stroke={highlightColor}
+                            strokeWidth={7}
+                            fill="none"
+                            strokeLinecap="round"
+                            opacity={effectiveOpacity}
+                          />
+                          {/* Small filled circle arrowhead at the target (left-center of child) */}
+                          <circle
+                            cx={edge.arrowTx}
+                            cy={edge.arrowTy}
+                            r={4}
+                            fill={highlightColor}
+                            opacity={effectiveOpacity}
+                          />
+                        </g>
+                      );
+                    })}
+                </>
+              ) : (
+                /* ── Vertical (original) edge rendering ─────────────────── */
+                <>
+                  {/* Non-highlighted edges. */}
+                  {edges
+                    .filter((e) => !e.isHighlighted)
+                    .map((edge, i) => {
+                      const childLevel = positions.get(edge.childId)?.level ?? 0;
+                      const startFrame = sec(0.6 * t) + childLevel * sec(0.4 * s);
+                      const edgeOpacity = fadeIn(frame, startFrame, sec(0.5));
+                      const parentDim = camera.getNodeDim(edge.parentId);
+                      const childDim = camera.getNodeDim(edge.childId);
+                      const edgeDim = Math.max(parentDim, childDim);
+                      const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
+                      // Unchosen edges recede via opacity + weight. The 30% mute
+                      // factor + 1.25px stroke is the FT scenario-tree default.
+                      const muteFactor = someHighlighted ? 0.3 : 0.7;
+                      const strokeWidth = someHighlighted ? 1.25 : 1.75;
 
-                  return (
-                    <path
-                      key={`edge-${i}`}
-                      d={edge.pathData}
-                      stroke={theme.text.muted}
-                      strokeWidth={strokeWidth}
-                      fill="none"
-                      opacity={edgeOpacity * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
-                    />
-                  );
-                })}
+                      return (
+                        <path
+                          key={`edge-${i}`}
+                          d={edge.pathData}
+                          stroke={theme.text.muted}
+                          strokeWidth={strokeWidth}
+                          fill="none"
+                          opacity={edgeOpacity * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
+                        />
+                      );
+                    })}
 
-              {/* Highlighted (chosen-path) edges — solid, full weight, no glow. */}
-              {edges
-                .filter((e) => e.isHighlighted)
-                .map((edge, i) => {
-                  const childLevel = positions.get(edge.childId)?.level ?? 0;
-                  const startFrame = sec(1) + childLevel * sec(0.4) + sec(0.5);
-                  const edgeOpacity = fadeIn(frame, startFrame, sec(0.6));
-                  const parentDim = camera.getNodeDim(edge.parentId);
-                  const childDim = camera.getNodeDim(edge.childId);
-                  const edgeDim = Math.max(parentDim, childDim);
-                  return (
-                    <path
-                      key={`edge-hl-${i}`}
-                      d={edge.pathData}
-                      stroke={highlightColor}
-                      strokeWidth={2.5}
-                      fill="none"
-                      strokeLinecap="round"
-                      opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
-                    />
-                  );
-                })}
+                  {/* Highlighted (chosen-path) edges — solid, full weight, no glow. */}
+                  {edges
+                    .filter((e) => e.isHighlighted)
+                    .map((edge, i) => {
+                      const childLevel = positions.get(edge.childId)?.level ?? 0;
+                      const startFrame = sec(1) + childLevel * sec(0.4) + sec(0.5);
+                      const edgeOpacity = fadeIn(frame, startFrame, sec(0.6));
+                      const parentDim = camera.getNodeDim(edge.parentId);
+                      const childDim = camera.getNodeDim(edge.childId);
+                      const edgeDim = Math.max(parentDim, childDim);
+                      return (
+                        <path
+                          key={`edge-hl-${i}`}
+                          d={edge.pathData}
+                          stroke={highlightColor}
+                          strokeWidth={2.5}
+                          fill="none"
+                          strokeLinecap="round"
+                          opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
+                        />
+                      );
+                    })}
+                </>
+              )}
 
               {/* Edge labels — mid-segment, mono register, paper-color halo
                   for legibility against any edge color. The double-rendered
@@ -999,9 +1199,12 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 // off-path nodes to 0.5 dim alongside their dimmed edges so the
                 // chosen branch reads as the editorial protagonist. The path
                 // nodes still get camera-driven dim if focused elsewhere.
+                // For horizontal layout, path-based dimming is handled inside
+                // TreeNodeComponent (isOnPathNode prop) so we skip it here to
+                // avoid compounding two independent dim factors.
                 const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
                 const onPath = someHighlighted && data.highlightedPath!.includes(node.id);
-                const pathDim = someHighlighted && !onPath ? 0.5 : 0;
+                const pathDim = !isHorizontal && someHighlighted && !onPath ? 0.5 : 0;
                 const dimAmount = Math.max(camera.getNodeDim(node.id), pathDim);
 
                 return (
@@ -1016,6 +1219,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     dimAmount={dimAmount}
                     focusScale={camera.getNodeScale(node.id)}
                     highlightColor={highlightColor}
+                    isHorizontal={isHorizontal}
+                    isOnPathNode={onPath}
                   />
                 );
               })}

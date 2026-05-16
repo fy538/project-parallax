@@ -120,6 +120,8 @@ export interface DecisionTreeData {
   source?: string;
   durationSec?: number;
   backgroundVariant?: "dark" | "light";
+  /** Tree growth direction. "vertical" (default) = top→bottom. "horizontal" = left→right with track-style path highlighting. */
+  layout?: "vertical" | "horizontal";
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

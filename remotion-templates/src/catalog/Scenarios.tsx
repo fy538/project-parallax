@@ -222,6 +222,38 @@ const gameIteratedPD: GameBoardData = {
 // DuelingFrameworks (side-by-side structural comparison) or
 // HorizontalTimeline dual mode (cadence-aligned parallel tracks).
 
+// Horizontal layout demo — AI timeline branching, left-to-right, track-style
+// path highlighting. Demonstrates the "horizontal" layout variant with a
+// thick ribbon on the chosen path and muted thin lines for unchosen branches.
+const treeAITimelineHorizontal: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "The AI Timeline Question",
+  subtitle: "Everything turns on a single variable nobody can predict",
+  rootId: "root",
+  layout: "horizontal",
+  backgroundVariant: "dark",
+  durationSec: 14,
+  probabilityWeights: true,
+  highlightColor: "#C4A747",
+  highlightedPath: ["root", "slow", "controls-backfire", "china-independent"],
+  nodes: [
+    { id: "root", label: "AI arrival timeline", color: "#C4A747", children: ["fast", "slow"], active: true },
+    { id: "fast", label: "Fast (2–3 years)", edgeLabel: "35%", color: "#4A7BA7", children: ["controls-succeed"] },
+    { id: "slow", label: "Slow (10+ years)", edgeLabel: "65%", color: "#A64D46", children: ["controls-backfire"], highlighted: true },
+    { id: "controls-succeed", label: "Controls succeeded", color: "#4A7BA7", children: ["us-lead"] },
+    { id: "controls-backfire", label: "Controls backfired", color: "#A64D46", children: ["china-independent"], highlighted: true },
+    { id: "us-lead", label: "US keeps decisive lead", color: "#4A7BA7" },
+    { id: "china-independent", label: "China achieved self-sufficiency", color: "#A64D46", highlighted: true },
+  ],
+  cameraPath: [
+    { focus: "root", zoom: 1.8, duration: 2 },
+    { focus: "root", zoom: 1.1, duration: 1.5 },
+    { focus: "china-independent", zoom: 1.6, duration: 4, dimOthers: true, label: "Scenario B: Controls backfire" },
+    { focus: "root", zoom: 1.0, duration: 2.5 },
+  ],
+  source: "Parallax analysis",
+};
+
 // ─── Composition registrations ────────────────────────────────────────────
 
 export const CatalogTreeChess = () => (
@@ -251,6 +283,21 @@ export const CatalogTreeExCommLadder = () => (
       height: layout.height,
     })}
     defaultProps={{ data: treeExCommLadder }}
+  />
+);
+
+export const DecisionTreeHorizontalComposition = () => (
+  <Composition
+    id="DecisionTree-Horizontal"
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treeAITimelineHorizontal }}
   />
 );
 
@@ -317,5 +364,5 @@ export const CatalogGameIteratedPD = () => (
 // CatalogBifurcationCocom export removed May 13, 2026 with BifurcationRoute.
 
 export const catalogScenariosData = {
-  treeChessOpening, treeExCommLadder, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
+  treeChessOpening, treeExCommLadder, treeAITimelineHorizontal, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
 };

@@ -28,6 +28,7 @@ import { KineticTypographyComposition } from "./templates/KineticTypography";
 import { FrameworkDiagramComposition } from "./templates/FrameworkDiagram";
 import { TitleTransitionComposition } from "./templates/TitleTransition";
 import { DecisionTreeComposition } from "./templates/DecisionTree";
+import { DecisionTreeHorizontalComposition } from "./catalog/Scenarios";
 import { SplitCompositionComposition } from "./templates/SplitComposition";
 import { ProbabilityGaugeComposition } from "./templates/ProbabilityGauge";
 import { ImageCompositeComposition } from "./templates/ImageComposite";
@@ -263,6 +264,7 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Scenarios">
         <DecisionTreeComposition />
+        <DecisionTreeHorizontalComposition />
         <GameBoardComposition />
         {/* BifurcationRouteComposition removed May 13, 2026 — see import comment. */}
       </Folder>
