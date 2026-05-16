@@ -123,3 +123,207 @@ class TestRealEpisodesClean:
             f"{slug} has {len(errors)} M-* errors: "
             + ", ".join(f"{e.rule}: {e.message[:80]}" for e in errors)
         )
+
+
+# ─── M-TEXT-ANIM rule (Phase 3 text-animation integration) ─────────────────
+# Validates: (a) textAnimation values are canonical; (b) composite patterns
+# match their template variant; (c) quote-attribution requires a real named
+# attribution; (d) stat-caption with unparseable statValue warns.
+
+
+def _setup_episode(tmp_path, segments, datafiles):
+    """Build a synthetic episode dir with a manifest + dataFile JSONs."""
+    episode_dir = tmp_path
+    (episode_dir / "assembly-manifest.json").write_text(json.dumps({
+        "version": "1.0",
+        "episode": "test",
+        "fps": 30,
+        "narration": {"totalDurationSec": 100},
+        "segments": segments,
+    }))
+    for fname, content in datafiles.items():
+        (episode_dir / fname).write_text(json.dumps(content))
+    return episode_dir / "assembly-manifest.json"
+
+
+class TestTextAnimRule:
+    def test_canonical_technique_passes(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE",
+                "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "q.json"},
+            }],
+            datafiles={"q.json": {
+                "variant": "quote",
+                "text": "...",
+                "attribution": "Nash",
+                "_direction": {"textAnimation": "quote-attribution"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_unknown_technique_errors(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "q.json"},
+            }],
+            datafiles={"q.json": {
+                "variant": "quote",
+                "_direction": {"textAnimation": "made-up-name"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].severity == "error"
+        assert "made-up-name" in violations[0].message
+        assert violations[0].rule == "M-TEXT-ANIM"
+
+    def test_quote_attribution_on_non_quote_variant_warns(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "x.json"},
+            }],
+            datafiles={"x.json": {
+                "variant": "definition",
+                "term": "test",
+                "_direction": {"textAnimation": "quote-attribution"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].severity == "warning"
+        assert "quote-attribution" in violations[0].message
+
+    def test_quote_attribution_without_attribution_field_warns(self, tmp_path):
+        """Channel-voice 'quote' (no named attribution) should NOT use typewriter register."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "cv.json"},
+            }],
+            datafiles={"cv.json": {
+                "variant": "quote",
+                "text": "Cooperation isn't a miracle. It's designed.",
+                # No attribution field — this is channel voice
+                "_direction": {"textAnimation": "quote-attribution"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert "named `attribution`" in violations[0].message
+
+    def test_quote_attribution_with_empty_attribution_warns(self, tmp_path):
+        """Empty-string attribution counts as missing."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "x.json"},
+            }],
+            datafiles={"x.json": {
+                "variant": "quote",
+                "text": "...",
+                "attribution": "   ",  # whitespace-only
+                "_direction": {"textAnimation": "quote-attribution"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+
+    def test_definition_reveal_on_quote_warns(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "x.json"},
+            }],
+            datafiles={"x.json": {
+                "variant": "quote",
+                "_direction": {"textAnimation": "definition-reveal"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert "definition-reveal" in violations[0].message
+
+    def test_stat_caption_with_unparseable_value_warns(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "x.json"},
+            }],
+            datafiles={"x.json": {
+                "variant": "statistic",
+                "statValue": "many",  # not a number
+                "_direction": {"textAnimation": "stat-caption"},
+            }},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert "unparseable" in violations[0].message
+
+    def test_stat_caption_with_parseable_value_passes(self, tmp_path):
+        """Variants of parseable statValue strings — all should be silent."""
+        for stat_value in ["82%", "$165B", "1,500", "0", "3.14"]:
+            manifest_path = _setup_episode(tmp_path,
+                segments=[{
+                    "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                    "template": {"component": "KineticTypography", "dataFile": "x.json"},
+                }],
+                datafiles={"x.json": {
+                    "variant": "statistic",
+                    "statValue": stat_value,
+                    "_direction": {"textAnimation": "stat-caption"},
+                }},
+            )
+            violations = manifest_lint.check_text_animation_register(
+                json.loads(manifest_path.read_text()), manifest_path,
+            )
+            assert violations == [], f"unexpected violation on statValue={stat_value!r}"
+
+    def test_missing_direction_block_is_silent(self, tmp_path):
+        """No _direction block → backwards-compat path; rule should not fire."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 5,
+                "template": {"component": "KineticTypography", "dataFile": "x.json"},
+            }],
+            datafiles={"x.json": {"variant": "quote", "text": "..."}},
+        )
+        violations = manifest_lint.check_text_animation_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_real_episodes_have_no_violations(self):
+        """Phase 2 backfill should be coherent with the M-TEXT-ANIM rule."""
+        for slug in ("silicon-trap", "prisoners-dilemma"):
+            manifest_path = (
+                REPO_ROOT / "remotion-templates" / "data" / "episodes" / slug
+                / "assembly-manifest.json"
+            )
+            if not manifest_path.is_file():
+                continue
+            violations = manifest_lint.check_text_animation_register(
+                json.loads(manifest_path.read_text()), manifest_path,
+            )
+            assert violations == [], (
+                f"{slug} has M-TEXT-ANIM violations: "
+                + "; ".join(v.message for v in violations)
+            )

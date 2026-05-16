@@ -209,6 +209,23 @@ Beat 4: [MG:Chart 8s] [AI-GEN 7s] [ILLUST 5s] [MG:FW 10s]  ✅ register variety
 - PACE changes align with narrative structure (e.g., breathing at act breaks, urgent during crisis escalation) rather than being randomly scattered
 - If no PACE annotations exist, note this as informational — they're optional but recommended for scripts with clear tempo shifts
 
+**Text-animation register check.** When the script tags `[MG:] KineticTypography` cells, verify the implicit text-animation register matches the content's editorial role. The doctrine is in `project/TEXT_ANIMATION_REGISTER.md`. For audit purposes, walk each KineticTypography cell and flag these specific patterns:
+
+- **A quote variant with a real, named attribution** (Nash, Morris Chang, Schmidt, Schelling, Sullivan, etc.) should be tagged or specified to use the `quote-attribution` composite pattern (Typewriter + serif-italic attribution). If the script doesn't explicitly say so via `DIR: type(quote-attribution)` or visual-spec doesn't appear to be picking it up, flag as: "Named-attribution quote — consider tagging `DIR: type(quote-attribution)` so visual-spec emits the typewriter register; otherwise the channel-voice default applies and the quote loses its archival/transcribed feel."
+- **A quote variant with NO named attribution** (i.e., channel-voice text styled as a "quote" for emphasis, e.g., "Cooperation isn't a miracle. It's designed.") — should NOT use `quote-attribution`. This is the most common misuse. Flag if the script tags `DIR: type(quote-attribution)` (or similar) on a channel-voice quote: "Channel-voice statements aren't transcribed speech — typewriter register implies a named speaker. Use `[MG:] KineticTypography variant=\"quote\"` with the word-cascade default; or, if the line is the episode's editorial pivot, consider switching it to a definition variant or a stat-caption."
+- **A definition variant introducing a foreign term** (any cell where `term`, `termPinyin`, `termTranslation` would be set — typically `卡脖子`, `举国体制`, or any non-English term being defined) should use `definition-reveal`. If the script writer authored a cell for the term but didn't request the composite, flag: "Foreign-term introduction — `DIR: type(definition-reveal)` would lift this from a generic word reveal into the canonical Parallax definition pattern (term + pinyin + translation choreography)."
+- **A statistic variant with a hero number** (cell with `statValue` set) should use `stat-caption`. Same flag logic — recommend tagging.
+
+**Concept-callback check (cross-episode continuity).** When the script references a term that was introduced in a PRIOR Parallax episode (per `data/concepts.json`), the second-and-later renderings should be tagged with `DIR: type(<technique>, callback)` so visual-spec sets `_direction.isCallback: true`. The callback pulse is a compounding-production lever: every recurring concept gets a subtle "you've seen this before" cue at zero cost.
+
+To run this check: use the concept-registry CLI to look up each term in the current script. For each match where `introduced.episode` is NOT the current episode, flag the callback opportunity:
+```
+python3 tools/concepts/lookup.py callback-check --term "卡脖子" --episode <current-slug>
+```
+The CLI returns JSON: `{ isCallback: true|false, conceptId, accentColor, introducedIn, currentEpisode }`. If `isCallback: true`, flag the rendering moment in the script audit as: "Concept callback opportunity — add `DIR: type(<technique>, callback)` so the term pulses on arrival per the cross-episode continuity register (TEXT_ANIMATION_REGISTER.md § Tier 1.B)."
+
+**Anti-pattern — over-use of dramatic text registers.** Reserve the high-energy techniques for editorial peaks. If the script has more than ~2 `DIR: type(scramble)` or more than ~3 `DIR: type(reveal-mask)` invocations in a single episode, flag as register-creep: "These techniques are register signals; using them frequently drifts toward spy-thriller or theatrical territory. Reserve for the highest-weight moments."
+
 ### Lens 7: Decoder Posture Check
 
 This lens operationalizes the narrative rules NAR-09 through NAR-16 from the Editorial Playbook. The core question: **is this script interesting, bold, and intellectually honest?** Note: "decoder" posture is about *engagement quality*, not about avoiding all context or hedging every claim. Context that creates wonder is good. Strong positions defended with evidence are good. The enemy is boring, not bold.

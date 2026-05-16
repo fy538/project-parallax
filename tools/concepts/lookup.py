@@ -241,6 +241,102 @@ def cmd_reuse_check(args, registry):
         print()
 
 
+# ── Callback check (Phase 3 text-animation integration) ────────────────────
+#
+# Given a specific term + current-episode slug, return whether it's a
+# cross-episode callback (introduced in an EARLIER episode and now
+# recurring). Used by the visual-spec skill to set
+# `_direction.isCallback` in segment JSONs. See
+# `project/TEXT_ANIMATION_REGISTER.md` § Tier 1.B (Concept Callback Pulse).
+#
+# Resolution rules:
+#   1. Try exact match against concept.id.
+#   2. Fall back to case-insensitive match against term.en, term.cn,
+#      term.pinyin, or term.short.
+#   3. If no match found → exit 2 with a clear message (term unknown).
+#
+# Returns JSON with `isCallback`, `conceptId`, `accentColor`, plus the
+# matched concept's `introduced.episode` for transparency.
+
+def cmd_callback_check(args, registry):
+    """Decide whether a term in a given episode is a concept callback."""
+    target_term = args.term
+    target_episode = args.episode
+    target_lower = target_term.lower()
+
+    # 1. Exact ID match
+    concept = next(
+        (c for c in registry["concepts"] if c["id"] == target_term),
+        None,
+    )
+
+    # 2. Term match (case-insensitive en / pinyin / short; exact for CN)
+    if concept is None:
+        for c in registry["concepts"]:
+            term = c.get("term", {})
+            candidates = [
+                term.get("en", "").lower(),
+                term.get("pinyin", "").lower(),
+                term.get("short", "").lower(),
+            ]
+            cn = term.get("cn")
+            if cn and cn == target_term:
+                concept = c
+                break
+            if target_lower and target_lower in candidates:
+                concept = c
+                break
+
+    if concept is None:
+        if args.json:
+            print(
+                json.dumps(
+                    {
+                        "isCallback": False,
+                        "conceptId": None,
+                        "accentColor": None,
+                        "introducedIn": None,
+                        "error": f"term not found in registry: {target_term!r}",
+                    }
+                )
+            )
+        else:
+            print(
+                f"callback-check: term not found in registry: {target_term!r}",
+                file=sys.stderr,
+            )
+        sys.exit(2)
+
+    introduced = concept.get("introduced") or {}
+    introduced_ep = introduced.get("episode")
+    # Compare loosely — concepts.json may use EP01 / silicon-trap / etc.
+    # so we normalise both ends to lowercase before equality.
+    is_callback = (
+        introduced_ep is not None
+        and introduced_ep.lower() != target_episode.lower()
+    )
+    accent_color = introduced.get("accentColor")
+
+    result = {
+        "isCallback": is_callback,
+        "conceptId": concept["id"],
+        "accentColor": accent_color,
+        "introducedIn": introduced_ep,
+        "currentEpisode": target_episode,
+    }
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False))
+    else:
+        status = "✓ callback" if is_callback else "· first introduction"
+        print(
+            f"  {status} — '{concept['id']}' "
+            f"(introduced in {introduced_ep}, current {target_episode})"
+        )
+        if accent_color:
+            print(f"  accent color: {accent_color}")
+    return 0
+
+
 # ── Show ────────────────────────────────────────────────────────────────────
 
 def cmd_show(args, registry):
@@ -764,6 +860,13 @@ def main():
     p_reuse.add_argument("episode", help="Target episode ID")
     p_reuse.add_argument("--script", required=True, help="Path to script .md file")
 
+    p_callback = sub.add_parser(
+        "callback-check",
+        help="Given a term + episode slug, decide if it's a cross-episode callback",
+    )
+    p_callback.add_argument("--term", required=True, help="Term being rendered (CJK, English, pinyin, or concept ID)")
+    p_callback.add_argument("--episode", required=True, help="Current episode slug")
+
     p_show = sub.add_parser("show", help="Show concept detail")
     p_show.add_argument("concept_id", help="Concept ID")
 
@@ -790,6 +893,7 @@ def main():
         "search": cmd_search,
         "episode": cmd_episode,
         "reuse-check": cmd_reuse_check,
+        "callback-check": cmd_callback_check,
         "show": cmd_show,
         "tags": cmd_tags,
         "stats": cmd_stats,

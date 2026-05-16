@@ -118,6 +118,28 @@ PALETTE_COLORS = {
     "oxblood": "#6B1D1D",
 }
 
+# Canonical text-animation technique names for `DIR: type(...)`. Mirrors
+# the Zod enum in remotion-templates/src/hooks/directionBlock.schema.ts
+# (TextAnimationTechniqueSchema). When this list changes, the schema
+# must change too — and the schema-enum-sync test catches drift between
+# manifest_lint and the schema, but this constant lives in a third file
+# without automatic checking. Last synced: 2026-05-16.
+VALID_TEXT_ANIMATIONS = {
+    # Atomic primitives
+    "typewriter",
+    "tracking-in",
+    "reveal-mask",
+    "underline-draw",
+    "number-ticker",
+    "scramble",
+    "backspace",
+    "word-cascade",
+    # Composite patterns
+    "definition-reveal",
+    "stat-caption",
+    "quote-attribution",
+}
+
 # ── PACE: annotation parsing ─────────────────────────────────────────────
 # Matches: PACE: profile
 PACE_LINE_RE = re.compile(r"^\s*PACE:\s*(\w+)\s*$")
@@ -416,12 +438,14 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
     """
     Parse DIR: annotation lines into a direction dict for assembly manifest use.
 
-    Only extracts hold(), cut(), and mood() — these affect timing and transitions.
-    cam() and reveal() are consumed by Remotion templates via _direction in JSON
-    data files, not by the assembly manifest.
+    Extracts hold(), cut(), mood(), type(), and sync metadata from cam() /
+    reveal(). cam() and reveal() positional parameters themselves are
+    consumed by Remotion templates via _direction in JSON data files, not
+    by the assembly manifest.
 
     Returns dict with keys: holdAfter, holdBehavior, preDelay, transitionOut,
-    transitionDuration, washColor, narrationGate, syncWords.
+    transitionDuration, washColor, narrationGate, syncWords, textAnimation,
+    isCallback.
     """
     result = {}
 
@@ -499,6 +523,34 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
             sync_m = re.search(r'sync:\s*"([^"]+)"', params_str)
             if sync_m:
                 result.setdefault("syncWords", []).append(sync_m.group(1))
+
+        elif dtype == "type":
+            # Parse type() — text-animation register for text-bearing
+            # templates (KineticTypography, StatReveal). See
+            # project/TEXT_ANIMATION_REGISTER.md for the technique catalog.
+            # Grammar:
+            #   type(<technique>)
+            #   type(<technique>, callback)
+            #   type(<technique>, isCallback:true)
+            tokens = [t.strip() for t in re.split(r",\s*", params_str)]
+            for token in tokens:
+                # Bare technique name (first positional)
+                if "textAnimation" not in result and token in VALID_TEXT_ANIMATIONS:
+                    result["textAnimation"] = token
+                    continue
+                # Bare `callback` modifier
+                if token.lower() == "callback":
+                    result["isCallback"] = True
+                    continue
+                # `isCallback:true|false` keyword form
+                cb_m = re.match(r"^isCallback:\s*(true|false)\s*$", token, re.IGNORECASE)
+                if cb_m:
+                    result["isCallback"] = cb_m.group(1).lower() == "true"
+                    continue
+                # Unknown token — silently ignored (forward-compat for
+                # future sub-params like cps:22, cursor:blink). A future
+                # version may surface these as warnings; for Phase 3
+                # minimum, accept and discard.
 
     return result
 

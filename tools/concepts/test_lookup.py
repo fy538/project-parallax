@@ -448,3 +448,125 @@ def test_validate_against_real_concepts_json(capsys):
         f"data/concepts.json failed validation (exit {exit_code}):\n"
         f"--- stdout ---\n{out.out}\n--- stderr ---\n{out.err}"
     )
+
+
+# ─── callback-check (Phase 3 text-animation integration) ────────────────────
+# Phase 3 added a callback-check subcommand used by the visual-spec skill to
+# decide whether a term-in-an-episode is a cross-episode callback. These
+# tests lock the resolution behavior (exact ID match, term variants, exit
+# codes, JSON output shape).
+
+from argparse import Namespace as _NS  # alias to avoid shadowing earlier imports
+import pytest
+
+
+def _callback_args(term: str, episode: str, json: bool = True) -> _NS:
+    return _NS(term=term, episode=episode, json=json)
+
+
+def test_callback_check_first_introduction_is_not_callback(capsys):
+    """When introduced.episode matches the current episode, isCallback=false."""
+    reg = _registry([
+        {
+            "id": "ka-bozi",
+            "term": {"en": "stranglehold technology", "cn": "卡脖子", "pinyin": "kǎ bózi"},
+            "introduced": {"episode": "silicon-trap", "accentColor": "#C23B22"},
+            "appearances": [],
+        },
+    ])
+    lookup.cmd_callback_check(_callback_args("卡脖子", "silicon-trap"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["isCallback"] is False
+    assert out["conceptId"] == "ka-bozi"
+    assert out["accentColor"] == "#C23B22"
+    assert out["introducedIn"] == "silicon-trap"
+
+
+def test_callback_check_recurrence_in_later_episode_is_callback(capsys):
+    """When introduced.episode differs from the current episode, isCallback=true."""
+    reg = _registry([
+        {
+            "id": "ka-bozi",
+            "term": {"en": "stranglehold technology", "cn": "卡脖子"},
+            "introduced": {"episode": "silicon-trap", "accentColor": "#C23B22"},
+            "appearances": [],
+        },
+    ])
+    lookup.cmd_callback_check(_callback_args("卡脖子", "prisoners-dilemma"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["isCallback"] is True
+    assert out["currentEpisode"] == "prisoners-dilemma"
+
+
+def test_callback_check_matches_exact_concept_id(capsys):
+    reg = _registry([
+        {
+            "id": "stranglehold-tech",
+            "term": {"en": "stranglehold technology"},
+            "introduced": {"episode": "silicon-trap"},
+        },
+    ])
+    # Pass the ID directly
+    lookup.cmd_callback_check(_callback_args("stranglehold-tech", "future-ep"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["conceptId"] == "stranglehold-tech"
+    assert out["isCallback"] is True
+
+
+def test_callback_check_matches_english_term_case_insensitive(capsys):
+    reg = _registry([
+        {
+            "id": "test-id",
+            "term": {"en": "CHIPS Act"},
+            "introduced": {"episode": "silicon-trap"},
+        },
+    ])
+    lookup.cmd_callback_check(_callback_args("chips act", "future-ep"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["conceptId"] == "test-id"
+
+
+def test_callback_check_matches_pinyin(capsys):
+    reg = _registry([
+        {
+            "id": "ka-bozi",
+            "term": {"en": "stranglehold technology", "cn": "卡脖子", "pinyin": "kǎ bózi"},
+            "introduced": {"episode": "silicon-trap"},
+        },
+    ])
+    lookup.cmd_callback_check(_callback_args("kǎ bózi", "future-ep"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["isCallback"] is True
+
+
+def test_callback_check_unknown_term_exits_2(capsys):
+    reg = _registry([
+        {
+            "id": "ka-bozi",
+            "term": {"en": "stranglehold technology", "cn": "卡脖子"},
+            "introduced": {"episode": "silicon-trap"},
+        },
+    ])
+    with pytest.raises(SystemExit) as exc_info:
+        lookup.cmd_callback_check(_callback_args("nonsense-term", "silicon-trap"), reg)
+    assert exc_info.value.code == 2
+    # Still emits well-formed JSON with error field
+    out = json.loads(capsys.readouterr().out)
+    assert out["isCallback"] is False
+    assert "error" in out
+    assert "nonsense-term" in out["error"]
+
+
+def test_callback_check_episode_comparison_is_case_insensitive(capsys):
+    """SILICON-TRAP and silicon-trap should be treated as the same episode."""
+    reg = _registry([
+        {
+            "id": "ka-bozi",
+            "term": {"en": "x", "cn": "卡脖子"},
+            "introduced": {"episode": "SILICON-TRAP"},
+        },
+    ])
+    # Lowercase current episode — should match against the uppercase introduced
+    lookup.cmd_callback_check(_callback_args("卡脖子", "silicon-trap"), reg)
+    out = json.loads(capsys.readouterr().out)
+    assert out["isCallback"] is False

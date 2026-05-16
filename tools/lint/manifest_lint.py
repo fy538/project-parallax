@@ -12,6 +12,8 @@ for violations of editorial doctrine that aren't structurally enforced by
   - M-DATAFILE: segment `template.dataFile` references exist on disk
   - M-CUE: soundCue / textureCue types are in the canonical schema enum
   - M-DURATION: max(segments[].endSec) matches totalDurationSec (±0.5s)
+  - M-TEXT-ANIM: textAnimation technique is canonical and matches variant
+                 (Phase 3 text-animation integration — see TEXT_ANIMATION_REGISTER.md)
 
 Usage:
     python3 tools/lint/manifest_lint.py
@@ -395,6 +397,172 @@ def check_duration_drift(manifest: dict, _: str) -> list[Violation]:
     return violations
 
 
+# ─── Rule: M-TEXT-ANIM (text-animation register coherence) ───────────────────
+# Phase 3 text-animation integration (May 2026). Checks that each segment's
+# `template.dataFile` contents are coherent with the `_direction.textAnimation`
+# value the file declares — i.e. that the chosen technique matches the
+# content it's animating. See project/TEXT_ANIMATION_REGISTER.md for the
+# editorial register and per-technique use/avoid rules.
+#
+# Failure modes this catches (all warnings, not errors — register selection
+# is editorial judgment, not strict invariant):
+#   1. `textAnimation: "quote-attribution"` set on a quote variant without
+#      a real named `attribution` field (a channel-voice "quote" using the
+#      transcribed register is a category error per the doctrine doc).
+#   2. `textAnimation: "stat-caption"` on a statistic variant whose
+#      `statValue` is unparseable (Number Ticker can't tick to a label).
+#   3. `textAnimation: "definition-reveal"` on anything other than a
+#      definition variant in KineticTypography.
+#   4. `textAnimation: "quote-attribution"` on anything other than a quote
+#      variant in KineticTypography.
+#
+# Mirrors the canonical technique vocabulary from
+# remotion-templates/src/hooks/directionBlock.schema.ts. Unknown technique
+# names ARE flagged as errors (typos slip through Zod's .passthrough()
+# on the outer object — Zod validates the union inside, but only if Zod
+# parses the data file at render time; render-time-only validation
+# doesn't help authors during script writing).
+
+CANONICAL_TEXT_ANIM_TECHNIQUES: frozenset[str] = frozenset({
+    "typewriter", "tracking-in", "reveal-mask", "underline-draw",
+    "number-ticker", "scramble", "backspace", "word-cascade",
+    "definition-reveal", "stat-caption", "quote-attribution",
+})
+
+
+def _parsable_stat_value(s: str) -> bool:
+    """Match the same regex the KineticTypography StatCaptionDispatch uses
+    (`parseStatValueString` in KineticTypography.tsx). Returns True if the
+    string has a parseable numeric component — i.e. NumberTicker can
+    animate to a real value, not just fall back to 0."""
+    import re as _re
+    m = _re.match(r"^\s*[^\d\-+.]*\s*(-?[\d,]+(?:\.\d+)?)\s*.*$", s or "")
+    if not m:
+        return False
+    try:
+        float(m.group(1).replace(",", ""))
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def check_text_animation_register(manifest: dict, manifest_path: Path) -> list[Violation]:
+    """M-TEXT-ANIM: technique vocabulary + variant↔technique coherence."""
+    violations: list[Violation] = []
+    episode_dir = manifest_path.parent
+
+    for seg in manifest.get("segments", []) or []:
+        template = seg.get("template") or {}
+        data_file = template.get("dataFile")
+        if not data_file:
+            continue
+        full_path = episode_dir / data_file
+        if not full_path.exists():
+            continue  # M-DATAFILE already flagged this
+
+        try:
+            data = json.loads(full_path.read_text())
+        except json.JSONDecodeError:
+            continue  # validate_data.py handles JSON errors
+
+        direction = data.get("_direction") or {}
+        tech = direction.get("textAnimation")
+        if not tech:
+            continue  # Field absent → backwards-compat path; nothing to check
+
+        seg_id = seg.get("id", "?")
+        component = template.get("component", "")
+        variant = data.get("variant")
+
+        # 1. Validate technique against canonical vocabulary
+        if tech not in CANONICAL_TEXT_ANIM_TECHNIQUES:
+            violations.append(Violation(
+                rule="M-TEXT-ANIM",
+                file="",
+                pointer=f"segments[{seg_id}] → {data_file} → _direction.textAnimation",
+                message=(
+                    f"unknown textAnimation technique: {tech!r}. "
+                    f"Canonical set: {', '.join(sorted(CANONICAL_TEXT_ANIM_TECHNIQUES))}. "
+                    f"See project/TEXT_ANIMATION_REGISTER.md."
+                ),
+                severity="error",
+            ))
+            continue  # Don't run the coherence checks against an unknown name
+
+        # 2. Composite ↔ variant coherence (KineticTypography only)
+        if component == "KineticTypography":
+            if tech == "quote-attribution":
+                if variant != "quote":
+                    violations.append(Violation(
+                        rule="M-TEXT-ANIM",
+                        file="",
+                        pointer=f"segments[{seg_id}] → {data_file}",
+                        message=(
+                            f"'quote-attribution' set on KineticTypography "
+                            f"variant={variant!r}; this composite only applies to "
+                            f"variant=\"quote\". Use 'definition-reveal' for "
+                            f"definitions, 'stat-caption' for statistics, or omit "
+                            f"the field for word-cascade default."
+                        ),
+                        severity="warning",
+                    ))
+                elif not (data.get("attribution") or "").strip():
+                    violations.append(Violation(
+                        rule="M-TEXT-ANIM",
+                        file="",
+                        pointer=f"segments[{seg_id}] → {data_file}",
+                        message=(
+                            "'quote-attribution' set on a quote without a named "
+                            "`attribution` field. Typewriter register implies "
+                            "transcribed speech from a named speaker; channel-voice "
+                            "statements should omit textAnimation (defaults to "
+                            "word-cascade) per TEXT_ANIMATION_REGISTER.md § 05."
+                        ),
+                        severity="warning",
+                    ))
+            elif tech == "definition-reveal" and variant != "definition":
+                violations.append(Violation(
+                    rule="M-TEXT-ANIM",
+                    file="",
+                    pointer=f"segments[{seg_id}] → {data_file}",
+                    message=(
+                        f"'definition-reveal' set on KineticTypography "
+                        f"variant={variant!r}; this composite only applies to "
+                        f"variant=\"definition\"."
+                    ),
+                    severity="warning",
+                ))
+            elif tech == "stat-caption":
+                if variant != "statistic":
+                    violations.append(Violation(
+                        rule="M-TEXT-ANIM",
+                        file="",
+                        pointer=f"segments[{seg_id}] → {data_file}",
+                        message=(
+                            f"'stat-caption' set on KineticTypography "
+                            f"variant={variant!r}; this composite only applies to "
+                            f"variant=\"statistic\"."
+                        ),
+                        severity="warning",
+                    ))
+                elif not _parsable_stat_value(data.get("statValue") or ""):
+                    violations.append(Violation(
+                        rule="M-TEXT-ANIM",
+                        file="",
+                        pointer=f"segments[{seg_id}] → {data_file}",
+                        message=(
+                            f"'stat-caption' set on a statistic with unparseable "
+                            f"statValue={data.get('statValue')!r}. NumberTicker "
+                            f"will fall back to 0 with the value as a unit label. "
+                            f"Consider either: (a) reformat statValue to "
+                            f"<prefix><number><suffix>, or (b) omit textAnimation."
+                        ),
+                        severity="warning",
+                    ))
+
+    return violations
+
+
 # ─── Driver ──────────────────────────────────────────────────────────────────
 
 ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
@@ -404,6 +572,7 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     check_datafile_exists,  # needs the path
     lambda m, p: check_cue_types_canonical(m, str(p)),
     lambda m, p: check_duration_drift(m, str(p)),
+    check_text_animation_register,  # needs the path (reads dataFile contents)
 ]
 
 

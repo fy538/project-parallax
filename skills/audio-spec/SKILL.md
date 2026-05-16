@@ -23,6 +23,23 @@ You are generating the audio design layer for a bilingual geopolitics video chan
 - **`cut()`** → determines which transition SFX to use at segment boundaries. `cut(color-wash)` → `register-shift` SFX. `cut(iris)` → `section-open` SFX. `cut(blur-through)` → `beat-transition` SFX with atmospheric flavor.
 - **`hold()`** → creates audio silence/breathing opportunities. `hold(breathe)` → music bed thins to 50% volume during the hold. `hold(land)` → all audio pauses for 1s (deliberate silence candidate). `hold(linger)` → music bed continues at low volume.
 - **`mood()`** → maps directly to music bed mood and volume. `mood(dense)` → increase music intensity, add low-frequency texture. `mood(none)` → thin the bed, emphasize clarity. `mood(dim:0.5)` → reduce texture hits to minimum. A `mood()` change mid-beat may warrant a music bed crossfade within the beat.
+- **`type()` and `_direction.textAnimation`** → text-animation register dictates a default SFX/texture cue. See **`project/TEXT_ANIMATION_REGISTER.md`** for the technique catalog. The default mapping (apply unless the script overrides with an explicit cue) is:
+
+  | textAnimation technique | Default cue | When it fires |
+  |---|---|---|
+  | `typewriter` | `quote-bell` (Layer 2 SFX) | At cursor start (segment entrance) |
+  | `quote-attribution` | `quote-bell` (Layer 2) | At cursor start |
+  | `number-ticker` | `stat-reveal` (Layer 2) | At ticker settle (end of count-up) |
+  | `stat-caption` | `stat-reveal` (Layer 2) | At ticker settle |
+  | `definition-reveal` | `card-settle` (Layer 3 texture) | At term arrival (frame 0 of reveal) |
+  | `backspace` | `card-settle` (Layer 3) | At the moment the correction completes (NOT during backspace — at settle) |
+  | `reveal-mask` | `section-open` (Layer 2) | At wipe start |
+  | `scramble` | `tension-resolve` (Layer 2) | At all-positions-resolved (end of scramble) |
+  | `tracking-in` | None (let typography land in silence) | — |
+  | `underline-draw` | None (already an emphasis marker — adding cue would double-up) | — |
+  | `word-cascade` | None (the channel's default; cue adds nothing) | — |
+
+  When a segment's data file declares `_direction.textAnimation: "typewriter"`, automatically emit `quote-bell` as the Layer 2 cue at that segment's entrance unless the script's `DIR: cut(...)` already specifies a different SFX. Script-level direction wins; defaults fill in where the script is silent.
 
 Also read `episodes/EDITORIAL_PLAYBOOK.md` for any audio-related production rules that have been validated by analytics.
 

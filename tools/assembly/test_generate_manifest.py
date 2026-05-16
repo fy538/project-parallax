@@ -831,3 +831,81 @@ def test_find_sync_word_multiword():
     result = _find_sync_word("semiconductor cleanroom", words, 0.0, 5.0)
     assert result is not None
     assert result["word"] == "semiconductor"
+
+
+# ── parse_dir_lines · type() directive (text-animation register) ───────────
+# Phase 3 text-animation integration: DIR: type(<technique>) populates
+# _direction.textAnimation. Used by visual-spec and template dispatch
+# (KineticTypography → DefinitionReveal / QuoteAttribution / StatCaption).
+
+def test_parse_dir_type_typewriter():
+    result = parse_dir_lines(["DIR: type(typewriter)"])
+    assert result["textAnimation"] == "typewriter"
+
+
+def test_parse_dir_type_composite_quote_attribution():
+    result = parse_dir_lines(["DIR: type(quote-attribution)"])
+    assert result["textAnimation"] == "quote-attribution"
+
+
+def test_parse_dir_type_composite_definition_reveal():
+    result = parse_dir_lines(["DIR: type(definition-reveal)"])
+    assert result["textAnimation"] == "definition-reveal"
+
+
+def test_parse_dir_type_unknown_technique_ignored():
+    """Unknown technique names don't pollute result — silently dropped.
+
+    Forward-compat: if the schema enum gains a new value before manifest
+    generator is updated, scripts referencing it just fall back to no
+    directive rather than emitting an invalid field.
+    """
+    result = parse_dir_lines(["DIR: type(nonexistent-technique)"])
+    assert "textAnimation" not in result
+
+
+def test_parse_dir_type_with_bare_callback_modifier():
+    result = parse_dir_lines(["DIR: type(definition-reveal, callback)"])
+    assert result["textAnimation"] == "definition-reveal"
+    assert result["isCallback"] is True
+
+
+def test_parse_dir_type_with_callback_keyword_form():
+    result = parse_dir_lines(["DIR: type(definition-reveal, isCallback:true)"])
+    assert result["textAnimation"] == "definition-reveal"
+    assert result["isCallback"] is True
+
+
+def test_parse_dir_type_callback_explicit_false():
+    """isCallback:false is honored — visual-spec may emit it to overwrite
+    a default."""
+    result = parse_dir_lines(["DIR: type(definition-reveal, isCallback:false)"])
+    assert result["isCallback"] is False
+
+
+def test_parse_dir_type_isolated_callback_modifier():
+    """Bare `callback` without technique → isCallback only, no textAnimation."""
+    result = parse_dir_lines(["DIR: type(callback)"])
+    assert "textAnimation" not in result
+    assert result["isCallback"] is True
+
+
+def test_parse_dir_type_unknown_subparams_ignored_silently():
+    """Future-proofing: cps:22, cursor:blink etc. accepted and dropped."""
+    result = parse_dir_lines(["DIR: type(typewriter, cps:30, cursor:solid)"])
+    assert result["textAnimation"] == "typewriter"
+    # Other tokens not surfaced — won't pollute _direction with unknown fields
+    assert "cps" not in result
+    assert "cursor" not in result
+
+
+def test_parse_dir_type_composes_with_other_directives():
+    """Multiple DIR: lines on the same segment all merge into one dict."""
+    result = parse_dir_lines([
+        "DIR: type(quote-attribution)",
+        "DIR: hold(breathe)",
+        "DIR: mood(subtle)",  # mood() exists and would parse — testing that
+                              # type() doesn't conflict with the others.
+    ])
+    assert result["textAnimation"] == "quote-attribution"
+    assert result["holdAfter"] == 2.0
