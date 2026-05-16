@@ -137,6 +137,21 @@ export async function renderCompositionFrame(
         frame,
         browserExecutable,
         inputProps,
+        // Forward env vars the bundle reads at module init (MapGL token +
+        // Meridian map style URLs). `renderStill()` injects these into the
+        // headless browser's `process.env` BEFORE the bundle loads, which
+        // is when `MapGL.tsx` and `theme.ts` capture them into closure. See
+        // LESSONS.md L101 (module-init env capture) and L102 (MapGL warm-up).
+        // Forwarded only when set in the test process so untokenized CI
+        // runs continue to fail loudly rather than render blank maps with
+        // an empty token string.
+        envVariables: {
+          ...(process.env.MAPBOX_ACCESS_TOKEN ? { MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN } : {}),
+          ...(process.env.MAPBOX_STYLE_LIGHT_URL ? { MAPBOX_STYLE_LIGHT_URL: process.env.MAPBOX_STYLE_LIGHT_URL } : {}),
+          ...(process.env.MAPBOX_STYLE_DARK_URL ? { MAPBOX_STYLE_DARK_URL: process.env.MAPBOX_STYLE_DARK_URL } : {}),
+          ...(process.env.MAPBOX_STYLE_SEPIA_URL ? { MAPBOX_STYLE_SEPIA_URL: process.env.MAPBOX_STYLE_SEPIA_URL } : {}),
+          ...(process.env.MAPBOX_STYLE_TONER_URL ? { MAPBOX_STYLE_TONER_URL: process.env.MAPBOX_STYLE_TONER_URL } : {}),
+        },
         // Forward browser-side console.warn / .error to the test stdout
         // so `warnIf(...)` warnings from inside templates (substrate-contrast
         // checks, semantic data warnings, etc.) surface during visual
