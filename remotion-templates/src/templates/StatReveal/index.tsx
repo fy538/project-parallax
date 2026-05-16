@@ -14,6 +14,7 @@ const sampleData: StatRevealData = {
     suffix: "B",
     label: "Total CHIPS Act + private commitments",
     decimals: 0,
+    countUp: true,
   },
   comparisons: [
     { label: "Apollo Program (adj.)", value: 194, color: "#3266AD" },

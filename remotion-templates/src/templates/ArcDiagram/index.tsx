@@ -51,8 +51,8 @@ const sampleData: ArcDiagramData = {
     },
   ],
   connections: [
-    { from: "mahan", to: "mackinder", label: "inverted", strength: 0.7 },
-    { from: "mackinder", to: "spykman", label: "rebutted", strength: 0.8, style: "dashed" },
+    { from: "mahan", to: "mackinder", label: "inverted", strength: 0.7, emphasis: "accent" },
+    { from: "mackinder", to: "spykman", label: "rebutted", strength: 0.8, style: "dashed", emphasis: "muted" },
     { from: "mahan", to: "spykman", label: "recovered", strength: 0.9 },
     { from: "spykman", to: "kennan", label: "operationalized", strength: 1.0, color: "accent" },
     { from: "kennan", to: "brzezinski", label: "extended", strength: 0.8 },

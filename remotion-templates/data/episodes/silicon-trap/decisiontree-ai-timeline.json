@@ -17,7 +17,7 @@
     {
       "id": "fast",
       "label": "Fast (2-3 years)",
-      "probability": "Uncertain",
+      "probability": "35%",
       "color": "#4A7BA7",
       "children": [
         "controls-succeed"
@@ -27,7 +27,7 @@
     {
       "id": "slow",
       "label": "Slow (10+ years)",
-      "probability": "Uncertain",
+      "probability": "65%",
       "color": "#A64D46",
       "children": [
         "controls-backfire"
@@ -92,6 +92,7 @@
       "duration": 2.5
     }
   ],
+  "probabilityWeights": true,
   "highlightColor": "#C4A747",
   "source": "Parallax analysis",
   "backgroundVariant": "dark",

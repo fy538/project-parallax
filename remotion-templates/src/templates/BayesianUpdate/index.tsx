@@ -42,6 +42,8 @@ const sampleData: BayesianUpdateData = {
       source: "Executive order, Aug 2025",
     },
   ],
+  credibleInterval: [0.18, 0.52],
+  credibleIntervalLabel: "90% CI",
   marketPrice: 42,
   marketSource: "Kalshi",
   source: "Parallax analysis — composite estimate",

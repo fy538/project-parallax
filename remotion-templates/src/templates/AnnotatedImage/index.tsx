@@ -18,6 +18,7 @@ const sampleData: AnnotatedImageData = {
       label: "Tin Droplet Generator",
       detail: "50,000 droplets/second",
       placement: "left",
+      leaderLength: 80,
     },
     {
       x: 50,
