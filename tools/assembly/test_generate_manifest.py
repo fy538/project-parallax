@@ -21,6 +21,8 @@ from generate_manifest import (
     lint_mg_streaks,
     _find_sync_word,
     _build_segment,
+    resolve_all_sync_points,
+    FPS,
     WPM,
 )
 
@@ -939,3 +941,155 @@ def test_parse_dir_type_composes_with_other_directives():
     ])
     assert result["textAnimation"] == "quote-attribution"
     assert result["holdAfter"] == 2.0
+
+
+# ── resolve_all_sync_points · end-to-end Whisper resolution path ───────────
+#
+# These tests exercise the precise-mode pipeline without requiring WhisperX
+# to be installed. We synthesize the `words` list that WhisperX would produce
+# (each item has word/start/end/confidence) and verify resolve_all_sync_points
+# correctly attaches segment.syncPoints with episode-absolute timestamps and
+# frame-rounded indices.
+
+
+def _words_at(items):
+    """Build a Whisper-shaped words list. items = [(word, start_sec, [confidence])]."""
+    out = []
+    for it in items:
+        if len(it) == 3:
+            w, s, c = it
+        else:
+            w, s = it
+            c = 1.0
+        out.append({"word": w, "start": s, "end": s + 0.25, "confidence": c})
+    return out
+
+
+def test_resolve_sync_points_single_match():
+    """Basic case: one syncWord, one matching Whisper word in segment range."""
+    segments = [
+        {"id": "s1", "startSec": 0.0, "endSec": 10.0, "syncWords": ["Taiwan"]},
+    ]
+    words = _words_at([("Taiwan", 4.5, 0.95)])
+    resolve_all_sync_points(segments, words)
+    assert "syncPoints" in segments[0]
+    sp = segments[0]["syncPoints"]
+    assert len(sp) == 1
+    assert sp[0]["word"] == "Taiwan"
+    assert sp[0]["timeSec"] == 4.5
+    assert sp[0]["frame"] == round(4.5 * FPS)
+    assert sp[0]["confidence"] == 0.95
+
+
+def test_resolve_sync_points_unresolved_writes_null_entry():
+    """Sync word not present in audio: emit entry with confidence=0, null timeSec/frame."""
+    segments = [
+        {"id": "s1", "startSec": 0.0, "endSec": 10.0, "syncWords": ["Mongolia"]},
+    ]
+    words = _words_at([("Taiwan", 4.5)])
+    resolve_all_sync_points(segments, words)
+    sp = segments[0]["syncPoints"]
+    assert len(sp) == 1
+    assert sp[0]["word"] == "Mongolia"
+    assert sp[0]["timeSec"] is None
+    assert sp[0]["frame"] is None
+    assert sp[0]["confidence"] == 0
+
+
+def test_resolve_sync_points_multi_word_returns_first_word_frame():
+    """Multi-word sync ('two thousand') matches a sliding window; frame anchors on the FIRST word."""
+    segments = [
+        {"id": "s1", "startSec": 0.0, "endSec": 10.0, "syncWords": ["two thousand"]},
+    ]
+    # "two" at 3.0, "thousand" at 3.4 — multi-word match anchors on the first.
+    words = _words_at([("two", 3.0), ("thousand", 3.4)])
+    resolve_all_sync_points(segments, words)
+    sp = segments[0]["syncPoints"]
+    assert sp[0]["timeSec"] == 3.0
+    assert sp[0]["frame"] == round(3.0 * FPS)
+
+
+def test_resolve_sync_points_per_element_d17():
+    """Per-element D17 case: 3 syncWords on one segment → 3 syncPoints in order,
+    each resolved against its respective Whisper word. Each entity gets its own anchor."""
+    segments = [{
+        "id": "s1", "startSec": 0.0, "endSec": 20.0,
+        "syncWords": ["sixty", "three percent", "fifteen years"],
+    }]
+    words = _words_at([
+        ("sixty", 2.0),
+        ("three", 7.0),
+        ("percent", 7.4),  # multi-word resolves on "three"
+        ("fifteen", 12.0),
+        ("years", 12.4),   # multi-word resolves on "fifteen"
+    ])
+    resolve_all_sync_points(segments, words)
+    sp = segments[0]["syncPoints"]
+    assert len(sp) == 3
+    # Order preserved — index 0 is "sixty" (entity 0), 1 is "three percent" (entity 1), 2 is "fifteen years"
+    assert sp[0]["word"] == "sixty"      and sp[0]["timeSec"] == 2.0
+    assert sp[1]["word"] == "three percent" and sp[1]["timeSec"] == 7.0
+    assert sp[2]["word"] == "fifteen years" and sp[2]["timeSec"] == 12.0
+
+
+def test_resolve_sync_points_respects_segment_boundary():
+    """A syncWord in segment A's range shouldn't match a Whisper word in segment B's range
+    even if the same surface word appears there. (Boundary tolerance is ±0.5s.)"""
+    segments = [
+        {"id": "s1", "startSec": 0.0, "endSec": 5.0, "syncWords": ["Taiwan"]},
+        {"id": "s2", "startSec": 6.0, "endSec": 10.0, "syncWords": ["Taiwan"]},
+    ]
+    # Two "Taiwan" utterances, one in each segment's range.
+    words = _words_at([("Taiwan", 2.5), ("Taiwan", 7.5)])
+    resolve_all_sync_points(segments, words)
+    assert segments[0]["syncPoints"][0]["timeSec"] == 2.5
+    assert segments[1]["syncPoints"][0]["timeSec"] == 7.5
+
+
+def test_resolve_sync_points_segment_without_syncwords_unchanged():
+    """Segments without syncWords are not modified — no syncPoints key added."""
+    segments = [{"id": "s1", "startSec": 0.0, "endSec": 5.0}]  # no syncWords
+    words = _words_at([("Taiwan", 2.0)])
+    resolve_all_sync_points(segments, words)
+    assert "syncPoints" not in segments[0]
+
+
+def test_resolve_sync_points_dir_to_resolved_pipeline():
+    """End-to-end: DIR annotation → parse_dir_lines → segment shape → resolve_all_sync_points.
+
+    Simulates the precise-mode pipeline in miniature: a per-element D17 directive
+    written in a script flows through extraction and resolution and lands as a
+    fully-resolved syncPoints array on the segment, ready for FullEpisode to
+    convert to segment-relative coordinates and inject into _direction."""
+    # Step 1: parse the DIR line — extracts syncWords via _extract_sync_words
+    dir_result = parse_dir_lines([
+        'DIR: reveal(stagger, syncs:["Apple","Nvidia","AMD"])',
+    ])
+    assert dir_result["syncWords"] == ["Apple", "Nvidia", "AMD"]
+
+    # Step 2: build a segment carrying those syncWords (what generate_manifest does)
+    segments = [{
+        "id": "beat1-network",
+        "startSec": 30.0, "endSec": 45.0,
+        "syncWords": dir_result["syncWords"],
+        "type": "TEMPLATE",
+    }]
+
+    # Step 3: WhisperX (mocked) produces word timestamps
+    words = _words_at([
+        ("Apple", 32.0),
+        ("designs", 32.3),
+        ("Nvidia", 36.5),
+        ("ships", 37.0),
+        ("AMD", 41.0),
+        ("rounds", 41.4),
+    ])
+
+    # Step 4: resolve_all_sync_points fills in syncPoints with frame-accurate timestamps
+    resolve_all_sync_points(segments, words)
+    sp = segments[0]["syncPoints"]
+    assert [p["word"] for p in sp] == ["Apple", "Nvidia", "AMD"]
+    assert [p["timeSec"] for p in sp] == [32.0, 36.5, 41.0]
+    assert [p["frame"] for p in sp] == [round(32.0 * FPS), round(36.5 * FPS), round(41.0 * FPS)]
+    # All resolved with confidence > 0
+    assert all(p["confidence"] > 0 for p in sp)
