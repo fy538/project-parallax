@@ -9,7 +9,13 @@ const sampleData = {
     title: "Realism vs. Liberalism",
     phenomenon: "Great power competition",
     durationSec: 12,
-    backgroundVariant: "dark" as const,
+    // DuelingFrameworks is the analytical "bounded analogy" form — editorial
+    // newsroom register, not atmospheric. Light is primary per BRAND.md;
+    // both catalog variants (Empire Fall, Blockades) also render in light.
+    // The dark-mode standalone was producing a "movie title screen" feel
+    // from the Background atmosphere layer's dust + bokeh, fighting the
+    // mid-century editorial pillar this template carries.
+    backgroundVariant: "light" as const,
     frameworkA: {
       name: "Realism",
       color: "#C23B22", // episode-specific — not a brand token
