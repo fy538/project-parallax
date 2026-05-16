@@ -626,14 +626,33 @@ def test_transitions_hold_skipped():
     assert "transition" not in result[1]
 
 
-def test_transitions_template_to_template_dissolve():
+def test_transitions_template_to_template_within_beat_cuts_by_default():
+    """Rule 4 revised (Phase 5 of TRANSITION_GRAMMAR.md): different
+    templates within the same beat default to HARD CUT (0s), not the
+    legacy 0.3s dissolve. visual-spec opts in to dissolve explicitly
+    via `_direction.transitionOut` when same-data sequences justify it."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
         _make_seg("s2", "TEMPLATE", "beat1", component="KineticTypography"),
     ]
     result = apply_default_transitions(segs)
+    # cut is the default — apply_default_transitions only writes the
+    # transition field when non-default, so absence == cut.
+    assert "transition" not in result[1] or result[1]["transition"]["in"] == "cut"
+
+
+def test_transitions_template_to_template_dissolve_via_dir_override():
+    """visual-spec opts in to dissolve for same-data sequences via DIR
+    override on the prior segment. Rule 0 wins over Rule 4."""
+    segs = [
+        {**_make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
+         "_dirTransitionOut": "dissolve",
+         "_dirTransitionDuration": 0.5},
+        _make_seg("s2", "TEMPLATE", "beat1", component="DataChart"),
+    ]
+    result = apply_default_transitions(segs)
     assert result[1]["transition"]["in"] == "dissolve"
-    assert result[1]["transition"]["durationSec"] == 0.3
+    assert result[1]["transition"]["durationSec"] == 0.5
 
 
 def test_transitions_same_template_match_cut_still_atlas_plate():
@@ -657,27 +676,28 @@ def test_transitions_same_template_match_cut_still_route_animation():
     assert result[1]["transition"]["in"] == "match-cut-still"
 
 
-def test_transitions_same_template_not_in_match_cut_set_falls_back_to_dissolve():
-    """DataChart→DataChart is NOT in MATCH_CUT_STILL_TEMPLATES, so it
-    keeps the legacy 0.3s dissolve default."""
+def test_transitions_same_template_not_in_match_cut_set_falls_back_to_cut():
+    """Phase 5: DataChart→DataChart is NOT in MATCH_CUT_STILL_TEMPLATES,
+    so it falls through to the revised within-beat default of HARD CUT.
+    Same-data dissolve (e.g. small multiples) is opt-in via visual-spec."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
         _make_seg("s2", "TEMPLATE", "beat1", component="DataChart"),
     ]
     result = apply_default_transitions(segs)
-    assert result[1]["transition"]["in"] == "dissolve"
-    assert result[1]["transition"]["durationSec"] == 0.3
+    assert "transition" not in result[1] or result[1]["transition"]["in"] == "cut"
 
 
-def test_transitions_different_templates_in_match_cut_set_fall_back_to_dissolve():
-    """AtlasPlate→ChoroplethMap are BOTH in the set, but they're not the
-    SAME template — same-component is the trigger, not just both-eligible."""
+def test_transitions_different_templates_in_match_cut_set_fall_back_to_cut():
+    """AtlasPlate→ChoroplethMap are BOTH in the match-cut set, but they're
+    not the SAME template — same-component is the trigger, not just
+    both-eligible. Phase 5 default for non-match-cut path = HARD CUT."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
         _make_seg("s2", "TEMPLATE", "beat1", component="ChoroplethMap"),
     ]
     result = apply_default_transitions(segs)
-    assert result[1]["transition"]["in"] == "dissolve"
+    assert "transition" not in result[1] or result[1]["transition"]["in"] == "cut"
 
 
 def test_transitions_match_cut_still_does_not_fire_at_beat_boundary():
@@ -748,17 +768,20 @@ def test_transitions_urgent_pace_compresses_duration():
 
 
 def test_transitions_breathing_pace_stretches_cuts_to_dissolves():
+    """Phase 5: same-beat template→template now cuts by default. Rule 7's
+    breathing-pace upgrade then promotes cut→dissolve (0.4s), which is the
+    doctrinal escalation criterion — breathing pace IS the editorial signal
+    that justifies same-data dissolve treatment."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
         {**_make_seg("s2", "TEMPLATE", "beat1", component="KineticTypography"),
          "paceProfile": "breathing"},
     ]
     result = apply_default_transitions(segs)
-    # Same beat template→template is normally dissolve 0.3s
-    # Breathing should stretch it
     trans = result[1].get("transition", {})
-    if trans:
-        assert trans["durationSec"] >= 0.3
+    assert trans, "breathing pace should upgrade the default cut to a dissolve"
+    assert trans["in"] == "dissolve"
+    assert trans["durationSec"] == 0.4
 
 
 # ── infer_music_mood ───────────────────────────────────────────────────────

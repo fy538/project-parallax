@@ -976,17 +976,24 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
 
     4. FOOTAGE → TEMPLATE: When a background footage segment is followed
        by a foreground template, no transition needed (they're on different
-       layers — the template overlays). But when a TEMPLATE is followed by
-       another TEMPLATE in the same layer, use a brief dissolve (0.3s).
+       layers — the template overlays). When a TEMPLATE is followed by
+       another TEMPLATE in the same layer, Phase 5 (TRANSITION_GRAMMAR.md
+       May 16, 2026) sets the default to HARD CUT (0s), not dissolve.
+       Rationale: the editorial doctrine says within-beat seams should
+       cut by default; dissolve should be an opt-in editorial choice for
+       same-data sequences (chart→chart small multiples, photo→photo
+       within a montage). visual-spec opts in via
+       `_direction.transitionOut: "dissolve"` on the prior segment, or
+       authors write `DIR: cut(dissolve)` in the script.
 
     4a. MATCH-CUT PROMOTION (Phase 4 of TRANSITION_GRAMMAR.md): when the
         two consecutive same-layer templates are the SAME component AND the
         component is in MATCH_CUT_STILL_TEMPLATES (AtlasPlate, ChoroplethMap,
         AnnotatedImage, RouteAnimation, PhotoMontage), prefer
-        `match-cut-still` (0.35s opacity-only crossfade) over `dissolve` —
+        `match-cut-still` (0.35s opacity-only crossfade) over `cut` —
         the composition genuinely carries between segments, so the seam
         reads as a layer-swap on the same scene rather than two different
-        scenes softly resolving into each other.
+        scenes hard-cutting against each other.
 
     5. HOLD SEGMENTS: No transition — they sustain the previous visual.
        A fade on a hold defeats its purpose.
@@ -1084,8 +1091,12 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
                 trans_in = "match-cut-still"
                 dur = 0.35
             else:
-                trans_in = "dissolve"
-                dur = 0.3
+                # Phase 5 revision of Rule 4 — within-beat default = cut.
+                # Same-data dissolve (small multiples) is now opt-in via
+                # `_direction.transitionOut: "dissolve"` on the prior
+                # segment, NOT implicit. See TRANSITION_GRAMMAR.md §4 Ctx A.
+                trans_in = "cut"
+                dur = 0
 
         # Rule 7: Pace-driven transition adjustments (applied last before write)
         # Pace context modifies durations and may upgrade/downgrade transition types.
