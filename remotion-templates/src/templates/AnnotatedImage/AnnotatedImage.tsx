@@ -29,7 +29,6 @@ import {
   fadeIn,
   exitFade,
   slideIn,
-  kenBurnsDrift,
   lockOnPulse,
   anticipatoryStartFrame,
   CLAMP_CUBIC,

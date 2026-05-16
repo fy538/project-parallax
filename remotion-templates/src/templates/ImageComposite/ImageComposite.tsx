@@ -240,7 +240,9 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
  */
 const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const direction = useDirection(data._direction);
+  // HOLD_MOTION_REGISTER Register C — photo plate gets documentary Ken Burns
+  // by default (POLISH.md D20). Per-segment _direction.driftPreset overrides.
+  const direction = useDirection(data._direction, "documentary");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const theme = useThemeMode(data.backgroundVariant || "light");
 
@@ -410,7 +412,9 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
  */
 const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const direction = useDirection(data._direction);
+  // HOLD_MOTION_REGISTER Register C — portrait photo gets documentary Ken Burns
+  // by default (POLISH.md D20). Per-segment _direction.driftPreset overrides.
+  const direction = useDirection(data._direction, "documentary");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const theme = useThemeMode(data.backgroundVariant || "light");
 

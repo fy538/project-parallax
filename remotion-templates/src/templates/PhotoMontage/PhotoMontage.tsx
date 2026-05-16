@@ -35,7 +35,6 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import {
   fadeIn,
   fadeOut,
-  kenBurnsDrift,
   exitFade,
   heroSpring,
   CLAMP,
