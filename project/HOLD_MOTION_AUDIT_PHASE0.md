@@ -38,6 +38,28 @@ Two of those are **atlas plates** — the textbook case for Ken Burns documentar
 | `catalog-stat-reveal-mariana-depth` | 145,053 | 6.995% | 🟢 visible motion | ⚠ Reveal still landing past f90 |
 | `catalog-title-transition-episode` | — | — | (render failed at f150) | — |
 
+### Extended audit (added during Phase 0 follow-up)
+
+| Composition | Px diff (f90→f150) | % | Verdict |
+|---|---:|---:|---|
+| `catalog-kinetic-typography-statistic` | 311 | 0.015% | 🔴 STATIC |
+| `catalog-photo-montage-treatments` | 1,659 | 0.080% | 🔴 near-static |
+| `catalog-streamgraph-us-oil-imports` | — | 2.162% | 🟢 subtle drift |
+| `catalog-ternary-plot-un-votes` | — | 2.487% | 🟢 subtle drift |
+| `catalog-tilegram-u-s-map-electoral-2024` | — | 2.748% | 🟢 subtle drift |
+| `catalog-dumbbell-plot-income-spread` | — | 3.523% | 🟢 subtle drift |
+| `catalog-horizon-chart-brics-fx` | — | 4.732% | 🟢 visible (likely still revealing) |
+| `catalog-marimekko-chart-g7-energy` | — | 4.801% | 🟢 visible (likely still revealing) |
+
+**Updated 🔴 static count: 5 templates** (was 3):
+- `image-composite-archive` (0%)
+- `kinetic-typography-statistic` (0.015%) — new finding
+- `atlas-plate-cold-war-vintage` (0.002%)
+- `atlas-plate-g7` (0.002%)
+- `photo-montage-treatments` (0.080%) — new finding
+
+The pattern is now unmistakable: **photo plates (ImageComposite, PhotoMontage), atlas plates (AtlasPlate variants), and held-stat KineticTypography all render dead-screen during hold.** All five are categories where editorial doctrine prescribes *intentional motion* (Ken Burns for photos/maps; breathing for held hero numbers). The current default `editorial` preset under-serves all five.
+
 ## Smoking-gun observations
 
 ### 🔴 **AtlasPlate is mute**
