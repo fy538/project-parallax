@@ -9,6 +9,7 @@ Created: May 3, 2026
 **Related docs:**
 - **SCRIPT_FORMAT.md** — The two-column format this extends (direction goes in the right column)
 - **VISUAL_LANGUAGE.md** — Editorial logic for *when* to use each register and transition type
+- **TEXT_ANIMATION_REGISTER.md** — Eight canonical text-animation techniques and the editorial register each one claims; companion to this doc, planned home of the future `DIR: type()` directive
 - **PACING_SYSTEM.md** — The companion pacing system (`PACE:` annotations, proportional camera paths, Whisper sync)
 - **remotion-templates/references/template-schemas.md** — JSON field reference that direction maps to
 

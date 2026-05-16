@@ -68,9 +68,14 @@ export const EditorialHeroDemo: React.FC = () => {
         <EditorialFrame
           variant="hero"
           kicker="cooperation theory"
-          hero="67%"
-          headline="Iteration changes everything"
-          body="In one-shot games defection dominates. Repeated encounters shift the equilibrium — players who cooperate outperform those who defect across 200 rounds."
+          // Hero matches the highlighted bar (cooperationRates.highlightIndex
+          // = 0 → Round 1 = 82%). Previously this was "67%" (Round 100, the
+          // median), which made the editorial frame and the chart point at
+          // different answers. The chart now emphasises Round 1; the hero
+          // names it.
+          hero="82%"
+          headline="Even round one breaks the model"
+          body="The one-shot Prisoner's Dilemma predicts defection. Axelrod's iterated tournament saw 82% cooperation in round one — and cooperation never fell below 50% across all 200 rounds."
           byline="parallax · strategic analysis · catalog"
         >
           <DataChart data={cooperationRates} />

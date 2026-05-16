@@ -83,6 +83,7 @@ Read these when the task requires them:
 - [`project/SCRIPT_FORMAT.md`](./project/SCRIPT_FORMAT.md) — two-column production script spec (with `[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]` tags)
 - [`project/VISUAL_LANGUAGE.md`](./project/VISUAL_LANGUAGE.md) — *when* to use which visual mode; three-register system (Analytical/Atmospheric/Grounding); pacing rules
 - [`project/DIRECTING_LANGUAGE.md`](./project/DIRECTING_LANGUAGE.md) — `DIR:` annotation vocabulary (`cam`, `reveal`, `hold`, `cut`, `mood`); how it threads through script-draft → visual-spec → audio-spec → `generate_manifest.py`
+- [`project/TEXT_ANIMATION_REGISTER.md`](./project/TEXT_ANIMATION_REGISTER.md) — eight canonical text-animation techniques (Number Ticker, Tracking-In, Reveal Mask, Underline Draw, Typewriter, Backspace, Scramble, Word Cascade); the implicit editorial claim each technique makes; per-technique use/avoid rules with concrete Parallax episode examples; decision matrix for visual-spec skill
 - [`project/PACING_SYSTEM.md`](./project/PACING_SYSTEM.md) — proportional camera paths, Whisper sync loop, `PACE:` density budgeting
 - [`project/AUDIO_DESIGN.md`](./project/AUDIO_DESIGN.md) — 3-layer model (music bed, transition SFX, texture hits)
 - [`project/CONTENT_IDENTITY.md`](./project/CONTENT_IDENTITY.md) — 8 identity directions, 7 episode formats, 3 topic-discovery entry points

@@ -156,57 +156,30 @@ const AnimatedBar: React.FC<{
         </span>
       </div>
 
-      {/* Bar — gradient fill + drop shadow + pulse effect + hero glow */}
+      {/* Bar — gradient fill + drop shadow + restrained hero halo */}
       <div style={{ position: "relative" }}>
-        {/* Multi-layer bloom: outer soft glow + inner sharp halo + breathing pulse */}
+        {/* Single-layer halo for the highlighted bar — editorial register.
+            Previously this was a 3-layer treatment (40px outer bloom + 4px
+            halo + breathing pulse) that read "puffy game-UI" against the
+            rest of the editorial chrome (FT/Bloomberg precedent uses sharp
+            hierarchy, not soft glow). One subtle halo is enough to elevate
+            the hero bar without breaking register. The breathing pulse and
+            the wide 40px blur are intentionally dropped. */}
         {isHighlighted && highlightBloom > 0 && (
-          <>
-            {/* Layer 1: Outer soft bloom (40px blur) */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: -10,
-                left: "50%",
-                width: barWidth * 2,
-                height: barHeight * 1.1,
-                transform: "translateX(-50%)",
-                background: `radial-gradient(ellipse at center bottom, ${color}30 0%, transparent 65%)`,
-                opacity: highlightBloom * 0.7,
-                filter: "blur(40px)",
-                pointerEvents: "none",
-              }}
-            />
-            {/* Layer 2: Inner sharp halo (4px blur) */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: "50%",
-                width: barWidth * 0.9,
-                height: barHeight,
-                transform: "translateX(-50%)",
-                background: `radial-gradient(ellipse at center bottom, ${color}50 0%, transparent 80%)`,
-                opacity: highlightBloom * 0.9,
-                filter: "blur(4px)",
-                pointerEvents: "none",
-              }}
-            />
-            {/* Layer 3: Breathing pulse — opacity oscillates at ~2Hz */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: "50%",
-                width: barWidth * 1.5,
-                height: barHeight * 0.8,
-                transform: "translateX(-50%)",
-                background: `radial-gradient(ellipse at center bottom, ${color}25 0%, transparent 60%)`,
-                opacity: bloomIntensity(frame, startFrame + growDuration, 0.15, 0.25),
-                filter: "blur(20px)",
-                pointerEvents: "none",
-              }}
-            />
-          </>
+          <div
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: "50%",
+              width: barWidth * 1.05,
+              height: barHeight,
+              transform: "translateX(-50%)",
+              background: `radial-gradient(ellipse at center bottom, ${color}30 0%, transparent 75%)`,
+              opacity: highlightBloom * 0.5,
+              filter: "blur(6px)",
+              pointerEvents: "none",
+            }}
+          />
         )}
         <div
           style={{
@@ -215,9 +188,13 @@ const AnimatedBar: React.FC<{
             background: gradients.barFill(renderColor),
             borderRadius: barStyle.borderRadius,
             transition: "none",
-            // Outer shadow + inset right-edge to suggest end-cap volume
+            // Outer shadow + inset right-edge to suggest end-cap volume.
+            // The hero bar previously stacked TWO outer glows (20px + 50px)
+            // on top of shadows.medium, which read as illuminated game-UI
+            // against editorial chrome. Now: shadows.medium + a tight 8px
+            // colored halo — present but restrained.
             boxShadow: isHighlighted
-              ? `${shadows.medium}, 0 0 20px ${color}40, 0 0 50px ${color}20, inset -1px 0 0 rgba(0,0,0,0.18)`
+              ? `${shadows.medium}, 0 0 8px ${color}33, inset -1px 0 0 rgba(0,0,0,0.18)`
               : isMuted
                 ? `${shadows.subtle}` // no inset for muted — keep it flat-foil
                 : `${shadows.subtle}, inset -1px 0 0 rgba(0,0,0,0.15)`,
@@ -869,12 +846,22 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // bar heights scale against the niced max, not the raw data max.
   // This is the same domain-inference rule TimeSeriesChart uses; both
   // share the niceTicks utility.
+  // Compute the data ceiling across BOTH single-series points and comparison
+  // pairs. Earlier this only read `dataPoints`, so the comparison variant
+  // (which uses `comparisonPairs`) fell back to dataMaxBar=1 and the y-axis
+  // rendered a meaningless 0→1 decimal scale (with bars correctly scaled
+  // against the SEPARATE comparisonData.maxVal). Both paths must agree.
   const dataMaxBar = useMemo(
     () => {
-      const points = data.dataPoints || [];
-      return points.length > 0 ? Math.max(...points.map((d) => d.value)) : 1;
+      const pointVals = (data.dataPoints || []).map((d) => d.value);
+      const pairVals = (data.comparisonPairs || []).flatMap((p) => [
+        p.leftValue,
+        p.rightValue,
+      ]);
+      const all = [...pointVals, ...pairVals];
+      return all.length > 0 ? Math.max(...all) : 1;
     },
-    [data.dataPoints]
+    [data.dataPoints, data.comparisonPairs]
   );
   const [, niceMaxBar] = useMemo(
     () => niceDomain(0, dataMaxBar, 5),
@@ -905,6 +892,11 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // inside the bar container's `maxHeight + 80` height, NOT in chartLayout —
   // so we don't double-count it as extraPad.bottom.
   const VALUE_LABEL_HEADROOM = 80;
+  // Right-edge gutter for value labels that center above narrow bars and
+  // can extend horizontally past the bar's own width (e.g. "890" at h2 size
+  // above a ~88px bar in a 4-pair comparison render). Without this, the
+  // rightmost label gets clipped to "31(" by the safe-area boundary.
+  const VALUE_LABEL_RIGHT_GUTTER = 32;
   const hasTopBand = hasSpotlight;
   const hasBottomBand = !!data.source || !!data.contextNote;
   const chartBoxes = useMemo(
@@ -916,7 +908,11 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
         hasSource: hasBottomBand,
         sourceRows: data.source && data.contextNote ? 2 : 1,
         safeAreaTier: "generous",
-        extraPad: { bottom: layout.spacing.lg, left: yAxisLabelSpace },
+        extraPad: {
+          bottom: layout.spacing.lg,
+          left: yAxisLabelSpace,
+          right: VALUE_LABEL_RIGHT_GUTTER,
+        },
       }),
     [data.contextNote, data.source, hasBottomBand, hasTopBand]
   );

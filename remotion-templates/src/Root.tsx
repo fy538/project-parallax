@@ -182,6 +182,17 @@ import {
   CatalogEditorialHero,
   CatalogEditorialAside,
   CatalogEditorialMinimal,
+  // Exploratory: three structural directions for moving the editorial
+  // catalog out of PowerPoint register. Iteration data on top, diffusion
+  // (4 vs 890 skew) variants below.
+  CatalogEditorialDirectionA,
+  CatalogEditorialDirectionB,
+  CatalogEditorialDirectionC,
+  CatalogEditorialDirectionADiffusion,
+  CatalogEditorialDirectionBDiffusion,
+  CatalogEditorialDirectionCDiffusion,
+  // Eight text-animation techniques in one side-by-side composition.
+  CatalogTextAnimationShowcase,
   CatalogShowreel,
   CatalogShowreelBackdrops,
   CatalogEmphasisShowcase,
@@ -444,6 +455,16 @@ export const RemotionRoot: React.FC = () => {
           <CatalogEditorialHero />
           <CatalogEditorialAside />
           <CatalogEditorialMinimal />
+          {/* Iteration data (clean 0-100% scale) */}
+          <CatalogEditorialDirectionA />
+          <CatalogEditorialDirectionB />
+          <CatalogEditorialDirectionC />
+          {/* Diffusion data (4 vs 890 skew — the harder stress test) */}
+          <CatalogEditorialDirectionADiffusion />
+          <CatalogEditorialDirectionBDiffusion />
+          <CatalogEditorialDirectionCDiffusion />
+          {/* Text-animation reference: eight techniques in one composition */}
+          <CatalogTextAnimationShowcase />
         </Folder>
       </Folder>
     </>

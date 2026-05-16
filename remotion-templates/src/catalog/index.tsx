@@ -132,6 +132,25 @@ export {
   CatalogEditorialMinimal,
 } from "./Editorial";
 
+// Exploratory editorial-direction compositions (A/B/C). Standalone
+// compositions that bypass EditorialFrame + DataChart to evaluate three
+// structural directions for moving the catalog out of PowerPoint register.
+// Iteration set uses the Axelrod cooperation data (clean linear scale).
+// Diffusion set stress-tests each direction against the 4 vs 890 skew.
+export {
+  CatalogEditorialDirectionA,
+  CatalogEditorialDirectionB,
+  CatalogEditorialDirectionC,
+  CatalogEditorialDirectionADiffusion,
+  CatalogEditorialDirectionBDiffusion,
+  CatalogEditorialDirectionCDiffusion,
+} from "./EditorialDirections";
+
+// Text-animation reference showcase — eight techniques side-by-side on real
+// Parallax content. Use this to pick which techniques to extract into
+// reusable hooks/components after seeing them in motion.
+export { CatalogTextAnimationShowcase } from "./TextAnimationShowcase";
+
 export { CatalogShowreel } from "./Showreel";
 export { CatalogShowreelBackdrops } from "./ShowreelBackdrops";
 
