@@ -193,6 +193,9 @@ import {
   CatalogEditorialDirectionCDiffusion,
   // Eight text-animation techniques in one side-by-side composition.
   CatalogTextAnimationShowcase,
+  // Five composite editorial patterns (DefinitionReveal + callback,
+  // StatCaption, QuoteAttribution × 2 registers).
+  CatalogCompositePatternsShowcase,
   CatalogShowreel,
   CatalogShowreelBackdrops,
   CatalogEmphasisShowcase,
@@ -465,6 +468,8 @@ export const RemotionRoot: React.FC = () => {
           <CatalogEditorialDirectionCDiffusion />
           {/* Text-animation reference: eight techniques in one composition */}
           <CatalogTextAnimationShowcase />
+          {/* Composite editorial patterns: high-level choreography */}
+          <CatalogCompositePatternsShowcase />
         </Folder>
       </Folder>
     </>

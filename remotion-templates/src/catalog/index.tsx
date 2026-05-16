@@ -151,6 +151,12 @@ export {
 // reusable hooks/components after seeing them in motion.
 export { CatalogTextAnimationShowcase } from "./TextAnimationShowcase";
 
+// Composite editorial patterns — high-level choreography components that
+// compose atomic text-animation primitives into named patterns the
+// visual-spec skill thinks in (DefinitionReveal, StatCaption,
+// QuoteAttribution + ConceptCallback pulse for cross-episode continuity).
+export { CatalogCompositePatternsShowcase } from "./CompositePatternsShowcase";
+
 export { CatalogShowreel } from "./Showreel";
 export { CatalogShowreelBackdrops } from "./ShowreelBackdrops";
 
