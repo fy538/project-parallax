@@ -104,11 +104,11 @@ interface PhaseWindow extends StepBoundary {
  * schema enforces .min(1); fallback keeps all hooks executable until the
  * early-return at the bottom of the component runs).
  */
-const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+const FALLBACK_PHASE_WINDOW: PhaseWindow = Object.freeze({
   ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, symbols: [] },
   index: 0,
-};
+}) as PhaseWindow;
 
 const computePhaseWindows = (phases: ProportionalPhase[]): PhaseWindow[] => {
   const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));

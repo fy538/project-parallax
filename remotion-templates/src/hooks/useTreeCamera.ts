@@ -177,6 +177,36 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
     progress: stepProgress,
   } = useStepFramework(durations);
 
+  // ── Guard: empty cameraPath ─────────────────────────────────────────
+  // Previously crashed at `cameraPath[stepIndex].focus` because stepIndex=0
+  // but cameraPath=[]. Mirrors useNarratedCamera's neutral early-return.
+  if (cameraPath.length === 0) {
+    return {
+      viewportStyle: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: canvasWidth,
+        height: canvasHeight,
+        overflow: "hidden",
+      },
+      contentStyle: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: canvasWidth,
+        height: canvasHeight,
+      },
+      focusNodeId: "",
+      stepIndex: 0,
+      stepProgress: 0,
+      getNodeDim: () => 0,
+      getNodeScale: () => 1,
+      currentZoom: 1,
+      currentLabel: undefined,
+    };
+  }
+
   const currentStep = cameraPath[stepIndex];
   const stepStart = currentBounds.start;
 

@@ -168,6 +168,38 @@ export const useTimelineCamera = (
     progress: stepProgress,
   } = useStepFramework(durations);
 
+  // ── Guard: empty cameraPath ─────────────────────────────────────────
+  // Previously crashed at `cameraPath[stepIndex].focus`. Returns a neutral
+  // identity transform so the surrounding template can still render.
+  if (cameraPath.length === 0) {
+    return {
+      viewportStyle: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: canvasWidth,
+        height: canvasHeight,
+        overflow: "hidden",
+      },
+      contentStyle: {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: canvasWidth,
+        height: canvasHeight,
+      },
+      focusIndex: -1,
+      stepIndex: 0,
+      stepProgress: 0,
+      getEventDim: () => 0,
+      getEventScale: () => 1,
+      getEventBlur: () => 0,
+      currentZoom: 1,
+      currentLabel: undefined,
+      isTransitioning: false,
+    };
+  }
+
   const currentStep = cameraPath[stepIndex];
 
   // ── Compute target camera position ─────────────────────────────────

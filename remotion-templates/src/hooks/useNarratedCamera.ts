@@ -298,7 +298,13 @@ export const useNarratedCamera = (
         ? Math.round(step.duration * durationInFrames) // fraction of total
         : sec(step.duration), // absolute seconds
     );
-    const boundaries = computeStepBoundaries(frameDurations);
+    // Clone each StepBoundary before the auto-fill/sync-anchor passes below.
+    // computeStepBoundaries returns fresh objects, but the mutations downstream
+    // (last.end = durationInFrames, boundaries[i].start = syncFrame, etc.)
+    // would otherwise tie this memo's output identity to mutation order. The
+    // shallow clone keeps downstream consumers free to assume boundaries are
+    // effectively immutable from their perspective.
+    const boundaries = computeStepBoundaries(frameDurations).map((b) => ({ ...b }));
 
     // Auto-fill: if absolute mode and last step ends before composition,
     // extend the last step to fill remaining time (camera holds final position)

@@ -81,11 +81,11 @@ interface PhaseWindow extends StepBoundary {
   index: number;
 }
 
-const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+const FALLBACK_PHASE_WINDOW: PhaseWindow = Object.freeze({
   ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, data: [] },
   index: 0,
-};
+}) as PhaseWindow;
 
 const computePhaseWindows = (phases: CartogramPhase[]): PhaseWindow[] => {
   const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));

@@ -72,11 +72,11 @@ export interface PhaseWindow extends StepBoundary {
  * empty `AtlasPhase` and index 0, so the zero-window shape lives in exactly
  * one place across the library.
  */
-export const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+export const FALLBACK_PHASE_WINDOW: PhaseWindow = Object.freeze({
   ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, countries: [] },
   index: 0,
-};
+}) as PhaseWindow;
 
 /**
  * Convert phase durations (seconds) into cumulative frame windows.
