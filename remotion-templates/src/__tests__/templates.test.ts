@@ -61,6 +61,7 @@ const TEMP_DIR = path.resolve(__dirname, ".temp-renders");
 const COMPOSITIONS = [
   // Timelines
   "HorizontalTimeline",
+  "HorizontalTimelineSingle", // Added May 15, 2026 — registered in Root.tsx (prior round) but missed from test list
   // (TimelineComparison / TimelineMorph / DualTimeline were removed from
   //  Root.tsx; the deprecated entries previously kept here for regression
   //  now reference compositions that don't exist and crash the suite.)
