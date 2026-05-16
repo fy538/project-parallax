@@ -9,6 +9,7 @@
   "durationSec": 4,
   "backgroundVariant": "dark",
   "_direction": {
-    "paceProfile": "breathing"
+    "paceProfile": "breathing",
+    "textAnimation": "definition-reveal"
   }
 }

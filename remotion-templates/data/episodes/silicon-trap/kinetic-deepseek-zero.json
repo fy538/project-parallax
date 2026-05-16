@@ -8,6 +8,7 @@
   "durationSec": 5,
   "backgroundVariant": "dark",
   "_direction": {
-    "paceProfile": "urgent"
+    "paceProfile": "urgent",
+    "textAnimation": "stat-caption"
   }
 }

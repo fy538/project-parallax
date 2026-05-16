@@ -6,5 +6,8 @@
   "statContext": "Largest FDI greenfield project in US history",
   "accentColor": "#C4A747",
   "durationSec": 4,
-  "backgroundVariant": "light"
+  "backgroundVariant": "light",
+  "_direction": {
+    "textAnimation": "stat-caption"
+  }
 }

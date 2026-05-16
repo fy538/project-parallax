@@ -21,6 +21,7 @@ A typical episode: ~40-55% MG, ~25-40% footage, ~5-15% ILLUST, ~5-15% AI-GEN, ~5
 Before starting, familiarize yourself with:
 - **`project/VISUAL_LANGUAGE.md`** — editorial logic for when to use footage vs. MG vs. layered. This is the "why" behind visual decisions.
 - **`project/DIRECTING_LANGUAGE.md`** — the `DIR:` annotation syntax. This is the "how" — camera movement, reveal choreography, timing, transitions, and mood. You will parse these and translate them into `_direction` blocks in JSON files, camera/mood language in AI-GEN briefs, treatment selection in ILLUST specs, and tint hints in footage manifests.
+- **`project/TEXT_ANIMATION_REGISTER.md`** — the eight canonical text-animation techniques (Number Ticker, Tracking-In, Reveal Mask, Underline Draw, Typewriter, Backspace, Scramble, Word Cascade) and three composite patterns (Definition Reveal, Stat Caption, Quote Attribution). Use this to pick the `_direction.textAnimation` register for text-bearing templates (KineticTypography, StatReveal). The doctrine doc has per-technique use/avoid rules and a decision matrix.
 - **`project/FOOTAGE_SOURCING.md`** — what footage is actually available for geopolitics content, organized by sourcability tier. This is the reality check.
 - **`project/SCRIPT_FORMAT.md`** — the visual mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), `DIR:` annotations, and how they work in the two-column format.
 - **`project/AI_VIDEO_PIPELINE.md`** — the fourth visual mode specification: aesthetic philosophy (mannequin faces + realistic environments), tool selection, prompting patterns by use case, and editorial guardrails.
@@ -392,6 +393,100 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 "_direction": { "paceProfile": "urgent" }
 ```
 This ensures template animations respond to pacing intent even without explicit direction.
+
+### Text-animation register (`_direction.textAnimation`)
+
+For text-bearing templates — `KineticTypography` and `StatReveal` — you also pick a *text-animation register* that determines HOW the text reveals (typewriter vs word-cascade vs ticker vs etc.). The full vocabulary, editorial register, and per-technique use/avoid rules live in **`project/TEXT_ANIMATION_REGISTER.md`** — read that doc first. This section gives you the dispatch rules.
+
+**Selection rule by template + variant:**
+
+| Template | Variant / shape | When to emit | Set `textAnimation` to |
+|---|---|---|---|
+| KineticTypography | `variant: "quote"` WITH a real named `attribution` (Nash, Morris Chang, Schmidt, Schelling, Sullivan, etc.) | Always | `"quote-attribution"` |
+| KineticTypography | `variant: "quote"` with channel-voice text (no named attribution, or `attribution` is "Checkpoint" / editorial framing) | NEVER — leave unset | `(omit)` — falls back to word-cascade default |
+| KineticTypography | `variant: "definition"` introducing a term + pinyin + translation (foreign-term moments: 卡脖子, 举国体制) | Always | `"definition-reveal"` |
+| KineticTypography | `variant: "statistic"` with a hero stat value | Always | `"stat-caption"` |
+| KineticTypography | `variant: "bilingual"` (paired language display) | Leave unset for now | `(omit)` — no composite pattern yet |
+| StatReveal | (any data) | Never needed | `(omit)` — StatReveal already uses the canonical ticker internally as of Phase 1 |
+
+**Archival vs modern quote distinction.** The `quote-attribution` composite has an `archival` flag (renders in Plex Mono rather than Plex Sans display) — but it's set INTERNALLY by KineticTypography based on the `attributionContext`. As of Phase 1, archival mode is selected by KineticTypography when the context contains words like "1950", "1952", or document references (RAND RM-..., declassified, etc.). You don't need to emit it yourself; you just set `textAnimation: "quote-attribution"` and let KineticTypography pick the register.
+
+**Concept callbacks (`_direction.isCallback`).** This is a separate per-segment flag, distinct from `textAnimation`. Set `"isCallback": true` when:
+1. The segment renders a term from `data/concepts.json` (`KineticTypography variant="definition"` is the typical case), AND
+2. That term has an `introduced.episode` value that is a DIFFERENT, EARLIER episode than the current one (cross-episode recurrence)
+
+To check this:
+- Look up `data/concepts.json` for an entry whose `term.cn`, `term.en`, or `term.pinyin` matches the term being rendered
+- If found, compare `concept.introduced.episode` to the current episode slug
+- If introduced earlier and now recurring → `isCallback: true`
+- If introduced in the CURRENT episode (first introduction) → omit / `false`
+
+Phase 1 status: KineticTypography reads `_direction.isCallback` and wires it through `<DefinitionReveal isCallback={...}>` to fire the cross-episode pulse. The concept registry is the authority on the cross-episode state; visual-spec is the authority on encoding that into JSON.
+
+**Examples:**
+
+A Morris Chang quote in silicon-trap:
+```json
+{
+  "episode": "silicon-trap",
+  "variant": "quote",
+  "text": "Globalization is almost dead. Free trade is almost dead.",
+  "attribution": "Morris Chang",
+  "attributionContext": "TSMC Founder, 2022",
+  "_direction": {
+    "textAnimation": "quote-attribution"
+  }
+}
+```
+
+A 卡脖子 definition in silicon-trap (first introduction — NOT a callback):
+```json
+{
+  "episode": "silicon-trap",
+  "variant": "definition",
+  "term": "卡脖子",
+  "termPinyin": "kǎ bózi",
+  "termTranslation": "Stranglehold technology",
+  "_direction": {
+    "textAnimation": "definition-reveal"
+  }
+}
+```
+
+A 卡脖子 definition in a LATER episode (callback to silicon-trap introduction):
+```json
+{
+  "episode": "future-episode-slug",
+  "variant": "definition",
+  "term": "卡脖子",
+  "termPinyin": "kǎ bózi",
+  "termTranslation": "Stranglehold technology",
+  "_direction": {
+    "textAnimation": "definition-reveal",
+    "isCallback": true
+  }
+}
+```
+
+A hero stat in silicon-trap:
+```json
+{
+  "episode": "silicon-trap",
+  "variant": "statistic",
+  "statValue": "$165B",
+  "statLabel": "total semiconductor investment",
+  "_direction": {
+    "textAnimation": "stat-caption"
+  }
+}
+```
+
+**Anti-patterns** (don't do these):
+
+- Setting `textAnimation: "typewriter"` on a channel-voice statement. Typewriter implies *transcribed* text — the channel doesn't transcribe its own narration. Leave the field unset.
+- Setting `textAnimation: "number-ticker"` on a year, date, or label number. Tickers imply *arrived-at* values; years and dates are labels.
+- Setting `textAnimation: "scramble"` more than once or twice per episode. Scramble is editorial-archival ("classified → declassified" register); using it for every label drifts to spy-thriller register.
+- Setting `textAnimation` on segments that don't render text choreography (charts, maps, diagrams). The field is ignored on those templates.
 
 ### Quality checklist for each file
 

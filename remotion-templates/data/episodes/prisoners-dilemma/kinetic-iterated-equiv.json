@@ -1,11 +1,14 @@
 {
   "episode": "prisoners-dilemma",
   "variant": "quote",
-  "text": "Iterated PD \u2261 Stag Hunt",
+  "text": "Iterated PD ≡ Stag Hunt",
   "attribution": "Brian Skyrms",
   "attributionContext": "The Stag Hunt and the Evolution of Social Structure, 2004",
   "accentColor": "#C4A747",
   "backgroundVariant": "dark",
   "durationSec": 6,
-  "source": "Skyrms (2004)"
+  "source": "Skyrms (2004)",
+  "_direction": {
+    "textAnimation": "quote-attribution"
+  }
 }

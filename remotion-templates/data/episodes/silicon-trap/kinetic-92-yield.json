@@ -6,5 +6,8 @@
   "statContext": "4 points above the equivalent line in Taiwan",
   "accentColor": "#C4A747",
   "durationSec": 3,
-  "backgroundVariant": "light"
+  "backgroundVariant": "light",
+  "_direction": {
+    "textAnimation": "stat-caption"
+  }
 }

@@ -7,5 +7,8 @@
   "accentColor": "#F0E6D0",
   "backgroundVariant": "dark",
   "durationSec": 5,
-  "source": "Flood (1952), RAND RM-789-1"
+  "source": "Flood (1952), RAND RM-789-1",
+  "_direction": {
+    "textAnimation": "quote-attribution"
+  }
 }
