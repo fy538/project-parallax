@@ -20,7 +20,7 @@ You are generating the audio design layer for a bilingual geopolitics video chan
 **Read `project/AUDIO_DESIGN.md` before starting.** It defines the 3-layer audio model, the SFX palette, volume hierarchy, and all template-to-cue mappings. That document is the authoritative reference — this skill applies its rules to a specific script.
 
 **Read `project/DIRECTING_LANGUAGE.md` for direction-to-audio integration.** The script's `DIR:` annotations are the single source of truth for timing, transitions, and mood. Three directives directly inform audio cues:
-- **`cut()`** → determines which transition SFX to use at segment boundaries. `cut(color-wash)` → `register-shift` SFX. `cut(iris)` → `section-open` SFX. `cut(blur-through)` → `beat-transition` SFX with atmospheric flavor.
+- **`cut()`** → determines which transition SFX to use at segment boundaries. `cut(color-wash)` → `section-open` SFX (color flood = new section). `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click). `cut(blur-through)` → `tension-rise` → `tension-resolve` two-part SFX (rise during blur, resolve on reveal). Authoritative table: [`project/AUDIO_DESIGN.md`](../../project/AUDIO_DESIGN.md) lines 398-400.
 - **`hold()`** → creates audio silence/breathing opportunities. `hold(breathe)` → music bed thins to 50% volume during the hold. `hold(land)` → all audio pauses for 1s (deliberate silence candidate). `hold(linger)` → music bed continues at low volume.
 - **`mood()`** → maps directly to music bed mood and volume. `mood(dense)` → increase music intensity, add low-frequency texture. `mood(none)` → thin the bed, emphasize clarity. `mood(dim:0.5)` → reduce texture hits to minimum. A `mood()` change mid-beat may warrant a music bed crossfade within the beat.
 - **`type()` and `_direction.textAnimation`** → text-animation register dictates a default SFX/texture cue. See **`project/TEXT_ANIMATION_REGISTER.md`** for the technique catalog. The default mapping (apply unless the script overrides with an explicit cue) is:
@@ -126,10 +126,10 @@ Walk through the script segment by segment. For each segment, consult the templa
 
 For each segment:
 
-1. **Does the previous segment have a `DIR: cut()` annotation?** → The cut type determines the transition SFX:
-   - `cut(color-wash)` → `register-shift` SFX (dramatic — this is a register boundary)
-   - `cut(iris)` → `section-open` SFX (focal reveal)
-   - `cut(blur-through)` → `beat-transition` SFX with atmospheric overtone
+1. **Does the previous segment have a `DIR: cut()` annotation?** → The cut type determines the transition SFX (authoritative table: `project/AUDIO_DESIGN.md` lines 398-400):
+   - `cut(color-wash)` → `section-open` SFX (color flood signals a new section)
+   - `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click)
+   - `cut(blur-through)` → `tension-rise` → `tension-resolve` two-part SFX (rise during the blur, resolve on the reveal — the blur suggests a shift in understanding)
    - `cut(match-cut)` → silent transition (the visual continuity IS the connection — SFX would compete)
    - `cut(dissolve)` → `beat-transition` SFX at subtle intensity
    - `cut(fade)` → `beat-transition` SFX at subtle intensity
