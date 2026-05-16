@@ -40,8 +40,13 @@ import { sec } from "../design/theme";
 import {
   computeStepBoundaries,
   getCurrentStepIndex,
-  cinematicEasings,
+  getStepProgress,
+  motionEasings,
 } from "../utils/stepFramework";
+
+// Destructure at file top so call sites read as `track` / `snap` / `zoom`
+// — keeps diffs small vs the legacy TRACK_EASE / SNAP_EASE / ZOOM_EASE names.
+const { track, snap, zoom } = motionEasings;
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -172,8 +177,9 @@ export interface NarratedCameraState {
 }
 
 // ── Easing presets — imported from stepFramework ────────────────────────────
-// cinematicEasings.track / .snap / .zoom — defined once in stepFramework.ts
-// so calibration changes propagate to all camera hooks automatically.
+// `track` / `snap` / `zoom` destructured from `motionEasings` above —
+// defined once in stepFramework.ts so calibration changes propagate to all
+// camera hooks automatically.
 
 const CLAMP_OPTS = {
   extrapolateLeft: "clamp" as const,
@@ -365,11 +371,7 @@ export const useNarratedCamera = (
 
   const currentStep = cameraPath[stepIndex];
   const currentBounds = stepBoundaries[stepIndex];
-  const stepDuration = Math.max(1, currentBounds.end - currentBounds.start); // guard against zero
-  const stepProgress = Math.min(
-    1,
-    Math.max(0, (frame - currentBounds.start) / stepDuration)
-  );
+  const stepProgress = getStepProgress(frame, currentBounds);
 
   // ── Resolve target coordinates ─────────────────────────────────────
   const resolveTarget = (target: NarratedCameraStep["target"]): { x: number; y: number } => {
@@ -426,7 +428,7 @@ export const useNarratedCamera = (
   const isTransitioning =
     frame >= currentBounds.start && frame < transitionEnd && stepIndex > 0;
 
-  const ease = currentStep.behavior === "snap" ? cinematicEasings.snap : cinematicEasings.track;
+  const ease = currentStep.behavior === "snap" ? snap : track;
 
   const prevTarget = resolveTarget(prevStep.target);
   const currTarget = resolveTarget(currentStep.target);
@@ -467,7 +469,7 @@ export const useNarratedCamera = (
           frame,
           [currentBounds.start, zoomTransitionEnd],
           [prevZoom, currZoom],
-          { ...CLAMP_OPTS, easing: cinematicEasings.zoom }
+          { ...CLAMP_OPTS, easing: zoom }
         );
 
   // ── Shake ──────────────────────────────────────────────────────────

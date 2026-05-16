@@ -35,9 +35,13 @@ import { sec } from "../design/theme";
 import {
   computeStepBoundaries,
   getCurrentStepIndex,
-  cinematicEasings,
+  getStepProgress,
+  motionEasings,
 } from "../utils/stepFramework";
 import type { TimelineCameraStep } from "../templates/HorizontalTimeline/types";
+
+// Destructure at file top so call sites read as `track` / `snap` / `zoom`.
+const { track, snap, zoom } = motionEasings;
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -83,7 +87,8 @@ export interface TimelineCameraState {
 }
 
 // ── Easing presets — imported from stepFramework ────────────────────────────
-// cinematicEasings.track / .snap / .zoom — defined once in stepFramework.ts.
+// `track` / `snap` / `zoom` destructured from `motionEasings` above —
+// defined once in stepFramework.ts so calibration changes propagate.
 
 const CLAMP_OPTS = {
   extrapolateLeft: "clamp" as const,
@@ -164,12 +169,8 @@ export const useTimelineCamera = (
   const currentStep = cameraPath[stepIndex];
   const currentBounds = stepBoundaries[stepIndex];
 
-  // Progress within current step
-  const stepDuration = currentBounds.end - currentBounds.start;
-  const stepProgress = Math.min(
-    1,
-    Math.max(0, (frame - currentBounds.start) / stepDuration)
-  );
+  // Progress within current step (clamped 0–1 incl. exact-end-frame → 1).
+  const stepProgress = getStepProgress(frame, currentBounds);
 
   // ── Compute target camera position ─────────────────────────────────
   const getTargetX = (step: TimelineCameraStep): number => {
@@ -198,7 +199,7 @@ export const useTimelineCamera = (
 
   // Choose easing based on behavior
   const ease =
-    currentStep.behavior === "snap" ? cinematicEasings.snap : cinematicEasings.track;
+    currentStep.behavior === "snap" ? snap : track;
 
   // Camera X: interpolate from previous target to current target
   const prevTargetX = getTargetX(prevStep);
@@ -232,7 +233,7 @@ export const useTimelineCamera = (
           frame,
           [currentBounds.start, zoomTransitionEnd],
           [prevZoom, currZoom],
-          { ...CLAMP_OPTS, easing: cinematicEasings.zoom }
+          { ...CLAMP_OPTS, easing: zoom }
         );
 
   // ── Compute transform ──────────────────────────────────────────────
