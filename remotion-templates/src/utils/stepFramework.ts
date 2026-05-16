@@ -65,6 +65,28 @@ export interface StepBoundary {
 }
 
 /**
+ * Generic PhaseWindow — `StepBoundary` augmented with a domain-specific
+ * `phase` payload and a sequential index. Five map templates (AtlasPlate,
+ * ChoroplethMap, DensityMap, CartogramMap, ProportionalSymbolMap) all
+ * carry near-identical four-line interface bodies that differ only in the
+ * `phase` field's domain type; this generic lets them share one declaration
+ * while keeping each template's phase type its own.
+ *
+ * Usage in a template:
+ *   import { type PhaseWindow } from "../../utils/stepFramework";
+ *   import type { DensityPhase } from "./types";
+ *
+ *   const windows: PhaseWindow<DensityPhase>[] = computePhaseWindows(data.phases);
+ *
+ * The `phase` payload is intentionally not constrained — each template
+ * brings its own AtlasPhase / DensityPhase / ChoroplethPhase / etc. type.
+ */
+export interface PhaseWindow<P> extends StepBoundary {
+  phase: P;
+  index: number;
+}
+
+/**
  * Sentinel for empty-boundaries guards. Consumers that index into a possibly
  * empty boundaries array can fall back to this instead of redefining their
  * own per-domain fallback ({start:0,end:0} appeared in 6 places before).
@@ -132,7 +154,9 @@ export function getCurrentStepIndex(
   frame: number,
   boundaries: StepBoundary[],
 ): number {
-  // TODO: switch to binary search when boundaries.length > 50 (currently N≤20).
+  // NOTE: linear scan is correct for N≤50. Camera hooks today have N≤~20
+  // steps; the linear scan beats binary search at that size due to cache
+  // locality and branch prediction. Revisit if any consumer crosses 50 steps.
   let idx = 0;
   for (let i = 0; i < boundaries.length; i++) {
     if (frame >= boundaries[i].start) idx = i;

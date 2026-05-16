@@ -224,8 +224,11 @@ const timelineDualIndustrialInfo: HorizontalTimelineData = {
       connection: "Information layer",
     },
   ],
-  // TODO: HorizontalTimelineData doesn't expose `source` yet — when it does,
-  // restore: "Author's synthesis from standard histories of technology".
+  // NOTE: HorizontalTimelineData doesn't expose `source` yet (see schema in
+  // `templates/HorizontalTimeline/schema.ts`). When added, restore the
+  // attribution: "Author's synthesis from standard histories of technology".
+  // Two catalog fixtures carry these stash-attribution notes; both unblock
+  // the same schema extension.
   durationSec: 16,
 };
 
@@ -271,8 +274,9 @@ const timelineDualImperialTransitions: HorizontalTimelineData = {
       connection: "Handoff complete",
     },
   ],
-  // TODO: HorizontalTimelineData doesn't expose `source` yet — when it does,
-  // restore: "Author's synthesis from Heather (2006) + Brendon (2007)".
+  // NOTE: see attribution note on `timelineGreatGameThenNow` above —
+  // when `HorizontalTimelineData.source` exists, restore:
+  // "Author's synthesis from Heather (2006) + Brendon (2007)".
   durationSec: 16,
 };
 

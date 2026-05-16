@@ -43,6 +43,10 @@ import {
 } from "../../utils/animation";
 import { scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
+import {
+  computeStepBoundaries,
+  type PhaseWindow as StepPhaseWindow,
+} from "../../utils/stepFramework";
 import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -114,30 +118,27 @@ function getColorRamp(ramp?: string | string[]): readonly string[] {
 
 // ── Phase timing ────────────────────────────────────────────────────────────
 
-interface PhaseWindow {
-  phase: AnimationPhase;
-  startFrame: number;
-  endFrame: number;
-  index: number;
-}
+// Local alias so we don't have to repeat the generic at every use site.
+// PhaseWindow<AnimationPhase> is exactly what we want: step-framework
+// boundary + `phase: AnimationPhase` + `index`.
+type PhaseWindow = StepPhaseWindow<AnimationPhase>;
 
 function computePhaseWindows(phases: AnimationPhase[]): PhaseWindow[] {
-  let cursor = 0;
-  return phases.map((phase, i) => {
-    const start = cursor;
-    const duration = sec(phase.durationSec);
-    cursor += duration;
-    return { phase, startFrame: start, endFrame: cursor, index: i };
-  });
+  const boundaries = computeStepBoundaries(phases.map((p) => sec(p.durationSec)));
+  return boundaries.map((b, i) => ({ ...b, phase: phases[i], index: i }));
 }
 
+/**
+ * Nullable phase finder — returns `null` when the frame is before the first
+ * phase or after the last phase ends. This intentionally differs from
+ * `getCurrentStepIndex` (which clamps to last) because the camera logic
+ * below relies on `null` at the post-end to skip transition interpolation.
+ */
 function getCurrentPhase(
   frame: number,
   windows: PhaseWindow[]
 ): PhaseWindow | null {
-  return (
-    windows.find((w) => frame >= w.startFrame && frame < w.endFrame) || null
-  );
+  return windows.find((w) => frame >= w.start && frame < w.end) || null;
 }
 
 // ── Camera conversion ───────────────────────────────────────────────────────
@@ -373,7 +374,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
     const prevCamera = phaseToCamera(prevPhase?.phase || null, data);
     const camT = interpolate(
       frame,
-      [current.startFrame, current.startFrame + sec(1.5)],
+      [current.start, current.start + sec(1.5)],
       [0, 1],
       CLAMP_CUBIC_INOUT
     );
@@ -400,7 +401,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   const fillExpression = buildCountryFillExpression(
     current?.phase || null,
     frame,
-    current?.startFrame || 0,
+    current?.start || 0,
     colorRamp,
     firstPhaseEntrance,
   );
@@ -408,7 +409,7 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   const opacityExpression = buildCountryOpacityExpression(
     current?.phase || null,
     frame,
-    current?.startFrame || 0,
+    current?.start || 0,
     firstPhaseEntrance,
   );
 
@@ -425,8 +426,8 @@ export const ChoroplethMap: React.FC<{ data: ChoroplethMapData }> = ({
   const phaseWindowsSec = useMemo(
     () =>
       windows.map((w) => ({
-        startSec: w.startFrame / layout.fps,
-        endSec: w.endFrame / layout.fps,
+        startSec: w.start / layout.fps,
+        endSec: w.end / layout.fps,
       })),
     [windows],
   );

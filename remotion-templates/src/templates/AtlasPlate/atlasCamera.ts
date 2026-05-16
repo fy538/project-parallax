@@ -32,7 +32,7 @@ import {
   computeStepBoundaries,
   getCurrentStepIndex,
   EMPTY_BOUNDARY,
-  type StepBoundary,
+  type PhaseWindow as StepPhaseWindow,
 } from "../../utils/stepFramework";
 import type { AtlasPhase } from "./types";
 
@@ -47,20 +47,19 @@ export const CAMERA_TRANSITION_FRAMES = sec(1.2);
 // ── Phase windows ─────────────────────────────────────────────────────
 
 /**
- * AtlasPlate-specific extension of `StepBoundary` with the originating phase
- * and its sequential index attached. The `start` / `end` fields satisfy the
- * generic StepBoundary contract; `phase` / `index` are AtlasPlate-only
- * convenience fields read by AtlasPlate.tsx during render.
+ * AtlasPlate-specific PhaseWindow — `StepBoundary` + `phase: AtlasPhase` +
+ * `index`. The generic in `stepFramework.ts` owns the shape; this alias
+ * keeps grep-discoverability ("what shape does AtlasPlate's window have?")
+ * while sharing the underlying type across the five phase-driven map
+ * templates (AtlasPlate, ChoroplethMap, DensityMap, CartogramMap,
+ * ProportionalSymbolMap).
  *
  * Field-name note: pre-May-2026 this interface used `startFrame` / `endFrame`.
  * Renamed to `start` / `end` to align with `StepBoundary` so the generic
  * step-framework primitives (`getCurrentStepIndex`, `getStepProgress`) can
  * consume PhaseWindow arrays directly without a `.map(...)` adapter.
  */
-export interface PhaseWindow extends StepBoundary {
-  phase: AtlasPhase;
-  index: number;
-}
+export type PhaseWindow = StepPhaseWindow<AtlasPhase>;
 
 /**
  * Fallback phase window — used when `data.phases` is somehow empty (the

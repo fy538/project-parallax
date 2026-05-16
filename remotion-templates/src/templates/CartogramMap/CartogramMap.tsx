@@ -60,7 +60,7 @@ import {
   computeStepBoundaries,
   getCurrentStepIndex,
   EMPTY_BOUNDARY,
-  type StepBoundary,
+  type PhaseWindow as StepPhaseWindow,
 } from "../../utils/stepFramework";
 import type { FeatureCollection } from "geojson";
 import type { CartogramMapData, CartogramPhase } from "./types";
@@ -76,10 +76,7 @@ const VIEWPORT = { width: layout.width, height: layout.height } as const;
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow extends StepBoundary {
-  phase: CartogramPhase;
-  index: number;
-}
+type PhaseWindow = StepPhaseWindow<CartogramPhase>;
 
 const FALLBACK_PHASE_WINDOW: PhaseWindow = Object.freeze({
   ...EMPTY_BOUNDARY,

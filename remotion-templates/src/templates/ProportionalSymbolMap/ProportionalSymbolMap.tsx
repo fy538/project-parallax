@@ -70,7 +70,7 @@ import {
   computeStepBoundaries,
   getCurrentStepIndex,
   EMPTY_BOUNDARY,
-  type StepBoundary,
+  type PhaseWindow as StepPhaseWindow,
 } from "../../utils/stepFramework";
 import { resolveColor as resolveAnnotationColor } from "../../components/MapAnnotations";
 import type { ProportionalSymbolMapData, ProportionalPhase } from "./types";
@@ -94,10 +94,7 @@ const annotationKey = (ann: MapAnnotation): string =>
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow extends StepBoundary {
-  phase: ProportionalPhase;
-  index: number;
-}
+type PhaseWindow = StepPhaseWindow<ProportionalPhase>;
 
 /**
  * Fallback phase window — used when `data.phases` is somehow empty (the

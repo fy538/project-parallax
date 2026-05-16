@@ -34,7 +34,7 @@ import {
   computeStepBoundaries,
   getCurrentStepIndex,
   EMPTY_BOUNDARY,
-  type StepBoundary,
+  type PhaseWindow as StepPhaseWindow,
 } from "../../utils/stepFramework";
 import type { DensityMapData, DensityPhase } from "./types";
 
@@ -65,10 +65,7 @@ const DEFAULT_RAMP_HEX = [
 
 // ── Phase windows ─────────────────────────────────────────────────────────
 
-interface PhaseWindow extends StepBoundary {
-  phase: DensityPhase;
-  index: number;
-}
+type PhaseWindow = StepPhaseWindow<DensityPhase>;
 
 const FALLBACK_PHASE_WINDOW: PhaseWindow = Object.freeze({
   ...EMPTY_BOUNDARY,
