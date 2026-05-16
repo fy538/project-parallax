@@ -562,7 +562,7 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
 
     Returns dict with keys: holdAfter, holdBehavior, preDelay, transitionOut,
     transitionDuration, washColor, narrationGate, syncWords, textAnimation,
-    isCallback.
+    isCallback, narrationLeadIn (jcut), narrationLagOut (lcut).
     """
     result = {}
 
@@ -744,6 +744,26 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                 if "slug" not in chapter:
                     chapter["slug"] = _slugify_chapter_title(chapter["title"])
                 result["chapter"] = chapter
+
+        elif dtype == "jcut":
+            # Parse jcut(N) — J-cut audio bridge (TRANSITION_GRAMMAR.md §07).
+            # Sets narrationLeadIn: the narrator's audio for THIS segment begins
+            # N seconds before the segment's startSec so the audio bridges the
+            # visual seam. Used in NLE assembly; does NOT affect Remotion timing.
+            # Grammar: jcut(0.7)  or  jcut(0.5s)
+            num_m = re.match(r"^([0-9]+(?:\.[0-9]+)?)s?$", params_str.strip())
+            if num_m:
+                result["narrationLeadIn"] = float(num_m.group(1))
+
+        elif dtype == "lcut":
+            # Parse lcut(N) — L-cut audio bridge (TRANSITION_GRAMMAR.md §07).
+            # Sets narrationLagOut: narration from THIS segment extends N seconds
+            # past the segment's endSec (audio trails the visual cut). Used in
+            # NLE assembly; does NOT affect Remotion timing.
+            # Grammar: lcut(0.5)  or  lcut(0.3s)
+            num_m = re.match(r"^([0-9]+(?:\.[0-9]+)?)s?$", params_str.strip())
+            if num_m:
+                result["narrationLagOut"] = float(num_m.group(1))
 
         elif dtype == "type":
             # Parse type() — text-animation register for text-bearing
@@ -1086,6 +1106,16 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
 
     6. END CARD: The final segment (usually TitleTransition end-card)
        gets a fade-in (0.8s) for a cinematic close.
+
+    7. J-CUT AUDIO BRIDGE (Phase 7 of TRANSITION_GRAMMAR.md): every
+       hard-cut segment gets narrationLeadIn: 0.7 by default — the
+       narrator's audio for the incoming segment begins 0.7s before the
+       visual cut so the seam disappears in the NLE. Suppressed when:
+       • i == 0 (first segment, nothing to bridge from)
+       • the segment is a TRANSITION / chapter card (silence beat)
+       • the previous segment has driftPreset "none" (hold(stillness) —
+         eulogy / memorial / document-of-record; bridge contradicts intent)
+       • narrationLeadIn already on the segment from DIR: jcut(N)
     """
     if not segments:
         return segments
@@ -1203,6 +1233,16 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
                 if trans_in == "cut" and not is_title and not beat_changed:
                     trans_in = "dissolve"
                     dur = 0.4
+
+        # Phase 7: J-cut audio bridge default (TRANSITION_GRAMMAR.md §07)
+        # Every hard cut gets narrationLeadIn: 0.7 so the NLE editor has
+        # the audio bridge ready. The field is an annotation only — it
+        # does NOT change Remotion's visual timing. See TRANSITION_GRAMMAR
+        # §07 "Hard cuts without audio bridging" failure mode.
+        if trans_in == "cut" and not is_title and i > 0 and prev is not None:
+            prev_stillness = prev.get("_direction", {}).get("driftPreset") == "none"
+            if not prev_stillness and "narrationLeadIn" not in seg:
+                seg["narrationLeadIn"] = 0.7
 
         # Only set transition if non-default
         if trans_in != "cut" or trans_out != "cut":
@@ -2007,6 +2047,14 @@ def _build_segment(
         seg["narrationGate"] = direction["narrationGate"]
     if direction.get("syncWords"):
         seg["syncWords"] = direction["syncWords"]
+    # Phase 7: J/L-cut audio bridge fields (TRANSITION_GRAMMAR.md §07).
+    # Forwarded from DIR: jcut(N) / lcut(N) on the script row. The default
+    # narrationLeadIn: 0.7 for hard cuts is applied later by
+    # apply_default_transitions(), NOT here.
+    if "narrationLeadIn" in direction:
+        seg["narrationLeadIn"] = direction["narrationLeadIn"]
+    if "narrationLagOut" in direction:
+        seg["narrationLagOut"] = direction["narrationLagOut"]
 
     # Drift preset (DIR: drift(...) or hold(stillness)) — write to
     # segment._direction so FullEpisode.tsx merges it into data._direction

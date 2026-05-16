@@ -907,6 +907,123 @@ def test_build_segment_chapter_sugar_timing():
     assert seg["beat"] == "beat-d"
 
 
+# ── Phase 7: J/L-cut audio bridge fields ──────────────────────────────────
+
+
+def test_parse_dir_jcut_sets_narration_lead_in():
+    """DIR: jcut(0.5) → narrationLeadIn: 0.5 in the direction dict."""
+    result = parse_dir_lines(["DIR: jcut(0.5)"])
+    assert result["narrationLeadIn"] == 0.5
+
+
+def test_parse_dir_jcut_integer_value():
+    """jcut(1) — integer with no decimal — parses correctly."""
+    result = parse_dir_lines(["DIR: jcut(1)"])
+    assert result["narrationLeadIn"] == 1.0
+
+
+def test_parse_dir_jcut_with_s_suffix():
+    """jcut(0.7s) — trailing 's' suffix accepted."""
+    result = parse_dir_lines(["DIR: jcut(0.7s)"])
+    assert result["narrationLeadIn"] == 0.7
+
+
+def test_parse_dir_lcut_sets_narration_lag_out():
+    """DIR: lcut(0.3) → narrationLagOut: 0.3 in the direction dict."""
+    result = parse_dir_lines(["DIR: lcut(0.3)"])
+    assert result["narrationLagOut"] == 0.3
+
+
+def test_hard_cut_gets_default_narration_lead_in():
+    """Phase 7: within-beat hard cuts auto-get narrationLeadIn: 0.7."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1"),
+        _make_seg("s2", "TEMPLATE", "beat1"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1].get("narrationLeadIn") == 0.7
+
+
+def test_footage_to_footage_cut_gets_narration_lead_in():
+    """Phase 7: FOOTAGE→FOOTAGE hard cuts also get the 0.7 default."""
+    segs = [
+        _make_seg("s1", "FOOTAGE", "beat1"),
+        _make_seg("s2", "FOOTAGE", "beat1"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1].get("narrationLeadIn") == 0.7
+
+
+def test_title_card_no_default_narration_lead_in():
+    """Phase 7: TRANSITION/chapter-card segments don't get the J-cut default."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1"),
+        _make_seg("s2", "TRANSITION", "beat1", component="TitleTransition"),
+    ]
+    result = apply_default_transitions(segs)
+    # Title cards get fade (not cut) and silence — no narrationLeadIn.
+    assert "narrationLeadIn" not in result[1]
+
+
+def test_stillness_on_prev_suppresses_narration_lead_in():
+    """Phase 7: hold(stillness) on preceding segment blocks the J-cut default."""
+    segs = [
+        {**_make_seg("s1", "TEMPLATE", "beat1"), "_direction": {"driftPreset": "none"}},
+        _make_seg("s2", "TEMPLATE", "beat1"),
+    ]
+    result = apply_default_transitions(segs)
+    assert "narrationLeadIn" not in result[1]
+
+
+def test_explicit_jcut_wins_over_default():
+    """Phase 7: explicit narrationLeadIn from DIR: jcut() is not clobbered by 0.7 default."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1"),
+        {**_make_seg("s2", "TEMPLATE", "beat1"), "narrationLeadIn": 0.4},
+    ]
+    result = apply_default_transitions(segs)
+    assert result[1]["narrationLeadIn"] == 0.4
+
+
+def test_beat_boundary_dissolve_no_narration_lead_in():
+    """Phase 7: beat-boundary dissolve (not a hard cut) skips the J-cut default."""
+    segs = [
+        _make_seg("s1", "TEMPLATE", "beat1"),
+        _make_seg("s2", "TEMPLATE", "beat2"),
+    ]
+    result = apply_default_transitions(segs)
+    # Rule 1 assigns dissolve — trans_in != "cut" → no narrationLeadIn
+    assert result[1].get("transition", {}).get("in") == "dissolve"
+    assert "narrationLeadIn" not in result[1]
+
+
+def test_first_segment_no_narration_lead_in():
+    """Phase 7: the first segment (i=0) never gets narrationLeadIn (nothing precedes it)."""
+    segs = [_make_seg("s1", "TEMPLATE", "beat1")]
+    result = apply_default_transitions(segs)
+    assert "narrationLeadIn" not in result[0]
+
+
+def test_narration_lag_out_forwarded_in_build_segment():
+    """Phase 7: DIR: lcut() value is forwarded to the built segment via direction dict."""
+    parsed = parse_visual_spec("**P1 — DataChart** · 8s")
+    seg = _build_segment(
+        1, parsed, "TEMPLATE", 0.0, 8.0, "beat-a", "", "", "",
+        {}, {}, {"narrationLagOut": 0.5},
+    )
+    assert seg["narrationLagOut"] == 0.5
+
+
+def test_narration_lead_in_forwarded_in_build_segment():
+    """Phase 7: DIR: jcut() value is forwarded to the built segment via direction dict."""
+    parsed = parse_visual_spec("**P1 — DataChart** · 8s")
+    seg = _build_segment(
+        1, parsed, "TEMPLATE", 0.0, 8.0, "beat-a", "", "", "",
+        {}, {}, {"narrationLeadIn": 0.4},
+    )
+    assert seg["narrationLeadIn"] == 0.4
+
+
 def test_match_cut_still_templates_set_is_canonical():
     """Lock the set so accidental edits get caught."""
     from generate_manifest import MATCH_CUT_STILL_TEMPLATES

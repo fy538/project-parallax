@@ -275,6 +275,16 @@
           "type": "string",
           "description": "The narration paragraph this visual accompanies, for alignment debugging. First ~80 chars of the narration text."
         },
+        "narrationLeadIn": {
+          "type": "number",
+          "minimum": 0,
+          "description": "J-cut audio bridge offset in seconds. The narrator's audio for this segment begins this many seconds before the segment's startSec, so the sound carries the visual seam. Default 0.7 for hard cuts (applied by apply_default_transitions). Overridden explicitly via DIR: jcut(N) in the script. NLE-assembly annotation only — does not affect Remotion rendering. See TRANSITION_GRAMMAR.md §07."
+        },
+        "narrationLagOut": {
+          "type": "number",
+          "minimum": 0,
+          "description": "L-cut audio bridge offset in seconds. Narration from this segment extends this many seconds past the segment's endSec, trailing the visual cut. Set explicitly via DIR: lcut(N) in the script. NLE-assembly annotation only — does not affect Remotion rendering. See TRANSITION_GRAMMAR.md §07."
+        },
 
         "asset": {
           "type": "object",
