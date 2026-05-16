@@ -221,7 +221,7 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
         {data.statPrimaryLabel && (
           <div
             style={{
-              fontFamily: fonts.body,
+              fontFamily: fonts.metadata, // D13: tracked-uppercase labels are mono, not body
               fontSize: fontSizes.label,
               fontWeight: 400,
               color: palette.bone,

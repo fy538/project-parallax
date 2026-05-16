@@ -691,7 +691,7 @@ const SmallMultiplesPanels: React.FC<{
               <div
                 style={{
                   fontSize: fontSizes.caption,
-                  fontFamily: fonts.body,
+                  fontFamily: fonts.metadata, // D13: panel subtitle is metadata, not paragraph body
                   color: theme.text.muted,
                   marginTop: 2,
                   lineHeight: 1.2,
@@ -750,7 +750,7 @@ const SmallMultiplesPanels: React.FC<{
                         textAlign: "right",
                         paddingRight: 6,
                         fontSize: fontSizes.caption,
-                        fontFamily: fonts.body,
+                        fontFamily: fonts.metadata, // D13/D14: axis-row labels are metadata, not paragraph body
                         color: theme.text.secondary,
                         lineHeight: 1,
                         whiteSpace: "nowrap",

@@ -434,7 +434,7 @@ export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
                 {stage.descriptor && (
                   <div
                     style={{
-                      fontFamily: fonts.body,
+                      fontFamily: fonts.metadata, // D13: stage descriptor is metadata, not paragraph body
                       fontSize: fontSizes.label,
                       color: theme.text.muted,
                       marginTop: 2,
