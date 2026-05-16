@@ -1109,15 +1109,24 @@ const MatrixVariant: React.FC<{
                 opacity: cellOpacity * exitOp,
               }}
             >
-              {/* Cell background — subtle accent tint, no card chrome.
-                  Hero cell gets a stronger fill + accent border to mark
-                  it as the protagonist quadrant. */}
+              {/* Cell background — hairline chrome, no card fill on
+                  non-hero quadrants. Hero cell gets a barely-perceptible
+                  warm tint + a slightly heavier (but still hairline) left
+                  edge to mark it as the protagonist quadrant. Typography
+                  weight + accent color carry the editorial hierarchy;
+                  the grid is structural, not decorative. (POLISH.md D1) */}
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
-                  background: `${heroColor}${isHero ? "1A" : "0C"}`,
-                  borderLeft: `${isHero ? 4 : 2}px solid ${heroColor}${isHero ? "" : "55"}`,
+                  background: isHero ? `${heroColor}0F` : "transparent",
+                  // Hairline grid: full frame at very low opacity so the
+                  // 2×2 structure reads without competing with the type.
+                  border: `1px solid ${heroColor}${isHero ? "66" : "33"}`,
+                  // Hero gets a slightly heavier left edge (still 2px,
+                  // not 4px) as a directional cue toward the focus cell.
+                  borderLeftWidth: isHero ? 2 : 1,
+                  borderLeftColor: isHero ? `${heroColor}99` : `${heroColor}33`,
                   borderRadius: 2,
                 }}
               />
