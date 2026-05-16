@@ -78,26 +78,36 @@ The threshold lines (horizontal rules between severity zones) are the form's dis
 
 The existing `EscalationLadder` template (`src/templates/EscalationLadder/`):
 
-- `SEVERITY_COLORS` map matches the canonical geopolitical palette: `low`=`semantic.success` (green), `moderate`/`elevated`=`palette.amber`, `high`=`palette.rust`, `critical`=`semantic.danger`. This is the correct mapping — do not override.
+**Doctrine cleanup (May 16, 2026, commit `a85ebb6`).** Three POLISH.md doctrine items applied to rung rendering:
+- **D1 (drop card chrome).** Each rung no longer renders a tinted background fill, rounded corners, or a box-shadow halo behind the event card. Rungs sit directly on the paper substrate; severity color now carries through the **left accent rule** + the existing **severity dot on the spine** (T5-documented exception — color IS the editorial encoding here, so the accent rule survives the chrome drop). The Economist / Reuters editorial convention — no cards on rungs, color on the rule — is now met.
+- **D4 (ordinal numbering).** Each step has an `"01"`/`"02"`/`"03"`... prefix in `fonts.mono` at caption size, weight 600, in the rung's severity color with metadata letter-spacing. Detail text indents 32px under the label so it aligns with the label, not under the ordinal. Forces the scrub-reader index that Kahn's 44-rung table implied through numbering — but at editorial-cap scale (5–7 rungs).
+- **D8 (direction chevron).** A small CSS triangle ~20px past the terminal spine end, drawn in the terminal rung's severity color. `direction: "escalation"` points up at the top of the spine; `direction: "de-escalation"` points down at the bottom. Closes the false-ceiling visual ambiguity without requiring a `critical` rung — the chevron signals "the ladder keeps going" or "we are descending."
+
+What matches canon:
+- `SEVERITY_COLORS` map matches the canonical geopolitical palette: `low`=`semantic.success` (green), `moderate`/`elevated`=`palette.amber`, `high`=`palette.rust`, `critical`=`semantic.danger`. Do not override.
 - `current: true` renders a pulsing ring around the severity dot — the "current position" marker that Reuters and Economist treat as mandatory.
-- `hasCameraPath` mode triggers the cinematic vertical camera climb with shake intensity auto-scaled by `SEVERITY_SHAKE` (0 for low/moderate, 0.05 for elevated, 0.15 for high, 0.35 for critical). The ambient particle density and speed scale with `tensionProgress`. This is the designed form for editorial peaks.
-- Heat-track (the vertical gradient behind the spine) reverses the severity gradient — crisis at top in red, calm at bottom in green — which correctly mirrors the Kahn schema.
-- `direction: "de-escalation"` is in the type definition but the template currently treats it as documentation only; the `direction` field is not yet wired to invert the heat-track or ramp direction. **Diverges from canon:** de-escalation episodes should invert the gradient.
+- `hasCameraPath` mode triggers the cinematic vertical camera climb with shake intensity auto-scaled by `SEVERITY_SHAKE` (0 for low/moderate, 0.05 for elevated, 0.15 for high, 0.35 for critical). Ambient particle density and speed scale with `tensionProgress`. This is the designed form for editorial peaks.
+- Heat-track (vertical gradient behind the spine) reverses the severity gradient — crisis at top in red, calm at bottom in green — which correctly mirrors the Kahn schema.
 - `warnIf` fires for `rungs.length > 7` — matches the stress-tested safe-count range. Also fires for multiple `current` markers and for `high` severity without `critical` ("false ceiling" warning).
-- **Thresholds (E3 prop):** The type definition does not currently include a `thresholds` array for marking named threshold lines between severity zones. This is the primary gap versus the Kahn lineage — the visual doesn't distinguish between rungs within a zone and crossings between zones. Threshold labels are the form's most editorially powerful feature.
 - `contentOffset` allows optical centering correction — documented in schema and JSDoc. The default auto-offset (`DEFAULT_OFFSET_X: 150`) was tuned empirically via bbox measurement. Episodes should verify via still render before final assembly.
+
+What still diverges:
+- **Thresholds (E3 prop):** the type definition does not yet include a `thresholds` array for named threshold lines between severity zones. With the chrome drop, threshold labels would now have visual room to span the spine cleanly — the editorial argument for adding them is stronger than before. Still the primary gap versus the Kahn lineage.
+- `direction: "de-escalation"` now drives the terminal chevron correctly (points down), but the heat-track gradient itself is not yet inverted — green-at-top / red-at-bottom for de-escalation sequences would complete the editorial mirror.
 
 ## 6. Specific upgrades proposed
 
-1. **`thresholds` array prop — named threshold lines between severity zones.** Add `thresholds?: Array<{ afterRung: number; label: string }>` to `EscalationLadderData`. Renders a horizontal rule (muted ink, 1px) with an ALL-CAPS IBM Plex Mono label spanning the spine. "NUCLEAR THRESHOLD," "DIRECT ENGAGEMENT," "CITY-TARGETING" are canonical forms. This is the single most impactful editorial improvement. Effort: medium; impact: high — the form can't distinguish rung-within-zone from zone-crossing without it. **(medium effort / high impact)**
+1. **`thresholds` array prop — named threshold lines between severity zones.** Add `thresholds?: Array<{ afterRung: number; label: string }>` to `EscalationLadderData`. Renders a horizontal rule (muted ink, 1px) with an ALL-CAPS IBM Plex Mono label spanning the spine. "NUCLEAR THRESHOLD," "DIRECT ENGAGEMENT," "CITY-TARGETING" are canonical forms. With the May 16 chrome drop, threshold labels now have the visual quietness they need to read as boundary markers (no card chrome competing). Effort: medium; impact: high — the form still can't distinguish rung-within-zone from zone-crossing without it. **(medium effort / high impact)**
 
-2. **`direction: "de-escalation"` — invert gradient and severity ordering.** Wire the existing `direction` field to reverse the heat-track gradient (green at top, red at bottom), and optionally reverse the rung stagger direction so entries build bottom-up. Effort: small; impact: medium for any episode covering diplomatic resolution or arms-control success. **(small effort / medium impact)**
+2. **`direction: "de-escalation"` — invert heat-track gradient.** The chevron now points correctly; complete the inversion by reversing the heat-track gradient (green at top, red at bottom) and optionally reversing the rung stagger so entries build bottom-up. Effort: small; impact: medium for any episode covering diplomatic resolution or arms-control success. **(small effort / medium impact)**
 
-3. **Parallel-ladder `SplitComposition` pattern — doctrinal comparison.** Document (in dossier and SELECTOR) the standard pattern for side-by-side doctrine ladders: two `EscalationLadder` compositions in a `SplitComposition` with `_direction.synchronize: true` so their animations lock-step. This is a composition-level recipe, not a template change. Effort: documentation only; impact: enables the Arms Control Association idiom without building a new template. **(trivial effort / medium impact)**
+3. **Parallel-ladder `SplitComposition` pattern — doctrinal comparison.** Document (in dossier and SELECTOR) the standard pattern for side-by-side doctrine ladders: two `EscalationLadder` compositions in a `SplitComposition` with `_direction.synchronize: true` so their animations lock-step. Composition-level recipe, not a template change. Effort: documentation only; impact: enables the Arms Control Association idiom without building a new template. **(trivial effort / medium impact)**
 
 4. **`backgroundVariant: "dark"` severity color calibration.** The `semantic.success` green for `low` severity reads poorly on dark backgrounds — it blends into the heat-track gradient. Add a dark-mode override in `SEVERITY_COLORS` (or a `darkSeverityOverride` map) that bumps the low-severity color to `palette.bone` at reduced opacity. Effort: small; impact: small but eliminates a legibility regression for dark-mode cinematic sequences. **(small effort / small impact)**
 
-5. **Camera-path auto-tune for tenet duration.** The auto-generated camera path in `generateEscalationCameraPath` dwells on each rung for a fixed `duration: 2.5` seconds. For episodes where one rung has a long `detail` text that narration will read aloud, this is too short. Add an optional `dwellSec` per rung to let visual-spec writers override dwell time per rung without providing the full `cameraPath` array. Effort: small; impact: medium for cinematic sequences with text-dense rungs. **(small effort / medium impact)**
+5. **Camera-path auto-tune for rung duration.** The auto-generated camera path in `generateEscalationCameraPath` dwells on each rung for a fixed `duration: 2.5` seconds. For episodes where one rung has a long `detail` text that narration will read aloud, this is too short. Add an optional `dwellSec` per rung to let visual-spec writers override dwell time per rung without providing the full `cameraPath` array. Effort: small; impact: medium for cinematic sequences with text-dense rungs. **(small effort / medium impact)**
+
+[Shipped May 16, 2026 — commit `a85ebb6`]: D1 chrome drop on rung cards; D4 ordinal "01"/"02"/... prefix in severity color; D8 direction chevron at terminal spine end.
 
 ## 7. Failure mode flags (always catch in audit)
 
@@ -124,3 +134,5 @@ The existing `EscalationLadder` template (`src/templates/EscalationLadder/`):
 **5–7 rungs, `SEVERITY_COLORS` untouched, one `current` marker, threshold boundaries labeled in ALL-CAPS Mono. Static: 8–12s, light mode. Cinematic (`cameraPath`): 14–18s, dark mode, shake scales with severity. Never top out at `high` — always add `critical` to close the ceiling. Kahn's insight was that naming thresholds deters more than leaving them implicit; the template exists to encode that insight.**
 
 Last updated: May 15, 2026
+
+Last revised: May 16, 2026 — D1 chrome drop, D4 ordinals, D8 direction chevron applied to rung rendering; severity color now carries through accent rule + spine dot, not a tinted card behind the text.

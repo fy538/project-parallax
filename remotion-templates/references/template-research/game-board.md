@@ -122,8 +122,8 @@ Four variants map to four analytical registers:
 **Chess variant (`ChessBoard`):**
 - ✅ `React.memo` wrapping — performance guard for per-frame re-renders.
 - ✅ Unicode chess glyph registry (`CHESS_GLYPHS`) with `toChessGlyph` normalization — handles K/Q/R/B/N/P, full words, color-prefixed (wK/bK), and "white king"/"black queen" forms.
-- ✅ Chess register in `PieceCircle` — silhouette glyph (no disk, no ring), drop-shadow on wrapper. NYT editorial standard met.
-- ✅ Token register in `PieceCircle` — disk+ring for abstract markers (non-chess variants). Two visual registers correctly separated by glyph lookup.
+- ✅ Chess register in `PieceCircle` — silhouette glyph (no disk, no ring), drop-shadow on wrapper. NYT editorial standard met. Unchanged by the May 16 token-register refinement.
+- ✅ **Token register in `PieceCircle` — precision-marker refinement (May 16, 2026, commit `b4bbe41`).** Strategic-actor markers in the chess variant (NVIDIA, ASML, US-style country/firm labels — anything that hits `toChessGlyph`'s raw-text fallback) replaced their pill-chip rendering with a precision-marker stack: small filled colored dot + hairline outer ring + vertical tether line + uppercase IBM Plex Mono label below. This aligns the chess-variant strategic-actor case with the precision-marker aesthetic shared by NetworkDiagram and ArcDiagram (POLISH.md D19) and removes the "game piece in a pill" register break that was inconsistent with the silhouette-glyph chess pieces above it. The chess-glyph branch (wK/bK actual chess pieces) and `PayoffMatrix` / `PDCanonicalMatrix` / `IteratedPlayMatrix` / `GoBoard` are unchanged — the token-register refinement is scoped to the chess-variant raw-text marker case where pill chrome was the failure mode.
 - ✅ Alternating `palette.paper`/`palette.bronze` squares — warm, non-skeuomorphic. Dropped the accent (amber) ring from the board edge (May 13, 2026 pass); thin ink border replaces.
 - ✅ Piece spring physics (`heroSpring`) — weighted landing for initial piece placement.
 - ✅ Capture animation — fade + translateY slide for captured pieces.
@@ -172,6 +172,8 @@ Four variants map to four analytical registers:
 
 ## § 6 Specific upgrades
 
+[Shipped May 16, 2026 — commit `b4bbe41`]: chess-variant token-register precision-marker refinement (pill chip → dot + hairline ring + tether + mono label below) for strategic-actor markers that hit the raw-text branch of `toChessGlyph`. Chess-glyph register and non-chess variants unchanged.
+
 1. **Territory rendering for `go` variant.** Add a post-reveal territory fill at 15% opacity using a simple flood-fill or convex-hull approximation around clusters of same-color stones. This is the editorial standard (FT, go journalism) and the most significant gap in the current `go` variant — stones placed without territory makes the board look mid-game with no argument. Even a simplified "region fill around stone clusters" approximation would be editorially correct for the compositions Parallax produces (simplified 9×9 boards with 10–20 stones). Effort: medium (flood-fill on a grid is not trivial but is well-understood). Impact: enables the "territorial encirclement" argument that `go` is intended for. **(medium effort / high editorial impact)**
 
 2. **`highlightSquares` field for chess variant.** Add `highlightSquares?: Array<[number, number]>` to `GamePhase` — squares to highlight with a faint amber overlay (12% fill + 1px amber border) per NYT convention (the last-moved-to square). Currently the chess variant highlights pieces but not squares; the NYT standard highlights the destination square, not just the piece. Effort: small (render a highlighted div per square before pieces, same grid geometry). Impact: completes the NYT editorial chess diagram standard. **(low effort / medium impact)**
@@ -196,3 +198,5 @@ Four variants map to four analytical registers:
 ---
 
 Last updated: May 15, 2026
+
+Last revised: May 16, 2026 — chess-variant token register migrated to the POLISH.md D19 precision-marker aesthetic; strategic-actor markers (NVIDIA / ASML / country labels) now render as dot + hairline ring + tether + mono label rather than pill chip.

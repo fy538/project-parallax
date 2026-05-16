@@ -114,7 +114,7 @@ The annotated image form lives at the intersection of journalism and intelligenc
 
 ## 5. Current template alignment
 
-- ✅ `<BrandImage>` with `ramp`, `composite: "background"` — full brand treatment pipeline applied
+- ✅ `<BrandImage>` with `ramp`, `composite="inset"` — full brand treatment pipeline applied. **Composite mode corrected May 16, 2026 (commit `1f648a2`).** The component had been using `composite="background"` (35% opacity), which rendered the image effectively invisible against the dark backdrop — a register-level bug, not a styling preference. AnnotatedImage's load-bearing premise is that *the image is the evidence*; treating it as a background layer at 35% opacity contradicted the form's editorial purpose. `composite="inset"` (70% opacity) restores the image to its proper analytical weight while keeping the brand-treatment duotone + grain pipeline intact.
 - ✅ `<KenBurns direction="drift" intensity={2}>` — subtle drift on image (atmospheric) while callouts are analytical overlays
 - ✅ Callout animation sequence: dot scale-in (0→6px) + lock-on pulse ring → crosshair hairlines extend → elbow leader draws (two-leg reveal) → paper-stamp label fades in — correct sequential revelation
 - ✅ Elbow leader line (right-angle bend at 60% of leader length, two-leg reveal) — intelligence-dossier convention
@@ -146,6 +146,8 @@ The annotated image form lives at the intersection of journalism and intelligenc
 
 5. **Leader-line crossing detection with simple avoidance.** For each callout pair, compute whether their leader lines cross. If they do, apply a simple offset: push the shorter leader's endpoint up or down by 16px to avoid the crossing. This is not full path-routing (which is computationally complex) but handles the most common collision case (two adjacent dots with leaders extending in the same direction). Effort: medium; impact: reduces the #1 visual failure mode above 4 callouts. **(medium effort / high impact)**
 
+[Shipped May 16, 2026 — commit `1f648a2`]: image composite mode corrected from `"background"` (35% opacity, image invisible) to `"inset"` (70% opacity, image legible as the evidence layer it is meant to be). Restores the form's load-bearing premise.
+
 ---
 
 ## 7. Failure mode flags (always catch in audit)
@@ -161,3 +163,5 @@ The annotated image form lives at the intersection of journalism and intelligenc
 - **Image bleed into safe area** — the image is full-bleed by design (fills `layout.width × layout.height`). The TitleBlock and callout labels must respect the 80px safe area. If callouts are placed at x < 8% or x > 92% (approximately), their labels may overlap the safe area boundary.
 
 Last updated: May 15, 2026
+
+Last revised: May 16, 2026 — image composite mode corrected from `"background"` (35% opacity) to `"inset"` (70% opacity); the image is the evidence, not a background.

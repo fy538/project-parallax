@@ -94,6 +94,7 @@ The existing `DuelingFrameworks` template (`src/templates/DuelingFrameworks/`):
 - Bilingual support is complete: `titleCn`, `subtitleCn`, `phenomenonCn`, `verdictLabelCn`, `frameworkA.nameCn`, `frameworkB.nameCn`, `frameworkA.verdictCn`, `frameworkB.verdictCn`, and per-tenet `textCn`. This matches the channel's requirement for engaging Chinese-language scholarship without anglicizing it.
 - **Score suppression:** no built-in `showScore: boolean` field. To suppress the scoring bar, omit `score` from the schema — but the Zod schema makes `score` required (no `.optional()`). **Diverges from canon:** the Economist no-score convention for theoretical IR comparisons cannot currently be honored without overriding the schema. A `showScore?: boolean` field (defaulting to `true`) would allow suppression without removing the data.
 - `cinematicMode: true` sets `ambientParticles: true` by default. Static mode does not. This is the correct distinction — cinematic sequences earn the atmospheric depth treatment; reference cards do not.
+- **Background variant defaults are now consistent across catalog and standalone fixtures (May 16, 2026, commit `ca4e379`).** Both catalog variants always defaulted to `backgroundVariant: "light"` correctly, but the standalone fixture had been authored as `"dark"`, which produced a "movie-title-screen" register at frame 30 inconsistent with the template's intended editorial baseline. The fixture is now `"light"`, aligning fixture output with catalog output. This was a fixture-data bug, not a template-design problem — there is no canon shift, only the visual-regression baseline is now an accurate reflection of the canon recommendation in §4 ("static reference cards use light mode").
 - **Diverges from canon:** no "common ground" structural affordance. The FT "common ground first" convention has no UI slot — there is no `commonGround?: string[]` field for tenets that both frameworks share before the disagreement is named. This limits the template's ability to model a nuanced comparison where frameworks partially agree.
 
 ## 6. Specific upgrades proposed
@@ -107,6 +108,8 @@ The existing `DuelingFrameworks` template (`src/templates/DuelingFrameworks/`):
 4. **Score range recommendation in `warnIf`.** Fire a soft warning when either score is < 40 or either score is > 85. The < 40 case implies the episode is using the framework as a straw man to defeat; the > 85 case compresses visual differentiation. Both are editorial red flags. Effort: trivial; impact: medium. **(trivial effort / medium impact)**
 
 5. **`cinematicMode` camera-hold duration per tenet.** Currently the cinematic camera dwells on each tenet for a fixed interval. Add optional `tenet.dwellSec` to let visual-spec writers give more air to complex tenets without overriding the entire camera path. Matches the pattern proposed for EscalationLadder's rung-level dwell control. Effort: medium; impact: medium for cinematic climax sequences. **(medium effort / medium impact)**
+
+[Shipped May 16, 2026 — commit `ca4e379`]: standalone fixture's `backgroundVariant` corrected from `"dark"` to `"light"` to match catalog defaults and the §4 canon recommendation. Fixture-data fix, not a template-design change.
 
 ## 7. Failure mode flags (always catch in audit)
 
@@ -135,3 +138,5 @@ The existing `DuelingFrameworks` template (`src/templates/DuelingFrameworks/`):
 **4 tenets per framework, `phenomenon` as a historical event (not a theory name), scoring bar suppressed for Realism vs. Liberalism debates (RAND convention — use `showScore: false` once the field ships), shown in 55–80 range for empirical comparisons. Write the strongest version of each framework. `cinematicMode` reserved for the episode's analytical peak. `palette.rust` for Realism, `palette.amber` for Liberalism.**
 
 Last updated: May 15, 2026
+
+Last revised: May 16, 2026 — standalone-fixture background variant corrected from "dark" to "light"; no template-canon change.

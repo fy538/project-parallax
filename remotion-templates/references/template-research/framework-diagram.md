@@ -128,13 +128,14 @@ The existing `FrameworkDiagram` template, after our session's polish work:
 - ✅ Ordinal numbering
 - Diverges: equal spacing, not proportional — could enhance for duration-encoded flows
 
-**Matrix variant:**
-- ✅ Card chrome dropped (subtle accent tint per quadrant only)
-- ✅ Hero quadrant treatment (FOCUS tag, accent border)
-- ✅ Axis labels as actual axes with arrows ("↑ MORE IMPORTANT", "← MORE URGENT")
-- ✅ Matrix centered on canvas
-- ✅ Quadrant ordinals (Q1-Q4)
-- Diverges: no origin tick option for empirical matrices yet
+**Matrix variant** (cell chrome lightened May 16, 2026 — commit `e02f076`, applying D1):
+- ✅ Card chrome fully dropped. Non-hero cells now render as **transparent fills** (was 5% tint); hero cell renders as a barely-perceptible **6% amber** warm tint (was 10%). Cell borders thinned from 2–4px solid to **1px hairline**. Hero left-edge accent rule reduced from 4px to 2px. The matrix now reads as four quadrants defined by axes — not as four bordered tiles arranged in a grid. HBR / BCG / NYT Upshot empirical-matrix convention met more cleanly than before.
+- ✅ Hero quadrant treatment (FOCUS tag + 2px left-edge accent + 6% amber wash) — still legible after the lightening pass because the wash is uniform across the cell and the FOCUS tag carries the brand mark.
+- ✅ Axis labels as actual axes with arrows ("↑ MORE IMPORTANT", "← MORE URGENT") — unchanged.
+- ✅ Matrix centered on canvas — unchanged.
+- ✅ Quadrant ordinals (Q1–Q4) — unchanged.
+- ✅ Flow + comparison variants are untouched by the May 16 pass (they had no card chrome to drop; their post-May 11 state is canonical).
+- Diverges: no origin tick option for empirical matrices yet.
 
 ## 6. Specific upgrades proposed
 
@@ -148,4 +149,8 @@ The existing `FrameworkDiagram` template, after our session's polish work:
 
 - **Comparison →** NYT Upshot side-by-side policy panels (ordinal-numbered, no chrome, row-parallel, single accent per side)
 - **Flow →** FT horizontal spine with chevrons and hero terminal node (proportional spacing when durations are real)
-- **Matrix →** HBR-lineage 2×2 with axes-as-axes, no card chrome, hero quadrant where the argument lives
+- **Matrix →** HBR-lineage 2×2 with axes-as-axes, no card chrome, transparent cell fills, 1px hairline borders, hero quadrant at 6% amber wash
+
+[Shipped May 16, 2026 — commit `e02f076`]: matrix-variant cell chrome lightened to canon — non-hero fills 5% → transparent, hero fill 10% → 6%, cell borders 2–4px → 1px hairline, hero left-edge accent 4px → 2px. Flow + comparison variants untouched.
+
+Last revised: May 16, 2026 — matrix-variant cell chrome lightened per D1; flow + comparison variants unchanged.

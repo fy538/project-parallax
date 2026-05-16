@@ -60,10 +60,14 @@ When the editorial point is *escalation*, outlets converge on a literal numbered
 
 - `node.edgeLabel` field (added May 13, 2026) matches canon — transition labels on edges, not nodes.
 - `probabilityWeights` editorial gate matches canon: numeric percentages are suppressed by default unless explicitly opted-in.
-- Edge styling now matches FT/NYT canon: solid weight-based emphasis (2.5 px chosen / 1.25 px unchosen), no dashes, no glow filter.
 - Node styling matches NYT Upshot canon: typography-only, no card chrome, active-node underline.
-- Camera path is now editorial (argument arc) rather than inventory (tour).
 - Ladder variant matches Allison's actual book layout: flat options panel + prose gloss.
+- **Horizontal layout shipped May 15, 2026 (commits `ff6b14d`, `8f52d9b`).** Adds a horizontal Reingold–Tilford layout option (root at left, terminals at right) alongside the existing vertical canon. Both layouts now use **track-style path highlighting** in the FT race-stripe register: a thick translucent ribbon underlay traces the highlighted path while individual edges remain hairlines on top.
+  - Horizontal mode: 7px amber ribbon for on-path edges; off-path edges render at 1px in muted ink. Left margin tuned to 12% (was 8%) and edge labels anchor near the fork rather than mid-edge so they read as branch decisions, not transit annotations.
+  - Vertical mode: parity pass landed May 16, 2026 (commit `efe7651`). 5px ribbon (smaller than horizontal because vertical row-gap is closer, so a 7px ribbon dominates the gap rather than tracing it); r=3.5 arrowhead at child top of each on-path segment to carry the direction read; off-path dim 0.5 → 0.6 and edge mute 0.30 → 0.25 (slightly more dimming, slightly less mute on the line itself — keeps off-path edges legible enough to register as alternatives without competing).
+  - Both modes preserve the FT/NYT canon of "emphasis via weight + saturation, not brightness or dashes."
+- Edge styling matches FT/NYT canon: solid emphasis (no dashes, no glow filter) with the ribbon-underlay treatment encoding the chosen path.
+- Camera path is now editorial (argument arc) rather than inventory (tour).
 
 ## References
 
@@ -81,3 +85,7 @@ When the editorial point is *escalation*, outlets converge on a literal numbered
 - Schelling — *The Strategy of Conflict* (1960); Axelrod — *The Evolution of Cooperation* (1984) — extensive-form canon
 - Kahn — *On Escalation* (1965); Economist redraws — escalation-ladder canon
 - The Pudding visual-essay structure — explanation-tree narrative conventions
+
+---
+
+Last revised: May 16, 2026 — track-style path highlighting (FT race-stripe register) reached parity across vertical and horizontal layouts; vertical mode tuned to a 5px ribbon with arrowheads at child-top on the on-path segments.

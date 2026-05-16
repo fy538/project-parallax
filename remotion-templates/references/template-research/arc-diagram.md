@@ -81,18 +81,23 @@ Tufte's data-ink discipline applies brutally: every arc that doesn't carry edito
 ## 5. Current template alignment
 
 The existing `ArcDiagram` template (`src/templates/ArcDiagram/`):
-- ✅ Baseline draws in left-to-right then nodes stagger in — feels like an axis being laid down, matching canon
-- ✅ Per-arc `strength` ∈ [0.4, 1.0] drives stroke width + opacity (hero hierarchy is there)
-- ✅ `style: "solid" | "dashed"` distinguishes registers (extension vs. rebuttal); dashed arcs fade in rather than stroke-dash to avoid pattern conflict
-- ✅ Hero arcs (strength ≥ 1) get a soft glow underlay — subtle, palette-aligned
-- ✅ `color: "accent"` brand-token resolution keeps data files semantic, not hex-bound
-- ✅ Arc labels sit at apex with a small backing rect — solves the on-arc legibility problem outlets struggle with
-- ✅ Apex clamped to `maxArcHeight` (baseline−title−30px) so wide spans don't shoot into the title zone
-- ✅ `warnIf` fires above 12 nodes — matches canon's legibility cliff
-- ✅ Sample data (Mahan→Mackinder→Spykman→Kennan→Brzezinski) is an exemplary application: clear chronological order, the editorial point is the non-adjacent `mahan→spykman "recovered"` arc skipping Mackinder
-- **Diverges from canon:** no built-in "node order is editorial" affordance — array order is order, no validation that the order makes narrative sense (this is unfixable in code; lives in audit)
-- **Diverges from canon:** no aggregation for ≥10 nodes; warning, but no "split into eras" pattern
-- **Diverges from canon:** arc colors default to `theme.text.muted` for everything not-accent — fine, but no `emphasis: "muted" | "accent"` sugar like SankeyFlow has
+
+**Precision-marker aesthetic (May 16, 2026 — POLISH.md D19).** Entity rendering migrated from filled-disc + stroke-ring CircleNode to a dedicated `ArcNodeAnnotation` component mirroring NetworkDiagram's AnnotationNode pattern: small filled dot (r=3.5 satellite, r=5 primary) at each baseline position, lateral crosshair hairlines extending sideways from the dot, an optional protagonist halo ring for `importance: "primary"` nodes, and a vertical leader line drawn downward to the entity label below the baseline. Arcs themselves were thinned — stroke-weight range now `0.8 + min(1.2, strength·1.0)` (was `1 + min(1.5, strength·1.2)`) and the hero-arc glow halo was dropped entirely. The arcs read as hairline traces subordinate to the markers — markers carry the editorial weight, arcs trace the relationship. Geometry constants block at top of file (NODE_*) mirrors the HUB_*/SAT_* pattern from NetworkDiagram for cross-template consistency. See [`POLISH.md` D19](../../POLISH.md) and [`LESSONS.md` L103](../../LESSONS.md) for the doctrine + architecture notes.
+
+What matches canon:
+- Baseline draws in left-to-right then nodes stagger in — feels like an axis being laid down, matching canon.
+- Per-arc `strength` ∈ [0.4, 1.0] drives stroke width + opacity (hero hierarchy is there).
+- `style: "solid" | "dashed"` distinguishes registers (extension vs. rebuttal); dashed arcs fade in rather than stroke-dash to avoid pattern conflict.
+- `color: "accent"` brand-token resolution keeps data files semantic, not hex-bound. **Per-episode color emphasis now wired (commit `6c3c459`)** — arcs marked `color: "accent"` adopt the episode's primary accent via `useEpisodeColorEmphasis` instead of a frozen amber default.
+- Arc labels sit at apex with a small backing rect — solves the on-arc legibility problem outlets struggle with.
+- Apex clamped to `maxArcHeight` (baseline−title−30px) so wide spans don't shoot into the title zone.
+- `warnIf` fires above 12 nodes — matches canon's legibility cliff.
+- Sample data (Mahan→Mackinder→Spykman→Kennan→Brzezinski) is an exemplary application: clear chronological order, the editorial point is the non-adjacent `mahan→spykman "recovered"` arc skipping Mackinder.
+
+What still diverges:
+- No built-in "node order is editorial" affordance — array order is order, no validation that the order makes narrative sense (this is unfixable in code; lives in audit).
+- No aggregation for ≥10 nodes; warning, but no "split into eras" pattern.
+- Arc colors for everything not-accent still default to `theme.text.muted` — no `emphasis: "muted" | "accent" | "rebut"` sugar like SankeyFlow has.
 
 ## 6. Specific upgrades proposed
 
@@ -105,6 +110,8 @@ The existing `ArcDiagram` template (`src/templates/ArcDiagram/`):
 4. **Translucency mode for high-density catalog use.** Wattenberg's actual innovation. Add `variant: "density"` that drops all per-arc emphasis, renders every arc at uniform ~25% opacity, omits arc labels entirely — for the rare case where the *envelope* of arc lengths is the story (e.g., "every Treaty of Westphalia echo from 1648 to 2022"). Reuses existing geometry. Effort: small; impact: niche but unlocks a viz Parallax can't currently make. **(low effort / low-medium impact)**
 
 5. **Arc-direction affordance — directed lineage.** Today `from`/`to` is positional only (arc geometry is symmetric). For lineage / causation where direction matters editorially, add an optional arrowhead at the `to` end. Reserve for `style: "directed"` to avoid making every diagram into a flow chart — most influence stories are non-directional ("they spoke to each other"); directed mode is for explicit "X caused Y." Effort: small; impact: small but removes occasional confusion about which way the influence flows. **(low effort / low impact)**
+
+[Shipped May 16, 2026 — commits `d6317c8`, `6c3c459`]: ArcNodeAnnotation precision-marker redesign; arc hairline thinning + glow drop; NODE_* geometry constants; per-episode color emphasis wired for `color: "accent"` arcs.
 
 ## 7. Failure mode flags (always catch in audit)
 
@@ -123,3 +130,5 @@ The existing `ArcDiagram` template (`src/templates/ArcDiagram/`):
 **5–8 nodes on a chronological baseline, 3–8 arcs with one amber hero, dashed for rebuttals, lowercase mono verbs at apex, axis stamps in mono uppercase above the disc — Wattenberg's shape-of-song trick applied to intellectual lineage. The long-skip arc is the whole point.**
 
 Last updated: May 14, 2026
+
+Last revised: May 16, 2026 — precision-marker ArcNodeAnnotation redesign + arc hairline thinning aligning ArcDiagram to the POLISH.md D19 relationship-diagram pattern shared with NetworkDiagram.

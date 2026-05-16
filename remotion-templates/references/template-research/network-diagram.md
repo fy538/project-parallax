@@ -74,17 +74,21 @@ For video at 8–12s scrubbing speed the constraint tightens: every additional n
 
 The existing `NetworkDiagram` template supports five layouts (`horizontal-chain`, `hub-spoke`, `grid`, `vertical-chain`, `bipartite`) and a virtual-camera narration mode keyed off `cameraPath`.
 
+**Precision-marker aesthetic (May 16, 2026 — POLISH.md D19).** For `hub-spoke` and `bipartite` layouts, nodes now render through a dedicated `AnnotationNode` component rather than the historical filled-disc + stroke-ring CircleNode. The hub is a filled disc (r=72) wrapped in two concentric rings (r=84 at α=0.35, r=100 at α=0.18) with four short crosshair hairlines extending from the disc — a "target lock" treatment. Satellites are small dots (r=10) with lateral crosshair hairlines and a leader line drawn outward (away from hub center) terminating at the label. The leader-bearing label placement earns reading order through line direction rather than fixed below-marker positioning, which fixed the bipartite label-stacking collision documented in the old §5. This matches Bloomberg / The Economist / FT supply-chain diagram convention — markers annotate, they do not compete. Geometry constants (HUB_DISC_R, HUB_INNER_RING_R, HUB_OUTER_RING_R, HUB_EDGE_OFFSET, HUB_CROSSHAIR_GAP/LEN, mirror SAT_* set) are extracted to module top and `nodeRadius()` references the derived `*_EDGE_OFFSET` constants so edge terminators stay coupled to marker geometry — see [`LESSONS.md` L103](../../LESSONS.md) for the implicit-coupling architecture note.
+
 What matches canon:
-- Mode-aware node radii (May 2026): when ANY node is marked `importance: "primary"`, hub = 96px and satellites = 36px (~2.7× ratio, matches FT/Bloomberg/NYT Upshot hub-spoke proportions); when no node is primary, all nodes render at 52px (uniform satellite size for chain/grid/mesh). Old behavior defaulted undefined to 56px always, which collapsed the hub hierarchy when authors forgot to mark satellites — fixed.
-- Flat editorial disc treatment (May 2026 refactor): removed glossy specular highlights, concentric inner detail rings, and the secondary "gravity-well" ring. The hub now reads as a print-newsroom diagram, not a 3D UI mockup ("marbles and bubbles"). Hub presence comes from radius differential + display-weight in-circle numeral.
-- Hub-side convergence terminator: a small filled dot where each spoke meets the hub, pulling the eye inward to the chokepoint. Matches FT/Reuters convention for dependency diagrams.
-- Edge curvature: 0.18 default (curved bezier, reads "designed"), but **0 for bipartite** (straight diagonals — curves there add noise without information). Correct.
-- `actor` → `RoundedRectNode`, `concept` → `DiamondNode`, `nation`/`institution` → `CircleNode`. Hexagon retained but unwired by default (off-brand for editorial register).
+- Edges thinned to 1.5px (was 3.25px), glow halo halved — the markers carry the editorial weight, not the connectors. Spoke curvature 0 for hub-spoke (straight, eliminates the pinwheel effect) and 0 for bipartite (straight diagonals).
+- Hub-side convergence terminator dots where each spoke meets the hub disc — pulls the eye inward to the chokepoint. FT / Reuters dependency-diagram convention.
+- Mode-aware node radii: when ANY node is marked `importance: "primary"`, hub disc r=72 vs. satellite r=10 — ~7× ratio, well past the FT/Bloomberg/NYT Upshot proportion threshold. When no primary is set, layouts fall back to the legacy CircleNode (uniform 52px) — correct for chain/grid/mesh where mass hierarchy doesn't apply.
+- For chain/grid/mesh layouts: `actor` → `RoundedRectNode`, `concept` → `DiamondNode`, `nation`/`institution` → `CircleNode`. Hexagon retained but unwired by default (off-brand for editorial register).
+- Stat-block stacking direction flips correctly with leader direction (`isUpward = dy < -0.3`) — the label/sublabel/stat block stacks ABOVE the leader endpoint when the leader points upward, BELOW when it points downward. Latent bug for the first author who adds a satellite with a `stat` field, fixed pre-emptively in commit `2da0377`.
+- Narrated-camera hub focus dim flows through `fillAlpha` prop (0.42 focused / 0.30 unfocused) — `AnnotationNode` honors caller-supplied opacity for camera-driven focus isolation.
 - Five-step narrated-camera animation when `cameraPath` is set: pans, focus isolation (dim + blur + scale), single-step label overlay top-right.
 - Stress-test guard: `warnIf(nodes.length > 8)` cross-references DIAGRAM_TEMPLATE_SELECTOR.md.
 - Callout treatment: thin amber accent rule on inner edge + display-weight value + mono-caps muted label. No bordered box. Matches the doctrine-D shift (drop card chrome).
 
 What still diverges:
+- Chain / grid layouts still use the legacy CircleNode (filled disc + stroke ring). Precision-marker aesthetic ships for hub-spoke and bipartite only — the layouts where named entities + connections are the whole argument. Chain/grid carry sequence or topology weight that the disc form serves better.
 - The static-mode entrance is 5 staggered phases (structure → nodes → edges → controls → callouts) — readable, but slightly busier than the FT/Economist convention of "everything on by 0.8s, then the camera does the work." The cinematic narrated-camera mode is the eventual default; static mode is the fallback.
 - No automatic protagonist detection: authors must mark `importance: "primary"` manually. Otherwise the template assumes "flat" sizing.
 - No explicit blocking or warning when `bipartite` is selected without `side: "left" | "right"` on every node — fails silently into single-column.
@@ -97,6 +101,10 @@ What still diverges:
 4. **Edge emphasis field.** Mirror SankeyFlow's `link.emphasis?: "accent" | "muted"` — let visual-spec promote one inbound dependency without per-frame color overrides. The current `edge.color` is too low-level; an emphasis token cascades better through directing language. Effort: medium; impact: high for narration peaks.
 5. **`vertical-chain` typographic refit.** Vertical chain currently inherits the horizontal-chain label-below-node placement; flipping to label-right-of-node for vertical-chain reads cleaner (Economist convention for org charts and lineage cascades). Effort: small; impact: medium.
 6. **Deprecate hexagon from defaults.** Document inline in `types.ts` that hexagon is reserved for explicit lattice arguments — current type enum invites authors to pick it as a "cooler circle." Effort: trivial; impact: small but compounding.
+7. **Per-node color emphasis routing in `AnnotationNode`.** The hub disc currently always renders in `palette.ink`; `useEpisodeColorEmphasis` is wired into the parent component but not threaded into the precision-marker register. Letting one satellite or the hub adopt the episode's primary accent without a hex override would mirror ArcDiagram's per-arc emphasis model. Effort: small; impact: medium for narration peaks.
+8. **Narrated-camera + precision-marker focus treatment.** When `cameraPath` is set and the camera dwells on a single satellite, the focus-isolation dim + blur applies to the whole node group (disc, crosshairs, leader, label) uniformly. A tighter treatment would dim the ring + crosshairs more aggressively than the disc + label, sharpening the "this one" read. Effort: medium; impact: small but compounding for cinematic compositions.
+
+[Shipped May 16, 2026 — commits `1f648a2`, `2da0377`]: precision-marker AnnotationNode for hub-spoke and bipartite; edge thinning + glow halving; HUB_*/SAT_* geometry constants; stat-block direction flip; fillAlpha wiring; AnnotatedImage opacity fix (separate template).
 
 ## 7. Failure mode flags (always catch in audit)
 
@@ -110,7 +118,8 @@ What still diverges:
 - **Cycles drawn as DAG** — feedback loops hidden in a left-to-right chain. Use dashed back-edges or switch to FrameworkDiagram cycle.
 - **Edge labels on curved edges that cross** — labels untether from edges. Move to controls or callouts.
 - **Hexagon node for nations/institutions** — reads as blockchain/mesh UI. Use circles.
-- **Glossy / 3D node treatment** — if you see specular highlights, inner rings, or "marble" shading, the May 2026 refactor was reverted somewhere. Restore flat disc.
+- **Filled-disc + stroke-ring nodes on hub-spoke or bipartite** — the May 16, 2026 precision-marker refactor was reverted somewhere. Hub-spoke and bipartite nodes should be the AnnotationNode (small dot + crosshair hairlines + leader to label; hub = disc + concentric rings + crosshairs). Filled circles with stroke rings read as "marbles" and undermine the intelligence-briefing register the form requires.
+- **Glossy / 3D node treatment** — specular highlights, gradient discs, or "marble" shading on any layout. Restore flat marker.
 
 > **Safe-count range (NetworkDiagram hub-spoke, May 2026 stress-test):** 4–7 spokes at typical label length (≤ 25 chars per node, optional ≤ 30-char sublabel). Above 7 spokes OR with long labels (60+ chars), node CIRCLES still place cleanly on the radial layout (uniform angular spacing scales arbitrarily), but the LABELS at 3-o'clock and 9-o'clock positions collide with adjacent spokes and the hub stat reads through them. The stress build (12 spokes × 60-char labels) showed two failure layers: (i) horizontal-axis labels overlap each other end-to-end at radii smaller than the longest label, and (ii) the hub's `stat` callout ("92% of advanced-node chips") gets crossed through by the 3-o'clock and 9-o'clock spoke labels.
 >
@@ -123,3 +132,5 @@ What still diverges:
 **Reach for hub-spoke when one chokepoint dominates (4–7 spokes, mark the hub `primary` to bloom the 96/36 mass hierarchy). Reach for bipartite when "many → one" — a vertical inventory of dependents converging on one or two targets reads as enumeration, not ornament. Avoid force-directed hairballs. Flat editorial discs, single accent color on the loaded edges, hub-side convergence dots, the camera does the narration.**
 
 Last updated: May 14, 2026.
+
+Last revised: May 16, 2026 — precision-marker AnnotationNode redesign for hub-spoke and bipartite layouts (POLISH.md D19 codified the pattern).
