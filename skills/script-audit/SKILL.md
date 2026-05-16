@@ -226,6 +226,15 @@ The CLI returns JSON: `{ isCallback: true|false, conceptId, accentColor, introdu
 
 **Anti-pattern — over-use of dramatic text registers.** Reserve the high-energy techniques for editorial peaks. If the script has more than ~2 `DIR: type(scramble)` or more than ~3 `DIR: type(reveal-mask)` invocations in a single episode, flag as register-creep: "These techniques are register signals; using them frequently drifts toward spy-thriller or theatrical territory. Reserve for the highest-weight moments."
 
+**Hold-motion register check.** When the script uses `DIR: drift(<preset>)` or `DIR: hold(stillness)` to override a segment's hold-beat motion (added May 16, 2026), verify the preset choice matches the template's editorial register per `project/HOLD_MOTION_REGISTER.md` Section 4. Most segments don't need a `drift()` directive — the template default handles it. Flag these specific mismatches:
+
+- **Chart-category template with `DIR: drift(documentary)`** — the 0.3° rotation in documentary tilts chart axis baselines visibly (false data signal). The M-DRIFT-DEFAULT manifest lint will catch this at commit, but flagging at script-audit time is earlier feedback. Flag: "DataChart / TimeSeriesChart / BumpChart / etc. should use `drift(editorial)` (default — no override needed) or `drift(settle)`. The `documentary` preset's rotation tilts axes — HOLD_MOTION_REGISTER.md § 06 Failure mode."
+- **AtlasPlate with `DIR: drift(documentary|normal|slow)`** — directional pan shifts the map projection registration. Flag: "AtlasPlate is projection-sensitive — use `drift(breathing)` (scale-only, the template default), `drift(sway)` (zero-net pan), or `drift(none)` for memorial moments. See HOLD_MOTION_REGISTER.md § 06 vs § 04."
+- **Photo plate (ImageComposite / PhotoMontage / AnnotatedImage) with `DIR: drift(none|editorial)`** — these are Register C documentary templates; total stillness reads as a printed still rather than documentary footage. Flag: "Photo plates default to `drift(documentary)`. If you genuinely want stillness for a memorial / casualty / document-of-record beat, leave it — but verify the editorial register intent. See HOLD_MOTION_REGISTER.md Section 4."
+- **Held quote / definition (KineticTypography) with `DIR: drift(documentary)`** — Register B is breathing/settle/none; documentary's rotation reads careless on typography. Flag accordingly.
+
+**Authoring guidance**: when in doubt, omit `drift()` and let the template default fire. Reach for `drift()` only when the editorial intent of THIS beat diverges from the template's canonical register — most commonly `hold(stillness)` on a memorial/casualty card, or `drift(none)` on a document-of-record quote.
+
 ### Lens 7: Decoder Posture Check
 
 This lens operationalizes the narrative rules NAR-09 through NAR-16 from the Editorial Playbook. The core question: **is this script interesting, bold, and intellectually honest?** Note: "decoder" posture is about *engagement quality*, not about avoiding all context or hedging every claim. Context that creates wonder is good. Strong positions defended with evidence are good. The enemy is boring, not bold.
