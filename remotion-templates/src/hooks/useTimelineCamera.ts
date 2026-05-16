@@ -32,12 +32,8 @@
 import { useMemo } from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import { sec } from "../design/theme";
-import {
-  computeStepBoundaries,
-  getCurrentStepIndex,
-  getStepProgress,
-  motionEasings,
-} from "../utils/stepFramework";
+import { motionEasings } from "../utils/stepFramework";
+import { useStepFramework } from "./useStepFramework";
 import type { TimelineCameraStep } from "../templates/HorizontalTimeline/types";
 
 // Destructure at file top so call sites read as `track` / `snap` / `zoom`.
@@ -157,20 +153,22 @@ export const useTimelineCamera = (
   const frame = useCurrentFrame();
   const transitionFrames = sec(transitionSec);
 
-  // ── Build cumulative frame boundaries ──────────────────────────────
-  const stepBoundaries = useMemo(
-    () => computeStepBoundaries(cameraPath.map((s) => sec(s.duration))),
+  // ── Step framework: boundaries + active index + progress ───────────
+  // useStepFramework owns the boundary computation + clamped index/progress.
+  // We still call useCurrentFrame above because downstream `interpolate(frame,
+  // [...], [...])` calls operate over absolute frame ranges, not progress.
+  const durations = useMemo(
+    () => cameraPath.map((s) => sec(s.duration)),
     [cameraPath],
   );
-
-  // ── Determine current step ─────────────────────────────────────────
-  const stepIndex = getCurrentStepIndex(frame, stepBoundaries);
+  const {
+    boundaries: stepBoundaries,
+    index: stepIndex,
+    boundary: currentBounds,
+    progress: stepProgress,
+  } = useStepFramework(durations);
 
   const currentStep = cameraPath[stepIndex];
-  const currentBounds = stepBoundaries[stepIndex];
-
-  // Progress within current step (clamped 0–1 incl. exact-end-frame → 1).
-  const stepProgress = getStepProgress(frame, currentBounds);
 
   // ── Compute target camera position ─────────────────────────────────
   const getTargetX = (step: TimelineCameraStep): number => {

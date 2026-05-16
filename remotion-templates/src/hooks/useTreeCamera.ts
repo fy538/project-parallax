@@ -40,12 +40,8 @@
 import { useMemo } from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { sec } from "../design/theme";
-import {
-  computeStepBoundaries,
-  getCurrentStepIndex,
-  getStepProgress,
-  motionEasings,
-} from "../utils/stepFramework";
+import { motionEasings } from "../utils/stepFramework";
+import { useStepFramework } from "./useStepFramework";
 
 // Destructure at file top so call sites read as `track` / `zoom`
 // (snap isn't used in this hook — tree camera transitions are always smooth).
@@ -170,19 +166,19 @@ export const useTreeCamera = (opts: UseTreeCameraOptions): TreeCameraState => {
   const frame = useCurrentFrame();
   const transitionFrames = sec(transitionSec);
 
-  // ── Build cumulative frame boundaries for each step ────────────────
-  const stepBoundaries = useMemo(
-    () => computeStepBoundaries(cameraPath.map((s) => sec(s.duration))),
+  // ── Step framework: boundaries + active index + progress ───────────
+  const durations = useMemo(
+    () => cameraPath.map((s) => sec(s.duration)),
     [cameraPath],
   );
-
-  // ── Find current step and compute camera position ──────────────────
-  const stepIndex = getCurrentStepIndex(frame, stepBoundaries);
+  const {
+    index: stepIndex,
+    boundary: currentBounds,
+    progress: stepProgress,
+  } = useStepFramework(durations);
 
   const currentStep = cameraPath[stepIndex];
-  const currentBounds = stepBoundaries[stepIndex];
   const stepStart = currentBounds.start;
-  const stepProgress = getStepProgress(frame, currentBounds);
 
   // ── Compute camera target position (center of focused node) ─────────
   const getNodeCenter = (nodeId: string): { cx: number; cy: number } => {

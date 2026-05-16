@@ -39,10 +39,9 @@ import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { sec } from "../design/theme";
 import {
   computeStepBoundaries,
-  getCurrentStepIndex,
-  getStepProgress,
   motionEasings,
 } from "../utils/stepFramework";
+import { computeStepFrameworkState } from "./useStepFramework";
 
 // Destructure at file top so call sites read as `track` / `snap` / `zoom`
 // — keeps diffs small vs the legacy TRACK_EASE / SNAP_EASE / ZOOM_EASE names.
@@ -367,11 +366,17 @@ export const useNarratedCamera = (
   }
 
   // ── Determine current step ─────────────────────────────────────────
-  const stepIndex = getCurrentStepIndex(frame, stepBoundaries);
+  // useNarratedCamera builds boundaries with custom post-processing (sync-
+  // point snapping, auto-fill last step), so the hook form of useStepFramework
+  // doesn't fit. The pure compute function reuses the same index/progress
+  // semantics over our hand-built boundaries array.
+  const {
+    index: stepIndex,
+    boundary: currentBounds,
+    progress: stepProgress,
+  } = computeStepFrameworkState(frame, stepBoundaries);
 
   const currentStep = cameraPath[stepIndex];
-  const currentBounds = stepBoundaries[stepIndex];
-  const stepProgress = getStepProgress(frame, currentBounds);
 
   // ── Resolve target coordinates ─────────────────────────────────────
   const resolveTarget = (target: NarratedCameraStep["target"]): { x: number; y: number } => {
