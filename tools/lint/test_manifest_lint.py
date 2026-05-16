@@ -502,3 +502,239 @@ class TestSyncCoverageRule:
         assert len(violations) == 1
         assert violations[0].rule == "M-SYNC-COUNT"
         assert "3 entities" in violations[0].message
+
+
+# ─── M-DRIFT-DEFAULT rule (hold-motion register coverage) ───────────────────
+# Validates: (a) chart-category + documentary = ERROR (axis tilt); (b)
+# AtlasPlate + pan-bearing preset = ERROR (projection shift); (c) out-of-
+# register usage = WARNING. Source of truth: HOLD_MOTION_REGISTER.md Section 4.
+
+
+class TestDriftRegisterRule:
+    def test_no_drift_preset_silent(self, tmp_path):
+        """Segment without _direction.driftPreset → silent (template default applies)."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "template": {"component": "DataChart", "dataFile": "d.json"},
+            }],
+            datafiles={"d.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_chart_with_editorial_passes(self, tmp_path):
+        """DataChart with editorial = recommended register, no violation."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "editorial"},
+                "template": {"component": "DataChart", "dataFile": "d.json"},
+            }],
+            datafiles={"d.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_chart_with_documentary_errors(self, tmp_path):
+        """DataChart + documentary = ERROR (axis-rotation tilt)."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "documentary"},
+                "template": {"component": "DataChart", "dataFile": "d.json"},
+            }],
+            datafiles={"d.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-DRIFT-DEFAULT"
+        assert violations[0].severity == "error"
+        assert "documentary" in violations[0].message
+        assert "rotation" in violations[0].message  # mentions the why
+
+    def test_all_chart_components_reject_documentary(self, tmp_path):
+        """The full chart-category set should ERROR on documentary."""
+        for comp in ["TimeSeriesChart", "BumpChart", "Streamgraph",
+                     "BeeswarmChart", "RadarChart", "MarimekkoChart",
+                     "PopulationPyramid", "DumbbellPlot"]:
+            sub = tmp_path / comp
+            sub.mkdir()
+            manifest_path = _setup_episode(sub,
+                segments=[{
+                    "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                    "startSec": 0, "endSec": 5,
+                    "_direction": {"driftPreset": "documentary"},
+                    "template": {"component": comp, "dataFile": "d.json"},
+                }],
+                datafiles={"d.json": {}},
+            )
+            violations = manifest_lint.check_drift_register(
+                json.loads(manifest_path.read_text()), manifest_path,
+            )
+            assert len(violations) == 1, f"{comp} should error on documentary"
+            assert violations[0].severity == "error", f"{comp} should be error-severity"
+
+    def test_atlas_plate_with_breathing_passes(self, tmp_path):
+        """AtlasPlate + breathing = projection-safe, the correct register."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "breathing"},
+                "template": {"component": "AtlasPlate", "dataFile": "a.json"},
+            }],
+            datafiles={"a.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_atlas_plate_with_documentary_errors(self, tmp_path):
+        """AtlasPlate + documentary = ERROR (pan shifts projection)."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "documentary"},
+                "template": {"component": "AtlasPlate", "dataFile": "a.json"},
+            }],
+            datafiles={"a.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-DRIFT-DEFAULT"
+        assert violations[0].severity == "error"
+        assert "projection" in violations[0].message
+
+    def test_atlas_plate_with_legacy_normal_errors(self, tmp_path):
+        """Legacy 'normal' preset on AtlasPlate also pan-bearing → ERROR."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "normal"},
+                "template": {"component": "AtlasPlate", "dataFile": "a.json"},
+            }],
+            datafiles={"a.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].severity == "error"
+
+    def test_photo_montage_with_editorial_warns(self, tmp_path):
+        """PhotoMontage + editorial = out-of-register (doctrine says documentary).
+        Warning, not error — author may have a reason."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "editorial"},
+                "template": {"component": "PhotoMontage", "dataFile": "p.json"},
+            }],
+            datafiles={"p.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-DRIFT-DEFAULT"
+        assert violations[0].severity == "warning"
+
+    def test_kinetic_typography_with_documentary_warns(self, tmp_path):
+        """KineticTypography + documentary = out-of-register (Reg B is breathing/settle)."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "documentary"},
+                "template": {"component": "KineticTypography", "dataFile": "k.json"},
+            }],
+            datafiles={"k.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].severity == "warning"
+
+    def test_background_layer_skipped(self, tmp_path):
+        """Background segments aren't subject to drift register (no entrance)."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "background",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "documentary"},
+                "template": {"component": "DataChart", "dataFile": "d.json"},
+            }],
+            datafiles={"d.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_footage_segments_skipped(self, tmp_path):
+        """FOOTAGE / HOLD / TRANSITION segments don't have hold-motion registers."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[
+                {"id": "s1", "type": "FOOTAGE", "layer": "foreground",
+                 "startSec": 0, "endSec": 5,
+                 "_direction": {"driftPreset": "documentary"}},
+            ],
+            datafiles={},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_unmapped_component_silent(self, tmp_path):
+        """Components not in _RECOMMENDED_DRIFT pass silently."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "_direction": {"driftPreset": "documentary"},
+                "template": {"component": "FutureUnknownTemplate", "dataFile": "f.json"},
+            }],
+            datafiles={"f.json": {}},
+        )
+        violations = manifest_lint.check_drift_register(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_real_episodes_clean(self):
+        """No existing episode segment has an explicit driftPreset yet, so
+        M-DRIFT-DEFAULT should fire zero violations on the current state.
+        This guards against accidentally regressing into drift mismatches
+        as drift() directives are added."""
+        for slug in ("silicon-trap", "prisoners-dilemma"):
+            manifest_path = (
+                REPO_ROOT / "remotion-templates" / "data" / "episodes" / slug
+                / "assembly-manifest.json"
+            )
+            if not manifest_path.is_file():
+                continue
+            violations = manifest_lint.check_drift_register(
+                json.loads(manifest_path.read_text()), manifest_path,
+            )
+            assert violations == [], (
+                f"{slug} has M-DRIFT-DEFAULT violations: "
+                + "; ".join(v.message for v in violations)
+            )

@@ -695,6 +695,194 @@ def check_sync_coverage(manifest: dict, manifest_path: Path) -> list[Violation]:
     return violations
 
 
+# ─── Drift-register rule (M-DRIFT-DEFAULT) ───────────────────────────────────
+#
+# Flags segments whose explicit `_direction.driftPreset` contradicts the
+# template's recommended hold-motion register per HOLD_MOTION_REGISTER.md
+# Section 4 / POLISH.md D20. Two severity levels:
+#
+#   ERROR (hard doctrine violation):
+#     - Chart-category template with driftPreset:"documentary"
+#       → 0.3° rotation tilts axis baselines (false data signal)
+#     - AtlasPlate with pan-bearing preset (documentary / normal / slow)
+#       → directional pan shifts the map projection registration
+#
+#   WARNING (out-of-register, may be intentional):
+#     - Template uses a preset that isn't in its recommended set per the
+#       four registers (A analytical / B editorial-hero / C documentary
+#       / D cartographic). Author may have a good reason — author may
+#       not. The lint surfaces it for review.
+#
+# Templates with no entry in _RECOMMENDED_DRIFT are silently passed through
+# (the rule doesn't presume to govern templates whose register isn't yet
+# documented).
+
+# Per-component recommended preset set per HOLD_MOTION_REGISTER.md Section 4.
+# Add new templates here when extending the doctrine.
+_RECOMMENDED_DRIFT: dict[str, set[str]] = {
+    # Register A — Analytical (charts, diagrams, dense structured content)
+    "DataChart":             {"editorial", "settle", "none"},
+    "TimeSeriesChart":       {"editorial", "settle"},
+    "BumpChart":             {"editorial", "settle"},
+    "RidgelinePlot":         {"editorial", "settle"},
+    "Streamgraph":           {"editorial", "settle"},
+    "NetworkDiagram":        {"editorial", "settle"},
+    "ArcDiagram":            {"editorial", "settle"},
+    "FrameworkDiagram":      {"editorial", "settle"},
+    "GameBoard":             {"editorial", "settle"},
+    "DecisionTree":          {"editorial", "settle"},
+    "EscalationLadder":      {"editorial", "settle"},
+    "HorizontalTimeline":    {"editorial", "settle"},
+    "BayesianUpdate":        {"editorial", "settle"},
+    "BeeswarmChart":         {"editorial", "settle"},
+    "CalendarHeatmap":       {"editorial", "settle"},
+    "ConnectedScatterplot":  {"editorial", "settle"},
+    "DumbbellPlot":          {"editorial", "settle"},
+    "HorizonChart":          {"editorial", "settle"},
+    "IsotypeChart":          {"editorial", "settle"},
+    "MarimekkoChart":        {"editorial", "settle"},
+    "PopulationPyramid":     {"editorial", "settle"},
+    "ProbabilityGauge":      {"editorial", "settle"},
+    "RadarChart":            {"editorial", "settle"},
+    "RankChangeDotPlot":     {"editorial", "settle"},
+    "SankeyFlow":            {"editorial", "settle"},
+    "TernaryPlot":           {"editorial", "settle"},
+    "PricingWaterfall":      {"editorial", "settle"},
+    "StrategicLandscape":    {"editorial", "settle"},
+
+    # Register B — Editorial-hero (single stat, held quote, definition)
+    "StatReveal":            {"breathing", "settle", "none"},
+    "KineticTypography":     {"breathing", "settle", "none"},
+
+    # Register C — Documentary (photo plates, archival, evidence)
+    "ImageComposite":        {"documentary", "breathing"},
+    "PhotoMontage":          {"documentary", "breathing"},
+    "AnnotatedImage":        {"documentary", "breathing"},
+
+    # Register D — Cartographic (AtlasPlate: projection-safe only)
+    "AtlasPlate":            {"breathing", "sway", "none"},
+
+    # Other maps — editorial default, documentary for atmospheric register
+    "ChoroplethMap":         {"editorial", "documentary"},
+    "RouteAnimation":        {"editorial", "documentary"},
+    "DensityMap":            {"editorial", "documentary"},
+    "CartogramMap":          {"editorial"},
+    "TilegramUSMap":         {"editorial"},
+    "ProportionalSymbolMap": {"editorial"},
+
+    # Title cards
+    "TitleTransition":       {"settle", "breathing"},
+}
+
+# Components whose data is plotted on numerical axes — documentary preset's
+# 0.3° rotation tilts those axes visibly, producing false data signal. The
+# DRIFT_PRESETS source comment (`useDirection.ts`) explicitly flags this:
+# "NOT for charts — the rotation tilts axis baselines."
+_CHART_COMPONENTS: set[str] = {
+    "DataChart", "TimeSeriesChart", "BumpChart", "RidgelinePlot",
+    "Streamgraph", "BayesianUpdate", "BeeswarmChart", "CalendarHeatmap",
+    "ConnectedScatterplot", "DumbbellPlot", "HorizonChart", "IsotypeChart",
+    "MarimekkoChart", "PopulationPyramid", "ProbabilityGauge", "RadarChart",
+    "RankChangeDotPlot", "TernaryPlot", "PricingWaterfall",
+}
+
+# Presets that move the camera with directional intent (pan, rotation, or
+# both). When applied to a map plate where projection registration matters,
+# these visibly shift which geography is foregrounded — false editorial
+# signal about "which region the camera favors."
+_PAN_BEARING_PRESETS: set[str] = {"documentary", "normal", "slow"}
+
+
+def check_drift_register(manifest: dict, _manifest_path: Path) -> list[Violation]:
+    """
+    M-DRIFT-DEFAULT: surface segments whose explicit driftPreset contradicts
+    the template's recommended register per HOLD_MOTION_REGISTER.md.
+
+    Source of truth for the recommendations: HOLD_MOTION_REGISTER.md Section
+    4 decision matrix, broken into four registers (A analytical / B editorial-
+    hero / C documentary / D cartographic). When that doctrine doc updates,
+    `_RECOMMENDED_DRIFT` above must update in parallel.
+
+    Rule operates on segment._direction.driftPreset — the per-segment script
+    override (set via DIR: drift(<preset>) or hold(stillness)). Template
+    defaults (Phase 3 wiring) are not visible at the manifest layer, so
+    this rule only sees script-side overrides. That's the correct scope:
+    the rule shouldn't second-guess the template's own default register.
+    """
+    violations: list[Violation] = []
+
+    for seg in manifest.get("segments", []) or []:
+        if seg.get("layer") == "background":
+            continue
+        if seg.get("type") != "TEMPLATE":
+            continue
+
+        template = seg.get("template") or {}
+        component = template.get("component", "")
+        seg_id = seg.get("id", "?")
+
+        # The script-side drift override lives in segment._direction.driftPreset.
+        # Falls through silently if no override (template default applies and
+        # is presumed correct by construction).
+        seg_direction = seg.get("_direction") or {}
+        seg_preset = seg_direction.get("driftPreset")
+        if not seg_preset:
+            continue
+
+        # ── ERROR: chart with documentary (axis-rotation tilt) ────────────
+        if component in _CHART_COMPONENTS and seg_preset == "documentary":
+            violations.append(Violation(
+                rule="M-DRIFT-DEFAULT",
+                file="",
+                pointer=f"segments[{seg_id}] (component={component})",
+                message=(
+                    f"{component} segment uses driftPreset=\"documentary\" — the 0.3° "
+                    f"rotation in this preset tilts chart axis baselines visibly, "
+                    f"producing a false data signal. Use \"editorial\" (default) or "
+                    f"\"settle\" instead. See HOLD_MOTION_REGISTER.md technique 06 "
+                    f"\"Failure mode\"."
+                ),
+                severity="error",
+            ))
+            continue
+
+        # ── ERROR: AtlasPlate with pan-bearing preset (projection shift) ──
+        if component == "AtlasPlate" and seg_preset in _PAN_BEARING_PRESETS:
+            violations.append(Violation(
+                rule="M-DRIFT-DEFAULT",
+                file="",
+                pointer=f"segments[{seg_id}] (component={component})",
+                message=(
+                    f"AtlasPlate uses driftPreset=\"{seg_preset}\" — this preset "
+                    f"includes directional pan and/or rotation, which shifts the map "
+                    f"projection registration (false signal about which geography "
+                    f"the camera favors). Use \"breathing\" (scale-only — projection-"
+                    f"safe), \"sway\" (zero-net pan), or \"none\" (memorial moments). "
+                    f"See HOLD_MOTION_REGISTER.md technique 06 vs 04."
+                ),
+                severity="error",
+            ))
+            continue
+
+        # ── WARNING: out-of-register usage ────────────────────────────────
+        recommended = _RECOMMENDED_DRIFT.get(component)
+        if recommended is not None and seg_preset not in recommended:
+            violations.append(Violation(
+                rule="M-DRIFT-DEFAULT",
+                file="",
+                pointer=f"segments[{seg_id}] (component={component})",
+                message=(
+                    f"{component} uses driftPreset=\"{seg_preset}\" — doctrine "
+                    f"recommends one of {sorted(recommended)} for this template's "
+                    f"editorial register. See HOLD_MOTION_REGISTER.md Section 4 "
+                    f"\"Decision matrix\"."
+                ),
+                severity="warning",
+            ))
+
+    return violations
+
+
 # ─── Driver ──────────────────────────────────────────────────────────────────
 
 ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
@@ -706,6 +894,7 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     lambda m, p: check_duration_drift(m, str(p)),
     check_text_animation_register,  # needs the path (reads dataFile contents)
     check_sync_coverage,             # needs the path (reads dataFile contents)
+    check_drift_register,            # reads segment._direction.driftPreset
 ]
 
 
