@@ -201,7 +201,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
           <BrandImage
             src={resolveAssetSrc(data.imageSrc)}
             ramp={ramp}
-            composite="background"
+            composite="inset"
             alt={data.imageAlt}
             style={{ width: "100%", height: "100%" }}
           />

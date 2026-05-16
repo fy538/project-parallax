@@ -151,7 +151,7 @@ const bipartite = (
   const yFor = (i: number, total: number): number => {
     if (total <= 1) return 0.5;
     // Spread across 80% of usable height, centered.
-    const span = usable * 0.80;
+    const span = usable * 0.90;
     const top = pad + (usable - span) / 2;
     return top + (i / (total - 1)) * span;
   };

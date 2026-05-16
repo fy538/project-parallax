@@ -167,6 +167,8 @@ interface NodeRenderProps {
    * textAnchor = "start".
    */
   labelPlacement?: "below" | "right";
+  /** Hub center in canvas pixels — when provided, satellite leader lines extend away from hub. */
+  hubCenter?: { x: number; y: number };
 }
 
 const CircleNode: React.FC<NodeRenderProps> = React.memo(
@@ -409,6 +411,209 @@ const DiamondNode: React.FC<NodeRenderProps> = React.memo(
   }
 );
 
+const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
+  ({ x, y, label, sublabel, color, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, importance, filterId, hubCenter }) => {
+    const isPrimary = importance === "primary";
+
+    if (isPrimary) {
+      // ── Hub / target-lock treatment ───────────────────────────────────
+      return (
+        <g
+          opacity={opacity}
+          transform={`translate(${x}, ${y}) scale(${scale}) translate(${-x}, ${-y})`}
+          filter={blur > 0 ? `blur(${blur}px)` : undefined}
+        >
+          {/* Filled disc */}
+          <circle cx={x} cy={y} r={72} fill={color} opacity={0.45} />
+          {/* Inner ring */}
+          <circle cx={x} cy={y} r={84} fill="none" stroke={color} strokeWidth={1} opacity={0.35} />
+          {/* Outer ring */}
+          <circle cx={x} cy={y} r={100} fill="none" stroke={color} strokeWidth={0.6} opacity={0.18} />
+          {/* Crosshair hairlines — gap=92 (84+8), length=22 (conservative: SVG clips at viewBox) */}
+          <line x1={x} y1={y - 92} x2={x} y2={y - 114} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x} y1={y + 92} x2={x} y2={y + 114} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x - 92} y1={y} x2={x - 114} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x + 92} y1={y} x2={x + 114} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          {/* Stat value inside disc */}
+          {stat && (
+            <text
+              x={x}
+              y={y + 2}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize={fontSizes.h2}
+              fontFamily={fonts.data}
+              fontWeight={700}
+              fill={color}
+              filter={`url(#${filterId("text-shadow-stat")})`}
+            >
+              {stat.value}
+            </text>
+          )}
+          {/* Label below */}
+          <text
+            x={x}
+            y={y + 100 + 24}
+            textAnchor="middle"
+            fontSize={fontSizes.label}
+            fontFamily={fonts.mono}
+            fontWeight={600}
+            letterSpacing={1}
+            fill={textPrimary}
+            filter={`url(#${filterId("text-shadow")})`}
+          >
+            {label}
+          </text>
+          {/* Stat label below label */}
+          {stat && (
+            <text
+              x={x}
+              y={y + 100 + 46}
+              textAnchor="middle"
+              fontSize={fontSizes.caption}
+              fontFamily={fonts.mono}
+              fontWeight={400}
+              letterSpacing={0.5}
+              fill={textMuted}
+              filter={`url(#${filterId("text-shadow-caption")})`}
+            >
+              {stat.label}
+            </text>
+          )}
+        </g>
+      );
+    }
+
+    // ── Satellite / annotation treatment ─────────────────────────────────
+    // Compute leader-line direction: away from hub when hub center is known
+    let dx = 0;
+    let dy = 1; // default: downward
+    if (hubCenter) {
+      const rawDx = x - hubCenter.x;
+      const rawDy = y - hubCenter.y;
+      const dist = Math.sqrt(rawDx * rawDx + rawDy * rawDy) || 1;
+      dx = rawDx / dist;
+      dy = rawDy / dist;
+    }
+
+    const leaderStart = 10 + 2; // dot r + gap
+    const leaderLen = 64;
+    const leaderStartX = x + dx * leaderStart;
+    const leaderStartY = y + dy * leaderStart;
+    const leaderEndX = x + dx * (leaderStart + leaderLen);
+    const leaderEndY = y + dy * (leaderStart + leaderLen);
+
+    // Label anchor / position based on dominant quadrant
+    let textAnchor: "start" | "end" | "middle" = "middle";
+    let labelX = leaderEndX;
+    let labelY = leaderEndY + fontSizes.label + 8;
+
+    if (dx > 0.3) {
+      textAnchor = "start";
+      labelX = leaderEndX + 8;
+      labelY = leaderEndY + fontSizes.label * 0.35;
+    } else if (dx < -0.3) {
+      textAnchor = "end";
+      labelX = leaderEndX - 8;
+      labelY = leaderEndY + fontSizes.label * 0.35;
+    } else if (dy < -0.3) {
+      textAnchor = "middle";
+      labelX = leaderEndX;
+      labelY = leaderEndY - 8;
+    }
+
+    const sublabelY = labelY + fontSizes.caption + 4;
+
+    return (
+      <g
+        opacity={opacity}
+        transform={`translate(${x}, ${y}) scale(${scale}) translate(${-x}, ${-y})`}
+        filter={blur > 0 ? `blur(${blur}px)` : undefined}
+      >
+        {/* Small dot */}
+        <circle cx={x} cy={y} r={10} fill={color} opacity={0.90} />
+        {/* Inner ring */}
+        <circle cx={x} cy={y} r={20} fill="none" stroke={color} strokeWidth={0.8} opacity={0.28} />
+        {/* Crosshair hairlines — gap=15 (10+5), length=18 */}
+        <line x1={x} y1={y - 15} x2={x} y2={y - 33} stroke={color} strokeWidth={0.6} opacity={0.45} />
+        <line x1={x} y1={y + 15} x2={x} y2={y + 33} stroke={color} strokeWidth={0.6} opacity={0.45} />
+        <line x1={x - 15} y1={y} x2={x - 15 - 18} y2={y} stroke={color} strokeWidth={0.6} opacity={0.45} />
+        <line x1={x + 15} y1={y} x2={x + 15 + 18} y2={y} stroke={color} strokeWidth={0.6} opacity={0.45} />
+        {/* Leader line */}
+        <line
+          x1={leaderStartX}
+          y1={leaderStartY}
+          x2={leaderEndX}
+          y2={leaderEndY}
+          stroke={color}
+          strokeWidth={0.9}
+          opacity={0.55}
+        />
+        {/* Main label at leader endpoint */}
+        <text
+          x={labelX}
+          y={labelY}
+          textAnchor={textAnchor}
+          fill={textPrimary}
+          fontSize={fontSizes.label}
+          fontFamily={fonts.mono}
+          fontWeight={600}
+          letterSpacing={1}
+          filter={`url(#${filterId("text-shadow")})`}
+        >
+          {label}
+        </text>
+        {sublabel && (
+          <text
+            x={labelX}
+            y={sublabelY}
+            textAnchor={textAnchor}
+            fill={textSecondary}
+            fontSize={fontSizes.caption}
+            fontFamily={fonts.mono}
+            fontWeight={400}
+            letterSpacing={0.5}
+            filter={`url(#${filterId("text-shadow-caption")})`}
+          >
+            {sublabel}
+          </text>
+        )}
+        {/* Stat display for satellites (positioned after sublabel) */}
+        {stat && (
+          <>
+            <text
+              x={labelX}
+              y={sublabelY + fontSizes.caption + 4}
+              textAnchor={textAnchor}
+              fill={color}
+              fontSize={fontSizes.h3}
+              fontFamily={fonts.data}
+              fontWeight={700}
+              letterSpacing={1}
+              filter={`url(#${filterId("text-shadow-stat")})`}
+            >
+              {stat.value}
+            </text>
+            <text
+              x={labelX}
+              y={sublabelY + fontSizes.caption + 4 + fontSizes.h3 + 4}
+              textAnchor={textAnchor}
+              fill={textMuted}
+              fontSize={fontSizes.caption}
+              fontFamily={fonts.mono}
+              fontWeight={400}
+              letterSpacing={0.5}
+              filter={`url(#${filterId("text-shadow-caption")})`}
+            >
+              {stat.label}
+            </text>
+          </>
+        )}
+      </g>
+    );
+  }
+);
+
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
@@ -545,6 +750,9 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     [data.nodes]
   );
   const nodeRadius = (importance?: "primary" | "secondary"): number => {
+    if (data.layout === "hub-spoke" || data.layout === "bipartite") {
+      return importance === "primary" ? 74 : 12;
+    }
     if (hasPrimaryHub) {
       return importance === "primary" ? 96 : 36;
     }
@@ -556,6 +764,13 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
     data.nodes.forEach((n) => { map[n.id] = n; });
     return map;
   }, [data.nodes]);
+
+  const hubCenter = useMemo(() => {
+    const hubNode = data.nodes.find(n => n.importance === "primary");
+    if (!hubNode) return undefined;
+    const hubIdx = data.nodes.indexOf(hubNode);
+    return { x: positions[hubIdx].px, y: positions[hubIdx].py };
+  }, [data.nodes, positions]);
 
   const edgeEndpoints = (fromId: string, toId: string) => {
     const fp = positionMap[fromId];
@@ -672,10 +887,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
 
           // Curved edge — quadratic bezier with subtle perpendicular arc.
           // Curvature 0.18 reads as "designed" without becoming whimsical;
-          // 0 (straight line) reads sharper for the bipartite layout where
-          // every edge runs diagonally between two clean columns. Curves
+          // 0 (straight line) reads sharper for bipartite and hub-spoke layouts
+          // where every edge runs diagonally between two clean columns. Curves
           // there add visual noise without information.
-          const curvature = data.layout === "bipartite" ? 0 : 0.18;
+          const curvature = (data.layout === "bipartite" || data.layout === "hub-spoke") ? 0 : 0.18;
           const edgePath = bezierEdge(ep.x1, ep.y1, ep.x2, ep.y2, curvature);
 
           if (edge.style === "blocked") {
@@ -708,11 +923,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             const terminatorY = fromIsPrimary ? ep.y1 : toIsPrimary ? ep.y2 : ep.y2;
             return (
               <g key={`edge-${edgeIdx}`}>
-                {/* Soft glow halo — wider, slightly more present so the
-                    edge feels like a flow, not a wire. */}
-                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={20} opacity={progress * edgeCameraOpacity * 0.09 * emphasisMultiplier} strokeLinecap="round" />
-                {/* Main edge line — bumped from 2.5 to 3.25 for editorial confidence */}
-                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={3.25} opacity={progress * edgeCameraOpacity * 0.92 * emphasisMultiplier} strokeLinecap="round" />
+                {/* Soft glow halo — narrower and lighter for annotation layouts */}
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={12} opacity={progress * edgeCameraOpacity * 0.045 * emphasisMultiplier} strokeLinecap="round" />
+                {/* Main edge line — thinner for annotation layouts */}
+                <path d={edgePath} fill="none" stroke={edgeColor} strokeWidth={(data.layout === "hub-spoke" || data.layout === "bipartite") ? 1.5 : 3.25} opacity={progress * edgeCameraOpacity * 0.92 * emphasisMultiplier} strokeLinecap="round" />
                 {/* Hub-side convergence dot — only when a primary hub exists */}
                 {(fromIsPrimary || nodeById[edge.to]?.importance === "primary") && (
                   <circle
@@ -754,19 +968,21 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
             : nodeStartFrame + stagger(nodeIdx, sec(0.08));
           const lockScale = lockOnPulse(frame, nodeAppearFrame, config.fps);
 
-          // Editorial primitives — circles for nations + institutions
-          // (hexagons read as blockchain/mesh-network UI, off-brand for
-          // intelligence-briefing aesthetic). Actors keep rounded-rect for
-          // typographic plates; concepts keep the diamond as a marker.
-          const NodeComponent = (() => {
-            switch (node.type) {
-              case "nation": return CircleNode;
-              case "institution": return CircleNode;
-              case "actor": return RoundedRectNode;
-              case "concept": return DiamondNode;
-              default: return CircleNode;
-            }
-          })();
+          // Annotation layouts (hub-spoke, bipartite) use the precision
+          // annotation node aesthetic for ALL nodes regardless of type.
+          // Other layouts use the existing shape-per-type mapping.
+          const isAnnotationLayout = data.layout === "hub-spoke" || data.layout === "bipartite";
+          const NodeComponent = isAnnotationLayout
+            ? AnnotationNode
+            : (() => {
+                switch (node.type) {
+                  case "nation": return CircleNode;
+                  case "institution": return CircleNode;
+                  case "actor": return RoundedRectNode;
+                  case "concept": return DiamondNode;
+                  default: return CircleNode;
+                }
+              })();
 
           return (
             <NodeComponent
@@ -793,6 +1009,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
               }
               filterId={filterId}
               labelPlacement={data.layout === "vertical-chain" ? "right" : "below"}
+              hubCenter={hubCenter}
             />
           );
         })}
