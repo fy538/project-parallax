@@ -41,7 +41,9 @@ export const ScoringBar: React.FC<{
   startFrame: number;
   duration: number;
   theme: ThemeTokens;
-}> = React.memo(({ score, color, frame, startFrame, duration, theme }) => {
+  /** Pass true for dark-mode backgrounds so shimmer uses a subtle white-on-dark stop */
+  isDark?: boolean;
+}> = React.memo(({ score, color, frame, startFrame, duration, theme, isDark = false }) => {
   const barProgress = interpolate(
     frame,
     [startFrame, startFrame + duration],
@@ -92,7 +94,8 @@ export const ScoringBar: React.FC<{
           boxShadow: `inset 0 -1px 2px rgba(0,0,0,0.2), inset -1px 0 2px rgba(0,0,0,0.18)`, // shadows.none equivalent — inset border composite (no token)
         }}
       />
-      {/* Specular highlight — thin bright line at top */}
+      {/* Specular highlight — thin bright line at top.
+          Dark mode: subtle white-on-dark (low opacity); light mode: more visible shimmer. */}
       {barWidth > 1 && (
         <div
           style={{
@@ -101,7 +104,9 @@ export const ScoringBar: React.FC<{
             top: 1,
             height: 1.5,
             width: `${barWidth}%`,
-            background: `linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0.5) 70%, transparent 100%)`,
+            background: isDark
+              ? `linear-gradient(90deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.08) 30%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.08) 70%, rgba(255,255,255,0.0) 100%)`
+              : `linear-gradient(90deg, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.25) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.25) 70%, rgba(255,255,255,0.0) 100%)`,
             zIndex: 2,
           }}
         />

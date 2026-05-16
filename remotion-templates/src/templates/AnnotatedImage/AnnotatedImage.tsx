@@ -81,6 +81,7 @@ const computeCalloutPosition = (
   const dotX = imgLeft + (callout.x / 100) * imgWidth;
   const dotY = imgTop + (callout.y / 100) * imgHeight;
   const placement = callout.placement || "right";
+  const leaderLength = callout.leaderLength ?? LEADER_LENGTH;
 
   let dx = 0,
     dy = 0;
@@ -89,24 +90,24 @@ const computeCalloutPosition = (
 
   switch (placement) {
     case "right":
-      dx = LEADER_LENGTH;
+      dx = leaderLength;
       dy = 0;
       textAnchor = "start";
       break;
     case "left":
-      dx = -LEADER_LENGTH;
+      dx = -leaderLength;
       dy = 0;
       textAnchor = "end";
       break;
     case "top":
       dx = 0;
-      dy = -LEADER_LENGTH;
+      dy = -leaderLength;
       textAnchor = "middle";
       textBaseline = "text-after-edge";
       break;
     case "bottom":
       dx = 0;
-      dy = LEADER_LENGTH;
+      dy = leaderLength;
       textAnchor = "middle";
       textBaseline = "text-before-edge";
       break;
@@ -431,7 +432,7 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
                 dominantBaseline={pos.textBaseline}
                 fill={palette.ink}
                 fontSize={fontSizes.label}
-                fontFamily={fonts.heading}
+                fontFamily={fonts.mono}
                 fontWeight={fontWeights.semibold}
                 opacity={labelOpacity}
                 style={{ textShadow: shadows.textLiftLight }}

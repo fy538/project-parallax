@@ -22,6 +22,8 @@ export interface Callout {
   detail?: string;
   /** Label placement relative to the dot */
   placement?: "top" | "bottom" | "left" | "right";
+  /** Length of the leader line in pixels (default: 60) */
+  leaderLength?: number;
   /** Optional color override for the dot and leader line */
   color?: string;
 }

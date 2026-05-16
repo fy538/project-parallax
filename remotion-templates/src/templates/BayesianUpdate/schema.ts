@@ -35,6 +35,8 @@ export const BayesianUpdateSchema = z.object({
     question: z.string().optional(),
     hypotheses: z.tuple([HypothesisTrackSchema, HypothesisTrackSchema]).optional(),
     multiHypotheses: z.array(MultiHypothesisSchema).optional(),
+    credibleInterval: z.tuple([z.number(), z.number()]).optional(),
+    credibleIntervalLabel: z.string().optional(),
     evidence: z.array(EvidenceItemSchema),
     marketPrice: z.number().min(0).max(100).optional(),
     marketSource: z.string().optional(),

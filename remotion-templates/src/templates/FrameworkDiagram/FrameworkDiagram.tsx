@@ -1293,8 +1293,8 @@ const MatrixVariant: React.FC<{
                     background: itemColor,
                     opacity: itemOpacity,
                     boxShadow: weight > 1
-                      ? `0 0 16px ${itemColor}50, 0 2px 6px rgba(0,0,0,0.25)`
-                      : `0 2px 4px rgba(0,0,0,0.18)`,
+                      ? shadows.layer(shadows.accentGlowMd(itemColor), shadows.subtleLight)
+                      : shadows.subtleLight,
                   }}
                 />
                 {/* Label — to the right of marker, vertical-center aligned */}

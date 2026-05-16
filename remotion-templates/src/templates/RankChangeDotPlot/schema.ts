@@ -59,8 +59,12 @@ export const RankChangeDotPlotSchema = z.object({
       .boolean()
       .optional()
       .describe(
-        "Set to false if before/after are values (higher=better) rather than ranks (lower=better). Affects up/down color auto-assignment."
+        "Set explicitly: true for rank data (1=best, lower=better), false for score/value data (higher=better). Affects up/down color auto-assignment. Defaults to false."
       ),
+    backgroundVariant: z
+      .enum(["light", "dark"])
+      .optional()
+      .describe("Background mode. 'light' (default) for analytical; 'dark' for atmospheric segments."),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

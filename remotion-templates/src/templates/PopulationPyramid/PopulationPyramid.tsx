@@ -74,6 +74,8 @@ interface SinglePyramidProps {
   morphCohorts?: PyramidCohort[];
   /** Progress for the morph animation (0 = initial, 1 = fully morphed) */
   morphProgress?: number;
+  /** Theme mode for mode-aware colors */
+  mode?: "light" | "dark";
 }
 
 const SinglePyramid: React.FC<SinglePyramidProps> = React.memo(({
@@ -89,8 +91,9 @@ const SinglePyramid: React.FC<SinglePyramidProps> = React.memo(({
   showLegend = false,
   morphCohorts,
   morphProgress = 0,
+  mode = "light",
 }) => {
-  const theme = useThemeMode("light");
+  const theme = useThemeMode(mode);
 
   const AXIS_WIDTH = 88;                        // center label column
   const HALF_WIDTH = (totalWidth - AXIS_WIDTH) / 2; // each bar side
@@ -410,9 +413,14 @@ const YearLabel: React.FC<YearLabelProps> = React.memo(({
 
 export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const theme = useThemeMode("light");
+  const variant = data.backgroundVariant ?? "light";
+  const theme = useThemeMode(variant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+
+  // K3: per-data color overrides for male/female bars
+  const maleBarColor = data.maleColor ?? MALE_COLOR;
+  const femaleBarColor = data.femaleColor ?? FEMALE_COLOR;
 
   // ── Validation guards ──────────────────────────────────────────────────────
   warnIf(
@@ -488,11 +496,19 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
   const compGap = layout.spacing.xl;
   const compPyramidWidth = (area.width - compGap) / 2;
 
+  // J10: use first syncPoint frame (if any) to anchor bar reveal onset
+  const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+
   return (
-    <Background variant="light">
+    <Background
+      variant={variant}
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
-        <HeaderStrip metadata={data.episode} mode="light" />
-        <FooterStrip scale={unit ? `UNIT · ${unit}` : undefined} mode="light" />
+        <HeaderStrip metadata={data.episode} mode={variant} />
+        <FooterStrip scale={unit ? `UNIT · ${unit}` : undefined} mode={variant} />
 
         <TitleBlock
           title={data.title}
@@ -518,7 +534,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
                 morphProgress={morphProgress}
                 frame={frame}
                 morphStartFrame={morphStartFrame}
-                mode="light"
+                mode={variant}
               />
             )}
 
@@ -529,10 +545,13 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
               totalHeight={pyramidHeight}
               frame={frame}
               highlightAgeGroups={highlightSet}
-              entranceOffset={0}
+              entranceOffset={firstSyncFrame ?? 0}
               showLegend
+              maleColor={maleBarColor}
+              femaleColor={femaleBarColor}
               morphCohorts={data.variant === "morph" ? data.cohortsB : undefined}
               morphProgress={morphProgress}
+              mode={variant}
             />
 
             <ScaleTick
@@ -540,8 +559,74 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
               halfWidth={(singlePyramidWidth - 88) / 2}
               unit={unit}
               frame={frame}
-              mode="light"
+              mode={variant}
             />
+
+            {/* L3: Median age dashed indicator line */}
+            {data.medianAge !== undefined && (() => {
+              // Map medianAge to Y position within pyramidHeight.
+              // cohorts are ordered youngest→oldest; estimate age from ageGroup index.
+              const numC = data.cohorts.length;
+              const rowH = pyramidHeight / Math.max(numC, 1);
+              // Find the cohort whose index best represents the medianAge.
+              // Use linear interpolation across [0, numC-1] assuming standard 5-yr groups.
+              // Parse the start age of each cohort from ageGroup text (e.g. "20–24" → 20).
+              const parseStartAge = (g: string): number => {
+                const m = /^(\d+)/.exec(g);
+                return m ? parseInt(m[1], 10) : 0;
+              };
+              const ages = data.cohorts.map((c) => parseStartAge(c.ageGroup));
+              const ageMin = ages[0] ?? 0;
+              const ageMax = (ages[ages.length - 1] ?? (numC - 1) * 5) + 5;
+              // Clamp medianAge to [ageMin, ageMax]
+              const clamped = Math.max(ageMin, Math.min(data.medianAge, ageMax));
+              // Y from top: fraction of height
+              const fracFromTop = (clamped - ageMin) / Math.max(ageMax - ageMin, 1);
+              const medianY = fracFromTop * pyramidHeight + rowH * 0.5;
+              // Fade in after bars finish, then hold
+              const medianOpacity = fadeIn(frame, entranceEndFrame + sec(0.3), sec(0.5));
+
+              return (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: medianY,
+                    left: 0,
+                    width: singlePyramidWidth,
+                    pointerEvents: "none",
+                    opacity: medianOpacity,
+                  }}
+                >
+                  {/* Dashed line spanning full pyramid width */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: singlePyramidWidth,
+                      height: 0,
+                      borderTop: `1px dashed ${palette.amber}99`,
+                    }}
+                  />
+                  {/* Label at right end */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 3,
+                      right: 0,
+                      fontSize: fontSizes.meta,
+                      fontFamily: fonts.mono,
+                      color: palette.amber,
+                      letterSpacing: 0.5,
+                      whiteSpace: "nowrap",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {`Median age: ${data.medianAge}`}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -588,10 +673,11 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
                 totalHeight={pyramidHeight}
                 frame={frame}
                 highlightAgeGroups={highlightSet}
-                entranceOffset={0}
-                maleColor={data.left.color ?? MALE_COLOR}
-                femaleColor={data.left.color ?? FEMALE_COLOR}
+                entranceOffset={firstSyncFrame ?? 0}
+                maleColor={data.left.color ?? maleBarColor}
+                femaleColor={data.left.color ?? femaleBarColor}
                 showLegend
+                mode={variant}
               />
             </div>
 
@@ -641,10 +727,11 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
                 totalHeight={pyramidHeight}
                 frame={frame}
                 highlightAgeGroups={highlightSet}
-                entranceOffset={sec(0.2)}
-                maleColor={data.right.color ?? MALE_COLOR}
-                femaleColor={data.right.color ?? FEMALE_COLOR}
+                entranceOffset={(firstSyncFrame ?? 0) + sec(0.2)}
+                maleColor={data.right.color ?? maleBarColor}
+                femaleColor={data.right.color ?? femaleBarColor}
                 showLegend={false}
+                mode={variant}
               />
             </div>
           </div>
@@ -652,7 +739,7 @@ export const PopulationPyramid: React.FC<{ data: PopulationPyramidData }> = ({ d
 
         <SourceAttribution
           source={data.source}
-          mode="light"
+          mode={variant}
           prefix="Source: "
           startSec={2}
         />

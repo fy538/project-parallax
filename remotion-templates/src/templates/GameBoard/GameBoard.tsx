@@ -1261,6 +1261,9 @@ const IteratedPlayMatrix: React.FC<{
   );
 };
 
+// ── Named shadow constant for chess piece drop shadow ────────────────────────
+const PIECE_DROPSHADOW = "drop-shadow(0 2px 3px rgba(0,0,0,0.35))";
+
 // ── Unicode chess glyph map ─────────────────────────────────────────────────
 // Map data labels (case-insensitive) to filled chess Unicode glyphs.
 // Filled glyphs read better at video scale than outline ones.
@@ -1351,7 +1354,7 @@ const PieceCircle = React.memo<{
           justifyContent: "center",
           // Drop shadow — soft, slightly offset down-right to suggest the
           // piece is sitting on the board with raked light from upper-left.
-          filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.35))",
+          filter: PIECE_DROPSHADOW,
         }}
       >
         <div

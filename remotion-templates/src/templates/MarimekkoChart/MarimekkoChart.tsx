@@ -37,6 +37,7 @@ import {
   sec,
   contentArea,
   textMaxWidth,
+  shadows,
 } from "../../design/theme";
 import {
   fadeIn,
@@ -478,7 +479,7 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             // Subtle drop shadow lifts text off colored tiles
-                            textShadow: "0 1px 2px rgba(0,0,0,0.25)",
+                            textShadow: shadows.textLift,
                           }}
                         >
                           {seg.label}

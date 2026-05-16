@@ -102,6 +102,19 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import type { NetworkDiagramData } from "./types";
 import type { CameraElement } from "../../hooks/useNarratedCamera";
 
+// ── SVG feDropShadow constants ───────────────────────────────────────────────
+// Named constants for feDropShadow stdDeviation and floodOpacity values so
+// inline numbers don't drift independently across text-shadow filter defs.
+// text-shadow = mid-hierarchy label shadow (dy=1, std=1.5, opacity=0.5)
+// caption-shadow = lighter sublabel shadow (dy=0.5, std=1, opacity=0.4)
+// stat-shadow = hero stat shadow — heaviest lift (dy=1.5, std=2.5, opacity=0.55)
+const NODE_SHADOW_STD = 1.5;
+const NODE_SHADOW_OPACITY = 0.5;
+const CAPTION_SHADOW_STD = 1;
+const CAPTION_SHADOW_OPACITY = 0.4;
+const STAT_SHADOW_STD = 2.5;
+const STAT_SHADOW_OPACITY = 0.55;
+
 // ── Color token resolver ─────────────────────────────────────────────────
 
 const createTokenMap = (): Record<string, string> => ({
@@ -618,15 +631,15 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
         {/* Hierarchy-aware text shadows — dy + stdDeviation track text role */}
         <filter id={filterId("text-shadow")} x="-10%" y="-10%" width="120%" height="120%">
           {/* Default — used by labels (mid hierarchy) */}
-          <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="rgba(0,0,0,0.5)" />
+          <feDropShadow dx="0" dy="1" stdDeviation={NODE_SHADOW_STD} floodColor={`rgba(0,0,0,${NODE_SHADOW_OPACITY})`} />
         </filter>
         <filter id={filterId("text-shadow-caption")} x="-10%" y="-10%" width="120%" height="120%">
           {/* Caption / sublabel — lighter, smaller */}
-          <feDropShadow dx="0" dy="0.5" stdDeviation="1" floodColor="rgba(0,0,0,0.4)" />
+          <feDropShadow dx="0" dy="0.5" stdDeviation={CAPTION_SHADOW_STD} floodColor={`rgba(0,0,0,${CAPTION_SHADOW_OPACITY})`} />
         </filter>
         <filter id={filterId("text-shadow-stat")} x="-15%" y="-15%" width="130%" height="130%">
           {/* Stat / hero data — heavier lift to anchor numbers */}
-          <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" floodColor="rgba(0,0,0,0.55)" />
+          <feDropShadow dx="0" dy="1.5" stdDeviation={STAT_SHADOW_STD} floodColor={`rgba(0,0,0,${STAT_SHADOW_OPACITY})`} />
         </filter>
       </defs>
 

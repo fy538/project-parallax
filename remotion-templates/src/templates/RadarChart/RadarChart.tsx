@@ -302,6 +302,11 @@ export const RadarChart: React.FC<{ data: RadarChartData }> = ({ data }) => {
     "RadarChart",
     `${data.axes.length} axes — perimeter crowding degrades legibility above 8; consider pruning to 5–7 canonical dimensions`,
   );
+  warnIf(
+    data.morphFrom !== undefined && data.morphFrom.length !== data.subjects.length,
+    "RadarChart",
+    `morphFrom has ${data.morphFrom?.length} subjects but data.subjects has ${data.subjects?.length} — morph will be skipped`,
+  );
   if (data.axes.length < 3 || data.subjects.length === 0) return null;
 
   // ── Grid lines color ───────────────────────────────────────────────────

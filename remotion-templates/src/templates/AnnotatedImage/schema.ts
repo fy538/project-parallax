@@ -11,6 +11,7 @@ const CalloutSchema = z.object({
   label: z.string(),
   detail: z.string().optional(),
   placement: z.enum(["top", "bottom", "left", "right"]).optional(),
+  leaderLength: z.number().positive().optional(),
   color: z.string().optional(),
 });
 

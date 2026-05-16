@@ -64,6 +64,16 @@ export interface BayesianUpdateData {
     color?: string;
   }>;
 
+  // ── Credible interval bracket ──────────────────────────────────────────────
+  /**
+   * Credible interval for the posterior distribution, shown as a bracket
+   * overlay on the probability axis. E.g. [0.15, 0.45] means the bracket
+   * spans 15%–45% of the probability axis.
+   */
+  credibleInterval?: [number, number];
+  /** Label for the credible interval bracket (default: "90% CI") */
+  credibleIntervalLabel?: string;
+
   // ── Shared ──────────────────────────────────────────────────────────────
   /** Evidence items that arrive sequentially, each shifting the distribution */
   evidence: EvidenceItem[];

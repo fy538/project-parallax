@@ -40,6 +40,7 @@ import { Background } from "../../components/Background";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { fadeIn, exitFade, CLAMP_SINE } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import { ICON_PATHS, ICON_VIEWBOX } from "./icons";
@@ -78,6 +79,54 @@ const IsotypeIcon: React.FC<IsotypeIconProps> = React.memo(
 );
 IsotypeIcon.displayName = "IsotypeIcon";
 
+// ── Partial icon (fractional clip-path) ──────────────────────────────────────
+// Renders a single icon clipped to `fraction` of its width (e.g. 0.7 = 70%).
+// Used when a value like 3.7 requires 3 full icons + one 70%-clipped partial.
+
+interface PartialIsotypeIconProps {
+  iconType: IsotypeIconType;
+  size: number;
+  color: string;
+  opacity: number;
+  scale: number;
+  /** Fraction of the icon to show (0–1). e.g. 0.7 clips to 70% width. */
+  fraction: number;
+  /** Unique id used for the SVG clipPath element. */
+  clipId: string;
+}
+
+const PartialIsotypeIcon: React.FC<PartialIsotypeIconProps> = React.memo(
+  ({ iconType, size, color, opacity, scale, fraction, clipId }) => {
+    const path = ICON_PATHS[iconType] ?? ICON_PATHS.circle;
+    const VBOX = ICON_VIEWBOX; // e.g. "0 0 24 24"
+    const vbParts = VBOX.split(" ").map(Number);
+    const vbW = vbParts[2] ?? 24;
+    const vbH = vbParts[3] ?? 24;
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox={VBOX}
+        style={{
+          display: "block",
+          opacity,
+          transform: `scale(${scale})`,
+          transformOrigin: "center",
+          transition: "none",
+        }}
+      >
+        <defs>
+          <clipPath id={clipId}>
+            <rect x={0} y={0} width={vbW * fraction} height={vbH} />
+          </clipPath>
+        </defs>
+        <path d={path} fill={color} clipPath={`url(#${clipId})`} />
+      </svg>
+    );
+  }
+);
+PartialIsotypeIcon.displayName = "PartialIsotypeIcon";
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 /** Compute icons-per-row for proportion variant. */
@@ -110,6 +159,9 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
 }) => {
   const total = data.total ?? 0;
   const highlighted = data.highlighted ?? 0;
+  // L1: support fractional highlighted (e.g. 3.7 → 3 full + 1 partial at 70%)
+  const fullHighlighted = Math.floor(highlighted);
+  const partialFraction = highlighted % 1; // 0 = no partial icon
   const iconSize = data.iconSize ?? 36;
   const iconType = data.icon ?? "circle";
   const iconsPerRow = computeIconsPerRow(total, data.iconsPerRow);
@@ -126,16 +178,16 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
   // Icon gap
   const gap = 4;
 
-  // Build icon list
+  // Build icon list (full icons only — partial handled separately below)
   const icons = useMemo(
     () =>
       Array.from({ length: total }, (_, i) => {
-        const isHighlighted = i < highlighted;
+        const isHighlighted = i < fullHighlighted;
         const popFrame = sec(0.5) + i * Math.max(1, Math.floor(sec(0.05)));
         const color = isHighlighted ? accentColor : mutedColor;
         return { i, isHighlighted, popFrame, color };
       }),
-    [total, highlighted, accentColor, mutedColor]
+    [total, fullHighlighted, accentColor, mutedColor]
   );
 
   // Count-up progress — runs from sec(0.3) for annotation below grid
@@ -192,6 +244,25 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
             />
           );
         })}
+        {/* L1: partial icon — clipped to `partialFraction` of width */}
+        {partialFraction > 0 && (() => {
+          const partialIdx = fullHighlighted;
+          const popFrame = sec(0.5) + partialIdx * Math.max(1, Math.floor(sec(0.05)));
+          const scale = interpolate(frame, [popFrame, popFrame + sec(0.15)], [0, 1], CLAMP_SINE);
+          const opacity = interpolate(frame, [popFrame, popFrame + sec(0.2)], [0, 1], CLAMP_SINE) * exit;
+          return (
+            <PartialIsotypeIcon
+              key="partial"
+              iconType={iconType}
+              size={iconSize}
+              color={accentColor}
+              opacity={opacity}
+              scale={scale}
+              fraction={partialFraction}
+              clipId="proportion-partial-icon"
+            />
+          );
+        })()}
       </div>
 
       {/* Proportion annotation: "92 of 100 — TSMC" */}
@@ -445,9 +516,10 @@ export const IsotypeChart: React.FC<{ data: IsotypeChartData }> = ({ data }) => 
   const theme = useThemeMode();
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
+  const episodeEmphasis = useEpisodeColorEmphasis();
 
-  // Accent color — gold by default
-  const accentColor = palette.gold;
+  // Accent color — resolved from episode color emphasis (falls back to gold/amber)
+  const accentColor = episodeEmphasis.primaryAccent;
 
   // Exit fade
   const exit = exitFade(frame, durationInFrames, sec(1));
@@ -460,7 +532,12 @@ export const IsotypeChart: React.FC<{ data: IsotypeChartData }> = ({ data }) => 
   const iconSize = data.iconSize ?? 36;
 
   return (
-    <Background variant="light">
+    <Background
+      variant="light"
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
         {/* Brand strips */}
         <HeaderStrip mode="light" />

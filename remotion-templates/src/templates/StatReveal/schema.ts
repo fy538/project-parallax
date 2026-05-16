@@ -23,6 +23,7 @@ export const StatRevealSchema = z.object({
       suffix: z.string().optional(),
       label: z.string(),
       decimals: z.number().optional(),
+      countUp: z.boolean().optional().describe("When true (default), count up from 0 to value. Set false to render statically."),
     }),
     comparisons: z.array(ComparisonBarSchema),
     heroIsMax: z.boolean().optional(),

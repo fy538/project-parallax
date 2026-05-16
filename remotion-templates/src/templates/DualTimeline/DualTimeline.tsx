@@ -180,6 +180,9 @@ export const DualTimeline: React.FC<{
     { name: "exit", duration: sec(0.5) },
   ]);
 
+  // Pace timing scale — applied to era-column header entrance durations only.
+  const paceTimingScale = direction.paceTimingScale ?? 1;
+
   const eraAColor = data.eraAColor || "#3266AD";
   const eraBColor = data.eraBColor || "#C23B22";
 
@@ -267,7 +270,7 @@ export const DualTimeline: React.FC<{
                   color: eraAColor,
                   fontFamily: fonts.heading,
                   textShadow: shadows.textLift,
-                  transform: `translateY(${slideIn(frame, sec(0.3), 16, sec(0.5))}px)`,
+                  transform: `translateY(${slideIn(frame, sec(0.3), 16, Math.round(sec(0.5) * paceTimingScale))}px)`,
                 }}
               >
                 {data.eraATitle}
@@ -278,7 +281,7 @@ export const DualTimeline: React.FC<{
                   background: `linear-gradient(90deg, ${eraAColor} 0%, ${eraAColor}80 70%, transparent 100%)`,
                   borderRadius: 2,
                   marginTop: layout.spacing.xs,
-                  transform: `scaleX(${interpolate(frame, [sec(0.4), sec(1.0)], [0, 1], CLAMP_QUAD)})`,
+                  transform: `scaleX(${interpolate(frame, [sec(0.4), sec(0.4) + Math.round(sec(0.6) * paceTimingScale)], [0, 1], CLAMP_QUAD)})`,
                   transformOrigin: "left center",
                 }}
               />
@@ -298,7 +301,7 @@ export const DualTimeline: React.FC<{
                   color: eraBColor,
                   fontFamily: fonts.heading,
                   textShadow: shadows.textLift,
-                  transform: `translateY(${slideIn(frame, sec(0.4), 16, sec(0.5))}px)`,
+                  transform: `translateY(${slideIn(frame, sec(0.4), 16, Math.round(sec(0.5) * paceTimingScale))}px)`,
                 }}
               >
                 {data.eraBTitle}
@@ -309,7 +312,7 @@ export const DualTimeline: React.FC<{
                   background: `linear-gradient(90deg, ${eraBColor} 0%, ${eraBColor}80 70%, transparent 100%)`,
                   borderRadius: 2,
                   marginTop: layout.spacing.xs,
-                  transform: `scaleX(${interpolate(frame, [sec(0.5), sec(1.1)], [0, 1], CLAMP_QUAD)})`,
+                  transform: `scaleX(${interpolate(frame, [sec(0.5), sec(0.5) + Math.round(sec(0.6) * paceTimingScale)], [0, 1], CLAMP_QUAD)})`,
                   transformOrigin: "left center",
                 }}
               />

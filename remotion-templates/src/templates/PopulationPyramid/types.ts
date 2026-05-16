@@ -48,6 +48,14 @@ export interface PopulationPyramidData {
   highlightAgeGroups?: string[];
   /** Override auto-computed max value for bar scaling */
   maxValue?: number;
+  /** Background mode — "light" (default) or "dark" for dramatic/atmospheric segments. */
+  backgroundVariant?: "light" | "dark";
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;
+  /** Median age indicator line drawn horizontally across the pyramid. */
+  medianAge?: number;
+  /** Override color for male bars (default: semantic.us blue). */
+  maleColor?: string;
+  /** Override color for female bars (default: semantic.china rust). */
+  femaleColor?: string;
 }

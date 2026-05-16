@@ -250,7 +250,12 @@ export const DumbbellPlot: React.FC<{ data: DumbbellPlotData }> = ({ data }) => 
     : `SCALE · ${data.xAxisLabel}`;
 
   return (
-    <Background variant={variant}>
+    <Background
+      variant={variant}
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
         {/* Brand strips */}
         <HeaderStrip metadata={data.episode} mode={variant} />

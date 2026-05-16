@@ -43,9 +43,11 @@ export interface RankChangeDotPlotData {
   /**
    * Whether "before" and "after" values are ranks (true = lower is better, rank 1 is best)
    * or plain values (false = higher is better). Affects color-coding direction.
-   * Default: true (ranks)
+   * Default: false — set explicitly for correct color-coding.
    */
   isRankData?: boolean;
+  /** Background mode — "light" (default) or "dark" for dramatic/atmospheric segments. */
+  backgroundVariant?: "light" | "dark";
   /** Per-composition direction block from visual-spec _direction namespace. */
   _direction?: DirectionBlock;
 }

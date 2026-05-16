@@ -61,6 +61,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { BayesianUpdateData, EvidenceItem } from "./types";
+import { warnIf } from "../../utils/dataWarnings";
 
 // ── Gaussian curve generation ──────────────────────────────────────────────
 
@@ -352,6 +353,67 @@ const MarketPriceLine: React.FC<{
         fontFamily={fonts.data}
       >
         {label} {price}%
+      </text>
+    </g>
+  );
+});
+
+// ── Credible interval bracket ─────────────────────────────────────────────
+
+const CredibleIntervalBracket: React.FC<{
+  interval: [number, number];
+  label: string;
+  width: number;
+  height: number;
+  frame: number;
+  posteriorStartFrame: number;
+}> = React.memo(({ interval, label, width, height, frame, posteriorStartFrame }) => {
+  const opacity = fadeIn(frame, posteriorStartFrame, sec(0.5));
+  const x1 = (interval[0] / 100) * width;
+  const x2 = (interval[1] / 100) * width;
+  const tickHeight = 10;
+  const barY = height + 18;
+
+  return (
+    <g opacity={opacity * 0.7}>
+      {/* Horizontal bar */}
+      <line
+        x1={x1}
+        y1={barY}
+        x2={x2}
+        y2={barY}
+        stroke={palette.amber}
+        strokeWidth={1.5}
+      />
+      {/* Left tick */}
+      <line
+        x1={x1}
+        y1={barY - tickHeight / 2}
+        x2={x1}
+        y2={barY + tickHeight / 2}
+        stroke={palette.amber}
+        strokeWidth={1.5}
+      />
+      {/* Right tick */}
+      <line
+        x1={x2}
+        y1={barY - tickHeight / 2}
+        x2={x2}
+        y2={barY + tickHeight / 2}
+        stroke={palette.amber}
+        strokeWidth={1.5}
+      />
+      {/* Label */}
+      <text
+        x={(x1 + x2) / 2}
+        y={barY + tickHeight / 2 + 14}
+        textAnchor="middle"
+        fill={palette.amber}
+        fontSize={fontSizes.meta}
+        fontFamily={fonts.mono}
+        opacity={0.85}
+      >
+        {label}
       </text>
     </g>
   );
@@ -739,7 +801,7 @@ const MultiVariant: React.FC<{
                     textShadow: shadows.textLift,
                   }}
                 >
-                  {data.multiHypotheses[0].label}:{" "}
+                  {data.multiHypotheses?.[0]?.label ?? "H₁"}:{" "}
                   {Math.round(states[0].probabilities[0])}% →{" "}
                   {Math.round(currentProbs[0])}%
                 </div>
@@ -969,6 +1031,18 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
     [0, sec(1.0)],
     [0.95, 1],
     CLAMP_CUBIC
+  );
+
+  // ── warnIf guards ────────────────────────────────────────────────────
+  warnIf(
+    data.variant === "multi" && (!data.multiHypotheses || data.multiHypotheses.length === 0),
+    "BayesianUpdate",
+    "variant is 'multi' but multiHypotheses is empty — render will be blank"
+  );
+  warnIf(
+    data.variant === "multi" && (data.multiHypotheses?.length ?? 0) > 6,
+    "BayesianUpdate",
+    `${data.multiHypotheses?.length} multiHypotheses — more than 6 may overlap visually`
   );
 
   // Handle multi variant separately
@@ -1267,6 +1341,18 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
                   filter: `drop-shadow(0 0 6px ${curve1Color}60)`,
                 }}
               />
+
+              {/* Credible interval bracket */}
+              {data.credibleInterval && (
+                <CredibleIntervalBracket
+                  interval={data.credibleInterval}
+                  label={data.credibleIntervalLabel ?? "90% CI"}
+                  width={curveWidth}
+                  height={curveHeight}
+                  frame={frame}
+                  posteriorStartFrame={introFrames}
+                />
+              )}
             </svg>
             </div>
 

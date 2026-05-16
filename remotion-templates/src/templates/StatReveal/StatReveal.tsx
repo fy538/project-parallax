@@ -78,6 +78,11 @@ interface HeroStatProps {
   theme: ReturnType<typeof useThemeMode>;
   /** Per-episode primary accent. Defaults to channel amber if not provided. */
   accentColor?: string;
+  /**
+   * When false, render the final value statically without count-up animation.
+   * Defaults to true.
+   */
+  countUp?: boolean;
 }
 
 const HeroStat: React.FC<HeroStatProps> = ({
@@ -91,8 +96,9 @@ const HeroStat: React.FC<HeroStatProps> = ({
   revealScale,
   theme,
   accentColor = palette.amber,
+  countUp = true,
 }) => {
-  const currentValue = value * progress;
+  const currentValue = countUp ? value * progress : value;
   const displayValue = formatNumber(currentValue, decimals, prefix, suffix);
 
   return (
@@ -384,6 +390,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
             revealScale={scaleReveal(frame, heroStart, sec(0.8), 1.3, 1.0) * (1 + beat.pulse * 0.05)}
             theme={theme}
             accentColor={emphasis.primaryAccent}
+            countUp={data.stat.countUp}
           />
         </div>
 

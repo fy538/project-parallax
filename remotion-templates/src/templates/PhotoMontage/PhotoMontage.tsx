@@ -51,6 +51,7 @@ import { KenBurns } from "../../components/KenBurns";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { resolveAssetSrc } from "../../utils/assetPath";
+import { warnIf } from "../../utils/dataWarnings";
 import type { PhotoMontageData, MontageImage } from "./types";
 
 // ── Helper: Compute frame ranges for each image accounting for transitions ──
@@ -237,6 +238,10 @@ const ImageOverlay: React.FC<{
 // ── Main component ──
 
 export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => {
+  warnIf(!data.images || data.images.length === 0, "PhotoMontage", "images array is empty — nothing will render");
+  warnIf(data.images?.length === 1, "PhotoMontage", "only one image — dissolve transition has no effect; add a second image or use ImageComposite");
+  warnIf((data.durationSec ?? 0) < 1, "PhotoMontage", "durationSec < 1s — segment will be too short for transitions");
+
   const frame = useCurrentFrame();
   const theme = useThemeMode("light");
   const { durationInFrames } = useVideoConfig();

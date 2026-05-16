@@ -69,7 +69,8 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
   data,
 }) => {
   const frame = useCurrentFrame();
-  const theme = useThemeMode("light");
+  const bVariant = data.backgroundVariant ?? "light";
+  const theme = useThemeMode(bVariant);
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
@@ -84,10 +85,17 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
     "RankChangeDotPlot",
     "fewer than 3 items looks sparse; use StatReveal for a single comparison"
   );
+  // K6: warn when isRankData is not explicitly set to avoid silent miscoloring
+  warnIf(
+    data.isRankData === undefined || data.isRankData === null,
+    "RankChangeDotPlot",
+    "isRankData not set — defaulting to false. Set explicitly: true for rank data (1=best), false for score data (higher=better)"
+  );
 
   // ── Resolved options ───────────────────────────────────────────────────
   const sortBy = data.sortBy ?? "change";
-  const isRankData = data.isRankData ?? true;
+  // K6: default changed to false (score/value data is the more common editorial case)
+  const isRankData = data.isRankData ?? false;
   const highlightIds = useMemo(
     () => new Set(data.highlightIds ?? []),
     [data.highlightIds]
@@ -149,13 +157,18 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
   const unit = data.unit ?? "";
 
   return (
-    <Background variant="light">
+    <Background
+      variant={bVariant}
+      tint={direction.backgroundTint}
+      atmosphere={direction.atmosphere}
+      atmosphereIntensity={direction.atmosphereIntensity}
+    >
       <AbsoluteFill style={compStyle}>
         {/* Brand strips */}
-        <HeaderStrip metadata={data.episode} mode="light" />
+        <HeaderStrip metadata={data.episode} mode={bVariant} />
         <FooterStrip
           scale={unit ? `SCALE · ${unit}` : undefined}
-          mode="light"
+          mode={bVariant}
         />
 
         <TitleBlock
@@ -382,7 +395,7 @@ export const RankChangeDotPlot: React.FC<{ data: RankChangeDotPlotData }> = ({
         {/* ── Source attribution ──────────────────────────────────────── */}
         <SourceAttribution
           source={data.source}
-          mode="light"
+          mode={bVariant}
           prefix="Source: "
           startSec={2}
         />

@@ -62,6 +62,26 @@ export const PopulationPyramidSchema = z.object({
       .positive()
       .optional()
       .describe("Override auto-computed max value for bar scaling. Useful when comparing two pyramids."),
+    backgroundVariant: z
+      .enum(["light", "dark"])
+      .optional()
+      .describe("Background mode. 'light' (default) for analytical mode; 'dark' for dramatic/atmospheric segments."),
+    medianAge: z
+      .number()
+      .min(0)
+      .max(120)
+      .optional()
+      .describe(
+        "When set, draws a horizontal dashed indicator line at this age band position across the full pyramid width. Label reads 'Median age: N'."
+      ),
+    maleColor: z
+      .string()
+      .optional()
+      .describe("Override color for male bars. Default: semantic.us (muted blue). Use for comparison or custom palettes."),
+    femaleColor: z
+      .string()
+      .optional()
+      .describe("Override color for female bars. Default: semantic.china (muted rust). Use for comparison or custom palettes."),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

@@ -435,6 +435,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                       startFrame={scoringStartFrame + sec(0.2)}
                       duration={sec(1.5)}
                       theme={theme}
+                      isDark={isDark}
                     />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -457,6 +458,7 @@ export const CinematicDuelingFrameworks: React.FC<{
                       startFrame={scoringStartFrame + sec(0.35)}
                       duration={sec(1.5)}
                       theme={theme}
+                      isDark={isDark}
                     />
                   </div>
                 </div>

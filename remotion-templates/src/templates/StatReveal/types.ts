@@ -39,6 +39,12 @@ export interface StatRevealData {
     label: string;
     /** Number of decimal places (default: 0) */
     decimals?: number;
+    /**
+     * When true (default), animate the number counting up from 0 to value.
+     * Set to false to render the final value statically (useful when the
+     * number is already on-screen from a previous segment).
+     */
+    countUp?: boolean;
   };
 
   /** Comparison bars shown below/beside the hero number */
