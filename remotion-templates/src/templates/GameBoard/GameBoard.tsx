@@ -1264,6 +1264,22 @@ const IteratedPlayMatrix: React.FC<{
 // ── Named shadow constant for chess piece drop shadow ────────────────────────
 const PIECE_DROPSHADOW = "drop-shadow(0 2px 3px rgba(0,0,0,0.35))";
 
+// ── Token-register precision-marker geometry ────────────────────────────────
+// When a chess-board piece carries a non-chess label (e.g. company names like
+// "NVIDIA", "ASML", "US" — strategic-actor-as-piece metaphor), it is rendered
+// as a Bloomberg / Economist-style precision marker rather than a labeled disk.
+// Geometry mirrors the AnnotationNode SAT_* constants in NetworkDiagram so the
+// two templates share a visual vocabulary.
+const TOKEN_DOT_R = 7;            // small filled dot — the "position"
+const TOKEN_RING_R = 13;          // single hairline ring around the dot
+const TOKEN_RING_OPACITY = 0.42;
+const TOKEN_DOT_OPACITY = 0.95;
+const TOKEN_TETHER_GAP = TOKEN_DOT_R + 3;   // 10 — dot rim → tether start
+const TOKEN_TETHER_LEN = 8;
+const TOKEN_TETHER_OPACITY = 0.48;
+const TOKEN_LABEL_OFFSET = TOKEN_TETHER_GAP + TOKEN_TETHER_LEN + 4; // 22
+const TOKEN_FOOTPRINT = 72;       // SVG canvas; matches chess-glyph footprint
+
 // ── Unicode chess glyph map ─────────────────────────────────────────────────
 // Map data labels (case-insensitive) to filled chess Unicode glyphs.
 // Filled glyphs read better at video scale than outline ones.
@@ -1381,30 +1397,76 @@ const PieceCircle = React.memo<{
     );
   }
 
-  // ─── Token register: disk + ring (matrix markers, abstract pieces) ─────
+  // ─── Token register: precision marker (intelligence-briefing aesthetic) ─
+  // Strategic-actor-as-piece (e.g. "NVIDIA", "ASML", "US") — Bloomberg /
+  // Economist-style. Small filled colored dot anchors the position; a single
+  // hairline ring marks the actor without claiming the visual weight of a
+  // disk; a short tether drops down to a small uppercase label so the label
+  // reads as annotation, not as a button. Replaces the previous disk + amber
+  // ring + centered text treatment, which read as a poker chip rather than
+  // a precision marker. May 16, 2026 polish pass.
+  const half = TOKEN_FOOTPRINT / 2;
   return (
     <div
       style={{
-        width: 56,
-        height: 56,
-        borderRadius: "50%",
-        background: color,
-        border: `2px solid ${palette.amber}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: `${shadows.subtle}, inset -2px -2px 6px rgba(0,0,0,0.18), inset 2px 2px 4px rgba(255,255,255,0.12)`,
+        width: TOKEN_FOOTPRINT,
+        height: TOKEN_FOOTPRINT,
+        position: "relative",
+        filter: PIECE_DROPSHADOW,
       }}
     >
+      <svg
+        width={TOKEN_FOOTPRINT}
+        height={TOKEN_FOOTPRINT}
+        viewBox={`0 0 ${TOKEN_FOOTPRINT} ${TOKEN_FOOTPRINT}`}
+        style={{ position: "absolute", inset: 0, overflow: "visible" }}
+      >
+        {/* Outer hairline ring — subtle, single ring (no crosshair on chess
+            squares; that would clutter the board). */}
+        <circle
+          cx={half}
+          cy={half}
+          r={TOKEN_RING_R}
+          fill="none"
+          stroke={color}
+          strokeWidth={0.8}
+          opacity={TOKEN_RING_OPACITY}
+        />
+        {/* Filled position dot. */}
+        <circle
+          cx={half}
+          cy={half}
+          r={TOKEN_DOT_R}
+          fill={color}
+          opacity={TOKEN_DOT_OPACITY}
+        />
+        {/* Hairline tether dropping to the label. */}
+        <line
+          x1={half}
+          y1={half + TOKEN_TETHER_GAP}
+          x2={half}
+          y2={half + TOKEN_TETHER_GAP + TOKEN_TETHER_LEN}
+          stroke={color}
+          strokeWidth={0.6}
+          opacity={TOKEN_TETHER_OPACITY}
+        />
+      </svg>
+      {/* Label floats below the tether — uppercase metadata mono, no chip. */}
       <div
         style={{
-          fontSize: fontSizes.label,
-          fontFamily: fonts.body,
-          color: theme.text.primary,
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: half + TOKEN_LABEL_OFFSET,
           textAlign: "center",
+          fontSize: fontSizes.meta,
+          fontFamily: fonts.metadata,
+          letterSpacing: 1.5,
+          textTransform: "uppercase",
           fontWeight: 600,
+          color: theme.text.primary,
           lineHeight: 1,
-          maxWidth: "90%",
+          whiteSpace: "nowrap",
         }}
       >
         {glyph}
