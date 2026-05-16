@@ -74,6 +74,7 @@ import { warnIf } from "../../utils/dataWarnings";
 import {
   computeStepBoundaries,
   getCurrentStepIndex,
+  getStepProgress,
 } from "../../utils/stepFramework";
 import type { RouteAnimationData, RoutePhase, RouteSegment } from "./types";
 
@@ -473,14 +474,10 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     camera = interpolateCamera(initialCamera, currentCamera, introT);
   }
 
-  // Continuous slow bearing drift within each phase (globe "breathes")
-  // linear-ok: raw phase progress — easing applied by consumers (camera interpolation, bearing drift)
-  const intraPhaseProgress = interpolate(
-    frame,
-    [phaseWindow.start, phaseWindow.end],
-    [0, 1],
-    CLAMP
-  );
+  // Continuous slow bearing drift within each phase (globe "breathes").
+  // Raw clamped 0–1 progress through the active phase window — easing is
+  // applied by consumers (camera interpolation, bearing drift).
+  const intraPhaseProgress = getStepProgress(frame, phaseWindow);
   const bearingDrift = intraPhaseProgress * 3; // 3° drift per phase hold
 
   // ── Content timing ───────────────────────────────────────────────────
