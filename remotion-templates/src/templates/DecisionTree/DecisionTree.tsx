@@ -992,7 +992,16 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     })}
                 </>
               ) : (
-                /* ── Vertical (original) edge rendering ─────────────────── */
+                /* ── Vertical edge rendering ─────────────────────────────
+                   May 16, 2026 polish parity-pass: when `highlightedPath`
+                   is set, the chosen branch renders as a 5px ribbon (the
+                   vertical-mode track) with a small filled-circle arrowhead
+                   at the child top — same idiom as horizontal mode, scaled
+                   down (5px vs 7px) because vertical rows sit closer than
+                   horizontal columns and a 7px ribbon would feel chunky.
+                   Off-path edges retain the FT scenario-tree default
+                   (1.25px, 25% mute) so the editorial protagonist reads
+                   in under 300ms (POLISH D5). */
                 <>
                   {/* Non-highlighted edges. */}
                   {edges
@@ -1005,9 +1014,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       const childDim = camera.getNodeDim(edge.childId);
                       const edgeDim = Math.max(parentDim, childDim);
                       const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
-                      // Unchosen edges recede via opacity + weight. The 30% mute
-                      // factor + 1.25px stroke is the FT scenario-tree default.
-                      const muteFactor = someHighlighted ? 0.3 : 0.7;
+                      // Unchosen edges recede via opacity + weight.
+                      const muteFactor = someHighlighted ? 0.25 : 0.7;
                       const strokeWidth = someHighlighted ? 1.25 : 1.75;
 
                       return (
@@ -1022,7 +1030,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       );
                     })}
 
-                  {/* Highlighted (chosen-path) edges — solid, full weight, no glow. */}
+                  {/* Highlighted (chosen-path) edges — track-style ribbon
+                      with arrowhead terminus. Parity with horizontal mode. */}
                   {edges
                     .filter((e) => e.isHighlighted)
                     .map((edge, i) => {
@@ -1032,16 +1041,27 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       const parentDim = camera.getNodeDim(edge.parentId);
                       const childDim = camera.getNodeDim(edge.childId);
                       const edgeDim = Math.max(parentDim, childDim);
+                      const effectiveOpacity = edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5));
                       return (
-                        <path
-                          key={`edge-hl-${i}`}
-                          d={edge.pathData}
-                          stroke={highlightColor}
-                          strokeWidth={2.5}
-                          fill="none"
-                          strokeLinecap="round"
-                          opacity={edgeOpacity * (1 - edgeDim) * exitFade(frame, totalFrames, sec(0.5))}
-                        />
+                        <g key={`edge-hl-${i}`}>
+                          <path
+                            d={edge.pathData}
+                            stroke={highlightColor}
+                            strokeWidth={5}
+                            fill="none"
+                            strokeLinecap="round"
+                            opacity={effectiveOpacity}
+                          />
+                          {/* Filled-circle arrowhead at child top — marks
+                              "we land here" on the chosen branch. */}
+                          <circle
+                            cx={edge.arrowTx}
+                            cy={edge.arrowTy}
+                            r={3.5}
+                            fill={highlightColor}
+                            opacity={effectiveOpacity}
+                          />
+                        </g>
                       );
                     })}
                 </>
@@ -1145,7 +1165,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     // Camera-aware dim: inherit the node's dim amount.
                     const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
                     const onPath = someHighlighted && data.highlightedPath!.includes(nodeId);
-                    const pathDim = someHighlighted && !onPath ? 0.5 : 0;
+                    const pathDim = someHighlighted && !onPath ? 0.6 : 0;
                     const dimAmount = Math.max(camera.getNodeDim(nodeId), pathDim);
                     const effectiveOpacity = chipOpacity * (1 - dimAmount);
 
@@ -1205,7 +1225,11 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                 // avoid compounding two independent dim factors.
                 const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
                 const onPath = someHighlighted && data.highlightedPath!.includes(node.id);
-                const pathDim = !isHorizontal && someHighlighted && !onPath ? 0.5 : 0;
+                // Vertical off-path nodes recede to 0.6 dim (was 0.5) for
+                // parity with horizontal's 0.7 cap — chosen branch reads
+                // as the editorial protagonist (POLISH D5). Horizontal
+                // mode handles its own dim inside TreeNodeComponent.
+                const pathDim = !isHorizontal && someHighlighted && !onPath ? 0.6 : 0;
                 const dimAmount = Math.max(camera.getNodeDim(node.id), pathDim);
 
                 return (
