@@ -517,6 +517,36 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 
 **Where it lands:** `TitleTransition` `editorial-title` variant enforces the visual side (2.0s hold, fade-only, ∴ corner mark). Music and SFX are audio-track decisions made downstream in NLE assembly; this doctrine governs both.
 
+### D20. Hold-beat motion is editorial register, not decoration
+
+**Observation:** After D17 anticipatory entrance lands the element and before A7 exit fade kicks in, there's a 2–8 second window where the element is just *on screen*. The Phase 0 audit (May 16, 2026) found five templates rendering byte-identical (or near-identical) frames during this window — `ImageComposite-archive` showed **0 pixels different** between frame 90 and frame 150. Total stillness for two seconds on a historical photograph or atlas plate reads as a PowerPoint slide, not as documentary video.
+
+**Fix:** Pick a hold-motion technique whose implicit claim matches what kind of element this is. Eight canonical techniques, six of which are already implemented as `DRIFT_PRESETS` entries:
+
+| Technique | Preset | Implicit claim |
+|---|---|---|
+| Stillness | `none` | "document of record; nothing should compete with reading" |
+| Editorial drift | `editorial` (current default) | "analytical content; the screen is barely alive, intentionally" |
+| Breathing | `breathing` | "this single idea is held and alive" |
+| Settle | `settle` | "this composition established itself and is now waiting" |
+| Sway | `sway` | "this view is held with subtle life, no directional slip" |
+| Documentary Ken Burns | `documentary` | "this image is a master shot; meaning accrues through duration" |
+| Atmospheric particles | (FilmOverlay substrate layer) | "the world around this scene is alive" |
+| Mood pulse | (component chrome) | "this single accent is responding to tension" |
+
+Default-on-every-template is itself a wrong choice. Charts use `editorial`. Photo plates use `documentary`. Atlas plates use `breathing` (scale-only, projection-safe) or `sway`. Held quotes use `breathing` or `stillness` (for memorial moments). Dark cinematic scenes use atmospheric particles at substrate + an element-level technique.
+
+**Anti-patterns:**
+- Uniform continuous-zoom across every shot (YouTube-explainer signature; flag `driftPreset: "normal"` as global default)
+- Particle layers on light/paper substrate (reads as game UI; FT/Economist/NYT never do this)
+- Independent layer drifts — foreground text drifting while background photo drifts opposite direction (parallax mismatch causes motion sickness per OpenNews 2018; Gestalt Common Fate violation)
+- Rotation drift on charts (tilts axis baselines; `documentary` preset notes call this out explicitly)
+- Visible breathing on multi-element charts (bars appear to be "growing"; false data signal)
+
+**Reference implementation:** `DRIFT_PRESETS` + `useCompositionAnimation()` already wire the technical surface. Phase 3 wires `TEMPLATE_DRIFT_DEFAULTS` so each template uses its register's preset by default; Phase 4 adds `DIR: drift(<preset>)` and `DIR: hold(stillness)` script directives for per-segment overrides; Phase 5 ships a catalog showcase of all eight techniques on identical content.
+
+**Canonical doctrine:** `project/HOLD_MOTION_REGISTER.md` (May 16, 2026) — full register doc with per-template recommendations, decision matrix, and per-technique editorial register. `references/template-research/hold-motion.md` is the outlet-research dossier (NYT VI, FT, Economist, Bloomberg, Reuters, Vox Atlas, PBS Frontline, Cinemagraphs 2011, Ken Burns) the doctrine derives from.
+
 ---
 
 ## Timeline Visual Discipline (added May 12, 2026)
