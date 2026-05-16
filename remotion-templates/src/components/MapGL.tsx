@@ -137,10 +137,12 @@ const FOG_PRESETS = {
   editorial: {
     // Space matches paper — globe blends into editorial surface.
     "space-color": palette.paper,
-    // Atmosphere halo: paper-bone gradient.
+    // Atmosphere halo: paper-bone gradient. horizon-blend controls how wide
+    // the atmospheric ring spreads from the globe edge — 0.02 gives a barely-
+    // there halo (halved from 0.04 which was noticeably glowy at globe zoom).
     color: palette.bone,
     "high-color": palette.taupe,
-    "horizon-blend": 0.04,
+    "horizon-blend": 0.02,
     "star-intensity": 0,
   },
   atmospheric: {
