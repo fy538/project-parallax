@@ -52,8 +52,8 @@ export const resolveAnnotationFrames = (
   }
   if (annotation.phase !== undefined && phaseWindows[annotation.phase]) {
     return {
-      startFrame: phaseWindows[annotation.phase].startFrame,
-      endFrame: phaseWindows[annotation.phase].endFrame,
+      startFrame: phaseWindows[annotation.phase].start,
+      endFrame: phaseWindows[annotation.phase].end,
     };
   }
   return { startFrame: 0, endFrame: compositionDurationFrames };

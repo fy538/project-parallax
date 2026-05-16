@@ -31,6 +31,8 @@ import { sec } from "../../design/theme";
 import {
   computeStepBoundaries,
   getCurrentStepIndex,
+  EMPTY_BOUNDARY,
+  type StepBoundary,
 } from "../../utils/stepFramework";
 import type { AtlasPhase } from "./types";
 
@@ -44,11 +46,20 @@ export const CAMERA_TRANSITION_FRAMES = sec(1.2);
 
 // ── Phase windows ─────────────────────────────────────────────────────
 
-export interface PhaseWindow {
+/**
+ * AtlasPlate-specific extension of `StepBoundary` with the originating phase
+ * and its sequential index attached. The `start` / `end` fields satisfy the
+ * generic StepBoundary contract; `phase` / `index` are AtlasPlate-only
+ * convenience fields read by AtlasPlate.tsx during render.
+ *
+ * Field-name note: pre-May-2026 this interface used `startFrame` / `endFrame`.
+ * Renamed to `start` / `end` to align with `StepBoundary` so the generic
+ * step-framework primitives (`getCurrentStepIndex`, `getStepProgress`) can
+ * consume PhaseWindow arrays directly without a `.map(...)` adapter.
+ */
+export interface PhaseWindow extends StepBoundary {
   phase: AtlasPhase;
   index: number;
-  startFrame: number;
-  endFrame: number;
 }
 
 /**
@@ -56,12 +67,15 @@ export interface PhaseWindow {
  * Zod schema enforces `.min(1)`, so this should be unreachable, but a
  * fallback keeps all hooks executable until the early-return at the
  * bottom of the component runs. See B4 defensive-guard pattern.
+ *
+ * Composes `EMPTY_BOUNDARY` (the shared step-framework sentinel) with an
+ * empty `AtlasPhase` and index 0, so the zero-window shape lives in exactly
+ * one place across the library.
  */
 export const FALLBACK_PHASE_WINDOW: PhaseWindow = {
+  ...EMPTY_BOUNDARY,
   phase: { title: "", durationSec: 0, countries: [] },
   index: 0,
-  startFrame: 0,
-  endFrame: 0,
 };
 
 /**
@@ -77,29 +91,24 @@ export const computePhaseWindows = (phases: AtlasPhase[]): PhaseWindow[] => {
     phases.map((p) => sec(p.durationSec)),
   );
   return boundaries.map((b, index) => ({
+    ...b,
     phase: phases[index],
     index,
-    startFrame: b.start,
-    endFrame: b.end,
   }));
 };
 
 /**
  * Find the index of the phase active at a given frame. Returns the
- * last phase's index when `frame >= last.endFrame` (post-end clamp).
+ * last phase's index when `frame >= last.end` (post-end clamp).
  *
- * Delegates to `getCurrentStepIndex` (stepFramework.ts), adapting the
- * PhaseWindow field names (`startFrame`/`endFrame`) to the generic
- * `StepBoundary` shape (`start`/`end`).
+ * Thin wrapper around `getCurrentStepIndex` (stepFramework.ts) — now that
+ * `PhaseWindow extends StepBoundary`, the array passes through directly
+ * with no adapter `.map(...)`.
  */
 export const getCurrentPhaseIndex = (
   frame: number,
   windows: PhaseWindow[],
-): number =>
-  getCurrentStepIndex(
-    frame,
-    windows.map((w) => ({ start: w.startFrame, end: w.endFrame })),
-  );
+): number => getCurrentStepIndex(frame, windows);
 
 // ── Camera pose ───────────────────────────────────────────────────────
 

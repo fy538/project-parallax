@@ -223,7 +223,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     // Raw transition progress (frames → 0..1).
     const rawT = interpolate(
       frame,
-      [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
+      [currentWindow.start, currentWindow.start + CAMERA_TRANSITION_FRAMES],
       [0, 1],
       CLAMP_CUBIC_INOUT,
     );
@@ -247,7 +247,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     safeIdx,
     phasePoses,
     frame,
-    currentWindow?.startFrame,
+    currentWindow?.start,
     currentWindow?.phase.cameraTransition,
     currentWindow?.phase.cameraDwell?.before,
     currentWindow?.phase.cameraDwell?.after,
@@ -283,7 +283,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     // Raw 0→1 progress through the transition window.
     const rawT = interpolate(
       frame,
-      [currentWindow.startFrame, currentWindow.startFrame + CAMERA_TRANSITION_FRAMES],
+      [currentWindow.start, currentWindow.start + CAMERA_TRANSITION_FRAMES],
       [0, 1],
       CLAMP_CUBIC_INOUT,
     );
@@ -311,7 +311,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     safeIdx,
     phaseRotations,
     frame,
-    currentWindow?.startFrame,
+    currentWindow?.start,
     currentWindow?.phase.cameraTransition,
     currentWindow?.phase.cameraDwell?.before,
     currentWindow?.phase.cameraDwell?.after,
@@ -433,7 +433,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const fillTransitionT = useMemo(() => {
     if (safeIdx === 0) return 1;
     if (currentWindow.phase.fillTransition === "instant") return 1;
-    const sinceStart = frame - currentWindow.startFrame;
+    const sinceStart = frame - currentWindow.start;
     if (sinceStart <= 0) return 0;
     if (sinceStart >= CAMERA_TRANSITION_FRAMES) return 1;
     // Match the camera's transition curve so color motion stays in sync.
@@ -443,7 +443,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
     );
   }, [
     frame,
-    currentWindow.startFrame,
+    currentWindow.start,
     currentWindow.phase.fillTransition,
     currentWindow.phase.cameraTransition,
     safeIdx,
@@ -867,7 +867,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
 
   // D17 anticipatory reveal: first-phase country labels settled when the
   // narrator names the region. Later phases stick with
-  // `currentWindow.startFrame + sec(0.4)` so each phase's label entrance
+  // `currentWindow.start + sec(0.4)` so each phase's label entrance
   // composes from its own window.
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
   const entranceBase = firstSyncFrame != null
@@ -1052,7 +1052,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 strokeWidth={2}
                 strokeDasharray="8 5"
                 strokeDashoffset={(frame * 0.4) % 13}
-                opacity={0.75 * fadeIn(frame, currentWindow.startFrame, sec(0.6))}
+                opacity={0.75 * fadeIn(frame, currentWindow.start, sec(0.6))}
                 rx={3}
               />
             )}
@@ -1140,10 +1140,10 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             // First phase uses the anticipatory entranceBase; subsequent
             // phases keep the existing per-window offset.
             const enterCue =
-              safeIdx === 0 ? entranceBase : currentWindow.startFrame + sec(0.4);
+              safeIdx === 0 ? entranceBase : currentWindow.start + sec(0.4);
             const opacity = Math.min(
               fadeIn(frame, enterCue, sec(0.4)),
-              fadeOut(frame, currentWindow.endFrame, sec(0.3)),
+              fadeOut(frame, currentWindow.end, sec(0.3)),
             );
             if (opacity <= 0) return null;
 
@@ -1211,7 +1211,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             corner={data.detailInset.corner ?? "bottom-right"}
             size={data.detailInset.size}
             dark={dark}
-            opacity={fadeIn(frame, currentWindow.startFrame, sec(0.5)) * exitFade(frame, durationInFrames, 15)}
+            opacity={fadeIn(frame, currentWindow.start, sec(0.5)) * exitFade(frame, durationInFrames, 15)}
           />
         )}
       </AbsoluteFill>
