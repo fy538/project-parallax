@@ -103,6 +103,22 @@ HOLD_PRESETS = {
     "linger": (3.0, "linger"),
 }
 
+# Drift presets accepted by `DIR: drift(<preset>)` — must stay in sync with
+# DRIFT_PRESETS in remotion-templates/src/hooks/useDirection.ts. Adding a
+# preset here without adding it to useDirection (or vice versa) will leave
+# the parser writing _direction.driftPreset values that templates ignore.
+# See HOLD_MOTION_REGISTER.md for the editorial register each preset claims.
+VALID_DRIFT_PRESETS = {
+    "none",          # Stillness — document of record
+    "editorial",     # The current conservative default (charts, diagrams)
+    "slow",          # Back-compat preset (legacy episodes)
+    "normal",        # Back-compat preset (legacy episodes)
+    "documentary",   # Full Ken Burns — photo plates, archival, atmospheric
+    "breathing",     # Sinusoidal scale; held hero stats, quotes, atlas plates
+    "settle",        # One-time scale lock; framework headers, title cards
+    "sway",          # Zero-net pan; held atmospheric maps
+}
+
 # Transition type mappings for cut()
 VALID_CUT_TYPES = {
     "cut", "fade", "dissolve", "wipe-left", "wipe-right", "wipe-up",
@@ -526,6 +542,29 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                     hold_after, hold_behavior = HOLD_PRESETS[token]
                     result["holdAfter"] = hold_after
                     result["holdBehavior"] = hold_behavior
+                    continue
+
+                # hold(stillness) — sugar for drift(none). Reads naturally
+                # in scripts: "hold this beat with stillness." Sets the
+                # segment's driftPreset to "none" so D17 anticipation
+                # lands then the screen sits perfectly still for the
+                # remainder (eulogy, casualty list, document-of-record
+                # quote). HOLD_MOTION_REGISTER.md technique 01.
+                if token == "stillness":
+                    result["driftPreset"] = "none"
+                    continue
+
+        elif dtype == "drift":
+            # Parse drift(<preset>) — sets the segment's drift register
+            # per HOLD_MOTION_REGISTER.md / POLISH.md D20. Examples:
+            #   drift(documentary)  — photo plates, archival, atlas plates
+            #   drift(breathing)    — held hero stats, quotes
+            #   drift(settle)       — framework headers, title cards
+            #   drift(sway)         — held atmospheric maps
+            #   drift(none)         — stillness (alias of hold(stillness))
+            preset = params_str.strip().lower()
+            if preset in VALID_DRIFT_PRESETS:
+                result["driftPreset"] = preset
 
         elif dtype == "cut":
             # Parse cut() — affects transition out
@@ -1744,6 +1783,14 @@ def _build_segment(
         seg["narrationGate"] = direction["narrationGate"]
     if direction.get("syncWords"):
         seg["syncWords"] = direction["syncWords"]
+
+    # Drift preset (DIR: drift(...) or hold(stillness)) — write to
+    # segment._direction so FullEpisode.tsx merges it into data._direction
+    # for the template's useDirection() to consume. Per-segment script
+    # override wins over template default (set via useDirection(data._direction,
+    # "documentary") in the template); see HOLD_MOTION_REGISTER.md / D20.
+    if "driftPreset" in direction:
+        seg.setdefault("_direction", {})["driftPreset"] = direction["driftPreset"]
 
     # Narration reference
     if clean_narr:

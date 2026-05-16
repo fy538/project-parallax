@@ -251,10 +251,37 @@ DIR: hold(pre:<seconds>)
 | `hold(breathe)` | 2s extra with gentle drift continuing | `holdAfter: 2.0, holdBehavior: "breathe"` |
 | `hold(land)` | 1s static pause (drift stops) | `holdAfter: 1.0, holdBehavior: "land"` |
 | `hold(linger)` | 3s with slow zoom creep | `holdAfter: 3.0, holdBehavior: "linger"` |
+| `hold(stillness)` | Total stillness during the hold window (eulogy/casualty/memorial beats) | `_direction.driftPreset: "none"` |
 | `hold(until:"word")` | Don't advance to next segment until this word is spoken | `narrationGate: { word: "word" }` |
 | `hold(pre:1s)` | Delay 1s before the reveal animation begins | `preDelay: 1.0` |
 
 **Combining:** `hold(pre:1s, breathe)` means "wait 1s before animation starts, then after narration ends hold 2s with drift." This is two timing decisions at opposite ends — use it when you want a beat of anticipation before the visual appears AND a beat of absorption after.
+
+### Drift (`drift`) — added May 16, 2026
+
+Sets the hold-beat motion register for the segment (HOLD_MOTION_REGISTER.md / POLISH.md D20). Each preset carries an implicit editorial claim about what kind of element the segment renders. Per-segment `drift()` overrides the template's default register; both override the global editorial fallback. **Use only when the template's default doesn't match the editorial intent** — most segments take their template's default and need no `drift()` directive.
+
+| Preset | Implicit claim | Use when |
+|---|---|---|
+| `drift(none)` | "document of record; nothing competes with reading" | Eulogy, casualty list, memorial moment (alias: `hold(stillness)`) |
+| `drift(editorial)` | "analytical content; barely alive, intentionally" | Chart / diagram default — rarely needs explicit opt-in |
+| `drift(breathing)` | "this single idea is held and alive" | Hero stat, held quote, atlas plate (projection-safe scale-only) |
+| `drift(settle)` | "composition established and now waiting" | Framework matrix headers, chart kickers post-entrance |
+| `drift(sway)` | "held view with subtle life, no directional slip" | Atmospheric atlas where pan would shift projection |
+| `drift(documentary)` | "this image is a master shot; meaning accrues with duration" | Photo plates, archival images, atmospheric maps |
+
+**Why per-template defaults exist:** every template registers a default per the four registers (A analytical / B editorial-hero / C documentary / D cartographic). Most segments don't need a `drift()` directive — the template default handles it. Reach for `drift()` only when a specific segment wants a different register (e.g., a normally-editorial chart held in stillness for a memorial moment).
+
+**Generated JSON:**
+```json
+{
+  "_direction": {
+    "driftPreset": "documentary"
+  }
+}
+```
+
+See `HOLD_MOTION_REGISTER.md` for the full register including the two adjacent treatments (atmospheric particles, mood pulse) that live at substrate / chrome layers, not as drift presets.
 
 **`hold(until:)` vs `cam(sync:)`:**
 These serve different purposes:

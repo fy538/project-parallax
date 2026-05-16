@@ -400,6 +400,73 @@ def test_parse_dir_no_sync_returns_no_synckey():
     assert "syncWords" not in result
 
 
+# ── parse_dir_lines · drift() directive (HOLD_MOTION_REGISTER / D20) ───────
+
+
+def test_parse_dir_drift_documentary():
+    """Per-segment drift override — photo plate set to documentary Ken Burns."""
+    result = parse_dir_lines(['DIR: drift(documentary)'])
+    assert result["driftPreset"] == "documentary"
+
+
+def test_parse_dir_drift_breathing():
+    result = parse_dir_lines(['DIR: drift(breathing)'])
+    assert result["driftPreset"] == "breathing"
+
+
+def test_parse_dir_drift_none():
+    """drift(none) = total stillness, alias of hold(stillness)."""
+    result = parse_dir_lines(['DIR: drift(none)'])
+    assert result["driftPreset"] == "none"
+
+
+def test_parse_dir_drift_settle_sway():
+    for preset in ("settle", "sway"):
+        result = parse_dir_lines([f'DIR: drift({preset})'])
+        assert result["driftPreset"] == preset
+
+
+def test_parse_dir_drift_invalid_preset_silently_rejected():
+    """Forward-compat: unknown preset names don't pollute the result."""
+    result = parse_dir_lines(['DIR: drift(parallax-multi)'])
+    assert "driftPreset" not in result
+
+
+def test_parse_dir_drift_case_insensitive():
+    result = parse_dir_lines(['DIR: drift(DOCUMENTARY)'])
+    assert result["driftPreset"] == "documentary"
+
+
+def test_parse_dir_hold_stillness_sets_driftPreset_none():
+    """hold(stillness) sugar — sets driftPreset:'none' (alias of drift(none))."""
+    result = parse_dir_lines(['DIR: hold(stillness)'])
+    assert result["driftPreset"] == "none"
+
+
+def test_parse_dir_hold_stillness_with_pre_delay():
+    """Mixed tokens: stillness + pre:1s. Both fields land on the result."""
+    result = parse_dir_lines(['DIR: hold(stillness, pre:1s)'])
+    assert result["driftPreset"] == "none"
+    assert result["preDelay"] == 1.0
+
+
+def test_parse_dir_hold_breathe_does_not_set_driftPreset():
+    """hold(breathe) sets holdBehavior, not driftPreset — they're different concepts."""
+    result = parse_dir_lines(['DIR: hold(breathe)'])
+    assert result.get("holdBehavior") == "breathe"
+    assert "driftPreset" not in result
+
+
+def test_parse_dir_drift_and_sync_independent():
+    """drift() and sync clauses in different directives compose cleanly."""
+    result = parse_dir_lines([
+        'DIR: reveal(stagger, sync:"chokepoint")',
+        'DIR: drift(documentary)',
+    ])
+    assert result["driftPreset"] == "documentary"
+    assert result["syncWords"] == ["chokepoint"]
+
+
 def test_parse_dir_multiple_lines_combined():
     result = parse_dir_lines([
         "DIR: hold(breathe)",
