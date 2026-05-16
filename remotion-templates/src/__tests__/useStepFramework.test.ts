@@ -114,6 +114,25 @@ describe("computeStepFrameworkState — boundaries reference passes through", ()
   });
 });
 
+describe("computeStepBoundaries — id arrays that previously collided", () => {
+  // These two arrays both contain three logical ids but stringify
+  // identically under a naive `arr.join(",")` cache key:
+  //   ["a,b", "c"].join(",")  === "a,b,c"
+  //   ["a", "b,c"].join(",")  === "a,b,c"
+  // Lock that they produce distinguishable boundary arrays so any future
+  // cache-key change in useStepFramework can't silently reintroduce the bug.
+  it("['a,b','c'] vs ['a','b,c'] produce distinguishable boundary ids", () => {
+    const a = computeStepBoundaries([30, 40], 0, ["a,b", "c"]);
+    const b = computeStepBoundaries([30, 40], 0, ["a", "b,c"]);
+    expect(a[0].id).toBe("a,b");
+    expect(a[1].id).toBe("c");
+    expect(b[0].id).toBe("a");
+    expect(b[1].id).toBe("b,c");
+    // Sanity: the arrays differ in observable content.
+    expect(a[0].id).not.toBe(b[0].id);
+  });
+});
+
 describe("computeStepFrameworkState — single-step degenerate", () => {
   it("works with one step", () => {
     const oneStep = computeStepBoundaries([100]);

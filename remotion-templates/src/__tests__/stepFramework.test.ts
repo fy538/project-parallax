@@ -100,11 +100,26 @@ describe("computeStepBoundaries", () => {
     expect(result[2]).not.toHaveProperty("id");
   });
 
-  it("ignores empty-string id (falsy)", () => {
-    // empty string id should be treated as "no id" to avoid leaking
-    // unintentional defaults from authoring tools.
-    const result = computeStepBoundaries([30], 0, [""]);
+  it("preserves empty-string id verbatim (only undefined/null is 'absent')", () => {
+    // Regression: an earlier impl treated "" as falsy and silently dropped it,
+    // which surprised authors of arrays like ["intro", "", "outro"]. Only
+    // null/undefined now signal "no id". An explicit empty string is kept.
+    const result = computeStepBoundaries([30, 40, 50], 0, ["intro", "", "outro"]);
+    expect(result[0].id).toBe("intro");
+    expect(result[1].id).toBe("");
+    expect(result[2].id).toBe("outro");
+  });
+
+  it("treats null in the ids array as 'absent' (same as undefined)", () => {
+    // We accept readonly (string|undefined)[] but null can sneak through in
+    // JSON-derived data; `id != null` covers both.
+    const result = computeStepBoundaries(
+      [30, 40],
+      0,
+      [null as unknown as undefined, "labelled"],
+    );
     expect(result[0]).not.toHaveProperty("id");
+    expect(result[1].id).toBe("labelled");
   });
 });
 

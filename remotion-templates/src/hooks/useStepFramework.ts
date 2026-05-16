@@ -94,9 +94,14 @@ export const useStepFramework = (
 ): StepFrameworkState => {
   const frame = useCurrentFrame();
 
-  // Stable cache key — durations is the only input that affects boundaries.
-  // The join is cheap (camera hooks have N ≤ ~20 steps).
-  const cacheKey = `${baseOffset}|${durations.join(",")}|${ids?.join(",") ?? ""}`;
+  // Stable cache key for the boundaries memo.
+  //
+  // Why JSON.stringify and not `durations.join(",")`? Comma-joined keys
+  // collide when string ids contain commas — `["a,b","c"]` and `["a","b,c"]`
+  // both render as `"a,b,c"`. JSON encoding escapes the separator and
+  // preserves null/undefined distinctly. Cost is negligible: camera hooks
+  // have N ≤ ~20 steps; stringification is microseconds.
+  const cacheKey = JSON.stringify([baseOffset, durations, ids ?? null]);
 
   const boundaries = useMemo(
     () => computeStepBoundaries(durations, baseOffset, ids),

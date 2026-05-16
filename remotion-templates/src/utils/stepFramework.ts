@@ -100,7 +100,14 @@ export function computeStepBoundaries(
   for (let i = 0; i < frameDurations.length; i++) {
     const dur = frameDurations[i];
     const id = ids?.[i];
-    boundaries.push(id ? { start: cursor, end: cursor + dur, id } : { start: cursor, end: cursor + dur });
+    // Sparse semantics: only `undefined` (and `null`) are treated as "no id".
+    // Empty string is preserved verbatim so authors don't get silent drops on
+    // `["intro", "", "outro"]`-style arrays.
+    boundaries.push(
+      id != null
+        ? { start: cursor, end: cursor + dur, id }
+        : { start: cursor, end: cursor + dur },
+    );
     cursor += dur;
   }
   return boundaries;
