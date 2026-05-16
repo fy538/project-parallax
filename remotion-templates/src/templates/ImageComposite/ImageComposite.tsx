@@ -33,7 +33,6 @@ import {
 import {
   fadeIn,
   slideIn,
-  kenBurnsDrift,
   exitFade,
   heroSpring,
   scaleReveal,
@@ -58,24 +57,22 @@ import type { ImageCompositeData } from "./types";
  */
 const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const direction = useDirection(data._direction);
-  // L66: image is the only element that drifts in this variant (text stays
-  // fixed). Pass noDrift: true so compStyle provides only enter/exit fade —
-  // the manual kenBurnsDrift below is the SINGLE source of zoom on the image.
-  // Without noDrift, compStyle's 1.06 drift would compound with the 1.03 manual
-  // drift to ~1.09 zoom on the photo, far more than intended.
-  const { style: compStyle } = useCompositionAnimation({
-    ...direction.driftOptions,
-    noDrift: true,
-  });
+  // HOLD_MOTION_REGISTER Register C — photo plates use documentary Ken Burns
+  // (POLISH.md D20). Pre-cleanup: this variant manually drifted ONLY the
+  // photo at scale 1.03, while text stayed fixed — a Gestalt Common Fate
+  // violation (foreground moves, background doesn't → independent layer
+  // drifts → motion-sickness risk per OpenNews 2018, hold-motion.md § 7).
+  //
+  // Post-cleanup (May 16, 2026): single composition-level documentary
+  // drift via useDirection cascade. Photo + text drift together as one
+  // scene. Per-segment _direction.driftPreset overrides.
+  const direction = useDirection(data._direction, "documentary");
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const totalFrames = sec(data.durationSec || 6);
   const theme = useThemeMode(data.backgroundVariant || "light");
 
   // Duotone ramp selection
   const duotoneRamp = duotoneRamps[data.duotone || "standard"];
-
-  // Ken Burns: subtle zoom drift on the image itself (text stays fixed).
-  const scale = kenBurnsDrift(frame, totalFrames, 1.03);
 
   // Text animation — spring-based entrance
   const textOpacity = fadeIn(frame, 0, sec(0.4)) * exitFade(frame, totalFrames, sec(0.5));
@@ -140,11 +137,15 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
       </svg>
 
       <AbsoluteFill style={compStyle}>
-        {/* Main image with Ken Burns drift + real duotone filter */}
+        {/* Main image — Ken Burns drift now applied at composition level
+            via compStyle (Register C documentary preset). Removed the
+            per-element transform: scale(${scale}) that previously drifted
+            only this layer; that pattern was a Common Fate violation
+            (foreground photo drifted, text/grain/vignette overlay stayed
+            fixed). Documentary preset (1.06 scale + 18px pan + 0.3°
+            rotation) now applies uniformly to the whole composition. */}
       <AbsoluteFill
         style={{
-          transform: `scale(${scale})`,
-          transformOrigin: "center",
           filter: `url(#${filterId})`,
         }}
       >

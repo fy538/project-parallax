@@ -41,7 +41,7 @@ import {
 } from "remotion";
 import { palette, semantic, fonts, fontSizes, layout, sec, shadows, textMaxWidth } from "../../design/theme";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
-import { fadeIn, slideIn, heroSpring, pulse, exitFade, kenBurnsDrift, scaleReveal, anticipatoryStartFrame, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
+import { fadeIn, slideIn, heroSpring, pulse, exitFade, scaleReveal, anticipatoryStartFrame, CLAMP, CLAMP_QUAD, CLAMP_CUBIC } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -82,21 +82,16 @@ const smoothBloom = (
   );
 };
 
-// ── Parallax drift: differential Ken Burns per layer ──────────────────────
-// Rate multiplier controls how fast each layer drifts.
-// >1 = foreground (moves more), <1 = background (moves less).
-
-const parallaxDrift = (
-  frame: number,
-  totalFrames: number,
-  rateMultiplier: number = 1.0,
-  maxScale: number = 1.02,
-): number => {
-  const drift = kenBurnsDrift(frame, totalFrames, maxScale);
-  // Scale the drift amount by the rate multiplier
-  const baseAmount = drift - 1.0; // how much above 1.0
-  return 1.0 + baseAmount * rateMultiplier;
-};
+// REMOVED May 16, 2026: parallaxDrift() helper that implemented multi-rate
+// per-element parallax (e.g., quoteMark 1.5x / text 1.0x / attribution
+// 0.6x). The pattern was a Gestalt Common Fate violation per OpenNews
+// "Your Interactive Makes Me Sick" (2018) — independent layer drifts at
+// different rates are the leading cause of motion-induced disorientation
+// in news graphics. Hold-beat drift is now applied uniformly at the
+// composition level via the "breathing" preset (Register B, HOLD_MOTION_
+// REGISTER.md). Per-element entrance animations (spring scale, slideIn,
+// AnimatedText stagger) are preserved — only the *sustained* multi-rate
+// drift was the violation.
 
 // ── Divider scaleX from center ────────────────────────────────────────────
 
@@ -139,12 +134,13 @@ const QuoteVariant: React.FC<{
   // Smooth bloom behind quote mark
   const quoteBloom = smoothBloom(frame, 0, sec(0.2), 0.4);
 
-  // ── Parallax depth layers (memoized to avoid recalculation) ──
-  const { quoteMarkDrift, textDrift, attributionDrift } = useMemo(() => ({
-    quoteMarkDrift: parallaxDrift(frame, totalFrames, 1.5),   // foreground — moves more
-    textDrift: parallaxDrift(frame, totalFrames, 1.0),        // mid-ground
-    attributionDrift: parallaxDrift(frame, totalFrames, 0.6), // background — moves less
-  }), [frame, totalFrames]);
+  // HOLD_MOTION_REGISTER cleanup (May 16, 2026): removed multi-rate
+  // parallax (quoteMark 1.5x / text 1.0x / attribution 0.6x) — that was
+  // a Gestalt Common Fate violation per OpenNews 2018 motion-sickness
+  // research, and explicitly flagged in HOLD_MOTION_REGISTER.md § 7
+  // ("Independent layer drifts"). Hold-beat motion now applied uniformly
+  // at composition level via Register B "breathing" preset (Phase 3
+  // cascade in the outer KineticTypography component).
 
   return (
     <div
@@ -175,7 +171,8 @@ const QuoteVariant: React.FC<{
         }}
       />
 
-      {/* Opening quote mark — parallax foreground layer (1.5× drift) */}
+      {/* Opening quote mark — entrance spring only; hold-beat drift now at
+          composition level (Register B breathing). */}
       <div
         style={{
           fontSize: 160,
@@ -184,7 +181,7 @@ const QuoteVariant: React.FC<{
           fontFamily: "Georgia, serif",
           lineHeight: 0.6,
           marginBottom: layout.spacing.md,
-          transform: `scale(${quoteMarkScale * quoteMarkDrift})`,
+          transform: `scale(${quoteMarkScale})`,
           transformOrigin: "left center",
           textShadow: `0 0 40px ${accentColor}40`, // shadows.accentGlow (40px large variant)
         }}
@@ -192,7 +189,8 @@ const QuoteVariant: React.FC<{
         &ldquo;
       </div>
 
-      {/* Quote text — mid-ground layer (1.0× drift) */}
+      {/* Quote text — entrance slide-in only; hold-beat drift now at
+          composition level (Register B breathing). */}
       {/* Anticipatory-reveal adoption (POLISH.md D17): quote text is the
           hero — the editorially-loaded phrase. When `syncPoints[0]` carries
           the narration cue, AnimatedText's startFrame is shifted so the
@@ -202,7 +200,7 @@ const QuoteVariant: React.FC<{
           See TitleTransition.editorial-title (commit 1da5a49). */}
       <div
         style={{
-          transform: `translateY(${heroTranslateY}px) scale(${textDrift})`,
+          transform: `translateY(${heroTranslateY}px)`,
           transformOrigin: "left center",
         }}
       >
@@ -227,13 +225,13 @@ const QuoteVariant: React.FC<{
         />
       </div>
 
-      {/* Attribution — background layer (0.6× drift) */}
+      {/* Attribution — entrance slide-in only; hold-beat drift at composition level. */}
       {data.attribution && (
         <div
           style={{
             marginTop: layout.spacing.xl,
             opacity: fadeIn(frame, sec(2.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(2.5), 30, sec(0.6))}px) scale(${attributionDrift})`,
+            transform: `translateY(${slideIn(frame, sec(2.5), 30, sec(0.6))}px)`,
             transformOrigin: "left center",
           }}
         >
@@ -300,11 +298,10 @@ const DefinitionVariant: React.FC<{
   // Exit fade in last 15 frames
   const exitOpacity = exitFade(frame, totalFrames, 15);
 
-  // ── Parallax depth layers (memoized to avoid recalculation) ──
-  const { termDrift, supportDrift } = useMemo(() => ({
-    termDrift: parallaxDrift(frame, totalFrames, 1.3),        // term is dominant
-    supportDrift: parallaxDrift(frame, totalFrames, 0.7),     // supporting text recedes
-  }), [frame, totalFrames]);
+  // HOLD_MOTION_REGISTER cleanup (May 16, 2026): removed multi-rate
+  // parallax (term 1.3x / support 0.7x). Hold-beat drift now uniform at
+  // composition level (Register B breathing) via Phase 3 cascade. See
+  // HOLD_MOTION_REGISTER.md § 7 "Independent layer drifts" / OpenNews 2018.
 
   return (
     <div
@@ -320,13 +317,14 @@ const DefinitionVariant: React.FC<{
         opacity: exitOpacity,
       }}
     >
-      {/* Term — large, character-by-character with eased stagger + parallax */}
+      {/* Term — character-by-character entrance (eased stagger). Hold-beat
+          motion at composition level. */}
       {/* Anticipatory-reveal adoption (POLISH.md D17): the term IS the
           definition's hero — the named concept. First character lands 5
           frames before the narrator says it when `syncPoints[0]` carries
           the cue; settle = one stagger unit (framesPerUnit=8). Falls back
           to sec(0.2) absent a cue → identical baseline. */}
-      <div style={{ transform: `scale(${termDrift})`, transformOrigin: "left center" }}>
+      <div style={{ transformOrigin: "left center" }}>
         <AnimatedText
           text={data.term || ""}
           startFrame={
@@ -358,7 +356,7 @@ const DefinitionVariant: React.FC<{
             fontStyle: "italic",
             marginTop: layout.spacing.sm,
             opacity: fadeIn(frame, sec(1), sec(0.4)),
-            transform: `translateY(${slideIn(frame, sec(1), 8, sec(0.4))}px) scale(${supportDrift})`,
+            transform: `translateY(${slideIn(frame, sec(1), 8, sec(0.4))}px)`,
             transformOrigin: "left center",
             textShadow: shadows.textLift,
             letterSpacing: 1,
@@ -368,7 +366,7 @@ const DefinitionVariant: React.FC<{
         </div>
       )}
 
-      {/* Translation — slideIn + parallax */}
+      {/* Translation — slideIn entrance; hold-beat drift at composition level */}
       {data.termTranslation && (
         <div
           style={{
@@ -378,7 +376,7 @@ const DefinitionVariant: React.FC<{
             marginTop: layout.spacing.md,
             maxWidth: textMaxWidth.h2,
             opacity: fadeIn(frame, sec(1.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px) scale(${supportDrift})`,
+            transform: `translateY(${slideIn(frame, sec(1.5), 16, sec(0.5))}px)`,
             transformOrigin: "left center",
             textShadow: shadows.textLift,
           }}
@@ -401,7 +399,7 @@ const DefinitionVariant: React.FC<{
         }}
       />
 
-      {/* Definition text — slideIn + parallax background */}
+      {/* Definition text — slideIn entrance; hold-beat drift at composition level */}
       {data.definitionText && (
         <div
           style={{
@@ -410,7 +408,7 @@ const DefinitionVariant: React.FC<{
             lineHeight: 1.6,
             maxWidth: 1100,
             opacity: fadeIn(frame, sec(2.5), sec(0.5)),
-            transform: `translateY(${slideIn(frame, sec(2.5), 20, sec(0.5))}px) scale(${supportDrift})`,
+            transform: `translateY(${slideIn(frame, sec(2.5), 20, sec(0.5))}px)`,
             transformOrigin: "left center",
             textShadow: shadows.textLift,
           }}
@@ -437,11 +435,9 @@ const BilingualVariant: React.FC<{
   // Exit fade in last 15 frames
   const exitOpacity = exitFade(frame, totalFrames, 15);
 
-  // ── Parallax depth layers (memoized to avoid recalculation) ──
-  const { chineseDrift, englishDrift } = useMemo(() => ({
-    chineseDrift: parallaxDrift(frame, totalFrames, 1.3),  // Chinese = primary, drifts more
-    englishDrift: parallaxDrift(frame, totalFrames, 0.7),  // English = secondary, drifts less
-  }), [frame, totalFrames]);
+  // HOLD_MOTION_REGISTER cleanup (May 16, 2026): removed multi-rate
+  // parallax (chinese 1.3x / english 0.7x). Hold-beat drift now uniform
+  // at composition level (Register B breathing). See § 7 of the register.
 
   return (
     <div
@@ -458,14 +454,14 @@ const BilingualVariant: React.FC<{
         opacity: exitOpacity,
       }}
     >
-      {/* Chinese text — eased stagger + parallax foreground (7 frames/char for weight) */}
+      {/* Chinese text — eased stagger entrance (7 frames/char for weight) */}
       {/* Anticipatory-reveal adoption (POLISH.md D17): the Chinese phrase
           is the hero — the named foreign concept (e.g., 卡脖子). First
           character lands 5 frames before narration via `syncPoints[0]`.
           Settle = one stagger unit (framesPerUnit=7). Falls back to sec(0.3)
           → identical baseline absent a cue. */}
       {data.chineseText && (
-        <div style={{ transform: `scale(${chineseDrift})`, transformOrigin: "left center" }}>
+        <div style={{ transformOrigin: "left center" }}>
           <AnimatedText
             text={data.chineseText}
             startFrame={
@@ -501,9 +497,9 @@ const BilingualVariant: React.FC<{
         }}
       />
 
-      {/* English text — parallax background layer */}
+      {/* English text — entrance only; hold-beat drift at composition level */}
       {data.englishText && (
-        <div style={{ transform: `scale(${englishDrift})`, transformOrigin: "left center" }}>
+        <div style={{ transformOrigin: "left center" }}>
           <AnimatedText
             text={data.englishText}
             startFrame={sec(2) + sec(0.15)}
@@ -886,17 +882,17 @@ function parseStatValueString(s: string): { value: number; unit: string } {
 
 export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const direction = useDirection(data._direction);
-  // L66: each variant uses parallaxDrift() to drive multi-rate parallax across
-  // elements (quoteMark/text/attribution etc. drift at different rates). Pass
-  // noDrift: true so compStyle provides only enter/exit fade — the parallaxDrift
-  // values become the single source of zoom per element. Without noDrift, every
-  // element's drift was compounding with compStyle's 1.06 background drift,
-  // producing ~1.09 zoom instead of the intended ~1.02-1.03.
-  const { style: compStyle } = useCompositionAnimation({
-    ...direction.driftOptions,
-    noDrift: true,
-  });
+  // HOLD_MOTION_REGISTER Register B — held quote / definition / bilingual /
+  // statistic variants all use composition-level "breathing" for hold-beat
+  // motion (POLISH.md D20). The previous per-element parallaxDrift()
+  // implementation (quoteMark 1.5x / text 1.0x / attribution 0.6x, plus
+  // similar in DefinitionVariant and BilingualVariant) was a Gestalt
+  // Common Fate violation per OpenNews "Your Interactive Makes Me Sick"
+  // (2018) — independent layer drifts at different rates are the leading
+  // cause of motion-induced disorientation in news graphics. Cleanup
+  // landed alongside this template-default wiring (May 16, 2026).
+  const direction = useDirection(data._direction, "breathing");
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
 
