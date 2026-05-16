@@ -115,6 +115,35 @@ const CAPTION_SHADOW_OPACITY = 0.4;
 const STAT_SHADOW_STD = 2.5;
 const STAT_SHADOW_OPACITY = 0.55;
 
+// ── AnnotationNode geometry (hub-spoke / bipartite layouts) ─────────────────
+// AnnotationNode renders a fixed-size precision marker, NOT a scalable circle.
+// `nodeRadius()` returns HUB_EDGE_OFFSET / SAT_EDGE_OFFSET so edges terminate
+// just past the disc / dot rim — bumping any of these requires updating
+// `nodeRadius()` to match. Geometry constants live here so the coupling is
+// explicit; previously these were inline magic numbers scattered across the
+// component body.
+const HUB_DISC_R = 72;
+const HUB_INNER_RING_R = 84;
+const HUB_OUTER_RING_R = 100;
+const HUB_EDGE_OFFSET = HUB_DISC_R + 2;              // 74 — edge endpoint at hub
+const HUB_CROSSHAIR_GAP = HUB_INNER_RING_R + 8;      // 92 — center→crosshair start
+const HUB_CROSSHAIR_LEN = 22;
+const HUB_LABEL_GAP_BELOW = HUB_OUTER_RING_R + 24;   // 124 — hub label y offset
+const HUB_STAT_LABEL_GAP_BELOW = HUB_OUTER_RING_R + 46; // 146 — stat-label y offset
+const HUB_DISC_OPACITY_DEFAULT = 0.45;
+
+const SAT_DOT_R = 10;
+const SAT_INNER_RING_R = 20;
+const SAT_EDGE_OFFSET = SAT_DOT_R + 2;               // 12 — edge endpoint at satellite
+const SAT_CROSSHAIR_GAP = SAT_DOT_R + 5;             // 15
+const SAT_CROSSHAIR_LEN = 18;
+const SAT_LEADER_GAP = SAT_DOT_R + 2;                // 12 — dot rim → leader start
+const SAT_LEADER_LEN = 64;
+const SAT_DOT_OPACITY = 0.90;
+const SAT_RING_OPACITY = 0.28;
+const SAT_CROSSHAIR_OPACITY = 0.45;
+const SAT_LEADER_OPACITY = 0.55;
+
 // ── Color token resolver ─────────────────────────────────────────────────
 
 const createTokenMap = (): Record<string, string> => ({
@@ -411,12 +440,30 @@ const DiamondNode: React.FC<NodeRenderProps> = React.memo(
   }
 );
 
+/**
+ * AnnotationNode — precision-marker node for hub-spoke / bipartite layouts.
+ *
+ * Geometry is fixed (HUB_* / SAT_* constants at top of file). The `radius`
+ * prop from NodeRenderProps is accepted for interface uniformity but UNUSED
+ * — `nodeRadius()` returns HUB_EDGE_OFFSET / SAT_EDGE_OFFSET so edges land
+ * correctly against this fixed geometry. `labelPlacement` is also UNUSED:
+ * satellite label placement is derived from `hubCenter` bearing (label
+ * extends outward from hub). `isFocused` is UNUSED: narrated-camera focus
+ * dim flows through `opacity` and `blur` via cameraOpacity / cameraBlur,
+ * which already wrap this component the same way as CircleNode.
+ *
+ * `fillAlpha` IS used for the hub disc — caller encodes focus state in it
+ * (0.42 focused / 0.30 unfocused for primary), defaulting to
+ * HUB_DISC_OPACITY_DEFAULT for callers that omit it.
+ */
 const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, importance, filterId, hubCenter }) => {
+  ({ x, y, label, sublabel, color, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, importance, filterId, hubCenter, fillAlpha }) => {
     const isPrimary = importance === "primary";
 
     if (isPrimary) {
       // ── Hub / target-lock treatment ───────────────────────────────────
+      const discOpacity = fillAlpha ?? HUB_DISC_OPACITY_DEFAULT;
+      const farEdge = HUB_CROSSHAIR_GAP + HUB_CROSSHAIR_LEN;
       return (
         <g
           opacity={opacity}
@@ -424,16 +471,16 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           filter={blur > 0 ? `blur(${blur}px)` : undefined}
         >
           {/* Filled disc */}
-          <circle cx={x} cy={y} r={72} fill={color} opacity={0.45} />
+          <circle cx={x} cy={y} r={HUB_DISC_R} fill={color} opacity={discOpacity} />
           {/* Inner ring */}
-          <circle cx={x} cy={y} r={84} fill="none" stroke={color} strokeWidth={1} opacity={0.35} />
+          <circle cx={x} cy={y} r={HUB_INNER_RING_R} fill="none" stroke={color} strokeWidth={1} opacity={0.35} />
           {/* Outer ring */}
-          <circle cx={x} cy={y} r={100} fill="none" stroke={color} strokeWidth={0.6} opacity={0.18} />
-          {/* Crosshair hairlines — gap=92 (84+8), length=22 (conservative: SVG clips at viewBox) */}
-          <line x1={x} y1={y - 92} x2={x} y2={y - 114} stroke={color} strokeWidth={0.8} opacity={0.50} />
-          <line x1={x} y1={y + 92} x2={x} y2={y + 114} stroke={color} strokeWidth={0.8} opacity={0.50} />
-          <line x1={x - 92} y1={y} x2={x - 114} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
-          <line x1={x + 92} y1={y} x2={x + 114} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <circle cx={x} cy={y} r={HUB_OUTER_RING_R} fill="none" stroke={color} strokeWidth={0.6} opacity={0.18} />
+          {/* Crosshair hairlines extending beyond inner ring (SVG viewBox clips at canvas edges) */}
+          <line x1={x} y1={y - HUB_CROSSHAIR_GAP} x2={x} y2={y - farEdge} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x} y1={y + HUB_CROSSHAIR_GAP} x2={x} y2={y + farEdge} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x - HUB_CROSSHAIR_GAP} y1={y} x2={x - farEdge} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
+          <line x1={x + HUB_CROSSHAIR_GAP} y1={y} x2={x + farEdge} y2={y} stroke={color} strokeWidth={0.8} opacity={0.50} />
           {/* Stat value inside disc */}
           {stat && (
             <text
@@ -453,7 +500,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           {/* Label below */}
           <text
             x={x}
-            y={y + 100 + 24}
+            y={y + HUB_LABEL_GAP_BELOW}
             textAnchor="middle"
             fontSize={fontSizes.label}
             fontFamily={fonts.mono}
@@ -468,7 +515,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           {stat && (
             <text
               x={x}
-              y={y + 100 + 46}
+              y={y + HUB_STAT_LABEL_GAP_BELOW}
               textAnchor="middle"
               fontSize={fontSizes.caption}
               fontFamily={fonts.mono}
@@ -485,7 +532,9 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
     }
 
     // ── Satellite / annotation treatment ─────────────────────────────────
-    // Compute leader-line direction: away from hub when hub center is known
+    // Compute leader-line direction: away from hub when hub center is known.
+    // Fallback (no hub): leader extends downward so labels don't pile on top
+    // of the dot when authors forget to mark a primary node.
     let dx = 0;
     let dy = 1; // default: downward
     if (hubCenter) {
@@ -496,33 +545,59 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
       dy = rawDy / dist;
     }
 
-    const leaderStart = 10 + 2; // dot r + gap
-    const leaderLen = 64;
-    const leaderStartX = x + dx * leaderStart;
-    const leaderStartY = y + dy * leaderStart;
-    const leaderEndX = x + dx * (leaderStart + leaderLen);
-    const leaderEndY = y + dy * (leaderStart + leaderLen);
+    const leaderStartX = x + dx * SAT_LEADER_GAP;
+    const leaderStartY = y + dy * SAT_LEADER_GAP;
+    const leaderEndX = x + dx * (SAT_LEADER_GAP + SAT_LEADER_LEN);
+    const leaderEndY = y + dy * (SAT_LEADER_GAP + SAT_LEADER_LEN);
+
+    // Classify dominant quadrant. Upward leaders stack the label group
+    // ABOVE the leader endpoint; all other directions stack BELOW.
+    const isRightward = dx > 0.3;
+    const isLeftward = dx < -0.3;
+    const isUpward = !isRightward && !isLeftward && dy < -0.3;
 
     // Label anchor / position based on dominant quadrant
     let textAnchor: "start" | "end" | "middle" = "middle";
     let labelX = leaderEndX;
-    let labelY = leaderEndY + fontSizes.label + 8;
+    let labelY: number;
 
-    if (dx > 0.3) {
+    if (isRightward) {
       textAnchor = "start";
       labelX = leaderEndX + 8;
       labelY = leaderEndY + fontSizes.label * 0.35;
-    } else if (dx < -0.3) {
+    } else if (isLeftward) {
       textAnchor = "end";
       labelX = leaderEndX - 8;
       labelY = leaderEndY + fontSizes.label * 0.35;
-    } else if (dy < -0.3) {
-      textAnchor = "middle";
-      labelX = leaderEndX;
+    } else if (isUpward) {
       labelY = leaderEndY - 8;
+    } else {
+      labelY = leaderEndY + fontSizes.label + 8;
     }
 
-    const sublabelY = labelY + fontSizes.caption + 4;
+    // Stacked y-positions for sublabel + stat block.
+    //
+    // SVG text y is the BASELINE. Stacking two text lines so they don't
+    // overlap:
+    //   - downward stack: next baseline = prev + nextFontSize + gap
+    //   - upward stack:   next baseline = prev - prevFontSize - gap
+    //     (subtract prev's font size to clear its ascender).
+    //
+    // For upward leaders (label group above the leader endpoint), all
+    // subsequent elements stack ABOVE so the visual block sits entirely
+    // above the leader, reading top → bottom: stat-caption, stat-value,
+    // sublabel, label (closest to leader). Previously this was inverted —
+    // sublabel ended up between the leader endpoint and the dot, crossing
+    // the leader line.
+    const sublabelY = isUpward
+      ? labelY - fontSizes.label - 4
+      : labelY + fontSizes.caption + 4;
+    const statValueY = isUpward
+      ? sublabelY - fontSizes.caption - 4
+      : sublabelY + fontSizes.h3 + 4;
+    const statCaptionY = isUpward
+      ? statValueY - fontSizes.h3 - 4
+      : statValueY + fontSizes.caption + 4;
 
     return (
       <g
@@ -531,14 +606,14 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
         filter={blur > 0 ? `blur(${blur}px)` : undefined}
       >
         {/* Small dot */}
-        <circle cx={x} cy={y} r={10} fill={color} opacity={0.90} />
+        <circle cx={x} cy={y} r={SAT_DOT_R} fill={color} opacity={SAT_DOT_OPACITY} />
         {/* Inner ring */}
-        <circle cx={x} cy={y} r={20} fill="none" stroke={color} strokeWidth={0.8} opacity={0.28} />
-        {/* Crosshair hairlines — gap=15 (10+5), length=18 */}
-        <line x1={x} y1={y - 15} x2={x} y2={y - 33} stroke={color} strokeWidth={0.6} opacity={0.45} />
-        <line x1={x} y1={y + 15} x2={x} y2={y + 33} stroke={color} strokeWidth={0.6} opacity={0.45} />
-        <line x1={x - 15} y1={y} x2={x - 15 - 18} y2={y} stroke={color} strokeWidth={0.6} opacity={0.45} />
-        <line x1={x + 15} y1={y} x2={x + 15 + 18} y2={y} stroke={color} strokeWidth={0.6} opacity={0.45} />
+        <circle cx={x} cy={y} r={SAT_INNER_RING_R} fill="none" stroke={color} strokeWidth={0.8} opacity={SAT_RING_OPACITY} />
+        {/* Crosshair hairlines */}
+        <line x1={x} y1={y - SAT_CROSSHAIR_GAP} x2={x} y2={y - SAT_CROSSHAIR_GAP - SAT_CROSSHAIR_LEN} stroke={color} strokeWidth={0.6} opacity={SAT_CROSSHAIR_OPACITY} />
+        <line x1={x} y1={y + SAT_CROSSHAIR_GAP} x2={x} y2={y + SAT_CROSSHAIR_GAP + SAT_CROSSHAIR_LEN} stroke={color} strokeWidth={0.6} opacity={SAT_CROSSHAIR_OPACITY} />
+        <line x1={x - SAT_CROSSHAIR_GAP} y1={y} x2={x - SAT_CROSSHAIR_GAP - SAT_CROSSHAIR_LEN} y2={y} stroke={color} strokeWidth={0.6} opacity={SAT_CROSSHAIR_OPACITY} />
+        <line x1={x + SAT_CROSSHAIR_GAP} y1={y} x2={x + SAT_CROSSHAIR_GAP + SAT_CROSSHAIR_LEN} y2={y} stroke={color} strokeWidth={0.6} opacity={SAT_CROSSHAIR_OPACITY} />
         {/* Leader line */}
         <line
           x1={leaderStartX}
@@ -547,7 +622,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           y2={leaderEndY}
           stroke={color}
           strokeWidth={0.9}
-          opacity={0.55}
+          opacity={SAT_LEADER_OPACITY}
         />
         {/* Main label at leader endpoint */}
         <text
@@ -578,12 +653,14 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
             {sublabel}
           </text>
         )}
-        {/* Stat display for satellites (positioned after sublabel) */}
+        {/* Stat block — statValueY / statCaptionY already encode upward
+            vs downward stacking direction (see stacking-logic comment
+            above where they're computed). */}
         {stat && (
           <>
             <text
               x={labelX}
-              y={sublabelY + fontSizes.caption + 4}
+              y={statValueY}
               textAnchor={textAnchor}
               fill={color}
               fontSize={fontSizes.h3}
@@ -596,7 +673,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
             </text>
             <text
               x={labelX}
-              y={sublabelY + fontSizes.caption + 4 + fontSizes.h3 + 4}
+              y={statCaptionY}
               textAnchor={textAnchor}
               fill={textMuted}
               fontSize={fontSizes.caption}
@@ -751,7 +828,8 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   );
   const nodeRadius = (importance?: "primary" | "secondary"): number => {
     if (data.layout === "hub-spoke" || data.layout === "bipartite") {
-      return importance === "primary" ? 74 : 12;
+      // Coupled with AnnotationNode geometry — see HUB_/SAT_ constants.
+      return importance === "primary" ? HUB_EDGE_OFFSET : SAT_EDGE_OFFSET;
     }
     if (hasPrimaryHub) {
       return importance === "primary" ? 96 : 36;
