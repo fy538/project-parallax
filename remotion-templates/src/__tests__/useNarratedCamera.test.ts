@@ -103,6 +103,15 @@ describe("buildSyncLookup", () => {
     const lookup = buildSyncLookup([sp("again", 10), sp("again", 50)]);
     expect(lookup!.get("again")).toBe(50);
   });
+
+  it("case-folded duplicates also follow last-write-wins", () => {
+    // The same word appearing with different cases is treated as one key
+    // (lookup is lowercase-keyed). Locks the silent-collapse behaviour so
+    // future authors don't expect case-distinct entries.
+    const lookup = buildSyncLookup([sp("Beijing", 30), sp("BEIJING", 90)]);
+    expect(lookup!.size).toBe(1);
+    expect(lookup!.get("beijing")).toBe(90);
+  });
 });
 
 // ── 3. buildNarratedCameraBoundaries ───────────────────────────────────────
@@ -307,6 +316,31 @@ describe("buildNarratedCameraBoundaries — sync-anchor snapping", () => {
     // so end-extension branch DOES NOT fire and end stays at 300.
     expect(boundaries[1].start).toBe(150);
     expect(boundaries[1].end).toBe(300);
+  });
+
+  it("two consecutive syncStart words snapping to the SAME frame → second step squeeze-collapses", () => {
+    // Both step 1 and step 2 have syncStart pointing at the same word "ditto",
+    // which resolves to frame 100. Result:
+    //   step 1.start = 100 (snap), step 0.end = 100 (adjust prev), OK
+    //   step 2.start = 100 (snap), step 1.end = 100 (adjust prev) → step 1 collapses
+    //     squeeze guard: step 1.end = 100 + sec(0.5) = 115, step 2.start = 115
+    // Locks the cascade behaviour. The squeeze guard's "push current step
+    // start forward" branch fires on the SECOND snap.
+    const path: NarratedCameraStep[] = [
+      { target: "overview", zoom: 1, duration: 2 }, // 60f
+      { target: "overview", zoom: 1, duration: 2, syncStart: "ditto" },
+      { target: "overview", zoom: 1, duration: 2, syncStart: "ditto" },
+    ];
+    const syncLookup = buildSyncLookup([sp("ditto", 100)]);
+    const boundaries = buildNarratedCameraBoundaries(path, 300, false, syncLookup);
+    expect(boundaries[0].end).toBe(100);
+    expect(boundaries[1].start).toBe(100);
+    expect(boundaries[1].end).toBe(115); // 100 + sec(0.5), squeeze-guard minimum
+    expect(boundaries[2].start).toBe(115); // pushed forward to clear the squeeze
+    // Invariant: no inverted windows.
+    for (const b of boundaries) {
+      expect(b.end).toBeGreaterThanOrEqual(b.start);
+    }
   });
 
   it("step 0 with syncStart: snaps step 0's start without prev-step adjustment", () => {

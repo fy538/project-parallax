@@ -1,5 +1,8 @@
 # Dependencies
 remotion-templates/node_modules/
+# Root node_modules — empty today, but `npm install` from the repo root
+# would fill it. Guard so it doesn't get accidentally committed.
+/node_modules/
 
 # Build & render output
 remotion-templates/out/
@@ -15,6 +18,8 @@ remotion-templates/.vite/
 # AI agent local overrides (personal, not team-shared)
 CLAUDE.local.md
 .claude/settings.local.json
+# Scheduled-task runtime state — per-machine, not team-shared.
+.claude/scheduled_tasks.lock
 
 # Git worktrees for parallel work (created by scripts/worktree.sh)
 worktrees/

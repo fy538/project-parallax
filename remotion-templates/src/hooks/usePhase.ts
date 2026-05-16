@@ -26,7 +26,6 @@
  * schedule a stagger relative to a phase), use `getPhaseStart("reveal")`.
  */
 
-import { useMemo, useCallback } from "react";
 import { useCurrentFrame, interpolate } from "remotion";
 import { CLAMP } from "../utils/animation";
 import { computeStepBoundaries } from "../utils/stepFramework";
@@ -163,6 +162,22 @@ export function computePhaseState(
 /**
  * Declarative phase manager for multi-phase template animations.
  *
+ * Thin Remotion wrapper around `computePhaseState` — the pure function owns
+ * the load-bearing math (boundaries, index, progress, helpers). Mirrors the
+ * useBeatSync / computeBeatState split.
+ *
+ * Earlier versions of this hook pre-built a `{starts, totalDuration}` memo
+ * AND called computePhaseState (which rebuilds the same boundaries internally),
+ * then wrapped two `useCallback` getters that duplicated the pure-function's
+ * own `getPhaseStart` / `getPhaseEnd` closures. Net effect was 1.5× the
+ * compute and 25 lines of misleading "memoisation" theatre. Removed — the
+ * pure function does it all in one pass.
+ *
+ * Note on referential stability: `state.getPhaseStart` / `getPhaseEnd` are
+ * fresh closures per render. No template consumer puts them in a dep array
+ * (verified May 16, 2026); they're called inline. If a future consumer needs
+ * stable references, wrap at the call site.
+ *
  * @param phases - Ordered array of phase definitions
  * @param baseDelay - Optional delay before the first phase starts (in frames). Default: 0
  */
@@ -171,41 +186,5 @@ export const usePhase = (
   baseDelay: number = 0
 ): PhaseState => {
   const frame = useCurrentFrame();
-
-  // Stable key so memoisation works even when phases array is recreated.
-  const phasesKey = phases.map((p) => `${p.name}:${p.duration}`).join("|");
-
-  // Memoize start-frame array — pure from phases, never changes between frames.
-  const { starts, totalDuration } = useMemo(() => {
-    const bs = computeStepBoundaries(phases.map((p) => p.duration));
-    return {
-      starts: bs.map((b) => b.start),
-      totalDuration: bs.length > 0 ? bs[bs.length - 1].end : 0,
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey]);
-
-  // Delegate all math to the pure function so tests can call it directly.
-  const state = computePhaseState(frame, phases, baseDelay);
-
-  // Memoize the stable lookup helpers (their output only depends on phases,
-  // not the current frame) so callers get referentially stable functions.
-  const getPhaseStart = useCallback((name: string): number => {
-    const i = phases.findIndex((p) => p.name === name);
-    return i >= 0 ? starts[i] + baseDelay : 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey, baseDelay]);
-
-  const getPhaseEnd = useCallback((name: string): number => {
-    const i = phases.findIndex((p) => p.name === name);
-    return i >= 0 ? starts[i] + phases[i].duration + baseDelay : 0;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phasesKey, baseDelay]);
-
-  return {
-    ...state,
-    totalDuration,
-    getPhaseStart,
-    getPhaseEnd,
-  };
+  return computePhaseState(frame, phases, baseDelay);
 };
