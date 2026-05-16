@@ -327,3 +327,178 @@ class TestTextAnimRule:
                 f"{slug} has M-TEXT-ANIM violations: "
                 + "; ".join(v.message for v in violations)
             )
+
+
+# ─── M-SYNC rule (per-element D17 narration anchoring) ─────────────────────
+# Validates: (a) TEMPLATE foreground segments have at least one syncWord;
+# (b) per-element D17 components with >1 entities use syncs:[…] not a single sync.
+
+
+class TestSyncCoverageRule:
+    def test_template_with_sync_passes(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["Taiwan"],
+                "template": {"component": "ChoroplethMap", "dataFile": "m.json"},
+            }],
+            datafiles={"m.json": {"title": "..."}},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_template_without_sync_warns_missing(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                # no syncWords
+                "template": {"component": "KineticTypography", "dataFile": "q.json"},
+            }],
+            datafiles={"q.json": {"text": "..."}},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-SYNC-MISSING"
+        assert violations[0].severity == "warning"
+
+    def test_background_segment_skipped(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "background",
+                "startSec": 0, "endSec": 5,
+                "template": {"component": "ChoroplethMap", "dataFile": "m.json"},
+            }],
+            datafiles={"m.json": {"title": "..."}},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []  # background never flagged
+
+    def test_non_template_segment_skipped(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[
+                {"id": "s1", "type": "FOOTAGE", "layer": "foreground",
+                 "startSec": 0, "endSec": 5},
+                {"id": "s2", "type": "HOLD", "layer": "foreground",
+                 "startSec": 5, "endSec": 6},
+            ],
+            datafiles={},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []  # FOOTAGE / HOLD don't have entrance reveals
+
+    def test_per_element_multi_entity_with_one_sync_warns_count(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["chokepoint"],  # only ONE sync for a 5-node network
+                "template": {"component": "NetworkDiagram", "dataFile": "n.json"},
+            }],
+            datafiles={"n.json": {
+                "nodes": [
+                    {"id": "tsmc", "label": "TSMC"},
+                    {"id": "apple", "label": "Apple"},
+                    {"id": "nvidia", "label": "Nvidia"},
+                    {"id": "amd", "label": "AMD"},
+                    {"id": "qualcomm", "label": "Qualcomm"},
+                ],
+                "edges": [],
+            }},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        # No M-SYNC-MISSING (has 1 sync), but M-SYNC-COUNT fires.
+        assert len(violations) == 1
+        assert violations[0].rule == "M-SYNC-COUNT"
+        assert "5 entities" in violations[0].message
+
+    def test_per_element_multi_entity_with_multi_sync_passes(self, tmp_path):
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["Apple", "Nvidia", "AMD"],  # 3 syncs for 3 nodes
+                "template": {"component": "NetworkDiagram", "dataFile": "n.json"},
+            }],
+            datafiles={"n.json": {
+                "nodes": [
+                    {"id": "a"}, {"id": "b"}, {"id": "c"},
+                ],
+                "edges": [],
+            }},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_per_element_single_entity_with_one_sync_passes(self, tmp_path):
+        """A NetworkDiagram with 1 node is fine with 1 sync — no per-element gap."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["hub"],
+                "template": {"component": "NetworkDiagram", "dataFile": "n.json"},
+            }],
+            datafiles={"n.json": {"nodes": [{"id": "h"}], "edges": []}},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert violations == []
+
+    def test_annotated_image_callout_count_includes_image(self, tmp_path):
+        """AnnotatedImage convention: syncPoints[0]=image, [1..N]=callouts.
+        So 4 callouts → 5 expected sync cues, not 4."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["pearl"],  # just one
+                "template": {"component": "AnnotatedImage", "dataFile": "img.json"},
+            }],
+            datafiles={"img.json": {
+                "imageSrc": "x.png",
+                "callouts": [{"x": 0, "y": 0, "label": "a"},
+                             {"x": 0, "y": 0, "label": "b"},
+                             {"x": 0, "y": 0, "label": "c"}],
+            }},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-SYNC-COUNT"
+        assert "4 entities" in violations[0].message  # 3 callouts + 1 image
+
+    def test_horizontal_timeline_pairs_mode_recognized(self, tmp_path):
+        """HorizontalTimeline uses 'pairs' for dual mode, 'events' for single."""
+        manifest_path = _setup_episode(tmp_path,
+            segments=[{
+                "id": "s1", "type": "TEMPLATE", "layer": "foreground",
+                "startSec": 0, "endSec": 5,
+                "syncWords": ["dependence"],
+                "template": {"component": "HorizontalTimeline", "dataFile": "t.json"},
+            }],
+            datafiles={"t.json": {
+                "pairs": [{"a": {}, "b": {}}, {"a": {}, "b": {}}, {"a": {}, "b": {}}],
+            }},
+        )
+        violations = manifest_lint.check_sync_coverage(
+            json.loads(manifest_path.read_text()), manifest_path,
+        )
+        assert len(violations) == 1
+        assert violations[0].rule == "M-SYNC-COUNT"
+        assert "3 entities" in violations[0].message

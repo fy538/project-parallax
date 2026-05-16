@@ -563,6 +563,138 @@ def check_text_animation_register(manifest: dict, manifest_path: Path) -> list[V
     return violations
 
 
+# ─── Sync-coverage rule (M-SYNC) ─────────────────────────────────────────────
+#
+# Components that surface multiple labeled entities and consume per-element
+# D17 anticipation via syncPoints[i]. When data has >1 entity, the script
+# should provide a syncs:[…] plural sync list rather than a single sync — see
+# DIRECTING_LANGUAGE.md → "Per-element anticipatory reveals" (May 16, 2026).
+#
+# Each entry maps the component to its candidate entity-list field names in
+# the data file. Tried in order; the first list found determines the entity
+# count for the lint check. (HorizontalTimeline uses different fields per
+# mode — events / pairs / morphEvents — so we try all three.)
+_PER_ELEMENT_D17_COMPONENTS: dict[str, list[str]] = {
+    "NetworkDiagram":     ["nodes"],
+    "ArcDiagram":         ["nodes"],
+    "EscalationLadder":   ["rungs"],
+    "HorizontalTimeline": ["events", "pairs", "morphEvents"],
+    "AnnotatedImage":     ["callouts"],  # +1 for image at index 0
+    "FrameworkDiagram":   ["columns", "cells", "phases"],
+    "BumpChart":          ["entities"],
+}
+
+
+def _expected_entity_count(component: str, data: dict) -> int:
+    """
+    Return the expected number of narrated entities for a per-element D17
+    component, or 0 if the component isn't in the table or no candidate
+    field resolves to a non-empty list.
+
+    AnnotatedImage convention: syncPoints[0] = image, syncPoints[1..N] =
+    callouts — so the expected count is callouts + 1.
+    """
+    field_candidates = _PER_ELEMENT_D17_COMPONENTS.get(component)
+    if not field_candidates:
+        return 0
+    for field in field_candidates:
+        value = data.get(field)
+        if isinstance(value, list) and value:
+            count = len(value)
+            return count + 1 if component == "AnnotatedImage" else count
+    return 0
+
+
+def check_sync_coverage(manifest: dict, manifest_path: Path) -> list[Violation]:
+    """
+    M-SYNC: flag segments where narration anchoring is missing or under-utilized.
+
+    Two sub-rules:
+      M-SYNC-MISSING — TEMPLATE foreground segment has no syncWords. The
+        D17 anticipatory entrance can't anchor to a narration word; the
+        reveal falls back to estimate-mode timing. Fix: add sync:"word"
+        to the reveal()/cam() directive in the script for at least one
+        narration cue per beat.
+
+      M-SYNC-COUNT — per-element D17 component (NetworkDiagram, ArcDiagram,
+        EscalationLadder, HorizontalTimeline, AnnotatedImage, FrameworkDiagram,
+        BumpChart) has >1 entities but only 1 syncWord. The per-element
+        anticipation will only fire on entity 0; entities 1..N fall back to
+        the staggered estimate. Fix: use syncs:["w1","w2",…] in the script
+        so each entity anticipates its own cue.
+
+    Both rules are advisory (severity: warning). They surface authoring gaps
+    where the doctrine prescribes anchoring but the script omits it.
+
+    TYPEs we intentionally skip:
+      - FOOTAGE / HOLD / TRANSITION segments — no template, no entrance to
+        anticipate. Sync isn't relevant.
+      - background layer segments — narration anchors to foreground beats.
+    """
+    violations: list[Violation] = []
+    episode_dir = manifest_path.parent
+
+    for seg in manifest.get("segments", []) or []:
+        # Skip background segments — narration anchors to foreground beats.
+        if seg.get("layer") == "background":
+            continue
+        # Only TEMPLATE segments have entrance reveals that benefit from sync.
+        if seg.get("type") != "TEMPLATE":
+            continue
+
+        seg_id = seg.get("id", "?")
+        template = seg.get("template") or {}
+        component = template.get("component", "")
+        sync_words = seg.get("syncWords") or []
+
+        # ── M-SYNC-MISSING: TEMPLATE foreground beat has no sync anchor ─────
+        if not sync_words:
+            violations.append(Violation(
+                rule="M-SYNC-MISSING",
+                file="",
+                pointer=f"segments[{seg_id}] (component={component})",
+                message=(
+                    "TEMPLATE segment has no syncWords — D17 anticipation can't "
+                    "anchor to narration. Add sync:\"word\" to the reveal()/cam() "
+                    "directive in the script for at least one narration cue per beat."
+                ),
+                severity="warning",
+            ))
+            # When sync is missing entirely, M-SYNC-COUNT below is moot.
+            continue
+
+        # ── M-SYNC-COUNT: per-element template, multi-entity, single sync ───
+        if component in _PER_ELEMENT_D17_COMPONENTS and len(sync_words) == 1:
+            data_file = template.get("dataFile")
+            if not data_file:
+                continue
+            full_path = episode_dir / data_file
+            if not full_path.exists():
+                continue  # M-DATAFILE handles missing files
+            try:
+                data = json.loads(full_path.read_text())
+            except json.JSONDecodeError:
+                continue  # validate_data.py handles JSON errors
+
+            expected = _expected_entity_count(component, data)
+            if expected > 1:
+                violations.append(Violation(
+                    rule="M-SYNC-COUNT",
+                    file="",
+                    pointer=f"segments[{seg_id}] (component={component}) → {data_file}",
+                    message=(
+                        f"{component} has {expected} entities but only 1 syncWord — "
+                        f"per-element D17 anticipation will fire on entity 0 only. "
+                        f"Replace sync:\"word\" with syncs:[…] in the reveal()/cam() "
+                        f"directive so each entity anchors to its own narration cue. "
+                        f"See DIRECTING_LANGUAGE.md → \"Per-element anticipatory reveals\"."
+                    ),
+                    severity="warning",
+                ))
+
+    return violations
+
+
 # ─── Driver ──────────────────────────────────────────────────────────────────
 
 ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
@@ -573,6 +705,7 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     lambda m, p: check_cue_types_canonical(m, str(p)),
     lambda m, p: check_duration_drift(m, str(p)),
     check_text_animation_register,  # needs the path (reads dataFile contents)
+    check_sync_coverage,             # needs the path (reads dataFile contents)
 ]
 
 
