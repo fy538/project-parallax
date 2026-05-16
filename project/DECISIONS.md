@@ -3,7 +3,7 @@
 ## Purpose
 Running log of decisions made (with rationale) and questions still to resolve. Helps future conversations understand what's been decided and what needs work.
 
-Last updated: May 10, 2026 (matches the most recent entry — D40)
+Last updated: May 16, 2026 (matches the most recent entry — D45)
 
 ---
 
@@ -383,6 +383,39 @@ The positioning matrix confirms the niche is differentiated, but the research do
 **Scope:** `remotion-templates/src/design/fonts.ts` (Plex Sans + Plex Serif preload added, Space Grotesk import removed), `remotion-templates/src/design/theme.ts` (`fonts.display` + `fonts.heading` + new `fonts.serifBody`, EMPHASIS_MAP fallback chains), `BRAND.md` (Type Pair table, hierarchy rules, migration note, Anthropic alignment note), `CLAUDE.md` (font line), `VISUAL_LANGUAGE.md` (Register 1 description), `POLISH.md` (T1 hierarchy rule), `PrisonersDilemmaShowcase.tsx` (hardcoded font swap). Deferred for cleanup pass: `tools/design-playground/playground.html`, `visual-treatment-poc.html`, `MAPBOX_STUDIO_GUIDE.md`, `NEW_TEMPLATES_SPEC.md`, `LESSONS.md`, `KineticTypography.tsx` comment, `lint-conventions.mjs` comment, `episodes/blockades-leak/thumbnail-concepts.md`, `episodes/silicon-trap/thumbnail-concepts.md`, `SVG_ILLUSTRATION_PIPELINE.md`. Templates that consume `fonts.display` from theme.ts inherit the change automatically; only files with hardcoded `"Space Grotesk"` strings need direct edits.
 **Resolves:** Updates D22 (Meridian brand direction).
 
+### D41: Camera-primitive consolidation — Layer A now, Layer B deferred
+**Date:** May 16, 2026
+**Rationale:** Engineering audit found four boilerplate patterns (`computeStepBoundaries`, `getCurrentStepIndex`, `getStepProgress`, easing constants) duplicated verbatim across 6 files (`atlasCamera.ts`, `useNarratedCamera.ts`, `useTimelineCamera.ts`, `useTreeCamera.ts`, `usePhase.ts`, `RouteAnimation.tsx`). External survey of GSAP, Theatre.js, Remotion `<Series>`, Mapbox `AnimationOptions`, and drei `camera-controls` confirmed the industry-standard split: timing/easing primitives generalize cleanly; domain-specific pose math (SVG affine transform, Mapbox 5-tuple, FreeCamera altitude) does not. Theatre.js comes closest to a unified pose abstraction but requires editor-tool overhead Parallax doesn't need.
+**Decision:** Extract the domain-neutral primitives into `src/utils/stepFramework.ts` (Layer A, done). Defer a shared `useWaypointCamera` or `Pose<T>` abstraction (Layer B) until a second consumer extracts its camera math into a standalone file and reveals the same semantic pattern. Trigger condition: two templates using waypoint-style camera math that would share a `phases → interpolate → pose` shape.
+**Considered and rejected:** Full Layer A+B in one pass — the pose domains (SVG affine, Mapbox mercator, canvas 2D) have incompatible geometric invariants (`targetScale/baseScale` ratio, lng/lat spherical, pixel coordinates). A `Pose<T>` generic without those invariants is too shallow to be useful; with them, it pulls domain code into a shared module.
+**Scope:** `src/utils/stepFramework.ts` (NEW — `computeStepBoundaries`, `getCurrentStepIndex`, `getStepProgress`, `motionEasings`, `EMPTY_BOUNDARY`, `StepBoundary`, `PhaseWindow<P>`), `src/hooks/useStepFramework.ts` (NEW — React wrapper + `computeStepFrameworkState` pure function), `atlasCamera.ts` + `useNarratedCamera.ts` + `useTimelineCamera.ts` + `useTreeCamera.ts` + `RouteAnimation.tsx` + `ChoroplethMap.tsx` + `DensityMap.tsx` + `ProportionalSymbolMap.tsx` migrated. Research archived at `project/CAMERA_CONSOLIDATION_RESEARCH.md`.
+
+### D42: `usePhase.ts` retained as an independent hook
+**Date:** May 16, 2026
+**Rationale:** `usePhase` serves semantic phase queries (named phases, `isPhase`, `isPast`, `getPhaseStart`, per-phase easing functions, `baseDelay`). `useStepFramework` serves numeric step-index camera math (frame-count durations, `index`, `progress`). The two APIs target different call-sites: `usePhase` callers (DuelingFrameworks, HorizontalTimeline, EscalationLadder) query "am I in the reveal phase?" by name; `useStepFramework` callers (useNarratedCamera, useTimelineCamera, useTreeCamera) query "what is the 0–1 progress within the current camera step?"
+**Decision:** Both hooks coexist. `usePhase.ts` internals simplified (removed redundant `useMemo`/`useCallback` wrapping `computePhaseState`; the pure function now used directly). No merge, no re-export alias needed.
+**Considered and rejected:** Folding `usePhase` into `useStepFramework` — would require either parameterizing on phase-name generics or adding named-phase lookup to a module intended for numeric camera math; both bloat the wrong abstraction.
+**Scope:** `src/hooks/usePhase.ts` (simplified, not renamed), `src/__tests__/usePhase.test.ts` (40 tests, unchanged API).
+
+### D43: `PhaseWindow<P>` generic on `StepBoundary`
+**Date:** May 16, 2026
+**Rationale:** Five map templates needed to attach a typed camera pose to each step boundary (e.g., `MapboxCameraState` for ChoroplethMap, SVG coordinate pair for DensityMap). The options were: (a) per-template interface that extends `StepBoundary`, (b) a `StepBoundary & { pose: T }` intersection at call-site, (c) a generic `PhaseWindow<P>` exported from `stepFramework.ts`.
+**Decision:** Option (c). `PhaseWindow<P = undefined>` extends `StepBoundary` with an optional `pose?: P` field. Exported from `src/utils/stepFramework.ts` alongside the other primitives. Keeps `stepFramework.ts` free of domain imports while giving consumers type-safe pose attachment.
+**Scope:** `src/utils/stepFramework.ts` (added generic interface), 5 map templates updated to use `PhaseWindow<CameraState>` or `PhaseWindow<SvgCoords>` as appropriate.
+
+### D44: `comparePNGs` unit-tested as a pure function (independent of Remotion bundler)
+**Date:** May 16, 2026
+**Rationale:** `comparePNGs` (in `src/__tests__/render-helper.ts`) is the dependency of 8+ visual-regression test files. Despite being a pure function (pngjs + pixelmatch, no browser required), it had zero unit tests. The function lives in a file that also imports `@remotion/renderer`, but only `comparePNGs` is called from `render-helper.test.ts` — the bundler import path is never invoked. A regression in the diff-threshold logic, dimension-mismatch error, or diff-cleanup behavior would propagate silently to all visual-regression suites.
+**Decision:** Add `src/__tests__/render-helper.test.ts` with 15 tests covering: identical inputs, the exact-0.5% boundary condition (inclusive), dimension mismatch errors, missing-file errors, diff-PNG write-on-mismatch, no-write on match, `writeDiffOnMismatch: false` suppression, and stale-diff cleanup on subsequent pass. Named `ComparePNGsResult` interface added; dead `baselineSize`/`currentSize` fields removed; JSDoc corrected.
+**Scope:** `src/__tests__/render-helper.ts` (interface + cleanup + JSDoc), `src/__tests__/render-helper.test.ts` (NEW, 15 tests).
+
+### D45: `test:unit` hand-maintained whitelist → `vitest.unit.config.ts` glob
+**Date:** May 16, 2026
+**Rationale:** The `test:unit` npm script held an 18-entry hard-coded file list. By the time of this audit, 28 pure unit tests (no browser, no Remotion bundler) were missing from it — the list had drifted to 60% coverage. Every new test file required a manual `package.json` edit to be picked up by `npm run test:unit`. The whitelist also forced a specific timeout (60 s) sized for render suites onto tests that complete in < 10 ms each.
+**Decision:** Replace the whitelist with `vitest.unit.config.ts` (extends base config; overrides `exclude` to drop the 6 render-heavy suites: `*-real-data.test.ts`, `templates.test.ts`, `catalog-smoke.test.ts`, `full-episode-smoke.test.ts`, `editorialFrame-visual.test.ts`, `filmOverlay-cascade-integration.test.ts`). New unit tests auto-enroll without any package.json edit. `test:unit` timeout tuned to 10 s / 15 s (hook).
+**Result:** 18 → 48 test files; ~500 → 1151 tests included in `npm run test:unit`. Runtime: 6.3 s (was similar — the missing tests are fast).
+**Scope:** `remotion-templates/vitest.unit.config.ts` (NEW), `remotion-templates/package.json` (`test:unit` script, one-liner).
+
 ---
 
 ### Session 8 — April 26, 2026 (continued)
@@ -437,3 +470,20 @@ The positioning matrix confirms the niche is differentiated, but the research do
 - scaleToZoom() piecewise interpolation handles legacy react-simple-maps data files without migration
 - Warm palette shift (blue→brown undertone at same darkness) dramatically changes the emotional register without breaking any accent or text contrast relationships
 - Templates don't need individual color updates when dark-mode tokens are defined in theme.ts — everything propagates through the token system
+
+### Session 11 — May 16, 2026
+**Topics covered:**
+- External research on camera animation systems (Remotion `<Series>`, GSAP timeline labels, Theatre.js sheets, Mapbox `AnimationOptions`, drei `camera-controls`, Framer Motion) to inform consolidation strategy. Research archived at `project/CAMERA_CONSOLIDATION_RESEARCH.md`.
+- Camera-primitive consolidation Layer A (D41): extracted `computeStepBoundaries`, `getCurrentStepIndex`, `getStepProgress`, `motionEasings`, `EMPTY_BOUNDARY`, `StepBoundary`, `PhaseWindow<P>` into `src/utils/stepFramework.ts`. Created `src/hooks/useStepFramework.ts` as the canonical React wrapper. Migrated 6 hook/template consumers + 3 sister map templates.
+- `usePhase.ts` simplification (D42): removed redundant `useMemo`/`useCallback` wrapper; `computePhaseState` now called directly. Both hooks retained as independent abstractions.
+- `PhaseWindow<P>` generic (D43): generic interface added to stepFramework.ts for typed camera pose attachment across map templates.
+- HOLD_MOTION_REGISTER: 7-phase implementation (8 drift presets documented, `useDirection.ts` updated, `DriftRegisterShowcase` visual reference card, `M-DRIFT-DEFAULT` lint rule).
+- `render-helper.ts` overhaul (D44): `ComparePNGsResult` named interface, diff-PNG cleanup on successful match, 15 unit tests, dead `baselineSize`/`currentSize` fields removed, JSDoc corrected.
+- `test:unit` glob migration (D45): replaced 18-entry hand-maintained whitelist with `vitest.unit.config.ts`; 28 orphaned pure unit tests now auto-enrolled.
+- Engineering polish: audio-spec skill SFX cue mapping correction, `useNarratedCamera` `end < start` bug fix (regression-locked), ChoroplethMap stepFramework migration (was missed in initial consolidation pass), two sync-word tests added to `useNarratedCamera.test.ts`, `.gitignore` entries for test artifacts.
+
+**Key insights:**
+- The industry split between timing primitives and domain-specific pose math is real and well-established. Every mature animation system generalizes timing/easing but leaves pose semantics to the domain. Theatre.js attempts the broadest unification but pays in editor-tool overhead — the lesson for Parallax is to hold at Layer A until a second waypoint-camera consumer forces the geometry.
+- Hand-maintained test whitelists drift silently. The `test:unit` whitelist missed 28 of 46 pure unit tests — a 60% gap — without anyone noticing, because the orphaned tests still ran in the full `npm test` suite. Glob-based exclusion with an explicit render-heavy blocklist is the right default.
+- `comparePNGs` is the load-bearing function for all visual regression in the codebase. Zero unit tests before this session; 15 after. The stale-diff cleanup on successful match (removing `.diff.png` files from prior failing runs) was the hardest behavior to test correctly — required creating the stale file deliberately and asserting its absence after the pass.
+- `usePhase` and `useStepFramework` serve genuinely different call-sites: semantic name queries vs numeric frame-index math. The temptation to merge them dissolves once you see that neither hook has any duplicate code with the other after the stepFramework extraction.
