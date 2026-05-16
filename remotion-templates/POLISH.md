@@ -561,6 +561,38 @@ Default-on-every-template is itself a wrong choice. Charts use `editorial`. Phot
 
 **Canonical doctrine:** `project/HOLD_MOTION_REGISTER.md` (May 16, 2026) — full register doc with per-template recommendations, decision matrix, and per-technique editorial register. `references/template-research/hold-motion.md` is the outlet-research dossier (NYT VI, FT, Economist, Bloomberg, Reuters, Vox Atlas, PBS Frontline, Cinemagraphs 2011, Ken Burns) the doctrine derives from.
 
+### D21. Transitions are editorial sentences, not decoration
+
+**Observation:** Every seam between two segments either says *"same thought, next breath"* (hard cut), *"same thought, gentler delivery"* (cross-dissolve), *"new chapter"* (fade-to-black), *"same subject, different scale"* (match-cut), or *"new register entirely"* (color-wash). Picking the wrong transition doesn't just look wrong — it makes a *wrong claim* about the relationship between the two segments. The Phase 1 outlet research (May 16, 2026) found Parallax's code surface had 12 implemented transitions but only 3 were promoted in directives, and the six wipe / whip-pan / blur-through variants are universal PowerPoint / sports-broadcast / YouTube-explainer tells that compete with the channel's editorial register.
+
+**Fix:** Pick a transition whose implicit claim matches the editorial relationship between the two segments. Eight canonical transitions, six of which are already in `TransitionType`:
+
+| Transition | `cut(<type>)` | Implicit claim |
+|---|---|---|
+| Hard cut | `cut` | "same thought, next breath" |
+| Cross-dissolve | `dissolve` | "elaboration of the same thought, gentler delivery" |
+| Fade-through-black | `fade-through-black` | "new chapter / time-jump / silence beat" |
+| Match cut | `match-cut` | "same subject, different scale — continuity across a logical seam" |
+| Color-wash | `color-wash(ink\|oxblood\|rust\|amber\|bone\|paper)` | "register shift — new editorial mode" |
+| Iris-in / iris-out | `iris-in` / `iris-out` | "cinematic open or close, deliberately theatrical" |
+| Audio-bridged cut (J/L) | (audio-spec, `narrationLeadIn` / `narrationLagOut`) | "invisible continuity — sound carries the seam" |
+| Chapter card / slate | `TitleTransition` segment | "this section is named; pause to take it in" |
+
+Default-on-everything is itself a wrong choice. Within-beat seams = hard cut (not dissolve). Beat-boundary seams = cross-dissolve. Title-card boundaries = fade-through-black. Register shifts (analytical → editorial-hero) = color-wash with explicit color token. Historical → contemporary or wide → detail = match-cut. The under-promoted transition is **match-cut** — Parallax's historical-analogy structure produces match-cut opportunities at every beat seam; zero production uses currently.
+
+**Anti-patterns:**
+- `wipe-left` / `wipe-right` / `wipe-up` — universal PowerPoint signature; deprecate in favor of `dissolve` or `cut`
+- `whip-pan` — sports-broadcast / Vice News tell; deprecate
+- `blur-through` — YouTube-explainer signature; deprecate in favor of `dissolve`
+- `spatial-zoom` — gimmicky; deprecate in favor of `match-cut`
+- Dissolve creep — more than 2 dissolves in a 30-second window reads as wedding video
+- Iris overuse — more than 2 per episode reads as silent-film pastiche, not editorial choice
+- Color-wash without explicit color token — defaults to ink, but the editorial intent of the wash *is* the color choice
+
+**Reference implementation:** `Transitions.tsx` (`TransitionType` union + `TRANSITION_CATALOG`) wires the technical surface. `apply_default_transitions()` in `tools/assembly/generate_manifest.py` is the implicit-default engine. The doctrine work is *assignment*, not *invention* — the 8 canonical transitions are already (or trivially) in code; the deprecated 6 need to be marked, and `match-cut` needs promotion from unused to first-class. See `project/TRANSITION_GRAMMAR.md` for the canonical doctrine, decision matrix per context, and per-skill guidance (visual-spec, script-draft, script-audit, audio-spec).
+
+**Canonical doctrine:** `project/TRANSITION_GRAMMAR.md` (May 16, 2026) — full grammar doc with the eight transitions, four decision contexts (within-beat, beat-boundary, title-card, register-shift), color vocabulary for `color-wash`, and J/L-cut audio bridge handoff to audio-spec. `references/template-research/transition-grammar.md` is the outlet-research dossier (NYT VI, FT, Bloomberg, Economist, Reuters, Rex Studio / Cardia case) the doctrine derives from.
+
 ---
 
 ## Timeline Visual Discipline (added May 12, 2026)
