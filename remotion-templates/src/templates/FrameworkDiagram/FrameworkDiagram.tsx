@@ -948,6 +948,7 @@ const MatrixVariant: React.FC<{
 }> = React.memo(({ data, frame, durationInFrames }) => {
   const theme = useThemeMode(data.backgroundVariant);
   const emphasis = useEpisodeColorEmphasis();
+  const direction = useDirection(data._direction);
   const rowHeaders = data.rowHeaders || [];
   const colHeaders = data.colHeaders || [];
   const cells = data.cells || [];
@@ -1112,8 +1113,8 @@ const MatrixVariant: React.FC<{
           // D17 per-element: syncPoints[cellIdx] = cell's narration cue
           // (cellIdx = ri*numCols + ci, row-major). Falls back to stagger.
           const cellIdx = ri * numCols + ci;
-          const cellStart = perElementStartFW(
-            cellIdx,
+          const cellStart = perElementStartFrame(
+            direction.syncPoints?.[cellIdx]?.frame,
             stagger(cellIdx, sec(0.18), sec(0.6)),
           );
           const cellOpacity = fadeIn(frame, cellStart, sec(0.4));
