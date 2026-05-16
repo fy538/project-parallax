@@ -249,11 +249,18 @@ describe("buildNarratedCameraBoundaries — sync-anchor snapping", () => {
     expect(boundaries[1].start).toBe(15);
   });
 
-  it("step-end-precedes-start guard: extends current step to min(start+0.5s, next.start)", () => {
-    // Force step 1 to have start > end via a late sync, then verify the
-    // current-step extension clamps to next.start (not start+0.5s).
+  it("step-end-precedes-start guard: floors at `start` when next.start is below (degenerate over inverted)", () => {
+    // Force step 1 to have start > end via a late sync. Step 2's natural
+    // cumulative start (120) is BELOW step 1's snapped start (200), so the
+    // Math.min(start+0.5s, next.start) inner clamp would have produced
+    // end=120 — below start. The Math.max(start, …) floor accepts a
+    // degenerate zero-width window over an inverted (end<start) boundary.
+    //
     // Path: 60f, 60f, 60f. Sync "taiwan" → frame 200. Step 1.start=200.
-    // Step 1.end was 120 → end<=start → extend to min(200+15, 180) = 180.
+    // Step 1.end was 120 → end <= start → extension fires →
+    //   inner Math.min(200+15=215, next.start=120) = 120
+    //   floor Math.max(200, 120) = 200
+    // → boundaries[1] = { start: 200, end: 200 } (zero-width, valid).
     const syncLookup = buildSyncLookup([sp("taiwan", 200)]);
     const boundaries = buildNarratedCameraBoundaries(
       cameraPath,
@@ -262,13 +269,9 @@ describe("buildNarratedCameraBoundaries — sync-anchor snapping", () => {
       syncLookup,
     );
     expect(boundaries[1].start).toBe(200);
-    // step 2 hasn't been touched yet → its start is still 120, so
-    // i < boundaries.length - 1 → upper bound is next.start = 120.
-    // But 120 < 200, so Math.min(215, 120) = 120 < boundaries[1].start = 200.
-    // The implementation does NOT clamp end ≥ start, so this exposes a
-    // potential issue: end could land BELOW start when next.start < start + 0.5s.
-    // Lock the current behaviour — flag if this needs fixing later.
-    expect(boundaries[1].end).toBe(120);
+    expect(boundaries[1].end).toBe(200);
+    // Invariant: end >= start always holds (regression lock).
+    expect(boundaries[1].end).toBeGreaterThanOrEqual(boundaries[1].start);
   });
 
   it("step-end-precedes-start guard: last step has no `next` → uses durationInFrames", () => {

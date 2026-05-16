@@ -304,10 +304,21 @@ export function buildNarratedCameraBoundaries(
       }
 
       // Current step's end may now precede its start — extend it.
+      //
+      // Floor at `start` because the next step's natural cumulative start can
+      // sit BELOW this step's snapped start when the sync frame is past the
+      // path's cumulative duration. Without the floor, Math.min could pick
+      // a value below `start`, producing `end < start` — `getStepProgress`
+      // tolerates (span ≤ 0 → 0), but `isTransitioning` becomes silently
+      // always-false for the affected step. Accept a degenerate `end === start`
+      // (zero-width window) over an inverted boundary.
       if (boundaries[i].end <= boundaries[i].start) {
-        boundaries[i].end = Math.min(
-          boundaries[i].start + sec(0.5),
-          i < boundaries.length - 1 ? boundaries[i + 1].start : durationInFrames,
+        boundaries[i].end = Math.max(
+          boundaries[i].start,
+          Math.min(
+            boundaries[i].start + sec(0.5),
+            i < boundaries.length - 1 ? boundaries[i + 1].start : durationInFrames,
+          ),
         );
       }
     }
