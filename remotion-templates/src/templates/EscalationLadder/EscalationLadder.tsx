@@ -25,10 +25,10 @@ import {
   fontSizes,
   fontWeights,
   layout,
+  letterSpacing,
   sec,
   contentArea,
   shadows,
-  radii,
 } from "../../design/theme";
 import { Legend } from "../../components/Legend";
 import { useThemeMode } from "../../hooks/useThemeMode";
@@ -67,18 +67,6 @@ const SEVERITY_COLORS: Record<SeverityLevel, string> = {
   elevated: palette.amber,
   high: palette.rust,
   critical: semantic.danger,
-};
-
-const hexAlpha = (hex: string, alpha: number): string => {
-  const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
-  return `${hex}${a}`;
-};
-const SEVERITY_BG: Record<SeverityLevel, string> = {
-  low: hexAlpha(SEVERITY_COLORS.low, 0.12),
-  moderate: hexAlpha(SEVERITY_COLORS.moderate, 0.12),
-  elevated: hexAlpha(SEVERITY_COLORS.elevated, 0.18),
-  high: hexAlpha(SEVERITY_COLORS.high, 0.15),
-  critical: hexAlpha(SEVERITY_COLORS.critical, 0.20),
 };
 
 const SEVERITY_SHAKE: Record<SeverityLevel, number> = {
@@ -334,6 +322,50 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         />
       </svg>
 
+      {/* Direction chevron — sits beyond the terminal end of the spine in
+          the direction of the editorial claim. Escalation → at the top of
+          the ladder, pointing up (away from the first dot). De-escalation
+          → at the bottom of the ladder, pointing down. Per POLISH.md D8
+          (sequential progressions need direction cues). */}
+      {(() => {
+        const isDescent = data.direction === "de-escalation";
+        const terminalIdx = isDescent ? numRungs - 1 : 0;
+        const terminalColor = SEVERITY_COLORS[data.rungs[terminalIdx]!.severity];
+        const chevronStart = ladderStart + sec(0.1);
+        const chevronOpacity = fadeIn(frame, chevronStart, sec(0.4)) * exit;
+        // Position: ~20px outside the first/last dot, along the spine line.
+        const chevronY = isDescent
+          ? (numRungs - 1) * rungHeight + rungHeight / 2 + 20
+          : rungHeight / 2 - 32;
+        const chevronLeft = spineX - area.left - 8;
+        // CSS triangle: 16x12 px, points up (escalation) or down (descent).
+        const border = isDescent
+          ? {
+              borderLeft: "8px solid transparent",
+              borderRight: "8px solid transparent",
+              borderTop: `12px solid ${terminalColor}`,
+            }
+          : {
+              borderLeft: "8px solid transparent",
+              borderRight: "8px solid transparent",
+              borderBottom: `12px solid ${terminalColor}`,
+            };
+        return (
+          <div
+            style={{
+              position: "absolute",
+              left: chevronLeft,
+              top: chevronY,
+              width: 0,
+              height: 0,
+              opacity: chevronOpacity * 0.85,
+              pointerEvents: "none",
+              ...border,
+            }}
+          />
+        );
+      })()}
+
       {/* Spine — vertical connecting line */}
       {data.rungs.map((_, i) => {
         if (i === numRungs - 1) return null;
@@ -457,9 +489,12 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         const rungStart = ladderStart + i * rungStagger;
         const rungOpacity = fadeIn(frame, rungStart, rungFadeIn) * exit;
         const color = SEVERITY_COLORS[rung.severity];
-        const bgColor = SEVERITY_BG[rung.severity];
         const rungY = i * rungHeight;
         const dotY = rungY + rungHeight / 2;
+        // Sequence ordinal in narrative order (top-to-bottom on the canvas).
+        // 01 is the first event the narrator names; the chevron in the spine
+        // header carries the metaphorical direction (escalation vs descent).
+        const ordinal = String(i + 1).padStart(2, "0");
 
         // Camera-based effects
         const cameraOpacity = hasCameraPath ? camera.getElementOpacity(i) : 1;
@@ -543,31 +578,55 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
               </div>
             )}
 
-            {/* Event card (right) */}
+            {/* Event entry (right) — no card chrome. A thin severity-color
+                rule on the left edge carries the editorial encoding; an
+                ordinal prefix in mono caps surfaces sequence position.
+                Per POLISH.md D1 (drop card chrome) and D4 (ordinal
+                numbering). The severity color rule is the T5 exception:
+                color IS the editorial encoding on this template. */}
             <div
               style={{
                 position: "absolute",
                 left: labelLeft - area.left,
                 top: rungY + (rungHeight - (rung.detail ? 56 : 40)) / 2,
                 maxWidth: maxLabelWidth,
-                padding: `${layout.spacing.xs}px ${layout.spacing.sm}px`,
-                backgroundColor: bgColor,
-                borderLeft: `${isFocused ? 3 : 2}px solid ${color}${isFocused ? "cc" : "80"}`,
-                borderRadius: radii.xs,
-                boxShadow: isFocused ? `0 2px 12px ${color}20` : "none",
+                paddingLeft: layout.spacing.md,
+                borderLeft: `${isFocused ? 3 : 2}px solid ${color}${isFocused ? "ee" : "99"}`,
               }}
             >
+              {/* Header row: ordinal (mono caps, severity color) + label */}
               <div
                 style={{
-                  fontSize: fontSizes.label,
-                  color: theme.text.primary,
-                  fontFamily: fonts.heading,
-                  fontWeight: fontWeights.medium,
-                  textShadow: theme.textShadow,
-                  lineHeight: 1.3,
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: layout.spacing.sm,
                 }}
               >
-                {rung.label}
+                <div
+                  style={{
+                    fontSize: fontSizes.caption,
+                    fontFamily: fonts.mono,
+                    fontWeight: 600,
+                    color: color,
+                    letterSpacing: letterSpacing.meta,
+                    opacity: isFocused ? 1 : 0.8,
+                    flexShrink: 0,
+                  }}
+                >
+                  {ordinal}
+                </div>
+                <div
+                  style={{
+                    fontSize: fontSizes.label,
+                    color: theme.text.primary,
+                    fontFamily: fonts.heading,
+                    fontWeight: fontWeights.medium,
+                    textShadow: theme.textShadow,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {rung.label}
+                </div>
               </div>
               {rung.detail && (
                 <div
@@ -578,6 +637,8 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
                     marginTop: 2,
                     textShadow: theme.textShadow,
                     opacity: isFocused ? 1 : 0.7,
+                    // Indent the detail line to align under the label, not the ordinal.
+                    paddingLeft: 32,
                   }}
                 >
                   {rung.detail}
