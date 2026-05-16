@@ -678,10 +678,23 @@ export const HorizontalTimeline: React.FC<{
   const direction = useDirection(data._direction);
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   // D17 anticipatory reveal: first event settled when narrator names it.
+  // Per-element extension: syncPoints[i] carries event i's narration cue
+  // (1:1 with data.events[i] / data.pairs[i] / data.morphEvents[i]). When
+  // present, event i's entrance is anticipated against its own cue; when
+  // absent, it falls back to the existing staggered default
+  // (entranceBase + i * sec(0.15)).
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
+  const ELEMENT_SETTLE = sec(0.4);
   const entranceBase = firstSyncFrame != null
-    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    ? anticipatoryStartFrame(firstSyncFrame, ELEMENT_SETTLE)
     : sec(0.5); // existing default
+  // Per-event reveal frame: prefer syncPoints[i] (anticipatory) when set,
+  // otherwise fall back to the staggered default rooted at entranceBase.
+  // Used identically across single / dual / morph layout modes.
+  const eventRevealFrame = (i: number): number =>
+    direction.syncPoints?.[i]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[i]!.frame, ELEMENT_SETTLE)
+      : entranceBase + i * sec(0.15);
   const footerHeight =
     data.mode === "dual"
       ? fontSizes.label * 2 + layout.spacing.xl
@@ -1043,7 +1056,7 @@ export const HorizontalTimeline: React.FC<{
                     const eventBlur = camera.getEventBlur(i);
                     const isFocused = camera.focusIndex === i;
                     const position = (i % 2 === 0 ? "above" : "below") as "above" | "below";
-                    const revealFrame = entranceBase + i * sec(0.15);
+                    const revealFrame = eventRevealFrame(i);
                     // focusIndex === -1 means "pullback" (overview shot) — show all cards.
                     const isPullback = camera.focusIndex === -1;
                     const hideText =
@@ -1193,7 +1206,7 @@ export const HorizontalTimeline: React.FC<{
                     const eventBlur = camera.getEventBlur(i);
                     const isFocused = camera.focusIndex === i;
                     const isPullback = camera.focusIndex === -1;
-                    const revealFrame = entranceBase + i * sec(0.15);
+                    const revealFrame = eventRevealFrame(i);
                     const hideText =
                       shouldHideOffFocusCards && !isFocused && !isPullback;
                     // In cinematic mode, off-focus neighbors are hidden so
@@ -1332,7 +1345,7 @@ export const HorizontalTimeline: React.FC<{
                   const eventBlur = camera.getEventBlur(i);
                   const isFocused = camera.focusIndex === i;
                   const position = (i % 2 === 0 ? "above" : "below") as "above" | "below";
-                  const revealFrame = entranceBase + i * sec(0.15);
+                  const revealFrame = eventRevealFrame(i);
 
                   // Morph color
                   const morphColor = interpolateColors(

@@ -305,6 +305,24 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
   const arcStart = sec(1.4);
   const exitOp = exitFade(frame, durationInFrames, 15);
 
+  // D17 per-element anticipatory reveal.
+  // Convention: `direction.syncPoints[i]` is the narration cue for
+  // `data.nodes[i]` (1:1 indexing). When a per-node cue exists, that
+  // entity settles ~NODE_SETTLE before the narrator names it; absent cues
+  // fall through to the original `nodeStart + i * sec(0.1)` stagger —
+  // pixel-identical to the pre-D17-per-element baseline.
+  const NODE_SETTLE = sec(0.3);
+  const nodeStartFrames = useMemo(() => {
+    return data.nodes.map((_, i) => {
+      const cue = direction.syncPoints?.[i]?.frame;
+      if (cue !== undefined) {
+        return anticipatoryStartFrame(cue, NODE_SETTLE);
+      }
+      return nodeStart + stagger(i, sec(0.1));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.nodes, direction.syncPoints, nodeStart]);
+
   // Baseline draw progress (left → right reveal).
   const baselineProgress = interpolate(
     frame,
@@ -638,7 +656,7 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
           {data.nodes.map((node: ArcNode, i) => {
             const x = nodeXs[i];
             const isPrimary = node.importance === "primary";
-            const start = nodeStart + stagger(i, sec(0.1));
+            const start = nodeStartFrames[i];
             const op = fadeIn(frame, start, sec(0.3)) * exitOp;
             const fill =
               node.color === "accent"

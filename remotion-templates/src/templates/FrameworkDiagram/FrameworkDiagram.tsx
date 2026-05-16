@@ -63,6 +63,25 @@ import {
 } from "../../utils/segmentBackdrop";
 import type { FrameworkDiagramData, FrameworkPhase, EliminatedScenario } from "./types";
 
+// ── D17 per-element helper ─────────────────────────────────────────────────
+// Each variant (Comparison columns, Matrix cells, Flow steps) may opt-in to
+// per-element narration cues by passing `syncPoints[i].frame` to compute the
+// entrance of element i. When the sync point isn't provided, the helper
+// returns the caller's staggered fallback frame — pixel-identical to
+// pre-D17 behavior. Indexing convention is variant-specific:
+//   - Comparison: syncPoints[i] = column i's name cue
+//   - Matrix:     syncPoints[i] = cell i's name cue (row-major, i = ri*numCols + ci)
+//   - Flow:       syncPoints[i] = step i's name cue (where applicable)
+const perElementStartFrame = (
+  syncFrame: number | undefined,
+  fallback: number,
+  settle: number = sec(0.4),
+): number => {
+  return syncFrame != null
+    ? anticipatoryStartFrame(syncFrame, settle)
+    : fallback;
+};
+
 // ── Comparison variant ─────────────────────────────────────────────────────
 
 const ComparisonVariant: React.FC<{
@@ -81,6 +100,7 @@ const ComparisonVariant: React.FC<{
   const firstColumnRevealBase = firstSyncFrameFW != null
     ? anticipatoryStartFrame(firstSyncFrameFW, sec(0.5))
     : sec(0.5); // existing default
+
   // Audio-reactive amplification for the VS divider glow oscillation. Hook
   // is called unconditionally; the conditional VS render below uses
   // `vsBeat.pulse` only when columns.length === 2.
@@ -117,7 +137,11 @@ const ComparisonVariant: React.FC<{
       }}
     >
       {columns.map((col, ci) => {
-        const colStart = stagger(ci, sec(0.6 * s), firstColumnRevealBase);
+        // D17 per-element: syncPoints[ci] = column ci's narration cue; falls back to stagger.
+        const colStart = perElementStartFrame(
+          direction.syncPoints?.[ci]?.frame,
+          stagger(ci, sec(0.6 * s), firstColumnRevealBase),
+        );
         const colOpacity = fadeIn(frame, colStart, sec(0.5));
         const colScale = 0.96 + 0.04 * heroSpring(frame, layout.fps, colStart);
         const colColor = col.color || emphasis.primaryAccent;
@@ -1085,10 +1109,12 @@ const MatrixVariant: React.FC<{
       {rowHeaders.map((_, ri) =>
         colHeaders.map((_, ci) => {
           const cell = cellLookup.get(`${ri}-${ci}`);
-          const cellStart = stagger(
-            ri * numCols + ci,
-            sec(0.18),
-            sec(0.6)
+          // D17 per-element: syncPoints[cellIdx] = cell's narration cue
+          // (cellIdx = ri*numCols + ci, row-major). Falls back to stagger.
+          const cellIdx = ri * numCols + ci;
+          const cellStart = perElementStartFW(
+            cellIdx,
+            stagger(cellIdx, sec(0.18), sec(0.6)),
           );
           const cellOpacity = fadeIn(frame, cellStart, sec(0.4));
           const cellColor = cell?.color || theme.text.muted;

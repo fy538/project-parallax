@@ -250,6 +250,26 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
     ? anticipatoryStartFrame(firstSyncFrameEL, sec(0.5))
     : sec(0.5 * t); // existing default
 
+  // D17 per-element anticipatory reveal — per-rung narration cues.
+  //
+  // Convention: `direction.syncPoints[i]` carries the narration cue for rung
+  // `i` (no separate "title" cue — the ladder opens silent and each rung is
+  // a discrete editorial beat). When `syncPoints[i].frame` is provided, the
+  // rung is anticipated so it settles as the narrator names it
+  // (anticipatoryStartFrame backs out the RUNG_SETTLE settle window). When
+  // not provided, falls back to the existing `ladderStart + i * rungStagger`
+  // stagger — pixel-identical to pre-D17 behavior.
+  //
+  // The visual-spec skill emits syncPoints as a parallel array to
+  // `data.rungs` when narration timing is known; otherwise it omits them and
+  // the visual cadence is determined entirely by `rungStagger` / `s` (PACE).
+  const RUNG_SETTLE = sec(0.4);
+  const rungStartFrames = data.rungs.map((_, i) =>
+    direction.syncPoints?.[i]?.frame !== undefined
+      ? anticipatoryStartFrame(direction.syncPoints[i]!.frame!, RUNG_SETTLE)
+      : ladderStart + i * rungStagger,
+  );
+
   // ── Exit ────────────────────────────────────────────────────────────────
   const exit = exitFade(frame, durationInFrames, outroFrames);
 
@@ -369,7 +389,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
       {/* Spine — vertical connecting line */}
       {data.rungs.map((_, i) => {
         if (i === numRungs - 1) return null;
-        const rungStart = ladderStart + i * rungStagger;
+        const rungStart = rungStartFrames[i]!;
         const spineProgress = interpolate(
           frame,
           [rungStart + rungFadeIn, rungStart + rungFadeIn + spineDrawPerRung],
@@ -430,7 +450,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
         const nextCenterY = (rungIdx + 1) * rungHeight + rungHeight / 2;
         const lineY = (rungCenterY + nextCenterY) / 2;
         // Animate in with the same timing as the rung at afterRungIndex.
-        const rungStart = ladderStart + rungIdx * rungStagger;
+        const rungStart = rungStartFrames[rungIdx]!;
         const thresholdOpacity = fadeIn(frame, rungStart + rungFadeIn, sec(0.4)) * exit;
         const lineLeft = centerPad;
         const lineWidth = ladderBlockWidth;
@@ -486,7 +506,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
 
       {/* Rungs */}
       {data.rungs.map((rung, i) => {
-        const rungStart = ladderStart + i * rungStagger;
+        const rungStart = rungStartFrames[i]!;
         const rungOpacity = fadeIn(frame, rungStart, rungFadeIn) * exit;
         const color = SEVERITY_COLORS[rung.severity];
         const rungY = i * rungHeight;
@@ -780,7 +800,7 @@ export const EscalationLadder: React.FC<{ data: EscalationLadderData }> = ({
           swatchShape="circle"
           swatchSize={10}
           gap={layout.spacing.lg}
-          startFrame={ladderStart + (numRungs - 1) * rungStagger + sec(0.5)}
+          startFrame={(rungStartFrames[numRungs - 1] ?? ladderStart + (numRungs - 1) * rungStagger) + sec(0.5)}
           fadeInDuration={sec(0.4)}
           style={{
             position: "absolute",

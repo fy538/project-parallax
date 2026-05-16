@@ -880,13 +880,35 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
   const controlStartFrame = sec(1.8 * t);
   const calloutStartFrame = sec(2.2 * t);
 
+  // D17 per-element anticipatory reveal (static mode only).
+  // Convention: `direction.syncPoints[i]` is the narration cue for
+  // `data.nodes[i]` (1:1 indexing). The hub / primary node is conventionally
+  // the FIRST node in the array, so `syncPoints[0]` corresponds to the hub.
+  // When a per-node sync point exists, that node's entrance is shifted to
+  // land NODE_SETTLE before the narrator names it; absent sync points fall
+  // through to the original staggered formula — pixel-identical to the
+  // pre-D17-per-element output. Narrated-camera mode (hasCameraPath) is
+  // untouched: it owns its own focus timing via the camera path.
+  const NODE_SETTLE = sec(0.35);
+  const staticNodeStartFrames = useMemo(() => {
+    return data.nodes.map((_, i) => {
+      const cue = direction.syncPoints?.[i]?.frame;
+      if (cue !== undefined) {
+        return anticipatoryStartFrame(cue, NODE_SETTLE);
+      }
+      return nodeStartFrame + stagger(i, sec(0.08 * s));
+    });
+    // `nodeStartFrame`, `NODE_SETTLE`, `s` derive from frame-stable inputs
+    // (paceStaggerScale + syncPoints), so deps are intentionally narrow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.nodes, direction.syncPoints, nodeStartFrame, s]);
+
   const getNodeOpacity = (nodeIndex: number): number => {
     if (hasCameraPath) {
       // In narrated mode, all nodes appear quickly, camera handles focus
       return fadeIn(frame, sec(0.2) + stagger(nodeIndex, sec(0.04)), sec(0.3));
     }
-    const startDelay = stagger(nodeIndex, sec(0.08 * s));
-    return fadeIn(frame, nodeStartFrame + startDelay, sec(0.35));
+    return fadeIn(frame, staticNodeStartFrames[nodeIndex], sec(0.35));
   };
 
   const getEdgeProgress = (edgeIndex: number): number => {
@@ -1040,10 +1062,12 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
 
           // Brand lock-on pulse: fires when the node first appears (static)
           // or when the camera focuses on it (narrated). Applied as a scale
-          // multiplier on top of cameraScale.
+          // multiplier on top of cameraScale. Static mode uses the
+          // per-node D17 entrance frame (anticipates syncPoints[i] when
+          // provided, else staggered default).
           const nodeAppearFrame = hasCameraPath
             ? sec(0.2) + stagger(nodeIdx, sec(0.04))
-            : nodeStartFrame + stagger(nodeIdx, sec(0.08));
+            : staticNodeStartFrames[nodeIdx];
           const lockScale = lockOnPulse(frame, nodeAppearFrame, config.fps);
 
           // Annotation layouts (hub-spoke, bipartite) use the precision

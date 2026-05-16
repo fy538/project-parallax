@@ -166,9 +166,19 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
   const outroFrames = sec(1.5);
 
   // D17 anticipatory reveal: first image settled when narrator names it.
+  //
+  // syncPoints convention for AnnotatedImage:
+  //   syncPoints[0]       → image reveal cue (anticipated for IMAGE_SETTLE)
+  //   syncPoints[1..N]    → callout 1..N narration cues
+  //                         (callout i at index i+1 in syncPoints — the
+  //                         image is element 0, callouts share the array)
+  // Falls back pixel-identically to the legacy `calloutsStart + i * stagger`
+  // formula when per-callout sync points are not provided.
+  const IMAGE_SETTLE = sec(0.4);
+  const CALLOUT_SETTLE = sec(0.4);
   const firstSyncFrame = direction.syncPoints?.[0]?.frame;
   const entranceBase = firstSyncFrame != null
-    ? anticipatoryStartFrame(firstSyncFrame, sec(0.4))
+    ? anticipatoryStartFrame(firstSyncFrame, IMAGE_SETTLE)
     : sec(0.2); // existing default
   const imageStart = entranceBase;
   const calloutsStart = imageStart + imageRevealFrames + sec(0.3);
@@ -251,7 +261,14 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
           );
           const color = callout.color || emphasis.primaryAccent;
 
-          const calloutStart = calloutsStart + i * calloutStagger;
+          // D17 per-element anticipatory reveal — per-callout narration cues.
+          // syncPoints[i + 1] (image is syncPoints[0]); fall back to the
+          // existing staggered formula when no per-callout cue is provided.
+          const calloutSyncFrame = direction.syncPoints?.[i + 1]?.frame;
+          const calloutStart =
+            calloutSyncFrame !== undefined
+              ? anticipatoryStartFrame(calloutSyncFrame, CALLOUT_SETTLE)
+              : calloutsStart + i * calloutStagger;
           const dotProgress = interpolate(
             frame,
             [calloutStart, calloutStart + dotFrames],

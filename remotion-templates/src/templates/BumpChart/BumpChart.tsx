@@ -196,16 +196,34 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
   const entityStagger = sec(0.05);
 
   // D17 anticipatory reveal: first line segment settled when narrator names it.
+  // Per-element extension: syncPoints[i] carries entity i's narration cue
+  // (1:1 with data.entities[i] — e.g. "China overtakes Japan..."). When
+  // present, entity i's first segment lands settled on its own cue; when
+  // absent, falls back to the existing entity-staggered default rooted at
+  // lineRevealBase. Column phase math (col * segDuration) is unchanged —
+  // only the per-entity entrance offset shifts.
+  const ELEMENT_SETTLE = sec(0.4);
   const firstSyncFrameBC = direction.syncPoints?.[0]?.frame;
   const lineRevealBase = firstSyncFrameBC != null
-    ? anticipatoryStartFrame(firstSyncFrameBC, sec(0.4))
+    ? anticipatoryStartFrame(firstSyncFrameBC, ELEMENT_SETTLE)
     : sec(0.5); // existing default
 
-  // Get the frame at which entity i's segment from col (c) to col (c+1) starts
+  // Per-entity entrance frame: prefer syncPoints[entityIndex] (anticipatory)
+  // when set, otherwise fall back to lineRevealBase + entityIndex * stagger.
+  // Pixel-identical to previous behavior when no per-entity syncPoints set.
+  const entityBaseStart = (entityIndex: number): number =>
+    direction.syncPoints?.[entityIndex]?.frame !== undefined
+      ? anticipatoryStartFrame(
+          direction.syncPoints[entityIndex]!.frame,
+          ELEMENT_SETTLE,
+        )
+      : lineRevealBase + entityIndex * entityStagger;
+
+  // Get the frame at which entity i's segment from col (c) to col (c+1) starts.
+  // Each entity advances through columns at the shared segDuration cadence
+  // starting from its own per-entity base.
   const segStart = (entityIndex: number, colIndex: number): number => {
-    // Overall column phase starts at lineRevealBase
-    const colPhaseStart = lineRevealBase + colIndex * segDuration;
-    return colPhaseStart + entityIndex * entityStagger;
+    return entityBaseStart(entityIndex) + colIndex * segDuration;
   };
 
   // Frame at which entity i's last segment finishes
