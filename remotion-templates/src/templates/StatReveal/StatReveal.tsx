@@ -255,7 +255,11 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode(data.backgroundVariant);
-  const direction = useDirection(data._direction);
+  // HOLD_MOTION_REGISTER Register B — single-hero stat reveals breathe
+  // gently during their post-entrance hold so the number reads alive,
+  // not static (POLISH.md D20). Per-segment data overrides via
+  // _direction.driftPreset (e.g., memorial moments → "none").
+  const direction = useDirection(data._direction, "breathing");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   // Audio-reactive scale kick on Whisper-resolved sync points. Returns
   // neutral state when no sync points exist.

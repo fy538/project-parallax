@@ -245,7 +245,11 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
   const frame = useCurrentFrame();
   const theme = useThemeMode("light");
   const { durationInFrames } = useVideoConfig();
-  const direction = useDirection(data._direction);
+  // HOLD_MOTION_REGISTER Register C — photo plates use documentary Ken Burns
+  // (POLISH.md D20). Phase 0 audit found PhotoMontage at 0.080% pixel diff
+  // during hold; the "documentary" template default closes that gap.
+  // Per-segment _direction.driftPreset overrides the default.
+  const direction = useDirection(data._direction, "documentary");
   const { style: compositionStyle } = useCompositionAnimation(direction.driftOptions);
 
   const transitionDurationFrames = sec(data.transitionDurationSec ?? 0.3);

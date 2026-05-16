@@ -143,7 +143,10 @@ export const AnnotatedImage: React.FC<{ data: AnnotatedImageData }> = ({
   );
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const direction = useDirection(data._direction);
+  // HOLD_MOTION_REGISTER Register C — the image IS the evidence being
+  // annotated (per L103 doctrine — composite="inset"). Documentary Ken
+  // Burns is the canonical hold-beat treatment (POLISH.md D20).
+  const direction = useDirection(data._direction, "documentary");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   // Per-episode color emphasis — callout dot/leader lines fall back to
   // the episode's primary accent.

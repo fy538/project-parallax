@@ -268,24 +268,40 @@ const PACE_TIMING: Record<PaceProfile, { timing: number; stagger: number }> = {
  * (manifest validators, schema migrations, CLI tools).
  *
  * Behavior is fully backward-compatible: when `direction` is undefined or
- * null, returns the no-direction defaults (paceTimingScale=1.0,
- * paceStaggerScale=1.0, all other fields undefined). When `direction` is
- * present, derives atmosphereIntensity from ambientParticles (including explicit 0)
- * and optional musicBedAtmosphereMultiplier,
- * resolves driftPreset to animation options, and resolves paceProfile to
- * timing/stagger scales. Unknown preset/profile values fall back to
- * sensible defaults (empty drift options, analytical pace).
+ * null AND no `templateDefaultDriftPreset` is provided, returns the
+ * no-direction defaults (paceTimingScale=1.0, paceStaggerScale=1.0, all
+ * other fields undefined). When `direction` is present, derives
+ * atmosphereIntensity from ambientParticles (including explicit 0) and
+ * optional musicBedAtmosphereMultiplier, resolves driftPreset to animation
+ * options, and resolves paceProfile to timing/stagger scales. Unknown
+ * preset/profile values fall back to sensible defaults (empty drift options,
+ * analytical pace).
+ *
+ * The optional `templateDefaultDriftPreset` second argument lets each
+ * template declare its hold-motion register (HOLD_MOTION_REGISTER.md, D20).
+ * Cascade: `direction.driftPreset` → `templateDefaultDriftPreset` → empty.
+ * Per-segment script overrides win over template defaults; template defaults
+ * win over the global no-preset fallback. See `project/HOLD_MOTION_REGISTER.md`
+ * for the per-template assignment table.
  */
 export function resolveDirection(
   direction?: DirectionBlock | null,
+  templateDefaultDriftPreset?: DriftPreset,
 ): DirectionResult {
   if (!direction) {
+    // Template default still applies even when no direction block is provided —
+    // PhotoMontage / ImageComposite / AtlasPlate may render without an
+    // explicit _direction in the data, but still want their register's
+    // hold-motion treatment.
+    const fallbackDriftOptions = templateDefaultDriftPreset
+      ? DRIFT_PRESETS[templateDefaultDriftPreset] || {}
+      : {};
     return {
       atmosphere: undefined,
       atmosphereIntensity: undefined,
       backgroundTint: undefined,
       globalDim: undefined,
-      driftOptions: {},
+      driftOptions: fallbackDriftOptions,
       holdAfter: undefined,
       preDelay: undefined,
       proportional: undefined,
@@ -311,9 +327,13 @@ export function resolveDirection(
       ? (baseIntensity ?? 1.0) * moodMult
       : undefined;
 
-  // Resolve drift preset to animation options
-  const driftOptions = direction.driftPreset
-    ? DRIFT_PRESETS[direction.driftPreset] || {}
+  // Resolve drift preset to animation options. Cascade:
+  //   1. direction.driftPreset (per-segment data-file or DIR: drift(…) override)
+  //   2. templateDefaultDriftPreset (the template's HOLD_MOTION_REGISTER assignment)
+  //   3. empty options (falls through to useCompositionAnimation's motionBudget default)
+  const effectiveDriftPreset = direction.driftPreset ?? templateDefaultDriftPreset;
+  const driftOptions = effectiveDriftPreset
+    ? DRIFT_PRESETS[effectiveDriftPreset] || {}
     : {};
 
   // Resolve pace profile to timing scales
@@ -347,4 +367,5 @@ export function resolveDirection(
  */
 export const useDirection = (
   direction?: DirectionBlock | null,
-): DirectionResult => resolveDirection(direction);
+  templateDefaultDriftPreset?: DriftPreset,
+): DirectionResult => resolveDirection(direction, templateDefaultDriftPreset);

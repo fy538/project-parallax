@@ -142,11 +142,18 @@ const buildGraticulePaths = (
 export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const direction = useDirection(data._direction);
-  const { style: compStyle } = useCompositionAnimation({
-    noDrift: true,
-    ...direction.driftOptions,
-  });
+  // HOLD_MOTION_REGISTER Register D — atlas plates use `breathing` for
+  // projection-safe hold-beat motion (POLISH.md D20). Breathing is
+  // scale-only (zero pan, zero rotation) so the map projection stays
+  // registered. Phase 0 audit found atlas plates at 0.002% pixel diff
+  // (effectively static); the "breathing" template default closes that
+  // gap without risking projection drift.
+  //
+  // Previously hardcoded `noDrift: true` to prevent the default editorial
+  // drift from interfering with map projection. With `breathing`, the
+  // motion is scale-only so noDrift is no longer needed.
+  const direction = useDirection(data._direction, "breathing");
+  const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
   const dark = data.backgroundVariant === "dark";
   const framePadding = data.framePadding ?? DEFAULT_FRAME_PADDING;
