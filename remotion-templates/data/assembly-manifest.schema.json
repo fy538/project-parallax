@@ -388,6 +388,11 @@
             "filmOverlay": {
               "$ref": "#/$defs/filmOverlayConfig",
               "description": "Per-segment FilmOverlay override. Each field cascades independently — set just `preset` to override the auto-resolved choice for this segment, or just `intensity` to crank/dampen without changing preset. Resolution order (most-specific wins per field): segment field → backdrop `recommendedPreset` (for `preset` field only) → TEMPLATE_PRESET_MAP[component] → episode `manifest.filmOverlay` → `documentary`. Resolved at render time by `resolveFilmOverlay()`. The whole cascade is GATED on `manifest.filmOverlay` being present; when episode-level is unset, this field is ignored too."
+            },
+            "props": {
+              "type": "object",
+              "description": "Inline props to merge into the template's data at render time, BEFORE the JSON data file (if any) is applied. Currently used by Phase 6 chapter-sugar (`DIR: chapter(\"...\")`) to inject a TitleTransition title without requiring a `title-section-<slug>.json` file. Forward-compatible: any template-specific override may be passed here.",
+              "additionalProperties": true
             }
           }
         },

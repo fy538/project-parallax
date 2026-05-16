@@ -730,6 +730,183 @@ def test_parse_dir_cut_match_cut_still_accepted():
     assert result["transitionDuration"] == 0.35
 
 
+def test_parse_dir_chapter_basic():
+    """Phase 6 of TRANSITION_GRAMMAR.md — DIR: chapter("Title") sugar."""
+    result = parse_dir_lines(['DIR: chapter("The Logic of Denial")'])
+    assert result["chapter"]["title"] == "The Logic of Denial"
+    # Slug is the final meaningful token, stop-words dropped
+    assert result["chapter"]["slug"] == "denial"
+
+
+def test_parse_dir_chapter_with_kicker():
+    result = parse_dir_lines(['DIR: chapter("The Other Side of the Wall", kicker:"Beat 3")'])
+    assert result["chapter"]["title"] == "The Other Side of the Wall"
+    assert result["chapter"]["kicker"] == "Beat 3"
+    assert result["chapter"]["slug"] == "wall"
+
+
+def test_parse_dir_chapter_explicit_slug_override():
+    """Second positional arg or `slug:"..."` overrides the auto-derived slug."""
+    result = parse_dir_lines(['DIR: chapter("The Trap", "custom-slug")'])
+    assert result["chapter"]["slug"] == "custom-slug"
+
+    result2 = parse_dir_lines(['DIR: chapter("The Trap", slug:"trap-v2")'])
+    assert result2["chapter"]["slug"] == "trap-v2"
+
+
+def test_parse_dir_chapter_slug_handles_apostrophes_and_stopwords():
+    result = parse_dir_lines(['DIR: chapter("Don\'t Look Up")'])
+    # apostrophe dropped (dont), stop-words dropped → slug = "up"
+    assert result["chapter"]["slug"] == "up"
+
+
+def test_slugify_chapter_title_silicon_trap_examples():
+    """The slugifier should produce the same slugs as SILICON_TRAP_DATA_FILES."""
+    from generate_manifest import _slugify_chapter_title
+    assert _slugify_chapter_title("The Logic of Denial") == "denial"
+    assert _slugify_chapter_title("The Other Side of the Wall") == "wall"
+    assert _slugify_chapter_title("The Trap") == "trap"
+    assert _slugify_chapter_title("Your Chips") == "chips"
+    assert _slugify_chapter_title("The Paradox") == "paradox"
+
+
+def _make_chapter_parsed(title: str, slug: str, kicker: str | None = None) -> dict:
+    """Build a synthetic parsed dict as produced by the chapter-sugar intercept."""
+    return {
+        "type": "TRANSITION",
+        "priority": "P1",
+        "component": "TitleTransition",
+        "searchTerms": [],
+        "source": None,
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": None,
+        "durationSec": 3.0,
+        "durationMode": "explicit",
+        "notes": "",
+        "dataFile": None,
+        "backdropId": None,
+        "_chapterSlug": slug,
+        "_chapterTitle": title,
+        "_chapterKicker": kicker,
+    }
+
+
+def test_build_segment_chapter_sugar_emits_titletransition():
+    """Phase 6: _build_segment attaches template.props when _chapterTitle is set."""
+    parsed = _make_chapter_parsed("The Logic of Denial", "denial")
+    seg = _build_segment(
+        1,
+        parsed,
+        "TRANSITION",
+        0.0,
+        3.0,
+        "beat-a",
+        "",
+        "**TRANSITION** TitleTransition title-section-denial.json",
+        "**TRANSITION** TitleTransition title-section-denial.json",
+        {},  # data_files — no file exists, triggers warning path
+        {},
+        {},
+    )
+    assert seg["template"]["component"] == "TitleTransition"
+    assert seg["template"]["props"]["title"] == "The Logic of Denial"
+    assert seg["template"]["props"]["variant"] == "section"
+    assert "kicker" not in seg["template"]["props"]
+
+
+def test_build_segment_chapter_sugar_includes_kicker():
+    """Phase 6: kicker is forwarded into template.props when present."""
+    parsed = _make_chapter_parsed("The Other Side of the Wall", "wall", kicker="Beat 3")
+    seg = _build_segment(
+        1,
+        parsed,
+        "TRANSITION",
+        0.0,
+        3.0,
+        "beat-b",
+        "",
+        "**TRANSITION** TitleTransition title-section-wall.json",
+        "**TRANSITION** TitleTransition title-section-wall.json",
+        {},
+        {},
+        {},
+    )
+    assert seg["template"]["props"]["kicker"] == "Beat 3"
+    assert seg["template"]["props"]["title"] == "The Other Side of the Wall"
+    assert seg["template"]["props"]["variant"] == "section"
+
+
+def test_build_segment_chapter_sugar_warns_when_no_data_file(capsys):
+    """Phase 6: a stderr warning is emitted when no matching JSON data file exists."""
+    parsed = _make_chapter_parsed("The Trap", "trap")
+    _build_segment(
+        1,
+        parsed,
+        "TRANSITION",
+        0.0,
+        3.0,
+        "beat-c",
+        "",
+        "**TRANSITION** TitleTransition title-section-trap.json",
+        "**TRANSITION** TitleTransition title-section-trap.json",
+        {},   # empty data_files → triggers the "no data file" warning
+        {},
+        {},
+    )
+    err = capsys.readouterr().err
+    assert "title-section-trap.json" in err
+    assert "DIR: chapter()" in err
+
+
+def test_build_segment_chapter_sugar_no_warn_when_data_file_present(capsys):
+    """Phase 6: no warning when a data file is resolved (bracket notation triggers it)."""
+    parsed = _make_chapter_parsed("The Trap", "trap")
+    # Bracket notation [file.json] is the direct-extraction path in resolve_data_file
+    # and does not require data_files dict lookup — guarantees data_file is non-None.
+    _build_segment(
+        1,
+        parsed,
+        "TRANSITION",
+        0.0,
+        3.0,
+        "beat-c",
+        "",
+        "**TRANSITION** TitleTransition [title-section-trap.json]",
+        "**TRANSITION** TitleTransition [title-section-trap.json]",
+        {},
+        {},
+        {},
+    )
+    err = capsys.readouterr().err
+    # When data_file is resolved, the "props.title until you create the JSON" warning
+    # must NOT appear.
+    assert "props.title until you create" not in err
+
+
+def test_build_segment_chapter_sugar_timing():
+    """Phase 6: segment startSec / endSec / type are set correctly."""
+    parsed = _make_chapter_parsed("The Paradox", "paradox")
+    seg = _build_segment(
+        3,
+        parsed,
+        "TRANSITION",
+        10.5,   # cursor position
+        3.0,    # durationSec
+        "beat-d",
+        "",
+        "",
+        "",
+        {},
+        {},
+        {},
+    )
+    assert seg["startSec"] == 10.5
+    assert seg["endSec"] == 13.5
+    assert seg["type"] == "TRANSITION"
+    assert seg["beat"] == "beat-d"
+
+
 def test_match_cut_still_templates_set_is_canonical():
     """Lock the set so accidental edits get caught."""
     from generate_manifest import MATCH_CUT_STILL_TEMPLATES

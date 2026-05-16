@@ -526,6 +526,31 @@ def _extract_sync_words(params_str: str) -> list[str]:
     return words
 
 
+def _slugify_chapter_title(title: str) -> str:
+    """Slugify a chapter title for matching against `title-section-<slug>.json`.
+
+    Lowercases, drops articles (the/a/an), removes apostrophes, collapses
+    non-alphanumerics to hyphens, strips edges. Matches the convention used
+    in SILICON_TRAP_DATA_FILES (e.g. "The Logic of Denial" → "denial",
+    "The Other Side of the Wall" → "wall", "The Trap" → "trap").
+
+    Authors can override the auto-derived slug with the second positional
+    arg or `slug:"..."` keyword in `chapter(...)`.
+    """
+    s = title.lower()
+    s = re.sub(r"['']", "", s)  # drop apostrophes (don't → dont)
+    # Drop common stop words to mirror existing title-section naming
+    s = re.sub(r"\b(the|a|an|of|and|in|on|at|to|for|with)\b", " ", s)
+    s = re.sub(r"[^a-z0-9]+", "-", s)
+    s = s.strip("-")
+    # Final-token convention: SILICON_TRAP uses single-word slugs
+    # (denial, wall, trap, chips, paradox). Take the last meaningful token.
+    parts = [p for p in s.split("-") if p]
+    if not parts:
+        return "section"
+    return parts[-1]
+
+
 def parse_dir_lines(dir_lines: list[str]) -> dict:
     """
     Parse DIR: annotation lines into a direction dict for assembly manifest use.
@@ -658,6 +683,67 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
             # Extract sync words from reveal() — same grammar as cam().
             for sw in _extract_sync_words(params_str):
                 result.setdefault("syncWords", []).append(sw)
+
+        elif dtype == "chapter":
+            # Parse chapter() — Phase 6 of TRANSITION_GRAMMAR.md.
+            # Sugar for `[TRANSITION] TitleTransition` segment + fade pair.
+            # Reduces 4 lines of authoring boilerplate (timestamp + empty
+            # narration + visual cell with **TRANSITION** TitleTransition +
+            # data file reference) to a single DIR directive.
+            #
+            # Grammar:
+            #   chapter("Title Text")
+            #   chapter("Title Text", kicker:"Optional kicker")
+            #   chapter("Title Text", "section-slug")  — slug override
+            #
+            # The slug defaults to slugify(title) and is used to look up the
+            # corresponding `title-section-<slug>.json` data file. If no
+            # data file is found, the segment is still emitted but the
+            # template will fall back to inline `props.title` (Remotion
+            # wiring of inline-title is queued for a follow-up; the segment
+            # structure is the value Phase 6 delivers).
+            tokens = []
+            current = ""
+            depth = 0
+            in_str = False
+            for ch in params_str:
+                if ch == '"' and depth == 0:
+                    in_str = not in_str
+                    current += ch
+                elif ch == "," and not in_str and depth == 0:
+                    tokens.append(current.strip())
+                    current = ""
+                else:
+                    current += ch
+            if current.strip():
+                tokens.append(current.strip())
+
+            chapter = {}
+            for i, token in enumerate(tokens):
+                # kicker:"..."
+                kicker_m = re.match(r'^kicker:\s*"([^"]+)"\s*$', token)
+                if kicker_m:
+                    chapter["kicker"] = kicker_m.group(1)
+                    continue
+                # slug:"..." or bare second positional "slug"
+                slug_m = re.match(r'^slug:\s*"([^"]+)"\s*$', token)
+                if slug_m:
+                    chapter["slug"] = slug_m.group(1)
+                    continue
+                # Bare quoted string — first is title, second is slug
+                bare_m = re.match(r'^"([^"]+)"\s*$', token)
+                if bare_m:
+                    if "title" not in chapter:
+                        chapter["title"] = bare_m.group(1)
+                    elif "slug" not in chapter:
+                        chapter["slug"] = bare_m.group(1)
+                    continue
+                # Unknown token — silently ignored (forward-compat).
+
+            if "title" in chapter:
+                if "slug" not in chapter:
+                    chapter["slug"] = _slugify_chapter_title(chapter["title"])
+                result["chapter"] = chapter
 
         elif dtype == "type":
             # Parse type() — text-animation register for text-bearing
@@ -1393,6 +1479,49 @@ def build_estimate_manifest(
         # Determine row duration (how much the cursor advances)
         narr_dur = estimate_narration_duration(narr) if clean_narr else 0.0
 
+        # Phase 6 of TRANSITION_GRAMMAR.md — `DIR: chapter("Title")` sugar.
+        # When the visual cell is empty (parsed is None) and a chapter
+        # directive is present, synthesize a TitleTransition segment so the
+        # author doesn't have to write the `**TRANSITION** TitleTransition
+        # title-section-<slug>.json` boilerplate. Rule 2 of
+        # apply_default_transitions handles the fade pair on neighbors.
+        if parsed is None and direction.get("chapter"):
+            chapter = direction["chapter"]
+            slug = chapter["slug"]
+            # Default 3s — long enough for the card to land + a beat of breath.
+            inferred_dur = 3.0
+            parsed = {
+                "type": "TRANSITION",
+                "priority": "P1",
+                "component": "TitleTransition",
+                "searchTerms": [],
+                "source": None,
+                "ramp": "standard",
+                "composite": "background",
+                "opacity": None,
+                "durationSec": inferred_dur,
+                "durationMode": "explicit",
+                "notes": "",
+                "dataFile": None,
+                "backdropId": None,
+                # Synthesized hint for resolve_data_file (slug → file). The
+                # data_files dict is searched first; if no match, we still
+                # emit the segment and warn so the author knows to create
+                # the JSON. The inline title/kicker are stashed on the
+                # segment for future Remotion wiring (Phase 6 follow-up).
+                "_chapterSlug": slug,
+                "_chapterTitle": chapter["title"],
+                "_chapterKicker": chapter.get("kicker"),
+            }
+            # Pretend the visual cell was the standard boilerplate so
+            # downstream code (resolve_data_file, logging) has something
+            # readable to work with.
+            vis_raw = (
+                f'**TRANSITION** TitleTransition '
+                f'title-section-{slug}.json  '
+                f'(synthesized from DIR: chapter("{chapter["title"]}"))'
+            )
+
         if parsed is None:
             # Empty visual cell — narration with no specified visual.
             # Cursor still advances by narration duration.
@@ -1916,6 +2045,28 @@ def _build_segment(
         }
         if data_file:
             seg["template"]["dataFile"] = data_file
+
+        # Phase 6 chapter sugar — inline title metadata. When the segment
+        # was synthesized from `DIR: chapter("...")`, attach the title /
+        # kicker as `template.props` so Remotion can render the card even
+        # if no `title-section-<slug>.json` data file exists yet. (The
+        # FullEpisode-side merge of template.props into data is queued for
+        # a follow-up; until then, this metadata is harmless if unread.)
+        if parsed.get("_chapterTitle"):
+            seg["template"]["props"] = {
+                "title": parsed["_chapterTitle"],
+                "variant": "section",
+            }
+            if parsed.get("_chapterKicker"):
+                seg["template"]["props"]["kicker"] = parsed["_chapterKicker"]
+            if not data_file:
+                print(
+                    f"⚠  DIR: chapter() emitted a TitleTransition segment but "
+                    f"no `title-section-{parsed['_chapterSlug']}.json` data file "
+                    f"was found in data_files. The card will rely on inline "
+                    f"props.title until you create the JSON or update the slug.",
+                    file=sys.stderr,
+                )
 
         bid = parsed.get("backdropId")
         if (
