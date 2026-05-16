@@ -15,6 +15,7 @@ import {
   letterSpacing,
   lineHeight,
   layout,
+  palette,
   sec,
   shadows,
   textMaxWidth,
@@ -93,6 +94,19 @@ export const StaticDuelingFrameworks: React.FC<{
   const scoringStartFrame = getPhaseStart("scoring");
   const splitPosition = layout.width / 2;
 
+  // Magazine variant: asymmetric columns — frameworkA gets 42%, frameworkB gets 58%
+  const isAsymmetric = data.cardStyle === "magazine";
+  const totalWidth =
+    zones.left.rect && zones.right.rect
+      ? zones.left.rect.width + zones.right.rect.width
+      : layout.width;
+  const leftPanelStyle: React.CSSProperties = isAsymmetric
+    ? { ...zones.left.style, width: totalWidth * 0.42, right: "auto" }
+    : zones.left.style;
+  const rightPanelStyle: React.CSSProperties = isAsymmetric
+    ? { ...zones.right.style, width: totalWidth * 0.58, left: "auto", right: (zones.right.style as React.CSSProperties)?.right ?? 0 }
+    : zones.right.style;
+
   return (
     <Background
       variant={resolveAnalyticalBackgroundVariant(
@@ -113,27 +127,30 @@ export const StaticDuelingFrameworks: React.FC<{
           />
         )}
 
-        <div
-          style={{
-            position: "absolute",
-            left: splitPosition,
-            top: 0,
-            width: 2,
-            height: layout.height,
-            opacity: exitOpacity,
-          }}
-        >
+        {/* Center divider — hidden for magazine (accent sidebar bars replace it) */}
+        {!isAsymmetric && (
           <div
             style={{
               position: "absolute",
-              left: 0,
+              left: splitPosition,
               top: 0,
-              width: "100%",
-              height: `${dividerProgress * 100}%`,
-              background: `linear-gradient(to bottom, transparent, ${theme.text.muted}66, transparent)`,
+              width: 2,
+              height: layout.height,
+              opacity: exitOpacity,
             }}
-          />
-        </div>
+          >
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: "100%",
+                height: `${dividerProgress * 100}%`,
+                background: `linear-gradient(to bottom, transparent, ${theme.text.muted}66, transparent)`,
+              }}
+            />
+          </div>
+        )}
 
         <div style={{ opacity: frameworkAOpacity * exitOpacity }}>
           <FrameworkPanel
@@ -144,7 +161,8 @@ export const StaticDuelingFrameworks: React.FC<{
             theme={theme}
             isDimmed={isPhase("frameworkB")}
             isDark={isDark}
-            zoneStyle={zones.left.style}
+            zoneStyle={leftPanelStyle}
+            cardStyle={data.cardStyle ?? "inset"}
           />
         </div>
 
@@ -157,7 +175,8 @@ export const StaticDuelingFrameworks: React.FC<{
             theme={theme}
             isDimmed={isPhase("frameworkA")}
             isDark={isDark}
-            zoneStyle={zones.right.style}
+            zoneStyle={rightPanelStyle}
+            cardStyle={data.cardStyle ?? "inset"}
           />
         </div>
 
@@ -167,8 +186,10 @@ export const StaticDuelingFrameworks: React.FC<{
             What remains: per-framework verdict captions ("Explains the tempo
             and timing"), and the final verdict question as an editorial
             kicker at the bottom. Sits in the footer zone, comfortably below
-            the tenets — no opacity hacks needed. */}
-        {isPast("frameworkB") && (
+            the tenets — no opacity hacks needed.
+            Magazine variant skips the split verdict and renders a full-width
+            centered synthesis block instead. */}
+        {isPast("frameworkB") && data.cardStyle !== "magazine" && (
           <div
             style={{
               position: "absolute",
@@ -233,6 +254,46 @@ export const StaticDuelingFrameworks: React.FC<{
                 {data.verdictLabel}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Magazine variant: full-width centered synthesis verdict */}
+        {data.cardStyle === "magazine" && data.verdictLabel && isPast("frameworkB") && (
+          <div
+            style={{
+              position: "absolute",
+              bottom: zones.footer.rect ? zones.footer.rect.bottom : 80,
+              left: 0,
+              width: layout.width,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
+              opacity: fadeIn(frame, scoringStartFrame + sec(0.4), sec(0.6)) * exitOpacity,
+            }}
+          >
+            {/* Amber accent line */}
+            <div
+              style={{
+                width: 48,
+                height: 2,
+                backgroundColor: palette.amber,
+                marginBottom: 4,
+              }}
+            />
+            <div
+              style={{
+                fontFamily: fonts.heading,
+                fontSize: fontSizes.h2,
+                fontWeight: fontWeights.bold,
+                fontStyle: "italic",
+                color: isDark ? "rgba(255,255,255,0.92)" : "rgba(28,24,20,0.92)",
+                textAlign: "center",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {data.verdictLabel}
+            </div>
           </div>
         )}
 

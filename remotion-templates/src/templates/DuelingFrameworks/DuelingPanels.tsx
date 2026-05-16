@@ -143,7 +143,9 @@ export const FrameworkPanel: React.FC<{
   isDark: boolean;
   /** Zone style from useTemplateLayout — no manual positioning needed */
   zoneStyle: React.CSSProperties;
-}> = React.memo(({ side, data, frame, startFrame, theme, isDimmed, isDark, zoneStyle }) => {
+  /** Visual card style. Default "inset". */
+  cardStyle?: "inset" | "editorial" | "magazine";
+}> = React.memo(({ side, data, frame, startFrame, theme, isDimmed, isDark, zoneStyle, cardStyle = "inset" }) => {
   const isLeft = side === "left";
   const alignText: "left" | "right" = isLeft ? "left" : "right";
 
@@ -183,13 +185,93 @@ export const FrameworkPanel: React.FC<{
         {data.name}
       </h3>
 
-      {/* Tenets (staggered list with inset cards) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: layout.spacing.sm }}>
+      {/* Tenets (staggered list) */}
+      <div style={{ display: "flex", flexDirection: "column", gap: cardStyle === "editorial" ? 0 : layout.spacing.sm }}>
         {data.tenets.map((tenet, idx) => {
           const tenetStart = stagger(idx, sec(0.12), tenetBaseDelay);
           const tenetOpacity = fadeIn(frame, tenetStart, sec(0.4));
           const tenetSlide = slideIn(frame, tenetStart, 16, sec(0.4));
 
+          if (cardStyle === "editorial") {
+            // Editorial variant: hairline top rule + ordinal chip, no card box
+            return (
+              <div
+                key={idx}
+                style={{
+                  borderTop: idx === 0 ? `1px solid ${data.color}30` : `1px solid rgba(0,0,0,0.10)`,
+                  padding: "10px 0 10px 0",
+                  opacity: tenetOpacity,
+                  transform: isLeft
+                    ? `translateX(${tenetSlide}px)`
+                    : `translateX(${-tenetSlide}px)`,
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 12,
+                  flexDirection: isLeft ? "row" : "row-reverse",
+                }}
+              >
+                {/* Ordinal chip */}
+                <span style={{
+                  fontFamily: fonts.mono,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: data.color,
+                  opacity: 0.7,
+                  minWidth: 20,
+                  letterSpacing: "0.04em",
+                  flexShrink: 0,
+                }}>
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                {/* Tenet text */}
+                <span style={{
+                  fontFamily: fonts.body,
+                  fontSize: fontSizes.body,
+                  color: isDark ? "rgba(255,255,255,0.85)" : "rgba(28,24,20,0.85)",
+                  lineHeight: 1.4,
+                  textAlign: isLeft ? "left" : "right",
+                }}>
+                  {tenet.text}
+                </span>
+              </div>
+            );
+          }
+
+          if (cardStyle === "magazine") {
+            // Magazine variant: accent left/right sidebar bar, transparent background, no box shadow
+            return (
+              <div
+                key={idx}
+                style={{
+                  borderLeft: isLeft ? `3px solid ${data.color}` : "none",
+                  borderRight: !isLeft ? `3px solid ${data.color}` : "none",
+                  paddingLeft: isLeft ? 12 : 0,
+                  paddingRight: !isLeft ? 12 : 0,
+                  paddingTop: 10,
+                  paddingBottom: 10,
+                  backgroundColor: "transparent",
+                  opacity: tenetOpacity,
+                  transform: isLeft
+                    ? `translateX(${tenetSlide}px)`
+                    : `translateX(${-tenetSlide}px)`,
+                  marginBottom: 8,
+                }}
+              >
+                <span style={{
+                  fontFamily: fonts.body,
+                  fontSize: fontSizes.body,
+                  color: isDark ? "rgba(255,255,255,0.85)" : "rgba(28,24,20,0.85)",
+                  lineHeight: 1.4,
+                  textAlign: isLeft ? "left" : "right",
+                  display: "block",
+                }}>
+                  {tenet.text}
+                </span>
+              </div>
+            );
+          }
+
+          // Default "inset" — inset card rendering
           // Bilingual: when textCn is provided, render Chinese as primary (h3-ish)
           // and English at 60% size, muted, beneath. Otherwise single-line.
           const hasBilingual = !!tenet.textCn;
@@ -257,6 +339,10 @@ export const FrameworkPanel: React.FC<{
             </div>
           );
         })}
+        {/* Closing hairline rule for editorial variant */}
+        {cardStyle === "editorial" && (
+          <div style={{ borderTop: "1px solid rgba(0,0,0,0.10)", marginTop: 0 }} />
+        )}
       </div>
     </div>
   );
