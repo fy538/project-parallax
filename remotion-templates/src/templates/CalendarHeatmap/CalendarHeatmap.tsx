@@ -51,6 +51,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
 import type {
@@ -196,7 +197,11 @@ export const CalendarHeatmap: React.FC<{ data: CalendarHeatmapData }> = ({
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
-  const accent = palette.amber;
+  // Per-episode emphasis: callout-day accent follows episode primary palette.
+  // The intensity-ramp heat scale (line 172, palette.bone→palette.amber) is
+  // semantic (low→high intensity) and stays hardcoded.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
 
   const weekStart: "sunday" | "monday" = data.weekStart ?? "sunday";
   const colorScale: CalendarColorScale = data.colorScale ?? "intensity";

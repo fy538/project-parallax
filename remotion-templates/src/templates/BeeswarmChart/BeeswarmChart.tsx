@@ -70,6 +70,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
 import type { BeeswarmData, BeeswarmItem } from "./types";
@@ -275,7 +276,11 @@ export const BeeswarmChart: React.FC<{ data: BeeswarmData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
-  const accent = palette.amber;
+  // Per-episode emphasis: highlighted-dot accent follows episode primary
+  // palette colour. Multi-category ramp (line 349) keeps its hardcoded
+  // set since those are semantic per-category, not single-data-emphasis.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
 
   // ── Layout ──────────────────────────────────────────────────────────
   const area = useMemo(() => contentArea("content", "generous"), []);

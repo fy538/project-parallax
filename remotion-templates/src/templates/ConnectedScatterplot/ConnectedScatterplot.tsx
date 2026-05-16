@@ -59,6 +59,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { chartLayout } from "../../utils/chartLayout";
 import { niceDomain, niceTicks } from "../../utils/niceTicks";
@@ -164,7 +165,10 @@ export const ConnectedScatterplot: React.FC<{
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
-  const accent = palette.amber;
+  // Per-episode emphasis: trajectory accent follows the episode's primary
+  // palette colour rather than hardcoding amber.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
   const trajectoryColor = resolveTrajectoryColor(
     data.trajectoryColor,
     accent,

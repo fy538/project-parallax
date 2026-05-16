@@ -60,6 +60,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import type { TernaryPlotData, TernaryPoint } from "./types";
@@ -129,7 +130,9 @@ export const TernaryPlot: React.FC<{ data: TernaryPlotData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
-  const accent = palette.amber;
+  // Per-episode emphasis: highlighted-point accent follows episode primary palette.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
   const showGridlines = data.gridlines !== false;
   const showCentroid = data.centroid === true;
 

@@ -57,6 +57,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
+import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
 import type { ArcDiagramData, ArcConnection, ArcNode } from "./types";
@@ -253,7 +254,12 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant ?? "light";
   const theme = useThemeMode(bgVariant);
-  const accent = palette.amber;
+  // Per-episode emphasis: arc accent (used for highlighted/operationalized
+  // edges) follows the episode's primary palette colour rather than
+  // hardcoding amber. Episodes that pick a non-amber accent get a
+  // consistent visual identity across their templates.
+  const emphasis = useEpisodeColorEmphasis();
+  const accent = emphasis.primaryAccent;
   const rebut = palette.rust;
 
   // Layout. Content area gives us a bounded region beneath the title;
