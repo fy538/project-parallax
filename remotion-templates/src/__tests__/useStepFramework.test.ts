@@ -1,21 +1,33 @@
 /**
- * useStepFramework — unit tests for the pure compute helper.
+ * @vitest-environment happy-dom
  *
- * The hook itself is a thin wrapper around `computeStepFrameworkState` that
- * handles Remotion's `useCurrentFrame()` and useMemo'd boundary computation.
- * The load-bearing math (active-index resolution, EMPTY_BOUNDARY fallback,
- * progress clamping) lives in `computeStepFrameworkState`. Tests target the
- * pure function so we don't need to render a composition.
+ * useStepFramework — unit tests for the pure compute helper PLUS the React
+ * hook itself.
  *
- * Convention matches useBeatSync.test.ts and usePhase.test.ts.
+ * Pure-function tests follow the codebase convention (useBeatSync,
+ * usePhase): test the load-bearing math directly without rendering.
+ *
+ * The renderHook block at the bottom of the file is the exception —
+ * `useStepFramework`'s value-add over the pure function is the
+ * cacheKey-based useMemo, and the cacheKey behaviour is observable only
+ * through the hook. happy-dom is enabled for this file via the directive
+ * above; other unit tests stay in node environment per vitest.config.ts.
  */
 
-import { describe, it, expect } from "vitest";
-import { computeStepFrameworkState } from "../hooks/useStepFramework";
+import { describe, it, expect, vi } from "vitest";
+import { renderHook } from "@testing-library/react";
+import { computeStepFrameworkState, useStepFramework } from "../hooks/useStepFramework";
 import {
   computeStepBoundaries,
   EMPTY_BOUNDARY,
 } from "../utils/stepFramework";
+
+// useCurrentFrame is read once per render; we mock it to a fixed value so
+// the renderHook tests assert memoisation behaviour without composition setup.
+vi.mock("remotion", async () => {
+  const actual = await vi.importActual<typeof import("remotion")>("remotion");
+  return { ...actual, useCurrentFrame: () => 30 };
+});
 
 const STANDARD_BOUNDARIES = computeStepBoundaries([60, 90, 45]);
 // [{start:0,end:60}, {start:60,end:150}, {start:150,end:195}]
@@ -115,12 +127,9 @@ describe("computeStepFrameworkState — boundaries reference passes through", ()
 });
 
 describe("computeStepBoundaries — id arrays that previously collided", () => {
-  // These two arrays both contain three logical ids but stringify
-  // identically under a naive `arr.join(",")` cache key:
-  //   ["a,b", "c"].join(",")  === "a,b,c"
-  //   ["a", "b,c"].join(",")  === "a,b,c"
-  // Lock that they produce distinguishable boundary arrays so any future
-  // cache-key change in useStepFramework can't silently reintroduce the bug.
+  // Pure-function sanity: the two arrays produce distinguishable boundaries.
+  // This DOES NOT exercise the useStepFramework cacheKey — the cacheKey
+  // contract is locked separately in the renderHook block below.
   it("['a,b','c'] vs ['a','b,c'] produce distinguishable boundary ids", () => {
     const a = computeStepBoundaries([30, 40], 0, ["a,b", "c"]);
     const b = computeStepBoundaries([30, 40], 0, ["a", "b,c"]);
@@ -128,7 +137,6 @@ describe("computeStepBoundaries — id arrays that previously collided", () => {
     expect(a[1].id).toBe("c");
     expect(b[0].id).toBe("a");
     expect(b[1].id).toBe("b,c");
-    // Sanity: the arrays differ in observable content.
     expect(a[0].id).not.toBe(b[0].id);
   });
 });
@@ -140,5 +148,75 @@ describe("computeStepFrameworkState — single-step degenerate", () => {
     expect(computeStepFrameworkState(50, oneStep).progress).toBeCloseTo(0.5, 10);
     expect(computeStepFrameworkState(100, oneStep).progress).toBe(1);
     expect(computeStepFrameworkState(150, oneStep).progress).toBe(1); // post-end clamp
+  });
+});
+
+// ── React-side: useStepFramework cacheKey contract ──────────────────────────
+//
+// The hook's value-add over the pure function is its `useMemo`-based
+// boundary cache, keyed by a JSON-stringified `[baseOffset, durations, ids]`
+// tuple. The old `arr.join(",")` cacheKey collided on comma-containing ids
+// (`["a,b","c"]` and `["a","b,c"]` both stringified to `"a,b,c"`); switching
+// to JSON.stringify fixed it. These tests lock that contract — if a future
+// refactor reverts the cacheKey to a naive join, the collision case below
+// will fail (the memo would not bust between renders).
+describe("useStepFramework — memoisation contract", () => {
+  it("re-uses the boundaries array reference when inputs are content-equal", () => {
+    const durations = [30, 40];
+    const ids = ["a", "b"];
+    const { result, rerender } = renderHook(
+      ({ d, i }: { d: number[]; i: string[] }) => useStepFramework(d, 0, i),
+      { initialProps: { d: durations, i: ids } },
+    );
+    const firstBoundaries = result.current.boundaries;
+
+    // Re-render with NEW array references but identical content — memo
+    // should still hit because cacheKey is content-derived.
+    rerender({ d: [30, 40], i: ["a", "b"] });
+    expect(result.current.boundaries).toBe(firstBoundaries);
+  });
+
+  it("busts the cache on collision-prone id arrays ['a,b','c'] vs ['a','b,c']", () => {
+    // This is THE bug the JSON.stringify cacheKey fixes. Under the legacy
+    // `arr.join(",")` impl both arrays produced cacheKey `"a,b,c"` and the
+    // memo did not bust — boundaries[1].id would still be "c" after the
+    // re-render with ["a","b,c"]. The proper impl distinguishes them.
+    const { result, rerender } = renderHook(
+      ({ i }: { i: string[] }) => useStepFramework([30, 40], 0, i),
+      { initialProps: { i: ["a,b", "c"] } },
+    );
+    expect(result.current.boundaries[0].id).toBe("a,b");
+    expect(result.current.boundaries[1].id).toBe("c");
+
+    rerender({ i: ["a", "b,c"] });
+    expect(result.current.boundaries[0].id).toBe("a");
+    expect(result.current.boundaries[1].id).toBe("b,c");
+  });
+
+  it("busts the cache when baseOffset changes (same durations)", () => {
+    const { result, rerender } = renderHook(
+      ({ offset }: { offset: number }) => useStepFramework([60, 90], offset),
+      { initialProps: { offset: 0 } },
+    );
+    expect(result.current.boundaries[0].start).toBe(0);
+
+    rerender({ offset: 15 });
+    expect(result.current.boundaries[0].start).toBe(15);
+  });
+
+  it("distinguishes ids=undefined from ids=[] (JSON null vs JSON empty-array)", () => {
+    // Edge case the legacy `ids?.join(",") ?? ""` impl conflated: both
+    // produced "" in the cacheKey. With JSON.stringify, `ids ?? null` is
+    // `null` for undefined and `[]` for an empty array — different keys.
+    const { result, rerender } = renderHook(
+      ({ i }: { i: string[] | undefined }) => useStepFramework([30], 0, i),
+      { initialProps: { i: undefined as string[] | undefined } },
+    );
+    const undefinedRefBoundaries = result.current.boundaries;
+
+    // Re-render with an empty array — content-distinct from undefined, so
+    // the memo must bust (produces a new array reference).
+    rerender({ i: [] });
+    expect(result.current.boundaries).not.toBe(undefinedRefBoundaries);
   });
 });
