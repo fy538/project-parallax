@@ -797,6 +797,39 @@ Avoid `archival` at episode level (dust cycle resets still possible at boundarie
 geometry computation). No visual render needed — 3038px jump was analytically conclusive;
 fix confirmed by typecheck + cascade unit tests (18/18 pass).
 
+### L103: AnnotationNode geometry constants must couple with `nodeRadius()`
+
+**Pattern:** NetworkDiagram (and now ArcDiagram) renders relationship-diagram nodes as a precision marker — small filled dot + outward crosshair hairlines + leader line to label — rather than the historical "filled circle + stroke ring + label below." See `D19` in POLISH.md for the visual rationale.
+
+**Architecture gotcha worth knowing:**
+
+The annotation marker's geometry (disc radius, ring radii, crosshair gap/length) is **hardcoded** inside the `AnnotationNode` component — it does NOT scale with the `radius` prop from `NodeRenderProps`. The `radius` prop is accepted for interface uniformity with `CircleNode`/`RoundedRectNode`/`DiamondNode` but ignored.
+
+This creates an **implicit coupling**: the parent component's `nodeRadius()` function — which `edgeEndpoints()` uses to terminate edges just past the marker rim — must return values that match the AnnotationNode's internal geometry. Specifically:
+
+```ts
+const HUB_DISC_R = 72;
+const HUB_EDGE_OFFSET = HUB_DISC_R + 2;   // 74 — what nodeRadius() returns for primary
+const SAT_DOT_R = 10;
+const SAT_EDGE_OFFSET = SAT_DOT_R + 2;    // 12 — what nodeRadius() returns for satellite
+
+// Then:
+const nodeRadius = (importance) => {
+  if (isAnnotationLayout) {
+    return importance === "primary" ? HUB_EDGE_OFFSET : SAT_EDGE_OFFSET;
+  }
+  // ...
+};
+```
+
+**Why this is fragile:** If someone bumps `HUB_DISC_R` from 72 to 80 to make the hub bigger, they must remember to keep `HUB_EDGE_OFFSET = HUB_DISC_R + 2` in sync. The constants are **derivations** (`HUB_EDGE_OFFSET = HUB_DISC_R + 2`), so updating the base radius cascades correctly — *as long as the geometry constants are declared as derivations, not literals.*
+
+**Rule:** When you add a fixed-geometry shape component with a parent-managed edge-terminator helper, declare ALL geometry constants at module top with derivations spelled out. Never duplicate the disc-radius+gap value as a literal in `nodeRadius()` — always reference the derived `*_EDGE_OFFSET` constant.
+
+**Stat-block stacking gotcha** (separate but related): when a satellite has a `stat` field AND its leader points upward (label group above the leader endpoint), the stat-value and stat-caption baselines must be computed in the OPPOSITE direction from the default downward stack. The code uses an `isUpward = dy < -0.3` boolean to flip stacking direction for `sublabelY`, `statValueY`, and `statCaptionY`. Without this, the stat block ends up between the leader endpoint and the dot, crossing the leader line. Not visually obvious in current data (no satellite has a stat in the catalog), but landed as a latent bug for the first author who adds one.
+
+**Reference:** `templates/NetworkDiagram/NetworkDiagram.tsx` — `HUB_*` / `SAT_*` constant block + the `AnnotationNode` JSDoc explaining unused props (`radius`, `labelPlacement`, `isFocused`).
+
 ### L102: MapGL warm-up delay — three required props for correct Remotion rendering
 
 **Symptom:** Map tiles appear to "fade in" or the map is blank/incomplete for ~1 second at the start of every map segment, both in Studio preview and in rendered video.

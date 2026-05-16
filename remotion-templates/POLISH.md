@@ -498,6 +498,23 @@ Each rule has the form: **observation → fix → why**. Cross-references to `re
 - No audio sting on title-card landing (broadcast convention, not editorial)
 - Opener narration is substantive (first line is a claim or question, NOT "in this video we'll...")
 
+### D19. Relationship diagrams use precision markers, not filled discs
+
+**Observation:** Big filled circles with stroke rings, sized 3:1 hub-to-satellite for hierarchy, read as "bubble chart" or "marbles" rather than intelligence-briefing diagram — the form viewers associate with PowerPoint templates and game UI, not editorial argument. Even with proper hierarchy (large hub, small satellites), the visual register undermines the rigor of the claim.
+
+**Fix:** For hub-spoke, bipartite, and arc-style relationship diagrams, render nodes as **precision markers**:
+- Small filled dot (r=8–14 satellite, r=72 hub-disc as the editorial focal mass)
+- Crosshair hairlines extending from the dot center (4 lines, ~16–22px length at 45–50% opacity) — reads as a reticle / annotation, not a bubble
+- For the hub specifically: concentric rings outside the disc (r+12 inner, r+28 outer) at decreasing opacity (0.35, 0.18) — a "target lock" treatment
+- Labels positioned at the end of an outward-bearing leader line (away from hub center), not below the marker — this earns reading order through line direction rather than fixed positioning
+- Edges between markers stay thin (1.5px, not 3.25px), no glow halo — the markers carry the argument, not the connectors
+
+**Reference implementation:** `templates/NetworkDiagram/NetworkDiagram.tsx` → `AnnotationNode` component + `HUB_*`/`SAT_*` geometry constants. The pattern transfers to ArcDiagram (relationship-over-time) and any diagram where viewers should read "who" and "to whom" without being distracted by container chrome.
+
+**Where it lands:** NetworkDiagram (May 15, 2026), ArcDiagram (May 16, 2026). When building any new template whose primary content is named entities + their connections, default to this aesthetic rather than the filled-circle baseline.
+
+**Why:** Bloomberg / The Economist / FT supply-chain diagrams converge on precision markers for the same reason — the editorial claim ("X depends on Y") needs to read at video-scrubbing speed without competing visual weight from the markers themselves. Marbles compete; reticles annotate.
+
 **Where it lands:** `TitleTransition` `editorial-title` variant enforces the visual side (2.0s hold, fade-only, ∴ corner mark). Music and SFX are audio-track decisions made downstream in NLE assembly; this doctrine governs both.
 
 ---
