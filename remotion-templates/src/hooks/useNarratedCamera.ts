@@ -40,6 +40,7 @@ import { sec } from "../design/theme";
 import {
   computeStepBoundaries,
   motionEasings,
+  type StepBoundary,
 } from "../utils/stepFramework";
 import { computeStepFrameworkState } from "./useStepFramework";
 
@@ -196,6 +197,125 @@ const deterministicShake = (frame: number, intensity: number): { x: number; y: n
   return { x, y };
 };
 
+// ── Pure helpers — extracted from the hook body for unit testability ───────
+//
+// These three functions formerly lived inline inside the useMemo blocks at
+// the top of `useNarratedCamera`. Extracted so the proportional-mode
+// detection, sync-lookup construction, and (especially) the boundary
+// post-processing logic can be exercised without rendering a composition.
+//
+// The hook becomes a thin Remotion wrapper that calls these in useMemo —
+// same testing convention as useBeatSync (computeBeatState) and
+// usePhase (computePhaseState).
+
+/**
+ * Detect whether `cameraPath` is in proportional or absolute mode.
+ *
+ * - If `forceProportional` is set, that wins.
+ * - Otherwise treat the path as proportional iff total durations sum to ≤1.01
+ *   (fractions of total composition time). Strict equality at 1.0 is too
+ *   brittle; we allow a tiny float-rounding budget.
+ * - Empty `cameraPath` returns false (no mode applicable).
+ */
+export function detectProportionalMode(
+  cameraPath: { duration: number }[],
+  forceProportional: boolean | undefined,
+): boolean {
+  if (forceProportional !== undefined) return forceProportional;
+  if (cameraPath.length === 0) return false;
+  const total = cameraPath.reduce((sum, s) => sum + s.duration, 0);
+  return total <= 1.01;
+}
+
+/**
+ * Build a lowercase-keyed word → frame lookup from Whisper sync points.
+ * Returns null when sync points are absent so the boundary pass can skip
+ * the snapping branch entirely.
+ */
+export function buildSyncLookup(
+  syncPoints: SyncPoint[] | undefined,
+): Map<string, number> | null {
+  if (!syncPoints || syncPoints.length === 0) return null;
+  const lookup = new Map<string, number>();
+  for (const sp of syncPoints) {
+    lookup.set(sp.word.toLowerCase(), sp.frame);
+  }
+  return lookup;
+}
+
+/**
+ * Build the step-boundary array for the camera path with full post-processing:
+ *
+ *   1. Per-step durations → cumulative [start, end) windows
+ *      (proportional → fractions of `durationInFrames`; absolute → seconds).
+ *   2. Auto-fill: in absolute mode, extend the last step to `durationInFrames`
+ *      when the path ends before the composition (camera holds final pose).
+ *   3. Sync-anchor snap: when `syncLookup` is provided and a step has a
+ *      `syncStart` word, snap the step's start to that word's frame. Adjust
+ *      the previous step's end to match. If that squeezes the previous step
+ *      to ≤ 0 width, give it a minimum 0.5s viable duration and push the
+ *      current step's start forward to avoid overlap. If the current step's
+ *      end now precedes its start, extend it to min(start + 0.5s, next.start).
+ *
+ * Boundaries are cloned shallowly before any mutation so consumers can treat
+ * the returned array as effectively immutable.
+ */
+export function buildNarratedCameraBoundaries(
+  cameraPath: NarratedCameraStep[],
+  durationInFrames: number,
+  isProportional: boolean,
+  syncLookup: Map<string, number> | null,
+): StepBoundary[] {
+  const frameDurations = cameraPath.map((step) =>
+    isProportional
+      ? Math.round(step.duration * durationInFrames) // fraction of total
+      : sec(step.duration), // absolute seconds
+  );
+  const boundaries = computeStepBoundaries(frameDurations).map((b) => ({ ...b }));
+
+  // Auto-fill: extend last step to composition end in absolute mode.
+  if (!isProportional && boundaries.length > 0) {
+    const last = boundaries[boundaries.length - 1];
+    if (last.end < durationInFrames) {
+      last.end = durationInFrames;
+    }
+  }
+
+  // Sync anchor adjustment.
+  if (syncLookup && boundaries.length > 0) {
+    for (let i = 0; i < cameraPath.length; i++) {
+      const syncWord = cameraPath[i].syncStart;
+      if (!syncWord) continue;
+      const syncFrame = syncLookup.get(syncWord.toLowerCase());
+      if (syncFrame === undefined) continue;
+
+      // Snap this step's start to the sync frame.
+      boundaries[i].start = syncFrame;
+
+      // Adjust previous step's end to match.
+      if (i > 0) {
+        boundaries[i - 1].end = syncFrame;
+        // Guard: previous step squeezed to ≤ 0 width → restore 0.5s minimum.
+        if (boundaries[i - 1].end <= boundaries[i - 1].start) {
+          boundaries[i - 1].end = boundaries[i - 1].start + sec(0.5);
+          // Push current step start forward to avoid overlap.
+          boundaries[i].start = boundaries[i - 1].end;
+        }
+      }
+
+      // Current step's end may now precede its start — extend it.
+      if (boundaries[i].end <= boundaries[i].start) {
+        boundaries[i].end = Math.min(
+          boundaries[i].start + sec(0.5),
+          i < boundaries.length - 1 ? boundaries[i + 1].start : durationInFrames,
+        );
+      }
+    }
+  }
+
+  return boundaries;
+}
+
 // ── Auto-path generator ───────────────────────────────────────────────────
 
 /**
@@ -271,85 +391,25 @@ export const useNarratedCamera = (
   const transitionFrames = sec(transitionSec);
 
   // ── Detect proportional mode ───────────────────────────────────────
-  // Proportional when: explicitly set, or all step durations sum to ≤1.01
-  const isProportional = useMemo(() => {
-    if (forceProportional !== undefined) return forceProportional;
-    if (cameraPath.length === 0) return false;
-    const total = cameraPath.reduce((sum, s) => sum + s.duration, 0);
-    return total <= 1.01;
-  }, [cameraPath, forceProportional]);
+  const isProportional = useMemo(
+    () => detectProportionalMode(cameraPath, forceProportional),
+    [cameraPath, forceProportional],
+  );
 
   // ── Build sync point lookup ────────────────────────────────────────
-  const syncLookup = useMemo(() => {
-    if (!syncPoints || syncPoints.length === 0) return null;
-    const lookup = new Map<string, number>();
-    for (const sp of syncPoints) {
-      lookup.set(sp.word.toLowerCase(), sp.frame);
-    }
-    return lookup;
-  }, [syncPoints]);
+  const syncLookup = useMemo(() => buildSyncLookup(syncPoints), [syncPoints]);
 
-  // ── Build cumulative frame boundaries ──────────────────────────────
-  const stepBoundaries = useMemo(() => {
-    // Convert each step duration to frames, then build boundaries via
-    // the shared primitive (stepFramework.ts).
-    const frameDurations = cameraPath.map((step) =>
-      isProportional
-        ? Math.round(step.duration * durationInFrames) // fraction of total
-        : sec(step.duration), // absolute seconds
-    );
-    // Clone each StepBoundary before the auto-fill/sync-anchor passes below.
-    // computeStepBoundaries returns fresh objects, but the mutations downstream
-    // (last.end = durationInFrames, boundaries[i].start = syncFrame, etc.)
-    // would otherwise tie this memo's output identity to mutation order. The
-    // shallow clone keeps downstream consumers free to assume boundaries are
-    // effectively immutable from their perspective.
-    const boundaries = computeStepBoundaries(frameDurations).map((b) => ({ ...b }));
-
-    // Auto-fill: if absolute mode and last step ends before composition,
-    // extend the last step to fill remaining time (camera holds final position)
-    if (!isProportional && boundaries.length > 0) {
-      const last = boundaries[boundaries.length - 1];
-      if (last.end < durationInFrames) {
-        last.end = durationInFrames;
-      }
-    }
-
-    // Sync anchor adjustment: if sync points available, snap step starts
-    // to the frame where the narrator says the sync word
-    if (syncLookup && boundaries.length > 0) {
-      for (let i = 0; i < cameraPath.length; i++) {
-        const syncWord = cameraPath[i].syncStart;
-        if (syncWord) {
-          const syncFrame = syncLookup.get(syncWord.toLowerCase());
-          if (syncFrame !== undefined) {
-            // Snap this step's start to the sync frame
-            boundaries[i].start = syncFrame;
-            // Adjust previous step's end to match
-            if (i > 0) {
-              boundaries[i - 1].end = syncFrame;
-              // Guard: if previous step was squeezed to zero/negative width,
-              // give it a minimum viable duration (0.5s)
-              if (boundaries[i - 1].end <= boundaries[i - 1].start) {
-                boundaries[i - 1].end = boundaries[i - 1].start + sec(0.5);
-                // Push current step start forward to avoid overlap
-                boundaries[i].start = boundaries[i - 1].end;
-              }
-            }
-            // If current step's end is now at or before its start, extend it
-            if (boundaries[i].end <= boundaries[i].start) {
-              boundaries[i].end = Math.min(
-                boundaries[i].start + sec(0.5),
-                i < boundaries.length - 1 ? boundaries[i + 1].start : durationInFrames
-              );
-            }
-          }
-        }
-      }
-    }
-
-    return boundaries;
-  }, [cameraPath, durationInFrames, isProportional, syncLookup]);
+  // ── Build cumulative frame boundaries (with auto-fill + sync snap) ──
+  const stepBoundaries = useMemo(
+    () =>
+      buildNarratedCameraBoundaries(
+        cameraPath,
+        durationInFrames,
+        isProportional,
+        syncLookup,
+      ),
+    [cameraPath, durationInFrames, isProportional, syncLookup],
+  );
 
   // ── Guard: empty cameraPath ─────────────────────────────────────────
   if (cameraPath.length === 0) {
