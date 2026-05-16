@@ -35,7 +35,6 @@ export const DuelingFrameworksSchema = z.object({
     episode: z.string().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     durationSec: z.number().optional(),
-    cardStyle: z.enum(["inset", "editorial", "magazine", "hero"]).optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });
