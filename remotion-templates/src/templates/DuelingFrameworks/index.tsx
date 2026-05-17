@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { DuelingFrameworks } from "./DuelingFrameworks";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { DuelingFrameworksSchema } from "./schema";
 import type { DuelingFrameworksData } from "./types";
 const sampleData = {
@@ -46,12 +46,7 @@ export const DuelingFrameworksComposition = () => (
     id="DuelingFrameworks"
     component={DuelingFrameworks}
     schema={DuelingFrameworksSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as DuelingFrameworksData).durationSec || 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<DuelingFrameworksData>(12)}
     defaultProps={sampleData as { data: DuelingFrameworksData }}
   />
 );

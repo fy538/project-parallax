@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { ConnectedScatterplot } from "./ConnectedScatterplot";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { ConnectedScatterplotSchema } from "./schema";
 import type { ConnectedScatterplotData } from "./types";
 
@@ -46,14 +46,7 @@ export const ConnectedScatterplotComposition = () => (
     id="ConnectedScatterplot"
     component={ConnectedScatterplot}
     schema={ConnectedScatterplotSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as ConnectedScatterplotData).durationSec ?? 12,
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<ConnectedScatterplotData>(12)}
     defaultProps={{ data: sampleData as ConnectedScatterplotData }}
   />
 );

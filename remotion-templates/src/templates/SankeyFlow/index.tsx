@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { SankeyFlow } from "./SankeyFlow";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { SankeyFlowSchema } from "./schema";
 import type { SankeyFlowData } from "./types";
 
@@ -32,12 +32,7 @@ export const SankeyFlowComposition = () => (
     id="SankeyFlow"
     component={SankeyFlow}
     schema={SankeyFlowSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as SankeyFlowData).durationSec || 8),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<SankeyFlowData>(8)}
     defaultProps={{ data: sampleData as SankeyFlowData }}
   />
 );

@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { Streamgraph } from "./Streamgraph";
-import { layout, sec, palette } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
+import { palette } from "../../design/theme";
 import { StreamgraphSchema } from "./schema";
 import type { StreamgraphData, StreamSeries } from "./types";
 
@@ -111,12 +112,7 @@ export const StreamgraphComposition = () => (
     id="Streamgraph"
     component={Streamgraph}
     schema={StreamgraphSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as StreamgraphData).durationSec ?? 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<StreamgraphData>(12)}
     defaultProps={{ data: sampleData as StreamgraphData }}
   />
 );

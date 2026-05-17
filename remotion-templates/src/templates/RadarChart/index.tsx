@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { RadarChart } from "./RadarChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { RadarChartSchema } from "./schema";
 import type { RadarChartData } from "./types";
 
@@ -39,14 +39,7 @@ export const RadarChartComposition = () => (
     id="RadarChart"
     component={RadarChart}
     schema={RadarChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as RadarChartData).durationSec || 12
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<RadarChartData>(12)}
     defaultProps={{ data: sampleData }}
   />
 );

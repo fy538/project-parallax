@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { ArcDiagram } from "./ArcDiagram";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { ArcDiagramSchema } from "./schema";
 import type { ArcDiagramData } from "./types";
 
@@ -80,12 +80,7 @@ export const ArcDiagramComposition = () => (
     id="ArcDiagram"
     component={ArcDiagram}
     schema={ArcDiagramSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as ArcDiagramData).durationSec ?? 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<ArcDiagramData>(12)}
     defaultProps={{ data: sampleData as ArcDiagramData }}
   />
 );

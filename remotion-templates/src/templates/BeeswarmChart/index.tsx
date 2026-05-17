@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { BeeswarmChart } from "./BeeswarmChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { BeeswarmChartSchema } from "./schema";
 import type { BeeswarmData } from "./types";
 
@@ -62,12 +62,7 @@ export const BeeswarmChartComposition = () => (
     id="BeeswarmChart"
     component={BeeswarmChart}
     schema={BeeswarmChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as BeeswarmData).durationSec ?? 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<BeeswarmData>(12)}
     defaultProps={{ data: sampleData as BeeswarmData }}
   />
 );

@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { BumpChart } from "./BumpChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { BumpChartSchema } from "./schema";
 import type { BumpChartData } from "./types";
 import sampleData from "../../../data/episodes/catalog/bump-chart-gdp.json";
@@ -10,12 +10,7 @@ export const BumpChartComposition = () => (
     id="BumpChart"
     component={BumpChart}
     schema={BumpChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as BumpChartData).durationSec ?? 14),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<BumpChartData>(14)}
     defaultProps={{ data: sampleData as BumpChartData }}
   />
 );

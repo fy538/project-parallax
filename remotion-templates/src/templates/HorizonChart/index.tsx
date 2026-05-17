@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { HorizonChart } from "./HorizonChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { HorizonChartSchema } from "./schema";
 import type { HorizonChartData, HorizonDatum } from "./types";
 
@@ -99,14 +99,7 @@ export const HorizonChartComposition = () => (
     id="HorizonChart"
     component={HorizonChart}
     schema={HorizonChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as HorizonChartData).durationSec ?? 12,
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<HorizonChartData>(12)}
     defaultProps={{ data: sampleData as HorizonChartData }}
   />
 );

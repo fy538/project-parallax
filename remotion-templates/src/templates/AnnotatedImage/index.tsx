@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { AnnotatedImage } from "./AnnotatedImage";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { AnnotatedImageSchema } from "./schema";
 import type { AnnotatedImageData } from "./types";
 
@@ -51,14 +51,7 @@ export const AnnotatedImageComposition = () => (
     id="AnnotatedImage"
     component={AnnotatedImage}
     schema={AnnotatedImageSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as AnnotatedImageData).durationSec || 12
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<AnnotatedImageData>(12)}
     defaultProps={{ data: sampleData }}
   />
 );

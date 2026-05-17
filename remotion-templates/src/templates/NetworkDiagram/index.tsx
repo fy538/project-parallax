@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { NetworkDiagram } from "./NetworkDiagram";
-import { layout, sec } from "../../design/theme";
+import { layout } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { NetworkDiagramSchema } from "./schema";
 import type { NetworkDiagramData } from "./types";
 
@@ -99,12 +100,7 @@ export const NetworkDiagramComposition = () => (
     id="NetworkDiagram"
     component={NetworkDiagram}
     schema={NetworkDiagramSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as NetworkDiagramData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<NetworkDiagramData>(10)}
     defaultProps={{ data: sampleData as NetworkDiagramData }}
   />
 );

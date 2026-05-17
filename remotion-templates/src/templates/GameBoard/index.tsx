@@ -8,7 +8,7 @@
 
 import { Composition } from "remotion";
 import { GameBoard } from "./GameBoard";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { GameBoardSchema } from "./schema";
 import type { GameBoardData } from "./types";
 
@@ -20,12 +20,7 @@ export const GameBoardComposition = () => (
     id="GameBoard"
     component={GameBoard}
     schema={GameBoardSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as GameBoardData).durationSec || 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<GameBoardData>(12)}
     defaultProps={{ data: sampleData as GameBoardData }}
   />
 );

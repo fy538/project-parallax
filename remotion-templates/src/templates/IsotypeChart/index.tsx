@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { IsotypeChart } from "./IsotypeChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { IsotypeChartSchema } from "./schema";
 import type { IsotypeChartData } from "./types";
 import sampleData from "../../../data/episodes/catalog/isotype-chips.json";
@@ -10,12 +10,7 @@ export const IsotypeChartComposition = () => (
     id="IsotypeChart"
     component={IsotypeChart}
     schema={IsotypeChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as IsotypeChartData).durationSec ?? 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<IsotypeChartData>(10)}
     defaultProps={{ data: sampleData as IsotypeChartData }}
   />
 );

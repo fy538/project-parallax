@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { BayesianUpdate } from "./BayesianUpdate";
 import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { BayesianUpdateSchema } from "./schema";
 import type { BayesianUpdateData } from "./types";
 
@@ -107,14 +108,7 @@ export const BayesianUpdateComposition = () => (
     id="BayesianUpdate"
     component={BayesianUpdate}
     schema={BayesianUpdateSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as BayesianUpdateData).durationSec || 12
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<BayesianUpdateData>(12)}
     defaultProps={{ data: sampleData }}
   />
 );

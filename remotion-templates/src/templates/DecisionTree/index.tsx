@@ -8,7 +8,7 @@
 
 import { Composition } from "remotion";
 import { DecisionTree } from "./DecisionTree";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { DecisionTreeSchema } from "./schema";
 import type { DecisionTreeData } from "./types";
 
@@ -20,12 +20,7 @@ export const DecisionTreeComposition = () => (
     id="DecisionTree"
     component={DecisionTree}
     schema={DecisionTreeSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<DecisionTreeData>(12)}
     defaultProps={{ data: sampleData as DecisionTreeData }}
   />
 );

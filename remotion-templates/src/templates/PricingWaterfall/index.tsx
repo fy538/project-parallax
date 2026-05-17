@@ -2,7 +2,7 @@ import { Composition } from "remotion";
 import { PricingWaterfall } from "./PricingWaterfall";
 import { PricingWaterfallSchema } from "./schema";
 import type { PricingWaterfallData } from "./types";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { CATALOG_EPISODE } from "../../catalog/helpers";
 
 const sampleData: PricingWaterfallData = {
@@ -30,12 +30,7 @@ export const PricingWaterfallComposition: React.FC = () => (
     id="PricingWaterfall"
     component={PricingWaterfall}
     schema={PricingWaterfallSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as PricingWaterfallData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<PricingWaterfallData>(10)}
     defaultProps={{ data: sampleData }}
   />
 );

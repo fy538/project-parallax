@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { StrategicLandscape } from "./StrategicLandscape";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { StrategicLandscapeSchema } from "./schema";
 import type { StrategicLandscapeData } from "./types";
 
@@ -29,12 +29,7 @@ export const StrategicLandscapeComposition = () => (
     id="StrategicLandscape"
     component={StrategicLandscape}
     schema={StrategicLandscapeSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as StrategicLandscapeData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<StrategicLandscapeData>(10)}
     defaultProps={{ data: sampleData }}
   />
 );

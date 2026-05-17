@@ -7,7 +7,8 @@
 
 import { Composition } from "remotion";
 import { SplitComposition } from "./SplitComposition";
-import { layout, sec, semantic } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
+import { semantic } from "../../design/theme";
 import { SplitCompositionSchema } from "./schema";
 import type { SplitCompositionData } from "./types";
 
@@ -48,12 +49,7 @@ export const SplitCompositionComposition = () => (
     id="SplitComposition"
     component={SplitComposition}
     schema={SplitCompositionSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as SplitCompositionData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<SplitCompositionData>(10)}
     defaultProps={{ data: sampleData }}
   />
 );

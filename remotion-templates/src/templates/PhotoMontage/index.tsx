@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { PhotoMontage } from "./PhotoMontage";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { PhotoMontageSchema } from "./schema";
 import type { PhotoMontageData } from "./types";
 
@@ -71,12 +71,7 @@ export const PhotoMontageComposition = () => (
     id="PhotoMontage"
     component={PhotoMontage}
     schema={PhotoMontageSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as PhotoMontageData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<PhotoMontageData>(10)}
     defaultProps={{ data: sampleData as PhotoMontageData }}
   />
 );

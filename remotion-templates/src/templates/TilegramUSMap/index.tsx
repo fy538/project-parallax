@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { TilegramUSMap } from "./TilegramUSMap";
-import { layout, sec } from "../../design/theme";
+import { layout } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { TilegramUSMapSchema } from "./schema";
 import type { TilegramUSMapData, USStateCode } from "./types";
 
@@ -73,14 +74,7 @@ export const TilegramUSMapComposition = () => (
     id="TilegramUSMap"
     component={TilegramUSMap}
     schema={TilegramUSMapSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as TilegramUSMapData).durationSec ?? 12,
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<TilegramUSMapData>(12)}
     defaultProps={{ data: sampleData as TilegramUSMapData }}
   />
 );

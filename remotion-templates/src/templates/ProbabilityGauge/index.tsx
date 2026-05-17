@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { ProbabilityGauge } from "./ProbabilityGauge";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { ProbabilityGaugeSchema } from "./schema";
 import type { ProbabilityGaugeData } from "./types";
 
@@ -23,12 +23,7 @@ export const ProbabilityGaugeComposition = () => (
     id="ProbabilityGauge"
     component={ProbabilityGauge}
     schema={ProbabilityGaugeSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as ProbabilityGaugeData).durationSec || 8),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<ProbabilityGaugeData>(8)}
     defaultProps={{ data: sampleData }}
   />
 );

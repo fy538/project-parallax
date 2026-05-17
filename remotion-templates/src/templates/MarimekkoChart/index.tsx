@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { MarimekkoChart } from "./MarimekkoChart";
-import { layout, palette, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
+import { palette } from "../../design/theme";
 import { MarimekkoChartSchema } from "./schema";
 import type { MarimekkoChartData } from "./types";
 
@@ -119,12 +120,7 @@ export const MarimekkoChartComposition = () => (
     id="MarimekkoChart"
     component={MarimekkoChart}
     schema={MarimekkoChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as MarimekkoChartData).durationSec ?? 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<MarimekkoChartData>(12)}
     defaultProps={{ data: sampleData as MarimekkoChartData }}
   />
 );

@@ -2,6 +2,7 @@ import { Composition } from "remotion";
 import { HorizontalTimeline } from "./HorizontalTimeline";
 import { HorizontalTimelineSchema } from "./schema";
 import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import type { HorizontalTimelineData } from "./types";
 
 import sampleData from "../../../data/episodes/silicon-trap/horizontal-timeline-oil-chip.json";
@@ -22,12 +23,7 @@ export const HorizontalTimelineComposition = () => (
     id="HorizontalTimeline"
     component={HorizontalTimeline}
     schema={HorizontalTimelineSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as HorizontalTimelineData).durationSec || 15),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<HorizontalTimelineData>(15)}
     defaultProps={{ data: sampleData as HorizontalTimelineData }}
   />
 );

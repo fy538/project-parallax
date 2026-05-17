@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { TimeSeriesChart } from "./TimeSeriesChart";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { TimeSeriesChartSchema } from "./schema";
 import type { TimeSeriesChartData } from "./types";
 
@@ -12,12 +12,7 @@ export const TimeSeriesChartComposition = () => (
     id="TimeSeriesChart"
     component={TimeSeriesChart}
     schema={TimeSeriesChartSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as TimeSeriesChartData).durationSec || 8),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<TimeSeriesChartData>(8)}
     defaultProps={{ data: sampleData as TimeSeriesChartData }}
   />
 );

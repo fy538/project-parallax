@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { RidgelinePlot } from "./RidgelinePlot";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { RidgelinePlotSchema } from "./schema";
 import type { RidgelinePlotData } from "./types";
 
@@ -133,12 +133,7 @@ export const RidgelinePlotComposition = () => (
     id="RidgelinePlot"
     component={RidgelinePlot}
     schema={RidgelinePlotSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as RidgelinePlotData).durationSec ?? 12),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<RidgelinePlotData>(12)}
     defaultProps={{ data: sampleData as RidgelinePlotData }}
   />
 );

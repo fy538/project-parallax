@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { FrameworkDiagram } from "./FrameworkDiagram";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { FrameworkDiagramSchema } from "./schema";
 import type { FrameworkDiagramData } from "./types";
 import sampleData from "../../../data/episodes/silicon-trap/framework-cocom-china.json";
@@ -10,12 +10,7 @@ export const FrameworkDiagramComposition = () => (
     id="FrameworkDiagram"
     component={FrameworkDiagram}
     schema={FrameworkDiagramSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as FrameworkDiagramData).durationSec || 10),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<FrameworkDiagramData>(10)}
     defaultProps={{ data: sampleData as FrameworkDiagramData }}
   />
 );

@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { TitleTransition } from "./TitleTransition";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { TitleTransitionSchema } from "./schema";
 import type { TitleTransitionData } from "./types";
 import sampleData from "../../../data/episodes/silicon-trap/title-episode.json";
@@ -10,12 +10,7 @@ export const TitleTransitionComposition = () => (
     id="TitleTransition"
     component={TitleTransition}
     schema={TitleTransitionSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as TitleTransitionData).durationSec || 4),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<TitleTransitionData>(4)}
     defaultProps={{ data: sampleData as TitleTransitionData }}
   />
 );

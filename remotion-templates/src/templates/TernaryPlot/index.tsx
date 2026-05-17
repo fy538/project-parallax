@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { TernaryPlot } from "./TernaryPlot";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { TernaryPlotSchema } from "./schema";
 import type { TernaryPlotData } from "./types";
 
@@ -73,12 +73,7 @@ export const TernaryPlotComposition = () => (
     id="TernaryPlot"
     component={TernaryPlot}
     schema={TernaryPlotSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as TernaryPlotData).durationSec ?? 14),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<TernaryPlotData>(14)}
     defaultProps={{ data: sampleData }}
   />
 );

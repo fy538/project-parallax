@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { DumbbellPlot } from "./DumbbellPlot";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { DumbbellPlotSchema } from "./schema";
 import type { DumbbellPlotData } from "./types";
 
@@ -38,14 +38,7 @@ export const DumbbellPlotComposition = () => (
     id="DumbbellPlot"
     component={DumbbellPlot}
     schema={DumbbellPlotSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as DumbbellPlotData).durationSec ?? 12
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<DumbbellPlotData>(12)}
     defaultProps={{ data: sampleData }}
   />
 );

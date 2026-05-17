@@ -1,6 +1,6 @@
 import { Composition } from "remotion";
 import { StatReveal } from "./StatReveal";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { StatRevealSchema } from "./schema";
 import type { StatRevealData } from "./types";
 
@@ -30,14 +30,7 @@ export const StatRevealComposition = () => (
     id="StatReveal"
     component={StatReveal}
     schema={StatRevealSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec(
-        (props.data as StatRevealData).durationSec || 10
-      ),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<StatRevealData>(10)}
     defaultProps={{ data: sampleData }}
   />
 );

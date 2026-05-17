@@ -7,7 +7,7 @@
 
 import { Composition } from "remotion";
 import { ImageComposite } from "./ImageComposite";
-import { layout, sec } from "../../design/theme";
+import { standardMetadata } from "../../utils/composition";
 import { ImageCompositeSchema } from "./schema";
 import type { ImageCompositeData } from "./types";
 
@@ -34,12 +34,7 @@ export const ImageCompositeComposition = () => (
     id="ImageComposite"
     component={ImageComposite}
     schema={ImageCompositeSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: sec((props.data as ImageCompositeData).durationSec || 6),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
+    calculateMetadata={standardMetadata<ImageCompositeData>(6)}
     defaultProps={{ data: sampleData }}
   />
 );
