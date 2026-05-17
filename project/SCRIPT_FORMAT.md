@@ -211,7 +211,7 @@ When a visual column entry has no mode tag, the pipeline infers it from context:
 | The trap tightens invisibly... | **P2** · [AI-GEN:] "Dimly lit boardroom, suited mannequin figures around table, one gripping a microchip" · slow push · kling-3.0 · conflict · 7s |
 |                                | DIR: cam(push-in, over:7s) |
 |                                | DIR: mood(dense, particles:15) |
-|                                | DIR: cut(blur-through) |
+|                                | DIR: cut(dissolve) |
 ```
 
 `DIR:` lines stack below the visual spec line they belong to. Most compositions need 0-2 direction lines; hero moments may have 3-4. See "Direction Annotations" below for the full rules.
@@ -429,14 +429,16 @@ The script-audit skill should verify, for every `[SCENE:]` block:
 
 ### Register transition grammar
 
-When switching between visual registers, use the appropriate transition to maintain flow (see VISUAL_LANGUAGE.md for the full table):
+When switching between visual registers, use the appropriate transition to maintain flow. Full doctrine: `project/TRANSITION_GRAMMAR.md`. The implicit-default engine handles most seams — only emit an explicit `DIR: cut()` for register shifts and premium moments:
 
-- **Analytical → Grounding** (`[MG:]` → `[AI-GEN:]`): color-wash transition — the clean analytical space bleeds into the textured physical world.
-- **Grounding → Atmospheric** (`[AI-GEN:]` → `[ILLUST:]`): blur-through — the photorealistic scene dissolves into stylized abstraction.
-- **Atmospheric → Analytical** (`[ILLUST:]` → `[MG:]`): iris — the illustration contracts to a focal point, then the data visualization opens from that point.
-- **Analytical → Atmospheric** (`[MG:]` → `[ILLUST:]`): dissolve — softer transition, the clean data fades into mood.
-- **Grounding → Analytical** (`[AI-GEN:]` → `[MG:]`): color-wash or cut — the physical world yields to analysis.
-- **Same register adjacent**: standard cut. No special transition needed.
+- **Analytical → Grounding** (`[MG:]` → `[AI-GEN:]`): `DIR: cut(color-wash, ink)` — always include color token.
+- **Grounding → Atmospheric** (`[AI-GEN:]` → `[ILLUST:]`): `DIR: cut(dissolve)` — softens the register shift. (~~`blur-through`~~ is deprecated — use `dissolve`.)
+- **Atmospheric → Analytical** (`[ILLUST:]` → `[MG:]`): `DIR: cut(iris)` — premium register, ≤2 per episode; omit for routine returns to analytical.
+- **Analytical → Atmospheric** (`[MG:]` → `[ILLUST:]`): `DIR: cut(dissolve)` — clean data fades into mood.
+- **Grounding → Analytical** (`[AI-GEN:]` → `[MG:]`): `DIR: cut(color-wash, ink)` or omit (engine picks `cut`).
+- **Same register within beat**: omit — engine uses hard cut. Use `DIR: cut(dissolve)` only for deliberate elaboration.
+- **Chapter break / silence beat**: `DIR: cut(fade)` + `DIR: hold(stillness)` on the prior segment.
+- **Historical-analogy seam**: `DIR: cut(match-cut)` — same subject, different scale or era.
 
 ### Sourcability check
 

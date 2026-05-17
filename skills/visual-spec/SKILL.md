@@ -23,6 +23,7 @@ Before starting, familiarize yourself with:
 - **`project/DIRECTING_LANGUAGE.md`** — the `DIR:` annotation syntax. This is the "how" — camera movement, reveal choreography, timing, transitions, and mood. You will parse these and translate them into `_direction` blocks in JSON files, camera/mood language in AI-GEN briefs, treatment selection in ILLUST specs, and tint hints in footage manifests.
 - **`project/TEXT_ANIMATION_REGISTER.md`** — the eight canonical text-animation techniques (Number Ticker, Tracking-In, Reveal Mask, Underline Draw, Typewriter, Backspace, Scramble, Word Cascade) and three composite patterns (Definition Reveal, Stat Caption, Quote Attribution). Use this to pick the `_direction.textAnimation` register for text-bearing templates (KineticTypography, StatReveal). The doctrine doc has per-technique use/avoid rules and a decision matrix.
 - **`project/HOLD_MOTION_REGISTER.md`** — the eight canonical hold-beat motion techniques (Stillness, Editorial, Breathing, Settle, Sway, Documentary Ken Burns, Atmospheric particles, Mood pulse) and the four register decision matrix (A analytical / B editorial-hero / C documentary / D cartographic). Use this to pick the `_direction.driftPreset` for the *post-entrance hold window*. Most segments take their template default and need no override; reach for a per-segment `driftPreset` only when the editorial intent diverges from the template's canonical register (e.g., a memorial moment on a normally-editorial chart wants `none`/stillness). The `catalog-showcase-drift-register` composition is the side-by-side visual reference.
+- **`project/TRANSITION_GRAMMAR.md`** — the six canonical segment-to-segment transitions and their editorial claims. Use this to pick the `cut()` directive for each seam between segments. Each transition carries an implicit claim about the editorial relationship — picking the wrong one makes a wrong claim. Decision matrix: **cut** (same thought, next breath — within-beat default), **dissolve** (elaboration, gentler delivery — beat-boundary default), **fade** (new chapter / time-jump / silence beat), **match-cut** (same subject, different scale — historical-analogy seams), **color-wash** (register shift — new editorial mode; always include `washColor` token), **iris** (premium cinematic open/close — reserved for civilizational-rupture moments, ≤2 per episode). Six transitions are deprecated: `wipe-left/right/up`, `blur-through`, `whip-pan`, `spatial-zoom` — never emit these. Consult the `catalog-showcase-transition-grammar` composition to see all six in motion.
 - **`project/FOOTAGE_SOURCING.md`** — what footage is actually available for geopolitics content, organized by sourcability tier. This is the reality check.
 - **`project/SCRIPT_FORMAT.md`** — the visual mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), `DIR:` annotations, and how they work in the two-column format.
 - **`project/AI_VIDEO_PIPELINE.md`** — the fourth visual mode specification: aesthetic philosophy (mannequin faces + realistic environments), tool selection, prompting patterns by use case, and editorial guardrails.
@@ -238,7 +239,7 @@ Format it as a markdown table:
 | 0:10 | Arizona desert | FOOTAGE | — | Stock video | footage-manifest.json #1 | mood(subtle, drift:slow) | "Arizona desert aerial" · P3 |
 | 0:25 | TSMC Arizona fab | MG | Analytical | ChoroplethMap | choropleth-reshoring.json | cam(wide→tight:Taiwan, sync:"single island") reveal(sequential) hold(breathe) cut(color-wash, ink) | US highlighted · P1 |
 | 0:45 | "7% of US demand" | LAYERED | Mixed | Stock + KineticTypo | footage-manifest.json #2 + kinetic-7pct.json | reveal(count-up, sync:"seven percent") | stat over desert footage |
-| 1:10 | Cleanroom interior | AI-GEN | Grounding | Kling 3.0 | ai-brief-fab-walkthrough.json | cam(push-in, over:7s) mood(dense, particles:15) cut(blur-through) | mannequin workers |
+| 1:10 | Cleanroom interior | AI-GEN | Grounding | Kling 3.0 | ai-brief-fab-walkthrough.json | cam(push-in, over:7s) mood(dense, particles:15) cut(dissolve) | mannequin workers |
 | 1:30 | The trap tightens | ILLUST | Atmospheric | Recraft | illust-dependency-vise.json | mood(dense, dim:0.4) hold(2s) cut(iris) | metaphor mode · conflict |
 | ... | ... | ... | ... | ... | ... | ... | ... |
 ```
@@ -262,7 +263,7 @@ Check against target ranges from SCRIPT_FORMAT.md: MG 40-55%, FOOTAGE 25-40%, IL
 - ILLUST > 15% → too much atmospheric art, viewer fatigue
 - Either register completely absent → visual texture flattens
 - More than 2 consecutive AI-GEN or ILLUST entries → pacing violation, insert mode switch
-- Register transitions follow the grammar from SCRIPT_FORMAT.md (color-wash, blur-through, iris, dissolve)
+- Register transitions follow the canonical grammar from `project/TRANSITION_GRAMMAR.md` (color-wash, dissolve, match-cut, fade, iris) — `blur-through` is deprecated, never emit it
 
 Guidelines for the breakdown:
 - Every beat should start with a section title card (TitleTransition, section variant)
@@ -325,6 +326,13 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 | `hold()` | `holdAfter`, `holdBehavior`, `preDelay`, `narrationGate` |
 | `cut()` | `transitionOut`, `washColor`, `transitionDuration` |
 | `mood()` | `atmosphere`, `ambientParticles`, `driftPreset`, `globalDim`, `backgroundTint` |
+
+**Transition selection for `cut()` directives** — the implicit-default engine in `apply_default_transitions()` handles most seams (within-beat → cut; beat-boundary → dissolve; title cards → fade pair). Only emit an explicit `cut()` when the default is editorially wrong. When you do override, match the transition to the editorial relationship per `project/TRANSITION_GRAMMAR.md`:
+- **Seam crosses a civilizational-rupture moment** (rare, ≤2 per episode): `DIR: cut(iris)`
+- **Register shift** (entering a new editorial mode): `DIR: cut(color-wash, ink)` — always include the color token
+- **Match-cut opportunity** (same subject, different scale — historical-analogy seam): `DIR: cut(match-cut)` or `DIR: cut(match-cut-still)` for composition-locked templates
+- **Chapter / silence beat** (time-jump, memorial, end of act): `DIR: cut(fade)` paired with `DIR: hold(stillness)` on the prior segment
+- **Never emit**: `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom` — all deprecated (M-TRANSITION-DEPRECATED lint error)
 
 6. **Merge** all fields into a single `_direction` object within the data file
 7. **Set `proportional: true`** — camera path durations should be fractions of total composition time (0.0–1.0), not absolute seconds. This makes camera movements duration-adaptive — the same rhythm works whether narration runs 8 or 18 seconds. See PACING_SYSTEM.md.
@@ -609,7 +617,7 @@ data/episodes/<slug>/illust-<descriptive-slug>.json
 - [ ] Mode matches the visual intention
 - [ ] Treatment matches the emotional register of the accompanying narration
 - [ ] Duration is 4-8 seconds (atmospheric moments don't need long holds)
-- [ ] Transitions respect the register grammar (color-wash, blur-through, iris, dissolve)
+- [ ] Transitions respect the canonical grammar (color-wash, dissolve, match-cut, fade, iris) — no deprecated types (`blur-through`, `wipe-*`, `whip-pan`, `spatial-zoom`)
 - [ ] The illustration adds something footage and MG cannot — if a stock aerial shot would work equally well, use footage instead
 
 ### Batch output
@@ -879,7 +887,7 @@ Also emit a `_direction` block alongside the brief for assembly manifest consump
     "atmosphere": "dense",
     "ambientParticles": 15,
     "holdAfter": 0,
-    "transitionOut": "blur-through"
+    "transitionOut": "dissolve"
   }
 }
 ```

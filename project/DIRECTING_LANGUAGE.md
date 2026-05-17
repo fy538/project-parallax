@@ -318,31 +318,45 @@ DIR: cut(<type>, [origin], [color], [duration])
 
 | Parameter | Values | Maps to |
 |-----------|--------|---------|
-| Type | `cut`, `fade`, `dissolve`, `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `color-wash`, `iris`, `match-cut`, `whip-pan`, `spatial-zoom` | `transitionOut` in assembly manifest |
-| Origin | `origin:center`, `origin:element-<id>`, `origin:[x,y]` | Iris/spatial-zoom origin point |
+| Type | **Canonical:** `cut`, `fade`, `dissolve`, `match-cut`, `match-cut-still`, `color-wash`, `iris` · **Deprecated (never emit):** `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom` | `transitionOut` in assembly manifest |
+| Origin | `origin:center`, `origin:element-<id>`, `origin:[x,y]` | Iris origin point |
 | Duration | `0.5s`, `0.8s`, etc. | Override default transition duration |
-| Color | `ink`, `amber`, `rust` (for color-wash only) | `washColor` resolved from palette.json |
+| Color | `ink`, `amber`, `rust`, `bone`, `paper` (for `color-wash` only — required) | `washColor` resolved from palette.json |
 
-**`match-cut` note:** A match-cut requires visual continuity between this segment and the next. Visual-spec sets `transitionOut: "match-cut"` on this segment AND `transitionIn: "match-cut"` on the next segment. The FullEpisode composition uses synced zoom/position between both TransitionWrappers. The script writer is responsible for choosing compositions where visual rhyming is possible (e.g., a bar chart ending on a tall bar → next composition starting with a tall building).
+**`match-cut` note:** A match-cut requires visual continuity between this segment and the next. Visual-spec sets `transitionOut: "match-cut"` on this segment AND `transitionIn: "match-cut"` on the next segment. The FullEpisode composition uses synced zoom/position between both TransitionWrappers. The script writer is responsible for choosing compositions where visual rhyming is possible (e.g., a bar chart ending on a tall bar → next composition starting with a tall building). `match-cut-still` is the composition-locked variant — opacity only, used automatically for same-template map/image seams.
+
+**Deprecated transition types:** `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom` are no longer valid. The `M-TRANSITION-DEPRECATED` lint rule blocks any manifest that uses them. Replacements: `wipe-*` / `blur-through` → `dissolve`; `whip-pan` → `cut`; `spatial-zoom` → `match-cut`. See `project/TRANSITION_GRAMMAR.md` § "Retired forms".
 
 **Examples:**
 ```
 DIR: cut(iris, origin:element-3, 0.6s)
 DIR: cut(color-wash, ink, 0.7s)
-DIR: cut(blur-through, 0.8s)
 DIR: cut(dissolve)
 DIR: cut(match-cut)
+DIR: cut(fade)
+```
+
+**Audio-bridge directives (Phase 7):** These are NLE-assembly annotations — they do not affect Remotion rendering. The manifest engine applies `narrationLeadIn: 0.7` automatically to every hard cut; use these only to override the default.
+```
+DIR: jcut(0.5)        J-cut: narration of the incoming segment starts N seconds early
+DIR: lcut(0.8)        L-cut: narration of the outgoing segment runs N seconds late
+```
+
+**Chapter sugar (Phase 6):** Desugars to a `TitleTransition` segment automatically.
+```
+DIR: chapter("The Trap Tightens")
+DIR: chapter("The Logic of Defection", kicker:"BEAT 2")
 ```
 
 **Register grammar integration:**
-The register transition grammar from VISUAL_LANGUAGE.md specifies which transition type to use between registers. `cut()` lets the script override or refine this:
+The register transition grammar is defined in `project/TRANSITION_GRAMMAR.md`. `cut()` lets the script override the implicit-default engine when needed — most seams don't need an explicit `cut()` at all:
 
 | Register transition | Default `cut()` | When to override |
 |--------------------|--------------------|--------------|
-| Analytical → Grounding | `color-wash` | Rarely — strong boundary needed |
-| Grounding → Atmospheric | `blur-through` | Rarely — natural register shift |
-| Atmospheric → Analytical | `iris` | Override `origin:` to point at the "answer" element |
-| Same register | `cut` or `fade` | Use `match-cut` for visual rhyming, `dissolve` for soft time-skip |
+| Analytical → Grounding | `color-wash` (always include color token) | Rarely — boundary is usually correct |
+| Grounding → Atmospheric | `dissolve` | Rarely — natural register shift |
+| Atmospheric → Analytical | `iris` (≤2 per episode) | Override `origin:` to point at the "answer" element |
+| Same register | implicit `cut` (within-beat) or `dissolve` (beat-boundary) | Use `match-cut` for historical-analogy visual rhyme |
 
 **How it generates JSON:**
 ```json
@@ -442,7 +456,7 @@ Direction annotations go in the right column, immediately below the visual spec 
 | Inside the cleanroom, everything  | **P1** · [AI-GEN:] fab-walkthrough · 7s |
 | runs on precision.                 | DIR: cam(push-in, over:7s) |
 |                                    | DIR: mood(dense, particles:15) |
-|                                    | DIR: cut(blur-through) |
+|                                    | DIR: cut(dissolve) |
 | That's what makes this a trap —   | **P2** · [ILLUST:] metaphor · "dependency as tightening vise" · 6s |
 | you can't escape what you built.   | DIR: mood(dense, dim:0.4) |
 |                                    | DIR: hold(2s) |
@@ -509,14 +523,31 @@ hold(until:"word")                     Gate: don't advance until word
 
 ### Cut (`cut`)
 ```
-cut(cut|fade|dissolve)                 Basic transitions
-cut(iris, origin:<element|center>)     Circular reveal
-cut(color-wash, <ink|amber|rust>)      Color flood between registers
-cut(blur-through)                      Blur dissolve
-cut(match-cut)                         Visual rhyme (needs visual continuity)
-cut(whip-pan)                          Fast directional sweep
-cut(spatial-zoom)                      Deep zoom into detail
-cut(..., <duration>)                   Override default timing
+cut(cut|fade|dissolve)                     Basic transitions (default engine handles most seams)
+cut(iris, origin:<element|center>)         Circular reveal — premium, ≤2 per episode
+cut(color-wash, <ink|amber|rust|bone>)     Color flood — color token required
+cut(match-cut)                             Visual rhyme (needs shared subject)
+cut(match-cut-still)                       Composition-locked opacity-only (auto on same-template map/image seams)
+cut(..., <duration>)                       Override default timing
+cut(jcut|lcut, <N>)                        → use DIR: jcut(N) / DIR: lcut(N) instead
+# DEPRECATED — M-TRANSITION-DEPRECATED lint error:
+# cut(blur-through) → use cut(dissolve)
+# cut(wipe-left|wipe-right|wipe-up) → use cut(dissolve)
+# cut(whip-pan) → use cut(cut)
+# cut(spatial-zoom) → use cut(match-cut)
+```
+
+### Chapter sugar (`chapter`)
+```
+chapter("TITLE")                           Inserts a TitleTransition segment
+chapter("TITLE", kicker:"SUBTITLE")        With kicker text
+chapter("TITLE", "custom-slug")            Override data-file slug lookup
+```
+
+### Audio bridge (`jcut` / `lcut`)
+```
+jcut(0.7)   J-cut: narration of next segment starts N seconds before the visual cut
+lcut(0.5)   L-cut: narration of current segment runs N seconds past the visual cut
 ```
 
 ### Mood (`mood`)

@@ -528,7 +528,13 @@ Per NYT VI doctrine, every hard cut should have ~0.5-1.0s of next-segment audio 
 - ✅ **Phase 6 (`DIR: chapter("…")` sugar, shipped May 16, 2026, commit `0e51695`)**: parser desugars to a `TRANSITION TitleTransition` segment; `_slugify_chapter_title()` derives the slug for data-file lookup; `_build_segment` injects `template.props.{title, variant, kicker}` as inline fallback; 5 tests. Script authoring goes from 4 boilerplate lines to one `DIR: chapter("Title")` annotation.
 - ✅ **Phase 7 (audio-spec J/L-cut wiring, shipped May 16, 2026)**: added `narrationLeadIn` / `narrationLagOut` fields to the assembly-manifest schema and segment build pipeline. `DIR: jcut(N)` / `DIR: lcut(N)` parse to per-segment direction fields. `apply_default_transitions()` Rule 7 now applies `narrationLeadIn: 0.7` automatically to every hard cut (suppressed for TRANSITION segments, for `hold(stillness)` predecessor beats, and when an explicit `DIR: jcut()` already set the field). NLE-assembly annotation only — Remotion timing is unaffected.
 - ✅ **Phase 8 (catalog showcase, shipped May 16, 2026)**: `catalog-showcase-transition-grammar` — 30s Remotion composition at `src/catalog/TransitionGrammarShowcase.tsx`. 3×2 mosaic of 6 canonical transitions (cut, dissolve, fade, match-cut, color-wash, iris) on the "1850 oil embargo → 2025 chip controls" slide pair. Each cell loops independently using actual `defaultDurationSec` timing so the duration difference between cut (instant) and iris (0.8s) is visible. Amber pulse-dot flashes during the active transition window. Inline transition math mirrors `Transitions.tsx computeTransition` for fidelity.
-- **Phase 9 (lint rule `M-TRANSITION-DEFAULT`)**: surface deprecated-transition usage, chart-to-chart with iris, beat-boundary with cut when narration register suggests dissolve, etc.
+- ✅ **Phase 9 (lint rules `M-TRANSITION-*`, shipped May 16, 2026)**: five sub-rules wired into `tools/lint/manifest_lint.py` as `check_transition_grammar()`, registered in `ALL_RULES`.
+  - **M-TRANSITION-DEPRECATED** (error): fires for any of the 6 retired types (`wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom`) in `.in` or `.out`; message names the canonical replacement.
+  - **M-TRANSITION-IRIS-CHART** (error): fires when `iris` appears on a chart-category template (`DataChart`, `TimeSeriesChart`, `BumpChart`, and 16 siblings); explains the focal-point rationale.
+  - **M-TRANSITION-DISSOLVE-CREEP** (warning): fires exactly once at the third consecutive `dissolve`-in segment; suppressed for the remainder of the episode.
+  - **M-TRANSITION-IRIS-OVERUSE** (warning): fires once per episode when `iris` appears as `.in` more than 2 times; iris is a premium register reserved for civilizational-rupture moments.
+  - **M-TRANSITION-COLOR-WASH-TOKEN** (warning): fires when `color-wash` is used in `.in` or `.out` without a `washColor` field (the wash would render as transparent).
+  - Fixing the rules caught 3 real bugs in the `prisoners-dilemma` manifest: `beat1-seg07`, `beat2-seg18`, `beat3-seg27` all had `in: color-wash` without `washColor`; patched to `"#1C1814"` (ink). 24 new unit tests; 67 total pass.
 
 ---
 
@@ -571,4 +577,10 @@ Segment-to-segment transitions are editorial sentences, not decoration. The eigh
 
 The under-served transition is **match-cut**. Parallax's historical-analogy structure produces match-cut opportunities at every beat seam. Zero production uses currently. Promoting it from unused to first-class is the highest-leverage transition upgrade in the codebase.
 
-Phases 3-9 of the planned work close the implementation gaps. After they land, every seam in every Parallax episode is a deliberate editorial choice — same compounding leverage as text animation and hold-motion before it.
+- ✅ **Phase 10 (skill cross-references, shipped May 16, 2026)**: TRANSITION_GRAMMAR.md wired into all four production skills.
+  - **visual-spec**: added to key-documents block (with 6-canonical / 6-deprecated summary); added transition-selection guidance block at the `cut()` directive dispatch table.
+  - **script-draft**: extended the DIRECTING_LANGUAGE.md note with full transition vocabulary and J/L-cut directives; fixed the deprecated `blur-through` reference in the register-transition table (replaced with `dissolve`); updated the Direction checklist item to include color-wash token and no-deprecated-types checks.
+  - **script-audit**: added "Transition-grammar register check" section (Lens 6.5) with six specific flagging patterns — deprecated type, iris-on-chart, dissolve creep, iris overuse, color-wash without token, match-cut without shared subject. Each pattern includes the M-TRANSITION-* rule that will catch it at manifest commit.
+  - **audio-spec**: updated `cut()` bullet with full canonical-to-SFX mapping, deprecated blur-through treatment, and J/L-cut NLE enforcement guidance (default `narrationLeadIn: 0.7`; suppress conditions for stillness beats and chapter cards).
+
+Phases 3–10 close the implementation gaps. Every seam in every Parallax episode is now a deliberate editorial choice — same compounding leverage as text animation and hold-motion before it.

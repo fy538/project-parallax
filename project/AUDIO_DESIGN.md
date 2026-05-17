@@ -64,13 +64,16 @@ Created: May 2, 2026
 - **normal** — Noticeable but not foregrounded. For beat boundaries and data reveals. The default.
 - **dramatic** — Briefly takes precedence over music bed. For the 2-3 biggest moments per episode (the thesis reveal, the key stat, the closing argument).
 
-**Matching SFX to visual transitions:**
+**Matching SFX to visual transitions** (canonical types only — see `project/TRANSITION_GRAMMAR.md`):
 - `cut` → No SFX, or a very subtle beat-transition at subtle intensity
 - `fade` / `dissolve` → beat-transition at normal intensity
-- `wipe-left` / `wipe-right` → map-whoosh (the directional motion pairs with the spatial sweep)
-- `blur-through` → tension-rise → tension-resolve (the blur suggests a shift in understanding)
+- `match-cut` / `match-cut-still` → silent (the visual continuity is the connection — SFX competes)
 - `color-wash` → section-open (the color flood signals a new section)
 - `iris` → stat-reveal (the circular reveal pairs with the "lock" click)
+- ~~`wipe-left` / `wipe-right` / `blur-through`~~ → deprecated; treat as `dissolve` (beat-transition) if encountered in old manifests
+
+**J/L-cut audio bridges (`narrationLeadIn` / `narrationLagOut` in assembly manifest):**
+The manifest engine automatically sets `narrationLeadIn: 0.7` on every hard cut — the NLE editor should start the incoming narration 0.7s before the visual cut fires. Override with `DIR: jcut(N)` in the script (written to `segment.narrationLeadIn`). L-cuts are explicit only: `DIR: lcut(N)` → `segment.narrationLagOut`. Suppress the default J-cut when the preceding segment uses `DIR: hold(stillness)` (silence beats need abrupt entry) or when the cut is a `TitleTransition` chapter card.
 
 ---
 
@@ -135,42 +138,33 @@ Script markers: `[Pause.]` or `[Beat.]` in the narration column signal potential
 ## SFX Library Structure
 
 ```
-project-parallax/
+remotion-templates/public/
 ├── audio/
 │   ├── sfx/
-│   │   ├── transitions/          # Layer 2 — event-driven
-│   │   │   ├── beat-transition-subtle.wav
-│   │   │   ├── beat-transition-normal.wav
-│   │   │   ├── beat-transition-dramatic.wav
-│   │   │   ├── stat-reveal-normal.wav
-│   │   │   ├── stat-reveal-dramatic.wav
-│   │   │   ├── tension-rise-normal.wav
-│   │   │   ├── tension-resolve-normal.wav
-│   │   │   ├── map-whoosh-normal.wav
-│   │   │   ├── quote-bell-normal.wav
-│   │   │   ├── section-open-normal.wav
-│   │   │   └── end-stinger.wav
-│   │   └── textures/             # Layer 3 — micro-SFX
-│   │       ├── dot-click.wav
-│   │       ├── card-settle.wav
-│   │       ├── line-draw.wav
-│   │       ├── region-glow.wav
-│   │       ├── bar-grow.wav
-│   │       ├── node-pop.wav
-│   │       └── page-turn.wav
-│   ├── music/                    # Layer 1 — beds
-│   │   ├── EP01/                 # Per-episode music
-│   │   │   ├── bed-opening.wav
-│   │   │   ├── bed-analytical.wav
-│   │   │   ├── bed-tension.wav
-│   │   │   └── bed-resolution.wav
-│   │   └── shared/               # Reusable across episodes
-│   │       ├── bed-neutral.wav
-│   │       └── bed-contemplative.wav
-│   └── README.md                 # Sourcing notes, license info
+│   │   ├── transitions/          # Layer 2 — event-driven (22 files)
+│   │   │   ├── beat-transition-{subtle,normal,dramatic}.wav    0.5 / 0.7 / 1.0 s
+│   │   │   ├── stat-reveal-{subtle,normal,dramatic}.wav        0.8 / 1.0 / 1.2 s
+│   │   │   ├── tension-rise-{subtle,normal,dramatic}.wav       2.0 / 3.5 / 5.0 s
+│   │   │   ├── tension-resolve-{subtle,normal,dramatic}.wav    0.5 / 0.7 / 1.0 s
+│   │   │   ├── map-whoosh-{subtle,normal,dramatic}.wav         0.5 / 0.65 / 0.8 s
+│   │   │   ├── quote-bell-{subtle,normal,dramatic}.wav         0.3 / 0.4 / 0.5 s
+│   │   │   ├── section-open-{subtle,normal,dramatic}.wav       1.0 / 1.2 / 1.5 s
+│   │   │   └── end-stinger.wav                                 2.5 s
+│   │   └── textures/             # Layer 3 — micro-SFX (7 files)
+│   │       ├── dot-click.wav       0.05 s
+│   │       ├── card-settle.wav     0.15 s
+│   │       ├── line-draw.wav       0.30 s
+│   │       ├── region-glow.wav     0.50 s
+│   │       ├── bar-grow.wav        0.30 s
+│   │       ├── node-pop.wav        0.10 s
+│   │       └── page-turn.wav       0.25 s
+└── episodes/<slug>/audio/music/<slug>/
+    └── bed-{contemplative,analytical,tension,resolution}-N.wav  # Layer 1
 ```
 
-**File format:** WAV 48kHz 24-bit (production master). MP3 320kbps for Remotion preview. Remotion's `<Audio>` component handles both.
+**File format:** WAV 48 kHz · 24-bit · stereo PCM (production master). Remotion's `<Audio>` component handles WAV directly. Music beds use the `loop` prop in `MusicBedLayer` so any track shorter than the bed section loops seamlessly; fade-in/fade-out envelopes fire at section boundaries regardless of loop position.
+
+**SFX generator:** `python3 tools/generate_sfx.py` — regenerates all 29 Layer 2/3 files from Python synthesis. Flags: `--cue <name>` (one type only), `--dry-run` (print plan without writing). Run whenever you want to tweak a sound's character without touching source assets.
 
 **Naming convention:** `{cue-type}-{intensity}.wav` for SFX, `bed-{mood}.wav` for music beds.
 
@@ -390,14 +384,15 @@ The assembly manifest's `transition.in` and `transition.out` fields determine wh
 | Transition | SFX | Intensity | Notes |
 |---|---|---|---|
 | `cut` | none or `beat-transition` | subtle | Cut is the default — only add SFX at beat boundaries |
-| `fade` | `beat-transition` | normal | Standard inter-segment transition |
-| `dissolve` | `beat-transition` | normal | Same as fade (dissolve is the visual-only distinction) |
-| `wipe-left` | `map-whoosh` | normal | Directional motion pairs with spatial sweep |
-| `wipe-right` | `map-whoosh` | normal | Mirror of wipe-left |
-| `wipe-up` | `beat-transition` | normal | Vertical wipe is less spatial than horizontal — use beat-transition |
-| `blur-through` | `tension-rise` → `tension-resolve` | normal | Two-part: rise during blur, resolve on reveal |
-| `color-wash` | `section-open` | normal | Color flood = new section |
-| `iris` | `stat-reveal` | normal | Circular reveal pairs with "lock" click |
+| `fade` | `beat-transition` | normal | Chapter break / silence beat |
+| `dissolve` | `beat-transition` | normal | Beat-boundary softener |
+| `match-cut` / `match-cut-still` | none | — | Visual continuity is the connection — SFX competes |
+| `color-wash` | `section-open` | normal | Color flood = new section; always has washColor token |
+| `iris` | `stat-reveal` | normal | Circular reveal pairs with "lock" click; premium — ≤2 per episode |
+| ~~`wipe-left`~~ | ~~`map-whoosh`~~ | — | **Deprecated** — use `dissolve` |
+| ~~`wipe-right`~~ | ~~`map-whoosh`~~ | — | **Deprecated** — use `dissolve` |
+| ~~`wipe-up`~~ | ~~`beat-transition`~~ | — | **Deprecated** — use `dissolve` |
+| ~~`blur-through`~~ | ~~`tension-rise → tension-resolve`~~ | — | **Deprecated** — use `dissolve` |
 
 ### Music Bed Mood Mapping
 

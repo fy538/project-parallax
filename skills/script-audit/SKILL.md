@@ -159,11 +159,11 @@ All three registers should be present in any episode longer than 8 minutes. If a
 - Missing Atmospheric → the episode is all-data, all the time. Suggest 3-5 moments where constructivist illustrations would add emotional weight (typically at turning points, trap-closing moments, or dystopian implications).
 - Missing Grounding → the viewer never physically enters the spaces being discussed. Suggest 2-3 moments where a photorealistic AI scene would make the abstract concrete.
 
-**Register transition grammar.** When the script switches between registers, check that transitions respect the grammar from SCRIPT_FORMAT.md:
-- Analytical → Grounding: color-wash
-- Grounding → Atmospheric: blur-through
-- Atmospheric → Analytical: iris
-- Analytical → Atmospheric: dissolve
+**Register transition grammar.** When the script switches between registers, check that transitions respect the grammar from `project/TRANSITION_GRAMMAR.md`. Six canonical types only — the six deprecated types (`wipe-left/right/up`, `blur-through`, `whip-pan`, `spatial-zoom`) are never valid:
+- Analytical → Grounding (register shift): `color-wash` with color token
+- Grounding → Atmospheric (soften): `dissolve` (~~`blur-through`~~ is deprecated — flag any use)
+- Atmospheric → Analytical (rupture peak): `iris` — premium register, ≤2 per episode
+- Analytical → Atmospheric (gentle drift): `dissolve`
 - Hard cuts between stylistically distant registers (e.g., constructivist art directly to photorealistic AI) should be flagged as jarring.
 
 **Mode monotony.** Walk the visual column sequentially and flag:
@@ -234,6 +234,17 @@ The CLI returns JSON: `{ isCallback: true|false, conceptId, accentColor, introdu
 - **Held quote / definition (KineticTypography) with `DIR: drift(documentary)`** — Register B is breathing/settle/none; documentary's rotation reads careless on typography. Flag accordingly.
 
 **Authoring guidance**: when in doubt, omit `drift()` and let the template default fire. Reach for `drift()` only when the editorial intent of THIS beat diverges from the template's canonical register — most commonly `hold(stillness)` on a memorial/casualty card, or `drift(none)` on a document-of-record quote.
+
+**Transition-grammar register check.** When the script uses `DIR: cut(<type>)` to override a seam's transition, verify the choice matches the editorial relationship per `project/TRANSITION_GRAMMAR.md`. The implicit-default engine handles most seams (within-beat → cut; beat-boundary → dissolve; title cards → fade); only explicit overrides are worth flagging. Check these patterns:
+
+- **Deprecated transition type** — any use of `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, or `spatial-zoom`. Flag: "Deprecated transition — use [replacement] instead. M-TRANSITION-DEPRECATED will block this at manifest commit. See TRANSITION_GRAMMAR.md § Retired forms." Replacement map: `wipe-*` → `dissolve`; `blur-through` → `dissolve`; `whip-pan` → `cut`; `spatial-zoom` → `match-cut`.
+- **`cut(iris)` on a chart-category segment** — `DataChart`, `TimeSeriesChart`, `BumpChart`, `RidgelinePlot`, `Streamgraph`, `RadarChart`, etc. have no compositional focal point for an iris to open from. Flag: "Iris on chart template — chart grids have no focal-point anchor for an iris wipe. Use dissolve or cut. M-TRANSITION-IRIS-CHART will block at commit."
+- **Dissolve creep** — more than 2 consecutive `cut(dissolve)` directives within a 30-second window. Flag: "3+ consecutive dissolves suppress visual rhythm — the viewer stops registering cuts. Break the run with a cut or match-cut. See TRANSITION_GRAMMAR.md § dissolve."
+- **Iris overuse** — more than 2 `cut(iris)` directives episode-wide. Count them. Flag: "Episode uses N iris transitions (threshold: ≤2). Iris is a premium register reserved for civilizational-rupture moments. M-TRANSITION-IRIS-OVERUSE will warn at commit."
+- **`cut(color-wash)` without color token** — `cut(color-wash)` without specifying a color (e.g., `cut(color-wash, ink)`) renders as a transparent wash. Flag: "color-wash directive missing color token — add the brand palette value (e.g. ink, amber, rust). M-TRANSITION-COLOR-WASH-TOKEN will warn at commit."
+- **`cut(match-cut)` without shared visual subject** — match-cuts only land when both segments share a compositional anchor (same location, same scale-subject, same geometric form). If the two segments are visually unrelated, the match-cut reads as a jump cut. Flag: "Match-cut on segments without shared visual subject — verify both segments share [subject]. Consider dissolve instead."
+
+**Authoring guidance on transitions**: most seams need no `cut()` directive — omit it and let the engine decide. Reach for explicit `cut()` only for register shifts (`color-wash, ink`), civilizational-rupture peaks (`iris`, ≤2 per episode), historical-analogy match-cuts (`match-cut`), and chapter/silence beats (`fade` + `hold(stillness)`). J/L-cut audio bridges (`DIR: jcut(0.7)`) are applied automatically to every hard cut by the default engine; use `DIR: jcut(N)` only to override the default 0.7s overlap.
 
 ### Lens 7: Decoder Posture Check
 
