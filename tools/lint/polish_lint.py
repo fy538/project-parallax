@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-polish-lint.py — AST-level design rule enforcement for Remotion templates.
+polish_lint.py — AST-level design rule enforcement for Remotion templates.
 
 Scans template TSX files for violations of POLISH.md rules:
   - Magic pixel numbers instead of spacing tokens (L1)
@@ -15,10 +15,10 @@ Scans template TSX files for violations of POLISH.md rules:
   - Magic safe-area offsets (+ 40, + 60, + 120, etc.) (L7)
 
 Usage:
-    python polish-lint.py                    # lint all templates
-    python polish-lint.py DataChart          # lint one template
-    python polish-lint.py --json             # machine-readable output
-    python polish-lint.py --summary          # counts only
+    python polish_lint.py                    # lint all templates
+    python polish_lint.py DataChart          # lint one template
+    python polish_lint.py --json             # machine-readable output
+    python polish_lint.py --summary          # counts only
 
 Exit code: number of violations found (0 = clean).
 """

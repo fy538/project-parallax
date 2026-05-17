@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document names Parallax's eight canonical segment-to-segment transitions and matches each to its editorial context. It exists so that script-writing and visual-spec skills can select the right transition for a given seam — not by guessing from a 12-option menu, but by picking the one whose *implicit claim* about the relationship between two segments matches the editorial intent.
+This document names Parallax's **six canonical visual transitions plus two adjacent treatments** (eight total entries) and matches each to its editorial context. The six visual transitions live as `TransitionType` entries in `Transitions.tsx`; the two adjacent treatments (J/L-cut audio bridges and chapter cards) live at other layers (audio-spec, `TitleTransition` segments) but belong in the register because they're often the right answer for a seam. The doc exists so script-writing and visual-spec skills can select the right transition for a given seam — not by guessing from a 12-option menu, but by picking the one whose *implicit claim* about the relationship between two segments matches the editorial intent.
 
 **Transitions are the smallest editorial sentence in a video.** Every seam between two segments either says *"same thought, next breath"* (cut), *"same thought, gentler delivery"* (dissolve), *"new chapter"* (fade-to-black), *"same geography, different scale"* (match-cut on a location), or *"new register entirely"* (color-wash). Picking the wrong transition doesn't just look wrong — it makes a *wrong claim* about the relationship.
 
@@ -573,7 +573,7 @@ When `audio-spec` runs, it should:
 
 ## Summary
 
-Segment-to-segment transitions are editorial sentences, not decoration. The eight canonical transitions each carry an implicit claim about the relationship between the two segments they join; matching transition to claim is the work. The technical surface already exists in `Transitions.tsx` + `TRANSITION_CATALOG` + `apply_default_transitions` — the doctrine work is *assignment*, not *invention*. Six transitions in code are deprecated for editorial register (universal PowerPoint/sports/YouTube tells). Two adjacent treatments (J/L-cut audio bridges, chapter cards) live at other layers (audio-spec, `TitleTransition` segments) but belong in the transition register because they're often the right answer for a given seam.
+Segment-to-segment transitions are editorial sentences, not decoration. The six canonical visual transitions (plus two adjacent treatments — J/L-cut audio bridges and chapter cards — at other layers) each carry an implicit claim about the relationship between the two segments they join; matching transition to claim is the work. The technical surface already exists in `Transitions.tsx` + `TRANSITION_CATALOG` + `apply_default_transitions` — the doctrine work is *assignment*, not *invention*. Six legacy transitions in code (wipe-left/right/up, blur-through, whip-pan, spatial-zoom) are deprecated for editorial register (universal PowerPoint/sports/YouTube tells).
 
 The under-served transition is **match-cut**. Parallax's historical-analogy structure produces match-cut opportunities at every beat seam. Zero production uses currently. Promoting it from unused to first-class is the highest-leverage transition upgrade in the codebase.
 

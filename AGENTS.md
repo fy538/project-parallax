@@ -24,7 +24,7 @@ From repo root:
 
 Per-stack (when you need granular control):
 
-- Python tests: `pytest tools/ -q` (330 tests across modules, <1s)
+- Python tests: `pytest tools/ -q` (730 tests across modules, <2s)
 - Python tests in watch mode: `./scripts/test-watch.sh` (requires `entr`)
 - TS typecheck: `cd remotion-templates && npx tsc --noEmit`
 - TS lint: `cd remotion-templates && npm run lint`

@@ -139,7 +139,7 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 
 **Status:** complete wayfinding stack. Lowest cross-template overlap, highest register-confusion rate.
 
-**Selector:** [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](TYPOGRAPHY_TEMPLATE_SELECTOR.md) — wall-table with text-moment-kind decision tree, KineticTypography vs. TitleTransition disambiguation (the canonical confusion), POLISH D1-D18 grounded rules.
+**Selector:** [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](TYPOGRAPHY_TEMPLATE_SELECTOR.md) — wall-table with text-moment-kind decision tree, KineticTypography vs. TitleTransition disambiguation (the canonical confusion), POLISH D1-D21 grounded rules.
 
 **Audit:** `skills/typography-audit/SKILL.md` — 8-lens audit catching register confusion, TitleTransition motion/chrome violations, KineticTypography missing attribution, SplitComposition parallel-structure violations, image load-bearing failures, AnnotatedImage callout density and stagger.
 
@@ -199,7 +199,7 @@ Each family now has: SELECTOR wall-table + dedicated audit skill + at least one 
 - [`references/template-schemas.md`](references/template-schemas.md) — schema reference for every template
 - [`references/template-research/`](references/template-research/) — per-template dossiers (canonical idioms, failure modes, defaults)
 - [`BRAND.md`](BRAND.md) — design system; Cartography section for map register
-- [`POLISH.md`](POLISH.md) — editorial doctrine D1–D18 (cross-template polish rules)
+- [`POLISH.md`](POLISH.md) — editorial doctrine D1–D21 (cross-template polish rules)
 - [`project/VISUAL_LANGUAGE.md`](../project/VISUAL_LANGUAGE.md) — when to use footage / MG / ILLUST / AI-GEN
 - [`project/FOOTAGE_SOURCING.md`](../project/FOOTAGE_SOURCING.md) — stock footage selection
 - [`skills/visual-spec/SKILL.md`](../skills/visual-spec/SKILL.md) — the skill that consumes this index

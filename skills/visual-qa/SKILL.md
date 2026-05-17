@@ -10,7 +10,7 @@ You are performing a visual quality assurance pass on rendered Remotion composit
 
 ## Why This Exists
 
-``npm run lint:tsx` (tools/lint/polish_lint.py)` catches code-level violations (magic numbers, missing tokens). But some problems are only visible in the rendered output: text that's technically positioned correctly but visually collides, backgrounds that are technically gradients but read as flat, spacing that passes the 8px grid but looks cramped at 1920×1080. This skill closes the gap between "code looks right" and "output looks right."
+`npm run lint:tsx` (which runs `tools/lint/polish_lint.py`) catches code-level violations (magic numbers, missing tokens). But some problems are only visible in the rendered output: text that's technically positioned correctly but visually collides, backgrounds that are technically gradients but read as flat, spacing that passes the 8px grid but looks cramped at 1920×1080. This skill closes the gap between "code looks right" and "output looks right."
 
 ## Prerequisites
 
@@ -133,7 +133,7 @@ Produce a markdown report saved to the episode folder or the project root:
 1. [Most impactful fix] — affects [compositions]
 2. ...
 
-## Comparison with `npm run lint:tsx` (tools/lint/polish_lint.py)
+## Comparison with `npm run lint:tsx` (`tools/lint/polish_lint.py`)
 - Lint violations that are visible in renders: ...
 - Render issues NOT caught by lint: ...
 ```

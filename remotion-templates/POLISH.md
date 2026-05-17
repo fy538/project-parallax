@@ -529,8 +529,6 @@ DIR vocabulary: `DIR: syncs:["taiwan","korea","japan"]` in scripts emits the per
 
 **Why:** Bloomberg / The Economist / FT supply-chain diagrams converge on precision markers for the same reason — the editorial claim ("X depends on Y") needs to read at video-scrubbing speed without competing visual weight from the markers themselves. Marbles compete; reticles annotate.
 
-**Where it lands:** `TitleTransition` `editorial-title` variant enforces the visual side (2.0s hold, fade-only, ∴ corner mark). Music and SFX are audio-track decisions made downstream in NLE assembly; this doctrine governs both.
-
 ### D20. Hold-beat motion is editorial register, not decoration
 
 **Observation:** After D17 anticipatory entrance lands the element and before A7 exit fade kicks in, there's a 2–8 second window where the element is just *on screen*. The Phase 0 audit (May 16, 2026) found five templates rendering byte-identical (or near-identical) frames during this window — `ImageComposite-archive` showed **0 pixels different** between frame 90 and frame 150. Total stillness for two seconds on a historical photograph or atlas plate reads as a PowerPoint slide, not as documentary video.

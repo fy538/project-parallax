@@ -42,7 +42,7 @@
 - **Name:** Parallax — viewing the same object from different analytical positions
 - **Brand mark:** ∴ (therefore symbol)
 - **Visual system:** Meridian dual-mode — Light (in-video, primary), Dark (dramatic moments, secondary)
-- **Palette:** ink `#1C1814`, amber `#E5A544`, rust `#C23B22`, bone `#F0E6D0`, paper `#F5F0E8`, oxblood `#6B1D1D` — single source of truth: [`tools/brand-treatment/palette.json`](./tools/brand-treatment/palette.json)
+- **Palette:** ink `#1C1814`, gold `#C4A747`, bone `#F0E6D0`, paper `#F5F0E8`, walnut `#5C4A3D`, umber `#8B7355`, taupe `#B8A189`, sand `#D9C9B0`, midnight `#2A2520`, dustblue `#7AA3C9`, plus semantic us `#4A7BA7` / china `#A64D46` / neutral `#888780` — single source of truth: [`tools/brand-treatment/palette.json`](./tools/brand-treatment/palette.json)
 - **Fonts:** IBM Plex Sans (display, since May 10 2026 — was Space Grotesk), IBM Plex Serif (long-form body), IBM Plex Mono (metadata/kicker/byline), JetBrains Mono (data), Noto Sans SC (Chinese). The Plex superfamily anchors the system in the mid-century corporate-modernist (Burtin/Bayer/Fortune) lineage; see `remotion-templates/BRAND.md` → Typography for rationale.
 
 ## Content philosophy

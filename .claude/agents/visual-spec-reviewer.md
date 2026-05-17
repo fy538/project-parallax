@@ -18,7 +18,7 @@ You are a visual-spec reviewer for the Parallax Remotion pipeline. You read the 
    - Camera system matches the template (geographic for maps, canvas for diagrams, scroll for long, scene-brief for AI-GEN/ILLUST)
    - Hold presets are valid: `breathe` / `land` / `linger`
    - Sync words referenced exist in the narration line above the DIR:
-   - Transition types in `cut()` are in `Transitions.tsx`'s 9 types
+   - Transition types in `cut()` are one of the 6 canonical types per `project/TRANSITION_GRAMMAR.md` (cut, dissolve, fade, match-cut/match-cut-still, color-wash, iris). The 6 legacy types in `Transitions.tsx` (wipe-left/right/up, blur-through, whip-pan, spatial-zoom) are DEPRECATED — flag any usage and recommend the canonical replacement. Lint rule M-TRANSITION-DEPRECATED enforces this
 
 5. **Concept registry callbacks**: if the data file introduces a concept already in `data/concepts.json`, the `accentColor` and `callbackVisual` fields should match the registry entry. Run `python3 tools/concepts/lookup.py reuse-check --script <script-path>` to detect this.
 

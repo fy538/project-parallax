@@ -31,7 +31,7 @@ These principles come from what works in analytical/geopolitics YouTube and what
 
 3. **Text: 3-5 words maximum.** YouTube data consistently shows that thumbnails with less text outperform. The text should be a provocation or a number, not the full title. Think of it as the hook within the hook.
 
-4. **Warm palette, high contrast.** Use the Meridian palette but push contrast higher than in-video. Amber (#C4A747) on ink (#1C1814) reads well at all sizes. Avoid rust on dark backgrounds — too low contrast at thumbnail scale.
+4. **Warm palette, high contrast.** Use the Meridian palette but push contrast higher than in-video. Gold (`palette.gold` = `#C4A747`) on ink (`#1C1814`) reads well at all sizes. Avoid the `china` semantic red (`#A64D46`) on dark backgrounds — too low contrast at thumbnail scale.
 
 5. **No clickbait aesthetics.** No red arrows, no shocked faces, no ALL CAPS IMPACT font. Parallax's visual identity is "serious analytical publication" — think Foreign Affairs cover, not MrBeast thumbnail. The provocation comes from the idea, not the formatting.
 
@@ -53,7 +53,7 @@ Examples:
 Lead with a number, stat, or visual data element that creates immediate cognitive dissonance. This works best when the episode has a "wait, what?" number.
 
 Examples:
-- "$165B" in large amber text over a dark background, with a small "7%" underneath — the mismatch IS the hook
+- "$165B" in large gold text over a dark background, with a small "7%" underneath — the mismatch IS the hook
 - A simple chart showing an unexpected trend — the visual is the argument
 - A percentage or dollar amount that contradicts expectations
 
