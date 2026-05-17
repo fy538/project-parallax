@@ -43,7 +43,9 @@ If `episodes/$1/assets/narration.wav` does NOT exist, do the prep flow:
 
 ## Mode B — post-recording QA (if `narration.wav` exists)
 
-If `episodes/$1/assets/narration.wav` exists, run the audit flow:
+If `episodes/$1/assets/narration.wav` exists, run the full audit flow. This is a three-stage funnel: signal QA first (is the file usable at all?), then content QA (did we say what the script said?), then optional mastering (Auphonic).
+
+### Stage 1 — signal QA
 
 1. **Run the audio QA:**
    ```bash
@@ -56,20 +58,72 @@ If `episodes/$1/assets/narration.wav` exists, run the audit flow:
    - 🟡 warnings — should fix but won't break rendering (LUFS off target, long silences, mono violations)
    - 🟢 clean — call it out clearly so the operator can move on
 
-3. **If LUFS is off by > 2.0**, suggest running through Auphonic or a one-pass ffmpeg loudnorm:
-   ```bash
-   ffmpeg -i episodes/$1/assets/narration.wav \
-          -af loudnorm=I=-14:TP=-1.0:LRA=11 \
-          episodes/$1/assets/narration-mastered.wav
-   ```
+3. **If there are silence-gap warnings**, list them with timestamps so the operator can jump to those spots in the DAW for surgical edits — don't make them re-skim the QA file.
 
-4. **If there are silence-gap warnings**, list them with timestamps so the operator can jump to those spots in the DAW for surgical edits — don't make them re-skim the QA file.
+### Stage 2 — content QA (the big time-saver)
 
-5. **If clean:** advise the operator to refresh the assembly manifest in precise mode now that real narration timing is available:
-   ```bash
-   python3 tools/assembly/generate_manifest.py $1 --audio
-   ```
-   This promotes the manifest from `estimate` to `precise` mode (Whisper-aligned timings).
+Run the Whisper alignment to generate a pickup-take shopping list:
+
+```bash
+python3 tools/narration/whisper_alignment.py $1
+```
+
+This auto-discovers `episodes/$1/assets/narration.json` (transcript) or runs Whisper on `narration.wav` if `faster-whisper` is installed. If neither is available:
+
+- Tell the operator how to generate the transcript externally:
+  ```bash
+  # Option 1: openai-whisper (CPU/GPU, free, runs locally)
+  pip install openai-whisper
+  whisper episodes/$1/assets/narration.wav --model medium --output_format json \
+      --output_dir episodes/$1/assets/
+  # Then re-run the alignment.
+  ```
+- Or fall back to running on Tiger's own machine before re-invoking `/narrate`.
+
+The output is `episodes/$1/narration-diff.md`. **Read it and surface:**
+
+- The pickup-take shopping list at the top — these are the specific lines that need re-recording, with timestamps. Read them out so the operator knows exactly what to fix.
+- The delivery skew note (delivered faster or slower than 150-wpm estimate, by how much). This is informational — manifests will be Whisper-realigned anyway.
+- Any low-confidence spans (🟣) flagged as likely mispronunciations of foreign names — cross-reference with `pronunciation-guide.md` and confirm.
+
+If the report shows zero pickup candidates, say so clearly — the operator can skip to Stage 3 or assembly.
+
+### Stage 3 — optional mastering (Auphonic)
+
+If LUFS in the audio QA was off by > 2.0, **OR** if the operator prefers cloud-mastered output regardless, offer Auphonic:
+
+```bash
+# Requires: export AUPHONIC_API_KEY=... (https://auphonic.com/api/api_keys/)
+python3 tools/narration/auphonic_submit.py $1
+# Or with a specific preset:
+python3 tools/narration/auphonic_submit.py $1 --preset <preset-uuid>
+# List your account's presets:
+python3 tools/narration/auphonic_submit.py --list-presets
+```
+
+This uploads to Auphonic, polls for the mastered output (typically 1-3 min for a 15-min file), and downloads `episodes/$1/assets/narration-mastered.wav` alongside the original. The original is preserved untouched.
+
+After the master arrives, **re-run audio_qa.py on the mastered file** to verify LUFS lands on target:
+```bash
+python3 tools/narration/audio_qa.py --wav episodes/$1/assets/narration-mastered.wav
+```
+
+If the operator prefers an in-DAW chain or doesn't have an Auphonic account, the local fallback is a one-pass ffmpeg loudnorm:
+```bash
+ffmpeg -i episodes/$1/assets/narration.wav \
+       -af loudnorm=I=-14:TP=-1.0:LRA=11 \
+       episodes/$1/assets/narration-mastered.wav
+```
+
+### Stage 4 — advance the manifest
+
+When the WAV (mastered or raw) is clean and there are no major pickup candidates, refresh the assembly manifest in precise mode so visual timings sync to actual narration:
+
+```bash
+python3 tools/assembly/generate_manifest.py $1 --audio
+```
+
+This promotes the manifest from `estimate` to `precise` mode (Whisper-aligned timings).
 
 ## Mode C — both (if user explicitly asks for it)
 
