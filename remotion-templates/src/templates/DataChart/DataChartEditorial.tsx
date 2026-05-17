@@ -119,7 +119,12 @@ const BarsContent: React.FC<{
   const barGap = chartRect.width / (dataPoints.length * 3);
   const totalGapSpace = barGap * (dataPoints.length - 1);
   const barWidth = (chartRect.width - totalGapSpace) / dataPoints.length;
-  const maxHeight = chartRect.height - 40; // leave room for x-labels
+  // Reserve 40px at the BOTTOM of chartRect for x-axis labels + sublabels.
+  // Bars + value labels live in the top (chartRect.height - 40) zone; labels
+  // sit in the bottom 40 px slot, INSIDE chartRect so they don't collide with
+  // the EditorialFrame caption below chartRect.
+  const LABEL_BAND = 40;
+  const maxHeight = chartRect.height - LABEL_BAND;
 
   const highlight = data.highlightIndex;
   const someHighlighted =
@@ -204,7 +209,14 @@ const BarsContent: React.FC<{
           const isHighlighted = i === data.highlightIndex;
           const isMuted = someHighlighted && !isHighlighted;
           const color = dp.color ?? palette.gold;
-          const renderColor = isMuted ? `${palette.ink}33` : color;
+          // When muted, prefer the explicit dp.color (if user specified one);
+          // otherwise fall back to a clean editorial neutral (taupe). Avoid
+          // dim-ink-alpha which reads as "broken" rather than "supporting".
+          const renderColor = isMuted ? (dp.color ?? palette.taupe) : color;
+          // Inline label format: prefix with formatNumber, append unit if present
+          const formattedValue = data.formatAsYear
+            ? `${dp.value}`
+            : `${formatNumber(dp.value)}${data.unit ?? ""}`;
 
           // Label opacity timed slightly after bar reaches full height
           const labelFade = fadeIn(frame, startFrame + sec(0.7), sec(0.4));
@@ -214,46 +226,51 @@ const BarsContent: React.FC<{
               key={i}
               style={{
                 width: barWidth,
-                height: maxHeight,
+                height: chartRect.height, // full chart height — bars at top, labels in bottom band
                 position: "relative",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "flex-end",
               }}
             >
-              {/* Inline value label INSIDE the bar near top */}
+              {/* Bar — anchored to bottom of the bars-zone (above the label band) */}
               <div
                 style={{
                   position: "absolute",
-                  bottom: barHeight + 12,
-                  fontFamily: fonts.heading,
-                  fontSize: fontSizes.h3,
-                  fontWeight: fontWeights.bold,
-                  color: isMuted ? `${palette.ink}66` : theme.text.primary,
-                  opacity: labelFade,
-                  letterSpacing: -0.5,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {data.formatAsYear ? `${dp.value}` : formatNumber(dp.value)}
-              </div>
-              {/* Bar */}
-              <div
-                style={{
+                  left: 0,
+                  bottom: LABEL_BAND,
                   width: barWidth,
                   height: barHeight,
                   backgroundColor: renderColor,
                 }}
               />
-              {/* X-axis label */}
+              {/* Inline value label ABOVE the bar */}
               <div
                 style={{
                   position: "absolute",
-                  bottom: -28,
+                  left: 0,
+                  width: barWidth,
+                  bottom: LABEL_BAND + barHeight + 12,
+                  textAlign: "center",
+                  fontFamily: fonts.heading,
+                  fontSize: fontSizes.h3,
+                  fontWeight: fontWeights.bold,
+                  color: isMuted ? theme.text.muted : theme.text.primary,
+                  opacity: labelFade,
+                  letterSpacing: -0.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {formattedValue}
+              </div>
+              {/* X-axis label — in the bottom label band, inside chartRect */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  width: barWidth,
+                  bottom: 12,
+                  textAlign: "center",
                   fontFamily: fonts.mono,
                   fontSize: fontSizes.meta,
-                  color: isMuted ? `${palette.ink}66` : theme.text.muted,
+                  color: isMuted ? theme.text.muted : theme.text.secondary,
                   letterSpacing: letterSpacing.meta,
                   textTransform: "uppercase",
                   opacity: labelFade,
@@ -262,25 +279,6 @@ const BarsContent: React.FC<{
               >
                 {dp.label}
               </div>
-              {/* Sublabel */}
-              {dp.sublabel && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: -50,
-                    fontFamily: fonts.serifBody,
-                    fontStyle: "italic",
-                    fontSize: fontSizes.caption,
-                    color: isMuted ? `${palette.ink}66` : theme.text.muted,
-                    opacity: labelFade,
-                    whiteSpace: "nowrap",
-                    maxWidth: barWidth * 2,
-                    textAlign: "center",
-                  }}
-                >
-                  {dp.sublabel}
-                </div>
-              )}
             </div>
           );
         })}
@@ -476,18 +474,24 @@ function renderOverlays(
 
   const maxHeight = chartRect.height - 40;
   const barCount = dataPoints.length;
+  // Match the flex `justify-content: space-between` layout used in BarsContent.
+  // With N bars of width W in a container of width C, bar i sits at:
+  //   x = i * (C - W) / (N - 1)
   const barGap = chartRect.width / (barCount * 3);
   const totalGapSpace = barGap * (barCount - 1);
   const barWidth = (chartRect.width - totalGapSpace) / barCount;
 
-  // Compute bar-center pixel positions in chartRect-relative coords
+  // Anchor annotations at the bar's TOP-RIGHT corner so the leader line
+  // emanates cleanly without crossing the value label above the bar.
   const barPxFor = (idx: number): { x: number; y: number } => {
     const dp = dataPoints[idx];
     if (!dp) return { x: chartRect.x, y: chartRect.y + maxHeight };
-    const barLeft = chartRect.x + idx * (barWidth + barGap);
-    const barCenterX = barLeft + barWidth / 2;
+    const barLeft =
+      barCount > 1
+        ? chartRect.x + (idx * (chartRect.width - barWidth)) / (barCount - 1)
+        : chartRect.x + (chartRect.width - barWidth) / 2;
     const barTopY = chartRect.y + maxHeight - (maxHeight * dp.value) / yAxisMax;
-    return { x: barCenterX, y: barTopY };
+    return { x: barLeft + barWidth, y: barTopY };
   };
 
   // Annotations

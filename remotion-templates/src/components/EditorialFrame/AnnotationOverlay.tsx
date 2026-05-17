@@ -88,18 +88,22 @@ const SingleAnnotation: React.FC<{
   }
 
   // Default: callout with optional leader line
-  const TEXT_W = 320;
-  const GAP = 24;
-  // Position text block relative to target
+  const TEXT_W = 280;
+  const GAP = 56;
+  // Position text block relative to target. Annotations sit ABOVE the
+  // data they describe so the leader line angles down to the target —
+  // editorial convention (NYT Upshot, FT JBM). For "right" position,
+  // anchor the block ~90px above the target so it clears neighboring
+  // bar value labels and reads as commentary on the column.
   let textX = targetPx.x;
   let textY = targetPx.y;
   const position = annotation.position ?? "right";
   if (position === "right") {
     textX = targetPx.x + GAP;
-    textY = targetPx.y - 8;
+    textY = targetPx.y - 90;
   } else if (position === "left") {
     textX = targetPx.x - GAP - TEXT_W;
-    textY = targetPx.y - 8;
+    textY = targetPx.y - 90;
   } else if (position === "top") {
     textX = targetPx.x - TEXT_W / 2;
     textY = targetPx.y - GAP - 80;

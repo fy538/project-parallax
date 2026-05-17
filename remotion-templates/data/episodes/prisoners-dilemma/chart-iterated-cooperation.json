@@ -1,0 +1,68 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Cooperation across 200 rounds",
+  "subtitle": "Axelrod tournament — cooperation% by round",
+  "variant": "bar",
+  "unit": "%",
+  "dataPoints": [
+    {
+      "label": "Round 1",
+      "value": 82,
+      "color": "#C4A747"
+    },
+    {
+      "label": "Round 50",
+      "value": 71,
+      "color": "#B8A189"
+    },
+    {
+      "label": "Round 100",
+      "value": 67,
+      "color": "#B8A189"
+    },
+    {
+      "label": "Round 150",
+      "value": 62,
+      "color": "#B8A189"
+    },
+    {
+      "label": "Round 200",
+      "value": 58,
+      "color": "#B8A189"
+    }
+  ],
+  "highlightIndex": 0,
+  "source": "Axelrod (1984), Evolution of Cooperation — iterated tournament series. Cooperation rates rounded.",
+  "backgroundVariant": "light",
+  "durationSec": 8,
+  "frame": {
+    "kicker": "COOPERATION THEORY",
+    "title": "Even round one breaks the model.",
+    "dek": "Axelrod's iterated PD tournament — cooperation rates across 200 rounds.",
+    "layout": "centered",
+    "chrome": "publication",
+    "source": "Axelrod (1984), Evolution of Cooperation — iterated tournament series.",
+    "modeTag": "strategic analysis · B",
+    "legend": "suppressed",
+    "annotations": [
+      {
+        "targetDataPoint": 0,
+        "position": "right",
+        "headline": "The one-shot model predicts 0%.",
+        "dek": "Round one observed 82% cooperation.",
+        "style": "callout",
+        "leaderLine": true
+      }
+    ],
+    "referenceLines": [
+      {
+        "value": 50,
+        "axis": "y",
+        "label": "50% threshold",
+        "labelPosition": "end",
+        "style": "dashed"
+      }
+    ],
+    "caption": "The Prisoner's Dilemma predicts mutual defection. Axelrod ran 200 rounds; cooperation began at 82% and never fell below half. The one-shot model fails on its own first iteration."
+  }
+}
