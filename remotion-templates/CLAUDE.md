@@ -8,7 +8,7 @@
 
 Remotion-based template library for producing educational geopolitics YouTube videos. Templates are React components that render to MP4. Each template is data-driven: feed it a JSON file and it generates the visual segment.
 
-- **32 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 6, Charts 6, Diagrams 10, Timelines 4, Typography & layout 6; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7)
+- **45 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 8, Charts 17, Diagrams 8, Timelines 3, Typography & visuals 9; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7; canonical TEMPLATE_COMPONENTS registry in `src/templates/Episodes/FullEpisode.tsx`)
 - All templates use **Zod schemas** for runtime validation and **`calculateMetadata`** for dynamic durations
 - Resolution: **1920×1080 @ 30fps** (1080×1920 for Shorts)
 - TypeScript **strict mode** — don't disable
@@ -26,7 +26,7 @@ remotion-templates/
 ├── data/episodes/<slug>/     # Per-episode JSON data + assembly manifest
 ├── public/geo/               # Local TopoJSON (offline fallback)
 └── src/
-    ├── Root.tsx              # Composition registration (all 25+ in <Folder> groups)
+    ├── Root.tsx              # Composition registration (45+ templates in <Folder> groups)
     ├── design/               # theme.ts (BRAND.md in code), fonts.ts (preload)
     ├── components/           # Background, MetadataStrip, Crosshair, TitleBlock, Transitions, etc.
     ├── hooks/                # useCompositionAnimation, useDirection, useEntrance, useThemeMode, ...
@@ -142,7 +142,7 @@ Full reference: [`LESSONS.md`](./LESSONS.md). Worth knowing without reading it:
 - Map templates need network access for vector tile CDN — won't render full geography in fully sandboxed environments, but work fine in local Studio and Lambda.
 - `theme.ts` uses `as const` creating readonly tuples — code consuming color ramps must use `readonly string[]` types.
 - `MapGL` (the shared map component) requires the `delayRender` lifecycle — it's wired correctly; don't bypass it when adding new map templates.
-- Brand chrome (`HeaderStrip` + `FooterStrip`) is wired into all 25 templates by default via `<Background>`. Don't double-wrap.
+- Brand chrome (`HeaderStrip` + `FooterStrip`) is wired into all 45 templates by default via `<Background>`. Don't double-wrap.
 
 ## Don't
 

@@ -2,13 +2,16 @@
 
 > One page. Pin it. When a script beat needs a timeline, look here BEFORE writing visual-spec JSON.
 >
-> Last updated: May 11, 2026
+> Last updated: May 17, 2026
 
-Four timeline templates. Parallax's signature form lives here — TimelineComparison is the "bounded analogy" rendered as a visual structure. Picking wrong dilutes the channel's editorial differentiator.
+> **⚠ DELETED TEMPLATE — DO NOT PICK.** `TimelineMorph` was removed from the codebase May 13, 2026. Its one use case (era-A → era-B in-place morph) migrated to `HorizontalTimeline` with `mode: "morph"`. Rows below that mention TimelineMorph are kept only for historical context — the template no longer exists and rendering one will produce a silent null segment. **Use HorizontalTimeline (mode "morph") instead.**
+
+**Three live timeline templates:** TimelineComparison, HorizontalTimeline, DualTimeline. Parallax's signature form lives here — TimelineComparison is the "bounded analogy" rendered as a visual structure. Picking wrong dilutes the channel's editorial differentiator.
 
 Per-template dossier:
 - [`timeline-comparison.md`](references/template-research/timeline-comparison.md)
-- HorizontalTimeline, DualTimeline, TimelineMorph — no dedicated dossier; see `template-picker.md` § Timelines (lines 144-157)
+- HorizontalTimeline, DualTimeline — no dedicated dossier; see `template-picker.md` § Timelines (lines 144-157)
+- ~~TimelineMorph~~ — DELETED; see banner above
 
 ---
 
@@ -23,7 +26,7 @@ What KIND of time structure are you showing → which TEMPLATE
 | Two historical eras with paired events (structural rhyme) | "The shape of this rhymes with the shape of that" | **TimelineComparison** |
 | Single chronological arc with embedded callbacks | "Continuity / single arc with historical anchors" | **HorizontalTimeline** |
 | Two eras intercut with attentional shifting (documentary-style) | "Alternate deep-dives across two timelines" | **DualTimeline** |
-| Structural transformation as the punchline (same instrument, new tech) | "Continental Blockade becomes SWIFT sanctions" | **TimelineMorph** (use rarely) |
+| Structural transformation as the punchline (same instrument, new tech) | "Continental Blockade becomes SWIFT sanctions" | **HorizontalTimeline (mode: "morph")** ← was TimelineMorph (DELETED) |
 
 ---
 
@@ -40,7 +43,7 @@ Does the editorial argument involve TIME?
 │   └─ Events along a horizontal axis with annotations ──── HorizontalTimeline
 │
 ├─ Is the argument that INSTITUTIONAL IDENTITY persists across transformation?
-│   └─ Same shape, different epoch — morph as punchline ──── TimelineMorph (rare)
+│   └─ Same shape, different epoch — morph as punchline ──── HorizontalTimeline (mode: "morph") ← was TimelineMorph (DELETED)
 │
 └─ (If the editorial point is something OTHER than "look at time," check TEMPLATE_FAMILIES.md)
 ```
@@ -70,9 +73,9 @@ Does the editorial argument involve TIME?
 | Best for | The whole-episode analogy diagram | Documentary-style alternating deep-dives |
 | Cognitive load | Lower (one comparison structure) | Higher (viewer tracks two threads in parallel) |
 
-### Any timeline vs. TimelineMorph
+### Any timeline vs. TimelineMorph (DELETED — see banner; this comparison kept for historical guidance on `HorizontalTimeline mode: "morph"`)
 
-| | Standard timeline | TimelineMorph |
+| | Standard timeline | ~~TimelineMorph~~ → HorizontalTimeline (mode "morph") |
 |---|---|---|
 | When to use | Most timeline moments | Once per episode at most — the analytical climax |
 | Editorial point | "Here's the time-shape" | "Same instrument, different epoch" |
@@ -95,9 +98,9 @@ Use TimelineComparison early in any episode that names a historical analogy. Use
 | Template | Common flags / variants |
 |---|---|
 | TimelineComparison | `leftEvents[]` + `rightEvents[]`; `connections[]` (paired events with `leftIndex`/`rightIndex`); `leftColor`/`rightColor`; phase alignment is established by event ordering, not a flag |
-| HorizontalTimeline | `mode: "single" \| "dual" \| "morph"`; `events[]` (single) or `pairs[]` (dual); `eraAColor`/`eraBColor`; `eraWeight` for opacity foiling — the modern canonical timeline; supersedes DualTimeline/TimelineMorph for new authoring |
+| HorizontalTimeline | `mode: "single" \| "dual" \| "morph"`; `events[]` (single) or `pairs[]` (dual); `eraAColor`/`eraBColor`; `eraWeight` for opacity foiling — the modern canonical timeline; supersedes DualTimeline and (now-deleted) TimelineMorph for new authoring |
 | DualTimeline | `pairs[]` of `{ eraA, eraB }`; `eraATitle`/`eraBTitle`; `eraAColor`/`eraBColor`. Deprecated for new authoring; use HorizontalTimeline `mode: "dual"`. Still wired in FullEpisode for legacy manifests. |
-| TimelineMorph | `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText }`; `holdDurationSec`, `morphDurationSec`. Deprecated for new authoring; use HorizontalTimeline `mode: "morph"`. |
+| ~~TimelineMorph~~ (DELETED May 13, 2026) | Was: `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText }`; `holdDurationSec`, `morphDurationSec`. Migrate to HorizontalTimeline `mode: "morph"`. |
 
 ---
 

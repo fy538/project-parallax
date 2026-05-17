@@ -64,6 +64,7 @@ Per-stack (when you need granular control):
 - Cost log: `python3 tools/cost_tracker.py summary` and `python3 tools/cost_tracker.py add --episode <slug> --service claude --amount 12.50 --note "..."`
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
 - Clean regenerable artifacts (renders, caches, coverage): `./scripts/clean.sh`
+- Clean episode cruft (`.DS_Store`, duplicate version files): `./scripts/clean-episode-cruft.sh [slug] [--apply]` (dry-run by default; reports duplicate `*-v2.{json,md}` files but doesn't auto-promote)
 - Regenerate visual regression baselines (after intentional visual changes): `./scripts/regen-baselines.sh`
 - **SFX generator** (Layer 2 + 3): `python3 tools/generate_sfx.py` — synthesises all 22 transition SFX + 7 texture-hit WAV files at 48 kHz · 24-bit · stereo. `--cue <name>` for one type, `--dry-run` to preview. Run after any sound design change; output goes directly to `remotion-templates/public/audio/sfx/`. Requires `numpy` + `scipy`.
 

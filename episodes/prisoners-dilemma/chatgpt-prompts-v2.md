@@ -4,7 +4,7 @@
 >
 > Each prompt below is paired with an **anchor reference upload** — the existing aigen-XX still that the new frame must match in setting, figures, lighting, and palette. Upload the anchor frame fresh for each prompt; do not rely on chat memory.
 >
-> Companion design: `visual-thread-design.md`. Updated shot list: `shot-list-v2.json`.
+> Companion design: `visual-thread-design.md`. Updated shot list: `shot-list.json`.
 
 ## Why these prompts are different from v1
 
@@ -163,7 +163,7 @@ Shot 29. Same panorama as Shot 17 — two vast cityscapes facing each other acro
 
 For each shot:
 
-1. Save as `aigen-XXX.png` per the filenames in `shot-list-v2.json`.
+1. Save as `aigen-XXX.png` per the filenames in `shot-list.json`.
 2. Place in `episodes/prisoners-dilemma/assets/stills/`.
 3. Verify against the anchor frame: drop both into a 2-up comparison; confirm setting, lighting direction, palette ratio, and figure style match.
 4. If a frame drifts (different room, different lighting angle, palette wrong), regenerate before moving to the morph step. The morph tool will not save a misaligned pair.

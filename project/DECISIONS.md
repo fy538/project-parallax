@@ -319,7 +319,7 @@ The positioning matrix confirms the niche is differentiated, but the research do
 - Rewrote RouteAnimation: deck.gl ArcLayer for 3D great-circle routes, ScatterplotLayer for point glow, react-map-gl Marker for labels, camera interpolation per phase
 - Added scaleToZoom() to mapUtils for backward-compatible center/scale → Mapbox camera conversion
 - Added optional `camera` field to RoutePhase type (preferred over legacy center/scale)
-- TypeScript compiles clean across all 17 templates + shared infrastructure
+- TypeScript compiles clean across all 17 templates (as of that milestone; 45 templates today) + shared infrastructure
 
 **Key insights:**
 - Claude SVG's sweet spot is "information that happens to be beautiful" — lean into geometric/diagrammatic strengths, don't push toward organic/artistic

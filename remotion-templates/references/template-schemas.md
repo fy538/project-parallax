@@ -423,6 +423,8 @@ Point clusters or heatmap density on a Mapbox basemap (deck.gl HexagonLayer / He
 
 ## BifurcationRoute
 
+> **⚠ DELETED May 13, 2026.** The template folder no longer exists; rendering will produce a silent null segment. For new work: use **DuelingFrameworks** (two head-to-head scenarios) or **DecisionTree** (branching with probabilities). Schema below kept for archival reference only.
+
 Network split / lineage divergence. One unified network forks at a single node into two post-split networks (US-aligned vs. China-aligned, Indo-European → Germanic vs. Romance, etc.). Three phases: unified state holds → split animates → two-network steady state. Not a map — a node-graph laid out in percentage-of-canvas coords.
 
 ```jsonc
@@ -673,7 +675,7 @@ Year-based event ribbon — the canonical Parallax timeline template, replacing 
 
 ## TimelineMorph
 
-> **Deprecated** — use **HorizontalTimeline** with `mode: "morph"` for all new work. Kept registered for backward compatibility. Schema: `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText, icon? }`, plus `eraATitle` / `eraBTitle` / `eraAColor` / `eraBColor`, with `holdDurationSec` and `morphDurationSec` controlling the animated topology shift between the two states.
+> **⚠ DELETED May 13, 2026.** The template folder no longer exists; rendering will produce a silent null segment. Use **HorizontalTimeline** with `mode: "morph"` for all new work. Schema below kept for archival reference only — the original `events[]` of `{ eraALabel, eraAText, eraBLabel, eraBText, icon? }`, plus `eraATitle` / `eraBTitle` / `eraAColor` / `eraBColor`, with `holdDurationSec` and `morphDurationSec` controlling the animated topology shift between the two states.
 
 ---
 

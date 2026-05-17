@@ -2,9 +2,11 @@
 
 > One page. Pin it. When a script beat needs a structural / conceptual diagram, look here BEFORE writing visual-spec JSON.
 >
-> Last updated: May 11, 2026
+> Last updated: May 17, 2026
 
-Ten diagram templates with overlapping-but-distinct purposes. This family is the most under-indexed in the codebase — 10 templates, easy to mis-route. Picking wrong wastes hours and produces visuals that argue the wrong thing.
+> **⚠ DELETED TEMPLATE — DO NOT PICK.** `BifurcationRoute` was removed from the codebase May 13, 2026 (phylogenetic-tree register didn't fit Parallax; no queued episodes required it). Rows below mentioning BifurcationRoute are kept only for historical context — the template no longer exists and rendering one will produce a silent null segment. **For "forked future / scenario divergence" use `DuelingFrameworks` (two head-to-head scenarios) or `DecisionTree` (branching with probabilities) instead.**
+
+**Nine live diagram templates** with overlapping-but-distinct purposes. This family is the most under-indexed in the codebase — easy to mis-route. Picking wrong wastes hours and produces visuals that argue the wrong thing.
 
 Full editorial rationale and failure modes live in the per-template dossiers under `references/template-research/`:
 - [`framework-diagram.md`](references/template-research/framework-diagram.md)
@@ -12,7 +14,8 @@ Full editorial rationale and failure modes live in the per-template dossiers und
 - [`sankey-flow.md`](references/template-research/sankey-flow.md)
 - [`escalation-ladder.md`](references/template-research/escalation-ladder.md)
 - [`game-theory.md`](references/template-research/game-theory.md) (GameBoard)
-- DecisionTree, StrategicLandscape, BifurcationRoute, DuelingFrameworks, PricingWaterfall — no dedicated dossier yet, see `template-picker.md`
+- DecisionTree, StrategicLandscape, DuelingFrameworks, PricingWaterfall — no dedicated dossier yet, see `template-picker.md`
+- ~~BifurcationRoute~~ — DELETED; see banner above
 
 ---
 
@@ -33,7 +36,7 @@ What KIND of structure are you showing → which TEMPLATE
 | Conserved-total allocation (where it splits and flows) | **SankeyFlow** |
 | Escalating severity / crisis intensity / ladder of moves | **EscalationLadder** |
 | Two opposing frameworks compared (head-to-head) | **DuelingFrameworks** |
-| A path bifurcates into two scenarios / futures | **BifurcationRoute** |
+| A path bifurcates into two scenarios / futures | **DuelingFrameworks** or **DecisionTree** ← was BifurcationRoute (DELETED) |
 | Single fixed total broken into stage segments ($1 → stages) | **PricingWaterfall** |
 | Positions on 2D axes (capability vs. intent, strategic landscape) | **StrategicLandscape** |
 
@@ -53,7 +56,7 @@ Is the editorial point about a STRUCTURE / framework?
 ├─ Is it about CHOICES / STRATEGY?
 │   ├─ Sequential branching choices + probabilities ──── DecisionTree
 │   ├─ Simultaneous payoff matrix (Nash, PD) ─────────── GameBoard
-│   └─ Forked future / scenario divergence ───────────── BifurcationRoute
+│   └─ Forked future / scenario divergence ───────────── DuelingFrameworks (or DecisionTree) ← was BifurcationRoute (DELETED)
 │
 ├─ Is it about COMPARISON / TYPOLOGY?
 │   ├─ Two systems compared row-by-row (parallel) ────── FrameworkDiagram (comparison)

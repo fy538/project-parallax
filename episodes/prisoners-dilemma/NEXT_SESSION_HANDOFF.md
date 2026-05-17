@@ -58,7 +58,7 @@ Save each to: `episodes/prisoners-dilemma/assets/stills/aigen-{id}-{slug}.png`
 
 ### Phase B — Generate 15 morph clips (Kling / Hailuo)
 
-Full intent descriptions are in `shot-list-v2.json` → `morph_pairs`. Prompting rules in `visual-pipeline.md` → "Pika Prompting Rules" (same discipline applies to Kling/Hailuo).
+Full intent descriptions are in `shot-list.json` → `morph_pairs`. Prompting rules in `visual-pipeline.md` → "Pika Prompting Rules" (same discipline applies to Kling/Hailuo).
 
 **Kling (11 pairs) — figure-driven, camera moves:**
 
@@ -155,6 +155,6 @@ git log --oneline -5          # confirm both Day 1 commits are in place
 
 Then:
 1. Open `episodes/PIPELINE.md` — confirm `prisoners-dilemma` is still `RENDER READY`
-2. Open `episodes/prisoners-dilemma/shot-list-v2.json` — source of truth for asset IDs and morph pairs
+2. Open `episodes/prisoners-dilemma/shot-list.json` — source of truth for asset IDs and morph pairs
 3. Start Phase C (archival sourcing) — fastest unblock
 4. Queue Phase A (ChatGPT stills) while archival downloads

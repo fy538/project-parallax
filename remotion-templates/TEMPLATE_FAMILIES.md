@@ -4,7 +4,7 @@
 >
 > Last updated: May 11, 2026
 
-The Remotion MG layer has **32 templates** organized into 5 families plus 3 non-template asset types. Each family has its own "when to use which template" logic. This page is the *index* — it tells you which family you're in and where the canonical decision logic lives. The detailed editorial guidance is in:
+The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-template asset types. Each family has its own "when to use which template" logic. This page is the *index* — it tells you which family you're in and where the canonical decision logic lives. The detailed editorial guidance is in:
 
 - **Per-family SELECTOR docs** (wall-tables) when they exist
 - **`references/template-picker.md`** — long-form prose covering every family
@@ -55,11 +55,11 @@ The Remotion MG layer has **32 templates** organized into 5 families plus 3 non-
 | "Position-on-axes strategic frame" | Diagrams | StrategicLandscape |
 | "Where each dollar goes" | Diagrams | PricingWaterfall |
 | "Two frameworks compared" | Diagrams | DuelingFrameworks |
-| "Fork-in-the-road moment" | Diagrams | BifurcationRoute |
+| "Fork-in-the-road moment" | Diagrams | DuelingFrameworks or DecisionTree ← was BifurcationRoute (DELETED May 13) |
 | "Single-axis chronology" | Timelines | HorizontalTimeline |
 | "Two parallel chronologies" | Timelines | DualTimeline |
 | "Then-and-now comparison" | Timelines | TimelineComparison |
-| "Timeline transforming into another" | Timelines | TimelineMorph |
+| "Timeline transforming into another" | Timelines | HorizontalTimeline (mode: "morph") ← was TimelineMorph (DELETED May 13) |
 | "Quote / definition / bilingual text" | Typography | KineticTypography |
 | "Section title / kicker reveal" | Typography | TitleTransition |
 | "Side-by-side comparison" | Typography | SplitComposition |
@@ -127,7 +127,7 @@ The Remotion MG layer has **32 templates** organized into 5 families plus 3 non-
 
 **Selector:** [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) — wall-table with time-structure decision tree, bounded-analogy doctrine ground, sibling disambiguation.
 
-**Audit:** `skills/timeline-audit/SKILL.md` — 7-lens audit catching bounded-analogy mis-routing (HorizontalTimeline where TimelineComparison is correct), phase-vs-calendar alignment errors, TimelineMorph guardrails, era-color discipline, connection-line choreography.
+**Audit:** `skills/timeline-audit/SKILL.md` — 7-lens audit catching bounded-analogy mis-routing (HorizontalTimeline where TimelineComparison is correct), phase-vs-calendar alignment errors, era-color discipline (TimelineMorph guardrails now part of HorizontalTimeline mode "morph"), connection-line choreography.
 
 **Runtime heuristics:** HorizontalTimeline (>32 events), TimelineComparison (>5 connections OR missing connections).
 

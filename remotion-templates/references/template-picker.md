@@ -42,7 +42,7 @@ Use this table to find the right template in seconds. Scan the "I need to show..
 | **Countries or regions highlighted on a map** | ChoroplethMap | phase-animation | RouteAnimation (if showing routes) | [MG:] |
 | **Supply chain, trade route, or resource path** | RouteAnimation | phased-segments | NetworkDiagram (relational view) | [MG:] |
 | **Regional zoom with detail callouts** | AnnotatedImage | map-callouts | ChoroplethMap (zoomed-phase) | [MG:] |
-| **Diverging path or two futures** | BifurcationRoute | default | RouteAnimation (branching) | [MG:] |
+| **Diverging path or two futures** | ~~BifurcationRoute (DELETED May 13)~~ → DuelingFrameworks or DecisionTree | default | RouteAnimation (branching) | [MG:] |
 | **Key quote or statement** | KineticTypography | quote | ImageComposite (portrait, if face needed) | [MG:] |
 | **Foreign (especially Chinese) term** | KineticTypography | bilingual | KineticTypography (definition, more space) | [MG:] |
 | **Big number without comparison** | KineticTypography | statistic | StatReveal (with comparison bars) | [MG:] |
@@ -131,7 +131,7 @@ Example: "P(export controls succeed)" → Your estimate: 55% · Market: 42% · A
 
 ### PROGRESSIONS: When Events or Stakes Are Rising, Flowing, or Branching
 
-> Decision tree + sibling-disambiguation for progression templates lives in [`TIMELINE_TEMPLATE_SELECTOR.md`](../TIMELINE_TEMPLATE_SELECTOR.md) (TimelineComparison vs. HorizontalTimeline vs. DualTimeline vs. TimelineMorph) and [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md) (FrameworkDiagram flow vs. SankeyFlow vs. EscalationLadder vs. DecisionTree). Start with the SELECTOR for the structural question; this section deepens the prose.
+> Decision tree + sibling-disambiguation for progression templates lives in [`TIMELINE_TEMPLATE_SELECTOR.md`](../TIMELINE_TEMPLATE_SELECTOR.md) (TimelineComparison vs. HorizontalTimeline vs. DualTimeline) and [`DIAGRAM_TEMPLATE_SELECTOR.md`](../DIAGRAM_TEMPLATE_SELECTOR.md) (FrameworkDiagram flow vs. SankeyFlow vs. EscalationLadder vs. DecisionTree). Start with the SELECTOR for the structural question; this section deepens the prose.
 
 
 #### Single Timeline: Events in Chronological Order
@@ -492,11 +492,11 @@ Duration: 8-12 seconds (callouts stagger in, each holds 2s, final detail holds 3
 
 #### Diverging Paths or Bifurcation (Two Possible Futures)
 
-**Templates:** BifurcationRoute (primary) · RouteAnimation (branching variant) · DecisionTree (if adding decision context)
+**Templates:** ~~BifurcationRoute~~ (DELETED May 13 — use DuelingFrameworks or DecisionTree) · RouteAnimation (branching variant) · DecisionTree (if adding decision context)
 
 Use when: Showing a path that splits, representing two possible futures or outcomes.
 
-**BifurcationRoute** is a geographic visualization showing an initial route that divides into two branches, each leading to a different destination.
+**BifurcationRoute** ~~(DELETED May 13, 2026 — the template folder no longer exists)~~ was a geographic visualization showing an initial route that divides into two branches, each leading to a different destination. For new work: DuelingFrameworks (head-to-head scenarios) or DecisionTree (branching with probabilities).
 
 Example:
 ```

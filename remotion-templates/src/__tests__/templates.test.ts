@@ -34,7 +34,7 @@ const TEST_FRAME = 30;
 // 30fps), so frame 60 is always a valid render. Going higher (90, 120) would
 // trip on the shortest Shorts compositions.
 //
-// Why a curated list and not all 32 templates? 32 × 3 = 96 renders per
+// Why a curated list and not all 45 templates? 45 × 3 = 135 renders per
 // `npm test`, which would push the suite past 15 minutes. The five below are
 // where camera/stagger work has the most surface area and where frame-30-only
 // coverage has historically missed regressions.

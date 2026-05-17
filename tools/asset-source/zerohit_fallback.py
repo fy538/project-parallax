@@ -127,8 +127,10 @@ def load_asset_manifest(slug: str) -> tuple[Path, dict]:
 def load_shot_list(slug: str) -> dict:
     """Build a dict of shot_id → shot entry (from shot-list.json)."""
     ep_dir = EPISODES_DIR / slug
-    # Prefer canonical, fall back to v2 if v1 missing.
-    for fname in ("shot-list.json", "shot-list-v2.json"):
+    # Canonical filename. (Historical fallback to `shot-list-v2.json` dropped
+    # May 17, 2026 — prisoners-dilemma promotion folded v2 into the canonical
+    # name; no surviving consumers should produce v2-suffixed shot lists.)
+    for fname in ("shot-list.json",):
         path = ep_dir / fname
         if path.is_file():
             with open(path, encoding="utf-8") as f:
