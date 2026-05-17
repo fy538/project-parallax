@@ -19,5 +19,22 @@
   "contextNote": "Chips cost 50% more than equivalent production in Taiwan",
   "source": "Industry estimates, 2025",
   "durationSec": 4,
-  "backgroundVariant": "light"
+  "backgroundVariant": "light",
+  "frame": {
+    "kicker": "REPATRIATION MATH",
+    "title": "Arizona covers seven percent of US chip demand.",
+    "dek": "Domestic capacity meets a sliver of what America actually consumes — at fifty percent above import-from-Taiwan pricing.",
+    "heroStat": {
+      "value": "7%",
+      "placement": "left-rail",
+      "weight": "display",
+      "color": "#C4A747"
+    },
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "Industry estimates, 2025.",
+    "modeTag": "supply chain · silicon trap",
+    "legend": "suppressed"
+  }
 }

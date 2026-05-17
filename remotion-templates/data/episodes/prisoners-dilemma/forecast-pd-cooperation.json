@@ -1,17 +1,27 @@
 {
   "episode": "prisoners-dilemma",
-  "title": "US-China AI Safety Communiqu\u00e9",
-  "subtitle": "Forecast \u2014 December 2026",
+  "title": "US-China AI Safety Communiqué",
+  "subtitle": "Forecast — December 2026",
   "variant": "forecast",
   "forecast": {
     "probability": 30,
     "verbalTag": "below even odds",
-    "baseRate": "Historical base rate for joint US-adversary technical communiqu\u00e9s on emerging technology within any 12-month window: ~20\u201325%, based on 2018\u20132025 patterns",
+    "baseRate": "Historical base rate for joint US-adversary technical communiqués on emerging technology within any 12-month window: ~20–25%, based on 2018–2025 patterns",
     "keyDriver": "Both countries' AI security establishments have institutionalized PD-framing; reframing to shared-standards vocabulary requires executive leadership to override institutional inertia",
     "keyDisconfirmer": "If either government adopts stag-hunt vocabulary ('shared standards,' 'mutual thresholds') in official AI safety statements before Q3 2026, update to 50%+",
-    "benchmark": "No direct Kalshi market; Metaculus 'US-China AI cooperation' trackers at ~25\u201335% \u2014 Parallax aligned with market consensus",
+    "benchmark": "No direct Kalshi market; Metaculus 'US-China AI cooperation' trackers at ~25–35% — Parallax aligned with market consensus",
     "resolution": "Will US-China AI safety institutions produce a joint public statement containing mutual technical definitions (model evaluation thresholds, compute red lines, or safety standards) by December 31, 2026? Scored against public government statements as of January 1, 2027."
   },
   "durationSec": 14,
-  "backgroundVariant": "dark"
+  "backgroundVariant": "light",
+  "frame": {
+    "kicker": "FORECAST · DEC 2026",
+    "title": "US-China AI safety communiqué — below even odds.",
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "Parallax forecast; benchmarks via Metaculus US-China AI cooperation trackers.",
+    "modeTag": "calibrated forecast · D",
+    "legend": "suppressed"
+  }
 }

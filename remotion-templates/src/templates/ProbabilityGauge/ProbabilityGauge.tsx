@@ -51,6 +51,7 @@ import { useBeatSync } from "../../hooks/useBeatSync";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import type { ProbabilityGaugeData, GaugeItem, ShiftItem, ScorecardItem, ForecastData } from "./types";
+import { ProbabilityGaugeEditorial } from "./ProbabilityGaugeEditorial";
 
 // ── Gauge Arc Component ────────────────────────────────────────────────────
 
@@ -1152,6 +1153,21 @@ const ForecastCard: React.FC<{
 // ── Main Component ────────────────────────────────────────────────────────
 
 export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ data }) => {
+  // Editorial-frame opt-in for the forecast variant. Other variants
+  // (gauge / strip / shift / scorecard) fall through to the legacy render
+  // path until they get their own editorial migration.
+  if (data.frame && data.variant === "forecast" && data.forecast) {
+    return (
+      <ProbabilityGaugeEditorial
+        data={data as ProbabilityGaugeData & {
+          frame: NonNullable<ProbabilityGaugeData["frame"]>;
+          variant: "forecast";
+          forecast: NonNullable<ProbabilityGaugeData["forecast"]>;
+        }}
+      />
+    );
+  }
+
   checkChartDataCommon("ProbabilityGauge", data);
   warnIf(
     (data.gauges ?? []).some((g) => g.value < 0 || g.value > 100),

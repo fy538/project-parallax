@@ -40,5 +40,22 @@
   },
   "durationSec": 5,
   "backgroundVariant": "light",
-  "source": "TechInsights, SemiAnalysis estimates"
+  "source": "TechInsights, SemiAnalysis estimates",
+  "frame": {
+    "kicker": "SMIC 7NM YIELD",
+    "title": "SMIC closed the yield gap without EUV.",
+    "dek": "Industry-standard yield is eighty percent; SMIC reached two-thirds of that in two years from cold start — without access to ASML's machines.",
+    "heroStat": {
+      "value": "65%",
+      "placement": "left-rail",
+      "weight": "display",
+      "color": "#A64D46"
+    },
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "TechInsights, SemiAnalysis estimates.",
+    "modeTag": "process technology · silicon trap",
+    "legend": "suppressed"
+  }
 }

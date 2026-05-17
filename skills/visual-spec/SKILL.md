@@ -19,6 +19,8 @@ A typical episode: ~40-55% MG, ~25-40% footage, ~5-15% ILLUST, ~5-15% AI-GEN, ~5
 ## Reference Docs
 
 Before starting, familiarize yourself with:
+- **`remotion-templates/PARALLAX_VISUAL_VOCABULARY.md`** — **the chart chooser.** Modeled on FT Visual Vocabulary. Given the editorial argument a script beat is making ("X changed over time", "X is big / small", "X is a forecast"), find the strongest template form. Covers all 12 editorial categories (FT's 9 + Parallax's 3: framework/argument, forecast/probability, typography/text). Includes 10 channel-wide editorial principles (title-states-finding, single-accent, annotation-carries-argument, etc.) and 7 anti-patterns. Read this BEFORE picking a chart template — it tells you when to reach for Slopegraph over BumpChart, KPICard over StatReveal, BulletChart over DataChart+referenceLine.
+- **`remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md`** — the shared `EditorialFrame` system. Charts that opt in via `frame: {...}` get publication-grade composition (kicker + heroStat + multi-callout annotations + reference lines + era bands + publication chrome) instead of the legacy intelligence-briefing chrome. **Always include a `frame` block** for migrated templates: DataChart, TimeSeriesChart, PricingWaterfall, ProbabilityGauge (forecast variant). The 5 editorial-native templates (Slopegraph, KPICard, BulletChart, StepLine, Sparkline) accept frame natively. See `CHART_MIGRATION_GUIDE.md` for which templates still need legacy chrome.
 - **`project/VISUAL_LANGUAGE.md`** — editorial logic for when to use footage vs. MG vs. layered. This is the "why" behind visual decisions.
 - **`project/DIRECTING_LANGUAGE.md`** — the `DIR:` annotation syntax. This is the "how" — camera movement, reveal choreography, timing, transitions, and mood. You will parse these and translate them into `_direction` blocks in JSON files, camera/mood language in AI-GEN briefs, treatment selection in ILLUST specs, and tint hints in footage manifests.
 - **`project/TEXT_ANIMATION_REGISTER.md`** — the eight canonical text-animation techniques (Number Ticker, Tracking-In, Reveal Mask, Underline Draw, Typewriter, Backspace, Scramble, Word Cascade) and three composite patterns (Definition Reveal, Stat Caption, Quote Attribution). Use this to pick the `_direction.textAnimation` register for text-bearing templates (KineticTypography, StatReveal). The doctrine doc has per-technique use/avoid rules and a decision matrix.
@@ -60,18 +62,27 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 
 ### Charts / data visualizations — 6 templates · ~15-20% episode share
 
-**Selector doc:** [`remotion-templates/CHART_TEMPLATE_SELECTOR.md`](../../remotion-templates/CHART_TEMPLATE_SELECTOR.md) (wall-table). Cleveland-honesty rules grounded in Tufte + dossier conventions.
+**Selector doc:** [`remotion-templates/PARALLAX_VISUAL_VOCABULARY.md`](../../remotion-templates/PARALLAX_VISUAL_VOCABULARY.md) — the canonical chart chooser. Replaces the older `CHART_TEMPLATE_SELECTOR.md` for chart-form selection. Use the decision-rule table to map editorial intent → template, then check the per-category "When to pick / Avoid when" guidance. Includes the chart-chooser flowchart at the bottom.
+
+**Editorial-frame migration status:** As of May 17, 2026, the following templates support the `frame: {...}` opt-in for publication-grade composition (kicker + heroStat + multi-annotation + publication chrome instead of legacy intelligence chrome): **DataChart** (bar + comparison variants), **TimeSeriesChart**, **PricingWaterfall**, **ProbabilityGauge** (forecast variant only). Always include a `frame` block on these. Editorial-native templates: **Slopegraph, KPICard, BulletChart, StepLine, Sparkline** (built directly inside EditorialFrame). The 15 remaining chart templates use legacy chrome until migrated — see `CHART_MIGRATION_GUIDE.md`.
 
 **Audit skill:** `chart-audit` — sister to script-audit / visual-concept. Catches truncated y-axes (Tufte cardinal sin), rainbow bars, StatReveal without comparison bars, RadarChart density violations, BayesianUpdate vs. ProbabilityGauge mis-routing.
 
-| Template | Share | Purpose |
-|---|---|---|
-| DataChart | ~12% | Statistics, comparisons, numerical data. Default for bar / lollipop / dot plot. |
-| TimeSeriesChart | as needed | Multi-series line charts over time. Use when the editorial point is "trend." |
-| BayesianUpdate | as needed | Probability estimates updated by sequential evidence. The forecast-cascade form. |
-| ProbabilityGauge | as needed | Single probability readout with gauge arc. Use for "X% likely" beats. |
-| RadarChart | as needed | Multi-axis polygon capability comparison. Use when 4-6 attributes need parity comparison. |
-| StatReveal | as needed | Dramatic single-statistic with comparison bars. Use for the "one number that matters" beat. |
+| Template | Frame? | Share | Purpose |
+|---|---|---|---|
+| DataChart | 🟢 frame | ~12% | Statistics, comparisons, numerical data. Default for bar / lollipop / dot plot. |
+| TimeSeriesChart | 🟢 frame | as needed | Multi-series line charts over time with annotations + era bands. |
+| Slopegraph | 🟡 native | as needed | Before/after at 2 points; slopes carry the story. Tufte signature. |
+| StepLine | 🟡 native | as needed | Discrete/threshold time-series (rates, sanctions tiers, policy levels). |
+| KPICard | 🟡 native | as needed | Hero stat + change indicator + sparkline. The "number that matters." |
+| BulletChart | 🟡 native | as needed | Target vs. actual with qualitative bands. Calibration scorecards. |
+| BayesianUpdate | ⚪ legacy | as needed | Probability estimates updated by sequential evidence. Forecast-cascade form. |
+| ProbabilityGauge (forecast) | 🟢 frame | as needed | 6-layer superforecasting display. The Oracle posture's editorial peak. |
+| RadarChart | ⚪ legacy | as needed | Multi-axis polygon capability comparison. Use when 4-6 attributes need parity. |
+| StatReveal | ⚪ legacy | as needed | Dramatic single-statistic. Prefer KPICard for editorial framing. |
+| PricingWaterfall | 🟢 frame | as needed | Value-chain decomposition. "Where each dollar goes." |
+
+🟢 = Editorial-frame migrated · 🟡 = Editorial-frame native · ⚪ = Legacy chrome (see CHART_MIGRATION_GUIDE.md)
 
 ### Diagrams / framework / strategic — 10 templates · ~10-15% episode share
 

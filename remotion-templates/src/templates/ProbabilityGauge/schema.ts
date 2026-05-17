@@ -4,6 +4,7 @@
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { EditorialFrameSchema } from "../../components/EditorialFrame/schema";
 
 const GaugeItemSchema = z.object({
   label: z.string(),
@@ -50,6 +51,13 @@ export const ProbabilityGaugeSchema = z.object({
     source: z.string().optional(),
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
+    /**
+     * Opt-in editorial frame. When set on a `forecast` variant, the chart
+     * renders inside EditorialFrame with publication-grade composition.
+     * Other variants (gauge / strip / shift / scorecard) currently fall
+     * through to the legacy render path even when frame is set.
+     */
+    frame: EditorialFrameSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

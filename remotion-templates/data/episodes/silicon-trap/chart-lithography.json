@@ -19,5 +19,26 @@
   "backgroundVariant": "light",
   "_direction": {
     "paceProfile": "breathing"
+  },
+  "frame": {
+    "kicker": "THE LITHOGRAPHY GAP",
+    "title": "Nine passes with EUV. Thirty-four without.",
+    "dek": "Each extra exposure is another chance for a defect. SMIC builds its 7nm chips with nearly four times the lithography steps.",
+    "heroStat": {
+      "value": "3.8×",
+      "placement": "left-rail",
+      "weight": "display",
+      "color": "#A64D46"
+    },
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "SemiAnalysis estimates, 2024.",
+    "modeTag": "process technology · silicon trap",
+    "legend": "top-aligned",
+    "legendItems": [
+      { "label": "WITH EUV", "color": "#C4A747", "symbol": "square" },
+      { "label": "WITHOUT EUV", "color": "#A64D46", "symbol": "square" }
+    ]
   }
 }

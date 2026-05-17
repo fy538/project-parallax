@@ -13,5 +13,22 @@
   "contextNote": "Trump called the program 'horrible'",
   "source": "CHIPS for America, 2025",
   "durationSec": 6,
-  "backgroundVariant": "light"
+  "backgroundVariant": "light",
+  "frame": {
+    "kicker": "CHIPS ACT — FUNDING PIPELINE",
+    "title": "Authorized fifty-two billion. Disbursed six.",
+    "dek": "Less than twelve percent of authorized CHIPS Act funding has reached recipients three years in.",
+    "heroStat": {
+      "value": "$6B",
+      "placement": "left-rail",
+      "weight": "display",
+      "color": "#A64D46"
+    },
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "CHIPS for America Office, 2025.",
+    "modeTag": "industrial policy · silicon trap",
+    "legend": "suppressed"
+  }
 }
