@@ -3,9 +3,9 @@
  *
  * Every template should use:
  *   useCompositionAnimation() — for automatic Ken Burns + exit fade
- *   useEntrance() — for semantic element entrances
  *   useThemeMode() — for mode-correct color tokens (dark/light)
  *   useVerticalLayout() — for 9:16 Shorts layout tokens
+ *   fadeIn / heroSpring (from utils/animation.ts) — semantic entrance
  *
  * These hooks enforce POLISH.md rules by default, so templates get
  * the right behavior without having to remember which utility to call.
@@ -37,8 +37,11 @@
  */
 
 export { useCompositionAnimation } from "./useCompositionAnimation";
-export { useEntrance, useStaggeredEntrance } from "./useEntrance";
-export type { EntranceRole } from "./useEntrance";
+// useEntrance / useStaggeredEntrance / useDivider / splitCanvas removed
+// May 17, 2026 — zero consumers in production templates; the entrance-
+// pattern need is met by `useCompositionAnimation` + `fadeIn`/`heroSpring`
+// from `utils/animation.ts`. Restore from git if a future template needs
+// the semantic-entrance preset API.
 export { useThemeMode } from "./useThemeMode";
 export type { ThemeTokens } from "./useThemeMode";
 export { useVerticalLayout } from "./useVerticalLayout";
