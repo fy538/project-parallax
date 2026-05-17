@@ -39,6 +39,7 @@ import { warnIf } from "../../utils/dataWarnings";
 import { contrastDelta } from "../../utils/colorContrast";
 import type { DataChartData, DataPoint } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
+import { DataChartEditorial } from "./DataChartEditorial";
 
 // ── Animated bar ────────────────────────────────────────────────────────────
 
@@ -816,6 +817,15 @@ const SmallMultiplesPanels: React.FC<{
 // ── Main component ──────────────────────────────────────────────────────────
 
 export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
+  // Editorial-frame opt-in: when `data.frame` is set, route to the editorial
+  // render path which uses EditorialFrame for publication-grade composition
+  // (kicker + heroStat + annotations + top legend + publication chrome).
+  // When absent, fall through to the existing intelligence-briefing render
+  // below. See remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md.
+  if (data.frame && data.variant === "bar") {
+    return <DataChartEditorial data={data as DataChartData & { frame: NonNullable<DataChartData["frame"]> }} />;
+  }
+
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");
   const direction = useDirection(data._direction);

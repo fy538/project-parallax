@@ -36,7 +36,25 @@
       "sublabel": "+ Psychology"
     }
   ],
+  "highlightIndex": 4,
   "source": "Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984) and Poundstone (1992). Intermediate years illustrative.",
-  "backgroundVariant": "dark",
-  "durationSec": 6
+  "backgroundVariant": "light",
+  "durationSec": 6,
+  "frame": {
+    "kicker": "THEORY DIFFUSION",
+    "title": "A failed model conquered eight disciplines",
+    "dek": "Scholarly publications using the Prisoner's Dilemma framework grew from one paper in 1950 to over two thousand by 1975 — twenty-five years after Flood and Dresher's first experiment falsified its central prediction.",
+    "heroStat": {
+      "value": "2,000+",
+      "placement": "left-rail",
+      "weight": "display",
+      "color": "#C4A747"
+    },
+    "layout": "hero-split",
+    "splitRatio": [38, 62],
+    "chrome": "publication",
+    "source": "Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984) and Poundstone (1992). Intermediate years illustrative.",
+    "modeTag": "academic analysis · A",
+    "legend": "suppressed"
+  }
 }

@@ -4,6 +4,7 @@
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { EditorialFrameSchema } from "../../components/EditorialFrame/schema";
 
 const DataPointSchema = z.object({
   label: z.string(),
@@ -68,6 +69,15 @@ export const DataChartSchema = z.object({
       _direction: DirectionBlockSchema.optional(),
       backgroundTint: z.string().optional(),
       transparentBackground: z.boolean().optional(),
+      /**
+       * Opt-in editorial frame. When present, the chart renders inside
+       * EditorialFrame with publication-grade composition (kicker, hero stat,
+       * annotations with leader lines, reference lines, top legend, etc.) and
+       * the default chrome (HeaderStrip/FooterStrip/TitleBlock) is suppressed.
+       * When absent, the chart renders with its existing layout (backward
+       * compatible). See remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md.
+       */
+      frame: EditorialFrameSchema.optional(),
     })
     .superRefine((d, ctx) => {
       if (
