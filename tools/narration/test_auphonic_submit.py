@@ -170,6 +170,25 @@ class TestAuphonicClient:
         assert request.get_header("Authorization") == "Bearer test-key"
         assert request.full_url.endswith("/api/production/x.json")
 
+    def test_get_production_passes_socket_timeout(self):
+        """Regression: without timeout=, urlopen hangs indefinitely and
+        poll_until_done's wall-clock check never fires. This guards the
+        invariant that every API call has a finite socket-level bound."""
+        body = json.dumps({"data": {"uuid": "x", "status": 1, "status_string": "W"}}).encode()
+        client, opener = _make_client_with_opener([body])
+        client.get_production("x")
+        # opener.open was called with (request, timeout=N) — verify N is set.
+        kwargs = opener.open.call_args.kwargs
+        assert "timeout" in kwargs, "opener.open was called without timeout="
+        assert kwargs["timeout"] == au.API_REQUEST_TIMEOUT_SEC
+
+    def test_download_passes_socket_timeout(self, tmp_path):
+        client, opener = _make_client_with_opener([b"audio bytes"])
+        client.download("https://x/y.wav", tmp_path / "out.wav")
+        kwargs = opener.open.call_args.kwargs
+        assert "timeout" in kwargs
+        assert kwargs["timeout"] == au.DOWNLOAD_REQUEST_TIMEOUT_SEC
+
     def test_create_production_multipart_form(self, tmp_path):
         wav = tmp_path / "narration.wav"
         wav.write_bytes(b"RIFFfakeWAVdata")

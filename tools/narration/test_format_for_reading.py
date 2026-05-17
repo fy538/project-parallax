@@ -230,6 +230,35 @@ class TestParseScript:
         assert [b.title for b in beats] == ["A", "B"]
         assert beats[1].timing == "1:00–2:00"
 
+    def test_trailing_html_marker_stripped_from_title_and_timing_preserved(self, tmp_path):
+        """Regression for the bug where psychology-structural markers
+        like `<!-- [FRAMEWORK UNLOCK] -->` polluted beat.title and ate
+        the timing capture. The shipped prisoners-dilemma script has
+        this exact pattern on Beats 3 and 4."""
+        script = textwrap.dedent("""\
+            ## BEAT 3 — THE WRONG GAME (7:30–11:30) <!-- [FRAMEWORK UNLOCK] -->
+
+            | NARRATION | VISUAL PRODUCTION |
+            |-----------|-------------------|
+            | Hello. | x |
+        """)
+        beats = ffr.parse_script(_write_minimal_script(tmp_path, script))
+        assert len(beats) == 1
+        assert beats[0].title == "THE WRONG GAME"
+        assert beats[0].timing == "7:30–11:30"
+
+    def test_trailing_html_marker_without_timing(self, tmp_path):
+        script = textwrap.dedent("""\
+            ## BEAT 1 — TITLE ONLY <!-- [MAIN REVEAL] -->
+
+            | NARRATION | VISUAL PRODUCTION |
+            |-----------|-------------------|
+            | x | y |
+        """)
+        beats = ffr.parse_script(_write_minimal_script(tmp_path, script))
+        assert beats[0].title == "TITLE ONLY"
+        assert beats[0].timing == ""
+
 
 # ── render_read_doc ──────────────────────────────────────────────────────────
 

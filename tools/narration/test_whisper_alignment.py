@@ -365,6 +365,29 @@ class TestRenderDiffMd:
         out = wa.render_diff_md(report, slug="x")
         assert "slower" in out.lower()
 
+    def test_no_probabilities_surfaces_warning(self):
+        """Regression: a transcript with no per-word probabilities
+        (whisper.cpp older format, all probs = -1) silently produced
+        zero low-confidence findings, which the operator could read as
+        'no mispronunciations'. Now we say so explicitly."""
+        report = wa.AlignmentReport(
+            issues=[], script_word_count=10, transcript_word_count=10,
+            transcript_duration_sec=10, estimated_script_duration_sec=10,
+            transcript_has_probabilities=False,
+        )
+        out = wa.render_diff_md(report, slug="x")
+        assert "no per-word probabilities" in out
+        assert "low-confidence detection" in out
+
+    def test_probabilities_present_no_warning(self):
+        report = wa.AlignmentReport(
+            issues=[], script_word_count=10, transcript_word_count=10,
+            transcript_duration_sec=10, estimated_script_duration_sec=10,
+            transcript_has_probabilities=True,
+        )
+        out = wa.render_diff_md(report, slug="x")
+        assert "no per-word probabilities" not in out
+
 
 # ── End-to-end (real script + synthetic transcript) ──────────────────────────
 
@@ -398,6 +421,19 @@ class TestEndToEnd:
         # Rendering shouldn't blow up on large diffs.
         md = wa.render_diff_md(report, slug="prisoners-dilemma")
         assert "Narration Diff" in md
+
+    def test_custom_wpm_changes_estimated_duration(self, script_path):
+        """Regression: WPM was hardcoded as 150 in 5 places, so --wpm
+        was silently ignored and delivery-skew calculations were wrong
+        for any non-default delivery target."""
+        transcript = _make_transcript([("x", 0.0, 1.0, 0.99)])
+        r150 = wa.run_alignment(script_path, transcript, low_conf_threshold=0.5, wpm=150)
+        r100 = wa.run_alignment(script_path, transcript, low_conf_threshold=0.5, wpm=100)
+        # Slower target (100 wpm) → longer estimated duration.
+        assert r100.estimated_script_duration_sec > r150.estimated_script_duration_sec
+        # Report should echo the wpm value used.
+        assert r100.wpm == 100
+        assert "at 100 wpm" in wa.render_diff_md(r100, slug="x")
 
 
 # ── CLI smoke ────────────────────────────────────────────────────────────────

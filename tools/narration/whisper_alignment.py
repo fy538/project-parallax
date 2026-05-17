@@ -138,8 +138,10 @@ class AlignmentReport:
     script_word_count: int
     transcript_word_count: int
     transcript_duration_sec: float
-    estimated_script_duration_sec: float  # at 150 wpm
+    estimated_script_duration_sec: float
+    wpm: int = ffr.DEFAULT_WPM    # the wpm used to compute estimated_script_duration_sec
     beats: list[ffr.Beat] = field(default_factory=list)
+    transcript_has_probabilities: bool = True  # see find_low_confidence_spans
 
     @property
     def major_issues(self) -> list[AlignmentIssue]:
@@ -206,9 +208,21 @@ def load_transcript_from_json(path: Path) -> Transcript:
     return Transcript(words=words)
 
 
-def transcribe_wav(wav_path: Path, model_size: str = "medium") -> Transcript:
+def transcribe_wav(
+    wav_path: Path, model_size: str = "medium",
+    compute_type: str = "int8", language: Optional[str] = "en",
+) -> Transcript:
     """Run faster-whisper to produce a Transcript. Raises ImportError if
-    faster-whisper isn't installed."""
+    faster-whisper isn't installed.
+
+    `compute_type` defaults to `int8` (CPU-friendly, slower but works
+    anywhere). On a CUDA box pass `float16` or `int8_float16`; on Apple
+    Silicon `int8` is the right choice.
+
+    `language` defaults to `en` since Parallax is English-only. Pass
+    `None` to let Whisper auto-detect (slower, occasionally wrong on
+    short inputs).
+    """
     try:
         from faster_whisper import WhisperModel  # type: ignore[import-not-found]
     except ImportError as e:
@@ -219,8 +233,10 @@ def transcribe_wav(wav_path: Path, model_size: str = "medium") -> Transcript:
             "     e.g. `whisper narration.wav --model medium --output_format json`"
         ) from e
 
-    model = WhisperModel(model_size, compute_type="int8")
-    segments, _info = model.transcribe(str(wav_path), word_timestamps=True)
+    model = WhisperModel(model_size, compute_type=compute_type)
+    segments, _info = model.transcribe(
+        str(wav_path), word_timestamps=True, language=language,
+    )
     words: list[TranscriptWord] = []
     for seg in segments:
         for w in seg.words or []:
@@ -439,7 +455,7 @@ def _truncate(text: str, limit: int = DISPLAY_TRUNCATE_CHARS) -> str:
 
 
 def _delivery_skew_note(report: AlignmentReport) -> str:
-    """How does actual delivery compare to the 150-wpm estimate?"""
+    """How does actual delivery compare to the target-WPM estimate?"""
     est = report.estimated_script_duration_sec
     actual = report.transcript_duration_sec
     if est <= 0 or actual <= 0:
@@ -448,7 +464,7 @@ def _delivery_skew_note(report: AlignmentReport) -> str:
     direction = "slower" if delta > 0 else "faster"
     pct = abs(delta) / est * 100
     return (
-        f"Delivery {direction} than 150-wpm estimate by {abs(delta):.0f}s "
+        f"Delivery {direction} than {report.wpm}-wpm estimate by {abs(delta):.0f}s "
         f"({pct:.0f}%). Actual: {_fmt_ts(actual)} · estimated: {_fmt_ts(est)}."
     )
 
@@ -476,7 +492,7 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
         f"> Compares the production script against the Whisper transcript of the recording.",
         "",
         f"**Script:** {report.script_word_count} words · est. "
-        f"{_fmt_ts(report.estimated_script_duration_sec)} at 150 wpm",
+        f"{_fmt_ts(report.estimated_script_duration_sec)} at {report.wpm} wpm",
         f"**Transcript:** {report.transcript_word_count} words · "
         f"actual {_fmt_ts(report.transcript_duration_sec)}",
         "",
@@ -484,6 +500,18 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
     skew = _delivery_skew_note(report)
     if skew:
         lines.append(f"_{skew}_")
+        lines.append("")
+    if not report.transcript_has_probabilities:
+        # Without per-word probabilities, find_low_confidence_spans can't
+        # surface anything. Say so explicitly — otherwise the operator
+        # reads "0 low-conf findings" as "no mispronunciations" when
+        # really nothing was checked.
+        lines.append(
+            "_Note: the transcript carries no per-word probabilities — "
+            "low-confidence detection (likely mispronunciations) was "
+            "skipped. Regenerate with faster-whisper or openai-whisper for "
+            "per-word timestamps + probabilities to surface this signal._"
+        )
         lines.append("")
 
     # ── Pickup candidates (the actionable part) ──────────────────────────────
@@ -591,8 +619,15 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
 
 def run_alignment(
     script_path: Path, transcript: Transcript, low_conf_threshold: float,
+    wpm: int = ffr.DEFAULT_WPM,
 ) -> AlignmentReport:
-    """Parse the script, extract words, align against transcript, return report."""
+    """Parse the script, extract words, align against transcript, return report.
+
+    `wpm` (default: ffr.DEFAULT_WPM = 150) is the target words-per-minute used
+    to compute the script's estimated duration. Operators reading slower than
+    that should pass their actual target via --wpm; otherwise delivery-skew
+    reporting will be off by the difference.
+    """
     beats = ffr.parse_script(script_path)
     script_words = script_to_words(beats)
     issues = align(script_words, transcript)
@@ -600,13 +635,21 @@ def run_alignment(
     # Re-sort by audio time so the report reads chronologically.
     issues.sort(key=lambda i: i.audio_start_sec)
 
+    # Detect whether the transcript carries per-word probabilities. If every
+    # word has probability == -1 (placeholder for "no data"), low-confidence
+    # detection can't have surfaced anything — flag this in the report so
+    # the operator doesn't read "0 low-conf findings" as "no mispronunciations".
+    has_probs = any(w.probability >= 0 for w in transcript.words)
+
     return AlignmentReport(
         issues=issues,
         script_word_count=len(script_words),
         transcript_word_count=len(transcript.words),
         transcript_duration_sec=transcript.duration_sec,
-        estimated_script_duration_sec=len(script_words) / 150 * 60,
+        estimated_script_duration_sec=len(script_words) / wpm * 60 if wpm > 0 else 0.0,
+        wpm=wpm,
         beats=beats,
+        transcript_has_probabilities=has_probs,
     )
 
 
@@ -646,9 +689,25 @@ def main() -> int:
         help="faster-whisper model size (default: medium). large-v3 = highest quality, slowest.",
     )
     parser.add_argument(
+        "--compute-type", default="int8",
+        help="faster-whisper compute_type (default: int8). For CUDA: float16 / int8_float16.",
+    )
+    parser.add_argument(
+        "--language", default="en",
+        help="ISO-639-1 language hint passed to Whisper (default: en). "
+             "Pass an empty string to let Whisper auto-detect (slower).",
+    )
+    parser.add_argument(
         "--low-conf", type=float, default=DEFAULT_LOW_CONFIDENCE_THRESHOLD,
         help=f"Probability threshold for low-confidence flagging "
              f"(default: {DEFAULT_LOW_CONFIDENCE_THRESHOLD}).",
+    )
+    parser.add_argument(
+        "--wpm", type=int, default=ffr.DEFAULT_WPM,
+        help=f"Target words-per-minute for the script duration estimate "
+             f"(default: {ffr.DEFAULT_WPM}). Must match the --wpm passed to "
+             f"format_for_reading.py for the delivery-skew percentage to be "
+             f"meaningful.",
     )
     parser.add_argument("-o", "--output", help="Output path (default: episodes/<slug>/narration-diff.md).")
     parser.add_argument("--stdout", action="store_true", help="Write to stdout.")
@@ -687,7 +746,11 @@ def main() -> int:
             print(f"✗ WAV not found: {wpath}", file=sys.stderr)
             return 2
         try:
-            transcript = transcribe_wav(wpath, model_size=args.model)
+            transcript = transcribe_wav(
+                wpath, model_size=args.model,
+                compute_type=args.compute_type,
+                language=args.language or None,
+            )
         except ImportError as e:
             print(f"✗ {e}", file=sys.stderr)
             return 2
@@ -699,7 +762,11 @@ def main() -> int:
             transcript = load_transcript_from_json(default_t)
         elif default_w.is_file():
             try:
-                transcript = transcribe_wav(default_w, model_size=args.model)
+                transcript = transcribe_wav(
+                    default_w, model_size=args.model,
+                    compute_type=args.compute_type,
+                    language=args.language or None,
+                )
             except ImportError as e:
                 print(f"✗ {e}\n\nNo {default_t.name} found, and can't transcribe "
                       f"{default_w.name} without faster-whisper.", file=sys.stderr)
@@ -714,7 +781,10 @@ def main() -> int:
             return 2
 
     assert transcript is not None
-    report = run_alignment(script_path, transcript, low_conf_threshold=args.low_conf)
+    report = run_alignment(
+        script_path, transcript,
+        low_conf_threshold=args.low_conf, wpm=args.wpm,
+    )
     rendered = render_diff_md(report, slug=slug)
 
     if args.stdout:

@@ -60,6 +60,14 @@ DEFAULT_POLL_INTERVAL_SEC = 10.0   # be a polite API consumer
 DEFAULT_POLL_TIMEOUT_SEC = 1800.0  # 30 min — long enough for a 20-min master
 ENV_API_KEY = "AUPHONIC_API_KEY"
 
+# Per-request socket timeouts. Without these, urllib.request.urlopen blocks
+# indefinitely if the API stalls mid-response — which makes the
+# `poll_until_done` wall-clock timeout a lie (it only checks elapsed time
+# AFTER get_production() returns, not while it's hanging). Smaller for
+# status pings, larger for downloads which can take a while on slow links.
+API_REQUEST_TIMEOUT_SEC = 30.0      # POST / GET (status, presets)
+DOWNLOAD_REQUEST_TIMEOUT_SEC = 300.0  # mastered file download
+
 # Auphonic production status codes (per their API docs).
 # Values we care about:
 STATUS_DONE = 3
@@ -154,14 +162,17 @@ class AuphonicClient:
         self._opener = opener or urllib.request.build_opener()
 
     def _request(self, path: str, method: str = "GET", body: Optional[bytes] = None,
-                 content_type: Optional[str] = None) -> dict:
+                 content_type: Optional[str] = None,
+                 timeout: float = API_REQUEST_TIMEOUT_SEC) -> dict:
         url = f"{self.base_url}{path}"
         req = urllib.request.Request(url, data=body, method=method)
         req.add_header("Authorization", f"Bearer {self.api_key}")
         if content_type:
             req.add_header("Content-Type", content_type)
         try:
-            with self._opener.open(req) as resp:
+            # timeout= bounds the socket I/O; without it a stalled API holds
+            # the process forever and poll_until_done's timeout never fires.
+            with self._opener.open(req, timeout=timeout) as resp:
                 raw = resp.read()
         except urllib.error.HTTPError as e:
             raw = e.read()
@@ -219,13 +230,15 @@ class AuphonicClient:
     def list_presets(self) -> list[Preset]:
         return parse_presets_response(self._request("/presets.json"))
 
-    def download(self, url: str, out_path: Path) -> None:
+    def download(self, url: str, out_path: Path,
+                 timeout: float = DOWNLOAD_REQUEST_TIMEOUT_SEC) -> None:
         """Stream a download URL to disk. Auth header is included so this
-        works for private outputs."""
+        works for private outputs. Per-socket timeout (default 5 min)
+        bounds the total wait; for slow links bump via the `timeout` arg."""
         req = urllib.request.Request(url, method="GET")
         req.add_header("Authorization", f"Bearer {self.api_key}")
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        with self._opener.open(req) as resp, open(out_path, "wb") as fh:
+        with self._opener.open(req, timeout=timeout) as resp, open(out_path, "wb") as fh:
             while True:
                 chunk = resp.read(64 * 1024)
                 if not chunk:

@@ -54,8 +54,20 @@ CLAIM_TAG_RE = re.compile(r"\{(?:✅|⚠️|NEW|❌)\}")
 VOICE_NOTE_RE = re.compile(r"^\s*\*\(\s*Voice note:\s*(.*?)\s*\)\*\s*$", re.IGNORECASE)
 # Beat / pause markers stay visible but get distinct rendering.
 BEAT_MARKER_RE = re.compile(r"^\s*\*\[\s*(Beat|Pause)\.?\s*\]\*\s*$", re.IGNORECASE)
-# Beat header: ## BEAT 1 — TITLE (0:00–3:30)
-BEAT_HEADER_RE = re.compile(r"^##\s+BEAT\s+(\d+)\s*[—–-]\s*(.+?)(?:\s*\((.+?)\))?\s*$", re.IGNORECASE)
+# Beat header: ## BEAT 1 — TITLE (0:00–3:30)  [optional <!-- MARKER -->]
+# The trailing `(?:\s*<!--.*?-->)?` absorbs psychology-structural-marker
+# comments that real shipped scripts carry (e.g.
+# `## BEAT 3 — THE WRONG GAME (7:30–11:30) <!-- [FRAMEWORK UNLOCK] -->`).
+# Without it the lazy `(.+?)` for title expanded to swallow both the parens
+# and the comment, leaving the timing capture empty and the title polluted
+# with the literal HTML marker — visible to the operator in every
+# downstream tool that displays beat.title (cue sheet, take comparison, etc.).
+BEAT_HEADER_RE = re.compile(
+    r"^##\s+BEAT\s+(\d+)\s*[—–-]\s*(.+?)"
+    r"(?:\s*\((.+?)\))?"            # optional (timing)
+    r"(?:\s*<!--.*?-->)?\s*$",      # optional trailing HTML marker
+    re.IGNORECASE,
+)
 # Skip the asset summary table + anything after it — narration ends at the
 # last beat. The asset summary always sits below all beats and contains no
 # narration content.
@@ -63,15 +75,24 @@ ASSET_SUMMARY_HEADER_RE = re.compile(r"^##\s+ASSET\s+SUMMARY", re.IGNORECASE)
 # Sentence-end pattern: [.!?] optionally followed by a closing quote, then
 # whitespace, then a sentence-start character (capital letter or opening
 # quote). Captures the punctuation+quote chunk in group(1) so the splitter
-# can rejoin cleanly. Lookahead — not a true lookbehind — because we need
-# variable-length matching to also catch the closing-quote-after-period
-# case (`works."` then `She`).
+# can rejoin cleanly without losing the closing quote. We use a regular
+# lookahead (not a fixed-width lookbehind) because the punctuation chunk
+# is variable-length: we need to absorb both `works.` and `works."` and
+# the lookbehind syntax can't handle the optional closing quote.
 SENTENCE_END_RE = re.compile(r"([.!?][\"']?)(\s+)(?=[\"'A-Z])")
-# Common abbreviations where the period doesn't end a sentence.
+# Common abbreviations where the period doesn't end a sentence. The
+# breath-mark inserter checks the trailing token against this set to
+# avoid splitting "Dr. Smith" or "U.S. policy". Add new entries as
+# false positives surface during real recordings — especially Latin
+# abbreviations and geopolitics-relevant country/region codes (Parallax
+# scripts reference PRC, USSR, UAE etc. with periods more than most
+# channels would).
 ABBREV_PREFIXES = {
     "Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Sr.", "Jr.",
-    "vs.", "etc.", "i.e.", "e.g.", "U.S.", "U.K.", "U.N.",
-    "St.", "No.", "Inc.", "Ltd.", "Co.",
+    "Pres.", "Sec.", "Gen.", "Sgt.", "Capt.", "Rev.", "Hon.",
+    "vs.", "etc.", "i.e.", "e.g.", "cf.", "ca.", "viz.", "fl.",
+    "U.S.", "U.K.", "U.N.", "E.U.", "U.A.E.", "U.S.S.R.", "P.R.C.",
+    "St.", "No.", "Inc.", "Ltd.", "Co.", "Corp.",
 }
 
 
