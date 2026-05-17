@@ -14,7 +14,7 @@
 ✗ visual-spec
 ✓ assembly-manifest (estimate mode · 121 segments · 893.8s)
 ✓ audio-cue-sheet
-✓ data files (Remotion templates) (49 files)
+✓ data files (Remotion templates) (48 files)
 ✓ assets (17 stills · 17 clips)
 ✗ full-episode render
 ✗ narration recorded
@@ -28,7 +28,7 @@
 
 `Duration      `  14.9 min (893.8s)
 `Segments      `  121
-`Data files    `  49
+`Data files    `  48
 `Days in state `  8
 `Days to target`  +15
 

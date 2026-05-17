@@ -21,6 +21,21 @@ Usage:
   python3 tools/pipeline_validator.py --fix         # promote latest versioned → canonical
   python3 tools/pipeline_validator.py --fix silicon-trap  # fix one episode only
 
+May-17 additions — pipeline-state.json-driven dashboard + tracker refresh:
+  python3 tools/pipeline_validator.py --write-status                # all eps
+  python3 tools/pipeline_validator.py --write-status silicon-trap   # one ep
+  python3 tools/pipeline_validator.py --update-tracker              # PIPELINE.md
+  python3 tools/pipeline_validator.py --write-status --update-tracker  # both
+  python3 tools/pipeline_validator.py --check-only                  # dry-run
+  python3 tools/pipeline_validator.py --check-only silicon-trap     # one ep
+
+When --write-status / --update-tracker / --check-only is set, the script
+reads state from `episodes/pipeline-state.json` and bypasses the legacy
+validation flow. Wired into scripts/check-episode.sh as the post-check
+refresh (auto-runs after every per-episode validation). `--check-only`
+is useful as a pre-commit gate or to preview what --write-status /
+--update-tracker would do; exits 1 if any episode has health warnings.
+
 Exit 0 if clean, 1 if errors found (or warnings under --strict).
 """
 
@@ -46,6 +61,11 @@ REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
 STALL_WARN_DAYS  = 7    # warn if days in state exceeds this
 STALL_ALERT_DAYS = 21   # error if days in state exceeds this
 
+# Manifest-staleness thresholds (used by _check_manifest_staleness)
+STALENESS_TOLERANCE_SEC = 60.0      # script edits within this of manifest = same session
+SECONDS_PER_HOUR        = 3600.0
+SECONDS_PER_DAY         = 86400.0
+
 # States that should not trigger stall warnings
 NON_STALLING_STATES = {"PUBLISHED", "RETROED", "BLOCKED", "INCUBATING"}
 
@@ -57,6 +77,23 @@ STATE_ORDER = [
     "INCUBATING", "VIABLE", "RESEARCHING", "RESEARCH READY",
     "DRAFTING", "RENDER READY", "IN POST", "PUBLISHED", "RETROED",
 ]
+
+# Per-state emoji badge for the At-a-glance table in PIPELINE.md.
+# Keep in sync with STATE_ORDER + failure states. When adding a new state,
+# add it to BOTH STATE_ORDER (or the failure set) AND this map.
+STATE_BADGES: dict[str, str] = {
+    "INCUBATING":      "💭 INCUBATING",
+    "VIABLE":          "🟢 VIABLE",
+    "RESEARCHING":     "📚 RESEARCHING",
+    "RESEARCH READY":  "✅ RESEARCH READY",
+    "DRAFTING":        "✍️ DRAFTING",
+    "RENDER READY":    "🎬 RENDER READY",
+    "IN POST":         "🎞️ IN POST",
+    "PUBLISHED":       "🚀 PUBLISHED",
+    "RETROED":         "📊 RETROED",
+    "BLOCKED":         "🛑 BLOCKED",
+    "REVISING":        "🔄 REVISING",
+}
 
 # ── Artifact specs ────────────────────────────────────────────────────────────
 # Each entry: (glob_or_name, description, is_canonical)
@@ -150,10 +187,17 @@ def fix_naming_drift(ep_dir: Path) -> list[str]:
     return renames
 
 
-# ── PIPELINE.md parser ────────────────────────────────────────────────────────
+# ── Episode-row shape (legacy validate_episode contract) ─────────────────────
 
 @dataclass
 class EpisodeRow:
+    """Legacy-shape input to validate_episode() / write_checkpoint().
+
+    Kept for back-compat with the original validation flow. Modern callers
+    should consume StateEntry from load_pipeline_state() directly — the
+    pipeline-state.json schema is the single source of truth for state +
+    dates as of the May-17 refactor.
+    """
     slug: str
     state: str
     days_in_state: int
@@ -161,31 +205,36 @@ class EpisodeRow:
 
 
 def parse_pipeline_md() -> list[EpisodeRow]:
-    """Parse the current-state table from episodes/PIPELINE.md."""
-    if not PIPELINE_MD.exists():
-        print(f"✗ {PIPELINE_MD} not found", file=sys.stderr)
-        sys.exit(1)
+    """Legacy entry point — now delegates to load_pipeline_state().
 
-    text = PIPELINE_MD.read_text(encoding="utf-8")
+    BEFORE THE MAY-17 REFACTOR this function regex-parsed the markdown
+    table in PIPELINE.md to extract slug/state/days/blocked_on. The
+    parser was brittle (any column reorder broke it) AND duplicated
+    state information that already lived in pipeline-state.json.
 
-    # Find the table rows (skip header and separator)
-    # Row format: | `slug` | STATE | N | Format | Next action | Blocked on | Date | link |
-    row_re = re.compile(
-        r"^\|\s*`([^`]+)`\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|[^|]*\|[^|]*\|\s*([^|]+?)\s*\|"
-    )
+    NOW this is a shim that loads from JSON and converts to the legacy
+    EpisodeRow shape. The validate_episode() / write_checkpoint() code
+    paths downstream don't need to change; they keep consuming
+    EpisodeRow records.
 
-    rows = []
-    for line in text.splitlines():
-        m = row_re.match(line)
-        if not m:
-            continue
-        slug         = m.group(1).strip()
-        state        = m.group(2).strip()
-        days         = int(m.group(3))
-        blocked_on   = m.group(4).strip()
-        rows.append(EpisodeRow(slug=slug, state=state, days_in_state=days, blocked_on=blocked_on))
-
-    return rows
+    Returns empty list and prints a warning if pipeline-state.json is
+    missing — same semantics as before but with a better diagnostic.
+    """
+    entries = load_pipeline_state()
+    if not entries:
+        if not PIPELINE_STATE_JSON.is_file():
+            print(f"✗ {PIPELINE_STATE_JSON} not found — required for state lookup", file=sys.stderr)
+            sys.exit(1)
+        return []
+    return [
+        EpisodeRow(
+            slug=e.slug,
+            state=e.state,
+            days_in_state=e.days_in_state,
+            blocked_on=e.blocked_on,
+        )
+        for e in entries
+    ]
 
 
 # ── Artifact helpers ──────────────────────────────────────────────────────────
@@ -651,6 +700,7 @@ class StateEntry:
     state_entered_at: datetime.date
     format: Optional[str]
     target_publish: Optional[datetime.date]
+    blocked_on: str = "—"   # "—" means none; populated when state is BLOCKED/REVISING
     notes: str = ""
 
     @property
@@ -665,19 +715,28 @@ class StateEntry:
 
 
 def load_pipeline_state() -> list[StateEntry]:
-    """Parse episodes/pipeline-state.json into typed entries."""
+    """Parse episodes/pipeline-state.json into typed entries.
+
+    SINGLE source of truth for episode state + dates. Both the legacy
+    validation flow (validate_episode) and the new dashboard flow
+    (compute_episode_status) read from here. parse_pipeline_md() is a
+    thin shim over this function for back-compat with code paths that
+    expect the older EpisodeRow shape.
+    """
     if not PIPELINE_STATE_JSON.is_file():
         return []
     data = json.loads(PIPELINE_STATE_JSON.read_text(encoding="utf-8"))
     out: list[StateEntry] = []
     for e in data.get("episodes", []):
         target = e.get("targetPublish")
+        blocked = e.get("blockedOn")
         out.append(StateEntry(
             slug=e["slug"],
             state=e["state"],
             state_entered_at=datetime.date.fromisoformat(e["stateEnteredAt"]),
             format=e.get("format"),
             target_publish=datetime.date.fromisoformat(target) if target else None,
+            blocked_on=blocked if blocked else "—",
             notes=e.get("notes", ""),
         ))
     return out
@@ -692,12 +751,18 @@ def load_pipeline_state() -> list[StateEntry]:
 
 @dataclass
 class EpisodeStatus:
-    """Comprehensive operational snapshot for one episode."""
+    """Comprehensive operational snapshot for one episode.
+
+    All fields are raw data — no derived display strings stored. Derived
+    fields (health_summary, target_publish display, script_mtime display)
+    are computed at render time via properties, NOT mutated after
+    construction. This keeps the dataclass a pure data carrier.
+    """
     slug: str
     state: str
     days_in_state: int
     days_to_target: Optional[int]
-    target_publish: Optional[str]   # ISO string for display
+    target_publish: Optional[datetime.date]   # raw date, not formatted
     format: Optional[str]
     notes: str
 
@@ -719,58 +784,123 @@ class EpisodeStatus:
     manifest_segments: int
     manifest_duration_sec: float
     manifest_mode: str              # "estimate" | "precise" | "missing"
-    zero_hit_count: int             # from zerohit_fallback.py logic
+    zero_hit_count: int             # from zerohit_fallback.find_zero_hit_shots
     cost_usd: float
 
     # Health signals
     manifest_stale: bool            # script mtime > manifest mtime + tolerance
     manifest_stale_drift_str: str   # human-readable e.g. "6 days"
     script_version: Optional[str]   # e.g. "v3"
-    script_mtime: Optional[str]     # ISO
+    script_mtime: Optional[datetime.datetime]   # raw datetime, not formatted
 
-    # Stage progress (computed from state index)
-    stage_idx: int                  # position in STATE_ORDER (0-8)
-    stage_total: int = len(STATE_ORDER)
+    # Stage progress
+    stage_idx: int                  # position in STATE_ORDER (0-8), -1 off-lifecycle
 
-    # Health summary string for PIPELINE.md Health column
-    health_summary: str = ""
+    @property
+    def stage_total(self) -> int:
+        return len(STATE_ORDER)
+
+    @property
+    def target_publish_iso(self) -> Optional[str]:
+        """ISO date string for display, or None."""
+        return self.target_publish.isoformat() if self.target_publish else None
+
+    @property
+    def script_mtime_iso(self) -> Optional[str]:
+        """ISO datetime for display (minute precision), or None."""
+        return self.script_mtime.isoformat(timespec="minutes") if self.script_mtime else None
+
+    @property
+    def health_summary(self) -> str:
+        """Compact one-line health string for PIPELINE.md's Health column.
+        Derived; not stored, so it always reflects current field values."""
+        parts: list[str] = []
+        if self.manifest_stale:
+            parts.append(f"⚠ stale manifest ({self.manifest_stale_drift_str})")
+        if self.zero_hit_count > 0:
+            parts.append(f"🔴 {self.zero_hit_count} zero-hit shot{'s' if self.zero_hit_count != 1 else ''}")
+        if self.has_manifest and not self.has_render:
+            parts.append("✗ never rendered")
+        if self.has_render and not self.has_narration:
+            parts.append("✗ no narration")
+        if not parts:
+            if self.state == "INCUBATING":
+                return "⏸ awaiting promotion"
+            if self.state == "RETROED":
+                return "✓ shipped"
+            return "✓ clean"
+        return " · ".join(parts)
 
 
-def _read_cost_log() -> dict[str, float]:
-    """Parse episodes/COST_LOG.md → {episode_slug: total_usd}."""
-    cost_log = EPISODES_DIR / "COST_LOG.md"
-    if not cost_log.is_file():
+def _read_cost_log(cost_log_path: Optional[Path] = None) -> dict[str, float]:
+    """Parse episodes/COST_LOG.md → {episode_slug: total_usd}.
+
+    Expected row format (markdown table):
+        | YYYY-MM-DD | episode-slug | service | amount_usd | note |
+
+    Tolerates:
+      - Variable whitespace within cells
+      - Negative amounts (refunds; uncommon but valid)
+      - Decimal or integer amounts (`5`, `5.0`, `5.00`, `0.04`)
+      - Leading/trailing whitespace in slug cell
+      - Skips rows with non-date first cell (header/separator/conventions text)
+      - Skips rows where slug is `(system)` or starts with `(` (synthetic
+        rows like the cost-log initialization marker)
+
+    `cost_log_path` argument exists for tests; production callers omit it
+    to use the canonical episodes/COST_LOG.md path.
+    """
+    path = cost_log_path or (EPISODES_DIR / "COST_LOG.md")
+    if not path.is_file():
         return {}
     totals: dict[str, float] = {}
-    # Format: | date | episode | service | amount_usd | note |
-    row_re = re.compile(r"^\|\s*\d{4}-\d{2}-\d{2}\s*\|\s*([^|]+?)\s*\|\s*[^|]+?\s*\|\s*([\d.]+)\s*\|")
-    for line in cost_log.read_text(encoding="utf-8").splitlines():
+    # `-?` allows refund rows; `\d+(?:\.\d+)?` accepts integer OR decimal.
+    row_re = re.compile(
+        r"^\|\s*\d{4}-\d{2}-\d{2}\s*"          # date column
+        r"\|\s*([^|]+?)\s*"                    # episode slug (group 1)
+        r"\|\s*[^|]+?\s*"                      # service (discarded)
+        r"\|\s*(-?\d+(?:\.\d+)?)\s*"           # amount_usd (group 2)
+        r"\|"
+    )
+    for line in path.read_text(encoding="utf-8").splitlines():
         m = row_re.match(line)
         if not m:
             continue
         slug = m.group(1).strip()
+        # Skip synthetic / system rows
+        if slug.startswith("(") or not slug:
+            continue
         amount = float(m.group(2))
         totals[slug] = totals.get(slug, 0.0) + amount
     return totals
 
 
 def _count_zero_hits(slug: str) -> int:
-    """Count zero-hit shots in episodes/<slug>/assets/**/asset-manifest.json."""
+    """Count zero-hit shots in episodes/<slug>/assets/**/asset-manifest.json.
+
+    Delegates to zerohit_fallback.find_zero_hit_shots so the "zero hit"
+    definition lives in one place (asset-source module). Walks every
+    asset-manifest.json in the episode tree because a single episode can
+    have multiple sourcing batches.
+    """
+    # Local import — keeps the dependency edge intentional and avoids
+    # an import-time cycle if zerohit_fallback ever imports from us.
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "asset-source"))
+    try:
+        import zerohit_fallback as zf
+    except ImportError:
+        return 0
+
     ep_dir = EPISODES_DIR / slug
     if not ep_dir.is_dir():
         return 0
     count = 0
     for am in ep_dir.rglob("asset-manifest.json"):
         try:
-            data = json.loads(am.read_text(encoding="utf-8"))
+            manifest = json.loads(am.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
-        for entry in data.get("assets", []):
-            search = entry.get("search", {})
-            total = search.get("total_results", 0)
-            downloaded = [d for d in entry.get("downloaded", []) if d.get("status") != "failed"]
-            if total == 0 or not downloaded:
-                count += 1
+        count += len(zf.find_zero_hit_shots(manifest))
     return count
 
 
@@ -791,17 +921,17 @@ def _check_manifest_staleness(slug: str) -> tuple[bool, str]:
         return False, ""
     newest = max(scripts, key=lambda p: p.stat().st_mtime)
     drift = newest.stat().st_mtime - manifest_mtime
-    if drift <= 60:  # within same edit session
+    if drift <= STALENESS_TOLERANCE_SEC:  # within same edit session
         return False, ""
-    if drift < 3600:
+    if drift < SECONDS_PER_HOUR:
         return True, f"{int(drift / 60)} min"
-    if drift < 86400:
-        return True, f"{drift / 3600:.1f} h"
-    return True, f"{drift / 86400:.1f} d"
+    if drift < SECONDS_PER_DAY:
+        return True, f"{drift / SECONDS_PER_HOUR:.1f} h"
+    return True, f"{drift / SECONDS_PER_DAY:.1f} d"
 
 
-def _detect_script_version(ep_dir: Path) -> tuple[Optional[str], Optional[str]]:
-    """Return (version string like 'v3', mtime ISO) for the newest script file."""
+def _detect_script_version(ep_dir: Path) -> tuple[Optional[str], Optional[datetime.datetime]]:
+    """Return (version string like 'v3', raw mtime datetime) for the newest script file."""
     scripts: list[Path] = []
     for pattern in ("script-v*-production.md", "script-production.md", "script.md"):
         scripts.extend(ep_dir.glob(pattern))
@@ -810,122 +940,139 @@ def _detect_script_version(ep_dir: Path) -> tuple[Optional[str], Optional[str]]:
     newest = max(scripts, key=lambda p: p.stat().st_mtime)
     version_match = re.search(r"script-v(\d+)-production\.md", newest.name)
     version = f"v{version_match.group(1)}" if version_match else None
-    mtime = datetime.datetime.fromtimestamp(newest.stat().st_mtime).isoformat(timespec="minutes")
+    mtime = datetime.datetime.fromtimestamp(newest.stat().st_mtime)
     return version, mtime
 
 
-def _build_health_summary(s: "EpisodeStatus") -> str:
-    """Compact one-line health string for PIPELINE.md's Health column."""
-    parts: list[str] = []
-    if s.manifest_stale:
-        parts.append(f"⚠ stale manifest ({s.manifest_stale_drift_str})")
-    if s.zero_hit_count > 0:
-        parts.append(f"🔴 {s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''}")
-    if s.has_manifest and not s.has_render:
-        parts.append("✗ never rendered")
-    if s.has_render and not s.has_narration:
-        parts.append("✗ no narration")
-    if not parts:
-        if s.state == "INCUBATING":
-            return "⏸ awaiting promotion"
-        if s.state == "RETROED":
-            return "✓ shipped"
-        return "✓ clean"
-    return " · ".join(parts)
+# ── compute_episode_status — composed of small single-purpose helpers ────────
+# Each helper handles one signal source so the per-source logic is testable
+# in isolation and easy to extend without grepping a 100-line function.
+
+# Pattern for template data files Remotion consumes. Used by _count_data_files
+# to exclude non-template configs (backdrop-manifest, music-bed-config, etc.).
+_TEMPLATE_DATA_FILE_RE = re.compile(
+    r"^(?:annotated|arc|atlas|bayesian|beeswarm|bump|calendar|cartogram|chart|"
+    r"choropleth|connected|datachart|decision|density|dumbbell|dueling|"
+    r"escalation|framework|gameboard|horizon|horizontal|image|isotype|"
+    r"kinetic|map|marimekko|network|photo|population|pricing|probability|"
+    r"proportional|radar|rank|ridgeline|route|sankey|split|stat|strategic|"
+    r"streamgraph|template|ternary|tilegram|timeline|timeseries|title)"
+    r"[\w-]*\.json$",
+    re.IGNORECASE,
+)
+
+
+def _gather_artifacts(ep_dir: Path, data_dir: Path, slug: str) -> dict:
+    """File-presence checks. Returns {has_research, has_script, has_manifest, …}."""
+    out_dir = ROOT / "remotion-templates" / "out"
+    return {
+        "has_research":       (ep_dir / "brief.md").is_file(),
+        "has_angle_memo":     (ep_dir / "angle-memo.md").is_file(),
+        "has_script":         bool(_first_match(ep_dir, "script-v*-production.md",
+                                                "script-production.md", "script.md")),
+        "has_visual_spec":    (ep_dir / "visual-spec.md").is_file(),
+        "has_audio_cue_sheet": (ep_dir / "audio-cue-sheet.md").is_file(),
+        "has_manifest":       (data_dir / "assembly-manifest.json").is_file(),
+        "has_narration":      (ep_dir / "assets" / "narration.wav").is_file(),
+        "has_render":         bool(list(out_dir.glob(f"{slug}-full*.mp4"))) if out_dir.is_dir() else False,
+        "has_thumbnails":     (ep_dir / "thumbnail-spec.json").is_file(),
+    }
+
+
+def _count_data_files(data_dir: Path) -> int:
+    """Count Remotion template data files (excludes manifest + non-template configs).
+
+    Uses a pattern allowlist of known template prefixes (datachart-, kinetic-,
+    framework-, etc.) so episode dirs that happen to contain
+    `backdrop-manifest.json`, `music-bed-config.json`, etc. don't inflate the
+    count. Replaces the brittle `len(*.json) - 1` heuristic.
+    """
+    if not data_dir.is_dir():
+        return 0
+    return sum(1 for p in data_dir.glob("*.json") if _TEMPLATE_DATA_FILE_RE.match(p.name))
+
+
+def _count_assets(ep_dir: Path) -> tuple[int, int]:
+    """Count files in assets/stills and assets/clips. Returns (stills, clips)."""
+    assets_dir = ep_dir / "assets"
+    stills_dir = assets_dir / "stills"
+    clips_dir = assets_dir / "clips"
+    stills = len(list(stills_dir.glob("*"))) if stills_dir.is_dir() else 0
+    clips = len(list(clips_dir.glob("*"))) if clips_dir.is_dir() else 0
+    return stills, clips
+
+
+def _read_manifest_info(data_dir: Path) -> tuple[int, float, str]:
+    """Returns (segment_count, totalDurationSec, mode) from assembly-manifest.json."""
+    manifest = data_dir / "assembly-manifest.json"
+    if not manifest.is_file():
+        return 0, 0.0, "missing"
+    try:
+        m = json.loads(manifest.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return 0, 0.0, "missing"
+    return (
+        len(m.get("segments", [])),
+        float(m.get("totalDurationSec", 0)),
+        m.get("mode", "estimate"),
+    )
+
+
+def _stage_idx_for(state: str) -> int:
+    """Return position in STATE_ORDER, or -1 for off-lifecycle (BLOCKED/REVISING)."""
+    try:
+        return STATE_ORDER.index(state)
+    except ValueError:
+        return -1
 
 
 def compute_episode_status(entry: StateEntry) -> EpisodeStatus:
-    """Snapshot one episode by walking filesystem + helpers. No writes."""
+    """Snapshot one episode by composing single-purpose readers. No writes.
+
+    Each piece of data comes from a small helper:
+      _gather_artifacts        artifact presence booleans
+      _count_data_files        template-data file count (allowlist-filtered)
+      _count_assets            stills + clips counts
+      _read_manifest_info      segment/duration/mode from manifest JSON
+      _count_zero_hits         delegates to zerohit_fallback module
+      _read_cost_log           parses COST_LOG.md per-episode totals
+      _check_manifest_staleness  script-vs-manifest mtime drift
+      _detect_script_version   newest script + version + mtime
+      _stage_idx_for           STATE_ORDER position
+    """
     slug = entry.slug
     ep_dir = EPISODES_DIR / slug
     data_dir = REMOTION_DATA / slug
 
-    # Artifact presence
-    has_research = (ep_dir / "brief.md").is_file()
-    has_angle_memo = (ep_dir / "angle-memo.md").is_file()
-    has_script = bool(_first_match(ep_dir, "script-v*-production.md", "script-production.md", "script.md"))
-    has_visual_spec = (ep_dir / "visual-spec.md").is_file()
-    has_audio_cue_sheet = (ep_dir / "audio-cue-sheet.md").is_file()
-    has_manifest = (data_dir / "assembly-manifest.json").is_file()
-    has_narration = (ep_dir / "assets" / "narration.wav").is_file()
-    # Render check: look for a full-episode output named <slug>-full.mp4 or similar
-    out_dir = ROOT / "remotion-templates" / "out"
-    has_render = bool(list(out_dir.glob(f"{slug}-full*.mp4"))) if out_dir.is_dir() else False
-    has_thumbnails = (ep_dir / "thumbnail-spec.json").is_file()
-
-    # Counts
-    data_files = len(list(data_dir.glob("*.json"))) - (1 if has_manifest else 0) if data_dir.is_dir() else 0
-    assets_dir = ep_dir / "assets"
-    stills_dir = assets_dir / "stills"
-    clips_dir = assets_dir / "clips"
-    asset_stills = len(list(stills_dir.glob("*"))) if stills_dir.is_dir() else 0
-    asset_clips = len(list(clips_dir.glob("*"))) if clips_dir.is_dir() else 0
-
-    # Manifest details
-    manifest_segments = 0
-    manifest_duration_sec = 0.0
-    manifest_mode = "missing"
-    if has_manifest:
-        try:
-            m = json.loads((data_dir / "assembly-manifest.json").read_text(encoding="utf-8"))
-            manifest_segments = len(m.get("segments", []))
-            manifest_duration_sec = float(m.get("totalDurationSec", 0))
-            manifest_mode = m.get("mode", "estimate")
-        except (OSError, json.JSONDecodeError):
-            pass
-
-    # Zero-hit count
-    zero_hit_count = _count_zero_hits(slug)
-
-    # Cost
-    cost_totals = _read_cost_log()
-    cost_usd = cost_totals.get(slug, 0.0)
-
-    # Manifest staleness
+    artifacts = _gather_artifacts(ep_dir, data_dir, slug)
+    asset_stills, asset_clips = _count_assets(ep_dir)
+    manifest_segments, manifest_duration_sec, manifest_mode = _read_manifest_info(data_dir)
     is_stale, drift_str = _check_manifest_staleness(slug)
-
-    # Script version detection
     script_version, script_mtime = _detect_script_version(ep_dir)
 
-    # Stage index
-    try:
-        stage_idx = STATE_ORDER.index(entry.state)
-    except ValueError:
-        stage_idx = -1  # BLOCKED/REVISING/unknown
-
-    status = EpisodeStatus(
+    return EpisodeStatus(
         slug=slug,
         state=entry.state,
         days_in_state=entry.days_in_state,
         days_to_target=entry.days_to_target,
-        target_publish=entry.target_publish.isoformat() if entry.target_publish else None,
+        target_publish=entry.target_publish,
         format=entry.format,
         notes=entry.notes,
-        has_research=has_research,
-        has_angle_memo=has_angle_memo,
-        has_script=has_script,
-        has_visual_spec=has_visual_spec,
-        has_audio_cue_sheet=has_audio_cue_sheet,
-        has_manifest=has_manifest,
-        has_narration=has_narration,
-        has_render=has_render,
-        has_thumbnails=has_thumbnails,
-        data_files=data_files,
+        **artifacts,
+        data_files=_count_data_files(data_dir),
         asset_stills=asset_stills,
         asset_clips=asset_clips,
         manifest_segments=manifest_segments,
         manifest_duration_sec=manifest_duration_sec,
         manifest_mode=manifest_mode,
-        zero_hit_count=zero_hit_count,
-        cost_usd=cost_usd,
+        zero_hit_count=_count_zero_hits(slug),
+        cost_usd=_read_cost_log().get(slug, 0.0),
         manifest_stale=is_stale,
         manifest_stale_drift_str=drift_str,
         script_version=script_version,
         script_mtime=script_mtime,
-        stage_idx=stage_idx,
+        stage_idx=_stage_idx_for(entry.state),
     )
-    status.health_summary = _build_health_summary(status)
-    return status
 
 
 # ── write_status_md ──────────────────────────────────────────────────────────
@@ -962,99 +1109,112 @@ def _status_check(done: bool, in_progress: bool = False, warn: bool = False) -> 
     return "✗"
 
 
-def render_status_md(s: EpisodeStatus) -> str:
-    """Render the per-episode _status.md dashboard string."""
+def _render_header(s: EpisodeStatus) -> list[str]:
+    """Title + auto-gen banner + State/Format header lines."""
     today = datetime.date.today().isoformat()
-    lines: list[str] = [
+    target_clause = ""
+    if s.target_publish_iso:
+        target_clause = f" · target {s.target_publish_iso}"
+        if s.days_to_target is not None:
+            target_clause += f" ({s.days_to_target:+d} days)"
+    lines = [
         f"# Status — {s.slug}",
         f"> Auto-generated {today} by `tools/pipeline_validator.py --write-status`.",
-        f"> **Do not edit by hand.** Re-run the tool to refresh.",
-        f"> Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).",
+        "> **Do not edit by hand.** Re-run the tool to refresh.",
+        "> Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).",
         "",
-        f"**State:** {s.state} · day {s.days_in_state} in state"
-        + (f" · target {s.target_publish}" if s.target_publish else "")
-        + (f" ({s.days_to_target:+d} days)" if s.days_to_target is not None else ""),
+        f"**State:** {s.state} · day {s.days_in_state} in state{target_clause}",
     ]
     if s.format:
         lines.append(f"**Format:** {s.format}")
     lines.append("")
+    return lines
 
-    # ── Progress meter ─────────────────────────────────────────────────────────
+
+def _render_progress(s: EpisodeStatus) -> list[str]:
+    """Progress bar + stage counter."""
     if s.stage_idx >= 0:
         bar = _progress_bar(s.stage_idx + 1, s.stage_total)
-        lines.append(f"## Progress  {bar}  {s.stage_idx + 1} of {s.stage_total} stages")
-    else:
-        lines.append(f"## Progress  (off-lifecycle state: {s.state})")
-    lines.append("")
+        return [f"## Progress  {bar}  {s.stage_idx + 1} of {s.stage_total} stages", ""]
+    return [f"## Progress  (off-lifecycle state: {s.state})", ""]
 
-    # ── Done / In-progress / Blocked checklist ─────────────────────────────────
-    lines.extend([
+
+def _render_checklist(s: EpisodeStatus) -> list[str]:
+    """Done/in-progress/blocked artifact checklist."""
+    lines: list[str] = [
         f"{_status_check(s.has_research)} research (brief + audit)",
         f"{_status_check(s.has_angle_memo)} angle-memo",
-    ])
+    ]
     script_note = ""
-    if s.has_script and s.script_version:
-        script_note = f" — {s.script_version}, modified {s.script_mtime}"
-    elif s.has_script:
-        script_note = f" — modified {s.script_mtime}" if s.script_mtime else ""
+    if s.has_script and s.script_version and s.script_mtime_iso:
+        script_note = f" — {s.script_version}, modified {s.script_mtime_iso}"
+    elif s.has_script and s.script_mtime_iso:
+        script_note = f" — modified {s.script_mtime_iso}"
     lines.append(f"{_status_check(s.has_script)} script-production.md{script_note}")
     lines.append(f"{_status_check(s.has_visual_spec)} visual-spec")
     if s.has_manifest:
         mode_note = f" ({s.manifest_mode} mode · {s.manifest_segments} segments · {s.manifest_duration_sec:.1f}s)"
-        manifest_check = _status_check(True, warn=s.manifest_stale)
-        lines.append(f"{manifest_check} assembly-manifest{mode_note}")
+        lines.append(f"{_status_check(True, warn=s.manifest_stale)} assembly-manifest{mode_note}")
     else:
         lines.append("✗ assembly-manifest (run `generate_manifest.py`)")
     lines.append(f"{_status_check(s.has_audio_cue_sheet)} audio-cue-sheet")
     data_files_note = f" ({s.data_files} files)" if s.data_files > 0 else ""
     lines.append(f"{_status_check(s.data_files > 0)} data files (Remotion templates){data_files_note}")
-    assets_note = ""
-    if s.asset_stills or s.asset_clips:
-        assets_note = f" ({s.asset_stills} stills · {s.asset_clips} clips"
-        if s.zero_hit_count:
-            assets_note += f" · {s.zero_hit_count} zero-hit shots unresolved"
-        assets_note += ")"
-    elif s.zero_hit_count:
-        assets_note = f" ({s.zero_hit_count} zero-hit shots — no assets generated yet)"
-    assets_done = (s.asset_stills > 0 or s.asset_clips > 0) and s.zero_hit_count == 0
-    assets_check = _status_check(assets_done or s.asset_stills > 0, warn=s.zero_hit_count > 0)
-    lines.append(f"{assets_check} assets{assets_note}")
+    lines.append(_render_assets_line(s))
     lines.append(f"{_status_check(s.has_render)} full-episode render")
     lines.append(f"{_status_check(s.has_narration)} narration recorded")
     lines.append(f"{_status_check(s.has_thumbnails)} thumbnail-spec")
     lines.append("")
+    return lines
 
-    # ── Health checks ──────────────────────────────────────────────────────────
-    lines.append("## Health")
-    health_lines: list[str] = []
+
+def _render_assets_line(s: EpisodeStatus) -> str:
+    """One line for the assets row — accounts for stills/clips/zero-hit combinations."""
+    if s.asset_stills or s.asset_clips:
+        note = f" ({s.asset_stills} stills · {s.asset_clips} clips"
+        if s.zero_hit_count:
+            note += f" · {s.zero_hit_count} zero-hit shots unresolved"
+        note += ")"
+    elif s.zero_hit_count:
+        note = f" ({s.zero_hit_count} zero-hit shots — no assets generated yet)"
+    else:
+        note = ""
+    has_any = s.asset_stills > 0 or s.asset_clips > 0
+    return f"{_status_check(has_any, warn=s.zero_hit_count > 0)} assets{note}"
+
+
+def _render_health(s: EpisodeStatus) -> list[str]:
+    """Health checks with exact-command fixes."""
+    lines = ["## Health"]
+    health: list[str] = []
     if s.manifest_stale:
-        health_lines.append(
-            f"🔴 M-MANIFEST-STALE  script ({s.script_mtime}) > manifest "
+        health.append(
+            f"🔴 M-MANIFEST-STALE  script ({s.script_mtime_iso}) > manifest "
             f"(drift {s.manifest_stale_drift_str})"
         )
-        health_lines.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug}`")
+        health.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug}`")
     if s.zero_hit_count > 0:
-        health_lines.append(
+        health.append(
             f"🟡 {s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''} "
             f"in episodes/{s.slug}/assets/"
         )
-        health_lines.append(f"   → fix: `python3 tools/asset-source/zerohit_fallback.py {s.slug}`")
+        health.append(f"   → fix: `python3 tools/asset-source/zerohit_fallback.py {s.slug}`")
     if s.has_manifest and s.manifest_mode == "estimate" and s.has_narration:
-        health_lines.append(
-            "🟡 Manifest in estimate mode but narration recorded — regenerate in precise mode"
-        )
-        health_lines.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug} --audio`")
+        health.append("🟡 Manifest in estimate mode but narration recorded — regenerate in precise mode")
+        health.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug} --audio`")
     if s.has_manifest and not s.has_render:
-        health_lines.append("🟡 Manifest ready but episode never rendered")
-        health_lines.append(f"   → fix: `cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}`")
-    if not health_lines:
-        health_lines.append("🟢 No health issues detected")
-    lines.extend(health_lines)
+        health.append("🟡 Manifest ready but episode never rendered")
+        health.append(f"   → fix: `cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}`")
+    if not health:
+        health.append("🟢 No health issues detected")
+    lines.extend(health)
     lines.append("")
+    return lines
 
-    # ── By the numbers ─────────────────────────────────────────────────────────
-    lines.append("## By the numbers")
-    lines.append("")
+
+def _render_numbers(s: EpisodeStatus) -> list[str]:
+    """By the numbers panel — only includes rows with non-default values."""
+    lines = ["## By the numbers", ""]
     nums: list[tuple[str, str]] = []
     if s.cost_usd > 0:
         nums.append(("Cost so far", f"${s.cost_usd:.2f}"))
@@ -1071,56 +1231,81 @@ def render_status_md(s: EpisodeStatus) -> str:
     for label, val in nums:
         lines.append(f"`{label:<{width}}`  {val}")
     lines.append("")
+    return lines
 
-    # ── Editorial note (from pipeline-state.json) ─────────────────────────────
-    if s.notes:
-        lines.append("## Notes")
-        lines.append("")
-        lines.append(s.notes)
-        lines.append("")
 
-    lines.append("---")
-    lines.append("")
-    lines.append(
+def _render_notes(s: EpisodeStatus) -> list[str]:
+    """Editorial notes from pipeline-state.json (may be empty)."""
+    if not s.notes:
+        return []
+    return ["## Notes", "", s.notes, ""]
+
+
+def _render_footer(s: EpisodeStatus) -> list[str]:
+    return [
+        "---",
+        "",
         f"_Regenerate this file: `python3 tools/pipeline_validator.py --write-status {s.slug}` "
-        f"or run `./scripts/check-episode.sh {s.slug}` (auto-refreshes)._"
-    )
-    return "\n".join(lines) + "\n"
+        f"or run `./scripts/check-episode.sh {s.slug}` (auto-refreshes)._",
+    ]
+
+
+def render_status_md(s: EpisodeStatus) -> str:
+    """Render the per-episode _status.md dashboard string.
+
+    Composed of single-purpose section renderers so each block is easy to
+    edit independently. Adding a new section = add a `_render_*` function
+    and append its output to the pipeline below.
+    """
+    sections = [
+        _render_header(s),
+        _render_progress(s),
+        _render_checklist(s),
+        _render_health(s),
+        _render_numbers(s),
+        _render_notes(s),
+        _render_footer(s),
+    ]
+    return "\n".join(line for section in sections for line in section) + "\n"
 
 
 # ── update_tracker_health: write Health column into PIPELINE.md ──────────────
 
+# Match the "At a glance" section. The regex captures THREE groups so we can
+# preserve the blank line between the table and the next section when
+# rewriting just the table body:
+#   group(1) = header (## heading + table header + separator row)
+#   group(2) = table body (one or more rows starting with `|`)
+#   group(3) = trailing blank line(s) before the next non-table content;
+#              preserved verbatim on rewrite
+#
+# IMPORTANT: row terminators use `[ \t]*` (only horizontal whitespace), NOT
+# `\s*`. `\s` matches `\n`, so a greedy `\s*\n` row-terminator would consume
+# the trailing blank line as part of the last row's whitespace, eating
+# it on every rewrite. Same for the separator row pattern.
 PIPELINE_TABLE_RE = re.compile(
-    r"(## At a glance\s*\n\s*\n"
-    r"\| Episode\s*\|.*?\|\s*Health\s*\|\s*\n"
-    r"\|[-: ]+(?:\|[-: ]+)+\|\s*\n)"
-    r"((?:\|.*?\|\s*\n)+)",
+    r"(## At a glance[ \t]*\n[ \t]*\n"
+    r"\| Episode[ \t]*\|.*?\|[ \t]*Health[ \t]*\|[ \t]*\n"
+    r"\|[-: ]+(?:\|[-: ]+)+\|[ \t]*\n)"
+    r"((?:\|.*?\|[ \t]*\n)+)"
+    r"(\n+)?",     # captured: blank line(s) between table and next section
     re.MULTILINE,
 )
 
 
 def _format_tracker_row(s: EpisodeStatus) -> str:
     """Render one row of the At-a-glance table."""
-    state_badge_map = {
-        "INCUBATING":      "💭 INCUBATING",
-        "VIABLE":          "🟢 VIABLE",
-        "RESEARCHING":     "📚 RESEARCHING",
-        "RESEARCH READY":  "✅ RESEARCH READY",
-        "DRAFTING":        "✍️ DRAFTING",
-        "RENDER READY":    "🎬 RENDER READY",
-        "IN POST":         "🎞️ IN POST",
-        "PUBLISHED":       "🚀 PUBLISHED",
-        "RETROED":         "📊 RETROED",
-        "BLOCKED":         "🛑 BLOCKED",
-        "REVISING":        "🔄 REVISING",
-    }
-    badge = state_badge_map.get(s.state, s.state)
-    target = s.target_publish or "—"
+    badge = STATE_BADGES.get(s.state, s.state)
+    target = s.target_publish_iso or "—"
     return f"| `{s.slug}` | {badge} | {s.days_in_state} | {target} | {s.health_summary} |"
 
 
 def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
-    """Update the At-a-glance table in PIPELINE.md in place. Returns True if changed."""
+    """Update the At-a-glance table in PIPELINE.md in place. Returns True if changed.
+
+    Preserves the trailing blank line between the table and the next
+    section so the auto-refresh doesn't keep collapsing whitespace.
+    """
     if not PIPELINE_MD.is_file():
         return False
     text = PIPELINE_MD.read_text(encoding="utf-8")
@@ -1128,9 +1313,10 @@ def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
     if not m:
         # Table not present yet — first migration; caller should run --bootstrap-tracker
         return False
-    header, _old_body = m.group(1), m.group(2)
+    header = m.group(1)
+    trailing = m.group(3) or ""
     new_body = "\n".join(_format_tracker_row(s) for s in statuses) + "\n"
-    new_text = text.replace(m.group(0), header + new_body, 1)
+    new_text = text.replace(m.group(0), header + new_body + trailing, 1)
     if new_text != text:
         PIPELINE_MD.write_text(new_text, encoding="utf-8")
         return True
@@ -1194,35 +1380,56 @@ def main() -> int:
             "in place. Pairs with --write-status (typically use both together)."
         ),
     )
+    parser.add_argument(
+        "--check-only",
+        action="store_true",
+        help=(
+            "Compute status but don't write _status.md or modify PIPELINE.md. "
+            "Useful as a pre-commit check or to preview what --write-status / "
+            "--update-tracker would do. Prints a per-episode summary and exits "
+            "1 if any episode has health warnings (manifest-stale, zero-hits, "
+            "never-rendered, etc.)."
+        ),
+    )
     args = parser.parse_args()
 
-    # ── --write-status / --update-tracker path ────────────────────────────────
-    # When either flag is set, run the new pipeline-state-driven flow and exit.
-    # The legacy PIPELINE.md-parsing validation path runs only when neither
-    # new flag is set (back-compat for existing callers).
-    if args.write_status or args.update_tracker:
-        state_entries = load_pipeline_state()
-        if not state_entries:
+    # ── --write-status / --update-tracker / --check-only path ────────────────
+    # When any of these flags is set, run the new pipeline-state-driven flow
+    # and exit. The legacy PIPELINE.md-parsing validation path runs only when
+    # none of the new flags are set (back-compat for existing callers).
+    if args.write_status or args.update_tracker or args.check_only:
+        all_entries = load_pipeline_state()
+        if not all_entries:
             print("✗ episodes/pipeline-state.json not found or empty", file=sys.stderr)
             return 2
+        # Always compute status for ALL episodes once. The tracker rewrite
+        # needs every row; --write-status / --check-only with --episode just
+        # filter which dashboards get written/reported.
+        all_statuses = [compute_episode_status(e) for e in all_entries]
         if args.episode:
-            state_entries = [e for e in state_entries if e.slug == args.episode]
-            if not state_entries:
+            targeted = [s for s in all_statuses if s.slug == args.episode]
+            if not targeted:
                 print(f"✗ episode '{args.episode}' not found in pipeline-state.json", file=sys.stderr)
                 return 2
-        statuses = [compute_episode_status(e) for e in state_entries]
+        else:
+            targeted = all_statuses
+
+        if args.check_only:
+            # Dry-run mode: print summary, return 1 if any health issues.
+            print("\nPipeline status summary (--check-only; no files written):\n")
+            any_warnings = False
+            for s in targeted:
+                print(f"  {s.slug:<30} {STATE_BADGES.get(s.state, s.state):<20} {s.health_summary}")
+                if s.health_summary not in ("✓ clean", "✓ shipped", "⏸ awaiting promotion"):
+                    any_warnings = True
+            print()
+            return 1 if any_warnings else 0
+
         if args.write_status:
-            for s in statuses:
+            for s in targeted:
                 path = write_status(s)
                 print(f"✓ wrote {path.relative_to(ROOT)}")
         if args.update_tracker:
-            # Always compute statuses for ALL episodes when updating the tracker,
-            # since the table is global. If args.episode was passed we'd miss rows.
-            if args.episode:
-                all_entries = load_pipeline_state()
-                all_statuses = [compute_episode_status(e) for e in all_entries]
-            else:
-                all_statuses = statuses
             changed = update_tracker_health(all_statuses)
             print(f"{'✓ updated' if changed else '✓ no change to'} episodes/PIPELINE.md (At-a-glance Health column)")
         return 0
