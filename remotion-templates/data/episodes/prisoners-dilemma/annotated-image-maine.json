@@ -1,0 +1,29 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Maine · Lobster Harbor Gangs",
+  "subtitle": "Each color marks one fisher's territory. Cut another gang's traps and the sanction escalates: warning → severed buoy line → exclusion from the harbor. Documented since the 1880s.",
+  "imageSrc": "episodes/prisoners-dilemma/stills/maine-buoys.jpg",
+  "imageAlt": "Seven uniquely colored lobster trap buoys hanging on a weathered grey shingle wall — each color a different fisher's identity.",
+  "duotoneRamp": "standard",
+  "backgroundVariant": "dark",
+  "durationSec": 3.8,
+  "callouts": [
+    {
+      "x": 10,
+      "y": 22,
+      "label": "ONE COLOR · ONE BOAT",
+      "detail": "Ostrom Principle 1 — clear boundaries",
+      "placement": "right",
+      "leaderLength": 70
+    },
+    {
+      "x": 70,
+      "y": 55,
+      "label": "CUT A TRAP → ESCALATION",
+      "detail": "Warning · severed line · harbor exclusion — Principle 5",
+      "placement": "left",
+      "leaderLength": 70
+    }
+  ],
+  "source": "Photo: Marc-Lautenbacher (CC BY-SA 4.0 via Wikimedia Commons)"
+}

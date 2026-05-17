@@ -5,7 +5,7 @@
 **Episode slug:** prisoners-dilemma
 **Format:** Philosopher's Lens
 **Arc:** 3 — The Diplomacy of Deception (opener)
-**Current version:** v5.9 (May 16, 2026) — render-ready
+**Current version:** v5.10 (May 16, 2026) — render-ready
 **Author:** Tiger + Claude (collaborative drafting)
 **Log opened:** May 12, 2026 (retroactive)
 
@@ -120,7 +120,39 @@ Verification: render-still of proportional-symbol-ostrom.json at frame 210 (phas
 
 **Queued for next session (requires manual asset sourcing):**
 
-The audit also recommended an `AnnotatedImage` triptych — three real Wikimedia photographs (Valencia huerta channel; Swiss Törbel alpine meadow with stone walls; Maine lobster trap line on a working harbor) each annotated with the Ostrom principle it embodies (clear boundaries / graduated sanctions / collective-choice arrangements). This would convert the Ostrom segment from "academic citation with map visual" to "documentary proof anchored in named places with photographs." Skipped here because it requires manual Wikimedia Commons sourcing of three CC-licensed photos. When sourced: author three new `annotated-image-valencia.json` / `-torbel.json` / `-maine.json` data files; insert as new manifest segments interspersed between beat4-seg44 (the map) and beat4-seg46 (the principles diagram); each ~6s; sequence: map → Valencia photo → Törbel photo → Maine photo → principles diagram (now as legend). Total Beat 4 runtime extension: ~18s. See the May 16 ambitious-re-strategy audit Opportunity #1 for callout design.
+The audit also recommended an `AnnotatedImage` triptych — three real Wikimedia photographs each annotated with the Ostrom principle it embodies. ← **Done in v5.10 below.**
+
+---
+
+## v5.9 → v5.10 (May 16, 2026) — Beat 4 Ostrom AnnotatedImage triptych (documentary photo evidence)
+
+Third strategic upgrade from the May 16 ambitious-re-strategy audit, closing Opportunity #1 in full. The ProportionalSymbolMap in v5.9 made the map place-anchored; this commit makes Ostrom's argument **photo-anchored**. Real photographs of the actual cases — Valencia Tribunal de las Aguas in session, the Bernese Alps above Törbel, Maine lobster harbor buoys — appear in the foreground as the narrator names each region, while the map continues underneath in the background. This is the editorial-doctrine move: the narration commits to specific places, and the visual layer now commits the same way.
+
+Wikimedia Commons sources (all CC BY-SA, properly attributed in `episodes/prisoners-dilemma/CREDITS.md`):
+- Valencia: *The Tribunal de las Aguas of Valencia* by José Jordan / UNESCO (CC BY-SA 3.0 IGO)
+- Törbel: *Törbel (unten) und die Berner Alpen* by Daniel Reust (CC BY-SA 4.0)
+- Maine: *Lobster-Trap-Buoys Kennebunkport Maine USA* by Marc-Lautenbacher (CC BY-SA 4.0)
+
+Changes:
+
+- Three originals downloaded to `episodes/prisoners-dilemma/assets/stills-ostrom-triptych/` (source-of-truth at original resolution: 4367×2911, 4032×2268, 3504×2336).
+- Three resized copies in `remotion-templates/public/episodes/prisoners-dilemma/stills/` (1920px wide, q88 JPEG, ~500 KB each). Duotone is NOT baked into these files — `BrandImage` applies the standard ramp (ink → umber → gold) at render time via SVG filter, matching Beat 4's dark register.
+- Three new AnnotatedImage data files:
+  - `annotated-image-valencia.json` — 4.3s, 2 callouts: "ELECTED SYNDIC" pointing at the standing speaker, "APOSTLES' DOOR · SINCE 1273" tying to Ostrom Principle 3 (collective-choice arrangements).
+  - `annotated-image-torbel.json` — 4.2s, 2 callouts: "ALPINE PASTURES" tying to Principle 1 (clear boundaries), "TÖRBEL VILLAGE" anchoring the 800-year charter.
+  - `annotated-image-maine.json` — 4.3s, 2 callouts: "ONE COLOR · ONE BOAT" (Principle 1), "CUT A TRAP → ESCALATION" (Principle 5, graduated sanctions).
+- Manifest: `beat4-seg44-hold` (12.8s foreground HOLD on the map) replaced with three sequential AnnotatedImage TEMPLATE segments occupying the same 584.0–596.8s slot:
+  - `beat4-seg44b-valencia` (584.0–588.3, syncWord "Valencia")
+  - `beat4-seg44c-torbel` (588.3–592.5, syncWord "Swiss alpine")
+  - `beat4-seg44d-maine` (592.5–596.8, syncWord "Maine lobster")
+  - Background `beat4-seg45` FOOTAGE continues unchanged underneath. Total Beat 4 runtime unchanged (no shifts to subsequent segments).
+- Script line 186 updated to describe the triptych (replaces "continuation — camera moves between highlighted regions").
+- Asset Summary table entries 23a/23b/23c added.
+- New `episodes/prisoners-dilemma/CREDITS.md` — authoritative photographer-attribution record; CC BY-SA share-alike compliance + recommended closing-card credit text. Pending Beat 1/2/5 archival sourcing (Nash, RAND HQ, Reagan-Gorbachev) is also tracked here.
+
+Verification: render-still of each AnnotatedImage at frame 110 (mid-segment, after both callouts settle) confirms title block, image with brand duotone, and both callouts with leader lines render correctly. All 36 episode-integrity tests pass.
+
+**Editorial effect:** Beat 4 narration now plays with the visual layer doing real evidentiary work for the first time. When the narrator says "Spanish irrigation cooperatives in Valencia — still operating after six hundred years," the viewer sees the actual Tribunal in session at the Apostles' Door. When the narrator says "Swiss alpine grazing commons with charters from the thirteenth century," the viewer sees the actual Bernese Alps above Törbel. When the narrator says "Maine lobster fisheries," the viewer sees the actual color-coded buoys that embody Principle 1. The Ostrom argument is no longer "academic citation"; it's "documentary proof."
 
 ---
 

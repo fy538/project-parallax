@@ -183,7 +183,9 @@ Visual pipeline updated: ChatGPT image generation + Pika 2.5 (chained morphs) fo
 |  | DIR: reveal(stagger:200ms) |
 |  | DIR: cam(wide → tight:[0, 35], over:8s, track) |
 |  | DIR: hold(breathe) |
-| Spanish irrigation cooperatives in Valencia — still operating after six hundred years. {✅} Swiss alpine grazing commons with charters from the thirteenth century. {✅} Japanese mountain forest cooperatives. Maine lobster fisheries. {✅} | continuation — camera moves between highlighted regions |
+| Spanish irrigation cooperatives in Valencia — still operating after six hundred years. {✅} Swiss alpine grazing commons with charters from the thirteenth century. {✅} Japanese mountain forest cooperatives. Maine lobster fisheries. {✅} | **P1** · [MG:] AnnotatedImage TRIPTYCH — three brand-treated Wikimedia photographs syncing to the narrator's named cases: (1) Valencia Tribunal de las Aguas in session at the Apostles' Door — elected syndic + 8 farmer-judges, sync:"Valencia"; (2) Törbel alpine commons under the Bernese Alps — pasture boundaries match the watershed, sync:"Swiss alpine"; (3) Maine lobster harbor gangs — one buoy color per fisher, graduated sanctions for trap-cutting, sync:"Maine lobster". Each card 4.2–4.3s, dissolves between. Replaces the foreground HOLD on the map; map continues underneath via background. · [prisoners-dilemma/annotated-image-{valencia,torbel,maine}.json] · 12.8s total |
+|  | DIR: reveal(sequential, sync:per-case) |
+|  | DIR: mood(subtle, register:documentary) |
 | Ostrom documented what they shared: eight design principles. {✅} Clear boundaries. Graduated sanctions — first offense isn't a death sentence. The right to self-organize. Eight features total, and every single one of them builds something the Prisoner's Dilemma *assumes away*. | **P1** · [MG:] FrameworkDiagram — Split layout: left shows Ostrom's 8 principles as a structured list; right shows PD assumptions from Beat 2 (the narrowing gates). Lines connect each principle to the assumption it dissolves. · [prisoners-dilemma/framework-ostrom-vs-pd.json] · 12s |
 |  | DIR: reveal(stagger:400ms, progressive) |
 |  | DIR: cam(overview) |
@@ -317,7 +319,10 @@ Three documentary stills retained as [ARCHIVAL:] (Nash portrait, RAND building, 
 | 21 | KineticTypography | "Iterated PD ≡ Stag Hunt" | inline | [MG:] |
 | 22 | FrameworkDiagram | Old question → new question reframe | framework-reframe.json | [MG:] |
 | 23 | ProportionalSymbolMap | Six named Ostrom commons — area ∝ years of operation | proportional-symbol-ostrom.json | [MG:] |
-| 24 | FrameworkDiagram | Ostrom principles vs. PD assumptions | framework-ostrom-vs-pd.json | [MG:] |
+| 23a | AnnotatedImage | Valencia Tribunal de las Aguas (institutional governance) | annotated-image-valencia.json | [MG:] |
+| 23b | AnnotatedImage | Törbel alpine commons (clear boundaries) | annotated-image-torbel.json | [MG:] |
+| 23c | AnnotatedImage | Maine lobster harbor gangs (graduated sanctions) | annotated-image-maine.json | [MG:] |
+| 24 | FrameworkDiagram | Ostrom principles vs. PD assumptions (now legend role) | framework-ostrom-vs-pd.json | [MG:] |
 | 25 | KineticTypography | "Cooperation isn't a miracle. It's designed." | inline | [MG:] |
 | 26 | FrameworkDiagram | Motif — synchronized defection | framework-motif-beat5.json | [MG:] |
 | 27 | FrameworkDiagram | FINAL MOTIF — second equilibrium appears | framework-motif-final.json | [MG:] |

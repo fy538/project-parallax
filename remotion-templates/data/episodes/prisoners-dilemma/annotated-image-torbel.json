@@ -1,0 +1,29 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Törbel · Alpine Commons",
+  "subtitle": "Swiss village in canton Valais. Community charter of 1224 regulating shared use of alpine meadows, forest, and water channels — continuously enforced for 800 years.",
+  "imageSrc": "episodes/prisoners-dilemma/stills/torbel-alps.jpg",
+  "imageAlt": "Snow-capped Bernese Alps at dusk, with wooded slopes in the foreground where Törbel sits.",
+  "duotoneRamp": "standard",
+  "backgroundVariant": "dark",
+  "durationSec": 3.7,
+  "callouts": [
+    {
+      "x": 70,
+      "y": 32,
+      "label": "ALPINE PASTURES",
+      "detail": "Boundaries match the watershed — Ostrom Principle 1",
+      "placement": "bottom",
+      "leaderLength": 60
+    },
+    {
+      "x": 45,
+      "y": 75,
+      "label": "TÖRBEL VILLAGE",
+      "detail": "Charter of 1224 · 800+ years continuous enforcement",
+      "placement": "top",
+      "leaderLength": 60
+    }
+  ],
+  "source": "Photo: Daniel Reust (CC BY-SA 4.0 via Wikimedia Commons)"
+}

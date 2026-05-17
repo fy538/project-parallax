@@ -1,0 +1,29 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Valencia · Tribunal de las Aguas",
+  "subtitle": "Eight elected farmer-judges, meeting every Thursday at the Apostles' Door since 1273. Adjudicates Turia-river water disputes — orally, in 15 minutes, with no written record. UNESCO Intangible Heritage, 2009.",
+  "imageSrc": "episodes/prisoners-dilemma/stills/valencia-tribunal.jpg",
+  "imageAlt": "The Tribunal de las Aguas of Valencia in session at the Apostles' Door of Valencia Cathedral. A robed syndic stands center; eight elected judges sit on either side.",
+  "duotoneRamp": "standard",
+  "backgroundVariant": "dark",
+  "durationSec": 4.3,
+  "callouts": [
+    {
+      "x": 50,
+      "y": 55,
+      "label": "ELECTED SYNDIC",
+      "detail": "One per acequia, speaks for the community",
+      "placement": "bottom",
+      "leaderLength": 80
+    },
+    {
+      "x": 18,
+      "y": 18,
+      "label": "APOSTLES' DOOR · SINCE 1273",
+      "detail": "Ostrom Principle 3 — collective-choice arrangements",
+      "placement": "right",
+      "leaderLength": 70
+    }
+  ],
+  "source": "Photo: José Jordan / UNESCO (CC BY-SA 3.0 IGO via Wikimedia Commons)"
+}

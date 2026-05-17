@@ -1903,13 +1903,73 @@
       }
     },
     {
-      "id": "beat4-seg44-hold",
-      "type": "HOLD",
+      "id": "beat4-seg44b-valencia",
+      "type": "TEMPLATE",
       "startSec": 584.0,
-      "endSec": 596.8,
+      "endSec": 588.3,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "syncWords": ["Valencia"],
+      "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
+      "template": {
+        "component": "AnnotatedImage",
+        "dataFile": "annotated-image-valencia.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat4-seg44c-torbel",
+      "type": "TEMPLATE",
+      "startSec": 588.3,
+      "endSec": 592.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "syncWords": ["Swiss alpine"],
+      "narrationRef": "Swiss alpine grazing commons with charters from the thirteenth century.",
+      "template": {
+        "component": "AnnotatedImage",
+        "dataFile": "annotated-image-torbel.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.4
+      }
+    },
+    {
+      "id": "beat4-seg44c-torbel-hold",
+      "type": "HOLD",
+      "startSec": 592.0,
+      "endSec": 593.0,
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P3"
+    },
+    {
+      "id": "beat4-seg44d-maine",
+      "type": "TEMPLATE",
+      "startSec": 593.0,
+      "endSec": 596.8,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P1",
+      "syncWords": ["Maine lobster"],
+      "narrationRef": "Japanese mountain forest cooperatives. Maine lobster fisheries.",
+      "template": {
+        "component": "AnnotatedImage",
+        "dataFile": "annotated-image-maine.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.4
+      }
     },
     {
       "id": "beat4-seg45-hold",
