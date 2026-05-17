@@ -7,6 +7,7 @@
  */
 
 import type { DirectionBlock } from "../../hooks/useDirection";
+import type { EditorialFrameProps } from "../../components/EditorialFrame/schema";
 
 export interface TimeSeriesPoint {
   /** X-axis value (year, date string, or number) */
@@ -160,6 +161,13 @@ export interface TimeSeriesChartData {
   holdAfterRevealSec?: number;
   backgroundVariant?: "dark" | "light";
   backgroundTint?: string;
+
+  /**
+   * Opt-in editorial frame. When set, the chart renders inside EditorialFrame
+   * (kicker + heroStat + annotations + top legend + publication chrome).
+   * See EDITORIAL_FRAME_ARCHITECTURE.md.
+   */
+  frame?: EditorialFrameProps;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

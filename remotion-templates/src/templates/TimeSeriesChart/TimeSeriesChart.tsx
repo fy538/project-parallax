@@ -80,6 +80,7 @@ import { chartLayout, validateChartLayoutIntegrity } from "../../utils/chartLayo
 import { computeLabelStacks } from "../../utils/labelStack";
 import { checkChartDataCommon, warnIf } from "../../utils/dataWarnings";
 import type { TimeSeriesChartData, TimeSeriesLine } from "./types";
+import { TimeSeriesChartEditorial } from "./TimeSeriesChartEditorial";
 
 // ── Geometry helpers ────────────────────────────────────────────────────────
 
@@ -883,6 +884,17 @@ const SmallMultiplesChart: React.FC<{
 export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
   data,
 }) => {
+  // Editorial-frame opt-in: when `data.frame` is set, route to the editorial
+  // render path which uses EditorialFrame for publication-grade composition.
+  // See remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md.
+  if (data.frame) {
+    return (
+      <TimeSeriesChartEditorial
+        data={data as TimeSeriesChartData & { frame: NonNullable<TimeSeriesChartData["frame"]> }}
+      />
+    );
+  }
+
   // Dev-only semantic checks. Once-per-template per session in Studio.
   checkChartDataCommon("TimeSeriesChart", data);
   warnIf(

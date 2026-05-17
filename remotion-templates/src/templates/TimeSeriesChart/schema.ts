@@ -4,6 +4,7 @@
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { EditorialFrameSchema } from "../../components/EditorialFrame/schema";
 
 const TimeSeriesPointSchema = z.object({
   x: z.union([z.number(), z.string()]),
@@ -80,6 +81,14 @@ export const TimeSeriesChartSchema = z.object({
       .describe("Deliberate pause (seconds) after all lines finish drawing, before exit fade. Must fit within durationSec. Default: 0."),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
+    /**
+     * Opt-in editorial frame. When set, the chart renders inside EditorialFrame
+     * with publication-grade composition (kicker + heroStat + title + dek +
+     * top legend + multi-callout annotations + reference lines + era bands +
+     * publication chrome). Existing TitleBlock / HeaderStrip / FooterStrip
+     * chrome is suppressed. See EDITORIAL_FRAME_ARCHITECTURE.md.
+     */
+    frame: EditorialFrameSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });
