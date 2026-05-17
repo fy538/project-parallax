@@ -3,7 +3,7 @@ description: Walk the operator through a narration recording session — generat
 argument-hint: <slug>
 ---
 
-Run the narration recording workflow for episode **$1**. This is the orchestrator across the three Tier 1 narration tools (`format_for_reading.py`, `pronunciation_guide.py`, `audio_qa.py`) — the operator's single entry-point for "I'm about to record this episode" or "I just finished recording, what do I need to fix."
+Run the narration recording workflow for episode **$1**. This is the orchestrator across the narration toolchain (`format_for_reading.py`, `pronunciation_guide.py`, `pre_render_cue_sheet.py`, `audio_qa.py`, `whisper_alignment.py`, `take_selector.py`, `auphonic_submit.py`) — the operator's single entry-point for "I'm about to record this episode" or "I just finished recording, what do I need to fix."
 
 ## Mode A — pre-recording prep (default if no `narration.wav` yet)
 
@@ -32,7 +32,13 @@ If `episodes/$1/assets/narration.wav` does NOT exist, do the prep flow:
    - How many still need an IPA entry filled in before recording. Surface the top 5-10 by frequency so the operator knows which matter most.
    - Direct attention to the "Needs verification" section.
 
-5. **Print the recording checklist** to remind the operator of the physical setup before they press record:
+5. **Generate the printable cue sheet** for live markup during the session:
+   ```bash
+   python3 tools/narration/pre_render_cue_sheet.py $1
+   ```
+   Writes `episodes/$1/cue-sheet.md`. Tell the operator to **print this** before the session — it lists every take with a recognizable cue line, word count, cumulative timestamp, and a checkbox to mark live (✓ clean / ⚠ re-take / 𝗫 skip). The marked-up paper is the index into the post-record pickup work; it's strictly additive to the digital `narration-diff.md` whisper alignment produces in Mode B.
+
+6. **Print the recording checklist** to remind the operator of the physical setup before they press record:
    - Mic at fist-distance from mouth, 30° off-axis
    - Recording at -18 to -12 dBFS average, peaks ≤ -6 dBFS
    - Wear closed-back headphones during recording
@@ -62,11 +68,26 @@ If `episodes/$1/assets/narration.wav` exists, run the full audit flow. This is a
 
 ### Stage 2 — content QA (the big time-saver)
 
+#### Single-take case (default)
+
 Run the Whisper alignment to generate a pickup-take shopping list:
 
 ```bash
 python3 tools/narration/whisper_alignment.py $1
 ```
+
+#### Multi-take case (if the operator did 2+ full reads)
+
+If `episodes/$1/assets/` contains multiple takes (e.g. `narration-take-1.wav`, `narration-take-2.wav`), run the comparison instead so the operator gets a per-beat best-take pick:
+
+```bash
+python3 tools/narration/take_selector.py $1 \
+    --takes episodes/$1/assets/narration-take-*.wav
+```
+
+Writes `episodes/$1/take-comparison.md` — overall ranking, per-beat winner, and a splice cheat-sheet when no single take wins everything. Use this to choose which file becomes the canonical `narration.wav` (or which segments to splice in the DAW). After picking, alias the winner to `narration.wav` and continue.
+
+#### Either path
 
 This auto-discovers `episodes/$1/assets/narration.json` (transcript) or runs Whisper on `narration.wav` if `faster-whisper` is installed. If neither is available:
 
