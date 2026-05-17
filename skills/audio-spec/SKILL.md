@@ -20,7 +20,18 @@ You are generating the audio design layer for a bilingual geopolitics video chan
 **Read `project/AUDIO_DESIGN.md` before starting.** It defines the 3-layer audio model, the SFX palette, volume hierarchy, and all template-to-cue mappings. That document is the authoritative reference — this skill applies its rules to a specific script.
 
 **Read `project/DIRECTING_LANGUAGE.md` for direction-to-audio integration.** The script's `DIR:` annotations are the single source of truth for timing, transitions, and mood. Three directives directly inform audio cues:
-- **`cut()`** → determines which transition SFX to use at segment boundaries. `cut(color-wash)` → `section-open` SFX (color flood = new section). `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click). `cut(blur-through)` → `tension-rise` → `tension-resolve` two-part SFX (rise during blur, resolve on reveal). Authoritative table: [`project/AUDIO_DESIGN.md`](../../project/AUDIO_DESIGN.md) lines 398-400.
+- **`cut()`** → determines which transition SFX to use at segment boundaries. The canonical transition-type vocabulary (and their audio pairings) is defined in `project/TRANSITION_GRAMMAR.md`. Key mappings:
+  - `cut(color-wash)` → `section-open` SFX (color flood = new section)
+  - `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click)
+  - `cut(fade)` → music silence / thin bed (chapter break / silence beat — see D18)
+  - `cut(dissolve)` → no dedicated SFX; music bed continues uninterrupted
+  - `cut(match-cut)` / `cut(match-cut-still)` → optional `card-settle` texture hit at the locked frame
+  - ~~`cut(blur-through)`~~ is deprecated — if encountered in old scripts, treat as `cut(dissolve)` (no SFX)
+  - Authoritative table: [`project/AUDIO_DESIGN.md`](../../project/AUDIO_DESIGN.md) lines 398-400.
+- **J/L-cut audio bridges** (`narrationLeadIn` / `narrationLagOut` in the assembly manifest) — the implicit-default engine applies `narrationLeadIn: 0.7` automatically to every hard cut. This means narration for the incoming segment begins 0.7s before the visual cut — the standard J-cut overlap. Audio-spec should enforce this during NLE assembly:
+  - **J-cut (narrationLeadIn)**: start the incoming narration N seconds before the visual cut fires. Default: 0.7s. Explicit `DIR: jcut(N)` in the script overrides the default (present in manifest as `segment.narrationLeadIn`).
+  - **L-cut (narrationLagOut)**: let the outgoing narration run N seconds past the visual cut. No automatic default — only fires when script uses `DIR: lcut(N)` (present in manifest as `segment.narrationLagOut`).
+  - **Suppress the default J-cut when**: (a) the preceding segment uses `DIR: hold(stillness)` — silence beats need abrupt entry not a pre-roll, or (b) the cut is a `TitleTransition` chapter card — these have their own fade timing.
 - **`hold()`** → creates audio silence/breathing opportunities. `hold(breathe)` → music bed thins to 50% volume during the hold. `hold(land)` → all audio pauses for 1s (deliberate silence candidate). `hold(linger)` → music bed continues at low volume.
 - **`mood()`** → maps directly to music bed mood and volume. `mood(dense)` → increase music intensity, add low-frequency texture. `mood(none)` → thin the bed, emphasize clarity. `mood(dim:0.5)` → reduce texture hits to minimum. A `mood()` change mid-beat may warrant a music bed crossfade within the beat.
 - **`type()` and `_direction.textAnimation`** → text-animation register dictates a default SFX/texture cue. See **`project/TEXT_ANIMATION_REGISTER.md`** for the technique catalog. The default mapping (apply unless the script overrides with an explicit cue) is:
@@ -66,7 +77,7 @@ Read the full script. Identify:
 - **Quote cards** — attributed quotes that will become KineticTypography (trigger `quote-bell`)
 - **Data reveals** — statistics and numbers that will land as DataChart/StatReveal (trigger `stat-reveal`). Look for `DIR: reveal(count-up, sync:"...")` — the sync word tells you exactly when the stat lands.
 - **Geographic shifts** — map transitions (trigger `map-whoosh`). Look for `DIR: cam(wide → tight:...)` — the camera move is the audio trigger.
-- **Register transitions** — `DIR: cut()` annotations that specify transition type. These are the most reliable audio cue triggers: `cut(color-wash)` = register shift (dramatic audio moment), `cut(iris)` = focal reveal, `cut(blur-through)` = atmospheric softening.
+- **Register transitions** — `DIR: cut()` annotations that specify transition type. These are the most reliable audio cue triggers: `cut(color-wash)` = register shift (dramatic audio moment → `section-open` SFX), `cut(iris)` = focal reveal (premium moment → `stat-reveal` SFX), `cut(fade)` = chapter/silence beat (→ music thin / silence). Note: `blur-through` is deprecated — if encountered, treat as dissolve with no dedicated SFX. See `project/TRANSITION_GRAMMAR.md` for the canonical transition vocabulary.
 - **Mood shifts** — `DIR: mood()` changes within or between beats. A shift from `mood(subtle)` to `mood(dense)` signals the music bed should intensify.
 - **The thesis moment** — the single most important argument beat (candidate for dramatic intensity + deliberate silence before it). Often marked with `DIR: hold(land)` or a `DIR: mood(dense, dim:0.5)`.
 - **`PACE:` annotations** — visual density markers that also inform audio decisions. `PACE: urgent` sections pair with faster music tempo and denser SFX; `PACE: breathing` sections pair with sustained pads, reduced SFX, and silence moments. Note PACE changes in the beat map — they signal structural tempo shifts that the music bed should reinforce.
@@ -129,8 +140,8 @@ For each segment:
 1. **Does the previous segment have a `DIR: cut()` annotation?** → The cut type determines the transition SFX (authoritative table: `project/AUDIO_DESIGN.md` lines 398-400):
    - `cut(color-wash)` → `section-open` SFX (color flood signals a new section)
    - `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click)
-   - `cut(blur-through)` → `tension-rise` → `tension-resolve` two-part SFX (rise during the blur, resolve on the reveal — the blur suggests a shift in understanding)
    - `cut(match-cut)` → silent transition (the visual continuity IS the connection — SFX would compete)
+   - ~~`cut(blur-through)`~~ → deprecated; treat as `cut(dissolve)` if encountered in old scripts (no dedicated SFX)
    - `cut(dissolve)` → `beat-transition` SFX at subtle intensity
    - `cut(fade)` → `beat-transition` SFX at subtle intensity
    - No `cut()` → use the default logic below
