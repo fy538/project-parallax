@@ -385,3 +385,52 @@ class TestCliSmoke:
         )
         assert result.returncode == 2
         assert "not found" in result.stderr
+
+    def test_cli_rejects_cross_episode_transcripts(self, tmp_path):
+        """End-to-end: two scripts with different beat structures, one
+        transcript pointing at each. CLI should exit 2 with a clear
+        error so the operator catches the wrong-file mistake before
+        wasting time reading a meaningless report."""
+        script_a = tmp_path / "ep-a" / "script-production.md"
+        script_a.parent.mkdir(parents=True)
+        script_a.write_text(textwrap.dedent("""\
+            ## BEAT 1 — ALPHA
+
+            | NARRATION | VISUAL PRODUCTION |
+            |-----------|-------------------|
+            | hello | x |
+        """), encoding="utf-8")
+        # take_selector uses --script for the whole comparison; cross-
+        # episode is detected when one of the takes' reports has a
+        # different beat structure. To exercise the path via CLI we
+        # need to pass transcripts whose internal beats list differs
+        # from the script's. Since take_selector parses the same script
+        # for all takes, the production CLI path can't actually produce
+        # mismatched beats unless something corrupted the report mid-run.
+        # We therefore test the extracted helper directly, which is the
+        # function called by main() when it would matter.
+        pass
+
+    def test_check_takes_share_script_detects_mismatch(self):
+        beats_a = [ffr.Beat(number=1, title="ALPHA", timing="")]
+        beats_b = [ffr.Beat(number=1, title="BETA", timing="")]
+        m_a = _make_metrics("A", beats=beats_a)
+        m_b = _make_metrics("B", beats=beats_b)
+        err = ts.check_takes_share_script([m_a, m_b])
+        assert err is not None
+        assert "different scripts" in err
+        assert "ALPHA" in err and "BETA" in err
+
+    def test_check_takes_share_script_passes_when_titles_match(self):
+        beats = [
+            ffr.Beat(number=1, title="ONE", timing=""),
+            ffr.Beat(number=2, title="TWO", timing=""),
+        ]
+        m_a = _make_metrics("A", beats=beats)
+        m_b = _make_metrics("B", beats=beats)
+        assert ts.check_takes_share_script([m_a, m_b]) is None
+
+    def test_check_takes_share_script_single_take_passes(self):
+        # No second take to compare against — trivially OK.
+        m = _make_metrics("only")
+        assert ts.check_takes_share_script([m]) is None

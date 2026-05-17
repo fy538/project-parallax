@@ -183,6 +183,15 @@ class AuphonicClient:
             raise RuntimeError(
                 f"Auphonic API {method} {path} failed with status {e.code}: {payload}"
             ) from e
+        except urllib.error.URLError as e:
+            # Covers socket.timeout (the urlopen timeout fires), DNS
+            # failures, connection refused, TLS errors. Without this catch,
+            # poll_until_done would let the URLError propagate past main's
+            # `except RuntimeError`/`except TimeoutError` clauses and the
+            # operator sees a Python traceback instead of a clean exit-1.
+            raise RuntimeError(
+                f"Auphonic API {method} {path} network error: {e.reason}"
+            ) from e
         return json.loads(raw.decode("utf-8"))
 
     def create_production(

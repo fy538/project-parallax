@@ -65,7 +65,7 @@ BEAT_MARKER_RE = re.compile(r"^\s*\*\[\s*(Beat|Pause)\.?\s*\]\*\s*$", re.IGNOREC
 BEAT_HEADER_RE = re.compile(
     r"^##\s+BEAT\s+(\d+)\s*[—–-]\s*(.+?)"
     r"(?:\s*\((.+?)\))?"            # optional (timing)
-    r"(?:\s*<!--.*?-->)?\s*$",      # optional trailing HTML marker
+    r"(?:\s*<!--.*?-->)*\s*$",      # zero or more trailing HTML markers
     re.IGNORECASE,
 )
 # Skip the asset summary table + anything after it — narration ends at the
@@ -79,7 +79,12 @@ ASSET_SUMMARY_HEADER_RE = re.compile(r"^##\s+ASSET\s+SUMMARY", re.IGNORECASE)
 # lookahead (not a fixed-width lookbehind) because the punctuation chunk
 # is variable-length: we need to absorb both `works.` and `works."` and
 # the lookbehind syntax can't handle the optional closing quote.
-SENTENCE_END_RE = re.compile(r"([.!?][\"']?)(\s+)(?=[\"'A-Z])")
+#
+# Quote class covers both straight ASCII (`"`, `'`) and the curly typographic
+# variants (`“`, `”`, `‘`, `’`) that Word / iA Writer / iA Pages emit by
+# default. Without the curly variants, sentences ending in `works.”` (Word-
+# autocorrected) wouldn't trip the boundary and missed the breath mark.
+SENTENCE_END_RE = re.compile(r"([.!?][\"'“”‘’]?)(\s+)(?=[\"'“”‘’A-Z])")
 # Common abbreviations where the period doesn't end a sentence. The
 # breath-mark inserter checks the trailing token against this set to
 # avoid splitting "Dr. Smith" or "U.S. policy". Add new entries as

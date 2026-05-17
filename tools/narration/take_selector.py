@@ -182,6 +182,31 @@ def pick_best_per_beat(
     return out
 
 
+def check_takes_share_script(takes: list[TakeMetrics]) -> Optional[str]:
+    """If all takes were aligned against the same script, return None.
+    Otherwise return a human-readable error message identifying the
+    mismatch. Caller decides what to do (CLI prints + exits 2).
+
+    The check is structural: it compares per-take beat title lists. If
+    the operator passed transcripts from different episodes, the title
+    lists will differ — even if the lengths happen to match — and the
+    comparison would silently produce a meaningless report otherwise.
+    """
+    if len(takes) < 2:
+        return None
+    expected_titles = [b.title for b in takes[0].report.beats]
+    for other in takes[1:]:
+        other_titles = [b.title for b in other.report.beats]
+        if other_titles != expected_titles:
+            return (
+                f"✗ takes were aligned against different scripts:\n"
+                f"  {takes[0].name}: {expected_titles}\n"
+                f"  {other.name}: {other_titles}\n"
+                f"All takes must come from the same episode."
+            )
+    return None
+
+
 def has_single_winning_take(
     takes: list[TakeMetrics], best_per_beat: dict[int, TakeMetrics],
 ) -> Optional[TakeMetrics]:
@@ -423,24 +448,12 @@ def main() -> int:
             low_conf_threshold=args.low_conf,
         ))
 
-    # All reports share the same beat list (from the same script). If
-    # they don't — operator accidentally passed transcripts from different
-    # episodes — the comparison would silently align against beat 1 of
-    # the first take, masking the mistake. Surface it loudly.
+    # Surface mismatched-episode error before rendering.
+    mismatch = check_takes_share_script(takes)
+    if mismatch:
+        print(mismatch, file=sys.stderr)
+        return 2
     beats = takes[0].report.beats
-    expected_titles = [b.title for b in beats]
-    for other in takes[1:]:
-        other_titles = [b.title for b in other.report.beats]
-        if other_titles != expected_titles:
-            print(
-                f"✗ takes were aligned against different scripts:\n"
-                f"  {takes[0].name}: {expected_titles}\n"
-                f"  {other.name}: {other_titles}\n"
-                f"All takes must come from the same episode.",
-                file=sys.stderr,
-            )
-            return 2
-
     rendered = render_comparison_md(takes, beats, slug=slug)
 
     if args.stdout:

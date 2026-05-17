@@ -388,6 +388,19 @@ class TestRenderDiffMd:
         out = wa.render_diff_md(report, slug="x")
         assert "no per-word probabilities" not in out
 
+    def test_empty_transcript_does_not_show_probabilities_warning(self):
+        """Empty transcript has no probabilities by definition (nothing
+        was said). Showing 'low-confidence detection was skipped' would
+        be technically true but misleading — the real issue is no audio,
+        not missing metadata."""
+        report = wa.AlignmentReport(
+            issues=[], script_word_count=10, transcript_word_count=0,
+            transcript_duration_sec=0, estimated_script_duration_sec=10,
+            transcript_has_probabilities=False,
+        )
+        out = wa.render_diff_md(report, slug="x")
+        assert "no per-word probabilities" not in out
+
 
 # ── End-to-end (real script + synthetic transcript) ──────────────────────────
 

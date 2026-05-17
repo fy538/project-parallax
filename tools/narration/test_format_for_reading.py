@@ -77,6 +77,20 @@ class TestBreathMarks:
         # Should split before "She" (capital after the closing quote).
         assert "///" in out
 
+    def test_curly_closing_quotes_also_trigger_split(self):
+        """Regression: Word/iA Writer auto-correct emits curly quotes.
+        Without curly variants in SENTENCE_END_RE, sentences ending in
+        curly-close-quote wouldn't get a breath mark."""
+        text = "He said “It works.” She nodded."
+        out = ffr._add_breath_marks(text)
+        assert "///" in out
+
+    def test_curly_opening_quote_starts_sentence(self):
+        text = "He left. “Get back,” she called."
+        out = ffr._add_breath_marks(text)
+        # The boundary between "left." and the opening curly quote should split.
+        assert "///" in out
+
 
 # ── _split_table_row / _is_table_separator ───────────────────────────────────
 
@@ -258,6 +272,21 @@ class TestParseScript:
         beats = ffr.parse_script(_write_minimal_script(tmp_path, script))
         assert beats[0].title == "TITLE ONLY"
         assert beats[0].timing == ""
+
+    def test_multiple_html_markers_on_one_beat_header(self, tmp_path):
+        """A future script edit might stack multiple structural markers
+        (psychology + format-override comments). The regex should
+        absorb all of them, not just the first."""
+        script = textwrap.dedent("""\
+            ## BEAT 1 — TITLE (1:00–2:00) <!-- [FRAMEWORK UNLOCK] --> <!-- [TONE: SOMBER] -->
+
+            | NARRATION | VISUAL PRODUCTION |
+            |-----------|-------------------|
+            | hi | x |
+        """)
+        beats = ffr.parse_script(_write_minimal_script(tmp_path, script))
+        assert beats[0].title == "TITLE"
+        assert beats[0].timing == "1:00–2:00"
 
 
 # ── render_read_doc ──────────────────────────────────────────────────────────

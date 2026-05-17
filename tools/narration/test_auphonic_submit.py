@@ -230,6 +230,21 @@ class TestAuphonicClient:
             client.get_production("x")
         assert "500" in str(exc.value)
 
+    def test_url_error_translated_to_runtime(self):
+        """Regression: adding urlopen timeout= introduced a new failure
+        mode (socket.timeout → URLError) that wasn't caught. Operator
+        would see a Python traceback when the polling loop hits a
+        network blip. Now URLError translates to RuntimeError, same
+        treatment as HTTPError, so main()'s `except RuntimeError`
+        cleans it up."""
+        import urllib.error
+        opener = MagicMock()
+        opener.open.side_effect = urllib.error.URLError("timed out")
+        client = au.AuphonicClient(api_key="k", opener=opener)
+        with pytest.raises(RuntimeError) as exc:
+            client.get_production("x")
+        assert "network error" in str(exc.value).lower()
+
 
 # ── poll_until_done ──────────────────────────────────────────────────────────
 

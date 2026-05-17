@@ -414,6 +414,14 @@ def render_guide(terms: list[Term], slug: str) -> str:
 # extracts any IPA values present in rows whose term matches a freshly-
 # extracted candidate, and merges them back in.
 
+# Matches the first 4 cells of either table shape — known-section
+# (`Term | Count | IPA | Anglicized | Note`) and unknown-section
+# (`Term | Count | IPA | Anglicized | Forvo | Wiktionary`). Both put
+# the operator-editable IPA + Anglicized in cells 3 + 4, so we don't
+# need to anchor at end of line. Raw `|` inside a cell would break
+# markdown table rendering anyway — contract violation, not a parser
+# limitation. The `\d+` after Term enforces that we only match data
+# rows, not the header/separator rows (which have non-numeric cell 2).
 EXISTING_ROW_RE = re.compile(
     r"^\|\s*\*\*([^*]+?)\*\*\s*\|\s*\d+\s*\|\s*`?([^`|]*?)`?\s*\|\s*([^|]*?)\s*\|"
 )

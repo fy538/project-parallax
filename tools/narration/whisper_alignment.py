@@ -501,11 +501,12 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
     if skew:
         lines.append(f"_{skew}_")
         lines.append("")
-    if not report.transcript_has_probabilities:
-        # Without per-word probabilities, find_low_confidence_spans can't
-        # surface anything. Say so explicitly — otherwise the operator
-        # reads "0 low-conf findings" as "no mispronunciations" when
-        # really nothing was checked.
+    # Only surface the missing-probabilities warning when there's
+    # actually a transcript with words. An empty transcript has no
+    # probabilities by definition (nothing was said) — telling the
+    # operator "low-confidence detection was skipped" in that case is
+    # technically true but misleading; the real issue is "no audio".
+    if not report.transcript_has_probabilities and report.transcript_word_count > 0:
         lines.append(
             "_Note: the transcript carries no per-word probabilities — "
             "low-confidence detection (likely mispronunciations) was "
