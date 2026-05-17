@@ -38,7 +38,19 @@ Read these files in order. Each one gives you something specific:
 3. **EDITORIAL_PLAYBOOK.md** (`/episodes/EDITORIAL_PLAYBOOK.md`) — sections 1-4. These are hard-won production rules. Every rule exists because ignoring it cost revision cycles.
 4. **SCRIPT_FORMAT.md** (`/project/SCRIPT_FORMAT.md`) — the exact output format. Your script must match this spec precisely.
 5. **VISUAL_LANGUAGE.md** (`/project/VISUAL_LANGUAGE.md`) — editorial logic for visual decisions. Tells you *when* footage vs. MG vs. layered vs. AI-GEN vs. ILLUST is the right call. Includes the three-register visual system.
-6. **DIRECTING_LANGUAGE.md** (`/project/DIRECTING_LANGUAGE.md`) — the `DIR:` annotation syntax. Tells you *how* to direct camera, reveals, timing, transitions, and mood. Read the five directive types, template support matrix, and density guidelines. Note `DIR: drift(<preset>)` and `DIR: hold(stillness)` directives (added May 16, 2026) for per-segment hold-beat motion overrides — most segments don't need either; reach for them only when a beat's editorial intent diverges from its template's canonical register (e.g., a memorial moment on a normally-editorial chart should use `DIR: hold(stillness)`). The full register is in `project/HOLD_MOTION_REGISTER.md`.
+
+   **Template-picker companion docs (consult per `[MG:]` cell — not optional):**
+   - `/remotion-templates/references/template-picker.md` — the 1,170-line encyclopedia: "I need to show X" → template + variant + alternatives.
+   - **Family SELECTORs** (decision trees + sibling-disambiguation tables + canonical failure modes). Read the SELECTOR for the family you're picking from BEFORE committing to a template:
+     - Maps → `/remotion-templates/MAP_TEMPLATE_SELECTOR.md` (e.g. ChoroplethMap fails on count data → ProportionalSymbolMap; AtlasPlate is the default for editorial work).
+     - Charts → `/remotion-templates/CHART_TEMPLATE_SELECTOR.md` (BumpChart vs RankChangeDotPlot vs DumbbellPlot — all rank-change idioms with distinct fits).
+     - Diagrams → `/remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md` (SankeyFlow vs FrameworkDiagram-flow vs NetworkDiagram — flow vs structure vs relationship).
+     - Timelines → `/remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md` (HorizontalTimeline vs TimelineComparison vs DualTimeline — single vs parallel vs juxtaposed).
+     - Typography → `/remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md` (KineticTypography variants, StatReveal, TitleTransition).
+   - **Per-template dossier** at `/remotion-templates/references/template-research/<template-name>.md` (50 files) — real-outlet idioms (NYT Upshot, FT, Economist, Bloomberg, Reuters, Pudding), canonical use cases, Parallax-specific defaults, known failure modes. Skim the dossier for any template you're tempted by.
+
+   **Template-selection self-check** (mandatory, runs before script handoff): for every `[MG:]` cell, the writer has consulted the family SELECTOR and the template's dossier. The picker docs are load-bearing because `visual-spec` is mostly a transcriber of your choice; `script-audit` and the family audit skills are a safety net, not the front line. Picking wrong here costs a re-spec cycle.
+6. **DIRECTING_LANGUAGE.md** (`/project/DIRECTING_LANGUAGE.md`) — the `DIR:` annotation syntax. Tells you *how* to direct camera, reveals, timing, transitions, and mood. Read the five directive types, template support matrix, and density guidelines. Note `DIR: drift(<preset>)` and `DIR: hold(stillness)` directives (added May 16, 2026) for per-segment hold-beat motion overrides — most segments don't need either; reach for them only when a beat's editorial intent diverges from its template's canonical register (e.g., a memorial moment on a normally-editorial chart should use `DIR: hold(stillness)`). The full hold-beat register is in `project/HOLD_MOTION_REGISTER.md`. Transition directives (`DIR: cut(<type>)`) follow the transition grammar in `project/TRANSITION_GRAMMAR.md` — six canonical types (cut, dissolve, fade, match-cut, color-wash, iris), six deprecated types (wipe-*, blur-through, whip-pan, spatial-zoom). Most seams should omit `cut()` entirely and let the implicit-default engine handle them; reach for an explicit `cut()` only for register shifts, civilizational-rupture iris moments, match-cut opportunities, and chapter/silence beats. When using color-wash always include the color token: `DIR: cut(color-wash, ink)`. `DIR: chapter("TITLE")` sugar expands to a `TitleTransition` segment automatically.
 7. **FOOTAGE_SOURCING.md** (`/project/FOOTAGE_SOURCING.md`) — sourcability tiers. Tells you what footage actually exists before you spec it.
 8. **JIANG_NARRATIVE_RESEARCH.md** (`/project/JIANG_NARRATIVE_RESEARCH.md`) — the 12 extractable techniques and the toxin line. The narrative posture reference.
 9. **CALIBRATION_LANGUAGE.md** (`/project/CALIBRATION_LANGUAGE.md`) — the assertive calibration vocabulary. Read before drafting any speculative or predictive narration. Levels: quantified probability (best) > verbal calibration with explicit boundaries (acceptable) > vague uncertainty phrases (never). Process certainty + outcome humility split: be assertive about the analytical method, humble about specific predicted outcomes. For any `[FORECAST:]` segment, use the 6-layer format from this document.
@@ -251,11 +263,14 @@ DIR: hold(until:"but")                                        # hold this visual
 
 **Visual density annotations (`PACE:`).** Use `PACE:` lines to mark structural pacing shifts. Three profiles: `urgent` (0.7× — fast cuts for crisis/tension), `analytical` (1.0× — default), `breathing` (1.4× — extended holds for emotional peaks). Place on its own row (empty narration column). Aim for 2-4 PACE changes per episode — these mark act-level shifts, not per-shot decisions. Pairs naturally with `DIR:` direction: `PACE: breathing` + `DIR: hold(land)` + `DIR: mood(dense)` creates maximum "let it sink in" effect. See SCRIPT_FORMAT.md "Visual density annotations" for full spec.
 
-**Register transition direction.** When switching between visual registers, use `cut()` to specify the transition type from the register grammar:
-- Analytical → Grounding: `cut(color-wash, ink)`
-- Grounding → Atmospheric: `cut(blur-through)`
-- Atmospheric → Analytical: `cut(iris, origin:center)`
-- Same register: `cut(fade)` or `cut(dissolve)` or omit (default cut)
+**Register transition direction.** When switching between visual registers, use `cut()` to specify the transition type from the register grammar (full doctrine: `project/TRANSITION_GRAMMAR.md`). Most within-register seams do NOT need an explicit `cut()` — the implicit-default engine handles them. Use explicit `cut()` only for the cases below:
+- Analytical → Grounding (register shift): `cut(color-wash, ink)` — always include color token
+- Grounding → Atmospheric (soften): `cut(dissolve)` — ~~`cut(blur-through)`~~ is deprecated, use `dissolve`
+- Atmospheric → Analytical (focal rupture, rare): `cut(iris)` — premium register, ≤2 per episode
+- Historical-analogy seam (same subject, different scale): `cut(match-cut)` or `cut(match-cut-still)`
+- Chapter break / silence beat: `cut(fade)` paired with `DIR: hold(stillness)` on the prior segment
+- J/L-cut audio bridge (overlap narration): `DIR: jcut(0.7)` / `DIR: lcut(0.5)` — NLE annotation only
+- **Never emit**: `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom`
 
 **Backdrop selection (`[BACKDROP: id]`).** Per-segment editorial backdrop image — sits behind the template and silently drives the FilmOverlay film-treatment cascade. Each backdrop in `backdrop-manifest.json` declares its own `recommendedPreset` (e.g. a vintage-photo backdrop recommends `archival`, a constellation-grid backdrop recommends `documentary`), so picking the right backdrop is the *primary* lever for film-treatment mood. Most segments need *nothing beyond `[BACKDROP: id]`* — the cascade handles preset, effects, and intensity automatically.
 
@@ -438,7 +453,8 @@ Run through this checklist before handing the script to Tiger:
 
 **Direction:**
 - [ ] All P1 hero visuals carry at least one DIR: annotation
-- [ ] Register transitions have explicit `cut()` specifying transition type
+- [ ] **Template selection consulted SELECTOR + dossier:** for every `[MG:]` cell, the writer (a) consulted the relevant family SELECTOR (`MAP_TEMPLATE_SELECTOR.md` / `CHART_TEMPLATE_SELECTOR.md` / `DIAGRAM_TEMPLATE_SELECTOR.md` / `TIMELINE_TEMPLATE_SELECTOR.md` / `TYPOGRAPHY_TEMPLATE_SELECTOR.md`) AND (b) skimmed the per-template dossier in `remotion-templates/references/template-research/`. Without this, a wrong-template pick (e.g. ChoroplethMap for count data → should be ProportionalSymbolMap) ships into `visual-spec` where the only safety net is the family audit skills running afterward. Re-spec cycles are expensive; the up-front 5-min consult prevents them.
+- [ ] Register transitions have explicit `cut()` specifying transition type; color-wash includes color token; no deprecated transition types (wipe-*, blur-through, whip-pan, spatial-zoom)
 - [ ] Data reveals have `reveal()` + `cam()` with `sync:"word"` targeting key numbers/names
 - [ ] Emotional peaks have `mood()` + `hold()` for breathing room
 - [ ] No composition has more than 4 DIR: lines (simplify if over)

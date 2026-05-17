@@ -20,6 +20,9 @@
 #   W3. Script ↔ manifest cross-reference drift           (check_script_manifest.py)
 #   W4. Concept registry coverage                         (check_concept_coverage.py)
 #   W5. Audio cue sheet ↔ manifest                        (check_audio_cues.py)
+#   W6. PIPELINE.md state vs episode artifacts            (pipeline_validator.py --strict)
+#   W7. TSX code-level polish lint (POLISH.md L1/L7/...)  (polish_lint.py)
+#   W8. Zero-hit stock shots needing AI-gen fallback      (zerohit_fallback.py --count)
 #
 # Usage:
 #   ./scripts/check-episode.sh silicon-trap
@@ -196,6 +199,28 @@ if [[ "$HAS_MANIFEST" == "true" ]]; then
     python3 "$TOOLS/check_concept_coverage.py" "$SLUG" --strict
   run_soft "Audio cue sheet ↔ manifest (moods, track count, SFX vocabulary)" \
     python3 "$TOOLS/check_audio_cues.py" "$SLUG" --strict
+fi
+
+# W6. PIPELINE.md state vs episode artifacts (catches stale tables, missing
+# canonical filenames, and stall durations). Writes _checkpoint.md as a side
+# effect — a per-episode stage checklist for quick "done / not done" lookup.
+run_soft "Pipeline state ↔ artifact consistency (PIPELINE.md vs disk)" \
+  python3 "$TOOLS/pipeline_validator.py" "$SLUG" --strict
+
+# W7. TSX code-level polish lint (POLISH.md doctrine rules L1, L7, L9, L10,
+# L12, L13, L14, A1, A2). Repo-wide scan — surfaces violations in any
+# template that affects this episode (since templates are shared).
+run_soft "TSX polish lint (POLISH.md doctrine)" \
+  python3 "$TOOLS/lint/polish_lint.py" --summary
+
+# W8. Zero-hit stock shots needing AI-gen fallback. Surfaces the
+# silicon-trap failure mode: 21/21 FOOTAGE slots returned zero hits from
+# Pexels/Pixabay, with no auto-handoff to Recraft/Flux. Tool exits 1 when
+# zero-hits exist (which is informational here, not blocking). Run
+# `python3 tools/asset-source/zerohit_fallback.py <slug>` to write briefs.
+if [[ -d "$ROOT/episodes/$SLUG/assets" ]]; then
+  run_soft "Zero-hit stock shots (asset-source coverage)" \
+    python3 "$TOOLS/asset-source/zerohit_fallback.py" "$SLUG" --count
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────

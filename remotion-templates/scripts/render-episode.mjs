@@ -326,6 +326,16 @@ if (concat && !preview) {
 
   if (ffResult.status === 0) {
     console.log(`  Preview reel: ${reel}`);
+    // Postflight: guard against silent render corruption (0-frame MP4,
+    // truncated tail, wrong resolution). Non-fatal — render already succeeded;
+    // we just surface any anomaly the editor should know about before NLE.
+    const postflight = spawnSync("python3", [
+      "../tools/postflight.py", reel,
+      "--episode", episode,
+    ], { stdio: "inherit", encoding: "utf-8" });
+    if (postflight.status !== 0) {
+      console.log(`  ⚠ postflight reported anomalies for ${reel}`);
+    }
   } else {
     console.log(`  ffmpeg failed — ${ffResult.stderr?.split("\n").slice(-2).join(" ")}`);
   }

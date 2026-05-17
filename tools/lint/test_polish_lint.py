@@ -212,6 +212,47 @@ def test_hardcoded_padding_allows_layout_card_token():
     assert not _has_rule(vs, "L10")
 
 
+# ── check_forbidden_easings (A2) ───────────────────────────────────────────
+
+
+def test_forbidden_easings_bounce_fires():
+    src = "  easing: Easing.bounce,"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert _has_rule(vs, "A2")
+
+
+def test_forbidden_easings_elastic_fires():
+    src = "  easing: Easing.elastic(1.2),"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert _has_rule(vs, "A2")
+
+
+def test_forbidden_easings_back_fires():
+    src = "  easing: Easing.back(2),"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert _has_rule(vs, "A2")
+
+
+def test_forbidden_easings_suppressed_passes():
+    # The suppression marker on the line ABOVE the call disarms the rule.
+    src = "// easing-ok: percussive impact — intentional\n  easing: Easing.bounce,"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert not _has_rule(vs, "A2")
+
+
+def test_forbidden_easings_comment_line_skipped():
+    # A pure comment that mentions Easing.bounce must not trigger A2.
+    src = "// do NOT use Easing.bounce here"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert not _has_rule(vs, "A2")
+
+
+def test_forbidden_easings_allowed_easing_passes():
+    src = "  easing: Easing.out(Easing.cubic),"
+    vs = _check(pl.check_forbidden_easings, src)
+    assert not _has_rule(vs, "A2")
+
+
 # ── check_missing_maxwidth (L9) ────────────────────────────────────────────
 
 
@@ -342,3 +383,8 @@ def test_all_checks_export_includes_each_function():
     assert pl.check_direct_theme_refs in pl.ALL_CHECKS
     assert pl.check_linear_interpolation in pl.ALL_CHECKS
     assert pl.check_missing_maxwidth in pl.ALL_CHECKS
+    assert pl.check_hardcoded_shadows in pl.ALL_CHECKS
+    assert pl.check_hardcoded_textshadow in pl.ALL_CHECKS
+    assert pl.check_forbidden_easings in pl.ALL_CHECKS
+    assert pl.check_magic_safe_area_offsets in pl.ALL_CHECKS
+    assert pl.check_hardcoded_padding in pl.ALL_CHECKS

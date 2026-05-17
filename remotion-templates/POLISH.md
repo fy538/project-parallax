@@ -688,6 +688,6 @@ No row backgrounds. No tinted card surfaces. No pin-bar sidebars.
 3. Render the existing template at frame 30 + frame 180 to see current state
 4. Apply doctrine rules + dossier upgrades
 5. Regen visual regression baselines
-6. Run `polish_lint.py` and ensure clean
+6. Run `npm run lint:tsx` (TSX code-level checks, `tools/lint/polish_lint.py`) and ensure clean. Distinct from `npm run lint:polish` which checks per-episode JSON data files.
 
 This collapses the loop from "user screenshots → I diagnose" to "I audit against doctrine + dossier → propose specific upgrades."
