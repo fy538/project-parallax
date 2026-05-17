@@ -165,11 +165,44 @@ def probe_audio(wav_path: Path) -> ProbeReport:
     )
 
 
-# ffmpeg writes its measurement output to stderr. The loudnorm JSON block
-# starts with `{` at the start of a line and is the last JSON in the stream.
-# Use a non-greedy capture so we don't accidentally grab earlier `{}` from
-# log lines.
-LOUDNORM_JSON_RE = re.compile(r"\{\s*\"input_i\"\s*:.*?\}", re.DOTALL)
+# Anchor for the loudnorm JSON block. ffmpeg writes its measurement output
+# to stderr as a JSON object that starts somewhere after the Parsed_loudnorm
+# marker line. We locate the first opening brace on or after that marker
+# and walk forward counting brace depth to extract the balanced JSON —
+# robust to (a) future key-order changes (the old regex assumed `input_i`
+# was the first key), (b) extra log lines interleaved with the JSON, and
+# (c) hypothetical nested object values.
+_LOUDNORM_MARKER_RE = re.compile(r"Parsed_loudnorm", re.IGNORECASE)
+
+
+def _extract_balanced_json(text: str, start: int) -> Optional[str]:
+    """Starting at the first `{` at or after `start`, walk forward and
+    return the balanced JSON substring (or None if no balance found)."""
+    open_pos = text.find("{", start)
+    if open_pos < 0:
+        return None
+    depth = 0
+    in_string = False
+    escaped = False
+    for i in range(open_pos, len(text)):
+        ch = text[i]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[open_pos:i + 1]
+    return None
 
 
 def parse_loudnorm_output(stderr: str) -> Optional[LoudnessReport]:
@@ -178,12 +211,19 @@ def parse_loudnorm_output(stderr: str) -> Optional[LoudnessReport]:
     Pure-function — takes the stderr text, returns parsed report or None
     if the JSON block isn't present (e.g. the filter failed). Splitting
     this out makes unit-testing the parser trivial without spawning ffmpeg.
+
+    Two-step extraction: find the Parsed_loudnorm marker (if present),
+    walk forward to the next `{`, balance braces. Falls back to scanning
+    from position 0 if no marker is present — handles stderr blobs from
+    older ffmpeg versions or piped subsets.
     """
-    m = LOUDNORM_JSON_RE.search(stderr)
-    if not m:
+    m = _LOUDNORM_MARKER_RE.search(stderr)
+    start = m.end() if m else 0
+    block = _extract_balanced_json(stderr, start)
+    if block is None:
         return None
     try:
-        data = json.loads(m.group(0))
+        data = json.loads(block)
     except json.JSONDecodeError:
         return None
     try:
@@ -439,9 +479,13 @@ def render_report_md(report: AuditReport) -> str:
     lines.append("")
     lines.append("---")
     lines.append("")
+    # Use the literal placeholder — the previous attempt at slug recovery
+    # via string surgery on the WAV filename was flaky (the canonical
+    # layout has `narration.wav`, not `<slug>-narration.wav`) and almost
+    # always fell back to `SLUG` anyway. Better to be honest.
     lines.append(
-        f"_Re-run: `python3 tools/narration/audio_qa.py "
-        f"{report.wav_path.stem.replace('-narration', '') if 'narration' in report.wav_path.stem else 'SLUG'}`_"
+        "_Re-run: `python3 tools/narration/audio_qa.py <slug>` "
+        "(or `--wav <path>` for ad-hoc files)._"
     )
     return "\n".join(lines) + "\n"
 

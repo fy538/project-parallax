@@ -84,27 +84,36 @@ class TakeMetrics:
 
     @property
     def delivery_skew_pct(self) -> float:
-        """Percentage drift from the 150-wpm script estimate. Positive = slower."""
-        est = self.report.estimated_script_duration_sec
-        act = self.report.transcript_duration_sec
-        if est <= 0:
-            return 0.0
-        return (act - est) / est * 100
+        """Percentage drift from the script's WPM target. Positive = slower."""
+        return _delivery_skew_pct(self.report)
 
 
 # ── Scoring ──────────────────────────────────────────────────────────────────
+
+
+def _delivery_skew_pct(report: wa.AlignmentReport) -> float:
+    """Single source of truth for delivery-skew calculation.
+
+    Used by both `score_take` (absolute value, contributes to the score)
+    and `TakeMetrics.delivery_skew_pct` (signed, drives the "slower/faster"
+    display text). Returns 0.0 if there's no estimate to compare against
+    (empty script / wpm=0), so score_take stays defined in degenerate cases.
+    """
+    est = report.estimated_script_duration_sec
+    act = report.transcript_duration_sec
+    if est <= 0:
+        return 0.0
+    return (act - est) / est * 100
 
 
 def score_take(report: wa.AlignmentReport) -> float:
     """Composite score for one take. Lower is better — see module docstring."""
     pickup_count = len(report.pickup_candidates)
     low_conf = sum(1 for i in report.issues if i.kind == "low_confidence")
-    skew = report.transcript_duration_sec
-    est = report.estimated_script_duration_sec
-    skew_pct = abs((skew - est) / est * 100) if est > 0 else 0.0
+    skew_pct_abs = abs(_delivery_skew_pct(report))
     return (
         pickup_count * PICKUP_WEIGHT
-        + skew_pct * DELIVERY_SKEW_WEIGHT
+        + skew_pct_abs * DELIVERY_SKEW_WEIGHT
         + low_conf * LOW_CONFIDENCE_WEIGHT
     )
 
@@ -414,8 +423,24 @@ def main() -> int:
             low_conf_threshold=args.low_conf,
         ))
 
-    # All reports share the same beat list (from the same script).
+    # All reports share the same beat list (from the same script). If
+    # they don't — operator accidentally passed transcripts from different
+    # episodes — the comparison would silently align against beat 1 of
+    # the first take, masking the mistake. Surface it loudly.
     beats = takes[0].report.beats
+    expected_titles = [b.title for b in beats]
+    for other in takes[1:]:
+        other_titles = [b.title for b in other.report.beats]
+        if other_titles != expected_titles:
+            print(
+                f"✗ takes were aligned against different scripts:\n"
+                f"  {takes[0].name}: {expected_titles}\n"
+                f"  {other.name}: {other_titles}\n"
+                f"All takes must come from the same episode.",
+                file=sys.stderr,
+            )
+            return 2
+
     rendered = render_comparison_md(takes, beats, slug=slug)
 
     if args.stdout:

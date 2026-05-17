@@ -68,7 +68,15 @@ If `episodes/$1/assets/narration.wav` exists, run the full audit flow. This is a
 
 ### Stage 2 — content QA (the big time-saver)
 
-#### Single-take case (default)
+**First, detect multi-take vs single-take.** Always run this check explicitly — do not infer from filename conventions; actually list the directory:
+
+```bash
+ls episodes/$1/assets/narration-take-*.wav 2>/dev/null | wc -l
+```
+
+If the count is ≥ 2, take the multi-take branch. Otherwise, the single-take branch.
+
+#### Single-take branch
 
 Run the Whisper alignment to generate a pickup-take shopping list:
 
@@ -76,9 +84,9 @@ Run the Whisper alignment to generate a pickup-take shopping list:
 python3 tools/narration/whisper_alignment.py $1
 ```
 
-#### Multi-take case (if the operator did 2+ full reads)
+#### Multi-take branch (2+ full reads detected)
 
-If `episodes/$1/assets/` contains multiple takes (e.g. `narration-take-1.wav`, `narration-take-2.wav`), run the comparison instead so the operator gets a per-beat best-take pick:
+Run the comparison so the operator gets a per-beat best-take pick:
 
 ```bash
 python3 tools/narration/take_selector.py $1 \
@@ -152,7 +160,7 @@ If the operator says "regenerate both" or "rerun prep + QA," do Mode A then Mode
 
 ## Notes
 
-- All three underlying tools are idempotent — re-running them is always safe. The `--merge` flag on `pronunciation_guide.py` is the only thing that preserves operator state across runs.
+- All seven underlying tools (`format_for_reading`, `pronunciation_guide`, `pre_render_cue_sheet`, `audio_qa`, `whisper_alignment`, `take_selector`, `auphonic_submit`) are idempotent — re-running them is always safe. The `--merge` flag on `pronunciation_guide.py` is the only thing that preserves operator state across runs.
 - The exact-command philosophy from `polish_lint.py` and `pipeline_validator.py` carries over here: never describe a fix in prose where a copy-pasteable command would do.
 - If `$1` is missing, default to listing available episodes from `pipeline-state.json` and asking the operator to pick one.
 - This command does NOT commit anything. The operator decides when to stage `narration-readable.md`, `pronunciation-guide.md`, `_audio-qa.md`, and `narration.wav`.

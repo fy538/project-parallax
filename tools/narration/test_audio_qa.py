@@ -69,6 +69,38 @@ class TestParseLoudnorm:
         assert report is not None
         assert report.integrated_lufs == pytest.approx(-14.0)
 
+    def test_parses_block_when_keys_reordered(self):
+        """Regression: the old regex required `input_i` to be the first
+        key. Future ffmpeg versions may emit keys in different order;
+        the brace-balanced extractor handles any ordering."""
+        stderr = textwrap.dedent("""\
+            [Parsed_loudnorm_0 @ 0x1]
+            {
+                "input_thresh": "-33.0",
+                "input_lra": "5.0",
+                "output_i": "-14.0",
+                "input_tp": "-2.5",
+                "input_i": "-23.0"
+            }
+        """)
+        report = aq.parse_loudnorm_output(stderr)
+        assert report is not None
+        assert report.integrated_lufs == pytest.approx(-23.0)
+        assert report.true_peak_db == pytest.approx(-2.5)
+
+    def test_brace_balanced_handles_nested_objects(self):
+        """Hypothetical future ffmpeg output: nested object values
+        inside the loudnorm JSON. The old non-greedy `.*?\\}` stopped
+        at the first `}`; the new extractor walks brace depth."""
+        stderr = (
+            '[Parsed_loudnorm_0]\n'
+            '{"input_i": "-14.0", "input_tp": "-1.0", "input_lra": "5.0", '
+            '"meta": {"nested": "value"}}\n'
+        )
+        report = aq.parse_loudnorm_output(stderr)
+        assert report is not None
+        assert report.integrated_lufs == pytest.approx(-14.0)
+
 
 # ── parse_silencedetect_output ───────────────────────────────────────────────
 
