@@ -11,6 +11,7 @@
 | `prisoners-dilemma` | 🎬 RENDER READY | 8 | 2026-06-01 | ✗ never rendered |
 | `silicon-trap` | 🎬 RENDER READY | 16 | 2026-05-25 | ⚠ stale manifest (4.5 d) · 🔴 21 zero-hit shots · ✗ never rendered |
 | `blockades-leak` | 💭 INCUBATING | 60 | — | ⏸ awaiting promotion |
+
 _Health column auto-refreshed by `python3 tools/pipeline_validator.py --update-tracker` (wired into `check-episode.sh` W9 follow-up). State + dates: edit `pipeline-state.json`._
 
 ## Session start (2 min)
