@@ -8,7 +8,7 @@
 
 Remotion-based template library for producing educational geopolitics YouTube videos. Templates are React components that render to MP4. Each template is data-driven: feed it a JSON file and it generates the visual segment.
 
-- **45 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 8, Charts 17, Diagrams 8, Timelines 3, Typography & visuals 9; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7; canonical TEMPLATE_COMPONENTS registry in `src/templates/Episodes/FullEpisode.tsx`)
+- **45 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 7, Charts 19, Diagrams 10, Timelines 3, Typography & visuals 6; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7; canonical TEMPLATE_COMPONENTS registry in `src/templates/Episodes/FullEpisode.tsx`)
 - All templates use **Zod schemas** for runtime validation and **`calculateMetadata`** for dynamic durations
 - Resolution: **1920×1080 @ 30fps** (1080×1920 for Shorts)
 - TypeScript **strict mode** — don't disable

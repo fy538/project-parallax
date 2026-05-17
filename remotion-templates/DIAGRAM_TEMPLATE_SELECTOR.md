@@ -14,6 +14,7 @@ Full editorial rationale and failure modes live in the per-template dossiers und
 - [`sankey-flow.md`](references/template-research/sankey-flow.md)
 - [`escalation-ladder.md`](references/template-research/escalation-ladder.md)
 - [`game-theory.md`](references/template-research/game-theory.md) (GameBoard)
+- [`arc-diagram.md`](references/template-research/arc-diagram.md) (ArcDiagram)
 - DecisionTree, StrategicLandscape, DuelingFrameworks, PricingWaterfall — no dedicated dossier yet, see `template-picker.md`
 - ~~BifurcationRoute~~ — DELETED; see banner above
 
@@ -31,6 +32,7 @@ What KIND of structure are you showing → which TEMPLATE
 | A → B → C sequential chain or causation | **FrameworkDiagram (flow variant)** |
 | 2×2 typology (two independent axes, four cells) | **FrameworkDiagram (matrix variant)** |
 | Peer-to-peer relationship web (hub + spokes, alliance graph) | **NetworkDiagram** |
+| Relationships among items on a single ordered axis (chord-arc above a horizontal spine) | **ArcDiagram** — same nodes-and-edges domain as NetworkDiagram but with positional ordering (chronological, alphabetic, severity-ranked). Use when the relationships matter AND the linear ordering of the items is part of the editorial point. Bloomberg / FT supply-chain diagrams often pick this form when one axis is "ordered by year" or "ordered by tier." |
 | Sequential choice under uncertainty (branching with probabilities) | **DecisionTree** |
 | Simultaneous strategic choice (payoff matrix, Nash equilibrium) | **GameBoard** |
 | Conserved-total allocation (where it splits and flows) | **SankeyFlow** |
@@ -50,6 +52,7 @@ Is the editorial point about a STRUCTURE / framework?
 ├─ Is it about HOW THINGS FLOW or CONNECT?
 │   ├─ Sequential causation (A→B→C, ordered stages) ──── FrameworkDiagram (flow)
 │   ├─ Peer-to-peer web of relationships ──────────────── NetworkDiagram
+│   ├─ Same nodes-and-edges, BUT items have a meaningful linear order ──── ArcDiagram (spine + chord arcs)
 │   ├─ Conserved total being allocated (% adds up) ────── SankeyFlow
 │   └─ One fixed total ($1) decomposed into stages ────── PricingWaterfall
 │

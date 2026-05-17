@@ -1453,3 +1453,29 @@ Examples:
 - `data/episodes/silicon-trap/radar-strategic-comparison.json`
 - `data/episodes/silicon-trap/escalation-sanctions-timeline.json`
 - `data/episodes/silicon-trap/annotated-euv-machine.json`
+
+---
+
+## Templates without dedicated schema documentation here
+
+The following 15 live templates render fine and have full Zod schemas in their template directories, but no dedicated section has been authored in this doc yet. Until added, the per-template `schema.ts` is the source of truth. Read those files directly when authoring data files for these templates; the family SELECTORs name when to reach for each.
+
+| Template | Family | Source of truth | Dossier |
+|---|---|---|---|
+| **TilegramUSMap** | Maps | `src/templates/TilegramUSMap/schema.ts` | `references/template-research/tilegram-us-map.md` |
+| **ArcDiagram** | Diagrams | `src/templates/ArcDiagram/schema.ts` | `references/template-research/arc-diagram.md` |
+| **BeeswarmChart** | Charts | `src/templates/BeeswarmChart/schema.ts` | `references/template-research/beeswarm-chart.md` |
+| **BumpChart** | Charts | `src/templates/BumpChart/schema.ts` | `references/template-research/bump-chart.md` |
+| **CalendarHeatmap** | Charts | `src/templates/CalendarHeatmap/schema.ts` | `references/template-research/calendar-heatmap.md` |
+| **ConnectedScatterplot** | Charts | `src/templates/ConnectedScatterplot/schema.ts` | `references/template-research/connected-scatterplot.md` |
+| **DumbbellPlot** | Charts | `src/templates/DumbbellPlot/schema.ts` | `references/template-research/dumbbell-plot.md` |
+| **HorizonChart** | Charts | `src/templates/HorizonChart/schema.ts` | `references/template-research/horizon-chart.md` |
+| **IsotypeChart** | Charts | `src/templates/IsotypeChart/schema.ts` | `references/template-research/isotype-chart.md` |
+| **MarimekkoChart** | Charts | `src/templates/MarimekkoChart/schema.ts` | `references/template-research/marimekko-chart.md` |
+| **PopulationPyramid** | Charts | `src/templates/PopulationPyramid/schema.ts` | `references/template-research/population-pyramid.md` |
+| **RankChangeDotPlot** | Charts | `src/templates/RankChangeDotPlot/schema.ts` | `references/template-research/rank-change-dot-plot.md` |
+| **RidgelinePlot** | Charts | `src/templates/RidgelinePlot/schema.ts` | `references/template-research/ridgeline-plot.md` |
+| **Streamgraph** | Charts | `src/templates/Streamgraph/schema.ts` | `references/template-research/streamgraph.md` |
+| **TernaryPlot** | Charts | `src/templates/TernaryPlot/schema.ts` | `references/template-research/ternary-plot.md` |
+
+All 15 templates use the shared `_direction` field via `DirectionBlockSchema` (see `src/hooks/directionBlock.schema.ts`) and conform to the same editorial-shell fields documented in `src/templates/_shared/compositionBase.ts` (May 17, 2026). When this doc is expanded inline, follow the per-section pattern used for the existing 30+ entries above.

@@ -4,7 +4,7 @@
 >
 > Last updated: May 13, 2026
 
-Six map templates with overlapping-but-distinct purposes. Picking wrong wastes hours of render time and produces visuals that mislead. This doc is the canonical "if your data looks like X, use template Y" lookup.
+Seven map templates (AtlasPlate, ChoroplethMap, RouteAnimation, ProportionalSymbolMap, CartogramMap, DensityMap, TilegramUSMap) with overlapping-but-distinct purposes. Picking wrong wastes hours of render time and produces visuals that mislead. This doc is the canonical "if your data looks like X, use template Y" lookup.
 
 > **May 13, 2026 — AtlasPlate is the default for editorial work.**
 > A research pass on canonical outlets (NYT Graphics, FT Visual + Data, Bloomberg Originals, Reuters Graphics, Economist Graphic Detail) found that **all of them use D3 + TopoJSON SVG for static editorial maps** — *not* Mapbox. Mapbox at those outlets lives inside interactive web products with user-manipulated basemaps. AtlasPlate is structurally identical to the canonical D3+TopoJSON stack ported into Remotion. **Treat AtlasPlate as the default for analytical / titled / categorical map work; reserve Mapbox templates for the two narrow cases below.**
@@ -22,7 +22,8 @@ Full editorial rationale, canonical idioms, and failure modes live in the per-te
 - [`proportional-symbol-map.md`](references/template-research/proportional-symbol-map.md)
 - [`cartogram-map.md`](references/template-research/cartogram-map.md)
 - [`density-map.md`](references/template-research/density-map.md)
-- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay layer used by all six
+- [`tilegram-us-map.md`](references/template-research/tilegram-us-map.md) — US hex-tilegram (population-equal geography for US-only data)
+- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay layer used by all seven
 
 ---
 
@@ -45,6 +46,7 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 | **Flow / direction** (A → B, supply chain) | "How things move" | **RouteAnimation** (atmospheric — no overlay title) |
 | **Hub-and-spoke** (one center, N destinations) | "All roads lead to…" | **RouteAnimation** + radial mode |
 | **Cinematic globe** (cold-open, dramatic pivot) | "Here's our planet" | **AtlasPlate** orthographic + rotation |
+| **US-only data, per-state, where geography ≠ population** (electoral, federal funding, demographic patterns) | "Wyoming and California weigh the same in the Senate but a regular US map makes Wyoming dominate visually" | **TilegramUSMap** — hex-grid where each state = 1 (or n) tiles, geographic position approximated. Editorial use cases: Electoral College, Senate composition, per-state federal allocations, demographic patterns where land-area distortion is the failure mode of a standard US choropleth |
 
 ---
 
@@ -67,6 +69,8 @@ What does the script say?
 ├─ "Members of X" / "before vs. after"
 │   ├─ Modern context ──────────────────────────────── AtlasPlate (modern)
 │   └─ Historical / Cold War / period ──────────────── AtlasPlate (vintage)
+│
+├─ "US-only per-state data where land area distorts the editorial point" ──── TilegramUSMap (hex grid)
 │
 ├─ "From A to B" / "supply chain" / "campaign"
 │   ├─ Multi-segment phased reveal ─────────────────── RouteAnimation

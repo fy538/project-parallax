@@ -4,12 +4,12 @@
 >
 > Last updated: May 11, 2026
 
-Six chart templates. Cleveland's perceptual hierarchy is the underlying theory — *position-along-common-scale* (DataChart, TimeSeriesChart) outperforms *length* (proportional bars) which outperforms *angle / area* (pie charts, intentionally absent from this toolkit). Picking the wrong chart can falsify the editorial argument.
+**19 chart templates** (6 core: DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal — plus 13 specialized: BeeswarmChart, BumpChart, CalendarHeatmap, ConnectedScatterplot, DumbbellPlot, HorizonChart, IsotypeChart, MarimekkoChart, PopulationPyramid, RankChangeDotPlot, RidgelinePlot, Streamgraph, TernaryPlot). The 6 core templates carry most production weight; the 13 specialized templates are reached for specific data shapes — see the per-template dossiers under `references/template-research/` for each one's canonical use case and failure modes. Cleveland's perceptual hierarchy is the underlying theory — *position-along-common-scale* (DataChart, TimeSeriesChart) outperforms *length* (proportional bars) which outperforms *angle / area* (pie charts, intentionally absent from this toolkit). Picking the wrong chart can falsify the editorial argument.
 
-Per-template dossiers under `references/template-research/`:
-- [`data-chart.md`](references/template-research/data-chart.md)
-- [`time-series-chart.md`](references/template-research/time-series-chart.md)
-- BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal — no dedicated dossier; see `template-picker.md`
+Per-template dossiers under `references/template-research/` (every chart template has one):
+- Core 6: [`data-chart.md`], [`time-series-chart.md`], [`stat-reveal.md`], [`radar-chart.md`], [`bayesian-update.md`], [`probability-gauge.md`]
+- Specialized 13: [`beeswarm-chart.md`], [`bump-chart.md`], [`calendar-heatmap.md`], [`connected-scatterplot.md`], [`dumbbell-plot.md`], [`horizon-chart.md`], [`isotype-chart.md`], [`marimekko-chart.md`], [`population-pyramid.md`], [`rank-change-dot-plot.md`], [`ridgeline-plot.md`], [`streamgraph.md`], [`ternary-plot.md`]
+- Read the dossier for any template you're about to use — each one names the canonical idiom from real outlets (NYT Upshot, FT, Economist, Bloomberg, Reuters, Pudding), Parallax-specific defaults, and the failure modes that produce wrong-chart-for-the-data mis-routing.
 
 ---
 
@@ -19,6 +19,8 @@ Per-template dossiers under `references/template-research/`:
 What KIND of data → which TEMPLATE
 ```
 
+### Core 6 (most production weight)
+
 | Data shape | Editorial point | Template |
 |---|---|---|
 | Discrete categories, single metric | "Which is biggest" | **DataChart** (bar / lollipop / horizontal) |
@@ -27,6 +29,23 @@ What KIND of data → which TEMPLATE
 | Multi-dimensional capability comparison | "What does the whole profile look like" | **RadarChart** |
 | Probability updating from evidence | "Watch the prior shift into the posterior" | **BayesianUpdate** |
 | Single probability readout / fast reveal | "X% likely / point estimate" | **ProbabilityGauge** |
+
+### Specialized 13 (reach for these when the data shape demands it)
+
+| Data shape | Editorial point | Template |
+|---|---|---|
+| Rank changes across periods (lines crossing) | "Who overtook whom and when" | **BumpChart** — line crossings ARE the story (e.g., "China overtakes Japan as #2 GDP, 2010"). For 2-3 entities + 2-3 periods consider **RankChangeDotPlot** (simpler, ordinal-rank dots with connecting lines) or **DumbbellPlot** (before/after on a value axis, not just rank) |
+| Before-and-after on a value axis | "How far each shifted" | **DumbbellPlot** — two dots per entity connected by a line; reads the *delta* immediately. Use when "moved from X to Y" is the editorial sentence (income shift, polling shift, capability shift). |
+| Two ordered series moving together over time | "These two variables are co-evolving" | **ConnectedScatterplot** — x-axis = variable A, y-axis = variable B, dots connected chronologically. The shape of the path IS the argument (e.g., "GDP per capita vs life expectancy 1950-2024"). |
+| Distribution of many individual entities | "Look at the spread / cluster / outliers" | **BeeswarmChart** — dots non-overlapping along one axis. Use when there are 30-200 entities and the distribution shape matters more than per-entity labels (e.g., "income distribution across 195 countries"). |
+| Distribution shape across many groups | "How the distribution changes across categories" | **RidgelinePlot** — stacked density curves, one per group. Use when distributions are the unit of comparison (e.g., "polling distribution by age group across 5 elections"). |
+| Multi-series time data, dense, comparing shapes | "Each row IS a line — many tracks visible at once" | **HorizonChart** — overlapping bands compress vertical space so 8-15 series fit. Used by FT for market spreads, central-bank rate tracking. |
+| Year × day-of-year cyclical data | "Pattern repeats across years" | **CalendarHeatmap** — color intensity per day across a calendar grid. Use for daily metrics with annual rhythm (election cycles, weather patterns, conflict-event frequency). |
+| Counts using icons (one icon = N units) | "Make the count viscerally readable" | **IsotypeChart** — Otto Neurath pictogram tradition. Use when the count itself is the rhetoric (deaths, refugees, ships), and the icon humanizes the unit. |
+| Width × height proportional rectangles (two dimensions on one chart) | "Both share and category-share visible at once" | **MarimekkoChart** — width = share of total, height segments = composition within. Used by FT/Bloomberg for energy mix × economy size, fleet composition × country. |
+| Age × sex / two-axis population profile | "Demographic shape IS the story" | **PopulationPyramid** — back-to-back horizontal bars. Use only when age-cohort distribution is the editorial point. |
+| Stacked area over time (compositions evolving) | "Pieces of the whole shifting over time" | **Streamgraph** — silhouette-style stacked area centered on baseline. Use for relative-composition stories (oil-import sources, fleet composition, party-vote share). |
+| Three-component compositions (parts of 100%) | "Triangle showing the trade-off" | **TernaryPlot** — triangular plot for 3-component data summing to 100% (energy mix, soil composition, electoral splits A/B/abstain). |
 
 ---
 
@@ -56,8 +75,35 @@ What does the script say about the data?
 │   ├─ Compare two competing hypotheses ──────────────────── BayesianUpdate (compare)
 │   └─ Forecast scorecard (predictions vs. outcomes) ────── ProbabilityGauge (scorecard)
 │
-└─ "Multi-axis capability / profile"
-    └─ 3-6 axes × 1-3 entities ────────────────── RadarChart
+├─ "Multi-axis capability / profile"
+│   └─ 3-6 axes × 1-3 entities ────────────────── RadarChart
+│
+├─ "Rank changes over time"
+│   ├─ Lines crossing IS the story (many crossings) ──── BumpChart
+│   ├─ 2-3 entities, 2-3 periods (sparse) ────────────── RankChangeDotPlot
+│   └─ Before/after on a value axis (not just rank) ──── DumbbellPlot
+│
+├─ "Distribution / spread / cluster of many entities"
+│   ├─ 30-200 individual entities on one axis ────────── BeeswarmChart
+│   └─ Distribution SHAPE across groups (stacked KDE) ── RidgelinePlot
+│
+├─ "Two variables co-evolving over time"
+│   └─ x = var A, y = var B, path = chronology ──────── ConnectedScatterplot
+│
+├─ "Multi-series time data, dense"
+│   └─ 8-15 series compressed into bands ─────────────── HorizonChart
+│
+├─ "Cyclical / repeating-period data"
+│   └─ Year × day-of-year color grid ─────────────────── CalendarHeatmap
+│
+├─ "Counts made viscerally readable"
+│   └─ One icon = N units, Otto Neurath tradition ────── IsotypeChart
+│
+├─ "Compositional / part-of-whole"
+│   ├─ Width × height (share × composition) ──────────── MarimekkoChart
+│   ├─ Three components summing to 100% ─────────────── TernaryPlot
+│   ├─ Composition over time (stacked area silhouette)  Streamgraph
+│   └─ Age × sex demographic profile ─────────────────── PopulationPyramid
 ```
 
 ---

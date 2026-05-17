@@ -16,10 +16,10 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 
 | Family | Count | Selector doc | Audit skill | Status |
 |---|---|---|---|---|
-| **Maps** | 6 | ✅ [`MAP_TEMPLATE_SELECTOR.md`](MAP_TEMPLATE_SELECTOR.md) | ✅ `map-audit` | **Complete** |
-| **Charts** | 6 | ✅ [`CHART_TEMPLATE_SELECTOR.md`](CHART_TEMPLATE_SELECTOR.md) | ✅ `chart-audit` | **Complete** |
+| **Maps** | 7 | ✅ [`MAP_TEMPLATE_SELECTOR.md`](MAP_TEMPLATE_SELECTOR.md) | ✅ `map-audit` | **Complete** |
+| **Charts** | 19 | ✅ [`CHART_TEMPLATE_SELECTOR.md`](CHART_TEMPLATE_SELECTOR.md) | ✅ `chart-audit` | **Complete** |
 | **Diagrams** | 10 | ✅ [`DIAGRAM_TEMPLATE_SELECTOR.md`](DIAGRAM_TEMPLATE_SELECTOR.md) | ✅ `diagram-audit` | **Complete** |
-| **Timelines** | 4 | ✅ [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) | ✅ `timeline-audit` | **Complete** |
+| **Timelines** | 3 | ✅ [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) | ✅ `timeline-audit` | **Complete** |
 | **Typography / layout** | 6 | ✅ [`TYPOGRAPHY_TEMPLATE_SELECTOR.md`](TYPOGRAPHY_TEMPLATE_SELECTOR.md) | ✅ `typography-audit` | **Complete** |
 | **Stock footage** | n/a | ✅ [`FOOTAGE_SOURCING.md`](../project/FOOTAGE_SOURCING.md) tier system | 🟡 visual-concept Lens 2 | Partial |
 | **AI illustration** (ILLUST) | n/a | 🟡 [`VISUAL_LANGUAGE.md`](../project/VISUAL_LANGUAGE.md) Register 2 | 🟡 visual-concept Lens 6 | Partial |
@@ -72,7 +72,7 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 
 ---
 
-## Family detail — Maps (6 templates) ✅
+## Family detail — Maps (7 templates) ✅
 
 **Status:** complete wayfinding stack (selector + audit + runtime heuristics + dossiers).
 
@@ -89,11 +89,12 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 - [`proportional-symbol-map.md`](references/template-research/proportional-symbol-map.md)
 - [`cartogram-map.md`](references/template-research/cartogram-map.md)
 - [`density-map.md`](references/template-research/density-map.md)
-- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay-layer dossier shared by all 6
+- [`tilegram-us-map.md`](references/template-research/tilegram-us-map.md)
+- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay-layer dossier shared by all 7
 
 ---
 
-## Family detail — Charts (6 templates) ✅
+## Family detail — Charts (19 templates) ✅
 
 **Status:** complete wayfinding stack.
 
@@ -103,11 +104,11 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 
 **Runtime heuristics:** DataChart + TimeSeriesChart (existing), plus StatReveal (missing comparisons[]), RadarChart (>3 subjects / >25-char axis labels).
 
-**Dossiers:** [`data-chart.md`](references/template-research/data-chart.md), [`time-series-chart.md`](references/template-research/time-series-chart.md).
+**Dossiers** (every chart template has one): [`data-chart.md`], [`time-series-chart.md`], [`stat-reveal.md`], [`bayesian-update.md`], [`probability-gauge.md`], [`radar-chart.md`], [`beeswarm-chart.md`], [`bump-chart.md`], [`calendar-heatmap.md`], [`connected-scatterplot.md`], [`dumbbell-plot.md`], [`horizon-chart.md`], [`isotype-chart.md`], [`marimekko-chart.md`], [`population-pyramid.md`], [`rank-change-dot-plot.md`], [`ridgeline-plot.md`], [`streamgraph.md`], [`ternary-plot.md`] — all under `references/template-research/`. (PricingWaterfall lives in the Diagrams family per CHART_TEMPLATE_SELECTOR.md.)
 
 ---
 
-## Family detail — Diagrams (10 templates) ✅
+## Family detail — Diagrams (10 templates — incl. ArcDiagram) ✅
 
 **Status:** complete wayfinding stack. Largest family, highest leverage.
 
@@ -121,7 +122,7 @@ The Remotion MG layer has **45 templates** organized into 5 families plus 3 non-
 
 ---
 
-## Family detail — Timelines (4 templates) ✅
+## Family detail — Timelines (3 live templates; TimelineMorph deleted May 13) ✅
 
 **Status:** complete wayfinding stack. TimelineComparison is Parallax's signature form.
 
@@ -183,7 +184,7 @@ Owned by visual-spec but rendered outside Remotion.
 
 The Maps family was upgraded in May 2026 with a complete wayfinding stack (selector + audit + heuristics + dossiers). The pattern was rolled out to the remaining four Remotion families on May 11–12, 2026:
 
-- **Diagrams** — 10 templates, highest leverage (NetworkDiagram + SankeyFlow + EscalationLadder runtime heuristics)
+- **Diagrams** — 10 live templates incl. ArcDiagram (BifurcationRoute deleted May 13), highest leverage (NetworkDiagram + SankeyFlow + EscalationLadder runtime heuristics)
 - **Timelines** — signature-form integrity (TimelineComparison bounded-analogy enforcement)
 - **Charts** — Cleveland-honesty enforcement (StatReveal + RadarChart heuristics added to existing DataChart + TimeSeriesChart)
 - **Typography** — POLISH D-rule enforcement (SplitComposition + AnnotatedImage heuristics)
