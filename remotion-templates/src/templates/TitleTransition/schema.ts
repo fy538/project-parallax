@@ -20,6 +20,14 @@ export const TitleTransitionSchema = z.object({
     sectionTitle: z.string().optional(),
     ctaText: z.string().optional(),
     nextEpisodeTeaser: z.string().optional(),
+    /**
+     * Photo/asset credits to surface on the end-card. One line per attribution
+     * — typically "Subject — Photographer (License via Source)". Required for
+     * CC BY-SA compliance when the episode uses such photos. See
+     * `episodes/<slug>/CREDITS.md` for the canonical attribution record.
+     * Only rendered when variant === "end-card".
+     */
+    credits: z.array(z.string()).optional(),
     accentColor: z.string().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     durationSec: z.number().optional(),

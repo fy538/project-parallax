@@ -71,6 +71,16 @@ export interface TitleTransitionData {
   ctaText?: string;
   /** Next episode teaser. */
   nextEpisodeTeaser?: string;
+  /**
+   * Photo / asset credits to surface on the end-card. One line per attribution
+   * — typically "Subject — Photographer (License via Source)". Required for
+   * CC BY-SA compliance when the episode uses such photos. See
+   * `episodes/<slug>/CREDITS.md` for the canonical attribution record.
+   *
+   * Rendered as a small mono block beneath the next-episode teaser.
+   * Only applied when `variant === "end-card"`.
+   */
+  credits?: string[];
 
   // ── Styling ──
   accentColor?: string;

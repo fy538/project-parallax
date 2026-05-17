@@ -36,6 +36,10 @@ import { AnnotatedImageSchema } from "../AnnotatedImage/schema";
 import { EscalationLadderSchema } from "../EscalationLadder/schema";
 import { DualTimelineSchema } from "../DualTimeline/schema";
 import { HorizontalTimelineSchema } from "../HorizontalTimeline/schema";
+import { DuelingFrameworksSchema } from "../DuelingFrameworks/schema";
+import { StrategicLandscapeSchema } from "../StrategicLandscape/schema";
+import { ArcDiagramSchema } from "../ArcDiagram/schema";
+import { ProportionalSymbolMapSchema } from "../ProportionalSymbolMap/schema";
 
 export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
   TitleTransition: TitleTransitionSchema,
@@ -61,4 +65,8 @@ export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
   EscalationLadder: EscalationLadderSchema,
   DualTimeline: DualTimelineSchema,
   HorizontalTimeline: HorizontalTimelineSchema,
+  DuelingFrameworks: DuelingFrameworksSchema,
+  StrategicLandscape: StrategicLandscapeSchema,
+  ArcDiagram: ArcDiagramSchema,
+  ProportionalSymbolMap: ProportionalSymbolMapSchema,
 };

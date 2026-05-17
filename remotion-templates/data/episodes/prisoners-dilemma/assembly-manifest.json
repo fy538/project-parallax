@@ -3,7 +3,7 @@
   "episode": "prisoners-dilemma",
   "title": "prisoners-dilemma",
   "fps": 30,
-  "totalDurationSec": 891.8,
+  "totalDurationSec": 893.8,
   "mode": "estimate",
   "filmOverlay": {
     "preset": "documentary",
@@ -654,7 +654,7 @@
       "syncWords": [
         "two thousand"
       ],
-      "narrationRef": "By 1975 \u2014 twenty-five years after it failed that first experiment \u2014 there were ",
+      "narrationRef": "By 1975 \u2014 twenty-five years after it failed that first experiment \u2014 there were over two thousand scholarly articles on the Prisoner's Dilemma.",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-diffusion.json",
@@ -1611,7 +1611,7 @@
       "syncWords": [
         "fundamentally"
       ],
-      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma \u2014 but it is fund",
+      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma \u2014 but it is fundamentally different.",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-staghunt.json",
@@ -1859,8 +1859,6 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P2",
-      "holdAfter": 2.0,
-      "holdBehavior": "breathe",
       "narrationRef": "[VISUAL-FIRST: 3s]",
       "template": {
         "component": "ProportionalSymbolMap",
@@ -1943,7 +1941,7 @@
       }
     },
     {
-      "id": "beat4-seg44c-torbel-hold",
+      "id": "beat4-seg44c-hold",
       "type": "HOLD",
       "startSec": 592.0,
       "endSec": 593.0,
@@ -1960,7 +1958,7 @@
       "beat": "beat4",
       "priority": "P1",
       "syncWords": ["Maine lobster"],
-      "narrationRef": "Japanese mountain forest cooperatives. Maine lobster fisheries.",
+      "narrationRef": "Maine lobster fisheries — color-coded buoys, graduated sanctions, since the 1880s.",
       "template": {
         "component": "AnnotatedImage",
         "dataFile": "annotated-image-maine.json"
@@ -2665,7 +2663,7 @@
       "id": "closing-title",
       "type": "TRANSITION",
       "startSec": 886.8,
-      "endSec": 891.8,
+      "endSec": 893.8,
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P1",

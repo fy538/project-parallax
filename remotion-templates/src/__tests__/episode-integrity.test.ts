@@ -693,6 +693,59 @@ for (const { slug, manifestPath } of EPISODES) {
 
       expect(violations).toHaveLength(0);
     });
+
+    // ── syncWord ↔ narrationRef cross-check ─────────────────────────────────
+    //
+    // Catches typos in syncWords that would silently fail the per-element
+    // anticipatory-reveal (D17) system. The reveal hook looks up the
+    // narration timestamp by matching syncWords against the narration; if
+    // the syncWord string doesn't appear in the narration, the reveal falls
+    // through to legacy stagger timing — visible only by watching the cut,
+    // not by reading the data. Without this test, `syncWords: ["Valenica"]`
+    // (typo) would pass CI silently.
+    //
+    // Check shape: for each segment with syncWords AND a narrationRef, every
+    // syncWord must appear (case-insensitive substring) in narrationRef.
+    // Segments without narrationRef are skipped (they exist for TitleTransition
+    // and similar header segments where syncWords are not meaningful).
+    //
+    // Note: narrationRef is a substring of the actual narration (~80 chars),
+    // not the full sentence. False negatives are possible if the syncWord
+    // sits past the narrationRef truncation point. In that case, either
+    // extend narrationRef to include the syncWord, or move the syncWord
+    // earlier in the narration to land within the prefix.
+    it("syncWords appear in the corresponding narrationRef (per-element reveal sanity)", () => {
+      const violations: string[] = [];
+
+      for (const seg of manifest.segments) {
+        const syncWords = (seg as { syncWords?: string[] }).syncWords;
+        const narrationRef = (seg as { narrationRef?: string }).narrationRef;
+
+        if (!syncWords || syncWords.length === 0) continue;
+        if (!narrationRef) continue;
+
+        const lowerNarration = narrationRef.toLowerCase();
+        for (const word of syncWords) {
+          if (!lowerNarration.includes(word.toLowerCase())) {
+            violations.push(
+              `  Segment "${seg.id}": syncWord "${word}" not found in narrationRef "${narrationRef.slice(0, 60)}…"`
+            );
+          }
+        }
+      }
+
+      if (violations.length > 0) {
+        throw new Error(
+          `\n${violations.length} segment(s) with syncWord/narrationRef mismatch:\n` +
+          `${violations.join("\n")}\n\n` +
+          `Fix: either correct the syncWord typo, or extend narrationRef ` +
+          `to include the word the syncWord targets. The per-element ` +
+          `anticipatory-reveal system depends on this lookup.`
+        );
+      }
+
+      expect(violations).toHaveLength(0);
+    });
   });
 }
 

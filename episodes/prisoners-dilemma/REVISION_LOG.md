@@ -5,7 +5,7 @@
 **Episode slug:** prisoners-dilemma
 **Format:** Philosopher's Lens
 **Arc:** 3 — The Diplomacy of Deception (opener)
-**Current version:** v5.10 (May 16, 2026) — render-ready
+**Current version:** v5.11 (May 17, 2026) — render-ready
 **Author:** Tiger + Claude (collaborative drafting)
 **Log opened:** May 12, 2026 (retroactive)
 
@@ -139,12 +139,13 @@ Changes:
 - Three resized copies in `remotion-templates/public/episodes/prisoners-dilemma/stills/` (1920px wide, q88 JPEG, ~500 KB each). Duotone is NOT baked into these files — `BrandImage` applies the standard ramp (ink → umber → gold) at render time via SVG filter, matching Beat 4's dark register.
 - Three new AnnotatedImage data files:
   - `annotated-image-valencia.json` — 4.3s, 2 callouts: "ELECTED SYNDIC" pointing at the standing speaker, "APOSTLES' DOOR · SINCE 1273" tying to Ostrom Principle 3 (collective-choice arrangements).
-  - `annotated-image-torbel.json` — 4.2s, 2 callouts: "ALPINE PASTURES" tying to Principle 1 (clear boundaries), "TÖRBEL VILLAGE" anchoring the 800-year charter.
-  - `annotated-image-maine.json` — 4.3s, 2 callouts: "ONE COLOR · ONE BOAT" (Principle 1), "CUT A TRAP → ESCALATION" (Principle 5, graduated sanctions).
-- Manifest: `beat4-seg44-hold` (12.8s foreground HOLD on the map) replaced with three sequential AnnotatedImage TEMPLATE segments occupying the same 584.0–596.8s slot:
+  - `annotated-image-torbel.json` — 3.7s, 2 callouts: "ALPINE PASTURES" tying to Principle 1 (clear boundaries), "TÖRBEL VILLAGE" anchoring the 800-year charter.
+  - `annotated-image-maine.json` — 3.8s, 2 callouts: "ONE COLOR · ONE BOAT" (Principle 1), "CUT A TRAP → ESCALATION" (Principle 5, graduated sanctions).
+- Manifest: `beat4-seg44-hold` (12.8s foreground HOLD on the map) replaced with three sequential AnnotatedImage TEMPLATE segments + one 1s HOLD break occupying the same 584.0–596.8s slot:
   - `beat4-seg44b-valencia` (584.0–588.3, syncWord "Valencia")
-  - `beat4-seg44c-torbel` (588.3–592.5, syncWord "Swiss alpine")
-  - `beat4-seg44d-maine` (592.5–596.8, syncWord "Maine lobster")
+  - `beat4-seg44c-torbel` (588.3–592.0, syncWord "Swiss alpine")
+  - `beat4-seg44c-hold` (592.0–593.0, foreground HOLD — editorial breath between European and New World cases; also satisfies M-PACING max-3-consecutive-TEMPLATE lint rule)
+  - `beat4-seg44d-maine` (593.0–596.8, syncWord "Maine lobster")
   - Background `beat4-seg45` FOOTAGE continues unchanged underneath. Total Beat 4 runtime unchanged (no shifts to subsequent segments).
 - Script line 186 updated to describe the triptych (replaces "continuation — camera moves between highlighted regions").
 - Asset Summary table entries 23a/23b/23c added.
@@ -152,7 +153,43 @@ Changes:
 
 Verification: render-still of each AnnotatedImage at frame 110 (mid-segment, after both callouts settle) confirms title block, image with brand duotone, and both callouts with leader lines render correctly. All 36 episode-integrity tests pass.
 
-**Editorial effect:** Beat 4 narration now plays with the visual layer doing real evidentiary work for the first time. When the narrator says "Spanish irrigation cooperatives in Valencia — still operating after six hundred years," the viewer sees the actual Tribunal in session at the Apostles' Door. When the narrator says "Swiss alpine grazing commons with charters from the thirteenth century," the viewer sees the actual Bernese Alps above Törbel. When the narrator says "Maine lobster fisheries," the viewer sees the actual color-coded buoys that embody Principle 1. The Ostrom argument is no longer "academic citation"; it's "documentary proof."
+**Editorial effect:** Beat 4 narration now plays with the visual layer doing real evidentiary work for the first time. When the narrator says "Spanish irrigation cooperatives in Valencia — still operating after six hundred years," the viewer sees the actual Tribunal in session at the Apostles' Door. When the narrator says "Swiss alpine grazing commons with charters from the thirteenth century," the viewer sees the actual Valais Alps above Törbel. When the narrator says "Maine lobster fisheries," the viewer sees the actual color-coded buoys that embody Principle 1. The Ostrom argument is no longer "academic citation"; it's "documentary proof."
+
+---
+
+## v5.10 → v5.11 (May 17, 2026) — code-review hygiene pass
+
+Two-pass code review (visual-spec-reviewer + general-purpose code review) of the v5.8–v5.10 work surfaced 12 findings: 4 must-fix, 8 recommended. All 12 closed in this commit. Net: no new editorial content, all hygiene + correctness + compliance.
+
+**Must-fix:**
+
+1. **`TEMPLATE_SCHEMAS` registry was silently skipping new templates.** `src/templates/Episodes/templateSchemas.ts` was missing entries for `ArcDiagram`, `ProportionalSymbolMap`, `DuelingFrameworks`, and `StrategicLandscape`. The `episode-integrity.test.ts` "all template data files pass their Zod schema" test silently skipped components without a registered schema — meaning `arc-pd-lineage.json` and `proportional-symbol-ostrom.json` were not being Zod-validated in CI. Added all four schemas to the registry. Tests now actually validate the new data files.
+
+2. **Orphan `holdAfter: 2.0` on `beat4-seg44`.** After the v5.10 triptych insert removed `beat4-seg44-hold` and replaced it with three back-to-back AnnotatedImage segments, the `holdAfter: 2.0, holdBehavior: "breathe"` on `beat4-seg44` had nowhere to land — `beat4-seg44b-valencia` starts at exactly 584.0 with zero gap. Dead field; removed.
+
+3. **Stale timings in REVISION_LOG.md v5.10 entry.** Log said Törbel ends at 592.5 and Maine starts at 592.5, but actual manifest had the 1s HOLD insert at 592.0–593.0. Corrected timings in v5.10 entry above and added the HOLD segment to the segment list. Also updated Törbel `durationSec` reference from 4.2 to 3.7.
+
+4. **Factual error: "Bernese Alps" → "Valais (Pennine) Alps".** Törbel is in canton Valais, not Bern. The mountains visible from Törbel are the Mischabel range and Weisshorn — both Valais. Wikimedia's German filename ("Berner Alpen") propagated the miscategorization into our `imageAlt`. Corrected the `imageAlt` text in `annotated-image-torbel.json`. (The Wikimedia file itself retains its original name; the credit line in CREDITS.md was unchanged.)
+
+**Recommended (all closed):**
+
+5. Removed `BifurcationRoute` and `TimelineMorph` from the manifest schema component enum (templates were deleted May 13 but enum hadn't been cleaned up).
+
+6. Renamed `beat4-seg44c-torbel-hold` → `beat4-seg44c-hold` to match the `beat4-seg41b-hold` precedent (parent stem + `-hold`, descriptor stripped).
+
+7. Trimmed the orphan "Japanese mountain forest cooperatives" narration line — the script had 4 named cases but the triptych only has 3 photos (Valencia/Törbel/Maine). The Japan beat would have played over a Törbel→Maine HOLD with no anchoring photo. Trimmed and replaced with editorial extension on Maine: "Maine lobster fisheries — color-coded buoys, graduated sanctions, since the 1880s." Japan remains visible on the ProportionalSymbolMap as one of the 6 symbols.
+
+8. Softened `chart-diffusion.json` source attribution from "Axelrod (1984), Poundstone (1992)" to "Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984) and Poundstone (1992). Intermediate years illustrative." The endpoint figure is canonically attested; intermediate 1960/1965/1970 bars were interpolated.
+
+9. Moved `proportional-symbol-ostrom.json` source annotation from `[100, -25]` (Indian Ocean south of Java, would visually collide with the Philippines symbol at `[121.7, 12.9]` in phase 2) to `[-30, -45]` (South Atlantic, clear of all 6 case markers).
+
+10. **Wired CC BY-SA closing-card credit lines.** Added a `credits?: string[]` field to `TitleTransitionSchema` + `TitleTransitionData` type, rendered as a small mono block in the end-card variant beneath the next-episode teaser. Populated `title-end-card.json` with the three photo attributions per CC BY-SA on-screen requirement. Bumped `closing-title` segment from 5s to 7s to give the credits a 2s readable window; bumped manifest `totalDurationSec` from 891.8 to 893.8. Render-verified at frame 100.
+
+11. **Added syncWord ↔ narrationRef cross-check test** to `episode-integrity.test.ts`. The test iterates over all segments with `syncWords`, asserting each word appears (case-insensitive substring) in the segment's `narrationRef`. **The new test immediately caught two pre-existing bugs**: `beat2-seg14b` `syncWords: ["two thousand"]` and `beat4-seg39` `syncWords: ["fundamentally"]` — both target words sat past the ~80-char `narrationRef` truncation point, so the D17 per-element anticipatory-reveal lookup would have silently fallen through to legacy stagger timing. Both narrationRefs extended to include the target word. The test is now load-bearing for future syncWord typos.
+
+12. **Concept registry callback note.** `data/concepts.json` registers `ostrom-governance-principles` as introduced by `blockades-leak`. If `prisoners-dilemma` ships before `blockades-leak` (which is the current launch order — PD is the launch candidate, blockades-leak is in draft), the registry needs publish-time reconciliation: re-point `introduced.episode` from `blockades-leak` to `prisoners-dilemma`, and update `callbackVisual` to match the v5.9 FrameworkDiagram with `protagonist: 0`. Tracked here so publish-retro doesn't miss it. No data-file change in this commit; pure documentation.
+
+Verification: all 38 episode-integrity tests pass (added one); full unit suite 49/49 files / 1167/1167 tests pass. End-card render-stilled at frame 100 confirms credits block renders correctly.
 
 ---
 

@@ -617,6 +617,30 @@ const EndCardVariant: React.FC<{
             Next: {data.nextEpisodeTeaser}
           </div>
         )}
+
+        {/* Photo / asset credits — small mono block, slides in last. Required
+            for CC BY-SA on-screen attribution when the episode uses such
+            photos. Sourced from data.credits[]; record of truth is
+            episodes/<slug>/CREDITS.md. */}
+        {data.credits && data.credits.length > 0 && (
+          <div
+            style={{
+              marginTop: layout.spacing.lg,
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.caption,
+              color: theme.text.muted,
+              textAlign: "center",
+              maxWidth: 1000,
+              lineHeight: 1.55,
+              opacity: fadeIn(frame, sec(2.0), sec(0.5)),
+              transform: `translateY(${slideIn(frame, sec(2.0), 10, sec(0.5))}px)`,
+            }}
+          >
+            {data.credits.map((line, i) => (
+              <div key={i}>{line}</div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Episode label — slideIn (was naked fade) */}

@@ -5,5 +5,12 @@
   "nextEpisodeTeaser": "Next: The Silicon Trap \u2014 why the chip war is a game neither side can win",
   "accentColor": "#C4A747",
   "backgroundVariant": "dark",
-  "durationSec": 5
+  "durationSec": 7,
+  "credits": [
+    "Photography credits \u2014 Wikimedia Commons",
+    "Valencia Water Tribunal \u2014 Jos\u00e9 Jordan / UNESCO (CC BY-SA 3.0 IGO)",
+    "T\u00f6rbel alpine vista \u2014 Daniel Reust (CC BY-SA 4.0)",
+    "Maine lobster buoys \u2014 Marc-Lautenbacher (CC BY-SA 4.0)",
+    "Photo segments licensed CC BY-SA 4.0."
+  ]
 }
