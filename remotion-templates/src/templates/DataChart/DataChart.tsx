@@ -822,7 +822,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   // (kicker + heroStat + annotations + top legend + publication chrome).
   // When absent, fall through to the existing intelligence-briefing render
   // below. See remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md.
-  if (data.frame && data.variant === "bar") {
+  if (data.frame && (data.variant === "bar" || data.variant === "comparison")) {
     return <DataChartEditorial data={data as DataChartData & { frame: NonNullable<DataChartData["frame"]> }} />;
   }
 

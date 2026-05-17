@@ -32,7 +32,7 @@ import type { Rect, ChartHelpers } from "../../components/EditorialFrame/Editori
 import { AnnotationOverlay } from "../../components/EditorialFrame/AnnotationOverlay";
 import { ReferenceLineOverlay } from "../../components/EditorialFrame/ReferenceLineOverlay";
 import { useThemeMode } from "../../hooks/useThemeMode";
-import type { DataChartData, DataPoint } from "./types";
+import type { DataChartData, DataPoint, ComparisonPair } from "./types";
 
 interface DataChartEditorialProps {
   data: DataChartData & {
@@ -49,15 +49,22 @@ export const DataChartEditorial: React.FC<DataChartEditorialProps> = ({ data }) 
   useDirection(data._direction, "none");
   useCompositionAnimation();
 
-  // Bar geometry
+  const isComparison = data.variant === "comparison";
+
+  // Bar geometry — for bar variant, derived from dataPoints; for comparison,
+  // derived from comparisonPairs (max combined value).
   const dataPoints = data.dataPoints ?? [];
-  const maxValue = useMemo(
-    () =>
-      dataPoints.length > 0
-        ? Math.max(...dataPoints.map((d) => d.value))
-        : 1,
-    [dataPoints],
-  );
+  const comparisonPairs = data.comparisonPairs ?? [];
+  const maxValue = useMemo(() => {
+    if (isComparison) {
+      return comparisonPairs.length > 0
+        ? Math.max(...comparisonPairs.map((p) => p.leftValue + p.rightValue))
+        : 1;
+    }
+    return dataPoints.length > 0
+      ? Math.max(...dataPoints.map((d) => d.value))
+      : 1;
+  }, [isComparison, dataPoints, comparisonPairs]);
   const [niceMin, niceMax] = useMemo(() => niceDomain(0, maxValue), [maxValue]);
   const yTicks = useMemo(() => niceTicks(niceMin, niceMax, 5), [niceMin, niceMax]);
   const yAxisMax = yTicks[yTicks.length - 1] ?? maxValue;
@@ -71,16 +78,26 @@ export const DataChartEditorial: React.FC<DataChartEditorialProps> = ({ data }) 
         renderOverlays(data, chartRect, helpers, frame, yAxisMax, dataPoints)
       }
     >
-      {(chartRect, _helpers) => (
-        <BarsContent
-          dataPoints={dataPoints}
-          chartRect={chartRect}
-          yAxisMax={yAxisMax}
-          yTicks={yTicks}
-          frame={frame}
-          data={data}
-        />
-      )}
+      {(chartRect, _helpers) =>
+        isComparison ? (
+          <StackedBarsContent
+            comparisonPairs={comparisonPairs}
+            chartRect={chartRect}
+            maxTotal={yAxisMax}
+            frame={frame}
+            data={data}
+          />
+        ) : (
+          <BarsContent
+            dataPoints={dataPoints}
+            chartRect={chartRect}
+            yAxisMax={yAxisMax}
+            yTicks={yTicks}
+            frame={frame}
+            data={data}
+          />
+        )
+      }
     </EditorialFrame>
   );
 };
@@ -268,6 +285,178 @@ const BarsContent: React.FC<{
           );
         })}
       </div>
+    </>
+  );
+};
+
+// ── Stacked horizontal bars (comparison variant) ─────────────────────────────
+
+const StackedBarsContent: React.FC<{
+  comparisonPairs: ComparisonPair[];
+  chartRect: Rect;
+  maxTotal: number;
+  frame: number;
+  data: DataChartData;
+}> = ({ comparisonPairs, chartRect, maxTotal, frame, data }) => {
+  const theme = useThemeMode("light");
+
+  if (comparisonPairs.length === 0) return null;
+
+  const leftColor = data.leftGroupColor ?? palette.gold;
+  const rightColor = data.rightGroupColor ?? palette.umber;
+
+  // Vertical layout — each pair gets a row. Reserve room for the row label
+  // on the left and the terminal label on the right of each bar.
+  const ROW_LABEL_WIDTH = 90;
+  const TERMINAL_WIDTH = 90;
+  const ROW_GAP = 28;
+  const innerWidth = chartRect.width - ROW_LABEL_WIDTH - TERMINAL_WIDTH;
+  const rowCount = comparisonPairs.length;
+  const totalGap = ROW_GAP * (rowCount - 1);
+  const rowHeight = Math.min(80, (chartRect.height - totalGap) / rowCount);
+
+  return (
+    <>
+      {comparisonPairs.map((pair, i) => {
+        const total = pair.leftValue + pair.rightValue;
+        const fullBarFraction = total / maxTotal; // share of max combined width
+        const fullBarWidth = innerWidth * fullBarFraction;
+        const leftFraction = total > 0 ? pair.leftValue / total : 0;
+        const leftSegWidth = fullBarWidth * leftFraction;
+        const rightSegWidth = fullBarWidth - leftSegWidth;
+
+        const startFrame = sec(0.4) + i * sec(0.15);
+        const grow = interpolate(
+          frame,
+          [startFrame, startFrame + sec(1.0)],
+          [0, 1],
+          {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+            easing: easings.bar,
+          },
+        );
+        const labelFade = fadeIn(frame, startFrame + sec(0.7), sec(0.4));
+        const rowY = i * (rowHeight + ROW_GAP);
+
+        // Inline value labels — auto-show when segment is wide enough to fit
+        // the number with breathing room (rough rule: 60px per number).
+        const autoShowInline = leftSegWidth > 65 && rightSegWidth > 50;
+        const showInline = pair.showInlineValues ?? autoShowInline;
+
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: 0,
+              top: rowY,
+              width: chartRect.width,
+              height: rowHeight,
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
+            {/* Row label (e.g. "1990S") */}
+            <div
+              style={{
+                width: ROW_LABEL_WIDTH,
+                fontFamily: fonts.mono,
+                fontSize: fontSizes.meta,
+                color: theme.text.muted,
+                letterSpacing: letterSpacing.meta,
+                textTransform: "uppercase",
+                opacity: labelFade,
+              }}
+            >
+              {pair.label}
+            </div>
+
+            {/* Bar segments (stacked horizontally) */}
+            <div
+              style={{
+                position: "relative",
+                height: rowHeight * 0.7,
+                width: innerWidth,
+              }}
+            >
+              {/* Left segment */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  width: leftSegWidth * grow,
+                  height: "100%",
+                  backgroundColor: leftColor,
+                  display: "flex",
+                  alignItems: "center",
+                  paddingLeft: 16,
+                }}
+              >
+                {showInline && leftSegWidth * grow > 50 && (
+                  <span
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fontSizes.h3 - 4,
+                      fontWeight: fontWeights.bold,
+                      color: palette.paper,
+                      opacity: labelFade,
+                    }}
+                  >
+                    {formatNumber(pair.leftValue)}
+                  </span>
+                )}
+              </div>
+              {/* Right segment */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: leftSegWidth * grow,
+                  top: 0,
+                  width: rightSegWidth * grow,
+                  height: "100%",
+                  backgroundColor: rightColor,
+                  display: "flex",
+                  alignItems: "center",
+                  paddingLeft: 12,
+                }}
+              >
+                {showInline && rightSegWidth * grow > 40 && (
+                  <span
+                    style={{
+                      fontFamily: fonts.heading,
+                      fontSize: fontSizes.h3 - 4,
+                      fontWeight: fontWeights.bold,
+                      color: palette.paper,
+                      opacity: labelFade,
+                    }}
+                  >
+                    {formatNumber(pair.rightValue)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Terminal label (e.g. "3.0:1") */}
+            {pair.terminalLabel && (
+              <div
+                style={{
+                  width: TERMINAL_WIDTH,
+                  paddingLeft: 16,
+                  fontFamily: fonts.mono,
+                  fontSize: fontSizes.label,
+                  color: theme.text.primary,
+                  letterSpacing: 0.5,
+                  opacity: labelFade,
+                }}
+              >
+                {pair.terminalLabel}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </>
   );
 };

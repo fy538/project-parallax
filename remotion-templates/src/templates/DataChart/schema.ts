@@ -19,6 +19,20 @@ const ComparisonPairSchema = z.object({
   rightValue: z.number(),
   leftLabel: z.string().optional(),
   rightLabel: z.string().optional(),
+  /**
+   * Terminal label rendered to the right of the stacked bar (e.g. "3.0:1"
+   * for a ratio annotation, or "+2.4×" for change indicators). Editorial
+   * convention: terminal labels carry the rhetorical claim of the bar.
+   * Used by DataChartEditorial when `frame` is set + variant is "comparison".
+   */
+  terminalLabel: z.string().optional(),
+  /**
+   * When true, value numbers render INSIDE each segment of the stacked bar
+   * (paper-colored text on amber/oxblood). Economist signature when the bar
+   * is wide enough to accommodate inline labels. Defaults to auto: inline
+   * when the segment width can fit the formatted number, otherwise omitted.
+   */
+  showInlineValues: z.boolean().optional(),
 });
 
 const ReferenceLineSchema = z.object({

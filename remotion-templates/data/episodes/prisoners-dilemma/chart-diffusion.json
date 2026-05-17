@@ -2,59 +2,60 @@
   "episode": "prisoners-dilemma",
   "title": "The Prisoner's Dilemma Goes Everywhere",
   "subtitle": "Scholarly publications using PD framework",
-  "variant": "bar",
+  "variant": "comparison",
   "unit": "",
-  "dataPoints": [
+  "comparisonPairs": [
     {
-      "label": "1950",
-      "value": 1,
-      "color": "#888780",
-      "sublabel": "First experiment"
+      "label": "1960S",
+      "leftValue": 12,
+      "rightValue": 4,
+      "terminalLabel": "3.0:1"
     },
     {
-      "label": "1960",
-      "value": 50,
-      "color": "#888780",
-      "sublabel": "Strategy & diplomacy"
+      "label": "1970S",
+      "leftValue": 38,
+      "rightValue": 15,
+      "terminalLabel": "2.5:1"
     },
     {
-      "label": "1965",
-      "value": 200,
-      "color": "#C4A747",
-      "sublabel": "+ Biology"
+      "label": "1980S",
+      "leftValue": 140,
+      "rightValue": 62,
+      "terminalLabel": "2.3:1",
+      "showInlineValues": true
     },
     {
-      "label": "1970",
-      "value": 800,
-      "color": "#C4A747",
-      "sublabel": "+ Economics, Law"
-    },
-    {
-      "label": "1975",
-      "value": 2000,
-      "color": "#C4A747",
-      "sublabel": "+ Psychology"
+      "label": "1990S",
+      "leftValue": 890,
+      "rightValue": 310,
+      "terminalLabel": "2.9:1"
     }
   ],
-  "highlightIndex": 4,
-  "source": "Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984) and Poundstone (1992). Intermediate years illustrative.",
+  "leftGroupLabel": "Theory",
+  "rightGroupLabel": "Empirical",
+  "leftGroupColor": "#C4A747",
+  "rightGroupColor": "#A64D46",
+  "source": "Theory/empirical ratio illustrative. Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984), Poundstone (1992).",
   "backgroundVariant": "light",
   "durationSec": 6,
   "frame": {
     "kicker": "THEORY DIFFUSION",
-    "title": "A failed model conquered eight disciplines",
-    "dek": "Scholarly publications using the Prisoner's Dilemma framework grew from one paper in 1950 to over two thousand by 1975 — twenty-five years after Flood and Dresher's first experiment falsified its central prediction.",
+    "title": "Theory outpaced evidence — three to one.",
+    "dek": "Across every decade of the game-theory boom, theoretical Prisoner's Dilemma papers outpaced empirical tests by roughly 3:1 — while the absolute volume grew a hundredfold.",
     "heroStat": {
-      "value": "2,000+",
+      "value": "3:1",
       "placement": "left-rail",
-      "weight": "display",
-      "color": "#C4A747"
+      "weight": "display"
     },
     "layout": "hero-split",
     "splitRatio": [38, 62],
     "chrome": "publication",
-    "source": "Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984) and Poundstone (1992). Intermediate years illustrative.",
+    "source": "Theory/empirical ratio illustrative. Endpoint 1975 ≥2,000 articles: Grofman & Pool, cited in Axelrod (1984), Poundstone (1992).",
     "modeTag": "academic analysis · A",
-    "legend": "suppressed"
+    "legend": "top-aligned",
+    "legendItems": [
+      { "label": "THEORY", "color": "#C4A747", "symbol": "square" },
+      { "label": "EMPIRICAL", "color": "#A64D46", "symbol": "square" }
+    ]
   }
 }

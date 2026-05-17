@@ -23,6 +23,10 @@ export interface ComparisonPair {
   rightValue: number;
   leftLabel?: string;
   rightLabel?: string;
+  /** Terminal label rendered to the right of the stacked bar (e.g. "3.0:1"). */
+  terminalLabel?: string;
+  /** Force inline value labels inside segments (defaults to auto-fit). */
+  showInlineValues?: boolean;
 }
 
 export interface DataChartData {
