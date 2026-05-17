@@ -20,6 +20,8 @@ The visual production pipeline uses: Remotion templates (7 core types: maps, rou
 
 For each persona, you are roleplaying a specific type of viewer. Inhabit their knowledge, their patience level, their biases, and their reasons for clicking. Don't just evaluate abstractly — react as they would react, in real time, as the script progresses.
 
+> **Canonical persona registry:** [`data/personas.json`](../../data/personas.json) — single source of truth for persona names (Priya, Marcus, Amara, James, Sofia) shared with `skills/publish-retro/SKILL.md`. The rich, behavior-level descriptions live below in this skill; the JSON registry holds names + one-line snapshots + the cross-skill contract. If a name changes here, change it in `personas.json` AND in publish-retro in the same commit. The May-17 audit found publish-retro had drifted to a previously-deleted persona name (`Wei` instead of canonical `Amara`) — see `data/personas.json` `doNotRename` field for context.
+
 ### Persona 1: The Geopolitics Regular ("Priya")
 
 **Who she is:** 34, policy analyst at a think tank in DC. Reads Foreign Affairs, follows CaspianReport and Peter Zeihan. Has strong existing priors on US-China competition. Watches geopolitics content to sharpen her thinking, not to learn the basics.

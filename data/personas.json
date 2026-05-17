@@ -1,0 +1,56 @@
+{
+  "_comment": "Parallax canonical audience persona registry. SINGLE SOURCE OF TRUTH for persona names + roles across skills. Consumed by skills/persona-eval/SKILL.md (rich personas + episode pre-render predictions) and skills/publish-retro/SKILL.md (post-publish retrospective scoring + comment-inference). If you change a persona name or role here, update both skills.",
+  "version": "1.0",
+  "lastUpdated": "2026-05-17",
+  "lastReviewed": "2026-05-17",
+  "personas": [
+    {
+      "id": "persona-1",
+      "name": "Priya",
+      "role": "The Geopolitics Regular",
+      "snapshot": "34, policy analyst at a DC think tank. Reads Foreign Affairs, follows CaspianReport / Zeihan. Strong existing priors on US-China competition.",
+      "hooks": "Novel framing she hasn't encountered. Historical parallels that recontextualize what she thought she understood. Intellectual honesty about uncertainty.",
+      "loses": "Retreading ground she already knows. Surface-level both-sides framing. False balance that avoids taking analytical positions.",
+      "bar": "Did this give me a framework or historical parallel I didn't already have? Would I send this to a colleague?"
+    },
+    {
+      "id": "persona-2",
+      "name": "Marcus",
+      "role": "The Algorithm Discovery",
+      "snapshot": "28, software engineer in Austin. YouTube-recommended viewer. Smart but no geopolitics background.",
+      "hooks": "Surprising fact in the first 30s. A paradox he didn't expect. Visual storytelling. \"I had no idea this was happening.\"",
+      "loses": "Jargon he has to decode. >2 min of setup before something surprising. Visual monotony (3+ consecutive same-type segments). Anything that feels like homework.",
+      "bar": "Am I confused? Am I bored? Would I watch to the end? Would I subscribe?"
+    },
+    {
+      "id": "persona-3",
+      "name": "Amara",
+      "role": "The Cross-Cultural Viewer",
+      "snapshot": "33, IR researcher who grew up in Nairobi, studied at Sciences Po, now at a Singapore policy institute. Consumes English, French, and Swahili media. Fatigue with both \"Western frameworks are universal\" and shallow \"the West doesn't understand us\" counter-narratives.",
+      "hooks": "Analysis self-aware about where its frameworks come from. Non-Western concepts used correctly (not as exotic decoration). Other actors' internal logic shown on its own terms.",
+      "loses": "West as default subject and everyone else as response. Treating Western IR theory as \"theory\" and non-Western strategic thought as \"culture.\" Visual coding that paints non-Western actors with conflict treatment while Western shots are standard.",
+      "bar": "Does this person understand their analytical framework is *one* framework, not *the* framework? Would I share this with colleagues in Nairobi, Delhi, or São Paulo without adding a caveat?",
+      "flexNote": "This persona flexes per episode geography. For US-China episodes, Amara reads as someone with Chinese-diaspora ties who notices when 'coordination' assumes both sides define it the same way. For Africa episodes, she's someone who notices when African states are treated as passive recipients of great-power competition. The persona name + core question stays constant; the contextual lens adapts to the episode's non-Western subject.",
+      "previousName": "Wei (Chinese Diaspora) — generalized to Amara on May 17, 2026 because the persona was always meant to flex per episode; the original Chinese-diaspora-specific framing was a US-China-episode anchoring that didn't generalize."
+    },
+    {
+      "id": "persona-4",
+      "name": "James",
+      "role": "The Tech Insider",
+      "snapshot": "41, director of engineering at a semiconductor equipment company. Knows TSMC's yield numbers by heart; has opinions about SMIC's multi-patterning.",
+      "hooks": "Technical details right. Specific numbers he can verify. Nuance about manufacturing most commentators miss. \"Most people get this wrong, but this person doesn't.\"",
+      "loses": "Technical errors. Oversimplified metaphors that distort how the technology works. Confident claims about things genuinely uncertain in the industry.",
+      "bar": "Is this technically accurate? Does this go beyond what I already know? Would I share this without my colleagues laughing at me?"
+    },
+    {
+      "id": "persona-5",
+      "name": "Sofia",
+      "role": "The Framework Thinker",
+      "snapshot": "37, management consultant. Listens to Lex Fridman, reads Taleb. Watches geopolitics content for thinking tools — game theory, systems thinking, Bayesian reasoning.",
+      "hooks": "Explicit or implicit framework she can extract and reuse. The chess vs. go metaphor done well. Bayesian updating done well. Feeling that the narrator is teaching her how to think about complex systems.",
+      "loses": "Pure news reporting without a generalizable insight. Analysis specific to the topic that doesn't illuminate broader patterns. Missing the meta-lesson in favor of the object-level story.",
+      "bar": "Did I walk away with a lens I can apply to other problems? Is the framework genuine or just a narrative device?"
+    }
+  ],
+  "doNotRename": "If a persona name needs to change, update this file FIRST, then run `grep -rln '<old-name>' skills/` and update every referencing skill in the same commit. The May-17 audit found publish-retro had drifted to a deleted name (Wei → Amara) and produced retros that didn't match persona-eval reports for an unknown period."
+}

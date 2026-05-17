@@ -10,6 +10,8 @@ You are closing the post-publish learning loop for a Parallax episode. After an 
 
 ## Context
 
+> **Canonical persona registry:** [`data/personas.json`](../../data/personas.json) — single source of truth for persona names (Priya, Marcus, Amara, James, Sofia) shared with `skills/persona-eval/SKILL.md`. The rich behavior-level definitions live in persona-eval; this skill consumes the names + roles for retro scoring and comment inference. If a name needs to change, update `personas.json` AND both skills in the same commit (the May-17 audit found this skill had drifted to a previously-deleted persona name `Wei` while persona-eval used canonical `Amara` — every retro produced misaligned with the upstream persona-eval report).
+
 **The feedback loop:** Every episode goes through a predictions phase where the production pipeline generates two predictive artifacts:
 
 1. **Persona-eval report** (from the persona-eval skill) — predicts which of the 5 audience personas (Priya/Marcus/Amara/James/Sofia) will be most engaged, where each persona might bounce, and what resonance scores to expect per persona.
