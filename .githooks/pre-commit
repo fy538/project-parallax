@@ -14,6 +14,7 @@ PY_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.py$' |
 JSON_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.json$' | grep -v 'package-lock\.json' || true)
 MANIFEST_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'data/episodes/[^/]+/assembly-manifest\.json$' || true)
 CONCEPTS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^data/concepts\.json$' || true)
+PIPELINE_STATE_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^episodes/pipeline-state\.json$' || true)
 
 if [ -n "$TS_CHANGED" ]; then
   echo "→ TypeScript typecheck (TS files changed)"
@@ -52,7 +53,25 @@ if [ -n "$CONCEPTS_CHANGED" ]; then
   python3 tools/concepts/lookup.py validate
 fi
 
-if [ -z "$TS_CHANGED" ] && [ -z "$TEMPLATE_TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ]; then
+if [ -n "$PIPELINE_STATE_CHANGED" ]; then
+  echo "→ Pipeline state changed; auto-syncing stateEnteredAt + refreshing dashboards"
+  # 1. For any episode whose `state` field changed since HEAD, bump
+  #    `stateEnteredAt` to today so days-in-state stays honest.
+  CHANGED_SLUGS=$(python3 tools/sync_pipeline_state.py)
+  if [ -n "$CHANGED_SLUGS" ]; then
+    echo "  state advanced for: $(echo "$CHANGED_SLUGS" | tr '\n' ' ')"
+    git add episodes/pipeline-state.json
+  fi
+  # 2. Regenerate per-episode _status.md dashboards + refresh At-a-glance
+  #    Health column in PIPELINE.md, then re-stage the touched files.
+  python3 tools/pipeline_validator.py --write-status --update-tracker >/dev/null
+  git add episodes/PIPELINE.md
+  # _status.md files only exist for episodes that have a folder; glob may
+  # not match anything, so use find + xargs to stay quiet.
+  find episodes -maxdepth 2 -name '_status.md' -print0 | xargs -0 -r git add
+fi
+
+if [ -z "$TS_CHANGED" ] && [ -z "$TEMPLATE_TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ] && [ -z "$PIPELINE_STATE_CHANGED" ]; then
   echo "  (no .ts/.tsx/.py/.json changes, skipping checks)"
 fi
 
