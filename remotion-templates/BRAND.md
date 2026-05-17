@@ -35,74 +35,112 @@ All three variants use the same palette, type pair, and image pipeline. They dif
 
 ## Color Palette
 
-### Shared Palette
+> **Source of truth:** [`tools/brand-treatment/palette.json`](../tools/brand-treatment/palette.json). Everything below is derived from that file. If a hex value in this doc disagrees with palette.json, **palette.json wins** — file a fix on this doc. `theme.ts` consumes palette.json directly via `import paletteData from "...palette.json"`.
 
-These colors work across both dark and light modes. They are the brand's DNA.
+### Direction A — Monochrome Warm + muted semantics + gold accent
+
+The palette is a warm-monochrome family (ink → walnut → umber → taupe → sand → bone → paper) with **two restrained semantic accents** (`us` muted blue, `china` muted rust-red) and **one channel accent** (`gold`). This is the "Direction A" palette adopted in the April 2026 brand exploration — calmer than the original Meridian draft (which had a saturated amber + rust + oxblood + olive system that this doc still partially described until May 17, 2026).
+
+### Shared Palette (10 keys)
+
+These are the canonical palette keys exported from `theme.ts` via `palette.<key>`. They work in both dark and light modes — they ARE the brand's DNA.
 
 | Token | Hex | Role |
 |-------|-----|------|
-| `ink` | `#1C1814` | Deepest dark — shadows, dark mode bg base (warm umber) |
-| `midnight` | `#2A2520` | Dark mode elevated surfaces (warm walnut) |
-| `amber` | `#E5A544` | Primary accent — crosshairs, labels, highlights |
-| `rust` | `#C23B22` | Secondary accent — conflict, China, urgency |
-| `bone` | `#F0E6D0` | Primary text on dark, light mode bg base |
-| `paper` | `#F5F0E8` | Light mode surface, card backgrounds |
-| `folder` | `#C8B89A` | Light mode secondary surface, muted elements |
-| `oxblood` | `#6B1D1D` | Light mode accent, stamps, emphasis |
-| `olive` | `#4A5A24` | Tertiary accent — used sparingly for contrast |
-| `bronze` | `#8B5E2B` | Midtone in duotone ramps, warm neutral |
+| `ink` | `#1C1814` | Deepest dark — shadows, dark mode bg base (warm umber undertone) |
+| `midnight` | `#2A2520` | Dark mode elevated surfaces (one step lighter than ink) |
+| `walnut` | `#5C4A3D` | Mid-shadow brown; light-mode accent (replaces the old `oxblood`) |
+| `umber` | `#8B7355` | Midtone in duotone ramps; warm neutral; secondary accent |
+| `taupe` | `#B8A189` | Light midtone; subtitles in dark mode |
+| `sand` | `#D9C9B0` | Light secondary surface (replaces the old `folder`); primary text on dark |
+| `bone` | `#F0E6D0` | Warm cream; primary text on dark, dark backgrounds in light mode |
+| `paper` | `#F5F0E8` | Light mode bg base; card backgrounds |
+| `gold` | `#C4A747` | **Channel accent** — crosshairs, hero labels, highlights, emphasis (replaces the old saturated `amber`) |
+| `dustblue` | `#7AA3C9` | Muted us-blue midtone (RdBu diverging midpoint between `bone` and `semantic.us`) |
 
 ### Semantic Colors (Geopolitical)
 
-Unchanged from prior system. These override mode colors when encoding geopolitical meaning.
+These override mode colors when encoding geopolitical meaning. **Note the muted intensity** — Parallax intentionally avoids the saturated reds/blues of cable-news geopolitics; the editorial register is closer to The Economist than to CNN.
 
 | Token | Hex | Meaning |
 |-------|-----|---------|
-| `us` | `#3266AD` | US / Western-aligned actions |
-| `china` | `#C23B22` | China / Eastern-aligned actions (= `rust`) |
+| `us` | `#4A7BA7` | US / Western-aligned actions (muted blue) |
+| `china` | `#A64D46` | China / Eastern-aligned actions (muted rust-red) |
 | `neutral` | `#888780` | Non-aligned, structural, historical |
-| `highlight` | `#F5A623` | Emphasis, contested space (close to `amber`) |
-| `success` | `#5DAA68` | Positive trend, growth |
-| `danger` | `#D64545` | Negative trend, conflict, failure |
+
+Exposed in `theme.ts` as `semantic.us` / `semantic.china` / `semantic.neutral`, plus three convenience aliases: `semantic.highlight` = `gold`, `semantic.success` = `us` (no separate green; growth/positive trends use US-blue when geopolitical, gold when channel-neutral), `semantic.danger` = `china`.
+
+### Legacy aliases (in `theme.ts`, NOT in palette.json)
+
+For backwards compatibility with templates written against the original Meridian draft, `theme.ts` exports six aliases that point at canonical palette keys. These names still appear in older template code — DON'T propagate them to new code.
+
+| Legacy alias | Resolves to | Notes |
+|--------------|-------------|-------|
+| `amber` | `gold` (`#C4A747`) | Old saturated amber `#E5A544` is gone; channel accent is now `gold` |
+| `rust` | `semantic.china` (`#A64D46`) | Old `#C23B22` saturated rust no longer exists |
+| `oxblood` | `walnut` (`#5C4A3D`) | Old `#6B1D1D` deep-red no longer exists; light-mode accent migrated to `walnut` |
+| `folder` | `sand` (`#D9C9B0`) | Old `#C8B89A` folder-tan no longer exists |
+| `olive` | `umber` (`#8B7355`) | No green in palette — folded into umber |
+| `bronze` | `umber` (`#8B7355`) | Duotone midtone — same family as `umber` |
+
+Audit (May 17, 2026): all callers of these aliases were verified to render correctly against the current canonical values. New work should use the canonical keys directly.
 
 ### Sequential Ramps (5-stop, light → dark)
 
+Defined in `palette.json` → `ramps`. Exposed in `theme.ts` as `ramps.<name>`. Used for sequential / divergent chart fills, choropleth scales, and ProportionalSymbolMap size encoding.
+
 | Ramp | Stops |
 |------|-------|
-| `rampBlue` | `#E6F1FB` `#85B7EB` `#378ADD` `#185FA5` `#042C53` |
-| `rampRed` | `#FCEBEB` `#F09595` `#E24B4A` `#A32D2D` `#501313` |
-| `rampAmber` | `#FFF3D6` `#F5D78E` `#E5A544` `#B07A28` `#5C3F12` |
-| `rampGray` | `#F1EFE8` `#B4B2A9` `#888780` `#5F5E5A` `#2C2C2A` |
+| `warm` (6-stop) | `#F5F0E8` `#D9C9B0` `#B8A189` `#8B7355` `#5C4A3D` `#1C1814` (paper → ink) |
+| `blue` | `#E8F0F6` `#9DBDD6` `#4A7BA7` `#2E5C82` `#163048` |
+| `red` | `#F5E8E7` `#CFA09C` `#A64D46` `#7A3530` `#3D1A18` |
+| `gold` | `#FFF6E0` `#E8D49A` `#C4A747` `#967E30` `#5C4D1A` |
+| `gray` | `#F1EFE8` `#B4B2A9` `#888780` `#5F5E5A` `#2C2C2A` |
 
 ### Dark Mode Palette
 
-| Token | Hex | Use |
-|-------|-----|-----|
-| `bg.dark.base` | `#12100E` | Deepest background (radial gradient edge) |
-| `bg.dark.surface` | `#1C1814` | Primary surface (= `ink`) |
-| `bg.dark.elevated` | `#2A2520` | Cards, panels, raised elements |
-| `bg.dark.map` | `#1A1612` | Map background (slightly different from surface) |
-| `text.dark.primary` | `#F0E6D0` | Primary text (= `bone`) |
-| `text.dark.secondary` | `#B8AE9C` | Subtitles, descriptions |
-| `text.dark.muted` | `#7A6E60` | Captions, metadata |
-| `text.dark.accent` | `#E5A544` | Labels, crosshair text (= `amber`) |
+Defined in `palette.json` → `modes.dark`. Tokens resolve to palette keys, not raw hex — change the underlying key and the mode follows.
+
+| Token | Resolves to | Hex | Use |
+|-------|-------------|-----|-----|
+| `bg.dark.base` | (raw) | `#12100E` | Deepest background (radial gradient edge) |
+| `bg.dark.surface` | `ink` | `#1C1814` | Primary surface |
+| `bg.dark.elevated` | `midnight` | `#2A2520` | Cards, panels, raised elements |
+| `bg.dark.map` | (raw) | `#1A1612` | Map background (slightly different from surface) |
+| `text.dark.primary` | `sand` | `#D9C9B0` | Primary text (warm cream) |
+| `text.dark.secondary` | `taupe` | `#B8A189` | Subtitles, descriptions |
+| `text.dark.muted` | `umber` | `#8B7355` | Captions, metadata |
+| `text.dark.accent` | `gold` | `#C4A747` | Labels, crosshair text, hero numbers |
 
 Background treatment: radial gradient from `ink` (center) to `bg.dark.base` (edges), creating a warm vignette that focuses attention center-frame. The brown undertone reads as candlelit/archival rather than cold surveillance.
 
 ### Light Mode Palette
 
-| Token | Hex | Use |
-|-------|-----|-----|
-| `bg.light.base` | `#F5F0E8` | Primary surface (= `paper`) |
-| `bg.light.surface` | `#EDE7DB` | Slightly darker surface for depth |
-| `bg.light.elevated` | `#FFFFFF` | Cards, containers on paper bg |
-| `bg.light.border` | `#D4CAB8` | Subtle borders, divider lines |
-| `text.light.primary` | `#1C1814` | Primary text (= `ink`) |
-| `text.light.secondary` | `#4A4538` | Subtitles, descriptions |
-| `text.light.muted` | `#8A8070` | Captions, metadata, sources |
-| `text.light.accent` | `#6B1D1D` | Labels, stamps (= `oxblood`) |
+Defined in `palette.json` → `modes.light`.
+
+| Token | Resolves to | Hex | Use |
+|-------|-------------|-----|-----|
+| `bg.light.base` | `paper` | `#F5F0E8` | Primary surface |
+| `bg.light.surface` | (raw) | `#EDE7DB` | Slightly darker surface for depth |
+| `bg.light.elevated` | (raw) | `#FFFFFF` | Cards, containers on paper bg |
+| `bg.light.border` | `sand` | `#D9C9B0` | Subtle borders, divider lines |
+| `bg.light.map` | (raw) | `#EDE7DB` | Map background |
+| `text.light.primary` | `ink` | `#1C1814` | Primary text |
+| `text.light.secondary` | `walnut` | `#5C4A3D` | Subtitles, descriptions |
+| `text.light.muted` | `umber` | `#8B7355` | Captions, metadata, sources |
+| `text.light.accent` | `walnut` | `#5C4A3D` | Labels, stamps (replaces old `oxblood` for light-mode accent) |
 
 Background treatment: flat or lightly textured `paper` with subtle noise (2-3% opacity). Optional: thin ruled border inset 40px from edges (1px, `bg.light.border`), evoking a briefing document.
+
+### Duotone treatments (image pipeline)
+
+Defined in `palette.json` → `duotone`. Used by `tools/brand-treatment/treat.py` and the `BrandImage` Remotion component. Each treatment is a 3-stop ramp (shadows → midtones → highlights).
+
+| Treatment | Shadows | Midtones | Highlights | When to use |
+|-----------|---------|----------|------------|-------------|
+| `standard` | `ink` | `umber` | `gold` | Default treatment — most footage |
+| `conflict` | `ink` | `#7A2E1A` (deep brick) | `china` `#A64D46` | Geopolitical tension, military, opposition |
+| `editorial` | `taupe` | `bone` | `paper` | Documents, archival, low-saturation editorial register |
 
 ---
 
@@ -164,7 +202,7 @@ Usage:
 - **Standalone:** The ∴ can appear alone as a section divider, loading indicator, or watermark
 - **Antipode variant:** The ∴ sits at the center of the thesis/antithesis split
 - **Minimum size:** 12px (the three dots must remain visually distinct)
-- **Color:** `amber` on dark mode, `oxblood` on light mode
+- **Color:** `gold` on dark mode, `walnut` on light mode (legacy aliases: `amber`/`oxblood`)
 
 ### Cross-Register Placement (the systematic anchor)
 
@@ -172,7 +210,7 @@ The ∴ mark is the channel's most reliable visual unity anchor. It appears acro
 
 | Surface | Placement | Style | Source |
 |---------|-----------|-------|--------|
-| **Remotion templates** | Header strip (lower-left of strip), part of `∴ PARALLAX` wordmark | IBM Plex Mono uppercase, letter-spacing 2.5px, amber/oxblood per mode | HeaderStrip component |
+| **Remotion templates** | Header strip (lower-left of strip), part of `∴ PARALLAX` wordmark | IBM Plex Mono uppercase, letter-spacing 2.5px, `gold` (dark) / `walnut` (light) per mode | HeaderStrip component |
 | **Remotion templates (footer)** | Footer strip (right side, after FILED date) | Standalone glyph at meta size, muted color | FooterStrip component |
 | **Constructivist illustrations (Register 2/3)** | Lower-right corner, 60-80px from edge | Standalone glyph, brand-treated to match the illustration's palette emphasis | Per AI_VIDEO_PIPELINE.md disclosure rules — also serves as "∴ Visualized" indicator for AI-GEN clips >10s |
 | **Thumbnails** | After channel name in title, or as standalone accent in lower-third | Heavy weight, saturated accent color | thumbnail-concept skill |
@@ -188,7 +226,7 @@ Inherited from Cartograph. A reticle (concentric circles + crosshair lines) that
 
 - **Construction:** Outer circle (stroke only) + inner circle (stroke only) + center dot + vertical/horizontal hairlines extending beyond outer circle
 - **Stroke weight:** 0.8px outer, 0.5px inner, 0.4px hairlines
-- **Color:** `amber` at 40-60% opacity (dark mode), `oxblood` at 30-40% opacity (light mode)
+- **Color:** `gold` at 40-60% opacity (dark mode), `walnut` at 30-40% opacity (light mode) (legacy aliases: `amber`/`oxblood`)
 - **Animation:** Slow tracking (translating to target over 600-800ms), lock-on pulse (inner circle scales 1.0 → 1.1 → 1.0 over 200ms)
 - **Placement:** Right-third of frame for title cards, centered on subject for thumbnails
 
@@ -199,9 +237,9 @@ Horizontal bands along the left edge showing historical eras, colored in warm ea
 | Era label | Color | Example |
 |-----------|-------|---------|
 | Present | `bone` at 80% | 2026 |
-| Cold War | `folder` | 1947 |
-| Empire | `bronze` | 1900 |
-| Industrial | `rust` at 60% | 1786 |
+| Cold War | `sand` (legacy alias: `folder`) | 1947 |
+| Empire | `umber` (legacy alias: `bronze`) | 1900 |
+| Industrial | `semantic.china` at 60% (legacy alias: `rust`) | 1786 |
 | Deep | `ink` at 50% | — |
 
 Bands are 80-120px wide, full height of frame, with era labels in IBM Plex Mono at `meta` size.
@@ -267,9 +305,9 @@ Map the desaturated image to a two-color ramp from the brand palette:
 
 | Ramp name | Shadows | Midtones | Highlights | When to use |
 |-----------|---------|----------|------------|-------------|
-| **Standard** | `ink` #1C1814 | `bronze` #8B5E2B | `amber` #E5A544 | Default for most content |
-| **Conflict** | `ink` #1C1814 | `#7A2E1A` | `rust` #C23B22 | China, conflict, danger |
-| **Editorial** | `folder` #C8B89A | `bone` #F0E6D0 | `paper` #F5F0E8 | Light mode images |
+| **Standard** | `ink` #1C1814 | `umber` #8B7355 | `gold` #C4A747 | Default for most content |
+| **Conflict** | `ink` #1C1814 | `#7A2E1A` (deep brick) | `china` #A64D46 | China, conflict, danger |
+| **Editorial** | `taupe` #B8A189 | `bone` #F0E6D0 | `paper` #F5F0E8 | Light mode images, documents, archival |
 
 ### Step 3: Grain & Vignette
 
@@ -462,13 +500,13 @@ The unity rule: **never hard-cut across pillars in Class B (clean ↔ grainy) wi
 
 ## Color Assignment Rules
 
-1. **Geopolitical actors get semantic colors.** US = `us` blue, China = `china`/`rust` red. Non-negotiable.
-2. **Contested or swing actors get `amber`.** Countries caught between blocs, unresolved outcomes.
+1. **Geopolitical actors get semantic colors.** US = `semantic.us` (muted blue `#4A7BA7`), China = `semantic.china` (muted rust-red `#A64D46`). Non-negotiable.
+2. **Contested or swing actors get `gold`** (legacy alias: `amber`). Countries caught between blocs, unresolved outcomes.
 3. **Historical or structural concepts get `neutral`.** Past events, background context, non-partisan framing.
-4. **Positive/negative valence uses `success`/`danger`.** Growth, triumph, failure, escalation.
-5. **Default accent is `amber`** (dark mode) or **`oxblood`** (light mode). When no semantic meaning applies.
+4. **Positive/negative valence uses `semantic.success`/`semantic.danger` aliases.** These resolve to `semantic.us` (growth/positive — no separate green) and `semantic.china` (failure/escalation — same as conflict red). The lack of a dedicated green is intentional: Parallax's editorial register doesn't use the green-good/red-bad cable-news binary.
+5. **Default accent is `gold`** (dark mode) or **`walnut`** (light mode) when no semantic meaning applies. Legacy aliases `amber`/`oxblood` still resolve correctly.
 6. **Never use raw hex in JSON data files.** Always reference a named token from this file.
-7. **Image duotone ramp matches content:** Standard (amber) for neutral analysis, Conflict (rust) for adversarial content.
+7. **Image duotone ramp matches content:** `standard` (ink → umber → gold) for neutral analysis, `conflict` (ink → deep-brick → `semantic.china`) for adversarial content, `editorial` (taupe → bone → paper) for documents/archival.
 
 ---
 
@@ -482,11 +520,11 @@ The episode color emphasis is specified once at the episode level (in `episodes/
 
 | Value | Foregrounded tokens | Semantic | Pairs with text_treatment |
 |-------|---------------------|----------|----------------------------|
-| `neutral` (default) | Full brand palette, `amber` accents | Channel default | Mixed-typography episodes, transitional moments |
-| `soviet` | `rust` + `bronze` + `amber` + `ink` + `bone` (full saturated revolutionary) | Russian/Soviet content | `russian_constructivist` |
-| `american-modernist` | `walnut` + `umber` + `bronze` + `bone` + `paper` (softer mid-century, `rust` only as sparing accent) | American mid-century / contemporary tech | `english_modernist` or `english_minimal` |
-| `chinese-state` | Chinese vermillion + `amber` + `ink` + `bone` (lacquer-influenced, distinct from Soviet) | Chinese contemporary state-led content | `chinese_propaganda` or `chinese_minimal` |
-| `chinese-traditional` | `ink` dominant + `bone` + `paper`, sparse `oxblood` for seal accents | Pre-revolutionary Chinese / classical | `chinese_traditional` |
+| `neutral` (default) | Full brand palette, `gold` accents (legacy alias: `amber`) | Channel default | Mixed-typography episodes, transitional moments |
+| `soviet` | `semantic.china` + `umber` + `gold` + `ink` + `bone` (legacy aliases: rust + bronze + amber — full revolutionary palette) | Russian/Soviet content | `russian_constructivist` |
+| `american-modernist` | `walnut` + `umber` (legacy alias: bronze folds into umber) + `bone` + `paper` (softer mid-century, `semantic.china` only as sparing accent) | American mid-century / contemporary tech | `english_modernist` or `english_minimal` |
+| `chinese-state` | Chinese vermillion + `gold` + `ink` + `bone` (lacquer-influenced, distinct from Soviet) | Chinese contemporary state-led content | `chinese_propaganda` or `chinese_minimal` |
+| `chinese-traditional` | `ink` dominant + `bone` + `paper`, sparse `walnut` for seal accents (legacy alias: `oxblood`) | Pre-revolutionary Chinese / classical | `chinese_traditional` |
 | `japanese-showa` | `ink` + bold red + `bone` (minimal 2-3 colors) | Pre-1945 Japanese imperial / Showa-era | `japanese_showa` |
 
 ### Implementation
@@ -495,21 +533,21 @@ The `getEpisodeColorEmphasis(emphasis: EmphasisName)` helper in `theme.ts` retur
 
 ```typescript
 // Before (pulls full palette regardless of episode)
-<Bar fill={theme.colors.amber} />
+<Bar fill={theme.palette.gold} />  // or palette.amber (legacy alias)
 
 // After (consumes episode emphasis)
 const emphasis = useEpisodeColorEmphasis(); // reads from manifest's episodeColorEmphasis
 <Bar fill={emphasis.primaryAccent} />
 ```
 
-`emphasis.primaryAccent` returns `amber` for neutral, `rust` for soviet, `walnut` for american-modernist (a softer accent), Chinese vermillion for chinese-state, etc. Same for `secondaryAccent`, `dominantText`, `surfaceTone`, `chartFillSequence`.
+`emphasis.primaryAccent` returns `gold` for neutral, `semantic.china` for soviet, `walnut` for american-modernist (a softer accent), Chinese vermillion for chinese-state, etc. Same for `secondaryAccent`, `dominantText`, `surfaceTone`, `chartFillSequence`. (Legacy callers using the `amber`/`rust` alias names still resolve to the canonical values.)
 
 ### High-impact templates that consume emphasis
 
 The five templates that benefit most from per-episode emphasis (chart fills, accent colors, and highlight elements drive visual identity hardest):
 
 1. **DataChart** — bar fills and accent labels
-2. **ChoroplethMap** — contested-actor highlight color (was always `amber`; now `emphasis.primaryAccent`)
+2. **ChoroplethMap** — contested-actor highlight color (was always `gold`/`amber`; now `emphasis.primaryAccent`)
 3. **FrameworkDiagram** — node fills and connection-line colors
 4. **TimelineComparison** — era band fills and event accents
 5. **KineticTypography** — accent words and emphasis underlines
@@ -518,7 +556,7 @@ Other templates (TitleTransition, CrosshairOverlay, MetadataStrip, etc.) keep th
 
 ### Default behavior
 
-If an episode's `visual-identity.json` is missing or `episodeColorEmphasis` is unset, templates fall back to `neutral` (full palette, `amber` accents). This preserves backward compatibility — existing data files render identically until an episode opts in to emphasis.
+If an episode's `visual-identity.json` is missing or `episodeColorEmphasis` is unset, templates fall back to `neutral` (full palette, `gold` accents). This preserves backward compatibility — existing data files render identically until an episode opts in to emphasis.
 
 ### Typographic voice (per-emphasis display font)
 
@@ -532,7 +570,7 @@ Every composition includes a metadata layer in IBM Plex Mono at `meta` size (11p
 
 ### Header strip (top of frame, inside safe area)
 
-Dark mode: `amber` text on transparent
+Dark mode: `gold` text on transparent
 Light mode: `text.light.muted` text on transparent
 
 Content varies by variant:
@@ -549,7 +587,7 @@ Content: `● REC · runtime` (left) + `scale or subject` (center) + `FILED date
 
 ### Light mode additions
 
-- Rubber stamp element (EPISODE XX) in `oxblood`, rotated 2-3°, top-right area
+- Rubber stamp element (EPISODE XX) in `walnut` (legacy alias: `oxblood`), rotated 2-3°, top-right area
 - Thin ruled border inset 40px, 1px `bg.light.border`
 - Classification-style label: `PARALLAX // FILE XXX` in IBM Plex Mono
 
@@ -581,7 +619,7 @@ Source of truth: `mapConfig.styleColors` / `mapConfig.darkStyleColors` in [`src/
 | Land fill | `#F5F0E8` (paper) | `#1C1814` (ink) | Reads as paper, not map |
 | Water | `#E4DDD3` (paper-tint) | `#100E0C` | Soft, no marketing blue |
 | Country border | `#1C1814` (ink) | `#5A5448` (muted) | Single ink-weight stroke, no glow |
-| Disputed border | `#C23B22` (rust) dashed | `#C23B22` (rust) dashed | Editorially-named contests render visually distinct |
+| Disputed border | `#A64D46` (`semantic.china`) dashed | `#A64D46` (`semantic.china`) dashed | Editorially-named contests render visually distinct |
 | Country label | `#1C1814` ink, IBM Plex Sans Medium, uppercase, letter-spacing 0.06em | `#F0E6D0` bone | Plex Sans matches the brand display register |
 | State/province | `#5A5448`, IBM Plex Sans Regular | `#8A8070` | One step below country; uppercase + tight tracking |
 | Water label | `#8A8070`, italic-feeling, sparse letter-spacing | `#5A5448` | Subtle — water is felt, not announced |
@@ -593,7 +631,7 @@ These rules apply to every Parallax map regardless of template:
 
 - **Terrain is opt-in, not default.** The single biggest "Google Earth" tell is on-by-default terrain hillshading. As of May 11 2026, `MapGL` defaults `terrain={false}`. Enable per-shot via the template data field when relief is genuinely the point (e.g., a Himalayan supply route). See LESSONS L99.
 - **POIs are off.** Atlases don't show coffee shops. The Meridian styles hide every POI label group.
-- **Disputed boundaries render dashed in rust.** Taiwan Strait, South China Sea nine-dash, Kashmir, Crimea — Parallax names these. Don't suppress them in styles.
+- **Disputed boundaries render dashed in `semantic.china` red (`#A64D46`).** Taiwan Strait, South China Sea nine-dash, Kashmir, Crimea — Parallax names these. Don't suppress them in styles.
 - **US worldview, disputed lines visible.** The bounded-analogy doctrine in cartographic form: show the recognized boundary *and* the contested claim.
 - **Major roads at 0.15 opacity, all other transit hidden.** Editorial corridors, not navigation.
 - **Annotations carry the editorial voice.** Base maps are substrate; `MapAnnotations` (see [`components/MapAnnotations.tsx`](./src/components/MapAnnotations.tsx) and the [map-annotations dossier](./references/template-research/map-annotations.md)) carry the named places, leaders, source notes.
@@ -621,16 +659,18 @@ Episodes directory: `data/episodes/ep{NN}/`
 
 ## Quick Reference: Light (Primary) vs Dark (Secondary)
 
-| Element | Light Mode — PRIMARY (Dossier) | Dark Mode — secondary (Meridian) |
-|---------|---------------------|----------------------|
+_Note: the table columns are swapped — the first content column is Dark Mode (secondary), the second is Light Mode (primary). The headers are kept in their historical order; read left as Dark, right as Light, per the original "Dossier vs Meridian" framing._
+
+| Element | Dark Mode — secondary (Meridian) | Light Mode — PRIMARY (Dossier) |
+|---------|----------------------------------|--------------------------------|
 | Background | Radial gradient: `ink` → `bg.dark.base` (warm umber) | Flat `paper` with subtle noise |
-| Text primary | `bone` #F0E6D0 | `ink` #1C1814 |
-| Accent color | `amber` #E5A544 | `oxblood` #6B1D1D |
-| Metadata text | `text.dark.muted` | `text.light.muted` |
-| Crosshair | `amber` at 40-60% | `oxblood` at 30-40% |
-| ∴ mark | `amber` | `oxblood` |
-| Image duotone | ink → bronze → amber | folder → bone → paper |
+| Text primary | `sand` #D9C9B0 (was `bone` #F0E6D0) | `ink` #1C1814 |
+| Accent color | `gold` #C4A747 | `walnut` #5C4A3D |
+| Metadata text | `text.dark.muted` (`umber`) | `text.light.muted` (`umber`) |
+| Crosshair | `gold` at 40-60% | `walnut` at 30-40% |
+| ∴ mark | `gold` | `walnut` |
+| Image duotone | ink → umber → gold | taupe → bone → paper |
 | Card shadow | `0 2px 12px rgba(0,0,0,0.25)` | `0 1px 8px rgba(0,0,0,0.08)` |
-| Divider lines | `amber` at 30%, gradient fade | `bg.light.border`, gradient fade |
-| Stamp element | — (not used) | `oxblood`, rotated 2-3° |
+| Divider lines | `gold` at 30%, gradient fade | `bg.light.border` (`sand`), gradient fade |
+| Stamp element | — (not used) | `walnut`, rotated 2-3° |
 | Border frame | — (not used) | 1px inset 40px, `bg.light.border` |
