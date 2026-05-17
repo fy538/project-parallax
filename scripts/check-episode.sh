@@ -24,6 +24,7 @@
 #   W7. TSX code-level polish lint (POLISH.md L1/L7/...)  (polish_lint.py)
 #   W8. Zero-hit stock shots needing AI-gen fallback      (zerohit_fallback.py --count)
 #   W9. Doc consistency (templates/palette/npm/personas)  (check_docs.py)
+#  W10. Narration audio QA (LUFS / peaks / silence)       (narration/audio_qa.py — only if narration.wav exists)
 #
 # Usage:
 #   ./scripts/check-episode.sh silicon-trap
@@ -232,6 +233,17 @@ fi
 # `./scripts/check-docs.sh` or with `--strict` for CI gating.
 run_soft "Repo-wide doc consistency (templates/palette/npm/personas)" \
   python3 "$TOOLS/lint/check_docs.py"
+
+# W10. Narration audio QA — only fires if narration.wav has been recorded.
+# Surfaces LUFS-off-target, true-peak clipping, mono violations, sample-rate
+# mismatches, and long silence gaps. Soft check: warnings are informational;
+# the operator decides when to re-master vs. re-record. Tool writes
+# episodes/$SLUG/assets/_audio-qa.md alongside the WAV. Pre-recording, this
+# step is silently skipped (no narration.wav = nothing to audit).
+if [[ -f "$ROOT/episodes/$SLUG/assets/narration.wav" ]]; then
+  run_soft "Narration audio QA (LUFS / peaks / silence / format)" \
+    python3 "$TOOLS/narration/audio_qa.py" "$SLUG"
+fi
 
 # ── Post-check: refresh the pipeline tracker for THIS episode ────────────────
 # After all checks complete, regenerate the per-episode _status.md dashboard

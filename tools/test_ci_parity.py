@@ -124,6 +124,11 @@ COVERAGE_CONTRACT: list[dict[str, str]] = [
         "pattern": r"lint/check_docs\.py",
         "covered_by": "tools/lint/test_check_docs.py — 17 tests covering template-name resolution, palette consistency (two-pass scan with smart-skip), npm-script resolution, persona consistency. Wired into check-episode.sh as W9.",
     },
+    {
+        "name": "narration/audio_qa.py",
+        "pattern": r"narration/audio_qa\.py",
+        "covered_by": "tools/narration/test_audio_qa.py — 36 tests covering parsers (loudnorm JSON, silencedetect line pairing), per-check finders (loudness/format/silences), CLI smoke, and ffmpeg-backed integration tests against synthesized WAVs. Wired into check-episode.sh as W10 (skipped if narration.wav absent).",
+    },
 ]
 
 
