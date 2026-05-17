@@ -1323,6 +1323,54 @@ def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
     return False
 
 
+def suggest_state_promotion(
+    entry: StateEntry, status: EpisodeStatus
+) -> Optional[tuple[str, str]]:
+    """Return (next_state, reason) if `entry` looks ready to promote, else None.
+
+    Promotion rules — derived from STATE_REQUIRED + check-episode workflow:
+      INCUBATING     → VIABLE         viability.md present
+      VIABLE         → RESEARCHING    brief.md or research-pass1.md present
+      RESEARCHING    → RESEARCH READY brief.md + research-audit.md present
+      RESEARCH READY → DRAFTING       angle-memo.md + script present
+      DRAFTING       → RENDER READY   script + visual-spec + manifest present
+      RENDER READY   → IN POST        full render + narration present
+      IN POST        → PUBLISHED      (manual — needs YouTube confirmation)
+      PUBLISHED      → RETROED        (manual — publish-retro skill)
+
+    Off-lifecycle states (BLOCKED, REVISING) and the two manual-only
+    transitions return None — those require human judgment.
+
+    The function reads ONLY filesystem signals via the already-computed
+    EpisodeStatus, so it's pure relative to `entry` + `status` and safe
+    to call in tests. It does NOT mutate pipeline-state.json — that's
+    the caller's job under `--apply`.
+    """
+    ep_dir = EPISODES_DIR / entry.slug
+    cur = entry.state
+
+    if cur == "INCUBATING":
+        if (ep_dir / "viability.md").is_file() or (ep_dir / "viability-check.md").is_file():
+            return ("VIABLE", "viability.md present")
+    elif cur == "VIABLE":
+        if status.has_research or list(ep_dir.glob("research-pass*.md")):
+            return ("RESEARCHING", "research brief / pass file present")
+    elif cur == "RESEARCHING":
+        if status.has_research and (ep_dir / "research-audit.md").is_file():
+            return ("RESEARCH READY", "brief.md + research-audit.md present")
+    elif cur == "RESEARCH READY":
+        if status.has_angle_memo and status.has_script:
+            return ("DRAFTING", "angle-memo + script started")
+    elif cur == "DRAFTING":
+        if status.has_script and status.has_visual_spec and status.has_manifest:
+            return ("RENDER READY", "script + visual-spec + assembly-manifest all present")
+    elif cur == "RENDER READY":
+        if status.has_render and status.has_narration:
+            return ("IN POST", "full-episode render + narration recorded")
+    # IN POST → PUBLISHED and PUBLISHED → RETROED are manual.
+    return None
+
+
 def write_status(s: EpisodeStatus) -> Path:
     """Write _status.md for one episode. Returns the path."""
     ep_dir = EPISODES_DIR / s.slug
@@ -1391,7 +1439,74 @@ def main() -> int:
             "never-rendered, etc.)."
         ),
     )
+    parser.add_argument(
+        "--suggest-states",
+        action="store_true",
+        help=(
+            "For each episode, check whether artifact presence indicates it "
+            "should be promoted to a forward state and print the suggestion. "
+            "Read-only by default — pair with --apply to actually rewrite "
+            "pipeline-state.json (which also bumps stateEnteredAt to today)."
+        ),
+    )
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help=(
+            "With --suggest-states: apply the promotions in place to "
+            "episodes/pipeline-state.json (sets new state + bumps "
+            "stateEnteredAt to today). No-op without --suggest-states."
+        ),
+    )
     args = parser.parse_args()
+
+    # ── --suggest-states path ────────────────────────────────────────────────
+    # Walks every episode and surfaces ready-to-promote candidates by
+    # comparing artifact presence against STATE_REQUIRED. Read-only by
+    # default; --apply rewrites pipeline-state.json (bumping stateEnteredAt
+    # to today, matching the pre-commit sync_pipeline_state.py invariant).
+    if args.suggest_states:
+        entries = load_pipeline_state()
+        if not entries:
+            print("✗ episodes/pipeline-state.json not found or empty", file=sys.stderr)
+            return 2
+        if args.episode:
+            entries = [e for e in entries if e.slug == args.episode]
+            if not entries:
+                print(f"✗ episode '{args.episode}' not found in pipeline-state.json", file=sys.stderr)
+                return 2
+        statuses = {e.slug: compute_episode_status(e) for e in entries}
+        suggestions: list[tuple[StateEntry, str, str]] = []
+        for e in entries:
+            sug = suggest_state_promotion(e, statuses[e.slug])
+            if sug:
+                suggestions.append((e, sug[0], sug[1]))
+        if not suggestions:
+            print("✓ no promotion candidates — every episode matches its claimed state")
+            return 0
+        print("\nPromotion candidates:\n")
+        for e, new_state, reason in suggestions:
+            print(f"  {e.slug:<30} {e.state} → {new_state}    ({reason})")
+        print()
+        if args.apply:
+            # Rewrite pipeline-state.json: change state + bump stateEnteredAt
+            data = json.loads(PIPELINE_STATE_JSON.read_text(encoding="utf-8"))
+            today_iso = datetime.date.today().isoformat()
+            applied: set[str] = {e.slug for e, _, _ in suggestions}
+            slug_to_new = {e.slug: ns for e, ns, _ in suggestions}
+            for ep in data.get("episodes", []):
+                if ep.get("slug") in applied:
+                    ep["state"] = slug_to_new[ep["slug"]]
+                    ep["stateEnteredAt"] = today_iso
+            PIPELINE_STATE_JSON.write_text(
+                json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            print(f"✓ applied {len(applied)} promotion(s) to {PIPELINE_STATE_JSON.relative_to(ROOT)}")
+            print("  → re-run with --write-status --update-tracker to refresh dashboards")
+        else:
+            print("Run with --apply to write these to pipeline-state.json.")
+        return 0
 
     # ── --write-status / --update-tracker / --check-only path ────────────────
     # When any of these flags is set, run the new pipeline-state-driven flow

@@ -590,3 +590,112 @@ _footer_
         # Expect: "...| `test-ep` | ... |\n\n_footer_"
         assert "`test-ep`" in text
         assert "|\n\n_footer_" in text, f"blank line eaten: {repr(text[-80:])}"
+
+
+# ── suggest_state_promotion ──────────────────────────────────────────────────
+
+class TestSuggestStatePromotion:
+    """The suggester reads ONLY the EpisodeStatus + entry.state + filesystem
+    for the few signals not yet in EpisodeStatus (viability.md, research
+    passes). Tests stub EPISODES_DIR at the module level so artifact lookups
+    hit an isolated tmp_path."""
+
+    @staticmethod
+    def _entry(slug: str, state: str) -> pv.StateEntry:
+        return pv.StateEntry(
+            slug=slug, state=state,
+            state_entered_at=datetime.date(2026, 1, 1),
+            format=None, target_publish=None,
+        )
+
+    def _setup_ep(self, tmp_path, monkeypatch, slug: str) -> Path:
+        ep_dir = tmp_path / "episodes" / slug
+        ep_dir.mkdir(parents=True)
+        monkeypatch.setattr(pv, "EPISODES_DIR", tmp_path / "episodes")
+        return ep_dir
+
+    def test_incubating_promotes_to_viable_when_viability_md_present(self, tmp_path, monkeypatch):
+        ep_dir = self._setup_ep(tmp_path, monkeypatch, "alpha")
+        (ep_dir / "viability.md").write_text("ok")
+        status = _make_status(slug="alpha", state="INCUBATING")
+        result = pv.suggest_state_promotion(self._entry("alpha", "INCUBATING"), status)
+        assert result is not None
+        assert result[0] == "VIABLE"
+        assert "viability" in result[1]
+
+    def test_incubating_stays_when_no_viability_doc(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="INCUBATING")
+        assert pv.suggest_state_promotion(self._entry("alpha", "INCUBATING"), status) is None
+
+    def test_viable_promotes_to_researching_when_brief_or_pass_present(self, tmp_path, monkeypatch):
+        # has_research=True signals brief.md
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="VIABLE", has_research=True)
+        result = pv.suggest_state_promotion(self._entry("alpha", "VIABLE"), status)
+        assert result == ("RESEARCHING", "research brief / pass file present")
+
+    def test_viable_promotes_when_only_pass_file_exists(self, tmp_path, monkeypatch):
+        ep_dir = self._setup_ep(tmp_path, monkeypatch, "alpha")
+        (ep_dir / "research-pass1.md").write_text("pass 1")
+        status = _make_status(slug="alpha", state="VIABLE", has_research=False)
+        result = pv.suggest_state_promotion(self._entry("alpha", "VIABLE"), status)
+        assert result is not None and result[0] == "RESEARCHING"
+
+    def test_researching_promotes_when_brief_and_audit_present(self, tmp_path, monkeypatch):
+        ep_dir = self._setup_ep(tmp_path, monkeypatch, "alpha")
+        (ep_dir / "research-audit.md").write_text("audit")
+        status = _make_status(slug="alpha", state="RESEARCHING", has_research=True)
+        result = pv.suggest_state_promotion(self._entry("alpha", "RESEARCHING"), status)
+        assert result == ("RESEARCH READY", "brief.md + research-audit.md present")
+
+    def test_researching_stays_when_audit_missing(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="RESEARCHING", has_research=True)
+        assert pv.suggest_state_promotion(self._entry("alpha", "RESEARCHING"), status) is None
+
+    def test_research_ready_promotes_when_angle_and_script_present(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="RESEARCH READY",
+                              has_angle_memo=True, has_script=True)
+        result = pv.suggest_state_promotion(self._entry("alpha", "RESEARCH READY"), status)
+        assert result == ("DRAFTING", "angle-memo + script started")
+
+    def test_drafting_promotes_when_script_visual_spec_manifest_all_present(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="DRAFTING",
+                              has_script=True, has_visual_spec=True, has_manifest=True)
+        result = pv.suggest_state_promotion(self._entry("alpha", "DRAFTING"), status)
+        assert result is not None and result[0] == "RENDER READY"
+
+    def test_drafting_stays_when_manifest_missing(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="DRAFTING",
+                              has_script=True, has_visual_spec=True, has_manifest=False)
+        assert pv.suggest_state_promotion(self._entry("alpha", "DRAFTING"), status) is None
+
+    def test_render_ready_promotes_to_in_post_when_render_and_narration_present(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="RENDER READY",
+                              has_render=True, has_narration=True)
+        result = pv.suggest_state_promotion(self._entry("alpha", "RENDER READY"), status)
+        assert result == ("IN POST", "full-episode render + narration recorded")
+
+    def test_render_ready_stays_without_narration(self, tmp_path, monkeypatch):
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="RENDER READY",
+                              has_render=True, has_narration=False)
+        assert pv.suggest_state_promotion(self._entry("alpha", "RENDER READY"), status) is None
+
+    def test_in_post_to_published_is_manual_returns_none(self, tmp_path, monkeypatch):
+        """IN POST → PUBLISHED requires human action (YouTube confirmation)."""
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="IN POST",
+                              has_render=True, has_narration=True)
+        assert pv.suggest_state_promotion(self._entry("alpha", "IN POST"), status) is None
+
+    def test_blocked_state_returns_none(self, tmp_path, monkeypatch):
+        """Off-lifecycle states never get auto-promoted."""
+        self._setup_ep(tmp_path, monkeypatch, "alpha")
+        status = _make_status(slug="alpha", state="BLOCKED")
+        assert pv.suggest_state_promotion(self._entry("alpha", "BLOCKED"), status) is None
