@@ -1045,6 +1045,19 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
         layout.spacing.md,
     };
   }, [chartBoxes.chart.width, data.comparisonPairs]);
+
+  // Small-multiples globalMax — shared value-axis across panel grid.
+  // Memoized so the spread+flatMap+map don't re-run every frame; the IIFE
+  // at the small-multiples JSX block below references this directly.
+  // (Sibling dataMaxBar + comparisonData are already memoized; this was the
+  // straggler called out by the May-17 perf audit.)
+  const smallMultiplesGlobalMax = useMemo(() => {
+    if (!data.panels || data.panels.length === 0) return 1e-9;
+    return Math.max(
+      1e-9,
+      ...data.panels.flatMap((p) => p.dataPoints.map((dp) => dp.value)),
+    );
+  }, [data.panels]);
   const frame = useCurrentFrame();
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
@@ -1394,15 +1407,10 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
 
       {/* ── Small-multiples variant — grid of mini horizontal bar panels with
           shared value scale. See: data-chart.md § 6.5 */}
-      {data.variant === "small-multiples" && data.panels && data.panels.length > 0 && (() => {
-        const globalMax = Math.max(
-          1e-9,
-          ...data.panels.flatMap((p) => p.dataPoints.map((dp) => dp.value)),
-        );
-        return (
+      {data.variant === "small-multiples" && data.panels && data.panels.length > 0 && (
           <SmallMultiplesPanels
             panels={data.panels}
-            globalMax={globalMax}
+            globalMax={smallMultiplesGlobalMax}
             unit={unit}
             chartLeft={chartArea.left}
             chartTop={chartArea.top}
@@ -1414,8 +1422,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
             formatAsYear={data.formatAsYear}
             mode="light"
           />
-        );
-      })()}
+      )}
 
       {/* ── Top metadata band — shares one reserved zone with the chart layout */}
       {hasTopBand && (

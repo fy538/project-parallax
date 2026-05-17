@@ -1,7 +1,7 @@
 /**
  * FullEpisode — Assembly-manifest-driven episode composition.
  *
- * Replaces the manual SiliconTrap.tsx approach (27-clip Series) with a data-driven
+ * Replaces the manual SiliconTrap.tsx approach (29-clip Series) with a data-driven
  * composition that renders the COMPLETE video: narration audio, motion graphics,
  * stock footage with brand treatment, and transitions — all from one JSON file.
  *
@@ -1167,6 +1167,12 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                   foregroundFadeInSec={seg.layered?.foregroundFadeInSec}
                   vignette={seg.layered?.vignette}
                 >
+                  {/* Fresh {background, foreground} object literal per frame —
+                      defeats React.memo if LayeredComposition is ever memoized
+                      (it isn't today; flagged by May-17 perf audit). When
+                      memoizing LayeredComposition: switch to separate
+                      `backgroundSlot` / `foregroundSlot` props so the object
+                      literal goes away. */}
                   {{
                     background: (
                       <SegmentErrorBoundary

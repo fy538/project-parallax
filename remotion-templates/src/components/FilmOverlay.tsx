@@ -122,8 +122,14 @@ const GrainOverlay = React.memo(({ intensity }: { intensity: number }) => {
   // <FilmOverlay> mount simultaneously (e.g. per-segment wiring in
   // FullEpisode.tsx, commit 09bb29a). Strip colons from useId() output
   // (`:r0:`) — valid in HTML5 ids but noisy in SVG `url(#…)` refs.
+  //
+  // Perf note (May-17 audit): filterId is STABLE per instance — the changing
+  // `seed` lives only on <feTurbulence seed={seed}>. Keeping the filter id
+  // constant lets React patch the seed attribute in place; Chrome updates
+  // the noise without recompiling the filter graph. Previously the seed was
+  // baked into the id, forcing a fresh filter element 15×/sec.
   const instanceId = useId().replace(/:/g, "");
-  const filterId = `film-grain-${instanceId}-${seed}`;
+  const filterId = `film-grain-${instanceId}`;
   const opacity = clampValue(intensity * 0.12, 0, 0.12);
 
   return (

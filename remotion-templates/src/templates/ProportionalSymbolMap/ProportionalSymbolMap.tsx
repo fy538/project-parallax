@@ -288,6 +288,14 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
     : Math.min(getCurrentPhaseIndex(frame, windows), windows.length - 1);
   const currentWindow: PhaseWindow = windows[safeIdx] ?? FALLBACK_PHASE_WINDOW;
 
+  // Memoize the max-symbols density check so the warnIf reduce doesn't
+  // recompute every frame (it's purely a function of windows, which is
+  // already memoized). See May-17 perf audit.
+  const maxSymbolsPerPhase = useMemo(
+    () => windows.reduce((max, w) => Math.max(max, w.phase.symbols.length), 0),
+    [windows],
+  );
+
   const phasePoses = useMemo(
     () =>
       data.phases.map((phase) =>
@@ -421,10 +429,6 @@ export const ProportionalSymbolMap: React.FC<{ data: ProportionalSymbolMapData }
   // circles) they overlap into illegibility. CartogramMap's d3-force
   // decollision is the right form there.
   // See MAP_TEMPLATE_SELECTOR.md.
-  const maxSymbolsPerPhase = windows.reduce(
-    (max, w) => Math.max(max, w.phase.symbols.length),
-    0,
-  );
   warnIf(
     maxSymbolsPerPhase >= 20,
     "ProportionalSymbolMap",

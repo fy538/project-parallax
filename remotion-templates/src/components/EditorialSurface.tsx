@@ -56,6 +56,15 @@ const INK_B = parseInt(palette.ink.slice(5, 7), 16);
 
 // ── Grain layer ───────────────────────────────────────────────────────────────
 
+// EditorialSurface wraps the entire episode, so the grain layer renders for
+// every frame of every episode. Previously we keyed the filter id off the
+// seed (`editorial-grain-${seed}`), which forced Chrome to recompile a new
+// SVG filter graph 15 times per second × ~13 min = ~12,000 fresh filter
+// elements per episode. Keeping the id constant and only mutating the
+// `seed=` attribute on <feTurbulence> lets React patch the attribute in
+// place; Chrome updates the noise without rebuilding the filter graph.
+const GRAIN_FILTER_ID = "editorial-grain";
+
 const GrainLayer = React.memo(({ intensity }: { intensity: number }) => {
   const frame = useCurrentFrame();
   // Update seed every 2 frames (15fps flicker) to simulate film "gate weave" —
@@ -81,13 +90,7 @@ const GrainLayer = React.memo(({ intensity }: { intensity: number }) => {
         }}
       >
         <defs>
-          <filter
-            id={`editorial-grain-${seed}`}
-            x="0%"
-            y="0%"
-            width="100%"
-            height="100%"
-          >
+          <filter id={GRAIN_FILTER_ID} x="0%" y="0%" width="100%" height="100%">
             <feTurbulence
               type="fractalNoise"
               baseFrequency="0.45"
@@ -98,11 +101,7 @@ const GrainLayer = React.memo(({ intensity }: { intensity: number }) => {
             <feColorMatrix type="saturate" values="0" in="noise" />
           </filter>
         </defs>
-        <rect
-          width="100%"
-          height="100%"
-          filter={`url(#editorial-grain-${seed})`}
-        />
+        <rect width="100%" height="100%" filter={`url(#${GRAIN_FILTER_ID})`} />
       </svg>
     </AbsoluteFill>
   );

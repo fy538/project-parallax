@@ -323,6 +323,54 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.nodes, direction.syncPoints, nodeStart]);
 
+  // ── Arc-layout pre-computation (memoized) ───────────────────────────────────
+  // The JSX below renders connections inside an IIFE. The pre-render layout —
+  // someAccentConn flag, label-apex collision sort + verticalOffsets — is
+  // pure-data-derived from {data.connections, nodeIndex, nodeXs, maxArcHeight}
+  // and was previously recomputed every frame (30 fps × episode length).
+  // Lifted out here so React.memo can skip it across the bulk of the timeline.
+  const arcLayout = useMemo(() => {
+    const someAccentConn = data.connections.some((c) => c.emphasis === "accent");
+
+    // E4 — arc-label collision detection. Compute apex positions, sort by x,
+    // then assign verticalOffsets to labels whose apex-x is closer than half
+    // their estimated width.
+    const apexEntries: Array<{
+      apexX: number;
+      apex: number;
+      label: string;
+      connIdx: number;
+    }> = [];
+    data.connections.forEach((conn, i) => {
+      if (!conn.label) return;
+      const fromIdx = nodeIndex[conn.from];
+      const toIdx = nodeIndex[conn.to];
+      if (fromIdx === undefined || toIdx === undefined) return;
+      const [leftIdx, rightIdx] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
+      const aX = nodeXs[leftIdx];
+      const bX = nodeXs[rightIdx];
+      if (Math.abs(bX - aX) < 1) return;
+      const halfSpan = (bX - aX) / 2;
+      const apex = Math.max(24, Math.min(halfSpan, maxArcHeight));
+      apexEntries.push({ apexX: (aX + bX) / 2, apex, label: conn.label, connIdx: i });
+    });
+    const sorted = [...apexEntries].sort((a, b) => a.apexX - b.apexX);
+    const verticalOffsets: Record<number, number> = {};
+    for (let k = 0; k < sorted.length; k++) {
+      const cur = sorted[k]!;
+      const labelWidth = Math.max(cur.label.length * 7, 60);
+      let collides = false;
+      if (k > 0) {
+        const prev = sorted[k - 1]!;
+        if (Math.abs(cur.apexX - prev.apexX) < labelWidth / 2) {
+          collides = true;
+        }
+      }
+      verticalOffsets[cur.connIdx] = collides ? -22 : 0;
+    }
+    return { someAccentConn, verticalOffsets };
+  }, [data.connections, nodeIndex, nodeXs, maxArcHeight]);
+
   // Baseline draw progress (left → right reveal).
   const baselineProgress = interpolate(
     frame,
@@ -461,42 +509,9 @@ export const ArcDiagram: React.FC<{ data: ArcDiagramData }> = ({ data }) => {
               without needing path.getTotalLength() (which is unreliable
               during SSR / first-frame render). */}
           {(() => {
-            // Pre-compute emphasis state for the whole connection set so
-            // the mute hierarchy activates when ANY connection is "accent".
-            const someAccentConn = data.connections.some(c => c.emphasis === "accent");
-
-            // E4 — arc-label collision detection.
-            // After all arc geometries are known, deconflict labels that share
-            // a similar apex-x position so they don't overlap.
-            const apexEntries: Array<{ apexX: number; apex: number; label: string; connIdx: number }> = [];
-            data.connections.forEach((conn, i) => {
-              if (!conn.label) return;
-              const fromIdx = nodeIndex[conn.from];
-              const toIdx = nodeIndex[conn.to];
-              if (fromIdx === undefined || toIdx === undefined) return;
-              const [leftIdx, rightIdx] = fromIdx <= toIdx ? [fromIdx, toIdx] : [toIdx, fromIdx];
-              const aX = nodeXs[leftIdx];
-              const bX = nodeXs[rightIdx];
-              if (Math.abs(bX - aX) < 1) return;
-              const halfSpan = (bX - aX) / 2;
-              const apex = Math.max(24, Math.min(halfSpan, maxArcHeight));
-              apexEntries.push({ apexX: (aX + bX) / 2, apex, label: conn.label, connIdx: i });
-            });
-            // Sort by apexX, then compute verticalOffset per label.
-            const sorted = [...apexEntries].sort((a, b) => a.apexX - b.apexX);
-            const verticalOffsets: Record<number, number> = {};
-            for (let k = 0; k < sorted.length; k++) {
-              const cur = sorted[k]!;
-              const labelWidth = Math.max(cur.label.length * 7, 60);
-              let collides = false;
-              if (k > 0) {
-                const prev = sorted[k - 1]!;
-                if (Math.abs(cur.apexX - prev.apexX) < labelWidth / 2) {
-                  collides = true;
-                }
-              }
-              verticalOffsets[cur.connIdx] = collides ? -22 : 0;
-            }
+            // Layout pre-computation is memoized above in `arcLayout` — pull
+            // out the bits the render loop needs.
+            const { someAccentConn, verticalOffsets } = arcLayout;
 
             return data.connections.map((conn: ArcConnection, i) => {
             const fromIdx = nodeIndex[conn.from];
