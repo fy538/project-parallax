@@ -20,6 +20,32 @@ The Parallax pipeline flows: script → visual-spec (JSON generation) → Remoti
 
 This is not a pixel-perfect polish pass (that's post-assembly). This is a **mandatory sanity check** before handing renders to the video editor.
 
+## The validator chain (run these BEFORE this skill's vision pass)
+
+This skill is the human/vision-level QA. The Parallax codebase also ships **structured validators** that catch a different category of issues (data schema, asset existence, render integrity, manifest staleness). Always run the validator chain first — it's faster than vision and catches things vision misses.
+
+```
+./scripts/check-episode.sh <slug>
+```
+
+That command runs all 8 hard checks + 8 soft checks in sequence. The ones most relevant to render-qa:
+
+- **`tools/lint/manifest_lint.py`** — manifest doctrine rules including the recently-added **`M-MANIFEST-STALE`** (warns when the production script is newer than the assembly manifest — caught the silicon-trap May-16 failure mode where v5 script + 6 new kinetic JSONs landed on a v4 manifest). Re-run `python3 tools/assembly/generate_manifest.py <slug>` to refresh whenever this warning fires.
+- **`tools/preflight.py <slug>`** — verifies every referenced asset path exists on disk before render. Catches missing footage / illustrations / narration files.
+- **`tools/pipeline_validator.py <slug> --strict`** — cross-checks the PIPELINE.md state against actual artifacts; writes a `_checkpoint.md` per episode so you have a "done/not-done" summary without opening a dozen files.
+- **`tools/lint/polish_lint.py --summary`** (or `npm run lint:tsx` from `remotion-templates/`) — TSX code-level POLISH.md doctrine rules (L1, L7, L9, L10, L12, L13, L14, A1, A2). Catches forbidden easings, missing maxWidth, magic numbers — things that affect every render.
+- **`tools/asset-source/zerohit_fallback.py <slug> --count`** — counts zero-hit stock-search shots that haven't been routed to the AI-gen fallback yet. If non-zero, run without `--count` to emit `ai-gen-briefs.md` per shot.
+
+After the render itself completes, the render pipeline auto-runs:
+
+- **`tools/postflight.py <render.mp4> --episode <slug>`** — guards against silent corruption (0-frame MP4, truncated tail, wrong resolution). Wired into `scripts/render-episode.mjs` after every concat; surfaces anomalies via stdout/stderr. If render-episode reports a postflight warning, investigate before doing the vision pass below.
+
+Housekeeping that doesn't gate render but keeps the episode tree tidy:
+
+- **`./scripts/clean-episode-cruft.sh <slug>`** — removes `.DS_Store` and reports duplicate version files (`shot-list-v2.json` next to `shot-list.json`, etc.). Dry-run by default; pass `--apply` to delete.
+
+If any structured validator fails, fix that first — vision-pass findings on top of a manifest-stale render are wasted work.
+
 ## Context
 
 Parallax uses Remotion (React-based video rendering) with 45 core templates plus 9 Shorts variants (full inventory: `remotion-templates/CLAUDE.md`; canonical schemas: `remotion-templates/references/template-schemas.md`). Each template has specific visual elements that need verification:

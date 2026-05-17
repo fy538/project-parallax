@@ -33,6 +33,26 @@ Every image in a Parallax video passes through a 4-step brand treatment pipeline
 
 The project includes `tools/asset-source/source.py`, a CLI that searches Pexels, Pixabay, and Unsplash. API keys are in `tools/asset-source/.env`.
 
+### Natural follow-up: zero-hit AI-gen fallback
+
+After a `source.py` run produces `asset-manifest.json`, some shots will inevitably come back with `total_results: 0` (subjects too specific for stock libraries — TSMC interior, COCOM-era archival, etc.). The canonical pipeline-side fallback is `tools/asset-source/zerohit_fallback.py`:
+
+```
+python3 tools/asset-source/zerohit_fallback.py <slug>
+```
+
+It scans the asset-manifest for zero-hit (and zero-successful-download) shots and writes `episodes/<slug>/ai-gen-briefs.md` — a structured per-shot brief with:
+- the original search terms + shot-list notes for context
+- a heuristically-routed Recraft anchor (`A1`–`A7`) for stills
+- a heuristically-routed Flux style ref (`r1`–`r15`) for video
+- a seeded generation prompt (edit before running)
+- format hints (1920×1080 still vs 16:9 5-8s video)
+- the full anchor + style-ref catalogs as appendix for manual override
+
+Workflow: run `source.py` → check `total_results` in the manifest → if any zero-hits, run `zerohit_fallback.py` → edit the briefs → generate via Recraft / Flux → drop into `episodes/<slug>/assets/` → re-run `source.py --rescan` or just edit the manifest to point at the new files.
+
+`check-episode.sh` runs `zerohit_fallback.py --count` as soft check W8 and surfaces the count of unresolved zero-hit shots before render.
+
 ### Running source.py
 
 ```bash

@@ -130,6 +130,20 @@ Produce 3-4 Shorts briefs (or fewer for Shorts-light episodes). For each:
 [How each Short can reference the full episode — end card, pinned comment, description link — without making the Short feel like an ad]
 ```
 
+## Rendering the Shorts
+
+This skill produces the per-Short concept doc + a machine-readable `episodes/<slug>/shorts-manifest.json` (one entry per Short, naming the template, data file path, and 9:16 layout overrides). Once Tiger approves the concepts, the actual MP4 files are rendered by the shipped npm script:
+
+```
+cd remotion-templates && npm run shorts -- --episode=<slug>
+```
+
+That command (`remotion-templates/scripts/render-shorts.mjs`, shipped May 14, 2026) reads `episodes/<slug>/shorts-manifest.json` and renders every Short to `out/shorts/<slug>/`. Each Short is one MP4 at 1080×1920 (9:16), 30fps, ready for YouTube Shorts upload.
+
+The 9 Shorts templates in `src/templates/Shorts/` (KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort, ChoroplethMapShort, ProbabilityGaugeShort, SplitCompositionShort, StatRevealShort, TimelineComparisonShort) each have a Shorts-specific Zod schema and `useVerticalLayout()` hook that adapts spacing for the vertical aspect. Don't try to use the 16:9 templates directly — the Shorts variants exist because layout doesn't crop cleanly.
+
+Write `shorts-manifest.json` in the same conversation as the per-Short concepts so the render handoff is one step.
+
 ## Self-Check
 
 Before delivering, verify:

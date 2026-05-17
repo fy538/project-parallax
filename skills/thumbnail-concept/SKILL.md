@@ -113,6 +113,18 @@ For each concept, provide:
 [Resolution: 1280×720. File format: PNG. Safe area: keep key elements away from corners where YouTube overlays timestamp and "WATCH LATER" button.]
 ```
 
+## Rendering the concepts
+
+This skill produces the concept doc + a machine-readable `episodes/<slug>/thumbnail-spec.json`. Once Tiger picks a final direction, the actual PNG files are rendered by the Remotion `Thumbnail` composition via the shipped npm script:
+
+```
+cd remotion-templates && npm run thumbnails -- --episode=<slug>
+```
+
+That command (`remotion-templates/scripts/generate-thumbnails.mjs`, shipped May 14, 2026) reads `episodes/<slug>/thumbnail-spec.json` and renders every concept to `out/thumbnails/<slug>/`. A/B variants are rendered as separate files for upload to YouTube Studio. The 1280×720 resolution, PNG format, and safe-area rules from the Technical Notes section above are handled by the composition — you just need to ship a clean spec.
+
+If `thumbnail-spec.json` doesn't exist or the spec is missing fields, the renderer warns and skips. Write the spec in the same conversation as the concepts so the handoff is one step.
+
 ## Self-Check
 
 Before delivering, verify:
