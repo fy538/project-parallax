@@ -14,6 +14,14 @@ for violations of editorial doctrine that aren't structurally enforced by
   - M-DURATION: max(segments[].endSec) matches totalDurationSec (±0.5s)
   - M-TEXT-ANIM: textAnimation technique is canonical and matches variant
                  (Phase 3 text-animation integration — see TEXT_ANIMATION_REGISTER.md)
+  - M-TRANSITION-DEPRECATED: deprecated transition type (wipe-*, whip-pan, spatial-zoom, blur-through)
+  - M-TRANSITION-IRIS-CHART: iris transition on a chart-category template (no focal point)
+  - M-TRANSITION-DISSOLVE-CREEP: >2 consecutive dissolve-in segments (rhythm suppression)
+  - M-TRANSITION-IRIS-OVERUSE: >2 iris-in transitions episode-wide (premium register overuse)
+  - M-TRANSITION-COLOR-WASH-TOKEN: color-wash without washColor (renders as transparent)
+                 (Phase 9 transition-grammar integration — see TRANSITION_GRAMMAR.md)
+  - M-BGMODE: foreground TEMPLATE segments within the same beat mix backgroundVariant
+              (light/dark) — warns on unintentional mode switches within a narrative beat
 
 Usage:
     python3 tools/lint/manifest_lint.py
@@ -281,13 +289,17 @@ def check_datafile_exists(manifest: dict, manifest_path: Path) -> list[Violation
             continue
         full_path = episode_dir / data_file
         if not full_path.exists():
+            try:
+                display_dir = episode_dir.relative_to(REPO_ROOT)
+            except ValueError:
+                display_dir = episode_dir  # outside repo (e.g. test tmp_path)
             violations.append(Violation(
                 rule="M-DATAFILE",
                 file="",
                 pointer=f"segments[{seg.get('id', '?')}].template.dataFile",
                 message=(
                     f"referenced data file `{data_file}` does not exist relative to "
-                    f"`{episode_dir.relative_to(REPO_ROOT)}/`. Render will fail at this segment."
+                    f"`{display_dir}/`. Render will fail at this segment."
                 ),
                 severity="error",
             ))
@@ -733,6 +745,8 @@ _RECOMMENDED_DRIFT: dict[str, set[str]] = {
     "DecisionTree":          {"editorial", "settle"},
     "EscalationLadder":      {"editorial", "settle"},
     "HorizontalTimeline":    {"editorial", "settle"},
+    "TimelineComparison":    {"editorial", "settle"},
+    "DualTimeline":          {"editorial", "settle"},
     "BayesianUpdate":        {"editorial", "settle"},
     "BeeswarmChart":         {"editorial", "settle"},
     "CalendarHeatmap":       {"editorial", "settle"},
@@ -783,7 +797,7 @@ _CHART_COMPONENTS: set[str] = {
     "Streamgraph", "BayesianUpdate", "BeeswarmChart", "CalendarHeatmap",
     "ConnectedScatterplot", "DumbbellPlot", "HorizonChart", "IsotypeChart",
     "MarimekkoChart", "PopulationPyramid", "ProbabilityGauge", "RadarChart",
-    "RankChangeDotPlot", "TernaryPlot", "PricingWaterfall",
+    "RankChangeDotPlot", "TernaryPlot", "PricingWaterfall", "SankeyFlow",
 }
 
 # Presets that move the camera with directional intent (pan, rotation, or
@@ -883,6 +897,335 @@ def check_drift_register(manifest: dict, _manifest_path: Path) -> list[Violation
     return violations
 
 
+# ─── Rule: M-TRANSITION-* (transition grammar doctrine) ──────────────────────
+# Source: TRANSITION_GRAMMAR.md — canonical 6-transition vocabulary, failure
+# modes, and overuse thresholds.  Phase 9 of the Transition Grammar roadmap.
+#
+# Five sub-rules enforced by a single pass over segments[]:
+#
+#   M-TRANSITION-DEPRECATED     error   — deprecated transition type in .in/.out
+#   M-TRANSITION-IRIS-CHART     error   — iris on a chart-category template
+#   M-TRANSITION-DISSOLVE-CREEP warning — >2 consecutive dissolve-in segments
+#   M-TRANSITION-IRIS-OVERUSE   warning — >2 iris-in occurrences episode-wide
+#   M-TRANSITION-COLOR-WASH-TOKEN warning — color-wash without washColor field
+
+# Transitions retired from the canonical vocabulary. Keys are the deprecated
+# type string; values are the preferred replacement.
+_DEPRECATED_TRANSITIONS: dict[str, str] = {
+    "wipe-left":    "dissolve",
+    "wipe-right":   "dissolve",
+    "wipe-up":      "dissolve",
+    "blur-through": "dissolve",
+    "whip-pan":     "cut",
+    "spatial-zoom": "match-cut",
+}
+
+# Iris demands a clear compositional focal point (a face, a geographic marker,
+# a single datum) to open from. Chart templates have no such anchor — the iris
+# would open onto a grid of axes, making the opening point ambiguous and the
+# transition read as decorative rather than argumentative.
+# Keep in sync with _CHART_COMPONENTS defined above (used by M-DRIFT-DEFAULT).
+_IRIS_FORBIDDEN_COMPONENTS: frozenset[str] = frozenset(_CHART_COMPONENTS)
+
+
+def check_transition_grammar(manifest: dict, _manifest_path: Path) -> list[Violation]:
+    """
+    M-TRANSITION-DEPRECATED / IRIS-CHART / DISSOLVE-CREEP / IRIS-OVERUSE /
+    COLOR-WASH-TOKEN — all fired from a single ordered pass over segments[].
+
+    Transition dict shape (per assembly-manifest.schema.json):
+        { "in": "<type>", "out": "<type>", "durationSec": N,
+          "washColor"?: "<hex>" }
+    Segments without a .transition dict are silently skipped (cut-through,
+    or background footage whose transition is implicit).
+
+    Iris-overuse counts only .in occurrences (each represents one visible
+    scene change experienced by the viewer). Iris on .out of the same segment
+    would be the reverse side of the same cut counted via the next segment's
+    .in, so counting both would double-count a single wipe.
+
+    Dissolve-creep fires exactly once at the third consecutive dissolve-in and
+    is then suppressed for the remainder of the episode (one warning is
+    sufficient to flag the problem; additional firings just add noise).
+    """
+    segments = manifest.get("segments", [])
+    violations: list[Violation] = []
+
+    iris_in_count = 0          # episode-wide iris .in occurrences
+    consecutive_dissolves = 0  # run length of consecutive dissolve-in segments
+    dissolve_creep_fired = False
+
+    for i, seg in enumerate(segments):
+        trans = seg.get("transition")
+        if not isinstance(trans, dict):
+            # No explicit transition dict — reset dissolve streak and continue.
+            consecutive_dissolves = 0
+            continue
+
+        seg_id = seg.get("id", str(i))
+        trans_in = trans.get("in", "")
+        trans_out = trans.get("out", "")
+        component = (seg.get("template") or {}).get("component", "")
+        pointer = f"segments[{seg_id}].transition"
+
+        # ── M-TRANSITION-DEPRECATED ──────────────────────────────────────────
+        for side, tv in (("in", trans_in), ("out", trans_out)):
+            if tv in _DEPRECATED_TRANSITIONS:
+                replacement = _DEPRECATED_TRANSITIONS[tv]
+                violations.append(Violation(
+                    rule="M-TRANSITION-DEPRECATED",
+                    file="",
+                    pointer=f"{pointer}.{side}",
+                    message=(
+                        f"Deprecated transition \"{tv}\" in segment \"{seg_id}\" "
+                        f"(.{side}). Use \"{replacement}\" instead. "
+                        f"See TRANSITION_GRAMMAR.md § \"Retired forms\"."
+                    ),
+                    severity="error",
+                ))
+
+        # ── M-TRANSITION-IRIS-CHART ──────────────────────────────────────────
+        if component in _IRIS_FORBIDDEN_COMPONENTS:
+            for side, tv in (("in", trans_in), ("out", trans_out)):
+                if tv == "iris":
+                    violations.append(Violation(
+                        rule="M-TRANSITION-IRIS-CHART",
+                        file="",
+                        pointer=f"{pointer}.{side}",
+                        message=(
+                            f"Iris transition on chart template \"{component}\" "
+                            f"(segment \"{seg_id}\", .{side}). "
+                            f"Iris demands a clear compositional focal point; "
+                            f"chart axis grids have no such anchor. "
+                            f"Use dissolve or cut instead. "
+                            f"See TRANSITION_GRAMMAR.md § iris."
+                        ),
+                        severity="error",
+                    ))
+
+        # ── M-TRANSITION-IRIS-OVERUSE (accumulate .in count) ────────────────
+        if trans_in == "iris":
+            iris_in_count += 1
+
+        # ── M-TRANSITION-DISSOLVE-CREEP ──────────────────────────────────────
+        if trans_in == "dissolve":
+            consecutive_dissolves += 1
+            if consecutive_dissolves >= 3 and not dissolve_creep_fired:
+                dissolve_creep_fired = True
+                violations.append(Violation(
+                    rule="M-TRANSITION-DISSOLVE-CREEP",
+                    file="",
+                    pointer=pointer,
+                    message=(
+                        f"3 or more consecutive dissolve-in transitions — "
+                        f"third occurs at segment \"{seg_id}\". "
+                        f"Sustained dissolves suppress visual rhythm; "
+                        f"the viewer stops registering cuts. "
+                        f"Break the run with a cut or match-cut. "
+                        f"See TRANSITION_GRAMMAR.md § dissolve."
+                    ),
+                    severity="warning",
+                ))
+        else:
+            consecutive_dissolves = 0
+
+        # ── M-TRANSITION-COLOR-WASH-TOKEN ────────────────────────────────────
+        if "color-wash" in (trans_in, trans_out):
+            if not trans.get("washColor"):
+                violations.append(Violation(
+                    rule="M-TRANSITION-COLOR-WASH-TOKEN",
+                    file="",
+                    pointer=pointer,
+                    message=(
+                        f"color-wash transition in segment \"{seg_id}\" is missing "
+                        f"\"washColor\". Without a color token the wash defaults to "
+                        f"transparent — set washColor to a brand palette value "
+                        f"(e.g. ink \"#1C1814\" or amber \"#E5A544\"). "
+                        f"See TRANSITION_GRAMMAR.md § color-wash."
+                    ),
+                    severity="warning",
+                ))
+
+    # ── M-TRANSITION-IRIS-OVERUSE (episode-wide summary) ────────────────────
+    if iris_in_count > 2:
+        violations.append(Violation(
+            rule="M-TRANSITION-IRIS-OVERUSE",
+            file="",
+            pointer="segments",
+            message=(
+                f"Episode uses {iris_in_count} iris-in transitions "
+                f"(threshold: ≤2). "
+                f"Iris is a premium register reserved for civilizational-rupture "
+                f"moments — overuse dilutes the impact. "
+                f"See TRANSITION_GRAMMAR.md § iris."
+            ),
+            severity="warning",
+        ))
+
+    return violations
+
+
+# ─── Rule: M-BGMODE (background mode consistency within a beat) ──────────────
+# Source: VISUAL_LANGUAGE.md § "Reading Path and Compositional Gravity"
+# + BRAND.md § "Meridian dual-mode".
+#
+# Within a single narrative beat, all foreground TEMPLATE segments should share
+# the same backgroundVariant (light / dark). Unintentional switches create
+# jarring mode jumps (paper → ink → paper) mid-argument; intentional switches
+# should cross a chapter/beat boundary to signal the register change.
+#
+# Severity: warning (not error) — some episodes intentionally contrast modes
+#   within a beat for dramatic effect, but this must be a deliberate choice.
+
+def check_bgmode_consistency(manifest: dict, manifest_path: Path) -> list[Violation]:
+    """M-BGMODE: warn when foreground TEMPLATE segments within the same beat
+    mix backgroundVariant values (light / dark)."""
+    violations: list[Violation] = []
+
+    # Accumulate (seg_id, variant) pairs per beat.
+    # Only foreground TEMPLATE segments carry a backgroundVariant; footage/image
+    # segments and background-layer segments are excluded.
+    beat_segs: dict[str, list[tuple[str, str]]] = {}
+
+    for seg in manifest.get("segments", []):
+        if seg.get("type") != "TEMPLATE":
+            continue
+        if seg.get("layer") == "background":
+            continue
+
+        beat_id = seg.get("beat", "")
+        if not beat_id:
+            continue
+
+        seg_id = seg.get("id", "?")
+        datafile = seg.get("template", {}).get("dataFile")
+        if not datafile:
+            continue
+
+        try:
+            data_path = manifest_path.parent / datafile
+            data = json.loads(data_path.read_text())
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            continue  # datafile issue caught by M-DATAFILE rule
+
+        variant = data.get("backgroundVariant", "light")
+        beat_segs.setdefault(beat_id, []).append((seg_id, variant))
+
+    for beat_id, segs in beat_segs.items():
+        variants = {v for _, v in segs}
+        if len(variants) <= 1:
+            continue  # All same mode — no issue
+
+        detail = ", ".join(f"{sid}={v}" for sid, v in segs)
+        violations.append(Violation(
+            rule="M-BGMODE",
+            file="",
+            pointer=f"beat/{beat_id}",
+            message=(
+                f"Beat '{beat_id}' mixes background modes within its TEMPLATE segments"
+                f" ({detail}). Unintentional dark/light switches create jarring mode"
+                " shifts mid-argument. Set a consistent backgroundVariant across all"
+                " TEMPLATE segments in this beat, or use a chapter transition"
+                " (TitleTransition) to intentionally cross the mode boundary."
+            ),
+            severity="warning",
+        ))
+
+    return violations
+
+
+# ─── Rule: M-MANIFEST-STALE (script newer than manifest) ─────────────────────
+# Source: silicon-trap May-16 episode trace — script v5 finalized 2026-05-16
+# 11:08, six new kinetic-typography JSON files created 10:46 the same day,
+# but `assembly-manifest.json` last touched 2026-05-11 23:36. The manifest
+# referenced v4 timing while v5 was the canonical script; six new template
+# data files were orphaned (referenced by nothing in the manifest). Rendering
+# at that moment would have shipped phantom-asset gaps and stale timing.
+#
+# Detection:
+#   Compare mtime(assembly-manifest.json) to mtime(latest script-*.md) in the
+#   episode's working directory at `episodes/<slug>/`. If a script file is
+#   newer than the manifest, the manifest is stale — re-run generate_manifest
+#   against the latest script.
+#
+# Resolved episode dir: prefer `episodes/<slug>/` (the script working dir);
+# fall back to checking just the manifest itself when working dir is absent.
+
+REPO_ROOT_DIR = REPO_ROOT  # alias for clarity in this rule
+
+
+def check_manifest_staleness(manifest: dict, manifest_path: Path) -> list[Violation]:
+    """M-MANIFEST-STALE: warn when a script file is newer than the manifest."""
+    violations: list[Violation] = []
+    if not manifest_path.is_file():
+        return violations
+
+    manifest_mtime = manifest_path.stat().st_mtime
+
+    # Resolve the script working dir. The manifest lives at
+    # `remotion-templates/data/episodes/<slug>/assembly-manifest.json`; the
+    # script lives at `episodes/<slug>/script-*.md`.
+    try:
+        slug = manifest_path.parent.name
+    except Exception:
+        return violations
+    script_dir = REPO_ROOT_DIR / "episodes" / slug
+    if not script_dir.is_dir():
+        return violations  # no script working dir → nothing to compare
+
+    # Find every script file at the top level of the working dir. Exclude
+    # `drafts/` (legacy versions are expected to be older). Names we accept:
+    # `script-v*-production.md`, `script-production.md`, `script.md`.
+    script_files = []
+    for pattern in ("script-v*-production.md", "script-production.md", "script.md"):
+        script_files.extend(script_dir.glob(pattern))
+    if not script_files:
+        return violations
+
+    newest_script = max(script_files, key=lambda p: p.stat().st_mtime)
+    script_mtime = newest_script.stat().st_mtime
+
+    # Tolerance: if script is within 60 s of manifest, treat as same edit
+    # session (no warning). Beyond that, the manifest is stale relative to
+    # the script and the producer should re-run generate_manifest.py.
+    STALENESS_TOLERANCE_SEC = 60.0
+    if script_mtime <= manifest_mtime + STALENESS_TOLERANCE_SEC:
+        return violations
+
+    drift_sec = script_mtime - manifest_mtime
+    drift_hours = drift_sec / 3600
+    if drift_hours < 1:
+        drift_str = f"{drift_sec / 60:.0f} min"
+    elif drift_hours < 24:
+        drift_str = f"{drift_hours:.1f} h"
+    else:
+        drift_str = f"{drift_hours / 24:.1f} d"
+
+    try:
+        rel_script = newest_script.relative_to(REPO_ROOT_DIR)
+    except ValueError:
+        rel_script = newest_script
+    try:
+        rel_manifest = manifest_path.relative_to(REPO_ROOT_DIR)
+    except ValueError:
+        rel_manifest = manifest_path
+
+    violations.append(Violation(
+        rule="M-MANIFEST-STALE",
+        file="",
+        pointer="assembly-manifest.json",
+        message=(
+            f"`{rel_script}` is {drift_str} newer than `{rel_manifest}`. "
+            f"The manifest may reference outdated script timing or miss new "
+            f"template data files added since the last manifest regen. "
+            f"Re-run `python3 tools/assembly/generate_manifest.py {slug}` "
+            f"to refresh. Tolerance: 60 s (same-session edits ignored)."
+        ),
+        severity="warning",
+    ))
+    return violations
+
+
 # ─── Driver ──────────────────────────────────────────────────────────────────
 
 ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
@@ -895,6 +1238,9 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     check_text_animation_register,  # needs the path (reads dataFile contents)
     check_sync_coverage,             # needs the path (reads dataFile contents)
     check_drift_register,            # reads segment._direction.driftPreset
+    check_transition_grammar,        # reads segment.transition.{in,out,...}
+    check_bgmode_consistency,        # reads dataFile.backgroundVariant per beat
+    check_manifest_staleness,        # reads mtime(script) vs mtime(manifest)
 ]
 
 

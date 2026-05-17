@@ -39,21 +39,28 @@ Before auditing, internalize what each tool can and cannot do. This is the found
 
 ### Tool 1: Remotion Templates (motion graphics)
 
-Seven core templates, each with specific strengths and hard limits:
+**45 templates across 5 families** (May 2026 count). This skill delegates to the family-level decision matrices rather than enumerating every template — those matrices are the canonical, authoritative picker, and re-stating them here is a guaranteed drift trap.
 
-| Template | Best For | Cannot Do |
-|----------|----------|-----------|
-| **ChoroplethMap** | Country-level highlighting, alliance blocs, trade relationships, phase-based storytelling (build up actors over time) | City-level detail, terrain, 3D globes, street-level geography, smooth zoom animations between regions |
-| **RouteAnimation** | Trade routes, supply chains, resource flows between geographic points, animated path drawing | Complex branching networks (>8 nodes), non-geographic flows, flows that need to show volume/bandwidth |
-| **TimelineComparison** | Dual-column historical parallels, before/after, synchronized timelines showing two eras | More than 2 parallel timelines, timelines with branching paths, timelines needing dense event clusters (>8 events per column) |
-| **DataChart** | Bar charts, comparisons, animated number reveals, simple statistical storytelling | Scatter plots, line charts over time, multi-axis charts, real-time data, complex statistical visualizations |
-| **KineticTypography** | Quotes with attribution, definitions (with pinyin for Chinese terms), bilingual text cards, single statistics with context | Long text passages, animated word-by-word reveals of full paragraphs, complex text layouts with multiple competing elements |
-| **FrameworkDiagram** | 2-3 column comparisons, simple flow diagrams, matrices, conceptual models | Complex network graphs, diagrams with >12 nodes, animated state transitions, decision trees with many branches |
-| **TitleTransition** | Episode titles, section headers, beat markers, end cards | Content-carrying visuals (these are structural, not informational) |
+**Family overview** (5 SELECTORs + the per-template dossier library):
 
-Plus 4 format-specific templates: **DecisionTree** (branching choice visualizations), **SplitComposition** (side-by-side with ∴ divider), **ProbabilityGauge** (uncertainty/probability display), **ImageComposite** (photo with brand treatment + text overlay).
+| Family | What it's for | Templates (count) | Canonical picker |
+|---|---|---|---|
+| **Maps** | Geography, territory, trade routes, location relationships | 7 (AtlasPlate, ChoroplethMap, RouteAnimation, ProportionalSymbolMap, DensityMap, CartogramMap, TilegramUSMap, StrategicLandscape) | `remotion-templates/MAP_TEMPLATE_SELECTOR.md` |
+| **Charts** | Quantitative data — magnitudes, distributions, comparisons, rank changes, time series | 17 (DataChart, TimeSeriesChart, BarChart, BumpChart, RadarChart, ProbabilityGauge, SankeyFlow, PricingWaterfall, BeeswarmChart, CalendarHeatmap, ConnectedScatterplot, DumbbellPlot, HorizonChart, IsotypeChart, MarimekkoChart, PopulationPyramid, RankChangeDotPlot, RidgelinePlot, Streamgraph, TernaryPlot, BayesianUpdate) | `remotion-templates/CHART_TEMPLATE_SELECTOR.md` |
+| **Diagrams** | Structure, relationships, decisions, frameworks, conflict/escalation | 8 (FrameworkDiagram, NetworkDiagram, ArcDiagram, DecisionTree, EscalationLadder, GameBoard, DuelingFrameworks, SplitComposition) | `remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md` |
+| **Timelines** | Single, parallel, juxtaposed temporal sequences | 3 (HorizontalTimeline, TimelineComparison, DualTimeline) | `remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md` |
+| **Typography & visuals** | Quotes, hero stats, definitions, section headers, photo composites, archival | 6 (KineticTypography, StatReveal, TitleTransition, ImageComposite, AnnotatedImage, PhotoMontage) | `remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md` |
 
-**Key constraint:** Remotion templates are data-driven — change the JSON, get a different video. They're fast to produce but limited to their designed visual vocabulary. If a visual moment doesn't fit any template's "Best For" column, it needs a different tool.
+**How to use the SELECTORs in concept review.** For every `[MG:]` cell the script writer chose:
+
+1. Identify the family the template lives in (from the table above).
+2. Open the family SELECTOR. Each one contains: (a) a decision tree mapping "I need to show X" → template choice, (b) a sibling-disambiguation table comparing closely-related templates row-by-row (e.g., BumpChart vs RankChangeDotPlot vs DumbbellPlot — all rank-change idioms with distinct fits), (c) canonical failure modes the writer is most likely to hit (e.g. **ChoroplethMap on count data → should be ProportionalSymbolMap**; **TimelineComparison with >8 events per column → too dense, split or use HorizontalTimeline**).
+3. If the writer's choice contradicts a documented failure mode, flag the mismatch in your concept audit and recommend the SELECTOR-recommended alternative.
+4. For nuanced calls, open the per-template dossier at `remotion-templates/references/template-research/<template-name>.md` — 50 dossiers, each citing real-outlet idioms (NYT Upshot, FT, Economist, Bloomberg, Reuters, Pudding), canonical use cases, Parallax-specific defaults, and known failure modes.
+
+**Why not just list them inline here?** Earlier versions of this skill enumerated 7-11 templates in a Best-For/Cannot-Do table. With 45 templates that approach (a) immediately drifts as new templates ship, (b) duplicates the SELECTORs (which can hold the rich sibling-disambiguation tables this table can't), and (c) silently let wrong-template picks pass concept review when the writer used a template the table didn't cover. Delegation to the SELECTORs eliminates all three failure modes.
+
+**Key constraint:** Remotion templates are data-driven — change the JSON, get a different video. They're fast to produce but each template has a designed visual vocabulary. If a visual moment doesn't fit any template's documented use cases, it needs a different tool (footage, illustration, AI-gen).
 
 ### Tool 2: Stock Footage + Photography (Pexels, Pixabay, Unsplash)
 
@@ -139,9 +146,9 @@ Run each lens independently against the script's right column. For each issue fo
 
 Walk through every right-column entry that references a Remotion template. For each one, check:
 
-1. **Does this visual moment actually fit the template's capabilities?** Cross-reference against the "Best For" and "Cannot Do" columns above. A ChoroplethMap asked to show city-level detail is a mismatch. A DataChart asked to show a trend line over time is outside its vocabulary.
+1. **Does this visual moment actually fit the template's capabilities?** Open the family SELECTOR (Tool 1, above) and find the template. Read its "use cases" and "failure modes" / "do NOT use for" rows. A ChoroplethMap asked to show count data is a documented failure mode (should be ProportionalSymbolMap). A DataChart asked to show a time series should be TimeSeriesChart. A KineticTypography asked to render a long paragraph should be split. For nuanced calls, open the per-template dossier at `remotion-templates/references/template-research/<template-name>.md`.
 
-2. **Is the data complexity within template limits?** A FrameworkDiagram with 15 comparison dimensions won't render readably. A TimelineComparison with 12 events per column will be too dense. Flag overloaded specs and suggest splitting into multiple compositions or simplifying.
+2. **Is the data complexity within template limits?** Each dossier names quantitative limits (max nodes, max columns, max events per column) and the visual breakdown they cause. FrameworkDiagram >12 nodes, TimelineComparison >8 events per column, NetworkDiagram >15 nodes — all flagged. Suggest splitting or template change rather than letting it ship over-dense.
 
 3. **Are there visual moments assigned to stock footage or static images that would be BETTER served by a template?** If the script says `FOOTAGE: "global trade statistics"` but the narration is rattling off specific numbers — that's a DataChart moment, not a footage moment. The template would serve comprehension better.
 
@@ -264,7 +271,7 @@ Check the script for:
 
 4. **Transition grammar compliance.** When the script switches between registers, check that the implied transition makes sense:
    - Analytical → Grounding: color-wash (clean space bleeds into textured world)
-   - Grounding → Atmospheric: blur-through (photorealistic dissolves into stylized)
+   - Grounding → Atmospheric: dissolve (photorealistic dissolves into stylized — ~~blur-through~~ is deprecated)
    - Atmospheric → Analytical: iris (illustration contracts to focal point, data opens from it)
    - Analytical → Atmospheric: dissolve (data fades into mood)
    - Grounding → Analytical: color-wash or cut

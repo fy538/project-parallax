@@ -36,10 +36,24 @@ Find these files relative to the project root. Read only those relevant to the g
 
 ## Detection Heuristics
 
+### Automated zero-hit briefing
+
+Before diagnosing by hand, run the tool:
+
+```
+python3 tools/asset-source/zerohit_fallback.py <slug>
+```
+
+Writes `episodes/<slug>/ai-gen-briefs.md` — a structured per-shot brief for every zero-hit (or zero-successful-download) entry in `asset-manifest.json`. Each brief includes the original search terms, shot-list notes, a suggested Recraft anchor (`A1–A7` heuristically routed by keyword), a suggested Flux style reference (`r1–r15`), and a seeded generation prompt. The appendix lists the full anchor + style-ref catalogs for manual override.
+
+Use this as the first pass; this skill's qualitative analysis below augments it for tier-2 gaps (low-quality matches, treatment-survivability issues, P1 hero shots with sub-optimal hits — cases the tool can't detect from JSON alone).
+
+`zerohit_fallback.py --count` returns exit code 1 when zero-hits exist (wired into `scripts/check-episode.sh` as W8 for CI visibility).
+
 ### What counts as a gap?
 
 1. **Zero results** — query returned no matches across all three APIs.
-   - Action: need fallback approach immediately.
+   - Action: run `zerohit_fallback.py` (above) to get a starter AI-gen brief; review and edit the prompts.
 
 2. **Only generic fallback worked** — most specific search term(s) returned zero results; only the final/most-generic fallback scored matches.
    - Example: You wanted "TSMC Arizona construction aerial drone" but had to settle for "chip manufacturing" from Pexels.
