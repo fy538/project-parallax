@@ -43,15 +43,19 @@ class TestBuildFilters:
 
     def test_standard_preset_includes_compressor(self):
         chain = lm.build_pass1_filters("standard", target_lufs=-14, target_lra=11)
-        assert "highpass" in chain
-        assert "acompressor" in chain
+        # Assert full filter strings, not just substrings — a typo like
+        # `acompresser=...` would still satisfy `"acompressor" in chain`
+        # via the substring "acompres", failing only at ffmpeg runtime.
+        assert "highpass=f=80" in chain
+        assert "acompressor=threshold=-18dB:ratio=3:attack=5:release=50:makeup=2" in chain
         assert "agate" not in chain  # no gate at standard
         assert "loudnorm" in chain
 
     def test_aggressive_preset_includes_gate_and_compressor(self):
         chain = lm.build_pass1_filters("aggressive", target_lufs=-14, target_lra=11)
-        assert "agate" in chain
-        assert "acompressor" in chain
+        # Tight substring assertions catch typos that "agate" in chain wouldn't.
+        assert "agate=threshold=-50dB:ratio=2:attack=10:release=300" in chain
+        assert "acompressor=threshold=-15dB:ratio=4:attack=3:release=40:makeup=3" in chain
         assert "loudnorm" in chain
 
     def test_unknown_preset_rejected(self):
@@ -111,6 +115,71 @@ class TestParsePass1:
              "input_thresh": "-33"}
         """)
         assert lm.parse_pass1_measurement(stderr) is None
+
+
+class TestClassifyParseFailure:
+    """Diagnostic-message classifier that explains WHY pass-1 parse
+    returned None — distinguishing operator-actionable cases from
+    'something is genuinely weird'."""
+
+    def test_no_marker_at_all(self):
+        msg = lm._classify_parse_failure("ffmpeg version 6.0\nsome other log\n")
+        assert "no loudnorm output found" in msg
+
+    def test_marker_but_no_target_offset_blames_ffmpeg_version(self):
+        # The specific case the previous test covered — `target_offset`
+        # absent. The classifier should explicitly call out the ffmpeg
+        # version as the likely cause.
+        stderr = textwrap.dedent("""\
+            [Parsed_loudnorm_0]
+            {"input_i": "-23", "input_tp": "-7", "input_lra": "8",
+             "input_thresh": "-33"}
+        """)
+        msg = lm._classify_parse_failure(stderr)
+        assert "target_offset" in msg
+        assert "ffmpeg" in msg.lower() and "too old" in msg.lower()
+        assert "4.2" in msg  # the version threshold the docstring promises
+
+    def test_marker_but_malformed_json(self):
+        stderr = "[Parsed_loudnorm_0]\n{not valid json"
+        msg = lm._classify_parse_failure(stderr)
+        # Should reach the "couldn't extract" or "failed to parse" branch.
+        assert any(
+            phrase in msg.lower()
+            for phrase in ("could not be extracted", "failed to parse")
+        )
+
+
+class TestEffectiveTargetLra:
+    """Aggressive preset auto-tightens the LRA target (the "tighter LRA"
+    claim in the module docstring). Other presets pass through."""
+
+    def test_aggressive_overrides_default_lra(self):
+        # User left LRA at the system default (11); aggressive narrows to 7.
+        assert lm._effective_target_lra("aggressive", lm.DEFAULT_TARGET_LRA) == 7.0
+
+    def test_aggressive_respects_user_tighter_value(self):
+        # If the operator explicitly passed 5, the preset shouldn't widen
+        # back to 7 — keep the tighter setting.
+        assert lm._effective_target_lra("aggressive", 5.0) == 5.0
+
+    def test_standard_preset_passes_lra_through(self):
+        assert lm._effective_target_lra("standard", 11.0) == 11.0
+        assert lm._effective_target_lra("standard", 5.0) == 5.0
+
+    def test_safe_preset_passes_lra_through(self):
+        assert lm._effective_target_lra("safe", 11.0) == 11.0
+
+
+class TestLoudnormParseError:
+    """LoudnormParseError is a distinct exception type so the CLI can
+    surface a specific error path (typically: ffmpeg too old)."""
+
+    def test_is_runtime_error_subclass(self):
+        # Subclassing matters because the CLI's except RuntimeError
+        # block needs to still catch this if the more-specific handler
+        # is missing.
+        assert issubclass(lm.LoudnormParseError, RuntimeError)
 
 
 # ── _default_output ──────────────────────────────────────────────────────────

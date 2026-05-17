@@ -38,9 +38,12 @@ After mastering, automatically runs `audio_qa.py` on the output to
 verify LUFS lands on target. Suppress with --no-audio-qa.
 
 Exit codes:
-    0 — mastered file written successfully
-    1 — ffmpeg failed or audio_qa flagged errors
+    0 — mastered file written + verified clean (or --no-audio-qa)
+    1 — ffmpeg failed or audio_qa flagged errors in the mastered output
     2 — ffmpeg missing / WAV missing / wrong input
+    3 — mastered file written but post-master audio_qa was inconclusive
+        (e.g. ffprobe failure on the output). The file is on disk; the
+        operator should re-verify before promoting it.
 """
 
 from __future__ import annotations
@@ -68,9 +71,23 @@ EPISODES_DIR = ROOT / "episodes"
 DEFAULT_TARGET_LUFS = -14.0      # YouTube spec
 DEFAULT_TARGET_TP_DB = -1.0      # broadcast-safe ceiling
 DEFAULT_TARGET_LRA = 11.0        # loudness range target (broad enough for narration)
+# Aggressive preset narrows the LRA target — the whole point of "aggressive"
+# is to tame dynamic range for noisy/varied source material. Tightening
+# loudnorm's LRA target to ~7 LU is the editorial counterpart to the
+# harder compression in the filter chain.
+AGGRESSIVE_TARGET_LRA = 7.0
 
 VALID_PRESETS = ("safe", "standard", "aggressive")
 DEFAULT_PRESET = "standard"
+
+
+def _effective_target_lra(preset: str, user_target_lra: float) -> float:
+    """Aggressive preset overrides user-supplied LRA target unless the
+    operator explicitly passed something tighter than the aggressive
+    default. Other presets pass user value through verbatim."""
+    if preset == "aggressive":
+        return min(user_target_lra, AGGRESSIVE_TARGET_LRA)
+    return user_target_lra
 
 
 @dataclass
@@ -164,6 +181,12 @@ def _ensure_ffmpeg() -> None:
         sys.exit(2)
 
 
+class LoudnormParseError(RuntimeError):
+    """Distinct exception so the CLI can surface a useful operator-facing
+    diagnostic when the JSON itself is parseable but missing fields
+    (typically: ffmpeg too old to emit target_offset)."""
+
+
 def parse_pass1_measurement(stderr: str) -> Optional[LoudnormPass1]:
     """Extract the measured-loudness JSON block from pass-1 stderr.
 
@@ -171,8 +194,13 @@ def parse_pass1_measurement(stderr: str) -> Optional[LoudnormPass1]:
     without spawning ffmpeg. Re-uses the brace-balanced extractor from
     `audio_qa.parse_loudnorm_output` so any future fix to that path
     benefits us too.
+
+    Returns None on two distinct cases — the marker block isn't
+    present at all (filter chain wrong / pass failed), OR required
+    fields are missing (likely older ffmpeg without `target_offset`).
+    The CLI distinguishes these via _classify_parse_failure for a
+    useful error message.
     """
-    # Walk stderr the same way audio_qa does — find the marker, balance braces.
     m = aq._LOUDNORM_MARKER_RE.search(stderr)
     start = m.end() if m else 0
     block = aq._extract_balanced_json(stderr, start)
@@ -194,6 +222,41 @@ def parse_pass1_measurement(stderr: str) -> Optional[LoudnormPass1]:
         return None
 
 
+def _classify_parse_failure(stderr: str) -> str:
+    """When parse_pass1_measurement returns None, this helper tells the
+    operator why — distinguishing 'no JSON at all' (filter broken) from
+    'JSON present but missing target_offset' (ffmpeg too old)."""
+    m = aq._LOUDNORM_MARKER_RE.search(stderr)
+    if m is None:
+        return (
+            "no loudnorm output found in ffmpeg stderr — the filter chain "
+            "may have failed before reaching loudnorm. Check the stderr "
+            "tail above for the actual error."
+        )
+    start = m.end()
+    block = aq._extract_balanced_json(stderr, start)
+    if block is None:
+        return (
+            "loudnorm marker present but JSON block could not be extracted. "
+            "Possibly truncated stderr output."
+        )
+    try:
+        data = json.loads(block)
+    except json.JSONDecodeError:
+        return (
+            "loudnorm JSON block found but failed to parse. The ffmpeg "
+            "output format may have changed; please report with ffmpeg --version."
+        )
+    if "target_offset" not in data:
+        return (
+            "loudnorm JSON is missing `target_offset` — your ffmpeg is "
+            "probably too old (need ≥ 4.2 for two-pass loudnorm with "
+            "linear normalization). Upgrade via: `brew upgrade ffmpeg` "
+            "or `apt install ffmpeg/<your-distro-newer-source>`."
+        )
+    return "loudnorm JSON parsed but a required numeric field is malformed."
+
+
 def run_pass1(input_path: Path, filter_chain: str) -> LoudnormPass1:
     """Run measurement pass. Output is discarded (-f null); we only want
     the loudnorm JSON written to stderr."""
@@ -210,10 +273,7 @@ def run_pass1(input_path: Path, filter_chain: str) -> LoudnormPass1:
         raise RuntimeError(f"ffmpeg pass-1 failed: {result.stderr[-500:]}")
     measured = parse_pass1_measurement(result.stderr)
     if measured is None:
-        raise RuntimeError(
-            "ffmpeg pass-1 succeeded but loudnorm JSON could not be parsed. "
-            "Check that the loudnorm filter is in the chain."
-        )
+        raise LoudnormParseError(_classify_parse_failure(result.stderr))
     return measured
 
 
@@ -242,10 +302,15 @@ def master_wav(
     target_lra: float = DEFAULT_TARGET_LRA,
 ) -> LoudnormPass1:
     """Two-pass master. Returns the measured LoudnormPass1 from pass 1
-    so callers can report or log the source levels."""
-    pass1_chain = build_pass1_filters(preset, target_lufs, target_lra)
+    so callers can report or log the source levels.
+
+    `target_lra` is tightened automatically when preset is "aggressive"
+    — see _effective_target_lra. Other presets pass it through.
+    """
+    effective_lra = _effective_target_lra(preset, target_lra)
+    pass1_chain = build_pass1_filters(preset, target_lufs, effective_lra)
     measured = run_pass1(input_path, pass1_chain)
-    pass2_chain = build_pass2_filters(preset, target_lufs, target_lra, measured)
+    pass2_chain = build_pass2_filters(preset, target_lufs, effective_lra, measured)
     run_pass2(input_path, output_path, pass2_chain)
     return measured
 
@@ -321,6 +386,11 @@ def main() -> int:
             target_lufs=args.target_lufs,
             target_lra=args.target_lra,
         )
+    except LoudnormParseError as e:
+        # LoudnormParseError is a subclass of RuntimeError but warrants a
+        # specific operator message — usually "your ffmpeg is too old."
+        print(f"✗ loudnorm output parse failed: {e}", file=sys.stderr)
+        return 1
     except RuntimeError as e:
         print(f"✗ {e}", file=sys.stderr)
         return 1
@@ -334,12 +404,20 @@ def main() -> int:
 
     # ── Post-master verification ────────────────────────────────────────
     if not args.no_audio_qa:
-        print(f"\n→ Verifying mastered output via audio_qa…")
+        print("\n→ Verifying mastered output via audio_qa…")
         try:
             report = aq.audit_audio(output_path)
-        except Exception as e:
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired,
+                OSError, RuntimeError, ValueError) as e:
+            # Narrow exception set — covers ffprobe/ffmpeg invocation
+            # failures, file I/O issues, audit_audio's RuntimeError
+            # wrappers, and numeric parse errors. Anything else (e.g.
+            # KeyboardInterrupt, MemoryError) should propagate.
+            # Returns 3 — distinct from "no error" (0) and "QA found
+            # problems" (1) so orchestrators can branch: 3 = "mastered
+            # file is on disk but post-QA was inconclusive; reconfirm."
             print(f"  ⚠ audio_qa skipped: {e}", file=sys.stderr)
-            return 0
+            return 3
         if report.loudness:
             actual = report.loudness.integrated_lufs
             delta = abs(actual - args.target_lufs)

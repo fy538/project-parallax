@@ -237,10 +237,16 @@ def _cache_key(
     bytes — operators re-export from a DAW which always updates mtime,
     so the trade-off is fine in practice and saves the few seconds it'd
     take to SHA-256 a 250MB WAV.
+
+    Deliberately does NOT include the file path: copying or renaming the
+    same WAV (parallel git worktree, renamed `narration-v2.wav`, moved
+    project root) should still hit the cache when the bytes haven't
+    changed. Path is cosmetic; only content + params determine the
+    transcript.
     """
     st = wav_path.stat()
     blob = (
-        f"{CACHE_VERSION}|{wav_path.resolve()}|{st.st_size}|{st.st_mtime_ns}"
+        f"{CACHE_VERSION}|{st.st_size}|{st.st_mtime_ns}"
         f"|{model_size}|{language or ''}|{compute_type}"
     )
     return hashlib.sha256(blob.encode()).hexdigest()
@@ -270,16 +276,31 @@ def _cache_load(key: str) -> Optional[Transcript]:
 
 def _cache_store(key: str, transcript: Transcript) -> None:
     """Best-effort write. Cache failures don't propagate — caller already
-    has the transcript, the cache is just an optimization."""
-    path = _cache_root() / f"{key}.json"
+    has the transcript, the cache is just an optimization.
+
+    Writes atomically via a per-pid `.tmp.<pid>` sidecar + os.replace().
+    Without this, two concurrent runs writing to the same key could race:
+    one truncates while the other reads, and if the truncation lands at
+    a JSON brace boundary the partial file parses successfully into
+    garbage and gets returned as a fake transcript on the next call.
+    """
+    final = _cache_root() / f"{key}.json"
+    tmp = final.with_name(f"{key}.json.tmp.{os.getpid()}")
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(
+        final.parent.mkdir(parents=True, exist_ok=True)
+        tmp.write_text(
             json.dumps({"words": [asdict(w) for w in transcript.words]}),
             encoding="utf-8",
         )
+        os.replace(tmp, final)  # atomic on POSIX + Windows
     except OSError:
-        pass  # swallow — disk full / permissions / etc. don't break the run
+        # Disk full / permissions / etc. don't break the run. Clean up
+        # the tmp file if it was created.
+        try:
+            if tmp.exists():
+                tmp.unlink()
+        except OSError:
+            pass
 
 
 def transcribe_wav(
@@ -299,9 +320,15 @@ def transcribe_wav(
     short inputs).
 
     `use_cache` (default True): hit-or-miss disk cache keyed on the WAV's
-    (path, size, mtime) + params. Re-runs against an unchanged file
-    return in ~200ms instead of re-transcribing for minutes.
+    (size + mtime) + params. Re-runs against an unchanged file return in
+    ~200ms instead of re-transcribing for minutes. Cache is path-
+    independent, so renames / copies / cross-worktree hits work.
     """
+    # Initialize `key` up-front so the store path below can't NameError
+    # if a future refactor accidentally moves the store outside the
+    # `if use_cache:` gate. Cheaper than the time it'd take to debug
+    # the resulting "name not defined" stack trace 6 months from now.
+    key: Optional[str] = None
     if use_cache:
         key = _cache_key(wav_path, model_size, language, compute_type)
         cached = _cache_load(key)
@@ -332,7 +359,7 @@ def transcribe_wav(
                 probability=float(getattr(w, "probability", -1.0)),
             ))
     transcript = Transcript(words=words)
-    if use_cache:
+    if use_cache and key is not None:
         _cache_store(key, transcript)
     return transcript
 

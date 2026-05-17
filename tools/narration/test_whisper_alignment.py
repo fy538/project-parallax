@@ -533,10 +533,131 @@ class TestTranscriptCache:
         # Point cache at a path that can't be created (file where dir expected)
         bad_root = tmp_path / "blocked"
         bad_root.write_bytes(b"")  # bad_root is now a file, not a dir
-        monkeypatch.setattr(wa, "_cache_root", lambda: bad_root / "sub")
+        cache_path = bad_root / "sub"
+        monkeypatch.setattr(wa, "_cache_root", lambda: cache_path)
         transcript = _make_transcript([("x", 0.0, 0.5, 0.9)])
         # Should not raise.
         wa._cache_store("k", transcript)
+        # AND should not have managed to write anything — the test would
+        # pass vacuously if the function returned early before even
+        # attempting the write.
+        assert not (cache_path / "k.json").exists()
+
+    def test_cache_path_independence(self, tmp_path):
+        """Regression: cache key used to include resolved file path, so
+        moving/renaming the same WAV would force a re-transcription.
+        With path dropped from the key, identical bytes (same size +
+        mtime + params) hash to the same key regardless of location."""
+        import os
+        a = tmp_path / "a.wav"
+        b = tmp_path / "b.wav"
+        a.write_bytes(b"identical content")
+        b.write_bytes(b"identical content")
+        # `os.utime(path, times=(...))` only takes float seconds (precision
+        # is FS-dependent on macOS / APFS). Use the `ns=(...)` kwarg to
+        # match mtime at nanosecond resolution so the cache key inputs
+        # truly converge.
+        st = a.stat()
+        os.utime(b, ns=(st.st_atime_ns, st.st_mtime_ns))
+        # Confirm the test fixture is what we think it is.
+        assert a.stat().st_size == b.stat().st_size
+        assert a.stat().st_mtime_ns == b.stat().st_mtime_ns
+        ka = wa._cache_key(a, "medium", "en", "int8")
+        kb = wa._cache_key(b, "medium", "en", "int8")
+        assert ka == kb, "cache key should not depend on file path"
+
+    def test_cache_store_is_atomic(self, tmp_path, monkeypatch):
+        """Atomic via .tmp + os.replace — no partial files left behind
+        on success, and a concurrent reader either sees the old file or
+        the complete new file, never a truncated/half-written one."""
+        self._isolate_cache(tmp_path, monkeypatch)
+        transcript = _make_transcript([("x", 0.0, 0.5, 0.9)])
+        wa._cache_store("atomic-test", transcript)
+        cache_dir = tmp_path / "cache"
+        # The final file exists.
+        assert (cache_dir / "atomic-test.json").exists()
+        # No tmp files left over from the write process.
+        leftover = list(cache_dir.glob("*.tmp.*"))
+        assert leftover == [], f"unexpected tmp leftovers: {leftover}"
+
+    def test_transcribe_wav_uses_cache_on_second_call(self, tmp_path, monkeypatch):
+        """End-to-end integration: calling transcribe_wav twice with
+        use_cache=True on the same WAV should invoke the underlying
+        WhisperModel exactly ONCE. This is the test that catches a
+        future regression where someone deletes the cache lookup."""
+        self._isolate_cache(tmp_path, monkeypatch)
+
+        # Build a fake faster_whisper module that records call counts.
+        call_count = {"transcribe": 0}
+
+        class FakeWord:
+            def __init__(self, word, start, end, prob):
+                self.word, self.start, self.end, self.probability = word, start, end, prob
+
+        class FakeSegment:
+            def __init__(self):
+                self.words = [FakeWord("hello", 0.0, 0.5, 0.95)]
+
+        class FakeModel:
+            def __init__(self, model_size, compute_type):
+                pass
+            def transcribe(self, *args, **kwargs):
+                call_count["transcribe"] += 1
+                return [FakeSegment()], None
+
+        # Inject the fake module into sys.modules so the lazy import inside
+        # transcribe_wav picks it up.
+        import sys
+        fake_module = type(sys)("faster_whisper")
+        fake_module.WhisperModel = FakeModel
+        monkeypatch.setitem(sys.modules, "faster_whisper", fake_module)
+
+        wav = tmp_path / "test.wav"
+        wav.write_bytes(b"audio bytes")
+
+        # First call: should transcribe (miss).
+        t1 = wa.transcribe_wav(wav, model_size="medium", use_cache=True)
+        assert call_count["transcribe"] == 1
+        assert len(t1.words) == 1
+
+        # Second call: should hit cache, NOT transcribe again.
+        t2 = wa.transcribe_wav(wav, model_size="medium", use_cache=True)
+        assert call_count["transcribe"] == 1, (
+            "cache miss on second call — transcribe_wav isn't using the cache"
+        )
+        assert len(t2.words) == 1
+        assert t2.words[0].word == t1.words[0].word
+
+    def test_transcribe_wav_skips_cache_with_no_cache_flag(self, tmp_path, monkeypatch):
+        """use_cache=False forces re-transcription every time."""
+        self._isolate_cache(tmp_path, monkeypatch)
+
+        call_count = {"transcribe": 0}
+
+        class FakeWord:
+            def __init__(self):
+                self.word, self.start, self.end, self.probability = "x", 0.0, 0.5, 0.9
+
+        class FakeSegment:
+            def __init__(self):
+                self.words = [FakeWord()]
+
+        class FakeModel:
+            def __init__(self, *a, **kw): pass
+            def transcribe(self, *args, **kwargs):
+                call_count["transcribe"] += 1
+                return [FakeSegment()], None
+
+        import sys
+        fake_module = type(sys)("faster_whisper")
+        fake_module.WhisperModel = FakeModel
+        monkeypatch.setitem(sys.modules, "faster_whisper", fake_module)
+
+        wav = tmp_path / "test.wav"
+        wav.write_bytes(b"audio")
+        wa.transcribe_wav(wav, use_cache=False)
+        wa.transcribe_wav(wav, use_cache=False)
+        assert call_count["transcribe"] == 2  # both calls hit the backend
 
 
 class TestCliSmoke:

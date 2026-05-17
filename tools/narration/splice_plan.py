@@ -37,9 +37,13 @@ Usage:
 Default output: `episodes/<slug>/splice-plan.txt`
 
 Exit codes:
-    0 — label track written
-    1 — alignment produced no pickup candidates (nothing to splice)
-    2 — missing input / fewer pickups than candidates
+    0 — label track written, OR alignment was clean (nothing to splice)
+    2 — missing input / wrong arguments
+
+A clean alignment is a successful outcome (the take didn't need pickups)
+— treating it as a failure with exit 1 would break orchestrator scripts
+that chain `splice_plan && next_stage`. We surface the "no candidates"
+message to stderr instead.
 """
 
 from __future__ import annotations
@@ -307,6 +311,14 @@ def main() -> int:
     if missing:
         for p in missing:
             print(f"✗ pickup not found: {p}", file=sys.stderr)
+        print(
+            "  → check filename casing (case-sensitive on Linux), and that "
+            "you passed the absolute path or a path relative to your "
+            f"current directory ({Path.cwd()}). Expected naming convention "
+            "is `pickup-1.wav`, `pickup-2.wav`, ... in the order they appear "
+            "in narration-diff.md's pickup table.",
+            file=sys.stderr,
+        )
         return 2
 
     # Build the plan
@@ -316,10 +328,11 @@ def main() -> int:
     if not marks:
         for w in warnings:
             print(f"⚠ {w}", file=sys.stderr)
-        # No candidates to splice — return 1 so a CI / orchestrator
-        # treats "alignment was clean" as "no work to do here" distinctly
-        # from "all good."
-        return 1
+        # A clean alignment IS success — the take didn't need pickups,
+        # there's nothing to splice. Returning 1 here would invert the
+        # standard exit-code semantic ("1 = error/findings") and break
+        # any orchestrator chaining `splice_plan && next_stage`.
+        return 0
 
     label_track = render_audacity_labels(marks)
 

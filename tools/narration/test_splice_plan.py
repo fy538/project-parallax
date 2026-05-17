@@ -162,6 +162,45 @@ class TestRenderAudacityLabels:
             assert len(cells) == 3, f"expected 3 cells, got {len(cells)}: {line!r}"
 
 
+# ── render_summary ───────────────────────────────────────────────────────────
+
+
+class TestRenderSummary:
+    """The --summary flag rendering path. Operator-facing markdown — an
+    off-by-one or missing column would show up in their terminal."""
+
+    def test_summary_shows_splice_count(self, tmp_path):
+        report = _make_report((10.0, 12.0, "first", ""), (20.0, 22.0, "second", ""))
+        p1 = tmp_path / "pickup-1.wav"; p1.write_bytes(b"")
+        p2 = tmp_path / "pickup-2.wav"; p2.write_bytes(b"")
+        marks, _ = sp.build_splice_plan(report, [p1, p2], pad_sec=0)
+        out = sp.render_summary(marks, [], slug="x")
+        assert "2 splice(s) planned" in out
+
+    def test_summary_includes_each_pickup_filename(self, tmp_path):
+        report = _make_report((10.0, 12.0, "alpha", ""), (20.0, 22.0, "beta", ""))
+        p1 = tmp_path / "pickup-alpha.wav"; p1.write_bytes(b"")
+        p2 = tmp_path / "pickup-beta.wav"; p2.write_bytes(b"")
+        marks, _ = sp.build_splice_plan(report, [p1, p2], pad_sec=0)
+        out = sp.render_summary(marks, [], slug="x")
+        assert "pickup-alpha.wav" in out
+        assert "pickup-beta.wav" in out
+
+    def test_summary_surfaces_warnings(self, tmp_path):
+        out = sp.render_summary([], ["nothing to splice"], slug="x")
+        assert "⚠ nothing to splice" in out
+
+    def test_summary_includes_next_step_instructions(self, tmp_path):
+        report = _make_report((10.0, 12.0, "x", ""))
+        p = tmp_path / "p.wav"; p.write_bytes(b"")
+        marks, _ = sp.build_splice_plan(report, [p], pad_sec=0)
+        out = sp.render_summary(marks, [], slug="x")
+        # The operator needs to know what to do with the splice-plan.txt
+        # — the summary doc is the discoverable place for that.
+        assert "Audacity" in out
+        assert "Import" in out and "Labels" in out
+
+
 # ── CLI smoke ────────────────────────────────────────────────────────────────
 
 
@@ -225,9 +264,12 @@ class TestCliSmoke:
         assert "\t" in result.stdout
         assert "PICKUP 1" in result.stdout
 
-    def test_no_candidates_exits_1(self, tmp_path):
+    def test_no_candidates_exits_0(self, tmp_path):
         """Clean alignment (transcript matches script perfectly) →
-        nothing to splice → exit 1 to differentiate from success."""
+        nothing to splice = SUCCESS, not failure. The convention is
+        exit 0 = success (regardless of whether work was done);
+        otherwise orchestrators chaining `splice_plan && next_stage`
+        would break on the most common case (a clean take)."""
         script = self._make_script(tmp_path)
         transcript = self._make_transcript(tmp_path, [
             ("Hello", 0.0), ("world", 0.5), ("this", 1.0), ("is", 1.5),
@@ -248,7 +290,10 @@ class TestCliSmoke:
             ],
             capture_output=True, text=True,
         )
-        assert result.returncode == 1
+        assert result.returncode == 0
+        # The informational message belongs on stderr so stdout stays
+        # consumable by piped tooling (label-track redirected to a file
+        # would normally not see this).
         assert "nothing to splice" in result.stderr
 
     def test_missing_pickup_file_exits_2(self, tmp_path):
