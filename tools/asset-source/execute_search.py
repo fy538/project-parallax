@@ -15,7 +15,7 @@ env_file = Path(__file__).parent / ".env"
 api_key = None
 
 if env_file.exists():
-    with open(env_file) as f:
+    with open(env_file, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line.startswith("PEXELS_API_KEY="):
@@ -84,7 +84,7 @@ print(f"{'='*60}\n")
 
 # Save results
 output_file = Path(__file__).parent / "search_results.json"
-with open(output_file, "w") as f:
+with open(output_file, "w", encoding="utf-8") as f:
     json.dump({
         "search_queries": search_queries,
         "total_results": len(unique_results),

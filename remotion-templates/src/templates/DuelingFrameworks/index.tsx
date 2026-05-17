@@ -52,6 +52,6 @@ export const DuelingFrameworksComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={sampleData as unknown as { data: DuelingFrameworksData }}
+    defaultProps={sampleData as { data: DuelingFrameworksData }}
   />
 );

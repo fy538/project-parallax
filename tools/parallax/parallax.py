@@ -216,7 +216,7 @@ def batch_process(shot_list_path: str, stills_dir: str, output_dir: str, motions
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    with open(shot_list_path) as f:
+    with open(shot_list_path, encoding="utf-8") as f:
         shots = json.load(f)
 
     for shot in shots:
@@ -290,7 +290,7 @@ if __name__ == "__main__":
         import json
         motions = {}
         if args.motions_json:
-            with open(args.motions_json) as f:
+            with open(args.motions_json, encoding="utf-8") as f:
                 motions = json.load(f)
         batch_process(args.shot_list, args.stills_dir, args.output_dir, motions)
     else:

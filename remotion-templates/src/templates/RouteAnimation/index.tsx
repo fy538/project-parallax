@@ -24,6 +24,6 @@ export const RouteAnimationComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as unknown as RouteAnimationData }}
+    defaultProps={{ data: sampleData as RouteAnimationData }}
   />
 );

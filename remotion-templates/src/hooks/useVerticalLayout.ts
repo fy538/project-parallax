@@ -20,7 +20,7 @@
  *   const fontSize = vl?.fontSizes.h2 ?? fontSizes.h2;
  */
 
-import { useMemo } from "react";
+// useMemo removed — VERTICAL_TOKENS is a module-level constant; no memoization needed.
 
 export interface VerticalLayoutTokens {
   /** Canvas dimensions */
@@ -136,5 +136,5 @@ const VERTICAL_TOKENS: VerticalLayoutTokens = {
  * Values are memoized — safe to call every frame.
  */
 export const useVerticalLayout = (): VerticalLayoutTokens => {
-  return useMemo(() => VERTICAL_TOKENS, []);
+  return VERTICAL_TOKENS;
 };

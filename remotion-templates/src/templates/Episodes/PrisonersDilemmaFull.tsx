@@ -21,7 +21,7 @@ import { TEMPLATE_DATA } from "./prisoners-dilemma-data";
 
 export const PrisonersDilemmaFull: React.FC = () => (
   <FullEpisode
-    manifest={manifest as unknown as AssemblyManifest}
+    manifest={manifest as AssemblyManifest}
     templateData={TEMPLATE_DATA}
     assetBasePath="episodes/prisoners-dilemma"
   />
@@ -34,7 +34,7 @@ export const PrisonersDilemmaFullComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: manifest as unknown as AssemblyManifest,
+          manifest: manifest as AssemblyManifest,
           templateData: TEMPLATE_DATA,
           assetBasePath: "episodes/prisoners-dilemma",
         },

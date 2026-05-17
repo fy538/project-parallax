@@ -28,7 +28,7 @@ export const HorizontalTimelineComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as unknown as HorizontalTimelineData }}
+    defaultProps={{ data: sampleData as HorizontalTimelineData }}
   />
 );
 
@@ -44,6 +44,6 @@ export const HorizontalTimelineSingleComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: singleSampleData as unknown as HorizontalTimelineData }}
+    defaultProps={{ data: singleSampleData as HorizontalTimelineData }}
   />
 );

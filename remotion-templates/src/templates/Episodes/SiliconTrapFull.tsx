@@ -34,7 +34,7 @@ import { TEMPLATE_DATA } from "./silicon-trap-data";
 
 export const SiliconTrapFull: React.FC = () => (
   <FullEpisode
-    manifest={manifest as unknown as AssemblyManifest}
+    manifest={manifest as AssemblyManifest}
     templateData={TEMPLATE_DATA}
     assetBasePath="assets/silicon-trap"
   />
@@ -49,7 +49,7 @@ export const SiliconTrapFullComposition = () => (
     calculateMetadata={() =>
       calculateFullEpisodeMetadata({
         props: {
-          manifest: manifest as unknown as AssemblyManifest,
+          manifest: manifest as AssemblyManifest,
           templateData: TEMPLATE_DATA,
           assetBasePath: "assets/silicon-trap",
         },

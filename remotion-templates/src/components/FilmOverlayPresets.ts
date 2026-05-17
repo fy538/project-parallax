@@ -115,6 +115,7 @@ export const TEMPLATE_PRESET_MAP: Record<string, string> = {
   SplitComposition: "documentary",
   DecisionTree: "documentary",
   NetworkDiagram: "documentary",
+  ArcDiagram: "documentary",
   DualTimeline: "documentary",
   TimelineComparison: "documentary",
   DuelingFrameworks: "documentary",

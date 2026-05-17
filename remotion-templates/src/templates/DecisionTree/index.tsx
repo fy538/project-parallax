@@ -26,6 +26,6 @@ export const DecisionTreeComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as unknown as DecisionTreeData }}
+    defaultProps={{ data: sampleData as DecisionTreeData }}
   />
 );

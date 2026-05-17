@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { layout, sec } from "../../design/theme";
 import { AudioPreview, type AudioPreviewData } from "./AudioPreview";
+import type { SoundCue, TextureCue } from "../Episodes/FullEpisode";
 import siliconTrapManifest from "../../../data/episodes/silicon-trap/assembly-manifest.json";
 
 export { AudioPreview, type AudioPreviewData } from "./AudioPreview";
@@ -19,9 +20,9 @@ function dataFromManifest(manifest: unknown): AudioPreviewData {
       id: string;
       startSec: number;
       endSec: number;
-      soundCue?: unknown;
-      soundCueSecondary?: unknown;
-      textureCues?: unknown;
+      soundCue?: SoundCue;
+      soundCueSecondary?: SoundCue;
+      textureCues?: TextureCue[];
     }>;
   };
 
@@ -30,12 +31,9 @@ function dataFromManifest(manifest: unknown): AudioPreviewData {
     .map((s) => ({
       segmentId: s.id,
       startSec: s.startSec,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      soundCue: s.soundCue as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      soundCueSecondary: s.soundCueSecondary as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      textureCues: s.textureCues as any,
+      soundCue: s.soundCue,
+      soundCueSecondary: s.soundCueSecondary,
+      textureCues: s.textureCues,
     }));
 
   return {

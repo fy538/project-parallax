@@ -286,7 +286,7 @@ def process_batch(batch_file: Path, output_dir: Path, preview_only: bool = False
     }
     """
     try:
-        with open(batch_file) as f:
+        with open(batch_file, encoding="utf-8") as f:
             batch = json.load(f)
     except json.JSONDecodeError as e:
         print(f"Error: batch file is not valid JSON: {e}", file=sys.stderr)
@@ -357,7 +357,7 @@ def process_batch(batch_file: Path, output_dir: Path, preview_only: bool = False
 
     # Save manifest
     manifest_path = ep_dir / "asset-manifest.json"
-    with open(manifest_path, "w") as f:
+    with open(manifest_path, "w", encoding="utf-8") as f:
         json.dump({
             "episode": episode,
             "generated": "auto",

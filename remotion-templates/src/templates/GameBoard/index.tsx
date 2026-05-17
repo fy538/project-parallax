@@ -26,6 +26,6 @@ export const GameBoardComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as unknown as GameBoardData }}
+    defaultProps={{ data: sampleData as GameBoardData }}
   />
 );

@@ -15,7 +15,7 @@ export const ChoroplethMapComposition = () => (
     component={ChoroplethMap}
     schema={ChoroplethMapSchema}
     calculateMetadata={({ props }) => ({
-      durationInFrames: totalDuration(props.data as ChoroplethMapData),
+      durationInFrames: totalDuration(props.data as unknown as ChoroplethMapData),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,
