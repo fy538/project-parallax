@@ -48,10 +48,22 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { TextureFilters } from "../../utils/textures";
 import { warnIf } from "../../utils/dataWarnings";
 import type { PricingWaterfallData } from "./types";
+import { PricingWaterfallEditorial } from "./PricingWaterfallEditorial";
 
 export const PricingWaterfall: React.FC<{ data: PricingWaterfallData }> = ({
   data,
 }) => {
+  // Editorial-frame opt-in: when `data.frame` is set, route to the editorial
+  // render path. See remotion-templates/EDITORIAL_FRAME_ARCHITECTURE.md.
+  if (data.frame) {
+    return (
+      <PricingWaterfallEditorial
+        data={data as PricingWaterfallData & { frame: NonNullable<PricingWaterfallData["frame"]> }}
+      />
+    );
+  }
+
+
   warnIf(
     data.stages.filter(s => s.hero).length > 1,
     "PricingWaterfall",

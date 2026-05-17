@@ -18,6 +18,7 @@
 
 import type { DirectionBlock } from "../../hooks/useDirection";
 import type { MotionIdentity } from "../../design/motion";
+import type { EditorialFrameProps } from "../../components/EditorialFrame/schema";
 
 export interface PricingWaterfallStage {
   /** Stage name displayed prominently. */
@@ -57,6 +58,13 @@ export interface PricingWaterfallData {
   /** Substrate-motion preset (grain + atmosphere + wobble combination).
    *  Default: channel-wide "briefing". See design/motion.ts. */
   motionIdentity?: MotionIdentity;
+
+  /**
+   * Opt-in editorial frame. When set, the chart renders inside EditorialFrame
+   * (kicker + heroStat + multi-callout annotations + publication chrome).
+   * See EDITORIAL_FRAME_ARCHITECTURE.md.
+   */
+  frame?: EditorialFrameProps;
 
   // ── Directing language overrides ──────────────────────────────────────
   /** Per-composition direction block from visual-spec _direction namespace. */

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { EditorialFrameSchema } from "../../components/EditorialFrame/schema";
 
 const PricingWaterfallStageSchema = z.object({
   label: z.string(),
@@ -23,6 +24,11 @@ export const PricingWaterfallSchema = z.object({
     durationSec: z.number().optional(),
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
+    /**
+     * Opt-in editorial frame. When set, the chart renders inside EditorialFrame
+     * with publication-grade composition. See EDITORIAL_FRAME_ARCHITECTURE.md.
+     */
+    frame: EditorialFrameSchema.optional(),
     _direction: DirectionBlockSchema.optional(),
   }),
 });

@@ -23,6 +23,23 @@ const sampleData: PricingWaterfallData = {
   ],
   source: "Specialty Coffee Association reports; representative figures",
   durationSec: 10,
+  frame: {
+    kicker: "VALUE CAPTURE",
+    title: "The farmer gets three cents on the dollar.",
+    dek: "Where each five-dollar specialty cup actually goes. The first link of the chain captures the smallest share.",
+    heroStat: {
+      value: "3%",
+      placement: "left-rail",
+      weight: "display",
+      color: "#C4A747",
+    },
+    layout: "hero-split",
+    splitRatio: [38, 62],
+    chrome: "publication",
+    source: "Specialty Coffee Association — penny breakdown reports (representative).",
+    modeTag: "supply chain · catalog",
+    legend: "suppressed",
+  },
 };
 
 export const PricingWaterfallComposition: React.FC = () => (
