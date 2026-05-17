@@ -72,7 +72,10 @@ Visual pipeline updated: ChatGPT image generation + Pika 2.5 (chained morphs) fo
 |-----------|-------------------|
 | **TRANSITION** · TitleTransition · "HOW A FAILED MODEL CONQUERED THE WORLD" · 2s |
 | | PACE: analytical |
-| Thomas Schelling put it in a diplomacy textbook. {✅} Biologists imported it to explain why animals compete. {✅} Economists used it to model why cartels cheat. {✅} By 1975 — twenty-five years after it failed that first experiment — there were over two thousand scholarly articles on the Prisoner's Dilemma. {✅} | **P1** · [MG:] DataChart — Animated bar chart showing PD publication count: 1950 (1) → 1960 (~50) → 1975 (2,000+). Domain labels: "Strategy," "Biology," "Economics," "Law," "Psychology." · [prisoners-dilemma/chart-diffusion.json] · 12s |
+| Thomas Schelling put it in a diplomacy textbook. {✅} William Hamilton imported it into biology to explain why animals compete. {✅} Economists used it to model why cartels cheat. {✅} Robert Axelrod ran computer tournaments to evolve cooperative strategies. {✅} Douglas Hofstadter put it in *Scientific American*. {✅} | **P1** · [MG:] ArcDiagram — Citational lineage of the PD across eight named figures, 1950→1983: Flood & Dresher (RAND experiment) → Nash (equilibrium response) → Schelling (diplomacy) → Hamilton (biology) → Trivers (reciprocal altruism) → Maynard Smith (ESS) → Axelrod & Hamilton (tournaments) → Hofstadter (popularization). Arcs encode disciplinary jumps. · [prisoners-dilemma/arc-pd-lineage.json] · 8s |
+|  | DIR: reveal(sequential, per-node:1s) |
+|  | DIR: cam(overview, settle) |
+| By 1975 — twenty-five years after it failed that first experiment — there were over two thousand scholarly articles on the Prisoner's Dilemma. {✅} | **P1** · [MG:] DataChart — Animated bar chart: 1950 (1) → 1960 (~50) → 1975 (2,000+). The numeric punch landing after the lineage. · [prisoners-dilemma/chart-diffusion.json] · 6s |
 |  | DIR: reveal(stagger:300ms, pulse) |
 |  | DIR: cam(overview → element:4, sync:"two thousand", track) |
 |  | DIR: hold(breathe) |
@@ -295,7 +298,8 @@ Three documentary stills retained as [ARCHIVAL:] (Nash portrait, RAND building, 
 | 3 | KineticTypography | "Every negotiation" stakes line | inline | [MG:] |
 | 4 | FrameworkDiagram | Standard Frame — PD payoff matrix | framework-standard-frame.json | [MG:] |
 | 5 | GameBoard | Single equilibrium dot — motif first appearance | gameboard-motif-beat1.json | [MG:] |
-| 6 | DataChart | PD publication diffusion 1950-1975 | chart-diffusion.json | [MG:] |
+| 6a | ArcDiagram | PD citational lineage 1950-1983 (8 named figures) | arc-pd-lineage.json | [MG:] |
+| 6b | DataChart | "2,000+ articles" punch (numeric coda) | chart-diffusion.json | [MG:] |
 | 7 | GameBoard | PD matrix with nuclear icons | gameboard-nuclear.json | [MG:] |
 | 8 | FrameworkDiagram | Narrowing conditions (assumptions as filters) | framework-narrowing.json | [MG:] |
 | 9 | KineticTypography | "2,000+ articles. 14 applications." | inline | [MG:] |

@@ -5,7 +5,7 @@
 **Episode slug:** prisoners-dilemma
 **Format:** Philosopher's Lens
 **Arc:** 3 — The Diplomacy of Deception (opener)
-**Current version:** v5.6 (May 9, 2026) — render-ready
+**Current version:** v5.8 (May 16, 2026) — render-ready
 **Author:** Tiger + Claude (collaborative drafting)
 **Log opened:** May 12, 2026 (retroactive)
 
@@ -84,6 +84,21 @@ Not a script-narration change; a Tier-1 data-layer pass after the May 11–12 pi
 - New `gameboard-iterated-play.json` added — Skyrms moment at Beat 4 (line 172) now has a visual proof of "it always was [an equilibrium]" via small-multiples across rounds 1/10/50/200. Inserted as `beat4-seg41b-iterated-play` in the assembly manifest. One script line added at line 173.
 - `manifest.filmOverlay: { preset: "documentary", intensity: 0.45 }` activated at the episode top level.
 - 11 lon/lat-anchored `MapAnnotations` added to `choropleth-ostrom.json` covering Valencia, Swiss Alps, Japan, Maine across the three phases + a tertiary source attribution.
+
+---
+
+## v5.7 → v5.8 (May 16, 2026) — Beat 2 lineage upgrade (ArcDiagram)
+
+Strategic visual upgrade flagged by the May 16 ambitious-re-strategy audit. Beat 2 segment 14 was previously a single 14s `DataChart` bar count of PD publications across disciplines. The script's actual argument in that segment is *citational lineage* — "Schelling put it in a diplomacy textbook. Biologists imported it. Economists used it." — which is the structural form ArcDiagram exists to render. The bar chart hedged the lineage into a quantity. ArcDiagram commits the lineage as named figures and named jumps.
+
+Changes:
+
+- New `arc-pd-lineage.json` — 8 named figures (Flood & Dresher / Nash / Schelling / Hamilton / Trivers / Maynard Smith / Axelrod & Hamilton / Hofstadter), 9 arcs encoding the disciplinary jumps. Three eras: "RAND origins" (1950), "Disciplinary capture" (1960–1973), "Synthesis & popularization" (1981–1983). Sources verified from `brief.md` Section 2 (Mirowski 2002; Amadae 2016; Poundstone 1992; Axelrod & Hamilton 1981).
+- `beat2-seg14` (DataChart, 14s) split into:
+  - `beat2-seg14` (ArcDiagram, 8s) — the lineage
+  - `beat2-seg14b` (DataChart, 6s) — the "2,000+ articles" numeric punch (chart-diffusion.json `durationSec` shortened 12 → 6)
+- Script narration extended to name Hamilton, Axelrod, and Hofstadter explicitly (line 75). Word count +10. Pacing: each new figure name lands as its node settles on the arc.
+- `ArcDiagram` registered in three places it was missing from: `TEMPLATE_COMPONENTS` in `FullEpisode.tsx`, `data/assembly-manifest.schema.json` component enum, manifest import.
 
 ---
 

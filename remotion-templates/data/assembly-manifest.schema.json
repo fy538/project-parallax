@@ -383,7 +383,8 @@
                 "DualTimeline",
                 "DuelingFrameworks",
                 "StrategicLandscape",
-                "TimelineMorph"
+                "TimelineMorph",
+                "ArcDiagram"
               ],
               "description": "Remotion template component name."
             },

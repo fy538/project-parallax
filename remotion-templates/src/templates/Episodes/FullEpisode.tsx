@@ -99,6 +99,7 @@ import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
 import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
+import { ArcDiagram } from "../ArcDiagram/ArcDiagram";
 // BifurcationRoute template removed May 13, 2026 (phylogenetic-tree
 // register didn't fit Parallax; no episodes in queue required it).
 import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
@@ -414,6 +415,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   HorizontalTimeline,
   DuelingFrameworks,
   StrategicLandscape,
+  ArcDiagram,
 };
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────

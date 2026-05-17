@@ -1,0 +1,146 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "How a Failed Experiment Conquered Eight Disciplines",
+  "subtitle": "From RAND 1950 to Scientific American 1983 — the citational lineage that made the Prisoner's Dilemma the default model of cooperation",
+  "nodes": [
+    {
+      "id": "flood-dresher",
+      "label": "Flood & Dresher",
+      "sublabel": "RAND experiment",
+      "axisStamp": "1950",
+      "importance": "primary"
+    },
+    {
+      "id": "nash",
+      "label": "Nash",
+      "sublabel": "Equilibrium response",
+      "axisStamp": "1950",
+      "importance": "primary"
+    },
+    {
+      "id": "schelling",
+      "label": "Schelling",
+      "sublabel": "Strategy of Conflict",
+      "axisStamp": "1960",
+      "importance": "primary",
+      "color": "accent"
+    },
+    {
+      "id": "hamilton",
+      "label": "Hamilton",
+      "sublabel": "Kin selection",
+      "axisStamp": "1964"
+    },
+    {
+      "id": "trivers",
+      "label": "Trivers",
+      "sublabel": "Reciprocal altruism",
+      "axisStamp": "1971"
+    },
+    {
+      "id": "maynard-smith",
+      "label": "Maynard Smith",
+      "sublabel": "Evolutionarily Stable Strategies",
+      "axisStamp": "1973"
+    },
+    {
+      "id": "axelrod",
+      "label": "Axelrod & Hamilton",
+      "sublabel": "Evolution of Cooperation",
+      "axisStamp": "1981",
+      "importance": "primary",
+      "color": "accent"
+    },
+    {
+      "id": "hofstadter",
+      "label": "Hofstadter",
+      "sublabel": "Scientific American",
+      "axisStamp": "1983",
+      "importance": "primary"
+    }
+  ],
+  "connections": [
+    {
+      "from": "flood-dresher",
+      "to": "nash",
+      "label": "anomaly → theory",
+      "strength": 1.0,
+      "emphasis": "accent"
+    },
+    {
+      "from": "nash",
+      "to": "schelling",
+      "label": "to diplomacy",
+      "strength": 0.9,
+      "color": "accent"
+    },
+    {
+      "from": "nash",
+      "to": "hamilton",
+      "label": "to biology",
+      "strength": 0.8
+    },
+    {
+      "from": "hamilton",
+      "to": "trivers",
+      "label": "extended",
+      "strength": 0.7
+    },
+    {
+      "from": "trivers",
+      "to": "maynard-smith",
+      "label": "formalized as ESS",
+      "strength": 0.8
+    },
+    {
+      "from": "hamilton",
+      "to": "axelrod",
+      "label": "tournament synthesis",
+      "strength": 0.9,
+      "emphasis": "accent"
+    },
+    {
+      "from": "maynard-smith",
+      "to": "axelrod",
+      "label": "ESS + iteration",
+      "strength": 0.6,
+      "style": "dashed",
+      "emphasis": "muted"
+    },
+    {
+      "from": "axelrod",
+      "to": "hofstadter",
+      "label": "popularized",
+      "strength": 1.0
+    },
+    {
+      "from": "schelling",
+      "to": "hofstadter",
+      "label": "popular register",
+      "strength": 0.5,
+      "style": "dashed",
+      "emphasis": "muted"
+    }
+  ],
+  "eras": [
+    {
+      "label": "RAND origins",
+      "range": [0, 1],
+      "color": "#888780"
+    },
+    {
+      "label": "Disciplinary capture",
+      "range": [2, 5],
+      "color": "#888780"
+    },
+    {
+      "label": "Synthesis & popularization",
+      "range": [6, 7],
+      "color": "#C4A747"
+    }
+  ],
+  "axisTitle": "Decade",
+  "source": "Mirowski (Machine Dreams, 2002); Amadae (Prisoners of Reason, 2016); Poundstone (1992); Axelrod & Hamilton (1981)",
+  "durationSec": 8,
+  "backgroundVariant": "dark"
+}

@@ -365,7 +365,8 @@
       "transition": {
         "in": "color-wash",
         "out": "cut",
-        "durationSec": 0.5
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
       }
     },
     {
@@ -624,6 +625,26 @@
       "id": "beat2-seg14",
       "type": "TEMPLATE",
       "startSec": 143.4,
+      "endSec": 151.4,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. William Hamilton imported it i",
+      "template": {
+        "component": "ArcDiagram",
+        "dataFile": "arc-pd-lineage.json",
+        "backdropId": "archive-vault"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "dissolve",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat2-seg14b",
+      "type": "TEMPLATE",
+      "startSec": 151.4,
       "endSec": 157.4,
       "layer": "foreground",
       "beat": "beat2",
@@ -633,7 +654,7 @@
       "syncWords": [
         "two thousand"
       ],
-      "narrationRef": "Thomas Schelling put it in a diplomacy textbook. {\u2705} Biologists imported it to e",
+      "narrationRef": "By 1975 \u2014 twenty-five years after it failed that first experiment \u2014 there were ",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-diffusion.json",
@@ -646,18 +667,18 @@
       },
       "soundCue": {
         "type": "stat-reveal",
-        "offsetSec": 8.4,
+        "offsetSec": 2.4,
         "intensity": "normal"
       },
       "textureCues": [
         {
           "type": "bar-grow",
-          "offsetSec": 5.6,
+          "offsetSec": 0.8,
           "volume": 0.08
         },
         {
           "type": "bar-grow",
-          "offsetSec": 7.0,
+          "offsetSec": 1.8,
           "volume": 0.06
         }
       ]
@@ -760,7 +781,8 @@
       "transition": {
         "in": "color-wash",
         "out": "cut",
-        "durationSec": 0.5
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
       },
       "soundCue": {
         "type": "beat-transition",
@@ -1105,7 +1127,8 @@
       "transition": {
         "in": "color-wash",
         "out": "cut",
-        "durationSec": 0.5
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
       },
       "soundCue": {
         "type": "beat-transition",
