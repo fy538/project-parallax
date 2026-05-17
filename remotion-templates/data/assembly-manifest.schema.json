@@ -384,7 +384,8 @@
                 "DuelingFrameworks",
                 "StrategicLandscape",
                 "TimelineMorph",
-                "ArcDiagram"
+                "ArcDiagram",
+                "ProportionalSymbolMap"
               ],
               "description": "Remotion template component name."
             },

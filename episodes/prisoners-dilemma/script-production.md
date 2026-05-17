@@ -179,7 +179,7 @@ Visual pipeline updated: ChatGPT image generation + Pika 2.5 (chained morphs) fo
 | Which means the question was never "how do you escape the logic of defection?" It was always "how do you coordinate on the outcome you both prefer?" | **P2** · [MG:] FrameworkDiagram — Old question struck through: "How to escape defection?" → New question in amber: "How to coordinate on cooperation?" · [prisoners-dilemma/framework-reframe.json] · 6s |
 |  | DIR: reveal(instant, hero:1, glow) |
 | *[Beat.]* | |
-| And we don't have to theorize. Elinor Ostrom spent thirty years documenting communities that solved this problem in practice. {✅} [VISUAL-FIRST: 3s] | **P1** · [MG:] ChoroplethMap — World map lights up with Ostrom's 800+ cases: Spain (huertas), Switzerland (alps), Japan (iriaichi), Maine (lobster), plus dozens more. Counter: "800+ documented cases." Viewer sees the map filling before narration explains what the dots are. · [prisoners-dilemma/choropleth-ostrom.json] · 14s |
+| And we don't have to theorize. Elinor Ostrom spent thirty years documenting communities that solved this problem in practice. {✅} [VISUAL-FIRST: 3s] | **P1** · [MG:] ProportionalSymbolMap — Six named commons across four continents, symbol AREA encodes years of documented continuous operation: Valencia huertas (750+ yrs), Swiss Törbel alps (800+ yrs), Japanese iriaichi (400+ yrs), Filipino zanjeras (400+ yrs), Nepalese pani panchayats (300+ yrs), Maine lobster gangs (140+ yrs). Three phases: Europe close-up → +Japan+Maine → +Philippines+Nepal global. Replaces choropleth-ostrom (country-fill) with case-anchored evidentiary register. · [prisoners-dilemma/proportional-symbol-ostrom.json] · 14s |
 |  | DIR: reveal(stagger:200ms) |
 |  | DIR: cam(wide → tight:[0, 35], over:8s, track) |
 |  | DIR: hold(breathe) |
@@ -316,7 +316,7 @@ Three documentary stills retained as [ARCHIVAL:] (Nash portrait, RAND building, 
 | 20 | SplitComposition | PD vs. stag hunt side-by-side (∴ divider) | split-pd-vs-staghunt.json | [MG:] |
 | 21 | KineticTypography | "Iterated PD ≡ Stag Hunt" | inline | [MG:] |
 | 22 | FrameworkDiagram | Old question → new question reframe | framework-reframe.json | [MG:] |
-| 23 | ChoroplethMap | Ostrom's 800+ cases world map | choropleth-ostrom.json | [MG:] |
+| 23 | ProportionalSymbolMap | Six named Ostrom commons — area ∝ years of operation | proportional-symbol-ostrom.json | [MG:] |
 | 24 | FrameworkDiagram | Ostrom principles vs. PD assumptions | framework-ostrom-vs-pd.json | [MG:] |
 | 25 | KineticTypography | "Cooperation isn't a miracle. It's designed." | inline | [MG:] |
 | 26 | FrameworkDiagram | Motif — synchronized defection | framework-motif-beat5.json | [MG:] |

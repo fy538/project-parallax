@@ -5,7 +5,7 @@
 **Episode slug:** prisoners-dilemma
 **Format:** Philosopher's Lens
 **Arc:** 3 — The Diplomacy of Deception (opener)
-**Current version:** v5.8 (May 16, 2026) — render-ready
+**Current version:** v5.9 (May 16, 2026) — render-ready
 **Author:** Tiger + Claude (collaborative drafting)
 **Log opened:** May 12, 2026 (retroactive)
 
@@ -99,6 +99,28 @@ Changes:
   - `beat2-seg14b` (DataChart, 6s) — the "2,000+ articles" numeric punch (chart-diffusion.json `durationSec` shortened 12 → 6)
 - Script narration extended to name Hamilton, Axelrod, and Hofstadter explicitly (line 75). Word count +10. Pacing: each new figure name lands as its node settles on the arc.
 - `ArcDiagram` registered in three places it was missing from: `TEMPLATE_COMPONENTS` in `FullEpisode.tsx`, `data/assembly-manifest.schema.json` component enum, manifest import.
+
+---
+
+## v5.8 → v5.9 (May 16, 2026) — Beat 4 Ostrom place-anchoring (ProportionalSymbolMap)
+
+Second strategic upgrade from the May 16 ambitious-re-strategy audit. Beat 4 segment 44 previously used `ChoroplethMap` (country fills) for Ostrom's 800+ documented commons. Country fills imply nation-state aggregation — the wrong unit for community-scale Ostromian institutions. ProportionalSymbolMap places a single symbol per named case, sized by years of documented continuous operation, with leader-line annotations to specific cities. The case is the data point; the country is just where it happens to be.
+
+Changes:
+
+- New `proportional-symbol-ostrom.json` — six named commons across four continents: Valencia huertas (750+ yrs, Tribunal de las Aguas since 1273), Swiss Törbel alpine commons (800+ yrs, charter 1224), Japanese iriaichi forests (400+ yrs, Edo period), Maine lobster harbor gangs (140+ yrs, 1880s onward), Filipino zanjeras (400+ yrs, Spanish colonial era), Nepalese pani panchayats (300+ yrs). Three phases mirroring the prior ChoroplethMap structure: Europe close-up (2 cases) → +Japan+Maine global (4 cases) → +Philippines+Nepal comprehensive (6 cases). Symbol AREA encodes years of documented operation — bigger circle = stronger evidence of institutional durability. Sources: Ostrom (1990) *Governing the Commons*; Wade (1988); Acheson (1988).
+- `framework-ostrom-vs-pd.json` demoted to *legend* role via new `protagonist: 0` field. The 8-principles diagram now visibly emphasizes the Ostrom side (the thesis) while the PD-assumptions column recedes. Editorially correct — Ostrom IS the protagonist of Beat 4.
+- `ProportionalSymbolMap` registered in `TEMPLATE_COMPONENTS` (FullEpisode.tsx) and `assembly-manifest.schema.json` component enum. Was registered in `Root.tsx` for Studio use but missing from the full-episode renderer.
+- `beat4-seg44` manifest entry: `ChoroplethMap` / `choropleth-ostrom.json` → `ProportionalSymbolMap` / `proportional-symbol-ostrom.json`. Same 14s duration, same beat positioning.
+- Script line 182 updated to reference the new template + named cases. Asset Summary table (line 319) updated.
+
+`choropleth-ostrom.json` retained on disk as a fallback / reference (not deleted), per the existing convention for orphaned-but-valid data files.
+
+Verification: render-still of proportional-symbol-ostrom.json at frame 210 (phase 2 "Across four continents") renders correctly — four amber circles sized by years (Törbel 800 largest, Valencia 750, Japan 400, Maine 140 smallest), leader-line annotations to specific cities, brand chrome, source attribution. All 36 episode-integrity tests pass.
+
+**Queued for next session (requires manual asset sourcing):**
+
+The audit also recommended an `AnnotatedImage` triptych — three real Wikimedia photographs (Valencia huerta channel; Swiss Törbel alpine meadow with stone walls; Maine lobster trap line on a working harbor) each annotated with the Ostrom principle it embodies (clear boundaries / graduated sanctions / collective-choice arrangements). This would convert the Ostrom segment from "academic citation with map visual" to "documentary proof anchored in named places with photographs." Skipped here because it requires manual Wikimedia Commons sourcing of three CC-licensed photos. When sourced: author three new `annotated-image-valencia.json` / `-torbel.json` / `-maine.json` data files; insert as new manifest segments interspersed between beat4-seg44 (the map) and beat4-seg46 (the principles diagram); each ~6s; sequence: map → Valencia photo → Törbel photo → Maine photo → principles diagram (now as legend). Total Beat 4 runtime extension: ~18s. See the May 16 ambitious-re-strategy audit Opportunity #1 for callout design.
 
 ---
 

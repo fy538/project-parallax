@@ -3,6 +3,7 @@
   "title": "Ostrom's Design Principles vs. PD Assumptions",
   "subtitle": "Every principle dissolves an assumption the model requires",
   "variant": "comparison",
+  "protagonist": 0,
   "columns": [
     {
       "title": "Ostrom's 8 Principles",

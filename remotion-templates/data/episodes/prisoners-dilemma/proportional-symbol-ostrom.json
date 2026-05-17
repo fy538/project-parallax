@@ -1,0 +1,187 @@
+{
+  "episode": "prisoners-dilemma",
+  "title": "Cooperation, Documented",
+  "subtitle": "Six named commons across four continents — symbol area encodes centuries of continuous operation. The PD assumes this is impossible; the empirical record says otherwise.",
+  "projection": "equalEarth",
+  "source": "Ostrom (1990) Governing the Commons; Hardin–Ostrom debate (2009). 800+ cases documented; six representative anchors shown.",
+  "unit": "yrs",
+  "valueLabel": "Years of documented continuous operation",
+  "maxRadiusPx": 44,
+  "scaleType": "sqrt",
+  "symbolColor": "#C4A747",
+  "framePadding": 80,
+  "graticule": {
+    "spacing": 30,
+    "opacity": 0.08,
+    "emphasize30": true
+  },
+  "backgroundVariant": "dark",
+  "durationSec": 14,
+  "phases": [
+    {
+      "title": "Two European anchors",
+      "subtitle": "Charters older than most modern states",
+      "durationSec": 4,
+      "symbols": [
+        {
+          "iso3": "ESP",
+          "value": 750,
+          "label": "Valencia huertas"
+        },
+        {
+          "iso3": "CHE",
+          "value": 800,
+          "label": "Swiss alpine commons"
+        }
+      ],
+      "focus": {
+        "iso3": ["ESP", "CHE"]
+      },
+      "cameraTransition": "cinematic",
+      "cameraDwell": { "before": 0.15, "after": 0.2 }
+    },
+    {
+      "title": "Across four continents",
+      "subtitle": "Not Western, not religious, not coincidence",
+      "durationSec": 4,
+      "symbols": [
+        { "iso3": "ESP", "value": 750, "label": "Valencia" },
+        { "iso3": "CHE", "value": 800, "label": "Swiss alps" },
+        { "iso3": "JPN", "value": 400, "label": "Iriaichi forests" },
+        { "iso3": "USA", "value": 140, "label": "Maine lobster gangs" }
+      ],
+      "focus": {
+        "iso3": ["ESP", "CHE", "JPN", "USA"]
+      },
+      "cameraTransition": "cinematic",
+      "cameraDwell": { "before": 0.1, "after": 0.2 }
+    },
+    {
+      "title": "Six anchors of 800+ documented cases",
+      "subtitle": "Cooperation is designed, not miraculous",
+      "durationSec": 6,
+      "symbols": [
+        { "iso3": "ESP", "value": 750, "label": "Valencia" },
+        { "iso3": "CHE", "value": 800, "label": "Swiss alps" },
+        { "iso3": "JPN", "value": 400, "label": "Iriaichi" },
+        { "iso3": "USA", "value": 140, "label": "Maine" },
+        { "iso3": "PHL", "value": 400, "label": "Zanjeras" },
+        { "iso3": "NPL", "value": 300, "label": "Pani panchayats" }
+      ],
+      "cameraTransition": "cinematic",
+      "cameraDwell": { "before": 0.1, "after": 0.3 }
+    }
+  ],
+  "annotations": [
+    {
+      "at": [-0.4, 39.5],
+      "label": "VALENCIA",
+      "sublabel": "Tribunal de las Aguas, since 1273",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "left",
+      "leader": { "dx": -60, "dy": -30 },
+      "phase": 0
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "TÖRBEL",
+      "sublabel": "Alpine charter, 1224",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "right",
+      "leader": { "dx": 70, "dy": -30 },
+      "phase": 0
+    },
+    {
+      "at": [-0.4, 39.5],
+      "label": "Valencia",
+      "hierarchy": "secondary",
+      "align": "left",
+      "phase": 1
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "Törbel",
+      "hierarchy": "secondary",
+      "align": "right",
+      "phase": 1
+    },
+    {
+      "at": [138.2, 36.2],
+      "label": "JAPAN",
+      "sublabel": "Iriaichi forest commons, Edo period",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "left",
+      "leader": { "dx": -60, "dy": -40 },
+      "phase": 1
+    },
+    {
+      "at": [-69.0, 44.7],
+      "label": "MAINE",
+      "sublabel": "Lobster harbor gangs, 1880s+",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "right",
+      "leader": { "dx": 60, "dy": -40 },
+      "phase": 1
+    },
+    {
+      "at": [-0.4, 39.5],
+      "label": "Valencia",
+      "hierarchy": "tertiary",
+      "align": "left",
+      "phase": 2
+    },
+    {
+      "at": [8.0, 46.6],
+      "label": "Törbel",
+      "hierarchy": "tertiary",
+      "align": "right",
+      "phase": 2
+    },
+    {
+      "at": [138.2, 36.2],
+      "label": "Japan",
+      "hierarchy": "tertiary",
+      "align": "left",
+      "phase": 2
+    },
+    {
+      "at": [-69.0, 44.7],
+      "label": "Maine",
+      "hierarchy": "tertiary",
+      "align": "right",
+      "phase": 2
+    },
+    {
+      "at": [121.7, 12.9],
+      "label": "PHILIPPINES",
+      "sublabel": "Zanjeras (Ilocos), 1600s+",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "right",
+      "leader": { "dx": 60, "dy": 40 },
+      "phase": 2
+    },
+    {
+      "at": [84.1, 28.4],
+      "label": "NEPAL",
+      "sublabel": "Pani panchayats, 1700s+",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "align": "left",
+      "leader": { "dx": -60, "dy": -40 },
+      "phase": 2
+    },
+    {
+      "at": [100, -25],
+      "label": "Sources: Ostrom (1990); Wade (1988); Acheson (1988). Symbol area ∝ years of documented continuous operation.",
+      "hierarchy": "tertiary",
+      "emphasis": "mute",
+      "align": "center",
+      "phase": 2
+    }
+  ]
+}

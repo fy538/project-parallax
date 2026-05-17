@@ -78,6 +78,7 @@ import {
 
 import { TitleTransition } from "../TitleTransition/TitleTransition";
 import { ChoroplethMap } from "../ChoroplethMap/ChoroplethMap";
+import { ProportionalSymbolMap } from "../ProportionalSymbolMap/ProportionalSymbolMap";
 import { KineticTypography } from "../KineticTypography/KineticTypography";
 import { TimelineComparison } from "../TimelineComparison/TimelineComparison";
 import { DataChart } from "../DataChart/DataChart";
@@ -416,6 +417,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   DuelingFrameworks,
   StrategicLandscape,
   ArcDiagram,
+  ProportionalSymbolMap,
 };
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────

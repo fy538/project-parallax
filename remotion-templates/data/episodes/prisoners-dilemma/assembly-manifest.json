@@ -1863,8 +1863,8 @@
       "holdBehavior": "breathe",
       "narrationRef": "[VISUAL-FIRST: 3s]",
       "template": {
-        "component": "ChoroplethMap",
-        "dataFile": "choropleth-ostrom.json"
+        "component": "ProportionalSymbolMap",
+        "dataFile": "proportional-symbol-ostrom.json"
       },
       "soundCue": {
         "type": "map-whoosh",
