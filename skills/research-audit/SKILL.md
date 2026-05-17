@@ -238,6 +238,8 @@ A Weak connection density score by itself should trigger at minimum a CONDITIONA
 
 ## Output Format
 
+**Canonical write path:** `episodes/<slug>/research-audit.md` — **required, not optional.** The report is the audit trail the next stage (angle-memo) consults. Without it the verdict happened only in chat and there's no record to diagnose a topic that fails later. Write the file before presenting the verdict in chat.
+
 ```
 # RESEARCH AUDIT REPORT
 ## Episode: [number and title]

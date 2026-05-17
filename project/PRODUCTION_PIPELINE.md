@@ -188,6 +188,8 @@ Automated quality audit of the research brief before scripting begins. Seven ana
 
 **Output:** Verdict — READY FOR SCRIPTING / CONDITIONAL / NEEDS MORE RESEARCH
 
+**Canonical artifact path:** `episodes/<slug>/research-audit.md` — **required, not optional** (the verdict + rubric + per-claim notes). Without this file the audit happened only in chat and the next stage (angle-memo) has no audit trail to consult. The skill MUST write to this path before issuing the verdict.
+
 **Hard triggers for NEEDS MORE RESEARCH:** Missing required sections, unverified load-bearing claims, missing counterarguments, overconfident thesis language, rubric score <15/25, >40% unverified claims.
 
 **Skill location:** `skills/research-audit/SKILL.md` (also installed in Cowork plugins directory for auto-triggering).
@@ -381,6 +383,8 @@ python tools/brand-treatment/treat.py input.jpg -r conflict --preview -o process
 python tools/brand-treatment/treat.py assets/*.jpg -o processed/
 ```
 
+**Canonical output convention:** treat to `episodes/<slug>/assets/treated/` (NOT a `processed/` directory at the repo root — that pattern in the examples above is just for ad-hoc one-offs). When the manifest's `asset.file` paths reference treated assets, they should point under this canonical subdirectory so the producer can re-treat without breaking references. Untreated source files live at `episodes/<slug>/assets/raw/` or `episodes/<slug>/assets/<batch-id>/`.
+
 **At render time:** The `BrandImage` Remotion component (`remotion-templates/src/components/BrandImage.tsx`) applies the same 4-step treatment via SVG filters — GPU-accelerated, resolution-independent. Used inside Remotion compositions for photos that appear alongside motion graphics.
 
 ### Track C.5: Video Treatment
@@ -459,6 +463,11 @@ The pre-May 4 Claude SVG path documented in SVG_ILLUSTRATION_PIPELINE.md is **de
 - Style: conversational and thoughtful, "smart friend explaining" tone
 - Post-processing: noise removal, compression, EQ (can be automated)
 
+**Canonical artifact paths** (so downstream Whisper alignment + manifest precise-mode regen finds them automatically):
+- Raw recording: `episodes/<slug>/assets/narration-raw.wav`
+- Cleaned final: `episodes/<slug>/assets/narration.wav` (this is the file Whisper + `generate_manifest.py --audio` consume; preflight.py also checks this exact path)
+- Multi-take outtakes: `episodes/<slug>/assets/narration-takes/` (subdirectory; out of the way but preserved)
+
 **Future option:** Voice clone (ElevenLabs, Tiger's own voice) for supplementary content after 50+ episodes establish vocal identity.
 
 ---
@@ -469,7 +478,7 @@ The pre-May 4 Claude SVG path documented in SVG_ILLUSTRATION_PIPELINE.md is **de
 
 The assembly pipeline has two stages:
 
-**Stage 9a — Assembly manifest generation.** `generate_manifest.py` parses the production script's right column — including `DIR:` annotations — and produces `assembly-manifest.json` mapping every second of the video to a visual element (footage, image, template, transition, hold). Direction annotations affect timing: `hold()` extends segment durations, `cut()` overrides default transitions with register-appropriate types (color-wash, blur-through, iris, etc.), `cam(sync:"word")` creates sync word anchors for Whisper alignment. Two modes: "estimate" (from word count at 150 WPM, before narration is recorded) and "precise" (from Whisper word-level timestamps after narration).
+**Stage 9a — Assembly manifest generation.** `generate_manifest.py` parses the production script's right column — including `DIR:` annotations — and produces `assembly-manifest.json` mapping every second of the video to a visual element (footage, image, template, transition, hold). Direction annotations affect timing: `hold()` extends segment durations, `cut()` overrides default transitions with register-appropriate types (color-wash, dissolve, iris, match-cut — see `project/TRANSITION_GRAMMAR.md`), `cam(sync:"word")` creates sync word anchors for Whisper alignment. Two modes: "estimate" (from word count at 150 WPM, before narration is recorded) and "precise" (from Whisper word-level timestamps after narration).
 
 ```
 python tools/assembly/generate_manifest.py \
@@ -481,6 +490,12 @@ python tools/assembly/generate_manifest.py \
 **Stage 9b — Full-episode Remotion render.** `FullEpisode.tsx` reads the assembly manifest and renders the complete video in one pass: `<Audio>` narration + `<Sequence>`-positioned motion graphics + stock footage with BrandImage treatment. Registered as `<slug>-full` in Remotion Studio (e.g., `silicon-trap-full`). This eliminates the NLE for rough cuts — iteration becomes a data-editing session (edit the manifest JSON, re-render).
 
 The NLE (DaVinci Resolve) is still used for final polish: audio mastering, color grading tweaks, and any manual timing adjustments that go beyond what the manifest captures.
+
+**Canonical artifact paths for NLE outputs:**
+- DaVinci project file: `episodes/<slug>/assets/master.drp` (or `.drt` per Resolve version)
+- Final master render: `episodes/<slug>/assets/master.mp4` (1920×1080 H.264, the upload-ready file)
+- Audio stems (if separately mastered): `episodes/<slug>/assets/audio-master.wav`
+- YouTube-upload variant (if different): `episodes/<slug>/assets/upload.mp4`
 
 ---
 

@@ -445,7 +445,7 @@ If Thread C fails on Kling and Hailuo: the technique itself is wrong for this st
 This design produces three outputs:
 
 - **`visual-thread-design.md`** — this document.
-- **`shot-list-v2.json`** — updated shot list with 12 new entries plus thread/bridge metadata for each existing shot. Replaces `shot-list.json` once approved.
+- **`shot-list.json`** — updated shot list with 12 new entries plus thread/bridge metadata for each existing shot. (Promoted from `shot-list-v2.json` May 17, 2026; the pre-v2 version is archived at `drafts/shot-list-v1.json`.)
 - **`chatgpt-prompts-v2.md`** — addendum prompts for the 12 new stills, written to be pasted into the existing ChatGPT conversation that already has the 5 episode style refs locked in.
 
 After approval, the showcase update (`PrisonersDilemmaShowcase.tsx`) is a separate mechanical step: import 12 new clips, splice into the sequence per §3, regenerate preview.

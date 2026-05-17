@@ -39,6 +39,23 @@ Per-stack (when you need granular control):
 - **Logged render** (wrap any render command): `python3 tools/render_log.py --episode <slug> [--output <mp4>] [--label <suffix>] -- <command...>` — tees stdout/stderr to `episodes/<slug>/render-logs/<timestamp>[-<label>].log` AND the terminal, propagates the wrapped command's exit code, and (when `--output` is set) appends a postflight report to the log. Use this for any real render so a permanent record exists.
 - **Manifest schema migration**: `python3 tools/migrate_manifest.py` — status mode lists current versions of all manifests. `--to-version <X>` runs the migration planner; `--write` persists the result (default is dry-run). Migrations are registered in `MIGRATIONS` inside the script; the registry is empty today (schema is at 1.0) but the framework is wired so the first schema evolution doesn't become ad-hoc.
 - **Sourcing brief generator**: `python3 tools/sourcing_brief.py <slug> [--pending-only] [--priority P1] [--source pexels] [--format csv] [--output FILE]` — reads `assembly-manifest.json` + `shot-list.json`, joins per shotListId, and emits a Markdown (default) or CSV brief grouped by beat. Each asset shows pre-built search URLs for the target platform (Pexels/Pixabay/Wikimedia/Archive.org), priority, treatment, notes, and status. Re-run after updating `asset.file` / `asset.status` to see only what's still pending. Use this to direct human or skill-driven asset sourcing.
+- **Manifest doctrine lint**: `python3 tools/lint/manifest_lint.py [--episode <slug>]` — runs all `M-*` doctrine rules against assembly manifests. Also runs automatically via pre-commit when `assembly-manifest.json` is staged. Rules:
+  - `M-D18` — music enters only after the opening setup concludes (POLISH.md D18)
+  - `M-CROSSFADE` — music crossfades land near beat boundaries
+  - `M-OVERLAP` — foreground segments that overlap must have an explicit transition
+  - `M-DATAFILE` — `template.dataFile` references exist on disk
+  - `M-CUE` — soundCue / textureCue types are canonical enum values
+  - `M-DURATION` — max(segments[].endSec) matches totalDurationSec ±0.5s
+  - `M-TEXT-ANIM` — textAnimation technique is canonical and matches template variant (see `project/TEXT_ANIMATION_REGISTER.md`)
+  - `M-SYNC-MISSING` / `M-SYNC-COUNT` — per-element anticipatory reveal sync coverage
+  - `M-DRIFT-DEFAULT` — driftPreset overrides don't contradict the template's editorial register (see `project/HOLD_MOTION_REGISTER.md`)
+  - `M-BGMODE` — foreground TEMPLATE segments within the same beat must share a backgroundVariant (light/dark); unintentional mode switches mid-beat fire a warning
+  - `M-TRANSITION-DEPRECATED` — deprecated transition types (`wipe-*`, `blur-through`, `whip-pan`, `spatial-zoom`) in `.in` or `.out`
+  - `M-TRANSITION-IRIS-CHART` — iris on a chart-category template (no focal-point anchor)
+  - `M-TRANSITION-DISSOLVE-CREEP` — >2 consecutive dissolve-in segments
+  - `M-TRANSITION-IRIS-OVERUSE` — >2 iris-in transitions episode-wide
+  - `M-TRANSITION-COLOR-WASH-TOKEN` — color-wash without `washColor` field (renders as transparent)
+  (See `project/TRANSITION_GRAMMAR.md` for full transition doctrine.)
 - **Cross-document drift checks** (all soft / informational by default; `--strict` to fail):
   - `python3 tools/check_script_manifest.py <slug>` — script + `shot-list.json` ↔ manifest. Catches renamed `shotListId`s and stale `[<slug>/*.json]` references.
   - `python3 tools/check_concept_coverage.py <slug>` — concepts in `data/concepts.json` claiming `introduced.episode == <slug>` must have their `term.en` / `term.cn` / `term.pinyin` appear in the script (diacritic-insensitive substring match).
@@ -48,6 +65,7 @@ Per-stack (when you need granular control):
 - Worktree for parallel work: `./scripts/worktree.sh new <slug>` / `remove <slug>` / `list`
 - Clean regenerable artifacts (renders, caches, coverage): `./scripts/clean.sh`
 - Regenerate visual regression baselines (after intentional visual changes): `./scripts/regen-baselines.sh`
+- **SFX generator** (Layer 2 + 3): `python3 tools/generate_sfx.py` — synthesises all 22 transition SFX + 7 texture-hit WAV files at 48 kHz · 24-bit · stereo. `--cue <name>` for one type, `--dry-run` to preview. Run after any sound design change; output goes directly to `remotion-templates/public/audio/sfx/`. Requires `numpy` + `scipy`.
 
 ## Slash commands and subagents
 
@@ -129,3 +147,15 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 - Brand system: [`remotion-templates/BRAND.md`](./remotion-templates/BRAND.md) + [`tools/brand-treatment/palette.json`](./tools/brand-treatment/palette.json) (machine-readable source of truth)
 - Decisions log: [`project/DECISIONS.md`](./project/DECISIONS.md)
 - Lessons learned (Remotion gotchas): [`remotion-templates/LESSONS.md`](./remotion-templates/LESSONS.md)
+
+## Manual-only tools (not auto-invoked)
+
+These tools exist in `tools/` but no skill or script auto-invokes them. Run by hand when the named recovery scenario applies:
+
+- **`tools/assembly/fill_manifest_holds.py <slug>`** — Manual HOLD-segment repair. Use when an assembly manifest is missing HOLD segments after timing drift (e.g., narration ran longer than estimate-mode predicted). Reads the manifest, computes gaps, inserts HOLDs to bridge.
+- **`tools/assembly/sync_episode_clips.py <slug>`** — Manual clip-attachment to a manifest. Use when stock/AI-gen clips landed in `assets/` after `generate_manifest.py` ran and you need to back-fill `file:` paths on FOOTAGE segments without re-running the full generator.
+- **`tools/parallax/parallax.py`** — Experimental AI depth-based parallax video generator (own `.venv` with torch/numpy; ~5 GB install). Standalone; not part of the standard B-roll pipeline. Use for one-off effects.
+- **`tools/postflight.py <mp4-path> --episode <slug>`** — Verify a rendered MP4 isn't silently broken (zero-frame, truncated tail, wrong resolution). Auto-invoked by `render-episode.mjs` after the final concat; also runnable standalone.
+- **`tools/asset-source/zerohit_fallback.py <slug>`** — Generate AI-gen briefs for stock-search zero-hit shots. Wired into `check-episode.sh` as W8 (count only); run standalone to write `episodes/<slug>/ai-gen-briefs.md`.
+
+Tools that were retired during the May 17, 2026 audit are at [`tools/_archive/`](./tools/_archive/README.md) — kept for provenance, not invoked anywhere.
