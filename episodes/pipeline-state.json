@@ -1,0 +1,46 @@
+{
+  "_comment": "Episode pipeline state — machine-readable source of truth for state + dates per episode. Consumed by tools/pipeline_validator.py to compute days-in-state, days-to-target, and to drive the auto-updated Health column in PIPELINE.md plus the per-episode _status.md dashboards. UPDATE THIS FILE when an episode's state changes (don't just edit PIPELINE.md prose). The validator will detect drift if state here doesn't match the at-a-glance table in PIPELINE.md.",
+  "version": "1.0",
+  "lastUpdated": "2026-05-17",
+  "episodes": [
+    {
+      "slug": "prisoners-dilemma",
+      "state": "RENDER READY",
+      "stateEnteredAt": "2026-05-09",
+      "format": "Philosopher's Lens",
+      "targetPublish": "2026-06-01",
+      "notes": "Launch candidate. Script v3 locked editorially; work remaining is AI-gen fallback for 4 zero-hit shots + first full-episode render + narration + NLE."
+    },
+    {
+      "slug": "silicon-trap",
+      "state": "RENDER READY",
+      "stateEnteredAt": "2026-05-01",
+      "format": "Wargamer",
+      "targetPublish": "2026-05-25",
+      "notes": "Editorially production-ready. The wall is 21 zero-hit FOOTAGE slots — ai-gen-briefs.md exists but the briefs haven't been actioned. Narration not recorded."
+    },
+    {
+      "slug": "blockades-leak",
+      "state": "INCUBATING",
+      "stateEnteredAt": "2026-03-18",
+      "format": null,
+      "targetPublish": null,
+      "notes": "Awaiting viability re-gate. v1 research returned CONDITIONAL on low historical depth."
+    }
+  ],
+  "stateLifecycle": [
+    "INCUBATING",
+    "VIABLE",
+    "RESEARCHING",
+    "RESEARCH READY",
+    "DRAFTING",
+    "RENDER READY",
+    "IN POST",
+    "PUBLISHED",
+    "RETROED"
+  ],
+  "failureStates": [
+    "BLOCKED",
+    "REVISING"
+  ]
+}

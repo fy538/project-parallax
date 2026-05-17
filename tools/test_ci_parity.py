@@ -104,6 +104,26 @@ COVERAGE_CONTRACT: list[dict[str, str]] = [
         "pattern": r"check_audio_cues\.py",
         "covered_by": "tools/test_check_audio_cues.py::TestRealEpisodes — smoke on both episodes",
     },
+    {
+        "name": "pipeline_validator.py",
+        "pattern": r"pipeline_validator\.py",
+        "covered_by": "tools/test_pipeline_validator.py — covers load_pipeline_state, compute_episode_status, render_status_md, update_tracker_health, _check_manifest_staleness, _build_health_summary (19 tests). Wired into check-episode.sh as W6 (validation) + as the post-check tracker refresh (--write-status --update-tracker).",
+    },
+    {
+        "name": "lint/polish_lint.py",
+        "pattern": r"lint/polish_lint\.py",
+        "covered_by": "tools/lint/test_polish_lint.py — 40+ unit tests covering all 9 check functions + ALL_CHECKS sanity assertions. Wired into check-episode.sh as W7.",
+    },
+    {
+        "name": "asset-source/zerohit_fallback.py",
+        "pattern": r"asset-source/zerohit_fallback\.py",
+        "covered_by": "tools/asset-source/test_zerohit_fallback.py — 25 tests covering anchor/style-ref heuristics, zero-hit detection, brief rendering, end-to-end --count and --output. Wired into check-episode.sh as W8.",
+    },
+    {
+        "name": "lint/check_docs.py",
+        "pattern": r"lint/check_docs\.py",
+        "covered_by": "tools/lint/test_check_docs.py — 17 tests covering template-name resolution, palette consistency (two-pass scan with smart-skip), npm-script resolution, persona consistency. Wired into check-episode.sh as W9.",
+    },
 ]
 
 
