@@ -123,7 +123,7 @@ Use TimelineComparison early in any episode that names a historical analogy. Use
 - [ ] If TimelineComparison: is it phase-aligned, not calendar-aligned?
 - [ ] Are events under the density cap for the chosen template?
 - [ ] Does each era have a single distinguishing color (not coded by event type)?
-- [ ] If TimelineMorph: does *institutional continuity* genuinely persist, or is the parallel coincidental?
+- [ ] If using HorizontalTimeline `mode: "morph"` (the successor to the deleted TimelineMorph): does *institutional continuity* genuinely persist, or is the parallel coincidental?
 - [ ] Source attribution on every dated event?
 
 ---
@@ -136,8 +136,8 @@ Use TimelineComparison early in any episode that names a historical analogy. Use
 4. **>5 connections in TimelineComparison** → spaghetti; reduce to 3-5 most-structural pairings.
 5. **>32 events total in HorizontalTimeline** → narration outruns reading speed; split into multiple compositions.
 6. **DualTimeline non-focus opacity below 0.35** → era becomes illegible instead of receded.
-7. **TimelineMorph for coincidental parallel** → implies false causation; use TimelineComparison instead.
-8. **TimelineMorph used more than once per episode** → erodes the analytical punchline.
+7. **HorizontalTimeline `mode: "morph"` for coincidental parallel** (or the deleted TimelineMorph in legacy data) → implies false causation; use TimelineComparison instead.
+8. **Morph-mode used more than once per episode** (formerly the TimelineMorph guardrail before the template was deleted) → erodes the analytical punchline.
 9. **HorizontalTimeline when editorial point IS pairing** → use TimelineComparison.
 10. **TimelineComparison without connection lines** → reduces to two parallel timelines; defeats the pairing form.
 

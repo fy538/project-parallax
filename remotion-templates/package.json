@@ -6,6 +6,7 @@
     "start": "npx remotion studio",
     "build": "npx remotion render",
     "preview": "npx remotion preview",
+    "typecheck": "tsc --noEmit",
     "clean:browsers": "node scripts/kill-stale-browsers.mjs",
     "pretest": "node scripts/kill-stale-browsers.mjs",
     "test": "vitest run",

@@ -23,6 +23,7 @@
 #   W6. PIPELINE.md state vs episode artifacts            (pipeline_validator.py --strict)
 #   W7. TSX code-level polish lint (POLISH.md L1/L7/...)  (polish_lint.py)
 #   W8. Zero-hit stock shots needing AI-gen fallback      (zerohit_fallback.py --count)
+#   W9. Doc consistency (templates/palette/npm/personas)  (check_docs.py)
 #
 # Usage:
 #   ./scripts/check-episode.sh silicon-trap
@@ -222,6 +223,15 @@ if [[ -d "$ROOT/episodes/$SLUG/assets" ]]; then
   run_soft "Zero-hit stock shots (asset-source coverage)" \
     python3 "$TOOLS/asset-source/zerohit_fallback.py" "$SLUG" --count
 fi
+
+# W9. Repo-wide doc consistency lint. Not episode-scoped (catches
+# template-name drift in family selectors, palette hex mismatches in
+# BRAND.md vs palette.json, broken `npm run X` refs, persona-name drift
+# between persona-eval + publish-retro). Surfaced here so editorial work
+# on one episode catches doc drift before it ships. Run standalone via
+# `./scripts/check-docs.sh` or with `--strict` for CI gating.
+run_soft "Repo-wide doc consistency (templates/palette/npm/personas)" \
+  python3 "$TOOLS/lint/check_docs.py"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
 
