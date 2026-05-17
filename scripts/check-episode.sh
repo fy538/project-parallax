@@ -233,6 +233,21 @@ fi
 run_soft "Repo-wide doc consistency (templates/palette/npm/personas)" \
   python3 "$TOOLS/lint/check_docs.py"
 
+# ── Post-check: refresh the pipeline tracker for THIS episode ────────────────
+# After all checks complete, regenerate the per-episode _status.md dashboard
+# and update PIPELINE.md's At-a-glance Health column. This means the Pipeline
+# tracker is never more than one check-episode.sh run out of date for any
+# episode you've touched.
+#
+# Soft-fails — if pipeline-state.json doesn't list this slug yet, the
+# refresh skips with a notice and the rest of the run is unaffected.
+step "Pipeline tracker refresh (_status.md + Health column)"
+if python3 "$TOOLS/pipeline_validator.py" --write-status "$SLUG" --update-tracker 2>&1; then
+  pass "tracker refreshed"
+else
+  warn "tracker refresh skipped (episode may not be in pipeline-state.json yet)"
+fi
+
 # ── Summary ───────────────────────────────────────────────────────────────────
 
 printf "\n${BOLD}══════════════════════════════════════════════════════════════${RESET}\n"
