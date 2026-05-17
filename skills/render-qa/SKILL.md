@@ -22,7 +22,7 @@ This is not a pixel-perfect polish pass (that's post-assembly). This is a **mand
 
 ## Context
 
-Parallax uses Remotion (React-based video rendering) with 32 core templates plus 9 Shorts variants (full inventory: `remotion-templates/CLAUDE.md`; canonical schemas: `remotion-templates/references/template-schemas.md`). Each template has specific visual elements that need verification:
+Parallax uses Remotion (React-based video rendering) with 45 core templates plus 9 Shorts variants (full inventory: `remotion-templates/CLAUDE.md`; canonical schemas: `remotion-templates/references/template-schemas.md`). Each template has specific visual elements that need verification:
 
 **Core templates:**
 - ChoroplethMap — country highlighting on world maps

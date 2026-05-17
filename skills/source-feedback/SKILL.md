@@ -80,7 +80,7 @@ When you identify a gap, map it to a solution using this priority order:
    - Cost: 5-10 min re-run of source.py with new terms
    - Likelihood of success: 40-60%
 
-2. **Remotion template substitution** — use one of the 32 core templates instead of stock footage (full inventory: `remotion-templates/CLAUDE.md`; canonical schemas: `remotion-templates/references/template-schemas.md`).
+2. **Remotion template substitution** — use one of the 45 core templates instead of stock footage (full inventory: `remotion-templates/CLAUDE.md`; canonical schemas: `remotion-templates/references/template-schemas.md`).
    - **ChoroplethMap** — if the shot is about geographic/political division or supply chain phases
    - **TimelineComparison** — if comparing historical vs. contemporary moments
    - **RouteAnimation** — if showing movement, supply chains, or progression
@@ -239,4 +239,4 @@ Quick reminder of what each template does (for gap resolution decisions):
 | **FrameworkDiagram** | Conceptual structures (e.g., trilemma, three pillars) | SVG + positioning, optional animation |
 | **TitleTransition** | Section breaks and beat titles | Title text, subtitle, timing |
 
-More detail in `remotion-templates/BRAND.md` and the 32 core templates in `src/templates/` (canonical schemas: `remotion-templates/references/template-schemas.md`).
+More detail in `remotion-templates/BRAND.md` and the 45 core templates in `src/templates/` (canonical schemas: `remotion-templates/references/template-schemas.md`).
