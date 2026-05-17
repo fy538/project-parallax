@@ -40,6 +40,10 @@ import { DuelingFrameworksSchema } from "../DuelingFrameworks/schema";
 import { StrategicLandscapeSchema } from "../StrategicLandscape/schema";
 import { ArcDiagramSchema } from "../ArcDiagram/schema";
 import { ProportionalSymbolMapSchema } from "../ProportionalSymbolMap/schema";
+import { SlopegraphSchema } from "../Slopegraph/schema";
+import { KPICardSchema } from "../KPICard/schema";
+import { BulletChartSchema } from "../BulletChart/schema";
+import { StepLineSchema } from "../StepLine/schema";
 
 export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
   TitleTransition: TitleTransitionSchema,
@@ -69,4 +73,8 @@ export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
   StrategicLandscape: StrategicLandscapeSchema,
   ArcDiagram: ArcDiagramSchema,
   ProportionalSymbolMap: ProportionalSymbolMapSchema,
+  Slopegraph: SlopegraphSchema,
+  KPICard: KPICardSchema,
+  BulletChart: BulletChartSchema,
+  StepLine: StepLineSchema,
 };

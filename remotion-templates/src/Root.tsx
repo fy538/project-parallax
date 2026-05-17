@@ -35,6 +35,10 @@ import { ImageCompositeComposition } from "./templates/ImageComposite";
 import { PhotoMontageComposition } from "./templates/PhotoMontage";
 import { NetworkDiagramComposition } from "./templates/NetworkDiagram";
 import { ArcDiagramComposition } from "./templates/ArcDiagram";
+import { SlopegraphComposition } from "./templates/Slopegraph";
+import { KPICardComposition } from "./templates/KPICard";
+import { BulletChartComposition } from "./templates/BulletChart";
+import { StepLineComposition } from "./templates/StepLine";
 import { BeeswarmChartComposition } from "./templates/BeeswarmChart";
 import { TilegramUSMapComposition } from "./templates/TilegramUSMap";
 import { CalendarHeatmapComposition } from "./templates/CalendarHeatmap";
@@ -267,6 +271,10 @@ export const RemotionRoot: React.FC = () => {
         <TernaryPlotComposition />
         <HorizonChartComposition />
         <DumbbellPlotComposition />
+        <SlopegraphComposition />
+        <KPICardComposition />
+        <BulletChartComposition />
+        <StepLineComposition />
       </Folder>
 
       <Folder name="Typography">

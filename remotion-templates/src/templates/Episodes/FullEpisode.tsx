@@ -107,6 +107,10 @@ import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
 import { DualTimeline } from "../DualTimeline/DualTimeline";
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
 import { ArcDiagram } from "../ArcDiagram/ArcDiagram";
+import { Slopegraph } from "../Slopegraph/Slopegraph";
+import { KPICard } from "../KPICard/KPICard";
+import { BulletChart } from "../BulletChart/BulletChart";
+import { StepLine } from "../StepLine/StepLine";
 // BifurcationRoute template removed May 13, 2026 (phylogenetic-tree
 // register didn't fit Parallax; no episodes in queue required it).
 import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
@@ -470,6 +474,10 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   StrategicLandscape,
   ArcDiagram,
   ProportionalSymbolMap,
+  Slopegraph,
+  KPICard,
+  BulletChart,
+  StepLine,
   PricingWaterfall,
   AtlasPlate,
   BeeswarmChart,

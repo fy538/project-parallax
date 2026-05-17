@@ -149,6 +149,18 @@ const ALLOWLIST_UNCOVERED = new Map<string, string>([
 
   // ── Composite wrappers ────────────────────────────────────────────────
   ["BayesianUpdate-Multi", "wrapper around BayesianUpdate; inner template is baselined"],
+
+  // ── Phase 4 editorial-frame templates (real-data tests deferred) ──────
+  // Built May 17, 2026 as part of EDITORIAL_FRAME_ARCHITECTURE.md Phase 4
+  // (5 missing chart types). Each renders inside EditorialFrame with the
+  // shared composition; render-still validation passed manually before
+  // shipping. Real-data tests (-real-data.test.ts) and visual baselines
+  // (templates.test.ts) deferred until a published episode actually uses
+  // them — at which point coverage flips to that episode's smoke test.
+  ["Slopegraph", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
+  ["KPICard", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
+  ["BulletChart", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
+  ["StepLine", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
 ]);
 
 // ── Tests ───────────────────────────────────────────────────────────────────
