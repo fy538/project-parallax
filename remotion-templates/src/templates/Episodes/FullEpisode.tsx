@@ -57,7 +57,13 @@ import { LayeredComposition } from "../../components/LayeredComposition";
 import { LowerThird } from "../../components/LowerThird";
 import { FilmOverlay } from "../../components/FilmOverlay";
 import { AudioLayer } from "../../components/AudioLayer";
+import type { SegmentTimeline } from "../../components/AudioLayer";
 import { EpisodeColorEmphasisProvider } from "../../hooks/useEpisodeColorEmphasis";
+import {
+  type EpisodeMotif,
+  EpisodeMotifProvider,
+  SegmentMotifProgressProvider,
+} from "../../hooks/useMotifProgress";
 import {
   BACKDROP_MANIFEST,
   EditorialSurface,
@@ -105,8 +111,26 @@ import { ArcDiagram } from "../ArcDiagram/ArcDiagram";
 // register didn't fit Parallax; no episodes in queue required it).
 import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
 import { StrategicLandscape } from "../StrategicLandscape/StrategicLandscape";
+import { PricingWaterfall } from "../PricingWaterfall/PricingWaterfall";
 // TimelineMorph template deleted May 13, 2026 (its single use case
 // migrated to DuelingFrameworks). Removed from FullEpisode template map.
+import { AtlasPlate } from "../AtlasPlate/AtlasPlate";
+import { BeeswarmChart } from "../BeeswarmChart/BeeswarmChart";
+import { BumpChart } from "../BumpChart/BumpChart";
+import { CalendarHeatmap } from "../CalendarHeatmap/CalendarHeatmap";
+import { CartogramMap } from "../CartogramMap/CartogramMap";
+import { ConnectedScatterplot } from "../ConnectedScatterplot/ConnectedScatterplot";
+import { DensityMap } from "../DensityMap/DensityMap";
+import { DumbbellPlot } from "../DumbbellPlot/DumbbellPlot";
+import { HorizonChart } from "../HorizonChart/HorizonChart";
+import { IsotypeChart } from "../IsotypeChart/IsotypeChart";
+import { MarimekkoChart } from "../MarimekkoChart/MarimekkoChart";
+import { PopulationPyramid } from "../PopulationPyramid/PopulationPyramid";
+import { RankChangeDotPlot } from "../RankChangeDotPlot/RankChangeDotPlot";
+import { RidgelinePlot } from "../RidgelinePlot/RidgelinePlot";
+import { Streamgraph } from "../Streamgraph/Streamgraph";
+import { TernaryPlot } from "../TernaryPlot/TernaryPlot";
+import { TilegramUSMap } from "../TilegramUSMap/TilegramUSMap";
 import { warnIf } from "../../utils/dataWarnings";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
@@ -160,6 +184,12 @@ interface TransitionInfo {
   in?: TransitionType;
   out?: TransitionType;
   durationSec?: number;
+  /**
+   * Fill color for color-wash transitions. When absent, TransitionWrapper
+   * defaults to palette.amber. Must be set whenever `in` or `out` is
+   * "color-wash" — the M-TRANSITION-COLOR-WASH-TOKEN lint rule enforces this.
+   */
+  washColor?: string;
 }
 
 interface LayeredInfo {
@@ -179,7 +209,7 @@ interface LayeredInfo {
   vignette?: boolean;
 }
 
-interface SoundCue {
+export interface SoundCue {
   type:
     | "beat-transition"
     | "stat-reveal"
@@ -193,7 +223,7 @@ interface SoundCue {
   intensity?: "subtle" | "normal" | "dramatic";
 }
 
-interface TextureCue {
+export interface TextureCue {
   type:
     | "dot-click"
     | "card-settle"
@@ -243,6 +273,20 @@ export interface ManifestSegment {
    * Merged into data._direction by ForegroundSegment — segment overrides data-file
    * defaults; Whisper syncPoints always win over both. */
   _direction?: Record<string, unknown>;
+  /** NLE metadata: seconds of hold to add after this segment in the cut list. */
+  holdAfter?: number;
+  /** NLE metadata: behaviour during the hold (e.g. "freeze", "loop"). */
+  holdBehavior?: string;
+  /** NLE metadata: pacing profile key (e.g. "deliberate", "rapid"). */
+  paceProfile?: string;
+  /** NLE metadata: narration words that trigger the next cut. */
+  syncWords?: string[];
+  /** NLE metadata: seconds narrator speaks before the visual cut fires (J-cut bridge). */
+  narrationLeadIn?: number;
+  /** NLE metadata: seconds visual lingers after narration finishes (L-cut bridge). */
+  narrationLagOut?: number;
+  /** NLE metadata: per-segment render quality overrides forwarded to Lambda. */
+  renderQuality?: Record<string, unknown>;
 }
 
 export interface NarrationInfo {
@@ -312,6 +356,14 @@ export interface AssemblyManifest {
    * `$defs/filmOverlayConfig` in `data/assembly-manifest.schema.json`.
    */
   filmOverlay?: FilmOverlayConfig;
+  /**
+   * Visual motif configuration for the episode. When set, the
+   * `useMotifProgress()` hook returns a live value in every template segment,
+   * letting templates render an evolving geometric identity element across
+   * the episode's narrative arc. Optional — omit for episodes with no motif.
+   * See `src/hooks/useMotifProgress.tsx` and VISUAL_LANGUAGE.md § "Visual Motifs".
+   */
+  episodeMotif?: EpisodeMotif;
   /** Episode-level lower-third config. If present, renders LowerThird per beat. */
   lowerThird?: {
     /** Label shown on all lower-thirds, e.g. "∴ PARALLAX · EP.01" */
@@ -418,6 +470,24 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   StrategicLandscape,
   ArcDiagram,
   ProportionalSymbolMap,
+  PricingWaterfall,
+  AtlasPlate,
+  BeeswarmChart,
+  BumpChart,
+  CalendarHeatmap,
+  CartogramMap,
+  ConnectedScatterplot,
+  DensityMap,
+  DumbbellPlot,
+  HorizonChart,
+  IsotypeChart,
+  MarimekkoChart,
+  PopulationPyramid,
+  RankChangeDotPlot,
+  RidgelinePlot,
+  Streamgraph,
+  TernaryPlot,
+  TilegramUSMap,
 };
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────
@@ -461,8 +531,16 @@ const SegmentFilmOverlay: React.FC<{
   /** Total episode duration in frames — used as the interpolation ceiling for
    * LightLeakOverlay. Passed through from the manifest totalDurationSec * fps. */
   episodeTotalFrames: number;
+  /**
+   * Frames over which grain ramps from 0 → resolved intensity at segment start.
+   * Derived from the segment's transitionIn type: set to the transition duration
+   * for Class B (color-wash) transitions so grain "grows in" with the amber wash
+   * rather than snapping to full texture at frame 0.
+   * 0 = no ramp (grain at full intensity from frame 0). Default: 0.
+   */
+  grainRampInFrames?: number;
   children: ReactNode;
-}> = ({ episodeFilmOverlay, segmentOverride, backdropId, componentName, frameOffset, episodeTotalFrames, children }) => {
+}> = ({ episodeFilmOverlay, segmentOverride, backdropId, componentName, frameOffset, episodeTotalFrames, grainRampInFrames = 0, children }) => {
   // GATE: episode has not opted in → render children directly, FilmOverlay
   // dormant. This preserves byte-identical baselines for any episode whose
   // manifest doesn't set `filmOverlay`.
@@ -482,6 +560,7 @@ const SegmentFilmOverlay: React.FC<{
       intensity={resolved.intensity}
       frameOffset={frameOffset}
       episodeTotalFrames={episodeTotalFrames}
+      grainRampInFrames={grainRampInFrames}
     >
       {children}
     </FilmOverlay>
@@ -573,7 +652,7 @@ const BackgroundSegment: React.FC<{
       <AbsoluteFill style={{ opacity: opacity ?? COMPOSITE_DEFAULTS[composite] }}>
         <BrandImage
           src="" // BrandImage filter applied to the container; video below
-          ramp={ramp as any}
+          ramp={ramp}
           composite="raw"
           opacity={1}
         >
@@ -594,8 +673,8 @@ const BackgroundSegment: React.FC<{
   return (
     <BrandImage
       src={src}
-      ramp={ramp as any}
-      composite={composite as any}
+      ramp={ramp}
+      composite={composite}
       opacity={opacity}
     />
   );
@@ -677,7 +756,13 @@ const ForegroundSegment: React.FC<{
   /** Composition fps — needed to convert manifest absolute frames to segment-relative. */
   fps: number;
   manifest: AssemblyManifest;
-}> = memo(({ segment, templateData, fps, manifest }) => {
+  /**
+   * Frames over which grain ramps in at segment start — derived from the
+   * segment's transition-in type by the parent. 0 = no ramp (default).
+   * See FilmOverlayProps.grainRampInFrames for the full rationale.
+   */
+  grainRampInFrames?: number;
+}> = memo(({ segment, templateData, fps, manifest, grainRampInFrames = 0 }) => {
   const { template } = segment;
 
   if (!template?.component) {
@@ -806,6 +891,7 @@ const ForegroundSegment: React.FC<{
       segmentId={segment.id}
       componentName={template.component}
     >
+      <SegmentMotifProgressProvider segmentStartSec={segment.startSec}>
       <SegmentFilmOverlay
         episodeFilmOverlay={manifest.filmOverlay}
         segmentOverride={template.filmOverlay}
@@ -813,6 +899,7 @@ const ForegroundSegment: React.FC<{
         componentName={template.component}
         frameOffset={Math.round(segment.startSec * fps)}
         episodeTotalFrames={Math.round(manifest.totalDurationSec * manifest.fps)}
+        grainRampInFrames={grainRampInFrames}
       >
         <EditorialModeProvider mode={editorialMode}>
           <AbsoluteFill>
@@ -825,6 +912,7 @@ const ForegroundSegment: React.FC<{
           </AbsoluteFill>
         </EditorialModeProvider>
       </SegmentFilmOverlay>
+      </SegmentMotifProgressProvider>
     </SegmentErrorBoundary>
   );
 });
@@ -985,6 +1073,21 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       }));
   }, [manifest.segments]);
 
+  // Extract segment timeline for music-bed ducking in AudioLayer.
+  // All segments (not just those with audio cues) are included so the ducking
+  // curve has full coverage across the episode — FOOTAGE/HOLD segments lift the
+  // music even if they carry no SFX of their own.
+  const segmentTimeline = useMemo((): SegmentTimeline[] => {
+    return manifest.segments.map((seg) => ({
+      startSec: seg.startSec,
+      endSec:   seg.endSec,
+      // No cast: TypeScript verifies SegmentType satisfies SegmentTimeline["type"].
+      // If a new SegmentType is added without updating SegmentTimeline, this line
+      // becomes a compile error — keeping the two unions in sync automatically.
+      type: seg.type,
+    }));
+  }, [manifest.segments]);
+
   const lowerThirdConfig = manifest.lowerThird;
 
   // Build visual layers (shared between overlay and non-overlay paths)
@@ -1012,6 +1115,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                 transitionIn={seg.transition?.in}
                 transitionOut={seg.transition?.out}
                 durationSec={seg.transition?.durationSec}
+                washColor={seg.transition?.washColor}
                 durationInFrames={durationFrames}
               >
                 <BackgroundSegment
@@ -1051,6 +1155,7 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
               transitionIn={seg.transition?.in}
               transitionOut={seg.transition?.out}
               durationSec={seg.transition?.durationSec}
+              washColor={seg.transition?.washColor}
               durationInFrames={durationFrames}
             >
               {layeredBg ? (
@@ -1080,6 +1185,11 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                         templateData={templateData}
                         fps={fps}
                         manifest={manifest}
+                        grainRampInFrames={
+                          seg.transition?.in === "color-wash"
+                            ? Math.round((seg.transition?.durationSec ?? 0.7) * fps)
+                            : 0
+                        }
                       />
                     ),
                   }}
@@ -1090,6 +1200,18 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                   templateData={templateData}
                   fps={fps}
                   manifest={manifest}
+                  grainRampInFrames={
+                    // Class B transition (Remotion ↔ grainy pillar): ramp grain
+                    // in over the color-wash window so texture "grows into" the
+                    // amber flood rather than snapping to full intensity at frame 0.
+                    // For dissolve/fade transitions the TransitionWrapper's opacity
+                    // already fades grain smoothly; the ramp is additive but subtle.
+                    // For cut transitions there's no wrapper fade, so this is the
+                    // only grain introduction mechanism.
+                    seg.transition?.in === "color-wash"
+                      ? Math.round((seg.transition?.durationSec ?? 0.7) * fps)
+                      : 0
+                  }
                 />
               )}
             </TransitionWrapper>
@@ -1153,6 +1275,10 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
   );
 
   return (
+    <EpisodeMotifProvider
+      motif={manifest.episodeMotif}
+      totalDurationSec={manifest.totalDurationSec}
+    >
     <EpisodeColorEmphasisProvider value={manifest.episodeColorEmphasis}>
       {/*
        * EditorialSurface provides the paper background + grain layer that
@@ -1190,9 +1316,11 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
           episode={manifest.episode.toLowerCase()}
           musicBedTracks={manifest.musicBed?.tracks}
           segmentAudio={segmentAudio}
+          segmentTimeline={segmentTimeline}
         />
       </EditorialSurface>
     </EpisodeColorEmphasisProvider>
+    </EpisodeMotifProvider>
   );
 };
 

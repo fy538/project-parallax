@@ -114,6 +114,10 @@
       "$ref": "#/$defs/filmOverlayConfig",
       "description": "Episode-level film overlay config. Presence of this field is the ACTIVATION GATE for the entire FilmOverlay system — when absent, no FilmOverlay renders anywhere (per-segment cascade is skipped too). When present (even as `{}`), each segment resolves its preset/effects/intensity via the cascade in `src/utils/resolveFilmOverlay.ts`: per-segment override → backdrop `recommendedPreset` → TEMPLATE_PRESET_MAP → episode-level field on this object → `documentary` default."
     },
+    "episodeMotif": {
+      "$ref": "#/$defs/episodeMotif",
+      "description": "Visual motif configuration for the episode. When set, useMotifProgress() returns a live value in every template segment, letting templates render an evolving geometric identity element across the episode's narrative arc. Optional — omit for episodes with no motif. See src/hooks/useMotifProgress.tsx and VISUAL_LANGUAGE.md § 'Visual Motifs'."
+    },
     "lowerThird": {
       "type": "object",
       "description": "Episode-level lower-third config. When present, renders a LowerThird per beat with the specified label and timing.",
@@ -212,6 +216,37 @@
     }
   },
   "$defs": {
+    "episodeMotif": {
+      "type": "object",
+      "description": "Visual motif configuration — a recurring geometric element that evolves across the episode, giving the central concept a visual identity that deepens as the argument builds. TS-SIDE SIBLING: EpisodeMotif in src/hooks/useMotifProgress.tsx.",
+      "required": ["concept", "visual", "evolutionSec"],
+      "additionalProperties": false,
+      "properties": {
+        "concept": {
+          "type": "string",
+          "description": "Human-readable name of the episode's central concept, e.g. 'Silicon Trap'."
+        },
+        "visual": {
+          "type": "string",
+          "description": "Visual form keyword — templates dispatch on this to select their geometry. Canonical values: 'net', 'spiral', 'matrix', 'ladder', 'web', 'fracture', 'pulse'. Open-ended: add new values as episodes need them — templates that don't recognise a value render their default state."
+        },
+        "evolutionSec": {
+          "type": "array",
+          "description": "Episode-absolute seconds at which the motif transitions between evolution states. Array of N thresholds defines N+1 states. Typically 2–3 thresholds → 3–4 states mirroring the episode's narrative arc.",
+          "items": { "type": "number", "minimum": 0 },
+          "minItems": 1
+        },
+        "states": {
+          "type": "array",
+          "description": "Human-readable labels for each state. Length must be evolutionSec.length + 1. Optional — purely for editorial reference and Studio overlay display.",
+          "items": { "type": "string" }
+        },
+        "color": {
+          "type": "string",
+          "description": "Override accent color for motif rendering. When absent, templates fall back to the episode's primaryAccent via useEpisodeColorEmphasis()."
+        }
+      }
+    },
     "filmOverlayConfig": {
       "type": "object",
       "description": "Film-overlay configuration shape. Used at episode level (manifest.filmOverlay) and per-segment (segment.template.filmOverlay). At segment level, each of `preset`, `effects`, `intensity` is INDEPENDENTLY optional — per-field cascade in resolveFilmOverlay.ts means you can override just intensity for one segment without disturbing the cascade-resolved preset and effects. TS-SIDE SIBLING: `FilmOverlayConfig` in `src/utils/resolveFilmOverlay.ts` is the TypeScript source of truth. Both must be kept in sync by hand when adding fields — a future improvement is to generate this fragment from a Zod schema (see resolveFilmOverlay.ts header).",
@@ -379,13 +414,29 @@
                 "AnnotatedImage",
                 "EscalationLadder",
                 "HorizontalTimeline",
-                "BifurcationRoute",
                 "DualTimeline",
                 "DuelingFrameworks",
                 "StrategicLandscape",
-                "TimelineMorph",
                 "ArcDiagram",
-                "ProportionalSymbolMap"
+                "ProportionalSymbolMap",
+                "PricingWaterfall",
+                "AtlasPlate",
+                "BeeswarmChart",
+                "BumpChart",
+                "CalendarHeatmap",
+                "CartogramMap",
+                "ConnectedScatterplot",
+                "DensityMap",
+                "DumbbellPlot",
+                "HorizonChart",
+                "IsotypeChart",
+                "MarimekkoChart",
+                "PopulationPyramid",
+                "RankChangeDotPlot",
+                "RidgelinePlot",
+                "Streamgraph",
+                "TernaryPlot",
+                "TilegramUSMap"
               ],
               "description": "Remotion template component name."
             },
@@ -648,6 +699,11 @@
               }
             }
           }
+        },
+        "_direction": {
+          "type": "object",
+          "description": "Per-segment direction overrides emitted by generate_manifest.py from DIR:/PACE: script annotations (drift preset, transitions, text animation, hold, preDelay, etc.). Consumed by ForegroundSegment in FullEpisode.tsx, which merges it into data._direction before passing to the template. Also written directly by apply_default_transitions() and resolve_all_sync_points(). Open schema: additionalProperties allowed so new DIR: vocabulary can be added without schema churn.",
+          "additionalProperties": true
         }
       }
     }
