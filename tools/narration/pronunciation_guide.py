@@ -82,6 +82,12 @@ class Term:
 # hand, that knowledge should land here so the next episode benefits. The
 # tool reads this dict at import time; no JSON/YAML round-trip needed.
 
+# IPA convention: entries represent the **English-speaker pronunciation**
+# (i.e. what a US narrator should sound like reading the name in English
+# context), NOT the native-language IPA. So "Xi" is `ʃiː` (English "shee"),
+# not the Mandarin `ɕi`. For names where the operator wants the Mandarin-
+# accurate read, override the row via `pronunciation-guide.md`'s editable
+# Anglicized column — the `--merge` flag will preserve the override.
 LEXICON: dict[str, tuple[str, str, str]] = {
     # ── Economists & game-theorists ──────────────────────────────────────
     "Schelling":       ("ˈʃɛlɪŋ",       "SHELL-ing",           "Thomas Schelling"),
@@ -200,7 +206,16 @@ COMMON_FALSE_POSITIVES = {
     "american", "european", "western", "eastern", "northern", "southern",
     "game", "checkpoint", "note", "stage", "beat", "pause", "voice",
     "transition", "titletransition", "narration", "visual", "production",
-    "counterpoint", "every", "soviet", "i'm",
+    "counterpoint", "every", "soviet",
+    # Contractions that get capitalized at sentence start. Matching is
+    # case-insensitive against the whole token (including the apostrophe),
+    # both straight and curly forms.
+    "i'm", "i've", "i'll", "i'd", "you're", "you've", "you'll", "you'd",
+    "we're", "we've", "we'll", "we'd", "they're", "they've", "they'll",
+    "they'd", "he's", "she's", "it's", "that's", "there's", "what's",
+    "who's", "let's", "don't", "doesn't", "didn't", "won't", "wouldn't",
+    "can't", "couldn't", "shouldn't", "isn't", "aren't", "wasn't", "weren't",
+    "haven't", "hasn't", "hadn't",
     # Months / common time references — every English speaker knows these
     "january", "february", "march", "april", "may", "june", "july",
     "august", "september", "october", "november", "december",
@@ -245,6 +260,13 @@ def _normalise_term(raw: str) -> str:
     return cleaned
 
 
+def _is_false_positive(term: str) -> bool:
+    """COMMON_FALSE_POSITIVES match — case-insensitive AND apostrophe-normalized
+    so the curly-vs-straight variants ('don’t' vs 'don't') compare equal."""
+    canonical = term.lower().replace("’", "'")
+    return canonical in COMMON_FALSE_POSITIVES
+
+
 def extract_candidates(narration_text: str) -> Counter[str]:
     """Pull proper-noun candidates from a chunk of narration text.
 
@@ -265,7 +287,7 @@ def extract_candidates(narration_text: str) -> Counter[str]:
         term = _normalise_term(m.group(1))
         if not term:
             continue
-        if term.lower() in COMMON_FALSE_POSITIVES:
+        if _is_false_positive(term):
             continue
 
         if _is_sentence_initial(narration_text, m.start()):
@@ -287,7 +309,7 @@ def extract_candidates(narration_text: str) -> Counter[str]:
                 # The stripped remainder might itself be on the
                 # false-positive list (e.g. "In January" → "January"),
                 # so re-check before counting.
-                if term.lower() in COMMON_FALSE_POSITIVES:
+                if _is_false_positive(term):
                     continue
 
         candidates[term] += 1
@@ -296,7 +318,7 @@ def extract_candidates(narration_text: str) -> Counter[str]:
     # the apostrophe-s would otherwise complicate the multi-word regex.
     for m in ACRONYM_RE.finditer(narration_text):
         term = _normalise_term(m.group(1))
-        if term and term.lower() not in COMMON_FALSE_POSITIVES:
+        if term and not _is_false_positive(term):
             candidates[term] += 1
 
     return candidates

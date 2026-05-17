@@ -106,6 +106,23 @@ class TestExtractCandidates:
         counts = pg.extract_candidates("COUNTERPOINT flickers under the narration.")
         assert "COUNTERPOINT" not in counts
 
+    def test_contractions_filtered(self):
+        """Regression: capitalized contractions at sentence start
+        ("You're", "We'll", "Don't") used to leak through as proper-noun
+        candidates because they weren't in any stoplist."""
+        text = "You're early. We'll meet there. Don't be late."
+        counts = pg.extract_candidates(text)
+        for contraction in ("You're", "We'll", "Don't"):
+            assert contraction not in counts, f"{contraction} leaked through"
+
+    def test_contraction_with_curly_apostrophe_also_filtered(self):
+        # Same words with curly apostrophes (Word/Pages auto-correct output)
+        text = "You’re early. We’ll meet there."
+        counts = pg.extract_candidates(text)
+        # Should match canonically against the straight-quote list entry.
+        for contraction in ("You’re", "We’ll"):
+            assert contraction not in counts, f"{contraction} (curly) leaked through"
+
 
 # ── _is_sentence_initial ─────────────────────────────────────────────────────
 
