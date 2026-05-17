@@ -163,6 +163,12 @@ export { CatalogCompositePatternsShowcase } from "./CompositePatternsShowcase";
 // + POLISH.md D20.
 export { CatalogDriftRegisterShowcase } from "./DriftRegisterShowcase";
 
+// Transition-grammar register showcase — 3×2 mosaic of the six canonical
+// transitions on identical content (1850/2025 historical-analogy pair).
+// Consult before reaching for `DIR: cut(<transition>)`.
+// See TRANSITION_GRAMMAR.md + POLISH.md D21.
+export { CatalogTransitionGrammarShowcase } from "./TransitionGrammarShowcase";
+
 export { CatalogShowreel } from "./Showreel";
 export { CatalogShowreelBackdrops } from "./ShowreelBackdrops";
 

@@ -199,6 +199,9 @@ import {
   // 3×2 mosaic of the six drift presets on identical content — visual
   // reference for HOLD_MOTION_REGISTER / POLISH D20.
   CatalogDriftRegisterShowcase,
+  // 3×2 mosaic of the six canonical transitions on identical content — visual
+  // reference for TRANSITION_GRAMMAR / POLISH D21.
+  CatalogTransitionGrammarShowcase,
   CatalogShowreel,
   CatalogShowreelBackdrops,
   CatalogEmphasisShowcase,
@@ -342,6 +345,7 @@ export const RemotionRoot: React.FC = () => {
         <CatalogEmphasisShowcase />
         <CatalogTemplatePreview />
         <CatalogDriftRegisterShowcase />
+        <CatalogTransitionGrammarShowcase />
 
         <Folder name="Maps">
           <CatalogAtlasG7 />
