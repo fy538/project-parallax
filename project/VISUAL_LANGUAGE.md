@@ -514,6 +514,67 @@ A recurring template-selection mistake: rendering geographically-anchored relati
 
 ---
 
+## Reading Path and Compositional Gravity
+
+Every frame has a *reading order* — the sequence in which a viewer's eye traverses it before comprehension kicks in. On video, the first pass happens in roughly 500ms. If that pass hits the wrong thing first, the editorial hierarchy fails.
+
+### The Gutenberg Diagram
+
+Western viewers (left-to-right reading culture) scan a new frame in a Z or F pattern rooted in four gravity zones:
+
+```
+┌─────────────────────────────────────┐
+│  PRIMARY OPTICAL AREA (POA)  │  strong gravity  │
+│  top-left → top-center              │
+├─────────────────────────────────────┤
+│  weak gravity                       │  strong gravity
+│  bottom-left                        │  (secondary anchor)
+├─────────────────────────────────────┤
+│  TERMINAL ANCHOR (TA)               │
+│  bottom-right ← bottom-center       │
+└─────────────────────────────────────┘
+```
+
+The **Primary Optical Area (top-left / top-center)** lands the first fixation. The **Terminal Anchor (bottom-right)** receives the closing fixation after the eye sweeps through content. The weak-gravity zones (bottom-left, far top-right) are processed last and with the least dwell.
+
+### Rules for Parallax Templates
+
+**R1: Hero element anchors the POA.**
+The title, the headline stat, or the primary chart axis label should sit in the top-left quadrant or top-center of the content area. The eye will find it before it searches for anything else. Templates that center a title and bury the hero stat in the bottom half are fighting the natural reading order.
+
+**R2: Supporting metadata lives in weak-gravity zones.**
+Source attribution, episode number, kicker labels, and the ∴ brand mark belong at the bottom-right (FooterStrip / HeaderStrip). This is where the eye lands *after* absorbing the content — just in time for "where did this come from?" These elements are invisible during the primary scan and available on demand.
+
+**R3: Data labels follow the reading direction of the data.**
+On horizontal bar charts, labels go right of the bar tip (reading direction). On vertical charts, labels sit above the bar — not below where they register after the eye leaves. On line charts, annotation labels float at the terminal point of the line, aligned with the slope direction.
+
+**R4: The second piece of text earns its position through color or weight, not position.**
+Two pieces of text at equal size in the same zone compete. Resolve competition through the type hierarchy (h1 → h3, bold → regular) rather than by moving content into a different gravity zone. Moving text to a weak-gravity zone to "avoid crowding" just means viewers will read it last or miss it.
+
+**R5: Motion enters from the POA and exits toward the TA.**
+Animated elements (bar growth, chart reveals, diagram connectors) should build left-to-right and top-to-bottom, matching the reading scan direction. An element that appears at bottom-right first, then expands upward, reads as visually backwards. Remotion's stagger timing tokens already bake this in when applied in DOM order — resist reversing stagger for decorative effect.
+
+**R6: The primary optical area is not for decoration.**
+Crosshair animations, ambient particle systems, and brand chrome belong in the weak zones or at the perimeter of the safe area. A decorative element landing in the POA competes with the editorial hierarchy before content has registered. The crosshair behavior in existing templates already honors this — it anchors to the bottom-right or subject-relevant quadrant, not the POA.
+
+### How This Interacts with the Two-Column Layout
+
+In SplitComposition templates (left panel / right panel), the split creates two POAs — one per panel. The left panel's top-left is the primary; the right panel's top-left is the secondary. Analytical content (chart, map, framework) belongs in the left panel at 55-65% width so the primary POA carries the data argument. Narrative or context content (quote, definition, kicker) belongs in the right panel where it's processed second.
+
+When content fills a single panel (most templates), the POA occupies roughly the top-left 25% of the content area (after safe insets). That's where `TitleBlock` anchors in all templates — not coincidentally.
+
+### Applying in Practice
+
+The reading path rules are not strict layout constraints — they're the *physics of visual attention*. When a frame feels cluttered or hierarchically flat, check whether:
+1. The hero element is in the POA.
+2. Supporting metadata is in a weak zone.
+3. Data labels follow the scan direction of the data structure.
+4. No decoration sits in the POA.
+
+The templates already implement this correctly at their defaults. The rules become relevant when adding annotations, overlay text, or novel layout variants — those are the moments where the default physics can be overridden by accident.
+
+---
+
 ## Relationship to Other Docs
 
 - **SCRIPT_FORMAT.md** — the syntax for specifying visuals in the script's right column. This doc tells you *what* to write; that doc tells you *how* to write it.

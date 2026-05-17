@@ -309,21 +309,26 @@ export const timing = {
 // ── Categorical Palette ────────────────────────────────────────────────────
 // Distinct hues for multi-series charts when data doesn't specify per-element
 // colors. Kept narrow (6 entries) so individual hues remain memorable rather
-// than blurring into a bouquet. Order chosen so adjacent indices contrast
-// (blue → rust → gold) — sequential indexing produces high-contrast chart
-// visuals instead of degrading to one-color-per-side.
+// than blurring into a bouquet.
+//
+// Order is red-green colorblind safe:
+//   us-blue (0) and china-rust (5) are separated by 4 steps so the most
+//   common 2-series chart (US vs. China) never pairs a blue with a red that
+//   looks identical to colorblind viewers. The remaining steps — gold,
+//   umber, walnut, taupe — are all warm earth tones that read as distinct
+//   under deuteranopia/protanopia because they differ in lightness, not hue.
 //
 // Use via `getCategoricalColor(index)` — wraps around for >6 series.
 //
 // This replaces the universal `color || palette.amber` fallback that made
 // undecorated multi-series charts go monochrome.
 export const categorical = [
-  paletteData.semantic.us,        // muted blue
-  paletteData.semantic.china,     // muted rust
-  paletteData.palette.gold,       // gold
-  paletteData.palette.umber,      // earthy brown
-  paletteData.palette.walnut,     // deep brown
-  paletteData.palette.taupe,      // warm tan
+  paletteData.semantic.us,        // muted blue   (0) — primary
+  paletteData.palette.gold,       // gold         (1) — warm anchor
+  paletteData.palette.umber,      // earthy brown (2)
+  paletteData.palette.walnut,     // deep brown   (3)
+  paletteData.palette.taupe,      // warm tan     (4)
+  paletteData.semantic.china,     // muted rust   (5) — colorblind-safe distance from blue
 ] as const;
 
 /**
@@ -450,14 +455,47 @@ export const fontWeights = {
 } as const;
 
 export const letterSpacing = {
-  display: 3,
-  h1: 2,
-  h2: 2,
-  h3: 1.5,
+  // Display and h1 use tighter tracking so IBM Plex Sans reads as editorial
+  // display type (Fortune / Burtin register) rather than loose titling.
+  // At 96px, +3px reads as spaced-out; −1px is barely perceptible but
+  // prevents "telegraphed" letter-spacing that signals amateur template work.
+  // At 64px (h1), 0 is optically correct for a humanist grotesque.
+  // Sub-display sizes retain conventional positive tracking for legibility.
+  display: -1,
+  h1: 0,
+  h2: 1.5,
+  h3: 1,
   body: 0,
   label: 1,
   caption: 0.5,
-  meta: 2.5, // 2-3px range
+  meta: 2.5, // 2-3px range — metadata stays open for readability at small sizes
+} as const;
+
+/**
+ * OpenType font feature settings.
+ * Apply via the CSS `fontFeatureSettings` property on text elements.
+ *
+ * Usage:
+ *   <span style={{ fontFeatureSettings: fontFeatureSettings.tabular }}>
+ *     {animatedNumber}
+ *   </span>
+ *
+ * `tnum` (tabular figures) — each digit occupies the same advance width so
+ *   counter animations and live data labels don't cause surrounding text to
+ *   shift laterally as numbers change. Essential for any animated number.
+ * `kern` — optical kerning pairs (AV, WA, To, etc.) for display type.
+ *   IBM Plex Sans has good built-in kern tables; enabling the feature is low-
+ *   cost insurance at headline sizes where pair-spacing errors are visible.
+ * `liga` — standard ligatures (fi, fl, ffi) in body copy. No-op in Plex
+ *   Sans (it has no discretionary ligatures) but harmless and signals intent.
+ */
+export const fontFeatureSettings = {
+  /** Body and heading text — kerning + common ligatures */
+  default: '"kern" 1, "liga" 1',
+  /** Counter animations, data labels, axis values — tabular figures prevent width-jitter */
+  tabular: '"kern" 1, "tnum" 1',
+  /** Monospaced metadata (IBM Plex Mono, JetBrains Mono) — tabular by design; kern still helps */
+  mono: '"kern" 1, "tnum" 1',
 } as const;
 
 export const lineHeight = {
