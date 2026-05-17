@@ -46,6 +46,7 @@ import React, { useId, useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { random } from "remotion";
 import { palette } from "../design/theme";
+import { CLAMP } from "../utils/animation";
 
 interface FilmOverlayProps {
   /** Which effects to enable. Default: ["grain", "vignette"] */
@@ -77,6 +78,23 @@ interface FilmOverlayProps {
    * use — the pre-per-segment behaviour). Default: undefined.
    */
   episodeTotalFrames?: number;
+  /**
+   * When > 0, grain intensity ramps from 0 → `intensity` over this many
+   * frames. Use for Class B transitions (Remotion ↔ AI-gen/footage):
+   * the receiving segment starts grain-free and ramps to full texture over
+   * the transition window, so grain feels like it "grows into" the amber
+   * color-wash rather than snapping at frame 0 of a cut.
+   *
+   * For `color-wash`, `dissolve`, and `fade` transitions the TransitionWrapper
+   * already fades the content (including grain) via its `opacity` prop —
+   * setting this additionally multiplies the grain intensity, producing an
+   * even softer introduction. For `cut` transitions this is the ONLY grain
+   * fade mechanism.
+   *
+   * Typical value: `Math.round(transitionDurationSec * fps)`.
+   * Default: 0 (no ramp — grain appears at full intensity from frame 0).
+   */
+  grainRampInFrames?: number;
 }
 
 // Use the canonical palette from theme.ts (single source of truth)
@@ -389,11 +407,27 @@ export const FilmOverlay = React.memo(
     style,
     frameOffset = 0,
     episodeTotalFrames,
+    grainRampInFrames = 0,
   }: FilmOverlayProps) => {
+    // Grain ramp: interpolate intensity from 0 → clampedIntensity over the
+    // first grainRampInFrames frames. frame 0 = start of THIS Sequence (Remotion
+    // Sequence resets useCurrentFrame() to 0 at each segment boundary).
+    // Note: React.memo optimization is intentionally weakened here — this hook
+    // makes FilmOverlay frame-dependent when grainRampInFrames > 0. The sub-
+    // components (GrainOverlay, VignetteOverlay, etc.) are already frame-
+    // dependent via their own useCurrentFrame() calls, so this is not a
+    // regression. When grainRampInFrames === 0 the interpolate call is skipped
+    // and clampedIntensity is used directly, preserving the original behavior.
+    const frame = useCurrentFrame();
     const clampedIntensity = clampValue(intensity, 0, 1);
+    const grainIntensity =
+      grainRampInFrames > 0
+        ? clampedIntensity *
+          interpolate(frame, [0, grainRampInFrames], [0, 1], CLAMP)
+        : clampedIntensity;
 
     const effectMap = {
-      grain: <GrainOverlay key="grain" intensity={clampedIntensity} />,
+      grain: <GrainOverlay key="grain" intensity={grainIntensity} />,
       vignette: <VignetteOverlay key="vignette" intensity={clampedIntensity} />,
       "light-leak": <LightLeakOverlay key="light-leak" intensity={clampedIntensity} frameOffset={frameOffset} episodeTotalFrames={episodeTotalFrames} />,
       dust: <DustOverlay key="dust" intensity={clampedIntensity} />,

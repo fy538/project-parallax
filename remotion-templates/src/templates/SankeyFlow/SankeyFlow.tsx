@@ -55,6 +55,7 @@ import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import type { SankeyFlowData, SankeyNode, SankeyLink } from "./types";
 import { warnIf } from "../../utils/dataWarnings";
+import { contrastDelta } from "../../utils/colorContrast";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -749,6 +750,29 @@ export const SankeyFlow: React.FC<{ data: SankeyFlowData }> = ({ data }) => {
     `${links.length} ribbons — above 15 ribbons cross-over crowding destroys ` +
       `proportion readability. Collapse minor flows into an "other" node or ` +
       `split into staged compositions.`,
+  );
+
+  // ── Color-contrast gate (light substrate only) ───────────────────────────
+  // Node fills must be visible against the paper background. Fires once per
+  // session via warnIf. Dark-mode SankeyFlow has a different substrate and is
+  // excluded from this check (dark.bg.base is checked separately if needed).
+  const bgVariantSankey = data.backgroundVariant ?? "light";
+  const lowContrastNodes = useMemo(() => {
+    if (bgVariantSankey !== "light" || !nodes) return [];
+    const issues: string[] = [];
+    nodes.forEach((node, i) => {
+      const color = node.color || getCategoricalColor(i);
+      if (contrastDelta(color, palette.paper) < 0.10) {
+        issues.push(node.label ?? `node[${i}]`);
+      }
+    });
+    return issues;
+  }, [nodes, bgVariantSankey]);
+  warnIf(
+    lowContrastNodes.length > 0,
+    "SankeyFlow",
+    `Node fill(s) have insufficient contrast against the paper background (Δluminance < 0.10): [${lowContrastNodes.join(", ")}]. Use a darker palette token or set node.color explicitly.`,
+    lowContrastNodes
   );
 
   // Layout — `contentArea` already reserves the title clearance + 48px gap,

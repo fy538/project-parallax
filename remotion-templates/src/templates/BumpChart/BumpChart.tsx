@@ -45,6 +45,7 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { useDirection } from "../../hooks/useDirection";
 import { fadeIn, exitFade, anticipatoryStartFrame, CLAMP_SINE, CLAMP_CUBIC } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
+import { contrastDelta } from "../../utils/colorContrast";
 import type { BumpChartData } from "./types";
 
 // ── Layout constants ────────────────────────────────────────────────────────
@@ -269,6 +270,23 @@ export const BumpChart: React.FC<{ data: BumpChartData }> = ({ data }) => {
     () =>
       entities.map((entity, i) => entity.color ?? getCategoricalColor(i)),
     [entities]
+  );
+
+  // ── Color-contrast gate (light substrate only) ───────────────────────────
+  // BumpChart lines must be visible against the paper background in light mode
+  // and against the dark base in dark mode. The warning fires once per session
+  // via warnIf, not 30× per second.
+  const lowContrastEntities = useMemo(() => {
+    if (bgVariant !== "light") return [];
+    return entities
+      .filter((_, i) => contrastDelta(entityColors[i] ?? "", palette.paper) < 0.10)
+      .map((e) => e.id);
+  }, [entities, entityColors, bgVariant]);
+  warnIf(
+    lowContrastEntities.length > 0,
+    "BumpChart",
+    `Entity line(s) have insufficient contrast against the paper background (Δluminance < 0.10): [${lowContrastEntities.join(", ")}]. Use a darker palette token or set entity.color explicitly.`,
+    lowContrastEntities
   );
 
   // ── Render ───────────────────────────────────────────────────────────────

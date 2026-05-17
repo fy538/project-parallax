@@ -36,6 +36,7 @@ import {
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
 import { warnIf } from "../../utils/dataWarnings";
+import { contrastDelta } from "../../utils/colorContrast";
 import type { DataChartData, DataPoint } from "./types";
 import type { CameraElement, NarratedCameraStep } from "../../hooks/useNarratedCamera";
 
@@ -951,6 +952,27 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
     "DataChart",
     `bar variant with >${data.dataPoints?.length ?? 0} items will read as narrow vertical bars at video scale. Consider variant="horizontal" (sorted-descending) or variant="lollipop" for ranked comparisons.`,
     { itemCount: data.dataPoints?.length }
+  );
+
+  // ── Color-contrast gate (paper substrate) ─────────────────────────────────
+  // DataChart always renders on the paper background (#F5F0E8). If a data
+  // point color has < 0.10 luminance delta vs. paper, the bar effectively
+  // disappears into the substrate. Fires once per session via warnIf.
+  const lowContrastBars = useMemo(() => {
+    const issues: string[] = [];
+    (data.dataPoints ?? []).forEach((dp, i) => {
+      const color = dp.color || getCategoricalColor(i);
+      if (contrastDelta(color, palette.paper) < 0.10) {
+        issues.push(dp.label ?? `item[${i}]`);
+      }
+    });
+    return issues;
+  }, [data.dataPoints]);
+  warnIf(
+    lowContrastBars.length > 0,
+    "DataChart",
+    `Bar fill(s) have insufficient contrast against the paper background (Δluminance < 0.10): [${lowContrastBars.join(", ")}]. Use a darker palette token or set dp.color explicitly.`,
+    lowContrastBars
   );
 
   const barWidth = useMemo(

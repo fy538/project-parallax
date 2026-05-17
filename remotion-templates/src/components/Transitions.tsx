@@ -275,11 +275,12 @@ const computeTransition = (
       break;
     }
 
-    case "blur-through":
+    case "blur-through": {
       state.opacity = progress;
       const blur = 20 * (1 - progress);
       state.filter = blur > 0.5 ? `blur(${blur}px)` : undefined;
       break;
+    }
 
     case "color-wash": {
       state.opacity = 1;
@@ -502,13 +503,13 @@ export const TRANSITION_CATALOG: Record<TransitionType, TransitionCatalogEntry> 
   fade: {
     label: "Fade",
     description: "Simple opacity crossfade (closest current surrogate for fade-through-black)",
-    defaultDurationSec: 0.5,
+    defaultDurationSec: 0.6,
     implicitClaim: "new chapter / time-jump / silence beat",
   },
   dissolve: {
     label: "Cross-dissolve",
     description: "Opacity crossfade with subtle scale shift for depth",
-    defaultDurationSec: 0.6,
+    defaultDurationSec: 0.5,
     implicitClaim: "elaboration of the same thought, gentler delivery",
   },
   "wipe-left": {
