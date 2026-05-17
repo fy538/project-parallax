@@ -3,7 +3,7 @@
  */
 
 import { z } from "zod";
-import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { compositionBase, holdAfterRevealSec } from "../_shared/compositionBase";
 
 const BumpChartEntitySchema = z.object({
   id: z.string().describe("Unique identifier for this entity — used for highlightIds matching."),
@@ -22,25 +22,9 @@ const BumpChartEntitySchema = z.object({
 
 export const BumpChartSchema = z.object({
   data: z.object({
-    episode: z.string().describe("Episode slug displayed in HeaderStrip metadata."),
-    title: z
-      .string()
-      .describe(
-        "State the finding, not the topic. Write: 'China overtakes Japan as World #2 GDP in 2010' not 'GDP rankings over time'. The title IS the editorial argument."
-      ),
-    subtitle: z.string().optional().describe("Optional subtitle adding analytical context."),
-    source: z.string().optional().describe("Data source attribution shown at bottom-right."),
-    durationSec: z
-      .number()
-      .positive()
-      .optional()
-      .describe("Total composition duration in seconds. Default: 14."),
-    holdAfterRevealSec: z
-      .number()
-      .min(0)
-      .max(10)
-      .optional()
-      .describe("Deliberate pause (seconds) after all lines finish animating, before exit fade."),
+    ...compositionBase,
+    holdAfterRevealSec,
+    // ── template-specific fields ──
     periods: z
       .array(z.string())
       .min(2)
@@ -61,10 +45,5 @@ export const BumpChartSchema = z.object({
       .string()
       .optional()
       .describe("Context annotation, e.g. 'GDP in current USD'. Shown in FooterStrip scale field."),
-    backgroundVariant: z
-      .enum(["light", "dark"])
-      .optional()
-      .describe("Background theme variant — 'light' (default) or 'dark'."),
-    _direction: DirectionBlockSchema.optional(),
   }),
 });

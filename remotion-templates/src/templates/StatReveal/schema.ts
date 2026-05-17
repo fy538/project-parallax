@@ -3,7 +3,7 @@
  */
 
 import { z } from "zod";
-import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
+import { compositionBase, holdAfterRevealSec } from "../_shared/compositionBase";
 
 const ComparisonBarSchema = z.object({
   label: z.string(),
@@ -14,9 +14,9 @@ const ComparisonBarSchema = z.object({
 
 export const StatRevealSchema = z.object({
   data: z.object({
-    episode: z.string(),
-    title: z.string().describe("State the finding, not the topic. Write: 'One company makes 92% of the world's most advanced chips' not 'TSMC market share'. The title IS the editorial argument."),
-    subtitle: z.string().optional(),
+    ...compositionBase,
+    holdAfterRevealSec,
+    // ── template-specific fields ──
     stat: z.object({
       value: z.number(),
       prefix: z.string().optional(),
@@ -27,11 +27,5 @@ export const StatRevealSchema = z.object({
     }),
     comparisons: z.array(ComparisonBarSchema),
     heroIsMax: z.boolean().optional(),
-    source: z.string().optional(),
-    durationSec: z.number().optional(),
-    holdAfterRevealSec: z.number().min(0).max(10).optional()
-      .describe("Deliberate pause (seconds) after stat and comparisons finish animating in, before exit fade. Must fit within durationSec. Default: 0."),
-    backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: DirectionBlockSchema.optional(),
   }),
 });
