@@ -88,7 +88,7 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | GameBoard | as needed | Strategic game theory visualizations (Prisoners' Dilemma matrix, Axelrod tournament). |
 | EscalationLadder | as needed | Vertical event sequence with severity indicators. |
 | StrategicLandscape | as needed | Position-on-axes strategic frame (e.g., capability vs. intent). |
-| BifurcationRoute | as needed | "Two paths diverged" form for fork-point narratives. |
+| ~~BifurcationRoute~~ | DELETED May 13 | Was "two paths diverged" form. Migrate to **DuelingFrameworks** (head-to-head scenarios) or **DecisionTree** (branching with probabilities). Do NOT emit BifurcationRoute in new manifests — the template no longer exists. |
 | DuelingFrameworks | as needed | Two opposing frameworks compared side by side. |
 | PricingWaterfall | as needed | Value-chain decomposition ($1 of price → segments of cost). |
 
@@ -103,7 +103,7 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | TimelineComparison | ~8% | Historical parallels, before/after, "this happened, then this happened." |
 | HorizontalTimeline | as needed | Single-axis chronology with phased reveal. |
 | DualTimeline | as needed | Two parallel chronologies in stacked tracks. |
-| TimelineMorph | as needed | One timeline morphing into another (transformation reveal). |
+| ~~TimelineMorph~~ | DELETED May 13 | Was "one timeline morphing into another" (transformation reveal). Migrate to **HorizontalTimeline** with `mode: "morph"`. Do NOT emit TimelineMorph in new manifests — the template no longer exists. |
 
 ### Typography / layout — 6 templates · ~10-15% episode share
 

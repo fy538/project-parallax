@@ -46,7 +46,7 @@ When you spot one of these, the fix lives in the *template*, not in every data f
 
 **`computeLabelStacks(items, options)`** — collision-avoidance: returns a stack-level (0, 1, 2…) for each item so clustered labels cascade vertically instead of overlapping.
 
-**Used by:** TimeSeriesChart annotations. Migration target: DataChart bar value labels, NetworkDiagram callouts, BifurcationRoute branch labels.
+**Used by:** TimeSeriesChart annotations. Migration target: DataChart bar value labels, NetworkDiagram callouts. (BifurcationRoute branch-label use case deleted with the template May 13, 2026.)
 
 ### `src/utils/dataWarnings.ts`
 

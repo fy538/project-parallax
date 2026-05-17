@@ -12,7 +12,7 @@ You are closing the post-publish learning loop for a Parallax episode. After an 
 
 **The feedback loop:** Every episode goes through a predictions phase where the production pipeline generates two predictive artifacts:
 
-1. **Persona-eval report** (from the persona-eval skill) — predicts which of the 5 audience personas (Priya/Marcus/Wei/James/Sofia) will be most engaged, where each persona might bounce, and what resonance scores to expect per persona.
+1. **Persona-eval report** (from the persona-eval skill) — predicts which of the 5 audience personas (Priya/Marcus/Amara/James/Sofia) will be most engaged, where each persona might bounce, and what resonance scores to expect per persona.
 
 2. **Visual rhythm map** (from the visual-concept or visual-spec skills) — documents the sequence of visual types (maps, charts, frameworks, footage, typography, titles) across the episode, transitions, and holds times. Identifies visual monotony zones and visual payoff moments.
 
@@ -22,7 +22,7 @@ You are closing the post-publish learning loop for a Parallax episode. After an 
 
 **The analytical task:** Connect the dots. When retention drops at minute 7, was that predicted by persona-eval? Does that visual rhythm map show visual monotony at that checkpoint? Did the top comments reference that moment? This is where production science meets art — you're building evidence for what production choices actually move the needle.
 
-After 3+ episodes, patterns emerge: "frameworks hold attention 15% longer than stock footage," "Wei's comments show frustration with conflict treatment," "Marcus consistently bounces at the 4-minute mark when we're still in setup." These patterns become the production playbook for the channel.
+After 3+ episodes, patterns emerge: "frameworks hold attention 15% longer than stock footage," "Amara's comments show frustration with non-Western framing," "Marcus consistently bounces at the 4-minute mark when we're still in setup." These patterns become the production playbook for the channel.
 
 ## Input Modes
 
@@ -126,7 +126,7 @@ If prediction artifacts are missing, note that fact and proceed with what you ha
 
 - **Marcus (Algorithm Discovery):** Persona-eval predicted he'd bounce at minute X if visuals got monotonous, but stay engaged if visual variety stayed high. Did retention data show a drop-off at that moment? Did early-exit comments mention boredom or confusion?
 
-- **Wei (Chinese Diaspora):** Persona-eval flagged concern about conflict treatment and Western-centric framing. Do comments reveal alienation or validation? Did Chinese-language comments (if any) appear, and what did they say? Did her predicted bounce point match actual retention behavior?
+- **Amara (Cross-Cultural Viewer):** Persona-eval flagged concern about conflict treatment and Western-centric framing. Do comments reveal alienation or validation? Did Chinese-language comments (if any) appear, and what did they say? Did her predicted bounce point match actual retention behavior?
 
 - **James (Tech Insider):** Persona-eval predicted he'd scrutinize technical accuracy and data attribution. Do comments reference technical specifics? Any corrections or "gotchas"? Did he subscribe (inferred from positive technical comments)?
 
@@ -138,7 +138,7 @@ If prediction artifacts are missing, note that fact and proceed with what you ha
 - **CONTRADICTED:** Prediction missed badly (e.g., expected Marcus to leave early, but he had above-average watch time)
 - **INSUFFICIENT DATA:** No proxy signals to validate
 
-**Build a cumulative accuracy score:** After multiple episodes, you'll track whether predictions are getting better or whether certain personas are consistently mispredicted. (E.g., "Our predictions for James are 80% accurate after 3 episodes, but Wei's predictions miss the mark 60% of the time.")
+**Build a cumulative accuracy score:** After multiple episodes, you'll track whether predictions are getting better or whether certain personas are consistently mispredicted. (E.g., "Our predictions for James are 80% accurate after 3 episodes, but Amara's predictions miss the mark 60% of the time.")
 
 ### 4. Visual Effectiveness Analysis
 
@@ -289,22 +289,22 @@ Top comments are the richest qualitative signal. They reveal:
 1. **Extract top comments** (typically the first 20-30 sorted by engagement). Note:
    - The moment/topic they reference
    - Sentiment (positive, negative, neutral, mixed)
-   - Persona signal (can you infer whether this is Priya, Marcus, Wei, etc. based on vocabulary and concerns?)
+   - Persona signal (can you infer whether this is Priya, Marcus, Amara, etc. based on vocabulary and concerns?)
 
 2. **Pattern identification:**
    - **Confusion signals:** Comments asking "wait, what?" or explaining something suggest that moment wasn't clear. Cross-reference with retention to see if confusion correlated with drop-off.
    - **Resonance moments:** Comments citing a specific historical parallel, framework, or fact suggest those moments landed hard.
-   - **Persona presence:** Comments with technical specifics (James), policy analysis (Priya), Chinese cultural references (Wei), framework thinking (Sofia), discovery excitement (Marcus). Tally which personas are represented. If Wei's persona is underrepresented, the audience might be skewed.
+   - **Persona presence:** Comments with technical specifics (James), policy analysis (Priya), cross-cultural-aware references (Amara — Chinese diaspora for US-China episodes; flexes per geography), framework thinking (Sofia), discovery excitement (Marcus). Tally which personas are represented. If Amara's persona is underrepresented, the audience might be skewed.
 
 3. **Specific analysis format:**
    ```
    COMMENT SIGNAL: [Mention of moment X]
    - Sentiment: [positive/negative/neutral]
-   - Inferred persona: [Priya/Marcus/Wei/James/Sofia]
+   - Inferred persona: [Priya/Marcus/Amara/James/Sofia]
    - What it tells us: [e.g., "Framework diagram landed — three separate comments reference the chess/go metaphor"]
    ```
 
-4. **Synthesis:** "Comments reveal that the oil embargo parallel resonated strongly with Priya-type viewers (3 policy-focused comments), but there was confusion about the technical details (James-type viewers asked clarification questions). Wei's persona was notably absent from comments — possible signal that Chinese-diaspora framing didn't reach or resonate."
+4. **Synthesis:** "Comments reveal that the oil embargo parallel resonated strongly with Priya-type viewers (3 policy-focused comments), but there was confusion about the technical details (James-type viewers asked clarification questions). Amara's persona was notably absent from comments — possible signal that the cross-cultural framing (Chinese diaspora for this US-China episode) didn't reach or resonate."
 
 ---
 
@@ -366,12 +366,12 @@ Produce a comprehensive retrospective report:
 - **Verdict:** [...]
 - **Notes:** [...]
 
-### Persona 3: Wei (Chinese Diaspora)
+### Persona 3: Amara (Cross-Cultural Viewer)
 - **Predicted engagement score:** [X]/10
 - **Predicted friction points:** [visual treatment concern, Western-centric framing risk]
 - **Actual signals:** [did comments show alienation or validation? presence in comment section?]
 - **Verdict:** [...]
-- **Notes:** [specific findings about framing, visual treatment impact, and Chinese-diaspora viewer response]
+- **Notes:** [specific findings about framing, visual treatment impact, and cross-cultural viewer response — Chinese-diaspora lens for US-China episodes; per persona-eval the persona flexes to match the episode's non-Western geography]
 
 ### Persona 4: James (Tech Insider)
 - **Predicted engagement score:** [X]/10
@@ -390,7 +390,7 @@ Produce a comprehensive retrospective report:
 **Cumulative Accuracy (if this is episode 2+):**
 - Priya predictions: [X% accurate across episodes]
 - Marcus predictions: [X% accurate across episodes]
-- Wei predictions: [X% accurate across episodes]
+- Amara predictions: [X% accurate across episodes]
 - James predictions: [X% accurate across episodes]
 - Sofia predictions: [X% accurate across episodes]
 - [Note patterns: which personas are we consistently mispredicting?]
@@ -475,7 +475,7 @@ After 5+ episodes, retire any pairing the data contradicts and add candidate rul
 ### Persona Representation in Comments
 - **Priya signals:** [count and nature of policy-analyst style comments]
 - **Marcus signals:** [count and nature of discovery/algorithm comments]
-- **Wei signals:** [count and nature of diaspora-aware comments; note if absent]
+- **Amara signals:** [count and nature of cross-cultural-aware comments; note the lens that fits the episode's geography (e.g., Chinese-diaspora for US-China); flag if absent]
 - **James signals:** [count and nature of technical comments; note technical errors if any]
 - **Sofia signals:** [count and nature of framework/mental-model comments]
 
@@ -587,7 +587,7 @@ After you produce the retrospective report, append the key findings to `episodes
 ### Persona Prediction Accuracy
 - Priya: [verdict + confidence score]
 - Marcus: [verdict + confidence score]
-- Wei: [verdict + confidence score]
+- Amara: [verdict + confidence score]
 - James: [verdict + confidence score]
 - Sofia: [verdict + confidence score]
 - **Overall:** [X/5 personas correctly predicted]

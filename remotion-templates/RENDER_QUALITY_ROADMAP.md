@@ -100,7 +100,7 @@ Static mode was already on `useTemplateLayout()`. Cinematic mode is now consiste
 - Camera label: `safe.top + 60`, `safe.right` — was raw `layout.safeAreaTier.generous.*`
 - Legend: `safe.bottom`, `safe.left` — was raw `layout.safeAreaTier.generous.*`
 
-### `TimelineMorph` and `TimelineComparison`
+### `HorizontalTimeline mode: "morph"` (formerly `TimelineMorph` — template deleted May 13, 2026) and `TimelineComparison`
 
 Both templates: `const safe = layout.safeAreaTier.generous;` added in the render component body. All three overlay blocks (era/column header, event area, episode label) now read from `safe.*` instead of inline `layout.safeAreaTier.generous.*`.
 

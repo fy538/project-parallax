@@ -3,7 +3,7 @@ name: diagram-audit
 description: >
   Audit the diagram shots in a Parallax production script against the 10
   diagram templates (FrameworkDiagram, NetworkDiagram, DecisionTree,
-  EscalationLadder, GameBoard, SankeyFlow, DuelingFrameworks, BifurcationRoute,
+  EscalationLadder, GameBoard, SankeyFlow, DuelingFrameworks,
   PricingWaterfall, StrategicLandscape) and their data files. Catches sibling
   confusions (DecisionTree vs. GameBoard, flow vs. Sankey, comparison vs.
   matrix), density-cap violations (>7 spokes on NetworkDiagram, >7 rungs on

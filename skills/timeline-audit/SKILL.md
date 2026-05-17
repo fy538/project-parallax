@@ -3,10 +3,10 @@ name: timeline-audit
 description: >
   Audit the timeline shots in a Parallax production script against the 4
   timeline templates (TimelineComparison, HorizontalTimeline, DualTimeline,
-  TimelineMorph) and their data files. TimelineComparison is Parallax's
+  and the legacy-now-deleted TimelineMorph) and their data files. TimelineComparison is Parallax's
   signature form (bounded analogy as visual structure) — mis-routing it
   dilutes the channel's editorial differentiator. Catches sibling confusions
-  (TimelineComparison vs. HorizontalTimeline-dual, TimelineMorph misuse),
+  (TimelineComparison vs. HorizontalTimeline-dual; HorizontalTimeline mode-morph misuse — formerly the TimelineMorph guardrail set),
   density-cap violations (>32 events, >5 connections), calendar-vs-phase
   alignment errors, era-coloring mistakes, and missing source attribution.
   Sister to script-audit and visual-concept; runs after script-draft, before
@@ -17,7 +17,7 @@ description: >
   when finalizing a script with multiple time-based beats. Trigger
   proactively when [MG:] beats route to HorizontalTimeline where the
   editorial argument is bounded analogy (should be TimelineComparison) or
-  when TimelineMorph appears more than once per episode.
+  when HorizontalTimeline `mode: "morph"` (the successor to the deleted TimelineMorph template) appears more than once per episode.
 ---
 
 # Timeline Audit
@@ -26,7 +26,7 @@ You are auditing the **timeline shots** in a Parallax production script for temp
 
 ## Context
 
-The canonical "if your time structure looks like X, use template Y" lookup is `remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md` — read it BEFORE running the audit. The 4 timeline templates each encode a specific time-argument: pairing (TimelineComparison), continuity (HorizontalTimeline), intercutting (DualTimeline), structural-transformation (TimelineMorph).
+The canonical "if your time structure looks like X, use template Y" lookup is `remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md` — read it BEFORE running the audit. The 3 live timeline templates each encode a specific time-argument: pairing (TimelineComparison), continuity (HorizontalTimeline — also handles structural-transformation via `mode: "morph"`, which replaced the deleted TimelineMorph May 13), intercutting (DualTimeline).
 
 You are NOT generating new visual-spec JSON. You are reading what's already there and flagging issues with concrete remediation suggestions.
 
@@ -91,12 +91,12 @@ For DualTimeline:
 → Flag: non-focus era opacity below 0.35 (illegible) or above 0.6 (no attention-shift).
 → Replacement: `0.4` is the canonical foil opacity.
 
-### Lens 5 — TimelineMorph guardrails
+### Lens 5 — Morph-mode guardrails (formerly "TimelineMorph" — template deleted May 13, 2026; rules apply to `HorizontalTimeline mode: "morph"`)
 
-TimelineMorph is the analytical climax — use ONCE per episode at most, and only when **institutional continuity** is genuinely the punchline (same instrument across epochs: Continental Blockade → SWIFT sanctions).
+`HorizontalTimeline mode: "morph"` is the analytical climax — use ONCE per episode at most, and only when **institutional continuity** is genuinely the punchline (same instrument across epochs: Continental Blockade → SWIFT sanctions).
 
-→ Flag: TimelineMorph used more than once in an episode.
-→ Flag: TimelineMorph used for a coincidental parallel (no institutional through-line). Replacement: TimelineComparison.
+→ Flag: morph-mode used more than once in an episode.
+→ Flag: morph-mode used for a coincidental parallel (no institutional through-line). Replacement: TimelineComparison.
 
 ### Lens 6 — Connection-line presence
 

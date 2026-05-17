@@ -553,7 +553,7 @@ All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word
 **Problem:** Vertical dot-line-card timelines look like web UI components, not documentary graphics. The brain pattern-matches "scrolling a list" rather than "watching a film."
 **Solution:** HorizontalTimeline template uses a wide canvas (events distributed along x-axis at 480px spacing) with a virtual camera that tracks horizontally between events. `useTimelineCamera()` hook handles pan/zoom interpolation, focus isolation (dim + blur + scale), and step transitions.
 **Key insight:** What separates "cinematic" from "UI": (1) camera moves through SPACE, (2) focus isolation via depth-of-field blur, (3) scale encodes importance, (4) atmosphere between elements (grain, glow, particles), (5) transitions have physics (easing, overshoot). The Vox/documentary standard is horizontal camera tracking between "stations."
-**Architecture:** Single configurable template with 3 modes (single/dual/morph) replaces TimelineComparison + DualTimeline + TimelineMorph. Camera path is data-driven (auto-generated if omitted). Glowing spine with animated gradient pulse.
+**Architecture:** Single configurable template with 3 modes (single/dual/morph). The morph-mode supersedes the standalone TimelineMorph template (deleted May 13, 2026); DualTimeline remains in the catalog but new dual-spine work routes to HorizontalTimeline `mode: "dual"`. Camera path is data-driven (auto-generated if omitted). Glowing spine with animated gradient pulse.
 **File:** `index.tsx` (not `index.ts`) because composition wrappers contain JSX.
 
 ### L70: useNarratedCamera — generalized 2D virtual camera for all data templates
@@ -581,7 +581,7 @@ All card presets now include `overflow: "hidden"` and `overflowWrap: "break-word
 **Solution:** `useBeatSync()` hook accepts beat marker timestamps and returns exponentially-decaying pulse (0-1), isOnBeat boolean, and timing data. Beat markers can come from assembly manifest or be manually placed in JSON data. Anticipation offset (default 2 frames) makes visuals lead audio slightly for perceived sync.
 **Usage:** `const zoomBoost = 1 + beat.pulse * 0.05` adds 5% zoom on each beat. Degrades gracefully (returns 0 pulse) when no markers provided.
 
-### L75: spatial-zoom transition for inter-composition continuity
+### L75: spatial-zoom transition for inter-composition continuity (DEPRECATED — see TRANSITION_GRAMMAR.md; use match-cut or fade instead)
 **Problem:** Cut/fade between compositions breaks spatial continuity. When camera-driven templates end zoomed into a detail, the next composition should feel like emerging from that depth.
 **Solution:** `spatial-zoom` transition type: exit zooms to 2.5x (pushing through), entry zooms from 2.5x to 1x (emerging). Combined with 8px blur at peak for depth-of-field. Creates illusion of continuous camera movement through a 3D space between compositions.
 
@@ -715,7 +715,7 @@ const safe = layout.safeAreaTier.generous;
 // Then: safe.top, safe.bottom, safe.left, safe.right at every use site
 ```
 **Why it matters:** Same principle as `const colors = theme.text` or `const zones = useTemplateLayout(...)` — one named reference means one refactor point when the source changes. The compiler resolves it anyway; this is purely a readability/maintainability convention.
-**Applied to:** DuelingFrameworks (cinematic), EscalationLadder, TimelineMorph, TimelineComparison in the RENDER_QUALITY_ROADMAP layout migrations.
+**Applied to:** DuelingFrameworks (cinematic), EscalationLadder, TimelineComparison, and the now-deleted TimelineMorph in the RENDER_QUALITY_ROADMAP layout migrations (HorizontalTimeline mode-morph inherits the same treatment post-May-13).
 
 ### L97: POL-10 shadow suppression — `// shadows.X` comment as inline exemption
 **Context:** The `shadows.*` token object (`shadows.subtle`, `shadows.medium`, `shadows.textLift`, `shadows.accentGlow(color)`, etc.) covers most shadow needs. But some effects are legitimately custom: cinematic double-glow with two radii, opacity-modified variants, grain-matched vignette values that don't map to a token.
