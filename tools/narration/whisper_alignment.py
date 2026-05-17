@@ -44,10 +44,12 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 import json
+import os
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, asdict, field
 from pathlib import Path
 from typing import Optional
 
@@ -208,9 +210,82 @@ def load_transcript_from_json(path: Path) -> Transcript:
     return Transcript(words=words)
 
 
+# ── Transcript cache ─────────────────────────────────────────────────────────
+# Whisper transcription on a 15-min medium-model file takes 2-5 minutes per
+# run. Operators iterating (re-record a pickup → re-run alignment → repeat)
+# would otherwise pay that cost every time even though the WAV hasn't
+# changed. We cache transcripts by (canonical wav path + size + mtime +
+# transcribe params), so a re-run hits the cache and returns in ~200ms.
+
+CACHE_VERSION = "v1"   # bump to invalidate every cached transcript at once
+
+# Honour XDG_CACHE_HOME on Linux; default to ~/.cache on Mac too (works fine
+# even though macOS convention is ~/Library/Caches — keeping it simple).
+def _cache_root() -> Path:
+    base = os.environ.get("XDG_CACHE_HOME")
+    if base:
+        return Path(base) / "parallax" / "whisper"
+    return Path.home() / ".cache" / "parallax" / "whisper"
+
+
+def _cache_key(
+    wav_path: Path, model_size: str, language: Optional[str], compute_type: str,
+) -> str:
+    """Stable hash over the inputs that determine the transcript output.
+
+    Uses file (size + mtime_ns) as the content proxy rather than hashing
+    bytes — operators re-export from a DAW which always updates mtime,
+    so the trade-off is fine in practice and saves the few seconds it'd
+    take to SHA-256 a 250MB WAV.
+    """
+    st = wav_path.stat()
+    blob = (
+        f"{CACHE_VERSION}|{wav_path.resolve()}|{st.st_size}|{st.st_mtime_ns}"
+        f"|{model_size}|{language or ''}|{compute_type}"
+    )
+    return hashlib.sha256(blob.encode()).hexdigest()
+
+
+def _cache_load(key: str) -> Optional[Transcript]:
+    """Hit → return Transcript. Miss / corrupted file → return None."""
+    path = _cache_root() / f"{key}.json"
+    if not path.is_file():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    try:
+        words = [
+            TranscriptWord(
+                word=w["word"], start_sec=w["start_sec"],
+                end_sec=w["end_sec"], probability=w["probability"],
+            )
+            for w in data.get("words", [])
+        ]
+    except (KeyError, TypeError):
+        return None
+    return Transcript(words=words)
+
+
+def _cache_store(key: str, transcript: Transcript) -> None:
+    """Best-effort write. Cache failures don't propagate — caller already
+    has the transcript, the cache is just an optimization."""
+    path = _cache_root() / f"{key}.json"
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"words": [asdict(w) for w in transcript.words]}),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass  # swallow — disk full / permissions / etc. don't break the run
+
+
 def transcribe_wav(
     wav_path: Path, model_size: str = "medium",
     compute_type: str = "int8", language: Optional[str] = "en",
+    use_cache: bool = True,
 ) -> Transcript:
     """Run faster-whisper to produce a Transcript. Raises ImportError if
     faster-whisper isn't installed.
@@ -222,7 +297,17 @@ def transcribe_wav(
     `language` defaults to `en` since Parallax is English-only. Pass
     `None` to let Whisper auto-detect (slower, occasionally wrong on
     short inputs).
+
+    `use_cache` (default True): hit-or-miss disk cache keyed on the WAV's
+    (path, size, mtime) + params. Re-runs against an unchanged file
+    return in ~200ms instead of re-transcribing for minutes.
     """
+    if use_cache:
+        key = _cache_key(wav_path, model_size, language, compute_type)
+        cached = _cache_load(key)
+        if cached is not None:
+            return cached
+
     try:
         from faster_whisper import WhisperModel  # type: ignore[import-not-found]
     except ImportError as e:
@@ -246,7 +331,10 @@ def transcribe_wav(
                 end_sec=float(w.end),
                 probability=float(getattr(w, "probability", -1.0)),
             ))
-    return Transcript(words=words)
+    transcript = Transcript(words=words)
+    if use_cache:
+        _cache_store(key, transcript)
+    return transcript
 
 
 # ── Script word extraction ───────────────────────────────────────────────────
@@ -699,6 +787,13 @@ def main() -> int:
              "Pass an empty string to let Whisper auto-detect (slower).",
     )
     parser.add_argument(
+        "--no-cache", action="store_true",
+        help="Skip the transcript cache (always re-transcribe). Default: "
+             "cache by (WAV size + mtime + model + lang + compute_type) at "
+             "~/.cache/parallax/whisper/ so re-runs against unchanged files "
+             "are ~200ms instead of minutes.",
+    )
+    parser.add_argument(
         "--low-conf", type=float, default=DEFAULT_LOW_CONFIDENCE_THRESHOLD,
         help=f"Probability threshold for low-confidence flagging "
              f"(default: {DEFAULT_LOW_CONFIDENCE_THRESHOLD}).",
@@ -751,6 +846,7 @@ def main() -> int:
                 wpath, model_size=args.model,
                 compute_type=args.compute_type,
                 language=args.language or None,
+                use_cache=not args.no_cache,
             )
         except ImportError as e:
             print(f"✗ {e}", file=sys.stderr)
@@ -767,6 +863,7 @@ def main() -> int:
                     default_w, model_size=args.model,
                     compute_type=args.compute_type,
                     language=args.language or None,
+                    use_cache=not args.no_cache,
                 )
             except ImportError as e:
                 print(f"✗ {e}\n\nNo {default_t.name} found, and can't transcribe "

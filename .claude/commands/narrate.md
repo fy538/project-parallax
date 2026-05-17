@@ -3,7 +3,7 @@ description: Walk the operator through a narration recording session — generat
 argument-hint: <slug>
 ---
 
-Run the narration recording workflow for episode **$1**. This is the orchestrator across the narration toolchain (`format_for_reading.py`, `pronunciation_guide.py`, `pre_render_cue_sheet.py`, `audio_qa.py`, `whisper_alignment.py`, `take_selector.py`, `auphonic_submit.py`) — the operator's single entry-point for "I'm about to record this episode" or "I just finished recording, what do I need to fix."
+Run the narration recording workflow for episode **$1**. This is the orchestrator across the narration toolchain (`format_for_reading.py`, `pronunciation_guide.py`, `pre_render_cue_sheet.py`, `audio_qa.py`, `whisper_alignment.py`, `take_selector.py`, `splice_plan.py`, `local_master.py`, `auphonic_submit.py`) — the operator's single entry-point for "I'm about to record this episode" or "I just finished recording, what do I need to fix."
 
 ## Mode A — pre-recording prep (default if no `narration.wav` yet)
 
@@ -117,9 +117,36 @@ The output is `episodes/$1/narration-diff.md`. **Read it and surface:**
 
 If the report shows zero pickup candidates, say so clearly — the operator can skip to Stage 3 or assembly.
 
-### Stage 3 — optional mastering (Auphonic)
+**If pickup candidates exist**, surface the next-action splice workflow:
 
-If LUFS in the audio QA was off by > 2.0, **OR** if the operator prefers cloud-mastered output regardless, offer Auphonic:
+1. The operator records pickup takes — one short WAV per flagged line. Conventional naming: `pickup-1.wav`, `pickup-2.wav`, ... in `episodes/$1/assets/pickups/`, in the order they appear in `narration-diff.md`'s pickup table.
+2. Run `splice_plan.py` to generate an Audacity label track:
+   ```bash
+   python3 tools/narration/splice_plan.py $1 \
+       --pickups episodes/$1/assets/pickups/pickup-*.wav
+   ```
+   Writes `episodes/$1/splice-plan.txt`.
+3. In Audacity: open the master narration.wav → File → Import → Labels → select `splice-plan.txt`. Markers appear at exact pickup positions. Drag pickup WAVs onto adjacent tracks, align to markers, crossfade at boundaries, export as the final `narration.wav` (replacing the original or to a new filename — operator's call).
+
+The cache layer means re-running `whisper_alignment.py` after each splice iteration is ~200ms instead of minutes (transcripts are cached by file mtime + params).
+
+### Stage 3 — mastering
+
+If LUFS in the audio QA was off by > 2.0, **OR** the operator prefers an explicitly mastered output, run one of two paths. Both produce `episodes/$1/assets/narration-mastered.wav`. The original is preserved untouched.
+
+#### Path A — local (default, no account required)
+
+```bash
+python3 tools/narration/local_master.py $1
+# Or aggressive for noisy source:
+python3 tools/narration/local_master.py $1 --preset aggressive
+# Or safe (HPF + loudnorm only, no compression):
+python3 tools/narration/local_master.py $1 --preset safe
+```
+
+Runs a two-pass ffmpeg chain (HPF → compression → loudnorm to -14 LUFS) and auto-verifies the output via `audio_qa.py`. No internet, no account, ~10-30s for a 15-min file. The standard preset matches what Auphonic's defaults produce within audible tolerance.
+
+#### Path B — cloud (Auphonic, if you have an account)
 
 ```bash
 # Requires: export AUPHONIC_API_KEY=... (https://auphonic.com/api/api_keys/)
@@ -130,19 +157,16 @@ python3 tools/narration/auphonic_submit.py $1 --preset <preset-uuid>
 python3 tools/narration/auphonic_submit.py --list-presets
 ```
 
-This uploads to Auphonic, polls for the mastered output (typically 1-3 min for a 15-min file), and downloads `episodes/$1/assets/narration-mastered.wav` alongside the original. The original is preserved untouched.
+Uploads to Auphonic, polls for completion (1-3 min for a 15-min file), downloads `narration-mastered.wav`. Use this when you want Auphonic's specific tuning (Adaptive Leveler, intelligent noise reduction) or you've already set up a custom preset there.
 
-After the master arrives, **re-run audio_qa.py on the mastered file** to verify LUFS lands on target:
+#### Either path
+
+Re-run audio_qa on the mastered file to confirm LUFS is on target (local_master does this automatically):
 ```bash
 python3 tools/narration/audio_qa.py --wav episodes/$1/assets/narration-mastered.wav
 ```
 
-If the operator prefers an in-DAW chain or doesn't have an Auphonic account, the local fallback is a one-pass ffmpeg loudnorm:
-```bash
-ffmpeg -i episodes/$1/assets/narration.wav \
-       -af loudnorm=I=-14:TP=-1.0:LRA=11 \
-       episodes/$1/assets/narration-mastered.wav
-```
+If the operator prefers in-DAW mastering instead, skip both — record clean and master in your DAW. The pipeline doesn't care which path produced the final WAV.
 
 ### Stage 4 — advance the manifest
 
@@ -160,7 +184,7 @@ If the operator says "regenerate both" or "rerun prep + QA," do Mode A then Mode
 
 ## Notes
 
-- All seven underlying tools (`format_for_reading`, `pronunciation_guide`, `pre_render_cue_sheet`, `audio_qa`, `whisper_alignment`, `take_selector`, `auphonic_submit`) are idempotent — re-running them is always safe. The `--merge` flag on `pronunciation_guide.py` is the only thing that preserves operator state across runs.
+- All nine underlying tools (`format_for_reading`, `pronunciation_guide`, `pre_render_cue_sheet`, `audio_qa`, `whisper_alignment`, `take_selector`, `splice_plan`, `local_master`, `auphonic_submit`) are idempotent — re-running them is always safe. The `--merge` flag on `pronunciation_guide.py` is the only thing that preserves operator state across runs. `whisper_alignment` caches transcripts by file mtime + params, so iteration is fast.
 - The exact-command philosophy from `polish_lint.py` and `pipeline_validator.py` carries over here: never describe a fix in prose where a copy-pasteable command would do.
 - If `$1` is missing, default to listing available episodes from `pipeline-state.json` and asking the operator to pick one.
 - This command does NOT commit anything. The operator decides when to stage `narration-readable.md`, `pronunciation-guide.md`, `_audio-qa.md`, and `narration.wav`.

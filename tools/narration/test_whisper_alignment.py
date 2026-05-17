@@ -452,6 +452,93 @@ class TestEndToEnd:
 # ── CLI smoke ────────────────────────────────────────────────────────────────
 
 
+class TestTranscriptCache:
+    """The cache layer lives between transcribe_wav and the WhisperModel
+    backend. faster-whisper isn't installed in the test environment, so
+    the round-trip (store-then-load) tests use _cache_load / _cache_store
+    directly. CLI integration is exercised only indirectly via the cache
+    helpers; full end-to-end requires faster-whisper."""
+
+    def _isolate_cache(self, tmp_path, monkeypatch):
+        """Point the cache root at tmp_path so we don't pollute the
+        real ~/.cache while running tests."""
+        monkeypatch.setattr(wa, "_cache_root", lambda: tmp_path / "cache")
+
+    def test_cache_key_stable_across_calls(self, tmp_path):
+        wav = tmp_path / "x.wav"
+        wav.write_bytes(b"audio")
+        k1 = wa._cache_key(wav, "medium", "en", "int8")
+        k2 = wa._cache_key(wav, "medium", "en", "int8")
+        assert k1 == k2
+
+    def test_cache_key_changes_with_params(self, tmp_path):
+        wav = tmp_path / "x.wav"
+        wav.write_bytes(b"audio")
+        base = wa._cache_key(wav, "medium", "en", "int8")
+        assert wa._cache_key(wav, "large", "en", "int8") != base
+        assert wa._cache_key(wav, "medium", "fr", "int8") != base
+        assert wa._cache_key(wav, "medium", "en", "float16") != base
+
+    def test_cache_key_changes_when_file_mtime_changes(self, tmp_path, monkeypatch):
+        wav = tmp_path / "x.wav"
+        wav.write_bytes(b"audio")
+        k1 = wa._cache_key(wav, "medium", "en", "int8")
+        # Touch the file with a different mtime.
+        import os, time
+        new_mtime = wav.stat().st_mtime + 100.0
+        os.utime(wav, (new_mtime, new_mtime))
+        k2 = wa._cache_key(wav, "medium", "en", "int8")
+        assert k1 != k2, "cache should invalidate when source mtime changes"
+
+    def test_cache_roundtrip(self, tmp_path, monkeypatch):
+        self._isolate_cache(tmp_path, monkeypatch)
+        original = _make_transcript([
+            ("hello", 0.0, 0.5, 0.95),
+            ("world", 0.5, 1.0, 0.99),
+        ])
+        wa._cache_store("test-key", original)
+        loaded = wa._cache_load("test-key")
+        assert loaded is not None
+        assert len(loaded.words) == 2
+        assert loaded.words[0].word == "hello"
+        assert loaded.words[0].probability == pytest.approx(0.95)
+
+    def test_cache_miss_returns_none(self, tmp_path, monkeypatch):
+        self._isolate_cache(tmp_path, monkeypatch)
+        assert wa._cache_load("no-such-key") is None
+
+    def test_cache_load_tolerates_corrupted_json(self, tmp_path, monkeypatch):
+        self._isolate_cache(tmp_path, monkeypatch)
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir(parents=True)
+        (cache_dir / "bad-key.json").write_text("{not json", encoding="utf-8")
+        # Should return None silently rather than crashing — the caller
+        # will fall through to re-transcribing.
+        assert wa._cache_load("bad-key") is None
+
+    def test_cache_load_tolerates_missing_fields(self, tmp_path, monkeypatch):
+        self._isolate_cache(tmp_path, monkeypatch)
+        cache_dir = tmp_path / "cache"
+        cache_dir.mkdir(parents=True)
+        # Valid JSON but words list has wrong shape (missing keys).
+        (cache_dir / "k.json").write_text(
+            json.dumps({"words": [{"word": "hello"}]}),  # missing start_sec etc.
+            encoding="utf-8",
+        )
+        assert wa._cache_load("k") is None
+
+    def test_cache_store_handles_disk_failure_silently(self, tmp_path, monkeypatch):
+        """If cache write fails (disk full, permissions), the caller still
+        has the transcript — silent failure is the right behavior."""
+        # Point cache at a path that can't be created (file where dir expected)
+        bad_root = tmp_path / "blocked"
+        bad_root.write_bytes(b"")  # bad_root is now a file, not a dir
+        monkeypatch.setattr(wa, "_cache_root", lambda: bad_root / "sub")
+        transcript = _make_transcript([("x", 0.0, 0.5, 0.9)])
+        # Should not raise.
+        wa._cache_store("k", transcript)
+
+
 class TestCliSmoke:
     def test_with_explicit_transcript_runs(self, tmp_path):
         # Build a script + transcript pair locally so no real-data dependency.
