@@ -279,8 +279,8 @@ def validate_episode(row: EpisodeRow) -> EpisodeReport:
                     dur = mdata.get("totalDurationSec", 0)
                     add(Finding("ok",
                         f"assembly-manifest.json ({seg_count} segments, {dur:.0f}s)"))
-                except Exception:
-                    add(Finding("warn", "assembly-manifest.json exists but failed to parse"))
+                except Exception as e:
+                    add(Finding("warn", f"assembly-manifest.json exists but failed to parse: {e}"))
             else:
                 add(Finding("error",
                     f"assembly-manifest.json missing from "
@@ -531,8 +531,8 @@ def build_checkpoint_stages(
                 segs = len(mdata.get("segments", []))
                 dur = mdata.get("totalDurationSec", 0)
                 detail = f"assembly-manifest.json ({segs} segments, {dur:.0f}s) + {len(json_files)} data files"
-            except Exception:
-                detail = f"assembly-manifest.json (parse error) + {len(json_files)} data files"
+            except Exception as e:
+                detail = f"assembly-manifest.json (parse error: {e}) + {len(json_files)} data files"
             prep.append(StageCheck("Template Data + Manifest", True, detail=detail))
         elif json_files:
             prep.append(StageCheck(

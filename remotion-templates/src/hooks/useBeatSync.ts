@@ -24,7 +24,7 @@
  *   - Manually placed in JSON data files
  */
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { useCurrentFrame } from "remotion";
 import { sec } from "../design/theme";
 
@@ -150,12 +150,33 @@ export const useBeatSync = (opts: UseBeatSyncOptions): BeatSyncState => {
   const { markers, pulseDecay = 0.25, anticipationFrames = 2 } = opts;
   const frame = useCurrentFrame();
 
+  // Value-stable markers reference.
+  //
+  // All call sites derive markers from an inline `.map()` (e.g.
+  // `(direction.syncPoints ?? []).map(p => p.timeSec)`), producing a new
+  // array object every frame. A plain `[markers]` dep would cause
+  // normalizedMarkers and beatFrames to recompute every frame — defeating
+  // both memos and running the O(N) scan unconditionally at 30fps.
+  //
+  // Fix: track the previous serialised value in a ref. When the values are
+  // identical, return the previous stable reference; only allocate a new one
+  // when the content actually changes. Serialisation of a typical syncPoints
+  // array (< 10 items) is negligible compared to the memo computation it saves.
+  const prevMarkersJsonRef = useRef<string>("");
+  const stableMarkersRef = useRef<typeof markers>(markers);
+  const markersJson = JSON.stringify(markers);
+  if (markersJson !== prevMarkersJsonRef.current) {
+    prevMarkersJsonRef.current = markersJson;
+    stableMarkersRef.current = markers;
+  }
+
   // Normalize markers to BeatMarker[]
   const normalizedMarkers = useMemo(() => {
-    return markers.map((m) =>
+    return stableMarkersRef.current.map((m) =>
       typeof m === "number" ? { time: m, intensity: 1.0 } : m
     );
-  }, [markers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markersJson]); // depend on the serialised form — stable when values unchanged
 
   // Convert to frame positions (memoized)
   const beatFrames = useMemo<BeatFrame[]>(() => {

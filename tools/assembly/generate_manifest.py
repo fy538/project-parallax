@@ -45,6 +45,7 @@ from backdrop_manifest import warn_clutter_backdrop_mismatch  # noqa: E402
 WPM = 150  # analytical narration pace (from PRODUCTION_NOTES)
 FPS = 30
 DEFAULT_BROLL_INTERVAL = 4.0  # seconds per visual change for auto-fill gaps
+END_CARD_PADDING_SEC = 4  # seconds added after narration ends for end-card hold
 
 # ── Backdrop tags ([BACKDROP: id]) ──────────────────────────────────────────
 # Canonical ids: remotion-templates/data/backdrop-manifest.json
@@ -168,6 +169,7 @@ PALETTE_COLORS = {
     "amber": "#E5A544",
     "rust": "#C23B22",
     "bone": "#F0E6D0",
+    "paper": "#F5F0E8",
     "oxblood": "#6B1D1D",
 }
 
@@ -372,7 +374,7 @@ def estimate_narration_duration(text: str) -> float:
     return len(words) / WPM * 60
 
 
-def parse_visual_spec(spec: str):
+def parse_visual_spec(spec: str) -> Optional[dict]:
     """Parse a single visual production cell into structured data."""
     result = {
         "type": None,
@@ -983,7 +985,7 @@ def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> Optional[
     return None
 
 
-def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict = None) -> Optional[str]:
+def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict | None = None) -> Optional[str]:
     """Try to resolve which Remotion data file a template segment references."""
     vis_lower = vis_raw.lower()
 
@@ -1473,7 +1475,7 @@ def build_estimate_manifest(
     title: str = "",
     data_files: dict = None,
     shot_ids: dict = None,
-) -> dict:
+) -> tuple[dict, list[dict]]:
     """
     Build an assembly manifest in estimate mode from script parsing.
 
@@ -1705,7 +1707,10 @@ def build_estimate_manifest(
     segments = apply_audio_cues(segments)
 
     # Compute total duration
-    total_dur = max(s["endSec"] for s in segments) if segments else 0
+    total_dur = max(
+        (s["endSec"] for s in segments if isinstance(s.get("endSec"), (int, float))),
+        default=0,
+    )
 
     # Build music bed (L1) from beat structure
     beat_dicts = [
@@ -2236,7 +2241,14 @@ def get_audio_duration(audio_path: str) -> float:
         import torchaudio
         info = torchaudio.info(audio_path)
         return info.num_frames / info.sample_rate
-    except Exception:
+    except Exception as e:
+        print(
+            f"WARNING: could not read audio duration from {audio_path!r}: {e}. "
+            "Precise-mode segment timestamps will be computed against duration=0 "
+            "and will be wrong. Check that ffprobe and/or torchaudio are installed "
+            "and the audio file is accessible.",
+            file=sys.stderr,
+        )
         return 0.0
 
 
@@ -2394,7 +2406,7 @@ def align_to_narration(manifest: dict, audio_path: str, hf_token: Optional[str] 
     manifest["narration"]["audioFile"] = str(Path(audio_path).name)
     manifest["narration"]["totalDurationSec"] = round(total_dur, 2)
     manifest["narration"]["words"] = words
-    manifest["totalDurationSec"] = round(total_dur + 4, 2)  # +4s for end card
+    manifest["totalDurationSec"] = round(total_dur + END_CARD_PADDING_SEC, 2)
 
     # Step 3: Fuzzy-match segments to word timestamps
     already_matched: set[int] = set()

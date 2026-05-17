@@ -25,6 +25,9 @@ const NetworkNodeSchema = z.object({
     })
     .optional(),
   side: z.enum(["left", "right"]).optional(),
+  // Group membership — used by cameraPath "group:name" targeting and node styling.
+  // TS-SIDE: group?: string in types.ts. Previously absent from schema.
+  group: z.string().optional(),
 });
 
 const NetworkEdgeSchema = z.object({
@@ -66,6 +69,24 @@ export const NetworkDiagramSchema = z.object({
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
     _direction: DirectionBlockSchema.optional(),
+    // Cinematic narrated camera — pans between nodes/groups as argument builds.
+    // TS-SIDE: NarratedCameraStep[] in types.ts + useNarratedCamera.ts.
+    // Previously absent from schema, so Zod would strip it in non-passthrough
+    // mode, silently degrading to static layout.
+    cameraPath: z.array(z.object({
+      target: z.union([
+        z.object({ x: z.number(), y: z.number() }),
+        z.string(),
+      ]),
+      zoom: z.number().positive(),
+      duration: z.number().positive(),
+      focus: z.array(z.number().int()).optional(),
+      focusGroup: z.string().optional(),
+      behavior: z.enum(["track", "snap"]).optional(),
+      shake: z.number().min(0).max(1).optional(),
+    })).optional(),
+    // Background depth particles — enabled automatically when cameraPath present.
+    ambientParticles: z.boolean().optional(),
   }).superRefine((val, ctx) => {
     if (val.layout === "bipartite") {
       const missing = val.nodes.filter(n => !n.side).map(n => n.id);

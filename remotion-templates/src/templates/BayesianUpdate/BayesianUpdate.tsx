@@ -46,7 +46,6 @@ import {
   CLAMP_CUBIC,
   CLAMP_CUBIC_INOUT,
 } from "../../utils/animation";
-import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
@@ -525,6 +524,18 @@ const HypothesisBar: React.FC<HypothesisBarProps & { isLeading?: boolean }> = Re
 
 // ── Multi Variant Component ────────────────────────────────────────────────
 
+// Module-level constant — palette.* values are stable after import, so this
+// is safe here. Kept at module scope rather than inside the component to
+// avoid creating a new array on every render (would defeat useMemo deps).
+const MULTI_HYPOTHESIS_COLOR_PALETTE = [
+  palette.amber,
+  semantic.us,
+  semantic.china,
+  palette.rust,
+  palette.bronze,
+  semantic.highlight,
+];
+
 const MultiVariant: React.FC<{
   data: BayesianUpdateData;
   theme: ReturnType<typeof useThemeMode>;
@@ -535,41 +546,48 @@ const MultiVariant: React.FC<{
   syncPoints?: DirectionSyncPoint[];
 }> = React.memo(
   ({ data, theme, frame, durationInFrames, area, compStyle, syncPoints }) => {
-    if (!data.multiHypotheses || data.multiHypotheses.length === 0) {
-      return null;
-    }
+    // ── All hooks MUST come before any conditional return (Rules of Hooks) ──
+    //
+    // Previously this component had `return null` before two useMemo calls,
+    // which crashes React whenever multiHypotheses is empty or absent.
+    // Fix: stabilise all derived values with useMemo at the top, guard within
+    // each memo, then apply the early return after all hooks.
 
-    // Color palette for auto-assignment
-    const colorPalette = [
-      palette.amber,
-      semantic.us,
-      semantic.china,
-      palette.rust,
-      palette.bronze,
-      semantic.highlight,
-    ];
+    const hypotheses = data.multiHypotheses ?? [];
 
-    // Get colors for each hypothesis
-    const hypothesisColors = data.multiHypotheses.map(
-      (h, i) => h.color || colorPalette[i % colorPalette.length]
+    // Colors per hypothesis (stable reference — depends only on the hypotheses array)
+    const hypothesisColors = useMemo(
+      () =>
+        hypotheses.map(
+          (h, i) => h.color || MULTI_HYPOTHESIS_COLOR_PALETTE[i % MULTI_HYPOTHESIS_COLOR_PALETTE.length],
+        ),
+      [hypotheses],
     );
 
-    // Extract initial probabilities
-    const priors = data.multiHypotheses.map(h => h.prior);
+    // Prior probabilities for each hypothesis
+    const priors = useMemo(
+      () => hypotheses.map((h) => h.prior),
+      [hypotheses],
+    );
 
-    // Compute states
+    // Compute Bayesian update states — safe with empty priors (returns [{probabilities:[]}])
+    // Dep: data.evidence (stable array ref from JSON load), priors (stable memo above)
     const states = useMemo(
-      () => computeMultiHypothesisStates(priors, (data.evidence ?? [])),
-      [priors, (data.evidence ?? [])]
+      () =>
+        priors.length > 0
+          ? computeMultiHypothesisStates(priors, data.evidence ?? [])
+          : [{ probabilities: [] as number[] }],
+      [priors, data.evidence],
     );
 
     // Timing
-    const evidenceCount = (data.evidence ?? []).length;
+    const evidenceCount = data.evidence?.length ?? 0;
     const introFrames = sec(1.5);
     const perEvidenceFrames = sec(1.8);
 
-    // Current probabilities (interpolated)
+    // Current probabilities (interpolated) — no-ops when states is the empty sentinel
     const currentProbs = useMemo(() => {
+      if (states[0].probabilities.length === 0) return [] as number[];
       const evidenceFrame = frame - introFrames;
       if (evidenceFrame <= 0) return states[0].probabilities;
 
@@ -586,6 +604,9 @@ const MultiVariant: React.FC<{
 
       return from.map((f, i) => f + (to[i] - f) * t);
     }, [frame, introFrames, perEvidenceFrames, evidenceCount, states]);
+
+    // ← All hooks above. Early return is now safe.
+    if (hypotheses.length === 0) return null;
 
     // Entrance animation
     const barsEnterOpacity = fadeIn(frame, 0, sec(0.8));
@@ -681,7 +702,7 @@ const MultiVariant: React.FC<{
                     (best, p, i) => (p > currentProbs[best] ? i : best),
                     0
                   );
-                  return data.multiHypotheses.map((h, i) => (
+                  return hypotheses.map((h, i) => (
                     <HypothesisBar
                       key={i}
                       label={h.label}
@@ -704,7 +725,7 @@ const MultiVariant: React.FC<{
                   gap: layout.spacing.md,
                 }}
               >
-                {data.multiHypotheses.map((h, i) => (
+                {hypotheses.map((h, i) => (
                   <div
                     key={i}
                     style={{
@@ -878,9 +899,11 @@ export const BayesianUpdate: React.FC<{ data: BayesianUpdateData }> = ({
     ? (data.prior ?? 50)
     : (data.hypotheses?.[0]?.prior ?? 50);
 
+  // Dep: data.evidence — stable array ref from JSON load; ?? [] would create
+  // a new array reference every render, defeating the memo.
   const states = useMemo(
-    () => computeDistributionStates(prior, (data.evidence ?? [])),
-    [prior, (data.evidence ?? [])]
+    () => computeDistributionStates(prior, data.evidence ?? []),
+    [prior, data.evidence],
   );
 
   // For compare variant, compute second track

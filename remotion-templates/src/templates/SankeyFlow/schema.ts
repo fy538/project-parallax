@@ -52,5 +52,13 @@ export const SankeyFlowSchema = z.object({
     backgroundVariant: z.enum(["dark", "light"]).optional(),
     backgroundTint: z.string().optional(),
     _direction: DirectionBlockSchema.optional(),
+    // Animated flow particles along Sankey ribbons. Use sparingly —
+    // see references/template-research/sankey-flow.md § 7 (failure modes).
+    // TS-SIDE: flowParticles/particleSpeed/particleDensity/ambientParticles in types.ts.
+    // Previously absent from schema, so Zod would strip these in non-passthrough mode.
+    flowParticles: z.boolean().optional(),
+    particleSpeed: z.number().positive().optional(),
+    particleDensity: z.number().positive().optional(),
+    ambientParticles: z.boolean().optional(),
   }),
 });

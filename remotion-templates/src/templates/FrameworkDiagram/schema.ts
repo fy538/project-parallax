@@ -59,6 +59,21 @@ export const FrameworkDiagramSchema = z.object({
       durationSec: z.number().positive().optional(),
       _direction: DirectionBlockSchema.optional(),
       backgroundTint: z.string().optional(),
+      // Phase-sequenced reveals — each phase makes a subset of nodes active.
+      // TS-SIDE: FrameworkPhase[] in types.ts. Previously absent from schema
+      // so Zod would silently strip this field in non-passthrough parse mode.
+      phases: z.array(z.object({
+        label: z.string(),
+        durationSec: z.number().positive(),
+        activeNodes: z.array(z.number().int().nonnegative()).optional(),
+      })).optional(),
+      // Logical elimination overlays (matrix variant).
+      // TS-SIDE: EliminatedScenario[] in types.ts.
+      eliminatedScenarios: z.array(z.object({
+        filter: z.number().int().nonnegative(),
+        scenario: z.string(),
+        color: z.string().optional(),
+      })).optional(),
     })
     .superRefine((d, ctx) => {
       if (

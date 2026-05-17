@@ -40,7 +40,9 @@ Re-run safety:
 
 import argparse
 import json
+import os
 import sys
+import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -72,7 +74,7 @@ def main():
         print(f"ERROR: manifest not found: {mpath}", file=sys.stderr)
         sys.exit(1)
 
-    with open(mpath) as f:
+    with open(mpath, encoding="utf-8") as f:
         m = json.load(f)
 
     existing_ids = {seg["id"] for seg in m["segments"]}
@@ -155,9 +157,17 @@ def main():
     m["segments"].extend(new_holds)
     m["segments"].sort(key=lambda s: (s["startSec"], s.get("layer", "background")))
 
-    with open(mpath, "w") as f:
-        json.dump(m, f, indent=2)
-        f.write("\n")
+    # Atomic write: dump to a sibling temp file, then os.replace() into place.
+    # Prevents a corrupted manifest if the process is interrupted mid-write.
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=mpath.parent, suffix=".tmp.json")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+            json.dump(m, f, indent=2)
+            f.write("\n")
+        os.replace(tmp_path, mpath)
+    except Exception:
+        os.unlink(tmp_path)
+        raise
 
     total = len(m["segments"])
     print(f"\n✅ Wrote {mpath.relative_to(REPO_ROOT)}")

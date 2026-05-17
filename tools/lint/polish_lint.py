@@ -472,8 +472,13 @@ def main():
 
     files = find_template_files(templates_dir, filter_name)
     if not files:
-        print(f"No template files found" + (f" matching '{filter_name}'" if filter_name else ""))
-        sys.exit(0)
+        # Exit 1 (not 0) so CI sees a failure when templates_dir is misconfigured
+        # or the filter matches nothing that should exist.
+        print(
+            f"No template files found" + (f" matching '{filter_name}'" if filter_name else ""),
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     all_violations: list[Violation] = []
     file_results: dict[str, list[Violation]] = {}

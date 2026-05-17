@@ -124,6 +124,11 @@
         "resolution": {
           "type": "object",
           "properties": {
+            "status": {
+              "type": "string",
+              "enum": ["confirmed", "falsified", "partially-confirmed", "expired"],
+              "description": "Resolution outcome. confirmed/falsified = clear evidence. partially-confirmed = directionally right but details differ. expired = timeframe passed without clear resolution."
+            },
             "date": {
               "type": "string",
               "description": "When the prediction was resolved (ISO date)."

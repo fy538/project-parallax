@@ -1024,6 +1024,50 @@ def test_narration_lead_in_forwarded_in_build_segment():
     assert seg["narrationLeadIn"] == 0.4
 
 
+def test_jcut_from_parse_dir_lines_survives_apply_default():
+    """Phase 7 integration: narrationLeadIn written by _build_segment (from DIR: jcut)
+    is NOT clobbered by apply_default_transitions's 0.7 default. The guard
+    `if "narrationLeadIn" not in seg` protects pre-existing explicit values."""
+    parsed_s2 = parse_visual_spec("**P1 — KineticTypography** · 5s")
+    # Simulate jcut directive arriving through direction dict into _build_segment
+    seg2 = _build_segment(
+        2, parsed_s2, "TEMPLATE", 5.0, 10.0, "beat-a", "", "", "",
+        {}, {}, {"narrationLeadIn": 0.4},
+    )
+    segs = [_make_seg("s1", "TEMPLATE", "beat-a"), seg2]
+    result = apply_default_transitions(segs)
+    assert result[1].get("narrationLeadIn") == 0.4, (
+        "apply_default_transitions must not overwrite a DIR: jcut() value"
+    )
+
+
+def test_jcut_empty_arg_silently_omitted():
+    """DIR: jcut() with no numeric argument produces no narrationLeadIn — the
+    regex requires at least one digit so empty params don't match, giving no
+    implicit default from this call. Documented behavior."""
+    result = parse_dir_lines(["jcut()"])
+    assert "narrationLeadIn" not in result, (
+        "jcut() with empty arg should silently omit narrationLeadIn"
+    )
+
+
+def test_narration_lead_in_default_skipped_when_no_transition_dict_on_prev():
+    """Phase 7: if the previous segment has no .transition key, apply_default
+    will add one (Rule 0/1). After that, the J-cut default still fires on the
+    current segment when trans_in ends up as 'cut'."""
+    segs = [
+        # s1 starts with no transition key at all
+        {"id": "s1", "type": "TEMPLATE", "layer": "foreground",
+         "beat": "beat-a", "startSec": 0.0, "endSec": 5.0,
+         "template": {"component": "DataChart", "dataFile": "d.json"}},
+        _make_seg("s2", "TEMPLATE", "beat-a"),
+    ]
+    result = apply_default_transitions(segs)
+    # s2 is in the same beat as s1 → Rule 4 fires → cut (Phase 5 default)
+    # J-cut default fires → narrationLeadIn: 0.7
+    assert result[1].get("narrationLeadIn") == 0.7
+
+
 def test_match_cut_still_templates_set_is_canonical():
     """Lock the set so accidental edits get caught."""
     from generate_manifest import MATCH_CUT_STILL_TEMPLATES
@@ -1076,6 +1120,12 @@ def test_transitions_breathing_pace_stretches_cuts_to_dissolves():
     assert trans, "breathing pace should upgrade the default cut to a dissolve"
     assert trans["in"] == "dissolve"
     assert trans["durationSec"] == 0.4
+    # The breathing-pace upgrade fires BEFORE the J-cut default check, so by
+    # the time the J-cut logic runs, trans_in is already "dissolve" — which
+    # correctly skips the narrationLeadIn injection (J-cuts are for hard cuts only).
+    assert "narrationLeadIn" not in result[1], (
+        "breathing-pace dissolve upgrade should suppress the J-cut default"
+    )
 
 
 # ── infer_music_mood ───────────────────────────────────────────────────────

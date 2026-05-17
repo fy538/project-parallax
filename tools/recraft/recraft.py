@@ -1081,6 +1081,14 @@ def process_batch(
 
     Returns manifest of generated files.
     """
+    # Guard here (not only in main()) so programmatic callers — e.g. scripts,
+    # tests, or Agent SDK tool wrappers — get a clean early failure rather than
+    # a cryptic 401 from the Recraft API deep inside the batch loop.
+    if not API_KEY:
+        print("ERROR: RECRAFT_API_KEY environment variable not set.", file=sys.stderr)
+        print("  export RECRAFT_API_KEY=your_key", file=sys.stderr)
+        sys.exit(1)
+
     with open(shot_list_path, "r", encoding="utf-8") as f:
         shots = json.load(f)
 

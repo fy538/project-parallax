@@ -33,6 +33,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -90,7 +91,7 @@ def main():
         print(f"ERROR: manifest not found: {mpath}", file=sys.stderr)
         sys.exit(1)
 
-    with open(mpath) as f:
+    with open(mpath, encoding="utf-8") as f:
         m = json.load(f)
 
     # Clips available on disk
@@ -195,9 +196,17 @@ def main():
             asset["source"] = "local"
         wired += 1
 
-    with open(mpath, "w") as f:
-        json.dump(m, f, indent=2)
-        f.write("\n")
+    # Atomic write: dump to a sibling temp file, then os.replace() into place.
+    # Prevents a corrupted manifest if the process is interrupted mid-write.
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=mpath.parent, suffix=".tmp.json")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+            json.dump(m, f, indent=2)
+            f.write("\n")
+        os.replace(tmp_path, mpath)
+    except Exception:
+        os.unlink(tmp_path)
+        raise
 
     print(f"\n  ✅ Wrote {mpath.relative_to(REPO_ROOT)}")
     print(f"     Wired: {wired}  |  Still pending: {no_match}\n")

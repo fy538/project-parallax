@@ -1792,10 +1792,10 @@ export const GameBoard: React.FC<{ data: GameBoardData }> = ({ data }) => {
             {state.currentPhaseIndex >= 0 &&
               phases[state.currentPhaseIndex]?.counterAnimation && (
                 <CounterDisplay
-                  counter={phases[state.currentPhaseIndex].counterAnimation!}
+                  counter={phases[state.currentPhaseIndex]?.counterAnimation!}
                   frame={frame}
                   phaseStart={phaseStart}
-                  phaseDuration={sec(phases[state.currentPhaseIndex].durationSec)}
+                  phaseDuration={sec(phases[state.currentPhaseIndex]?.durationSec ?? 0)}
                   mode={mode}
                 />
               )}

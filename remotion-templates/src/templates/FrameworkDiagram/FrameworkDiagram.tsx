@@ -49,7 +49,7 @@ import { TitleBlock } from "../../components/TitleBlock";
 import { AnimatedArrow } from "../../components/AnimatedArrow";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { fadeIn, slideIn, stagger, exitFade, scaleReveal, bloomIntensity, heroSpring, anticipatoryStartFrame, CLAMP_QUAD } from "../../utils/animation";
+import { fadeIn, slideIn, stagger, exitFade, scaleReveal, heroSpring, anticipatoryStartFrame, CLAMP_QUAD } from "../../utils/animation";
 import { warnIf } from "../../utils/dataWarnings";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";

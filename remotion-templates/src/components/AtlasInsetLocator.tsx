@@ -87,7 +87,7 @@ export const AtlasInsetLocator: React.FC<AtlasInsetLocatorProps> = ({
       } as any, // no-as-any-ok: d3-geo accepts GeometryCollection at runtime
       properties: {},
     };
-    return pathGen(merged as any) ?? "";
+    return pathGen(merged as any) ?? ""; // no-as-any-ok: d3-geo accepts GeometryCollection at runtime
   }, [projection]);
 
   // Focus-region bbox in screen coords — recomputed per phase.
@@ -106,10 +106,10 @@ export const AtlasInsetLocator: React.FC<AtlasInsetLocatorProps> = ({
       geometry: {
         type: "GeometryCollection",
         geometries: features.map((f) => f.geometry),
-      } as any,
+      } as any, // no-as-any-ok: d3-geo accepts GeometryCollection at runtime
       properties: {},
     };
-    const [[x0, y0], [x1, y1]] = pathGen.bounds(merged as any);
+    const [[x0, y0], [x1, y1]] = pathGen.bounds(merged as any); // no-as-any-ok: d3-geo accepts GeometryCollection at runtime
 
     // C3: detect antimeridian-spanning bbox. geoPath().bounds() returns a
     // near-full-width rect for Russia, USA, and other countries that cross

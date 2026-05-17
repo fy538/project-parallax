@@ -118,8 +118,12 @@ export const MarimekkoChart: React.FC<{ data: MarimekkoChartData }> = ({
       `Above 10, label collisions and tile fragmentation overwhelm the ` +
       `two-dimensional reading. Consider grouping smaller columns into "Other".`,
   );
-  const segCounts = data.columns.map((c) => c.segments.length);
-  const maxSegs = Math.max(...segCounts);
+  // Memoised — data.columns is stable from JSON load; O(N) map + spread
+  // over column segments would otherwise run 900× per 30 seconds.
+  const maxSegs = useMemo(
+    () => Math.max(...data.columns.map((c) => c.segments.length)),
+    [data.columns],
+  );
   warnIf(
     maxSegs > 6,
     "MarimekkoChart",

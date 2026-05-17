@@ -33,6 +33,7 @@ import json
 import os
 import re
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -57,9 +58,23 @@ def load_registry(path: Path) -> dict:
         sys.exit(1)
 
 
-def save_registry(data: dict, path: Path):
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+def save_registry(data: dict, path: Path) -> None:
+    """Write the concept registry atomically to avoid corruption on interruption.
+
+    Uses a sibling temp file + os.replace() so the path is either the previous
+    content or the new content — never a partial write. This is especially
+    important because concepts.json is validated by the git pre-commit hook;
+    a partial write would break every subsequent commit until manual recovery.
+    """
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=path.parent, suffix=".tmp.json")
+    try:
+        with os.fdopen(tmp_fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+        os.replace(tmp_path, path)
+    except Exception:
+        os.unlink(tmp_path)
+        raise
     print(f"  ✓ Saved to {path}")
 
 
