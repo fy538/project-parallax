@@ -815,14 +815,30 @@ const SpineTreeVariant: React.FC<{
   const safe = layout.safeAreaTier.generous;
   const baseReveal = firstRevealBase ?? sec(0.4);
 
-  // Layout constants
-  const SPINE_LEFT = safe.left + 60;
+  // Layout constants — sized so the full composition (spine ordinals on the
+  // left + rung label band + stem fan + leaf label band on the right) sits
+  // centered on the 1920px canvas with comfortable margins. Without the
+  // explicit center calculation, the spine anchored at `safe.left + 60`
+  // left a ~700px empty band on the right of the frame.
   const RUNG_HEIGHT = 160;
-  const ORDINAL_X = SPINE_LEFT - 50;
   const RUNG_LABEL_GAP = 24;         // gap from spine to rung label
   const STEM_VERTICAL_FAN = 40;      // vertical fan-out per child stem (px)
   const STEM_START_OFFSET = 480;     // px right of spine where stems begin
   const STEM_LENGTH = 260;           // bezier reach from stem start to leaf
+  const LEAF_LABEL_REACH = 360;      // approx tail of leaf label text
+  const ORDINAL_LEFT_OF_SPINE = 50;  // ORDINAL_X = SPINE_LEFT - this
+  const LEAF_LABEL_GAP = 14;
+  const TOTAL_CONTENT_WIDTH =
+    ORDINAL_LEFT_OF_SPINE +
+    STEM_START_OFFSET +
+    STEM_LENGTH +
+    LEAF_LABEL_GAP +
+    LEAF_LABEL_REACH;
+  const SPINE_LEFT = Math.max(
+    safe.left + 60,
+    Math.round((layout.width - TOTAL_CONTENT_WIDTH) / 2) + ORDINAL_LEFT_OF_SPINE,
+  );
+  const ORDINAL_X = SPINE_LEFT - ORDINAL_LEFT_OF_SPINE;
   const LEAF_DOT_R = 4;
 
   // Path-dim mode: when a highlighted path is set, lateral non-highlighted
@@ -965,7 +981,7 @@ const SpineTreeVariant: React.FC<{
                     />
                     {/* Leaf label */}
                     <text
-                      x={stemX2 + 14}
+                      x={stemX2 + LEAF_LABEL_GAP}
                       y={stemY2 + 6}
                       fontSize={isChildHighlighted ? fontSizes.body : fontSizes.label}
                       fontFamily={fonts.body}
