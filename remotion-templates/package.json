@@ -40,7 +40,9 @@
     "deploy:teardown": "node scripts/deploy-lambda.mjs --teardown",
     "render:lambda": "node scripts/render-lambda.mjs",
     "thumbnails": "node scripts/generate-thumbnails.mjs",
-    "shorts": "node scripts/render-shorts.mjs"
+    "shorts": "node scripts/render-shorts.mjs",
+    "gen:types": "node scripts/generate-schema-types.mjs",
+    "gen:types:check": "node scripts/generate-schema-types.mjs --check"
   },
   "dependencies": {
     "@deck.gl/core": "^9.3.1",
@@ -78,6 +80,7 @@
     "@types/topojson-specification": "^1.0.5",
     "ajv": "^8.20.0",
     "happy-dom": "^20.9.0",
+    "json-schema-to-typescript": "^15.0.4",
     "pixelmatch": "^7.2.0",
     "playwright": "^1.40.0",
     "pngjs": "^7.0.0",

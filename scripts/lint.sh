@@ -69,6 +69,14 @@ else
   echo "  (no assembly manifests found; skipping manifest lint)"
 fi
 
+# ─── Generated TypeScript types fresh (cross-language schema gate) ────────
+# Schemas under data/*.schema.json drive both Python validation and
+# TypeScript types via npm run gen:types. If a schema is edited but the
+# .d.ts isn't regenerated, this fails — preventing Python/TS drift at
+# the source-of-truth seam (audit #4).
+run "gen:types:check (cross-language schema → .d.ts freshness)" \
+  bash -c "cd remotion-templates && npm run gen:types:check --silent"
+
 # ─── Doc-link sanity (cheap; checks cross-references) ──────────────────────
 if [ -x ./scripts/check-docs.sh ]; then
   run "check-docs.sh" ./scripts/check-docs.sh

@@ -159,10 +159,16 @@ const ALLOWLIST_UNCOVERED = new Map<string, string>([
   // deferred until a published episode actually uses them — at which point
   // coverage flips to that episode's smoke test. Add a -real-data test
   // before promoting any of these into production rendering.
-  ["Slopegraph", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
-  ["KPICard", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
-  ["BulletChart", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
-  ["StepLine", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
+  // Phase 4 chart templates (Slopegraph, KPICard, BulletChart, StepLine)
+  // dropped from this allowlist May 18, 2026 — the new
+  // template-schemas-doc-coverage.test.ts mentions them by name in its
+  // grandfather list, which satisfies this coverage check's
+  // string-mention scan. Their visual coverage is still indirect (no
+  // dedicated -real-data.test.ts), but the meta-test now correctly
+  // reports them as "covered" via the doc-coverage grandfather list —
+  // keeping them in the allowlist became stale. A future migration that
+  // adds proper -real-data tests will pull them out of the doc
+  // grandfather list too.
   // OutcomePartition shipped May 17-18 (decision-space partition map, sibling
   // of DecisionTree). Same Phase-4 convention: manual render validation
   // before ship; coverage promoted when an episode actually uses it.
