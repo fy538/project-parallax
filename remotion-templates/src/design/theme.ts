@@ -619,6 +619,23 @@ export const cjk = {
   },
 } as const;
 
+// ── Episode label format ───────────────────────────────────────────────────
+// Canonical form: `EP.01`, `EP.02`, …, `EP.99`, `EP.100`. Two-digit zero
+// pad up to 99 (matches the channel's HeaderStrip/MetadataStrip register);
+// three-or-more digits if/when we get past 99 episodes. If we ever shift
+// to "S01·E02", "Ep 01", or any other cadence, this is the one place to
+// edit — every consumer reads through `formatEpisodeLabel(n)` and the
+// rendered string updates automatically.
+//
+// Optional `title` appends ` — TITLE` so the helper covers both the bare
+// `EP.01` form (HeaderStrip metadata) and the `EP.01 — TITLE` form
+// (MetadataStrip header).
+export const formatEpisodeLabel = (episodeNumber: number, title?: string): string => {
+  const num = String(episodeNumber).padStart(2, "0");
+  const base = `EP.${num}`;
+  return title ? `${base} — ${title}` : base;
+};
+
 // ── Layout ─────────────────────────────────────────────────────────────────
 
 // Video output dimensions + frame rate come from `tools/config/video.json`

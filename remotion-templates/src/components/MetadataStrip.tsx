@@ -25,6 +25,7 @@ import {
   fonts,
   fontSizes,
   fontWeights,
+  formatEpisodeLabel,
   letterSpacing,
   dark,
   light,
@@ -74,9 +75,9 @@ export const MetadataStrip: React.FC<MetadataStripProps> = ({
     textTransform: "uppercase" as const,
   };
 
-  // Episode label: "EP.01 — THE SILICON TRAP"
+  // Episode label: "EP.01 — THE SILICON TRAP" (canonical form via theme.ts)
   const epLabel = episodeNumber
-    ? `EP.${String(episodeNumber).padStart(2, "0")}${episodeTitle ? ` — ${episodeTitle}` : ""}`
+    ? formatEpisodeLabel(episodeNumber, episodeTitle || undefined)
     : null;
 
   // Date label: "FILED 2026-04-25"
