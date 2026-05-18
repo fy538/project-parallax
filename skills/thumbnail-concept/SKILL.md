@@ -33,9 +33,22 @@ These principles come from what works in analytical/geopolitics YouTube and what
 
 4. **Warm palette, high contrast.** Use the Meridian palette but push contrast higher than in-video. Gold (`palette.gold` = `#C4A747`) on ink (`#1C1814`) reads well at all sizes. Avoid the `china` semantic red (`#A64D46`) on dark backgrounds — too low contrast at thumbnail scale.
 
-5. **No clickbait aesthetics.** No red arrows, no shocked faces, no ALL CAPS IMPACT font. Parallax's visual identity is "serious analytical publication" — think Foreign Affairs cover, not MrBeast thumbnail. The provocation comes from the idea, not the formatting.
+5. **No clickbait aesthetics.** Parallax's visual identity is "serious analytical publication" — think Foreign Affairs cover, not MrBeast thumbnail. The provocation comes from the idea, not the formatting. Specific bans (research 2026-05-18):
 
-6. **A/B testable.** Each concept should be distinct enough that YouTube's A/B testing (or manual testing) can reveal which approach resonates. Don't produce three minor variations — produce three genuinely different visual strategies.
+   | Banned | Reason |
+   |---|---|
+   | Shocked / open-mouth face (yours or anyone's) | Wrong genre signal — reads as content-free affect |
+   | Red arrows, red circles, red corner brackets | Aggregator-tier visual marker |
+   | Bebas Neue / ALL-CAPS Impact text overlay | Aggregator visual identity; conflicts with IBM Plex |
+   | Saturated red/yellow background | Algorithmic-cargo-cult marker |
+   | Round shock numbers without anchor ($1T, "100 years") | Fails specificity test — specific small numbers beat round huge ones |
+   | "I tried X for Y" / "X for 30 days" framings | Stunt-video genre signal |
+   | Curiosity-gap titles whose payoff isn't *literally* in the video | YouTube's satisfaction signals now penalize broken-promise directly (Gemini analyzes thumbnail-title-video as a system) |
+   | Year-stamped titles ("...in 2026") | Decays against evergreen strategy |
+
+6. **A/B testable — but Test & Compare likely unavailable at video #1.** Each concept should be distinct enough that YouTube's A/B testing (or manual testing) can reveal which approach resonates. Don't produce three minor variations — produce three genuinely different visual strategies. **Note (2026 update):** YouTube's native "Test & Compare" feature gates on Advanced Features + likely on channel scale; pre-launch channels probably don't have access at video #1. Plan for **manual thumbnail swap at 48h and 7d** based on YouTube Studio CTR data instead. Test & Compare becomes meaningful once you have a baseline.
+
+7. **CTR target zone: 5–7%, not 4%** (research 2026-05-18 update). The 4% threshold from older sources is the floor below which distribution stalls. The working target for serious educational long-form is 5–7%. Below 4% → swap thumbnail at 48h. Education tier sits slightly lower than entertainment because more traffic is search-driven.
 
 ## The Three Concept Approaches
 
@@ -64,6 +77,21 @@ Examples:
 - A geometric net/trap motif from the visual arc — the concept made visual
 - A single striking image with minimal text overlay
 - The ∴ brand mark integrated into a concept-specific visual
+
+### Concept D (optional): The Object + Annotation
+*Added 2026-05-18 — FT-chart-annotation aesthetic.* Single subject (an object, a chart fragment, a diagram element) with one precise callout / annotation. Distinct from Data Provocation (number leads) and Symbolic (object alone). This is the NYT Upshot / FT visual journalism register applied to thumbnails — a small precise annotation pointing at one feature of the dominant subject.
+
+Use when:
+- The episode has a *specific, defensible technical detail* that anchors the argument
+- The Symbolic register would feel too abstract for the topic
+- You want to telegraph "this is rigorous editorial journalism" via visual register
+
+Examples:
+- A payoff matrix with one cell circled + a 4-word annotation pointing at it
+- A historical map with a single arrow + a date label
+- A chart with one line and a 3-word callout
+
+Ship 3 concepts (A / B / C) by default. Use D where the episode shape genuinely calls for it — don't force it.
 
 ## Output Format
 

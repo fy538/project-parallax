@@ -1,5 +1,5 @@
 # SHORTS EXTRACTION
-## Episode: prisoners-dilemma — "The Prisoner's Dilemma Is Wrong About Almost Everything"
+## Episode: prisoners-dilemma — "What the Prisoner's Dilemma Gets Wrong"
 ## Date: 2026-05-18
 
 Produced via `shorts-adaptation` skill, two-phase flow (May 2026 doctrine). Phase 1 consumed two design-time `[SHORTS-BEAT:]` tags placed at outlining time. Phase 2 auto-extracted two additional Shorts from Beats 2 and 3. All four passed the standalone test AND the hedge-strip self-check.

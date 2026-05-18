@@ -255,12 +255,22 @@ Does this episode belong to a numbered arc? If so, what's the series tag? (e.g.,
 
 ### 8. Working Title Options
 
-3-5 titles following Jiang titling mechanics:
-- The named concept as title ("The Silicon Trap")
-- An information-asymmetry frame ("What Nobody's Telling You About...")
-- A provocation ("How America Made China's Chip Industry")
-- A stakes-shock ("The $165B Mistake Nobody Can Stop")
-- A series-tagged variant ("Great Power Competition #1: The Silicon Trap")
+3-5 titles following Jiang titling mechanics (updated 2026-05-18 — see `project/research/2026-05-18-thumbnail-title-research.md`):
+
+- **Named concept** as title ("The Silicon Trap")
+- **Information-asymmetry** frame ("What Nobody's Telling You About...") — *highest curiosity-gap pattern; now carries the most algorithmic downside risk if the video underdelivers. Use rarely; only when the asymmetry is genuinely true.*
+- **Provocation** ("How America Made China's Chip Industry")
+- **Stakes-shock** ("The $165B Mistake Nobody Can Stop") — *closest to cringe register. Discipline: the shocking number must be specific and verifiable, not round.*
+- **Series-tagged** variant ("Great Power Competition #1: The Silicon Trap")
+- **Compression** ("[Large idea] in [small time/scale]" — e.g. "30 Years of Game Theory in 12 Minutes"). *Added 2026-05-18 — fits Parallax's "essay distilled to 12 minutes" register.*
+
+**Title doctrine (2025–2026 algorithm shifts):**
+
+- **Length:** mobile home feed truncates at ~45–50 chars; desktop at 60–70. **Sweet spot for visible titles is 40–60 chars; 60–70 is acceptable only if the first 45 carry the payload.** Front-load the hook.
+- **Punctuation:** default to **colon**. **Avoid em dash in titles** — in 2025–2026 it's increasingly read as ChatGPT-tell. (Internal doc usage is fine; this is title-specific.)
+- **Direct-promise > curiosity-gap** in the rigorous tier. The algorithm now penalizes broken-promise patterns via satisfaction signals — curiosity-gap titles whose payoff isn't literally in the video actively hurt the channel.
+- **Avoid year-stamped titles** ("...in 2026") — decays against evergreen strategy.
+- **Avoid stunt framings** ("I tried X for 30 days") — wrong genre signal.
 
 Check SEO_KEYWORDS.md for keyword constraints. The title locks during the title/hook workshop step after script review, so these are working options, not final.
 

@@ -1,4 +1,4 @@
-# PRODUCTION SCRIPT — "The Prisoner's Dilemma Is Wrong About Almost Everything"
+# PRODUCTION SCRIPT — "What the Prisoner's Dilemma Gets Wrong"
 
 **Episode slug:** prisoners-dilemma
 **Format:** Philosopher's Lens

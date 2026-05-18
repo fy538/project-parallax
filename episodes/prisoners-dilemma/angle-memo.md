@@ -1,4 +1,4 @@
-# prisoners-dilemma Angle Memo — The Prisoner's Dilemma Is Wrong About Almost Everything
+# prisoners-dilemma Angle Memo — What the Prisoner's Dilemma Gets Wrong
 **Storyline chosen:** A ("The Model That Failed Its Own First Test") + stag hunt as resolution from B
 
 ---
@@ -86,7 +86,13 @@ Two design-time beats engineered as **shorts-native standalone moments**. Each p
 | cooperation-residual | analytical-tool | The persistent gap between a model's prediction and observed outcomes, treated by the field as anomaly rather than refutation | Beat 1 |
 
 ## Title Options
-1. The Prisoner's Dilemma Is Wrong About Almost Everything
+
+**Locked title (May 18, 2026 title/hook workshop):** *"What the Prisoner's Dilemma Gets Wrong"* (40 chars; mobile-fits; direct-promise; colon-default; no em dash).
+
+The original v6.3 working title was *"The Prisoner's Dilemma Is Wrong About Almost Everything"* (62 chars). Tightened during the title/hook workshop on advice from the 2026-05-18 thumbnail+title research: "almost everything" read slightly maximalist against the bounded-analogy doctrine, and the satisfaction-signal contract is tighter when the promise is direct ("what gets wrong" → the long-form delivers a specific list). The 40-char version also clears mobile-feed truncation fully.
+
+Original working options (preserved for record):
+1. The Prisoner's Dilemma Is Wrong About Almost Everything *(original v6.3 working title)*
 2. The Model That Failed Its Own First Test
 3. Why Your Government Thinks Cooperation Is Irrational
 4. You're Playing the Wrong Game
