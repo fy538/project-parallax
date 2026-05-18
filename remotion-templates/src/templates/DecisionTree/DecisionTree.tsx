@@ -570,9 +570,28 @@ const IndentedTreeVariant: React.FC<{
   );
 
   const INDENT = 56;            // px per depth level
-  const ROW_HEIGHT = 56;        // baseline-to-baseline
+  const ROW_HEIGHT_RUBRIC = 76; // depth-0 row (the h3 rubric line)
+  const ROW_HEIGHT_BODY = 62;   // depth>0 row (sub-clauses)
+  const SECTION_GAP = 24;       // extra air above a new rubric (not the first)
   const ORDINAL_COL = 64;       // mono ordinal column width
   const PROB_COL_MAX = 160;     // right-aligned probability column
+
+  // Cumulative top positions so each row breathes. Depth-0 lines get more
+  // height (the h3 type is bigger) and any depth-0 line after the first
+  // gets a section gap above it — keeps top-level rubrics from bunching
+  // against the trailing sub-clause of the previous group.
+  const topPositions = useMemo(() => {
+    const out: number[] = [];
+    let cursor = 0;
+    flat.forEach(({ depth }, i) => {
+      const isRubric = depth === 0;
+      const prevWasBody = i > 0 && flat[i - 1].depth > 0;
+      const gap = isRubric && prevWasBody ? SECTION_GAP : 0;
+      out.push(cursor + gap);
+      cursor += (isRubric ? ROW_HEIGHT_RUBRIC : ROW_HEIGHT_BODY) + gap;
+    });
+    return out;
+  }, [flat]);
 
   const exitOp = exitFade(frame, totalFrames, sec(0.5));
   const safe = layout.safeAreaTier.generous;
@@ -614,15 +633,16 @@ const IndentedTreeVariant: React.FC<{
               ? node.probability
               : null;
 
+          const rowHeight = depth === 0 ? ROW_HEIGHT_RUBRIC : ROW_HEIGHT_BODY;
           return (
             <div
               key={node.id}
               style={{
                 position: "absolute",
-                top: index * ROW_HEIGHT,
+                top: topPositions[index],
                 left: depth * INDENT,
                 right: 0,
-                height: ROW_HEIGHT,
+                height: rowHeight,
                 opacity,
                 transform: `translateY(${slide}px)`,
                 display: "flex",
