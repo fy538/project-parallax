@@ -591,6 +591,107 @@ _footer_
         assert "|\n\n_footer_" in text, f"blank line eaten: {repr(text[-80:])}"
 
 
+# ── update_tracker_topics ────────────────────────────────────────────────────
+
+
+class TestUpdateTrackerTopics:
+    """update_tracker_topics() appends/replaces an auto-managed Topics
+    summary block in PIPELINE.md, sourced from project/IDEAS.md via
+    topics_parser. Idempotent. Empty IDEAS.md → strips an existing block."""
+
+    def _setup(self, tmp_path, monkeypatch, ideas_content: str | None,
+               pipeline_content: str = "# Pipeline\n\nprose only\n"):
+        pipeline = tmp_path / "episodes" / "PIPELINE.md"
+        pipeline.parent.mkdir(parents=True)
+        pipeline.write_text(pipeline_content, encoding="utf-8")
+        monkeypatch.setattr(pv, "PIPELINE_MD", pipeline)
+
+        # Redirect topics_parser to a tmp IDEAS.md
+        import topics_parser
+        ideas_path = tmp_path / "IDEAS.md"
+        if ideas_content is not None:
+            ideas_path.write_text(ideas_content, encoding="utf-8")
+        monkeypatch.setattr(topics_parser, "IDEAS_PATH", ideas_path)
+        return pipeline
+
+    def test_appends_block_when_pipeline_has_no_existing_block(
+        self, tmp_path, monkeypatch,
+    ):
+        pipeline = self._setup(
+            tmp_path, monkeypatch,
+            ideas_content=(
+                "## Launch Sequence\n"
+                "| Ep | Slug | Format | Arc | Pipeline State |\n"
+                "|---|---|---|---|---|\n"
+                "| 1 | `silicon-trap` | Detective | Arc 1 | Script v5 |\n"
+            ),
+        )
+        changed = pv.update_tracker_topics()
+        assert changed is True
+        text = pipeline.read_text(encoding="utf-8")
+        assert "<!-- BEGIN AUTO-TOPICS" in text
+        assert "<!-- END AUTO-TOPICS -->" in text
+        assert "silicon-trap" in text
+        assert "Detective" in text
+        # Block appended AFTER existing prose
+        assert text.index("prose only") < text.index("AUTO-TOPICS")
+
+    def test_idempotent_second_run_no_change(self, tmp_path, monkeypatch):
+        self._setup(
+            tmp_path, monkeypatch,
+            ideas_content=(
+                "## Topic Lifecycle\n\n```\n"
+                "📡 SIGNAL DETECTED → noticed.\n"
+                "```\n"
+            ),
+        )
+        first = pv.update_tracker_topics()
+        second = pv.update_tracker_topics()
+        assert first is True
+        assert second is False
+
+    def test_replaces_existing_block_in_place(self, tmp_path, monkeypatch):
+        """Editing IDEAS.md should refresh the auto-block, not duplicate."""
+        pipeline = self._setup(
+            tmp_path, monkeypatch,
+            ideas_content="## Launch Sequence\n| Ep | Slug | Format | Arc | Pipeline State |\n|---|---|---|---|---|\n| 1 | `a` | F | Arc 1 | s |\n",
+            pipeline_content=(
+                "# Pipeline\n\nprose\n\n"
+                "<!-- BEGIN AUTO-TOPICS · do not edit — `pipeline_validator.py --update-tracker` rewrites this block. -->\n"
+                "## Topics — auto-summary from `project/IDEAS.md`\n\n"
+                "STALE OLD CONTENT\n"
+                "<!-- END AUTO-TOPICS -->\n"
+            ),
+        )
+        changed = pv.update_tracker_topics()
+        assert changed is True
+        text = pipeline.read_text(encoding="utf-8")
+        assert "STALE OLD CONTENT" not in text
+        assert "| 1 | `a` | F | Arc 1 | s |" in text
+        # Block should appear exactly once
+        assert text.count("<!-- BEGIN AUTO-TOPICS") == 1
+        assert text.count("<!-- END AUTO-TOPICS -->") == 1
+
+    def test_strips_stale_block_when_ideas_disappears(self, tmp_path, monkeypatch):
+        """If IDEAS.md gets emptied/deleted, the auto-block should go too."""
+        pipeline = self._setup(
+            tmp_path, monkeypatch,
+            ideas_content="",  # empty file → topics_parser returns empty TopicsData
+            pipeline_content=(
+                "# Pipeline\n\nprose\n\n"
+                "<!-- BEGIN AUTO-TOPICS · do not edit — `pipeline_validator.py --update-tracker` rewrites this block. -->\n"
+                "## Topics — auto-summary from `project/IDEAS.md`\n\n"
+                "rendered earlier\n"
+                "<!-- END AUTO-TOPICS -->\n"
+            ),
+        )
+        changed = pv.update_tracker_topics()
+        assert changed is True
+        text = pipeline.read_text(encoding="utf-8")
+        assert "AUTO-TOPICS" not in text
+        assert "prose" in text  # surrounding content preserved
+
+
 # ── suggest_state_promotion ──────────────────────────────────────────────────
 
 class TestSuggestStatePromotion:

@@ -183,6 +183,62 @@
   .topics-source { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); }
   .topics-source code { background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); }
 
+  /* Per-episode state-transition timeline.
+     Horizontal track with dots positioned proportionally by date. */
+  .ep-tab-timeline { margin: 24px 0 0; padding: 18px 0 0; border-top: 1px solid var(--sand); }
+  .ep-tab-timeline h4 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--umber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 24px; }
+  .ep-tab-timeline-empty { padding: 14px 0; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--umber); }
+  .ep-tab-timeline-empty code { background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); }
+  .timeline-track { position: relative; height: 72px; margin: 0 12px 8px; background: linear-gradient(to right, var(--bone) 0%, var(--bone) 100%); background-size: 100% 1px; background-repeat: no-repeat; background-position: 0 12px; }
+  .timeline-node { position: absolute; transform: translateX(-50%); top: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; min-width: 80px; }
+  .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gold); border: 2px solid white; box-shadow: 0 0 0 1px var(--gold); margin-bottom: 4px; cursor: help; }
+  .timeline-dot-open { background: white; box-shadow: 0 0 0 1.5px var(--gold); }
+  .timeline-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--ink); letter-spacing: 0.04em; }
+  .timeline-date { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--umber); }
+  .timeline-delta { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gold); font-weight: 600; }
+  .timeline-axis { display: flex; justify-content: space-between; margin: 6px 12px 0; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--umber); letter-spacing: 0.04em; }
+
+  /* Spend tab */
+  .spend-tab { max-width: 1240px; margin: 0 auto; background: white; border: 1px solid var(--sand); border-radius: 6px; padding: 28px 32px; }
+  .spend-tab[hidden] { display: none; }
+  .spend-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 1px solid var(--sand); }
+  .spend-total-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .spend-total { font-family: 'IBM Plex Sans', sans-serif; font-size: 32px; font-weight: 700; color: var(--ink); letter-spacing: -0.02em; }
+  .spend-count { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--walnut); }
+  .spend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 28px; }
+  .spend-panel h4 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--umber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px dashed var(--sand); }
+  .spend-bars { display: flex; flex-direction: column; gap: 8px; }
+  .spend-row { display: grid; grid-template-columns: 140px 1fr 70px; align-items: center; gap: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .spend-label { color: var(--walnut); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .spend-bar { background: var(--bone); height: 8px; border-radius: 4px; overflow: hidden; }
+  .spend-bar-fill { background: var(--gold); height: 100%; border-radius: 4px; }
+  .spend-amount { text-align: right; color: var(--ink); font-weight: 600; }
+  .spend-recent h4 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--umber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed var(--sand); }
+  .spend-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .spend-table thead th { text-align: left; padding: 6px 12px 6px 0; color: var(--umber); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; border-bottom: 1px solid var(--sand); }
+  .spend-table tbody td { padding: 7px 12px 7px 0; color: var(--ink); border-bottom: 1px dashed var(--bone); }
+  .spend-table tbody tr:last-child td { border-bottom: none; }
+  .spend-table .amt { text-align: right; font-weight: 600; }
+  .spend-table .note { color: var(--walnut); }
+  .spend-empty { text-align: center; padding: 64px 32px; color: var(--walnut); }
+  .spend-empty-icon { font-family: 'IBM Plex Sans', sans-serif; font-size: 48px; font-weight: 700; color: var(--taupe); margin-bottom: 16px; letter-spacing: -0.02em; }
+  .spend-empty h3 { font-family: 'IBM Plex Sans', sans-serif; font-size: 18px; color: var(--ink); margin-bottom: 12px; }
+  .spend-empty p { font-size: 13px; color: var(--walnut); max-width: 560px; margin: 0 auto 12px; line-height: 1.6; }
+  .spend-empty code { font-family: 'IBM Plex Mono', monospace; background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); font-size: 12px; }
+  .spend-source { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); line-height: 1.6; }
+  .spend-source code { background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); }
+
+  /* Per-episode quick-actions toolbar — curated next-step commands as
+     copyable chips. Sits between the tab header and the 3-panel grid. */
+  .quick-actions { margin: 0 0 22px; padding: 14px 18px; background: var(--paper); border: 1px solid var(--sand); border-radius: 4px; }
+  .quick-actions-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--umber); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+  .quick-actions-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .quick-action { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 8px 12px; background: white; border: 1px solid var(--sand); border-radius: 4px; cursor: pointer; transition: border-color 0.12s, transform 0.12s; font-family: inherit; }
+  .quick-action:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .quick-action-label { font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--ink); }
+  .quick-action-cmd { font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: var(--bone); padding: 2px 6px; border-radius: 2px; color: var(--walnut); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .quick-action.copied { border-color: var(--gold); background: rgba(196, 167, 71, 0.06); }
+
   /* Click-to-copy on inline shell commands.
      Any <code> wrapped in <code class="copyable"> becomes hover-clickable;
      the JS wires the actual clipboard write + visual feedback. */
@@ -235,6 +291,7 @@
   <button class="tab" role="tab" data-tab="prisoners-dilemma"><span class="dot" style="background: var(--gold);"></span>prisoners-dilemma</button>
   <button class="tab" role="tab" data-tab="silicon-trap"><span class="dot" style="background: var(--dustblue);"></span>silicon-trap</button>
   <button class="tab" role="tab" data-tab="blockades-leak"><span class="dot" style="background: var(--taupe);"></span>blockades-leak</button>
+  <button class="tab" role="tab" data-tab="spend">Spend</button>
   <button class="tab" role="tab" data-tab="topics">Topics</button>
 </nav>
 
@@ -367,6 +424,15 @@
       <div class="ep-tab-state-meta">day 9 · target 2026-06-01 (+14 days)</div>
     </div>
   </header>
+  <div class="quick-actions">
+    <div class="quick-actions-label">Quick actions · click to copy</div>
+    <div class="quick-actions-row">
+      <button class="quick-action" data-cmd="python3 tools/pipeline_validator.py --write-status prisoners-dilemma"><span class="quick-action-label">Refresh status</span><code class="quick-action-cmd copyable">python3 tools/pipeline_validator.py --write-status prisoners-dilemma</code></button>
+      <button class="quick-action" data-cmd="python3 tools/assembly/generate_manifest.py prisoners-dilemma"><span class="quick-action-label">Regen stale manifest</span><code class="quick-action-cmd copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code></button>
+      <button class="quick-action" data-cmd="cd remotion-templates &amp;&amp; node scripts/render-episode.mjs --episode=prisoners-dilemma"><span class="quick-action-label">First full render</span><code class="quick-action-cmd copyable">cd remotion-templates &amp;&amp; node scripts/render-episode.mjs --episode=prisoners-dilemma</code></button>
+      <button class="quick-action" data-cmd="open episodes/prisoners-dilemma/_status.md"><span class="quick-action-label">Open _status.md</span><code class="quick-action-cmd copyable">open episodes/prisoners-dilemma/_status.md</code></button>
+    </div>
+  </div>
   <div class="ep-tab-grid">
     <div class="ep-tab-panel">
       <h4>Progress · 6 of 9 stages</h4>
@@ -402,9 +468,22 @@
       </div>
     </div>
   </div>
+  <div class="ep-tab-timeline">
+    <h4>State transitions · 1 event over 9 days</h4>
+    <div class="timeline-track">
+    <div class="timeline-node" style="left: 0.00%;" title="2026-05-09 → RENDER READY: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">RENDER READY</div><div class="timeline-date">2026-05-09</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 9 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+9d</div></div>
+    </div>
+    <div class="timeline-axis">
+      <span class="timeline-axis-start">2026-05-09</span>
+      <span class="timeline-axis-end">2026-05-18</span>
+    </div>
+  </div>
   <div class="ep-tab-source">
     Source · <code>episodes/prisoners-dilemma/_status.md</code> (auto-generated by
-    <code>tools/pipeline_validator.py --write-status</code>)
+    <code>tools/pipeline_validator.py --write-status</code>) ·
+    <code>episodes/prisoners-dilemma/_state-history.jsonl</code> (append-only
+    via <code>tools/state_history.py record</code>)
   </div>
 </section>
 <section class="ep-tab dustblue" data-tab-content="silicon-trap" hidden>
@@ -418,6 +497,16 @@
       <div class="ep-tab-state-meta">day 17 · target 2026-05-25 (+7 days)</div>
     </div>
   </header>
+  <div class="quick-actions">
+    <div class="quick-actions-label">Quick actions · click to copy</div>
+    <div class="quick-actions-row">
+      <button class="quick-action" data-cmd="python3 tools/pipeline_validator.py --write-status silicon-trap"><span class="quick-action-label">Refresh status</span><code class="quick-action-cmd copyable">python3 tools/pipeline_validator.py --write-status silicon-trap</code></button>
+      <button class="quick-action" data-cmd="python3 tools/assembly/generate_manifest.py silicon-trap"><span class="quick-action-label">Regen stale manifest</span><code class="quick-action-cmd copyable">python3 tools/assembly/generate_manifest.py silicon-trap</code></button>
+      <button class="quick-action" data-cmd="python3 tools/asset-source/zerohit_fallback.py silicon-trap"><span class="quick-action-label">Fill 21 zero-hit assets</span><code class="quick-action-cmd copyable">python3 tools/asset-source/zerohit_fallback.py silicon-trap</code></button>
+      <button class="quick-action" data-cmd="cd remotion-templates &amp;&amp; node scripts/render-episode.mjs --episode=silicon-trap"><span class="quick-action-label">First full render</span><code class="quick-action-cmd copyable">cd remotion-templates &amp;&amp; node scripts/render-episode.mjs --episode=silicon-trap</code></button>
+      <button class="quick-action" data-cmd="open episodes/silicon-trap/_status.md"><span class="quick-action-label">Open _status.md</span><code class="quick-action-cmd copyable">open episodes/silicon-trap/_status.md</code></button>
+    </div>
+  </div>
   <div class="ep-tab-grid">
     <div class="ep-tab-panel">
       <h4>Progress · 6 of 9 stages</h4>
@@ -453,9 +542,22 @@
       </div>
     </div>
   </div>
+  <div class="ep-tab-timeline">
+    <h4>State transitions · 1 event over 17 days</h4>
+    <div class="timeline-track">
+    <div class="timeline-node" style="left: 0.00%;" title="2026-05-01 → RENDER READY: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">RENDER READY</div><div class="timeline-date">2026-05-01</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 17 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+17d</div></div>
+    </div>
+    <div class="timeline-axis">
+      <span class="timeline-axis-start">2026-05-01</span>
+      <span class="timeline-axis-end">2026-05-18</span>
+    </div>
+  </div>
   <div class="ep-tab-source">
     Source · <code>episodes/silicon-trap/_status.md</code> (auto-generated by
-    <code>tools/pipeline_validator.py --write-status</code>)
+    <code>tools/pipeline_validator.py --write-status</code>) ·
+    <code>episodes/silicon-trap/_state-history.jsonl</code> (append-only
+    via <code>tools/state_history.py record</code>)
   </div>
 </section>
 <section class="ep-tab taupe" data-tab-content="blockades-leak" hidden>
@@ -469,6 +571,15 @@
       <div class="ep-tab-state-meta">day 61</div>
     </div>
   </header>
+  <div class="quick-actions">
+    <div class="quick-actions-label">Quick actions · click to copy</div>
+    <div class="quick-actions-row">
+      <button class="quick-action" data-cmd="python3 tools/pipeline_validator.py --write-status blockades-leak"><span class="quick-action-label">Refresh status</span><code class="quick-action-cmd copyable">python3 tools/pipeline_validator.py --write-status blockades-leak</code></button>
+      <button class="quick-action" data-cmd="python3 tools/assembly/generate_manifest.py blockades-leak"><span class="quick-action-label">Generate manifest</span><code class="quick-action-cmd copyable">python3 tools/assembly/generate_manifest.py blockades-leak</code></button>
+      <button class="quick-action" data-cmd="python3 tools/topic/idea_invalidation.py blockades-leak"><span class="quick-action-label">Run viability gate</span><code class="quick-action-cmd copyable">python3 tools/topic/idea_invalidation.py blockades-leak</code></button>
+      <button class="quick-action" data-cmd="open episodes/blockades-leak/_status.md"><span class="quick-action-label">Open _status.md</span><code class="quick-action-cmd copyable">open episodes/blockades-leak/_status.md</code></button>
+    </div>
+  </div>
   <div class="ep-tab-grid">
     <div class="ep-tab-panel">
       <h4>Progress · 1 of 9 stages</h4>
@@ -497,9 +608,40 @@
       </div>
     </div>
   </div>
+  <div class="ep-tab-timeline">
+    <h4>State transitions · 1 event over 61 days</h4>
+    <div class="timeline-track">
+    <div class="timeline-node" style="left: 0.00%;" title="2026-03-18 → INCUBATING: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">INCUBATING</div><div class="timeline-date">2026-03-18</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 61 in INCUBATING"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+61d</div></div>
+    </div>
+    <div class="timeline-axis">
+      <span class="timeline-axis-start">2026-03-18</span>
+      <span class="timeline-axis-end">2026-05-18</span>
+    </div>
+  </div>
   <div class="ep-tab-source">
     Source · <code>episodes/blockades-leak/_status.md</code> (auto-generated by
-    <code>tools/pipeline_validator.py --write-status</code>)
+    <code>tools/pipeline_validator.py --write-status</code>) ·
+    <code>episodes/blockades-leak/_state-history.jsonl</code> (append-only
+    via <code>tools/state_history.py record</code>)
+  </div>
+</section>
+
+<section class="spend-tab" data-tab-content="spend" hidden>
+  <div class="spend-empty">
+    <div class="spend-empty-icon">$0.00</div>
+    <h3>No spend logged yet</h3>
+    <p>
+      The cost log (<code>episodes/COST_LOG.md</code>) has no real rows.
+      Spend events get added one per row as you ship — research credits,
+      AI illustration calls, mastering, lambda renders. The Markdown file
+      lists rough per-stage targets ($10–80 per episode total).
+    </p>
+    <p>
+      Once <code>python3 tools/cost_tracker.py add</code> starts logging
+      real spend, this tab will fill in with per-episode and per-service
+      breakdowns automatically — no separate refresh needed.
+    </p>
   </div>
 </section>
 
@@ -577,26 +719,46 @@
   });
 
   // ── Click-to-copy on shell commands ───────────────────────────────────────
-  // Every <code class="copyable"> becomes clickable — the click writes the
-  // text content to the clipboard and flashes a "copied" indicator. Falls
-  // back silently on browsers without navigator.clipboard (cowork iframe
-  // sandbox can be restrictive; the visual hover still works).
+  // Two click targets:
+  //   1. <code class="copyable"> — inline commands inside prose
+  //   2. <button class="quick-action" data-cmd="..."> — toolbar chips
+  // Both write to clipboard + flash a "copied" indicator. Fallback selects
+  // the text so the user can ⌘C manually (cowork iframe sandbox can be
+  // restrictive about clipboard access).
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch { return false; }
+  }
+  function selectNode(el) {
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
   document.querySelectorAll('code.copyable').forEach(el => {
     el.title = 'Click to copy';
-    el.addEventListener('click', async () => {
+    el.addEventListener('click', async (ev) => {
+      // Inside a quick-action button — let the parent handler fire to
+      // avoid double-flash + ambiguity.
+      if (el.closest('.quick-action')) return;
+      ev.stopPropagation();
       const text = el.textContent.trim();
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        // Fallback: select the text so the user can ⌘C manually
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-      }
+      if (!(await copyText(text))) selectNode(el);
       el.classList.add('copied');
       setTimeout(() => el.classList.remove('copied'), 1200);
+    });
+  });
+  document.querySelectorAll('.quick-action').forEach(btn => {
+    btn.title = 'Click to copy command';
+    btn.addEventListener('click', async () => {
+      const text = (btn.dataset.cmd || btn.querySelector('.quick-action-cmd')?.textContent || '').trim();
+      if (!(await copyText(text))) {
+        const code = btn.querySelector('.quick-action-cmd');
+        if (code) selectNode(code);
+      }
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 1200);
     });
   });
 

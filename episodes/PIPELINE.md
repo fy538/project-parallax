@@ -8,9 +8,9 @@
 
 | Episode | State | Day | Target | Health |
 |---|---|---|---|---|
-| `prisoners-dilemma` | 🎬 RENDER READY | 8 | 2026-06-01 | ✗ never rendered |
-| `silicon-trap` | 🎬 RENDER READY | 16 | 2026-05-25 | ⚠ stale manifest (4.5 d) · 🔴 21 zero-hit shots · ✗ never rendered |
-| `blockades-leak` | 💭 INCUBATING | 60 | — | ⏸ awaiting promotion |
+| `prisoners-dilemma` | 🎬 RENDER READY | 9 | 2026-06-01 | ⚠ stale manifest (1.6 d) · ✗ never rendered |
+| `silicon-trap` | 🎬 RENDER READY | 17 | 2026-05-25 | ⚠ stale manifest (4.5 d) · 🔴 21 zero-hit shots · ✗ never rendered |
+| `blockades-leak` | 💭 INCUBATING | 61 | — | ⏸ awaiting promotion |
 
 _Health column auto-refreshed by `python3 tools/pipeline_validator.py --update-tracker` (wired into `check-episode.sh` W9 follow-up). State + dates: edit `pipeline-state.json`._
 
@@ -137,3 +137,42 @@ When a gate rejects an episode, use one of these states instead of leaving it in
 ## Backlog (not yet promoted to state)
 
 Topics that have passed the signal-watch gate but are still pre-`INCUBATING`. See [`project/IDEAS.md`](../project/IDEAS.md) for the full topic pipeline including `Signal Detected` entries.
+
+<!-- BEGIN AUTO-TOPICS · do not edit — `pipeline_validator.py --update-tracker` rewrites this block. -->
+
+## Topics — auto-summary from `project/IDEAS.md`
+
+> Surfaced here so the Markdown dashboard mirrors what the visual [`PIPELINE.html`](./PIPELINE.html) shows. **For the full topic thinking** (sequencing rationale, format variety, signal-discovery narrative), open `project/IDEAS.md` directly — that's the canonical source.
+
+### Launch sequence
+
+| Ep | Slug | Format | Arc | Pipeline state |
+|---|---|---|---|---|
+| 1 | `prisoners-dilemma` | Philosopher's Lens | Arc 3 (meta-framework for all arcs) | 🔬 Deep Research in progress |
+| 2 | `silicon-trap` | Detective | Arc 1 | 📋 Script v5, shot list, visual assets built — needs narration + stock footage |
+| 3 | `blockades-leak` | Philosopher's Lens | Arc 1 | 📋 Script v1, full pipeline run complete — needs production |
+| 4 | `treaty-nobody-believes` | Wargame | Arc 3 | 🔄 Incubating — New START expiry (Feb 2026) is trigger |
+| 5 | `industrial-convergence` | Dialectic | Arc 1 | 📡 Signal — viable concept, needs research |
+
+### Signal watch (9 signals)
+
+- **New START expired Feb 2026 — no US-Russia nuclear treaty for first time in 50 years** — _Mechanism + Silence + Inversion (3-shape convergence)_ · Arc 3 or new Nuclear Arc · first noticed May 3
+- **Global industrial policy convergence — US, EU, Japan, India, China all pursuing simultaneously** — _Convergent Drift_ · Arc 1 (tech competition) · first noticed May 3
+- **"Rules-based international order" rhetoric persists while institutions are non-functional** — _Conspicuous Silence_ · Arc 2 (empire decline) · first noticed May 3
+- **Simultaneous democratic weakness — France, Germany, UK all with weak governments + populist pressure** — _Convergent Drift_ · Arc 2 (empire decline) · first noticed May 3
+- **East Asian simultaneous demographic collapse — China, Japan, Korea all declining together** — _Conspicuous Silence_ · Arc 5 or Arc 1 · first noticed May 3
+- **India-Pakistan Operation Sindoor aftermath — largest aerial engagement between nuclear powers ever** — _Actor-Constraint + Second-Order_ · Nuclear/Deterrence arc candidate · first noticed May 3
+- **Russia-Ukraine frozen conflict possibility and European identity transformation** — _Second-Order_ · Arc 2 · first noticed May 3
+- **Dollar reserve share decline → US military reach feedback loop** — _Second-Order_ · Standalone · first noticed May 3
+- **Drone warfare cost inversion — offense/defense economics flipping** — _Mechanism_ · Arc 1 · first noticed May 3
+
+### Topic lifecycle
+
+- 📡 **SIGNAL DETECTED** — You noticed something interesting.
+- 🔄 **INCUBATING** — Monitoring.
+- ✅ **VIABLE** — Passed viability check.
+- 🔬 **RESEARCHING** — Active Deep Research in progress.
+- 📋 **RESEARCH READY** — Brief complete, passed research-audit.
+- 🎬 **IN PRODUCTION** — Angle memo → script → audits → visual-spec → render → publish.
+
+<!-- END AUTO-TOPICS -->

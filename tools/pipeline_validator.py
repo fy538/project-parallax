@@ -1322,6 +1322,116 @@ def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
     return False
 
 
+# ── update_tracker_topics: append/replace auto-managed Topics block ─────────
+# PIPELINE.md is mostly hand-curated narrative — the operator's strategic
+# thinking lives there. But the same topic-pipeline data that drives the
+# HTML's Topics tab (project/IDEAS.md) should also surface in the Markdown
+# so a `cat PIPELINE.md` view doesn't miss it.
+#
+# Use an HTML-comment-delimited "managed block" so the auto-refresh can
+# rewrite the section without disturbing the surrounding prose. If the
+# block doesn't exist, append at the bottom of the file. Idempotent.
+
+TOPICS_BLOCK_BEGIN = "<!-- BEGIN AUTO-TOPICS · do not edit — `pipeline_validator.py --update-tracker` rewrites this block. -->"
+TOPICS_BLOCK_END = "<!-- END AUTO-TOPICS -->"
+TOPICS_BLOCK_RE = re.compile(
+    re.escape(TOPICS_BLOCK_BEGIN) + r"\n(?:.*\n)*?" + re.escape(TOPICS_BLOCK_END),
+    re.MULTILINE,
+)
+
+
+def _render_topics_markdown_block() -> str | None:
+    """Render the Topics summary section for PIPELINE.md. Returns None if
+    IDEAS.md is empty / missing (nothing to surface)."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from topics_parser import load_topics  # type: ignore[import-not-found]
+    topics = load_topics()
+    if not topics.launch_sequence and not topics.signal_watch and not topics.lifecycle_states:
+        return None
+
+    parts: list[str] = [
+        TOPICS_BLOCK_BEGIN,
+        "",
+        "## Topics — auto-summary from `project/IDEAS.md`",
+        "",
+        "> Surfaced here so the Markdown dashboard mirrors what the visual "
+        "[`PIPELINE.html`](./PIPELINE.html) shows. **For the full topic "
+        "thinking** (sequencing rationale, format variety, signal-discovery "
+        "narrative), open `project/IDEAS.md` directly — that's the canonical "
+        "source.",
+        "",
+    ]
+
+    if topics.launch_sequence:
+        parts.append("### Launch sequence")
+        parts.append("")
+        parts.append("| Ep | Slug | Format | Arc | Pipeline state |")
+        parts.append("|---|---|---|---|---|")
+        for ep in topics.launch_sequence:
+            parts.append(
+                f"| {ep.ep_number} | `{ep.slug}` | {ep.format} | {ep.arc} | {ep.pipeline_state} |"
+            )
+        parts.append("")
+
+    if topics.signal_watch:
+        parts.append(f"### Signal watch ({len(topics.signal_watch)} signals)")
+        parts.append("")
+        for sig in topics.signal_watch:
+            # One bullet per signal, compact form (full table lives in IDEAS.md)
+            parts.append(
+                f"- **{sig.signal}** — _{sig.discovery_path}_ · {sig.potential_arc}"
+                + (f" · first noticed {sig.first_noticed}" if sig.first_noticed else "")
+            )
+        parts.append("")
+
+    if topics.lifecycle_states:
+        parts.append("### Topic lifecycle")
+        parts.append("")
+        for ls in topics.lifecycle_states:
+            parts.append(f"- {ls.emoji} **{ls.label}** — {ls.description}")
+        parts.append("")
+
+    parts.append(TOPICS_BLOCK_END)
+    return "\n".join(parts)
+
+
+def update_tracker_topics() -> bool:
+    """Refresh the auto-managed Topics block in PIPELINE.md. Returns True
+    if changed.
+
+    Behavior:
+      · IDEAS.md missing or empty → remove existing block (no-op if absent)
+      · Existing block present     → in-place rewrite
+      · No existing block          → append at end of file (after one blank line)
+
+    Pairs with update_tracker_health — both run under --update-tracker.
+    """
+    if not PIPELINE_MD.is_file():
+        return False
+    text = PIPELINE_MD.read_text(encoding="utf-8")
+    block = _render_topics_markdown_block()
+    existing = TOPICS_BLOCK_RE.search(text)
+
+    if block is None:
+        # Nothing to render — strip an existing stale block if present.
+        if existing:
+            new_text = TOPICS_BLOCK_RE.sub("", text).rstrip() + "\n"
+            PIPELINE_MD.write_text(new_text, encoding="utf-8")
+            return True
+        return False
+
+    if existing:
+        new_text = text.replace(existing.group(0), block, 1)
+    else:
+        # Append at end with a separating blank line.
+        new_text = text.rstrip() + "\n\n" + block + "\n"
+
+    if new_text != text:
+        PIPELINE_MD.write_text(new_text, encoding="utf-8")
+        return True
+    return False
+
+
 def suggest_state_promotion(
     entry: StateEntry, status: EpisodeStatus
 ) -> tuple[str, str] | None:
@@ -1477,6 +1587,17 @@ def main() -> int:
             "into scripts/lint.sh as the gen:pipeline-html freshness gate."
         ),
     )
+    parser.add_argument(
+        "--watch",
+        action="store_true",
+        help=(
+            "With --emit-html: render once, then poll source files for "
+            "mtime changes and re-emit on each change. Stays open until "
+            "Ctrl-C. Use during dashboard design iteration — edit "
+            "pipeline_html.py, save, reload browser to see the change. "
+            "Incompatible with --check."
+        ),
+    )
     args = parser.parse_args()
 
     # ── --suggest-states path ────────────────────────────────────────────────
@@ -1528,11 +1649,12 @@ def main() -> int:
         return 0
 
     # ── --emit-html path ─────────────────────────────────────────────────────
-    # Delegate to pipeline_html.emit_html — handles both write + --check
-    # freshness comparison. Exits without running the legacy flow.
+    # Delegate to pipeline_html.emit_html — handles write + --check
+    # freshness comparison + --watch live-rerender. Exits without running
+    # the legacy flow.
     if args.emit_html:
         from pipeline_html import emit_html
-        return emit_html(check=args.check)
+        return emit_html(check=args.check, watch=args.watch)
 
     # ── --write-status / --update-tracker / --check-only path ────────────────
     # When any of these flags is set, run the new pipeline-state-driven flow
@@ -1573,6 +1695,11 @@ def main() -> int:
         if args.update_tracker:
             changed = update_tracker_health(all_statuses)
             print(f"{'✓ updated' if changed else '✓ no change to'} episodes/PIPELINE.md (At-a-glance Health column)")
+            topics_changed = update_tracker_topics()
+            print(
+                f"{'✓ updated' if topics_changed else '✓ no change to'} "
+                "episodes/PIPELINE.md (Topics auto-summary block)"
+            )
         return 0
 
     rows = parse_pipeline_md()

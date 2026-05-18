@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import pipeline_html as ph
+from cost_parser import CostData, CostRow
 from pipeline_validator import EpisodeStatus
 from topics_parser import LaunchEpisode, LifecycleState, SignalEntry, TopicsData
 
@@ -322,6 +323,161 @@ def test_next_up_prioritizes_smallest_days_to_target():
     middle = html.find('class="slug">middle<')
     far = html.find('class="slug">far<')
     assert 0 < near < middle < far, "next-up ordering wrong"
+
+
+# ── Quick-actions toolbar ────────────────────────────────────────────────────
+
+
+def test_quick_actions_toolbar_renders_for_each_episode_tab():
+    statuses = [_make_status(slug=s) for s in ("prisoners-dilemma", "silicon-trap", "blockades-leak")]
+    html = ph.render_dashboard_html(statuses, snapshot_date="2026-05-18")
+    # Three episodes × one toolbar each = at least three quick-actions blocks
+    assert html.count('class="quick-actions"') == 3
+
+
+def test_quick_actions_always_includes_refresh_status():
+    s = _make_status()
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert 'data-cmd="python3 tools/pipeline_validator.py --write-status prisoners-dilemma"' in html
+
+
+def test_quick_actions_includes_zero_hit_remediation_when_present():
+    s = _make_status(slug="silicon-trap", zero_hit_count=21)
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert 'data-cmd="python3 tools/asset-source/zerohit_fallback.py silicon-trap"' in html
+    assert "Fill 21 zero-hit assets" in html
+
+
+def test_quick_actions_skips_render_command_when_no_manifest():
+    """blockades-leak shape — no manifest, so the "first full render" chip
+    would dispatch a nonsense command. Make sure it's omitted."""
+    s = _make_status(slug="blockades-leak", state="INCUBATING", stage_idx=0,
+                     has_manifest=False)
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert "First full render" not in html
+
+
+def test_quick_actions_includes_viability_gate_for_incubating():
+    s = _make_status(slug="blockades-leak", state="INCUBATING", stage_idx=0,
+                     has_manifest=False)
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert 'data-cmd="python3 tools/topic/idea_invalidation.py blockades-leak"' in html
+
+
+# ── State-transition timeline ────────────────────────────────────────────────
+
+
+def _seed_history(tmp_episodes_dir, slug, transitions):
+    """Helper — write a _state-history.jsonl for a fake episode dir."""
+    import json
+    ep_dir = tmp_episodes_dir / slug
+    ep_dir.mkdir(parents=True, exist_ok=True)
+    lines = [
+        json.dumps({"date": t["date"], "from": t.get("from"),
+                    "to": t["to"], "reason": t.get("reason", "")})
+        for t in transitions
+    ]
+    (ep_dir / "_state-history.jsonl").write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_timeline_empty_state_when_no_history(tmp_path, monkeypatch):
+    import state_history as sh
+    monkeypatch.setattr(sh, "EPISODES_DIR", tmp_path)
+    s = _make_status(slug="never-tracked")
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert "no <code>_state-history.jsonl</code> yet" in html
+
+
+def test_timeline_renders_nodes_for_each_transition(tmp_path, monkeypatch):
+    import state_history as sh
+    monkeypatch.setattr(sh, "EPISODES_DIR", tmp_path)
+    _seed_history(tmp_path, "demo-ep", [
+        {"date": "2026-03-18", "from": None, "to": "INCUBATING", "reason": "bootstrap"},
+        {"date": "2026-04-15", "from": "INCUBATING", "to": "VIABLE", "reason": "v1 brief"},
+        {"date": "2026-05-09", "from": "VIABLE", "to": "RENDER READY", "reason": "skipped research → straight to draft"},
+    ])
+    s = _make_status(slug="demo-ep")
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    # Three transitions + one "Now" marker = at least 4 timeline-node elements
+    assert html.count('class="timeline-node') >= 4
+    # All three target states should appear as labels
+    for state in ("INCUBATING", "VIABLE", "RENDER READY"):
+        assert f">{state}</div>" in html
+
+
+def test_timeline_now_marker_uses_open_dot(tmp_path, monkeypatch):
+    import state_history as sh
+    monkeypatch.setattr(sh, "EPISODES_DIR", tmp_path)
+    _seed_history(tmp_path, "demo-ep", [
+        {"date": "2026-05-01", "from": None, "to": "VIABLE", "reason": "bootstrap"},
+    ])
+    s = _make_status(slug="demo-ep")
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert "timeline-dot-open" in html
+    assert ">Now</div>" in html
+
+
+# ── Spend tab ────────────────────────────────────────────────────────────────
+
+
+def test_spend_tab_renders_empty_state_when_no_cost_data():
+    html = ph.render_dashboard_html(
+        [_make_status()], cost=CostData(), snapshot_date="2026-05-18",
+    )
+    assert 'data-tab-content="spend"' in html
+    assert "No spend logged yet" in html
+    assert "$0.00" in html
+
+
+def test_spend_tab_renders_bars_when_cost_data_present():
+    cost = CostData()
+    cost.rows = [
+        CostRow(date="2026-05-10", episode="silicon-trap", service="claude",
+                amount_usd=8.50, note="research"),
+        CostRow(date="2026-05-11", episode="silicon-trap", service="recraft",
+                amount_usd=1.20, note="illust"),
+        CostRow(date="2026-05-12", episode="prisoners-dilemma", service="claude",
+                amount_usd=4.00, note="audit"),
+    ]
+    cost.by_episode = {"silicon-trap": 9.70, "prisoners-dilemma": 4.00}
+    cost.by_service = {"claude": 12.50, "recraft": 1.20}
+    cost.total_usd = 13.70
+    html = ph.render_dashboard_html(
+        [_make_status()], cost=cost, snapshot_date="2026-05-18",
+    )
+    assert "$13.70" in html  # total
+    assert "$9.70" in html   # silicon-trap subtotal
+    assert "By episode" in html
+    assert "By service" in html
+    # Recent table should include the rows
+    assert ">research<" in html
+
+
+def test_spend_tab_recent_table_shows_at_most_ten_rows():
+    cost = CostData()
+    cost.rows = [
+        CostRow(date=f"2026-05-{i:02d}", episode="demo", service="claude",
+                amount_usd=1.0, note=f"distinct-note-{i}")
+        for i in range(1, 16)  # 15 rows
+    ]
+    cost.by_episode = {"demo": 15.0}
+    cost.by_service = {"claude": 15.0}
+    cost.total_usd = 15.0
+    html = ph.render_dashboard_html(
+        [_make_status()], cost=cost, snapshot_date="2026-05-18",
+    )
+    # "Recent (last 10)" — newest 10 rows. The substring-match needs to be
+    # specific enough that "distinct-note-1" doesn't accidentally match a
+    # "distinct-note-15" substring (which it did in v1 of this test).
+    for i in range(6, 16):
+        assert f"distinct-note-{i}<" in html
+    for i in range(1, 6):
+        assert f"distinct-note-{i}<" not in html
+
+
+def test_spend_tab_button_in_tabbar():
+    html = ph.render_dashboard_html([_make_status()], snapshot_date="2026-05-18")
+    assert '<button class="tab" role="tab" data-tab="spend">Spend</button>' in html
 
 
 def test_next_up_recommends_zero_hit_remediation_when_present():
