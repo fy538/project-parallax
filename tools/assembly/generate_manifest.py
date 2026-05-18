@@ -2199,7 +2199,15 @@ def detect_pauses(audio_path: str, min_pause_sec: float = MIN_PAUSE_SEC) -> list
             trust_repo=True,
         )
         (get_speech_timestamps, _, read_audio, *_) = utils
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 — third-party torch.hub failure surface
+        # torch.hub.load can fail in MANY ways: network (model download),
+        # version mismatch (model API changed), filesystem (cache locked /
+        # disk full), AttributeError (utils tuple shape changed), GPU
+        # init errors. Every failure should degrade gracefully to "no
+        # pause detection" — pre-launch users should never have a render
+        # blocked by an optional model. Pre-launch this code path is also
+        # rarely exercised; widening the catch is the right trade-off
+        # until we have telemetry on real failures.
         print(f"WARNING: SileroVAD not available ({e}). Skipping pause detection.")
         return []
 
@@ -2239,7 +2247,16 @@ def get_audio_duration(audio_path: str) -> float:
         import torchaudio
         info = torchaudio.info(audio_path)
         return info.num_frames / info.sample_rate
-    except Exception as e:
+    except (ImportError, OSError, RuntimeError, AttributeError, ZeroDivisionError) as e:
+        # ImportError: torchaudio not installed (most common).
+        # OSError: file missing / unreadable.
+        # RuntimeError: torchaudio raises this for unsupported codecs +
+        #   corrupt/truncated audio files.
+        # AttributeError: defensive — if torchaudio's API changes and
+        #   `.info()` returns a shape we don't expect.
+        # ZeroDivisionError: sample_rate=0 → division crash.
+        # Other exceptions bubble; this is a graceful-degradation path,
+        # not a swallow-all defense.
         print(
             f"WARNING: could not read audio duration from {audio_path!r}: {e}. "
             "Precise-mode segment timestamps will be computed against duration=0 "

@@ -178,7 +178,9 @@ class AuphonicClient:
             raw = e.read()
             try:
                 payload = json.loads(raw.decode("utf-8"))
-            except Exception:
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                # Non-JSON error body (HTML page, plain text, binary). Fall
+                # back to a best-effort utf-8 decode with replacement.
                 payload = {"raw": raw.decode("utf-8", errors="replace")}
             raise RuntimeError(
                 f"Auphonic API {method} {path} failed with status {e.code}: {payload}"

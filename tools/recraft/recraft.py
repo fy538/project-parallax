@@ -267,7 +267,8 @@ def create_style(
         print(f"  API Error creating style: {e}", file=sys.stderr)
         try:
             print(f"  → {resp.json()}", file=sys.stderr)
-        except Exception:
+        except (json.JSONDecodeError, ValueError):
+            # Body wasn't JSON — fall back to truncated raw text.
             print(f"  → {resp.text[:200]}", file=sys.stderr)
         sys.exit(1)
 
@@ -369,7 +370,8 @@ def generate_image(
         else:
             try:
                 print(f"  → {resp.json()}", file=sys.stderr)
-            except Exception:
+            except (json.JSONDecodeError, ValueError):
+                # Body wasn't JSON — fall back to truncated raw text.
                 print(f"  → {resp.text[:200]}", file=sys.stderr)
         return []
 
@@ -475,7 +477,12 @@ def download_image(url: str, output_path: Path) -> bool:
 
         return True
 
-    except Exception as e:
+    except (requests.RequestException, OSError) as e:
+        # RequestException: network failures, HTTP errors, timeouts.
+        # OSError: local file write errors (disk full, permissions, bad path).
+        # PIL errors during WebP conversion are caught inside the converter
+        # branch (handled there as ImportError fallback). Programming
+        # errors bubble — this catch is for the runtime-fragile boundary.
         print(f"  Download failed: {e}", file=sys.stderr)
         return False
 

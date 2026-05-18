@@ -216,7 +216,11 @@ def _sample_image_pixels(image_path: Path, sample_size: int = 64) -> list[tuple[
         img = Image.open(image_path).convert("RGB")
         img = img.resize((sample_size, sample_size))
         return list(img.getdata())
-    except Exception:
+    except (OSError, ValueError):
+        # OSError covers file-not-found, truncated, unidentified format.
+        # ValueError covers PIL "cannot convert/resize" cases (rare).
+        # Empty-list fallback keeps the critic loop running on bad images;
+        # programming errors still bubble.
         return []
 
 

@@ -1164,11 +1164,10 @@ def check_manifest_staleness(manifest: dict, manifest_path: Path) -> list[Violat
 
     # Resolve the script working dir. The manifest lives at
     # `remotion-templates/data/episodes/<slug>/assembly-manifest.json`; the
-    # script lives at `episodes/<slug>/script-*.md`.
-    try:
-        slug = manifest_path.parent.name
-    except Exception:
-        return violations
+    # script lives at `episodes/<slug>/script-*.md`. `Path.parent.name` is
+    # a pure attribute access — the prior try/except was dead defensive
+    # code (audit P0-3). Removed May 18, 2026.
+    slug = manifest_path.parent.name
     script_dir = REPO_ROOT_DIR / "episodes" / slug
     if not script_dir.is_dir():
         return violations  # no script working dir → nothing to compare

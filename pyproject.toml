@@ -138,23 +138,16 @@ ignore = [
 # Migration / one-shot scripts may legitimately catch broadly.
 "tools/migrate_manifest.py" = ["BLE001"]
 
-# BLE001 grandfather list — 11 files with pre-existing `except Exception:`
-# blocks. The rule is enabled globally so NEW broad-excepts get blocked at
-# commit time; these entries tolerate the existing ones. Burn down by
-# narrowing the catch (per the pattern in tools/asset-source/source.py
-# `_fetch_json`), then deleting that entry. Audit item P1-5 + P2-13.
-#
-# Last reviewed May 18, 2026. Add a date when re-touched.
-"tools/ai-video/critic_loop.py" = ["BLE001"]
-"tools/ai-video/generate_style_refs.py" = ["BLE001"]
-"tools/assembly/generate_manifest.py" = ["BLE001"]
-"tools/brand-treatment/treat.py" = ["BLE001"]
-"tools/brand-treatment/treat_video.py" = ["BLE001"]
-"tools/lint/manifest_lint.py" = ["BLE001"]
-"tools/narration/auphonic_submit.py" = ["BLE001"]
-"tools/pipeline_validator.py" = ["BLE001"]
-"tools/recraft/recraft.py" = ["BLE001"]
-"tools/validate_data.py" = ["BLE001"]
+# BLE001 grandfather list. The rule is enabled globally so NEW broad-
+# excepts get blocked at commit time; per-line `# noqa: BLE001` (with
+# rationale comment) is the convention for legitimate cases. Started at
+# 11 files (May 18, 2026 audit P1-5 + P2-13), burned to 0 the same day
+# by narrowing each catch to the actually-possible exception types per
+# the `_fetch_json` pattern in tools/asset-source/source.py. The two
+# remaining broad catches (critic_loop.py:457, generate_style_refs.py:860,
+# generate_manifest.py:2202) carry per-line noqa + rationale because they
+# guard legitimately-broad failure surfaces (loop-iteration safety nets,
+# torch.hub.load). No grandfather entries needed here.
 
 [tool.ruff.lint.isort]
 known-first-party = ["tools"]

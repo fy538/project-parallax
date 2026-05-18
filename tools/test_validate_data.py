@@ -330,8 +330,12 @@ def test_template_data_file_skips_schema_files(tmp_path, monkeypatch):
 # ── validate_schema — crash handler ──────────────────────────────────────────
 
 
-def test_schema_crash_handler_returns_error(tmp_path, monkeypatch):
-    """If jsonschema.validate raises an unexpected exception, return a 'crashed' error string."""
+def test_schema_crash_handler_catches_schema_error(tmp_path, monkeypatch):
+    """If the SCHEMA itself is malformed (vs the data), validate_schema
+    returns a 'crashed' error string. May 2026: the broad-except was
+    narrowed to (SchemaError, RefResolutionError, JSONDecodeError, OSError),
+    so this test now uses a real one of those exception types — bare
+    RuntimeError would (correctly) bubble as a programming error."""
 
     schema = tmp_path / "schema.json"
     schema.write_text(json.dumps({"type": "object"}), encoding="utf-8")
@@ -344,12 +348,37 @@ def test_schema_crash_handler_returns_error(tmp_path, monkeypatch):
         return  # skip if jsonschema not installed
 
     def boom(instance, schema_):
-        raise RuntimeError("unexpected internal error")
+        raise jsonschema.SchemaError("schema is malformed")
 
     monkeypatch.setattr(jsonschema, "validate", boom)
     err = vd.validate_schema(data, schema)
     assert err is not None
     assert "crashed" in err
+
+
+def test_schema_crash_handler_lets_programming_errors_bubble(tmp_path, monkeypatch):
+    """Contract guarantee: a TypeError / RuntimeError in our own code
+    should NOT be silently absorbed as a 'schema validation crashed'
+    message. That was the original anti-pattern — masking real bugs as
+    schema infra problems. Narrowed catch ensures they bubble."""
+    import pytest
+
+    schema = tmp_path / "schema.json"
+    schema.write_text(json.dumps({"type": "object"}), encoding="utf-8")
+    data = tmp_path / "data.json"
+    data.write_text('{"x": 1}', encoding="utf-8")
+
+    try:
+        import jsonschema
+    except ImportError:
+        return  # skip if jsonschema not installed
+
+    def boom(instance, schema_):
+        raise RuntimeError("simulated bug in our code")
+
+    monkeypatch.setattr(jsonschema, "validate", boom)
+    with pytest.raises(RuntimeError, match="simulated bug"):
+        vd.validate_schema(data, schema)
 
 
 # ── _expected_audio_files — manifest → file path set ─────────────────────────

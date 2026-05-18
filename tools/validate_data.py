@@ -150,7 +150,14 @@ def validate_schema(path: Path, schema_path: Path) -> str | None:
         # Truncate huge validator output; show the path that failed and the message
         loc = "/".join(str(x) for x in e.absolute_path) or "<root>"
         return f"schema error at {loc}: {e.message}"
-    except Exception as e:
+    except (jsonschema.SchemaError, json.JSONDecodeError, OSError) as e:
+        # SchemaError: the schema itself is malformed (vs the data). Modern
+        # jsonschema (>=4.18) raises this for unresolvable $refs too, so a
+        # separate RefResolutionError catch is redundant + deprecated.
+        # JSONDecodeError: the data or schema file isn't valid JSON.
+        # OSError: schema or data file couldn't be read.
+        # Other exceptions (e.g. a TypeError from our own conversion code)
+        # bubble — that's a bug we want to see, not "schema validation crashed."
         return f"schema validation crashed: {e}"
 
 

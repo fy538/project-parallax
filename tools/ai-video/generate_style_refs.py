@@ -857,7 +857,13 @@ def cmd_generate(args):
             if args.lut_test:
                 run_lut_test(ref, STYLE_REFS_DIR)
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — loop-iteration safety net
+            # Top-level loop runner over up to 7 references. Each iteration
+            # calls generate_image (fal.ai HTTP), download_image (HTTP +
+            # file write), and run_lut_test (subprocess). Their internal
+            # failure paths are already narrowed; this catch is the "one
+            # bad ref shouldn't kill --all" backstop. Single-ref mode
+            # (else branch) still hard-fails.
             print(f"  ERROR: {e}")
             if not args.all:
                 sys.exit(1)

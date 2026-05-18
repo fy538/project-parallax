@@ -187,7 +187,11 @@ def main():
 
         try:
             img = Image.open(path)
-        except Exception as e:
+        except (OSError, Image.UnidentifiedImageError) as e:
+            # OSError covers file-not-found + truncated/unreadable; the
+            # PIL-specific UnidentifiedImageError covers "file exists but
+            # isn't an image format we recognize." Programming errors
+            # (TypeError on bad arg type) bubble — they're our bug.
             print(f"⚠ Skipping {path} — {e}", file=sys.stderr)
             continue
 
