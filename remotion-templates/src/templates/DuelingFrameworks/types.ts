@@ -1,46 +1,17 @@
 /**
- * Type definitions for DuelingFrameworks template.
+ * DuelingFrameworks — two frameworks compared head-to-head with animated
+ * scoring and verdict phase.
  *
- * Two frameworks compared head-to-head with animated scoring and verdict phase.
+ * Types derived from Zod schemas (May 2026 audit #3 burn-down).
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
+import type { z } from "zod";
+import type {
+  DuelingFrameworksDataSchema,
+  FrameworkSchema,
+  FrameworkTenetSchema,
+} from "./schema";
 
-export interface FrameworkTenet {
-  text: string;
-  textCn?: string;
-}
-
-export interface Framework {
-  name: string;
-  nameCn?: string;
-  color: string; // accent color (hex)
-  tenets: FrameworkTenet[];
-  score: number; // 0-100 explanatory power
-  verdict?: string; // e.g., "Explains escalation logic"
-  verdictCn?: string;
-}
-
-export interface DuelingFrameworksData {
-  title: string;
-  titleCn?: string;
-  subtitle?: string;
-  subtitleCn?: string;
-  frameworkA: Framework;
-  frameworkB: Framework;
-  phenomenon: string; // what's being analyzed
-  phenomenonCn?: string;
-  verdictLabel?: string; // e.g., "Which lens fits better?"
-  verdictLabelCn?: string;
-  episode?: string;
-  backgroundVariant?: "light" | "dark";
-  durationSec?: number;
-  /** When true, uses cinematic horizontal camera that tracks between frameworks */
-  cinematicMode?: boolean;
-  /** Enable ambient particles for depth */
-  ambientParticles?: boolean;
-
-  // ── Directing language overrides ──────────────────────────────────────
-  /** Per-composition direction block from visual-spec _direction namespace. */
-  _direction?: DirectionBlock;
-}
+export type FrameworkTenet = z.infer<typeof FrameworkTenetSchema>;
+export type Framework = z.infer<typeof FrameworkSchema>;
+export type DuelingFrameworksData = z.infer<typeof DuelingFrameworksDataSchema>;

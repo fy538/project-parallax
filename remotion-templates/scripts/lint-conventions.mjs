@@ -883,22 +883,14 @@ export function lintDeprecatedTemplateDispatch(
  * Added: May 18, 2026 engineering audit #3.
  */
 export const TYPES_DRIFT_GRANDFATHERED = new Set([
-  // Migrated as of May 18, 2026 (canonical examples): StatReveal,
-  // KineticTypography, DataChart, BumpChart, FrameworkDiagram. Entries
-  // below are the remaining 46 templates that hand-type their data shape;
-  // remove an entry when its types.ts is migrated to z.infer.
-  "AnnotatedImage", "ArcDiagram", "AtlasPlate", "BayesianUpdate",
-  "BeeswarmChart", "BulletChart", "CalendarHeatmap", "CartogramMap",
-  "ChoroplethMap", "ConnectedScatterplot", "DecisionTree", "DensityMap",
-  "DualTimeline", "DuelingFrameworks", "DumbbellPlot", "EditorialTest",
-  "EscalationLadder", "GameBoard", "HorizonChart", "HorizontalTimeline",
-  "ImageComposite", "IsotypeChart", "KPICard", "MarimekkoChart",
-  "NetworkDiagram", "OutcomePartition", "PhotoMontage", "PopulationPyramid",
-  "PricingWaterfall", "ProbabilityGauge", "ProportionalSymbolMap",
-  "RadarChart", "RankChangeDotPlot", "RidgelinePlot", "RouteAnimation",
-  "SankeyFlow", "Slopegraph", "SplitComposition", "StepLine",
-  "StrategicLandscape", "Streamgraph", "TernaryPlot", "Thumbnail",
-  "TilegramUSMap", "TimeSeriesChart", "TimelineComparison", "TitleTransition",
+  // 8 remaining templates with structural complexity (superRefine cross-
+  // field validation, recursive z.lazy schemas, multiple z.union variants,
+  // or third-party types that don't round-trip through z.infer cleanly).
+  // Each gets per-template attention rather than the mechanical migration.
+  // Plus EditorialTest (test fixture, not a production template).
+  "AtlasPlate", "ChoroplethMap", "EditorialTest", "GameBoard",
+  "HorizontalTimeline", "IsotypeChart", "NetworkDiagram",
+  "RouteAnimation", "TimeSeriesChart",
 ]);
 
 export function lintTypesDriftFromSchema(templatesDir = TEMPLATES_DIR) {

@@ -1,6 +1,8 @@
 /**
  * Zod schemas for TilegramUSMap template — runtime validation + Remotion
  * Studio editing.
+ *
+ * Schema-derived types (May 2026 audit #3 burn-down).
  */
 
 import { z } from "zod";
@@ -16,16 +18,16 @@ const US_STATE_CODES = [
   "DC",
 ] as const;
 
-const USStateCodeSchema = z.enum(US_STATE_CODES);
+export const USStateCodeSchema = z.enum(US_STATE_CODES);
 
-const TilegramStateValueSchema = z.object({
+export const TilegramStateValueSchema = z.object({
   state: USStateCodeSchema,
   value: z.number(),
   label: z.string().optional(),
   color: z.string().optional(),
 });
 
-const TilegramColorScaleSchema = z.object({
+export const TilegramColorScaleSchema = z.object({
   min: z.number(),
   max: z.number(),
   low: z.string(),
@@ -33,27 +35,29 @@ const TilegramColorScaleSchema = z.object({
   high: z.string(),
 });
 
-export const TilegramUSMapSchema = z.object({
-  data: z.object({
-    episode: z.string(),
-    title: z.string(),
-    subtitle: z.string().optional(),
-    states: z.array(TilegramStateValueSchema).min(1, {
-      message:
-        "TilegramUSMap requires at least one state value — an empty tilegram has nothing to show.",
-    }),
-    colorScale: z
-      .union([
-        TilegramColorScaleSchema,
-        z.literal("diverging"),
-        z.literal("sequential"),
-      ])
-      .optional(),
-    valueLabel: z.string().optional(),
-    source: z.string().optional(),
-    durationSec: z.number().positive().optional(),
-    backgroundVariant: z.enum(["dark", "light"]).optional(),
-    mapTitle: MapTitleConfigSchema.optional(),
-    _direction: DirectionBlockSchema.optional(),
+export const TilegramColorScaleInputSchema = z.union([
+  TilegramColorScaleSchema,
+  z.literal("diverging"),
+  z.literal("sequential"),
+]);
+
+export const TilegramUSMapDataSchema = z.object({
+  episode: z.string(),
+  title: z.string(),
+  subtitle: z.string().optional(),
+  states: z.array(TilegramStateValueSchema).min(1, {
+    message:
+      "TilegramUSMap requires at least one state value — an empty tilegram has nothing to show.",
   }),
+  colorScale: TilegramColorScaleInputSchema.optional(),
+  valueLabel: z.string().optional(),
+  source: z.string().optional(),
+  durationSec: z.number().positive().optional(),
+  backgroundVariant: z.enum(["dark", "light"]).optional(),
+  mapTitle: MapTitleConfigSchema.optional(),
+  _direction: DirectionBlockSchema.optional(),
+});
+
+export const TilegramUSMapSchema = z.object({
+  data: TilegramUSMapDataSchema,
 });

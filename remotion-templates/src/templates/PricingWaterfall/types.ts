@@ -1,72 +1,16 @@
 /**
- * PricingWaterfall — value-chain decomposition.
+ * PricingWaterfall — value-chain decomposition. Fixed total split into
+ * stage segments with the smallest sliver in accent color (FT iPhone /
+ * Bloomberg cocoa / SCA farmgate-share idiom).
  *
- * The canonical editorial form for value-capture stories: a fixed total
- * ($1, $5, $100) split into stage segments, with the smallest sliver
- * rendered in accent color so the punchline ("3% to the farmer") lands
- * visually before the viewer reads the number.
- *
- * Use cases: supply-chain margin extraction, where-your-tax-dollar-goes,
- * cost-of-goods decomposition, fair-trade analysis. Outlets that converge
- * on this idiom: FT (iPhone breakdown), Bloomberg Opinion (oil/cocoa),
- * Reuters (commodity pricing), Specialty Coffee Association reports.
- *
- * NOT for: pure sequence-of-stages stories without value math (use
- * FrameworkDiagram flow), or relationship/network structure (use
- * NetworkDiagram).
+ * Types derived from Zod schemas (May 2026 audit #3 burn-down).
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
-import type { MotionIdentity } from "../../design/motion";
-import type { EditorialFrameProps } from "../../components/EditorialFrame/schema";
+import type { z } from "zod";
+import type {
+  PricingWaterfallStageSchema,
+  PricingWaterfallDataSchema,
+} from "./schema";
 
-export interface PricingWaterfallStage {
-  /** Stage name displayed prominently. */
-  label: string;
-  /** Share of the total, as a percentage (0–100). Stages should sum to ~100. */
-  share: number;
-  /** Optional descriptor — location, role, or detail (e.g., "Yirgacheffe, Ethiopia"). */
-  descriptor?: string;
-  /** Mark this stage as the editorial protagonist. Renders in accent color
-   *  with a glow + label emphasis. The "3% to the farmer" stage. */
-  hero?: boolean;
-  /** Optional explicit color override for the segment (otherwise muted bone). */
-  color?: string;
-}
-
-export interface PricingWaterfallData {
-  episode: string;
-  title: string;
-  subtitle?: string;
-
-  /** The fixed total being decomposed — anchors the viewer. */
-  total: {
-    /** Display value, e.g. "$5", "100", "1¢". */
-    value: string;
-    /** Caption, e.g. "of every $5 cup of coffee", "Where each tax dollar goes". */
-    label: string;
-  };
-
-  /** Stages from origin to destination (Farm → Shop). Rendered bottom-up so
-   *  the bar visually "builds" through the chain. */
-  stages: PricingWaterfallStage[];
-
-  source?: string;
-  durationSec?: number;
-  backgroundVariant?: "dark" | "light";
-  backgroundTint?: string;
-  /** Substrate-motion preset (grain + atmosphere + wobble combination).
-   *  Default: channel-wide "briefing". See design/motion.ts. */
-  motionIdentity?: MotionIdentity;
-
-  /**
-   * Opt-in editorial frame. When set, the chart renders inside EditorialFrame
-   * (kicker + heroStat + multi-callout annotations + publication chrome).
-   * See EDITORIAL_FRAME_ARCHITECTURE.md.
-   */
-  frame?: EditorialFrameProps;
-
-  // ── Directing language overrides ──────────────────────────────────────
-  /** Per-composition direction block from visual-spec _direction namespace. */
-  _direction?: DirectionBlock;
-}
+export type PricingWaterfallStage = z.infer<typeof PricingWaterfallStageSchema>;
+export type PricingWaterfallData = z.infer<typeof PricingWaterfallDataSchema>;

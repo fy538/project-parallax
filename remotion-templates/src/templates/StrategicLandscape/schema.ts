@@ -1,11 +1,13 @@
 /**
  * Zod schemas for StrategicLandscape template — runtime validation + Remotion Studio editing.
+ *
+ * Schema-derived types (May 2026 audit #3 burn-down).
  */
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
-const ActorSchema = z.object({
+export const ActorSchema = z.object({
   name: z.string(),
   nameCn: z.string().optional(),
   x: z.number().min(0).max(100),
@@ -15,20 +17,22 @@ const ActorSchema = z.object({
   icon: z.string().optional(),
 });
 
+export const StrategicLandscapeDataSchema = z.object({
+  title: z.string(),
+  subtitle: z.string().optional(),
+  xAxisLabel: z.string(),
+  xAxisLabelEnd: z.string(),
+  yAxisLabel: z.string(),
+  yAxisLabelEnd: z.string(),
+  actors: z.array(ActorSchema),
+  quadrantLabels: z.tuple([z.string(), z.string(), z.string(), z.string()]).optional(),
+  episode: z.string().optional(),
+  source: z.string().optional(),
+  durationSec: z.number().optional(),
+  backgroundVariant: z.enum(["dark", "light"]).optional(),
+  _direction: DirectionBlockSchema.optional(),
+});
+
 export const StrategicLandscapeSchema = z.object({
-  data: z.object({
-    title: z.string(),
-    subtitle: z.string().optional(),
-    xAxisLabel: z.string(),
-    xAxisLabelEnd: z.string(),
-    yAxisLabel: z.string(),
-    yAxisLabelEnd: z.string(),
-    actors: z.array(ActorSchema),
-    quadrantLabels: z.tuple([z.string(), z.string(), z.string(), z.string()]).optional(),
-    episode: z.string().optional(),
-    source: z.string().optional(),
-    durationSec: z.number().optional(),
-    backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: DirectionBlockSchema.optional(),
-  }),
+  data: StrategicLandscapeDataSchema,
 });

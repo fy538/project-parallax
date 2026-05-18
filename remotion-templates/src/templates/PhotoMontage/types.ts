@@ -1,57 +1,12 @@
 /**
- * PhotoMontage template types.
+ * PhotoMontage — rapid-fire image sequence with text overlays, chip counts,
+ * date stamps. Each image gets the full BrandImage treatment (4-step pipeline).
  *
- * Rapid-fire image sequence with text overlays, chip counts, date stamps.
- * Shows multiple related images in rhythmic succession with unified pacing.
- * Each image gets the full BrandImage treatment (4-step pipeline).
+ * Types derived from Zod schemas (May 2026 audit #3 burn-down).
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
+import type { z } from "zod";
+import type { MontageImageSchema, PhotoMontageDataSchema } from "./schema";
 
-export interface MontageImage {
-  /** Path to image file (relative to public/) */
-  src: string;
-  /** Display duration in seconds */
-  durationSec: number;
-  /** Duotone ramp */
-  treatment: "standard" | "conflict" | "editorial";
-  /** Layout mode */
-  compositeMode: "background" | "inset";
-  /** Image opacity */
-  compositeOpacity?: number;
-  /** Enable Ken Burns effect for this image (default: true) */
-  kenBurns?: boolean;
-  /** Text overlay */
-  overlay?: {
-    text: string;
-    position: "bottom-left" | "bottom-right" | "center" | "top-right";
-    style: "stat" | "label" | "caption";
-  };
-  /** Optional secondary overlay (e.g., date stamp) */
-  secondaryOverlay?: {
-    text: string;
-    position: "top-left" | "top-right";
-  };
-}
-
-export interface PhotoMontageData {
-  episode: string;
-  /** Optional title card before the sequence */
-  title?: string;
-  subtitle?: string;
-
-  images: MontageImage[];
-
-  /** Transition between images */
-  transition: "cut" | "dissolve" | "wipe-left";
-  /** Transition duration in seconds (default 0.3) */
-  transitionDurationSec?: number;
-
-  source?: string;
-  durationSec?: number;
-  backgroundTint?: string;
-
-  // ── Directing language overrides ──────────────────────────────────────
-  /** Per-composition direction block from visual-spec _direction namespace. */
-  _direction?: DirectionBlock;
-}
+export type MontageImage = z.infer<typeof MontageImageSchema>;
+export type PhotoMontageData = z.infer<typeof PhotoMontageDataSchema>;

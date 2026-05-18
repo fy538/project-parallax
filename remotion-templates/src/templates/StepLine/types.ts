@@ -6,38 +6,17 @@
  * Correct form for data that changes discretely (interest rates, policy
  * rates, sanctions tiers, regulatory thresholds) where a smooth line would
  * lie about the change being gradual.
+ *
+ * Types derived from Zod schemas (May 2026 audit #3 burn-down).
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
-import type { EditorialFrameProps } from "../../components/EditorialFrame/schema";
+import type { z } from "zod";
+import type {
+  StepPointXSchema,
+  StepPointSchema,
+  StepLineDataSchema,
+} from "./schema";
 
-export interface StepPoint {
-  /** X value — typically a date string (YYYY-MM-DD) or year number. */
-  x: string | number;
-  /** Y value. */
-  y: number;
-  /** Optional event label (shown as a tick + small annotation at this step). */
-  event?: string;
-}
-
-export interface StepLineData {
-  episode: string;
-  title: string;
-  subtitle?: string;
-  /** Stepped data series. Each point's value holds until the next point. */
-  points: StepPoint[];
-  /** Line color (default amber). */
-  color?: string;
-  /** Area fill beneath the steps. */
-  areaFill?: boolean;
-  areaOpacity?: number;
-  xLabel?: string;
-  yLabel?: string;
-  yUnit?: string;
-  source?: string;
-  durationSec?: number;
-  backgroundVariant?: "dark" | "light";
-  backgroundTint?: string;
-  frame?: EditorialFrameProps;
-  _direction?: DirectionBlock;
-}
+export type StepPointX = z.infer<typeof StepPointXSchema>;
+export type StepPoint = z.infer<typeof StepPointSchema>;
+export type StepLineData = z.infer<typeof StepLineDataSchema>;

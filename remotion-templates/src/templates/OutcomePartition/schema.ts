@@ -1,12 +1,14 @@
 /**
  * Zod schemas for OutcomePartition template.
+ *
+ * Schema-derived types (May 2026 audit #3 burn-down).
  */
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 // Region is recursive — Zod requires the .lazy() workaround for self-reference.
-const LeafRegion = z.object({
+export const LeafRegionSchema = z.object({
   kind: z.literal("leaf"),
   label: z.string(),
   sublabel: z.string().optional(),
@@ -16,20 +18,22 @@ const LeafRegion = z.object({
   highlighted: z.boolean().optional(),
 });
 
-type RegionType =
-  | z.infer<typeof LeafRegion>
-  | {
-      kind: "split";
-      axis: "horizontal" | "vertical";
-      at: number;
-      revealStep?: number;
-      label?: string;
-      children: [RegionType, RegionType];
-    };
+export type LeafRegion = z.infer<typeof LeafRegionSchema>;
 
-const RegionSchema: z.ZodType<RegionType> = z.lazy(() =>
+export type SplitRegion = {
+  kind: "split";
+  axis: "horizontal" | "vertical";
+  at: number;
+  revealStep?: number;
+  label?: string;
+  children: [Region, Region];
+};
+
+export type Region = LeafRegion | SplitRegion;
+
+export const RegionSchema: z.ZodType<Region> = z.lazy(() =>
   z.union([
-    LeafRegion,
+    LeafRegionSchema,
     z.object({
       kind: z.literal("split"),
       axis: z.enum(["horizontal", "vertical"]),
@@ -41,17 +45,19 @@ const RegionSchema: z.ZodType<RegionType> = z.lazy(() =>
   ]),
 );
 
+export const OutcomePartitionDataSchema = z.object({
+  episode: z.string(),
+  title: z.string(),
+  subtitle: z.string().optional(),
+  xAxisLabel: z.string().optional(),
+  yAxisLabel: z.string().optional(),
+  root: RegionSchema,
+  source: z.string().optional(),
+  durationSec: z.number().optional(),
+  backgroundVariant: z.enum(["dark", "light"]).optional(),
+  _direction: DirectionBlockSchema.optional(),
+});
+
 export const OutcomePartitionSchema = z.object({
-  data: z.object({
-    episode: z.string(),
-    title: z.string(),
-    subtitle: z.string().optional(),
-    xAxisLabel: z.string().optional(),
-    yAxisLabel: z.string().optional(),
-    root: RegionSchema,
-    source: z.string().optional(),
-    durationSec: z.number().optional(),
-    backgroundVariant: z.enum(["dark", "light"]).optional(),
-    _direction: DirectionBlockSchema.optional(),
-  }),
+  data: OutcomePartitionDataSchema,
 });
