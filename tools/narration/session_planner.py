@@ -45,7 +45,6 @@ import json
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
@@ -304,10 +303,10 @@ def render_plan_md(plan: SessionPlan) -> str:
     if len(plan.segments) > 1:
         lines.extend([
             "",
-            f"_Voice fatigue typically becomes audible after ~20 min of "
-            f"continuous narration. Take a 2-3 min water + stretch break "
-            f"between segments. Don't push through — re-records always "
-            f"cost more than a break does._",
+            "_Voice fatigue typically becomes audible after ~20 min of "
+            "continuous narration. Take a 2-3 min water + stretch break "
+            "between segments. Don't push through — re-records always "
+            "cost more than a break does._",
         ])
     lines.extend(["", "## Suggested warm-up order", ""])
     warmup_count = WARMUP_BEATS

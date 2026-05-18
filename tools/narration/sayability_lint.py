@@ -56,7 +56,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
@@ -416,7 +415,7 @@ def render_report_md(report: SayabilityReport, top: int = 0) -> str:
                 f"**Consonant clusters:** {s.consonant_clusters} · "
                 f"**Sibilance:** {s.sibilance_ratio:.2f} · "
                 f"**Long words:** {s.unique_long_words}",
-                f"- _Contributions:_ "
+                "- _Contributions:_ "
                 + ", ".join(f"{k}={v}" for k, v in s.contributions.items() if v > 0),
                 "",
             ])

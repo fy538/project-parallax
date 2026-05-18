@@ -33,7 +33,6 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Optional
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -94,7 +93,7 @@ def load_palette_hex_set() -> set[str]:
     return hex_values
 
 
-def find_json_files(filter_paths: Optional[list[Path]] = None) -> list[Path]:
+def find_json_files(filter_paths: list[Path] | None = None) -> list[Path]:
     """Return all JSON files under the project, optionally filtered to a given list."""
     candidates: list[Path] = []
     for sub in ("data", "episodes", "remotion-templates/data"):
@@ -111,7 +110,7 @@ def find_json_files(filter_paths: Optional[list[Path]] = None) -> list[Path]:
     return sorted(candidates)
 
 
-def validate_wellformed(path: Path) -> Optional[str]:
+def validate_wellformed(path: Path) -> str | None:
     """Return None on success, or an error string."""
     try:
         with open(path, encoding="utf-8") as f:
@@ -123,7 +122,7 @@ def validate_wellformed(path: Path) -> Optional[str]:
         return f"read error: {e}"
 
 
-def schema_for(path: Path) -> Optional[Path]:
+def schema_for(path: Path) -> Path | None:
     """Return the schema path that applies to this file, if any."""
     rel = path.relative_to(ROOT)
     for pattern, schema_rel in SCHEMAS:
@@ -134,7 +133,7 @@ def schema_for(path: Path) -> Optional[Path]:
     return None
 
 
-def validate_schema(path: Path, schema_path: Path) -> Optional[str]:
+def validate_schema(path: Path, schema_path: Path) -> str | None:
     """Validate against JSON Schema. Returns None on success, error string on failure."""
     try:
         import jsonschema  # type: ignore[import-untyped]
@@ -176,7 +175,7 @@ def is_template_data_file(path: Path) -> bool:
     return s.startswith("remotion-templates/data/episodes/")
 
 
-def validate_palette(path: Path, allowed: set[str]) -> Optional[str]:
+def validate_palette(path: Path, allowed: set[str]) -> str | None:
     """Layer 3: scan a template data file for hex values not in palette.json."""
     if not allowed:
         return None  # palette didn't load; skip silently
@@ -277,7 +276,7 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    filter_paths: Optional[list[Path]] = None
+    filter_paths: list[Path] | None = None
     if args.files:
         filter_paths = [p for p in args.files if p.suffix == ".json"]
         if not filter_paths:

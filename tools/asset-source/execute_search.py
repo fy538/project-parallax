@@ -4,11 +4,10 @@ Direct execution of aerial semiconductor search using the Pexels API
 """
 
 import json
-import os
+import sys
+import urllib.request
 from pathlib import Path
 from urllib.parse import quote_plus
-import urllib.request
-import sys
 
 # Load API key from .env
 env_file = Path(__file__).parent / ".env"

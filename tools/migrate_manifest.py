@@ -43,9 +43,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"
@@ -300,7 +300,7 @@ def print_status_json(statuses: list[ManifestStatus]) -> None:
             for s in statuses
         ],
         "registeredMigrations": [
-            {"from": src, "to": dst} for (src, dst) in MIGRATIONS.keys()
+            {"from": src, "to": dst} for (src, dst) in MIGRATIONS
         ],
     }
     print(json.dumps(out, indent=2))
@@ -334,7 +334,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument(
         "--to-version",
-        help=f"Target schema version. If set, runs the migration planner. Default action without this flag is status-only.",
+        help="Target schema version. If set, runs the migration planner. Default action without this flag is status-only.",
     )
     parser.add_argument(
         "--write", action="store_true",
@@ -359,7 +359,7 @@ def main(argv: list[str] | None = None) -> int:
         # it. This isn't necessarily fatal (the planner can chain), but we
         # short-circuit the obvious case: target version completely unknown.
         known_versions = {CURRENT_VERSION}
-        for src, dst in MIGRATIONS.keys():
+        for src, dst in MIGRATIONS:
             known_versions.add(src)
             known_versions.add(dst)
         if args.to_version not in known_versions:

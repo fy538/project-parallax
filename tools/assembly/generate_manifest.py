@@ -31,14 +31,12 @@ import argparse
 import json
 import re
 import sys
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from dataclasses import dataclass, field, asdict
-from typing import Optional
 
 _SHARED = Path(__file__).resolve().parent.parent / "shared"
 sys.path.insert(0, str(_SHARED))
 from backdrop_manifest import warn_clutter_backdrop_mismatch  # noqa: E402
-
 
 # ── Constants ──────────────────────────────────────────────────────────────
 
@@ -218,17 +216,17 @@ class WordTimestamp:
 
 @dataclass
 class Asset:
-    shotListId: Optional[str] = None
+    shotListId: str | None = None
     searchTerms: list = field(default_factory=list)
-    source: Optional[str] = None
-    file: Optional[str] = None
+    source: str | None = None
+    file: str | None = None
 
 
 @dataclass
 class Treatment:
     ramp: str = "standard"
     composite: str = "background"
-    opacity: Optional[float] = None
+    opacity: float | None = None
 
 
 @dataclass
@@ -259,11 +257,11 @@ class Segment:
     beat: str = ""
     priority: str = "P2"
     narrationRef: str = ""
-    asset: Optional[Asset] = None
-    treatment: Optional[Treatment] = None
-    template: Optional[Template] = None
-    hold: Optional[Hold] = None
-    transition: Optional[Transition] = None
+    asset: Asset | None = None
+    treatment: Treatment | None = None
+    template: Template | None = None
+    hold: Hold | None = None
+    transition: Transition | None = None
     notes: str = ""
 
     def to_dict(self):
@@ -374,7 +372,7 @@ def estimate_narration_duration(text: str) -> float:
     return len(words) / WPM * 60
 
 
-def parse_visual_spec(spec: str) -> Optional[dict]:
+def parse_visual_spec(spec: str) -> dict | None:
     """Parse a single visual production cell into structured data."""
     result = {
         "type": None,
@@ -721,7 +719,7 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                 tokens.append(current.strip())
 
             chapter = {}
-            for i, token in enumerate(tokens):
+            for _i, token in enumerate(tokens):
                 # kicker:"..."
                 kicker_m = re.match(r'^kicker:\s*"([^"]+)"\s*$', token)
                 if kicker_m:
@@ -813,7 +811,6 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
     rows = []
     current_beat = None
     current_pace = "analytical"  # default pacing profile
-    in_table = False
 
     for line in lines:
         # Stop at ASSET SUMMARY — everything below is metadata, not narration
@@ -838,7 +835,6 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
                 endSec=end_min * 60 + end_sec,
             )
             beats.append(current_beat)
-            in_table = False
             # Reset pace to default at beat boundaries — prevents a forgotten
             # PACE: urgent from infecting the rest of the episode
             if current_pace != "analytical":
@@ -855,7 +851,6 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
 
             # Skip header rows
             if narr == "NARRATION" or narr.startswith("---"):
-                in_table = True
                 continue
             if narr.startswith("---"):
                 continue
@@ -975,7 +970,7 @@ SILICON_TRAP_SHOT_IDS = {
 }
 
 
-def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> Optional[str]:
+def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> str | None:
     """Try to match search terms to a known shot list ID."""
     lookup = shot_ids or SILICON_TRAP_SHOT_IDS
     for term in search_terms:
@@ -985,7 +980,7 @@ def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> Optional[
     return None
 
 
-def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict | None = None) -> Optional[str]:
+def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict | None = None) -> str | None:
     """Try to resolve which Remotion data file a template segment references."""
     vis_lower = vis_raw.lower()
 
@@ -1611,7 +1606,10 @@ def build_estimate_manifest(
             remaining = row_dur - total_explicit
 
             sub_cursor = cursor
-            for i, (part_raw, ps) in enumerate(zip(vis_parts, part_specs)):
+            # strict=True: vis_parts and part_specs are constructed in parallel
+            # earlier in this function; a length mismatch indicates a parser bug
+            # we want to surface immediately, not silently truncate.
+            for i, (part_raw, ps) in enumerate(zip(vis_parts, part_specs, strict=True)):
                 if ps is None:
                     continue
                 seg_counter += 1
@@ -2205,7 +2203,7 @@ def detect_pauses(audio_path: str, min_pause_sec: float = MIN_PAUSE_SEC) -> list
         print(f"WARNING: SileroVAD not available ({e}). Skipping pause detection.")
         return []
 
-    print(f"  Detecting pauses with SileroVAD...")
+    print("  Detecting pauses with SileroVAD...")
     wav = read_audio(audio_path, sampling_rate=16000)
     speech_timestamps = get_speech_timestamps(wav, model, sampling_rate=16000)
 
@@ -2252,7 +2250,7 @@ def get_audio_duration(audio_path: str) -> float:
         return 0.0
 
 
-def transcribe_whisperx(audio_path: str, hf_token: Optional[str] = None) -> tuple[float, list[dict]]:
+def transcribe_whisperx(audio_path: str, hf_token: str | None = None) -> tuple[float, list[dict]]:
     """
     Run WhisperX on narration audio for phoneme-level word timestamps.
 
@@ -2274,6 +2272,7 @@ def transcribe_whisperx(audio_path: str, hf_token: Optional[str] = None) -> tupl
         sys.exit(1)
 
     import os
+
     import torch
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -2321,7 +2320,7 @@ def fuzzy_match_segment(
     narration_ref: str,
     words: list[dict],
     already_matched: set[int],
-) -> Optional[float]:
+) -> float | None:
     """
     Use RapidFuzz to find where a narration reference appears in the word stream.
 
@@ -2384,7 +2383,7 @@ def fuzzy_match_segment(
     return None
 
 
-def align_to_narration(manifest: dict, audio_path: str, hf_token: Optional[str] = None) -> dict:
+def align_to_narration(manifest: dict, audio_path: str, hf_token: str | None = None) -> dict:
     """
     Upgrade an estimate-mode manifest to precise mode by aligning
     segment boundaries to WhisperX word timestamps + SileroVAD pauses.
@@ -2525,7 +2524,7 @@ def resolve_all_sync_points(segments: list[dict], words: list[dict]) -> None:
 
 def _find_sync_word(
     sync_word: str, words: list[dict], seg_start: float, seg_end: float
-) -> Optional[dict]:
+) -> dict | None:
     """
     Find a sync word in the WhisperX word stream within a segment's time range.
     Uses case-insensitive matching with tolerance for hyphenated/compound words.
@@ -2637,7 +2636,7 @@ def main():
     # Upgrade to precise mode if audio provided
     if args.audio:
         print(f"\nAligning to narration audio: {args.audio}")
-        print(f"  Pipeline: SileroVAD (pause detection) → WhisperX (transcription + alignment) → RapidFuzz (matching)")
+        print("  Pipeline: SileroVAD (pause detection) → WhisperX (transcription + alignment) → RapidFuzz (matching)")
         manifest = align_to_narration(manifest, args.audio, hf_token=args.hf_token)
         print(f"  Precise duration: {manifest['totalDurationSec']:.1f}s")
 

@@ -23,7 +23,6 @@ from generate_manifest import (
     _build_segment,
     resolve_all_sync_points,
     FPS,
-    WPM,
 )
 
 
@@ -1072,13 +1071,13 @@ def test_match_cut_still_templates_set_is_canonical():
     """Lock the set so accidental edits get caught."""
     from generate_manifest import MATCH_CUT_STILL_TEMPLATES
 
-    assert MATCH_CUT_STILL_TEMPLATES == {
+    assert {
         "AtlasPlate",
         "ChoroplethMap",
         "AnnotatedImage",
         "RouteAnimation",
         "PhotoMontage",
-    }
+    } == MATCH_CUT_STILL_TEMPLATES
 
 
 def test_transitions_dir_override_beats_rule1():

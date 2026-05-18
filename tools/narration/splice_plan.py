@@ -52,7 +52,6 @@ import argparse
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -267,7 +266,7 @@ def main() -> int:
         script_path = found
 
     # Resolve transcript
-    transcript: Optional[wa.Transcript] = None
+    transcript: wa.Transcript | None = None
     if args.transcript:
         tpath = Path(args.transcript).resolve()
         if not tpath.is_file():

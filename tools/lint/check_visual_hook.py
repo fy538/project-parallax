@@ -40,7 +40,6 @@ import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -126,7 +125,7 @@ def _load_pipeline_state() -> dict[str, str]:
     return {e["slug"]: e["state"] for e in data.get("episodes", []) if "slug" in e}
 
 
-def _find_viability_doc(ep_dir: Path) -> Optional[Path]:
+def _find_viability_doc(ep_dir: Path) -> Path | None:
     """Episodes use either viability.md or viability-check.md — accept either."""
     for name in ("viability.md", "viability-check.md"):
         p = ep_dir / name
@@ -138,7 +137,7 @@ def _find_viability_doc(ep_dir: Path) -> Optional[Path]:
 # ── Check helpers ───────────────────────────────────────────────────────────
 
 
-def _extract_visual_hook_section(text: str) -> Optional[str]:
+def _extract_visual_hook_section(text: str) -> str | None:
     """Locate the visual-hook section in viability.md text. Returns the
     section body (between the heading and the next same-or-higher level
     heading), or None if no visual-hook heading is found."""
@@ -264,7 +263,7 @@ def check_episode(slug: str, state: str) -> Finding:
     return Finding(severity, slug, state, msg)
 
 
-def run_check(episode_filter: Optional[str] = None) -> CheckResult:
+def run_check(episode_filter: str | None = None) -> CheckResult:
     """Run the check across every episode in pipeline-state.json."""
     state_map = _load_pipeline_state()
     result = CheckResult()
@@ -285,8 +284,8 @@ def render_report_md(result: CheckResult) -> str:
     lines: list[str] = [
         "# Visual Hook Lint",
         "",
-        f"_Veritasium discipline: no topic crosses from INCUBATING → VIABLE without "
-        f"articulating its cold-open visual hook._",
+        "_Veritasium discipline: no topic crosses from INCUBATING → VIABLE without "
+        "articulating its cold-open visual hook._",
         "",
         f"**Results:** {len(result.errors)} 🔴 error · "
         f"{len(result.warnings)} 🟡 warn · "

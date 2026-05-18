@@ -804,7 +804,7 @@ class TestTransitionGrammar:
         """Every entry in _DEPRECATED_TRANSITIONS fires on .in."""
         deprecated = list(manifest_lint._DEPRECATED_TRANSITIONS)
         for dtype in deprecated:
-            vs = self._run([_trans_seg("s1", trans_in=dtype)])
+            self._run([_trans_seg("s1", trans_in=dtype)])
             rules = self._rules([_trans_seg("s1", trans_in=dtype)])
             assert "M-TRANSITION-DEPRECATED" in rules, f"{dtype!r} not caught"
 

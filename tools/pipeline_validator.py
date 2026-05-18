@@ -46,7 +46,6 @@ import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 from paths import get_project_root
@@ -454,7 +453,7 @@ class StageCheck:
     warn: str = ""      # non-blocking issue (e.g. naming drift)
 
 
-def _first_match(ep_dir: Path, *globs: str) -> Optional[Path]:
+def _first_match(ep_dir: Path, *globs: str) -> Path | None:
     """Return the first matching file from any of the glob patterns, or None."""
     for g in globs:
         hits = sorted(ep_dir.glob(g))
@@ -609,7 +608,7 @@ def build_checkpoint_stages(
     asset_manifest = assets_dir / "asset-manifest.json" if assets_dir.is_dir() else None
     has_footage = bool(video_files) or (asset_manifest is not None and asset_manifest.exists())
     if has_footage:
-        detail = f"asset-manifest.json" if (asset_manifest and asset_manifest.exists()) \
+        detail = "asset-manifest.json" if (asset_manifest and asset_manifest.exists()) \
             else f"{len(video_files)} video file(s) in assets/"
     else:
         detail = "no sourced footage — run: python3 tools/asset-source/source.py --batch shot-list.json"
@@ -655,7 +654,7 @@ def write_checkpoint(row: EpisodeRow, ep_dir: Path, data_dir: Path) -> None:
     lines: list[str] = [
         f"# {row.slug} — Pipeline Checkpoint",
         f"> Auto-generated {today} by `pipeline_validator.py` · do not edit manually",
-        f"> Refresh: `python3 tools/pipeline_validator.py`",
+        "> Refresh: `python3 tools/pipeline_validator.py`",
         "",
         f"**State:** {row.state}  ·  {row.days_in_state} days in state",
     ]
@@ -678,7 +677,7 @@ def write_checkpoint(row: EpisodeRow, ep_dir: Path, data_dir: Path) -> None:
     done  = sum(1 for c in all_checks if c.done)
     total = len(all_checks)
     warns = sum(1 for c in all_checks if c.warn)
-    lines.append(f"---")
+    lines.append("---")
     lines.append(f"**Progress:** {done}/{total} stages complete"
                  + (f" · {warns} naming drift warning(s)" if warns else ""))
     lines.append("")
@@ -698,8 +697,8 @@ class StateEntry:
     slug: str
     state: str
     state_entered_at: datetime.date
-    format: Optional[str]
-    target_publish: Optional[datetime.date]
+    format: str | None
+    target_publish: datetime.date | None
     blocked_on: str = "—"   # "—" means none; populated when state is BLOCKED/REVISING
     notes: str = ""
 
@@ -708,7 +707,7 @@ class StateEntry:
         return (datetime.date.today() - self.state_entered_at).days
 
     @property
-    def days_to_target(self) -> Optional[int]:
+    def days_to_target(self) -> int | None:
         if self.target_publish is None:
             return None
         return (self.target_publish - datetime.date.today()).days
@@ -761,9 +760,9 @@ class EpisodeStatus:
     slug: str
     state: str
     days_in_state: int
-    days_to_target: Optional[int]
-    target_publish: Optional[datetime.date]   # raw date, not formatted
-    format: Optional[str]
+    days_to_target: int | None
+    target_publish: datetime.date | None   # raw date, not formatted
+    format: str | None
     notes: str
 
     # Artifact presence
@@ -790,8 +789,8 @@ class EpisodeStatus:
     # Health signals
     manifest_stale: bool            # script mtime > manifest mtime + tolerance
     manifest_stale_drift_str: str   # human-readable e.g. "6 days"
-    script_version: Optional[str]   # e.g. "v3"
-    script_mtime: Optional[datetime.datetime]   # raw datetime, not formatted
+    script_version: str | None   # e.g. "v3"
+    script_mtime: datetime.datetime | None   # raw datetime, not formatted
 
     # Stage progress
     stage_idx: int                  # position in STATE_ORDER (0-8), -1 off-lifecycle
@@ -801,12 +800,12 @@ class EpisodeStatus:
         return len(STATE_ORDER)
 
     @property
-    def target_publish_iso(self) -> Optional[str]:
+    def target_publish_iso(self) -> str | None:
         """ISO date string for display, or None."""
         return self.target_publish.isoformat() if self.target_publish else None
 
     @property
-    def script_mtime_iso(self) -> Optional[str]:
+    def script_mtime_iso(self) -> str | None:
         """ISO datetime for display (minute precision), or None."""
         return self.script_mtime.isoformat(timespec="minutes") if self.script_mtime else None
 
@@ -832,7 +831,7 @@ class EpisodeStatus:
         return " · ".join(parts)
 
 
-def _read_cost_log(cost_log_path: Optional[Path] = None) -> dict[str, float]:
+def _read_cost_log(cost_log_path: Path | None = None) -> dict[str, float]:
     """Parse episodes/COST_LOG.md → {episode_slug: total_usd}.
 
     Expected row format (markdown table):
@@ -930,7 +929,7 @@ def _check_manifest_staleness(slug: str) -> tuple[bool, str]:
     return True, f"{drift / SECONDS_PER_DAY:.1f} d"
 
 
-def _detect_script_version(ep_dir: Path) -> tuple[Optional[str], Optional[datetime.datetime]]:
+def _detect_script_version(ep_dir: Path) -> tuple[str | None, datetime.datetime | None]:
     """Return (version string like 'v3', raw mtime datetime) for the newest script file."""
     scripts: list[Path] = []
     for pattern in ("script-v*-production.md", "script-production.md", "script.md"):
@@ -1325,7 +1324,7 @@ def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
 
 def suggest_state_promotion(
     entry: StateEntry, status: EpisodeStatus
-) -> Optional[tuple[str, str]]:
+) -> tuple[str, str] | None:
     """Return (next_state, reason) if `entry` looks ready to promote, else None.
 
     Promotion rules — derived from STATE_REQUIRED + check-episode workflow:
@@ -1611,7 +1610,7 @@ def main() -> int:
     if total_errors == 0 and total_warnings == 0:
         print("  ✓ All checks passed — PIPELINE.md is consistent with artifacts.")
     if checkpoints_written:
-        print(f"  Checkpoints written: "
+        print("  Checkpoints written: "
               + ", ".join(f"episodes/{s}/_checkpoint.md" for s in checkpoints_written))
     print()
 

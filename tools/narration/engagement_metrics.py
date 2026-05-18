@@ -37,7 +37,6 @@ import statistics
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -161,8 +160,8 @@ class EngagementMetrics:
 
     # Cold-open / hook signals
     cold_open_word_count: int = 0       # words from beat-1 start to first take with pivot signal
-    hook_position_sec: Optional[float] = None  # cold_open_word_count / wpm * 60
-    hook_take_index: Optional[int] = None  # which take within Beat 1 fired the pivot
+    hook_position_sec: float | None = None  # cold_open_word_count / wpm * 60
+    hook_take_index: int | None = None  # which take within Beat 1 fired the pivot
     has_pivot_signal: bool = False
 
     # Cross-beat aggregate signals
@@ -276,7 +275,7 @@ def compute_beat_metrics(beat: ffr.Beat, wpm: int = DEFAULT_WPM) -> BeatMetrics:
 
 def detect_hook_position(
     cold_open_beat: ffr.Beat, wpm: int = DEFAULT_WPM,
-) -> tuple[Optional[float], Optional[int], int, bool]:
+) -> tuple[float | None, int | None, int, bool]:
     """Scan Beat 1's narration takes in order. Return (hook_sec, hook_take_idx,
     cold_open_word_count_when_hook_fired, has_pivot).
 
@@ -315,7 +314,7 @@ def count_pattern_interrupts(raw_script: str) -> tuple[int, int]:
 
 
 def compute_engagement_metrics(
-    script_path: Path, slug: Optional[str] = None, wpm: int = DEFAULT_WPM,
+    script_path: Path, slug: str | None = None, wpm: int = DEFAULT_WPM,
 ) -> EngagementMetrics:
     """Parse a script, derive every measurable signal, return the snapshot."""
     raw = script_path.read_text(encoding="utf-8")

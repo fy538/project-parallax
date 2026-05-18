@@ -32,6 +32,17 @@ if [ -n "$TEMPLATE_TS_CHANGED" ]; then
 fi
 
 if [ -n "$PY_CHANGED" ]; then
+  echo "→ Python lint (ruff) on changed files"
+  # ruff is fast (<1s on the changed-files subset); catches the bare-`except
+  # Exception` / unused-import / bad-zip-strict patterns the codebase has been
+  # cleaned to zero. Per pyproject.toml [tool.ruff]. Skip silently if ruff
+  # isn't installed (e.g. fresh clone before `pip install -e '.[dev]'`).
+  if python3 -m ruff --version >/dev/null 2>&1; then
+    # shellcheck disable=SC2086
+    python3 -m ruff check $PY_CHANGED
+  else
+    echo "  (ruff not installed; skipping lint. install with: pip install -e '.[dev]')"
+  fi
   echo "→ Python tests (Python files changed)"
   python3 -m pytest tools/ -q
 fi

@@ -40,9 +40,9 @@ import argparse
 import json
 import re
 import sys
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 

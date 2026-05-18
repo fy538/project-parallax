@@ -7,7 +7,6 @@ The CLI in invalidate.py is tested separately via integration tests.
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 

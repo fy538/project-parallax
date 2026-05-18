@@ -4,11 +4,10 @@ Asset search runner: aerial semiconductor factory shots
 Executes the search directly and saves results.
 """
 
-import sys
-import json
 import os
-from pathlib import Path
 import subprocess
+import sys
+from pathlib import Path
 
 # Step 1: Load environment variables from .env
 env_file = Path(__file__).parent / ".env"

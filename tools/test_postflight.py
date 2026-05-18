@@ -9,6 +9,7 @@ present).
 
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
@@ -241,9 +242,12 @@ class TestCLI:
         assert postflight.parse_resolution("1920×1080") == (1920, 1080)
 
     def test_parse_resolution_rejects_garbage(self):
-        with pytest.raises(Exception):
+        # parse_resolution raises argparse.ArgumentTypeError on bad input;
+        # narrow the assertion so a future accidental TypeError / KeyError
+        # wouldn't silently pass the previous `pytest.raises(Exception)`.
+        with pytest.raises(argparse.ArgumentTypeError):
             postflight.parse_resolution("1920")
-        with pytest.raises(Exception):
+        with pytest.raises(argparse.ArgumentTypeError):
             postflight.parse_resolution("foo x bar")
 
     def test_missing_input_file_exits_2(self):

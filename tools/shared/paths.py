@@ -16,7 +16,6 @@ with a helpful message that includes the current working directory, so silent
 
 from pathlib import Path
 
-
 # Sentinel file that uniquely identifies the project root.
 _SENTINEL = "AGENTS.md"
 

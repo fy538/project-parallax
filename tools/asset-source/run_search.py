@@ -3,9 +3,9 @@
 Run asset search for aerial semiconductor factory shots
 """
 
-import sys
 import json
 import os
+import sys
 from pathlib import Path
 
 # Load environment

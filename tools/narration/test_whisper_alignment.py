@@ -484,7 +484,7 @@ class TestTranscriptCache:
         wav.write_bytes(b"audio")
         k1 = wa._cache_key(wav, "medium", "en", "int8")
         # Touch the file with a different mtime.
-        import os, time
+        import os
         new_mtime = wav.stat().st_mtime + 100.0
         os.utime(wav, (new_mtime, new_mtime))
         k2 = wa._cache_key(wav, "medium", "en", "int8")

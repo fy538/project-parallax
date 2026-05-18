@@ -199,7 +199,7 @@ def manifest_moods(manifest: dict) -> Counter[str]:
 
 
 def manifest_track_count(manifest: dict) -> int:
-    return len(((manifest.get("musicBed") or {}).get("tracks") or []))
+    return len((manifest.get("musicBed") or {}).get("tracks") or [])
 
 
 # ─── Report ──────────────────────────────────────────────────────────────────

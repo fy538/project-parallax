@@ -47,7 +47,7 @@ import urllib.request
 import uuid as uuid_mod
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -137,7 +137,7 @@ def parse_presets_response(body: dict) -> list[Preset]:
     return presets
 
 
-def first_wav_output(production: Production) -> Optional[dict[str, Any]]:
+def first_wav_output(production: Production) -> dict[str, Any] | None:
     """Pick the WAV output from a finished production. Falls back to the
     first output if no WAV is present (operator's preset may emit FLAC/MP3)."""
     for f in production.output_files:
@@ -161,8 +161,8 @@ class AuphonicClient:
         # Tests inject a fake opener; production uses urllib's default.
         self._opener = opener or urllib.request.build_opener()
 
-    def _request(self, path: str, method: str = "GET", body: Optional[bytes] = None,
-                 content_type: Optional[str] = None,
+    def _request(self, path: str, method: str = "GET", body: bytes | None = None,
+                 content_type: str | None = None,
                  timeout: float = API_REQUEST_TIMEOUT_SEC) -> dict:
         url = f"{self.base_url}{path}"
         req = urllib.request.Request(url, data=body, method=method)
@@ -195,7 +195,7 @@ class AuphonicClient:
         return json.loads(raw.decode("utf-8"))
 
     def create_production(
-        self, wav_path: Path, preset_uuid: Optional[str] = None, title: Optional[str] = None,
+        self, wav_path: Path, preset_uuid: str | None = None, title: str | None = None,
     ) -> Production:
         """Upload a WAV via the Simple API and immediately start the production."""
         boundary = f"----auphonic{uuid_mod.uuid4().hex}"
@@ -271,7 +271,7 @@ def poll_until_done(
     a terminal state in time. Both `sleep` and `on_status` are injectable
     so tests run instantly and can assert progress reporting."""
     start = time.monotonic()
-    last_status_int: Optional[int] = None
+    last_status_int: int | None = None
     while True:
         production = client.get_production(production_uuid)
         if on_status and production.status != last_status_int:
@@ -298,7 +298,7 @@ def _default_output(wav_path: Path) -> Path:
     return wav_path.parent / "narration-mastered.wav"
 
 
-def _resolve_api_key() -> Optional[str]:
+def _resolve_api_key() -> str | None:
     return os.environ.get(ENV_API_KEY)
 
 

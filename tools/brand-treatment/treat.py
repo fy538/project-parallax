@@ -24,11 +24,10 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
 
 # === Brand palette — loaded from palette.json (single source of truth) ===
-
-from palette_loader import get_ramps_rgb, get_defaults
+from palette_loader import get_defaults, get_ramps_rgb
+from PIL import Image
 
 RAMPS = get_ramps_rgb()
 

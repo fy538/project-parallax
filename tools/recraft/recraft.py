@@ -88,8 +88,6 @@ import re
 import sys
 import time
 from pathlib import Path
-from typing import Optional
-from xml.etree import ElementTree as ET
 
 import requests
 
@@ -223,7 +221,9 @@ def create_style(
         if not p.exists():
             print(f"  WARNING: Reference image not found: {path}", file=sys.stderr)
             continue
-        files.append(("files", (p.name, open(p, "rb"), "image/png")))
+        # noqa: SIM115 — file handle must stay open until the multipart POST
+        # below consumes it. Wrapping in `with` would close before upload.
+        files.append(("files", (p.name, open(p, "rb"), "image/png")))  # noqa: SIM115
 
     if not files:
         print("ERROR: No valid reference images found.", file=sys.stderr)
@@ -283,7 +283,7 @@ def generate_image(
     size: str = "",
     n: int = 1,
     use_brand_prefix: bool = True,
-    style_id: Optional[str] = None,
+    style_id: str | None = None,
 ) -> list[dict]:
     """
     Generate image(s) via Recraft API.
@@ -408,7 +408,7 @@ def download_image(url: str, output_path: Path) -> bool:
                         output_width=1820,
                         output_height=1024,
                     )
-                    print(f"  Note: SVG response, auto-converted to PNG")
+                    print("  Note: SVG response, auto-converted to PNG")
                 except ImportError:
                     save_path = output_path.with_suffix(".svg")
                     with open(save_path, "w", encoding="utf-8") as f:
@@ -424,8 +424,9 @@ def download_image(url: str, output_path: Path) -> bool:
         elif "webp" in content_type:
             # WebP — convert to PNG for compatibility
             try:
-                from PIL import Image
                 from io import BytesIO
+
+                from PIL import Image
                 img = Image.open(BytesIO(resp.content))
                 save_path = output_path.with_suffix(".png")
                 img.save(save_path, "PNG")
@@ -435,7 +436,7 @@ def download_image(url: str, output_path: Path) -> bool:
                 save_path = output_path.with_suffix(".webp")
                 with open(save_path, "wb") as f:
                     f.write(resp.content)
-                print(f"  Note: WebP response (install Pillow to auto-convert to PNG)")
+                print("  Note: WebP response (install Pillow to auto-convert to PNG)")
         else:
             # PNG/JPEG or unknown — save as binary with requested extension
             # Detect actual format from magic bytes
@@ -443,12 +444,13 @@ def download_image(url: str, output_path: Path) -> bool:
             if magic[:4] == b"RIFF" and resp.content[8:12] == b"WEBP":
                 # WebP disguised as something else
                 try:
-                    from PIL import Image
                     from io import BytesIO
+
+                    from PIL import Image
                     img = Image.open(BytesIO(resp.content))
                     save_path = output_path.with_suffix(".png")
                     img.save(save_path, "PNG")
-                    print(f"  Note: Converted WebP → PNG")
+                    print("  Note: Converted WebP → PNG")
                 except ImportError:
                     save_path = output_path.with_suffix(".webp")
                     with open(save_path, "wb") as f:
@@ -497,7 +499,7 @@ def apply_duotone_svg(svg_path: Path, ramp_name: str = "standard") -> Path:
     """
     ramp = DUOTONE_RAMPS.get(ramp_name, DUOTONE_RAMPS["standard"])
 
-    with open(svg_path, "r", encoding="utf-8") as f:
+    with open(svg_path, encoding="utf-8") as f:
         content = f.read()
 
     # Parse all hex colors in the SVG
@@ -1048,11 +1050,11 @@ def process_batch(
     shot_list_path: Path,
     output_dir: Path,
     style: str = "vector_illustration",
-    treat_ramp: Optional[str] = None,
-    default_register: Optional[str] = None,
+    treat_ramp: str | None = None,
+    default_register: str | None = None,
     default_realism: str = "balanced",
     default_text_treatment: str = "none",
-    style_id: Optional[str] = None,
+    style_id: str | None = None,
 ) -> dict:
     """
     Process a shot list JSON file, generating SVGs for AI-GENERATE entries.
@@ -1089,7 +1091,7 @@ def process_batch(
         print("  export RECRAFT_API_KEY=your_key", file=sys.stderr)
         sys.exit(1)
 
-    with open(shot_list_path, "r", encoding="utf-8") as f:
+    with open(shot_list_path, encoding="utf-8") as f:
         shots = json.load(f)
 
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1116,11 +1118,16 @@ def process_batch(
         description = shot.get("recraft_prompt") or shot.get("description", "")
         visual_mode = shot.get("visual_mode", "illustration")
         context = shot.get("context", "")
-        # Per-shot register/realism/text_treatment override CLI-level defaults;
-        # all three feed the constructivist preamble composition.
+        # Per-shot register/realism/text_treatment/style_id override CLI-level
+        # defaults; all four feed the constructivist preamble composition. The
+        # style_id assignment MUST be here (not below the prompt-building
+        # branch) — line 1136's `if shot_register and shot_style_id:` needs it
+        # in scope. The prior duplicate assignment at the foot of the loop
+        # (which existed when this was a NameError bug) is removed.
         shot_register = shot.get("register") or default_register
         shot_realism = shot.get("realism", default_realism)
         shot_text_treatment = shot.get("text_treatment", default_text_treatment)
+        shot_style_id = shot.get("style_id") or style_id
 
         print(f"\n[{i+1}/{len(ai_shots)}] {shot_id}")
         print(f"  Description: {description[:60]}{'...' if len(description) > 60 else ''}")
@@ -1165,8 +1172,8 @@ def process_batch(
         else:
             shot_style = shot.get("style", style)
 
-        # Per-shot style_id overrides batch-level style_id
-        shot_style_id = shot.get("style_id") or style_id
+        # (shot_style_id is assigned above with the other per-shot overrides,
+        # before the prompt-building branch needs it.)
 
         # Generate
         results = generate_image(
@@ -1334,7 +1341,7 @@ def cmd_create_style(args):
             json.dump(meta, f, indent=2)
         print(f"  Style metadata saved to: {save_path}")
 
-    print(f"\n  Use this style_id in subsequent commands:")
+    print("\n  Use this style_id in subsequent commands:")
     print(f"    python recraft.py generate \"prompt\" --style-id {style_id}")
     print(f"    python recraft.py batch shot-list.json --style-id {style_id}")
 
@@ -1353,7 +1360,7 @@ def cmd_styles(args):
         print(f"  {name:24s} {desc}")
 
     print(f"\n  Total: {len(ALL_STYLES)} styles available")
-    print(f"  ★ = default\n")
+    print("  ★ = default\n")
 
 
 def main():

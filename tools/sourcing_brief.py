@@ -50,7 +50,6 @@ import sys
 import urllib.parse
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_ROOT = REPO_ROOT / "episodes"
@@ -302,7 +301,7 @@ def render_markdown(brief: Brief, assets: list[AssetEntry]) -> str:
     if brief.shot_list_path:
         buf.write(f"**Shot list:** `{_try_relative(brief.shot_list_path)}`\n")
     else:
-        buf.write(f"**Shot list:** (none — notes / treatment / priority unavailable)\n")
+        buf.write("**Shot list:** (none — notes / treatment / priority unavailable)\n")
     buf.write(f"**Total assets shown:** {len(assets)} of {brief.total}\n")
     if brief.by_status:
         status_str = " · ".join(
@@ -332,7 +331,7 @@ def render_markdown(brief: Brief, assets: list[AssetEntry]) -> str:
             buf.write(f"**Medium:** {a.medium} · **Treatment:** {a.treatment}  \n")
             if not a.in_shot_list:
                 buf.write(
-                    f"⚠️  Not in shot-list.json — treatment/notes/priority unavailable.  \n"
+                    "⚠️  Not in shot-list.json — treatment/notes/priority unavailable.  \n"
                 )
             if a.file:
                 buf.write(f"**File:** `{a.file}`  \n")

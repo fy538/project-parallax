@@ -51,9 +51,7 @@ import shutil
 import subprocess
 import sys
 from collections import defaultdict
-from dataclasses import asdict
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -74,7 +72,7 @@ def _ensure_git() -> None:
         sys.exit(2)
 
 
-def git_diff_paths(from_ref: Optional[str], to_ref: Optional[str]) -> list[str]:
+def git_diff_paths(from_ref: str | None, to_ref: str | None) -> list[str]:
     """Return changed paths between two refs.
 
     Modes:
@@ -156,8 +154,8 @@ _CONFIDENCE_ICON = {"high": "🔴", "medium": "🟡", "low": "🟢"}
 
 def render_report_md(
     invalidations: list[ic.Invalidation],
-    changed_paths: list[str], from_ref: Optional[str], to_ref: Optional[str],
-    episode_filter: Optional[str] = None,
+    changed_paths: list[str], from_ref: str | None, to_ref: str | None,
+    episode_filter: str | None = None,
 ) -> str:
     """Render the staleness report as markdown — grouped by source path,
     with min-repro-set at the top + per-source detail."""
@@ -246,7 +244,7 @@ def render_report_md(
     return "\n".join(lines) + "\n"
 
 
-def _describe_diff(from_ref: Optional[str], to_ref: Optional[str]) -> str:
+def _describe_diff(from_ref: str | None, to_ref: str | None) -> str:
     if from_ref is None and to_ref is None:
         return "working tree vs HEAD"
     if to_ref is None:
@@ -257,7 +255,7 @@ def _describe_diff(from_ref: Optional[str], to_ref: Optional[str]) -> str:
 
 def render_report_json(
     invalidations: list[ic.Invalidation], changed_paths: list[str],
-    from_ref: Optional[str], to_ref: Optional[str],
+    from_ref: str | None, to_ref: str | None,
 ) -> str:
     """JSON for downstream tooling."""
     payload = {

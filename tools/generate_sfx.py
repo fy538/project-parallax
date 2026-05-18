@@ -25,7 +25,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from scipy.signal import butter, sosfilt, fftconvolve
+from scipy.signal import butter, fftconvolve, sosfilt
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -314,7 +314,7 @@ def synth_map_whoosh(dur: float, gain: float) -> np.ndarray:
     evoking a camera panning across a geographic surface.
     """
     n   = int(dur * SR)
-    tt  = t(dur)
+    t(dur)
 
     noise = pink_noise(n)
 

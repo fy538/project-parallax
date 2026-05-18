@@ -18,7 +18,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 import sync_pipeline_state as sps  # type: ignore[import-not-found]
 

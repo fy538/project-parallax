@@ -44,9 +44,9 @@ import sys
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -267,7 +267,7 @@ def save_state(path: Path, state: dict) -> None:
 def run_digest(
     config_path: Path = DEFAULT_CONFIG_PATH,
     state_path: Path = DEFAULT_STATE_PATH,
-    since_override: Optional[str] = None,
+    since_override: str | None = None,
     fetcher: HttpFetcher = _http_fetch,
     update_state: bool = True,
 ) -> DigestReport:

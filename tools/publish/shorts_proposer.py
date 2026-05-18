@@ -60,7 +60,6 @@ import os
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -141,7 +140,7 @@ class ShortsCandidate:
     # "snaps into focus" / when its limit is named cleanly / when it
     # stands alone without setup. The heuristic score gets WHAT to score;
     # the LLM score gets WHICH OF THESE deserves the operator's attention.
-    llm_score: Optional[float] = None     # 0-100 (None = not scored)
+    llm_score: float | None = None     # 0-100 (None = not scored)
     llm_rationale: str = ""
 
 
@@ -311,7 +310,7 @@ def _propose_quote_candidates(manifest: dict, beat_labels: dict[str, str]) -> li
             label=f"Quote — {seg.get('id', '')}",
             rationale=f"MG/{tmpl} segment at {seg.get('startSec', 0):.0f}s. "
                       f"Quotes carry their own context and lift cleanly to KineticShort/quote.",
-            notes=f"Fill `data.variant='quote'`, `data.text`, `data.attribution`.",
+            notes="Fill `data.variant='quote'`, `data.text`, `data.attribution`.",
         ))
     return out
 
@@ -342,8 +341,8 @@ def _propose_framework_candidates(manifest: dict, beat_labels: dict[str, str]) -
             durationSec=target_dur,
             score=score,
             label=f"Framework — {seg.get('id', '')}",
-            rationale=f"FrameworkDiagram segment. One diagram → one Short is the cleanest "
-                      f"shape (a self-contained concept).",
+            rationale="FrameworkDiagram segment. One diagram → one Short is the cleanest "
+                      "shape (a self-contained concept).",
             notes=f"Reuse the framework data file from "
                   f"{_segment_data_file(seg)}.",
         ))
@@ -591,8 +590,8 @@ def main() -> int:
     def _positive_int(s):
         try:
             v = int(s)
-        except ValueError:
-            raise argparse.ArgumentTypeError(f"expected int, got {s!r}")
+        except ValueError as e:
+            raise argparse.ArgumentTypeError(f"expected int, got {s!r}") from e
         if v <= 0:
             raise argparse.ArgumentTypeError(
                 f"--llm-top-k must be > 0 (got {v}); use --top alone if you "

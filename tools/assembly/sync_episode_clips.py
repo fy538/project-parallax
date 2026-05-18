@@ -154,7 +154,7 @@ def main():
             src = asset.get("source", "—")
             if not is_resolved:
                 no_match += 1
-                status_str = f"no shotListId match" if shot_id == "—" else f"no file for shotListId={shot_id}"
+                status_str = "no shotListId match" if shot_id == "—" else f"no file for shotListId={shot_id}"
                 print(f"  ❓ {seg['id']} ({seg['startSec']:.1f}s): {status_str} | source={src}")
 
     # Report proposed changes

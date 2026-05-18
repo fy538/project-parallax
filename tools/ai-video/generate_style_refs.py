@@ -67,8 +67,8 @@ import json
 import os
 import sys
 import time
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────
 
@@ -750,7 +750,7 @@ def run_lut_test(ref: StyleRef, style_refs_dir: Path) -> dict:
                 else:
                     print(f"    ✗ Failed: {result2.stderr[:200]}")
         except subprocess.TimeoutExpired:
-            print(f"    ✗ Timed out")
+            print("    ✗ Timed out")
         except FileNotFoundError:
             print(f"    ✗ Treatment tool not found at {TREAT_VIDEO}")
             break
@@ -831,8 +831,8 @@ def cmd_generate(args):
 
     if args.all:
         refs = [REFS_BY_NUMBER[n] for n in GENERATION_ORDER]
-        print(f"\nGenerating all 7 style references in recommended order...")
-        print(f"Estimated cost: ~$0.32 (7 × $0.045)\n")
+        print("\nGenerating all 7 style references in recommended order...")
+        print("Estimated cost: ~$0.32 (7 × $0.045)\n")
     else:
         ref = resolve_ref(args.ref)
         refs = [ref]

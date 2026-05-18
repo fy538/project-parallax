@@ -55,7 +55,6 @@ import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -187,7 +186,7 @@ class LoudnormParseError(RuntimeError):
     (typically: ffmpeg too old to emit target_offset)."""
 
 
-def parse_pass1_measurement(stderr: str) -> Optional[LoudnormPass1]:
+def parse_pass1_measurement(stderr: str) -> LoudnormPass1 | None:
     """Extract the measured-loudness JSON block from pass-1 stderr.
 
     Pure function over stderr text so we can unit-test against fixtures

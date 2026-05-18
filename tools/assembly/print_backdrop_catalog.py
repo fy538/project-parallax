@@ -25,7 +25,6 @@ _TOOLS_SHARED = Path(__file__).resolve().parent.parent / "shared"
 sys.path.insert(0, str(_TOOLS_SHARED))
 from backdrop_manifest import (  # noqa: E402
     CHART_FIT_HINT,
-    CHART_RANK,
     derive_chart_fit,
     passes_chart_at_least,
 )

@@ -43,7 +43,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
@@ -260,8 +259,8 @@ def build_pickup_chunks(
 
 def run_pickup_pass(
     slug: str, script_path: Path,
-    wav_path: Optional[Path] = None,
-    alignment_json: Optional[Path] = None,
+    wav_path: Path | None = None,
+    alignment_json: Path | None = None,
     merge_window: float = DEFAULT_MERGE_WINDOW_SEC,
 ) -> PickupReport:
     """Run alignment (from WAV or cached JSON), produce the pickup report."""
@@ -325,8 +324,8 @@ def render_pickup_md(report: PickupReport) -> str:
     lines = [
         f"# Pickup Script — {report.slug}",
         "",
-        f"_Re-record only the chunks below. Each one is short enough to read "
-        f"in one take with natural lead-in / trail-out for splicing._",
+        "_Re-record only the chunks below. Each one is short enough to read "
+        "in one take with natural lead-in / trail-out for splicing._",
         "",
         f"**Source:** `{report.wav_path}`",
         f"**Alignment issues total:** {report.total_alignment_issues}",
@@ -369,7 +368,7 @@ def render_pickup_md(report: PickupReport) -> str:
         )
         lines.append("")
         if c.lead_in:
-            lines.append(f"_Lead-in (don't record — read silently first):_")
+            lines.append("_Lead-in (don't record — read silently first):_")
             lines.append("")
             lines.append(f"> {c.lead_in}")
             lines.append("")
@@ -378,7 +377,7 @@ def render_pickup_md(report: PickupReport) -> str:
         lines.append(f"> **{c.pickup_text}**")
         lines.append("")
         if c.trail_out:
-            lines.append(f"_Trail-out (read into this for natural landing — editor trims):_")
+            lines.append("_Trail-out (read into this for natural landing — editor trims):_")
             lines.append("")
             lines.append(f"> {c.trail_out}")
             lines.append("")

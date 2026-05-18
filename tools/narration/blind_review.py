@@ -46,7 +46,6 @@ import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -116,7 +115,7 @@ class LabelAssignment:
 
 
 def randomly_assign_labels(
-    path_first: Path, path_second: Path, seed: Optional[int] = None,
+    path_first: Path, path_second: Path, seed: int | None = None,
 ) -> LabelAssignment:
     """Coin flip — half the time A=first_arg, half the time A=second_arg.
 
@@ -215,7 +214,7 @@ def build_reviewer_prompt(script_a_text: str, script_b_text: str) -> str:
 
 
 def prepare_blind_pair(
-    script_a: Path, script_b: Path, seed: Optional[int] = None,
+    script_a: Path, script_b: Path, seed: int | None = None,
 ) -> tuple[LabelAssignment, str]:
     """Randomize labels + build the prompt. Returns (assignment, prompt_text)
     so the caller can hand the prompt to whichever reviewer they choose
@@ -241,10 +240,10 @@ def render_review_report(
         "",
         "## Setup",
         "",
-        f"- **Reviewer:** [LLM agent / human — fill in]",
+        "- **Reviewer:** [LLM agent / human — fill in]",
         f"- **Input A (first CLI arg):** `{name_first}`",
         f"- **Input B (second CLI arg):** `{name_second}`",
-        f"- **Random seed:** [seed value used]",
+        "- **Random seed:** [seed value used]",
         "",
         "## Reviewer verdict (blind — labels A/B do NOT correspond to input order)",
         "",

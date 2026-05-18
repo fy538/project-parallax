@@ -12,6 +12,7 @@ Covers:
 
 from __future__ import annotations
 
+import contextlib
 import re
 import subprocess
 import sys
@@ -250,7 +251,5 @@ class TestCLISubprocess:
             for f in log_dir.glob("*-pytest-smoke.log"):
                 f.unlink()
             # Remove the render-logs dir if it's empty (we may have created it)
-            try:
+            with contextlib.suppress(OSError):
                 log_dir.rmdir()
-            except OSError:
-                pass

@@ -44,7 +44,6 @@ import json
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -84,7 +83,7 @@ class RetentionDrop:
     end_sec: float
     start_retention_pct: float
     end_retention_pct: float
-    beat_number: Optional[int] = None
+    beat_number: int | None = None
     beat_title: str = ""
 
     @property

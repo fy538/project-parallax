@@ -34,7 +34,6 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Optional
 from urllib.parse import quote_plus
 
 import requests
@@ -214,7 +213,7 @@ def search_with_fallbacks(terms: list[str], media_type: str = "photo") -> dict:
             all_results.extend(results)
             print(f"    Found {len(results)} results")
         else:
-            print(f"    No results")
+            print("    No results")
 
     # Deduplicate by (source, id)
     seen = set()
@@ -235,7 +234,7 @@ def search_with_fallbacks(terms: list[str], media_type: str = "photo") -> dict:
 
 # ── Download ──────────────────────────────────────────────────────────────────
 
-def download_asset(result: dict, output_dir: Path, prefix: str = "") -> Optional[Path]:
+def download_asset(result: dict, output_dir: Path, prefix: str = "") -> Path | None:
     """Download a single asset to the output directory."""
     url = result.get("download", "")
     if not url:

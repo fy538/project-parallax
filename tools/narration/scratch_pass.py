@@ -47,12 +47,10 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
-import json
 import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -85,7 +83,7 @@ class ScratchPassReport:
     alignment_minor_issues: int = 0
 
     manifest_promoted: bool = False
-    manifest_path: Optional[Path] = None
+    manifest_path: Path | None = None
 
     script_estimated_sec: float = 0.0     # at 150 wpm
     actual_runtime_sec: float = 0.0       # measured from scratch wav transcript
@@ -179,7 +177,7 @@ def run_manifest_promotion(
 def run_scratch_pass(
     slug: str, scratch_wav: Path,
     skip_alignment: bool = False, skip_manifest: bool = False,
-    script_override: Optional[Path] = None,
+    script_override: Path | None = None,
 ) -> ScratchPassReport:
     """The full scratch-pass workflow as a pure function (returns the report)."""
     script_path = script_override or ffr.find_script(slug)
@@ -284,7 +282,7 @@ def render_report_md(r: ScratchPassReport) -> str:
             "## Timing drift",
             "",
             f"- Script estimate at {ffr.DEFAULT_WPM} wpm: **{_fmt_mmss(r.script_estimated_sec)}**",
-            f"- Scratch actual runtime: _not measured (alignment skipped or unavailable)_",
+            "- Scratch actual runtime: _not measured (alignment skipped or unavailable)_",
             "",
         ])
 
@@ -324,7 +322,7 @@ def render_report_md(r: ScratchPassReport) -> str:
         "timestamps instead of 150-wpm estimates. Without this, late narration "
         "drift (which can be 10%+) forces visual-spec rework.",
         "",
-        f"Next steps:",
+        "Next steps:",
         "1. If pickup count is high, refine the scratch take OR proceed knowing "
         "   the final recording will improve.",
         "2. Use the precise-mode manifest to inform visual-spec timing budgets.",

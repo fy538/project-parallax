@@ -210,7 +210,7 @@ class TestRunDigest:
         ])
         state = tmp_path / "state.json"
         fetcher = _FakeFetcher({"https://example.com/feed.rss": _RSS_SAMPLE})
-        report = sm.run_digest(
+        sm.run_digest(
             config_path=cfg, state_path=state,
             fetcher=fetcher, update_state=False,
         )

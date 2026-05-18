@@ -37,6 +37,7 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime
 import json
 import re
@@ -45,7 +46,6 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -103,7 +103,7 @@ class ProbeReport:
     sample_rate: int
     channels: int
     codec: str
-    bit_depth: Optional[int] = None  # PCM only
+    bit_depth: int | None = None  # PCM only
 
 
 @dataclass
@@ -158,10 +158,10 @@ class Finding:
 class AuditReport:
     wav_path: Path
     probe: ProbeReport
-    loudness: Optional[LoudnessReport]
+    loudness: LoudnessReport | None
     silences: list[SilenceEvent] = field(default_factory=list)
-    rms_envelope: Optional[RmsEnvelope] = None
-    noise_floor: Optional[NoiseFloor] = None
+    rms_envelope: RmsEnvelope | None = None
+    noise_floor: NoiseFloor | None = None
     findings: list[Finding] = field(default_factory=list)
 
     @property
@@ -244,7 +244,7 @@ def probe_audio(wav_path: Path) -> ProbeReport:
 _LOUDNORM_MARKER_RE = re.compile(r"Parsed_loudnorm", re.IGNORECASE)
 
 
-def _extract_balanced_json(text: str, start: int) -> Optional[str]:
+def _extract_balanced_json(text: str, start: int) -> str | None:
     """Starting at the first `{` at or after `start`, walk forward and
     return the balanced JSON substring (or None if no balance found)."""
     open_pos = text.find("{", start)
@@ -274,7 +274,7 @@ def _extract_balanced_json(text: str, start: int) -> Optional[str]:
     return None
 
 
-def parse_loudnorm_output(stderr: str) -> Optional[LoudnessReport]:
+def parse_loudnorm_output(stderr: str) -> LoudnessReport | None:
     """Extract integrated LUFS + true peak from the loudnorm stderr blob.
 
     Pure-function — takes the stderr text, returns parsed report or None
@@ -305,7 +305,7 @@ def parse_loudnorm_output(stderr: str) -> Optional[LoudnessReport]:
         return None
 
 
-def measure_loudness(wav_path: Path) -> Optional[LoudnessReport]:
+def measure_loudness(wav_path: Path) -> LoudnessReport | None:
     """Run ffmpeg's loudnorm filter in measurement mode."""
     result = subprocess.run(
         [
@@ -336,7 +336,7 @@ def parse_silencedetect_output(stderr: str) -> list[SilenceEvent]:
     dropped — duration unknown, not worth surfacing.
     """
     events: list[SilenceEvent] = []
-    pending_start: Optional[float] = None
+    pending_start: float | None = None
     for line in stderr.splitlines():
         sm = SILENCE_START_RE.search(line)
         if sm:
@@ -392,10 +392,8 @@ def parse_astats_envelope(stderr: str, window_sec: float = RMS_WINDOW_SEC) -> Rm
     for line in stderr.splitlines():
         pm = _ASTATS_PTS_RE.search(line)
         if pm:
-            try:
+            with contextlib.suppress(ValueError):
                 current_time = float(pm.group(1))
-            except ValueError:
-                pass
             continue
         rm = _ASTATS_RMS_RE.search(line)
         if rm:
@@ -422,7 +420,7 @@ def parse_astats_envelope(stderr: str, window_sec: float = RMS_WINDOW_SEC) -> Rm
 
 def measure_rms_envelope(
     wav_path: Path, window_sec: float = RMS_WINDOW_SEC,
-    sample_rate: Optional[int] = None,
+    sample_rate: int | None = None,
 ) -> RmsEnvelope:
     """Run ffmpeg with the astats filter and parse per-frame RMS into
     windowed bins. Returns RmsEnvelope (empty if measurement failed).
@@ -452,7 +450,7 @@ def measure_rms_envelope(
 # ── Noise floor (RMS during detected silences) ──────────────────────────────
 
 
-def parse_volumedetect_mean_dbfs(stderr: str) -> Optional[float]:
+def parse_volumedetect_mean_dbfs(stderr: str) -> float | None:
     """Extract `mean_volume: -XX.X dB` from ffmpeg volumedetect output."""
     m = re.search(r"mean_volume:\s*(-?\d+(?:\.\d+)?)\s*dB", stderr)
     if not m:
@@ -465,7 +463,7 @@ def parse_volumedetect_mean_dbfs(stderr: str) -> Optional[float]:
 
 def measure_noise_floor(
     wav_path: Path, silences: list[SilenceEvent], min_total_sec: float = 1.0,
-) -> Optional[NoiseFloor]:
+) -> NoiseFloor | None:
     """Measure RMS dBFS during detected silence regions. Returns None if
     no silences were found (can't measure room tone if there are no
     pauses in the take) or if the total silent duration is too short to
@@ -519,7 +517,7 @@ def measure_noise_floor(
 # checks out makes each one unit-testable without spawning ffmpeg.
 
 
-def check_loudness(loud: Optional[LoudnessReport]) -> list[Finding]:
+def check_loudness(loud: LoudnessReport | None) -> list[Finding]:
     findings: list[Finding] = []
     if loud is None:
         findings.append(Finding(
@@ -611,12 +609,12 @@ def check_silences(silences: list[SilenceEvent], threshold_sec: float) -> list[F
         level="warn", code="A-SILENCE-LONG",
         msg=msg,
         fix="Edit out the unintended dead air in your DAW; "
-            f"or relax the threshold with `--silence-min` if these are deliberate pauses.",
+            "or relax the threshold with `--silence-min` if these are deliberate pauses.",
     ))
     return findings
 
 
-def check_rms_envelope(env: Optional[RmsEnvelope]) -> list[Finding]:
+def check_rms_envelope(env: RmsEnvelope | None) -> list[Finding]:
     """Flag loudness drift across the take. Auphonic can normalize a
     consistent take but won't fix one where the first half is much
     quieter than the second."""
@@ -651,7 +649,7 @@ def check_rms_envelope(env: Optional[RmsEnvelope]) -> list[Finding]:
     return findings
 
 
-def check_noise_floor(nf: Optional[NoiseFloor]) -> list[Finding]:
+def check_noise_floor(nf: NoiseFloor | None) -> list[Finding]:
     """Flag a noisy recording environment. > -45 dBFS is audible in
     pauses; > -35 dBFS is unsalvageable without aggressive denoising
     that introduces artifacts."""
@@ -717,14 +715,14 @@ def audit_audio(
     # Long-silence detection uses the user-facing threshold for the warn finding
     long_silences = [s for s in silences if s.duration_sec >= silence_min_sec]
 
-    envelope: Optional[RmsEnvelope] = None
+    envelope: RmsEnvelope | None = None
     if measure_envelope:
         # Pass the already-probed sample_rate so measure_rms_envelope
         # doesn't re-probe (saves one ffprobe invocation).
         envelope = measure_rms_envelope(
             wav_path, sample_rate=probe.sample_rate or None,
         )
-    floor: Optional[NoiseFloor] = None
+    floor: NoiseFloor | None = None
     if measure_floor:
         floor = measure_noise_floor(wav_path, silences)
 
@@ -751,7 +749,7 @@ def render_report_md(report: AuditReport) -> str:
     lines: list[str] = [
         f"# Audio QA — {report.wav_path.name}",
         f"> Auto-generated {today} by `tools/narration/audio_qa.py`.",
-        f"> **Do not edit by hand.** Re-run after each pickup or mastering pass.",
+        "> **Do not edit by hand.** Re-run after each pickup or mastering pass.",
         "",
         f"**File:** `{report.wav_path}`",
         f"**Duration:** {duration_str} ({report.probe.duration_sec:.1f}s) · "
@@ -832,7 +830,7 @@ def render_report_md(report: AuditReport) -> str:
 # ── CLI ──────────────────────────────────────────────────────────────────────
 
 
-def _resolve_wav(slug: Optional[str], wav_arg: Optional[str]) -> Path:
+def _resolve_wav(slug: str | None, wav_arg: str | None) -> Path:
     """Resolve the WAV path from slug + --wav. Either may be set."""
     if wav_arg:
         return Path(wav_arg).resolve()

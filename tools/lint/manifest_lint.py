@@ -38,9 +38,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"
@@ -168,7 +168,7 @@ def check_d18_music_hold(manifest: dict, _: str) -> list[Violation]:
         violations.append(Violation(
             rule="M-D18",
             file="",  # filled in by caller
-            pointer=f"musicBed.tracks[0].startSec",
+            pointer="musicBed.tracks[0].startSec",
             message=(
                 f"first music track starts at {track_start}s but opening setup "
                 f"ends at {opening_end}s ({rationale}). POLISH.md D18: music "
@@ -1265,7 +1265,7 @@ def lint_manifest(manifest_path: Path) -> list[Violation]:
     return violations
 
 
-def find_manifests(episode_filter: Optional[str] = None) -> list[Path]:
+def find_manifests(episode_filter: str | None = None) -> list[Path]:
     """Find every assembly-manifest.json under data/episodes/."""
     paths = []
     if not EPISODES_DIR.exists():

@@ -17,7 +17,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 INVALIDATE_SCRIPT = REPO_ROOT / "tools" / "assembly" / "invalidate.py"

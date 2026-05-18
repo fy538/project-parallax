@@ -29,8 +29,9 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from shorts_proposer import ShortsCandidate
@@ -77,7 +78,7 @@ Return ONLY a JSON object with this exact shape:
 
 
 def build_scoring_prompt(
-    candidate: "ShortsCandidate", narration_text: str,
+    candidate: ShortsCandidate, narration_text: str,
 ) -> str:
     """Render the per-candidate scoring prompt. The candidate's
     structural metadata (template, beat, duration, kind) frames the
@@ -163,7 +164,7 @@ class LLMScoreResult:
     rationale: str
 
 
-def parse_llm_response(text: str) -> Optional[LLMScoreResult]:
+def parse_llm_response(text: str) -> LLMScoreResult | None:
     """Parse the structured JSON the LLM returns. Tolerant of code
     fences + prepended text. Returns None on unparseable input."""
     if not text:
@@ -248,9 +249,9 @@ def make_anthropic_scorer(
 
 
 def llm_rerank(
-    candidates: list["ShortsCandidate"], manifest: dict,
-    scorer: ScorerFn, top_k: Optional[int] = None,
-) -> list["ShortsCandidate"]:
+    candidates: list[ShortsCandidate], manifest: dict,
+    scorer: ScorerFn, top_k: int | None = None,
+) -> list[ShortsCandidate]:
     """Score the top-K candidates with the LLM and re-sort by LLM score
     (desc; falls back to heuristic score for unscored / failed entries).
 
@@ -283,7 +284,7 @@ def llm_rerank(
         cand.llm_rationale = result.rationale
     # Sort: LLM-scored first (by llm_score desc), then unscored
     # (by heuristic score desc). Tie-break by startSec for stability.
-    def _sort_key(c: "ShortsCandidate"):
+    def _sort_key(c: ShortsCandidate):
         # llm_score=None sorts after any scored candidate
         has_llm = c.llm_score is not None
         return (

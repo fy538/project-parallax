@@ -33,9 +33,9 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -89,13 +89,13 @@ def _direction(a: float, b: float) -> str:
     return "↑" if b > a else "↓"
 
 
-def _fmt_sec(s: Optional[float]) -> str:
+def _fmt_sec(s: float | None) -> str:
     if s is None:
         return "—"
     return f"{s:.1f}s"
 
 
-def _fmt_mmss(s: Optional[float]) -> str:
+def _fmt_mmss(s: float | None) -> str:
     if s is None:
         return "—"
     total = int(round(s))
@@ -103,11 +103,11 @@ def _fmt_mmss(s: Optional[float]) -> str:
 
 
 def _make_delta(
-    name: str, a: Optional[float], b: Optional[float],
+    name: str, a: float | None, b: float | None,
     threshold_key: str,
-    fmt: Callable[[Optional[float]], str] = lambda v: f"{v:.1f}" if v is not None else "—",
+    fmt: Callable[[float | None], str] = lambda v: f"{v:.1f}" if v is not None else "—",
     interpretation: str = "",
-    delta_fmt: Optional[Callable[[float, float], str]] = None,
+    delta_fmt: Callable[[float, float], str] | None = None,
 ) -> MetricDelta:
     """Build one MetricDelta row."""
     if a is None and b is None:
@@ -234,7 +234,10 @@ def compare_per_beat(
     mismatch in the report.
     """
     pairs: list[tuple[em.BeatMetrics, em.BeatMetrics, dict[str, str]]] = []
-    for ba, bb in zip(a.beats, b.beats):
+    # strict=False: docstring above says "if they don't [match length], we zip
+    # up to the shorter and flag the mismatch in the report." — that's the
+    # explicit intent here, not a bug.
+    for ba, bb in zip(a.beats, b.beats, strict=False):
         deltas = {
             "word_count": f"{bb.word_count - ba.word_count:+d}",
             "runtime": f"{bb.estimated_runtime_sec - ba.estimated_runtime_sec:+.0f}s",

@@ -51,9 +51,9 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -391,7 +391,7 @@ def _default_manifest_path(slug: str) -> Path:
     return REMOTION_DATA / slug / "assembly-manifest.json"
 
 
-def load_manifest(path: Path) -> Optional[dict]:
+def load_manifest(path: Path) -> dict | None:
     if not path.is_file():
         return None
     try:
@@ -402,10 +402,10 @@ def load_manifest(path: Path) -> Optional[dict]:
 
 def run_episode_watch(
     slug: str,
-    mp4_path: Optional[Path] = None,
-    video_id: Optional[str] = None,
-    manifest_path: Optional[Path] = None,
-    api_key: Optional[str] = None,
+    mp4_path: Path | None = None,
+    video_id: str | None = None,
+    manifest_path: Path | None = None,
+    api_key: str | None = None,
     index_id: str = DEFAULT_INDEX_ID,
     dry_run: bool = False,
     post_fn: HttpFn = _http_post_json,
@@ -473,10 +473,10 @@ def render_report_md(report: EpisodeWatchReport) -> str:
     lines = [
         f"# Episode Watch — {report.episode_title}",
         "",
-        f"_Editorial AI pass over the assembled MP4 via Twelve Labs "
-        f"Pegasus 1.2. Surfaces pacing dead zones, visual register "
-        f"monotony, missed callbacks, AV desync, and closing-third "
-        f"energy drops — problems that only emerge at assembly._",
+        "_Editorial AI pass over the assembled MP4 via Twelve Labs "
+        "Pegasus 1.2. Surfaces pacing dead zones, visual register "
+        "monotony, missed callbacks, AV desync, and closing-third "
+        "energy drops — problems that only emerge at assembly._",
         "",
         f"**Video ID:** `{report.video_id or '(dry-run, no video indexed)'}`",
         "",
@@ -581,7 +581,7 @@ def main() -> int:
     api_key = os.environ.get("TWELVELABS_API_KEY", "")
     index_id = args.index_id or DEFAULT_INDEX_ID
 
-    mp4_path: Optional[Path] = None
+    mp4_path: Path | None = None
     if args.mp4:
         mp4_path = Path(args.mp4).resolve()
         if not mp4_path.is_file():

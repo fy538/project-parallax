@@ -78,9 +78,9 @@ import argparse
 import json
 import re
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -104,9 +104,9 @@ class GenerationSpec:
     """What the visual-spec wants from the generator."""
     prompt: str
     required_terms: list[str] = field(default_factory=list)
-    target_dimensions: Optional[tuple[int, int]] = None
-    register: Optional[str] = None  # "analytical" | "atmospheric" | "grounding"
-    aspect_ratio: Optional[str] = None  # "16:9" | "9:16" | "1:1"
+    target_dimensions: tuple[int, int] | None = None
+    register: str | None = None  # "analytical" | "atmospheric" | "grounding"
+    aspect_ratio: str | None = None  # "16:9" | "9:16" | "1:1"
 
 
 @dataclass
@@ -117,9 +117,9 @@ class Artifact:
     `pixel_sample` (list of (r,g,b) tuples) — critics handle both.
     """
     prompt_used: str
-    image_path: Optional[Path] = None
-    pixel_sample: Optional[list[tuple[int, int, int]]] = None
-    dimensions: Optional[tuple[int, int]] = None
+    image_path: Path | None = None
+    pixel_sample: list[tuple[int, int, int]] | None = None
+    dimensions: tuple[int, int] | None = None
     metadata: dict = field(default_factory=dict)
 
 
@@ -154,7 +154,7 @@ class LoopResult:
     """Outcome of the full loop."""
     accepted: bool
     iterations: int
-    final_artifact: Optional[Artifact]
+    final_artifact: Artifact | None
     history: list[IterationRecord] = field(default_factory=list)
 
     @property
@@ -230,7 +230,7 @@ def palette_critic(
     artifact: Artifact, spec: GenerationSpec,
     tolerance: float = DEFAULT_PALETTE_TOLERANCE,
     coverage: float = DEFAULT_PALETTE_COVERAGE,
-    palette: Optional[list[tuple[int, int, int]]] = None,
+    palette: list[tuple[int, int, int]] | None = None,
 ) -> CritiqueResult:
     """Check that dominant colors fall within the brand palette."""
     if palette is None:
@@ -264,10 +264,10 @@ def palette_critic(
                 f"(target ≥{int(coverage * 100)}%)",
         refinement_hint=(
             "" if passed
-            else f"Constrain palette: only use Meridian brand colors "
-                 f"(ink #1C1814, walnut #5C4A3D, umber #8B7355, taupe #B8A189, "
-                 f"sand #D9C9B0, bone #F0E6D0, paper #F5F0E8, gold #C4A747). "
-                 f"Avoid saturated reds, greens, blues outside this palette."
+            else "Constrain palette: only use Meridian brand colors "
+                 "(ink #1C1814, walnut #5C4A3D, umber #8B7355, taupe #B8A189, "
+                 "sand #D9C9B0, bone #F0E6D0, paper #F5F0E8, gold #C4A747). "
+                 "Avoid saturated reds, greens, blues outside this palette."
         ),
     )
 
@@ -438,7 +438,7 @@ Generator = Callable[[str], Artifact]
 def run_critic_loop(
     spec: GenerationSpec,
     generator: Generator,
-    critics: Optional[list[Critic]] = None,
+    critics: list[Critic] | None = None,
     max_iters: int = DEFAULT_MAX_ITERS,
 ) -> LoopResult:
     """Iterate generator → critique → refine until all critics pass or
@@ -450,7 +450,7 @@ def run_critic_loop(
 
     history: list[IterationRecord] = []
     current_prompt = spec.prompt
-    artifact: Optional[Artifact] = None
+    artifact: Artifact | None = None
 
     for i in range(1, max_iters + 1):
         try:

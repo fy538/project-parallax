@@ -316,7 +316,6 @@ class TestIntegration:
                   sample_rate: int = 48000, channels: int = 1,
                   freq: int = 440) -> None:
         """Generate a sine-wave WAV at the given specs."""
-        ch_layout = "mono" if channels == 1 else "stereo"
         subprocess.run(
             [
                 "ffmpeg", "-y", "-loglevel", "error",

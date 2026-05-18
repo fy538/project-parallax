@@ -39,7 +39,6 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"

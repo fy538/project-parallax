@@ -20,8 +20,6 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
-
 
 # ── PathPattern ──────────────────────────────────────────────────────────────
 
@@ -106,7 +104,7 @@ class PathPattern:
                 i += 1
         return re.compile("^" + "".join(out_parts) + "$")
 
-    def match(self, path: str) -> Optional[dict[str, str]]:
+    def match(self, path: str) -> dict[str, str] | None:
         """If `path` matches this pattern, return the captured {var} dict.
         Otherwise None. An empty match (pattern with no vars) returns {}."""
         m = self.to_regex().fullmatch(path)
@@ -159,7 +157,7 @@ class DependencyGraph:
     version: str = "1.0"
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DependencyGraph":
+    def from_dict(cls, data: dict) -> DependencyGraph:
         rules: list[Rule] = []
         for r in data.get("rules", []):
             rules.append(Rule(
@@ -174,7 +172,7 @@ class DependencyGraph:
         return cls(rules=rules, version=str(data.get("version", "1.0")))
 
     @classmethod
-    def from_json_file(cls, path: Path) -> "DependencyGraph":
+    def from_json_file(cls, path: Path) -> DependencyGraph:
         return cls.from_dict(json.loads(path.read_text(encoding="utf-8")))
 
 

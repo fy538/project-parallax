@@ -49,7 +49,6 @@ import sys
 import tempfile
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -204,7 +203,7 @@ def _save(path: Path, data: dict) -> None:
 
 
 def record_prediction(
-    slug: str, field_name: str, value, recorded_at: Optional[str] = None,
+    slug: str, field_name: str, value, recorded_at: str | None = None,
 ) -> Path:
     """Save (or update) a single predicted field for an episode.
 
@@ -231,7 +230,7 @@ def record_prediction(
 
 
 def record_actual(
-    slug: str, field_name: str, value, recorded_at: Optional[str] = None,
+    slug: str, field_name: str, value, recorded_at: str | None = None,
 ) -> Path:
     """Save (or update) a single actual field for an episode."""
     if not _is_known_field(field_name):
@@ -255,7 +254,7 @@ def record_actual(
 
 
 def compute_episode_calibration(
-    slug: str, field_pairs: Optional[dict[str, str]] = None,
+    slug: str, field_pairs: dict[str, str] | None = None,
 ) -> EpisodeCalibration:
     """For one episode, compute deltas between every predicted/actual pair.
 
@@ -325,8 +324,8 @@ def compute_field_summary(
 
 
 def build_calibration_report(
-    slug_filter: Optional[str] = None,
-    field_pairs: Optional[dict[str, str]] = None,
+    slug_filter: str | None = None,
+    field_pairs: dict[str, str] | None = None,
     threshold_pct: float = DEFAULT_DRIFT_THRESHOLD_PCT,
 ) -> CalibrationReport:
     """Walk every episode that has BOTH predictions.json and actuals.json

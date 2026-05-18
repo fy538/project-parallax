@@ -51,9 +51,9 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Callable, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -116,7 +116,7 @@ class TopicRow:
     state: str                    # raw state cell (e.g. "📡 SIGNAL")
     last_checked_iso: str         # YYYY-MM-DD or empty
     notes: str = ""               # last column / hook / etc.
-    days_since_checked: Optional[int] = None
+    days_since_checked: int | None = None
     freshness_verdict: str = ""   # 🟢 / 🟡 / 🔴
     search_query: str = ""
     search_url: str = ""
@@ -277,15 +277,11 @@ def parse_ideas(text: str) -> list[TopicRow]:
             if col_idx >= len(cells):
                 break
             val = cells[col_idx]
-            if h in ("slug", "signal"):
-                title = val
-            elif h in ("working title",) and not title:
+            if h in ("slug", "signal") or h in ("working title",) and not title:
                 title = val
             elif h == "state":
                 state = val
-            elif h == "last checked":
-                last_checked = _parse_iso_date(val)
-            elif h in ("first noticed",) and not last_checked:
+            elif h == "last checked" or h in ("first noticed",) and not last_checked:
                 last_checked = _parse_iso_date(val)
             elif h in ("notes", "thesis / hook", "thesis", "hook"):
                 notes = val
@@ -303,7 +299,7 @@ def parse_ideas(text: str) -> list[TopicRow]:
 
 
 def compute_freshness(
-    topic: TopicRow, today: Optional[datetime.date] = None,
+    topic: TopicRow, today: datetime.date | None = None,
 ) -> None:
     """Set `days_since_checked` and `freshness_verdict` on the topic
     in-place. Skips items with no Last Checked date (verdict stays empty
@@ -439,8 +435,8 @@ def search_youtube_api(
 
 def run_invalidation(
     ideas_path: Path = IDEAS_PATH,
-    today: Optional[datetime.date] = None,
-    api_key: Optional[str] = None,
+    today: datetime.date | None = None,
+    api_key: str | None = None,
     fetcher: HttpFetcher = _http_fetch,
     stale_only: bool = False,
 ) -> InvalidationReport:

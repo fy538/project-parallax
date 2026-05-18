@@ -13,7 +13,6 @@ import json
 import sys
 from pathlib import Path
 
-import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import pipeline_validator as pv  # noqa: E402
@@ -559,7 +558,7 @@ _footer note_
         """The original failure mode: first run loses the blank line, every
         subsequent run reports 'no change' even though it shouldn't keep
         re-eating whitespace. Verify the second run is genuinely a no-op."""
-        pipeline = self._make_tracker(tmp_path, monkeypatch)
+        self._make_tracker(tmp_path, monkeypatch)
         s = _make_status()
         first = pv.update_tracker_health([s])
         second = pv.update_tracker_health([s])

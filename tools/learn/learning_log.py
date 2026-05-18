@@ -43,9 +43,8 @@ import datetime
 import json
 import re
 import sys
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -368,8 +367,8 @@ def insert_entry(log_text: str, entry_md: str) -> str:
 
 def build_payload(
     slug: str, retention_json_path: Path,
-    publish_date: str, analysis_date: Optional[str] = None,
-    episode_title: Optional[str] = None,
+    publish_date: str, analysis_date: str | None = None,
+    episode_title: str | None = None,
 ) -> LogEntryPayload:
     """Assemble a LogEntryPayload from the structured retention JSON
     that `analytics_ingest.py --json` produces."""
@@ -420,7 +419,7 @@ def _days_between(start_iso: str, end_iso: str) -> int:
         return 0
 
 
-def _resolve_episode_title(slug: str) -> Optional[str]:
+def _resolve_episode_title(slug: str) -> str | None:
     manifest = REMOTION_DATA / slug / "assembly-manifest.json"
     if not manifest.is_file():
         return None

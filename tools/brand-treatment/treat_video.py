@@ -50,18 +50,15 @@ in the production pipeline).
 
 import argparse
 import json
-import os
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Tuple
 
 import numpy as np
 
 # === Brand palette — loaded from palette.json (single source of truth) ===
-
-from palette_loader import get_ramps_rgb, get_ramps_hex, get_defaults
+from palette_loader import get_defaults, get_ramps_hex, get_ramps_rgb
 
 RAMPS = get_ramps_rgb()
 RAMPS_HEX = get_ramps_hex()  # Used for LUT file headers
@@ -296,7 +293,7 @@ def treat_video(
             return False
         return True
     except subprocess.TimeoutExpired:
-        print(f"  ✗ ffmpeg timed out (5 min limit)", file=sys.stderr)
+        print("  ✗ ffmpeg timed out (5 min limit)", file=sys.stderr)
         return False
 
 
@@ -401,7 +398,7 @@ and Final Cut Pro — import them for manual color grading workflows.
         for ramp_name in ramps_to_generate:
             lut_path = save_lut(ramp_name, lut_dir, args.saturation)
             print(f"✓ LUT saved: {lut_path}")
-            print(f"  Import into DaVinci Resolve / Premiere Pro for manual grading.")
+            print("  Import into DaVinci Resolve / Premiere Pro for manual grading.")
 
         return
 

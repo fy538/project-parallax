@@ -5,10 +5,9 @@ Single source of truth for hex/RGB conversion used across treat.py,
 palette_loader.py, recraft.py, and check.py.
 """
 
-from typing import Tuple
 
 
-def hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:
+def hex_to_rgb(hex_str: str) -> tuple[int, int, int]:
     """Convert '#RRGGBB' or 'RRGGBB' to (R, G, B) tuple.
 
     Raises ValueError for invalid input (wrong length, non-hex chars).
@@ -22,11 +21,11 @@ def hex_to_rgb(hex_str: str) -> Tuple[int, int, int]:
         )
     try:
         return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
-    except ValueError:
-        raise ValueError(f"Invalid hex color '{hex_str}': contains non-hex characters.")
+    except ValueError as e:
+        raise ValueError(f"Invalid hex color '{hex_str}': contains non-hex characters.") from e
 
 
-def hex_to_rgba(hex_str: str, alpha: float = 1.0) -> Tuple[int, int, int, int]:
+def hex_to_rgba(hex_str: str, alpha: float = 1.0) -> tuple[int, int, int, int]:
     """Convert '#RRGGBB' to (R, G, B, A) tuple. Alpha is 0.0–1.0, converted to 0–255."""
     r, g, b = hex_to_rgb(hex_str)
     a = max(0, min(255, round(alpha * 255)))
@@ -34,7 +33,7 @@ def hex_to_rgba(hex_str: str, alpha: float = 1.0) -> Tuple[int, int, int, int]:
 
 
 def euclidean_distance(
-    rgb1: Tuple[int, int, int], rgb2: Tuple[int, int, int]
+    rgb1: tuple[int, int, int], rgb2: tuple[int, int, int]
 ) -> float:
     """Euclidean distance in RGB space."""
-    return sum((a - b) ** 2 for a, b in zip(rgb1, rgb2)) ** 0.5
+    return sum((a - b) ** 2 for a, b in zip(rgb1, rgb2, strict=True)) ** 0.5

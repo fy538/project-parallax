@@ -332,7 +332,6 @@ def test_template_data_file_skips_schema_files(tmp_path, monkeypatch):
 
 def test_schema_crash_handler_returns_error(tmp_path, monkeypatch):
     """If jsonschema.validate raises an unexpected exception, return a 'crashed' error string."""
-    import importlib
 
     schema = tmp_path / "schema.json"
     schema.write_text(json.dumps({"type": "object"}), encoding="utf-8")

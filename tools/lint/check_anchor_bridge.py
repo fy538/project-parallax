@@ -51,7 +51,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -181,7 +180,7 @@ _TAG_RE = re.compile(r"\[([A-Z][A-Z-]*)\s*[:\]]", re.IGNORECASE)
 _TEMPLATE_RE = re.compile(r"\b([A-Z][a-zA-Z]+(?:[A-Z][a-zA-Z]+)*)\b")
 
 
-def classify_cell(raw: str) -> Optional[VisualCell]:
+def classify_cell(raw: str) -> VisualCell | None:
     """Parse one visual-column cell. Returns None for cells that aren't
     visual specs (PACE: lines, DIR: continuation lines, etc.)."""
     stripped = raw.strip()
@@ -262,7 +261,7 @@ def parse_visual_cells(script_path: Path) -> list[BeatVisualReport]:
 
     # Walk the raw script for table rows; assign visual cells to the
     # current beat by tracking beat headers.
-    current_beat: Optional[int] = None
+    current_beat: int | None = None
     inside_table = False
 
     for raw_line in script_path.read_text(encoding="utf-8").splitlines():
@@ -354,12 +353,12 @@ def render_report_md(report: AnchorBridgeReport) -> str:
     lines: list[str] = [
         f"# Anchor-Bridge Audit — {report.slug}",
         "",
-        f"_Doctrine source: Johnny Harris's anchor-bridge editorial method. "
-        f"Every analytical beat needs at least one concrete visual ANCHOR "
-        f"(footage / archival / AI-gen scene / data chart / framework diagram / "
-        f"map) for the narration to BRIDGE between. Walls of typography "
-        f"(>60% text-heavy cells with no anchor) reduce the credibility "
-        f"signal that real evidence supplies._",
+        "_Doctrine source: Johnny Harris's anchor-bridge editorial method. "
+        "Every analytical beat needs at least one concrete visual ANCHOR "
+        "(footage / archival / AI-gen scene / data chart / framework diagram / "
+        "map) for the narration to BRIDGE between. Walls of typography "
+        "(>60% text-heavy cells with no anchor) reduce the credibility "
+        "signal that real evidence supplies._",
         "",
         f"**Results:** {len(report.errors)} 🔴 error · "
         f"{len(report.warnings)} 🟡 warn · "

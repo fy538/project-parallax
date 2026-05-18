@@ -51,7 +51,7 @@ def load_registry(path: Path) -> dict:
         print("  Run from project root, or check that data/concepts.json exists.", file=sys.stderr)
         sys.exit(1)
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         print(f"Error: concept registry is not valid JSON: {e}", file=sys.stderr)
@@ -242,7 +242,7 @@ def cmd_reuse_check(args, registry):
         return
 
     print(f"\n  {len(hits)} prior concept(s) detected in {script_path.name}:")
-    print(f"  These were introduced in earlier episodes — consider callbacks.\n")
+    print("  These were introduced in earlier episodes — consider callbacks.\n")
 
     for c, matched in hits:
         term_str = c["term"]["en"]
@@ -378,13 +378,13 @@ def cmd_show(args, registry):
         print(f"  {term['cn']}  ({term.get('pinyin', '')})")
     print(f"\n  ID:   {c['id']}")
     print(f"  Type: {c['type']}")
-    print(f"\n  Definition:")
+    print("\n  Definition:")
     print(f"    {c['definition']}")
-    print(f"\n  Key Insight:")
+    print("\n  Key Insight:")
     print(f"    {c['insight']}")
 
     intro = c["introduced"]
-    print(f"\n  Introduced:")
+    print("\n  Introduced:")
     print(f"    Episode {intro['episode']}, Beat {intro['beat']}", end="")
     if intro.get("timestamp"):
         print(f" ({intro['timestamp']})", end="")
@@ -408,14 +408,14 @@ def cmd_show(args, registry):
     if c.get("tags"):
         print(f"  Tags: {', '.join(c['tags'])}")
     if c.get("callbackVisual"):
-        print(f"\n  Callback visual:")
+        print("\n  Callback visual:")
         print(f"    {c['callbackVisual']}")
 
     if c.get("prediction"):
         pred = c["prediction"]
         prob = pred.get("probability", "?")
         prob_str = f"{int(prob*100)}%" if isinstance(prob, (int, float)) else str(prob)
-        print(f"\n  Prediction:")
+        print("\n  Prediction:")
         print(f"    Claim: {pred.get('claim', '—')}")
         print(f"    Probability: {prob_str}")
         print(f"    Timeframe: {pred.get('timeframe', '—')}")
@@ -484,18 +484,18 @@ def cmd_stats(args, registry):
         }, indent=2))
         return
 
-    print(f"\n  ═══ CONCEPT REGISTRY STATS ═══\n")
+    print("\n  ═══ CONCEPT REGISTRY STATS ═══\n")
     print(f"  Total concepts:         {total}")
     print(f"  Total appearances:      {total_appearances}")
     print(f"  With callback visual:   {with_callback}/{total}")
     print(f"  Bilingual (EN+CN):      {with_cn}/{total}")
-    print(f"\n  By type:")
+    print("\n  By type:")
     for t, n in by_type.most_common():
         print(f"    {t:22s} {n}")
-    print(f"\n  By episode:")
+    print("\n  By episode:")
     for ep, n in sorted(by_ep.items()):
         print(f"    {ep:10s} {n} concepts introduced")
-    print(f"\n  By pillar:")
+    print("\n  By pillar:")
     for p, n in by_pillar.most_common():
         print(f"    {p:30s} {n}")
     if orphans:
@@ -527,7 +527,7 @@ def cmd_graph(args, registry):
         print(json.dumps({"nodes": list(id_set), "edges": edges}, indent=2))
         return
 
-    print(f"\n  ═══ CONCEPT GRAPH ═══\n")
+    print("\n  ═══ CONCEPT GRAPH ═══\n")
     for c in sorted(concepts, key=lambda x: x["id"]):
         related = c.get("relatedConcepts", [])
         valid = [r for r in related if r in id_set]
@@ -819,7 +819,7 @@ def cmd_resolve(args, registry):
         return
 
     pred = concept.get("prediction", {})
-    print(f"\n  ═══ RESOLVE PREDICTION ═══\n")
+    print("\n  ═══ RESOLVE PREDICTION ═══\n")
     print(f"  [{cid}] {concept['term']['en']}")
     print(f"  Claim: {pred.get('claim', '—')}")
     print(f"  Current probability: {pred.get('probability', '—')}")
@@ -902,10 +902,10 @@ def _matches_query(concept: dict, query: str) -> bool:
     if q in (concept.get("attribution") or "").lower():
         return True
     meta = concept.get("sourceMeta", {}) or {}
-    for field in ("author", "publisher", "url"):
-        if q in (meta.get(field) or "").lower():
-            return True
-    return False
+    return any(
+        q in (meta.get(field) or "").lower()
+        for field in ("author", "publisher", "url")
+    )
 
 
 def _format_appearances(concept: dict) -> str:

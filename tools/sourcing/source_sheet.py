@@ -40,7 +40,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -121,7 +120,7 @@ class SourceSheetReport:
 # ── Parsing the script ──────────────────────────────────────────────────────
 
 
-def _split_table_row(line: str) -> Optional[list[str]]:
+def _split_table_row(line: str) -> list[str] | None:
     s = line.rstrip("\n")
     if not s.lstrip().startswith("|") or s.count("|") < 2:
         return None
@@ -202,7 +201,7 @@ def _count_words(text: str) -> int:
     return sum(1 for tok in cleaned.split() if re.search(r"\w", tok))
 
 
-def find_script(slug: str) -> Optional[Path]:
+def find_script(slug: str) -> Path | None:
     """Canonical script-production.md, then highest versioned."""
     ep_dir = EPISODES_DIR / slug
     canonical = ep_dir / "script-production.md"
@@ -336,7 +335,7 @@ def _word_boundary_match(needle: str, haystack: str) -> bool:
     return bool(pattern.search(haystack))
 
 
-def _title_substring_match(title: str, claim_text: str) -> Optional[str]:
+def _title_substring_match(title: str, claim_text: str) -> str | None:
     """Match if a multi-word run from the source title appears in the
     claim text. Returns the matched substring or None. Avoids matching
     single short words ('War', 'The Strategy') by requiring the matched
@@ -417,7 +416,7 @@ def attach_source_suggestions(
 
 
 def map_claims_to_timecodes(
-    claims: list[ClaimEntry], manifest: Optional[dict], wpm: int = DEFAULT_WPM,
+    claims: list[ClaimEntry], manifest: dict | None, wpm: int = DEFAULT_WPM,
 ) -> None:
     """Assign `timecode_sec` to each claim in-place.
 
@@ -447,11 +446,9 @@ def map_claims_to_timecodes(
     else:
         # No manifest — flat wpm from episode start
         # claims arrive in script order so we accumulate
-        running_words = 0
         last_beat = -1
         for c in claims:
             if c.beat_number != last_beat:
-                running_words = 0
                 last_beat = c.beat_number
             c.timecode_sec = round(c.word_offset / wpm * 60, 1)
 
@@ -463,7 +460,7 @@ def _default_manifest_path(slug: str) -> Path:
     return REMOTION_DATA / slug / "assembly-manifest.json"
 
 
-def load_manifest(path: Path) -> Optional[dict]:
+def load_manifest(path: Path) -> dict | None:
     if not path.is_file():
         return None
     try:
@@ -474,9 +471,9 @@ def load_manifest(path: Path) -> Optional[dict]:
 
 def build_source_sheet(
     slug: str, script_path: Path,
-    manifest_path: Optional[Path] = None,
+    manifest_path: Path | None = None,
     wpm: int = DEFAULT_WPM,
-    registry_path: Optional[Path] = CONCEPTS_REGISTRY,
+    registry_path: Path | None = CONCEPTS_REGISTRY,
     suggest_sources: bool = True,
 ) -> SourceSheetReport:
     """Full pipeline. Returns the report.

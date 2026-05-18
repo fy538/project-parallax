@@ -56,7 +56,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -172,7 +171,7 @@ class CostForecast:
 # ── Input loaders ───────────────────────────────────────────────────────────
 
 
-def load_shot_list(slug: str) -> Optional[dict]:
+def load_shot_list(slug: str) -> dict | None:
     path = EPISODES_DIR / slug / "shot-list.json"
     if not path.is_file():
         return None
@@ -182,7 +181,7 @@ def load_shot_list(slug: str) -> Optional[dict]:
         return None
 
 
-def load_assembly_manifest(slug: str) -> Optional[dict]:
+def load_assembly_manifest(slug: str) -> dict | None:
     path = REMOTION_DATA / slug / "assembly-manifest.json"
     if not path.is_file():
         return None
@@ -232,7 +231,7 @@ def count_ai_gen_briefs(slug: str) -> tuple[int, int]:
     return still_count, video_count
 
 
-def find_script(slug: str) -> Optional[Path]:
+def find_script(slug: str) -> Path | None:
     """Canonical script-production.md, then highest versioned."""
     ep_dir = EPISODES_DIR / slug
     canonical = ep_dir / "script-production.md"
@@ -505,7 +504,7 @@ def load_actual_spend(slug: str) -> dict[str, float]:
 
 
 def render_forecast_md(
-    forecast: CostForecast, budget: Optional[float] = None,
+    forecast: CostForecast, budget: float | None = None,
 ) -> str:
     lines = [
         f"# Cost Forecast — {forecast.slug}",

@@ -46,7 +46,6 @@ import re
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -78,8 +77,7 @@ MAX_CONCEPTS_DISPLAYED = 8
 PRESERVED_ACRONYMS = {
     "US", "USA", "UK", "EU", "UN", "NATO", "USSR", "PRC", "CCP",
     "WTO", "WHO", "IMF", "OECD", "OPEC", "GDP",
-    "AI", "ML", "GPU", "CPU", "TSMC", "RAND", "MIT", "MIT",
-    "TLDR", "DNA", "RNA", "FBI", "CIA", "NSA", "FDA",
+    "AI", "ML", "GPU", "CPU", "TSMC", "RAND", "MIT", "TLDR", "DNA", "RNA", "FBI", "CIA", "NSA", "FDA",
 }
 
 # Standard channel footer. Edit here, not per-episode.
@@ -298,7 +296,7 @@ def count_source_tags(script_path: Path) -> int:
 
 
 def build_description(
-    slug: str, manifest_path: Path, script_path: Optional[Path] = None,
+    slug: str, manifest_path: Path, script_path: Path | None = None,
     concepts_path: Path = CONCEPTS_PATH, include_intro: bool = True,
 ) -> DescriptionPayload:
     """Assemble all the data the description renderer needs."""
@@ -414,7 +412,7 @@ def main() -> int:
         print(f"✗ assembly manifest not found: {manifest_path}", file=sys.stderr)
         return 2
 
-    script_path: Optional[Path] = None
+    script_path: Path | None = None
     if args.script:
         script_path = Path(args.script).resolve()
         if not script_path.is_file():

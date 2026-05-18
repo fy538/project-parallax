@@ -15,7 +15,6 @@ Usage:
 import json
 import sys
 from pathlib import Path
-from typing import Dict, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from color_utils import hex_to_rgb as _hex_to_rgb  # noqa: E402
@@ -28,7 +27,7 @@ _cache: dict = {}
 def load_palette() -> dict:
     """Load and return the raw palette.json contents. Cached after first call."""
     if not _cache:
-        with open(PALETTE_PATH, "r", encoding="utf-8") as f:
+        with open(PALETTE_PATH, encoding="utf-8") as f:
             _cache.update(json.load(f))
     return _cache
 
@@ -46,7 +45,7 @@ def _resolve_color(name_or_hex: str, palette_colors: dict) -> str:
     return resolved.upper()
 
 
-def get_ramps_rgb() -> Dict[str, Dict[str, Tuple[int, int, int]]]:
+def get_ramps_rgb() -> dict[str, dict[str, tuple[int, int, int]]]:
     """
     Load duotone ramps with all named references resolved to RGB tuples.
 
@@ -70,7 +69,7 @@ def get_ramps_rgb() -> Dict[str, Dict[str, Tuple[int, int, int]]]:
     return ramps
 
 
-def get_ramps_hex() -> Dict[str, Dict[str, str]]:
+def get_ramps_hex() -> dict[str, dict[str, str]]:
     """
     Load duotone ramps with all named references resolved to hex strings.
 

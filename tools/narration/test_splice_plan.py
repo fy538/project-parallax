@@ -120,7 +120,7 @@ class TestTruncateForLabel:
         assert out.endswith("…")
         head = out[:-1].rstrip()
         for w in head.split():
-            assert w in "alpha beta gamma delta epsilon zeta".split()
+            assert w in ["alpha", "beta", "gamma", "delta", "epsilon", "zeta"]
 
 
 # ── render_audacity_labels ───────────────────────────────────────────────────
@@ -156,7 +156,7 @@ class TestRenderAudacityLabels:
         p = tmp_path / "p.wav"; p.write_bytes(b"")
         marks, _ = sp.build_splice_plan(report, [p], pad_sec=0)
         out = sp.render_audacity_labels(marks)
-        lines = [l for l in out.splitlines() if l.strip()]
+        lines = [ln for ln in out.splitlines() if ln.strip()]
         for line in lines:
             cells = line.split("\t")
             assert len(cells) == 3, f"expected 3 cells, got {len(cells)}: {line!r}"

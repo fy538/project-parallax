@@ -23,13 +23,11 @@ Usage:
 Exit code: number of violations found (0 = clean).
 """
 
+import json
 import re
 import sys
-import json
-import os
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from dataclasses import dataclass, field, asdict
-from typing import Optional
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -441,7 +439,7 @@ def lint_file(filepath: Path, base: Path) -> list[Violation]:
     return violations
 
 
-def find_template_files(templates_dir: Path, filter_name: Optional[str] = None) -> list[Path]:
+def find_template_files(templates_dir: Path, filter_name: str | None = None) -> list[Path]:
     """Find all template TSX files, optionally filtered by name."""
     files = []
     for tsx in sorted(templates_dir.rglob("*.tsx")):
@@ -475,7 +473,7 @@ def main():
         # Exit 1 (not 0) so CI sees a failure when templates_dir is misconfigured
         # or the filter matches nothing that should exist.
         print(
-            f"No template files found" + (f" matching '{filter_name}'" if filter_name else ""),
+            "No template files found" + (f" matching '{filter_name}'" if filter_name else ""),
             file=sys.stderr,
         )
         sys.exit(1)

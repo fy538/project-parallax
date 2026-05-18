@@ -18,7 +18,6 @@ import json
 import os
 import subprocess
 import sys
-import urllib.request
 from pathlib import Path
 from unittest.mock import MagicMock
 

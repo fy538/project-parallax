@@ -60,7 +60,6 @@ import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audio_qa as aq  # noqa: E402
@@ -139,11 +138,11 @@ class TakeScore:
 class ComparisonReport:
     slug: str
     script_path: str
-    beat_number: Optional[int]
+    beat_number: int | None
     takes: list[TakeScore] = field(default_factory=list)
 
     @property
-    def winner(self) -> Optional[TakeScore]:
+    def winner(self) -> TakeScore | None:
         if not self.takes:
             return None
         # Highest score; tiebreak on fewest long silences
@@ -296,7 +295,7 @@ def measure_take(
 
 def compare_takes(
     slug: str, script_path: Path, wav_paths: list[Path],
-    beat_number: Optional[int] = None,
+    beat_number: int | None = None,
     wpm: int = ffr.DEFAULT_WPM,
 ) -> ComparisonReport:
     """Compare N takes and produce a ranked report."""

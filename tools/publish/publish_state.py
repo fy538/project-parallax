@@ -48,7 +48,6 @@ import json
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
@@ -132,7 +131,7 @@ class StateReport:
 # ── Artifact checkers ──────────────────────────────────────────────────────
 
 
-def _find_script(ep_dir: Path) -> Optional[Path]:
+def _find_script(ep_dir: Path) -> Path | None:
     """Canonical script-production.md, then highest versioned."""
     canonical = ep_dir / "script-production.md"
     if canonical.is_file():
@@ -148,7 +147,7 @@ def _find_script(ep_dir: Path) -> Optional[Path]:
 RENDERED_MP4_MIN_BYTES = 1_000_000   # 1 MB
 
 
-def _find_render_mp4(ep_dir: Path) -> Optional[Path]:
+def _find_render_mp4(ep_dir: Path) -> Path | None:
     """Any *.mp4 under episodes/<slug>/output/ or render-output/.
     Returns the largest by file size that passes a minimum-size sanity
     check (rejects truncated / failed renders that landed as small
@@ -300,7 +299,7 @@ def load_publish_order(path: Path = PUBLISH_ORDER_PATH) -> dict:
 
 
 def build_state_report(
-    slug_filter: Optional[str] = None,
+    slug_filter: str | None = None,
     publish_order_path: Path = PUBLISH_ORDER_PATH,
 ) -> StateReport:
     """Walk every queued + published episode, run all checks. If
