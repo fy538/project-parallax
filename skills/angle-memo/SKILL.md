@@ -361,6 +361,26 @@ The standard frame: [X]. Our frame: [Y].
 **Counterpoint moment:**
 - Beat [Z]: Narration says [X], visual shows [Y]
 
+## Shorts Beats (Design-Time)
+
+Two beats per episode engineered as **shorts-native standalone moments** — each must pass the standalone test (structural claim + bounded clause inside 45–60s without requiring the long-form for sense-making). At script-draft time these get flagged with `[SHORTS-BEAT: <series>]` so `shorts-adaptation` treats them as primary candidates rather than slicing whatever fits. Post-hoc extraction still handles 1–2 additional Shorts per episode where the long-form yields them.
+
+**Hedge-stripping self-check** — for each beat ask: *"If this Short's claim were challenged on Twitter, would the long-form defend it as worded?"* If no, rewrite. The bounded-analogy form ("useful here, misleading there") must survive vertical compression — otherwise the Short sounds like prophecy and breaks the channel's editorial register.
+
+**Series options** (slug-cased; one per beat): `framework-in-45s` · `history-rhymes` · `both-sides-wrong` · `what-happens-next` · `the-market-says` · `was-i-right`. See `skills/shorts-adaptation/SKILL.md` for each series's editorial brief.
+
+1. **Beat [X] — `<series>`**
+   - **Standalone claim** (frame-1 hook + opening line): [one sentence, complete-thought, communicates visually with sound off]
+   - **Bounded clause** (where the analogy/framework breaks): [the half that prevents this from sounding like prophecy — must fit the 45–60s window WITH the claim]
+   - **Hook frame-1 visual:** [bold text + composition on frame 1; assume sound-off]
+
+2. **Beat [Y] — `<series>`**
+   - **Standalone claim:**
+   - **Bounded clause:**
+   - **Hook frame-1 visual:**
+
+If the episode is structurally Shorts-light (only one viable beat), say so explicitly here — don't force two weak beats. Post-hoc extraction will cover the rest.
+
 ## Speculation Budget
 **Structure:** [Named scenarios / Single prediction / Watch signals]
 **Depth:** [Bold / Moderate / Light]
@@ -416,6 +436,7 @@ This section is a checklist for script-draft — every callback should appear in
 - [ ] Decoder framing shows a clear gap between standard and Parallax frame
 - [ ] Visual motif is simple enough to evolve (geometric, not literal)
 - [ ] At least 2 visual-first and 1 counterpoint moment planned
+- [ ] Two Shorts beats identified (or one + explicit "Shorts-light" note); each assigned to one of the six series; each passes the standalone test AND the hedge-stripping self-check ("would the long-form defend this claim as worded?")
 - [ ] Title options include at least one named-concept title and one provocation
 - [ ] Speculation budget is set: structure chosen, depth chosen, "what would change my mind" written, falsifiable prediction drafted
 - [ ] Total length is 300-500 words (this is a memo, not a brief)
