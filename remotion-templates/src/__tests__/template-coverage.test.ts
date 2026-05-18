@@ -152,15 +152,17 @@ const ALLOWLIST_UNCOVERED = new Map<string, string>([
 
   // ── Phase 4 editorial-frame templates (real-data tests deferred) ──────
   // Built May 17, 2026 as part of EDITORIAL_FRAME_ARCHITECTURE.md Phase 4
-  // (5 missing chart types). Each renders inside EditorialFrame with the
-  // shared composition; render-still validation passed manually before
-  // shipping. Real-data tests (-real-data.test.ts) and visual baselines
-  // (templates.test.ts) deferred until a published episode actually uses
-  // them — at which point coverage flips to that episode's smoke test.
-  ["Slopegraph", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
-  ["KPICard", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
-  ["BulletChart", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
-  ["StepLine", "Phase 4 editorial-frame template; covered by EditorialFrame composition tests + manual render validation"],
+  // (5 missing chart types). Render-still validation passed manually before
+  // shipping; the EditorialFrame composition wrapper itself is exercised by
+  // editorialFrame-visual.test.ts. Per-template real-data tests
+  // (-real-data.test.ts) and visual baselines (templates.test.ts) are
+  // deferred until a published episode actually uses them — at which point
+  // coverage flips to that episode's smoke test. Add a -real-data test
+  // before promoting any of these into production rendering.
+  ["Slopegraph", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
+  ["KPICard", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
+  ["BulletChart", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
+  ["StepLine", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
 ]);
 
 // ── Tests ───────────────────────────────────────────────────────────────────

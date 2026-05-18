@@ -129,7 +129,7 @@ export const EditorialFrameSchema = z.object({
   layout: z
     .enum(["hero-split", "centered", "full-bleed", "stacked"])
     .default("centered"),
-  /** Left/right split percentages for `hero-split` layout. Defaults to [35, 65]. */
+  /** Left/right split percentages for `hero-split` layout. Defaults to [38, 62]. */
   splitRatio: z.tuple([z.number(), z.number()]).optional(),
 
   // ── Overlay elements ──────────────────────────────────────────────────────

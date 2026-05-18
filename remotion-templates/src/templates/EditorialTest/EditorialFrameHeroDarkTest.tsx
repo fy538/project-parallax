@@ -21,7 +21,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { EditorialSurface, pickBackdrop } from "../../components/EditorialSurface";
-import { EditorialFrame } from "../../components/EditorialFrame";
+import { EditorialScaffold } from "../../components/EditorialScaffold";
 import { DataChart } from "../DataChart/DataChart";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { palette, semantic } from "../../design/theme";
@@ -83,7 +83,7 @@ export const EditorialFrameHeroDarkTest: React.FC = () => {
   return (
     <AbsoluteFill>
       <EditorialSurface intensity={0.4} backdrop={pickBackdrop("night-grid")}>
-        <EditorialFrame
+        <EditorialScaffold
           variant="hero"
           mode="dark"
           kicker="iterated prisoner's dilemma"
@@ -93,7 +93,7 @@ export const EditorialFrameHeroDarkTest: React.FC = () => {
           byline="parallax · prisoner's dilemma · 2026"
         >
           <DataChart data={cooperationData} />
-        </EditorialFrame>
+        </EditorialScaffold>
       </EditorialSurface>
     </AbsoluteFill>
   );

@@ -17,7 +17,7 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
 import { EditorialSurface, pickBackdrop } from "../../components/EditorialSurface";
-import { EditorialFrame } from "../../components/EditorialFrame";
+import { EditorialScaffold } from "../../components/EditorialScaffold";
 import { DataChart } from "../DataChart/DataChart";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { palette, semantic } from "../../design/theme";
@@ -82,7 +82,7 @@ export const EditorialFrameHeroTest: React.FC = () => {
   return (
     <AbsoluteFill>
       <EditorialSurface intensity={0.4} backdrop={pickBackdrop("cartographic")}>
-        <EditorialFrame
+        <EditorialScaffold
           variant="hero"
           kicker="iterated prisoner's dilemma"
           hero="23%"
@@ -91,7 +91,7 @@ export const EditorialFrameHeroTest: React.FC = () => {
           byline="parallax · prisoner's dilemma · 2026"
         >
           <DataChart data={cooperationData} />
-        </EditorialFrame>
+        </EditorialScaffold>
       </EditorialSurface>
     </AbsoluteFill>
   );

@@ -13,13 +13,12 @@
  * pattern: children is `(chartRect, helpers) => ReactNode` so the chart can
  * size itself to the layout's content slot, and overlays (annotations,
  * reference lines, era bands) can position relative to that rect using the
- * helpers (`xToPx`, `yToPx`, `dataPointToPx`).
+ * helpers (`normalizedToPxX`, `normalizedToPxY`).
  */
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import {
-  palette,
   fonts,
   fontSizes,
   fontWeights,
@@ -73,7 +72,7 @@ export function computeChartRect(
   const captionH = frame.caption ? 50 : 0;
 
   if (frame.layout === "hero-split") {
-    const [leftPct] = frame.splitRatio ?? [35, 65];
+    const [leftPct] = frame.splitRatio ?? [38, 62];
     const splitX = safe.left + ((frameWidth - safe.left - safe.right) * leftPct) / 100;
     // Reserve top room for inline value labels above bars (60px) and
     // bottom room for x-axis labels + caption + footer.
@@ -249,7 +248,7 @@ const HeroSplitHeader: React.FC<{
 }> = ({ frame, frameWidth, frameHeight, frameNum }) => {
   const theme = useThemeMode("light");
   const safe = layout.safeArea;
-  const [leftPct] = frame.splitRatio ?? [35, 65];
+  const [leftPct] = frame.splitRatio ?? [38, 62];
   const leftWidth = ((frameWidth - safe.left - safe.right) * leftPct) / 100;
 
   const kickerOpacity = fadeIn(frameNum, sec(0.3), sec(0.5));

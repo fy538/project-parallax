@@ -8,7 +8,7 @@
 import React from "react";
 import { Composition, AbsoluteFill } from "remotion";
 import { EditorialSurface } from "../components/EditorialSurface";
-import { EditorialFrame } from "../components/EditorialFrame";
+import { EditorialScaffold } from "../components/EditorialScaffold";
 import { DataChart } from "../templates/DataChart/DataChart";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
 import { layout, sec, palette, semantic } from "../design/theme";
@@ -65,7 +65,7 @@ export const EditorialHeroDemo: React.FC = () => {
   return (
     <AbsoluteFill>
       <EditorialSurface intensity={0.6}>
-        <EditorialFrame
+        <EditorialScaffold
           variant="hero"
           kicker="cooperation theory"
           // Hero matches the highlighted bar (cooperationRates.highlightIndex
@@ -79,7 +79,7 @@ export const EditorialHeroDemo: React.FC = () => {
           byline="parallax · strategic analysis · catalog"
         >
           <DataChart data={cooperationRates} />
-        </EditorialFrame>
+        </EditorialScaffold>
       </EditorialSurface>
     </AbsoluteFill>
   );
@@ -90,7 +90,7 @@ export const EditorialAsideDemo: React.FC = () => {
   return (
     <AbsoluteFill>
       <EditorialSurface intensity={0.6}>
-        <EditorialFrame
+        <EditorialScaffold
           variant="aside"
           kicker="theory diffusion"
           hero="3:1"
@@ -98,7 +98,7 @@ export const EditorialAsideDemo: React.FC = () => {
           byline="parallax · academic analysis · catalog"
         >
           <DataChart data={diffusionData} />
-        </EditorialFrame>
+        </EditorialScaffold>
       </EditorialSurface>
     </AbsoluteFill>
   );
@@ -109,9 +109,9 @@ export const EditorialMinimalDemo: React.FC = () => {
   return (
     <AbsoluteFill>
       <EditorialSurface intensity={0.6}>
-        <EditorialFrame variant="minimal" showBrandMark>
+        <EditorialScaffold variant="minimal" showBrandMark>
           <DataChart data={cooperationRates} />
-        </EditorialFrame>
+        </EditorialScaffold>
       </EditorialSurface>
     </AbsoluteFill>
   );

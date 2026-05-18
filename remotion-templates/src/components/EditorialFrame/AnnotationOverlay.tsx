@@ -17,14 +17,13 @@
 
 import React from "react";
 import {
-  palette,
   fonts,
   fontSizes,
   fontWeights,
   layout,
+  sec,
 } from "../../design/theme";
 import { fadeIn } from "../../utils/animation";
-import { sec } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import type { Annotation } from "./schema";
 import type { Rect } from "./EditorialFrame";

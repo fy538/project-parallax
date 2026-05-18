@@ -825,6 +825,15 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
   if (data.frame && (data.variant === "bar" || data.variant === "comparison")) {
     return <DataChartEditorial data={data as DataChartData & { frame: NonNullable<DataChartData["frame"]> }} />;
   }
+  // Surface silent fallthrough: `frame` was set on a variant the editorial
+  // wrapper doesn't yet support (horizontal / lollipop / small-multiples).
+  // Without this warning the publication-chrome data would disappear into
+  // the legacy intelligence-briefing render with no signal to the author.
+  warnIf(
+    Boolean(data.frame) && !(data.variant === "bar" || data.variant === "comparison"),
+    "DataChart",
+    `data.frame set on variant="${data.variant}" — DataChartEditorial only supports bar + comparison; frame fields will be ignored. Either change variant or drop the frame block.`,
+  );
 
   const { durationInFrames } = useVideoConfig();
   const theme = useThemeMode("light");

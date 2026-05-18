@@ -11,6 +11,6 @@ export const DataChartComposition = () => (
     component={DataChart}
     schema={DataChartSchema}
     calculateMetadata={standardMetadata<DataChartData>(8)}
-    defaultProps={{ data: sampleData as DataChartData }}
+    defaultProps={{ data: sampleData as unknown as DataChartData }}
   />
 );

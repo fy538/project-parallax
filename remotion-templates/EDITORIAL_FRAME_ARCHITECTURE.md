@@ -243,7 +243,7 @@ After the EditorialFrame ships, these are the chart types Parallax is missing pe
 ## Migration plan
 
 ### Phase 1 — Build EditorialFrame (2 days)
-Files: `src/components/EditorialFrame/{schema.ts, EditorialFrame.tsx, layouts/HeroSplit.tsx, layouts/Centered.tsx, layouts/FullBleed.tsx, layouts/Stacked.tsx, AnnotationOverlay.tsx, ReferenceLineOverlay.tsx, EraBandOverlay.tsx, HeroStatModule.tsx, ChartChrome.tsx}`. No template migration yet. Unit tests for layout math + annotation positioning.
+Files actually shipped: `src/components/EditorialFrame/{EditorialFrame.tsx, schema.ts, AnnotationOverlay.tsx, ReferenceLineOverlay.tsx, index.ts}`. The four layout modes (`hero-split`, `centered`, `full-bleed`, `stacked`) and the hero-stat block are implemented inline inside `EditorialFrame.tsx` rather than split into a `layouts/` subdirectory — splitting was unnecessary at this scope. `EraBandOverlay` is co-located with `ReferenceLineOverlay` (same file, sibling export).
 
 ### Phase 2 — Migrate DataChart (1 day)
 DataChart wraps `<EditorialFrame>` and accepts the frame props. Existing schema fields (`title`, `subtitle`, `annotation`, `referenceLine`, `highlightIndex`) get adapter shims so existing data files (PD's `chart-diffusion.json`) continue working. New data files can use the full EditorialFrame schema. Re-render PD's `chart-diffusion.json` and compare to Tiger's aspirational image 1.

@@ -596,13 +596,13 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   // ── Editorial ──
   sectionSegment(
     "Editorial",
-    "EditorialFrame × 3 — hero, aside, minimal"
+    "EditorialScaffold × 3 — hero, aside, minimal"
   ),
-  slateSegment("Editorial", "EditorialFrame", "hero"),
+  slateSegment("Editorial", "EditorialScaffold", "hero"),
   { durationSec: 14, render: () => <EditorialHeroDemo /> },
-  slateSegment("Editorial", "EditorialFrame", "aside"),
+  slateSegment("Editorial", "EditorialScaffold", "aside"),
   { durationSec: 12, render: () => <EditorialAsideDemo /> },
-  slateSegment("Editorial", "EditorialFrame", "minimal"),
+  slateSegment("Editorial", "EditorialScaffold", "minimal"),
   { durationSec: 10, render: () => <EditorialMinimalDemo /> },
 
   // ── Effects + Backdrops Showcase ──

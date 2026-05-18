@@ -1167,6 +1167,14 @@ export const ProbabilityGauge: React.FC<{ data: ProbabilityGaugeData }> = ({ dat
       />
     );
   }
+  // Surface silent fallthrough: frame set on a variant the editorial wrapper
+  // doesn't support yet (only forecast is migrated). Without this warning the
+  // frame fields would disappear into the legacy intelligence-briefing render.
+  warnIf(
+    Boolean(data.frame) && !(data.variant === "forecast" && data.forecast),
+    "ProbabilityGauge",
+    `data.frame set on variant="${data.variant}"${data.variant === "forecast" ? " without a populated forecast block" : ""} — ProbabilityGaugeEditorial only renders when variant="forecast" AND data.forecast is set; frame fields will be ignored. Either switch to forecast (with a populated forecast block) or drop the frame block.`,
+  );
 
   checkChartDataCommon("ProbabilityGauge", data);
   warnIf(

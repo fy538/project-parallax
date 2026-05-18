@@ -10,6 +10,7 @@
  */
 
 import React from "react";
+import { palette } from "../design/theme";
 
 export interface SparklineProps {
   /** Numeric series — values will be normalized to fit the sparkline rect. */
@@ -34,7 +35,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
   values,
   width = 160,
   height = 40,
-  color = "#1C1814",
+  color = palette.ink,
   strokeWidth = 1.75,
   areaOpacity = 0,
   endpointDot = false,

@@ -247,7 +247,7 @@ Visually compare to a reference aspirational composition (NYT Upshot / FT / Econ
 ### Step 6 — Run tests + commit
 
 ```bash
-npm run test:unit    # confirm 1168/1168 pass
+npm test             # full vitest run — confirm no regressions vs main
 git add ...
 git commit -m "feat(editorial-frame): migrate <Chart> to EditorialFrame"
 ```
@@ -291,7 +291,7 @@ A chart migration is "done" when:
 - [ ] Component routes to `<Chart>Editorial` when `frame` is set
 - [ ] `<Chart>Editorial.tsx` exists with self-contained editorial composition
 - [ ] Sample data in `index.tsx` includes a `frame` block (serves as render test)
-- [ ] `npm run test:unit` passes (1168+ tests)
+- [ ] `npm test` passes with no regressions versus `origin/main`
 - [ ] `npx remotion still` produces a publication-grade composition
 - [ ] No regression in existing data files (backward compat via early-route pattern)
 
