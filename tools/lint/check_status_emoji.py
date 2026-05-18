@@ -39,18 +39,23 @@ TOOLS_DIR = REPO_ROOT / "tools"
 # here AND exposed from status_emoji.py.
 STATUS_EMOJI = {"🟢", "🟡", "🔴"}
 
-# Files where the literal is expected (canonical module, tests, and one
-# legitimate functional use — the regex that strips known emoji chars
-# from titles before slug computation).
+# Files where the literal is expected by virtue of what the file IS
+# (canonical module + its tests + this lint + its tests). Anything else
+# — including legitimate functional uses like a regex character-class
+# that happens to mention these glyphs — uses the inline pragma instead,
+# so an allowlisted file doesn't become a back-door for new render
+# regressions hidden among the legitimate uses.
 ALLOWED_PATHS = {
     REPO_ROOT / "tools" / "status_emoji.py",
     REPO_ROOT / "tools" / "test_status_emoji.py",
     REPO_ROOT / "tools" / "lint" / "check_status_emoji.py",
     REPO_ROOT / "tools" / "lint" / "test_check_status_emoji.py",
-    # Functional regex character-class — `re.sub(r"[...🟢🟡🔴]", "", title)`
-    # strips known emoji chars before computing a slug. Not a render.
-    REPO_ROOT / "tools" / "topic" / "idea_invalidation.py",
 }
+
+# Inline pragma: same-line or previous-line comment suppresses the flag.
+# Used for one-off functional uses (regex character-classes, etc.) without
+# allowlisting the entire file.
+_PRAGMA = "no-bare-status-emoji: ok"
 
 SKIP_DIRS = {"_archive", "__pycache__", ".venv", "site-packages", "node_modules"}
 
@@ -118,13 +123,19 @@ def scan_file(path: Path) -> list[dict]:
         return []
 
     stripped = _strip_for_scan(source)
+    source_lines = source.splitlines()
     issues: list[dict] = []
     for i, line in enumerate(stripped.splitlines(), start=1):
         for emoji in STATUS_EMOJI:
-            if emoji in line:
-                original = source.splitlines()[i - 1] if i - 1 < len(source.splitlines()) else line
-                issues.append({"line": i, "emoji": emoji, "snippet": original.strip()})
-                break  # one issue per line is enough
+            if emoji not in line:
+                continue
+            # Inline pragma: same line or immediately preceding line.
+            original = source_lines[i - 1] if i - 1 < len(source_lines) else line
+            prev = source_lines[i - 2] if i >= 2 else ""
+            if _PRAGMA in original or _PRAGMA in prev:
+                break
+            issues.append({"line": i, "emoji": emoji, "snippet": original.strip()})
+            break  # one issue per line is enough
     return issues
 
 

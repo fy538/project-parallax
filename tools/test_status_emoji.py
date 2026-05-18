@@ -33,6 +33,17 @@ def test_for_severity_dispatch(severity: str, expected: str) -> None:
     assert status_emoji.for_severity(severity) == expected  # type: ignore[arg-type]
 
 
+@pytest.mark.parametrize("bad", ["errror", "critical", "Error", "", "info ", "warning"])
+def test_for_severity_raises_on_unknown(bad: str) -> None:
+    """A silent OK return on a typo'd severity would mask real errors
+    behind a healthy-green dashboard indicator. The runtime guard makes
+    the Literal contract real."""
+    with pytest.raises(ValueError) as exc:
+        status_emoji.for_severity(bad)  # type: ignore[arg-type]
+    assert "unknown severity" in str(exc.value)
+    assert bad in str(exc.value) or repr(bad) in str(exc.value)
+
+
 def test_constants_are_strings() -> None:
     """Type sanity: the canonical names are plain `str`, not a custom Enum."""
     for c in (status_emoji.OK, status_emoji.WARN, status_emoji.ERROR):

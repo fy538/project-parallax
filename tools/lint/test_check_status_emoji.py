@@ -85,3 +85,34 @@ def test_full_tools_tree_is_clean() -> None:
     """The repo as it stands should have zero violations (post-refactor baseline)."""
     results = check_status_emoji.scan_tree(check_status_emoji.TOOLS_DIR)
     assert results == {}, f"Unexpected literals: {results}"
+
+
+def test_inline_pragma_same_line_suppresses(tmp_path: Path) -> None:
+    """Same-line pragma allows one intentional literal without whole-file allowlist."""
+    f = tmp_path / "pragma_same.py"
+    f.write_text("x = '🔴'  # no-bare-status-emoji: ok\n", encoding="utf-8")
+    assert check_status_emoji.scan_file(f) == []
+
+
+def test_inline_pragma_previous_line_suppresses(tmp_path: Path) -> None:
+    """Previous-line pragma works for cases where same-line is awkward
+    (e.g. inside a long expression or multi-line call)."""
+    f = tmp_path / "pragma_prev.py"
+    f.write_text("# no-bare-status-emoji: ok\nx = '🔴 broken'\n", encoding="utf-8")
+    assert check_status_emoji.scan_file(f) == []
+
+
+def test_pragma_does_not_leak_two_lines_back(tmp_path: Path) -> None:
+    """Pragma is strictly adjacent — a blank line between pragma and the
+    literal means the pragma doesn't apply, so a stray pragma comment far
+    upstream doesn't accidentally bless every literal below it."""
+    f = tmp_path / "pragma_stale.py"
+    f.write_text(
+        "# no-bare-status-emoji: ok\n"
+        "\n"
+        "x = '🔴 broken'\n",
+        encoding="utf-8",
+    )
+    issues = check_status_emoji.scan_file(f)
+    assert len(issues) == 1
+    assert issues[0]["line"] == 3

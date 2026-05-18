@@ -42,19 +42,32 @@ ERROR: str = "🔴"
 Severity = Literal["ok", "info", "warn", "error"]
 
 
+_SEVERITY_MAP: dict[str, str] = {
+    "error": ERROR,
+    "warn":  WARN,
+    "ok":    OK,
+    # `info` collapses to OK because info-level findings don't deserve a
+    # yellow-flag warning in dashboard summaries. Promote to WARN
+    # explicitly at the call site if a particular `info` should stand out.
+    "info":  OK,
+}
+
+
 def for_severity(severity: Severity) -> str:
     """Map a lint-style severity to the channel's status emoji.
 
-    `info` collapses to OK because info-level findings don't deserve a
-    yellow-flag warning in dashboard summaries. Promote to WARN
-    explicitly at the call site if a particular `info` should stand out.
+    Raises `ValueError` on unknown severities — silently returning OK
+    for a typo (`"errror"`) or made-up level (`"critical"`) would mask
+    real failures behind a healthy-green indicator. The Literal type
+    hint is static-only; this runtime guard makes the contract real.
     """
-    if severity == "error":
-        return ERROR
-    if severity == "warn":
-        return WARN
-    # ok | info — both render as healthy
-    return OK
+    try:
+        return _SEVERITY_MAP[severity]
+    except KeyError:
+        raise ValueError(
+            f"unknown severity {severity!r}; "
+            f"valid: {sorted(_SEVERITY_MAP.keys())}"
+        ) from None
 
 
 # ── Compatibility shim ────────────────────────────────────────────────────

@@ -338,7 +338,11 @@ def build_search_query(topic: TopicRow) -> str:
     base = topic.title.strip()
     # Strip markdown link syntax `[label](url)` → keep just the label
     base = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", base)
-    # Strip emoji/state markers that sometimes contaminate the title
+    # Strip emoji/state markers that sometimes contaminate the title.
+    # The 🟢/🟡/🔴 chars are listed here as a character-class for
+    # functional stripping, not as a render — they're being REMOVED
+    # from text, not displayed.
+    # no-bare-status-emoji: ok
     base = re.sub(r"[📡🔄✅🔬📋📺🎬🟢🟡🔴]", "", base).strip()
     # Strip leading "The" + "A " for cleaner search
     base = re.sub(r"^(The|A|An)\s+", "", base, flags=re.IGNORECASE)

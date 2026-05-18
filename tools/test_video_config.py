@@ -54,6 +54,21 @@ def test_social_platforms_present() -> None:
         assert s.height > 0
 
 
+def test_social_crop_has_no_fps_field() -> None:
+    """SocialCrop is intentionally separate from VideoProfile — social
+    crops are stills without a frame rate. A unified type with `fps=0`
+    as a sentinel was the prior shape; callers who did
+    `parser.add_argument('--fps', default=youtube.fps)` would have
+    silently gotten 0. The type split prevents that footgun."""
+    s = video_config.get_social_config("youtube")
+    assert not hasattr(s, "fps")
+    assert isinstance(s, video_config.SocialCrop)
+    # Animated profiles still have fps — the split preserves that.
+    ep = video_config.get_video_config("episode")
+    assert isinstance(ep, video_config.VideoProfile)
+    assert ep.fps == 30
+
+
 def test_get_video_config_is_cached() -> None:
     first = video_config.get_video_config("episode")
     second = video_config.get_video_config("episode")
@@ -91,11 +106,12 @@ def test_video_profile_is_frozen() -> None:
         ep.width = 9999  # type: ignore[misc]
 
 
-def test_theme_ts_reads_same_json() -> None:
-    """The TS side imports `tools/config/video.json` directly. Verify the
-    file exists and has the structure theme.ts expects. (A theme.ts typo
-    would be caught by tsc, but a missing/malformed JSON would surface
-    here as a clearer error than a downstream Remotion render crash.)"""
+def test_video_json_has_keys_theme_ts_expects() -> None:
+    """video.json must have the structure theme.ts imports — both
+    surfaces read this file, so a missing key would surface as a TS
+    runtime error in one place and a Python KeyError in the other.
+    This test fails clearly on a missing key instead of letting a
+    downstream Remotion render or CLI invocation crash."""
     cfg = json.loads(video_config.CONFIG_PATH.read_text(encoding="utf-8"))
     assert "episode" in cfg
     assert "short" in cfg
