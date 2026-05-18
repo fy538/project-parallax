@@ -4,31 +4,159 @@
   "generated_at": "2026-05-09",
   "design_doc": "visual-thread-design.md",
   "thread_summary": {
-    "A_building": ["aigen-01", "aigen-01b", "aigen-04a", "aigen-04", "aigen-04b", "aigen-05"],
-    "B_institution": ["aigen-02", "aigen-02b", "aigen-03"],
-    "C_capture": ["aigen-06", "aigen-06b", "aigen-07"],
-    "D_markets_color_thread": ["aigen-08", "aigen-09"],
-    "E_cooperation": ["aigen-10", "aigen-11", "aigen-11b", "aigen-12", "aigen-12a", "aigen-13"],
-    "F_stakes": ["aigen-14", "aigen-14b", "aigen-15", "aigen-forecast-01", "aigen-16", "aigen-16a", "aigen-17", "aigen-17a"],
-    "G_atmospheric_inserts": ["aigen-permeation-01"],
-    "H_atmospheric_inserts": ["aigen-forecast-01"]
+    "A_building": [
+      "aigen-01",
+      "aigen-01b",
+      "aigen-04a",
+      "aigen-04",
+      "aigen-04b",
+      "aigen-05"
+    ],
+    "B_institution": [
+      "aigen-02",
+      "aigen-02b",
+      "aigen-03"
+    ],
+    "C_capture": [
+      "aigen-06",
+      "aigen-06b",
+      "aigen-07"
+    ],
+    "D_markets_color_thread": [
+      "aigen-08",
+      "aigen-09"
+    ],
+    "E_cooperation": [
+      "aigen-10",
+      "aigen-11",
+      "aigen-11b",
+      "aigen-12",
+      "aigen-12a",
+      "aigen-13"
+    ],
+    "F_stakes": [
+      "aigen-14",
+      "aigen-14b",
+      "aigen-15",
+      "aigen-forecast-01",
+      "aigen-16",
+      "aigen-16a",
+      "aigen-17",
+      "aigen-17a"
+    ],
+    "G_atmospheric_inserts": [
+      "aigen-permeation-01"
+    ],
+    "H_atmospheric_inserts": [
+      "aigen-forecast-01"
+    ]
   },
   "morph_pairs": [
-    {"from": "aigen-01", "to": "aigen-01b", "duration_sec": 6, "tool": "kling", "intent": "dolly-in to grids"},
-    {"from": "aigen-04a", "to": "aigen-04", "duration_sec": 6, "tool": "kling", "intent": "pull-back from chalkboard to corridor"},
-    {"from": "aigen-04", "to": "aigen-04b", "duration_sec": 6, "tool": "kling", "intent": "push along corridor toward doorway"},
-    {"from": "aigen-04b", "to": "aigen-05", "duration_sec": 6, "tool": "kling", "intent": "push through doorway"},
-    {"from": "aigen-02", "to": "aigen-02b", "duration_sec": 6, "tool": "kling", "intent": "tilt up to sky-rays"},
-    {"from": "aigen-02b", "to": "aigen-03", "duration_sec": 8, "tool": "hailuo", "intent": "rays land on aerial buildings"},
-    {"from": "aigen-06", "to": "aigen-06b", "duration_sec": 8, "tool": "kling", "intent": "grid sharpens, table emerges"},
-    {"from": "aigen-06b", "to": "aigen-07", "duration_sec": 6, "tool": "hailuo", "intent": "figures arrive into formed table"},
-    {"from": "aigen-11", "to": "aigen-11b", "duration_sec": 8, "tool": "kling", "intent": "pursuit resolves to gathering around stag"},
-    {"from": "aigen-12", "to": "aigen-12a", "duration_sec": 8, "tool": "hailuo", "intent": "terraces transition to alpine pasture"},
-    {"from": "aigen-12a", "to": "aigen-13", "duration_sec": 10, "tool": "hailuo", "intent": "stone walls dissolve to ocean (HERO morph)"},
-    {"from": "aigen-14", "to": "aigen-14b", "duration_sec": 8, "tool": "kling", "intent": "parallel pedestrians become meeting figures"},
-    {"from": "aigen-15", "to": "aigen-forecast-01", "duration_sec": 6, "tool": "kling", "intent": "diplomatic figures appear on cliff"},
-    {"from": "aigen-16", "to": "aigen-16a", "duration_sec": 8, "tool": "kling", "intent": "lecture wide to notebook close"},
-    {"from": "aigen-17", "to": "aigen-17a", "duration_sec": 8, "tool": "kling", "intent": "panorama wide to single mannequin at edge"}
+    {
+      "from": "aigen-01",
+      "to": "aigen-01b",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "dolly-in to grids"
+    },
+    {
+      "from": "aigen-04a",
+      "to": "aigen-04",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "pull-back from chalkboard to corridor"
+    },
+    {
+      "from": "aigen-04",
+      "to": "aigen-04b",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "push along corridor toward doorway"
+    },
+    {
+      "from": "aigen-04b",
+      "to": "aigen-05",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "push through doorway"
+    },
+    {
+      "from": "aigen-02",
+      "to": "aigen-02b",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "tilt up to sky-rays"
+    },
+    {
+      "from": "aigen-02b",
+      "to": "aigen-03",
+      "duration_sec": 8,
+      "tool": "hailuo",
+      "intent": "rays land on aerial buildings"
+    },
+    {
+      "from": "aigen-06",
+      "to": "aigen-06b",
+      "duration_sec": 8,
+      "tool": "kling",
+      "intent": "grid sharpens, table emerges"
+    },
+    {
+      "from": "aigen-06b",
+      "to": "aigen-07",
+      "duration_sec": 6,
+      "tool": "hailuo",
+      "intent": "figures arrive into formed table"
+    },
+    {
+      "from": "aigen-11",
+      "to": "aigen-11b",
+      "duration_sec": 8,
+      "tool": "kling",
+      "intent": "pursuit resolves to gathering around stag"
+    },
+    {
+      "from": "aigen-12",
+      "to": "aigen-12a",
+      "duration_sec": 8,
+      "tool": "hailuo",
+      "intent": "terraces transition to alpine pasture"
+    },
+    {
+      "from": "aigen-12a",
+      "to": "aigen-13",
+      "duration_sec": 10,
+      "tool": "hailuo",
+      "intent": "stone walls dissolve to ocean (HERO morph)"
+    },
+    {
+      "from": "aigen-14",
+      "to": "aigen-14b",
+      "duration_sec": 8,
+      "tool": "kling",
+      "intent": "parallel pedestrians become meeting figures"
+    },
+    {
+      "from": "aigen-15",
+      "to": "aigen-forecast-01",
+      "duration_sec": 6,
+      "tool": "kling",
+      "intent": "diplomatic figures appear on cliff"
+    },
+    {
+      "from": "aigen-16",
+      "to": "aigen-16a",
+      "duration_sec": 8,
+      "tool": "kling",
+      "intent": "lecture wide to notebook close"
+    },
+    {
+      "from": "aigen-17",
+      "to": "aigen-17a",
+      "duration_sec": 8,
+      "tool": "kling",
+      "intent": "panorama wide to single mannequin at edge"
+    }
   ],
   "assets": [
     {
@@ -41,7 +169,8 @@
       "status": "existing",
       "description": "1950s RAND research office — Flood-Dresher experiment",
       "duration_sec": 6,
-      "morph_to": "aigen-01b"
+      "morph_to": "aigen-01b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-01b",
@@ -70,7 +199,8 @@
       "status": "existing",
       "description": "Equation radiating sunbeams over silhouetted institutions",
       "duration_sec": 6,
-      "morph_to": "aigen-02b"
+      "morph_to": "aigen-02b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-02b",
@@ -98,7 +228,8 @@
       "thread_position": 3,
       "status": "existing",
       "description": "Aerial building complex — nations converging",
-      "duration_sec": 6
+      "duration_sec": 6,
+      "type": "ai-generate"
     },
     {
       "id": "aigen-04a",
@@ -128,7 +259,8 @@
       "status": "existing",
       "description": "RAND institutional corridor — lone figure, chalkboards",
       "duration_sec": 6,
-      "morph_to": "aigen-04b"
+      "morph_to": "aigen-04b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-04b",
@@ -157,7 +289,8 @@
       "thread_position": 6,
       "status": "existing",
       "description": "Doorway threshold — escape moment",
-      "duration_sec": 6
+      "duration_sec": 6,
+      "type": "ai-generate"
     },
     {
       "id": "aigen-permeation-01",
@@ -187,7 +320,8 @@
       "status": "existing",
       "description": "Grid projected onto landscape — model reshaping reality",
       "duration_sec": 6,
-      "morph_to": "aigen-06b"
+      "morph_to": "aigen-06b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-06b",
@@ -216,7 +350,8 @@
       "thread_position": 3,
       "status": "existing",
       "description": "Negotiation room — two figures approaching table",
-      "duration_sec": 6
+      "duration_sec": 6,
+      "type": "ai-generate"
     },
     {
       "id": "aigen-08",
@@ -228,7 +363,8 @@
       "status": "existing",
       "description": "Stock exchange floor — Black-Scholes parallel",
       "duration_sec": 6,
-      "thread_note": "Color thread — palette continuity (rust/amber) with aigen-09, not spatial morph"
+      "thread_note": "Color thread — palette continuity (rust/amber) with aigen-09, not spatial morph",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-09",
@@ -239,7 +375,8 @@
       "thread_position": 2,
       "status": "existing",
       "description": "Oil infrastructure — OPEC context",
-      "duration_sec": 6
+      "duration_sec": 6,
+      "type": "ai-generate"
     },
     {
       "id": "aigen-10",
@@ -250,7 +387,8 @@
       "thread_position": 1,
       "status": "existing",
       "description": "Sunrise — cooperative figures, tone shift",
-      "duration_sec": 6
+      "duration_sec": 6,
+      "type": "ai-generate"
     },
     {
       "id": "aigen-11",
@@ -262,7 +400,8 @@
       "status": "existing",
       "description": "Forest stag hunt — converging on stag, one diverging to hare",
       "duration_sec": 6,
-      "morph_to": "aigen-11b"
+      "morph_to": "aigen-11b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-11b",
@@ -292,7 +431,8 @@
       "status": "existing",
       "description": "Terraced farmland — Ostrom commons, irrigation",
       "duration_sec": 6,
-      "morph_to": "aigen-12a"
+      "morph_to": "aigen-12a",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-12a",
@@ -323,7 +463,8 @@
       "status": "existing",
       "description": "Ocean vastness — boundless, scaling limit",
       "duration_sec": 6,
-      "thread_note": "12a → 13 is the HERO morph of the cooperation arc; the contained-to-boundless transition IS the script's argument"
+      "thread_note": "12a → 13 is the HERO morph of the cooperation arc; the contained-to-boundless transition IS the script's argument",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-14",
@@ -335,7 +476,8 @@
       "status": "existing",
       "description": "City street — present day evening, parallel pedestrians",
       "duration_sec": 4,
-      "morph_to": "aigen-14b"
+      "morph_to": "aigen-14b",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-14b",
@@ -364,7 +506,8 @@
       "status": "existing",
       "description": "Horizon — two landmasses, two dots, contemplative",
       "duration_sec": 4,
-      "morph_to": "aigen-forecast-01"
+      "morph_to": "aigen-forecast-01",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-forecast-01",
@@ -394,7 +537,8 @@
       "status": "existing",
       "description": "Lecture hall — students facing chalkboard with PD matrices",
       "duration_sec": 5,
-      "morph_to": "aigen-16a"
+      "morph_to": "aigen-16a",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-16a",
@@ -423,7 +567,8 @@
       "status": "existing",
       "description": "Panorama — two cityscapes across game-matrix channel",
       "duration_sec": 6,
-      "morph_to": "aigen-17a"
+      "morph_to": "aigen-17a",
+      "type": "ai-generate"
     },
     {
       "id": "aigen-17a",

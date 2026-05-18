@@ -10,8 +10,8 @@
   "labelB": "2025",
   "unit": "millions",
   "medianAge": 38,
-  "maleColor": "#4A7FA5",
-  "femaleColor": "#C25B6E",
+  "maleColor": "#4A7BA7",
+  "femaleColor": "#A64D46",
   "highlightAgeGroups": ["30–34", "35–39", "40–44"],
   "cohorts": [
     { "ageGroup": "0–4",   "male": 57.8, "female": 51.8 },

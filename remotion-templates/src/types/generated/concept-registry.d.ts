@@ -58,9 +58,9 @@ export interface Concept {
    */
   relatedConcepts?: string[];
   /**
-   * Which content pillar(s) this concept serves.
+   * Which content pillar(s) this concept serves. Added 'psychology' May 2026 — the channel's analytical doctrine draws on six psychological frameworks (Loewenstein information-gap, Kruglanski cognitive closure, Affective Intelligence Theory, Narrative Transportation, Terror Management, calibration/superforecasting) documented in project/psychology/. Concepts that materially depend on one of those frameworks (e.g. 'cooperation-residual' on observed-vs-predicted-behavior gap) get tagged with this fourth pillar.
    */
-  pillar?: ("historical-analogy" | "philosophical-framework" | "geopolitics")[];
+  pillar?: ("historical-analogy" | "philosophical-framework" | "geopolitics" | "psychology")[];
   /**
    * Free-form tags for filtering (arc names, regions, disciplines).
    */

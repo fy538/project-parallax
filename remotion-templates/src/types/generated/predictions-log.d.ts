@@ -41,4 +41,8 @@ export interface PredictionEntry {
   outcome?: string | null;
   brierFinal?: number | null;
   lesson?: string | null;
+  /**
+   * Optional pre-resolution analytical annotation distinct from `lesson` (which is post-resolution). Typical structure inside the string: orientation (how this maps to the script framing) · watch signals (what to monitor) · disconfirmer (what would surprise us) · falsification clause (what episode thesis would weaken if outcome shifts). Loose string rather than structured shape because predictions vary in how much annotation they need — promote to a sub-object schema if 3+ entries adopt the same shape (rule of three). Added May 2026 — see `us-china-ai-communique-shared-vocab-2026` for the canonical example.
+   */
+  note?: string | null;
 }

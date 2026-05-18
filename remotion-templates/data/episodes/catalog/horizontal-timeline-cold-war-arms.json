@@ -34,7 +34,7 @@
       "title": "Cuban Missile Crisis",
       "description": "Thirteen days at the edge. Both sides defect — then pull back.",
       "weight": 3,
-      "color": "#C23B22"
+      "color": "#A64D46"
     },
     {
       "year": "1972",
@@ -50,7 +50,7 @@
     }
   ],
   "eras": [
-    { "label": "COLD WAR", "startIndex": 0, "endIndex": 3, "color": "#C23B22" },
+    { "label": "COLD WAR", "startIndex": 0, "endIndex": 3, "color": "#A64D46" },
     { "label": "PEAK TENSION", "startIndex": 4, "endIndex": 4 },
     { "label": "DÉTENTE", "startIndex": 5, "endIndex": 6 }
   ],
