@@ -50,6 +50,12 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"
 
+# Shared manifest loader — May 2026 audit #6. migrate_manifest uses the
+# diagnostic variant that returns the error message (vs None) so the
+# operator's repair report can name WHY each manifest failed to load.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+from manifests import load_manifest_with_error as _shared_load_with_error  # noqa: E402
+
 # Bump this when the canonical schema version advances. The `version` field
 # in assembly-manifest.schema.json must match.
 CURRENT_VERSION = "1.0"
@@ -170,12 +176,9 @@ def find_manifests(episode_filter: str | None = None) -> list[Path]:
 
 
 def load_manifest(path: Path) -> tuple[dict | None, str | None]:
-    try:
-        return json.loads(path.read_text()), None
-    except json.JSONDecodeError as exc:
-        return None, f"invalid JSON: {exc}"
-    except OSError as exc:
-        return None, f"could not read: {exc}"
+    """Delegates to tools/shared/manifests.load_manifest_with_error
+    (May 2026 audit #6)."""
+    return _shared_load_with_error(path)
 
 
 def manifest_status(path: Path) -> ManifestStatus:

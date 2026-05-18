@@ -52,6 +52,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_ROOT = REPO_ROOT / "episodes"
 MANIFEST_ROOT = REPO_ROOT / "remotion-templates" / "data" / "episodes"
 
+# Shared manifest loader — single source of truth (May 2026 audit #6).
+sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+from manifests import load_manifest as _shared_load_manifest  # noqa: E402
+
 # Canonical music bed moods — must match the enum in
 # remotion-templates/data/assembly-manifest.schema.json (musicBed.tracks.mood).
 CANONICAL_MUSIC_MOODS = frozenset({
@@ -184,13 +188,10 @@ def music_track_count(cue_text: str) -> int:
 
 
 def load_manifest(slug: str) -> dict | None:
-    path = MANIFEST_ROOT / slug / "assembly-manifest.json"
-    if not path.is_file():
-        return None
-    try:
-        return json.loads(path.read_text())
-    except json.JSONDecodeError:
-        return None
+    """Delegates to tools/shared/manifests.load_manifest. Constructs the
+    path from MANIFEST_ROOT (rather than passing a bare slug) so test
+    monkeypatching of MANIFEST_ROOT continues to redirect the lookup."""
+    return _shared_load_manifest(MANIFEST_ROOT / slug / "assembly-manifest.json")
 
 
 def manifest_moods(manifest: dict) -> Counter[str]:

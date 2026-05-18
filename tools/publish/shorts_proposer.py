@@ -62,6 +62,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
+from manifests import load_manifest_strict as _shared_load_manifest_strict  # noqa: E402
 from paths import get_project_root  # noqa: E402
 
 ROOT = get_project_root()
@@ -161,8 +162,10 @@ def _default_manifest_path(slug: str) -> Path:
 
 def load_manifest(path: Path) -> dict:
     """Read the assembly manifest. Returns the raw dict (no validation —
-    the proposer is read-only and tolerates partial manifests)."""
-    return json.loads(path.read_text(encoding="utf-8"))
+    the proposer is read-only and tolerates partial manifests). Delegates
+    to tools/shared/manifests.load_manifest_strict (May 2026 audit #6) —
+    strict variant lets FileNotFoundError / JSONDecodeError bubble."""
+    return _shared_load_manifest_strict(path)
 
 
 # ── Candidate identification ────────────────────────────────────────────────

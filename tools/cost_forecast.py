@@ -58,6 +58,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+from manifests import load_manifest as _shared_load_manifest  # noqa: E402
 from paths import get_project_root  # noqa: E402
 
 ROOT = get_project_root()
@@ -182,13 +183,9 @@ def load_shot_list(slug: str) -> dict | None:
 
 
 def load_assembly_manifest(slug: str) -> dict | None:
-    path = REMOTION_DATA / slug / "assembly-manifest.json"
-    if not path.is_file():
-        return None
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return None
+    """Delegates to tools/shared/manifests.load_manifest. Path constructed
+    from local REMOTION_DATA so test monkeypatching continues to redirect."""
+    return _shared_load_manifest(REMOTION_DATA / slug / "assembly-manifest.json")
 
 
 def count_ai_gen_briefs(slug: str) -> tuple[int, int]:

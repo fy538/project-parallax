@@ -52,6 +52,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_ROOT = REPO_ROOT / "episodes"
 MANIFEST_ROOT = REPO_ROOT / "remotion-templates" / "data" / "episodes"
 
+# Shared manifest loader — May 2026 audit #6.
+sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
+from manifests import load_manifest as _shared_load_manifest  # noqa: E402
 
 # ─── Script parsing ──────────────────────────────────────────────────────────
 
@@ -118,13 +121,9 @@ def shot_ids_from_list(shot_list: dict) -> set[str]:
 
 
 def load_manifest(slug: str) -> dict | None:
-    path = MANIFEST_ROOT / slug / "assembly-manifest.json"
-    if not path.is_file():
-        return None
-    try:
-        return json.loads(path.read_text())
-    except json.JSONDecodeError:
-        return None
+    """Delegates to tools/shared/manifests.load_manifest. Path constructed
+    from MANIFEST_ROOT so test monkeypatching continues to redirect."""
+    return _shared_load_manifest(MANIFEST_ROOT / slug / "assembly-manifest.json")
 
 
 def shotlist_ids_in_manifest(manifest: dict) -> set[str]:
