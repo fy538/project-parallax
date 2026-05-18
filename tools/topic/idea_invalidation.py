@@ -58,6 +58,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = get_project_root()
 IDEAS_PATH = ROOT / "project" / "IDEAS.md"
 
@@ -133,15 +136,15 @@ class InvalidationReport:
 
     @property
     def fresh(self) -> list[TopicRow]:
-        return [t for t in self.topics if t.freshness_verdict == "🟢"]
+        return [t for t in self.topics if t.freshness_verdict == OK]
 
     @property
     def review(self) -> list[TopicRow]:
-        return [t for t in self.topics if t.freshness_verdict == "🟡"]
+        return [t for t in self.topics if t.freshness_verdict == WARN]
 
     @property
     def stale(self) -> list[TopicRow]:
-        return [t for t in self.topics if t.freshness_verdict == "🔴"]
+        return [t for t in self.topics if t.freshness_verdict == ERROR]
 
 
 # ── IDEAS.md parsing ──────────────────────────────────────────────────────
@@ -319,11 +322,11 @@ def compute_freshness(
     days = (today - checked).days
     topic.days_since_checked = days
     if days < FRESH_DAYS:
-        topic.freshness_verdict = "🟢"
+        topic.freshness_verdict = OK
     elif days < REVIEW_DAYS:
-        topic.freshness_verdict = "🟡"
+        topic.freshness_verdict = WARN
     else:
-        topic.freshness_verdict = "🔴"
+        topic.freshness_verdict = ERROR
 
 
 # ── Search-query + URL ────────────────────────────────────────────────────
@@ -450,7 +453,7 @@ def run_invalidation(
         compute_freshness(t, today=today)
         t.search_query = build_search_query(t)
         t.search_url = build_search_url(t.search_query)
-        if stale_only and t.freshness_verdict != "🔴":
+        if stale_only and t.freshness_verdict != ERROR:
             continue
         if api_key:
             try:
@@ -471,7 +474,7 @@ def run_invalidation(
             except Exception as e:  # noqa: BLE001 — defensive boundary
                 t.competing_error = f"{type(e).__name__}: {e}"
     if stale_only:
-        topics = [t for t in topics if t.freshness_verdict == "🔴"]
+        topics = [t for t in topics if t.freshness_verdict == ERROR]
     return InvalidationReport(
         generated_at=(today or datetime.date.today()).isoformat(),
         ideas_path=str(ideas_path),
@@ -495,23 +498,23 @@ def render_invalidation_md(report: InvalidationReport) -> str:
         f"# Idea Invalidation Digest — {report.generated_at}",
         "",
         f"_Scanned `{report.ideas_path}`. Topics are flagged by "
-        f"freshness verdict (🟢 < {FRESH_DAYS}d / 🟡 {FRESH_DAYS}-{REVIEW_DAYS}d "
-        f"/ 🔴 ≥ {REVIEW_DAYS}d since last check). Click each search "
+        f"freshness verdict ({OK} < {FRESH_DAYS}d / {WARN} {FRESH_DAYS}-{REVIEW_DAYS}d "
+        f"/ {ERROR} ≥ {REVIEW_DAYS}d since last check). Click each search "
         f"URL to scan YouTube for competing coverage; decide keep / "
         f"kill / re-research, then update the **Last Checked** column "
         f"in IDEAS.md._",
         "",
         f"**Total topics tracked:** {len(report.topics)}  ·  "
-        f"🟢 {len(report.fresh)}  ·  🟡 {len(report.review)}  ·  "
-        f"🔴 {len(report.stale)}",
+        f"{OK} {len(report.fresh)}  ·  {WARN} {len(report.review)}  ·  "
+        f"{ERROR} {len(report.stale)}",
         "",
     ]
     for label, bucket, doctrine in (
-        ("🔴 Stale — review NOW", report.stale,
+        (f"{ERROR} Stale — review NOW", report.stale,
          "Last checked ≥ 90 days ago. Highest-priority cull pass — competing coverage may have shipped."),
-        ("🟡 Review soon", report.review,
+        (f"{WARN} Review soon", report.review,
          "Last checked 30-90 days ago. Schedule a re-check in this digest cycle."),
-        ("🟢 Fresh", report.fresh,
+        (f"{OK} Fresh", report.fresh,
          "Recently checked. No action required this cycle."),
     ):
         if not bucket:
@@ -568,11 +571,11 @@ def main() -> int:
     parser.add_argument("--ideas", default=str(IDEAS_PATH), help="Path to IDEAS.md.")
     parser.add_argument(
         "--stale-only", action="store_true",
-        help="Only report 🔴 stale topics (skip 🟡 and 🟢).",
+        help=f"Only report {ERROR} stale topics (skip {WARN} and {OK}).",
     )
     parser.add_argument(
         "--strict", action="store_true",
-        help="Exit 1 if any 🔴 stale topics exist.",
+        help=f"Exit 1 if any {ERROR} stale topics exist.",
     )
     parser.add_argument("--json", action="store_true", help="Emit JSON.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")

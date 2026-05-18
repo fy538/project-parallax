@@ -63,6 +63,10 @@ run "concepts/lookup.py validate" \
 run "check_brand_mark.py (no hardcoded `∴` in tools/)" \
   python3 tools/lint/check_brand_mark.py
 
+# ─── Status-emoji guard (no hardcoded 🟢/🟡/🔴 outside tools/status_emoji.py) ─
+run "check_status_emoji.py (no hardcoded 🟢/🟡/🔴 in tools/)" \
+  python3 tools/lint/check_status_emoji.py
+
 # ─── Assembly-manifest doctrine lint (per-episode) ─────────────────────────
 # manifest_lint expects file path args. Find all current assembly manifests.
 shopt -s nullglob

@@ -55,6 +55,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
 import whisper_alignment as wa  # noqa: E402
@@ -106,10 +109,10 @@ def _default_manifest_path(slug: str) -> Path:
 def _drift_severity(pct: float) -> str:
     """Classify drift magnitude for the report."""
     if abs(pct) < ACCEPTABLE_DRIFT_PCT:
-        return "🟢 within tolerance"
+        return f"{OK} within tolerance"
     if abs(pct) < ACCEPTABLE_DRIFT_PCT * 2:
-        return "🟡 noticeable — visual-spec timing may need light touch-ups"
-    return "🔴 material — visual-spec timing should be regenerated against precise mode"
+        return f"{WARN} noticeable — visual-spec timing may need light touch-ups"
+    return f"{ERROR} material — visual-spec timing should be regenerated against precise mode"
 
 
 # ── Pipeline steps ───────────────────────────────────────────────────────────

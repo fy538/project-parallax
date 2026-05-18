@@ -50,6 +50,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 
@@ -740,7 +743,7 @@ def audit_audio(
 
 # ── Rendering ────────────────────────────────────────────────────────────────
 
-ICONS = {"error": "🔴", "warn": "🟡", "ok": "🟢"}
+ICONS = {"error": ERROR, "warn": WARN, "ok": OK}
 
 
 def render_report_md(report: AuditReport) -> str:
@@ -797,7 +800,7 @@ def render_report_md(report: AuditReport) -> str:
     lines.append("## Findings")
     lines.append("")
     if not report.findings:
-        lines.append("🟢 No findings — audio passes every check.")
+        lines.append(f"{OK} No findings — audio passes every check.")
         lines.append("")
     else:
         for f in report.findings:

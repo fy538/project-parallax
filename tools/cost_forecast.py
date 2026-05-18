@@ -61,6 +61,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 from manifests import load_manifest as _shared_load_manifest  # noqa: E402
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
@@ -561,18 +564,18 @@ def render_forecast_md(
         lines.extend(["## Budget check", ""])
         if forecast.total_mid <= budget:
             lines.append(
-                f"🟢 MID projection (${forecast.total_mid:.2f}) is within "
+                f"{OK} MID projection (${forecast.total_mid:.2f}) is within "
                 f"budget (${budget:.2f})."
             )
         elif forecast.total_low <= budget:
             lines.append(
-                f"🟡 LOW projection (${forecast.total_low:.2f}) fits budget "
+                f"{WARN} LOW projection (${forecast.total_low:.2f}) fits budget "
                 f"(${budget:.2f}) but MID (${forecast.total_mid:.2f}) "
                 f"exceeds it. Tight."
             )
         else:
             lines.append(
-                f"🔴 Even LOW projection (${forecast.total_low:.2f}) "
+                f"{ERROR} Even LOW projection (${forecast.total_low:.2f}) "
                 f"exceeds budget (${budget:.2f}). Re-scope or raise budget."
             )
         lines.append("")
@@ -636,7 +639,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--budget", type=float,
-        help="Compare totals against this budget; emit 🟢/🟡/🔴 banner.",
+        help=f"Compare totals against this budget; emit {OK}/{WARN}/{ERROR} banner.",
     )
     parser.add_argument(
         "--strict", action="store_true",

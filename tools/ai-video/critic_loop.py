@@ -85,6 +85,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK  # noqa: E402
+
 ROOT = get_project_root()
 PALETTE_PATH = ROOT / "tools" / "brand-treatment" / "palette.json"
 
@@ -524,7 +527,7 @@ def render_report_md(result: LoopResult, spec: GenerationSpec) -> str:
         lines.append("| Critic | Verdict | Score | Note |")
         lines.append("|---|---|---|---|")
         for c in rec.critiques:
-            icon = "🟢" if c.passed else "🔴"
+            icon = OK if c.passed else ERROR
             # Escape `|` in messages so a critic that mentions pipes
             # (file paths, regex literals, "a|b" examples) doesn't break
             # the markdown table layout.

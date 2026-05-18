@@ -41,6 +41,7 @@ from paths import get_project_root  # noqa: E402
 # glyph is tools/brand-treatment/palette.json::brandMark.glyph.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from brand import get_brand_mark  # noqa: E402
+from status_emoji import ERROR, OK, WARN  # noqa: E402
 
 if TYPE_CHECKING:
     from cost_parser import CostData
@@ -597,35 +598,35 @@ def _render_episode_health(s: EpisodeStatus) -> str:
     health: list[tuple[str, str]] = []
     if s.manifest_stale:
         health.append((
-            "🔴",
+            ERROR,
             f"Manifest stale ({s.manifest_stale_drift_str} drift) — "
             f"<code class=\"copyable\">python3 tools/assembly/generate_manifest.py {s.slug}</code>",
         ))
     if s.zero_hit_count > 0:
         health.append((
-            "🟡",
+            WARN,
             f"{s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''} "
             f"— <code class=\"copyable\">python3 tools/asset-source/zerohit_fallback.py {s.slug}</code>",
         ))
     if s.has_manifest and s.manifest_mode == "estimate" and s.has_narration:
         health.append((
-            "🟡",
+            WARN,
             "Manifest in estimate mode but narration recorded — regenerate in precise mode",
         ))
     if s.has_manifest and not s.has_render:
         health.append((
-            "🟡",
+            WARN,
             f"Manifest ready but never rendered — "
             f"<code class=\"copyable\">cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}</code>",
         ))
     if s.has_render and not s.has_narration:
         health.append((
-            "🟡",
+            WARN,
             "Rendered but no narration recorded yet",
         ))
     if not health:
         return (
-            '      <div class="health-clean">🟢 No health issues detected.</div>'
+            f'      <div class="health-clean">{OK} No health issues detected.</div>'
         )
     items = "\n".join(
         f'        <li class="health-item">'

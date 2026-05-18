@@ -41,6 +41,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR  # noqa: E402
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
 import pronunciation_guide as pg  # noqa: E402
@@ -376,7 +379,7 @@ def render_metrics_md(m: EngagementMetrics) -> str:
             f"- **Pivot detected:** ✓ at ~{_fmt_mmss(m.hook_position_sec or 0)} "
             f"({m.cold_open_word_count} words in)",
             f"- **Hook position target:** ≤15s (research-backed). "
-            f"{'✓ on target' if (m.hook_position_sec or 0) <= 15 else '⚠ above target' if (m.hook_position_sec or 0) <= 30 else '🔴 well above target'}",
+            f"{'✓ on target' if (m.hook_position_sec or 0) <= 15 else '⚠ above target' if (m.hook_position_sec or 0) <= 30 else f'{ERROR} well above target'}",
         ])
     else:
         lines.append(

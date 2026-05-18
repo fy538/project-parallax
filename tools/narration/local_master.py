@@ -59,6 +59,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import OK, WARN  # noqa: E402
+
 # Re-use the loudnorm output parser instead of duplicating it.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audio_qa as aq  # noqa: E402
@@ -421,7 +424,7 @@ def main() -> int:
             actual = report.loudness.integrated_lufs
             delta = abs(actual - args.target_lufs)
             ok = delta <= 1.0
-            icon = "🟢" if ok else "🟡"
+            icon = OK if ok else WARN
             print(
                 f"  {icon} mastered loudness: {actual:.1f} LUFS "
                 f"(target {args.target_lufs:.0f}, delta {delta:.1f})"

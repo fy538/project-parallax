@@ -59,6 +59,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from manifests import load_manifest as _shared_load_manifest  # noqa: E402
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
@@ -75,9 +78,9 @@ POLL_INTERVAL_SEC = 10.0
 POLL_TIMEOUT_SEC = 900.0   # 15 min — generous for long episodes / queue depth
 
 # Severity bands for findings.
-SEVERITY_MATERIAL = "🔴"  # ships a meaningful flaw — fix before render
-SEVERITY_NOTICEABLE = "🟡"  # worth reviewing — operator judgment
-SEVERITY_OK = "🟢"
+SEVERITY_MATERIAL = ERROR  # ships a meaningful flaw — fix before render
+SEVERITY_NOTICEABLE = WARN  # worth reviewing — operator judgment
+SEVERITY_OK = OK
 
 # Categorical finding types — the structured-output schema we ask
 # Pegasus to fill. Each maps to a doctrine concern.
@@ -132,7 +135,7 @@ OUTPUT FORMAT — return a JSON object with this exact shape:
   "findings": [
     {{
       "category": "pacing_dead_zone" | "visual_monotony" | "missed_callback" | "av_desync" | "energy_drop",
-      "severity": "🔴" | "🟡" | "🟢",
+      "severity": ERROR | WARN | OK,
       "timecode_sec": <number — start of the issue, in seconds from episode start>,
       "duration_sec": <number — how long the issue persists>,
       "beat_number": <integer — which beat is affected>,
@@ -145,9 +148,9 @@ OUTPUT FORMAT — return a JSON object with this exact shape:
   "rationale": "<one paragraph summarizing the strongest signals>"
 }}
 
-🔴 = material flaw, fix before publishing.
-🟡 = worth reviewing, operator judgment.
-🟢 = noted but not blocking.
+{ERROR} = material flaw, fix before publishing.
+{WARN} = worth reviewing, operator judgment.
+{OK} = noted but not blocking.
 
 If you find nothing material, return findings=[] and overall_verdict="ready_to_publish".
 """
@@ -497,8 +500,8 @@ def render_report_md(report: EpisodeWatchReport) -> str:
         ])
     else:
         lines.append(
-            f"**Findings:** {len(report.material)} 🔴  ·  "
-            f"{len(report.noticeable)} 🟡  ·  "
+            f"**Findings:** {len(report.material)} {ERROR}  ·  "
+            f"{len(report.noticeable)} {WARN}  ·  "
             f"{len(report.findings)} total"
         )
         lines.append("")
@@ -568,7 +571,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--strict", action="store_true",
-        help="Exit 1 if any 🔴 material findings are reported.",
+        help=f"Exit 1 if any {ERROR} material findings are reported.",
     )
     parser.add_argument("--json", action="store_true", help="Emit JSON.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")

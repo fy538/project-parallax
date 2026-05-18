@@ -60,6 +60,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = ffr.ROOT
 EPISODES_DIR = ffr.EPISODES_DIR
 
@@ -154,10 +157,10 @@ class SentenceScore:
     @property
     def severity(self) -> str:
         if self.score >= 75:
-            return "🔴"
+            return ERROR
         if self.score >= 60:
-            return "🟡"
-        return "🟢"
+            return WARN
+        return OK
 
 
 @dataclass
@@ -361,7 +364,7 @@ def render_report_md(report: SayabilityReport, top: int = 0) -> str:
     for s in report.flagged:
         by_beat.setdefault(s.beat_number, []).append(s)
 
-    sev_counts = {"🔴": 0, "🟡": 0, "🟢": 0}
+    sev_counts = {ERROR: 0, WARN: 0, OK: 0}
     for s in report.sentences:
         sev_counts[s.severity] += 1
 
@@ -374,7 +377,7 @@ def render_report_md(report: SayabilityReport, top: int = 0) -> str:
         f"BEFORE the booth — not after, when you're already hoarse._",
         "",
         f"**Total sentences:** {report.total_sentences}  ·  "
-        f"🔴 {sev_counts['🔴']} · 🟡 {sev_counts['🟡']} · 🟢 {sev_counts['🟢']}",
+        f"{ERROR} {sev_counts[ERROR]} · {WARN} {sev_counts[WARN]} · {OK} {sev_counts[OK]}",
         f"**Flagged at threshold ≥{report.threshold:.0f}:** {len(report.flagged)}",
         "",
     ]

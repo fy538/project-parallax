@@ -48,7 +48,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
-from paths import get_project_root
+from paths import get_project_root  # noqa: E402
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
 
 ROOT = get_project_root()
 PIPELINE_MD   = ROOT / "episodes" / "PIPELINE.md"
@@ -82,7 +85,7 @@ STATE_ORDER = [
 # add it to BOTH STATE_ORDER (or the failure set) AND this map.
 STATE_BADGES: dict[str, str] = {
     "INCUBATING":      "💭 INCUBATING",
-    "VIABLE":          "🟢 VIABLE",
+    "VIABLE":          f"{OK} VIABLE",
     "RESEARCHING":     "📚 RESEARCHING",
     "RESEARCH READY":  "✅ RESEARCH READY",
     "DRAFTING":        "✍️ DRAFTING",
@@ -817,7 +820,7 @@ class EpisodeStatus:
         if self.manifest_stale:
             parts.append(f"⚠ stale manifest ({self.manifest_stale_drift_str})")
         if self.zero_hit_count > 0:
-            parts.append(f"🔴 {self.zero_hit_count} zero-hit shot{'s' if self.zero_hit_count != 1 else ''}")
+            parts.append(f"{ERROR} {self.zero_hit_count} zero-hit shot{'s' if self.zero_hit_count != 1 else ''}")
         if self.has_manifest and not self.has_render:
             parts.append("✗ never rendered")
         if self.has_render and not self.has_narration:
@@ -1188,24 +1191,24 @@ def _render_health(s: EpisodeStatus) -> list[str]:
     health: list[str] = []
     if s.manifest_stale:
         health.append(
-            f"🔴 M-MANIFEST-STALE  script ({s.script_mtime_iso}) > manifest "
+            f"{ERROR} M-MANIFEST-STALE  script ({s.script_mtime_iso}) > manifest "
             f"(drift {s.manifest_stale_drift_str})"
         )
         health.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug}`")
     if s.zero_hit_count > 0:
         health.append(
-            f"🟡 {s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''} "
+            f"{WARN} {s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''} "
             f"in episodes/{s.slug}/assets/"
         )
         health.append(f"   → fix: `python3 tools/asset-source/zerohit_fallback.py {s.slug}`")
     if s.has_manifest and s.manifest_mode == "estimate" and s.has_narration:
-        health.append("🟡 Manifest in estimate mode but narration recorded — regenerate in precise mode")
+        health.append(f"{WARN} Manifest in estimate mode but narration recorded — regenerate in precise mode")
         health.append(f"   → fix: `python3 tools/assembly/generate_manifest.py {s.slug} --audio`")
     if s.has_manifest and not s.has_render:
-        health.append("🟡 Manifest ready but episode never rendered")
+        health.append(f"{WARN} Manifest ready but episode never rendered")
         health.append(f"   → fix: `cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}`")
     if not health:
-        health.append("🟢 No health issues detected")
+        health.append(f"{OK} No health issues detected")
     lines.extend(health)
     lines.append("")
     return lines

@@ -55,6 +55,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 # Re-use the existing script parser instead of duplicating two-column parsing.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import format_for_reading as ffr  # noqa: E402
@@ -590,9 +593,9 @@ KIND_LABELS = {
     "low_confidence": "LOW CONFIDENCE",
 }
 KIND_ICONS = {
-    "missed": "🔴",
-    "substituted": "🟡",
-    "inserted": "🟢",
+    "missed": ERROR,
+    "substituted": WARN,
+    "inserted": OK,
     "low_confidence": "🟣",
 }
 
@@ -634,7 +637,7 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
     lines.append("## Pickup-take shopping list")
     lines.append("")
     if not pickups:
-        lines.append("🟢 No pickup candidates — every major beat read cleanly.")
+        lines.append(f"{OK} No pickup candidates — every major beat read cleanly.")
         lines.append("")
     else:
         lines.append(
@@ -667,7 +670,7 @@ def render_diff_md(report: AlignmentReport, slug: str) -> str:
     for beat in report.beats:
         beat_issues = by_beat.get(beat.number, [])
         if not beat_issues:
-            lines.append(f"### Beat {beat.number} — {beat.title}  🟢 clean")
+            lines.append(f"### Beat {beat.number} — {beat.title}  {OK} clean")
             lines.append("")
             continue
         major_n = sum(1 for i in beat_issues if i.severity == "major")

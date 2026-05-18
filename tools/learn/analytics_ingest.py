@@ -48,6 +48,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
@@ -93,10 +96,10 @@ class RetentionDrop:
     @property
     def severity(self) -> str:
         if self.drop_pp >= DROP_SEVERITY_MATERIAL:
-            return "🔴"
+            return ERROR
         if self.drop_pp >= DROP_SEVERITY_NOTICEABLE:
-            return "🟡"
-        return "🟢"
+            return WARN
+        return OK
 
 
 @dataclass
@@ -366,8 +369,8 @@ def render_report_md(report: RetentionReport) -> str:
         f"- **Samples:** {len(report.points)}",
         f"- **Average retention:** {report.average_retention_pct:.1f}%",
         f"- **Detected drops:** {len(report.drops)} "
-        f"({len(report.material_drops)} 🔴, "
-        f"{len(report.noticeable_drops)} 🟡)",
+        f"({len(report.material_drops)} {ERROR}, "
+        f"{len(report.noticeable_drops)} {WARN})",
         "",
     ]
     if not report.drops:

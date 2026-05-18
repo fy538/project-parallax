@@ -46,6 +46,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"
 SCHEMA_PATH = REPO_ROOT / "remotion-templates" / "data" / "assembly-manifest.schema.json"
 
+sys.path.insert(0, str(REPO_ROOT / "tools"))
+from status_emoji import ERROR, WARN  # noqa: E402
 
 # ─── Canonical cue enums (source of truth: assembly-manifest.schema.json) ────
 # Mirrored explicitly here rather than parsed from the schema at runtime so the
@@ -1321,7 +1323,7 @@ def main() -> int:
         print(f"  {filepath}  ({len(vs)} violation{'s' if len(vs) != 1 else ''})")
         print(f"{'━' * 70}")
         for v in vs:
-            marker = "🔴" if v.severity == "error" else "🟡"
+            marker = ERROR if v.severity == "error" else WARN
             print(f"  {marker} [{v.rule}] {v.pointer}")
             print(f"     {v.message}")
             print()

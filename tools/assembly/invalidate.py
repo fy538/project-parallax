@@ -56,6 +56,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import _invalidation_core as ic  # noqa: E402
 
@@ -149,7 +152,7 @@ def filter_invalidations_by_episode(
 # ── Rendering ───────────────────────────────────────────────────────────────
 
 
-_CONFIDENCE_ICON = {"high": "🔴", "medium": "🟡", "low": "🟢"}
+_CONFIDENCE_ICON = {"high": ERROR, "medium": WARN, "low": OK}
 
 
 def render_report_md(
@@ -188,7 +191,7 @@ def render_report_md(
 
     lines.extend([
         f"**{len(invalidations)} invalidation(s)** "
-        f"({high_conf_count} 🔴 high · {other_conf_count} 🟡/🟢) "
+        f"({high_conf_count} {ERROR} high · {other_conf_count} {WARN}/{OK}) "
         f"across {len(changed_paths)} changed path(s).",
         "",
         "## Minimum reproduction set",
@@ -228,9 +231,9 @@ def render_report_md(
         "",
         "## How to read this",
         "",
-        "- **🔴 high** confidence = the artifact is genuinely stale; regenerate.",
-        "- **🟡 medium** = likely stale; review before regenerating.",
-        "- **🟢 low** = possibly stale; semantic dependency, operator decides.",
+        f"- **{ERROR} high** confidence = the artifact is genuinely stale; regenerate.",
+        f"- **{WARN} medium** = likely stale; review before regenerating.",
+        f"- **{OK} low** = possibly stale; semantic dependency, operator decides.",
         "",
         "Patterns like `*.json` or `**/*.tsx` in stale-artifact paths mean ",
         "\"every file matching this pattern.\" The regen command may not ",
@@ -360,7 +363,7 @@ def main() -> int:
         print(f"✓ wrote {rel}")
         # One-line summary to stdout
         high = sum(1 for i in invalidations if i.rule.confidence == "high")
-        print(f"  {len(invalidations)} invalidation(s); {high} 🔴 high-confidence")
+        print(f"  {len(invalidations)} invalidation(s); {high} {ERROR} high-confidence")
     else:
         sys.stdout.write(rendered)
 

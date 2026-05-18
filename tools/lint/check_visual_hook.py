@@ -44,6 +44,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+from status_emoji import ICON as _ICON
+
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 PIPELINE_STATE_JSON = EPISODES_DIR / "pipeline-state.json"
@@ -277,9 +281,6 @@ def run_check(episode_filter: str | None = None) -> CheckResult:
 # ── Rendering ───────────────────────────────────────────────────────────────
 
 
-_ICON = {"error": "🔴", "warn": "🟡", "ok": "🟢"}
-
-
 def render_report_md(result: CheckResult) -> str:
     lines: list[str] = [
         "# Visual Hook Lint",
@@ -287,9 +288,9 @@ def render_report_md(result: CheckResult) -> str:
         "_Veritasium discipline: no topic crosses from INCUBATING → VIABLE without "
         "articulating its cold-open visual hook._",
         "",
-        f"**Results:** {len(result.errors)} 🔴 error · "
-        f"{len(result.warnings)} 🟡 warn · "
-        f"{sum(1 for f in result.findings if f.level == 'ok')} 🟢 ok",
+        f"**Results:** {len(result.errors)} {ERROR} error · "
+        f"{len(result.warnings)} {WARN} warn · "
+        f"{sum(1 for f in result.findings if f.level == 'ok')} {OK} ok",
         "",
     ]
     if not result.findings:

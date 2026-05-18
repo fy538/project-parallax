@@ -29,6 +29,9 @@ import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, WARN  # noqa: E402
+
 # ─── Configuration ───────────────────────────────────────────────────────────
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent.parent / "remotion-templates" / "src" / "templates"
@@ -555,7 +558,7 @@ def main():
             print(f"  {relpath}  ({len(violations)} violation{'s' if len(violations) != 1 else ''})")
             print(f"{'━'*70}")
             for v in violations:
-                severity_marker = "🔴" if v.severity == "error" else "🟡"
+                severity_marker = ERROR if v.severity == "error" else WARN
                 print(f"  {severity_marker} [{v.rule}] L{v.line}: {v.message}")
                 print(f"     │ {v.snippet[:100]}")
                 print()

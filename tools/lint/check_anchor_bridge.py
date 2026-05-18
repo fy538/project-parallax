@@ -55,6 +55,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from status_emoji import ERROR, OK, WARN  # noqa: E402
+from status_emoji import ICON as _ICON
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "narration"))
 import format_for_reading as ffr  # noqa: E402
 
@@ -346,9 +350,6 @@ def lint_beats(beat_reports: list[BeatVisualReport]) -> list[Finding]:
 # ── Rendering ───────────────────────────────────────────────────────────────
 
 
-_ICON = {"ok": "🟢", "warn": "🟡", "error": "🔴"}
-
-
 def render_report_md(report: AnchorBridgeReport) -> str:
     lines: list[str] = [
         f"# Anchor-Bridge Audit — {report.slug}",
@@ -360,9 +361,9 @@ def render_report_md(report: AnchorBridgeReport) -> str:
         "(>60% text-heavy cells with no anchor) reduce the credibility "
         "signal that real evidence supplies._",
         "",
-        f"**Results:** {len(report.errors)} 🔴 error · "
-        f"{len(report.warnings)} 🟡 warn · "
-        f"{sum(1 for f in report.findings if f.level == 'ok')} 🟢 ok",
+        f"**Results:** {len(report.errors)} {ERROR} error · "
+        f"{len(report.warnings)} {WARN} warn · "
+        f"{sum(1 for f in report.findings if f.level == 'ok')} {OK} ok",
         "",
         "## Per-beat breakdown",
         "",
