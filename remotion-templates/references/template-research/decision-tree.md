@@ -36,7 +36,18 @@ When the editorial point is *escalation*, outlets converge on a literal numbered
 
 ## Parallax defaults
 
-- Use `variant: "extensive"` (default) for contingency / scenario branching; use `variant: "ladder"` when the editorial frame is a specific actor's deliberation.
+### Variant chooser (five aesthetics as of May 18, 2026)
+
+| Variant | When to pick | Visual signature |
+|---|---|---|
+| `extensive` (default) | Contingency / scenario branching with curved-edge typographic register | Typography-only nodes, smooth-step bezier edges, canvas viewport with virtual camera pan |
+| `ladder` | Allison-style deliberation: "decision-maker X weighed N options and picked this one" — ExComm 1962, Politburo, boardroom | Flat option list, left-rail ordinal numerals, 3px accent left-bar + faint walnut tint on the highlighted option (no card-chrome rectangles) |
+| `indented` | Script-density reasoning, policy taxonomies, branching outlines; tall narrow trees where horizontal branching wastes space | Manuscript outline; depth = horizontal indent; Plex Mono ordinals (1, 1.a, 1.a.i); right-aligned probability column when gated |
+| `spine` | Sequential decision moments along a through-line; "the world forked here, then again there" — ≤3 levels deep | Vertical ordinal spine on the left; rung labels in display weight; discarded alternatives fan rightward as hairlines + leaf dots; non-highlighted fans dim to 35% when a `highlightedPath` exists |
+| `schematic` | Engineering-drawing register; wargaming nomographs, contingency planning trees, technical "and-then-then" sequences | Thin-bordered boxed nodes with mono corner ordinals (`01`, `02`, …); orthogonal right-angle edges (parent → vertical → horizontal → vertical); same canvas-camera-pan as `extensive` |
+
+### Field-level guidance (applies across variants except where noted)
+
 - **Node labels describe the STATE; edge labels describe the TRANSITION.** Use `node.edgeLabel` (added May 13, 2026) for qualitative branch character ("Sharp", "Mainline", "Drift away") — it renders mid-segment on the incoming edge in the metadata mono register.
 - Keep `probabilityWeights: false` (the default) unless every numeric `%` in `nodes[].probability` traces to a named source in `data.source`. The schema automatically suppresses numeric strings matching `/\d+\s*%/` when this gate is off; qualitative labels always render. Probability labels now render on the EDGE mid-segment alongside (or in place of) `edgeLabel` — same gate.
 - Mark the protagonist branch with `highlightedPath: [...]`. Mark the current "you are here" node with `active: true` — it gets a 2 px accent underline (replaces the prior accent-glow shadow).
@@ -88,4 +99,4 @@ When the editorial point is *escalation*, outlets converge on a literal numbered
 
 ---
 
-Last revised: May 16, 2026 — track-style path highlighting (FT race-stripe register) reached parity across vertical and horizontal layouts; vertical mode tuned to a 5px ribbon with arrowheads at child-top on the on-path segments.
+Last revised: May 18, 2026 — three new variants landed in the research-driven aesthetic exploration: `indented` (manuscript-outline register), `spine` (Kahn-ladder-derived stem-and-leaf), `schematic` (engineering-drawing boxed nodes + orthogonal edges). Pre-existing `ladder` variant got a POLISH.md D1 cleanup (per-option borders replaced with left-rail accent). Sibling template `OutcomePartition` shipped for the "decision space narrows" register that doesn't fit a tree gestalt. See `PARALLAX_VISUAL_VOCABULARY.md` § 10 for the chooser table.

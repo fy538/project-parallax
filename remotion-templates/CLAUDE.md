@@ -45,7 +45,7 @@ Categories:
 
 - **Maps**: **AtlasPlate** (pure SVG, default for editorial work — see `MAP_TEMPLATE_SELECTOR.md`); ChoroplethMap / RouteAnimation / DensityMap (Mapbox via `MapGL`, reserved for atmospheric / terrain-required shots only — no title overlay)
 - **Data**: DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal
-- **Diagrams**: FrameworkDiagram, NetworkDiagram, DecisionTree, EscalationLadder, GameBoard, SankeyFlow
+- **Diagrams**: FrameworkDiagram, NetworkDiagram, DecisionTree (5 variants: extensive · ladder · indented · spine · schematic), OutcomePartition (decision-space partition map), EscalationLadder, GameBoard, SankeyFlow
 - **Typography & layout**: KineticTypography, TitleTransition, SplitComposition, ImageComposite, AnnotatedImage, PhotoMontage
 - **Episodes**: `FullEpisode.tsx` (manifest-driven), `SiliconTrap.tsx` (per-episode `<Series>`)
 - **Shorts (9:16)**: KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort

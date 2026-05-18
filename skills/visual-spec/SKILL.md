@@ -84,9 +84,9 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 
 🟢 = Editorial-frame migrated · 🟡 = Editorial-frame native · ⚪ = Legacy chrome (see CHART_MIGRATION_GUIDE.md)
 
-### Diagrams / framework / strategic — 10 templates · ~10-15% episode share
+### Diagrams / framework / strategic — 11 templates · ~10-15% episode share
 
-**Selector doc:** [`remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md`](../../remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md) (wall-table). Largest family with the heaviest sibling-confusion surface — sibling-disambiguation tables for DecisionTree vs. GameBoard, FrameworkDiagram-flow vs. SankeyFlow, comparison vs. matrix vs. DuelingFrameworks.
+**Selector doc:** [`remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md`](../../remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md) (wall-table). Largest family with the heaviest sibling-confusion surface — sibling-disambiguation tables for DecisionTree vs. GameBoard, DecisionTree vs. OutcomePartition, FrameworkDiagram-flow vs. SankeyFlow, comparison vs. matrix vs. DuelingFrameworks, plus the DecisionTree-variant chooser.
 
 **Audit skill:** `diagram-audit` — 8-lens audit catching sibling mis-routing, density-cap violations, missing focal hierarchy, invented payoff numbers.
 
@@ -94,7 +94,8 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 |---|---|---|
 | FrameworkDiagram | ~7% | Conceptual models, comparisons, flows (matrix / comparison / flow variants). |
 | NetworkDiagram | as needed | Relationship webs, alliance structures, hub-spoke topologies. |
-| DecisionTree | as needed | Branching scenarios, decision points. Use the ladder variant for stacked options. |
+| DecisionTree | as needed | Branching scenarios, decision points. **5 variants**: `extensive` (default, curved canvas+camera tree) · `ladder` (Allison flat options list) · `indented` (manuscript outline) · `spine` (vertical ordinal spine + lateral fans) · `schematic` (engineering-drawing boxed nodes + orthogonal edges). Pick by editorial register, not data shape — see `DIAGRAM_TEMPLATE_SELECTOR.md` § "DecisionTree variants" + `references/template-research/decision-tree.md`. |
+| OutcomePartition | as needed | "The decision space narrows" — 2D field with named axes recursively partitioned by editorial decisions; each terminal region is one outcome. NOT a tree (no branching) — companion form when the script's move is "two structural pressures carve outcomes into N regions" rather than "world forked here." See `references/template-research/outcome-partition.md`. |
 | SankeyFlow | as needed | Flow/allocation diagrams (trade, resources, where-the-dollar-goes). |
 | GameBoard | as needed | Strategic game theory visualizations (Prisoners' Dilemma matrix, Axelrod tournament). |
 | EscalationLadder | as needed | Vertical event sequence with severity indicators. |
@@ -323,7 +324,8 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 1. **Parse** each `DIR:` line into directive type + parameters using the formal grammar from DIRECTING_LANGUAGE.md
 2. **Identify the camera system** based on template type:
    - ChoroplethMap, RouteAnimation → **geographic** (center/scale/duration)
-   - NetworkDiagram, EscalationLadder, DataChart, GameBoard, DecisionTree → **canvas** (cameraPath array)
+   - NetworkDiagram, EscalationLadder, DataChart, GameBoard, DecisionTree (`extensive`/`schematic` variants only — `ladder`/`indented`/`spine` are static-frame and ignore `cameraPath`) → **canvas** (cameraPath array)
+   - OutcomePartition → **static** (no camera; reveal animation is the partition draw + leaf-label fade)
    - HorizontalTimeline → **scroll** (scrollTo offset)
    - [AI-GEN:] entries → **scene brief** (natural language camera note — handled in Step 5)
 3. **Validate** that the template supports the directive (see DIRECTING_LANGUAGE.md template support matrix). Unsupported directives → emit a `// DIR-WARN` comment and omit from `_direction`

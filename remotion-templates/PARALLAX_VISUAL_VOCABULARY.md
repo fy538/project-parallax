@@ -235,10 +235,21 @@ Parallax-specific category beyond FT VV — frameworks themselves are the visual
 | **FrameworkDiagram** | ⚪ | Comparison / matrix / flow of analytical frameworks; 2-column comparison with protagonist; multi-cell matrix; sequential filter (narrowing) | Two competing frameworks with scoring — use DuelingFrameworks |
 | **DuelingFrameworks** | ⚪ | Two named frameworks scored against the same phenomenon, with a verdict phase | Frameworks aren't being SCORED — use FrameworkDiagram (comparison variant) |
 | **EscalationLadder** | ⚪ | Sequence with severity gradient (low → critical); each rung is a discrete event with a date | The sequence is logical/conditional (use FrameworkDiagram flow); no severity dimension |
-| **DecisionTree** | ⚪ | Branching choice structure; "if X then Y else Z" decision points | The decision is binary at one node (use FrameworkDiagram) |
+| **DecisionTree** (5 variants — see below) | ⚪ | Branching choice structure; "if X then Y else Z" decision points | The decision is binary at one node (use FrameworkDiagram) |
+| **OutcomePartition** | ⚪ | "The decision space narrows" — 2D field with named axes (e.g. US Resolve × PRC Escalation) recursively partitioned by editorial decisions; each terminal region is an outcome with severity-encoded fill | Sequential branching reasoning (use DecisionTree spine); flow/quantity (use SankeyFlow); time-series escalation (use EscalationLadder) |
 | **GameBoard** | ⚪ | Payoff matrix; canonical 2×2 with TPRS labels (Prisoner's Dilemma, Stag Hunt) | Non-game-theory content (use FrameworkDiagram matrix) |
 | **StrategicLandscape** | ⚪ | 2×2 quadrant positioning (sometimes Boston Matrix-style); axes named, entities placed | Continuous correlation (use ConnectedScatter); ordinal ranking (use BumpChart) |
 | **SplitComposition** | ⚪ | Side-by-side two-pane visual ("PD on the left, Stag Hunt on the right") | Same form on both sides — use DuelingFrameworks |
+
+**DecisionTree variant chooser** (pick by what editorial work the form does, not what the data looks like):
+
+| Variant | When to pick | Visual signature |
+|---|---|---|
+| `extensive` (default) | Contingency / scenario branching with curved-edge typographic register; chess openings, game-theory branches, generic "what could happen" trees | Typography-only nodes, curved gold beziers, canvas with camera pan |
+| `ladder` | "Decision-maker X weighed N options and picked this one" — Allison-style deliberation scenes (ExComm 1962, Politburo, boardroom) | Flat stack of option panels, left-rail ordinal numerals, accent left-bar + tint on highlighted option |
+| `indented` | Script-density reasoning, policy taxonomies, branching outlines; tall narrow trees where horizontal branching wastes space | Manuscript outline; depth = horizontal indent; Plex Mono ordinals (1, 1.a, 1.a.i); right-aligned probability column when gated |
+| `spine` | Sequential decision moments along a through-line; "the world forked here, then again there" — ≤3 levels deep, small lateral fans | Vertical ordinal spine on left; rung labels; discarded alternatives fan rightward as hairlines + leaf dots; non-highlighted fans dim to 35% |
+| `schematic` | Engineering-drawing register; wargaming nomographs, contingency planning trees, technical "and-then-then" sequences | Thin-bordered node boxes with mono corner ordinals; orthogonal right-angle edges; same canvas-camera-pan as `extensive` |
 
 **Editorial register notes:**
 

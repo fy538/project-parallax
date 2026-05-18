@@ -91,6 +91,7 @@ import { DataChart } from "../DataChart/DataChart";
 import { FrameworkDiagram } from "../FrameworkDiagram/FrameworkDiagram";
 import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
 import { DecisionTree } from "../DecisionTree/DecisionTree";
+import { OutcomePartition } from "../OutcomePartition/OutcomePartition";
 import { SplitComposition } from "../SplitComposition/SplitComposition";
 import { ProbabilityGauge } from "../ProbabilityGauge/ProbabilityGauge";
 import { ImageComposite } from "../ImageComposite/ImageComposite";
@@ -455,6 +456,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   FrameworkDiagram,
   RouteAnimation,
   DecisionTree,
+  OutcomePartition,
   SplitComposition,
   ProbabilityGauge,
   ImageComposite,

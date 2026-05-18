@@ -944,8 +944,56 @@ Branching scenarios, decision points. Tree structure via flat array + ID referen
 
 **Variants:**
 
-- **`extensive`** (default) — classic extensive-form tree with branches radiating from `rootId`. Each node renders as a labeled card; edges show parent→child relationships with optional probabilities.
-- **`ladder`** — Graham Allison nested-rectangles style. Decisions render as concentric / stacked rectangles where the chosen path drills inward, rather than branching outward. Pairs naturally with `highlightedPath` (the chosen-path receives accent treatment; alternative branches mute to taupe) and `probabilityWeights: true` (rectangle sizes scale with `probability`, so the editorial weight of each branch reads at a glance). Use for "the decision-maker faced N options and picked this one" stories — Cuban missile crisis OPTIONS A through F, October 7 controls vs. lighter alternatives.
+- **`extensive`** (default) — classic extensive-form tree with branches radiating from `rootId`. Typography-only nodes, curved-bezier gold edges, canvas viewport with virtual camera pan. The original / "Italian Opening" register.
+- **`ladder`** — Graham Allison flat-stack option list. Top-level options render as vertically-stacked rows; the first child's label (and additional children, joined) becomes the option's prose gloss inside the row. Use for "the decision-maker faced N options and picked this one" stories — ExComm October 1962 is the canonical case. POLISH.md D1: no card-chrome rectangles; left-rail ordinal numerals + 3px accent bar + faint walnut tint on the highlighted option carry the structure. Skip `cameraPath`; the ladder is static-frame.
+- **`indented`** — Manuscript / directory-tree outline. Depth = horizontal indent; ordinals generated as `1` / `1.a` / `1.a.i` / `1.a.i.A` (numeric → alpha-lower → roman-lower → alpha-upper, alternating by depth, caps at depth 5); edges are thin vertical hairlines on the indent gutter; probability column renders right-aligned in Plex Mono when gated. Right for tall narrow trees, policy taxonomies, legal-style outlines. Static-frame; skip `cameraPath`.
+- **`spine`** — Stem-and-leaf branching spine. Vertical ordinal spine on the left (rungs = decision moments along the chosen sequence); lateral children fan rightward off each rung as labeled hairlines with leaf-dot terminals. The spine is `highlightedPath` if set, else first-child walk from root. When a highlighted path exists, non-highlighted lateral children dim to ~35% so the spine reads first. ≤3 levels deep; >3 lateral children per rung will cause adjacent fans to collide vertically (the template emits a `warnIf`). Static-frame.
+- **`schematic`** — Engineering-drawing register. Same canvas + camera-pan as `extensive`, but each node renders inside a thin-bordered box with a small mono corner-ordinal marker, and edges are orthogonal right-angle paths (parent → vertical → horizontal → vertical). Use for wargaming-nomograph / circuit-diagram scenes where the box IS the editorial device. POLISH.md D1 contextual exemption.
+
+`layout: "horizontal"` is supported on `extensive` (and the `DecisionTree-Horizontal` catalog composition). It is ignored by the four non-canvas variants.
+
+---
+
+## OutcomePartition
+
+A 2D scenario field, recursively partitioned by thin rules. Each terminal region is a labeled outcome; severity = walnut fill density; probability is read as area. Different editorial form than DecisionTree — the form argues "the decision space narrows," not "the world forked." Recursive Region type (split | leaf); reveal animation draws each rule progressively 0 → full length, then leaf labels fade in over region centroids.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "title": "The Decision Space Narrows",
+  "subtitle": "Taiwan-strait outcomes under two structural pressures",
+  "xAxisLabel": "US RESOLVE  →",
+  "yAxisLabel": "PRC ESCALATION  →",
+  "root": {
+    "kind": "split",
+    "axis": "horizontal",         // "horizontal" axis = vertical cut line
+    "at": 0.5,                    // split position 0.05–0.95
+    "label": "US holds resolve?", // renders mid-rule, with paper-haloed mono caption
+    "revealStep": 0,              // optional; auto-incrementing when omitted
+    "children": [
+      { "kind": "leaf", "label": "Fait accompli", "severity": 0.75, "revealStep": 4 },
+      { "kind": "split", "axis": "vertical", "at": 0.55, "children": [
+        { "kind": "leaf", "label": "Deterrence holds", "highlighted": true, "severity": 0.25 },
+        { "kind": "leaf", "label": "Open hostilities", "color": "#A64D46" }
+      ]}
+    ]
+  },
+  "source": "Scenario sketch after RAND TR-392 contingency framework.",
+  "durationSec": 12
+}
+```
+
+**Key fields:**
+
+- `root` — the partition tree; recursive `kind: "split" | "leaf"`.
+- `axis: "horizontal"` cuts the rectangle vertically (left vs right halves). `axis: "vertical"` cuts horizontally (top vs bottom).
+- `at` — fractional split position in [0.05, 0.95]; encodes the editorial weight of the two children (a 0.7 split says "this side gets 70% of the outcome space").
+- `revealStep` — optional integer ordering reveal animation; explicit values are honored AND the auto-cursor advances past them, so mixing explicit + implicit is safe.
+- Leaf `severity` (0–1) and `color` are mutually exclusive — `color` takes precedence (renders at ~15% opacity); `severity` ramps walnut fill 0–25% opacity.
+- Leaf `highlighted: true` adds a 3px accent rule on the region's leading (left) edge.
+
+**When to pick:** "the decision space narrows" arguments where successive editorial choices CARVE outcome regions rather than fork new branches. Wrong when ordering matters in a narrative sense (use DecisionTree `spine`) or quantitative flow (use SankeyFlow).
 
 ---
 

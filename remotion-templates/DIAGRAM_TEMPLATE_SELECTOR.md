@@ -15,7 +15,9 @@ Full editorial rationale and failure modes live in the per-template dossiers und
 - [`escalation-ladder.md`](references/template-research/escalation-ladder.md)
 - [`game-theory.md`](references/template-research/game-theory.md) (GameBoard)
 - [`arc-diagram.md`](references/template-research/arc-diagram.md) (ArcDiagram)
-- DecisionTree, StrategicLandscape, DuelingFrameworks, PricingWaterfall — no dedicated dossier yet, see `template-picker.md`
+- [`decision-tree.md`](references/template-research/decision-tree.md) (DecisionTree — 5 variants)
+- [`outcome-partition.md`](references/template-research/outcome-partition.md) (OutcomePartition)
+- StrategicLandscape, DuelingFrameworks, PricingWaterfall — no dedicated dossier yet, see `template-picker.md`
 - ~~BifurcationRoute~~ — DELETED; see banner above
 
 ---
@@ -33,7 +35,8 @@ What KIND of structure are you showing → which TEMPLATE
 | 2×2 typology (two independent axes, four cells) | **FrameworkDiagram (matrix variant)** |
 | Peer-to-peer relationship web (hub + spokes, alliance graph) | **NetworkDiagram** |
 | Relationships among items on a single ordered axis (chord-arc above a horizontal spine) | **ArcDiagram** — same nodes-and-edges domain as NetworkDiagram but with positional ordering (chronological, alphabetic, severity-ranked). Use when the relationships matter AND the linear ordering of the items is part of the editorial point. Bloomberg / FT supply-chain diagrams often pick this form when one axis is "ordered by year" or "ordered by tier." |
-| Sequential choice under uncertainty (branching with probabilities) | **DecisionTree** |
+| Sequential choice under uncertainty (branching with probabilities) | **DecisionTree** — 5 variants, pick by editorial register (see § "DecisionTree variants" below) |
+| Decision space narrowed by two structural pressures (axis × axis carving outcome regions) | **OutcomePartition** — RAND-style partition map, NOT a tree |
 | Simultaneous strategic choice (payoff matrix, Nash equilibrium) | **GameBoard** |
 | Conserved-total allocation (where it splits and flows) | **SankeyFlow** |
 | Escalating severity / crisis intensity / ladder of moves | **EscalationLadder** |
@@ -57,7 +60,8 @@ Is the editorial point about a STRUCTURE / framework?
 │   └─ One fixed total ($1) decomposed into stages ────── PricingWaterfall
 │
 ├─ Is it about CHOICES / STRATEGY?
-│   ├─ Sequential branching choices + probabilities ──── DecisionTree
+│   ├─ Sequential branching choices + probabilities ──── DecisionTree (5 variants — see below)
+│   ├─ "The decision space narrows" (two axes, partition map) ── OutcomePartition
 │   ├─ Simultaneous payoff matrix (Nash, PD) ─────────── GameBoard
 │   └─ Forked future / scenario divergence ───────────── DuelingFrameworks (or DecisionTree) ← was BifurcationRoute (DELETED)
 │
@@ -98,6 +102,29 @@ The hardest part of diagram selection: choosing between siblings with overlappin
 | Probabilities | First-class (per branch) | Implicit in payoff weighting |
 | Max depth | 3 levels × 2 branches = ~12 terminals | 2×2 or 3×3 strategies per side |
 | Canonical use | Forecasting, scenario branching, Cuban missile crisis ExComm | Prisoner's Dilemma, Nash analysis, deterrence |
+
+### DecisionTree variants — pick by editorial register, not by data shape
+
+All five variants accept the same `nodes` + `rootId` + `highlightedPath` schema; what differs is the visual register. Pick by what editorial work the form does.
+
+| Variant | Picks when the script says… | Visual signature |
+|---|---|---|
+| `extensive` (default) | "Here's the branching possibility space" — chess openings, generic contingency trees | Typography-only nodes, curved gold beziers, canvas + camera pan |
+| `ladder` | "Decision-maker X weighed N options and picked this one" — Allison-style ExComm, Politburo deliberations | Flat option list, left-rail ordinals, accent left-bar on chosen option |
+| `indented` | "Let me walk through the structure of the argument" — policy taxonomies, legal-style outlines | Manuscript outline, depth-as-indent, Plex Mono ordinals (1.a.i) |
+| `spine` | "The world forked here, then forked again here" — sequential moments with discarded alternatives, ≤3 levels deep | Vertical ordinal spine, lateral fans dim to 35% off-path |
+| `schematic` | Wargaming nomograph / contingency planning register — engineering-drawing feel | Bordered boxed nodes with mono corner ordinals, orthogonal right-angle edges, canvas + camera pan |
+
+### DecisionTree vs. OutcomePartition
+
+| | DecisionTree (any variant) | OutcomePartition |
+|---|---|---|
+| Editorial argument | "The world forked here" (sequential branching) | "The decision space narrows" (partition map) |
+| Form | Nodes + edges, hierarchical | 2D field + thin rules, recursive subdivision |
+| Ordering | Tree depth = sequence of choices | Reveal order = sequence of editorial decisions; partitions read as *given* |
+| Probabilities | Per-branch labels (gated) | Area-of-region (implicit) |
+| When to pick | Narrative says "first they chose A, then B" | Narrative says "two structural pressures carve outcomes into N regions" |
+| Max | 12 terminals (across all variants) | 5 leaf regions before resolution collapses |
 
 ### FrameworkDiagram (flow) vs. SankeyFlow
 

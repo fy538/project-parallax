@@ -400,6 +400,7 @@
                 "ChoroplethMap",
                 "RouteAnimation",
                 "DecisionTree",
+                "OutcomePartition",
                 "SplitComposition",
                 "ProbabilityGauge",
                 "ImageComposite",
