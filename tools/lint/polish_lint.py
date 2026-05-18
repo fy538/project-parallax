@@ -193,11 +193,36 @@ def check_hardcoded_textshadow(lines: list[str], relpath: str) -> list[Violation
 
 
 def check_missing_titleblock(lines: list[str], relpath: str, template_name: str) -> list[Violation]:
-    """L13: Eligible templates must use <TitleBlock>, not hand-built titles."""
+    """L13: Eligible templates must use <TitleBlock>, not hand-built titles.
+
+    Exemptions (in order):
+      1. Hard-coded template name in TITLEBLOCK_EXEMPT (Shorts, full-screen
+         titles, episode orchestrators).
+      2. File renders `<TitleBlock>` directly.
+      3. File uses `<EditorialFrame>` — the Phase-4 chart family delegates
+         title rendering to EditorialFrame's publication-chrome header.
+         Detection: a `<EditorialFrame` element is present (covers both
+         direct usage and the `frame={frameProps}` data-prop pattern).
+      4. File carries the `@title-block: delegated` or `@title-block: none`
+         pragma — same convention as scripts/lint-conventions.mjs. Use
+         this for templates that legitimately render title chrome in a
+         non-TitleBlock way (e.g. a custom hero card or split-screen
+         dual-title layout). Must include a one-line rationale.
+    """
     if template_name in TITLEBLOCK_EXEMPT:
         return []
     content = "\n".join(lines)
     if "TitleBlock" in content:
+        return []
+    if "<EditorialFrame" in content:
+        return []
+    if "<MapTitleFrame" in content:
+        # Map templates legitimately delegate title chrome to MapTitleFrame
+        # (same convention as EditorialFrame but for the geographic register
+        # — the map needs its own corner-anchored title placement that
+        # TitleBlock's centered hierarchy doesn't accommodate).
+        return []
+    if "@title-block: delegated" in content or "@title-block: none" in content:
         return []
     # Check if there's a hand-built title pattern (fontSize + fontWeight + absolute positioning)
     has_title_pattern = (
@@ -209,7 +234,11 @@ def check_missing_titleblock(lines: list[str], relpath: str, template_name: str)
             rule="L13",
             file=relpath,
             line=1,
-            message=f"Template '{template_name}' has hand-built title block. Use <TitleBlock> component.",
+            message=(
+                f"Template '{template_name}' has hand-built title block. "
+                f"Use <TitleBlock>, delegate to <EditorialFrame>, or add a "
+                f"`// @title-block: delegated` pragma with rationale."
+            ),
             snippet="(file-level check)",
             severity="error",
         )]
@@ -539,7 +568,13 @@ def main():
         print(f"  {len(files) - len(file_results)}/{len(files)} files clean")
         print(f"{'─'*70}\n")
 
-    sys.exit(len(all_violations))
+    # Exit code is the ERROR count, not the total. Warnings are
+    # informational only — they print but don't fail CI (May 2026 audit
+    # #18: promoted polish_lint to blocking in scripts/lint.sh once the
+    # 9 missing-title-block errors were resolved; the 20 remaining L9
+    # maxWidth warnings are a separate workstream tracked in POLISH.md).
+    error_count = sum(1 for v in all_violations if v.severity == "error")
+    sys.exit(error_count)
 
 
 if __name__ == "__main__":

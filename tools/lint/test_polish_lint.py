@@ -141,6 +141,66 @@ def test_titleblock_skipped_for_exempt_template():
     assert not _has_rule(vs, "L13")
 
 
+def test_titleblock_skipped_when_delegating_to_editorial_frame():
+    """Phase-4 chart templates (KPICard, Slopegraph, etc.) pass `title`
+    into EditorialFrame's frameProps — title rendering is delegated to
+    EditorialFrame's publication-chrome header, not hand-built. Even with
+    a fontSize.h2 + fontWeight 700 pattern elsewhere in the file, the
+    delegation should suppress the L13 warning."""
+    src = """
+    return (
+      <EditorialFrame frame={frameProps} episode={data.episode}>
+        {(chartRect) => <Chart data={data} rect={chartRect} />}
+      </EditorialFrame>
+    );
+    // Internal chart label using h2/bold typography — NOT a hand-built title.
+    const label = { fontSize: fontSizes.h2, fontWeight: 700 };
+    """
+    vs = _check(pl.check_missing_titleblock, src, "KPICard")
+    assert not _has_rule(vs, "L13")
+
+
+def test_titleblock_skipped_when_delegating_to_map_title_frame():
+    """Map templates (ProportionalSymbolMap, ChoroplethMap variants) pass
+    title into MapTitleFrame — the map-specific corner-anchored title
+    chrome that TitleBlock's centered hierarchy doesn't accommodate."""
+    src = """
+    return (
+      <MapGL>
+        <MapTitleFrame title={data.title} subtitle={data.subtitle} />
+      </MapGL>
+    );
+    const label = { fontSize: fontSizes.h2, fontWeight: 700 };
+    """
+    vs = _check(pl.check_missing_titleblock, src, "ProportionalSymbolMap")
+    assert not _has_rule(vs, "L13")
+
+
+def test_titleblock_skipped_when_pragma_present():
+    """Per-file pragma `// @title-block: delegated` suppresses the check.
+    Convention shared with scripts/lint-conventions.mjs. Must carry a
+    rationale (the comment after the pragma) — not enforced by the regex
+    but socially required."""
+    src = """
+    // @title-block: delegated — pure SVG sub-component; parent owns the chrome.
+    return <text fontSize={fontSizes.h2} fontWeight={700}>{data.title}</text>;
+    """
+    vs = _check(pl.check_missing_titleblock, src, "AtlasAnnotation")
+    assert not _has_rule(vs, "L13")
+
+
+def test_titleblock_skipped_when_none_pragma_present():
+    """`@title-block: none` is the explicit-no-title variant of the
+    pragma — for templates that have no title chrome at all (e.g., a
+    full-screen visual whose data.title is editorial-only metadata)."""
+    src = """
+    // @title-block: none — full-screen photo, no title overlay.
+    return <img style={{ fontSize: fontSizes.h2, fontWeight: 700 }} />;
+    """
+    vs = _check(pl.check_missing_titleblock, src, "SomeHeroTemplate")
+    assert not _has_rule(vs, "L13")
+
+
 # ── check_linear_interpolation (A1) ────────────────────────────────────────
 
 

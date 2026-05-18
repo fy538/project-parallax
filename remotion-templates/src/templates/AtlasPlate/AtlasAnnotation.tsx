@@ -1,4 +1,5 @@
 // @composition-animation: delegated — pure SVG sub-component; AtlasPlate.tsx owns the hook.
+// @title-block: delegated — pure SVG sub-component for one annotation label + leader line; AtlasPlate.tsx owns MapTitleFrame.
 
 /**
  * AtlasAnnotation — SVG label + leader-line + anchor-dot for a single

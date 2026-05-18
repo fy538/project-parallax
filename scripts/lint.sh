@@ -43,20 +43,15 @@ run "remotion lint-conventions.mjs" \
 run "remotion audit-direction-fields.mjs --strict" \
   bash -c "cd remotion-templates && npm run lint:direction --silent"
 
-# ─── Polish lint (Python over .tsx) — informational ───────────────────────
-# polish_lint surfaces 29+ pre-existing findings across 14 templates (audit
-# item #18: title-block + maxWidth burn-down). Run it for visibility but
-# don't block — burning down is a separate workstream and we don't want CI
-# red on day one of the aggregator. Re-enable as blocking once the audit's
-# template-polish item lands.
-echo ""
-echo "→ polish_lint.py over remotion-templates/src/templates (informational)"
-if python3 tools/lint/polish_lint.py >/dev/null 2>&1; then
-  echo "  ✓ polish_lint clean"
-else
-  echo "  ⚠ polish_lint has pre-existing findings (audit item #18 burn-down)"
-  echo "    run \`python3 tools/lint/polish_lint.py\` to see them"
-fi
+# ─── Polish lint (Python over .tsx) — blocking ────────────────────────────
+# Promoted from "informational" to "blocking" May 18, 2026 (audit #18) once
+# the 9 pre-existing missing-title-block errors were resolved (8 by adding
+# EditorialFrame/MapTitleFrame delegation detection to polish_lint, 1 by
+# adding @title-block: delegated pragma to AtlasAnnotation). Polish_lint
+# exits 0 on warnings only; the 20 remaining L9 maxWidth warnings don't
+# fail CI. They're a separate workstream tracked in POLISH.md.
+run "polish_lint.py over remotion-templates/src/templates" \
+  python3 tools/lint/polish_lint.py
 
 # ─── Concept registry ──────────────────────────────────────────────────────
 run "concepts/lookup.py validate" \
