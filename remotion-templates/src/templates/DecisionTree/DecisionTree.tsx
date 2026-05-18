@@ -33,7 +33,6 @@ import {
   fontWeights,
   layout,
   sec,
-  radii,
   shadows,
   textMaxWidth,
   titleHeight,
@@ -479,6 +478,514 @@ const TreeNodeComponent: React.FC<{
 // Reference: references/template-research/decision-tree.md § 3 item 10;
 // game-theory.md § A2.
 
+// ── IndentedTreeVariant — Aesthetic A: Manuscript / Directory-Tree ─────────
+// FT Visual Vocabulary "Hierarchy" register; Tufte's Beautiful Evidence
+// hierarchical-list chapter; how The Economist sets out policy scenarios.
+//
+// Visual language: pure left-aligned typographic outline.
+//   - Depth = horizontal indent (one em ladder rung per level)
+//   - Edges = thin vertical hairlines connecting the indent gutters of
+//     parent → children (rendered as borderLeft on the indent column)
+//   - Ordinal numbering at every fork: "1.", "1.a", "1.a.i" — Plex Mono
+//   - Probability + outcome severity render as right-aligned Plex Mono
+//     columns — a table that happens to be a tree
+//   - Highlighted path: thicker left-margin rule + bold title
+//
+// Right when the editorial point is "let me walk through the structure of
+// the argument" — script-density reasoning, taxonomies, branching policy
+// outlines. Tall narrow trees where horizontal branching would waste space.
+//
+// Reference: research report 2026-05-17, Aesthetic A.
+
+interface IndentedNode {
+  node: TreeNode;
+  depth: number;
+  ordinal: string; // "1", "1.a", "1.a.i"
+  index: number;   // flattened reveal index for staggering
+}
+
+// Generate ordinal in `1.a.i.A` style — alternating numeric / alpha-lower /
+// roman-lower / alpha-upper by depth. Caps out at depth 5 for safety.
+const ORDINAL_ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii", "viii", "ix", "x", "xi", "xii"];
+const ordinalAt = (depth: number, idx: number): string => {
+  if (depth === 0) return `${idx + 1}`;
+  if (depth === 1) return String.fromCharCode("a".charCodeAt(0) + idx);
+  if (depth === 2) return ORDINAL_ROMAN[idx] ?? `${idx + 1}`;
+  return String.fromCharCode("A".charCodeAt(0) + idx);
+};
+
+const flattenIndented = (
+  nodes: TreeNode[],
+  rootId: string,
+): IndentedNode[] => {
+  const map = new Map(nodes.map((n) => [n.id, n]));
+  const out: IndentedNode[] = [];
+  let counter = 0;
+  const walk = (id: string, depth: number, parentOrdinal: string, siblingIdx: number) => {
+    const n = map.get(id);
+    if (!n) return;
+    const myOrdinal = depth === 0 ? "" : parentOrdinal
+      ? `${parentOrdinal}.${ordinalAt(depth - 1, siblingIdx)}`
+      : ordinalAt(depth - 1, siblingIdx);
+    if (depth > 0) {
+      out.push({ node: n, depth: depth - 1, ordinal: myOrdinal, index: counter++ });
+    }
+    (n.children ?? []).forEach((cid, i) => walk(cid, depth + 1, myOrdinal, i));
+  };
+  walk(rootId, 0, "", 0);
+  return out;
+};
+
+const IndentedTreeVariant: React.FC<{
+  data: DecisionTreeData;
+  frame: number;
+  totalFrames: number;
+  syncPoints?: DirectionSyncPoint[];
+  firstRevealBase?: number;
+}> = React.memo(({ data, frame, totalFrames, syncPoints, firstRevealBase }) => {
+  const mode = (data.backgroundVariant || "light") as "light" | "dark";
+  const theme = useThemeMode(mode);
+  const emphasis = useEpisodeColorEmphasis();
+  const highlightColor = data.highlightColor || emphasis.primaryAccent;
+  const root = useMemo(
+    () => data.nodes.find((n) => n.id === data.rootId),
+    [data.nodes, data.rootId],
+  );
+  const flat = useMemo(
+    () => flattenIndented(data.nodes, data.rootId),
+    [data.nodes, data.rootId],
+  );
+  const highlightSet = useMemo(
+    () => new Set(data.highlightedPath ?? []),
+    [data.highlightedPath],
+  );
+
+  const INDENT = 56;            // px per depth level
+  const ROW_HEIGHT = 56;        // baseline-to-baseline
+  const ORDINAL_COL = 64;       // mono ordinal column width
+  const PROB_COL_MAX = 160;     // right-aligned probability column
+
+  const exitOp = exitFade(frame, totalFrames, sec(0.5));
+  const safe = layout.safeAreaTier.generous;
+  const baseReveal = firstRevealBase ?? sec(0.4);
+
+  return (
+    <>
+      <TitleBlock
+        title={data.title}
+        subtitle={data.subtitle}
+        mode={mode}
+        safeAreaTier="generous"
+        syncPoints={syncPoints}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: safe.top + titleHeight.content + layout.spacing.lg,
+          left: safe.left,
+          right: safe.right,
+          bottom: safe.bottom + 40,
+          opacity: exitOp,
+          overflow: "hidden",
+        }}
+      >
+        {flat.map(({ node, depth, ordinal, index }) => {
+          const isHighlighted =
+            node.highlighted || highlightSet.has(node.id);
+          const accent = isHighlighted ? highlightColor : theme.text.muted;
+
+          const revealStart = baseReveal + index * sec(0.18);
+          const opacity = fadeIn(frame, revealStart, sec(0.5));
+          const slide = slideIn(frame, revealStart, 10, sec(0.5));
+
+          // Probability text — gated for numeric pct same as the rest of the template.
+          const probText =
+            node.probability &&
+            (data.probabilityWeights || !/\d+\s*%/.test(node.probability))
+              ? node.probability
+              : null;
+
+          return (
+            <div
+              key={node.id}
+              style={{
+                position: "absolute",
+                top: index * ROW_HEIGHT,
+                left: depth * INDENT,
+                right: 0,
+                height: ROW_HEIGHT,
+                opacity,
+                transform: `translateY(${slide}px)`,
+                display: "flex",
+                alignItems: "baseline",
+                gap: layout.spacing.lg,
+                // Indent-gutter hairline: a thin left rule for any node at
+                // depth > 0, rendered as the parent→child connecting line.
+                // Highlighted path gets a 2px rule in accent color.
+                borderLeft:
+                  depth > 0
+                    ? isHighlighted
+                      ? `2px solid ${accent}`
+                      : `1px solid ${theme.text.muted}40`
+                    : "none",
+                paddingLeft: depth > 0 ? layout.spacing.md : 0,
+              }}
+            >
+              {/* Ordinal — Plex Mono, right-aligned in fixed column */}
+              <div
+                style={{
+                  fontSize: fontSizes.caption,
+                  fontFamily: fonts.metadata,
+                  color: theme.text.muted,
+                  letterSpacing: 1.2,
+                  width: ORDINAL_COL,
+                  textAlign: "right",
+                  flexShrink: 0,
+                  opacity: 0.7,
+                }}
+              >
+                {ordinal}
+              </div>
+
+              {/* Label — Plex Serif body, bold for highlighted */}
+              <div
+                style={{
+                  flex: 1,
+                  fontSize: depth === 0 ? fontSizes.h3 : fontSizes.body,
+                  fontFamily: depth === 0 ? fonts.display : fonts.body,
+                  fontWeight:
+                    isHighlighted || depth === 0
+                      ? fontWeights.semibold
+                      : fontWeights.regular,
+                  color: isHighlighted ? accent : theme.text.primary,
+                  lineHeight: 1.3,
+                  maxWidth: textMaxWidth.body * 1.4,
+                }}
+              >
+                {node.label}
+                {node.edgeLabel && (
+                  <span
+                    style={{
+                      fontSize: fontSizes.caption,
+                      fontFamily: fonts.body,
+                      fontWeight: fontWeights.regular,
+                      fontStyle: "italic",
+                      color: theme.text.secondary,
+                      marginLeft: layout.spacing.md,
+                    }}
+                  >
+                    via {node.edgeLabel}
+                  </span>
+                )}
+              </div>
+
+              {/* Probability column — right-aligned mono, optional */}
+              {probText && (
+                <div
+                  style={{
+                    fontSize: fontSizes.caption,
+                    fontFamily: fonts.mono,
+                    color: isHighlighted ? accent : theme.text.muted,
+                    letterSpacing: 1.2,
+                    width: PROB_COL_MAX,
+                    textAlign: "right",
+                    flexShrink: 0,
+                  }}
+                >
+                  {probText}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {data.source && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: safe.bottom,
+            left: safe.left,
+            fontSize: fontSizes.caption,
+            color: theme.text.muted,
+            opacity: fadeIn(frame, 0, sec(1)) * exitOp,
+          }}
+        >
+          {data.source}
+        </div>
+      )}
+    </>
+  );
+});
+
+// ── SpineTreeVariant — Aesthetic B: Stem-and-Leaf Branching Spine ──────────
+// Kahn escalation-ladder lineage + Christian Swinehart's CYOA structural
+// maps. Inherits the EscalationLadder doctrine: spine + ordinals carry
+// hierarchy.
+//
+// Visual language:
+//   - Single vertical spine of ordinal numerals down the left column
+//     (Plex Mono, hairline rules between rungs). Each rung = decision moment.
+//   - Branches fan HORIZONTALLY RIGHTWARD off each rung as short labeled
+//     hairlines, leaves are small filled circles at stem-tips.
+//   - Spine encodes depth (one axis, one meaning).
+//   - Lateral fan = choice space at that rung.
+//   - Highlighted path: spine segment + one stem rendered in accent color;
+//     other stems dim to 50%.
+//   - No boxes anywhere.
+//
+// Right when the editorial point is "the world forked here, then again
+// there" — sequential decision moments with a small lateral branch fan.
+// Best for trees ≤3 levels deep.
+//
+// Reference: research report 2026-05-17, Aesthetic B.
+
+const SpineTreeVariant: React.FC<{
+  data: DecisionTreeData;
+  frame: number;
+  totalFrames: number;
+  syncPoints?: DirectionSyncPoint[];
+  firstRevealBase?: number;
+}> = React.memo(({ data, frame, totalFrames, syncPoints, firstRevealBase }) => {
+  const mode = (data.backgroundVariant || "light") as "light" | "dark";
+  const theme = useThemeMode(mode);
+  const emphasis = useEpisodeColorEmphasis();
+  const highlightColor = data.highlightColor || emphasis.primaryAccent;
+  const nodeMap = useMemo(
+    () => new Map(data.nodes.map((n) => [n.id, n])),
+    [data.nodes],
+  );
+  const highlightSet = useMemo(
+    () => new Set(data.highlightedPath ?? []),
+    [data.highlightedPath],
+  );
+
+  // Walk root → child chain to collect "rungs" (the decision sequence).
+  // A rung is a node along the main spine; its children are the lateral
+  // fan-out at that decision moment. For spine variant we treat the
+  // highlightedPath as the spine if provided; otherwise we walk first-child
+  // links until we hit a leaf.
+  const spine = useMemo(() => {
+    if (data.highlightedPath && data.highlightedPath.length > 0) {
+      return data.highlightedPath
+        .map((id) => nodeMap.get(id))
+        .filter((n): n is TreeNode => Boolean(n));
+    }
+    const rungs: TreeNode[] = [];
+    let current = nodeMap.get(data.rootId);
+    while (current) {
+      rungs.push(current);
+      const firstChildId = current.children?.[0];
+      if (!firstChildId) break;
+      current = nodeMap.get(firstChildId);
+    }
+    return rungs;
+  }, [data.highlightedPath, data.rootId, nodeMap]);
+
+  const exitOp = exitFade(frame, totalFrames, sec(0.5));
+  const safe = layout.safeAreaTier.generous;
+  const baseReveal = firstRevealBase ?? sec(0.4);
+
+  // Layout constants
+  const SPINE_LEFT = safe.left + 60;
+  const RUNG_HEIGHT = 160;
+  const ORDINAL_X = SPINE_LEFT - 50;
+  const RUNG_LABEL_GAP = 24;         // gap from spine to rung label
+  const STEM_VERTICAL_FAN = 40;      // vertical fan-out per child stem (px)
+  const STEM_START_OFFSET = 480;     // px right of spine where stems begin
+  const STEM_LENGTH = 260;           // bezier reach from stem start to leaf
+  const LEAF_DOT_R = 4;
+
+  // Path-dim mode: when a highlighted path is set, lateral non-highlighted
+  // children dim to ~30% so the eye reads the chosen sequence first.
+  // Without a highlighted path, all lateral fans render at full weight
+  // (no editorial chosen-path claim).
+  const pathDimActive = highlightSet.size > 0;
+
+  return (
+    <>
+      <TitleBlock
+        title={data.title}
+        subtitle={data.subtitle}
+        mode={mode}
+        safeAreaTier="generous"
+        syncPoints={syncPoints}
+      />
+
+      <svg
+        style={{
+          position: "absolute",
+          top: safe.top + titleHeight.content + layout.spacing.xl,
+          left: 0,
+          width: layout.width,
+          height: spine.length * RUNG_HEIGHT + 80,
+          opacity: exitOp,
+          overflow: "visible",
+        }}
+      >
+        {/* Spine — vertical thin rule connecting all rungs. Draws
+            progressively as rungs reveal. */}
+        {spine.length > 1 && (() => {
+          const spineRevealEnd = baseReveal + (spine.length - 1) * sec(0.45);
+          const spineProgress = interpolate(
+            frame,
+            [baseReveal, spineRevealEnd],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          );
+          return (
+            <line
+              x1={SPINE_LEFT}
+              y1={20}
+              x2={SPINE_LEFT}
+              y2={20 + (spine.length - 1) * RUNG_HEIGHT * spineProgress}
+              stroke={theme.text.muted}
+              strokeOpacity={0.45}
+              strokeWidth={1}
+            />
+          );
+        })()}
+
+        {spine.map((rung, rungIdx) => {
+          const rungY = 20 + rungIdx * RUNG_HEIGHT;
+          const isRungHighlighted =
+            rung.highlighted || highlightSet.has(rung.id);
+          const rungReveal = baseReveal + rungIdx * sec(0.45);
+          const rungOp = fadeIn(frame, rungReveal, sec(0.45));
+
+          // Find children that are NOT on the spine (i.e. lateral branches).
+          const spineIds = new Set(spine.map((r) => r.id));
+          const lateralChildren = (rung.children ?? [])
+            .map((cid) => nodeMap.get(cid))
+            .filter((n): n is TreeNode => Boolean(n) && !spineIds.has(n!.id));
+
+          return (
+            <g key={rung.id} opacity={rungOp}>
+              {/* Ordinal numeral — Plex Mono, left of spine */}
+              <text
+                x={ORDINAL_X}
+                y={rungY + 6}
+                fontSize={fontSizes.caption}
+                fontFamily={fonts.metadata}
+                fill={theme.text.muted}
+                opacity={0.7}
+                letterSpacing={1.2}
+                textAnchor="end"
+              >
+                {String(rungIdx + 1).padStart(2, "0")}
+              </text>
+
+              {/* Spine dot — accent if highlighted, muted otherwise */}
+              <circle
+                cx={SPINE_LEFT}
+                cy={rungY}
+                r={isRungHighlighted ? 5 : 3.5}
+                fill={isRungHighlighted ? highlightColor : theme.text.secondary}
+              />
+
+              {/* Rung label — the decision moment itself */}
+              <text
+                x={SPINE_LEFT + RUNG_LABEL_GAP}
+                y={rungY + 8}
+                fontSize={fontSizes.h3}
+                fontFamily={fonts.display}
+                fontWeight={isRungHighlighted ? fontWeights.semibold : fontWeights.medium}
+                fill={isRungHighlighted ? highlightColor : theme.text.primary}
+              >
+                {rung.label}
+              </text>
+
+              {/* Lateral branches — fan out to the right of the rung label */}
+              {lateralChildren.map((child, childIdx) => {
+                const fanCount = lateralChildren.length;
+                const fanOffset =
+                  fanCount === 1
+                    ? 0
+                    : ((childIdx - (fanCount - 1) / 2)) * STEM_VERTICAL_FAN;
+                const stemRevealStart = rungReveal + sec(0.15) + childIdx * sec(0.12);
+                const stemOp = fadeIn(frame, stemRevealStart, sec(0.4));
+                const stemX1 = SPINE_LEFT + RUNG_LABEL_GAP + STEM_START_OFFSET;
+                const stemX2 = stemX1 + STEM_LENGTH;
+                const stemY2 = rungY + fanOffset;
+                const isChildHighlighted =
+                  child.highlighted || highlightSet.has(child.id);
+                const stemColor = isChildHighlighted
+                  ? highlightColor
+                  : child.color || theme.text.muted;
+                // Dim factor — non-highlighted children fade back when a
+                // highlighted path is present, so the spine reads first.
+                const dimFactor = pathDimActive && !isChildHighlighted ? 0.35 : 1;
+
+                return (
+                  <g key={child.id} opacity={stemOp * dimFactor}>
+                    {/* Stem hairline — quarter-bezier from rung to leaf */}
+                    <path
+                      d={`M ${stemX1} ${rungY} Q ${(stemX1 + stemX2) / 2} ${rungY} ${stemX2} ${stemY2}`}
+                      stroke={stemColor}
+                      strokeOpacity={isChildHighlighted ? 0.85 : 0.55}
+                      strokeWidth={isChildHighlighted ? 1.5 : 1}
+                      fill="none"
+                    />
+                    {/* Leaf dot */}
+                    <circle
+                      cx={stemX2}
+                      cy={stemY2}
+                      r={LEAF_DOT_R}
+                      fill={stemColor}
+                      opacity={isChildHighlighted ? 1 : 0.75}
+                    />
+                    {/* Leaf label */}
+                    <text
+                      x={stemX2 + 14}
+                      y={stemY2 + 6}
+                      fontSize={isChildHighlighted ? fontSizes.body : fontSizes.label}
+                      fontFamily={fonts.body}
+                      fontWeight={isChildHighlighted ? fontWeights.semibold : fontWeights.regular}
+                      fill={isChildHighlighted ? highlightColor : theme.text.primary}
+                    >
+                      {child.label}
+                    </text>
+                    {/* Edge label — mid-stem mono caption (gated like other variants) */}
+                    {child.edgeLabel && (
+                      <text
+                        x={(stemX1 + stemX2) / 2}
+                        y={rungY - 8 + fanOffset / 2}
+                        fontSize={fontSizes.meta}
+                        fontFamily={fonts.metadata}
+                        fill={theme.text.muted}
+                        opacity={0.7}
+                        letterSpacing={1}
+                        textAnchor="middle"
+                      >
+                        {child.edgeLabel}
+                      </text>
+                    )}
+                  </g>
+                );
+              })}
+            </g>
+          );
+        })}
+      </svg>
+
+      {data.source && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: safe.bottom,
+            left: safe.left,
+            fontSize: fontSizes.caption,
+            color: theme.text.muted,
+            opacity: fadeIn(frame, 0, sec(1)) * exitOp,
+          }}
+        >
+          {data.source}
+        </div>
+      )}
+    </>
+  );
+});
+
 const LadderVariant: React.FC<{
   data: DecisionTreeData;
   frame: number;
@@ -529,16 +1036,16 @@ const LadderVariant: React.FC<{
         style={{
           opacity,
           transform: `translateY(${slide}px)`,
-          marginTop: idx === 0 ? 0 : layout.spacing.md,
-          padding: `${layout.spacing.sm}px ${layout.spacing.lg}px`,
-          // Highlighted option gets a 2.5px accent border + tinted fill;
-          // unchosen options get a 1px muted hairline + transparent fill.
-          // Weight + saturation carry the hierarchy — not brightness.
-          border: `${isHighlighted ? 2.5 : 1}px solid ${isHighlighted ? accent : `${theme.text.muted}55`}`,
-          borderRadius: radii.sm,
-          background: isHighlighted
-            ? `${accent}10`
-            : "transparent",
+          marginTop: idx === 0 ? 0 : layout.spacing.lg,
+          // POLISH.md D1 — no card chrome. Hierarchy carries via ordinal
+          // numerals (left rail) + bold display weight on title + body
+          // text gloss. Highlighted option gets a 3px left-rail accent
+          // bar (quoted-passage register) + faint tinted fill — no full
+          // enclosing rectangle. Unchosen options get nothing — pure
+          // typographic vertical-rhythm separation.
+          padding: `${layout.spacing.xs}px ${layout.spacing.lg}px`,
+          borderLeft: isHighlighted ? `3px solid ${accent}` : "3px solid transparent",
+          background: isHighlighted ? `${accent}0A` : "transparent",
           display: "flex",
           gap: layout.spacing.lg,
           alignItems: "baseline",
@@ -722,10 +1229,21 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
       "or node.probability fields, or set probabilityWeights: false to suppress.",
   );
 
-  // ── Ladder variant early return — Allison-style nested rectangles ──────
-  // Right for ExComm-class deliberation scenes. See LadderVariant component
-  // and references/template-research/game-theory.md § A2.
-  if (data.variant === "ladder") {
+  // ── Non-canvas variants — early return when variant uses a non-extensive
+  // typographic / schematic layout (no virtual camera, no graph layout).
+  // Each variant component is fully self-contained.
+  if (
+    data.variant === "ladder" ||
+    data.variant === "indented" ||
+    data.variant === "spine"
+  ) {
+    const VariantComponent =
+      data.variant === "ladder"
+        ? LadderVariant
+        : data.variant === "indented"
+          ? IndentedTreeVariant
+          : SpineTreeVariant;
+
     return (
       <Background
         variant={resolveAnalyticalBackgroundVariant(
@@ -739,7 +1257,13 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         <AbsoluteFill style={compStyle}>
           <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
           <FooterStrip mode={backgroundVariant} />
-          <LadderVariant data={data} frame={frame} totalFrames={totalFrames} syncPoints={direction.syncPoints} firstRevealBase={nodeRevealBase} />
+          <VariantComponent
+            data={data}
+            frame={frame}
+            totalFrames={totalFrames}
+            syncPoints={direction.syncPoints}
+            firstRevealBase={nodeRevealBase}
+          />
         </AbsoluteFill>
       </Background>
     );

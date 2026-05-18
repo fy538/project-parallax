@@ -83,7 +83,7 @@ export interface DecisionTreeData {
    *   See: references/template-research/game-theory.md § A2 (Allison nested
    *   rectangles).
    */
-  variant?: "extensive" | "ladder";
+  variant?: "extensive" | "ladder" | "indented" | "spine";
   /** All nodes in the tree (flat array, tree structure via children refs) */
   nodes: TreeNode[];
   /** ID of the root node */

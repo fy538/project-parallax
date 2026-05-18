@@ -14,7 +14,7 @@ import { GameBoard } from "../templates/GameBoard/GameBoard";
 import { GameBoardSchema } from "../templates/GameBoard/schema";
 import type { GameBoardData } from "../templates/GameBoard/types";
 // BifurcationRoute template removed May 13, 2026.
-import { layout, sec } from "../design/theme";
+import { layout, palette, semantic, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
 // ─── DecisionTree × 1 ─────────────────────────────────────────────────────
@@ -73,6 +73,108 @@ const treeExCommLadder: DecisionTreeData = {
   rootId: "root",
   highlightedPath: ["blockade", "quarantine"],
   source: "Allison, Essence of Decision (1971); ExComm transcripts",
+  durationSec: 14,
+};
+
+// Indented manuscript-tree demo — Aesthetic A (May 17, 2026 research pass).
+// Trade-policy taxonomy: a depth-3 tree where the indented form does the
+// editorial work directly (each level reads as a sub-clause of the level
+// above, like a legal outline or a policy memo).
+const treePolicyIndented: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "Tariff Response Options",
+  subtitle: "A trade-policy taxonomy as the brief reads it",
+  variant: "indented",
+  nodes: [
+    {
+      id: "root",
+      label: "How should a mid-tier exporter respond to U.S. tariffs?",
+      children: ["accommodate", "retaliate", "rebuild"],
+    },
+    // Branch 1 — accommodate
+    {
+      id: "accommodate",
+      label: "Accommodate",
+      edgeLabel: "low political cost",
+      children: ["accom-bilateral", "accom-fdi"],
+    },
+    {
+      id: "accom-bilateral",
+      label: "Open bilateral talks — concede on non-core sectors",
+    },
+    {
+      id: "accom-fdi",
+      label: "Offer FDI commitments in the U.S. as a tariff offset",
+    },
+    // Branch 2 — retaliate (highlighted path)
+    {
+      id: "retaliate",
+      label: "Retaliate proportionally",
+      edgeLabel: "WTO-aligned",
+      highlighted: true,
+      children: ["retal-symmetric", "retal-sector"],
+    },
+    {
+      id: "retal-symmetric",
+      label: "Mirror the tariff schedule line-by-line",
+      highlighted: true,
+    },
+    {
+      id: "retal-sector",
+      label: "Target politically sensitive U.S. sectors (agricultural, energy)",
+    },
+    // Branch 3 — rebuild
+    {
+      id: "rebuild",
+      label: "Rebuild dependencies",
+      edgeLabel: "long horizon",
+      children: ["rebuild-trade-diversion", "rebuild-domestic"],
+    },
+    {
+      id: "rebuild-trade-diversion",
+      label: "Trade-divert via ASEAN / EU agreements",
+    },
+    {
+      id: "rebuild-domestic",
+      label: "Subsidize domestic alternatives to U.S.-sourced inputs",
+    },
+  ],
+  rootId: "root",
+  highlightedPath: ["retaliate", "retal-symmetric"],
+  source: "Policy taxonomy after Drezner (2007) and Bown (2024).",
+  durationSec: 14,
+};
+
+// Spine branching demo — Aesthetic B (May 17, 2026 research pass).
+// Taiwan blockade escalation chain: three sequential decision rungs along
+// the spine, each with 1-3 lateral branches representing alternative
+// responses considered (and discarded) at that rung. The chosen path
+// (the spine itself) reads top-to-bottom; the discarded lateral options
+// fan rightward off each rung.
+const treeTaiwanSpine: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "Quarantine Decision Spine",
+  subtitle: "Three rungs in a contingency-planning chain",
+  variant: "spine",
+  nodes: [
+    // Spine — the chosen sequence
+    { id: "root", label: "PRC blockade declared", children: ["assess", "limited-strike", "diplomatic"] },
+    { id: "rung1", label: "Quarantine the strait", children: ["rung2", "freeze-only", "naval-strike"] },
+    { id: "rung2", label: "Inspect-and-divert ROE", children: ["rung3", "no-inspect"] },
+    { id: "rung3", label: "Hold until political off-ramp", children: [] },
+    // Lateral branches off root (the "spine starts here" rung)
+    { id: "assess", label: "Stand off and assess", edgeLabel: "buy time", color: palette.taupe },
+    { id: "limited-strike", label: "Limited strike on blockade ships", edgeLabel: "escalatory", color: semantic.china },
+    { id: "diplomatic", label: "Demand UNSC emergency session", edgeLabel: "signal-only", color: palette.taupe },
+    // Lateral branches off rung 1
+    { id: "freeze-only", label: "Freeze PRC commercial shipping", edgeLabel: "symmetric", color: palette.taupe },
+    { id: "naval-strike", label: "Engage blockade fleet directly", edgeLabel: "kinetic", color: semantic.china },
+    // Lateral branch off rung 2
+    { id: "no-inspect", label: "Pass-through with no inspection", edgeLabel: "concession", color: palette.taupe },
+  ],
+  rootId: "root",
+  highlightedPath: ["root", "rung1", "rung2", "rung3"],
+  source: "Scenario sketch after RAND TR-392 contingency framework.",
   durationSec: 14,
 };
 
@@ -286,6 +388,36 @@ export const CatalogTreeExCommLadder = () => (
   />
 );
 
+export const CatalogTreePolicyIndented = () => (
+  <Composition
+    id={catalogId("DecisionTree", "policy-indented")}
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treePolicyIndented }}
+  />
+);
+
+export const CatalogTreeTaiwanSpine = () => (
+  <Composition
+    id={catalogId("DecisionTree", "taiwan-spine")}
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treeTaiwanSpine }}
+  />
+);
+
 export const DecisionTreeHorizontalComposition = () => (
   <Composition
     id="DecisionTree-Horizontal"
@@ -364,5 +496,7 @@ export const CatalogGameIteratedPD = () => (
 // CatalogBifurcationCocom export removed May 13, 2026 with BifurcationRoute.
 
 export const catalogScenariosData = {
-  treeChessOpening, treeExCommLadder, treeAITimelineHorizontal, gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
+  treeChessOpening, treeExCommLadder, treeAITimelineHorizontal,
+  treePolicyIndented, treeTaiwanSpine,
+  gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
 };
