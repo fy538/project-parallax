@@ -67,6 +67,24 @@ MIN_DURATION_SEC = 10.0      # below this almost certainly the wrong file
 # Acceptable secondary sample rate (warn but don't error).
 SECONDARY_SAMPLE_RATE = 44100
 
+# Noise-floor doctrine — measured during detected silence regions, not
+# the active narration. A clean home-studio with treatment lands -60 to
+# -55 dBFS; an untreated room with HVAC or computer fans lands -50 to
+# -40 dBFS. > -45 dBFS is "noisy enough to be audible in pauses" and
+# warrants either treatment, a noise gate in mastering, or re-recording.
+TARGET_NOISE_FLOOR_DBFS = -55.0       # full score at or below
+NOISE_FLOOR_WARN_DBFS = -45.0         # above this surfaces a warn
+NOISE_FLOOR_ERROR_DBFS = -35.0        # above this surfaces an error
+
+# RMS envelope doctrine — how much the loudness wanders over the take.
+# A consistent take has std-dev under 3 dB across rolling 5s windows.
+# > 6 dB suggests mic drift, room change, or significant pace/energy
+# variation. Auphonic can normalize most of this but won't fix a take
+# where the first half is -22 LUFS and the second half is -14 LUFS.
+RMS_WINDOW_SEC = 5.0
+RMS_STD_WARN_DB = 6.0
+RMS_STD_ERROR_DB = 10.0
+
 
 @dataclass
 class SilenceEvent:
@@ -98,6 +116,37 @@ class LoudnessReport:
 
 
 @dataclass
+class RmsEnvelope:
+    """Sliding-window RMS measurements over the take. `samples` is one
+    dB value per RMS_WINDOW_SEC window."""
+
+    window_sec: float
+    samples_dbfs: list[float] = field(default_factory=list)
+
+    @property
+    def mean_dbfs(self) -> float:
+        if not self.samples_dbfs:
+            return 0.0
+        return sum(self.samples_dbfs) / len(self.samples_dbfs)
+
+    @property
+    def std_dbfs(self) -> float:
+        if len(self.samples_dbfs) < 2:
+            return 0.0
+        import statistics
+        return statistics.stdev(self.samples_dbfs)
+
+
+@dataclass
+class NoiseFloor:
+    """RMS dBFS measured during detected silence regions (the actual
+    room-tone, not just gap detection)."""
+
+    rms_dbfs: float
+    silence_seconds_measured: float
+
+
+@dataclass
 class Finding:
     level: str   # "error" | "warn" | "ok"
     code: str    # short identifier for the check (e.g. "L-LUFS-OUT-OF-SPEC")
@@ -111,6 +160,8 @@ class AuditReport:
     probe: ProbeReport
     loudness: Optional[LoudnessReport]
     silences: list[SilenceEvent] = field(default_factory=list)
+    rms_envelope: Optional[RmsEnvelope] = None
+    noise_floor: Optional[NoiseFloor] = None
     findings: list[Finding] = field(default_factory=list)
 
     @property
@@ -120,6 +171,24 @@ class AuditReport:
     @property
     def warnings(self) -> list[Finding]:
         return [f for f in self.findings if f.level == "warn"]
+
+    @property
+    def auphonic_ready(self) -> bool:
+        """Composite go/no-go: no errors AND key warnings absent.
+        Auphonic can normalize loudness + reduce noise + de-ess, but it
+        can't fix wrong-file-format, clipped peaks, or a take with
+        material loudness drift across its duration. Those need to be
+        addressed before submission."""
+        if self.errors:
+            return False
+        # Block warnings that Auphonic can't safely paper over
+        blockers = {
+            "A-CHANNELS",            # wrong mono/stereo — re-export first
+            "A-CODEC-LOSSY",         # lossy source = re-export first
+            "A-RMS-DRIFT",           # loudness wanders across the take
+            "A-NOISE-FLOOR-NOISY",   # noise floor too high to clean up
+        }
+        return not any(f.code in blockers for f in self.warnings)
 
 
 # ── ffmpeg / ffprobe wrappers ───────────────────────────────────────────────
@@ -300,6 +369,151 @@ def detect_silences(
     return parse_silencedetect_output(result.stderr)
 
 
+# ── RMS envelope (loudness drift over time) ─────────────────────────────────
+
+# Each frame from `astats` reports its own RMS_level in dB on its own line.
+# Pattern: `[Parsed_astats_*] RMS level dB: -23.456` (after enabling the
+# `metadata=1` option). We split into windows of RMS_WINDOW_SEC and take
+# the mean RMS within each window.
+_ASTATS_RMS_RE = re.compile(r"RMS level dB:\s*(-?\d+\.\d+|nan|inf|-inf)")
+_ASTATS_PTS_RE = re.compile(r"pts_time:\s*(-?\d+\.\d+)")
+
+
+def parse_astats_envelope(stderr: str, window_sec: float = RMS_WINDOW_SEC) -> RmsEnvelope:
+    """Parse the per-frame metadata stream from ffmpeg `astats=metadata=1
+    :reset=1` and bin into `window_sec` windows. Each window's value is
+    the mean RMS dBFS of frames falling inside it.
+
+    Robust to inf/nan readings (silent frames produce -inf RMS) — those
+    are skipped from the mean rather than dragging it to -∞.
+    """
+    bins: dict[int, list[float]] = {}
+    current_time = 0.0
+    for line in stderr.splitlines():
+        pm = _ASTATS_PTS_RE.search(line)
+        if pm:
+            try:
+                current_time = float(pm.group(1))
+            except ValueError:
+                pass
+            continue
+        rm = _ASTATS_RMS_RE.search(line)
+        if rm:
+            raw = rm.group(1)
+            try:
+                rms = float(raw)
+            except ValueError:
+                continue
+            # Skip non-finite readings (silent frames)
+            if rms != rms or rms in (float("inf"), float("-inf")):
+                continue
+            idx = int(current_time // window_sec)
+            bins.setdefault(idx, []).append(rms)
+    if not bins:
+        return RmsEnvelope(window_sec=window_sec, samples_dbfs=[])
+    # Emit one mean per window, in index order
+    max_idx = max(bins)
+    samples = [
+        sum(bins[i]) / len(bins[i])
+        for i in range(max_idx + 1) if i in bins
+    ]
+    return RmsEnvelope(window_sec=window_sec, samples_dbfs=samples)
+
+
+def measure_rms_envelope(
+    wav_path: Path, window_sec: float = RMS_WINDOW_SEC,
+    sample_rate: Optional[int] = None,
+) -> RmsEnvelope:
+    """Run ffmpeg with the astats filter and parse per-frame RMS into
+    windowed bins. Returns RmsEnvelope (empty if measurement failed).
+
+    `sample_rate` is used to size `asetnsamples` (samples per window).
+    If not provided, probes the file to read it — previously this was
+    hardcoded to 48 kHz, which made 44.1 kHz files report bins that
+    were ~9% wider than `window_sec`.
+    """
+    if sample_rate is None:
+        try:
+            sample_rate = probe_audio(wav_path).sample_rate or 48000
+        except (RuntimeError, subprocess.CalledProcessError):
+            sample_rate = 48000
+    result = subprocess.run(
+        [
+            "ffmpeg", "-nostats", "-hide_banner",
+            "-i", str(wav_path),
+            "-af", f"asetnsamples={int(sample_rate * window_sec)},astats=metadata=1:reset=1",
+            "-f", "null", "-",
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    return parse_astats_envelope(result.stderr, window_sec=window_sec)
+
+
+# ── Noise floor (RMS during detected silences) ──────────────────────────────
+
+
+def parse_volumedetect_mean_dbfs(stderr: str) -> Optional[float]:
+    """Extract `mean_volume: -XX.X dB` from ffmpeg volumedetect output."""
+    m = re.search(r"mean_volume:\s*(-?\d+(?:\.\d+)?)\s*dB", stderr)
+    if not m:
+        return None
+    try:
+        return float(m.group(1))
+    except ValueError:
+        return None
+
+
+def measure_noise_floor(
+    wav_path: Path, silences: list[SilenceEvent], min_total_sec: float = 1.0,
+) -> Optional[NoiseFloor]:
+    """Measure RMS dBFS during detected silence regions. Returns None if
+    no silences were found (can't measure room tone if there are no
+    pauses in the take) or if the total silent duration is too short to
+    yield a stable RMS reading.
+
+    Uses ffmpeg's volumedetect filter on a concatenation of silence
+    segments cut out via aselect. Conservative: bails on the first
+    ffmpeg failure rather than guessing at noise floor from active
+    narration.
+    """
+    if not silences:
+        return None
+    total = sum(s.duration_sec for s in silences)
+    if total < min_total_sec:
+        return None
+
+    # Build an aselect filter that keeps only frames whose timestamp
+    # falls within one of the detected silence regions. Use the first
+    # 60s of cumulative silence (most takes have plenty; cap so we don't
+    # spend CPU on enormous files).
+    keep_clauses = []
+    accumulated = 0.0
+    for s in silences:
+        if accumulated >= 60.0:
+            break
+        keep_clauses.append(
+            f"between(t,{s.start_sec:.3f},{s.end_sec:.3f})"
+        )
+        accumulated += s.duration_sec
+    if not keep_clauses:
+        return None
+    aselect_expr = "+".join(keep_clauses)
+
+    result = subprocess.run(
+        [
+            "ffmpeg", "-nostats", "-hide_banner",
+            "-i", str(wav_path),
+            "-af", f"aselect='{aselect_expr}',asetpts=N/SR/TB,volumedetect",
+            "-f", "null", "-",
+        ],
+        capture_output=True, text=True, check=False,
+    )
+    rms = parse_volumedetect_mean_dbfs(result.stderr)
+    if rms is None:
+        return None
+    return NoiseFloor(rms_dbfs=rms, silence_seconds_measured=min(accumulated, 60.0))
+
+
 # ── Check functions: one per finding category ────────────────────────────────
 # Each takes the relevant data and returns 0 or more Findings. Splitting
 # checks out makes each one unit-testable without spawning ffmpeg.
@@ -402,6 +616,76 @@ def check_silences(silences: list[SilenceEvent], threshold_sec: float) -> list[F
     return findings
 
 
+def check_rms_envelope(env: Optional[RmsEnvelope]) -> list[Finding]:
+    """Flag loudness drift across the take. Auphonic can normalize a
+    consistent take but won't fix one where the first half is much
+    quieter than the second."""
+    findings: list[Finding] = []
+    if env is None or len(env.samples_dbfs) < 2:
+        return findings
+    std = env.std_dbfs
+    if std >= RMS_STD_ERROR_DB:
+        findings.append(Finding(
+            level="error", code="A-RMS-DRIFT-MATERIAL",
+            msg=f"RMS std-dev {std:.1f} dB across {env.window_sec:.0f}s windows — "
+                f"material loudness drift (≥{RMS_STD_ERROR_DB:.0f} dB). The take's "
+                f"loudness wanders too much for clean mastering.",
+            fix="Re-record the section where the level changed (often the "
+                "mic was bumped or the room HVAC kicked in); OR manually "
+                "ride the gain in your DAW before sending to Auphonic.",
+        ))
+    elif std >= RMS_STD_WARN_DB:
+        findings.append(Finding(
+            level="warn", code="A-RMS-DRIFT",
+            msg=f"RMS std-dev {std:.1f} dB across {env.window_sec:.0f}s windows — "
+                f"some loudness drift (≥{RMS_STD_WARN_DB:.0f} dB). Auphonic "
+                f"compression will help but won't fully equalize.",
+            fix="Inspect the take in your DAW for a quiet region; consider "
+                "manual gain ride or a more aggressive compressor setting.",
+        ))
+    else:
+        findings.append(Finding(
+            level="ok", code="A-RMS-DRIFT",
+            msg=f"RMS std-dev {std:.1f} dB — consistent loudness across the take.",
+        ))
+    return findings
+
+
+def check_noise_floor(nf: Optional[NoiseFloor]) -> list[Finding]:
+    """Flag a noisy recording environment. > -45 dBFS is audible in
+    pauses; > -35 dBFS is unsalvageable without aggressive denoising
+    that introduces artifacts."""
+    findings: list[Finding] = []
+    if nf is None:
+        return findings  # no silences detected — can't measure
+    if nf.rms_dbfs >= NOISE_FLOOR_ERROR_DBFS:
+        findings.append(Finding(
+            level="error", code="A-NOISE-FLOOR-LOUD",
+            msg=f"Noise floor {nf.rms_dbfs:+.1f} dBFS during silences — "
+                f"≥ {NOISE_FLOOR_ERROR_DBFS:.0f} dBFS is too loud to clean up "
+                f"without artifacts. Re-record in a quieter environment.",
+            fix="Identify the noise source (HVAC / fans / outside traffic) "
+                "and either eliminate it or move the recording location. "
+                "Software denoise at this floor will degrade speech quality.",
+        ))
+    elif nf.rms_dbfs >= NOISE_FLOOR_WARN_DBFS:
+        findings.append(Finding(
+            level="warn", code="A-NOISE-FLOOR-NOISY",
+            msg=f"Noise floor {nf.rms_dbfs:+.1f} dBFS during silences — "
+                f"audible in pauses (target ≤ {TARGET_NOISE_FLOOR_DBFS:.0f} dBFS). "
+                f"Auphonic's noise reduction may help but ideal is to fix "
+                f"the source.",
+            fix="Apply Auphonic's noise-reduction at medium strength, OR "
+                "rerun ffmpeg with anlmdn / afftdn filter before mastering.",
+        ))
+    else:
+        findings.append(Finding(
+            level="ok", code="A-NOISE-FLOOR",
+            msg=f"Noise floor {nf.rms_dbfs:+.1f} dBFS — quiet recording environment.",
+        ))
+    return findings
+
+
 def _fmt_timestamp(seconds: float) -> str:
     """0:12.3 / 1:23.4 / 12:34.5 format. Sub-minute pads to 0:SS.S."""
     minutes = int(seconds // 60)
@@ -415,18 +699,44 @@ def _fmt_timestamp(seconds: float) -> str:
 def audit_audio(
     wav_path: Path,
     silence_min_sec: float = DEFAULT_SILENCE_MIN_SEC,
+    measure_envelope: bool = True,
+    measure_floor: bool = True,
 ) -> AuditReport:
-    """Probe + measure + detect silences + run all checks. Returns full report."""
+    """Probe + measure + detect silences + run all checks. Returns full report.
+
+    `measure_envelope` and `measure_floor` toggle the newer, slower
+    ffmpeg passes (each runs the file once). Off by default in CI /
+    test contexts that want only the cheap pre-flight checks.
+    """
     probe = probe_audio(wav_path)
     loud = measure_loudness(wav_path)
-    silences = detect_silences(wav_path, min_duration_sec=silence_min_sec)
+    silences = detect_silences(
+        wav_path,
+        min_duration_sec=min(0.5, silence_min_sec),  # measure noise on shorter silences too
+    )
+    # Long-silence detection uses the user-facing threshold for the warn finding
+    long_silences = [s for s in silences if s.duration_sec >= silence_min_sec]
+
+    envelope: Optional[RmsEnvelope] = None
+    if measure_envelope:
+        # Pass the already-probed sample_rate so measure_rms_envelope
+        # doesn't re-probe (saves one ffprobe invocation).
+        envelope = measure_rms_envelope(
+            wav_path, sample_rate=probe.sample_rate or None,
+        )
+    floor: Optional[NoiseFloor] = None
+    if measure_floor:
+        floor = measure_noise_floor(wav_path, silences)
 
     report = AuditReport(
-        wav_path=wav_path, probe=probe, loudness=loud, silences=silences,
+        wav_path=wav_path, probe=probe, loudness=loud,
+        silences=long_silences, rms_envelope=envelope, noise_floor=floor,
     )
     report.findings.extend(check_format(probe))
     report.findings.extend(check_loudness(loud))
-    report.findings.extend(check_silences(silences, silence_min_sec))
+    report.findings.extend(check_silences(long_silences, silence_min_sec))
+    report.findings.extend(check_rms_envelope(envelope))
+    report.findings.extend(check_noise_floor(floor))
     return report
 
 
@@ -456,6 +766,35 @@ def render_report_md(report: AuditReport) -> str:
             f"LRA {report.loudness.lra:.1f}"
         )
         lines.append("")
+    if report.rms_envelope and report.rms_envelope.samples_dbfs:
+        lines.append(
+            f"**RMS envelope:** mean {report.rms_envelope.mean_dbfs:+.1f} dBFS · "
+            f"σ {report.rms_envelope.std_dbfs:.1f} dB across "
+            f"{report.rms_envelope.window_sec:.0f}s windows "
+            f"({len(report.rms_envelope.samples_dbfs)} bins)"
+        )
+        lines.append("")
+    if report.noise_floor is not None:
+        lines.append(
+            f"**Noise floor:** {report.noise_floor.rms_dbfs:+.1f} dBFS "
+            f"(measured over {report.noise_floor.silence_seconds_measured:.1f}s "
+            f"of silence)"
+        )
+        lines.append("")
+
+    # Auphonic-ready composite banner: a single go/no-go signal that the
+    # operator can read at a glance before submitting.
+    ready_icon = "✓" if report.auphonic_ready else "✗"
+    ready_label = "READY FOR MASTERING" if report.auphonic_ready else "FIX BEFORE MASTERING"
+    lines.append(f"**Auphonic-ready:** {ready_icon} **{ready_label}**")
+    if not report.auphonic_ready:
+        lines.append(
+            "_Auphonic can normalize loudness + reduce noise + de-ess, but it "
+            "can't fix wrong channels / lossy source / hard-clipped peaks / "
+            "material loudness drift / extreme noise floors. Address the "
+            "blocking findings below before submission._"
+        )
+    lines.append("")
 
     lines.append("## Findings")
     lines.append("")
@@ -522,6 +861,14 @@ def main() -> int:
         "--strict", action="store_true",
         help="Exit 1 on warnings as well as errors.",
     )
+    parser.add_argument(
+        "--no-envelope", action="store_true",
+        help="Skip the RMS envelope measurement (faster; loses drift detection).",
+    )
+    parser.add_argument(
+        "--no-noise-floor", action="store_true",
+        help="Skip the noise-floor measurement (faster; loses room-tone signal).",
+    )
     args = parser.parse_args()
 
     _ensure_ffmpeg()
@@ -536,7 +883,11 @@ def main() -> int:
         print(f"✗ WAV not found: {wav_path}", file=sys.stderr)
         return 2
 
-    report = audit_audio(wav_path, silence_min_sec=args.silence_min)
+    report = audit_audio(
+        wav_path, silence_min_sec=args.silence_min,
+        measure_envelope=not args.no_envelope,
+        measure_floor=not args.no_noise_floor,
+    )
     rendered = render_report_md(report)
 
     if args.stdout:

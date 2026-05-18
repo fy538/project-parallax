@@ -403,3 +403,296 @@ class TestIntegration:
         )
         assert result.returncode == 2
         assert "not found" in result.stderr
+
+
+# ── New: RMS envelope parsing ──────────────────────────────────────────────
+
+
+class TestParseAstatsEnvelope:
+    def test_empty_input_returns_empty(self):
+        env = aq.parse_astats_envelope("")
+        assert env.samples_dbfs == []
+
+    def test_skips_inf_nan_readings(self):
+        # Frames that are silent produce -inf RMS — must be filtered
+        text = (
+            "pts_time:0.5\nRMS level dB: -inf\n"
+            "pts_time:1.5\nRMS level dB: -23.4\n"
+            "pts_time:2.5\nRMS level dB: nan\n"
+        )
+        env = aq.parse_astats_envelope(text, window_sec=5.0)
+        # Only the -23.4 reading survives the inf/nan filter; falls in bin 0
+        assert env.samples_dbfs == [-23.4]
+
+    def test_bins_by_window(self):
+        # Two frames in bin 0 (pts < 5), one in bin 1 (pts ≥ 5)
+        text = (
+            "pts_time:1.0\nRMS level dB: -20.0\n"
+            "pts_time:3.0\nRMS level dB: -22.0\n"
+            "pts_time:7.0\nRMS level dB: -18.0\n"
+        )
+        env = aq.parse_astats_envelope(text, window_sec=5.0)
+        assert len(env.samples_dbfs) == 2
+        assert env.samples_dbfs[0] == pytest.approx(-21.0)
+        assert env.samples_dbfs[1] == pytest.approx(-18.0)
+
+
+# ── New: noise-floor parser ────────────────────────────────────────────────
+
+
+class TestParseVolumedetect:
+    def test_basic_extraction(self):
+        text = "[Parsed_volumedetect_0] mean_volume: -52.3 dB\n"
+        assert aq.parse_volumedetect_mean_dbfs(text) == -52.3
+
+    def test_no_match_returns_none(self):
+        assert aq.parse_volumedetect_mean_dbfs("nothing here") is None
+
+
+# ── New: check_rms_envelope ────────────────────────────────────────────────
+
+
+class TestCheckRmsEnvelope:
+    def test_consistent_take_ok(self):
+        env = aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-20.0, -20.5, -20.1, -19.8])
+        findings = aq.check_rms_envelope(env)
+        assert len(findings) == 1
+        assert findings[0].level == "ok"
+
+    def test_drift_warns(self):
+        # std-dev of [-20,-10,-25,-15] ≈ 6.45 — between WARN (6) and ERROR (10)
+        env = aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-20.0, -10.0, -25.0, -15.0])
+        findings = aq.check_rms_envelope(env)
+        assert findings[0].level == "warn"
+        assert findings[0].code == "A-RMS-DRIFT"
+
+    def test_material_drift_errors(self):
+        env = aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-30.0, -10.0, -5.0, -35.0])
+        findings = aq.check_rms_envelope(env)
+        assert findings[0].level == "error"
+        assert "MATERIAL" in findings[0].code
+
+    def test_none_envelope_no_findings(self):
+        assert aq.check_rms_envelope(None) == []
+
+    def test_single_sample_no_findings(self):
+        env = aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-20.0])
+        assert aq.check_rms_envelope(env) == []
+
+
+# ── New: check_noise_floor ─────────────────────────────────────────────────
+
+
+class TestCheckNoiseFloor:
+    def test_quiet_room_ok(self):
+        nf = aq.NoiseFloor(rms_dbfs=-58.0, silence_seconds_measured=5.0)
+        findings = aq.check_noise_floor(nf)
+        assert findings[0].level == "ok"
+
+    def test_noisy_warns(self):
+        nf = aq.NoiseFloor(rms_dbfs=-40.0, silence_seconds_measured=5.0)
+        findings = aq.check_noise_floor(nf)
+        assert findings[0].level == "warn"
+        assert "NOISY" in findings[0].code
+
+    def test_unsalvageable_errors(self):
+        nf = aq.NoiseFloor(rms_dbfs=-30.0, silence_seconds_measured=5.0)
+        findings = aq.check_noise_floor(nf)
+        assert findings[0].level == "error"
+        assert "LOUD" in findings[0].code
+
+    def test_none_floor_no_findings(self):
+        assert aq.check_noise_floor(None) == []
+
+
+# ── New: auphonic_ready composite ──────────────────────────────────────────
+
+
+class TestAuphonicReady:
+    def _make_report(self, findings=None):
+        probe = aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        )
+        return aq.AuditReport(
+            wav_path=Path("/tmp/x.wav"), probe=probe,
+            loudness=aq.LoudnessReport(
+                integrated_lufs=-14.5, true_peak_db=-1.5, lra=8.0,
+            ),
+            findings=findings or [],
+        )
+
+    def test_clean_report_is_ready(self):
+        assert self._make_report().auphonic_ready is True
+
+    def test_errors_block_ready(self):
+        report = self._make_report([
+            aq.Finding(level="error", code="A-DURATION-TOO-SHORT", msg="x"),
+        ])
+        assert report.auphonic_ready is False
+
+    def test_channel_warning_blocks_ready(self):
+        report = self._make_report([
+            aq.Finding(level="warn", code="A-CHANNELS", msg="stereo"),
+        ])
+        assert report.auphonic_ready is False
+
+    def test_rms_drift_warning_blocks_ready(self):
+        report = self._make_report([
+            aq.Finding(level="warn", code="A-RMS-DRIFT", msg="drift"),
+        ])
+        assert report.auphonic_ready is False
+
+    def test_noisy_floor_warning_blocks_ready(self):
+        report = self._make_report([
+            aq.Finding(level="warn", code="A-NOISE-FLOOR-NOISY", msg="noisy"),
+        ])
+        assert report.auphonic_ready is False
+
+    def test_silence_warning_does_not_block(self):
+        report = self._make_report([
+            aq.Finding(level="warn", code="A-SILENCE-LONG", msg="5s gap"),
+        ])
+        assert report.auphonic_ready is True
+
+    def test_lufs_warning_does_not_block(self):
+        report = self._make_report([
+            aq.Finding(level="warn", code="A-LUFS-OUT-OF-SPEC", msg="too quiet"),
+        ])
+        assert report.auphonic_ready is True
+
+
+# ── New: render includes Auphonic-ready banner ─────────────────────────────
+
+
+class TestRenderAuphonicReady:
+    def _make_report(self, ready=True):
+        probe = aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        )
+        loud = aq.LoudnessReport(integrated_lufs=-14.5, true_peak_db=-1.5, lra=8.0)
+        findings = []
+        if not ready:
+            findings.append(aq.Finding(
+                level="error", code="A-DURATION-TOO-SHORT", msg="too short",
+            ))
+        return aq.AuditReport(
+            wav_path=Path("/tmp/x.wav"), probe=probe, loudness=loud,
+            findings=findings,
+        )
+
+    def test_ready_banner_in_render(self):
+        out = aq.render_report_md(self._make_report(ready=True))
+        assert "Auphonic-ready" in out
+        assert "READY FOR MASTERING" in out
+
+    def test_not_ready_banner_in_render(self):
+        out = aq.render_report_md(self._make_report(ready=False))
+        assert "FIX BEFORE MASTERING" in out
+
+
+# ── New: skip-flag plumbing ────────────────────────────────────────────────
+
+
+class TestSkipFlagsActuallySkip:
+    """Verify --no-envelope / --no-noise-floor actually skip work, so
+    a regression doesn't silently keep running the slow ffmpeg passes."""
+
+    def test_audit_skips_envelope_when_disabled(self, monkeypatch, tmp_path):
+        # Stub out the slow measurements so we don't need ffmpeg
+        monkeypatch.setattr(aq, "probe_audio", lambda p: aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        ))
+        monkeypatch.setattr(aq, "measure_loudness", lambda p: aq.LoudnessReport(
+            integrated_lufs=-16.0, true_peak_db=-2.0, lra=8.0,
+        ))
+        monkeypatch.setattr(aq, "detect_silences", lambda *a, **kw: [])
+
+        env_called = {"n": 0}
+        def fake_env(*a, **kw):
+            env_called["n"] += 1
+            return aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-20.0, -20.0])
+        monkeypatch.setattr(aq, "measure_rms_envelope", fake_env)
+
+        # With measure_envelope=False, fake_env must NOT be called
+        report = aq.audit_audio(
+            tmp_path / "x.wav", measure_envelope=False, measure_floor=False,
+        )
+        assert env_called["n"] == 0
+        assert report.rms_envelope is None
+
+    def test_audit_skips_noise_floor_when_disabled(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(aq, "probe_audio", lambda p: aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        ))
+        monkeypatch.setattr(aq, "measure_loudness", lambda p: None)
+        monkeypatch.setattr(aq, "detect_silences", lambda *a, **kw: [])
+
+        floor_called = {"n": 0}
+        def fake_floor(*a, **kw):
+            floor_called["n"] += 1
+            return None
+        monkeypatch.setattr(aq, "measure_noise_floor", fake_floor)
+
+        report = aq.audit_audio(
+            tmp_path / "x.wav", measure_envelope=False, measure_floor=False,
+        )
+        assert floor_called["n"] == 0
+        assert report.noise_floor is None
+
+    def test_audit_runs_envelope_when_enabled(self, monkeypatch, tmp_path):
+        # Symmetric: when enabled, the function IS called
+        monkeypatch.setattr(aq, "probe_audio", lambda p: aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        ))
+        monkeypatch.setattr(aq, "measure_loudness", lambda p: None)
+        monkeypatch.setattr(aq, "detect_silences", lambda *a, **kw: [])
+
+        env_called = {"n": 0}
+        def fake_env(*a, **kw):
+            env_called["n"] += 1
+            return aq.RmsEnvelope(window_sec=5.0, samples_dbfs=[-20.0, -20.0])
+        monkeypatch.setattr(aq, "measure_rms_envelope", fake_env)
+
+        aq.audit_audio(
+            tmp_path / "x.wav", measure_envelope=True, measure_floor=False,
+        )
+        assert env_called["n"] == 1
+
+
+# ── New: integration with new fields ───────────────────────────────────────
+
+
+class TestAuditIntegrationNewFields:
+    """Smoke that audit_audio composes the new fields into the report."""
+
+    def test_report_carries_envelope_and_floor_when_measured(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(aq, "probe_audio", lambda p: aq.ProbeReport(
+            duration_sec=60.0, sample_rate=48000, channels=1,
+            codec="pcm_s24le", bit_depth=24,
+        ))
+        monkeypatch.setattr(aq, "measure_loudness", lambda p: aq.LoudnessReport(
+            integrated_lufs=-14.5, true_peak_db=-1.5, lra=7.0,
+        ))
+        monkeypatch.setattr(aq, "detect_silences", lambda *a, **kw: [
+            aq.SilenceEvent(start_sec=10.0, end_sec=12.0, duration_sec=2.0),
+        ])
+        monkeypatch.setattr(aq, "measure_rms_envelope", lambda *a, **kw: aq.RmsEnvelope(
+            window_sec=5.0, samples_dbfs=[-20.0, -20.5, -19.8],
+        ))
+        monkeypatch.setattr(aq, "measure_noise_floor", lambda *a, **kw: aq.NoiseFloor(
+            rms_dbfs=-58.0, silence_seconds_measured=2.0,
+        ))
+        report = aq.audit_audio(tmp_path / "x.wav")
+        assert report.rms_envelope is not None
+        assert report.noise_floor is not None
+        # New findings should land in the report
+        finding_codes = {f.code for f in report.findings}
+        assert "A-RMS-DRIFT" in finding_codes
+        assert "A-NOISE-FLOOR" in finding_codes
+        # Auphonic-ready since everything is clean
+        assert report.auphonic_ready is True
