@@ -54,6 +54,15 @@ SCHEMAS = [
         "episodes/*/shot-list.json",
         "data/shot-list.schema.json",
     ),
+    # Visual-identity files were schema-less when Tier 4 wired up
+    # `npm run gen:types` for the cross-language types. The TS side
+    # (`remotion-templates/src/types/generated/visual-identity.d.ts`) was
+    # locked to the schema while the Python producer side wasn't — half-
+    # wired contract. Audit P1 fix May 18, 2026.
+    (
+        "episodes/*/visual-identity.json",
+        "data/visual-identity.schema.json",
+    ),
 ]
 
 # Palette source of truth (L19). Hex values here are normalized lowercase.

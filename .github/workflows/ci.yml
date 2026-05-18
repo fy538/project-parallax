@@ -32,7 +32,13 @@ jobs:
           cache-dependency-path: remotion-templates/package-lock.json
 
       - name: Install Python deps
-        run: pip install pytest pytest-cov jsonschema
+        # `pip install -e '.[dev]'` reads pyproject.toml and pulls in pytest,
+        # pytest-cov, ruff, jsonschema, requests. The bare `pip install` line
+        # we had before was missing ruff entirely — `scripts/lint.sh` then
+        # silently skipped the ruff check (its `if ruff --version` guard
+        # protects fresh clones), so a new BLE001 / unused-import could land
+        # on main without anyone noticing. Audit P0 fix May 18, 2026.
+        run: pip install -e '.[dev]'
 
       - name: Install Node deps
         run: cd remotion-templates && npm ci
@@ -72,7 +78,12 @@ jobs:
           cache-dependency-path: remotion-templates/package-lock.json
 
       - name: Install Python deps
-        run: pip install pytest jsonschema
+        # macos-smoke runs Vitest + tsc but invokes Python only via
+        # tools/lint/polish_lint.py from scripts/check-episode.sh-style
+        # paths; the lighter dep set (no ruff/cov) is fine here. Keep
+        # parallel to the linux test job's deps to avoid drift —
+        # pyproject.toml is the single source of truth.
+        run: pip install -e '.'
 
       - name: Install Node deps
         run: cd remotion-templates && npm ci
