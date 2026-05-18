@@ -77,6 +77,14 @@ fi
 run "gen:types:check (cross-language schema → .d.ts freshness)" \
   bash -c "cd remotion-templates && npm run gen:types:check --silent"
 
+# ─── Pipeline dashboard HTML fresh ────────────────────────────────────────
+# tools/pipeline_dashboard/index.html is auto-generated from
+# pipeline-state.json + per-episode _status.md + project/IDEAS.md. If any
+# source drifts ahead of the HTML, this fails — same "single source of
+# truth" gate pattern as gen:types:check above.
+run "pipeline_validator --emit-html --check (dashboard HTML freshness)" \
+  python3 tools/pipeline_validator.py --emit-html --check
+
 # ─── Doc-link sanity (cheap; checks cross-references) ──────────────────────
 if [ -x ./scripts/check-docs.sh ]; then
   run "check-docs.sh" ./scripts/check-docs.sh

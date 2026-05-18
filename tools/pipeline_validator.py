@@ -1457,6 +1457,26 @@ def main() -> int:
             "stateEnteredAt to today). No-op without --suggest-states."
         ),
     )
+    parser.add_argument(
+        "--emit-html",
+        action="store_true",
+        help=(
+            "Regenerate the visual pipeline dashboard at "
+            "tools/pipeline_dashboard/index.html from current state. Reads "
+            "the same data sources as --write-status (pipeline-state.json + "
+            "per-episode _status.md inputs) plus project/IDEAS.md for the "
+            "Topics tab. Pair with --check for a freshness-only gate."
+        ),
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help=(
+            "With --emit-html: don't write, compare instead. Exit 1 if the "
+            "committed HTML differs from what would be generated now. Wired "
+            "into scripts/lint.sh as the gen:pipeline-html freshness gate."
+        ),
+    )
     args = parser.parse_args()
 
     # ── --suggest-states path ────────────────────────────────────────────────
@@ -1506,6 +1526,13 @@ def main() -> int:
         else:
             print("Run with --apply to write these to pipeline-state.json.")
         return 0
+
+    # ── --emit-html path ─────────────────────────────────────────────────────
+    # Delegate to pipeline_html.emit_html — handles both write + --check
+    # freshness comparison. Exits without running the legacy flow.
+    if args.emit_html:
+        from pipeline_html import emit_html
+        return emit_html(check=args.check)
 
     # ── --write-status / --update-tracker / --check-only path ────────────────
     # When any of these flags is set, run the new pipeline-state-driven flow
