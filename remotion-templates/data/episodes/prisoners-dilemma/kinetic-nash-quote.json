@@ -9,6 +9,7 @@
   "durationSec": 5,
   "source": "Flood (1952), RAND RM-789-1",
   "_direction": {
-    "textAnimation": "quote-attribution"
+    "textAnimation": "quote-attribution",
+    "isCallback": true
   }
 }
