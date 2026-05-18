@@ -69,6 +69,11 @@ import { BumpChart } from "../templates/BumpChart/BumpChart";
 import { PopulationPyramid } from "../templates/PopulationPyramid/PopulationPyramid";
 import { RankChangeDotPlot } from "../templates/RankChangeDotPlot/RankChangeDotPlot";
 import { IsotypeChart } from "../templates/IsotypeChart/IsotypeChart";
+// OutcomePartition — Aesthetic C from the May 17, 2026 decision-tree
+// research pass; the only new editorial template (the other three
+// aesthetics ship as DecisionTree variants).
+import { OutcomePartition } from "../templates/OutcomePartition/OutcomePartition";
+import { outcomePartitionSampleData } from "../templates/OutcomePartition";
 // Phase 4 editorial-native templates (May 17, 2026)
 import { Slopegraph } from "../templates/Slopegraph/Slopegraph";
 import { KPICard } from "../templates/KPICard/KPICard";
@@ -562,12 +567,36 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   // ── Scenarios ──
   sectionSegment(
     "Scenarios",
-    "DecisionTree · GameBoard × 3"
+    "DecisionTree × 4 aesthetics (extensive · ladder · indented · spine) · OutcomePartition · GameBoard × 3"
   ),
-  slateSegment("Scenarios", "DecisionTree", "chess-opening"),
+  slateSegment("Scenarios", "DecisionTree-extensive", "chess-opening"),
   {
     durationSec: catalogScenariosData.treeChessOpening.durationSec ?? 12,
     render: () => <DecisionTree data={still(catalogScenariosData.treeChessOpening)} />,
+  },
+  // Three new decision-tree aesthetics from the May 17, 2026 research pass —
+  // ladder (polished), indented manuscript-tree, and stem-and-leaf spine.
+  slateSegment("Scenarios", "DecisionTree-ladder", "excomm-1962"),
+  {
+    durationSec: catalogScenariosData.treeExCommLadder.durationSec ?? 14,
+    render: () => <DecisionTree data={still(catalogScenariosData.treeExCommLadder)} />,
+  },
+  slateSegment("Scenarios", "DecisionTree-indented", "tariff-response"),
+  {
+    durationSec: catalogScenariosData.treePolicyIndented.durationSec ?? 14,
+    render: () => <DecisionTree data={still(catalogScenariosData.treePolicyIndented)} />,
+  },
+  slateSegment("Scenarios", "DecisionTree-spine", "quarantine-decision"),
+  {
+    durationSec: catalogScenariosData.treeTaiwanSpine.durationSec ?? 14,
+    render: () => <DecisionTree data={still(catalogScenariosData.treeTaiwanSpine)} />,
+  },
+  // OutcomePartition — separate template, Aesthetic C from the same research
+  // pass (RAND / De Stijl partition-map register).
+  slateSegment("Scenarios", "OutcomePartition", "taiwan-decision-space"),
+  {
+    durationSec: outcomePartitionSampleData.durationSec ?? 12,
+    render: () => <OutcomePartition data={outcomePartitionSampleData} />,
   },
   slateSegment("Scenarios", "GameBoard", "chess-endgame"),
   {
