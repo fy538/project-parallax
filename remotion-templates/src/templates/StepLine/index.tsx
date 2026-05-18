@@ -4,7 +4,7 @@ import { layout, sec } from "../../design/theme";
 import { StepLineSchema } from "./schema";
 import type { StepLineData } from "./types";
 
-const sampleData: StepLineData = {
+export const stepLineSampleData: StepLineData = {
   episode: "_catalog",
   title: "Fed funds rate, 2020–2024.",
   source: "FRED — Federal Funds Effective Rate.",
@@ -46,6 +46,6 @@ export const StepLineComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as StepLineData }}
+    defaultProps={{ data: stepLineSampleData as StepLineData }}
   />
 );

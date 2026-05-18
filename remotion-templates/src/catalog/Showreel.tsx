@@ -69,6 +69,11 @@ import { BumpChart } from "../templates/BumpChart/BumpChart";
 import { PopulationPyramid } from "../templates/PopulationPyramid/PopulationPyramid";
 import { RankChangeDotPlot } from "../templates/RankChangeDotPlot/RankChangeDotPlot";
 import { IsotypeChart } from "../templates/IsotypeChart/IsotypeChart";
+// Phase 4 editorial-native templates (May 17, 2026)
+import { Slopegraph } from "../templates/Slopegraph/Slopegraph";
+import { KPICard } from "../templates/KPICard/KPICard";
+import { BulletChart } from "../templates/BulletChart/BulletChart";
+import { StepLine } from "../templates/StepLine/StepLine";
 
 // Catalog data
 import { catalogMapsData } from "./Maps";
@@ -372,6 +377,68 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogDataData.dumbbellIncome.durationSec ?? 14,
     render: () => <DumbbellPlot data={still(catalogDataData.dumbbellIncome)} />,
+  },
+
+  // ── Editorial-native charts (Phase 4 — May 17, 2026) ──
+  // Four new chart forms built to fill specific editorial niches that the
+  // legacy DataChart/TimeSeriesChart couldn't reach: slope/before-after,
+  // hero KPI + sparkline, target-vs-actual with qualitative bands, and
+  // stepped (non-interpolated) time series. Each ships with EditorialFrame
+  // composition by default (kicker + heroStat + chrome).
+  sectionSegment(
+    "Editorial Charts",
+    "Slopegraph · KPICard · BulletChart · StepLine — four new editorial-native chart forms"
+  ),
+  slateSegment("Data", "Slopegraph", "nato-defense-spending"),
+  {
+    durationSec: catalogDataData.slopegraphNATO.durationSec ?? 8,
+    render: () => <Slopegraph data={still(catalogDataData.slopegraphNATO)} />,
+  },
+  slateSegment("Data", "KPICard", "tsmc-fab-capacity"),
+  {
+    durationSec: catalogDataData.kpiCardTSMC.durationSec ?? 6,
+    render: () => <KPICard data={still(catalogDataData.kpiCardTSMC)} />,
+  },
+  slateSegment("Data", "BulletChart", "forecast-accuracy"),
+  {
+    durationSec: catalogDataData.bulletForecastAccuracy.durationSec ?? 7,
+    render: () => <BulletChart data={still(catalogDataData.bulletForecastAccuracy)} />,
+  },
+  slateSegment("Data", "StepLine", "fed-funds-rate"),
+  {
+    durationSec: catalogDataData.stepLineFedFunds.durationSec ?? 8,
+    render: () => <StepLine data={still(catalogDataData.stepLineFedFunds)} />,
+  },
+
+  // ── EditorialFrame · publication composition (Phase 1-6, May 14-17 2026) ──
+  // Migrated chart templates rendered with their production frame blocks
+  // (kicker + title + dek + heroStat + annotations + chrome). These are the
+  // NYT-Upshot / FT / Economist register the editorial-frame architecture
+  // was built for; the regular Data section above shows the chart-only
+  // intelligence-briefing render. Compare the two for the same template.
+  sectionSegment(
+    "EditorialFrame · Publication Composition",
+    "DataChart · TimeSeriesChart · ProbabilityGauge with frame blocks — kicker + heroStat + chrome from production episode data"
+  ),
+  slateSegment("EditorialFrame", "DataChart-bar", "chips-act-funding-pipeline"),
+  {
+    durationSec: catalogDataData.efChipsAct.durationSec ?? 6,
+    render: () => <DataChart data={still(catalogDataData.efChipsAct)} />,
+  },
+  slateSegment("EditorialFrame", "DataChart-comparison", "lithography-gap"),
+  {
+    durationSec: catalogDataData.efLithography.durationSec ?? 8,
+    render: () => <DataChart data={still(catalogDataData.efLithography)} />,
+  },
+  slateSegment("EditorialFrame", "TimeSeriesChart", "smic-7nm-yield"),
+  {
+    durationSec: catalogDataData.efSmicYield.durationSec ?? 5,
+    render: () => <TimeSeriesChart data={still(catalogDataData.efSmicYield)} />,
+  },
+  slateSegment("EditorialFrame", "ProbabilityGauge-forecast", "pd-cooperation-2025"),
+  {
+    durationSec: catalogDataData.efForecastPD.durationSec ?? 10,
+    render: () => <ProbabilityGauge data={still(catalogDataData.efForecastPD)} />,
   },
 
   // ── Motion-Identity ──

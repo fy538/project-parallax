@@ -4,7 +4,7 @@ import { layout, sec } from "../../design/theme";
 import { BulletChartSchema } from "./schema";
 import type { BulletChartData } from "./types";
 
-const sampleData: BulletChartData = {
+export const bulletChartSampleData: BulletChartData = {
   episode: "_catalog",
   title: "Forecast accuracy vs commitment, 2024.",
   unit: "%",
@@ -39,6 +39,6 @@ export const BulletChartComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as BulletChartData }}
+    defaultProps={{ data: bulletChartSampleData as BulletChartData }}
   />
 );

@@ -4,7 +4,7 @@ import { layout, sec } from "../../design/theme";
 import { KPICardSchema } from "./schema";
 import type { KPICardData } from "./types";
 
-const sampleData: KPICardData = {
+export const kpiCardSampleData: KPICardData = {
   episode: "_catalog",
   title: "TSMC controls cutting-edge production",
   value: "92",
@@ -37,6 +37,6 @@ export const KPICardComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as KPICardData }}
+    defaultProps={{ data: kpiCardSampleData as KPICardData }}
   />
 );

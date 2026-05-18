@@ -78,6 +78,24 @@ import { CATALOG_EPISODE, catalogId } from "./helpers";
 import bumpGdpData from "../../data/episodes/catalog/bump-chart-gdp.json";
 import pyramidChinaData from "../../data/episodes/catalog/population-pyramid-china.json";
 
+// Phase 4 editorial-native template sample data — re-exported from each
+// template's index.tsx so the showreel can render them without duplicating
+// the data inline.
+import { slopegraphSampleData } from "../templates/Slopegraph";
+import { kpiCardSampleData } from "../templates/KPICard";
+import { bulletChartSampleData } from "../templates/BulletChart";
+import { stepLineSampleData } from "../templates/StepLine";
+
+// Production-episode JSON with EditorialFrame `frame` blocks — drives the
+// "EditorialFrame · publication composition" section of the showreel so
+// viewers see the kicker + heroStat + annotations + chrome stack the
+// architecture actually ships in episodes (rather than the legacy
+// chart-only renders that the regular Data section already covers).
+import chartChipsActData from "../../data/episodes/silicon-trap/chart-chips-act.json";
+import chartLithographyData from "../../data/episodes/silicon-trap/chart-lithography.json";
+import timeseriesSmicYieldData from "../../data/episodes/silicon-trap/timeseries-smic-yield.json";
+import forecastPdCooperationData from "../../data/episodes/prisoners-dilemma/forecast-pd-cooperation.json";
+
 // ─── StatReveal — three different scale categories ────────────────────────
 
 const statApollo: StatRevealData = {
@@ -1559,6 +1577,14 @@ const pyramidChina = pyramidChinaData as PopulationPyramidData;
 const isotypeChips = isotypeChipsData as IsotypeChartData;
 const rankChangeSemiconductorsTyped = rankChangeSemiconductors as RankChangeDotPlotData;
 
+// Frame-equipped production data for the EditorialFrame showcase. The JSON
+// loader returns `any`; assert the schema-validated shape here so the
+// showreel doesn't have to repeat the cast at every call site.
+const chartChipsAct = chartChipsActData as unknown as DataChartData;
+const chartLithography = chartLithographyData as unknown as DataChartData;
+const timeseriesSmicYield = timeseriesSmicYieldData as unknown as TimeSeriesChartData;
+const forecastPdCooperation = forecastPdCooperationData as unknown as ProbabilityGaugeData;
+
 export const catalogDataData = {
   statApollo, statMariana, statHabitable,
   chartMountains, chartSpaceRace, chartAxelrodRankings, chartOlympicsSmallMultiples,
@@ -1584,4 +1610,14 @@ export const catalogDataData = {
   horizonBRICSFX,
   horizonBRICSShared,
   dumbbellIncome,
+  // Phase 4 editorial-native templates (May 17, 2026)
+  slopegraphNATO: slopegraphSampleData,
+  kpiCardTSMC: kpiCardSampleData,
+  bulletForecastAccuracy: bulletChartSampleData,
+  stepLineFedFunds: stepLineSampleData,
+  // EditorialFrame showcase — production episode data with frame blocks
+  efChipsAct: chartChipsAct,
+  efLithography: chartLithography,
+  efSmicYield: timeseriesSmicYield,
+  efForecastPD: forecastPdCooperation,
 };

@@ -10,7 +10,7 @@ import type { SlopegraphData } from "./types";
  * against the trend" story unmistakable — most NATO members raised
  * spending; a few stayed flat.
  */
-const sampleData: SlopegraphData = {
+export const slopegraphSampleData: SlopegraphData = {
   episode: "_catalog",
   title: "Most NATO members raised defense spending after February 2022.",
   leftLabel: "2021",
@@ -55,6 +55,6 @@ export const SlopegraphComposition = () => (
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: sampleData as SlopegraphData }}
+    defaultProps={{ data: slopegraphSampleData as SlopegraphData }}
   />
 );
