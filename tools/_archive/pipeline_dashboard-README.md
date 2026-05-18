@@ -1,6 +1,14 @@
-# `tools/pipeline_dashboard/`
+# `tools/pipeline_dashboard/` (archived May 18, 2026)
 
-A self-contained HTML rendering of the Parallax episode pipeline. Open `index.html` in a browser (or drop into Claude.ai's cowork pane) to see at-a-glance state, per-episode progress, and "what to work on next."
+**This directory is gone.** The HTML dashboard moved to `episodes/PIPELINE.html` — sibling to `PIPELINE.md` so the visual + Markdown surfaces sit together. The emitter (`tools/pipeline_html.py`) and parser (`tools/topics_parser.py`) stay under `tools/`.
+
+This README is preserved in `tools/_archive/` because it carries the original architectural rationale + design notes that informed the dashboard. Read the live `episodes/PIPELINE.md` header for the current canonical entry point.
+
+---
+
+## (Original contents — for historical reference)
+
+A self-contained HTML rendering of the Parallax episode pipeline. Open `episodes/PIPELINE.html` in a browser (or drop into Claude.ai's cowork pane) to see at-a-glance state, per-episode progress, and "what to work on next."
 
 ## Status
 

@@ -41,7 +41,12 @@ if TYPE_CHECKING:
     from topics_parser import TopicsData
 
 ROOT = get_project_root()
-DEFAULT_OUTPUT = ROOT / "tools" / "pipeline_dashboard" / "index.html"
+
+# Sibling to PIPELINE.md so the visual dashboard sits next to the Markdown
+# truth in episodes/. Originally lived at tools/pipeline_dashboard/index.html
+# (May 18, 2026 first wire-up); moved to episodes/ same day for cleaner
+# discoverability — the file's an output of the pipeline, not a tool itself.
+DEFAULT_OUTPUT = ROOT / "episodes" / "PIPELINE.html"
 
 
 # Per-episode accent color assignments. Stays in sync with the visual
@@ -282,19 +287,19 @@ def _next_action_for(s: EpisodeStatus) -> str:
     if s.zero_hit_count > 0:
         return (
             f"close the {s.zero_hit_count} zero-hit asset gap "
-            f"(<code>python3 tools/asset-source/zerohit_fallback.py {s.slug}</code>), "
+            f"(<code class=\"copyable\">python3 tools/asset-source/zerohit_fallback.py {s.slug}</code>), "
             f"then regen manifest + first full render."
         )
     if s.manifest_stale:
         return (
             f"regen stale manifest "
-            f"(<code>python3 tools/assembly/generate_manifest.py {s.slug}</code>), "
+            f"(<code class=\"copyable\">python3 tools/assembly/generate_manifest.py {s.slug}</code>), "
             f"then continue."
         )
     if s.has_manifest and not s.has_render:
         return (
             f"first full-episode render "
-            f"(<code>cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}</code>)."
+            f"(<code class=\"copyable\">cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}</code>)."
         )
     if s.has_render and not s.has_narration:
         return "record narration → assets/narration.wav → regenerate manifest in precise mode."
@@ -441,13 +446,13 @@ def _render_episode_health(s: EpisodeStatus) -> str:
         health.append((
             "🔴",
             f"Manifest stale ({s.manifest_stale_drift_str} drift) — "
-            f"<code>python3 tools/assembly/generate_manifest.py {s.slug}</code>",
+            f"<code class=\"copyable\">python3 tools/assembly/generate_manifest.py {s.slug}</code>",
         ))
     if s.zero_hit_count > 0:
         health.append((
             "🟡",
             f"{s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''} "
-            f"— <code>python3 tools/asset-source/zerohit_fallback.py {s.slug}</code>",
+            f"— <code class=\"copyable\">python3 tools/asset-source/zerohit_fallback.py {s.slug}</code>",
         ))
     if s.has_manifest and s.manifest_mode == "estimate" and s.has_narration:
         health.append((
@@ -458,7 +463,7 @@ def _render_episode_health(s: EpisodeStatus) -> str:
         health.append((
             "🟡",
             f"Manifest ready but never rendered — "
-            f"<code>cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}</code>",
+            f"<code class=\"copyable\">cd remotion-templates && node scripts/render-episode.mjs --episode={s.slug}</code>",
         ))
     if s.has_render and not s.has_narration:
         health.append((
@@ -564,8 +569,23 @@ def _render_topics_launch(topics: TopicsData) -> str:
 
 
 def _render_topics_signals(topics: TopicsData) -> str:
+    """Render the Signal Watch cards with a client-side filter box.
+
+    Filter is wired in _JS — it matches against the card's full text
+    (title + discovery path + arc + first-noticed + notes). Updates a
+    count display so the operator sees how many match the query.
+    """
     if not topics.signal_watch:
         return '    <div class="topics-empty">No signals parsed.</div>'
+    n = len(topics.signal_watch)
+    search_box = (
+        '    <div class="signals-search">\n'
+        '      <label for="signals-filter">Filter</label>\n'
+        '      <input id="signals-filter" type="search" '
+        'placeholder="search signals, arcs, discovery paths…" autocomplete="off">\n'
+        f'      <span id="signals-count" class="signal-count">{n} signals</span>\n'
+        '    </div>'
+    )
     cards = "\n".join(
         f'    <div class="signal-card">'
         f'<div class="signal-title">{_esc(sig.signal)}</div>'
@@ -578,7 +598,7 @@ def _render_topics_signals(topics: TopicsData) -> str:
         f'</div>'
         for sig in topics.signal_watch
     )
-    return f'    <div class="signals-list">\n{cards}\n    </div>'
+    return f'{search_box}\n    <div class="signals-list">\n{cards}\n    </div>'
 
 
 # ── CSS (kept inline so the file is a single drop-in artifact) ───────────────
@@ -757,6 +777,38 @@ _CSS = """
   .topics-source { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); }
   .topics-source code { background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); }
 
+  /* Click-to-copy on inline shell commands.
+     Any <code> wrapped in <code class=\"copyable\"> becomes hover-clickable;
+     the JS wires the actual clipboard write + visual feedback. */
+  code.copyable { cursor: pointer; position: relative; transition: background 0.12s; }
+  code.copyable:hover { background: var(--gold); color: var(--ink); }
+  code.copyable.copied { background: var(--gold); color: var(--ink); }
+  code.copyable.copied::after {
+    content: 'copied';
+    position: absolute;
+    top: -22px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 3px;
+    pointer-events: none; white-space: nowrap;
+    animation: copied-pop 1.2s ease-out forwards;
+  }
+  @keyframes copied-pop {
+    0% { opacity: 0; transform: translate(-50%, 4px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -4px); }
+  }
+
+  /* Signal-watch search box */
+  .signals-search { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 10px 14px; background: var(--paper); border: 1px solid var(--sand); border-radius: 4px; }
+  .signals-search label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+  .signals-search input { flex: 1; border: none; background: transparent; outline: none; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; color: var(--ink); }
+  .signals-search input::placeholder { color: var(--taupe); }
+  .signals-search .signal-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--walnut); letter-spacing: 0.06em; flex-shrink: 0; }
+  .signal-card[hidden] { display: none; }
+
   /* Footer */
   .source { max-width: 1240px; margin: 32px auto 0; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); line-height: 1.6; }
   .source code { color: var(--walnut); background: var(--bone); padding: 1px 5px; border-radius: 3px; }
@@ -764,7 +816,7 @@ _CSS = """
 
 
 _JS = """
-  // Tab switching — show the matching content panel, hide siblings.
+  // ── Tab switching ────────────────────────────────────────────────────────
   // Overview content is the unkeyed top-level (diagram + episodes-grid + next-up).
   // Per-episode + topics tabs have [data-tab-content="<slug>"] panels that
   // get toggled with [hidden]. Overview is shown when no per-episode tab
@@ -783,6 +835,53 @@ _JS = """
       showTab(tab.dataset.tab);
     });
   });
+
+  // ── Click-to-copy on shell commands ───────────────────────────────────────
+  // Every <code class=\"copyable\"> becomes clickable — the click writes the
+  // text content to the clipboard and flashes a "copied" indicator. Falls
+  // back silently on browsers without navigator.clipboard (cowork iframe
+  // sandbox can be restrictive; the visual hover still works).
+  document.querySelectorAll('code.copyable').forEach(el => {
+    el.title = 'Click to copy';
+    el.addEventListener('click', async () => {
+      const text = el.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fallback: select the text so the user can ⌘C manually
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 1200);
+    });
+  });
+
+  // ── Signal-watch search ──────────────────────────────────────────────────
+  // Filters .signal-card siblings by visible text (signal title + meta +
+  // notes + arc + discovery path). Case-insensitive substring match.
+  // Updates the count display so the operator sees "3 of 9 match".
+  const signalSearch = document.querySelector('#signals-filter');
+  if (signalSearch) {
+    const cards = Array.from(document.querySelectorAll('.signal-card'));
+    const countEl = document.querySelector('#signals-count');
+    const total = cards.length;
+    const update = () => {
+      const q = signalSearch.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach(card => {
+        const hit = !q || card.textContent.toLowerCase().includes(q);
+        card.hidden = !hit;
+        if (hit) shown++;
+      });
+      if (countEl) countEl.textContent = q ? `${shown} of ${total} match` : `${total} signals`;
+    };
+    signalSearch.addEventListener('input', update);
+    update();
+  }
 """
 
 

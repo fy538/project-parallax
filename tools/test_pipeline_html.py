@@ -202,6 +202,74 @@ def test_per_episode_tab_renders_health_zero_hit_chip():
     assert "21 zero-hit shot" in html
 
 
+def test_health_shell_commands_marked_copyable():
+    """Shell commands in the Health section should be click-to-copy.
+    Operator UX — the JS in _JS wires .copyable to clipboard.writeText."""
+    s = _make_status(slug="silicon-trap", zero_hit_count=21, manifest_stale=True)
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert 'class="copyable">python3 tools/asset-source/zerohit_fallback.py' in html
+    assert 'class="copyable">python3 tools/assembly/generate_manifest.py' in html
+
+
+def test_next_up_shell_commands_marked_copyable():
+    s = _make_status(slug="silicon-trap", zero_hit_count=21)
+    html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")
+    assert 'class="copyable">python3 tools/asset-source/zerohit_fallback.py silicon-trap' in html
+
+
+def test_copyable_js_handler_present():
+    """The JS that wires <code class='copyable'> to clipboard.writeText
+    must be in every emitted file — without it, copyable elements have
+    the hover-styled affordance but no actual copy on click."""
+    html = ph.render_dashboard_html([_make_status()], snapshot_date="2026-05-18")
+    assert "navigator.clipboard.writeText" in html
+    assert "code.copyable" in html
+
+
+# ── Signal-watch search ──────────────────────────────────────────────────────
+
+
+def test_signals_search_box_emitted_when_signals_present():
+    html = ph.render_dashboard_html(
+        [_make_status()],
+        topics=_make_topics(signals=3),
+        snapshot_date="2026-05-18",
+    )
+    assert 'id="signals-filter"' in html
+    assert 'id="signals-count"' in html
+    assert ">3 signals<" in html
+
+
+def test_signals_search_box_omitted_when_no_signals():
+    """Empty signal_watch list — search box would be confusing UI clutter."""
+    html = ph.render_dashboard_html(
+        [_make_status()],
+        topics=_make_topics(launch=1, signals=0, states=1),
+        snapshot_date="2026-05-18",
+    )
+    assert 'id="signals-filter"' not in html
+
+
+def test_signals_search_js_filter_handler_present():
+    """The JS handler must reference both the input id and the card
+    selector — otherwise the search input renders but does nothing."""
+    html = ph.render_dashboard_html(
+        [_make_status()],
+        topics=_make_topics(signals=2),
+        snapshot_date="2026-05-18",
+    )
+    assert "signals-filter" in html
+    assert "signal-card" in html
+
+
+def test_default_output_path_is_episodes_PIPELINE_html():
+    """The dashboard lives next to PIPELINE.md as a sibling output of the
+    pipeline. Was tools/pipeline_dashboard/index.html in the first wire-up;
+    moved May 18, 2026 for discoverability."""
+    assert ph.DEFAULT_OUTPUT.name == "PIPELINE.html"
+    assert ph.DEFAULT_OUTPUT.parent.name == "episodes"
+
+
 def test_per_episode_tab_renders_metric_rows():
     s = _make_status(manifest_duration_sec=893.8, manifest_segments=121, data_files=48)
     html = ph.render_dashboard_html([s], snapshot_date="2026-05-18")

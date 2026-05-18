@@ -1462,7 +1462,7 @@ def main() -> int:
         action="store_true",
         help=(
             "Regenerate the visual pipeline dashboard at "
-            "tools/pipeline_dashboard/index.html from current state. Reads "
+            "episodes/PIPELINE.html from current state. Reads "
             "the same data sources as --write-status (pipeline-state.json + "
             "per-episode _status.md inputs) plus project/IDEAS.md for the "
             "Topics tab. Pair with --check for a freshness-only gate."

@@ -183,6 +183,38 @@
   .topics-source { margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); }
   .topics-source code { background: var(--bone); padding: 1px 5px; border-radius: 3px; color: var(--walnut); }
 
+  /* Click-to-copy on inline shell commands.
+     Any <code> wrapped in <code class="copyable"> becomes hover-clickable;
+     the JS wires the actual clipboard write + visual feedback. */
+  code.copyable { cursor: pointer; position: relative; transition: background 0.12s; }
+  code.copyable:hover { background: var(--gold); color: var(--ink); }
+  code.copyable.copied { background: var(--gold); color: var(--ink); }
+  code.copyable.copied::after {
+    content: 'copied';
+    position: absolute;
+    top: -22px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 3px;
+    pointer-events: none; white-space: nowrap;
+    animation: copied-pop 1.2s ease-out forwards;
+  }
+  @keyframes copied-pop {
+    0% { opacity: 0; transform: translate(-50%, 4px); }
+    15% { opacity: 1; transform: translate(-50%, 0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-50%, -4px); }
+  }
+
+  /* Signal-watch search box */
+  .signals-search { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 10px 14px; background: var(--paper); border: 1px solid var(--sand); border-radius: 4px; }
+  .signals-search label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; }
+  .signals-search input { flex: 1; border: none; background: transparent; outline: none; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; color: var(--ink); }
+  .signals-search input::placeholder { color: var(--taupe); }
+  .signals-search .signal-count { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--walnut); letter-spacing: 0.06em; flex-shrink: 0; }
+  .signal-card[hidden] { display: none; }
+
   /* Footer */
   .source { max-width: 1240px; margin: 32px auto 0; padding-top: 16px; border-top: 1px solid var(--sand); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--umber); line-height: 1.6; }
   .source code { color: var(--walnut); background: var(--bone); padding: 1px 5px; border-radius: 3px; }
@@ -312,8 +344,8 @@
 
 <section class="next-up">
   <ol>
-    <li class="dustblue"><span class="slug">silicon-trap</span> — close the 21 zero-hit asset gap (<code>python3 tools/asset-source/zerohit_fallback.py silicon-trap</code>), then regen manifest + first full render.</li>
-    <li class="gold"><span class="slug">prisoners-dilemma</span> — regen stale manifest (<code>python3 tools/assembly/generate_manifest.py prisoners-dilemma</code>), then continue.</li>
+    <li class="dustblue"><span class="slug">silicon-trap</span> — close the 21 zero-hit asset gap (<code class="copyable">python3 tools/asset-source/zerohit_fallback.py silicon-trap</code>), then regen manifest + first full render.</li>
+    <li class="gold"><span class="slug">prisoners-dilemma</span> — regen stale manifest (<code class="copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code>), then continue.</li>
     <li class="taupe"><span class="slug">blockades-leak</span> — viability re-gate (day 61 in INCUBATING — likely needs a fresh research scan or to be promoted/killed).</li>
   </ol>
   <div class="pills">
@@ -355,8 +387,8 @@
     <div class="ep-tab-panel">
       <h4>Health</h4>
       <ul class="health-list">
-        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (1.6 d drift) — <code>python3 tools/assembly/generate_manifest.py prisoners-dilemma</code></span></li>
-        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">Manifest ready but never rendered — <code>cd remotion-templates && node scripts/render-episode.mjs --episode=prisoners-dilemma</code></span></li>
+        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (1.6 d drift) — <code class="copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code></span></li>
+        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">Manifest ready but never rendered — <code class="copyable">cd remotion-templates && node scripts/render-episode.mjs --episode=prisoners-dilemma</code></span></li>
       </ul>
     </div>
     <div class="ep-tab-panel">
@@ -406,9 +438,9 @@
     <div class="ep-tab-panel">
       <h4>Health</h4>
       <ul class="health-list">
-        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (4.5 d drift) — <code>python3 tools/assembly/generate_manifest.py silicon-trap</code></span></li>
-        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">21 zero-hit shots — <code>python3 tools/asset-source/zerohit_fallback.py silicon-trap</code></span></li>
-        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">Manifest ready but never rendered — <code>cd remotion-templates && node scripts/render-episode.mjs --episode=silicon-trap</code></span></li>
+        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (4.5 d drift) — <code class="copyable">python3 tools/assembly/generate_manifest.py silicon-trap</code></span></li>
+        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">21 zero-hit shots — <code class="copyable">python3 tools/asset-source/zerohit_fallback.py silicon-trap</code></span></li>
+        <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">Manifest ready but never rendered — <code class="copyable">cd remotion-templates && node scripts/render-episode.mjs --episode=silicon-trap</code></span></li>
       </ul>
     </div>
     <div class="ep-tab-panel">
@@ -495,6 +527,11 @@
   </div>
   <div class="topics-section">
     <h4>Signal watch (9 signals being monitored)</h4>
+    <div class="signals-search">
+      <label for="signals-filter">Filter</label>
+      <input id="signals-filter" type="search" placeholder="search signals, arcs, discovery paths…" autocomplete="off">
+      <span id="signals-count" class="signal-count">9 signals</span>
+    </div>
     <div class="signals-list">
     <div class="signal-card"><div class="signal-title">New START expired Feb 2026 — no US-Russia nuclear treaty for first time in 50 years</div><div class="signal-meta"><span class="signal-pill">Mechanism + Silence + Inversion (3-shape convergence)</span><span class="signal-pill">Arc 3 or new Nuclear Arc</span><span class="signal-date">First noticed: May 3</span></div><div class="signal-notes">Strongest multi-shape convergence in first interrogative scan. &quot;Third nuclear age&quot; being named.</div></div>
     <div class="signal-card"><div class="signal-title">Global industrial policy convergence — US, EU, Japan, India, China all pursuing simultaneously</div><div class="signal-meta"><span class="signal-pill">Convergent Drift</span><span class="signal-pill">Arc 1 (tech competition)</span><span class="signal-date">First noticed: May 3</span></div><div class="signal-notes">**Promoted** → `industrial-convergence` in Arc 1.</div></div>
@@ -519,7 +556,7 @@
 </footer>
 
 <script>
-  // Tab switching — show the matching content panel, hide siblings.
+  // ── Tab switching ────────────────────────────────────────────────────────
   // Overview content is the unkeyed top-level (diagram + episodes-grid + next-up).
   // Per-episode + topics tabs have [data-tab-content="<slug>"] panels that
   // get toggled with [hidden]. Overview is shown when no per-episode tab
@@ -538,6 +575,53 @@
       showTab(tab.dataset.tab);
     });
   });
+
+  // ── Click-to-copy on shell commands ───────────────────────────────────────
+  // Every <code class="copyable"> becomes clickable — the click writes the
+  // text content to the clipboard and flashes a "copied" indicator. Falls
+  // back silently on browsers without navigator.clipboard (cowork iframe
+  // sandbox can be restrictive; the visual hover still works).
+  document.querySelectorAll('code.copyable').forEach(el => {
+    el.title = 'Click to copy';
+    el.addEventListener('click', async () => {
+      const text = el.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fallback: select the text so the user can ⌘C manually
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      el.classList.add('copied');
+      setTimeout(() => el.classList.remove('copied'), 1200);
+    });
+  });
+
+  // ── Signal-watch search ──────────────────────────────────────────────────
+  // Filters .signal-card siblings by visible text (signal title + meta +
+  // notes + arc + discovery path). Case-insensitive substring match.
+  // Updates the count display so the operator sees "3 of 9 match".
+  const signalSearch = document.querySelector('#signals-filter');
+  if (signalSearch) {
+    const cards = Array.from(document.querySelectorAll('.signal-card'));
+    const countEl = document.querySelector('#signals-count');
+    const total = cards.length;
+    const update = () => {
+      const q = signalSearch.value.trim().toLowerCase();
+      let shown = 0;
+      cards.forEach(card => {
+        const hit = !q || card.textContent.toLowerCase().includes(q);
+        card.hidden = !hit;
+        if (hit) shown++;
+      });
+      if (countEl) countEl.textContent = q ? `${shown} of ${total} match` : `${total} signals`;
+    };
+    signalSearch.addEventListener('input', update);
+    update();
+  }
 </script>
 </body>
 </html>
