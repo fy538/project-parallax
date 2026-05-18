@@ -181,6 +181,7 @@ import {
   CatalogTreeExCommLadder,
   CatalogTreePolicyIndented,
   CatalogTreeTaiwanSpine,
+  CatalogTreeBerlinSchematic,
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogGamePDCanonical,
@@ -470,6 +471,7 @@ export const RemotionRoot: React.FC = () => {
           <CatalogTreeExCommLadder />
           <CatalogTreePolicyIndented />
           <CatalogTreeTaiwanSpine />
+          <CatalogTreeBerlinSchematic />
           <CatalogGameChess />
           <CatalogGamePayoff />
           <CatalogGamePDCanonical />

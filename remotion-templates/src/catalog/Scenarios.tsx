@@ -183,6 +183,37 @@ const treeTaiwanSpine: DecisionTreeData = {
   durationSec: 14,
 };
 
+// Schematic / engineering-drawing register — Aesthetic D (May 18, 2026).
+// Same canvas-camera-pan machinery as the extensive variant; what changes
+// is the visual treatment: thin-bordered node boxes with a small mono
+// ordinal corner marker, plus orthogonal right-angle edges (parent →
+// vertical drop → horizontal run → vertical drop to child). Reads as a
+// wargaming nomograph / decision-network drawing rather than a curved-
+// bezier infographic. POLISH.md D1 contextual — boxes are allowed when
+// the box IS the editorial device (schematic register), not decoration.
+const treeBerlinSchematic: DecisionTreeData = {
+  episode: CATALOG_EPISODE,
+  title: "Berlin Crisis Escalation Tree",
+  subtitle: "USAF contingency planning, July–October 1961",
+  variant: "schematic",
+  nodes: [
+    { id: "root", label: "Soviets close Berlin access", children: ["airlift", "limited", "convoy"] },
+    { id: "airlift", label: "Resume airlift only", edgeLabel: "minimal force", children: ["airlift-hold", "airlift-fail"] },
+    { id: "limited", label: "Limited ground probe", edgeLabel: "graduated", highlighted: true, children: ["probe-success", "probe-stall"] },
+    { id: "convoy", label: "Armed convoy on autobahn", edgeLabel: "kinetic", children: ["convoy-pass", "convoy-clash"] },
+    { id: "airlift-hold", label: "Berliners hold; war averted" },
+    { id: "airlift-fail", label: "Supply gap; political collapse" },
+    { id: "probe-success", label: "Soviet pullback; status quo restored", highlighted: true, active: true },
+    { id: "probe-stall", label: "Standoff; renewed crisis" },
+    { id: "convoy-pass", label: "Convoy through; deterrence proved" },
+    { id: "convoy-clash", label: "Tactical fire; escalation risk" },
+  ],
+  rootId: "root",
+  highlightedPath: ["root", "limited", "probe-success"],
+  source: "After Trachtenberg, A Constructed Peace (1999).",
+  durationSec: 14,
+};
+
 // ─── GameBoard × 2 ────────────────────────────────────────────────────────
 
 // Chess piece colors: white pieces use brand bone (#F0E6D0) so the
@@ -423,6 +454,21 @@ export const CatalogTreeTaiwanSpine = () => (
   />
 );
 
+export const CatalogTreeBerlinSchematic = () => (
+  <Composition
+    id={catalogId("DecisionTree", "berlin-schematic")}
+    component={DecisionTree}
+    schema={DecisionTreeSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: sec((props.data as DecisionTreeData).durationSec || 14),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: treeBerlinSchematic }}
+  />
+);
+
 export const DecisionTreeHorizontalComposition = () => (
   <Composition
     id="DecisionTree-Horizontal"
@@ -502,6 +548,6 @@ export const CatalogGameIteratedPD = () => (
 
 export const catalogScenariosData = {
   treeChessOpening, treeExCommLadder, treeAITimelineHorizontal,
-  treePolicyIndented, treeTaiwanSpine,
+  treePolicyIndented, treeTaiwanSpine, treeBerlinSchematic,
   gameChess, gamePayoff, gamePDCanonical, gameIteratedPD,
 };

@@ -121,6 +121,7 @@ export {
   CatalogTreeExCommLadder,
   CatalogTreePolicyIndented,
   CatalogTreeTaiwanSpine,
+  CatalogTreeBerlinSchematic,
   CatalogGameChess,
   CatalogGamePayoff,
   CatalogGamePDCanonical,

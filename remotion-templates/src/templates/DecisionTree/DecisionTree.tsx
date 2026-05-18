@@ -259,6 +259,24 @@ function edgePath(
 }
 
 /**
+ * Orthogonal edge path — right-angle elbow from parent bottom to child top.
+ * Reads as engineering-schematic / circuit-diagram register. Two segments:
+ *   parent → vertical drop to mid-y → horizontal run to child column → vertical
+ * drop to child top. Used by `variant: "schematic"`.
+ */
+function edgePathOrthogonal(
+  parentPos: NodePosition,
+  childPos: NodePosition,
+): string {
+  const x1 = parentPos.x + NODE_WIDTH / 2;
+  const y1 = parentPos.y + NODE_HEIGHT;
+  const x2 = childPos.x + NODE_WIDTH / 2;
+  const y2 = childPos.y;
+  const midY = (y1 + y2) / 2;
+  return `M ${x1} ${y1} L ${x1} ${midY} L ${x2} ${midY} L ${x2} ${y2}`;
+}
+
+/**
  * Horizontal bezier edge path — S-curve going left to right.
  * Source: right-center of parent; target: left-center of child.
  * Control points pull horizontally into the gap between columns.
@@ -337,6 +355,10 @@ const TreeNodeComponent: React.FC<{
   isHorizontal?: boolean;
   /** Whether this node is on the highlightedPath (for horizontal dimming). */
   isOnPathNode?: boolean;
+  /** Engineering-schematic register: thin border, mono ordinal corner. */
+  isSchematic?: boolean;
+  /** 1-based ordinal index for the schematic corner marker. */
+  ordinal?: number;
 }> = React.memo(({
   node,
   position,
@@ -349,6 +371,8 @@ const TreeNodeComponent: React.FC<{
   highlightColor,
   isHorizontal = false,
   isOnPathNode = false,
+  isSchematic = false,
+  ordinal,
 }) => {
   const theme = useThemeMode(mode);
   const nodeOpacity = fadeIn(frame, startFrame, sec(0.5));
@@ -376,6 +400,23 @@ const TreeNodeComponent: React.FC<{
   // Effective opacity: base animation × exit × inverse dim
   const effectiveOpacity = nodeOpacity * exitOp * (1 - combinedDim);
 
+  // Schematic register — thin border + corner ordinal marker, evoking
+  // engineering / circuit-diagram / wargaming nomographs. Border weight
+  // and color carry hierarchy in this register (active = accent + thicker;
+  // highlighted = ink full-weight; off-path = muted hairline).
+  const schematicBorder = isSchematic
+    ? isActive
+      ? `2px solid ${highlightColor}`
+      : isHighlighted
+        ? `1.5px solid ${theme.text.primary}`
+        : `1px solid ${theme.text.muted}66`
+    : "none";
+  const schematicFill = isSchematic
+    ? isActive
+      ? `${highlightColor}10`
+      : "transparent"
+    : "transparent";
+
   return (
     <div
       style={{
@@ -393,8 +434,31 @@ const TreeNodeComponent: React.FC<{
         alignItems: isHorizontal ? "flex-start" : "center",
         justifyContent: "center",
         boxSizing: "border-box",
+        // Schematic chrome — opt-in only. POLISH.md D1 allows boxes when
+        // the box IS the editorial device (here: schematic-drawing
+        // register), not decorative.
+        border: schematicBorder,
+        background: schematicFill,
       }}
     >
+      {/* Schematic corner ordinal — small mono numeral pinned to the
+          top-left of the box, like a node-ID in an engineering drawing. */}
+      {isSchematic && ordinal != null && (
+        <div
+          style={{
+            position: "absolute",
+            top: 4,
+            left: 8,
+            fontSize: fontSizes.meta,
+            fontFamily: fonts.metadata,
+            color: theme.text.muted,
+            opacity: 0.7,
+            letterSpacing: 1.2,
+          }}
+        >
+          {String(ordinal).padStart(2, "0")}
+        </div>
+      )}
       <div
         style={{
           fontSize: fontSizes.body,
@@ -1257,6 +1321,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
   const backgroundVariant = data.backgroundVariant || "light";
 
   const isHorizontal = data.layout === "horizontal";
+  const isSchematic = data.variant === "schematic";
 
   warnIf(
     !data.nodes.find((n) => n.id === data.rootId),
@@ -1397,7 +1462,9 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
           midY = (parentPos.y + NODE_HEIGHT + childPos.y) / 2;
           arrowTx = childPos.x + NODE_WIDTH / 2;
           arrowTy = childPos.y;
-          pathData = edgePath(parentPos, childPos);
+          pathData = isSchematic
+            ? edgePathOrthogonal(parentPos, childPos)
+            : edgePath(parentPos, childPos);
         }
 
         const edgeLabel = child?.edgeLabel;
@@ -1609,7 +1676,15 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                       const someHighlighted = (data.highlightedPath?.length ?? 0) > 0;
                       // Unchosen edges recede via opacity + weight.
                       const muteFactor = someHighlighted ? 0.25 : 0.7;
-                      const strokeWidth = someHighlighted ? 1.25 : 1.75;
+                      // Schematic register: thinner hairline + higher
+                      // opacity floor so the orthogonal elbows read
+                      // crisply at the smaller stroke weight.
+                      const strokeWidth = isSchematic
+                        ? someHighlighted ? 1 : 1.25
+                        : someHighlighted ? 1.25 : 1.75;
+                      const muteFactorEff = isSchematic
+                        ? someHighlighted ? 0.5 : 0.85
+                        : muteFactor;
 
                       return (
                         <path
@@ -1617,8 +1692,9 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                           d={edge.pathData}
                           stroke={theme.text.muted}
                           strokeWidth={strokeWidth}
+                          strokeLinejoin={isSchematic ? "miter" : "round"}
                           fill="none"
-                          opacity={edgeOpacity * (1 - edgeDim) * muteFactor * exitFade(frame, totalFrames, sec(0.5))}
+                          opacity={edgeOpacity * (1 - edgeDim) * muteFactorEff * exitFade(frame, totalFrames, sec(0.5))}
                         />
                       );
                     })}
@@ -1640,9 +1716,10 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                           <path
                             d={edge.pathData}
                             stroke={highlightColor}
-                            strokeWidth={5}
+                            strokeWidth={isSchematic ? 2.5 : 5}
                             fill="none"
-                            strokeLinecap="round"
+                            strokeLinecap={isSchematic ? "square" : "round"}
+                            strokeLinejoin={isSchematic ? "miter" : "round"}
                             opacity={effectiveOpacity}
                           />
                           {/* Filled-circle arrowhead at child top — marks
@@ -1798,7 +1875,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
 
             {/* Node layer */}
             <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-              {data.nodes.map((node) => {
+              {data.nodes.map((node, idx) => {
                 const pos = positions.get(node.id);
                 if (!pos) return null;
 
@@ -1839,6 +1916,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
                     highlightColor={highlightColor}
                     isHorizontal={isHorizontal}
                     isOnPathNode={onPath}
+                    isSchematic={isSchematic}
+                    ordinal={isSchematic ? idx + 1 : undefined}
                   />
                 );
               })}

@@ -567,15 +567,16 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   // ── Scenarios ──
   sectionSegment(
     "Scenarios",
-    "DecisionTree × 4 aesthetics (extensive · ladder · indented · spine) · OutcomePartition · GameBoard × 3"
+    "DecisionTree × 5 aesthetics (extensive · ladder · indented · spine · schematic) · OutcomePartition · GameBoard × 3"
   ),
   slateSegment("Scenarios", "DecisionTree-extensive", "chess-opening"),
   {
     durationSec: catalogScenariosData.treeChessOpening.durationSec ?? 12,
     render: () => <DecisionTree data={still(catalogScenariosData.treeChessOpening)} />,
   },
-  // Three new decision-tree aesthetics from the May 17, 2026 research pass —
-  // ladder (polished), indented manuscript-tree, and stem-and-leaf spine.
+  // Four additional decision-tree aesthetics — ladder (polished),
+  // indented manuscript-tree, stem-and-leaf spine (all from the May 17
+  // research pass), and schematic engineering-drawing register (May 18).
   slateSegment("Scenarios", "DecisionTree-ladder", "excomm-1962"),
   {
     durationSec: catalogScenariosData.treeExCommLadder.durationSec ?? 14,
@@ -590,6 +591,11 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
   {
     durationSec: catalogScenariosData.treeTaiwanSpine.durationSec ?? 14,
     render: () => <DecisionTree data={still(catalogScenariosData.treeTaiwanSpine)} />,
+  },
+  slateSegment("Scenarios", "DecisionTree-schematic", "berlin-1961"),
+  {
+    durationSec: catalogScenariosData.treeBerlinSchematic.durationSec ?? 14,
+    render: () => <DecisionTree data={still(catalogScenariosData.treeBerlinSchematic)} />,
   },
   // OutcomePartition — separate template, Aesthetic C from the same research
   // pass (RAND / De Stijl partition-map register).
