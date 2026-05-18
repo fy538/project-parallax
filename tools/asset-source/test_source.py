@@ -12,6 +12,8 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import requests
+
 sys.path.insert(0, str(Path(__file__).parent))
 
 import source
@@ -88,12 +90,77 @@ def test_pexels_returns_empty_when_no_key(monkeypatch):
     assert source.search_pexels("anything") == []
 
 
-def test_pexels_handles_api_error_gracefully(monkeypatch, capsys):
+def test_pexels_handles_network_error_gracefully(monkeypatch, capsys):
+    """A connection error (RequestException subclass) is logged with the
+    exception type name + URL context, then returns []. Bare `Exception` no
+    longer matches the narrowed catch — that's the contract of `_fetch_json`."""
     monkeypatch.setattr(source, "PEXELS_KEY", "fake-key")
-    with patch("source.requests.get", side_effect=Exception("network error")):
+    with patch(
+        "source.requests.get",
+        side_effect=requests.ConnectionError("name resolution failure"),
+    ):
         results = source.search_pexels("test")
     assert results == []
-    assert "Pexels error" in capsys.readouterr().err
+    err = capsys.readouterr().err
+    assert "Pexels request failed" in err
+    assert "ConnectionError" in err
+
+
+def test_fetch_json_logs_http_status_on_4xx(monkeypatch, capsys):
+    """4xx/5xx errors surface the status code so a bad key (401) reads
+    differently from a rate limit (429) or a server issue (5xx)."""
+    fake_resp = MagicMock()
+    fake_resp.status_code = 401
+    fake_resp.headers = {}
+    err = requests.HTTPError("401 Client Error: Unauthorized")
+    err.response = fake_resp
+    fake_resp.raise_for_status = MagicMock(side_effect=err)
+    with patch("source.requests.get", return_value=fake_resp):
+        result = source._fetch_json("TestAPI", "https://example.com")
+    assert result is None
+    out = capsys.readouterr().err
+    assert "TestAPI HTTP 401" in out
+
+
+def test_fetch_json_honors_retry_after_on_429(monkeypatch, capsys):
+    """The Retry-After header on a 429 is surfaced so operators can
+    throttle subsequent runs. Before this helper, every API error read
+    identically — making rate-limit problems invisible until they cascaded."""
+    fake_resp = MagicMock()
+    fake_resp.status_code = 429
+    fake_resp.headers = {"Retry-After": "60"}
+    err = requests.HTTPError("429 Too Many Requests")
+    err.response = fake_resp
+    fake_resp.raise_for_status = MagicMock(side_effect=err)
+    with patch("source.requests.get", return_value=fake_resp):
+        result = source._fetch_json("Pexels", "https://example.com")
+    assert result is None
+    out = capsys.readouterr().err
+    assert "HTTP 429" in out
+    assert "Retry-After: 60s" in out
+
+
+def test_fetch_json_handles_non_json_response(monkeypatch, capsys):
+    """If the API returns 200 OK with non-JSON (e.g., HTML maintenance
+    page), we log distinctly and return None — not the same as a 5xx."""
+    fake_resp = MagicMock()
+    fake_resp.status_code = 200
+    fake_resp.raise_for_status = MagicMock()
+    fake_resp.json.side_effect = ValueError("Expecting value: line 1 column 1")
+    with patch("source.requests.get", return_value=fake_resp):
+        result = source._fetch_json("Pexels", "https://example.com")
+    assert result is None
+    out = capsys.readouterr().err
+    assert "Pexels returned non-JSON response" in out
+
+
+def test_fetch_json_lets_programming_errors_bubble(monkeypatch):
+    """TypeError from our own code is NOT a 'Pexels error.' Before the
+    narrow, every Exception was swallowed and printed as if the API broke."""
+    with patch("source.requests.get", side_effect=TypeError("not iterable")):
+        import pytest
+        with pytest.raises(TypeError):
+            source._fetch_json("Pexels", "https://example.com")
 
 
 # ── search_pixabay — response parsing ─────────────────────────────────────

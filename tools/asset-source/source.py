@@ -47,6 +47,55 @@ UNSPLASH_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 RESULTS_PER_SOURCE = 5  # Top N results from each source
 
 
+# ── HTTP helper ───────────────────────────────────────────────────────────────
+
+
+def _fetch_json(
+    name: str,
+    url: str,
+    *,
+    headers: dict | None = None,
+    params: dict | None = None,
+    timeout: int = 10,
+) -> dict | None:
+    """Perform an authenticated GET and parse the JSON body.
+
+    Returns the parsed body on success, or `None` on a logged failure. The
+    failure path narrows what's caught so the operator sees WHICH thing
+    broke — a 401 (bad key) reads very differently from a 429 (rate limit)
+    or a network blip. Before this helper, the call sites all caught
+    `Exception` and printed a generic "<name> error", masking the cause.
+
+      · HTTPError: prints status code; honors Retry-After header on 429s
+        so operators can throttle going forward.
+      · RequestException (network / DNS / timeout): names the exception
+        type so transient vs. configuration issues are distinguishable.
+      · ValueError (JSONDecodeError extends it): API returned non-JSON.
+      · Anything else bubbles — a TypeError in our own code shouldn't be
+        swallowed as a "Pexels error."
+    """
+    try:
+        resp = requests.get(url, headers=headers, params=params, timeout=timeout)
+        resp.raise_for_status()
+        return resp.json()
+    except requests.HTTPError as e:
+        status = e.response.status_code if e.response is not None else "?"
+        retry_after = (
+            e.response.headers.get("Retry-After") if e.response is not None else None
+        )
+        suffix = f" (Retry-After: {retry_after}s)" if retry_after else ""
+        print(f"  ⚠ {name} HTTP {status}{suffix}: {e}", file=sys.stderr)
+    except requests.RequestException as e:
+        # network error, timeout, DNS failure, connection reset, ...
+        print(
+            f"  ⚠ {name} request failed: {type(e).__name__}: {e}", file=sys.stderr,
+        )
+    except ValueError as e:
+        # JSONDecodeError extends ValueError — API returned non-JSON body.
+        print(f"  ⚠ {name} returned non-JSON response: {e}", file=sys.stderr)
+    return None
+
+
 # ── API Clients ───────────────────────────────────────────────────────────────
 
 def search_pexels(query: str, media_type: str = "photo", count: int = RESULTS_PER_SOURCE) -> list:
@@ -61,48 +110,44 @@ def search_pexels(query: str, media_type: str = "photo", count: int = RESULTS_PE
     else:
         url = f"https://api.pexels.com/v1/search?query={quote_plus(query)}&per_page={count}&orientation=landscape"
 
-    try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-
-        results = []
-        items = data.get("videos" if media_type == "video" else "photos", [])
-        for item in items:
-            if media_type == "video":
-                # Get the HD video file
-                video_files = item.get("video_files", [])
-                hd = next((f for f in video_files if f.get("quality") == "hd"), video_files[0] if video_files else None)
-                results.append({
-                    "source": "pexels",
-                    "type": "video",
-                    "id": item["id"],
-                    "url": item.get("url", ""),
-                    "preview": item.get("image", ""),
-                    "download": hd["link"] if hd else "",
-                    "width": hd.get("width", 0) if hd else 0,
-                    "height": hd.get("height", 0) if hd else 0,
-                    "duration": item.get("duration", 0),
-                    "photographer": item.get("user", {}).get("name", "Unknown"),
-                    "license": "Pexels License (free, no attribution required)",
-                })
-            else:
-                results.append({
-                    "source": "pexels",
-                    "type": "photo",
-                    "id": item["id"],
-                    "url": item.get("url", ""),
-                    "preview": item.get("src", {}).get("medium", ""),
-                    "download": item.get("src", {}).get("original", ""),
-                    "width": item.get("width", 0),
-                    "height": item.get("height", 0),
-                    "photographer": item.get("photographer", "Unknown"),
-                    "license": "Pexels License (free, no attribution required)",
-                })
-        return results
-    except Exception as e:
-        print(f"  ⚠ Pexels error: {e}", file=sys.stderr)
+    data = _fetch_json("Pexels", url, headers=headers)
+    if data is None:
         return []
+
+    results = []
+    items = data.get("videos" if media_type == "video" else "photos", [])
+    for item in items:
+        if media_type == "video":
+            # Get the HD video file
+            video_files = item.get("video_files", [])
+            hd = next((f for f in video_files if f.get("quality") == "hd"), video_files[0] if video_files else None)
+            results.append({
+                "source": "pexels",
+                "type": "video",
+                "id": item["id"],
+                "url": item.get("url", ""),
+                "preview": item.get("image", ""),
+                "download": hd["link"] if hd else "",
+                "width": hd.get("width", 0) if hd else 0,
+                "height": hd.get("height", 0) if hd else 0,
+                "duration": item.get("duration", 0),
+                "photographer": item.get("user", {}).get("name", "Unknown"),
+                "license": "Pexels License (free, no attribution required)",
+            })
+        else:
+            results.append({
+                "source": "pexels",
+                "type": "photo",
+                "id": item["id"],
+                "url": item.get("url", ""),
+                "preview": item.get("src", {}).get("medium", ""),
+                "download": item.get("src", {}).get("original", ""),
+                "width": item.get("width", 0),
+                "height": item.get("height", 0),
+                "photographer": item.get("photographer", "Unknown"),
+                "license": "Pexels License (free, no attribution required)",
+            })
+    return results
 
 
 def search_pixabay(query: str, media_type: str = "photo", count: int = RESULTS_PER_SOURCE) -> list:
@@ -116,46 +161,42 @@ def search_pixabay(query: str, media_type: str = "photo", count: int = RESULTS_P
     if media_type != "video":
         params["image_type"] = "photo"
 
-    try:
-        resp = requests.get(base_url, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-
-        results = []
-        for item in data.get("hits", []):
-            if media_type == "video":
-                videos = item.get("videos", {})
-                large = videos.get("large", videos.get("medium", {}))
-                results.append({
-                    "source": "pixabay",
-                    "type": "video",
-                    "id": item["id"],
-                    "url": item.get("pageURL", ""),
-                    "preview": f"https://i.vimeocdn.com/video/{item.get('picture_id', '')}_640x360.jpg",
-                    "download": large.get("url", ""),
-                    "width": large.get("width", 0),
-                    "height": large.get("height", 0),
-                    "duration": item.get("duration", 0),
-                    "photographer": item.get("user", "Unknown"),
-                    "license": "Pixabay License (free, no attribution required)",
-                })
-            else:
-                results.append({
-                    "source": "pixabay",
-                    "type": "photo",
-                    "id": item["id"],
-                    "url": item.get("pageURL", ""),
-                    "preview": item.get("webformatURL", ""),
-                    "download": item.get("largeImageURL", ""),
-                    "width": item.get("imageWidth", 0),
-                    "height": item.get("imageHeight", 0),
-                    "photographer": item.get("user", "Unknown"),
-                    "license": "Pixabay License (free, no attribution required)",
-                })
-        return results
-    except Exception as e:
-        print(f"  ⚠ Pixabay error: {e}", file=sys.stderr)
+    data = _fetch_json("Pixabay", base_url, params=params)
+    if data is None:
         return []
+
+    results = []
+    for item in data.get("hits", []):
+        if media_type == "video":
+            videos = item.get("videos", {})
+            large = videos.get("large", videos.get("medium", {}))
+            results.append({
+                "source": "pixabay",
+                "type": "video",
+                "id": item["id"],
+                "url": item.get("pageURL", ""),
+                "preview": f"https://i.vimeocdn.com/video/{item.get('picture_id', '')}_640x360.jpg",
+                "download": large.get("url", ""),
+                "width": large.get("width", 0),
+                "height": large.get("height", 0),
+                "duration": item.get("duration", 0),
+                "photographer": item.get("user", "Unknown"),
+                "license": "Pixabay License (free, no attribution required)",
+            })
+        else:
+            results.append({
+                "source": "pixabay",
+                "type": "photo",
+                "id": item["id"],
+                "url": item.get("pageURL", ""),
+                "preview": item.get("webformatURL", ""),
+                "download": item.get("largeImageURL", ""),
+                "width": item.get("imageWidth", 0),
+                "height": item.get("imageHeight", 0),
+                "photographer": item.get("user", "Unknown"),
+                "license": "Pixabay License (free, no attribution required)",
+            })
+    return results
 
 
 def search_unsplash(query: str, count: int = RESULTS_PER_SOURCE) -> list:
@@ -166,29 +207,25 @@ def search_unsplash(query: str, count: int = RESULTS_PER_SOURCE) -> list:
     url = f"https://api.unsplash.com/search/photos?query={quote_plus(query)}&per_page={count}&orientation=landscape"
     headers = {"Authorization": f"Client-ID {UNSPLASH_KEY}"}
 
-    try:
-        resp = requests.get(url, headers=headers, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-
-        results = []
-        for item in data.get("results", []):
-            results.append({
-                "source": "unsplash",
-                "type": "photo",
-                "id": item["id"],
-                "url": item.get("links", {}).get("html", ""),
-                "preview": item.get("urls", {}).get("small", ""),
-                "download": item.get("urls", {}).get("full", ""),
-                "width": item.get("width", 0),
-                "height": item.get("height", 0),
-                "photographer": item.get("user", {}).get("name", "Unknown"),
-                "license": "Unsplash License (free, attribution appreciated)",
-            })
-        return results
-    except Exception as e:
-        print(f"  ⚠ Unsplash error: {e}", file=sys.stderr)
+    data = _fetch_json("Unsplash", url, headers=headers)
+    if data is None:
         return []
+
+    results = []
+    for item in data.get("results", []):
+        results.append({
+            "source": "unsplash",
+            "type": "photo",
+            "id": item["id"],
+            "url": item.get("links", {}).get("html", ""),
+            "preview": item.get("urls", {}).get("small", ""),
+            "download": item.get("urls", {}).get("full", ""),
+            "width": item.get("width", 0),
+            "height": item.get("height", 0),
+            "photographer": item.get("user", {}).get("name", "Unknown"),
+            "license": "Unsplash License (free, attribution appreciated)",
+        })
+    return results
 
 
 # ── Search orchestrator ───────────────────────────────────────────────────────
@@ -249,6 +286,10 @@ def download_asset(result: dict, output_dir: Path, prefix: str = "") -> Path | N
         print(f"  ⏩ Already exists: {filename}")
         return output_path
 
+    # download_asset can't use _fetch_json (this is a streaming binary
+    # download, not a JSON body). Narrow the catch the same way: separate
+    # network/HTTP failures from local disk failures so the operator knows
+    # whether the issue is upstream or local.
     try:
         print(f"  ⬇ Downloading {filename}...")
         resp = requests.get(url, timeout=30, stream=True)
@@ -258,8 +299,17 @@ def download_asset(result: dict, output_dir: Path, prefix: str = "") -> Path | N
                 f.write(chunk)
         print(f"    ✓ Saved ({output_path.stat().st_size // 1024}KB)")
         return output_path
-    except Exception as e:
-        print(f"  ⚠ Download failed: {e}", file=sys.stderr)
+    except requests.RequestException as e:
+        print(
+            f"  ⚠ Download failed (network/HTTP): {type(e).__name__}: {e}",
+            file=sys.stderr,
+        )
+        return None
+    except OSError as e:
+        print(f"  ⚠ Download failed (disk write): {e}", file=sys.stderr)
+        # Clean up partial write so the next run doesn't see a half-file
+        # and report ⏩ Already exists.
+        output_path.unlink(missing_ok=True)
         return None
 
 

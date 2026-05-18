@@ -128,13 +128,6 @@ ignore = [
     # Concentrated in test fixtures + migration scripts where compactness
     # matters more than line-by-line readability.
     "E702",
-    # BLE001 (blind `except Exception`) — 19 existing violations across 12
-    # files. Audit item P1-5 covers the principled fix (narrow the catches
-    # in tools/asset-source/source.py + tools/asset-source/execute_search.py
-    # to requests.RequestException; document the rest in-place). Until that
-    # PR lands, project-wide ignore keeps `ruff check` green. New broad
-    # excepts caught at code-review time. Re-enable after burn-down.
-    "BLE001",
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -144,6 +137,24 @@ ignore = [
 "**/conftest.py" = ["BLE001", "I001"]
 # Migration / one-shot scripts may legitimately catch broadly.
 "tools/migrate_manifest.py" = ["BLE001"]
+
+# BLE001 grandfather list — 11 files with pre-existing `except Exception:`
+# blocks. The rule is enabled globally so NEW broad-excepts get blocked at
+# commit time; these entries tolerate the existing ones. Burn down by
+# narrowing the catch (per the pattern in tools/asset-source/source.py
+# `_fetch_json`), then deleting that entry. Audit item P1-5 + P2-13.
+#
+# Last reviewed May 18, 2026. Add a date when re-touched.
+"tools/ai-video/critic_loop.py" = ["BLE001"]
+"tools/ai-video/generate_style_refs.py" = ["BLE001"]
+"tools/assembly/generate_manifest.py" = ["BLE001"]
+"tools/brand-treatment/treat.py" = ["BLE001"]
+"tools/brand-treatment/treat_video.py" = ["BLE001"]
+"tools/lint/manifest_lint.py" = ["BLE001"]
+"tools/narration/auphonic_submit.py" = ["BLE001"]
+"tools/pipeline_validator.py" = ["BLE001"]
+"tools/recraft/recraft.py" = ["BLE001"]
+"tools/validate_data.py" = ["BLE001"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["tools"]

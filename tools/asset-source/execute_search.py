@@ -5,6 +5,7 @@ Direct execution of aerial semiconductor search using the Pexels API
 
 import json
 import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 from urllib.parse import quote_plus
@@ -66,8 +67,16 @@ for query in search_queries:
                 results.append(result_entry)
                 print(f"  ✓ Found: {photo.get('photographer')} — {photo['width']}×{photo['height']}")
 
-    except Exception as e:
-        print(f"  Error: {e}", file=sys.stderr)
+    except urllib.error.HTTPError as e:
+        # Includes status code, e.g. 401 (bad key) vs 429 (rate limit) vs
+        # 5xx — distinguishes operator-actionable from transient.
+        print(f"  Error: HTTP {e.code} for {url}: {e.reason}", file=sys.stderr)
+    except urllib.error.URLError as e:
+        # Network failure / DNS / TLS — explicit so a config issue
+        # (no internet) reads differently from an API issue (4xx/5xx).
+        print(f"  Error: network failure for {url}: {e.reason}", file=sys.stderr)
+    except (json.JSONDecodeError, ValueError) as e:
+        print(f"  Error: non-JSON response from {url}: {e}", file=sys.stderr)
 
 # Remove duplicates by photo ID
 seen_ids = set()
