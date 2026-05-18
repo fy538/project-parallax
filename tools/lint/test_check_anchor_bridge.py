@@ -122,6 +122,34 @@ class TestClassifyCell:
         # No [TAG:] pattern at all — likely a continuation line
         assert cab.classify_cell("continuation of previous visual") is None
 
+    def test_unknown_tag_skipped(self):
+        # Prose-brackets ([actual], [bracketed-term]) would otherwise
+        # mis-parse as fake tags. Only the documented vocabulary
+        # (FOOTAGE, ARCHIVAL, AI-GEN, AI-VIDEO, B-ROLL, SCENE, FORECAST,
+        # MG, LAYERED, ILLUST) is recognized.
+        assert cab.classify_cell("the [actual] meaning here") is None
+        assert cab.classify_cell("see [bracketed-term] above") is None
+
+    def test_ai_video_is_anchor(self):
+        c = cab.classify_cell("[AI-VIDEO: pika 5s clip]")
+        assert c is not None
+        assert c.tag == "AI-VIDEO"
+        assert c.is_anchor
+
+    def test_b_roll_is_anchor(self):
+        c = cab.classify_cell("[B-ROLL: cutaway shot]")
+        assert c is not None
+        assert c.tag == "B-ROLL"
+        assert c.is_anchor
+
+    def test_priority_marker_prefix_parses_mg_template(self):
+        # The dominant pattern in every shipped script: "**P2** · [MG:] TemplateName"
+        c = cab.classify_cell("**P2** · [MG:] KineticTypography 'opening line'")
+        assert c is not None
+        assert c.tag == "MG"
+        assert c.template == "KineticTypography"
+        assert c.is_text_heavy
+
 
 # ── parse_visual_cells ──────────────────────────────────────────────────────
 
@@ -358,8 +386,12 @@ class TestCliSmoke:
         assert result.returncode == 1
 
     def test_real_prisoners_dilemma_script(self):
-        # Smoke test against the actual launch-candidate script. Should
-        # exit 0 (no errors) — the v6 restructure was anchor-heavy.
+        # Snapshot test against the launch-candidate script. Asserts:
+        #   · exit 0 (no doctrine errors)
+        #   · all 5 beats present
+        #   · per-beat anchor counts >= the v6.3-measured baseline
+        # so a future classification regression that under-counts anchors
+        # (e.g. someone breaks the AI-GEN tag recognition) gets caught.
         # Skip cleanly if the script has been moved/renamed.
         script_dir = REPO_ROOT / "episodes" / "prisoners-dilemma"
         if not (
@@ -371,14 +403,24 @@ class TestCliSmoke:
             [
                 sys.executable,
                 str(REPO_ROOT / "tools" / "lint" / "check_anchor_bridge.py"),
-                "prisoners-dilemma", "--stdout",
+                "prisoners-dilemma", "--json", "--stdout",
             ],
             capture_output=True, text=True,
         )
         assert result.returncode == 0
-        # Sanity check the parser actually walked the script — should
-        # produce a per-beat table row for beat 1.
-        assert "THE FAILED EXPERIMENT" in result.stdout or "| 1 |" in result.stdout
+        payload = json.loads(result.stdout)
+        by_num = {b["beat_number"]: b for b in payload["beats"]}
+        assert set(by_num) == {1, 2, 3, 4, 5}
+        # v6.3 baseline anchor counts (4, 6, 7, 10, 11). Use >= so
+        # additions don't break the test, only regressions.
+        assert by_num[1]["anchor_count"] >= 4
+        assert by_num[2]["anchor_count"] >= 6
+        assert by_num[3]["anchor_count"] >= 7
+        assert by_num[4]["anchor_count"] >= 10
+        assert by_num[5]["anchor_count"] >= 11
+        # No 🔴 errors in v6.3
+        errors = [f for f in payload["findings"] if f["level"] == "error"]
+        assert errors == []
 
     def test_error_exits_1(self, tmp_path):
         # >100 words with no anchor → error

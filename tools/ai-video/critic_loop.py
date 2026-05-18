@@ -24,7 +24,8 @@ Architecture (pure functions, mockable):
         ▲                                          │
         │              refined_prompt              │
         └──────────────────────────────────────────┘
-              max_iters, cost_budget guard
+              max_iters guard (cost budget deferred — generators are
+              priced per call by the caller, not the loop)
 
 Built-in critics:
   · palette_critic — dominant colors fall within brand palette tolerance
@@ -283,7 +284,13 @@ def prompt_spec_critic(
             "no required terms specified — skipped (treat as pass)",
         )
     prompt_l = artifact.prompt_used.lower()
-    missing = [t for t in required if t not in prompt_l]
+    # Word-boundary match so "gold" doesn't satisfy "goldfish" and "us"
+    # doesn't satisfy "trust". Term punctuation (hyphens, slashes) is
+    # escaped via re.escape so multi-word required terms work too.
+    missing = [
+        t for t in required
+        if not re.search(rf"\b{re.escape(t)}\b", prompt_l)
+    ]
     score = (len(required) - len(missing)) / len(required)
     passed = not missing
     return CritiqueResult(
@@ -514,9 +521,13 @@ def render_report_md(result: LoopResult, spec: GenerationSpec) -> str:
         lines.append("|---|---|---|---|")
         for c in rec.critiques:
             icon = "🟢" if c.passed else "🔴"
+            # Escape `|` in messages so a critic that mentions pipes
+            # (file paths, regex literals, "a|b" examples) doesn't break
+            # the markdown table layout.
+            safe_msg = c.message.replace("|", "\\|")
             lines.append(
                 f"| {c.name} | {icon} {'PASS' if c.passed else 'FAIL'} | "
-                f"{c.score:.2f} | {c.message} |"
+                f"{c.score:.2f} | {safe_msg} |"
             )
         lines.append("")
     return "\n".join(lines) + "\n"

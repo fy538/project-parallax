@@ -166,6 +166,62 @@ class TestRunScratchPass:
         assert not report.alignment_ran
         assert any("alignment skipped" in w for w in report.warnings)
 
+    def test_happy_path_produces_clean_report(self, tmp_script, monkeypatch):
+        """End-to-end success: alignment runs, manifest promotes, no warnings."""
+        script, wav = tmp_script
+        # Fixture script is "Hello world." → 2 words → 2/150*60 = 0.8s estimate
+        # Mock actual to match → 0% drift
+        EXPECTED_EST_SEC = 2 / sp.ffr.DEFAULT_WPM * 60
+
+        def fake_alignment(*args, **kwargs):
+            import whisper_alignment as wa
+            return (
+                wa.AlignmentReport(
+                    issues=[], script_word_count=2, transcript_word_count=2,
+                    transcript_duration_sec=EXPECTED_EST_SEC,
+                    estimated_script_duration_sec=EXPECTED_EST_SEC,
+                ),
+                0, 0,
+            )
+
+        def fake_manifest(*args, **kwargs):
+            pass  # silent success
+
+        monkeypatch.setattr(sp, "run_alignment_pass", fake_alignment)
+        monkeypatch.setattr(sp, "run_manifest_promotion", fake_manifest)
+        report = sp.run_scratch_pass("x", wav, script_override=script)
+        assert report.alignment_ran
+        assert report.manifest_promoted
+        assert report.warnings == []
+        assert report.actual_runtime_sec == pytest.approx(EXPECTED_EST_SEC, abs=0.01)
+        assert report.drift_pct == pytest.approx(0.0, abs=0.1)
+
+    def test_drift_pct_computation_correct(self, tmp_script, monkeypatch):
+        """Drift = (actual - estimate) / estimate * 100. Catches numerator
+        / denominator inversion or sign-flip regressions."""
+        script, wav = tmp_script
+        # Fixture script: 2 words → 0.8s estimate. Mock actual at 1.0s →
+        # drift = (1.0 - 0.8) / 0.8 * 100 = +25%
+        est_sec = 2 / sp.ffr.DEFAULT_WPM * 60
+        actual_sec = est_sec * 1.25
+
+        def fake_alignment(*args, **kwargs):
+            import whisper_alignment as wa
+            return (
+                wa.AlignmentReport(
+                    issues=[], script_word_count=2, transcript_word_count=2,
+                    transcript_duration_sec=actual_sec,
+                    estimated_script_duration_sec=est_sec,
+                ),
+                0, 0,
+            )
+
+        monkeypatch.setattr(sp, "run_alignment_pass", fake_alignment)
+        report = sp.run_scratch_pass(
+            "x", wav, skip_manifest=True, script_override=script,
+        )
+        assert report.drift_pct == pytest.approx(25.0, abs=0.5)
+
     def test_manifest_promotion_failure_captured_as_warning(self, tmp_script, monkeypatch):
         script, wav = tmp_script
 

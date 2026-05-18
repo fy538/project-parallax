@@ -396,8 +396,11 @@ def main() -> int:
         rel = out_path.relative_to(ROOT) if out_path.is_relative_to(ROOT) else out_path
         print(f"✓ wrote {rel}")
     else:
-        # Default: write to the episode dir
+        # Default: write to the episode dir (create if missing — protects
+        # against a typo'd slug where the wav was passed explicitly but
+        # the episode folder doesn't yet exist).
         out_path = EPISODES_DIR / args.slug / "scratch-pass-report.md"
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(rendered, encoding="utf-8")
         rel = out_path.relative_to(ROOT) if out_path.is_relative_to(ROOT) else out_path
         print(f"✓ wrote {rel}")
@@ -405,8 +408,18 @@ def main() -> int:
               f"{report.alignment_pickup_count} pickups · "
               f"manifest promoted: {report.manifest_promoted}")
 
-    # Exit codes
-    if report.warnings and not report.manifest_promoted:
+    # Exit codes:
+    #   2 — missing inputs (handled above)
+    #   1 — alignment or manifest stage FAILED unexpectedly (warning
+    #       recorded for a step we DIDN'T explicitly skip)
+    #   0 — everything succeeded OR was deliberately skipped
+    alignment_failed = (
+        not args.skip_alignment and not report.alignment_ran
+    )
+    manifest_failed = (
+        not args.no_manifest and not report.manifest_promoted
+    )
+    if alignment_failed or manifest_failed:
         return 1
     return 0
 

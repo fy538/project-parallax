@@ -74,9 +74,17 @@ ANCHOR_TAGS = {
     "FOOTAGE",      # real-world capture (anchor)
     "ARCHIVAL",     # historical photo / document (anchor)
     "AI-GEN",       # constructivist scene (figurative anchor)
+    "AI-VIDEO",     # generated motion clip (Pika / Kling / Sora) — concrete
+    "B-ROLL",       # cutaway / supporting capture — concrete
     "SCENE",        # chained morph scene (sustained anchor)
     "FORECAST",     # probability gauge — visual data, concrete
 }
+
+# Other tags we explicitly know about (LAYERED / ILLUST / MG) are handled
+# below in `classify_cell`. Any tag NOT in this allowlist is treated as
+# prose-bracket noise (`[actual]`, `[bracketed-term]`) and skipped to
+# avoid false-positive "ACTUAL" / "BRACKETED" classifications.
+KNOWN_TAGS = ANCHOR_TAGS | {"MG", "LAYERED", "ILLUST"}
 
 # Templates that count as anchors when wrapped in [MG:].
 ANCHOR_MG_TEMPLATES = {
@@ -160,8 +168,10 @@ class AnchorBridgeReport:
 
 
 # Match a leading [TAG:] or [TAG] at the start of the cell, capturing the
-# tag name (without brackets, without trailing colon).
-_TAG_RE = re.compile(r"\[([A-Z][A-Z-]*)\s*[:|\]]", re.IGNORECASE)
+# tag name (without brackets, without trailing colon). The `:` or `]` must
+# follow the tag immediately (after optional whitespace); the `|` inside
+# the character class was a typo in v1 — kept as literal but harmless.
+_TAG_RE = re.compile(r"\[([A-Z][A-Z-]*)\s*[:\]]", re.IGNORECASE)
 # After the tag, look for the first PascalCase template name. In the real
 # Parallax script format, [MG:] (closing bracket immediately) is followed
 # by a template name after whitespace, e.g. `[MG:] KineticTypography — ...`
@@ -188,6 +198,11 @@ def classify_cell(raw: str) -> Optional[VisualCell]:
     if not tag_match:
         return None
     tag = tag_match.group(1).upper()
+    # Bracketed prose in narration cells ([actual], [bracketed], etc.)
+    # would otherwise mis-parse as fake tags. Restrict classification to
+    # the documented tag vocabulary.
+    if tag not in KNOWN_TAGS:
+        return None
 
     template = ""
     # For [MG:], try to find the template name right after the tag.
@@ -428,9 +443,19 @@ def main() -> int:
     report = run_audit(args.slug, script_path)
 
     if args.json:
+        # `asdict` only walks dataclass fields, not @property values, so
+        # we re-emit the computed counts (anchor_count / text_heavy_count /
+        # typographic_ratio) alongside the field-level dump.
+        def _beat_dict(b):
+            d = asdict(b)
+            d["total_cells"] = b.total_cells
+            d["anchor_count"] = b.anchor_count
+            d["text_heavy_count"] = b.text_heavy_count
+            d["typographic_ratio"] = b.typographic_ratio
+            return d
         payload = {
             "slug": report.slug, "script_path": report.script_path,
-            "beats": [asdict(b) for b in report.beats],
+            "beats": [_beat_dict(b) for b in report.beats],
             "findings": [asdict(f) for f in report.findings],
         }
         out = json.dumps(payload, indent=2)

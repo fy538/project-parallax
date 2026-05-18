@@ -156,6 +156,24 @@ class TestPromptSpecCritic:
         result = cl.prompt_spec_critic(artifact, spec)
         assert result.passed
 
+    def test_word_boundary_prevents_substring_false_positives(self):
+        # 'gold' must not satisfy 'goldfish', 'us' must not satisfy 'trust',
+        # 'ink' must not satisfy 'thinking'. Pre-fix this critic used a
+        # naive substring search and silently passed wrong terms.
+        for prompt, term, should_pass in [
+            ("a goldfish swims", "gold", False),
+            ("trust the process", "us", False),
+            ("thinking ahead", "ink", False),
+            ("gold and ink palette", "gold", True),
+            ("gold and ink palette", "ink", True),
+        ]:
+            artifact = cl.Artifact(prompt_used=prompt)
+            spec = cl.GenerationSpec(prompt="x", required_terms=[term])
+            r = cl.prompt_spec_critic(artifact, spec)
+            assert r.passed is should_pass, (
+                f"prompt={prompt!r} term={term!r} expected {should_pass} got {r.passed}"
+            )
+
 
 # ── dimension_critic ────────────────────────────────────────────────────────
 
@@ -405,6 +423,24 @@ class TestRenderReport:
         assert "ACCEPTED" in out
         assert "Iteration 1" in out
         assert "🟢" in out
+
+    def test_escapes_pipe_in_message(self):
+        # If a critic message contains `|`, the markdown table layout
+        # would break (rendering an extra column). The escape replaces
+        # `|` with `\|` so the table stays readable.
+        spec = cl.GenerationSpec(prompt="x")
+        artifact = cl.Artifact(prompt_used="x", dimensions=(1920, 1080))
+        result = cl.LoopResult(
+            accepted=False, iterations=1, final_artifact=artifact,
+            history=[cl.IterationRecord(
+                iteration=1, prompt_used="x",
+                critiques=[cl.CritiqueResult(
+                    "synthetic", False, 0.0, "got a|b, want c|d",
+                )],
+            )],
+        )
+        out = cl.render_report_md(result, spec)
+        assert "got a\\|b" in out
 
     def test_renders_failures(self):
         spec = cl.GenerationSpec(prompt="x", required_terms=["missing"])
