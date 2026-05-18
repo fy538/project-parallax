@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
@@ -131,10 +132,17 @@ class ShortsCandidate:
     startSec: float
     endSec: float
     durationSec: float
-    score: int                   # composite ranking score
+    score: int                   # heuristic composite ranking score
     label: str                   # human-readable description
     rationale: str               # why this got proposed
     notes: str = ""              # operator notes (which inner template + data to fill)
+    # Optional LLM-scoring fields, populated only when --llm-score is used.
+    # Bounded-analogy rubric: a candidate scores higher when an analogy
+    # "snaps into focus" / when its limit is named cleanly / when it
+    # stands alone without setup. The heuristic score gets WHAT to score;
+    # the LLM score gets WHICH OF THESE deserves the operator's attention.
+    llm_score: Optional[float] = None     # 0-100 (None = not scored)
+    llm_rationale: str = ""
 
 
 @dataclass
@@ -409,6 +417,7 @@ def propose_shorts(
 
 
 def render_proposal_md(report: ProposalReport) -> str:
+    any_llm_scored = any(c.llm_score is not None for c in report.candidates)
     lines = [
         f"# Shorts Candidate Proposals — {report.slug}",
         "",
@@ -419,34 +428,62 @@ def render_proposal_md(report: ProposalReport) -> str:
         f"script-level understanding), then promote `shorts-manifest-"
         f"proposed.json` to `shorts-manifest.json`._",
         "",
+    ]
+    if any_llm_scored:
+        lines.append(
+            "_LLM-scored: candidates re-ranked via Claude scoring against "
+            "the Parallax bounded-analogy rubric (snap moment / bounded "
+            "moment / self-contained / visual hook). Heuristic score "
+            "shown alongside for cross-reference._"
+        )
+        lines.append("")
+    lines.extend([
         f"**Total candidates considered:** {report.total_candidates}",
         f"**Top N proposed:** {len(report.candidates)}",
         "",
         "## Proposed candidates (highest score first)",
         "",
-        "| # | Kind | Beat | Duration | Template | Score | Label |",
-        "|---|---|---|---|---|---|---|",
-    ]
-    for i, c in enumerate(report.candidates, 1):
-        lines.append(
-            f"| {i} | {c.candidate_kind} | _{c.sourceBeat[:30]}_ | "
-            f"{c.durationSec:.0f}s | `{c.template}` | {c.score} | {c.label} |"
-        )
+    ])
+    if any_llm_scored:
+        lines.append("| # | Kind | Beat | Dur | Template | LLM | Heur | Label |")
+        lines.append("|---|---|---|---|---|---|---|---|")
+        for i, c in enumerate(report.candidates, 1):
+            llm = f"{c.llm_score:.0f}" if c.llm_score is not None else "—"
+            lines.append(
+                f"| {i} | {c.candidate_kind} | _{c.sourceBeat[:25]}_ | "
+                f"{c.durationSec:.0f}s | `{c.template}` | **{llm}** | "
+                f"{c.score} | {c.label} |"
+            )
+    else:
+        lines.append("| # | Kind | Beat | Duration | Template | Score | Label |")
+        lines.append("|---|---|---|---|---|---|---|")
+        for i, c in enumerate(report.candidates, 1):
+            lines.append(
+                f"| {i} | {c.candidate_kind} | _{c.sourceBeat[:30]}_ | "
+                f"{c.durationSec:.0f}s | `{c.template}` | {c.score} | {c.label} |"
+            )
     lines.extend(["", "## Detail per candidate", ""])
     for i, c in enumerate(report.candidates, 1):
+        header_score = (
+            f"LLM {c.llm_score:.0f} · heuristic {c.score}"
+            if c.llm_score is not None else f"score {c.score}"
+        )
         lines.extend([
-            f"### {i}. {c.label} (score {c.score})",
+            f"### {i}. {c.label} ({header_score})",
             "",
             f"- **Kind:** {c.candidate_kind}",
             f"- **Source:** {c.sourceBeat}",
             f"- **Time:** {c.startSec:.1f}s – {c.endSec:.1f}s ({c.durationSec:.0f}s)",
             f"- **Template:** `{c.template}`",
             "",
-            f"**Why:** {c.rationale}",
-            "",
-            f"**Operator notes:** {c.notes}",
+            f"**Why (heuristic):** {c.rationale}",
             "",
         ])
+        if c.llm_rationale:
+            lines.append(f"**LLM rationale:** {c.llm_rationale}")
+            lines.append("")
+        lines.append(f"**Operator notes:** {c.notes}")
+        lines.append("")
     lines.extend([
         "---",
         "",
@@ -502,6 +539,22 @@ def main() -> int:
         help="Also write episodes/<slug>/shorts-manifest-proposed.json "
              "(skeleton for the operator to fill + rename).",
     )
+    parser.add_argument(
+        "--llm-score", action="store_true",
+        help="Re-rank candidates via Claude scoring against the Parallax "
+             "bounded-analogy rubric (snap moment / bounded moment / "
+             "self-contained / visual hook). Requires ANTHROPIC_API_KEY "
+             "env var. Smarter than the heuristic for editorial judgment.",
+    )
+    parser.add_argument(
+        "--llm-model", default="claude-sonnet-4-5",
+        help="Anthropic model to use for --llm-score (default: claude-sonnet-4-5).",
+    )
+    parser.add_argument(
+        "--llm-dry-run", action="store_true",
+        help="With --llm-score: print the prompt that WOULD be sent for "
+             "the first candidate (no API call). Useful for prompt iteration.",
+    )
     parser.add_argument("--json", action="store_true", help="Emit JSON report.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")
     parser.add_argument("-o", "--output", help="Write report to file.")
@@ -534,6 +587,42 @@ def main() -> int:
         + _propose_framework_candidates(manifest, beat_labels)
         + _propose_beat_opener_candidates(manifest, beat_labels)
     )
+
+    # Optional LLM re-rank — same I/O contract, smarter selection brain
+    if args.llm_score or args.llm_dry_run:
+        # Lazy import so the heuristic path has no LLM-related load
+        import shorts_llm_scorer as scorer_mod  # noqa
+        if args.llm_dry_run:
+            # Preview the prompt for the first candidate, don't call API
+            if candidates:
+                narration = scorer_mod.collect_narration_for_window(
+                    manifest, candidates[0].startSec, candidates[0].endSec,
+                )
+                prompt = scorer_mod.build_scoring_prompt(candidates[0], narration)
+                print(
+                    "# LLM Scoring — DRY RUN\n\n"
+                    "_Prompt that would be sent for candidate #1. Re-run "
+                    "without --llm-dry-run to actually score._\n\n"
+                    "```\n" + prompt + "\n```\n",
+                    file=sys.stderr,
+                )
+        else:
+            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+            if not api_key:
+                print(
+                    "✗ --llm-score requires ANTHROPIC_API_KEY env var. "
+                    "Use --llm-dry-run to preview the prompt without "
+                    "an API call.",
+                    file=sys.stderr,
+                )
+                return 2
+            try:
+                fn = scorer_mod.make_anthropic_scorer(api_key, model=args.llm_model)
+            except RuntimeError as e:
+                print(f"✗ {e}", file=sys.stderr)
+                return 2
+            candidates = scorer_mod.llm_rerank(candidates, manifest, fn)
+
     report = ProposalReport(
         slug=args.slug, manifest_path=str(manifest_path),
         total_candidates=len(all_candidates), candidates=candidates,
