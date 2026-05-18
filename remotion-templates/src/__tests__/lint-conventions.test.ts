@@ -16,6 +16,8 @@ import {
   lintContent,
   lintRootCompositions,
   lintDeprecatedTemplateDispatch,
+  lintTypesDriftFromSchema,
+  TYPES_DRIFT_GRANDFATHERED,
 } from "../../scripts/lint-conventions.mjs";
 
 interface Issue {
@@ -424,6 +426,85 @@ describe("lintDeprecatedTemplateDispatch (no-deprecated-template-dispatch)", () 
     // return zero. A future PR adding either back triggers this test.
     const issues = lintDeprecatedTemplateDispatch() as Issue[];
     expect(issues).toEqual([]);
+  });
+});
+
+describe("lintTypesDriftFromSchema (types-drift-from-schema)", () => {
+  function makeFixture(opts: { hasSchema: boolean; usesZInfer: boolean; hasInterface: boolean; pragma?: boolean }) {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lint-drift-"));
+    const templatesDir = path.join(tmp, "templates");
+    const fooDir = path.join(templatesDir, "Foo");
+    fs.mkdirSync(fooDir, { recursive: true });
+    if (opts.hasSchema) {
+      fs.writeFileSync(path.join(fooDir, "schema.ts"), "export const FooSchema = {};");
+    }
+    const typesParts: string[] = [];
+    if (opts.pragma) typesParts.push("// @types-drift: ok — Foo uses runtime-only typing.");
+    if (opts.usesZInfer) {
+      typesParts.push("import type { z } from 'zod';");
+      typesParts.push("import type { FooSchema } from './schema';");
+      typesParts.push("export type FooData = z.infer<typeof FooSchema>;");
+    }
+    if (opts.hasInterface) {
+      typesParts.push("export interface FooData { bar: string; baz?: number; }");
+    }
+    if (typesParts.length === 0) typesParts.push("// empty");
+    fs.writeFileSync(path.join(fooDir, "types.ts"), typesParts.join("\n"));
+    return { tmp, templatesDir };
+  }
+
+  it("flags a template with schema.ts + hand-typed types.ts (no z.infer, no pragma)", () => {
+    const { tmp, templatesDir } = makeFixture({ hasSchema: true, usesZInfer: false, hasInterface: true });
+    const issues = lintTypesDriftFromSchema(templatesDir) as Issue[];
+    expect(issues).toHaveLength(1);
+    expect(issues[0].rule).toBe("types-drift-from-schema");
+    expect(issues[0].message).toContain("Foo");
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("ignores migrated templates (z.infer present)", () => {
+    const { tmp, templatesDir } = makeFixture({ hasSchema: true, usesZInfer: true, hasInterface: false });
+    const issues = lintTypesDriftFromSchema(templatesDir) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("ignores templates with no schema.ts (the rule's premise doesn't apply)", () => {
+    const { tmp, templatesDir } = makeFixture({ hasSchema: false, usesZInfer: false, hasInterface: true });
+    const issues = lintTypesDriftFromSchema(templatesDir) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("ignores templates with `// @types-drift: ok` pragma (escape hatch)", () => {
+    const { tmp, templatesDir } = makeFixture({ hasSchema: true, usesZInfer: false, hasInterface: true, pragma: true });
+    const issues = lintTypesDriftFromSchema(templatesDir) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("ignores templates with no interface/type declarations (nothing to drift)", () => {
+    const { tmp, templatesDir } = makeFixture({ hasSchema: true, usesZInfer: false, hasInterface: false });
+    const issues = lintTypesDriftFromSchema(templatesDir) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("real-repo grandfather list is currently exhaustive (regression guard)", () => {
+    // After the May 18 migration of 5 templates + grandfathering of the
+    // remaining 46, the real repo MUST return zero from this rule. If a
+    // new template lands without using z.infer, this test fails — that's
+    // the point (new templates default to the right pattern).
+    const issues = lintTypesDriftFromSchema() as Issue[];
+    expect(issues).toEqual([]);
+  });
+
+  it("grandfather list shrinks meaningfully when entries are migrated (sanity check)", () => {
+    // The set should be non-empty (we haven't migrated all 51) and at
+    // most as large as the total template count. A future migration PR
+    // that drops to 0 would also drop this assertion; that's expected.
+    expect(TYPES_DRIFT_GRANDFATHERED.size).toBeGreaterThan(0);
+    expect(TYPES_DRIFT_GRANDFATHERED.size).toBeLessThan(100);
   });
 });
 

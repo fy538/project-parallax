@@ -1,18 +1,21 @@
 /**
  * Zod schemas for FrameworkDiagram template.
+ *
+ * Schema-derived types (May 2026 audit #3 — see StatReveal for canonical
+ * pattern). Inner shapes exported so types.ts can `z.infer` from each.
  */
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
-const ComparisonColumnSchema = z.object({
+export const ComparisonColumnSchema = z.object({
   title: z.string(),
   icon: z.string().optional(),
   items: z.array(z.string()),
   color: z.string().optional(),
 });
 
-const FlowNodeSchema = z.object({
+export const FlowNodeSchema = z.object({
   label: z.string(),
   sublabel: z.string().optional(),
   color: z.string().optional(),
@@ -23,7 +26,7 @@ const FlowNodeSchema = z.object({
   weight: z.number().positive().optional(),
 });
 
-const MatrixCellSchema = z.object({
+export const MatrixCellSchema = z.object({
   row: z.number(),
   col: z.number(),
   label: z.string(),
@@ -31,8 +34,27 @@ const MatrixCellSchema = z.object({
   highlight: z.boolean().optional(),
 });
 
-export const FrameworkDiagramSchema = z.object({
-  data: z
+export const MatrixItemSchema = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  label: z.string(),
+  color: z.string().optional(),
+  weight: z.number().positive().optional(),
+});
+
+export const FrameworkPhaseSchema = z.object({
+  label: z.string(),
+  durationSec: z.number().positive(),
+  activeNodes: z.array(z.number().int().nonnegative()).optional(),
+});
+
+export const EliminatedScenarioSchema = z.object({
+  filter: z.number().int().nonnegative(),
+  scenario: z.string(),
+  color: z.string().optional(),
+});
+
+export const FrameworkDiagramDataSchema = z
     .object({
       episode: z.string(),
       title: z.string(),
@@ -47,33 +69,16 @@ export const FrameworkDiagramSchema = z.object({
       rowHeaders: z.array(z.string()).optional(),
       colHeaders: z.array(z.string()).optional(),
       cells: z.array(MatrixCellSchema).optional(),
-      items: z.array(z.object({
-        x: z.number().min(0).max(1),
-        y: z.number().min(0).max(1),
-        label: z.string(),
-        color: z.string().optional(),
-        weight: z.number().positive().optional(),
-      })).optional(),
+      items: z.array(MatrixItemSchema).optional(),
       accentColor: z.string().optional(),
       backgroundVariant: z.enum(["dark", "light"]).optional(),
       durationSec: z.number().positive().optional(),
       _direction: DirectionBlockSchema.optional(),
       backgroundTint: z.string().optional(),
       // Phase-sequenced reveals — each phase makes a subset of nodes active.
-      // TS-SIDE: FrameworkPhase[] in types.ts. Previously absent from schema
-      // so Zod would silently strip this field in non-passthrough parse mode.
-      phases: z.array(z.object({
-        label: z.string(),
-        durationSec: z.number().positive(),
-        activeNodes: z.array(z.number().int().nonnegative()).optional(),
-      })).optional(),
+      phases: z.array(FrameworkPhaseSchema).optional(),
       // Logical elimination overlays (matrix variant).
-      // TS-SIDE: EliminatedScenario[] in types.ts.
-      eliminatedScenarios: z.array(z.object({
-        filter: z.number().int().nonnegative(),
-        scenario: z.string(),
-        color: z.string().optional(),
-      })).optional(),
+      eliminatedScenarios: z.array(EliminatedScenarioSchema).optional(),
     })
     .superRefine((d, ctx) => {
       if (
@@ -100,5 +105,8 @@ export const FrameworkDiagramSchema = z.object({
           path: ["cells"],
         });
       }
-    }),
+    });
+
+export const FrameworkDiagramSchema = z.object({
+  data: FrameworkDiagramDataSchema,
 });

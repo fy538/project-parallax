@@ -1,19 +1,25 @@
 /**
  * Zod schemas for DataChart template — runtime validation + Remotion Studio editing.
+ *
+ * Schema-derived types (May 2026 audit #3 — see StatReveal for the
+ * canonical pattern). Inner shapes (DataPointSchema, ComparisonPairSchema,
+ * ReferenceLineSchema, SpotlightStepSchema, DataChartDataSchema) are
+ * exported so types.ts can `z.infer` from each. Outer DataChartSchema is
+ * kept for the manifest dispatch in Episodes/templateSchemas.ts.
  */
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 import { EditorialFrameSchema } from "../../components/EditorialFrame/schema";
 
-const DataPointSchema = z.object({
+export const DataPointSchema = z.object({
   label: z.string(),
   value: z.number(),
   color: z.string().optional(),
   sublabel: z.string().optional(),
 });
 
-const ComparisonPairSchema = z.object({
+export const ComparisonPairSchema = z.object({
   label: z.string(),
   leftValue: z.number(),
   rightValue: z.number(),
@@ -35,13 +41,13 @@ const ComparisonPairSchema = z.object({
   showInlineValues: z.boolean().optional(),
 });
 
-const ReferenceLineSchema = z.object({
+export const ReferenceLineSchema = z.object({
   value: z.number(),
   label: z.string(),
   color: z.string().optional(),
 });
 
-const SpotlightStepSchema = z.object({
+export const SpotlightStepSchema = z.object({
   barIndices: z.array(z.number()),
   duration: z.number(),
   zoom: z.number().optional(),
@@ -50,8 +56,7 @@ const SpotlightStepSchema = z.object({
   label: z.string().optional(),
 });
 
-export const DataChartSchema = z.object({
-  data: z
+export const DataChartDataSchema = z
     .object({
       episode: z.string(),
       title: z.string().describe("State the finding, not the topic. Write: 'TSMC controls 90% of cutting-edge chip production' not 'Chip production shares'. The title IS the editorial argument."),
@@ -124,5 +129,8 @@ export const DataChartSchema = z.object({
           path: ["panels"],
         });
       }
-    }),
+    });
+
+export const DataChartSchema = z.object({
+  data: DataChartDataSchema,
 });

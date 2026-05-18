@@ -860,6 +860,99 @@ export function lintDeprecatedTemplateDispatch(
   return issues;
 }
 
+/**
+ * Repo-wide check: types.ts files in template directories must derive
+ * their types from schema.ts via z.infer, not hand-duplicate the shape.
+ *
+ * The old pattern (hand-typed types.ts + parallel schema.ts) silently
+ * drifted whenever a field was added to one file without the other.
+ * Adopters (z.infer) are the canonical pattern as of May 2026 audit #3.
+ *
+ * Grandfather list (TYPES_DRIFT_GRANDFATHERED below) tolerates the 46
+ * templates that haven't been migrated yet. The list is the SHRINKABLE
+ * surface: when a template is touched, migrate its types.ts to z.infer
+ * and remove the entry. New templates (not in the list) get blocked at
+ * commit time.
+ *
+ * Detection: a types.ts file is FLAGGED when:
+ *   1. A sibling schema.ts exists, AND
+ *   2. types.ts has no `z.infer` reference AND no `// @types-drift: ok`
+ *      pragma (escape hatch with rationale required), AND
+ *   3. types.ts declares at least one `export interface` or `export type`.
+ *
+ * Added: May 18, 2026 engineering audit #3.
+ */
+export const TYPES_DRIFT_GRANDFATHERED = new Set([
+  // Migrated as of May 18, 2026 (canonical examples): StatReveal,
+  // KineticTypography, DataChart, BumpChart, FrameworkDiagram. Entries
+  // below are the remaining 46 templates that hand-type their data shape;
+  // remove an entry when its types.ts is migrated to z.infer.
+  "AnnotatedImage", "ArcDiagram", "AtlasPlate", "BayesianUpdate",
+  "BeeswarmChart", "BulletChart", "CalendarHeatmap", "CartogramMap",
+  "ChoroplethMap", "ConnectedScatterplot", "DecisionTree", "DensityMap",
+  "DualTimeline", "DuelingFrameworks", "DumbbellPlot", "EditorialTest",
+  "EscalationLadder", "GameBoard", "HorizonChart", "HorizontalTimeline",
+  "ImageComposite", "IsotypeChart", "KPICard", "MarimekkoChart",
+  "NetworkDiagram", "OutcomePartition", "PhotoMontage", "PopulationPyramid",
+  "PricingWaterfall", "ProbabilityGauge", "ProportionalSymbolMap",
+  "RadarChart", "RankChangeDotPlot", "RidgelinePlot", "RouteAnimation",
+  "SankeyFlow", "Slopegraph", "SplitComposition", "StepLine",
+  "StrategicLandscape", "Streamgraph", "TernaryPlot", "Thumbnail",
+  "TilegramUSMap", "TimeSeriesChart", "TimelineComparison", "TitleTransition",
+]);
+
+export function lintTypesDriftFromSchema(templatesDir = TEMPLATES_DIR) {
+  if (!fs.existsSync(templatesDir)) return [];
+  const issues = [];
+  for (const entry of fs.readdirSync(templatesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith("_") || entry.name === "Episodes" || entry.name === "Shorts") continue;
+
+    const typesPath = path.join(templatesDir, entry.name, "types.ts");
+    const schemaPath = path.join(templatesDir, entry.name, "schema.ts");
+    if (!fs.existsSync(typesPath) || !fs.existsSync(schemaPath)) continue;
+
+    const typesContent = fs.readFileSync(typesPath, "utf-8");
+
+    // Migrated (uses z.infer)? Skip.
+    if (typesContent.includes("z.infer")) {
+      // Stale entry — was on the grandfather list but now migrated.
+      // Stale entries don't break anything but should be cleaned up so
+      // the list reflects truth. We could surface that here, but since
+      // the manual list-shrink workflow is the point, we keep it quiet.
+      continue;
+    }
+    // Explicit escape hatch.
+    if (/\/\/\s*@types-drift:\s*ok/.test(typesContent)) continue;
+    // No interface / type declarations? Not really a types.ts in the
+    // sense the rule targets; skip silently.
+    if (!/export\s+(interface|type)\s+\w/.test(typesContent)) continue;
+    // Grandfathered → tolerated.
+    if (TYPES_DRIFT_GRANDFATHERED.has(entry.name)) continue;
+
+    issues.push({
+      file: path.relative(path.resolve(__dirname, ".."), typesPath),
+      line: 1,
+      rule: "types-drift-from-schema",
+      severity: "error",
+      message: (
+        `Template '${entry.name}' has both types.ts and schema.ts but ` +
+        `types.ts hand-declares interfaces/types instead of deriving ` +
+        `them via z.infer<typeof XSchema>. This is the pattern that ` +
+        `silently drifts between the two files. See StatReveal for the ` +
+        `canonical migration.`
+      ),
+      fix: (
+        `Export the inner data shape as <Name>DataSchema in schema.ts, ` +
+        `then in types.ts: \`export type <Name>Data = z.infer<typeof <Name>DataSchema>\`. ` +
+        `Remove the entry from TYPES_DRIFT_GRANDFATHERED in lint-conventions.mjs ` +
+        `after migration. Or, with rationale, add \`// @types-drift: ok\` ` +
+        `to types.ts.`
+      ),
+    });
+  }
+  return issues;
+}
+
 // Re-export rule definitions for inspection in tests.
 export { rules };
 
@@ -899,6 +992,7 @@ for (const file of getEpisodeFiles()) {
 
 allIssues.push(...lintRootCompositions());
 allIssues.push(...lintDeprecatedTemplateDispatch());
+allIssues.push(...lintTypesDriftFromSchema());
 
 // ── Output ─────────────────────────────────────────────────────────────────
 

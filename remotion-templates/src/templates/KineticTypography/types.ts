@@ -1,43 +1,19 @@
 /**
- * Data types for the KineticTypography template.
+ * KineticTypography — animated quotes, definitions, bilingual text,
+ * single statistics.
  *
- * Animated quotes, definitions, and bilingual text displays.
+ * Types derived from Zod schemas (May 2026 audit #3 — see StatReveal for
+ * the canonical pattern explanation). The pre-existing hand-typed
+ * `QuoteData` interface silently drifted whenever a field was added to
+ * schema.ts without the corresponding TS update; now it's a one-line
+ * re-export.
+ *
+ * Variants: "quote" (with optional attribution), "definition" (with
+ * pinyin + translation for Chinese terms), "bilingual" (paired EN/CN),
+ * "statistic" (single hero number with label + context).
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
+import type { z } from "zod";
+import type { QuoteDataDataSchema } from "./schema";
 
-export interface QuoteData {
-  episode: string;
-  variant: "quote" | "definition" | "bilingual" | "statistic";
-
-  // For quotes
-  text?: string;
-  attribution?: string;
-  attributionContext?: string; // e.g., "Founder of TSMC, 2024"
-
-  // For definitions
-  term?: string;
-  termPinyin?: string; // For Chinese terms: "kǎ bózi"
-  termTranslation?: string; // "Stranglehold technology"
-  definitionText?: string;
-
-  // For bilingual display
-  chineseText?: string;
-  englishText?: string;
-
-  // For statistics
-  statValue?: string; // "7%"
-  statLabel?: string; // "of US chip demand"
-  statContext?: string; // "Despite $165B investment"
-
-  // Styling
-  accentColor?: string;
-  backgroundVariant?: "dark" | "light";
-  /** Subtle color tint for emotional temperature (Layer 3). Hex color, e.g. "#3266AD" for US-blue, "#C23B22" for China-red. */
-  backgroundTint?: string;
-  durationSec?: number;
-
-  // ── Directing language overrides ──────────────────────────────────────
-  /** Per-composition direction block from visual-spec _direction namespace. */
-  _direction?: DirectionBlock;
-}
+export type QuoteData = z.infer<typeof QuoteDataDataSchema>;

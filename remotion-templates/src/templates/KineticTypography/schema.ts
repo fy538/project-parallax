@@ -1,34 +1,39 @@
 /**
  * Zod schemas for KineticTypography template.
+ *
+ * Schema-derived types (May 2026 audit #3): the inner `data` object is
+ * exported as `QuoteDataDataSchema` so types.ts can `z.infer` from it.
+ * Outer `QuoteDataSchema` keeps its historic name (manifest dispatch in
+ * Episodes/templateSchemas.ts references it as `KineticTypographySchema`
+ * via import alias).
  */
 
 import { z } from "zod";
 import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
-export const QuoteDataSchema = z.object({
-  data: z
-    .object({
-      episode: z.string(),
-      variant: z.enum(["quote", "definition", "bilingual", "statistic"]),
-      text: z.string().optional(),
-      attribution: z.string().optional(),
-      attributionContext: z.string().optional(),
-      term: z.string().optional(),
-      termPinyin: z.string().optional(),
-      termTranslation: z.string().optional(),
-      definitionText: z.string().optional(),
-      chineseText: z.string().optional(),
-      englishText: z.string().optional(),
-      statValue: z.string().optional(),
-      statLabel: z.string().optional(),
-      statContext: z.string().optional(),
-      accentColor: z.string().optional(),
-      backgroundVariant: z.enum(["dark", "light"]).optional(),
-      durationSec: z.number().positive().optional(),
-      _direction: DirectionBlockSchema.optional(),
-      backgroundTint: z.string().optional(),
-    })
-    .superRefine((d, ctx) => {
+export const QuoteDataDataSchema = z
+  .object({
+    episode: z.string(),
+    variant: z.enum(["quote", "definition", "bilingual", "statistic"]),
+    text: z.string().optional(),
+    attribution: z.string().optional(),
+    attributionContext: z.string().optional(),
+    term: z.string().optional(),
+    termPinyin: z.string().optional(),
+    termTranslation: z.string().optional(),
+    definitionText: z.string().optional(),
+    chineseText: z.string().optional(),
+    englishText: z.string().optional(),
+    statValue: z.string().optional(),
+    statLabel: z.string().optional(),
+    statContext: z.string().optional(),
+    accentColor: z.string().optional(),
+    backgroundVariant: z.enum(["dark", "light"]).optional(),
+    durationSec: z.number().positive().optional(),
+    _direction: DirectionBlockSchema.optional(),
+    backgroundTint: z.string().optional(),
+  })
+  .superRefine((d, ctx) => {
       if (d.variant === "quote" && !d.text) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -71,5 +76,8 @@ export const QuoteDataSchema = z.object({
           path: ["statValue"],
         });
       }
-    }),
+    });
+
+export const QuoteDataSchema = z.object({
+  data: QuoteDataDataSchema,
 });

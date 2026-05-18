@@ -1,42 +1,19 @@
 /**
- * Data types for the BumpChart template.
+ * BumpChart — N entities tracing their rank position over M time periods.
  *
- * Shows N entities tracing their rank position over M time periods.
- * The "power transition" chart where rank crossings are the editorial argument.
- * Ranks are COMPUTED from entity values — not authored directly.
+ * The "power transition" chart where rank crossings are the editorial
+ * argument. Ranks are COMPUTED from entity values — not authored directly.
+ *
+ * Types derived from Zod schemas (May 2026 audit #3 — see StatReveal for
+ * the canonical pattern). Field semantics live on `.describe()` calls in
+ * schema.ts.
  */
 
-import type { DirectionBlock } from "../../hooks/useDirection";
+import type { z } from "zod";
+import type {
+  BumpChartEntitySchema,
+  BumpChartDataSchema,
+} from "./schema";
 
-export interface BumpChartEntity {
-  id: string;
-  label: string;
-  color?: string;
-  /** Pre-supplied values per period; ranks are COMPUTED from these (not authored) */
-  values: Array<{ period: string | number; value: number }>;
-}
-
-export interface BumpChartData {
-  episode: string;
-  title: string;
-  subtitle?: string;
-  source?: string;
-  durationSec?: number;
-  holdAfterRevealSec?: number;
-  /** The ordered time-period labels for the x-axis */
-  periods: string[];
-  entities: BumpChartEntity[];
-  /**
-   * "desc" = highest value is rank 1 (default — GDP, military spending, population)
-   * "asc"  = lowest value is rank 1 (e.g., cost rankings)
-   */
-  rankDirection?: "asc" | "desc";
-  /** Entity IDs to bold and always label */
-  highlightIds?: string[];
-  /** Context shown in annotation, e.g. "GDP in current USD" */
-  unit?: string;
-  /** Background theme variant — "light" (default) or "dark". */
-  backgroundVariant?: "light" | "dark";
-  /** Per-composition direction block from visual-spec _direction namespace. */
-  _direction?: DirectionBlock;
-}
+export type BumpChartEntity = z.infer<typeof BumpChartEntitySchema>;
+export type BumpChartData = z.infer<typeof BumpChartDataSchema>;
