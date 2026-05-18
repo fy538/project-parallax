@@ -50,14 +50,16 @@ Two design-time beats engineered as **shorts-native standalone moments**. Each p
 **Hedge-stripping self-check** — both beats keep the bounded clause inside the 45–60s window. Without it, Beat 1 would sound like "the textbook is just wrong" (Jiang/Whatifalthist register) and Beat 4 would sound like "the answer is always cooperation" (utopian register). Neither is what the long-form actually claims.
 
 1. **Beat 1 — `history-rhymes`** (Flood-Dresher 1950 incident)
-   - **Standalone claim:** *"In 1950, the Prisoner's Dilemma's very first experiment got 60% cooperation. The theory predicted zero. John Nash blamed the players, not the model — and the field followed him."*
+   - **Standalone claim:** *"In 1950, the Prisoner's Dilemma's very first experiment got 60% cooperation. The theory predicted mutual defection. John Nash blamed the players, not the model — and the field followed him for 75 years."*
    - **Bounded clause:** *"Nash was technically right about the math; a single Nash equilibrium is defection. But ring-fencing the result instead of revising the model set a template that's still running 75 years later — and you can hear it every time someone says 'players defect because they're rational.'"*
-   - **Hook frame-1 visual:** Large bone-on-ink type: **"60% / 0%"** with two captions beneath: "observed cooperation" / "predicted by theory". Mid-century corporate-modernist register; sound-off legible.
+   - **Hook frame-1 visual:** Large bone-on-ink type: **"60%"** stacked over **"0%"** with captions "observed cooperation" / "predicted by model". Mid-century corporate-modernist register; sound-off legible.
+   - **Wording note (hedge-strip self-check):** "predicted mutual defection" is the careful version. An earlier draft used "predicted zero" — game-theory critics would correctly note that PD's Nash analysis predicts an equilibrium strategy, not a literal rate. The long-form says *"mutual defection — the only outcome the model predicted — happened fourteen times out of a hundred,"* so this matches.
 
 2. **Beat 4 — `framework-in-45s`** (stag-hunt reframe)
-   - **Standalone claim:** *"The Prisoner's Dilemma assumes you can't talk. The Stag Hunt assumes you can. Most situations people call 'prisoner's dilemmas' are actually stag hunts — and the difference is whether cooperation is an equilibrium."*
+   - **Standalone claim:** *"The Prisoner's Dilemma has one equilibrium: defection. The Stag Hunt has two — and one of them is cooperation. Most situations people call 'prisoner's dilemmas' are actually stag hunts."*
    - **Bounded clause:** *"Some things really ARE prisoner's dilemmas — OPEC cheating, anonymous one-shots. The point isn't that PD is always wrong. The point is it's the wrong default — and defaulting to it locks in cooperation failure that wasn't structurally required."*
    - **Hook frame-1 visual:** SplitComposition — left half "PRISONER'S DILEMMA" with one glowing defection dot, ∴ divider, right half "STAG HUNT" with two glowing dots (cooperative one in amber). Single sentence below: "Most prisoner's dilemmas aren't."
+   - **Wording note (hedge-strip self-check):** earlier draft phrased the difference as *"the PD assumes you can't talk. The Stag Hunt assumes you can."* That folksy compression misrepresents the long-form, which locates the difference in equilibrium structure (Skyrms's proof that iterated PD ≡ stag hunt is about equilibrium multiplicity, not communication). The equilibrium-count framing matches what the long-form actually argues AND lands geometrically on the dot-count visual.
 
 ## Speculation Budget
 **Structure:** Single prediction + watch signals (compress the three scenarios to background texture — the episode's job is to deliver the reframe, not to forecast geopolitics).

@@ -45,7 +45,7 @@ Key changes from v5.6 (carried forward to v6.2):
 | NARRATION | VISUAL PRODUCTION |
 |-----------|-------------------|
 | Every textbook on international relations teaches the same lesson: rational actors defect. Cooperation between rivals is hard because of self-interest. There's even a model that proves it — the Prisoner's Dilemma. It's the lens through which the people managing US-China policy, climate negotiations, and the next round of nuclear arms control all look at each other. | **P2** · [MG:] KineticTypography — opening line treated as authoritative textbook quote, bone on ink, slight tracking-in animation. Cite-style attribution beneath: "(every IR textbook, basically)" in muted small caps · 14s |
-|  | [SHORTS-BEAT: history-rhymes; standalone:"In 1950, the Prisoner's Dilemma's first experiment got 60% cooperation. The theory predicted zero. Nash blamed the players, not the model — and the field followed him for 75 years."] |
+|  | [SHORTS-BEAT: history-rhymes; standalone:"In 1950, the Prisoner's Dilemma's first experiment got 60% cooperation. The theory predicted mutual defection. Nash blamed the players, not the model — and the field followed him for 75 years."] |
 |  | DIR: reveal(tracking-in, sync:"rational actors defect", settle) |
 |  | DIR: mood(subtle) |
 | It's also wrong. Not the math — the conclusion. And the proof that it's wrong is the first time anyone ever tested it. | **P1** · [MG:] KineticTypography — "It's also wrong." amber on ink, large center, then quick follow-on lines · 8s |
@@ -187,7 +187,7 @@ Key changes from v5.6 (carried forward to v6.2):
 |  | DIR: reveal(sequential, per-phase:4s, settle) |
 |  | DIR: cam(overview → element:0, sync:"fundamentally", track) |
 |  | DIR: hold(breathe) |
-|  | [SHORTS-BEAT: framework-in-45s; standalone:"The Prisoner's Dilemma assumes you can't talk. The Stag Hunt assumes you can. Most situations people call 'prisoner's dilemmas' are actually stag hunts — and the difference is whether cooperation is an equilibrium."] |
+|  | [SHORTS-BEAT: framework-in-45s; standalone:"The Prisoner's Dilemma has one equilibrium: defection. The Stag Hunt has two — and one of them is cooperation. Most situations people call 'prisoner's dilemmas' are actually stag hunts."] |
 | *(Voice note: slow down — this is the turn. Viewer needs to feel the difference between two equilibria and one.)* | |
 | In the Prisoner's Dilemma, mutual cooperation is not an equilibrium. Defection always pays more. In the stag hunt, mutual cooperation *is* an equilibrium — it's rational to cooperate, as long as you can trust that others will too. The puzzle shifts from domination to coordination. | **P1** · [MG:] SplitComposition — Left: PD matrix (one dot at mutual defection). ∴ divider. Right: Stag Hunt (two dots, cooperative dot highlighted amber). · [prisoners-dilemma/split-pd-vs-staghunt.json] · 10s |
 |  | DIR: reveal(stagger:400ms, hero:0, pulse) |
