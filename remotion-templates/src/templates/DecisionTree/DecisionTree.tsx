@@ -413,7 +413,7 @@ const TreeNodeComponent: React.FC<{
     : "none";
   const schematicFill = isSchematic
     ? isActive
-      ? `${highlightColor}10`
+      ? `${highlightColor}16`
       : "transparent"
     : "transparent";
 
@@ -447,13 +447,14 @@ const TreeNodeComponent: React.FC<{
         <div
           style={{
             position: "absolute",
-            top: 4,
-            left: 8,
-            fontSize: fontSizes.meta,
+            top: 6,
+            left: 10,
+            fontSize: 10,
             fontFamily: fonts.metadata,
             color: theme.text.muted,
             opacity: 0.7,
             letterSpacing: 1.2,
+            lineHeight: 1,
           }}
         >
           {String(ordinal).padStart(2, "0")}
@@ -461,7 +462,10 @@ const TreeNodeComponent: React.FC<{
       )}
       <div
         style={{
-          fontSize: fontSizes.body,
+          // Schematic uses a smaller font and tighter line-height so labels
+          // up to 3 lines fit comfortably inside the box without crowding
+          // the border. Extensive variant keeps the larger body register.
+          fontSize: isSchematic ? fontSizes.label : fontSizes.body,
           maxWidth: textMaxWidth.node,
           fontFamily: fonts.display,
           // Active gets semibold display weight; highlighted (on path) gets
@@ -472,10 +476,14 @@ const TreeNodeComponent: React.FC<{
             : isHighlighted
               ? fontWeights.medium
               : fontWeights.regular,
-          lineHeight: 1.3,
+          lineHeight: isSchematic ? 1.25 : 1.3,
           textAlign: isHorizontal ? "left" : "center",
           color: theme.text.primary,
-          padding: `0 ${layout.spacing.sm}px`,
+          // Schematic: more generous interior padding so the text floats
+          // inside the box. Top-padding clears the corner ordinal area.
+          padding: isSchematic
+            ? `4px 14px 0 14px`
+            : `0 ${layout.spacing.sm}px`,
         }}
       >
         {node.label}
@@ -484,8 +492,11 @@ const TreeNodeComponent: React.FC<{
       {/* Active-node accent rule — replaces the prior accent-glow boxShadow.
           A 2px underline in the highlight color, draw-in animation. This is
           the single visual signal that says "you are here," and it carries
-          the entire emphasis hierarchy at the node level. */}
-      {isActive && (
+          the entire emphasis hierarchy at the node level. Suppressed in
+          schematic register — the heavier border + accent fill already say
+          "you are here," and stacking a second underline below 3-line
+          labels would crash into the box's bottom edge. */}
+      {isActive && !isSchematic && (
         <div
           style={{
             marginTop: layout.spacing.xs,
