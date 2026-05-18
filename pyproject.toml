@@ -1,0 +1,153 @@
+# Project-parallax Python tools — packaging + tooling config.
+#
+# Why this file exists (May 2026 engineering audit, root cause R2):
+#   - No prior pyproject/requirements meant a fresh clone had to grep
+#     `import` statements to figure out deps.
+#   - No central place for ruff/pytest/mypy config → each tool reimplemented
+#     its own conventions, and `pre-commit` couldn't enforce a baseline.
+#   - This file is the single source of truth for: declared deps, ruff lint
+#     config, and pytest invocation. mypy is wired but kept lenient until
+#     we ratchet type discipline up tool-by-tool.
+#
+# Install:
+#   pip install -e .            # core only (jsonschema, requests)
+#   pip install -e '.[dev]'     # + pytest, ruff (recommended for contributors)
+#   pip install -e '.[ai]'      # + anthropic, twelvelabs (LLM/video AI tools)
+#   pip install -e '.[media]'   # + Pillow, numpy, scipy (image/audio tools)
+#   pip install -e '.[all]'     # everything
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-parallax-tools"
+version = "0.1.0"
+description = "Parallax YouTube production pipeline — Python CLI tools"
+requires-python = ">=3.10"
+# Loose lower bounds rather than strict pins — this is a solo dev pipeline,
+# not a published library. Pin tighter if a specific tool starts breaking.
+dependencies = [
+    "jsonschema>=4.0",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+# Dev tooling — install for contributors / CI.
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.6",
+]
+# Heavy AI deps — only needed for LLM-backed tools (shorts_llm_scorer,
+# asset-source AI critic) and the optional Twelve Labs pipeline.
+ai = [
+    "anthropic>=0.40",
+    "twelvelabs>=0.4",
+]
+# Image / audio processing — only needed for brand-treatment LUT generation
+# and generate_sfx synthesizer.
+media = [
+    "Pillow>=10.0",
+    "numpy>=1.26",
+    "scipy>=1.11",
+]
+all = [
+    "project-parallax-tools[dev,ai,media]",
+]
+
+# Tell setuptools we're not actually building an installable package —
+# `pip install -e .` just exposes the deps. Tools are run as scripts, not
+# imported as a package.
+[tool.setuptools]
+packages = []
+
+# ─── pytest ───────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+# Default invocation: `pytest` from repo root picks up everything under
+# tools/. Coverage reports stay off by default (fast); add via:
+#   pytest --cov=tools --cov-report=term
+testpaths = ["tools"]
+# Quiet by default; -v in CI / on demand.
+addopts = "-q --tb=short"
+# Ignore the parallax/ subdir — it has its own venv + its own pytest config.
+norecursedirs = ["_archive", "_vendor", "parallax", "node_modules", ".venv", "__pycache__"]
+
+# ─── ruff (lint + format) ─────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+# Only lint our code, not vendored / archived / venv content.
+extend-exclude = [
+    "tools/_archive",
+    "tools/parallax",
+    "tools/_vendor",
+    "**/node_modules",
+    "**/.venv",
+    "**/__pycache__",
+]
+
+[tool.ruff.lint]
+# Conservative starting rule set. The principle: don't enable rules that
+# would generate hundreds of pre-existing violations — each new rule should
+# be near-zero-noise on the current codebase, so the lint output stays
+# actionable. Ratchet by adding rules here once we've burnt down findings.
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes (unused imports/vars, undefined names)
+    "W",      # pycodestyle warnings
+    "I",      # isort (import ordering)
+    "B",      # flake8-bugbear (likely bugs)
+    "UP",     # pyupgrade (modernize syntax for py310+)
+    "T20",    # flake8-print (catches stray print() — but see ignores below)
+    "BLE",    # flake8-blind-except (catch bare `except Exception`)
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    # `print()` is the canonical output for CLI tools — only flag bare prints
+    # in non-CLI library code. We'd need per-file overrides to enforce
+    # stderr-vs-stdout discipline; that's a follow-up.
+    "T201",   # print found
+    "T203",   # pprint found
+    # Line length: we have a 100-char limit but old strings/comments occasionally
+    # go longer. Don't block commits on cosmetic overflow.
+    "E501",
+    # Simplify "if x: return True else: return False" — sometimes the explicit
+    # form reads better.
+    "SIM108",
+    "SIM102",
+    # B008 (function call in default arg) trips on argparse helpers + dataclass
+    # fields — false-positive-heavy in this codebase.
+    "B008",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests can use broad excepts (validating "anything is raised") and don't
+# need import-order discipline (often mock + import order matters).
+"**/test_*.py" = ["BLE001", "I001"]
+"**/conftest.py" = ["BLE001", "I001"]
+# Migration / one-shot scripts may legitimately catch broadly.
+"tools/migrate_manifest.py" = ["BLE001"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tools"]
+
+# ─── mypy (kept lenient; ratchet later) ───────────────────────────────────
+[tool.mypy]
+python_version = "3.10"
+# Start permissive — the codebase isn't fully annotated, and the goal here
+# is "no regressions on newly-typed code" not "burn down 1000 existing
+# errors." When a file becomes fully typed, add it to the strict list.
+ignore_missing_imports = true
+follow_imports = "silent"
+warn_unused_ignores = true
+warn_return_any = false
+disallow_untyped_defs = false
+# strict_optional is the one rule we want on everywhere — None-vs-value
+# bugs are the most common Python footgun.
+strict_optional = true
+exclude = [
+    "tools/_archive/",
+    "tools/_vendor/",
+    "tools/parallax/",
+]
