@@ -21,7 +21,9 @@ It's also wrong. /// Not the math — the conclusion. /// And the proof that it'
 
 _(voice note: misconception-first pivot. The textbook framing is delivered with respect — not mockery. The pivot lands flat and confident. No drama.)_
 
-In January 1950, two researchers at the RAND Corporation ran the first-ever prisoner's dilemma experiment. /// The subjects — an economist named Armen Alchian and a mathematician named John Williams — played one hundred rounds of the game that was supposed to prove cooperation is irrational.
+In January 1950, two researchers at the RAND Corporation ran the first-ever prisoner's dilemma experiment.
+
+The subjects — an economist named Armen Alchian and a mathematician named John Williams — played one hundred rounds of the game that was supposed to prove cooperation is irrational.
 
 They cooperated sixty percent of the time.
 

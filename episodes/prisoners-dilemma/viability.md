@@ -47,6 +47,18 @@ The gap is strong. The standard frame treats the PD as a diagnostic tool. The Pa
 
 **Parallax angle:** Every existing video either explains the PD or applies it. Nobody *critiques* it as an analytical tool using the empirical record of when cooperation actually succeeds despite PD conditions. The Parallax episode treats the framework itself as the subject — asking why this particular model became so dominant, what it blinds us to, and what better frameworks exist (Ostrom, evolutionary game theory, institutional design). The decoder move is: "you thought this video would explain the Prisoner's Dilemma — actually, it explains why the Prisoner's Dilemma explains less than you think."
 
+### 6. Cold Open Visual Hook
+**What does the viewer SEE in the first 15 seconds that makes them stop scrolling?**
+
+The textbook framing renders in KineticTypography first — "Every textbook on international relations teaches the same lesson: rational actors defect" — delivered with cite-style attribution beneath ("every IR textbook, basically"). The viewer recognizes the framing they've already absorbed from a hundred think-tank takes. Then the pivot: "It's also wrong. Not the math — the conclusion." in large amber on ink, instant reveal with a pulse, color-wash cut into the 1950 RAND research office (constructivist scene: two geometric figures in shirtsleeves at a small paper-grid table, warm amber light through venetian blinds). The cooperation-rate counter then animates up to sixty — landing the misconception-falsification within ~30 seconds.
+
+**Visual sourcing estimate:** Easy
+- The KineticTypography cards use existing templates with brand-treatment palette.
+- The constructivist research-office AI-GEN scene is already produced (v5 → v6 carried forward; cell #1 in the AI-GEN inventory).
+- The GameBoard cooperation-counter is the existing `gameboard-flood-dresher.json` template.
+
+_Visual hook follows the misconception-first cold-open pattern (Veritasium discipline): wrong-belief stated first → pivot signal within 15s → proof point lands within 60s. The whole structure is the engagement-first restructure from v5 → v6 (see script-v6-production.md header for the editorial rationale + audit-pass record)._
+
 ## Format Recommendation
 
 **Philosopher's Lens** — The framework IS the subject, and geopolitics is the proof. This is exactly what the format is designed for: take a philosophical/analytical framework, make it concrete through geopolitical case studies, and reveal the gap between the framework's promise and its actual explanatory power. The alternative would be Detective (start with a geopolitical puzzle, discover the PD doesn't explain it), but Philosopher's Lens is stronger because the intellectual surprise is in the framework critique itself, not in a specific case.
