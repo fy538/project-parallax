@@ -670,7 +670,15 @@ def cmd_validate(args, registry):
                         issues.append(f"[{cid}] Prediction missing required field: {pfield}")
 
         # Check type validity
-        valid_types = ["framework", "foreign-term", "named-concept", "historical-analogy", "entity", "mental-model", "prediction"]
+        # Must match the type enum in data/concept-registry.schema.json.
+        # When adding a new type, update BOTH the schema and this list
+        # (or this check rejects every entry of the new type and blocks
+        # the pre-commit hook on data/concepts.json).
+        valid_types = [
+            "framework", "foreign-term", "named-concept",
+            "historical-analogy", "entity", "mental-model", "prediction",
+            "person", "quote", "source",
+        ]
         if c.get("type") not in valid_types:
             issues.append(f"[{cid}] Invalid type: {c.get('type')}")
 
@@ -853,6 +861,149 @@ def cmd_resolve(args, registry):
     print(f"\n  ✓ Prediction '{cid}' resolved as {new_status}")
 
 
+# ── Typed-object lookups (person / quote / source) ─────────────────────────
+# These three commands implement the Casey Newton typed-object pattern: the
+# registry stores not just abstract Concepts but also discrete cross-episode
+# objects (a Person who recurs, a Quote we've used, a Source we've cited).
+# Each command filters by `type` and surfaces the matching entries with
+# their `appearances[]` so the operator can see cross-episode usage at a
+# glance ("every prior mention of Kennan" / "every Schelling quote we've
+# used" / "every episode that cites Allison").
+
+def _entries_of_type(
+    registry: dict, type_name: str, include_drafts: bool = False,
+) -> list[dict]:
+    """Filter registry by `type`. Skips entries marked `_status: "draft"`
+    by default — draft entries are provisional and shouldn't surface in
+    operator-facing queries until the introducing episode publishes.
+    Pass `include_drafts=True` to opt in."""
+    out = []
+    for c in registry["concepts"]:
+        if c.get("type") != type_name:
+            continue
+        if not include_drafts and c.get("_status") == "draft":
+            continue
+        out.append(c)
+    return out
+
+
+def _matches_query(concept: dict, query: str) -> bool:
+    """Case-insensitive substring match across term.en / term.cn / id /
+    definition / attribution / sourceMeta.author."""
+    q = query.lower()
+    if q in concept.get("id", "").lower():
+        return True
+    term = concept.get("term", {}) or {}
+    for field in ("en", "cn", "pinyin", "short"):
+        if q in (term.get(field) or "").lower():
+            return True
+    if q in (concept.get("definition") or "").lower():
+        return True
+    if q in (concept.get("attribution") or "").lower():
+        return True
+    meta = concept.get("sourceMeta", {}) or {}
+    for field in ("author", "publisher", "url"):
+        if q in (meta.get(field) or "").lower():
+            return True
+    return False
+
+
+def _format_appearances(concept: dict) -> str:
+    """One-line summary of where this entry has appeared across the
+    catalog (introducing episode + later appearances)."""
+    intro = concept.get("introduced", {}) or {}
+    intro_ep = intro.get("episode", "?")
+    intro_beat = intro.get("beat", "?")
+    apps = concept.get("appearances", []) or []
+    parts = [f"intro: {intro_ep} Beat {intro_beat}"]
+    for a in apps:
+        parts.append(f"{a.get('episode', '?')} Beat {a.get('beat', '?')}")
+    return "  ·  ".join(parts)
+
+
+def cmd_person(args, registry):
+    """List Person entries matching the query, with cross-episode usage."""
+    matches = [
+        c for c in _entries_of_type(
+            registry, "person", include_drafts=getattr(args, "include_drafts", False),
+        )
+        if not args.query or _matches_query(c, args.query)
+    ]
+    if args.json:
+        print(json.dumps(matches, indent=2, ensure_ascii=False))
+        return
+    if not matches:
+        print(f"  No `person` entries matching '{args.query or '(any)'}'.")
+        return
+    print(f"  {len(matches)} person(s) matching '{args.query or '(any)'}':\n")
+    for c in matches:
+        term = c.get("term", {}) or {}
+        name = term.get("en") or c["id"]
+        print(f"  [{c['id']}]  {name}")
+        defn = (c.get("definition") or "").rstrip(".")
+        if defn:
+            print(f"    {defn[:120]}")
+        print(f"    {_format_appearances(c)}")
+        print()
+
+
+def cmd_quote(args, registry):
+    """List Quote entries matching the query, with attribution + reuse."""
+    matches = [
+        c for c in _entries_of_type(
+            registry, "quote", include_drafts=getattr(args, "include_drafts", False),
+        )
+        if not args.query or _matches_query(c, args.query)
+    ]
+    if args.json:
+        print(json.dumps(matches, indent=2, ensure_ascii=False))
+        return
+    if not matches:
+        print(f"  No `quote` entries matching '{args.query or '(any)'}'.")
+        return
+    print(f"  {len(matches)} quote(s) matching '{args.query or '(any)'}':\n")
+    for c in matches:
+        term = c.get("term", {}) or {}
+        text = term.get("en") or c["id"]
+        attr = c.get("attribution") or "—"
+        print(f"  [{c['id']}]")
+        print(f"    \"{text}\"")
+        print(f"    — {attr}")
+        print(f"    {_format_appearances(c)}")
+        print()
+
+
+def cmd_source(args, registry):
+    """List Source entries matching the query, with bibliographic detail."""
+    matches = [
+        c for c in _entries_of_type(
+            registry, "source", include_drafts=getattr(args, "include_drafts", False),
+        )
+        if not args.query or _matches_query(c, args.query)
+    ]
+    if args.json:
+        print(json.dumps(matches, indent=2, ensure_ascii=False))
+        return
+    if not matches:
+        print(f"  No `source` entries matching '{args.query or '(any)'}'.")
+        return
+    print(f"  {len(matches)} source(s) matching '{args.query or '(any)'}':\n")
+    for c in matches:
+        term = c.get("term", {}) or {}
+        title = term.get("en") or c["id"]
+        meta = c.get("sourceMeta", {}) or {}
+        author = meta.get("author") or "?"
+        year = meta.get("year") or "?"
+        pub = meta.get("publisher") or ""
+        url = meta.get("url") or ""
+        print(f"  [{c['id']}]  {title}")
+        print(f"    {author} ({year}){f', {pub}' if pub else ''}")
+        if url:
+            print(f"    {url}")
+        print(f"    {_format_appearances(c)}")
+        print()
+
+
 # ── Main ────────────────────────────────────────────────────────────────────
 
 def main():
@@ -896,6 +1047,22 @@ def main():
     p_resolve = sub.add_parser("resolve", help="Resolve a prediction")
     p_resolve.add_argument("concept_id", help="Prediction concept ID")
 
+    # Typed-object lookups (Casey Newton pattern: registry isn't just
+    # Concepts, it's also Persons / Quotes / Sources we've used). All
+    # three accept --include-drafts to surface provisional entries (the
+    # introducing episode hasn't published yet).
+    p_person = sub.add_parser("person", help="List Person entries (optionally filter by query)")
+    p_person.add_argument("query", nargs="?", default="", help="Substring filter (case-insensitive; empty lists all)")
+    p_person.add_argument("--include-drafts", action="store_true", help="Include entries with _status='draft'")
+
+    p_quote = sub.add_parser("quote", help="List Quote entries (optionally filter by query)")
+    p_quote.add_argument("query", nargs="?", default="", help="Substring filter (case-insensitive; empty lists all)")
+    p_quote.add_argument("--include-drafts", action="store_true", help="Include entries with _status='draft'")
+
+    p_source = sub.add_parser("source", help="List Source entries (optionally filter by query)")
+    p_source.add_argument("query", nargs="?", default="", help="Substring filter (case-insensitive; empty lists all)")
+    p_source.add_argument("--include-drafts", action="store_true", help="Include entries with _status='draft'")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -918,6 +1085,9 @@ def main():
         "predictions": cmd_predictions,
         "predictions-due": cmd_predictions_due,
         "resolve": cmd_resolve,
+        "person": cmd_person,
+        "quote": cmd_quote,
+        "source": cmd_source,
     }
 
     commands[args.command](args, registry)

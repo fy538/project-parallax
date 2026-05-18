@@ -41,9 +41,12 @@
             "historical-analogy",
             "entity",
             "mental-model",
-            "prediction"
+            "prediction",
+            "person",
+            "quote",
+            "source"
           ],
-          "description": "Concept category. framework = analytical tool (game theory, Bayesian). foreign-term = non-English term with cultural weight (卡脖子). named-concept = a coined or established term (bifurcation, small yard high fence). historical-analogy = a specific historical episode used as a lens. entity = a company, organization, or regime relevant across episodes. mental-model = a reusable reasoning pattern (steelmanning, base rates). prediction = a falsifiable forward-looking claim with a timeframe (Oracle direction)."
+          "description": "Concept category. framework = analytical tool (game theory, Bayesian). foreign-term = non-English term with cultural weight (卡脖子). named-concept = a coined or established term (bifurcation, small yard high fence). historical-analogy = a specific historical episode used as a lens. entity = a company, organization, or regime relevant across episodes. mental-model = a reusable reasoning pattern (steelmanning, base rates). prediction = a falsifiable forward-looking claim with a timeframe (Oracle direction). person = a named individual whose ideas or actions appear across episodes (Nash, Schelling, Kennan). quote = a specific quoted statement worth tracking for reuse (term.en holds the quote text, attribution field names the source). source = a cited reference (paper, book, article, dataset) — sourceMeta carries the bibliographic detail."
         },
         "definition": {
           "type": "string",
@@ -87,6 +90,22 @@
         "prediction": {
           "$ref": "#/$defs/Prediction",
           "description": "Prediction-specific fields. Required when type = 'prediction', omit for other types."
+        },
+        "attribution": {
+          "type": "string",
+          "description": "For type='quote' entries: who said it (and when, if relevant). E.g., 'John Nash, 1950'. Used by lookup.py quote to surface the speaker alongside the quote text."
+        },
+        "sourceMeta": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "For type='source' entries: bibliographic detail used by lookup.py source and the source-sheet generator.",
+          "properties": {
+            "author": { "type": "string" },
+            "year": { "type": "integer" },
+            "publisher": { "type": "string" },
+            "url": { "type": "string", "format": "uri" },
+            "page": { "type": "string", "description": "Page or section reference (e.g. 'p. 107' or 'ch. 4')." }
+          }
         }
       }
     },
