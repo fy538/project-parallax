@@ -183,6 +183,6 @@ A: **drift** for backgrounds (safe, organic). **zoom-in** for emphasis. Alternat
 ## See Also
 
 - Main component: `src/components/KenBurns.tsx`
-- Implementation guide: `KENBURNS_IMPLEMENTATION.md`
+- Implementation guide: `project/_archive/KENBURNS_IMPLEMENTATION.md` (archived post-implementation; the component itself is the source of truth)
 - PhotoMontage example: `src/templates/PhotoMontage/PhotoMontage.tsx` (lines 316-390)
 - AnnotatedImage example: `src/templates/AnnotatedImage/AnnotatedImage.tsx` (lines 156-176)

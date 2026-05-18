@@ -103,9 +103,19 @@ async function teardown() {
   console.log("\n✅ Teardown complete.");
 }
 
-const args = process.argv.slice(2);
-if (args.includes("--teardown")) {
-  teardown().catch(console.error);
-} else {
-  deploy().catch(console.error);
+// Guard the CLI block so `import()` from tests doesn't actually deploy.
+// Added May 2026 (audit item #17): the Lambda scripts are scaffolded but
+// dormant; the smoke test in src/__tests__/lambda-scripts.smoke.test.ts
+// imports both modules to catch dep-drift rot. Without this guard, the
+// import would have triggered a real AWS bucket call.
+const isMain = import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  const args = process.argv.slice(2);
+  if (args.includes("--teardown")) {
+    teardown().catch(console.error);
+  } else {
+    deploy().catch(console.error);
+  }
 }
+
+export { deploy, teardown };

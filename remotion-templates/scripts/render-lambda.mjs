@@ -36,11 +36,12 @@ const REGION = process.env.REMOTION_AWS_REGION || "us-east-1";
 const FUNCTION_NAME = process.env.REMOTION_FUNCTION_NAME;
 const SERVE_URL = process.env.REMOTION_SERVE_URL;
 
-if (!FUNCTION_NAME || !SERVE_URL) {
-  console.error("Missing REMOTION_FUNCTION_NAME or REMOTION_SERVE_URL.");
-  console.error("Run: node scripts/deploy-lambda.mjs first.");
-  process.exit(1);
-}
+// Env-var validation moved inside the isMain CLI block below — at module
+// scope it killed the process during the smoke test's `import()`. The
+// downstream functions (renderEpisode/renderSingle) read FUNCTION_NAME/
+// SERVE_URL through closure, so a test that calls one without the env
+// set still surfaces the requirement (just via the real API error path
+// rather than a top-level process.exit).
 
 // ── Parse CLI args ─────────────────────────────────────────────────────────
 
@@ -265,18 +266,33 @@ async function renderEpisode(episode) {
 
 // ── Main ───────────────────────────────────────────────────────────────────
 
-const args = parseArgs();
+// Guard the CLI block so `import()` from tests doesn't trigger an AWS
+// render. Added May 2026 (audit item #17); see deploy-lambda.mjs for the
+// same pattern + rationale.
+const isMain = import.meta.url === `file://${process.argv[1]}`;
+if (isMain) {
+  // Env validation — fast-fail before parsing args.
+  if (!FUNCTION_NAME || !SERVE_URL) {
+    console.error("Missing REMOTION_FUNCTION_NAME or REMOTION_SERVE_URL.");
+    console.error("Run: node scripts/deploy-lambda.mjs first.");
+    process.exit(1);
+  }
 
-if (args.episode) {
-  renderEpisode(args.episode).catch(console.error);
-} else if (args.comp && args.props) {
-  renderSingle(args.comp, args.props, {
-    still: args.still,
-    frame: args.frame,
-  }).catch(console.error);
-} else {
-  console.log("Usage:");
-  console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/silicon-trap/chart-lithography.json");
-  console.log("  node scripts/render-lambda.mjs --episode=silicon-trap");
-  console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=... --still --frame=60");
+  const args = parseArgs();
+
+  if (args.episode) {
+    renderEpisode(args.episode).catch(console.error);
+  } else if (args.comp && args.props) {
+    renderSingle(args.comp, args.props, {
+      still: args.still,
+      frame: args.frame,
+    }).catch(console.error);
+  } else {
+    console.log("Usage:");
+    console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=data/episodes/silicon-trap/chart-lithography.json");
+    console.log("  node scripts/render-lambda.mjs --episode=silicon-trap");
+    console.log("  node scripts/render-lambda.mjs --comp=DataChart --props=... --still --frame=60");
+  }
 }
+
+export { renderEpisode, renderSingle, parseArgs };
