@@ -15,7 +15,7 @@
 
 import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
-import { fonts, fontSizes, layout, palette, sec, shadows } from "../design/theme";
+import { fonts, fontSizes, layout, palette, sec, shadows, zIndex } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { fadeIn, slideIn } from "../utils/animation";
 
@@ -76,7 +76,7 @@ export const FooterStrip: React.FC<FooterStripProps> = React.memo(
           opacity,
           transform: `translateY(${slideY}px)`,
           pointerEvents: "none",
-          zIndex: 20,
+          zIndex: zIndex.chrome,
         }}
       >
         {/* Left: REC + runtime */}

@@ -721,6 +721,77 @@ const rules = [
       "Replace the literal `∴` with `{brandMark.glyph}` (after `import { brandMark } from '<path>/design/theme'`), " +
       "or — if you're building a footer lockup like `∴ parallax · context` — use `<BrandLockup>context</BrandLockup>`.",
   },
+
+  // ── M-ZINDEX-GLOBAL-SCALE: block bare zIndex literals on the global scale ──
+  // The 8-tier global stacking scale lives in `theme.ts` as `zIndex.{base,
+  // attribution, callout, overlay, transition, hud, meta, chrome}`. Bare
+  // integer values that match one of those tiers (5, 9, 10, 11, 15, 19, 20)
+  // are almost always a missed migration; if intentional (local stacking
+  // inside a single component that happens to land on the same number),
+  // suppress with an inline pragma:
+  //
+  //   // no-bare-zindex-on-global-scale: ok
+  //   zIndex: 10,
+  //
+  // Local stacking values that don't collide with a global tier (0, 1, 2,
+  // 3, 6, 7, 8) are NOT blocked — those are normal intra-component layering
+  // and forcing them through a token would create worse semantic confusion
+  // than leaving them bare. Special case: `0` is excluded because it's the
+  // CSS default and used everywhere for "behind."
+  {
+    id: "no-bare-zindex-on-global-scale",
+    description:
+      "Bare `zIndex: N` for N in the global scale {5, 9, 10, 11, 15, 19, 20}. Use `zIndex.<layer>` from `design/theme`.",
+    fileLevel: true,
+    scope: ["components-too", "catalog"],
+    check: (content, filePath) => {
+      // Allowlist: the scale declaration site + tests + generated.
+      const allowedSubstrings = [
+        "src/design/theme.ts",
+        "src/__tests__/",
+      ];
+      if (allowedSubstrings.some((s) => filePath.includes(s))) return [];
+      if (filePath.endsWith(".d.ts")) return [];
+
+      const BLOCKED = new Set([5, 9, 10, 11, 15, 19, 20]);
+      const issues = [];
+      const lines = content.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const m = line.match(/zIndex:\s*(\d+)\b/);
+        if (!m) continue;
+        const val = Number(m[1]);
+        if (!BLOCKED.has(val)) continue;
+
+        // Inline pragma on the same line OR the immediately preceding line.
+        const prev = i > 0 ? lines[i - 1] : "";
+        if (line.includes("no-bare-zindex-on-global-scale: ok")) continue;
+        if (prev.includes("no-bare-zindex-on-global-scale: ok")) continue;
+
+        const tier =
+          val === 5  ? "zIndex.attribution"
+          : val === 9  ? "zIndex.callout"
+          : val === 10 ? "zIndex.overlay"
+          : val === 11 ? "zIndex.transition"
+          : val === 15 ? "zIndex.hud"
+          : val === 19 ? "zIndex.meta"
+          : /* 20 */   "zIndex.chrome";
+
+        issues.push({
+          line: i + 1,
+          message: `Bare \`zIndex: ${val}\` — use \`${tier}\` (from \`design/theme\`) or add \`// no-bare-zindex-on-global-scale: ok\` if intentional local stacking.`,
+        });
+      }
+      return issues;
+    },
+    severity: "error",
+    fix:
+      "Import `zIndex` from `<path>/design/theme` and replace the literal with the " +
+      "named tier (5 → attribution, 9 → callout, 10 → overlay, 11 → transition, " +
+      "15 → hud, 19 → meta, 20 → chrome). For intentional intra-component " +
+      "stacking that happens to land on a tier number, add the inline pragma " +
+      "`// no-bare-zindex-on-global-scale: ok` above the line.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────

@@ -140,6 +140,11 @@ const cornerStyle = (corner: CartoucheCorner): React.CSSProperties => {
     right: corner.endsWith("right") ? layout.safeArea.right : undefined,
     maxWidth: MAP_TITLE_FOOTPRINT_WIDTH,
     textAlign: corner.endsWith("right") ? "right" : "left",
+    // Single-site map-title chrome. Intentionally above zIndex.overlay (10)
+    // so the title isn't grain-treated, and below zIndex.hud (15) so HUD
+    // indicators can sit on top. Not promoted to the global scale because
+    // no other component needs the slot.
+    // no-bare-zindex-on-global-scale: ok
     zIndex: 11,
   };
 };

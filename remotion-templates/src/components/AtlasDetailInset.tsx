@@ -23,7 +23,7 @@ import {
   getCountryByAlpha3,
   type CountryFeature,
 } from "../utils/atlasProjection";
-import { layout, palette, fonts } from "../design/theme";
+import { layout, palette, fonts, zIndex } from "../design/theme";
 
 // ── Layout ────────────────────────────────────────────────────────────────
 
@@ -184,7 +184,7 @@ export const AtlasDetailInset: React.FC<AtlasDetailInsetProps> = ({
       : undefined,
     left: corner.endsWith("left") ? layout.safeArea.left : undefined,
     right: corner.endsWith("right") ? layout.safeArea.right : undefined,
-    zIndex: 9,
+    zIndex: zIndex.callout,
     pointerEvents: "none",
     opacity,
   };

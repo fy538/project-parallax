@@ -37,6 +37,7 @@ import {
   layout,
   letterSpacing,
   sec,
+  zIndex,
 } from "../design/theme";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
 import { Background } from "../components/Background";
@@ -155,7 +156,7 @@ function computeLayerStates(
             style={{
               backgroundColor: washColor,
               opacity: washAlpha,
-              zIndex: 10,
+              zIndex: zIndex.overlay,
               pointerEvents: "none",
             }}
           />
@@ -179,7 +180,7 @@ function computeLayerStates(
       // half-diagonal of a ~640×360 cell estimate (1920/3 × 1080/2 / 2 ≈ 560px)
       const radiusPx = (radius / 100) * 560;
       const aOverlay = ringVisible ? (
-        <AbsoluteFill style={{ pointerEvents: "none", zIndex: 11 }}>
+        <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.transition }}>
           <div
             style={{
               position: "absolute",
@@ -391,7 +392,7 @@ const TransitionCell: React.FC<{ cell: CellDef }> = ({ cell }) => {
           left: 0,
           right: 0,
           padding: "16px 20px 0",
-          zIndex: 20,
+          zIndex: zIndex.chrome,
           pointerEvents: "none",
         }}
       >
@@ -435,7 +436,7 @@ const TransitionCell: React.FC<{ cell: CellDef }> = ({ cell }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "flex-end",
-          zIndex: 20,
+          zIndex: zIndex.chrome,
           pointerEvents: "none",
         }}
       >
@@ -481,7 +482,7 @@ const TransitionCell: React.FC<{ cell: CellDef }> = ({ cell }) => {
           borderRadius: "50%",
           backgroundColor: palette.amber,
           opacity: isTransitioning ? 0.9 : 0.15,
-          zIndex: 20,
+          zIndex: zIndex.chrome,
         }}
       />
     </div>

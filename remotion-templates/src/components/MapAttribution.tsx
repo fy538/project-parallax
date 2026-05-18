@@ -36,6 +36,7 @@ import {
   fontSizes,
   layout,
   fontWeights,
+  zIndex,
 } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 
@@ -89,7 +90,7 @@ export const MapAttribution: React.FC<MapAttributionProps> = ({
   const positional: React.CSSProperties = {
     position: "absolute",
     bottom: safe.bottom + 12,
-    zIndex: 5,
+    zIndex: zIndex.attribution,
     ...(placement === "bottom-right"
       ? { right: safe.right * 0.4 }
       : { left: safe.left * 0.4 }),

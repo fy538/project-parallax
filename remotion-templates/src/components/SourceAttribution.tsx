@@ -13,7 +13,7 @@
 
 import React from "react";
 import { useCurrentFrame } from "remotion";
-import { fonts, fontSizes, layout, sec, shadows } from "../design/theme";
+import { fonts, fontSizes, layout, sec, shadows, zIndex } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { fadeIn, slideIn } from "../utils/animation";
 
@@ -59,7 +59,7 @@ export const SourceAttribution: React.FC<SourceAttributionProps> = React.memo(
           transform: `translateY(${slideY}px)`,
           textShadow: shadows.textLift,
           pointerEvents: "none",
-          zIndex: 19,
+          zIndex: zIndex.meta,
         }}
       >
         {prefix}

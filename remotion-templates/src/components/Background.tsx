@@ -24,7 +24,7 @@
 
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile, random } from "remotion";
-import { dark, light, palette, layout, fonts, fontSizes } from "../design/theme";
+import { dark, light, palette, layout, fonts, fontSizes, zIndex } from "../design/theme";
 import {
   motionIdentities,
   DEFAULT_MOTION_IDENTITY,
@@ -549,7 +549,7 @@ export const Background: React.FC<BackgroundProps> = ({
             borderRadius: 2,
             padding: "4px 12px",
             pointerEvents: "none",
-            zIndex: 15,
+            zIndex: zIndex.hud,
           }}
         >
           {stampLabel}

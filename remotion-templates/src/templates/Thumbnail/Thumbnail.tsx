@@ -18,7 +18,7 @@
 
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
-import { brandMark, palette, fonts, fontSizes, layout, cjk, textMaxWidth } from "../../design/theme";
+import { brandMark, palette, fonts, fontSizes, layout, cjk, textMaxWidth, zIndex } from "../../design/theme";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
@@ -55,7 +55,7 @@ const ThumbnailHeader: React.FC<{ episodeLabel?: string }> = ({ episodeLabel }) 
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      zIndex: 20,
+      zIndex: zIndex.chrome,
       pointerEvents: "none",
     }}
   >
@@ -180,6 +180,10 @@ const LayoutJuxtaposition: React.FC<{ data: ThumbnailData }> = ({ data }) => {
             letterSpacing: 5,
             textTransform: "uppercase",
             maxWidth: textMaxWidth.h2,
+            // Intra-thumbnail layering (title above bg image). Thumbnails are
+            // standalone PNGs — no FilmOverlay / transitions, so the global
+            // zIndex.overlay token doesn't apply semantically.
+            // no-bare-zindex-on-global-scale: ok
             zIndex: 10,
             textShadow: `0 2px 12px ${palette.ink}, 0 0 32px ${palette.ink}`, // shadows.subtle ink double (32px halo for thumbnail contrast)
           }}
@@ -406,6 +410,8 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         fontSize: THUMB_MARK_FS,
         color: palette.rust,
         letterSpacing: 1,
+        // Intra-thumbnail layering (corner mark above bg image).
+        // no-bare-zindex-on-global-scale: ok
         zIndex: 10,
       }}
     >

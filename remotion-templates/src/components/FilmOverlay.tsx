@@ -45,7 +45,7 @@
 import React, { useId, useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, interpolate } from "remotion";
 import { random } from "remotion";
-import { palette } from "../design/theme";
+import { palette, zIndex } from "../design/theme";
 import { CLAMP } from "../utils/animation";
 
 interface FilmOverlayProps {
@@ -133,7 +133,7 @@ const GrainOverlay = React.memo(({ intensity }: { intensity: number }) => {
   const opacity = clampValue(intensity * 0.12, 0, 0.12);
 
   return (
-    <AbsoluteFill style={{ pointerEvents: "none", zIndex: 10 }}>
+    <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.overlay }}>
       <svg
         style={{
           position: "absolute",
@@ -193,7 +193,7 @@ const VignetteOverlay = React.memo(({ intensity }: { intensity: number }) => {
       style={{
         background: `radial-gradient(ellipse at center, transparent 0%, transparent ${innerStop}%, rgba(28, 24, 20, ${opacity * 0.6}) 75%, rgba(18, 16, 14, ${opacity}) 100%)`,
         pointerEvents: "none",
-        zIndex: 10,
+        zIndex: zIndex.overlay,
       }}
     />
   );
@@ -261,7 +261,7 @@ const LightLeakOverlay = React.memo(
           rgba(${goldR}, ${goldG}, ${goldB}, ${leakOpacity}) 0%,
           rgba(${goldR}, ${goldG}, ${goldB}, 0) 70%)`,
         pointerEvents: "none",
-        zIndex: 10,
+        zIndex: zIndex.overlay,
         mixBlendMode: "screen",
       }}
     />
@@ -291,7 +291,7 @@ const DustOverlay = React.memo(({ intensity }: { intensity: number }) => {
   const dustOpacity = clampValue(intensity * 0.12, 0, 0.12);
 
   return (
-    <AbsoluteFill style={{ pointerEvents: "none", zIndex: 10 }}>
+    <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.overlay }}>
       {particles.map(({ id, x, y, size, cycleDuration, cycleOffset }) => {
         // Fade in and out over a cycle
         const cycleProgress = ((frame + cycleOffset) % cycleDuration) / cycleDuration;
@@ -343,7 +343,7 @@ const ScratchOverlay = React.memo(({ intensity }: { intensity: number }) => {
   const scratchOpacity = clampValue(intensity * 0.04, 0, 0.04);
 
   return (
-    <AbsoluteFill style={{ pointerEvents: "none", zIndex: 10 }}>
+    <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.overlay }}>
       {scratches.map(({ id, x, heightPercent, duration, offset }) => {
         // Fade in and out over duration
         const cycleFrame = (frame + offset) % (duration * 2);
@@ -395,7 +395,7 @@ const FlickerOverlay = React.memo(({ intensity }: { intensity: number }) => {
         backgroundColor: "white",
         opacity,
         pointerEvents: "none",
-        zIndex: 10,
+        zIndex: zIndex.overlay,
       }}
     />
   );

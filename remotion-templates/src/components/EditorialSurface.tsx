@@ -27,7 +27,7 @@ import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import backdropManifest from "../../data/backdrop-manifest.json";
 import type { BackdropChartFit } from "../utils/backdropChartFit";
 import type { EditorialMode } from "../design/editorialModes";
-import { palette } from "../design/theme";
+import { palette, zIndex } from "../design/theme";
 
 export interface EditorialSurfaceProps {
   children: ReactNode;
@@ -152,7 +152,7 @@ export const EditorialSurface = React.memo(
     return (
       <AbsoluteFill style={{ backgroundColor: bg }}>
         {backdrop && (
-          <AbsoluteFill style={{ zIndex: 0, pointerEvents: "none" }}>
+          <AbsoluteFill style={{ zIndex: zIndex.base, pointerEvents: "none" }}>
             <Img
               src={backdrop}
               style={{
@@ -278,7 +278,7 @@ export const SegmentBackdrop = React.memo(({ backdropId }: { backdropId: string 
     return null;
   }
   return (
-    <AbsoluteFill style={{ zIndex: 0, pointerEvents: "none" }}>
+    <AbsoluteFill style={{ zIndex: zIndex.base, pointerEvents: "none" }}>
       <Img
         src={src}
         style={{

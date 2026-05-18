@@ -938,6 +938,98 @@ describe("lint rule: no-literal-brand-mark", () => {
   });
 });
 
+// ── no-bare-zindex-on-global-scale ──────────────────────────────────────────
+
+describe("lint rule: no-bare-zindex-on-global-scale", () => {
+  const lintWith = (content: string, filePath: string) =>
+    lintContent(content, filePath, filePath) as Issue[];
+
+  it("flags bare zIndex: 20 (chrome tier)", () => {
+    const issues = lintWith(
+      `const s = { zIndex: 20 };`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-bare-zindex-on-global-scale")).toBe(true);
+  });
+
+  it("flags bare zIndex: 10 (overlay tier)", () => {
+    const issues = lintWith(
+      `const s = { zIndex: 10 };`,
+      "src/components/Overlay.tsx",
+    );
+    const offender = issues.find((i) => i.rule === "no-bare-zindex-on-global-scale");
+    expect(offender?.message).toContain("zIndex.overlay");
+  });
+
+  it("flags every tier value in the blocked set (5, 9, 10, 11, 15, 19, 20)", () => {
+    for (const val of [5, 9, 10, 11, 15, 19, 20]) {
+      const issues = lintWith(
+        `const s = { zIndex: ${val} };`,
+        "src/components/X.tsx",
+      );
+      expect(
+        hasRule(issues, "no-bare-zindex-on-global-scale"),
+      ).toBe(true);
+    }
+  });
+
+  it("does NOT flag local-stacking values (0, 1, 2, 3, 6, 7, 8)", () => {
+    for (const val of [0, 1, 2, 3, 6, 7, 8]) {
+      const issues = lintWith(
+        `const s = { zIndex: ${val} };`,
+        "src/components/X.tsx",
+      );
+      expect(
+        hasRule(issues, "no-bare-zindex-on-global-scale"),
+      ).toBe(false);
+    }
+  });
+
+  it("respects the inline pragma on the preceding line", () => {
+    const issues = lintWith(
+      `// no-bare-zindex-on-global-scale: ok\nconst s = { zIndex: 20 };`,
+      "src/components/Outlier.tsx",
+    );
+    expect(hasRule(issues, "no-bare-zindex-on-global-scale")).toBe(false);
+  });
+
+  it("respects the inline pragma on the same line", () => {
+    const issues = lintWith(
+      `const s = { zIndex: 20 }; // no-bare-zindex-on-global-scale: ok`,
+      "src/components/Outlier.tsx",
+    );
+    expect(hasRule(issues, "no-bare-zindex-on-global-scale")).toBe(false);
+  });
+
+  it("allowlists design/theme.ts (the scale declaration site)", () => {
+    const issues = lintWith(
+      `export const zIndex = { chrome: 20 };`,
+      "src/design/theme.ts",
+    );
+    expect(hasRule(issues, "no-bare-zindex-on-global-scale")).toBe(false);
+  });
+
+  it("emits the right named-tier suggestion in the message", () => {
+    const cases: Array<[number, string]> = [
+      [5, "zIndex.attribution"],
+      [9, "zIndex.callout"],
+      [10, "zIndex.overlay"],
+      [11, "zIndex.transition"],
+      [15, "zIndex.hud"],
+      [19, "zIndex.meta"],
+      [20, "zIndex.chrome"],
+    ];
+    for (const [val, suggestion] of cases) {
+      const issues = lintWith(
+        `const s = { zIndex: ${val} };`,
+        "src/components/X.tsx",
+      );
+      const offender = issues.find((i) => i.rule === "no-bare-zindex-on-global-scale");
+      expect(offender?.message).toContain(suggestion);
+    }
+  });
+});
+
 describe("rules array integrity", () => {
   it("every rule has id, description, severity", () => {
     // Smoke test that the export shape is consistent — protects against accidental

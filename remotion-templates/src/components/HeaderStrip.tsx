@@ -17,7 +17,7 @@
 
 import React from "react";
 import { useCurrentFrame } from "remotion";
-import { brandMark, fonts, fontSizes, layout, palette, sec, shadows } from "../design/theme";
+import { brandMark, fonts, fontSizes, layout, palette, sec, shadows, zIndex } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { fadeIn, slideIn } from "../utils/animation";
 
@@ -74,7 +74,7 @@ export const HeaderStrip: React.FC<HeaderStripProps> = React.memo(
           opacity,
           transform: `translateY(${slideY}px)`,
           pointerEvents: "none",
-          zIndex: 20,
+          zIndex: zIndex.chrome,
         }}
       >
         {/* Wordmark — left */}

@@ -30,6 +30,7 @@ import {
   contentArea,
   textMaxWidth,
   shadows,
+  zIndex,
 } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import {
@@ -409,6 +410,10 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
           left: 0,
           width: "100%",
           height: "100%",
+          // Intra-PhotoMontage layering — text/quote overlay above image
+          // panels (zIndex: 1) and tints (zIndex: 6/7). Local stacking
+          // context, not the global zIndex.overlay (film grain) tier.
+          // no-bare-zindex-on-global-scale: ok
           zIndex: 10,
           pointerEvents: "none",
         }}
@@ -541,7 +546,7 @@ export const PhotoMontage: React.FC<{ data: PhotoMontageData }> = ({ data }) => 
               fontSize: fontSizes.meta,
               color: theme.text.muted,
               fontFamily: fonts.body,
-              zIndex: 5,
+              zIndex: zIndex.attribution,
               opacity: exitFade(frame, durationInFrames, 15),
             }}
           >

@@ -49,7 +49,7 @@ import {
   interpolate,
   Easing,
 } from "remotion";
-import { palette, sec } from "../design/theme";
+import { palette, sec, zIndex } from "../design/theme";
 import { CLAMP } from "../utils/animation";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -192,7 +192,7 @@ const computeTransition = (
         state.clipPath = `inset(0 0 0 ${x}%)`;
         if (isMid) {
           state.overlay = (
-            <AbsoluteFill style={{ pointerEvents: "none", zIndex: 11 }}>
+            <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.transition }}>
               <div
                 style={{
                   position: "absolute",
@@ -222,7 +222,7 @@ const computeTransition = (
         state.clipPath = `inset(0 ${x}% 0 0)`;
         if (isMid) {
           state.overlay = (
-            <AbsoluteFill style={{ pointerEvents: "none", zIndex: 11 }}>
+            <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.transition }}>
               <div
                 style={{
                   position: "absolute",
@@ -252,7 +252,7 @@ const computeTransition = (
         state.clipPath = `inset(${y}% 0 0 0)`;
         if (isMid) {
           state.overlay = (
-            <AbsoluteFill style={{ pointerEvents: "none", zIndex: 11 }}>
+            <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.transition }}>
               <div
                 style={{
                   position: "absolute",
@@ -294,7 +294,7 @@ const computeTransition = (
             style={{
               backgroundColor: washColor,
               opacity: overlayOpacity,
-              zIndex: 10,
+              zIndex: zIndex.overlay,
               pointerEvents: "none",
             }}
           />
@@ -312,7 +312,7 @@ const computeTransition = (
         // Approximate radius in pixels (assuming 1920x1080, half-diagonal ≈ 1102)
         const radiusPx = (radius / 100) * 1102;
         state.overlay = (
-          <AbsoluteFill style={{ pointerEvents: "none", zIndex: 11 }}>
+          <AbsoluteFill style={{ pointerEvents: "none", zIndex: zIndex.transition }}>
             <div
               style={{
                 position: "absolute",

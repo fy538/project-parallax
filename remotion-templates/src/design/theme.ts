@@ -89,6 +89,42 @@ export const brandMark: BrandMarkSpec = {
   lockupSeparator: paletteData.brandMark.lockupSeparator,
 };
 
+// ── Global stacking scale ───────────────────────────────────────────────────
+// Semantic z-index tokens for stacking layers that cross composition boundaries.
+// Use these whenever a render needs to sit predictably above/below another
+// composition's chrome — film overlays, transitions, the header/footer wordmark,
+// map attribution, etc.
+//
+// What this scale does NOT cover: intra-component stacking (e.g. PhotoMontage
+// layering its image / tint / text using `zIndex: 0/1/2` within its own
+// stacking context). Local stacking values stay as bare integers — they're
+// only meaningful inside the component that owns them and don't compete for
+// the global layer order. The lint rule `no-bare-zindex-on-global-scale`
+// blocks bare integers that match a canonical layer value (0, 5, 9, 10, 11,
+// 15, 19, 20) outside theme.ts; it deliberately leaves 1, 2, 3, 6, 7 alone.
+//
+// Tier ordering (low → high):
+//   base(0)       backdrop / behind-everything
+//   attribution(5)  cartographic credit at frame bottom
+//   callout(9)      atlas-inset locators, "look here" markers
+//   overlay(10)     FilmOverlay grain / vignette / dust
+//   transition(11)  segment transitions (cut/dissolve/iris) above grain
+//   hud(15)         edge HUD indicators (crosshair, scan line)
+//   meta(19)        source-attribution text — sits just below brand chrome
+//   chrome(20)      HeaderStrip / FooterStrip wordmark — always on top
+export const zIndex = {
+  base: 0,
+  attribution: 5,
+  callout: 9,
+  overlay: 10,
+  transition: 11,
+  hud: 15,
+  meta: 19,
+  chrome: 20,
+} as const;
+
+export type ZIndexLayer = keyof typeof zIndex;
+
 // ── Per-Episode Color Emphasis ─────────────────────────────────────────────
 // Mirrors the per-typography palette emphasis architecture in tools/recraft/
 // recraft.py for AI-generated content. The brand palette range stays constant
