@@ -100,6 +100,31 @@ class TestCollectNarration:
         assert "body of the beat" in out
         assert "Different beat" not in out  # cross-beat exclusion
 
+    def test_fallback_capped_at_max_chars(self):
+        # A beat with many narrationRef-bearing segments would otherwise
+        # produce a multi-KB prompt. Cap prevents unbounded growth.
+        long_ref = "x" * 800  # 800 chars per ref
+        m = {
+            "segments": [
+                # Empty window
+                {"id": "s1", "type": "FOOTAGE", "startSec": 0, "endSec": 10,
+                 "beat": "beat1"},
+                # Many beat segments with long narration outside the window
+                *[
+                    {"id": f"big{i}", "type": "TEMPLATE",
+                     "startSec": 20 + i, "endSec": 20 + i + 1,
+                     "beat": "beat1",
+                     "narrationRef": long_ref}
+                    for i in range(20)
+                ],
+            ],
+        }
+        out = sls.collect_narration_for_window(m, 0, 10)
+        # 20 × 800 = 16000 chars would be the unbounded result; the
+        # cap should keep it under MAX_FALLBACK_CHARS + a few chars
+        # for the truncation ellipsis.
+        assert len(out) <= sls.MAX_FALLBACK_CHARS + 5
+
     def test_in_window_wins_over_fallback(self):
         # When a window DOES have narrationRef from in-window segments,
         # the fallback is NOT triggered (we don't over-broaden).
@@ -366,6 +391,30 @@ class TestCliSmoke:
         assert len(payload["candidates"]) <= 3
         # Dry-run preview still went to stderr
         assert "LLM Scoring — DRY RUN" in result.stderr
+
+    def test_llm_top_k_zero_rejected(self, tmp_path):
+        # Argparse validator should reject ≤0 with a clear message,
+        # NOT silently no-op (the v1 behavior of `or 0` masked typos)
+        manifest = tmp_path / "manifest.json"
+        manifest.write_text(json.dumps({
+            "beats": [{"id": "beat1", "title": "X", "startSec": 0, "endSec": 60}],
+            "segments": [{
+                "id": "x", "type": "TEMPLATE", "startSec": 0, "endSec": 30,
+                "beat": "beat1", "priority": "P1",
+                "template": {"component": "DataChart"},
+            }],
+        }), encoding="utf-8")
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "tools" / "publish" / "shorts_proposer.py"),
+             "x", "--manifest", str(manifest),
+             "--top", "3", "--llm-top-k", "0",
+             "--llm-dry-run", "--stdout"],
+            capture_output=True, text=True,
+            env={**__import__("os").environ, "ANTHROPIC_API_KEY": ""},
+        )
+        # Argparse error → exit 2
+        assert result.returncode == 2
+        assert "--llm-top-k" in result.stderr or "argument" in result.stderr.lower()
 
     def test_llm_score_without_api_key_exits_2(self, tmp_path):
         manifest = tmp_path / "manifest.json"

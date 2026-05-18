@@ -133,13 +133,24 @@ def collect_narration_for_window(
         return " ".join(in_window)
     # Fallback: pull narrationRef from every segment in the overlapping
     # beat(s). Better to give the LLM a too-broad context than none at all.
+    # Capped at MAX_FALLBACK_CHARS to keep prompts bounded — a long beat
+    # with 20 narration-bearing segments could otherwise add ~5KB+ of
+    # input tokens per candidate.
     beat_level: list[str] = []
+    chars_so_far = 0
     for seg in manifest.get("segments", []):
         if seg.get("beat") not in beat_ids_in_window:
             continue
         ref = seg.get("narrationRef", "") or ""
         if ref and ref not in beat_level:
+            if chars_so_far + len(ref) > MAX_FALLBACK_CHARS:
+                # Truncate the last entry to land at the cap, then stop
+                room = MAX_FALLBACK_CHARS - chars_so_far
+                if room > 80:
+                    beat_level.append(ref[:room].rstrip() + "…")
+                break
             beat_level.append(ref)
+            chars_so_far += len(ref) + 1  # +1 for the joining space
     return " ".join(beat_level)
 
 
@@ -196,6 +207,12 @@ ScorerFn = Callable[[str], str]
 # JSON envelope; truncation mid-response → unparseable → silent drop.
 DEFAULT_LLM_MODEL = "claude-sonnet-4-5-20250929"
 DEFAULT_MAX_TOKENS = 800
+
+# Cap on parent-beat narration when the in-window collection comes up
+# empty (beat-opener candidates spanning mostly FOOTAGE/HOLD segments).
+# 3000 chars ≈ 750 tokens — plenty of context for the LLM to judge
+# without blowing the input budget on every candidate.
+MAX_FALLBACK_CHARS = 3000
 
 
 def make_anthropic_scorer(

@@ -176,9 +176,19 @@ for (const short of manifest.shorts) {
   // Pull `_render` overrides off the data (same convention as
   // render-episode.mjs). Allows per-short crf / image-format / scale tweaks
   // without polluting the template's prop shape.
+  //
+  // ALSO strip any other `_*` keys before spreading into props. The
+  // shorts_proposer tool stashes `_TODO` (operator hint) and `_llm`
+  // (LLM-scoring metadata: { score, rationale }) inside data blocks
+  // for proposed-manifest skeletons. Those would otherwise leak into
+  // the template's prop shape and crash strict Zod schemas with
+  // cryptic ZodError messages pointing at metadata rather than the
+  // real missing fields. The convention: any key starting with `_` is
+  // tooling metadata, not template data.
   const renderOverrides = rawData._render ?? {};
-  const { _render: _stripped, ...data } = rawData;
-  void _stripped;
+  const data = Object.fromEntries(
+    Object.entries(rawData).filter(([k]) => !k.startsWith("_")),
+  );
 
   // If durationSec is on the short envelope, push it into data so
   // calculateMetadata picks it up. Manifest-level override beats inline.

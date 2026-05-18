@@ -186,6 +186,17 @@ def _segment_template_name(seg: dict) -> str:
     return ""
 
 
+def _segment_data_file(seg: dict) -> str:
+    """Pull `template.dataFile` safely. The template field may be a
+    string in hand-authored or legacy manifests; in that case `.get()`
+    would AttributeError. Returns a placeholder string when no
+    dataFile is available."""
+    tmpl = seg.get("template")
+    if isinstance(tmpl, dict):
+        return tmpl.get("dataFile", "<framework data file>") or "<framework data file>"
+    return "<framework data file>"
+
+
 def _is_anchor_segment(seg: dict) -> bool:
     """Does this segment carry concrete-evidence weight?
 
@@ -334,7 +345,7 @@ def _propose_framework_candidates(manifest: dict, beat_labels: dict[str, str]) -
             rationale=f"FrameworkDiagram segment. One diagram → one Short is the cleanest "
                       f"shape (a self-contained concept).",
             notes=f"Reuse the framework data file from "
-                  f"{seg.get('template', {}).get('dataFile', '<framework data file>')}.",
+                  f"{_segment_data_file(seg)}.",
         ))
     return out
 
@@ -533,13 +544,17 @@ def build_proposal_manifest(
             "data": data,
         })
     return {
+        # `$schema` and `version: "1.0-proposed"` together signal stub
+        # state. We previously also emitted a top-level `_proposed`
+        # field but the schema has `additionalProperties: false` at
+        # the top level — `_proposed` would be schema-illegal the
+        # moment shorts-manifest is added to validate_data.py's
+        # SCHEMAS map. `version: "1.0-proposed"` and the per-short
+        # `data._TODO` markers carry the same signal without violating
+        # the schema.
         "$schema": "../../remotion-templates/data/episodes/_schemas/shorts-manifest.schema.json",
         "episode": slug,
         "version": "1.0-proposed",
-        "_proposed": (
-            "STUB — fill in each short's `data` block then rename to "
-            "shorts-manifest.json before running `npm run shorts`."
-        ),
         "shorts": shorts,
     }
 
@@ -573,13 +588,25 @@ def main() -> int:
              "NOTE: only re-ranks within the --top window; pass --llm-top-k "
              "to widen the pool the LLM sees before its own ranking.",
     )
+    def _positive_int(s):
+        try:
+            v = int(s)
+        except ValueError:
+            raise argparse.ArgumentTypeError(f"expected int, got {s!r}")
+        if v <= 0:
+            raise argparse.ArgumentTypeError(
+                f"--llm-top-k must be > 0 (got {v}); use --top alone if you "
+                f"don't want to widen the LLM-scoring pool."
+            )
+        return v
     parser.add_argument(
-        "--llm-top-k", type=int, default=None,
+        "--llm-top-k", type=_positive_int, default=None,
         help="With --llm-score: widen the candidate pool the LLM scores "
              "before --top trims for output. Default = whatever --top is. "
              "Useful when you suspect the heuristic missed a strong "
              "candidate at rank 11+. The LLM scores --llm-top-k candidates, "
-             "then sorting + --top trim produces the final ranked list.",
+             "then sorting + --top trim produces the final ranked list. "
+             "Must be > 0.",
     )
     parser.add_argument(
         "--llm-model", default=None,
@@ -671,6 +698,13 @@ def main() -> int:
             except RuntimeError as e:
                 print(f"✗ {e}", file=sys.stderr)
                 return 2
+            # Log the model being used — typo'd --llm-model values would
+            # otherwise surface as cryptic 404s deep in the SDK; the log
+            # line at least confirms what we sent.
+            print(
+                f"ℹ scoring {len(candidates)} candidate(s) with {model}",
+                file=sys.stderr,
+            )
             candidates = scorer_mod.llm_rerank(candidates, manifest, fn)
             # Trim back to --top after the wider-pool LLM rerank
             candidates = candidates[:args.top]

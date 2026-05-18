@@ -233,6 +233,25 @@ class TestProposeQuoteCandidates:
 
 
 class TestProposeFrameworkCandidates:
+    def test_handles_string_template_field(self):
+        # Hand-authored / legacy manifests may have `template: "Name"`
+        # as a bare string instead of `{component: "Name"}`. Pre-fix,
+        # `_propose_framework_candidates` would AttributeError on the
+        # `seg.get('template', {}).get('dataFile', ...)` call when
+        # template was a string. The defensive _segment_data_file
+        # helper now handles both shapes.
+        manifest = {
+            "beats": [{"id": "beat1", "title": "B1"}],
+            "segments": [_make_segment(
+                template="FrameworkDiagram",  # bare string, not dict
+            )],
+        }
+        labels = sp._beat_title_lookup(manifest)
+        # Must not crash even with string-form template
+        cands = sp._propose_framework_candidates(manifest, labels)
+        assert len(cands) == 1
+        assert "<framework data file>" in cands[0].notes
+
     def test_finds_framework(self):
         manifest = {
             "beats": [{"id": "beat1", "title": "B1"}],
@@ -380,20 +399,22 @@ class TestBuildProposalManifest:
         assert manifest["shorts"][0]["id"] == "01"
         assert manifest["shorts"][11]["id"] == "12"
 
-    def test_proposed_marker_at_top_level(self):
-        # The skeleton is NOT renderable as-is — the _proposed marker
-        # tells the operator (and any tooling) that this is a stub.
+    def test_proposed_signals_via_version_and_todo_not_top_level(self):
+        # The skeleton is NOT renderable as-is, but we signal that via
+        # `version: "1.0-proposed"` + per-short `data._TODO` — NOT a
+        # top-level `_proposed` field. Pre-fix the top-level marker
+        # would have violated the schema's `additionalProperties: false`
+        # at the top level.
         cand = sp.ShortsCandidate(
             candidate_kind="stat", sourceBeat="B1", beat_id="beat1",
             template="StatRevealShort", startSec=0, endSec=30,
             durationSec=30, score=1, label="x", rationale="r",
         )
         manifest = sp.build_proposal_manifest("x", [cand])
-        assert "_proposed" in manifest
-        assert "STUB" in manifest["_proposed"]
-        # And the per-short _TODO names the rename-then-render gate
-        # ("renaming" → substring "renam" catches it without being
-        # fragile to "rename" vs "renaming" word forms)
+        # Schema-violating top-level field MUST be absent
+        assert "_proposed" not in manifest
+        # The signal lives in version + per-short _TODO instead
+        assert manifest["version"] == "1.0-proposed"
         assert "renam" in manifest["shorts"][0]["data"]["_TODO"].lower()
 
     def test_llm_score_persisted_to_data_llm(self):
@@ -497,6 +518,11 @@ class TestCliSmoke:
             payload = json.loads(out_manifest.read_text())
             assert payload["episode"] == "smoke-test-shorts"
             assert "shorts" in payload
+            # Rename-then-render warning surfaces in stderr — the
+            # operator who saw "✓ wrote skeleton" without this hint
+            # would skip the rename step and crash render-shorts.mjs.
+            assert "rename" in result.stderr.lower()
+            assert "shorts-manifest.json" in result.stderr
         finally:
             if out_manifest.exists():
                 out_manifest.unlink()
