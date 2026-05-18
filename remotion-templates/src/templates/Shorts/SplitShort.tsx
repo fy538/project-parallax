@@ -17,6 +17,8 @@ import {
 } from "../../design/theme";
 import { fadeIn, slideIn } from "../../utils/animation";
 import { ShortsWrapper } from "../../components/ShortsWrapper";
+import type { VerticalLayoutTokens } from "../../hooks/useVerticalLayout";
+import type { ThemeTokens } from "../../hooks/useThemeMode";
 import type { SplitCompositionData, SplitSide } from "../SplitComposition/types";
 
 // ── Helper ──────────────────────────────────────────────────────────────
@@ -30,8 +32,8 @@ const SideContent: React.FC<{
   frame: number;
   exit: number;
   baseDelay: number;
-  vl: any;
-  theme: any;
+  vl: VerticalLayoutTokens;
+  theme: ThemeTokens;
 }> = ({ side, frame, exit, baseDelay, vl, theme }) => {
   const accent = side.accentColor || palette.amber;
 

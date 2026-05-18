@@ -18,6 +18,8 @@ import {
 } from "../../design/theme";
 import { fadeIn, slideIn, CLAMP, CLAMP_CUBIC } from "../../utils/animation";
 import { ShortsWrapper } from "../../components/ShortsWrapper";
+import type { VerticalLayoutTokens } from "../../hooks/useVerticalLayout";
+import type { ThemeTokens } from "../../hooks/useThemeMode";
 import type { QuoteData } from "../KineticTypography/types";
 
 // ── Quote variant ────────────────────────────────────────────────────────
@@ -26,8 +28,8 @@ const QuoteContent: React.FC<{
   data: QuoteData;
   frame: number;
   exit: number;
-  vl: any;
-  theme: any;
+  vl: VerticalLayoutTokens;
+  theme: ThemeTokens;
 }> = ({ data, frame, exit, vl, theme }) => {
   const accent = data.accentColor || palette.amber;
 
@@ -138,8 +140,8 @@ const StatisticContent: React.FC<{
   data: QuoteData;
   frame: number;
   exit: number;
-  vl: any;
-  theme: any;
+  vl: VerticalLayoutTokens;
+  theme: ThemeTokens;
 }> = ({ data, frame, exit, vl, theme }) => {
   const accent = data.accentColor || palette.amber;
   const raw = data.statValue || "0";
@@ -228,8 +230,8 @@ const DefinitionContent: React.FC<{
   data: QuoteData;
   frame: number;
   exit: number;
-  vl: any;
-  theme: any;
+  vl: VerticalLayoutTokens;
+  theme: ThemeTokens;
 }> = ({ data, frame, exit, vl, theme }) => {
   const accent = data.accentColor || palette.amber;
 

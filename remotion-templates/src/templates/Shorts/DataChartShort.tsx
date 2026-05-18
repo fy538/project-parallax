@@ -19,6 +19,8 @@ import {
 import { fadeIn, slideIn, CLAMP_CUBIC } from "../../utils/animation";
 import { barGradient } from "../../utils/depth";
 import { ShortsWrapper } from "../../components/ShortsWrapper";
+import type { VerticalLayoutTokens } from "../../hooks/useVerticalLayout";
+import type { ThemeTokens } from "../../hooks/useThemeMode";
 import type { DataChartData, DataPoint } from "../DataChart/types";
 
 // ── Animated horizontal bar ─────────────────────────────────────────────
@@ -31,8 +33,8 @@ const HorizontalBar: React.FC<{
   exit: number;
   unit: string;
   defaultColor: string;
-  vl: any;
-  theme: any;
+  vl: VerticalLayoutTokens;
+  theme: ThemeTokens;
 }> = ({ point, index, maxValue, frame, exit, unit, defaultColor, vl, theme }) => {
   const barStart = 15 + index * 8;
   const color = point.color || defaultColor;

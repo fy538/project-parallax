@@ -19,6 +19,7 @@ import {
 } from "remotion";
 import { Marker } from "react-map-gl/mapbox";
 import { ArcLayer, ScatterplotLayer } from "@deck.gl/layers";
+import type { RoutePoint } from "./types";
 import {
   palette,
   fonts,
@@ -511,17 +512,31 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   /** Below this distance, arcs render flat (no great-circle curvature). */
   const GREAT_CIRCLE_KM_THRESHOLD = 3000;
 
+  // Hoisted layer-data types so the deck.gl layer generics
+  // (`new ArcLayer<Arc>({...})`) can type the accessors. Before May 18, 2026
+  // each `getX: (d: any)` accessor was an island — a typo in `d.someField`
+  // would only surface at runtime as `undefined` propagating through the
+  // render. Now `d` is typed and the compiler catches it.
+  type Arc = {
+    from: [number, number];
+    to: [number, number];
+    sourceColor: string;
+    targetColor: string;
+    isNew: boolean;
+    dashed: boolean;
+    index: number;
+    arcHeight: number;
+  };
+  type FlowParticle = {
+    position: [number, number, number];
+    color: string;
+    t: number;
+    arcIdx: number;
+  };
+  type ActivePoint = RoutePoint & { index: number };
+
   const arcData = useMemo(() => {
-    const arcs: Array<{
-      from: [number, number];
-      to: [number, number];
-      sourceColor: string;
-      targetColor: string;
-      isNew: boolean;
-      dashed: boolean;
-      index: number;
-      arcHeight: number;
-    }> = [];
+    const arcs: Arc[] = [];
 
     data.segments.forEach((seg, i) => {
       if (!allActiveSegments.has(i)) return;
@@ -575,11 +590,11 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     CLAMP_CUBIC
   );
 
-  const arcLayer = new ArcLayer({
+  const arcLayer = new ArcLayer<Arc>({
     id: "trade-routes",
     data: arcData,
-    getSourcePosition: (d: any) => d.from,
-    getTargetPosition: (d: any) => d.to,
+    getSourcePosition: (d) => d.from,
+    getTargetPosition: (d) => d.to,
     // Path-style hierarchy via alpha:
     //   isNew (current segment, mid-reveal): animates from 0 → 200 alpha
     //   isNew && settled:                    not applicable
@@ -592,22 +607,22 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     // active claim).
     //
     // See: references/template-research/route-animation.md § 6.2
-    getSourceColor: (d: any) => {
+    getSourceColor: (d) => {
       const alpha = d.isNew ? Math.round(newArcProgress * 200) : 80;
       return hexToRgba(d.sourceColor, alpha);
     },
-    getTargetColor: (d: any) => {
+    getTargetColor: (d) => {
       const alpha = d.isNew ? Math.round(newArcProgress * 200) : 80;
       return hexToRgba(d.targetColor, alpha);
     },
-    getWidth: (d: any) => {
+    getWidth: (d) => {
       const base = d.dashed ? 1.5 : 3;
       return d.isNew ? base * newArcProgress : base;
     },
     greatCircle: true,
     // Per-segment arc height — flat for sub-threshold hops, normal for true
     // great-circle distances. See `arcHeight` computation above.
-    getHeight: (d: any) => d.arcHeight,
+    getHeight: (d) => d.arcHeight,
     widthUnits: "pixels" as const,
     updateTriggers: {
       getSourceColor: [newArcProgress],
@@ -654,12 +669,12 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
     return parts;
   }, [arcData, frame, newArcProgress]);
 
-  const flowParticleLayer = new ScatterplotLayer({
+  const flowParticleLayer = new ScatterplotLayer<FlowParticle>({
     id: "flow-particles",
     data: flowParticles,
-    getPosition: (d: any) => d.position,
+    getPosition: (d) => d.position,
     getRadius: 3,
-    getFillColor: (d: any) => hexToRgba(d.color, Math.round(220 * d.t)),
+    getFillColor: (d) => hexToRgba(d.color, Math.round(220 * d.t)),
     radiusUnits: "pixels" as const,
     updateTriggers: {
       getPosition: [frame],
@@ -784,12 +799,12 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   }, [rawData._direction?.cameraPath]);
 
   // Outer atmospheric glow halo (14px, low alpha)
-  const scatterHaloLayer = new ScatterplotLayer({
+  const scatterHaloLayer = new ScatterplotLayer<ActivePoint>({
     id: "point-glow",
     data: pointData,
-    getPosition: (d: any) => d.coordinates,
+    getPosition: (d) => d.coordinates,
     getRadius: 14,
-    getFillColor: (d: any) => hexToRgba(d.color || routeColor, 60),
+    getFillColor: (d) => hexToRgba(d.color || routeColor, 60),
     radiusUnits: "pixels" as const,
     updateTriggers: {
       getFillColor: [routeColor],
@@ -800,14 +815,14 @@ export const RouteAnimation: React.FC<{ data: RouteAnimationData }> = ({
   // Ring weight bumped from 1.5px → 2.5px and dot radius from 6 → 7 for
   // visibility at video-scrub scale. At 1.5px the ring sub-pixeled into
   // invisibility when rendered at 1920×1080 then compressed.
-  const scatterMarkerLayer = new ScatterplotLayer({
+  const scatterMarkerLayer = new ScatterplotLayer<ActivePoint>({
     id: "point-marker",
     data: pointData,
-    getPosition: (d: any) => d.coordinates,
+    getPosition: (d) => d.coordinates,
     getRadius: 7,
-    getFillColor: (d: any) => hexToRgba(d.color || routeColor, 230),
+    getFillColor: (d) => hexToRgba(d.color || routeColor, 230),
     stroked: true,
-    getLineColor: (_d: any) => hexToRgba(palette.gold, 255),
+    getLineColor: () => hexToRgba(palette.gold, 255),
     getLineWidth: 2.5,
     lineWidthUnits: "pixels" as const,
     radiusUnits: "pixels" as const,

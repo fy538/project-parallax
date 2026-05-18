@@ -23,7 +23,10 @@
 import React, { useCallback, useRef, useState, useEffect } from "react";
 import { AbsoluteFill, delayRender, continueRender } from "remotion";
 import Map, { Source, useControl } from "react-map-gl/mapbox";
+import type { MapRef } from "react-map-gl/mapbox";
+import type { MapEvent } from "mapbox-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
+import type { Layer } from "@deck.gl/core";
 import { layout, mapConfig, palette } from "../design/theme";
 import { buildGraticuleLayers } from "./Graticule";
 import type { GraticuleConfig } from "./Graticule.types";
@@ -39,7 +42,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
  * Uses MapboxOverlay (interleaved mode) so deck.gl layers
  * composite correctly with Mapbox's terrain and label layers.
  */
-const DeckGLOverlay: React.FC<{ layers: any[] }> = ({ layers }) => {
+const DeckGLOverlay: React.FC<{ layers: Layer[] }> = ({ layers }) => {
   const overlay = useControl<MapboxOverlay>(
     () => new MapboxOverlay({ interleaved: true })
   );
@@ -385,7 +388,7 @@ export interface MapGLProps {
   /** Camera bearing in degrees (default 0) */
   bearing?: number;
   /** deck.gl layers to overlay */
-  layers?: any[];
+  layers?: Layer[];
   /** Callback when map + terrain are fully loaded */
   onLoad?: () => void;
   /**
@@ -586,7 +589,7 @@ export const MapGL: React.FC<MapGLProps> = ({
   // ── Delay render until map tiles are loaded ─────────────────────────
   const [handle] = useState(() => delayRender("Loading map tiles..."));
   const [loaded, setLoaded] = useState(false);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<MapRef | null>(null);
 
   // Wait for 'idle' (all tiles downloaded + composited), NOT just 'load'
   // (style JSON parsed). The delta is exactly the "warm-up" visible in
@@ -598,8 +601,12 @@ export const MapGL: React.FC<MapGLProps> = ({
   // the style is loaded but before we wait for tile-idle. The fog spec
   // affects horizon + atmosphere rendering, not tile loading. Wrapped in
   // try/catch because pre-globe Mapbox builds throw on setFog().
-  const handleLoad = useCallback((evt: { target: any }) => {
-    const map = evt.target as {
+  const handleLoad = useCallback((evt: MapEvent) => {
+    // evt.target is the underlying Mapbox `Map` instance. We only need
+    // `once` to wait for tile-idle; cast through `unknown` to the narrow
+    // shape we use here (mapbox-gl's exported Map type carries hundreds of
+    // methods we don't touch).
+    const map = evt.target as unknown as {
       once: (event: string, cb: () => void) => void;
     };
     // NOTE: fog and label-density application both moved OUT of
@@ -635,9 +642,13 @@ export const MapGL: React.FC<MapGLProps> = ({
   useEffect(() => {
     if (!loaded || !mapRef.current) return;
     if (lastFogRef.current === fogPreset) return;
-    const wrapper = mapRef.current;
-    const mapInstance =
-      typeof wrapper.getMap === "function" ? wrapper.getMap() : wrapper;
+    // MapRef intentionally omits style-mutation methods (setFog, setStyle,
+    // addLayer, …) to discourage call sites that would break the React
+    // binding. We want them: this template renders a static map per frame
+    // and explicitly re-applies the fog spec. Reach through .getMap() to
+    // the raw mapbox-gl `Map` instance which carries the full API.
+    const mapInstance = mapRef.current.getMap();
+    // setFog may not exist on pre-globe Mapbox builds; guard at runtime.
     if (!mapInstance || typeof mapInstance.setFog !== "function") return;
 
     try {
