@@ -83,13 +83,29 @@ interface Resolved {
   maxStep: number;
 }
 
+// Allocate a reveal step for one region. When the caller provided an
+// explicit `revealStep`, honor it AND advance the cursor past it so any
+// auto-assigned steps later in the walk don't collide with it. Without the
+// `Math.max` bump, an explicit `revealStep: 5` followed by an implicit
+// region would both land on step 5 — two reveals on the same beat.
+const consumeRevealStep = (
+  explicit: number | undefined,
+  stepCursor: { value: number },
+): number => {
+  if (explicit !== undefined) {
+    stepCursor.value = Math.max(stepCursor.value, explicit + 1);
+    return explicit;
+  }
+  return stepCursor.value++;
+};
+
 const resolveRegion = (
   region: Region,
   rect: Rect,
   stepCursor: { value: number },
 ): { splits: ResolvedSplit[]; leaves: ResolvedLeaf[] } => {
   if (region.kind === "leaf") {
-    const step = region.revealStep ?? stepCursor.value++;
+    const step = consumeRevealStep(region.revealStep, stepCursor);
     return {
       splits: [],
       leaves: [{
@@ -104,7 +120,7 @@ const resolveRegion = (
     };
   }
   // Split
-  const step = region.revealStep ?? stepCursor.value++;
+  const step = consumeRevealStep(region.revealStep, stepCursor);
   let leftRect: Rect;
   let rightRect: Rect;
   let cutX1: number, cutY1: number, cutX2: number, cutY2: number;
@@ -324,7 +340,7 @@ export const OutcomePartition: React.FC<{ data: OutcomePartitionData }> = ({ dat
                     y={-9}
                     width={140}
                     height={18}
-                    fill={mode === "dark" ? "#0F0E0C" : palette.paper}
+                    fill={mode === "dark" ? palette.midnight : palette.paper}
                     opacity={0.85}
                   />
                   <text

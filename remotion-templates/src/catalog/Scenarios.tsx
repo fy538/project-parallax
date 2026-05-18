@@ -157,8 +157,13 @@ const treeTaiwanSpine: DecisionTreeData = {
   subtitle: "Three rungs in a contingency-planning chain",
   variant: "spine",
   nodes: [
-    // Spine — the chosen sequence
-    { id: "root", label: "PRC blockade declared", children: ["assess", "limited-strike", "diplomatic"] },
+    // Spine — the chosen sequence. The spine successor MUST come first in
+    // each rung's `children` array; the spine variant filters it out via
+    // highlightedPath membership, but other tree-walking helpers
+    // (computeLeafPosteriors, buildParentMap, the indented/extensive
+    // variants if data is swapped) treat anything not in `children` as
+    // orphaned.
+    { id: "root", label: "PRC blockade declared", children: ["rung1", "assess", "limited-strike", "diplomatic"] },
     { id: "rung1", label: "Quarantine the strait", children: ["rung2", "freeze-only", "naval-strike"] },
     { id: "rung2", label: "Inspect-and-divert ROE", children: ["rung3", "no-inspect"] },
     { id: "rung3", label: "Hold until political off-ramp", children: [] },

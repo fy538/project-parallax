@@ -560,6 +560,15 @@ const IndentedTreeVariant: React.FC<{
     [data.highlightedPath],
   );
 
+  // Guard: empty tree (no children below root) renders a blank composition
+  // under the title. Most likely the root ID doesn't match any node OR the
+  // root has an empty `children` array — both are usually authoring bugs.
+  warnIf(
+    flat.length === 0,
+    "DecisionTree (indented)",
+    `tree is empty — root "${data.rootId}" has no descendants. Check the root has a non-empty \`children\` array.`,
+  );
+
   const INDENT = 56;            // px per depth level
   const ROW_HEIGHT = 56;        // baseline-to-baseline
   const ORDINAL_COL = 64;       // mono ordinal column width
@@ -781,6 +790,26 @@ const SpineTreeVariant: React.FC<{
     }
     return rungs;
   }, [data.highlightedPath, data.rootId, nodeMap]);
+
+  // Guards: empty spine + over-fanned rung. The lateral-fan limit comes from
+  // the fact that STEM_VERTICAL_FAN × children fans symmetrically around the
+  // rung; with RUNG_HEIGHT = 160 and STEM_VERTICAL_FAN = 40, 3 lateral
+  // children fit comfortably (60px above + below center). At 4+, fans from
+  // adjacent rungs start to collide vertically.
+  warnIf(
+    spine.length === 0,
+    "DecisionTree (spine)",
+    `spine is empty — rootId "${data.rootId}" not found in nodes array.`,
+  );
+  const spineIdSet = new Set(spine.map((r) => r.id));
+  const overFannedRung = spine.find(
+    (r) => (r.children ?? []).filter((cid) => !spineIdSet.has(cid)).length > 3,
+  );
+  warnIf(
+    Boolean(overFannedRung),
+    "DecisionTree (spine)",
+    `rung "${overFannedRung?.label ?? ""}" has more than 3 lateral children; adjacent rungs will collide vertically. Either reduce lateral options or split into two compositions.`,
+  );
 
   const exitOp = exitFade(frame, totalFrames, sec(0.5));
   const safe = layout.safeAreaTier.generous;
@@ -1229,56 +1258,19 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
       "or node.probability fields, or set probabilityWeights: false to suppress.",
   );
 
-  // ── Non-canvas variants — early return when variant uses a non-extensive
-  // typographic / schematic layout (no virtual camera, no graph layout).
-  // Each variant component is fully self-contained.
-  if (
-    data.variant === "ladder" ||
-    data.variant === "indented" ||
-    data.variant === "spine"
-  ) {
-    const VariantComponent =
-      data.variant === "ladder"
-        ? LadderVariant
-        : data.variant === "indented"
-          ? IndentedTreeVariant
-          : SpineTreeVariant;
-
-    return (
-      <Background
-        variant={resolveAnalyticalBackgroundVariant(
-          analyticalBackgroundBase(backgroundVariant),
-          transparentBackdropRequested(data),
-        )}
-        atmosphere={direction.atmosphere}
-        atmosphereIntensity={direction.atmosphereIntensity}
-        tint={direction.backgroundTint}
-      >
-        <AbsoluteFill style={compStyle}>
-          <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
-          <FooterStrip mode={backgroundVariant} />
-          <VariantComponent
-            data={data}
-            frame={frame}
-            totalFrames={totalFrames}
-            syncPoints={direction.syncPoints}
-            firstRevealBase={nodeRevealBase}
-          />
-        </AbsoluteFill>
-      </Background>
-    );
-  }
-
-  // ── Layout ────────────────────────────────────────────────────────────
+  // ── Layout + camera hooks — run UNCONDITIONALLY for Rules of Hooks ──────
+  // These were previously below the non-canvas variant early-return, which
+  // broke the hook count when `variant ∈ {ladder, indented, spine}` (the
+  // dispatched return fired before these hooks ran). All hooks now run for
+  // every variant; the non-canvas variants simply ignore the computed values.
+  // Cost is negligible — `computeTreeLayout` on ≤20 nodes is microseconds.
   const positions = useMemo(
     () => computeTreeLayout(data.nodes, data.rootId, layout.width, layout.height, isHorizontal),
     [data.nodes, data.rootId, isHorizontal]
   );
 
-  // ── Parent map for path-based dimming ─────────────────────────────────
   const parentMap = useMemo(() => buildParentMap(data.nodes), [data.nodes]);
 
-  // ── Camera path (use provided or auto-generate) ───────────────────────
   const cameraPath = useMemo(() => {
     if (data.cameraPath && data.cameraPath.length > 0) {
       return data.cameraPath;
@@ -1291,7 +1283,6 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     );
   }, [data.cameraPath, data.rootId, data.nodes, data.durationSec, data.highlightedPath]);
 
-  // ── Virtual camera ────────────────────────────────────────────────────
   const camera = useTreeCamera({
     positions: positions as Map<string, { x: number; y: number }>,
     cameraPath,
@@ -1303,7 +1294,8 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     transitionSec: 0.6,
   });
 
-  // ── On-path edge check (horizontal layout track system) ───────────────
+  // Plain helper (not a hook); kept above the early return for the edges
+  // useMemo below to close over.
   const isOnPath = (parentId: string, childId: string): boolean => {
     if (!data.highlightedPath || data.highlightedPath.length === 0) return false;
     const pIdx = data.highlightedPath.indexOf(parentId);
@@ -1394,6 +1386,47 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
     return result;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.nodes, positions, data.highlightedPath, isHorizontal]);
+
+  // ── Non-canvas variants — early return AFTER all hooks have run.
+  // Placed here (not earlier) to satisfy Rules of Hooks: every hook above
+  // runs unconditionally for every variant, so React sees a stable hook
+  // count regardless of which variant the data picks.
+  if (
+    data.variant === "ladder" ||
+    data.variant === "indented" ||
+    data.variant === "spine"
+  ) {
+    const VariantComponent =
+      data.variant === "ladder"
+        ? LadderVariant
+        : data.variant === "indented"
+          ? IndentedTreeVariant
+          : SpineTreeVariant;
+
+    return (
+      <Background
+        variant={resolveAnalyticalBackgroundVariant(
+          analyticalBackgroundBase(backgroundVariant),
+          transparentBackdropRequested(data),
+        )}
+        atmosphere={direction.atmosphere}
+        atmosphereIntensity={direction.atmosphereIntensity}
+        tint={direction.backgroundTint}
+      >
+        <AbsoluteFill style={compStyle}>
+          <HeaderStrip mode={backgroundVariant} metadata={data.episode} />
+          <FooterStrip mode={backgroundVariant} />
+          <VariantComponent
+            data={data}
+            frame={frame}
+            totalFrames={totalFrames}
+            syncPoints={direction.syncPoints}
+            firstRevealBase={nodeRevealBase}
+          />
+        </AbsoluteFill>
+      </Background>
+    );
+  }
 
   const highlightColor = data.highlightColor || emphasis.primaryAccent;
 

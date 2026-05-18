@@ -52,9 +52,13 @@ export type Region =
       /** Optional secondary line (sub-label / metric / etc.). */
       sublabel?: string;
       /** Severity tint (paper → walnut). 0 = no fill, 1 = full walnut.
-       *  Maps to opacity of the brand walnut palette token. */
+       *  Maps to opacity of the brand walnut palette token. Ignored when
+       *  `color` is set (color takes precedence). */
       severity?: number;
-      /** Optional explicit color override; when set, ignores severity. */
+      /** Optional explicit color override. When set, this color renders at
+       *  ~15% opacity REGARDLESS of `severity` — the two fields are mutually
+       *  exclusive; provide one or the other. Use for semantic accent
+       *  regions (e.g. `semantic.china` for escalation outcomes). */
       color?: string;
       /** Optional reveal-order index — when this leaf label appears. */
       revealStep?: number;
