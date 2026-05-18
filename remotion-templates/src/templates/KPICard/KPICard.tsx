@@ -16,6 +16,7 @@ import {
   fontWeights,
   letterSpacing,
   sec,
+  textMaxWidth,
 } from "../../design/theme";
 import { fadeIn, easings } from "../../utils/animation";
 import { useDirection } from "../../hooks/useDirection";
@@ -108,7 +109,7 @@ const KPIContent: React.FC<{
         style={{
           display: "flex",
           alignItems: "baseline",
-          gap: 28,
+          gap: 24,
         }}
       >
         <div
@@ -120,6 +121,7 @@ const KPIContent: React.FC<{
             lineHeight: 1.0,
             letterSpacing: letterSpacing.display,
             opacity: valueOpacity,
+            maxWidth: textMaxWidth.h1,
           }}
         >
           {data.value}
@@ -130,6 +132,7 @@ const KPIContent: React.FC<{
                 fontWeight: fontWeights.regular,
                 color: theme.text.secondary,
                 marginLeft: 8,
+                maxWidth: textMaxWidth.h2,
               }}
             >
               {data.unit}
@@ -145,6 +148,7 @@ const KPIContent: React.FC<{
               color: changeColor,
               letterSpacing: 0.5,
               opacity: changeOpacity,
+              maxWidth: textMaxWidth.label,
             }}
           >
             {data.change}
@@ -173,7 +177,7 @@ const KPIContent: React.FC<{
 
       {/* Inline sparkline */}
       {data.trend && data.trend.length > 1 && (
-        <div style={{ marginTop: 36, opacity: trendDraw }}>
+        <div style={{ marginTop: 32, opacity: trendDraw }}>
           <Sparkline
             values={data.trend}
             width={Math.min(360, chartRect.width * 0.45)}

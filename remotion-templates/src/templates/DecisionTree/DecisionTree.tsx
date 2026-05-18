@@ -971,7 +971,7 @@ const SpineTreeVariant: React.FC<{
             frame,
             [baseReveal, spineRevealEnd],
             [0, 1],
-            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            CLAMP_CUBIC,
           );
           return (
             <line

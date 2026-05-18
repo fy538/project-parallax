@@ -518,7 +518,7 @@ const CartogramLegend = React.memo<CartogramLegendProps>(({
 
   const padding = layout.safeAreaTier.generous.right;
   const baseY = layout.height - layout.safeAreaTier.generous.bottom;
-  const gap = 30;
+  const gap = 32;
   const xLarge = layout.width - padding - rLarge;
   const xMedium = xLarge - rLarge - gap - rMedium;
   const xSmall = xMedium - rMedium - gap - rSmall;

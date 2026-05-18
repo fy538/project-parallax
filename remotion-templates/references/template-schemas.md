@@ -1506,23 +1506,29 @@ Examples:
 
 ## Templates without dedicated schema documentation here
 
-The following 15 live templates render fine and have full Zod schemas in their template directories, but no dedicated section has been authored in this doc yet. Until added, the per-template `schema.ts` is the source of truth. Read those files directly when authoring data files for these templates; the family SELECTORs name when to reach for each.
+The following 19 live templates render fine and have full Zod schemas in their template directories, but no dedicated section has been authored in this doc yet. **Since May 2026 audit #3, the per-template `schema.ts` derives the TypeScript types directly (`z.infer`), so the schema is now the canonical source-of-truth for field shapes** — that field-level reference no longer needs duplicating here. Read the schema file directly when authoring data files for these templates; the family SELECTORs name when to reach for each, and the dossiers carry the editorial doctrine.
+
+Adding a template here (vs writing a full `## Name` section) is a deliberate editorial call: the schema + dossier together give an author everything they need. Full sections live above for templates that need extra editorial context (e.g. variant decision trees, complex composition rules) that doesn't fit naturally in either source.
 
 | Template | Family | Source of truth | Dossier |
 |---|---|---|---|
 | **TilegramUSMap** | Maps | `src/templates/TilegramUSMap/schema.ts` | `references/template-research/tilegram-us-map.md` |
 | **ArcDiagram** | Diagrams | `src/templates/ArcDiagram/schema.ts` | `references/template-research/arc-diagram.md` |
 | **BeeswarmChart** | Charts | `src/templates/BeeswarmChart/schema.ts` | `references/template-research/beeswarm-chart.md` |
+| **BulletChart** | Charts (Phase 4) | `src/templates/BulletChart/schema.ts` | `references/template-research/bullet-chart.md` |
 | **BumpChart** | Charts | `src/templates/BumpChart/schema.ts` | `references/template-research/bump-chart.md` |
 | **CalendarHeatmap** | Charts | `src/templates/CalendarHeatmap/schema.ts` | `references/template-research/calendar-heatmap.md` |
 | **ConnectedScatterplot** | Charts | `src/templates/ConnectedScatterplot/schema.ts` | `references/template-research/connected-scatterplot.md` |
 | **DumbbellPlot** | Charts | `src/templates/DumbbellPlot/schema.ts` | `references/template-research/dumbbell-plot.md` |
 | **HorizonChart** | Charts | `src/templates/HorizonChart/schema.ts` | `references/template-research/horizon-chart.md` |
 | **IsotypeChart** | Charts | `src/templates/IsotypeChart/schema.ts` | `references/template-research/isotype-chart.md` |
+| **KPICard** | Charts (Phase 4) | `src/templates/KPICard/schema.ts` | `references/template-research/kpi-card.md` |
 | **MarimekkoChart** | Charts | `src/templates/MarimekkoChart/schema.ts` | `references/template-research/marimekko-chart.md` |
 | **PopulationPyramid** | Charts | `src/templates/PopulationPyramid/schema.ts` | `references/template-research/population-pyramid.md` |
 | **RankChangeDotPlot** | Charts | `src/templates/RankChangeDotPlot/schema.ts` | `references/template-research/rank-change-dot-plot.md` |
 | **RidgelinePlot** | Charts | `src/templates/RidgelinePlot/schema.ts` | `references/template-research/ridgeline-plot.md` |
+| **Slopegraph** | Charts (Phase 4) | `src/templates/Slopegraph/schema.ts` | `references/template-research/slopegraph.md` |
+| **StepLine** | Charts (Phase 4) | `src/templates/StepLine/schema.ts` | `references/template-research/step-line.md` |
 | **Streamgraph** | Charts | `src/templates/Streamgraph/schema.ts` | `references/template-research/streamgraph.md` |
 | **TernaryPlot** | Charts | `src/templates/TernaryPlot/schema.ts` | `references/template-research/ternary-plot.md` |
 

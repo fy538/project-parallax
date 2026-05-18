@@ -131,7 +131,7 @@ const ForecastLayers: React.FC<{
               flexDirection: "column",
               justifyContent: "center",
               borderLeft: `2px solid ${palette.taupe}`,
-              paddingLeft: 20,
+              paddingLeft: 24,
             }}
           >
             <div
@@ -151,7 +151,7 @@ const ForecastLayers: React.FC<{
                 fontSize: fontSizes.label,
                 color: theme.text.primary,
                 lineHeight: 1.45,
-                maxWidth: chartRect.width - 20,
+                maxWidth: chartRect.width - 24,
               }}
             >
               {layer.text}

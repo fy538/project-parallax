@@ -21,6 +21,7 @@ import {
   letterSpacing,
   layout,
   sec,
+  textMaxWidth,
 } from "../../design/theme";
 import { fadeIn, easings, CLAMP_CUBIC } from "../../utils/animation";
 import { formatNumber } from "../../utils/numberFormat";
@@ -256,6 +257,7 @@ const BarsContent: React.FC<{
                   opacity: labelFade,
                   letterSpacing: -0.5,
                   whiteSpace: "nowrap",
+                  maxWidth: textMaxWidth.label,
                 }}
               >
                 {formattedValue}
@@ -400,6 +402,7 @@ const StackedBarsContent: React.FC<{
                       fontWeight: fontWeights.bold,
                       color: palette.paper,
                       opacity: labelFade,
+                      maxWidth: textMaxWidth.label,
                     }}
                   >
                     {formatNumber(pair.leftValue)}
@@ -417,7 +420,7 @@ const StackedBarsContent: React.FC<{
                   backgroundColor: rightColor,
                   display: "flex",
                   alignItems: "center",
-                  paddingLeft: 12,
+                  paddingLeft: 16,
                 }}
               >
                 {showInline && rightSegWidth * grow > 40 && (
@@ -428,6 +431,7 @@ const StackedBarsContent: React.FC<{
                       fontWeight: fontWeights.bold,
                       color: palette.paper,
                       opacity: labelFade,
+                      maxWidth: textMaxWidth.label,
                     }}
                   >
                     {formatNumber(pair.rightValue)}

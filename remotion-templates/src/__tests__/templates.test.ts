@@ -105,6 +105,13 @@ const COMPOSITIONS = [
   "TernaryPlot",
   "HorizonChart",
   "DumbbellPlot",
+  // Phase 4 chart family — added May 18, 2026 as part of the doc-coverage
+  // burn-down (audit #16). All four render fine and have full Zod schemas;
+  // baselines auto-create on next `npm run test:visual -- --update`.
+  "Slopegraph",
+  "KPICard",
+  "BulletChart",
+  "StepLine",
 ];
 
 // Shorts compositions — IDs match the Root.tsx registrations (note the

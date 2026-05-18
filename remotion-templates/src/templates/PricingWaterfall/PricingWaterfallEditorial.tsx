@@ -197,7 +197,8 @@ const WaterfallContent: React.FC<{
         );
       })}
 
-      {/* Total caption beneath bar */}
+      {/* Total caption beneath bar — SVG <text>, textMaxWidth not applicable (width
+          constrained by BAR_WIDTH + textAnchor="middle"). */}
       <g
         transform={`translate(${BAR_X + BAR_WIDTH / 2}, ${TOP_PAD + barHeight + 24})`}
       >
@@ -208,6 +209,8 @@ const WaterfallContent: React.FC<{
           textAnchor="middle"
           style={{
             fontFamily: fonts.heading,
+            // textMaxWidth not applicable: SVG <text> width is constrained by
+            // BAR_WIDTH + textAnchor="middle".
             fontSize: fontSizes.h2,
             fontWeight: fontWeights.bold,
             letterSpacing: -1,

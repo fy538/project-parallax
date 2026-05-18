@@ -337,6 +337,8 @@ const LinesContent: React.FC<{
                 fill={color}
                 style={{
                   fontFamily: fonts.heading,
+                  // textMaxWidth not applicable: SVG <text> width is bounded by
+                  // plot extent + adjacent gridlines.
                   fontSize: fontSizes.h3 - 8,
                   fontWeight: fontWeights.bold,
                 }}

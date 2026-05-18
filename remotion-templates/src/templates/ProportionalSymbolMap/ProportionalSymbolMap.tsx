@@ -632,7 +632,7 @@ const ProportionalLegend = React.memo<ProportionalLegendProps>(({
   // Layout: three reference circles side-by-side at the bottom-right corner.
   const padding = layout.safeAreaTier.generous.right;
   const baseY = layout.height - layout.safeAreaTier.generous.bottom;
-  const gap = 30;
+  const gap = 32;
   // Compute each circle's center x — right-aligned at `layout.width - padding`.
   const xLarge = layout.width - padding - rLarge;
   const xMedium = xLarge - rLarge - gap - rMedium;

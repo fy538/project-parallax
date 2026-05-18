@@ -353,7 +353,9 @@ const YearLabel: React.FC<YearLabelProps> = React.memo(({
   if (!labelA && !labelB) return null;
 
   // Show labelA fully until morph starts, then cross-fade to labelB
+  // linear-ok: opacity crossfade between year labels — eased curve reads as sluggish.
   const labelAOpacity = interpolate(morphProgress, [0, 0.3], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  // linear-ok: opacity crossfade between year labels — eased curve reads as sluggish.
   const labelBOpacity = interpolate(morphProgress, [0.3, 0.7], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const labelEnter = fadeIn(frame, 0, sec(0.5));
 

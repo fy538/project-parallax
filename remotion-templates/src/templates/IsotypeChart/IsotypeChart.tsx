@@ -31,6 +31,7 @@ import {
   sec,
   shadows,
   contentArea,
+  textMaxWidth,
 } from "../../design/theme";
 import { TitleBlock } from "../../components/TitleBlock";
 import { SourceAttribution } from "../../components/SourceAttribution";
@@ -283,6 +284,7 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
             color: accentColor,
             textShadow: shadows.textLift,
             lineHeight: 1,
+            maxWidth: textMaxWidth.label,
           }}
         >
           {countUp(highlighted, countProgress)}
@@ -295,6 +297,7 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
             fontSize: fontSizes.body,
             color: theme.text.secondary,
             lineHeight: 1,
+            maxWidth: textMaxWidth.label,
           }}
         >
           of
@@ -309,6 +312,7 @@ const ProportionGrid: React.FC<ProportionGridProps> = ({
             color: theme.text.secondary,
             textShadow: shadows.textLift,
             lineHeight: 1,
+            maxWidth: textMaxWidth.label,
           }}
         >
           {total}
