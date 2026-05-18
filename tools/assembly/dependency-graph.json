@@ -1,0 +1,194 @@
+{
+  "_comment": "Pipeline dependency graph — used by tools/assembly/invalidate.py to compute stale-artifact sets after a diff. Each rule maps a source-file pattern to derived-artifact patterns + the regen command. Pattern variables: {slug} (episode slug — extracted from source path), * (wildcard within path segment), ** (wildcard across path segments). When a source path is changed in a diff, every matching rule's derives are marked stale. The `why:` field on each rule explains the edge to future readers. The `confidence:` field signals whether stale-status is certain (high) or possible (low) — operator decides whether to act.",
+  "version": "1.0",
+  "lastUpdated": "2026-05-17",
+  "rules": [
+    {
+      "source": "episodes/{slug}/script-production.md",
+      "why": "The script is the single source of truth for narration text, visual tags, DIR/PACE annotations, and the asset summary. Every downstream artifact that quotes, parses, or times against it is stale when it changes.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "episodes/{slug}/narration-readable.md",
+          "regen": "python3 tools/narration/format_for_reading.py {slug}"
+        },
+        {
+          "artifact": "episodes/{slug}/pronunciation-guide.md",
+          "regen": "python3 tools/narration/pronunciation_guide.py {slug} --merge"
+        },
+        {
+          "artifact": "episodes/{slug}/cue-sheet.md",
+          "regen": "python3 tools/narration/pre_render_cue_sheet.py {slug}"
+        },
+        {
+          "artifact": "episodes/{slug}/engagement-metrics.md",
+          "regen": "python3 tools/narration/engagement_metrics.py {slug}"
+        },
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+          "regen": "python3 tools/assembly/generate_manifest.py {slug}"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/script-v*-production.md",
+      "why": "Versioned script drafts — same downstream consequences as canonical, but only the latest version's outputs are tracked.",
+      "confidence": "medium",
+      "derives": [
+        {
+          "artifact": "episodes/{slug}/script-production.md",
+          "regen": "(promote latest versioned draft to canonical when audit passes)"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/assets/narration.wav",
+      "why": "Re-recorded or edited narration shifts every sync-point timestamp. Precise-mode manifest must regenerate; alignment diff and audio QA become stale.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "episodes/{slug}/assets/_audio-qa.md",
+          "regen": "python3 tools/narration/audio_qa.py {slug}"
+        },
+        {
+          "artifact": "episodes/{slug}/narration-diff.md",
+          "regen": "python3 tools/narration/whisper_alignment.py {slug}"
+        },
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+          "regen": "python3 tools/assembly/generate_manifest.py {slug} --audio"
+        },
+        {
+          "artifact": "episodes/{slug}/assets/narration-mastered.wav",
+          "regen": "python3 tools/narration/local_master.py {slug}"
+        }
+      ]
+    },
+    {
+      "source": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+      "why": "The assembly manifest is what render-episode.mjs reads to compose the final video. Any edit to it invalidates the rendered MP4.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/{slug}-full*.mp4",
+          "regen": "cd remotion-templates && node scripts/render-episode.mjs --episode={slug}"
+        }
+      ]
+    },
+    {
+      "source": "remotion-templates/data/episodes/{slug}/*.json",
+      "why": "Template data files (excluding assembly-manifest) — when edited, the corresponding template render is stale, and the manifest may need to update segment metadata.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/{slug}-*.mp4",
+          "regen": "cd remotion-templates && node scripts/render-episode.mjs --episode={slug}"
+        },
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+          "regen": "python3 tools/assembly/generate_manifest.py {slug}"
+        }
+      ]
+    },
+    {
+      "source": "tools/brand-treatment/palette.json",
+      "why": "Brand palette is the canonical color source. Changes cascade to LUTs (treat_video.py reads it), all Remotion components (theme.ts reads it), and therefore every rendered episode.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "tools/brand-treatment/luts/**/*.cube",
+          "regen": "python tools/brand-treatment/treat_video.py --all-luts -o tools/brand-treatment/luts/"
+        },
+        {
+          "artifact": "remotion-templates/out/*-full*.mp4",
+          "regen": "(re-render every episode that uses the affected colors)"
+        }
+      ]
+    },
+    {
+      "source": "data/concepts.json",
+      "why": "The concept registry. Changes may invalidate cross-episode callback markers and visual-spec's reuse-check output. Semantic dependency — operator decides whether re-audit is warranted.",
+      "confidence": "low",
+      "derives": [
+        {
+          "artifact": "episodes/*/script-production.md",
+          "regen": "(audit scripts for stale concept references via python tools/concepts/lookup.py validate)"
+        }
+      ]
+    },
+    {
+      "source": "remotion-templates/src/templates/**/*.tsx",
+      "why": "Template component source. Edits invalidate every render that used that template.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/*.mp4",
+          "regen": "(re-render every episode that uses the affected template)"
+        }
+      ]
+    },
+    {
+      "source": "remotion-templates/src/components/**/*.tsx",
+      "why": "Shared components — even more cascading impact than templates. Edits to EditorialFrame/FilmOverlay/etc. invalidate everything that imports them.",
+      "confidence": "medium",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/*.mp4",
+          "regen": "(re-render every episode)"
+        }
+      ]
+    },
+    {
+      "source": "episodes/pipeline-state.json",
+      "why": "Pipeline state changes drive the At-a-glance table refresh and per-episode dashboards.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "episodes/PIPELINE.md",
+          "regen": "python3 tools/pipeline_validator.py --update-tracker"
+        },
+        {
+          "artifact": "episodes/*/_status.md",
+          "regen": "python3 tools/pipeline_validator.py --write-status"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/audio-cue-sheet.md",
+      "why": "Audio cue sheet specifies SFX hits + music bed transitions per beat. When edited, the assembly manifest needs regen to thread the cues through.",
+      "confidence": "medium",
+      "derives": [
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+          "regen": "python3 tools/assembly/generate_manifest.py {slug}"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/visual-spec.md",
+      "why": "Visual spec drives per-template JSON generation. When edited, those JSON files need regeneration via the visual-spec skill.",
+      "confidence": "medium",
+      "derives": [
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/*.json",
+          "regen": "(re-run visual-spec skill on {slug})"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/shot-list.json",
+      "why": "Shot list drives asset sourcing. When edited, the asset-source pipeline + zerohit-fallback briefs may be stale.",
+      "confidence": "medium",
+      "derives": [
+        {
+          "artifact": "episodes/{slug}/ai-gen-briefs.md",
+          "regen": "python3 tools/asset-source/zerohit_fallback.py {slug}"
+        },
+        {
+          "artifact": "episodes/{slug}/assets/asset-manifest.json",
+          "regen": "python3 tools/asset-source/source.py --batch episodes/{slug}/shot-list.json"
+        }
+      ]
+    }
+  ]
+}

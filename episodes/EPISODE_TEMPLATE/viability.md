@@ -31,6 +31,19 @@
 **Existing coverage:** [what's already on YouTube]
 **Parallax angle:** [what we add]
 
+### 6. Cold Open Visual Hook
+**What does the viewer SEE in the first 15 seconds that makes them stop scrolling?**
+
+[1-3 sentences describing the CONCRETE visual. Not "we'll open with a hook" — describe the actual image / footage / typography / AI-gen scene. The misconception-first cold-open structure (Veritasium pattern) wants: a clear textbook framing on screen, then the pivot. What's the framing image? What's the pivot image?]
+
+**Visual sourcing estimate:** [Easy / Moderate / Hard / Speculative]
+- **Easy** — stock footage, archival photo, or familiar AI-gen pattern (Recraft anchor library + Flux style-ref cascade we've used before)
+- **Moderate** — requires specific archival research / niche AI-gen / Pika 2.5 chained morph
+- **Hard** — expensive or expensive-to-iterate (large [SCENE:] block, custom motion graphics, multi-shot setup)
+- **Speculative** — we don't yet know if this is sourcable; flag for resolution before script-draft
+
+_The visual-hook gate (Veritasium discipline): no topic should cross from INCUBATING → VIABLE without articulating this section. The most expensive failure mode in the pipeline is "script locked but visuals don't land" — defending against it costs ~10 minutes here and saves a re-script. Checked by `tools/lint/check_visual_hook.py`._
+
 ## Format Recommendation
 [Format name] — [one-line rationale]
 
