@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Foreign Affairs (latest)",
+    "url": "https://www.foreignaffairs.com/rss.xml",
+    "arc": "geopolitics"
+  },
+  {
+    "name": "War on the Rocks",
+    "url": "https://warontherocks.com/feed/",
+    "arc": "security / great-power"
+  },
+  {
+    "name": "Carnegie Endowment",
+    "url": "https://carnegieendowment.org/rss",
+    "arc": "great-power / arms control"
+  },
+  {
+    "name": "Brookings Foreign Policy",
+    "url": "https://www.brookings.edu/topic/u-s-foreign-policy/feed/",
+    "arc": "great-power"
+  },
+  {
+    "name": "Asia Times — China-US",
+    "url": "https://asiatimes.com/category/asia/china/feed/",
+    "arc": "tech competition / Arc 1"
+  },
+  {
+    "name": "RAND latest research",
+    "url": "https://www.rand.org/topics.xml",
+    "arc": "deterrence / strategy"
+  },
+  {
+    "name": "CSIS analysis",
+    "url": "https://www.csis.org/analysis/feed",
+    "arc": "great-power"
+  }
+]
