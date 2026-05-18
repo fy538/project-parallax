@@ -135,7 +135,36 @@ class TestCheckVisualHook:
         """)
         passes, issues = cvh.check_visual_hook(text)
         assert not passes
-        assert any("too thin" in i or "no Cold Open" in i for i in issues)
+        # Tight assertion — fail on the specific failure path, not
+        # the more-general "section not found" branch which would
+        # mask a different bug.
+        assert any("too thin" in i for i in issues), \
+            f"expected 'too thin' failure path, got: {issues}"
+
+    def test_unfilled_template_does_not_false_pass(self):
+        """REGRESSION: the unfilled template — bold question prompt +
+        instructional brackets + glossary bullets + italic blockquote —
+        previously cleared the 10-word floor on the bold question alone.
+        That defeated the whole gate. After the body-stripping fix, only
+        operator-supplied prose counts; the template alone fails."""
+        unfilled = textwrap.dedent("""\
+            ### 6. Cold Open Visual Hook
+            **What does the viewer SEE in the first 15 seconds that makes them stop scrolling?**
+
+            [1-3 sentences describing the CONCRETE visual. Not "we'll open with a hook"]
+
+            **Visual sourcing estimate:** Easy
+            - **Easy** — stock footage or familiar AI-gen pattern
+            - **Moderate** — requires specific archival
+            - **Hard** — expensive or expensive-to-iterate
+            - **Speculative** — we don't yet know if this is sourcable
+
+            _The visual-hook gate (Veritasium discipline): no topic should cross..._
+        """)
+        passes, issues = cvh.check_visual_hook(unfilled)
+        assert not passes, "unfilled template should NOT pass — gate defeated"
+        assert any("too thin" in i for i in issues), \
+            f"expected the too-thin failure path; got: {issues}"
 
     @pytest.mark.parametrize("verdict", ["Easy", "Moderate", "Hard", "Speculative"])
     def test_each_valid_verdict_passes(self, verdict):
@@ -214,14 +243,25 @@ class TestRealEpisodes:
     currently WARN (none have visual-hook sections yet — that's the
     intended state at toolchain rollout). Operator backfills over time."""
 
-    def test_known_viability_docs_parseable(self):
+    def test_known_viability_docs_currently_fail(self):
+        """As of the toolchain rollout, none of the shipped viability docs
+        had the new visual-hook section. This test enshrines that intent
+        until operator backfills retroactively — if it starts passing,
+        someone added the section (good) and the test should be updated."""
+        gates_passing = 0
         for slug in ("prisoners-dilemma", "silicon-trap", "blockades-leak"):
             doc = cvh._find_viability_doc(REPO_ROOT / "episodes" / slug)
             if doc is None:
                 continue
-            # Should parse without crashing — passes/fails is operator concern
-            result, _ = cvh.check_visual_hook(doc.read_text(encoding="utf-8"))
-            assert isinstance(result, bool)
+            passes, issues = cvh.check_visual_hook(doc.read_text(encoding="utf-8"))
+            if passes:
+                gates_passing += 1
+        # Backfill expectation: at most 1 doc currently passes
+        # (when this hits 2+, update the threshold to track progress)
+        assert gates_passing <= 1, (
+            f"{gates_passing} viability docs now pass the visual-hook gate. "
+            "Update this test's threshold to reflect the new baseline."
+        )
 
     def test_lint_run_against_real_pipeline_state(self):
         # Lint should run on the real state file and produce findings for

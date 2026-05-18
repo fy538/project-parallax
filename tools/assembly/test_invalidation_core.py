@@ -72,6 +72,34 @@ class TestPathPatternMatch:
         assert p.match("foo.bar") == {}
         assert p.match("fooXbar") is None  # the dot should not be a metachar
 
+    def test_double_star_with_trailing_slash_matches_empty_segment(self):
+        """Regression for the silent-failure bug where `**/x` only matched
+        `a/x` but not bare `x`. Standard glob says `**/x` covers both."""
+        p = ic.PathPattern("**/foo.tsx")
+        assert p.match("foo.tsx") is not None       # zero prefix segments
+        assert p.match("a/foo.tsx") is not None     # one segment
+        assert p.match("a/b/foo.tsx") is not None   # multiple segments
+
+    def test_double_star_inside_pattern_matches_empty_segment(self):
+        # luts/**/*.cube should match both luts/foo.cube AND luts/sub/foo.cube
+        p = ic.PathPattern("luts/**/*.cube")
+        assert p.match("luts/foo.cube") is not None
+        assert p.match("luts/sub/foo.cube") is not None
+        assert p.match("luts/a/b/foo.cube") is not None
+
+    def test_repeated_var_uses_backreference(self):
+        """Regression for the crash-at-compile bug: `{slug}` appearing
+        twice in one pattern previously raised PatternError. Now uses
+        a backreference so consistent slugs match and inconsistent ones
+        are rejected — the natural semantics for `episodes/{slug}/drafts/{slug}-v.md`."""
+        p = ic.PathPattern("episodes/{slug}/drafts/{slug}-v.md")
+        # Compiles without error
+        p.to_regex()
+        # Consistent slug matches
+        assert p.match("episodes/x/drafts/x-v.md") == {"slug": "x"}
+        # Inconsistent slug is rejected (the natural intent)
+        assert p.match("episodes/x/drafts/y-v.md") is None
+
 
 # ── PathPattern.substitute ──────────────────────────────────────────────────
 

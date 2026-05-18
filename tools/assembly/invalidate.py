@@ -38,7 +38,7 @@ Default behavior: compare working-tree (including untracked but
 workflow is "I just made some edits — what's now stale?"
 
 Exit codes:
-    0 — no stale artifacts identified (or --no-fail)
+    0 — no stale artifacts identified (or --soft)
     1 — at least one high-confidence stale artifact identified
     2 — usage error / git missing / dependency graph not loadable
 """
@@ -78,20 +78,27 @@ def git_diff_paths(from_ref: Optional[str], to_ref: Optional[str]) -> list[str]:
     """Return changed paths between two refs.
 
     Modes:
-      · from_ref=None, to_ref=None  → working tree vs HEAD (uncommitted)
+      · from_ref=None, to_ref=None  → working tree vs HEAD (uncommitted),
+                                       INCLUDING untracked-but-not-.gitignored
+                                       files (the most common operator
+                                       workflow: "I just dropped a new
+                                       visual-spec.md, what's now stale?")
       · from_ref=X,   to_ref=None  → X to working tree
       · from_ref=X,   to_ref=Y     → X..Y
       · from_ref=None, to_ref=Y    → HEAD..Y
+
+    Trailing `--` separator on git invocations locks argument parsing so
+    a malicious ref can't masquerade as a path/option.
     """
     _ensure_git()
     if from_ref is None and to_ref is None:
-        # Working tree vs HEAD — includes both staged and unstaged
-        cmd = ["git", "diff", "--name-only", "HEAD"]
+        # Tracked changes vs HEAD
+        cmd = ["git", "diff", "--name-only", "HEAD", "--"]
     elif to_ref is None:
-        cmd = ["git", "diff", "--name-only", from_ref]
+        cmd = ["git", "diff", "--name-only", from_ref, "--"]
     else:
         base = from_ref or "HEAD"
-        cmd = ["git", "diff", "--name-only", f"{base}..{to_ref}"]
+        cmd = ["git", "diff", "--name-only", f"{base}..{to_ref}", "--"]
 
     try:
         result = subprocess.run(
@@ -105,7 +112,21 @@ def git_diff_paths(from_ref: Optional[str], to_ref: Optional[str]) -> list[str]:
         print(f"✗ git diff failed: {result.stderr.strip()}", file=sys.stderr)
         sys.exit(2)
 
-    return [p for p in result.stdout.splitlines() if p.strip()]
+    paths = [p for p in result.stdout.splitlines() if p.strip()]
+
+    # In working-tree mode also include untracked-but-not-ignored files.
+    # `git diff` only sees tracked changes; the most common operator
+    # workflow is dropping a NEW file into the tree (untracked) and asking
+    # "what depends on this?" Without this, that workflow returns nothing.
+    if from_ref is None and to_ref is None:
+        untracked = subprocess.run(
+            ["git", "ls-files", "--others", "--exclude-standard"],
+            cwd=ROOT, capture_output=True, text=True, check=False,
+        )
+        if untracked.returncode == 0:
+            paths.extend(p for p in untracked.stdout.splitlines() if p.strip())
+
+    return paths
 
 
 # ── Filtering ───────────────────────────────────────────────────────────────
@@ -291,8 +312,10 @@ def main() -> int:
     parser.add_argument("-o", "--output", help="Write to file instead of stdout.")
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of markdown.")
     parser.add_argument(
-        "--no-fail", action="store_true",
-        help="Always exit 0 — useful as an informational pre-commit hook.",
+        "--soft", "--no-fail", action="store_true", dest="soft",
+        help="Always exit 0 — useful as an informational pre-commit hook. "
+             "(`--no-fail` accepted as legacy alias for consistency with "
+             "other tools' --soft convention.)",
     )
     args = parser.parse_args()
 
@@ -344,7 +367,7 @@ def main() -> int:
         sys.stdout.write(rendered)
 
     # Exit code
-    if args.no_fail:
+    if args.soft:
         return 0
     high_conf = sum(1 for i in invalidations if i.rule.confidence == "high")
     return 1 if high_conf > 0 else 0

@@ -50,32 +50,54 @@ class PathPattern:
 
         Rules:
           ·  {var}  becomes a named capture group matching one path segment
-                    (no slashes)
-          ·  **    matches any number of path segments (slashes allowed)
+                    (no slashes). REPEATED {var} usage emits a backreference
+                    `(?P=name)` to the first occurrence so identical slugs
+                    must match (e.g. `episodes/{slug}/drafts/{slug}-v*.md`).
+          ·  **/   matches zero-or-more slash-terminated path segments —
+                    `**/x` covers both `x` (no prefix) and `a/b/x`
+          ·  **    (without trailing slash) matches anything, slashes incl.
           ·  *     matches one path segment (no slashes)
           ·  any other character is matched literally (with re.escape)
         """
         out_parts: list[str] = []
+        seen_vars: set[str] = set()
         i = 0
         p = self.pattern
         while i < len(p):
             ch = p[i]
             if ch == "{":
-                # {var} capture
+                # {var} capture or backreference
                 end = p.find("}", i)
                 if end < 0:
                     raise ValueError(f"Unclosed brace in pattern: {p}")
                 var_name = p[i + 1:end]
                 if not var_name.isidentifier():
                     raise ValueError(f"Invalid pattern variable {var_name!r} in {p}")
-                # Capture one path segment (no slash).
-                out_parts.append(f"(?P<{var_name}>[^/]+)")
+                if var_name in seen_vars:
+                    # Backreference — repeated capture name must match the
+                    # value bound by the first occurrence. Without this,
+                    # `re.compile` raises `redefinition of group name`
+                    # and the whole CLI hard-fails at graph load time.
+                    out_parts.append(f"(?P={var_name})")
+                else:
+                    out_parts.append(f"(?P<{var_name}>[^/]+)")
+                    seen_vars.add(var_name)
                 i = end + 1
             elif ch == "*":
                 # Check for ** (cross-segment glob).
                 if i + 1 < len(p) and p[i + 1] == "*":
-                    out_parts.append(r".*")
-                    i += 2
+                    # **/ — zero-or-more slash-terminated segments. This is
+                    # standard glob semantics: `dir/**/x` covers both
+                    # `dir/x` and `dir/a/b/x`. The naive `.*` requires the
+                    # trailing slash to match a character, so `dir/**/x`
+                    # would NOT match `dir/x` (silently broken edge — would
+                    # bite the moment a top-level .cube appears under luts/).
+                    if i + 2 < len(p) and p[i + 2] == "/":
+                        out_parts.append(r"(?:[^/]+/)*")
+                        i += 3  # consume **/
+                    else:
+                        out_parts.append(r".*")
+                        i += 2
                 else:
                     out_parts.append(r"[^/]*")
                     i += 1

@@ -50,8 +50,13 @@ EPISODES_DIR = ROOT / "episodes"
 PIPELINE_STATE_JSON = EPISODES_DIR / "pipeline-state.json"
 
 # Episode states past which the visual hook is mandatory.
+# Deliberately excludes PUBLISHED and RETROED — once an episode has shipped,
+# erroring on a missing viability-stage visual-hook section is noise: the
+# gate's purpose is "don't cross from INCUBATING → VIABLE without this,"
+# not "retroactively block already-published episodes from passing lint."
+# Operator can still backfill historical viability docs voluntarily.
 MANDATORY_STATES = {"VIABLE", "RESEARCHING", "RESEARCH READY", "DRAFTING",
-                    "RENDER READY", "IN POST", "PUBLISHED", "RETROED"}
+                    "RENDER READY", "IN POST"}
 
 # Heading patterns recognized as the visual-hook section. Tolerant to
 # numbering / wording variations so legacy docs that called it
@@ -105,13 +110,19 @@ class CheckResult:
 
 
 def _load_pipeline_state() -> dict[str, str]:
-    """Return {slug: state} from pipeline-state.json."""
+    """Return {slug: state} from pipeline-state.json. Hard-fails on JSON
+    parse errors — silently returning `{}` would make the lint vacuously
+    pass for every episode, hiding real problems."""
     if not PIPELINE_STATE_JSON.is_file():
         return {}
     try:
         data = json.loads(PIPELINE_STATE_JSON.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return {}
+    except json.JSONDecodeError as e:
+        print(
+            f"✗ {PIPELINE_STATE_JSON} failed to parse: {e}",
+            file=sys.stderr,
+        )
+        sys.exit(2)
     return {e["slug"]: e["state"] for e in data.get("episodes", []) if "slug" in e}
 
 
@@ -173,19 +184,33 @@ def check_visual_hook(text: str) -> tuple[bool, list[str]]:
         )
         return False, issues
 
-    # Body must have a real description, not just the heading + estimate line.
-    # Strip the sourcing line + bullet glossary + any blockquotes; the rest
-    # should have non-empty content.
-    body_minus_estimate = re.sub(r"\*\*Visual sourcing estimate.*", "", section, flags=re.DOTALL)
-    # Drop instructional lines that start with a square-bracketed prompt
-    body_minus_estimate = re.sub(r"\[[^\]]+\]", "", body_minus_estimate)
-    body_minus_estimate = re.sub(r"^\s*[-*]\s+\*\*.*", "", body_minus_estimate, flags=re.MULTILINE)
-    body_minus_estimate = re.sub(r"^\s*_.*_\s*$", "", body_minus_estimate, flags=re.MULTILINE)
-    word_count = sum(1 for w in body_minus_estimate.split() if any(c.isalpha() for c in w))
+    # Body must have a real description, not just the template scaffold.
+    # Strip ALL markdown structural markers so the word count reflects
+    # operator-supplied prose, not the bold question prompt, instructional
+    # brackets, glossary bullets, or italic blockquote notes that ship
+    # with the template. Without this, the unfilled template (which has
+    # the bold question "What does the viewer SEE...?") clears the
+    # 10-word floor on its own — the gate becomes a false-pass.
+    clean = section
+    # Drop the sourcing estimate line entirely (handled by the regex above)
+    clean = re.sub(r"\*\*Visual\s*sourcing\s*estimate.*", "", clean, flags=re.IGNORECASE | re.DOTALL)
+    # Drop any `**bold**` runs — covers the question prompt + glossary keys
+    clean = re.sub(r"\*\*[^*]+\*\*", "", clean)
+    # Drop any `_italic_` runs — covers blockquote-style instructional notes
+    clean = re.sub(r"_[^_\n]+_", "", clean)
+    # Drop bracketed instructions like `[1-3 sentences describing...]`
+    clean = re.sub(r"\[[^\]]+\]", "", clean)
+    # Drop any list items (the glossary bullets)
+    clean = re.sub(r"^\s*[-*]\s+.*", "", clean, flags=re.MULTILINE)
+    # Drop any leftover headings
+    clean = re.sub(r"^\s*#+\s+.*", "", clean, flags=re.MULTILINE)
+    word_count = sum(1 for w in clean.split() if any(c.isalpha() for c in w))
     if word_count < 10:
         issues.append(
-            "visual hook description too thin (under 10 words) — "
-            "describe the concrete image the viewer sees, not 'a hook'"
+            "visual hook description too thin (under 10 words of plain prose) — "
+            "describe the concrete image the viewer sees, not just 'a hook'. "
+            "The template's bold question prompt and instructional brackets "
+            "don't count toward the threshold."
         )
         return False, issues
 
@@ -198,6 +223,17 @@ def check_visual_hook(text: str) -> tuple[bool, list[str]]:
 def check_episode(slug: str, state: str) -> Finding:
     """Evaluate one episode's viability doc."""
     ep_dir = EPISODES_DIR / slug
+    # Path-traversal hardening: an operator-supplied `--episode "../etc"`
+    # would resolve outside EPISODES_DIR. Reject before reading anything.
+    try:
+        ep_dir_resolved = ep_dir.resolve(strict=False)
+        if not str(ep_dir_resolved).startswith(str(EPISODES_DIR.resolve())):
+            return Finding(
+                "error", slug, state,
+                f"invalid slug — path traversal rejected (resolved to {ep_dir_resolved})",
+            )
+    except (OSError, RuntimeError):
+        return Finding("error", slug, state, "invalid slug — path resolution failed")
     if not ep_dir.is_dir():
         return Finding("error", slug, state, "episode directory missing")
 

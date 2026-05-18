@@ -85,10 +85,9 @@ class TestPathsMode:
         assert result.returncode == 0  # no high-confidence stale → exit 0
         assert "No tracked dependencies invalidated" in result.stdout
 
-    def test_no_paths_provided_no_changes(self):
-        # If --paths is empty (or unspecified and working tree is clean),
-        # report should be empty + exit 0
-        # We pass an unmatched path here as a stand-in
+    def test_unmatched_path_yields_no_invalidations(self):
+        # A path that doesn't match any dependency-graph rule produces
+        # the "No tracked dependencies invalidated" report and exits 0.
         result = subprocess.run(
             [
                 sys.executable, str(INVALIDATE_SCRIPT),

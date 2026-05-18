@@ -189,6 +189,39 @@
           "regen": "python3 tools/asset-source/source.py --batch episodes/{slug}/shot-list.json"
         }
       ]
+    },
+    {
+      "source": "episodes/{slug}/manifest-config.json",
+      "why": "Manifest config tunes generate_manifest.py's per-episode behavior (override segments, music bed cues, fixed durations). Edits invalidate the assembly manifest.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/data/episodes/{slug}/assembly-manifest.json",
+          "regen": "python3 tools/assembly/generate_manifest.py {slug}"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/shorts-manifest.json",
+      "why": "Shorts manifest drives the 9:16 short renders.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/{slug}-short-*.mp4",
+          "regen": "cd remotion-templates && npm run shorts -- --episode={slug}"
+        }
+      ]
+    },
+    {
+      "source": "episodes/{slug}/thumbnail-spec.json",
+      "why": "Thumbnail spec drives the per-concept thumbnail image generator.",
+      "confidence": "high",
+      "derives": [
+        {
+          "artifact": "remotion-templates/out/{slug}-thumb-*.png",
+          "regen": "cd remotion-templates && npm run thumbnails -- --episode={slug}"
+        }
+      ]
     }
   ]
 }
