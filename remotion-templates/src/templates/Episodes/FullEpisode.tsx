@@ -452,7 +452,33 @@ const COMPOSITE_DEFAULTS: Record<string, number> = {
   raw: 1.0,
 };
 
-export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any }>> = {
+/**
+ * Manifest-dispatch registry. Keys are referenced as strings from
+ * `assembly-manifest.json` segment `template.component` fields; values
+ * are the React components themselves.
+ *
+ * Typing strategy (May 2026 audit #5):
+ *
+ *  · Value type is `ComponentType<{ data: any }>` rather than
+ *    `ComponentType<{ data: unknown }>` because each template component
+ *    declares its own specific data type (e.g. `FC<{data: DataChartData}>`).
+ *    With `unknown`, assignment would fail (a component that needs
+ *    DataChartData can't be assigned to a slot accepting unknown — that
+ *    would force every template to validate at the function boundary).
+ *    The `any` here is bounded — runtime validation happens upstream via
+ *    TEMPLATE_SCHEMAS (Zod) before dispatch.
+ *
+ *  · `as const satisfies` (rather than the prior loose `Record<string, ...>`
+ *    annotation) preserves per-key literal types, which feeds the
+ *    `TemplateComponentName` literal union below. Concretely: adding a
+ *    typo to the registry now produces a compile error at the consumer
+ *    rather than a runtime "Unknown template component" warning.
+ *
+ *  · Sister registry TEMPLATE_SCHEMAS lives in Episodes/templateSchemas.ts;
+ *    a meta-test (src/__tests__/template-registries-aligned.test.ts)
+ *    enforces that the two registries' key sets match exactly.
+ */
+export const TEMPLATE_COMPONENTS = {
   TitleTransition,
   ChoroplethMap,
   KineticTypography,
@@ -503,7 +529,19 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   Streamgraph,
   TernaryPlot,
   TilegramUSMap,
-};
+} as const satisfies Record<string, React.ComponentType<{ data: any }>>;
+
+/**
+ * Literal union of every registered template name. Derived directly from
+ * the TEMPLATE_COMPONENTS keys via the `as const` above, so renaming /
+ * adding / removing a template propagates here at compile time — no
+ * separate hand-maintained enum.
+ *
+ * Use this type wherever you take a template name from external input
+ * (manifest JSON, CLI flag, ...) and want compile-time autocomplete +
+ * typo-checking on the downstream lookup.
+ */
+export type TemplateComponentName = keyof typeof TEMPLATE_COMPONENTS;
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────
 //
@@ -784,11 +822,16 @@ const ForegroundSegment: React.FC<{
     return null;
   }
 
-  const Component = TEMPLATE_COMPONENTS[template.component];
-  if (!Component) {
-    warnIf(true, "FullEpisode", `Unknown template component "${template.component}" in segment ${segment.id}`);
+  // template.component is a `string` from the manifest JSON; the registry
+  // is typed `Record<TemplateComponentName, ...>`. Narrow via runtime
+  // membership check before lookup — TS recognizes the `in` test and
+  // refines `template.component` to TemplateComponentName inside the if.
+  const componentName = template.component;
+  if (!(componentName in TEMPLATE_COMPONENTS)) {
+    warnIf(true, "FullEpisode", `Unknown template component "${componentName}" in segment ${segment.id}`);
     return null;
   }
+  const Component = TEMPLATE_COMPONENTS[componentName as TemplateComponentName];
 
   const data = template.dataFile ? templateData[template.dataFile] : null;
   if (!data && template.dataFile) {
@@ -922,7 +965,17 @@ const ForegroundSegment: React.FC<{
               <SegmentBackdrop backdropId={backdropId} />
             ) : null}
             <AbsoluteFill style={{ zIndex: 1 }}>
-              <Component data={dataForTemplate} />
+              {/*
+                * Type-cast: Component is `typeof TEMPLATE_COMPONENTS[name]`,
+                * which is a UNION of all 47 component types. Each component
+                * declares a specific `data: <FooData>` prop type, and the
+                * union's intersection of those data types is `never`
+                * (multiple templates have conflicting field types).
+                * Without per-template discriminated dispatch, the cross-
+                * registry call site has to widen. Runtime safety comes
+                * from TEMPLATE_SCHEMAS validation upstream (audit #5).
+                */}
+              <Component data={dataForTemplate as never} />
             </AbsoluteFill>
           </AbsoluteFill>
         </EditorialModeProvider>

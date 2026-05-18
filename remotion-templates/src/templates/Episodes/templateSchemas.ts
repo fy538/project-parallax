@@ -48,7 +48,42 @@ import { KPICardSchema } from "../KPICard/schema";
 import { BulletChartSchema } from "../BulletChart/schema";
 import { StepLineSchema } from "../StepLine/schema";
 
-export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
+// May 18, 2026 audit #5 — added the 19 schemas that were registered in
+// TEMPLATE_COMPONENTS (FullEpisode.tsx) but missing here. The alignment
+// meta-test (src/__tests__/template-registries-aligned.test.ts) caught
+// the pre-existing drift. Without these entries, manifest data for
+// these templates bypassed Zod validation — typo'd fields silently
+// produced prop-shape bugs at render time.
+import { OutcomePartitionSchema } from "../OutcomePartition/schema";
+import { PricingWaterfallSchema } from "../PricingWaterfall/schema";
+import { AtlasPlateSchema } from "../AtlasPlate/schema";
+import { BeeswarmChartSchema } from "../BeeswarmChart/schema";
+import { BumpChartSchema } from "../BumpChart/schema";
+import { CalendarHeatmapSchema } from "../CalendarHeatmap/schema";
+import { CartogramMapSchema } from "../CartogramMap/schema";
+import { ConnectedScatterplotSchema } from "../ConnectedScatterplot/schema";
+import { DensityMapSchema } from "../DensityMap/schema";
+import { DumbbellPlotSchema } from "../DumbbellPlot/schema";
+import { HorizonChartSchema } from "../HorizonChart/schema";
+import { IsotypeChartSchema } from "../IsotypeChart/schema";
+import { MarimekkoChartSchema } from "../MarimekkoChart/schema";
+import { PopulationPyramidSchema } from "../PopulationPyramid/schema";
+import { RankChangeDotPlotSchema } from "../RankChangeDotPlot/schema";
+import { RidgelinePlotSchema } from "../RidgelinePlot/schema";
+import { StreamgraphSchema } from "../Streamgraph/schema";
+import { TernaryPlotSchema } from "../TernaryPlot/schema";
+import { TilegramUSMapSchema } from "../TilegramUSMap/schema";
+
+/**
+ * Sister to TEMPLATE_COMPONENTS in FullEpisode.tsx. The key sets MUST
+ * match — enforced at runtime by
+ * src/__tests__/template-registries-aligned.test.ts (audit #5).
+ *
+ * `as const satisfies` preserves per-key literal types like
+ * TEMPLATE_COMPONENTS does, enabling the alignment test to do a
+ * compile-time key-set diff in addition to the runtime check.
+ */
+export const TEMPLATE_SCHEMAS = {
   TitleTransition: TitleTransitionSchema,
   ChoroplethMap: ChoroplethMapSchema,
   KineticTypography: KineticTypographySchema,
@@ -80,4 +115,27 @@ export const TEMPLATE_SCHEMAS: Record<string, z.ZodTypeAny> = {
   KPICard: KPICardSchema,
   BulletChart: BulletChartSchema,
   StepLine: StepLineSchema,
-};
+  // ── Audit #5 backfill (May 18, 2026) ─────────────────────────────────
+  OutcomePartition: OutcomePartitionSchema,
+  PricingWaterfall: PricingWaterfallSchema,
+  AtlasPlate: AtlasPlateSchema,
+  BeeswarmChart: BeeswarmChartSchema,
+  BumpChart: BumpChartSchema,
+  CalendarHeatmap: CalendarHeatmapSchema,
+  CartogramMap: CartogramMapSchema,
+  ConnectedScatterplot: ConnectedScatterplotSchema,
+  DensityMap: DensityMapSchema,
+  DumbbellPlot: DumbbellPlotSchema,
+  HorizonChart: HorizonChartSchema,
+  IsotypeChart: IsotypeChartSchema,
+  MarimekkoChart: MarimekkoChartSchema,
+  PopulationPyramid: PopulationPyramidSchema,
+  RankChangeDotPlot: RankChangeDotPlotSchema,
+  RidgelinePlot: RidgelinePlotSchema,
+  Streamgraph: StreamgraphSchema,
+  TernaryPlot: TernaryPlotSchema,
+  TilegramUSMap: TilegramUSMapSchema,
+} as const satisfies Record<string, z.ZodTypeAny>;
+
+/** Literal union of every name registered in TEMPLATE_SCHEMAS. */
+export type TemplateSchemaName = keyof typeof TEMPLATE_SCHEMAS;
