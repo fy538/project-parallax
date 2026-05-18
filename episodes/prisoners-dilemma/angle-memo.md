@@ -43,6 +43,22 @@ Every negotiation shaping your future is run by people trained on a model that f
 **Counterpoint moment:**
 - Beat 2: Narration describes the PD's rapid spread ("by 1975, over two thousand scholarly articles") while the visual shows the *narrowing conditions* where the model actually applies — anonymous, one-shot, no communication, no reputation — each condition eliminating another real-world scenario until almost nothing remains. The visual says "it spread everywhere, but applies almost nowhere."
 
+## Shorts Beats (Design-Time)
+
+Two design-time beats engineered as **shorts-native standalone moments**. Each passes the standalone test (structural claim + bounded clause inside 45–60s without requiring the long-form). Tagged in the script with `[SHORTS-BEAT: <series>]` for `shorts-adaptation` to pick up as primary candidates. Post-hoc extraction will yield 1–2 additional Shorts from Beats 2 (institutional momentum) and 3 (Schelling Trap) if they read standalone in review.
+
+**Hedge-stripping self-check** — both beats keep the bounded clause inside the 45–60s window. Without it, Beat 1 would sound like "the textbook is just wrong" (Jiang/Whatifalthist register) and Beat 4 would sound like "the answer is always cooperation" (utopian register). Neither is what the long-form actually claims.
+
+1. **Beat 1 — `history-rhymes`** (Flood-Dresher 1950 incident)
+   - **Standalone claim:** *"In 1950, the Prisoner's Dilemma's very first experiment got 60% cooperation. The theory predicted zero. John Nash blamed the players, not the model — and the field followed him."*
+   - **Bounded clause:** *"Nash was technically right about the math; a single Nash equilibrium is defection. But ring-fencing the result instead of revising the model set a template that's still running 75 years later — and you can hear it every time someone says 'players defect because they're rational.'"*
+   - **Hook frame-1 visual:** Large bone-on-ink type: **"60% / 0%"** with two captions beneath: "observed cooperation" / "predicted by theory". Mid-century corporate-modernist register; sound-off legible.
+
+2. **Beat 4 — `framework-in-45s`** (stag-hunt reframe)
+   - **Standalone claim:** *"The Prisoner's Dilemma assumes you can't talk. The Stag Hunt assumes you can. Most situations people call 'prisoner's dilemmas' are actually stag hunts — and the difference is whether cooperation is an equilibrium."*
+   - **Bounded clause:** *"Some things really ARE prisoner's dilemmas — OPEC cheating, anonymous one-shots. The point isn't that PD is always wrong. The point is it's the wrong default — and defaulting to it locks in cooperation failure that wasn't structurally required."*
+   - **Hook frame-1 visual:** SplitComposition — left half "PRISONER'S DILEMMA" with one glowing defection dot, ∴ divider, right half "STAG HUNT" with two glowing dots (cooperative one in amber). Single sentence below: "Most prisoner's dilemmas aren't."
+
 ## Speculation Budget
 **Structure:** Single prediction + watch signals (compress the three scenarios to background texture — the episode's job is to deliver the reframe, not to forecast geopolitics).
 **Depth:** Moderate.
