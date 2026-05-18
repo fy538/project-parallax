@@ -1,0 +1,143 @@
+{
+  "$schema": "../../remotion-templates/data/episodes/_schemas/shorts-manifest.schema.json",
+  "episode": "prisoners-dilemma",
+  "version": "1.0",
+  "shorts": [
+    {
+      "id": "01",
+      "label": "60% / 0% — Flood-Dresher first PD experiment",
+      "sourceBeat": "Beat 1: The Failed Experiment (design-time tag at script L48)",
+      "template": "StatRevealShort",
+      "durationSec": 35,
+      "data": {
+        "episode": "prisoners-dilemma",
+        "title": "The Theory Predicted Mutual Defection",
+        "subtitle": "First prisoner's dilemma experiment, RAND 1950",
+        "stat": {
+          "value": 60,
+          "suffix": "%",
+          "label": "cooperation observed (Flood–Dresher, RAND 1950)"
+        },
+        "comparisons": [
+          { "label": "Predicted by Nash equilibrium", "value": 0, "color": "#A64D46" },
+          { "label": "Mutual defection observed", "value": 14, "color": "#888780" },
+          { "label": "Cooperation observed", "value": 60, "color": "#C4A747" }
+        ],
+        "source": "Flood & Dresher (1952), RAND RM-789-1",
+        "backgroundVariant": "light"
+      }
+    },
+    {
+      "id": "02",
+      "label": "Most prisoner's dilemmas aren't — PD vs Stag Hunt",
+      "sourceBeat": "Beat 4: There Was Always Another Game (design-time tag at script L190)",
+      "template": "SplitComposition-Short",
+      "durationSec": 45,
+      "data": {
+        "episode": "prisoners-dilemma",
+        "title": "Most prisoner's dilemmas aren't",
+        "subtitle": "Equilibrium structure — not communication — is the difference",
+        "left": {
+          "tag": "PRISONER'S DILEMMA",
+          "title": "1 equilibrium",
+          "items": [
+            "Defection always pays more",
+            "Mutual defection is stable",
+            "Cooperation is not"
+          ],
+          "accentColor": "#A64D46"
+        },
+        "right": {
+          "tag": "STAG HUNT",
+          "title": "2 equilibria",
+          "items": [
+            "Mutual cooperation is stable",
+            "Mutual defection is also stable",
+            "The puzzle is coordination, not domination"
+          ],
+          "accentColor": "#C4A747"
+        },
+        "dividerLabel": "∴",
+        "source": "Skyrms (2004); Rousseau (1755)",
+        "backgroundVariant": "light"
+      }
+    },
+    {
+      "id": "03",
+      "label": "Hawks and Doves are playing the same game (the wrong one)",
+      "sourceBeat": "Beats 2 + 3: How a failed model conquered the world / The Wrong Game (auto-extracted)",
+      "template": "SplitShort",
+      "durationSec": 50,
+      "data": {
+        "episode": "prisoners-dilemma",
+        "title": "Same model. Wrong game.",
+        "subtitle": "Hawks and doves use the same default — and it's wrong",
+        "left": {
+          "tag": "HAWKS",
+          "headline": "Defect first",
+          "lines": [
+            "Rivals will defect.",
+            "Match them — controls, sanctions, decoupling.",
+            "Cooperation is naive."
+          ],
+          "accentColor": "#A64D46"
+        },
+        "right": {
+          "tag": "DOVES",
+          "headline": "Defection is structural",
+          "lines": [
+            "The model proves it.",
+            "Cooperation is impossible.",
+            "All we can do is mitigate."
+          ],
+          "accentColor": "#4A7BA7"
+        },
+        "footer": "Same default — Prisoner's Dilemma. Most US-China interactions aren't anonymous one-shots.",
+        "source": "Beats 2 + 3 of the long-form",
+        "backgroundVariant": "light"
+      }
+    },
+    {
+      "id": "04",
+      "label": "Black-Scholes Smile — when a model becomes a script",
+      "sourceBeat": "Beat 3: The Wrong Game — Black-Scholes parallel (auto-extracted)",
+      "template": "DataChartShort",
+      "durationSec": 40,
+      "data": {
+        "episode": "prisoners-dilemma",
+        "title": "The Black-Scholes Smile",
+        "subtitle": "When a model becomes a script — until it can't",
+        "variant": "line",
+        "unit": "",
+        "xLabel": "Year",
+        "yLabel": "Implied volatility skew",
+        "series": [
+          {
+            "label": "Implied volatility surface",
+            "color": "#C4A747",
+            "points": [
+              { "x": 1976, "y": 0.05 },
+              { "x": 1980, "y": 0.04 },
+              { "x": 1984, "y": 0.05 },
+              { "x": 1987, "y": 0.05 },
+              { "x": 1987.8, "y": 0.45 },
+              { "x": 1990, "y": 0.42 },
+              { "x": 2000, "y": 0.40 },
+              { "x": 2010, "y": 0.38 },
+              { "x": 2024, "y": 0.36 }
+            ]
+          }
+        ],
+        "regions": [
+          { "xStart": 1976, "xEnd": 1987, "label": "model = reality", "color": "#F0E6D0" },
+          { "xStart": 1987.5, "xEnd": 2024, "label": "the smile", "color": "#D9C9B0" }
+        ],
+        "annotations": [
+          { "x": 1987.6, "label": "Oct 1987 — Black Monday" }
+        ],
+        "source": "Derman & Kani (1994); standard equity-options literature",
+        "backgroundVariant": "light"
+      }
+    }
+  ]
+}
