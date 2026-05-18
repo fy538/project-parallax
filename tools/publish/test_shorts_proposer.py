@@ -380,6 +380,49 @@ class TestBuildProposalManifest:
         assert manifest["shorts"][0]["id"] == "01"
         assert manifest["shorts"][11]["id"] == "12"
 
+    def test_proposed_marker_at_top_level(self):
+        # The skeleton is NOT renderable as-is — the _proposed marker
+        # tells the operator (and any tooling) that this is a stub.
+        cand = sp.ShortsCandidate(
+            candidate_kind="stat", sourceBeat="B1", beat_id="beat1",
+            template="StatRevealShort", startSec=0, endSec=30,
+            durationSec=30, score=1, label="x", rationale="r",
+        )
+        manifest = sp.build_proposal_manifest("x", [cand])
+        assert "_proposed" in manifest
+        assert "STUB" in manifest["_proposed"]
+        # And the per-short _TODO names the rename-then-render gate
+        # ("renaming" → substring "renam" catches it without being
+        # fragile to "rename" vs "renaming" word forms)
+        assert "renam" in manifest["shorts"][0]["data"]["_TODO"].lower()
+
+    def test_llm_score_persisted_to_data_llm(self):
+        # When a candidate has LLM scoring, the score + rationale stash
+        # under `data._llm` so the editorial judgment isn't lost when
+        # the operator opens the JSON to fill in template fields.
+        cand = sp.ShortsCandidate(
+            candidate_kind="stat", sourceBeat="B1", beat_id="beat1",
+            template="StatRevealShort", startSec=0, endSec=30,
+            durationSec=30, score=4, label="x", rationale="r",
+            llm_score=87.0,
+            llm_rationale="strong snap moment; bounded clause lands cleanly",
+        )
+        manifest = sp.build_proposal_manifest("x", [cand])
+        llm_meta = manifest["shorts"][0]["data"]["_llm"]
+        assert llm_meta["score"] == 87.0
+        assert "snap moment" in llm_meta["rationale"]
+
+    def test_no_llm_meta_when_unscored(self):
+        # Heuristic-only candidates don't get a _llm block (keeps the
+        # JSON clean for the heuristic path)
+        cand = sp.ShortsCandidate(
+            candidate_kind="stat", sourceBeat="B1", beat_id="beat1",
+            template="StatRevealShort", startSec=0, endSec=30,
+            durationSec=30, score=4, label="x", rationale="r",
+        )
+        manifest = sp.build_proposal_manifest("x", [cand])
+        assert "_llm" not in manifest["shorts"][0]["data"]
+
 
 # ── CLI smoke ───────────────────────────────────────────────────────────────
 

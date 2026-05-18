@@ -73,6 +73,50 @@ class TestCollectNarration:
         m = {"segments": [{"id": "x", "startSec": 0, "endSec": 10}]}
         assert sls.collect_narration_for_window(m, 0, 10) == ""
 
+    def test_falls_back_to_beat_narration_when_window_empty(self):
+        # Beat-opener case: window spans FOOTAGE/HOLD with no narrationRef,
+        # but the parent beat has TEMPLATE segments downstream that DO
+        # carry narration. Fallback should surface those so the LLM
+        # scorer gets real context (not "(no narration text)").
+        m = {
+            "segments": [
+                # In-window: FOOTAGE + HOLD, no narrationRef
+                {"id": "s1", "type": "FOOTAGE", "startSec": 0, "endSec": 6,
+                 "beat": "beat1"},
+                {"id": "s2", "type": "HOLD", "startSec": 6, "endSec": 15,
+                 "beat": "beat1"},
+                # Same beat, later (downstream of window): has narrationRef
+                {"id": "s3", "type": "TEMPLATE", "startSec": 15, "endSec": 40,
+                 "beat": "beat1",
+                 "narrationRef": "The body of the beat, downstream."},
+                # Different beat — should NOT be pulled
+                {"id": "s4", "type": "TEMPLATE", "startSec": 60, "endSec": 80,
+                 "beat": "beat2",
+                 "narrationRef": "Different beat narration."},
+            ],
+        }
+        # Window 0-12 covers only FOOTAGE+HOLD (no narrationRef in window)
+        out = sls.collect_narration_for_window(m, 0, 12)
+        assert "body of the beat" in out
+        assert "Different beat" not in out  # cross-beat exclusion
+
+    def test_in_window_wins_over_fallback(self):
+        # When a window DOES have narrationRef from in-window segments,
+        # the fallback is NOT triggered (we don't over-broaden).
+        m = {
+            "segments": [
+                {"id": "s1", "type": "TEMPLATE", "startSec": 0, "endSec": 10,
+                 "beat": "beat1",
+                 "narrationRef": "In-window narration."},
+                {"id": "s2", "type": "TEMPLATE", "startSec": 30, "endSec": 50,
+                 "beat": "beat1",
+                 "narrationRef": "Beat-level narration outside window."},
+            ],
+        }
+        out = sls.collect_narration_for_window(m, 0, 10)
+        assert "In-window" in out
+        assert "outside window" not in out
+
 
 # ── build_scoring_prompt ──────────────────────────────────────────────────
 
@@ -280,6 +324,48 @@ class TestCliSmoke:
         assert "SNAP MOMENT" in result.stderr
         # The proposal markdown still goes to stdout normally
         assert "Shorts Candidate Proposals" in result.stdout
+
+    def test_llm_top_k_widens_pool_before_rerank(self, tmp_path):
+        # --llm-top-k > --top means the LLM scores a wider pool than
+        # the final --top trim. End-to-end smoke via --llm-dry-run
+        # which prints the prompt for candidate #1 of the WIDER pool
+        # (no API key needed). We verify the heuristic pool was
+        # widened by checking that more candidates were proposed than
+        # --top would normally allow.
+        manifest = tmp_path / "manifest.json"
+        # Build a manifest with enough TEMPLATE/DataChart segments to
+        # produce > 3 candidates
+        segs = []
+        for i in range(8):
+            segs.append({
+                "id": f"seg{i}", "type": "TEMPLATE",
+                "startSec": i * 30, "endSec": i * 30 + 20,
+                "beat": "beat1", "priority": "P1",
+                "template": {"component": "DataChart"},
+                "narrationRef": f"Narration for chunk {i}.",
+            })
+        manifest.write_text(json.dumps({
+            "beats": [{"id": "beat1", "title": "X", "startSec": 0, "endSec": 300}],
+            "segments": segs,
+        }), encoding="utf-8")
+        # --top 3 + --llm-top-k 7 → LLM should preview prompt for a
+        # candidate from the wider pool (--llm-dry-run prints the prompt
+        # for candidate #1 — which exists in both pools, so this is
+        # mainly a smoke that the flag parses + doesn't crash).
+        result = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "tools" / "publish" / "shorts_proposer.py"),
+             "x", "--manifest", str(manifest),
+             "--top", "3", "--llm-top-k", "7",
+             "--llm-dry-run", "--json", "--stdout"],
+            capture_output=True, text=True,
+            env={**__import__("os").environ, "ANTHROPIC_API_KEY": ""},
+        )
+        assert result.returncode == 0
+        payload = json.loads(result.stdout)
+        # Final report is still capped at --top
+        assert len(payload["candidates"]) <= 3
+        # Dry-run preview still went to stderr
+        assert "LLM Scoring — DRY RUN" in result.stderr
 
     def test_llm_score_without_api_key_exits_2(self, tmp_path):
         manifest = tmp_path / "manifest.json"

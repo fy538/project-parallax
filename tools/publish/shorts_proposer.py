@@ -497,25 +497,50 @@ def build_proposal_manifest(
     slug: str, candidates: list[ShortsCandidate],
 ) -> dict:
     """Build a shorts-manifest.json shape that the operator can edit + rename.
-    `data` blocks are stubbed with TODO markers."""
+
+    `data` blocks are stubbed with TODO markers — the proposed manifest
+    is NOT directly renderable (every Shorts template requires deep
+    template-specific fields like `stat`, `comparisons`, `dataPoints`,
+    `variant`, `attribution`). The operator must fill these in before
+    renaming to `shorts-manifest.json` and running `npm run shorts`.
+
+    When candidates were LLM-scored, we stash the score + rationale
+    under `data._llm` (the `data` block has `additionalProperties: true`
+    in the schema, so this is safe) so the editorial judgment isn't
+    lost when the operator opens the JSON to fill it in.
+    """
+    shorts = []
+    for i, c in enumerate(candidates, 1):
+        data: dict = {
+            "episode": slug,
+            "_TODO": (
+                f"Fill in template-specific fields before renaming to "
+                f"shorts-manifest.json — this stub will crash render-shorts.mjs "
+                f"as-is. {c.notes}"
+            ),
+        }
+        if c.llm_score is not None or c.llm_rationale:
+            data["_llm"] = {
+                "score": c.llm_score,
+                "rationale": c.llm_rationale,
+            }
+        shorts.append({
+            "id": f"{i:02d}",
+            "label": c.label,
+            "template": c.template,
+            "durationSec": round(c.durationSec, 1),
+            "sourceBeat": c.sourceBeat,
+            "data": data,
+        })
     return {
         "$schema": "../../remotion-templates/data/episodes/_schemas/shorts-manifest.schema.json",
         "episode": slug,
         "version": "1.0-proposed",
-        "shorts": [
-            {
-                "id": f"{i:02d}",
-                "label": c.label,
-                "template": c.template,
-                "durationSec": round(c.durationSec, 1),
-                "sourceBeat": c.sourceBeat,
-                "data": {
-                    "episode": slug,
-                    "_TODO": f"Fill in template-specific fields. {c.notes}",
-                },
-            }
-            for i, c in enumerate(candidates, 1)
-        ],
+        "_proposed": (
+            "STUB — fill in each short's `data` block then rename to "
+            "shorts-manifest.json before running `npm run shorts`."
+        ),
+        "shorts": shorts,
     }
 
 
@@ -544,16 +569,29 @@ def main() -> int:
         help="Re-rank candidates via Claude scoring against the Parallax "
              "bounded-analogy rubric (snap moment / bounded moment / "
              "self-contained / visual hook). Requires ANTHROPIC_API_KEY "
-             "env var. Smarter than the heuristic for editorial judgment.",
+             "env var. Smarter than the heuristic for editorial judgment. "
+             "NOTE: only re-ranks within the --top window; pass --llm-top-k "
+             "to widen the pool the LLM sees before its own ranking.",
     )
     parser.add_argument(
-        "--llm-model", default="claude-sonnet-4-5",
-        help="Anthropic model to use for --llm-score (default: claude-sonnet-4-5).",
+        "--llm-top-k", type=int, default=None,
+        help="With --llm-score: widen the candidate pool the LLM scores "
+             "before --top trims for output. Default = whatever --top is. "
+             "Useful when you suspect the heuristic missed a strong "
+             "candidate at rank 11+. The LLM scores --llm-top-k candidates, "
+             "then sorting + --top trim produces the final ranked list.",
+    )
+    parser.add_argument(
+        "--llm-model", default=None,
+        help="Anthropic model to use for --llm-score "
+             "(default: shorts_llm_scorer.DEFAULT_LLM_MODEL — dated for "
+             "reproducibility; bare aliases like 'claude-sonnet-4-5' work too).",
     )
     parser.add_argument(
         "--llm-dry-run", action="store_true",
-        help="With --llm-score: print the prompt that WOULD be sent for "
-             "the first candidate (no API call). Useful for prompt iteration.",
+        help="Print the prompt that WOULD be sent for the first candidate "
+             "(no API call, no API key needed). Useful for prompt iteration. "
+             "Implies the LLM scoring path — no need to also pass --llm-score.",
     )
     parser.add_argument("--json", action="store_true", help="Emit JSON report.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")
@@ -577,7 +615,14 @@ def main() -> int:
         )
         return 2
 
-    candidates = propose_shorts(manifest, top_n=args.top)
+    # When --llm-top-k > --top, the LLM scores a WIDER pool than the
+    # final output (so it can surface a strong candidate the heuristic
+    # ranked at #15). After LLM rerank sorts the wider pool, we trim
+    # back to --top for the operator-facing output.
+    llm_pool_size = max(args.top, args.llm_top_k or 0) if (
+        args.llm_score or args.llm_dry_run
+    ) else args.top
+    candidates = propose_shorts(manifest, top_n=llm_pool_size)
     # The full unsliced candidate count is useful for the operator — but
     # for the report we report total of all considered candidates
     beat_labels = _beat_title_lookup(manifest)
@@ -606,6 +651,10 @@ def main() -> int:
                     "```\n" + prompt + "\n```\n",
                     file=sys.stderr,
                 )
+            # Even in dry-run, trim back to --top so the report matches
+            # what a real --llm-score run would produce (the widened
+            # pool is just for the LLM to score against).
+            candidates = candidates[:args.top]
         else:
             api_key = os.environ.get("ANTHROPIC_API_KEY", "")
             if not api_key:
@@ -617,11 +666,14 @@ def main() -> int:
                 )
                 return 2
             try:
-                fn = scorer_mod.make_anthropic_scorer(api_key, model=args.llm_model)
+                model = args.llm_model or scorer_mod.DEFAULT_LLM_MODEL
+                fn = scorer_mod.make_anthropic_scorer(api_key, model=model)
             except RuntimeError as e:
                 print(f"✗ {e}", file=sys.stderr)
                 return 2
             candidates = scorer_mod.llm_rerank(candidates, manifest, fn)
+            # Trim back to --top after the wider-pool LLM rerank
+            candidates = candidates[:args.top]
 
     report = ProposalReport(
         slug=args.slug, manifest_path=str(manifest_path),
@@ -656,7 +708,15 @@ def main() -> int:
             encoding="utf-8",
         )
         rel = manifest_out.relative_to(ROOT) if manifest_out.is_relative_to(ROOT) else manifest_out
+        target = manifest_out.with_name("shorts-manifest.json")
+        target_rel = target.relative_to(ROOT) if target.is_relative_to(ROOT) else target
         print(f"✓ wrote skeleton {rel}", file=sys.stderr)
+        print(
+            f"  ⚠ skeleton is NOT renderable as-is — fill each short's `data` "
+            f"block then\n    rename to {target_rel} before running "
+            f"`npm run shorts -- --episode={args.slug}`",
+            file=sys.stderr,
+        )
 
     if not candidates:
         return 1

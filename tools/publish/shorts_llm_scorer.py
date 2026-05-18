@@ -108,19 +108,39 @@ def collect_narration_for_window(
 ) -> str:
     """Concatenate `narrationRef` snippets from segments that overlap
     the [start_sec, end_sec] window. Manifest segments carry per-
-    segment narration tied to the script via `narrationRef`."""
-    out: list[str] = []
+    segment narration tied to the script via `narrationRef`.
+
+    Fallback: if the window contains only FOOTAGE / HOLD / TRANSITION
+    segments (no `narrationRef`) — common for beat-opener windows that
+    span an introductory footage clip + a typography card — fall back
+    to collecting narrationRef from EVERY segment in the parent beat(s)
+    so the LLM scorer doesn't get blind context for the opener.
+    """
+    in_window: list[str] = []
+    beat_ids_in_window: set[str] = set()
     for seg in manifest.get("segments", []):
         seg_start = float(seg.get("startSec", 0))
         seg_end = float(seg.get("endSec", 0))
-        # Overlap: seg_start < end_sec AND seg_end > start_sec
         if seg_start >= end_sec or seg_end <= start_sec:
             continue
+        beat_id = seg.get("beat", "")
+        if beat_id:
+            beat_ids_in_window.add(beat_id)
         ref = seg.get("narrationRef", "") or ""
-        if ref and ref not in out:
-            out.append(ref)
-    # Dedup preserving order, then join with " "
-    return " ".join(out)
+        if ref and ref not in in_window:
+            in_window.append(ref)
+    if in_window:
+        return " ".join(in_window)
+    # Fallback: pull narrationRef from every segment in the overlapping
+    # beat(s). Better to give the LLM a too-broad context than none at all.
+    beat_level: list[str] = []
+    for seg in manifest.get("segments", []):
+        if seg.get("beat") not in beat_ids_in_window:
+            continue
+        ref = seg.get("narrationRef", "") or ""
+        if ref and ref not in beat_level:
+            beat_level.append(ref)
+    return " ".join(beat_level)
 
 
 # ── Response parsing ───────────────────────────────────────────────────────
@@ -169,9 +189,18 @@ def parse_llm_response(text: str) -> Optional[LLMScoreResult]:
 ScorerFn = Callable[[str], str]
 
 
+# Default model: the dated ID is more reproducible than the bare alias
+# (`claude-sonnet-4-5`) since the alias floats to whatever's current.
+# Operators can override with --llm-model. The token budget is generous
+# (was 400) because the rubric has 4 dimensions × short rationale + the
+# JSON envelope; truncation mid-response → unparseable → silent drop.
+DEFAULT_LLM_MODEL = "claude-sonnet-4-5-20250929"
+DEFAULT_MAX_TOKENS = 800
+
+
 def make_anthropic_scorer(
-    api_key: str, model: str = "claude-sonnet-4-5",
-    max_tokens: int = 400,
+    api_key: str, model: str = DEFAULT_LLM_MODEL,
+    max_tokens: int = DEFAULT_MAX_TOKENS,
 ) -> ScorerFn:
     """Build a scorer that calls Anthropic's Messages API. Import is
     lazy so this module doesn't hard-require the SDK — tests + dry-run
