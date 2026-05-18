@@ -840,6 +840,104 @@ describe("lint rule: template-missing-schema (L47)", () => {
   });
 });
 
+// ── no-literal-brand-mark ───────────────────────────────────────────────────
+
+describe("lint rule: no-literal-brand-mark", () => {
+  const lintWith = (content: string, filePath: string) =>
+    lintContent(content, filePath, filePath) as Issue[];
+
+  it("flags a literal `∴` in JSX", () => {
+    const issues = lintWith(
+      `export const X = () => <div>∴ PARALLAX</div>;`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(true);
+  });
+
+  it("flags a literal `∴` in a plain string", () => {
+    const issues = lintWith(
+      `const label = "∴ PARALLAX";`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(true);
+  });
+
+  it("ignores `∴` inside a // line comment", () => {
+    const issues = lintWith(
+      `// the ∴ brand mark lives in theme.ts\nconst x = 1;`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("ignores `∴` inside a /* block */ comment", () => {
+    const issues = lintWith(
+      `/* renders the ∴ mark */\nconst x = 1;`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("ignores `∴` inside a JSDoc spanning many lines", () => {
+    const issues = lintWith(
+      `/**\n * Multi-line\n * JSDoc that describes\n * the ∴ brand mark and how\n * it propagates from palette.json.\n */\nconst x = 1;`,
+      "src/components/Footer.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("reports the source line, not the post-strip line (no line-number drift)", () => {
+    // 5-line JSDoc above the offending literal. Pre-fix this reported L2;
+    // the strip-by-line implementation preserves the source-line mapping.
+    const issues = lintWith(
+      [
+        "/**",                              // 1
+        " * Multi-line",                    // 2
+        " * JSDoc above",                   // 3
+        " * the offender",                  // 4
+        " */",                              // 5
+        "import React from \"react\";",     // 6
+        "const X = \"∴ leakage\";",         // 7
+      ].join("\n"),
+      "src/components/Footer.tsx",
+    );
+    const offender = issues.find((i) => i.rule === "no-literal-brand-mark");
+    expect(offender?.line).toBe(7);
+  });
+
+  it("allowlists the canonical declaration site (design/theme.ts)", () => {
+    const issues = lintWith(
+      `export const X = "∴ in the canonical site is OK";`,
+      "src/design/theme.ts",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("allowlists BrandLockup (the canonical render component)", () => {
+    const issues = lintWith(
+      `const fallback = "∴";`,
+      "src/components/BrandLockup.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("allowlists EditorialScaffold (where the <BrandMark> component lives)", () => {
+    const issues = lintWith(
+      `const fallback = "∴";`,
+      "src/components/EditorialScaffold.tsx",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+
+  it("allowlists generated .d.ts files", () => {
+    const issues = lintWith(
+      `export type X = "∴";`,
+      "src/types/generated/visual-identity.d.ts",
+    );
+    expect(hasRule(issues, "no-literal-brand-mark")).toBe(false);
+  });
+});
+
 describe("rules array integrity", () => {
   it("every rule has id, description, severity", () => {
     // Smoke test that the export shape is consistent — protects against accidental

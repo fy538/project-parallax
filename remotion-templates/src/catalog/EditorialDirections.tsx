@@ -32,7 +32,7 @@ import { AbsoluteFill, Composition, useCurrentFrame, interpolate } from "remotio
 import { BrandLockup } from "../components/BrandLockup";
 import { EditorialSurface } from "../components/EditorialSurface";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
-import { brandMark, layout, palette, fonts, fontSizes, sec, semantic, shadows } from "../design/theme";
+import { layout, palette, fonts, fontSizes, sec, semantic, shadows } from "../design/theme";
 import { CLAMP_CUBIC, CLAMP_SINE } from "../utils/animation";
 import { catalogId } from "./helpers";
 
@@ -585,7 +585,12 @@ const DirectionB: React.FC = () => {
             opacity: fadeIn(frame, sec(1.6), sec(0.5)) * 0.6,
           }}
         >
-          Source: Axelrod (1984), iterated tournament · {brandMark.glyph} parallax · B
+          <BrandLockup
+            placement="trailing"
+            prefix="Source: Axelrod (1984), iterated tournament"
+          >
+            parallax · B
+          </BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -1370,7 +1375,9 @@ const DirectionBDiffusion: React.FC = () => {
             opacity: fadeIn(frame, sec(1.8), sec(0.5)) * 0.6,
           }}
         >
-          Source: JSTOR citation analysis · {brandMark.glyph} parallax · B
+          <BrandLockup placement="trailing" prefix="Source: JSTOR citation analysis">
+            parallax · B
+          </BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -1652,7 +1659,9 @@ const DirectionCDiffusion: React.FC = () => {
             opacity: fadeIn(frame, sec(2.7), sec(0.5)) * 0.5,
           }}
         >
-          Source: JSTOR citation analysis · {brandMark.glyph} parallax · C
+          <BrandLockup placement="trailing" prefix="Source: JSTOR citation analysis">
+            parallax · C
+          </BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>

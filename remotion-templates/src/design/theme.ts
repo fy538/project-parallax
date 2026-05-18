@@ -66,15 +66,28 @@ export const semantic = {
 // amber etc.) propagates without touching this file. `lockupSeparator`
 // is the typographic divider used in brand lockups like
 // "∴ parallax · cooperation theory" — change for a different cadence.
-export const brandMark = {
-  glyph: paletteData.brandMark.glyph,           // e.g. "∴"
-  svg: paletteData.brandMark.svg,               // e.g. "/brand-mark.svg" or null
-  fontFamily: paletteData.brandMark.fontFamily, // e.g. "IBM Plex Serif"
-  color: paletteData.brandMark.color,           // palette key, e.g. "gold"
-  lockupSeparator: paletteData.brandMark.lockupSeparator, // e.g. " · "
-} as const;
+// Explicit type — NOT `as const` on the object literal. With `as const`,
+// TypeScript would freeze `svg: null` into the literal type `null`,
+// making `brandMark.svg ? <img ...> : ...` unreachable as far as type
+// narrowing is concerned (and `svg?.startsWith(...)` a type error).
+// That defeats the whole point of the field — to enable a future
+// asset-swap by editing palette.json alone. Annotate explicitly so the
+// SVG branch stays live in the type system regardless of palette state.
+export interface BrandMarkSpec {
+  readonly glyph: string;       // e.g. "∴"
+  readonly svg: string | null;  // e.g. "/brand-mark.svg" or null
+  readonly fontFamily: string;  // e.g. "IBM Plex Serif"
+  readonly color: string;       // palette key, e.g. "gold"
+  readonly lockupSeparator: string;  // e.g. " · "
+}
 
-export type BrandMarkSpec = typeof brandMark;
+export const brandMark: BrandMarkSpec = {
+  glyph: paletteData.brandMark.glyph,
+  svg: paletteData.brandMark.svg,
+  fontFamily: paletteData.brandMark.fontFamily,
+  color: paletteData.brandMark.color,
+  lockupSeparator: paletteData.brandMark.lockupSeparator,
+};
 
 // ── Per-Episode Color Emphasis ─────────────────────────────────────────────
 // Mirrors the per-typography palette emphasis architecture in tools/recraft/

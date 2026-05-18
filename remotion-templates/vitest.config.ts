@@ -31,8 +31,10 @@ export default defineConfig({
     // identically in tests and in `npx remotion render`.
     setupFiles: ["dotenv/config"],
 
-    // Include test files
-    include: ["src/__tests__/**/*.test.ts"],
+    // Include test files. `.tsx` is accepted so component tests can use
+    // JSX directly (the first such test is BrandLockup.test.tsx — verifies
+    // the glyph-vs-SVG branch dispatch from the theme-token refactor).
+    include: ["src/__tests__/**/*.test.ts", "src/__tests__/**/*.test.tsx"],
     exclude: ["node_modules", "dist"],
   },
 });

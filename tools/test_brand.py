@@ -65,26 +65,11 @@ def test_reset_cache_forces_reload(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     assert swapped.lockup_separator == " // "
 
 
-def test_lockup_no_parts_returns_glyph_alone() -> None:
-    """lockup() with no args is just the glyph (no trailing separator)."""
-    assert brand.lockup() == "∴"
-
-
-def test_lockup_single_part() -> None:
-    assert brand.lockup("parallax") == "∴ parallax"
-
-
-def test_lockup_multi_part_uses_separator() -> None:
-    """Standard catalog footer form: `∴ parallax · catalog`."""
-    assert brand.lockup("parallax", "catalog") == "∴ parallax · catalog"
-    assert (
-        brand.lockup("parallax", "cooperation theory", "A")
-        == "∴ parallax · cooperation theory · A"
-    )
-
-
 def test_brandmark_is_frozen() -> None:
-    """BrandMark dataclass is frozen — runtime mutation must raise."""
+    """BrandMark dataclass is frozen — runtime mutation must raise
+    FrozenInstanceError (which is an AttributeError subclass)."""
+    from dataclasses import FrozenInstanceError
+
     bm = brand.get_brand_mark()
-    with pytest.raises((AttributeError, Exception)):
+    with pytest.raises(FrozenInstanceError):
         bm.glyph = "X"  # type: ignore[misc]

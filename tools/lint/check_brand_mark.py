@@ -109,10 +109,6 @@ def _strip_for_scan(source: str) -> str:
     return "\n".join(out)
 
 
-# Backwards-compatible alias retained in case anything imports the old name.
-_strip_strings_and_comments = _strip_for_scan
-
-
 def scan_file(path: Path) -> list[dict]:
     """Return a list of {line, snippet} dicts for each offending occurrence."""
     if path.resolve() in {p.resolve() for p in ALLOWED_PATHS}:

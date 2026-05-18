@@ -60,27 +60,3 @@ def reset_cache() -> None:
     palette path between calls."""
     global _cached
     _cached = None
-
-
-def lockup(*parts: str) -> str:
-    """Build a brand-lockup string: `∴ <part1> · <part2> · …`.
-
-    Examples:
-      lockup("parallax", "catalog")
-        → "∴ parallax · catalog"
-      lockup("parallax", "cooperation theory", "A")
-        → "∴ parallax · cooperation theory · A"
-
-    Use this instead of f-strings that hardcode "∴". The drift-prevention
-    test in test_brand.py blocks any new hardcoded glyph outside the
-    canonical render sites; routing through lockup() satisfies it.
-
-    Note: the brand mark is separated from the first part by a single
-    space (NOT the lockup_separator), matching the visual pattern in
-    every catalog footer ("∴ parallax · …"). The separator joins the
-    text parts after the mark.
-    """
-    bm = get_brand_mark()
-    if not parts:
-        return bm.glyph
-    return f"{bm.glyph} " + bm.lockup_separator.join(parts)

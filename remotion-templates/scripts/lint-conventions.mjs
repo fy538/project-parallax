@@ -32,6 +32,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "../src/templates");
 const COMPONENTS_DIR = path.resolve(__dirname, "../src/components");
+const CATALOG_DIR = path.resolve(__dirname, "../src/catalog");
 const ROOT_TSX = path.resolve(__dirname, "../src/Root.tsx");
 
 // Files to exclude from checking (shared infrastructure, not templates)
@@ -650,30 +651,61 @@ const rules = [
     description:
       "Hardcoded `∴` outside the canonical brand-mark sites. Use `brandMark.glyph` from `design/theme` or render via `<BrandLockup>` / `<BrandMark>`.",
     fileLevel: true,
-    scope: "components-too",  // also scan src/components/ and src/templates/Episodes/
+    // Apply to four scan passes: templates (default), components, episodes,
+    // and catalog. Catalog is the most regression-prone surface (its footers
+    // are exactly the literals this refactor cleaned up).
+    scope: ["components-too", "catalog"],
     check: (content, filePath) => {
-      // Allowlist: canonical declaration + render sites.
-      const allowedSuffixes = [
-        "/src/design/theme.ts",                      // the const declaration
-        "/src/components/BrandLockup.tsx",           // canonical render site (docs only)
-        "/src/components/EditorialScaffold.tsx",     // BrandMark component lives here
-        "/src/types/generated/",                     // generated .d.ts from JSON schema
-        "/src/__tests__/",                           // tests that assert the glyph appears
+      // Allowlist: canonical declaration + render sites. Match without a
+      // leading slash so the rule works in both real runs (absolute paths
+      // from `walk()`) and unit tests (relative paths from `lintContent`).
+      const allowedSubstrings = [
+        "src/design/theme.ts",                      // the const declaration
+        "src/components/BrandLockup.tsx",           // canonical render site (docs only)
+        "src/components/EditorialScaffold.tsx",     // BrandMark component lives here
+        "src/types/generated/",                     // generated .d.ts from JSON schema
+        "src/__tests__/",                           // tests that assert the glyph appears
       ];
-      if (allowedSuffixes.some((s) => filePath.includes(s))) return [];
+      if (allowedSubstrings.some((s) => filePath.includes(s))) return [];
 
       // Skip `.d.ts` files everywhere (generated).
       if (filePath.endsWith(".d.ts")) return [];
 
-      // Strip comments before scanning — JSDoc and inline comments may legitimately
-      // describe the brand mark (e.g. `// ∴ brand mark — amber`).
-      const stripped = content
-        .replace(/\/\*[\s\S]*?\*\//g, "")  // /* ... */ block + JSDoc
-        .replace(/(^|[^:])\/\/[^\n]*/g, "$1");  // // line comments (preserve URL ://)
+      // Blank out comments before scanning, preserving line count so reported
+      // line numbers match the source file. JSDoc and inline comments may
+      // legitimately describe the brand mark (e.g. `// ∴ brand mark — amber`).
+      // `.replace(..., "")` would collapse newlines and silently shift all
+      // subsequent reported line numbers — strip-by-line keeps the mapping 1:1.
+      const lines = content.split("\n");
+      let inBlockComment = false;
+      const stripped = lines.map((line) => {
+        let out = "";
+        let i = 0;
+        while (i < line.length) {
+          if (inBlockComment) {
+            const end = line.indexOf("*/", i);
+            if (end === -1) { i = line.length; break; }
+            inBlockComment = false;
+            i = end + 2;
+            continue;
+          }
+          // `//` line comment — but allow `://` (URLs in strings).
+          if (line[i] === "/" && line[i + 1] === "/" && line[i - 1] !== ":") {
+            break;  // rest of line is comment
+          }
+          if (line[i] === "/" && line[i + 1] === "*") {
+            inBlockComment = true;
+            i += 2;
+            continue;
+          }
+          out += line[i];
+          i += 1;
+        }
+        return out;
+      });
 
       const issues = [];
-      const lines = stripped.split("\n");
-      lines.forEach((line, i) => {
+      stripped.forEach((line, i) => {
         if (line.includes("∴")) {
           issues.push({
             line: i + 1,
@@ -758,6 +790,30 @@ function getComponentFiles() {
 }
 
 /**
+ * Files in `src/catalog/` (visual-reference compositions: catalog showreel,
+ * editorial-directions explorations, atomic + composite text-animation
+ * showcases). They render brand chrome (footers with the lockup, the slate
+ * cover) and so share the same brand-mark hygiene surface as templates.
+ * Returned separately so the runner applies only `scope: "components-too"`
+ * rules (skipping template-only checks like `missing-composition-animation`).
+ */
+function getCatalogFiles() {
+  const files = [];
+  function walk(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(fullPath);
+      else if (entry.name.endsWith(".tsx") || entry.name.endsWith(".ts")) {
+        files.push(fullPath);
+      }
+    }
+  }
+  walk(CATALOG_DIR);
+  return files;
+}
+
+/**
  * Run all rules against in-memory content (no disk I/O). Used by tests.
  * Pass the same `filePath` as if the content were on disk — file-level rules
  * use it for path-based decisions (e.g. excluding deprecated dirs).
@@ -770,7 +826,12 @@ export function lintContent(content, filePath, relativePath = filePath, scopeFil
     // tagged with `scope: "components-too"` apply. Template-specific rules
     // like missing-composition-animation would false-positive on shared
     // components which legitimately don't call those hooks.
-    if (scopeFilter && rule.scope !== scopeFilter) continue;
+    if (scopeFilter) {
+      // `rule.scope` may be a single string or an array of strings (rules
+      // that should apply to multiple separately-scanned directories).
+      const ruleScopes = Array.isArray(rule.scope) ? rule.scope : [rule.scope];
+      if (!ruleScopes.includes(scopeFilter)) continue;
+    }
     if (rule.fileLevel) {
       const fileIssues = rule.check(content, filePath);
       for (const issue of fileIssues) {
@@ -1030,6 +1091,15 @@ for (const file of getComponentFiles()) {
 // and console-in-render hygiene.
 for (const file of getEpisodeFiles()) {
   const issues = lintFile(file, "components-too");
+  allIssues.push(...issues);
+}
+
+// Apply `scope: "components-too"` rules to src/catalog/ — the catalog
+// compositions render brand chrome (footers, slate) and so are part of
+// the brand-mark hygiene surface. Without this pass, regressions in
+// catalog files would silently bypass the `no-literal-brand-mark` rule.
+for (const file of getCatalogFiles()) {
+  const issues = lintFile(file, "catalog");
   allIssues.push(...issues);
 }
 
