@@ -41,6 +41,11 @@ import json
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from video_config import get_video_config  # noqa: E402
+
+_EPISODE = get_video_config("episode")
+
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 EPISODES_DIR = REPO_ROOT / "episodes"
 ANCHOR_LIBRARY = REPO_ROOT / "tools" / "recraft" / "anchor-library.json"
@@ -183,7 +188,7 @@ def render_shot_brief(entry: dict, shot_meta: dict, anchors: list[dict]) -> str:
     anchor = next((a for a in anchors if a.get("id") == anchor_id), None)
     anchor_name = anchor.get("name", "") if anchor else ""
 
-    aspect = "1920×1080 still" if media_type == "photo" else "16:9 video, 5-8s"
+    aspect = f"{_EPISODE.width}×{_EPISODE.height} still" if media_type == "photo" else "16:9 video, 5-8s"
     tool = "Recraft (still)" if media_type == "photo" else "Flux 2 Pro on fal.ai (video)"
 
     lines = [

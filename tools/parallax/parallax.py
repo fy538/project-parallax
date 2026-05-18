@@ -25,6 +25,11 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from video_config import get_video_config  # noqa: E402
+
+_EPISODE = get_video_config("episode")
+
 # Lazy imports for torch/transformers (heavy)
 _pipe = None
 
@@ -153,9 +158,9 @@ def generate_parallax_video(
     motion: str = "zoom_in",
     duration: float = 5.0,
     intensity: float = 0.3,
-    fps: int = 30,
-    width: int = 1920,
-    height: int = 1080,
+    fps: int = _EPISODE.fps,
+    width: int = _EPISODE.width,
+    height: int = _EPISODE.height,
 ):
     """Generate a parallax video from a single still image."""
 
@@ -262,9 +267,9 @@ if __name__ == "__main__":
                        help="Camera motion type")
     single.add_argument("--duration", type=float, default=5.0, help="Duration in seconds")
     single.add_argument("--intensity", type=float, default=0.3, help="Parallax intensity (0.1-1.0)")
-    single.add_argument("--fps", type=int, default=30, help="Frame rate")
-    single.add_argument("--width", type=int, default=1920, help="Output width")
-    single.add_argument("--height", type=int, default=1080, help="Output height")
+    single.add_argument("--fps", type=int, default=_EPISODE.fps, help="Frame rate")
+    single.add_argument("--width", type=int, default=_EPISODE.width, help="Output width")
+    single.add_argument("--height", type=int, default=_EPISODE.height, help="Output height")
 
     # Batch mode
     batch = sub.add_parser("batch", help="Process all shots from shot-list.json")

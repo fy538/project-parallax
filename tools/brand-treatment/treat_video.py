@@ -60,6 +60,11 @@ import numpy as np
 # === Brand palette — loaded from palette.json (single source of truth) ===
 from palette_loader import get_defaults, get_ramps_hex, get_ramps_rgb
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from video_config import get_video_config  # noqa: E402
+
+_EPISODE = get_video_config("episode")
+
 RAMPS = get_ramps_rgb()
 RAMPS_HEX = get_ramps_hex()  # Used for LUT file headers
 
@@ -189,10 +194,10 @@ def get_video_info(input_path: Path) -> dict:
         )
         if video_stream:
             return {
-                "width": int(video_stream.get("width", 1920)),
-                "height": int(video_stream.get("height", 1080)),
+                "width": int(video_stream.get("width", _EPISODE.width)),
+                "height": int(video_stream.get("height", _EPISODE.height)),
                 "duration": float(data.get("format", {}).get("duration", 0)),
-                "fps": video_stream.get("r_frame_rate", "30/1"),
+                "fps": video_stream.get("r_frame_rate", f"{_EPISODE.fps}/1"),
             }
     except (subprocess.SubprocessError, OSError, json.JSONDecodeError, KeyError, ValueError) as e:
         # Narrowed May 2026 (audit BLE001 burn-down):
@@ -204,8 +209,17 @@ def get_video_info(input_path: Path) -> dict:
         #   · KeyError + ValueError: malformed stream data (missing keys,
         #     bad int/float casts in width/height/duration).
         # NameError / TypeError still bubble — those would be our bugs.
-        print(f"  ⚠ ffprobe failed ({e}), assuming 1920×1080 @ 30fps", file=sys.stderr)
-    return {"width": 1920, "height": 1080, "duration": 0, "fps": "30/1"}
+        print(
+            f"  ⚠ ffprobe failed ({e}), assuming "
+            f"{_EPISODE.width}×{_EPISODE.height} @ {_EPISODE.fps}fps",
+            file=sys.stderr,
+        )
+    return {
+        "width": _EPISODE.width,
+        "height": _EPISODE.height,
+        "duration": 0,
+        "fps": f"{_EPISODE.fps}/1",
+    }
 
 
 def build_filter_chain(

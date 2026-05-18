@@ -18,6 +18,7 @@
 // To change a color: edit palette.json → regenerate LUTs → Remotion picks it up automatically.
 
 import paletteData from "../../../tools/brand-treatment/palette.json";
+import videoConfig from "../../../tools/config/video.json";
 
 export const palette = {
   ink: paletteData.palette.ink,
@@ -620,10 +621,15 @@ export const cjk = {
 
 // ── Layout ─────────────────────────────────────────────────────────────────
 
+// Video output dimensions + frame rate come from `tools/config/video.json`
+// (the same file tools/video_config.py reads). To swap channel-wide
+// dimensions, edit that JSON once — both surfaces pick it up on next
+// run. Don't hex-hardcode `1920` / `1080` / `30` in templates; consume
+// `layout.width` / `layout.height` / `layout.fps` instead.
 export const layout = {
-  width: 1920,
-  height: 1080,
-  fps: 30,
+  width: videoConfig.episode.width,
+  height: videoConfig.episode.height,
+  fps: videoConfig.episode.fps,
   padding: 80,
   safeArea: { top: 80, right: 80, bottom: 80, left: 80 },
   /**
@@ -652,14 +658,14 @@ export const layout = {
     xxl: 64,
     xxxl: 80,
   },
-  // Thumbnail
-  thumbnail: { width: 1280, height: 720 },
-  // Social crops
+  // Thumbnail + per-platform social crops also sourced from video.json
+  // so a one-line edit there propagates everywhere.
+  thumbnail: { width: videoConfig.thumbnail.width, height: videoConfig.thumbnail.height },
   social: {
-    youtube: { width: 1280, height: 720 },
-    instagram: { width: 1080, height: 1080 },
-    tiktok: { width: 1080, height: 1920 },
-    community: { width: 1200, height: 675 },
+    youtube:   { width: videoConfig.social.youtube.width,   height: videoConfig.social.youtube.height   },
+    instagram: { width: videoConfig.social.instagram.width, height: videoConfig.social.instagram.height },
+    tiktok:    { width: videoConfig.social.tiktok.width,    height: videoConfig.social.tiktok.height    },
+    community: { width: videoConfig.social.community.width, height: videoConfig.social.community.height },
   },
 } as const;
 

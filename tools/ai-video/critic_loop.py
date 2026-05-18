@@ -87,6 +87,10 @@ from paths import get_project_root  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from status_emoji import ERROR, OK  # noqa: E402
+from video_config import get_video_config  # noqa: E402
+
+_EPISODE = get_video_config("episode")
+_EPISODE_DIMS = (_EPISODE.width, _EPISODE.height)
 
 ROOT = get_project_root()
 PALETTE_PATH = ROOT / "tools" / "brand-treatment" / "palette.json"
@@ -552,7 +556,7 @@ def _stub_generator(prompt: str) -> Artifact:
     return Artifact(
         prompt_used=prompt,
         pixel_sample=sample,
-        dimensions=(1920, 1080),
+        dimensions=_EPISODE_DIMS,
     )
 
 
@@ -579,7 +583,7 @@ def main() -> int:
     spec = GenerationSpec(
         prompt=args.prompt,
         required_terms=args.required_terms,
-        target_dimensions=(1920, 1080),
+        target_dimensions=_EPISODE_DIMS,
         register=args.register,
     )
     result = run_critic_loop(spec, _stub_generator, max_iters=args.max_iters)

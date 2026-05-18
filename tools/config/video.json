@@ -1,0 +1,28 @@
+{
+  "_comment": "Single source of truth for video output dimensions, frame rate, and per-profile defaults. Read by remotion-templates/src/design/theme.ts (TypeScript) AND tools/video_config.py (Python). Both surfaces must stay in sync — that's exactly what this file prevents drifting. To change channel-wide render dimensions: edit here, regenerate test baselines, run full visual regression.",
+  "episode": {
+    "_comment": "Standard 16:9 episode render — what every Composition with no override emits.",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "short": {
+    "_comment": "Vertical 9:16 short for YouTube Shorts / Reels / TikTok.",
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "thumbnail": {
+    "_comment": "Static 16:9 thumbnail at half-render resolution for fast iteration. Matches YouTube's recommended source dimensions.",
+    "width": 1280,
+    "height": 720,
+    "fps": 30
+  },
+  "social": {
+    "_comment": "Per-platform export crops. fps doesn't apply to stills.",
+    "youtube":   { "width": 1280, "height": 720 },
+    "instagram": { "width": 1080, "height": 1080 },
+    "tiktok":    { "width": 1080, "height": 1920 },
+    "community": { "width": 1200, "height": 675 }
+  }
+}

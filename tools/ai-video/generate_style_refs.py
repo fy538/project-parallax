@@ -70,6 +70,11 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from video_config import get_video_config  # noqa: E402
+
+_EPISODE = get_video_config("episode")
+
 # ── Paths ────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -577,7 +582,7 @@ GENERATION_ORDER = [
 # ── fal.ai Generation ───────────────────────────────────────────────────
 
 
-def generate_image(prompt: str, api_key: str, width: int = 1920, height: int = 1080) -> str:
+def generate_image(prompt: str, api_key: str, width: int = _EPISODE.width, height: int = _EPISODE.height) -> str:
     """
     Generate an image via Flux 2 Pro on fal.ai.
     Returns the URL of the generated image.

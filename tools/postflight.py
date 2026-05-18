@@ -40,6 +40,9 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from video_config import get_video_config  # noqa: E402
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 EPISODES_DIR = REPO_ROOT / "remotion-templates" / "data" / "episodes"
 
@@ -56,10 +59,12 @@ DEFAULT_MIN_BYTES_PER_SEC = 50_000
 # Real renders typically land within ±0.05s — Remotion frames are discrete.
 DEFAULT_DURATION_TOLERANCE_SEC = 0.5
 
-# Default frame size (1920×1080 landscape). Shorts use 1080×1920 — pass
-# --resolution to override.
-DEFAULT_WIDTH = 1920
-DEFAULT_HEIGHT = 1080
+# Default frame size — sourced from `tools/config/video.json::episode`.
+# Shorts use the `short` profile (1080×1920) — pass --resolution to override
+# or read `get_video_config("short")` if invoking programmatically.
+_EPISODE_PROFILE = get_video_config("episode")
+DEFAULT_WIDTH = _EPISODE_PROFILE.width
+DEFAULT_HEIGHT = _EPISODE_PROFILE.height
 
 
 # ─── Probe ───────────────────────────────────────────────────────────────────
@@ -381,10 +386,14 @@ def main(argv: list[str] | None = None) -> int:
         "--min-bytes-per-sec", type=int, default=DEFAULT_MIN_BYTES_PER_SEC,
         help=f"Minimum bytes-per-second-of-video floor (default: {DEFAULT_MIN_BYTES_PER_SEC:,})",
     )
+    _short = get_video_config("short")
     parser.add_argument(
         "--resolution", type=parse_resolution,
-        help="Expected resolution as WxH (e.g. '1080x1920' for Shorts). "
-             "Defaults to 1920x1080 when --episode is given; omit otherwise to skip.",
+        help=(
+            f"Expected resolution as WxH (e.g. '{_short.width}x{_short.height}' for Shorts). "
+            f"Defaults to {DEFAULT_WIDTH}x{DEFAULT_HEIGHT} when --episode is given; "
+            f"omit otherwise to skip."
+        ),
     )
     parser.add_argument(
         "--tolerance-sec", type=float, default=DEFAULT_DURATION_TOLERANCE_SEC,
