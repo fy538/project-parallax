@@ -48,6 +48,7 @@ from paths import get_project_root  # noqa: E402
 ROOT = get_project_root()
 EPISODES_DIR = ROOT / "episodes"
 REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
+CONCEPTS_REGISTRY = ROOT / "data" / "concepts.json"
 
 # ── Tunables ─────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,20 @@ _TABLE_SEP_RE = re.compile(r"^\|[\s\-:|]+\|$")
 
 
 @dataclass
+class SuggestedSource:
+    """One source-registry entry that the matcher suspects backs this
+    claim. Operator reviews and accepts / rejects."""
+    id: str                        # registry concept id
+    title: str                     # term.en — the source title
+    author: str                    # sourceMeta.author
+    year: int = 0                  # sourceMeta.year (0 if absent)
+    url: str = ""                  # sourceMeta.url
+    page: str = ""                 # sourceMeta.page
+    match_reason: str = ""         # why the matcher picked this source
+                                   # ("author 'Nash' in claim" / "title 'Strategy of Conflict' in claim")
+
+
+@dataclass
 class ClaimEntry:
     """One verified-claim tag found in the script."""
     number: int                    # 1-indexed across the whole episode
@@ -90,6 +105,7 @@ class ClaimEntry:
     claim_text: str                # the narration sentence containing the tag
     word_offset: int               # word index within the beat's narration
                                    # (used to compute timecode when manifest absent)
+    suggested_sources: list[SuggestedSource] = field(default_factory=list)
 
 
 @dataclass
@@ -268,6 +284,135 @@ def extract_claims(script_path: Path) -> list[ClaimEntry]:
     return claims
 
 
+# ── Source-registry suggestion (B1 ↔ B2 bridge) ───────────────────────────
+# Walks `data/concepts.json` for entries with type='source' and tries to
+# match each claim's text against the source's author / title / id. When
+# a match fires, the renderer pre-populates the operator-fillable
+# `**Source:**` placeholder with the matching citation — closing the
+# bundle-review cross-tool integration gap.
+
+
+def load_source_entries(
+    registry_path: Path, include_drafts: bool = False,
+) -> list[dict]:
+    """Load `type='source'` concepts from the registry. Returns [] on
+    missing or malformed file — the source-sheet still ships, just
+    without auto-suggestions."""
+    if not registry_path.is_file():
+        return []
+    try:
+        data = json.loads(registry_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+    out = []
+    for c in data.get("concepts", []):
+        if c.get("type") != "source":
+            continue
+        if not include_drafts and c.get("_status") == "draft":
+            continue
+        out.append(c)
+    return out
+
+
+# Minimum length of a substring to count as a "title match" — avoids
+# false-positive matches on short generic words like "the", "war", "is".
+_MIN_TITLE_TOKEN_LEN = 4
+
+
+def _author_lastname(author: str) -> str:
+    """Extract the last name from an author string for word-boundary
+    matching. 'Graham Allison' → 'Allison'; 'John von Neumann' →
+    'Neumann'; 'F. Scott Fitzgerald' → 'Fitzgerald'."""
+    parts = (author or "").strip().split()
+    return parts[-1] if parts else ""
+
+
+def _word_boundary_match(needle: str, haystack: str) -> bool:
+    """Case-insensitive word-boundary substring match. Avoids
+    'US' false-matching every 'us' pronoun."""
+    if not needle or not haystack:
+        return False
+    pattern = re.compile(rf"\b{re.escape(needle)}\b", re.IGNORECASE)
+    return bool(pattern.search(haystack))
+
+
+def _title_substring_match(title: str, claim_text: str) -> Optional[str]:
+    """Match if a multi-word run from the source title appears in the
+    claim text. Returns the matched substring or None. Avoids matching
+    single short words ('War', 'The Strategy') by requiring the matched
+    run to be ≥ _MIN_TITLE_TOKEN_LEN characters AND contain at least
+    one non-stopword."""
+    if not title or not claim_text:
+        return None
+    # Try the whole title first; fall back to shrinking from the end
+    # until we find a match or hit the minimum-length floor.
+    title_tokens = title.split()
+    for n in range(len(title_tokens), 0, -1):
+        for i in range(0, len(title_tokens) - n + 1):
+            candidate = " ".join(title_tokens[i:i + n])
+            if len(candidate) < _MIN_TITLE_TOKEN_LEN:
+                continue
+            if _word_boundary_match(candidate, claim_text):
+                return candidate
+    return None
+
+
+def suggest_sources_for_claim(
+    claim_text: str, source_entries: list[dict],
+) -> list[SuggestedSource]:
+    """Return source entries that plausibly back this claim.
+
+    Match triggers (highest-signal first):
+      1. Author last name appears as a word in the claim text
+         ("Nash" in "John Nash read the results")
+      2. Multi-word title substring appears in claim text
+         ("Strategy of Conflict" in "Schelling's Strategy of Conflict")
+
+    Author match is the strongest single signal — bare author last name
+    in a claim usually means "this person said / wrote this." Title
+    match is secondary because titles can be generic.
+    """
+    suggestions: list[SuggestedSource] = []
+    seen_ids: set[str] = set()
+    for entry in source_entries:
+        meta = entry.get("sourceMeta", {}) or {}
+        author = meta.get("author", "") or ""
+        title = (entry.get("term", {}) or {}).get("en", "") or ""
+        last_name = _author_lastname(author)
+
+        reason = ""
+        if last_name and _word_boundary_match(last_name, claim_text):
+            reason = f"author '{last_name}' in claim"
+        else:
+            matched = _title_substring_match(title, claim_text)
+            if matched:
+                reason = f"title '{matched}' in claim"
+
+        if not reason:
+            continue
+        if entry["id"] in seen_ids:
+            continue
+        seen_ids.add(entry["id"])
+        suggestions.append(SuggestedSource(
+            id=entry["id"], title=title, author=author,
+            year=int(meta.get("year", 0) or 0),
+            url=meta.get("url", "") or "",
+            page=meta.get("page", "") or "",
+            match_reason=reason,
+        ))
+    return suggestions
+
+
+def attach_source_suggestions(
+    claims: list[ClaimEntry], source_entries: list[dict],
+) -> None:
+    """Populate each claim's `suggested_sources` in-place."""
+    for c in claims:
+        c.suggested_sources = suggest_sources_for_claim(
+            c.claim_text, source_entries,
+        )
+
+
 # ── Timecode mapping ──────────────────────────────────────────────────────
 
 
@@ -331,12 +476,24 @@ def build_source_sheet(
     slug: str, script_path: Path,
     manifest_path: Optional[Path] = None,
     wpm: int = DEFAULT_WPM,
+    registry_path: Optional[Path] = CONCEPTS_REGISTRY,
+    suggest_sources: bool = True,
 ) -> SourceSheetReport:
-    """Full pipeline. Returns the report."""
+    """Full pipeline. Returns the report.
+
+    When `suggest_sources` is True (default) and `registry_path` exists,
+    each claim gets its `suggested_sources` populated from `type='source'`
+    entries in the registry whose author / title appears in the claim.
+    Missing or empty registry degrades gracefully (no suggestions, no
+    crash) — the operator just gets the standard fill-in placeholder.
+    """
     claims = extract_claims(script_path)
     manifest = load_manifest(manifest_path) if manifest_path else None
     map_claims_to_timecodes(claims, manifest, wpm=wpm)
     episode_title = (manifest or {}).get("title", slug)
+    if suggest_sources and registry_path is not None:
+        source_entries = load_source_entries(registry_path)
+        attach_source_suggestions(claims, source_entries)
     return SourceSheetReport(
         slug=slug,
         episode_title=episode_title,
@@ -419,10 +576,33 @@ def render_source_sheet_md(report: SourceSheetReport) -> str:
                 "",
                 f"> {c.claim_text}",
                 "",
-                "**Source:** _[Fill in from the research brief — primary "
-                "source with year, page, and link.]_",
-                "",
             ])
+            if c.suggested_sources:
+                # Pre-populated from the typed `source` registry. The
+                # operator still confirms (especially for author-match
+                # suggestions that could be false positives), but the
+                # citation skeleton is already there.
+                lines.append(
+                    "**Source(s)** _(auto-suggested from concept registry — "
+                    "verify before publishing):_"
+                )
+                for s in c.suggested_sources:
+                    year = f" ({s.year})" if s.year else ""
+                    page = f", {s.page}" if s.page else ""
+                    link = f" — {s.url}" if s.url else ""
+                    lines.append(
+                        f"- _{s.author}{year}._ **{s.title}**{page}.{link}  "
+                    )
+                    lines.append(
+                        f"  <sub>matched: {s.match_reason} · registry id: `{s.id}`</sub>"
+                    )
+                lines.append("")
+            else:
+                lines.extend([
+                    "**Source:** _[Fill in from the research brief — primary "
+                    "source with year, page, and link.]_",
+                    "",
+                ])
 
     lines.extend([
         "---",
@@ -450,6 +630,16 @@ def main() -> int:
         "--wpm", type=int, default=DEFAULT_WPM,
         help=f"WPM for timecode fallback when no manifest (default {DEFAULT_WPM}).",
     )
+    parser.add_argument(
+        "--registry", default=str(CONCEPTS_REGISTRY),
+        help=f"Path to concept registry for source-suggestion "
+             f"(default {CONCEPTS_REGISTRY.relative_to(ROOT)}).",
+    )
+    parser.add_argument(
+        "--no-suggest", action="store_true",
+        help="Skip source-suggestion from the concept registry — emit "
+             "the plain fill-in placeholder for every claim.",
+    )
     parser.add_argument("--json", action="store_true", help="Emit JSON.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")
     parser.add_argument("-o", "--output", help="Write to file (default: episodes/<slug>/sources.md).")
@@ -471,8 +661,11 @@ def main() -> int:
     if not manifest_path.is_file():
         manifest_path = None
 
+    registry_path = Path(args.registry).resolve() if args.registry else None
     report = build_source_sheet(
         args.slug, script_path, manifest_path=manifest_path, wpm=args.wpm,
+        registry_path=registry_path,
+        suggest_sources=not args.no_suggest,
     )
 
     if args.json:

@@ -325,6 +325,238 @@ class TestRenderSourceSheet:
 # ── CLI smoke ──────────────────────────────────────────────────────────────
 
 
+# ── Source-suggestion (B1 ↔ B2 bridge) ───────────────────────────────────
+
+
+def _source_entry(id, title, author, year=2020, url="", page="", status=None):
+    """Build a type='source' registry entry for testing."""
+    entry = {
+        "id": id,
+        "type": "source",
+        "term": {"en": title},
+        "definition": title,
+        "introduced": {"episode": "ep-x", "beat": 1},
+        "sourceMeta": {"author": author, "year": year},
+    }
+    if url:
+        entry["sourceMeta"]["url"] = url
+    if page:
+        entry["sourceMeta"]["page"] = page
+    if status:
+        entry["_status"] = status
+    return entry
+
+
+class TestAuthorLastname:
+    def test_single_name(self):
+        assert ss._author_lastname("Allison") == "Allison"
+
+    def test_two_names(self):
+        assert ss._author_lastname("Graham Allison") == "Allison"
+
+    def test_three_names(self):
+        assert ss._author_lastname("John von Neumann") == "Neumann"
+
+    def test_initials(self):
+        assert ss._author_lastname("F. Scott Fitzgerald") == "Fitzgerald"
+
+    def test_empty(self):
+        assert ss._author_lastname("") == ""
+
+
+class TestWordBoundaryMatch:
+    def test_matches_word(self):
+        assert ss._word_boundary_match("Nash", "John Nash read the results")
+
+    def test_avoids_substring_false_positive(self):
+        # "us" should NOT match "trust" — word-boundary required
+        assert not ss._word_boundary_match("us", "trust the process")
+
+    def test_case_insensitive(self):
+        assert ss._word_boundary_match("kennan", "George Kennan said")
+        assert ss._word_boundary_match("KENNAN", "george kennan said")
+
+    def test_empty_inputs(self):
+        assert not ss._word_boundary_match("", "anything")
+        assert not ss._word_boundary_match("anything", "")
+
+
+class TestTitleSubstringMatch:
+    def test_full_title_match(self):
+        assert ss._title_substring_match(
+            "Strategy of Conflict", "Schelling's Strategy of Conflict book",
+        ) == "Strategy of Conflict"
+
+    def test_partial_match_below_min_skipped(self):
+        # 3-char title is below MIN_TITLE_TOKEN_LEN (4)
+        assert ss._title_substring_match("War", "After the War ended") is None
+
+    def test_no_match(self):
+        assert ss._title_substring_match("X", "totally unrelated") is None
+
+    def test_word_boundary_enforced(self):
+        # Title "war" should not match "warhead"
+        assert ss._title_substring_match("warning", "afterwarnings") is None
+
+
+class TestSuggestSourcesForClaim:
+    def test_author_match_wins(self):
+        entries = [
+            _source_entry("nash-1950", "Equilibrium points", "John Nash"),
+            _source_entry("schelling-1960", "Strategy of Conflict", "Thomas Schelling"),
+        ]
+        sugs = ss.suggest_sources_for_claim(
+            "John Nash read the results.", entries,
+        )
+        assert len(sugs) == 1
+        assert sugs[0].id == "nash-1950"
+        assert "Nash" in sugs[0].match_reason
+
+    def test_title_match_when_no_author(self):
+        entries = [
+            _source_entry("schelling-1960", "Strategy of Conflict", "Thomas Schelling"),
+        ]
+        sugs = ss.suggest_sources_for_claim(
+            "The book Strategy of Conflict redefined deterrence.", entries,
+        )
+        # Author "Schelling" is not in the claim — title hits instead
+        assert len(sugs) == 1
+        assert "title" in sugs[0].match_reason
+
+    def test_multiple_authors_match(self):
+        entries = [
+            _source_entry("nash-1950", "Equilibrium", "John Nash"),
+            _source_entry("flood-1952", "Some Experimental Games", "Merrill Flood"),
+        ]
+        sugs = ss.suggest_sources_for_claim(
+            "Flood showed Nash the data.", entries,
+        )
+        ids = {s.id for s in sugs}
+        assert ids == {"nash-1950", "flood-1952"}
+
+    def test_no_match_returns_empty(self):
+        entries = [
+            _source_entry("nash-1950", "Equilibrium", "John Nash"),
+        ]
+        sugs = ss.suggest_sources_for_claim(
+            "Completely unrelated claim text.", entries,
+        )
+        assert sugs == []
+
+    def test_empty_entries_returns_empty(self):
+        sugs = ss.suggest_sources_for_claim("anything", [])
+        assert sugs == []
+
+    def test_dedup_by_id(self):
+        # Same entry shouldn't surface twice even if both author + title match
+        entries = [
+            _source_entry("nash-1950", "Nash equilibrium", "John Nash"),
+        ]
+        sugs = ss.suggest_sources_for_claim(
+            "John Nash's Nash equilibrium concept.", entries,
+        )
+        assert len(sugs) == 1
+
+
+class TestLoadSourceEntries:
+    def test_loads_only_source_type(self, tmp_path):
+        reg = tmp_path / "concepts.json"
+        reg.write_text(json.dumps({
+            "concepts": [
+                _source_entry("a", "Title A", "Author A"),
+                {"id": "b", "type": "framework", "term": {"en": "x"},
+                 "definition": "x", "introduced": {"episode": "e", "beat": 1}},
+                _source_entry("c", "Title C", "Author C"),
+            ],
+        }), encoding="utf-8")
+        out = ss.load_source_entries(reg)
+        assert {e["id"] for e in out} == {"a", "c"}
+
+    def test_skips_drafts_by_default(self, tmp_path):
+        reg = tmp_path / "concepts.json"
+        reg.write_text(json.dumps({
+            "concepts": [
+                _source_entry("a", "Title", "Author"),
+                _source_entry("b", "Draft", "Author", status="draft"),
+            ],
+        }), encoding="utf-8")
+        out = ss.load_source_entries(reg)
+        assert {e["id"] for e in out} == {"a"}
+
+    def test_include_drafts_opt_in(self, tmp_path):
+        reg = tmp_path / "concepts.json"
+        reg.write_text(json.dumps({
+            "concepts": [_source_entry("b", "Draft", "Author", status="draft")],
+        }), encoding="utf-8")
+        out = ss.load_source_entries(reg, include_drafts=True)
+        assert len(out) == 1
+
+    def test_missing_file_empty(self, tmp_path):
+        assert ss.load_source_entries(tmp_path / "no-such.json") == []
+
+    def test_malformed_empty(self, tmp_path):
+        reg = tmp_path / "concepts.json"
+        reg.write_text("not json", encoding="utf-8")
+        assert ss.load_source_entries(reg) == []
+
+
+class TestAttachSourceSuggestions:
+    def test_populates_in_place(self):
+        claims = [
+            ss.ClaimEntry(
+                number=1, beat_number=1, beat_title="x",
+                timecode_sec=0, claim_text="John Nash protested.",
+                word_offset=0,
+            ),
+        ]
+        entries = [_source_entry("nash", "Equilibrium", "John Nash")]
+        ss.attach_source_suggestions(claims, entries)
+        assert len(claims[0].suggested_sources) == 1
+        assert claims[0].suggested_sources[0].id == "nash"
+
+
+class TestRenderWithSuggestions:
+    def test_renders_auto_suggestion(self):
+        claim = ss.ClaimEntry(
+            number=1, beat_number=1, beat_title="OPEN",
+            timecode_sec=45, claim_text="Nash read the results.",
+            word_offset=10,
+            suggested_sources=[
+                ss.SuggestedSource(
+                    id="nash-1950", title="Equilibrium Points",
+                    author="John Nash", year=1950,
+                    url="https://example.com/nash",
+                    match_reason="author 'Nash' in claim",
+                ),
+            ],
+        )
+        report = ss.SourceSheetReport(
+            slug="x", episode_title="X", script_path="/tmp/s.md",
+            manifest_path="/tmp/m.json", total_claims=1, claims=[claim],
+        )
+        out = ss.render_source_sheet_md(report)
+        # Auto-suggested section instead of fill-in placeholder
+        assert "auto-suggested" in out
+        assert "John Nash" in out
+        assert "Equilibrium Points" in out
+        assert "1950" in out
+        assert "https://example.com/nash" in out
+        # The plain placeholder should NOT appear for this claim
+        assert "[Fill in from the research brief" not in out
+
+    def test_renders_placeholder_when_no_suggestion(self):
+        claim = ss.ClaimEntry(
+            number=1, beat_number=1, beat_title="x",
+            timecode_sec=0, claim_text="x", word_offset=0,
+        )
+        report = ss.SourceSheetReport(
+            slug="x", episode_title="X", script_path="/tmp/s.md",
+            manifest_path="/tmp/m.json", total_claims=1, claims=[claim],
+        )
+        out = ss.render_source_sheet_md(report)
+        assert "[Fill in" in out
+
+
 class TestCliSmoke:
     def test_missing_script_exits_2(self):
         result = subprocess.run(
@@ -363,6 +595,38 @@ class TestCliSmoke:
             capture_output=True, text=True,
         )
         assert result.returncode == 1
+
+    def test_no_suggest_flag_skips_lookup(self, tmp_path):
+        script = tmp_path / "script.md"
+        script.write_text(textwrap.dedent("""\
+            ## BEAT 1 — Test
+
+            | NARRATION | VISUAL |
+            |-----------|--------|
+            | John Nash protested the experiment. {✅} | [x] |
+        """), encoding="utf-8")
+        registry = tmp_path / "concepts.json"
+        registry.write_text(json.dumps({
+            "concepts": [_source_entry("nash", "Equilibrium", "John Nash")],
+        }), encoding="utf-8")
+        # WITH suggestion: should match Nash
+        result_with = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "tools" / "sourcing" / "source_sheet.py"),
+             "x", "--script", str(script), "--registry", str(registry),
+             "--json", "--stdout"],
+            capture_output=True, text=True,
+        )
+        payload_with = json.loads(result_with.stdout)
+        assert len(payload_with["claims"][0]["suggested_sources"]) == 1
+        # WITHOUT suggestion: empty
+        result_without = subprocess.run(
+            [sys.executable, str(REPO_ROOT / "tools" / "sourcing" / "source_sheet.py"),
+             "x", "--script", str(script), "--registry", str(registry),
+             "--no-suggest", "--json", "--stdout"],
+            capture_output=True, text=True,
+        )
+        payload_without = json.loads(result_without.stdout)
+        assert payload_without["claims"][0]["suggested_sources"] == []
 
     def test_real_prisoners_dilemma(self):
         # Real launch-candidate script should yield > 5 claims
