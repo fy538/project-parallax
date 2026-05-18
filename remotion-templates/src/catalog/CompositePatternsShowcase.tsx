@@ -24,6 +24,7 @@ import {
   useCurrentFrame,
   interpolate,
 } from "remotion";
+import { BrandLockup } from "../components/BrandLockup";
 import { EditorialSurface } from "../components/EditorialSurface";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
 import {
@@ -310,7 +311,7 @@ const CompositePatternsShowcase: React.FC = () => {
               letterSpacing: 2,
             }}
           >
-            ∴ parallax · editorial register · composite-patterns showcase
+            <BrandLockup>parallax · editorial register · composite-patterns showcase</BrandLockup>
           </div>
           <div
             style={{

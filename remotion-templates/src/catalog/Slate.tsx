@@ -19,6 +19,7 @@ import {
 } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { Background } from "../components/Background";
+import { BrandLockup } from "../components/BrandLockup";
 
 interface SlateProps {
   category?: string;
@@ -117,7 +118,7 @@ export const Slate: React.FC<SlateProps> = ({ category, template, variant }) => 
             letterSpacing: letterSpacing.caption,
           }}
         >
-          ∴ Parallax · catalog
+          <BrandLockup>Parallax · catalog</BrandLockup>
         </div>
       </AbsoluteFill>
     </AbsoluteFill>

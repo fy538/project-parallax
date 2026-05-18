@@ -17,7 +17,7 @@ import {
   interpolate,
   Easing,
 } from "remotion";
-import { palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
+import { brandMark as brandMarkToken, palette, fonts, fontSizes, textMaxWidth, layout, sec, shadows, gradients, durations } from "../../design/theme";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { fadeIn, fadeOut, slideIn, stagger, heroSpring, exitFade, scaleReveal, anticipatoryStartFrame, ANTICIPATE_FRAMES_DEFAULT, CLAMP, CLAMP_QUARTIC, CLAMP_QUAD } from "../../utils/animation";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
@@ -876,7 +876,7 @@ const EditorialTitleVariant: React.FC<{
           }}
           aria-label="Parallax"
         >
-          ∴
+          {brandMarkToken.glyph}
         </div>
       )}
     </div>

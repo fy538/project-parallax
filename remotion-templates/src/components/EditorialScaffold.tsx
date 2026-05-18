@@ -42,6 +42,7 @@
 import React, { type ReactNode } from "react";
 import { AbsoluteFill, Sequence, useCurrentFrame, interpolate } from "remotion";
 import {
+  brandMark,
   fonts,
   fontSizes,
   layout,
@@ -128,8 +129,18 @@ const KICKER_FONT_SIZE = fontSizes.meta; // 11px — IBM Plex Mono register
 // ── Shared sub-components ─────────────────────────────────────────────────────
 
 /**
- * Animated ∴ brand mark inside a hairline ink circle.
+ * Animated brand mark inside a hairline ink circle.
  * Circle stroke draws from 0 to full circumference, then the glyph fades in.
+ *
+ * The glyph itself comes from `brandMark.glyph` in theme.ts (single source
+ * of truth; ultimately tools/brand-treatment/palette.json::brandMark.glyph).
+ * If `brandMark.svg` is non-null, this renders the SVG asset instead of the
+ * glyph — letting a future logo swap to an image asset live in one place.
+ *
+ * The lint rule `no-literal-brand-mark` (scripts/lint-conventions.mjs) blocks
+ * any other file from inlining a literal "∴" — every other render site must
+ * route through this component (or `<BrandLockup>` for the footer pattern,
+ * or `brandMark.glyph` for plain-text contexts like the dashboard HTML).
  */
 const BrandMark = React.memo(
   ({
@@ -152,7 +163,7 @@ const BrandMark = React.memo(
       CLAMP_CUBIC,
     );
 
-    // ∴ glyph fades in after circle is 75% drawn
+    // Glyph/SVG fades in after circle is 75% drawn
     const glyphOpacity = interpolate(
       frame,
       [enterFrame + 15, enterFrame + 28],
@@ -191,7 +202,7 @@ const BrandMark = React.memo(
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: fonts.heading,
+            fontFamily: brandMark.fontFamily,
             fontSize: glyphSize,
             fontWeight: 500,
             color: colors.brandMark,
@@ -199,7 +210,17 @@ const BrandMark = React.memo(
             userSelect: "none",
           }}
         >
-          ∴
+          {brandMark.svg ? (
+            <img
+              src={brandMark.svg}
+              alt=""
+              width={glyphSize}
+              height={glyphSize}
+              style={{ display: "block" }}
+            />
+          ) : (
+            brandMark.glyph
+          )}
         </div>
       </div>
     );
@@ -717,7 +738,7 @@ const MinimalLayout = React.memo(
               position: "absolute",
               right: layout.safeArea.right,
               bottom: layout.safeArea.bottom,
-              fontFamily: fonts.heading,
+              fontFamily: brandMark.fontFamily,
               fontSize: fontSizes.label,
               fontWeight: 500,
               color: colors.brandMark,
@@ -726,7 +747,7 @@ const MinimalLayout = React.memo(
               userSelect: "none",
             }}
           >
-            ∴
+            {brandMark.glyph}
           </div>
         )}
       </AbsoluteFill>

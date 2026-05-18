@@ -36,12 +36,19 @@ from typing import TYPE_CHECKING
 sys.path.insert(0, str(Path(__file__).resolve().parent / "shared"))
 from paths import get_project_root  # noqa: E402
 
+# Brand mark via tools/brand.py (single source of truth). NO hardcoded
+# "∴" in this file — the only acceptable place to write the literal
+# glyph is tools/brand-treatment/palette.json::brandMark.glyph.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from brand import get_brand_mark  # noqa: E402
+
 if TYPE_CHECKING:
     from cost_parser import CostData
     from pipeline_validator import EpisodeStatus
     from topics_parser import TopicsData
 
 ROOT = get_project_root()
+_BRAND_MARK_GLYPH = get_brand_mark().glyph
 
 # Sibling to PIPELINE.md so the visual dashboard sits next to the Markdown
 # truth in episodes/. Originally lived at tools/pipeline_dashboard/index.html
@@ -1264,7 +1271,7 @@ def render_dashboard_html(
 
 <header class="header">
   <div class="brand">
-    <div class="brand-mark">∴</div>
+    <div class="brand-mark">{_esc(_BRAND_MARK_GLYPH)}</div>
     <h1>Parallax Pipeline</h1>
   </div>
   <div class="snapshot">SNAPSHOT {_esc(today)}</div>

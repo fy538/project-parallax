@@ -21,6 +21,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { AbsoluteFill } from "remotion";
 import {
+  brandMark,
   fonts,
   fontSizes,
   fontWeights,
@@ -106,7 +107,7 @@ export const MetadataStrip: React.FC<MetadataStripProps> = ({
                 fontWeight: fontWeights.bold,
               }}
             >
-              ∴
+              {brandMark.glyph}
             </span>
             <span
               style={{

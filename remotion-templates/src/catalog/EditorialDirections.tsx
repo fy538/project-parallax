@@ -29,9 +29,10 @@
 
 import React from "react";
 import { AbsoluteFill, Composition, useCurrentFrame, interpolate } from "remotion";
+import { BrandLockup } from "../components/BrandLockup";
 import { EditorialSurface } from "../components/EditorialSurface";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
-import { layout, palette, fonts, fontSizes, sec, semantic, shadows } from "../design/theme";
+import { brandMark, layout, palette, fonts, fontSizes, sec, semantic, shadows } from "../design/theme";
 import { CLAMP_CUBIC, CLAMP_SINE } from "../utils/animation";
 import { catalogId } from "./helpers";
 
@@ -295,7 +296,7 @@ const DirectionA: React.FC = () => {
             opacity: fadeIn(frame, sec(1.5), sec(0.5)) * 0.6,
           }}
         >
-          ∴ parallax · cooperation theory · A
+          <BrandLockup>parallax · cooperation theory · A</BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -367,7 +368,7 @@ const DirectionB: React.FC = () => {
             opacity: fadeIn(frame, 0, sec(0.4)),
           }}
         >
-          ∴ parallax · cooperation theory
+          <BrandLockup>parallax · cooperation theory</BrandLockup>
         </div>
 
         <div
@@ -584,7 +585,7 @@ const DirectionB: React.FC = () => {
             opacity: fadeIn(frame, sec(1.6), sec(0.5)) * 0.6,
           }}
         >
-          Source: Axelrod (1984), iterated tournament · ∴ parallax · B
+          Source: Axelrod (1984), iterated tournament · {brandMark.glyph} parallax · B
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -829,7 +830,7 @@ const DirectionC: React.FC = () => {
             opacity: fadeIn(frame, sec(2.6), sec(0.5)) * 0.5,
           }}
         >
-          ∴ parallax · cooperation theory · C
+          <BrandLockup>parallax · cooperation theory · C</BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -1132,7 +1133,7 @@ const DirectionADiffusion: React.FC = () => {
             opacity: fadeIn(frame, sec(1.6), sec(0.5)) * 0.6,
           }}
         >
-          ∴ parallax · academic analysis · A
+          <BrandLockup>parallax · academic analysis · A</BrandLockup>
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -1181,7 +1182,7 @@ const DirectionBDiffusion: React.FC = () => {
             opacity: fadeIn(frame, 0, sec(0.4)),
           }}
         >
-          ∴ parallax · theory diffusion
+          <BrandLockup>parallax · theory diffusion</BrandLockup>
         </div>
 
         {/* Headline */}
@@ -1369,7 +1370,7 @@ const DirectionBDiffusion: React.FC = () => {
             opacity: fadeIn(frame, sec(1.8), sec(0.5)) * 0.6,
           }}
         >
-          Source: JSTOR citation analysis · ∴ parallax · B
+          Source: JSTOR citation analysis · {brandMark.glyph} parallax · B
         </div>
       </EditorialSurface>
     </AbsoluteFill>
@@ -1651,7 +1652,7 @@ const DirectionCDiffusion: React.FC = () => {
             opacity: fadeIn(frame, sec(2.7), sec(0.5)) * 0.5,
           }}
         >
-          Source: JSTOR citation analysis · ∴ parallax · C
+          Source: JSTOR citation analysis · {brandMark.glyph} parallax · C
         </div>
       </EditorialSurface>
     </AbsoluteFill>

@@ -53,6 +53,29 @@ export const semantic = {
   danger: paletteData.semantic.china,
 } as const;
 
+// ── Brand mark ──────────────────────────────────────────────────────────────
+// Single source of truth for the Parallax brand mark. Every render site
+// (the canonical <BrandMark> React component, catalog footers, dashboard
+// HTML) reads from here — NO literal "∴" allowed elsewhere. To swap the
+// mark: edit `brandMark.glyph` in tools/brand-treatment/palette.json, OR
+// set `brandMark.svg` to a path under remotion-templates/public/ to render
+// an image asset instead.
+//
+// `color` resolves to the palette key — the React component reads
+// `palette[brandMark.color]` at render time so a palette change (gold →
+// amber etc.) propagates without touching this file. `lockupSeparator`
+// is the typographic divider used in brand lockups like
+// "∴ parallax · cooperation theory" — change for a different cadence.
+export const brandMark = {
+  glyph: paletteData.brandMark.glyph,           // e.g. "∴"
+  svg: paletteData.brandMark.svg,               // e.g. "/brand-mark.svg" or null
+  fontFamily: paletteData.brandMark.fontFamily, // e.g. "IBM Plex Serif"
+  color: paletteData.brandMark.color,           // palette key, e.g. "gold"
+  lockupSeparator: paletteData.brandMark.lockupSeparator, // e.g. " · "
+} as const;
+
+export type BrandMarkSpec = typeof brandMark;
+
 // ── Per-Episode Color Emphasis ─────────────────────────────────────────────
 // Mirrors the per-typography palette emphasis architecture in tools/recraft/
 // recraft.py for AI-generated content. The brand palette range stays constant

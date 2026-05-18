@@ -17,7 +17,7 @@
 
 import React from "react";
 import { useCurrentFrame } from "remotion";
-import { fonts, fontSizes, layout, palette, sec, shadows } from "../design/theme";
+import { brandMark, fonts, fontSizes, layout, palette, sec, shadows } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
 import { fadeIn, slideIn } from "../utils/animation";
 
@@ -36,9 +36,11 @@ export interface HeaderStripProps {
   accentColor?: string;
 }
 
+const DEFAULT_WORDMARK = `${brandMark.glyph} PARALLAX`;
+
 export const HeaderStrip: React.FC<HeaderStripProps> = React.memo(
   ({
-    wordmark = "∴ PARALLAX",
+    wordmark = DEFAULT_WORDMARK,
     metadata,
     variant = "meridian",
     mode = "light",

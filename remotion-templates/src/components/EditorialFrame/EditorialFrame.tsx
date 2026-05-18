@@ -19,6 +19,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import {
+  brandMark,
   fonts,
   fontSizes,
   fontWeights,
@@ -529,7 +530,7 @@ const PublicationFooter: React.FC<{
             opacity,
           }}
         >
-          ∴ parallax · {modeTag}
+          {brandMark.glyph} parallax · {modeTag}
         </div>
       )}
     </>

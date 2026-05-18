@@ -18,7 +18,7 @@
 
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
-import { palette, fonts, fontSizes, layout, cjk, textMaxWidth } from "../../design/theme";
+import { brandMark, palette, fonts, fontSizes, layout, cjk, textMaxWidth } from "../../design/theme";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { BrandImage } from "../../components/BrandImage";
 import type { ThumbnailData } from "./types";
@@ -69,7 +69,7 @@ const ThumbnailHeader: React.FC<{ episodeLabel?: string }> = ({ episodeLabel }) 
         textTransform: "uppercase",
       }}
     >
-      ∴ PARALLAX
+      {brandMark.glyph} PARALLAX
     </div>
     {episodeLabel && (
       <div
@@ -409,7 +409,7 @@ const LayoutSymbolic: React.FC<{ data: ThumbnailData }> = ({ data }) => (
         zIndex: 10,
       }}
     >
-      ∴
+      {brandMark.glyph}
     </div>
 
     {/* Illustration + title */}

@@ -82,5 +82,14 @@
     "saturation": 0.25,
     "grain": 0.10,
     "vignette": 0.18
+  },
+
+  "brandMark": {
+    "_comment": "Single source of truth for the Parallax brand mark. The literal glyph or SVG path here is what every render site (React component, dashboard HTML, catalog footers) reads from — no hardcoded ∴ allowed outside `tools/brand-treatment/palette.json` itself + the canonical <BrandMark> component. To swap the mark: (a) change `glyph` for a Unicode replacement (∴ → ⟁ → ∇ → ◊ → ※), or (b) set `svg` to a path under remotion-templates/public/ to render an image asset (the React component picks SVG over glyph automatically). Lint rules `no-literal-brand-mark` (lint-conventions.mjs) and the Python sibling block new hardcoded glyphs from sneaking back in.",
+    "glyph": "∴",
+    "svg": null,
+    "fontFamily": "IBM Plex Serif",
+    "color": "gold",
+    "lockupSeparator": " · "
   }
 }

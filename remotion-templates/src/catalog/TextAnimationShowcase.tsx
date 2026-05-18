@@ -34,6 +34,7 @@ import {
   interpolate,
   Easing,
 } from "remotion";
+import { BrandLockup } from "../components/BrandLockup";
 import { EditorialSurface } from "../components/EditorialSurface";
 import { useCompositionAnimation } from "../hooks/useCompositionAnimation";
 import { AnimatedText } from "../components/AnimatedText";
@@ -772,7 +773,7 @@ const TextAnimationShowcase: React.FC = () => {
               letterSpacing: 2,
             }}
           >
-            ∴ parallax · editorial register · text-animation showcase
+            <BrandLockup>parallax · editorial register · text-animation showcase</BrandLockup>
           </div>
           <div
             style={{

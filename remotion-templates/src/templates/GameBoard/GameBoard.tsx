@@ -18,6 +18,7 @@ import {
   interpolate,
 } from "remotion";
 import {
+  brandMark,
   palette,
   fonts,
   fontSizes,
@@ -900,7 +901,7 @@ const PDCanonicalMatrix: React.FC<{
                   }}
                   aria-label="Nash equilibrium"
                 >
-                  ∴
+                  {brandMark.glyph}
                 </div>
               )}
 

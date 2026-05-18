@@ -21,7 +21,7 @@
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { fonts, fontSizes, layout, palette } from "../../design/theme";
+import { brandMark, fonts, fontSizes, layout, palette } from "../../design/theme";
 import { AudioLayer, type AudioLayerProps } from "../../components/AudioLayer";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 
@@ -75,7 +75,7 @@ export const AudioPreview: React.FC<{ data: AudioPreviewData }> = ({ data }) => 
           color: palette.gold,
         }}
       >
-        ∴ AUDIO PREVIEW · {data.episode} · {formatTime(data.totalDurationSec)} total
+        {brandMark.glyph} AUDIO PREVIEW · {data.episode} · {formatTime(data.totalDurationSec)} total
       </div>
 
       {/* ── Big current-time readout ─────────────────────────────────────────── */}

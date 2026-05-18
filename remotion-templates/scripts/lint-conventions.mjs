@@ -636,6 +636,59 @@ const rules = [
       "the type in `types.ts`. Wrap in `z.object({ data: z.object({...}) })` to " +
       "match the `defaultProps={{ data: ... }}` shape used by the Composition.",
   },
+
+  // ── M-BRAND-MARK-LITERAL: block hardcoded brand glyph outside canonical sites ──
+  // The literal `∴` is centralized in `palette.json::brandMark.glyph` → exported
+  // as `brandMark.glyph` from `theme.ts` → rendered via the `<BrandMark>` and
+  // `<BrandLockup>` components. Swapping the channel mark (∴ → another glyph
+  // or an SVG asset) should be a one-line change in palette.json, not a
+  // codebase grep-and-replace. This rule blocks new hardcoded literals in
+  // executable JSX/TS, but allows them in comments, JSDoc, generated `.d.ts`
+  // files, and the canonical declaration sites listed below.
+  {
+    id: "no-literal-brand-mark",
+    description:
+      "Hardcoded `∴` outside the canonical brand-mark sites. Use `brandMark.glyph` from `design/theme` or render via `<BrandLockup>` / `<BrandMark>`.",
+    fileLevel: true,
+    scope: "components-too",  // also scan src/components/ and src/templates/Episodes/
+    check: (content, filePath) => {
+      // Allowlist: canonical declaration + render sites.
+      const allowedSuffixes = [
+        "/src/design/theme.ts",                      // the const declaration
+        "/src/components/BrandLockup.tsx",           // canonical render site (docs only)
+        "/src/components/EditorialScaffold.tsx",     // BrandMark component lives here
+        "/src/types/generated/",                     // generated .d.ts from JSON schema
+        "/src/__tests__/",                           // tests that assert the glyph appears
+      ];
+      if (allowedSuffixes.some((s) => filePath.includes(s))) return [];
+
+      // Skip `.d.ts` files everywhere (generated).
+      if (filePath.endsWith(".d.ts")) return [];
+
+      // Strip comments before scanning — JSDoc and inline comments may legitimately
+      // describe the brand mark (e.g. `// ∴ brand mark — amber`).
+      const stripped = content
+        .replace(/\/\*[\s\S]*?\*\//g, "")  // /* ... */ block + JSDoc
+        .replace(/(^|[^:])\/\/[^\n]*/g, "$1");  // // line comments (preserve URL ://)
+
+      const issues = [];
+      const lines = stripped.split("\n");
+      lines.forEach((line, i) => {
+        if (line.includes("∴")) {
+          issues.push({
+            line: i + 1,
+            message:
+              "Hardcoded `∴` literal — use `brandMark.glyph` (from `design/theme`) or `<BrandLockup>` / `<BrandMark>`.",
+          });
+        }
+      });
+      return issues;
+    },
+    severity: "error",
+    fix:
+      "Replace the literal `∴` with `{brandMark.glyph}` (after `import { brandMark } from '<path>/design/theme'`), " +
+      "or — if you're building a footer lockup like `∴ parallax · context` — use `<BrandLockup>context</BrandLockup>`.",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────

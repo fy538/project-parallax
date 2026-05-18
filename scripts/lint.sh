@@ -57,6 +57,12 @@ run "polish_lint.py over remotion-templates/src/templates" \
 run "concepts/lookup.py validate" \
   python3 tools/concepts/lookup.py validate
 
+# ─── Brand-mark literal guard (Python sibling of TS no-literal-brand-mark) ─
+# Blocks new hardcoded `∴` in tools/*.py. The glyph is centralized in
+# palette.json::brandMark.glyph (read via tools.brand.get_brand_mark()).
+run "check_brand_mark.py (no hardcoded `∴` in tools/)" \
+  python3 tools/lint/check_brand_mark.py
+
 # ─── Assembly-manifest doctrine lint (per-episode) ─────────────────────────
 # manifest_lint expects file path args. Find all current assembly manifests.
 shopt -s nullglob
