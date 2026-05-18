@@ -8,10 +8,14 @@
  */
 
 import { describe, it, expect } from "vitest";
+import fs from "fs";
+import os from "os";
+import path from "path";
 // @ts-expect-error — .mjs file, no .d.ts
 import {
   lintContent,
   lintRootCompositions,
+  lintDeprecatedTemplateDispatch,
 } from "../../scripts/lint-conventions.mjs";
 
 interface Issue {
@@ -319,6 +323,107 @@ describe("lintRootCompositions (L20 — duplicate composition ids)", () => {
     `;
     const issues = lintRootCompositions(root) as Issue[];
     expect(issues).toHaveLength(2);
+  });
+});
+
+describe("lintDeprecatedTemplateDispatch (no-deprecated-template-dispatch)", () => {
+  // Build a synthetic templates dir + dispatch files in a tmpdir. Tests the
+  // rule end-to-end (find deprecated → scan registries → emit issue) without
+  // depending on the live repo state of the deprecation list.
+  function makeFixture() {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lint-dep-"));
+    const templatesDir = path.join(tmp, "templates");
+    fs.mkdirSync(templatesDir, { recursive: true });
+    // Two templates: Foo (deprecated), Bar (current)
+    const fooDir = path.join(templatesDir, "Foo");
+    fs.mkdirSync(fooDir);
+    fs.writeFileSync(
+      path.join(fooDir, "Foo.tsx"),
+      "/**\n * @deprecated Use Bar instead.\n * Foo — legacy widget.\n */\nexport const Foo = () => null;",
+    );
+    const barDir = path.join(templatesDir, "Bar");
+    fs.mkdirSync(barDir);
+    fs.writeFileSync(
+      path.join(barDir, "Bar.tsx"),
+      "/** Bar — current widget. */\nexport const Bar = () => null;",
+    );
+    return { tmp, templatesDir };
+  }
+
+  it("returns no issues when no deprecated template is dispatched", () => {
+    const { tmp, templatesDir } = makeFixture();
+    const dispatchPath = path.join(tmp, "FullEpisode.tsx");
+    fs.writeFileSync(
+      dispatchPath,
+      "export const TEMPLATE_COMPONENTS = {\n  Bar,\n};\n",
+    );
+    const schemasPath = path.join(tmp, "templateSchemas.ts");
+    fs.writeFileSync(
+      schemasPath,
+      "export const TEMPLATE_SCHEMAS = {\n  Bar: BarSchema,\n};\n",
+    );
+    const issues = lintDeprecatedTemplateDispatch(templatesDir, dispatchPath, schemasPath) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("flags a deprecated template that's registered in TEMPLATE_COMPONENTS", () => {
+    const { tmp, templatesDir } = makeFixture();
+    const dispatchPath = path.join(tmp, "FullEpisode.tsx");
+    fs.writeFileSync(
+      dispatchPath,
+      "export const TEMPLATE_COMPONENTS = {\n  Foo,\n  Bar,\n};\n",
+    );
+    const schemasPath = path.join(tmp, "templateSchemas.ts");
+    fs.writeFileSync(schemasPath, "export const TEMPLATE_SCHEMAS = { Bar };\n");
+    const issues = lintDeprecatedTemplateDispatch(templatesDir, dispatchPath, schemasPath) as Issue[];
+    expect(issues).toHaveLength(1);
+    expect(issues[0].rule).toBe("no-deprecated-template-dispatch");
+    expect(issues[0].severity).toBe("error");
+    expect(issues[0].message).toContain("Foo");
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("flags a deprecated template that's registered in TEMPLATE_SCHEMAS", () => {
+    const { tmp, templatesDir } = makeFixture();
+    const dispatchPath = path.join(tmp, "FullEpisode.tsx");
+    fs.writeFileSync(dispatchPath, "export const TEMPLATE_COMPONENTS = { Bar };\n");
+    const schemasPath = path.join(tmp, "templateSchemas.ts");
+    fs.writeFileSync(
+      schemasPath,
+      "export const TEMPLATE_SCHEMAS = {\n  Foo: FooSchema,\n  Bar: BarSchema,\n};\n",
+    );
+    const issues = lintDeprecatedTemplateDispatch(templatesDir, dispatchPath, schemasPath) as Issue[];
+    expect(issues).toHaveLength(1);
+    expect(issues[0].message).toContain("TEMPLATE_SCHEMAS");
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("ignores deprecated-tag mentions inside non-JSDoc body (false-positive guard)", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "lint-dep-fp-"));
+    const templatesDir = path.join(tmp, "templates");
+    const fooDir = path.join(templatesDir, "Foo");
+    fs.mkdirSync(fooDir, { recursive: true });
+    // @deprecated tag is deep in the file (line 100+), NOT in the head JSDoc.
+    // Should not be treated as a deprecation marker.
+    const body = "/** Foo */\n" + "// regular comment\n".repeat(40) +
+      "// @deprecated — note about an internal helper, not the template\n";
+    fs.writeFileSync(path.join(fooDir, "Foo.tsx"), body);
+    const dispatchPath = path.join(tmp, "FullEpisode.tsx");
+    fs.writeFileSync(dispatchPath, "export const TEMPLATE_COMPONENTS = {\n  Foo,\n};\n");
+    const schemasPath = path.join(tmp, "templateSchemas.ts");
+    fs.writeFileSync(schemasPath, "export const TEMPLATE_SCHEMAS = {};\n");
+    const issues = lintDeprecatedTemplateDispatch(templatesDir, dispatchPath, schemasPath) as Issue[];
+    expect(issues).toEqual([]);
+    fs.rmSync(tmp, { recursive: true, force: true });
+  });
+
+  it("real-repo dispatch is currently clean (regression guard)", () => {
+    // No args = scans the real repo. After the May 18 audit removed
+    // TimelineComparison + DualTimeline from both registries, this MUST
+    // return zero. A future PR adding either back triggers this test.
+    const issues = lintDeprecatedTemplateDispatch() as Issue[];
+    expect(issues).toEqual([]);
   });
 });
 

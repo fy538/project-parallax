@@ -163,6 +163,10 @@ const ALLOWLIST_UNCOVERED = new Map<string, string>([
   ["KPICard", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
   ["BulletChart", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
   ["StepLine", "Phase 4 editorial-frame template; manual render validation only — add -real-data test before production use"],
+  // OutcomePartition shipped May 17-18 (decision-space partition map, sibling
+  // of DecisionTree). Same Phase-4 convention: manual render validation
+  // before ship; coverage promoted when an episode actually uses it.
+  ["OutcomePartition", "Phase 4-style template (shipped May 17-18); manual render validation only — add -real-data test before production use"],
 ]);
 
 // ── Tests ───────────────────────────────────────────────────────────────────

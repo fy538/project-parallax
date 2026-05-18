@@ -778,6 +778,77 @@ export function lintRootCompositions(rootContent) {
   return issues;
 }
 
+/**
+ * Repo-wide check: templates marked `@deprecated` in their source must NOT
+ * appear in either dispatch registry (TEMPLATE_COMPONENTS in FullEpisode.tsx
+ * or TEMPLATE_SCHEMAS in Episodes/templateSchemas.ts). Manifest authors pick
+ * templates by name from these registries; a deprecated entry there is a
+ * silent-use risk — they can keep selecting it indefinitely without warning.
+ *
+ * Source files remain in the tree (visual reference, catalog showreel, git
+ * provenance). Removal from the dispatch registries is the operational gate.
+ *
+ * Added: May 18, 2026 engineering audit P0 #8.
+ */
+export function lintDeprecatedTemplateDispatch(
+  templatesDir = TEMPLATES_DIR,
+  fullEpisodePath = path.resolve(__dirname, "../src/templates/Episodes/FullEpisode.tsx"),
+  templateSchemasPath = path.resolve(__dirname, "../src/templates/Episodes/templateSchemas.ts"),
+) {
+  if (!fs.existsSync(templatesDir)) return [];
+  const issues = [];
+
+  // 1. Find every template whose main .tsx has a `@deprecated` JSDoc tag.
+  //    Convention: each template lives at templates/<Name>/<Name>.tsx.
+  const deprecated = new Set();
+  for (const entry of fs.readdirSync(templatesDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith("_") || entry.name === "Episodes" || entry.name === "Shorts") continue;
+    const mainTsx = path.join(templatesDir, entry.name, `${entry.name}.tsx`);
+    if (!fs.existsSync(mainTsx)) continue;
+    const src = fs.readFileSync(mainTsx, "utf-8");
+    // Only flag templates whose `@deprecated` tag is in the file-level JSDoc
+    // (first ~30 lines). Catches the documented-deprecation case without
+    // false-positiving on per-symbol `@deprecated` deeper in the file.
+    const head = src.split("\n").slice(0, 30).join("\n");
+    if (/@deprecated/.test(head)) {
+      deprecated.add(entry.name);
+    }
+  }
+  if (deprecated.size === 0) return issues;
+
+  // 2. Scan dispatch registries for any deprecated name as an identifier.
+  const dispatchFiles = [
+    { path: fullEpisodePath, registry: "TEMPLATE_COMPONENTS" },
+    { path: templateSchemasPath, registry: "TEMPLATE_SCHEMAS" },
+  ];
+  for (const { path: filePath, registry } of dispatchFiles) {
+    if (!fs.existsSync(filePath)) continue;
+    const src = fs.readFileSync(filePath, "utf-8");
+    const lines = src.split("\n");
+    for (const name of deprecated) {
+      // Look for the deprecated name as a registry key: `  Name,` or `  Name:`
+      // (object shorthand / value position inside the registry literal). The
+      // regex deliberately requires comma OR colon AFTER the bare identifier
+      // so we don't false-positive on import lines, comments, or string
+      // references elsewhere in the file.
+      const keyRe = new RegExp(`^\\s+${name}[,:]\\s*$|^\\s+${name}:\\s`, "m");
+      for (let i = 0; i < lines.length; i++) {
+        if (keyRe.test(lines[i])) {
+          issues.push({
+            file: path.relative(path.resolve(__dirname, ".."), filePath),
+            line: i + 1,
+            rule: "no-deprecated-template-dispatch",
+            severity: "error",
+            message: `Deprecated template '${name}' registered in ${registry} — manifest authors can still silently dispatch to it. Remove from the registry (keep source file for reference).`,
+            fix: `Delete the '${name}' entry from ${registry} in this file. The template's source can stay under src/templates/${name}/ for catalog + historical reference.`,
+          });
+        }
+      }
+    }
+  }
+  return issues;
+}
+
 // Re-export rule definitions for inspection in tests.
 export { rules };
 
@@ -816,6 +887,7 @@ for (const file of getEpisodeFiles()) {
 }
 
 allIssues.push(...lintRootCompositions());
+allIssues.push(...lintDeprecatedTemplateDispatch());
 
 // ── Output ─────────────────────────────────────────────────────────────────
 

@@ -46,8 +46,7 @@
             "FrameworkDiagram-Short",
             "ChoroplethMap-Short",
             "SplitComposition-Short",
-            "ProbabilityGauge-Short",
-            "TimelineComparison-Short"
+            "ProbabilityGauge-Short"
           ],
           "description": "Remotion composition ID for one of the 9 Shorts templates. Must match exactly what's registered in src/templates/Shorts/index.tsx."
         },

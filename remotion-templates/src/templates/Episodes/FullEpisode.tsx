@@ -86,7 +86,12 @@ import { TitleTransition } from "../TitleTransition/TitleTransition";
 import { ChoroplethMap } from "../ChoroplethMap/ChoroplethMap";
 import { ProportionalSymbolMap } from "../ProportionalSymbolMap/ProportionalSymbolMap";
 import { KineticTypography } from "../KineticTypography/KineticTypography";
-import { TimelineComparison } from "../TimelineComparison/TimelineComparison";
+// TimelineComparison + DualTimeline are @deprecated — replaced by
+// HorizontalTimeline. Removed from TEMPLATE_COMPONENTS dispatch May 18, 2026
+// (engineering audit P0 #8) so manifest authors can't silently pick them.
+// Source kept under src/templates/{TimelineComparison,DualTimeline}/ for
+// historical reference + catalog showreel. Lint rule "no-deprecated-template-
+// dispatch" in scripts/lint-conventions.mjs guards against re-add.
 import { DataChart } from "../DataChart/DataChart";
 import { FrameworkDiagram } from "../FrameworkDiagram/FrameworkDiagram";
 import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
@@ -105,7 +110,7 @@ import { StatReveal } from "../StatReveal/StatReveal";
 import { RadarChart } from "../RadarChart/RadarChart";
 import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
 import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
-import { DualTimeline } from "../DualTimeline/DualTimeline";
+// DualTimeline @deprecated — see comment above the TimelineComparison import.
 import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
 import { ArcDiagram } from "../ArcDiagram/ArcDiagram";
 import { Slopegraph } from "../Slopegraph/Slopegraph";
@@ -451,7 +456,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   TitleTransition,
   ChoroplethMap,
   KineticTypography,
-  TimelineComparison,
+  // TimelineComparison removed (deprecated; see import-block comment).
   DataChart,
   FrameworkDiagram,
   RouteAnimation,
@@ -470,7 +475,7 @@ export const TEMPLATE_COMPONENTS: Record<string, React.ComponentType<{ data: any
   RadarChart,
   AnnotatedImage,
   EscalationLadder,
-  DualTimeline,
+  // DualTimeline removed (deprecated; see import-block comment).
   HorizontalTimeline,
   DuelingFrameworks,
   StrategicLandscape,
