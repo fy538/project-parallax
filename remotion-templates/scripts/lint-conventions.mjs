@@ -883,14 +883,12 @@ export function lintDeprecatedTemplateDispatch(
  * Added: May 18, 2026 engineering audit #3.
  */
 export const TYPES_DRIFT_GRANDFATHERED = new Set([
-  // 8 remaining templates with structural complexity (superRefine cross-
-  // field validation, recursive z.lazy schemas, multiple z.union variants,
-  // or third-party types that don't round-trip through z.infer cleanly).
-  // Each gets per-template attention rather than the mechanical migration.
-  // Plus EditorialTest (test fixture, not a production template).
-  "AtlasPlate", "ChoroplethMap", "EditorialTest", "GameBoard",
-  "HorizontalTimeline", "IsotypeChart", "NetworkDiagram",
-  "RouteAnimation", "TimeSeriesChart",
+  // EditorialTest test fixture only — not a production template, kept here
+  // because its hand-typed shape exists for fixture purposes, not for any
+  // schema-derived runtime path. All production templates now derive their
+  // types from their Zod schemas via z.infer (May 2026 audit #3 burn-down,
+  // completed May 18, 2026).
+  "EditorialTest",
 ]);
 
 export function lintTypesDriftFromSchema(templatesDir = TEMPLATES_DIR) {

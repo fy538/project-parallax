@@ -1,5 +1,8 @@
 /**
  * Zod schemas for HorizontalTimeline template — runtime validation + Remotion Studio editing.
+ *
+ * Schema-derived types (May 2026 audit #3 burn-down — see StatReveal for
+ * canonical pattern).
  */
 
 import { z } from "zod";
@@ -7,22 +10,29 @@ import { DirectionBlockSchema } from "../../hooks/directionBlock.schema";
 
 // ── Sub-schemas ─────────────────────────────────────────────────────────────
 
-const TimelineCameraStepSchema = z.object({
+export const TimelineCameraFocusSchema = z.union([z.number(), z.literal("pullback")]);
+export const TimelineCameraBehaviorSchema = z.enum(["track", "snap", "hold"]);
+export const TimelineWeightSchema = z.union([z.literal(1), z.literal(2), z.literal(3)]);
+export const TimelineEraWeightSchema = z.enum(["equal", "foil-old", "foil-new"]);
+export const TimelineModeSchema = z.enum(["single", "dual", "morph"]);
+export const TimelineFocusModeNameSchema = z.enum(["cinematic", "settled"]);
+
+export const TimelineCameraStepSchema = z.object({
   /** Which event to focus on (index into events array, or "pullback" for full view) */
-  focus: z.union([z.number(), z.literal("pullback")]),
+  focus: TimelineCameraFocusSchema,
   /** Zoom level: 1.0 = show ~3 events, 1.5 = tight on one, 0.6 = wide pullback */
   zoom: z.number(),
   /** Duration of this step in seconds */
   duration: z.number(),
   /** Camera behavior: how to arrive at this position */
-  behavior: z.enum(["track", "snap", "hold"]).optional(),
+  behavior: TimelineCameraBehaviorSchema.optional(),
   /** Optional overlay label shown during this step */
   label: z.string().optional(),
   /** Dim non-focused events during this step (default: true) */
   dimOthers: z.boolean().optional(),
 });
 
-const TimelineEventDataSchema = z.object({
+export const TimelineEventDataSchema = z.object({
   /** Year or date label (e.g., "1941", "Oct 1941", "2022 Q4") */
   year: z.string(),
   /** Event title — short, punchy */
@@ -32,12 +42,12 @@ const TimelineEventDataSchema = z.object({
   /** Optional accent color override for this event */
   color: z.string().optional(),
   /** Importance weight: affects node size and card prominence (1-3, default 1) */
-  weight: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  weight: TimelineWeightSchema.optional(),
   /** Optional icon/emoji shown in the node marker */
   icon: z.string().optional(),
 });
 
-const TimelinePairDataSchema = z.object({
+export const TimelinePairDataSchema = z.object({
   /** Event from era A (top spine) */
   eraA: TimelineEventDataSchema,
   /** Event from era B (bottom spine) */
@@ -48,7 +58,7 @@ const TimelinePairDataSchema = z.object({
   phasePosition: z.number().optional(),
 });
 
-const PhaseAxisConfigSchema = z.object({
+export const PhaseAxisConfigSchema = z.object({
   label: z.string(),
   unit: z.string().optional(),
   min: z.number().optional(),
@@ -56,7 +66,7 @@ const PhaseAxisConfigSchema = z.object({
   ticks: z.array(z.number()).optional(),
 });
 
-const TimelineMorphEventDataSchema = z.object({
+export const TimelineMorphEventDataSchema = z.object({
   /** Era A state */
   eraAYear: z.string(),
   eraATitle: z.string(),
@@ -66,13 +76,29 @@ const TimelineMorphEventDataSchema = z.object({
   eraBTitle: z.string(),
   eraBDescription: z.string().optional(),
   /** Importance weight */
-  weight: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  weight: TimelineWeightSchema.optional(),
+});
+
+export const TimelineFocusModeSchema = z.union([
+  TimelineFocusModeNameSchema,
+  z.object({
+    mode: TimelineFocusModeNameSchema,
+    dimOpacity: z.number().min(0).max(1).optional(),
+    hideOffFocusCards: z.boolean().optional(),
+  }),
+]);
+
+export const TimelineEraBracketSchema = z.object({
+  label: z.string(),
+  startIndex: z.number().int().min(0),
+  endIndex: z.number().int().min(0),
+  color: z.string().optional(),
 });
 
 // ── Root schema ─────────────────────────────────────────────────────────────
 
-export const HorizontalTimelineSchema = z.object({
-  data: z.object({
+export const HorizontalTimelineDataSchema = z
+  .object({
     /** Composition title */
     title: z.string(),
     /** Chinese translation */
@@ -81,7 +107,7 @@ export const HorizontalTimelineSchema = z.object({
     subtitle: z.string().optional(),
 
     /** Timeline mode */
-    mode: z.enum(["single", "dual", "morph"]),
+    mode: TimelineModeSchema,
 
     // ── Single mode events ──
     /** Events for single-spine mode */
@@ -99,7 +125,7 @@ export const HorizontalTimelineSchema = z.object({
     /** When connection lines render (in seconds from start) — dual mode only. */
     connectionRevealStart: z.number().nonnegative().optional(),
     /** Era weight ratio for dual mode. */
-    eraWeight: z.enum(["equal", "foil-old", "foil-new"]).optional(),
+    eraWeight: TimelineEraWeightSchema.optional(),
 
     /**
      * Focus isolation behavior during camera tracking.
@@ -115,16 +141,7 @@ export const HorizontalTimelineSchema = z.object({
      * Can also be set as an object for fine-tuning (`dimOpacity`, etc.).
      * See: May 13, 2026 timeline visual-register pass + POLISH.md T-rules.
      */
-    focusMode: z
-      .union([
-        z.enum(["cinematic", "settled"]),
-        z.object({
-          mode: z.enum(["cinematic", "settled"]),
-          dimOpacity: z.number().min(0).max(1).optional(),
-          hideOffFocusCards: z.boolean().optional(),
-        }),
-      ])
-      .optional(),
+    focusMode: TimelineFocusModeSchema.optional(),
 
     // ── Morph mode events ──
     /** Events that morph between eras */
@@ -156,16 +173,7 @@ export const HorizontalTimelineSchema = z.object({
 
     // ── Era/bracket groupings (single mode only) ──
     /** Era brackets rendered above the spine spanning a range of events. */
-    eras: z
-      .array(
-        z.object({
-          label: z.string(),
-          startIndex: z.number().int().min(0),
-          endIndex: z.number().int().min(0),
-          color: z.string().optional(),
-        }),
-      )
-      .optional(),
+    eras: z.array(TimelineEraBracketSchema).optional(),
 
     // ── Directing language overrides ──
     /** Per-composition direction block from visual-spec _direction namespace. */
@@ -219,5 +227,8 @@ export const HorizontalTimelineSchema = z.object({
         });
       }
     }
-  }),
+  });
+
+export const HorizontalTimelineSchema = z.object({
+  data: HorizontalTimelineDataSchema,
 });
