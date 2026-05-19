@@ -89,6 +89,8 @@ const COMPOSITIONS = [
   "TitleTransition",
   // Math (Phase 1 — math-rendering register, May 18, 2026)
   "MathReveal",
+  // Math (Phase 2 — multi-step derivations, May 18, 2026)
+  "MathDerivation",
   // Multi-segment
   "SplitComposition",
   "ProbabilityGauge",

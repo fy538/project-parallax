@@ -1,0 +1,30 @@
+{
+  "episode": "catalog",
+  "title": "Why defection dominates in the one-shot Prisoner's Dilemma",
+  "steps": [
+    {
+      "formula": "\\mathbb{E}[U_C] = p \\cdot R + (1-p) \\cdot S",
+      "annotation": "Expected payoff from cooperating, given the other cooperates with probability p",
+      "holdSec": 3.5
+    },
+    {
+      "formula": "\\mathbb{E}[U_D] = p \\cdot T + (1-p) \\cdot P",
+      "annotation": "Expected payoff from defecting under the same belief",
+      "holdSec": 3.5
+    },
+    {
+      "formula": "\\mathbb{E}[U_D] - \\mathbb{E}[U_C] = p(T - R) + (1-p)(P - S)",
+      "annotation": "The difference — defection's advantage over cooperation",
+      "holdSec": 3.5
+    },
+    {
+      "formula": "\\textcolor{#A64D46}{T > R} \\;\\land\\; \\textcolor{#A64D46}{P > S} \\;\\Rightarrow\\; \\mathbb{E}[U_D] > \\mathbb{E}[U_C] \\;\\forall p \\in [0, 1]",
+      "annotation": "When both PD inequalities hold (rust), defection dominates for every belief p",
+      "holdSec": 5.0
+    }
+  ],
+  "source": "Standard one-shot PD payoff analysis · see Axelrod (1984), ch. 2",
+  "crossfadeSec": 0.5,
+  "fontSize": 48,
+  "display": true
+}

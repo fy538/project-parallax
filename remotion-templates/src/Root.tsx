@@ -63,6 +63,7 @@ import { DuelingFrameworksComposition } from "./templates/DuelingFrameworks";
 import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
 import { MathRevealComposition } from "./templates/MathReveal";
+import { MathDerivationComposition } from "./templates/MathDerivation";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
 import { IsotypeChartComposition } from "./templates/IsotypeChart";
 import { BumpChartComposition } from "./templates/BumpChart";
@@ -288,6 +289,7 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Math">
         <MathRevealComposition />
+        <MathDerivationComposition />
       </Folder>
 
       <Folder name="Diagrams">
