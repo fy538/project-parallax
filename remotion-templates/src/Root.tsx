@@ -64,6 +64,11 @@ import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
 import { MathRevealComposition } from "./templates/MathReveal";
 import { MathDerivationComposition } from "./templates/MathDerivation";
+import {
+  CatalogMathAnnotatedBayes,
+  CatalogMathNewtonBounded,
+  CatalogMathInlineDemo,
+} from "./catalog/MathPrimitives";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
 import { IsotypeChartComposition } from "./templates/IsotypeChart";
 import { BumpChartComposition } from "./templates/BumpChart";
@@ -290,6 +295,10 @@ export const RemotionRoot: React.FC = () => {
       <Folder name="Math">
         <MathRevealComposition />
         <MathDerivationComposition />
+        {/* Phase 3 primitives — bounded + annotation + inline */}
+        <CatalogMathAnnotatedBayes />
+        <CatalogMathNewtonBounded />
+        <CatalogMathInlineDemo />
       </Folder>
 
       <Folder name="Diagrams">

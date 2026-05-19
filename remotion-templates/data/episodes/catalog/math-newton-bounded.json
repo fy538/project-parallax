@@ -1,0 +1,30 @@
+{
+  "episode": "catalog",
+  "title": "Bounded equation: where Newton's second law breaks",
+  "steps": [
+    {
+      "formula": "F = m \\cdot a",
+      "annotation": "Newton's second law — the relationship every undergraduate learns first",
+      "holdSec": 3.0
+    },
+    {
+      "formula": "F = m \\cdot a \\quad \\textcolor{#A64D46}{\\text{when} \\; v \\ll c}",
+      "annotation": "The unstated assumption: Newton's law works only when velocity is small relative to the speed of light",
+      "holdSec": 3.5
+    },
+    {
+      "formula": "\\textcolor{#A64D46}{p} = \\gamma \\, m_0 v, \\quad \\gamma = \\frac{1}{\\sqrt{1 - v^2/c^2}}",
+      "annotation": "Relativistic generalization: momentum is what's conserved, with the Lorentz factor γ correcting for relative motion",
+      "holdSec": 4.0
+    },
+    {
+      "formula": "v \\to c \\;\\Rightarrow\\; \\gamma \\to \\infty \\;\\Rightarrow\\; \\textcolor{#A64D46}{F = ma \\text{ fails}}",
+      "annotation": "At relativistic speeds, the Newtonian equation diverges from reality. Same shape; different domain.",
+      "holdSec": 4.5
+    }
+  ],
+  "source": "Standard derivation in any introductory special-relativity text",
+  "crossfadeSec": 0.5,
+  "fontSize": 52,
+  "display": true
+}

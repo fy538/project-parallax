@@ -1,0 +1,30 @@
+{
+  "episode": "catalog",
+  "title": "Bayes' rule, annotated",
+  "steps": [
+    {
+      "formula": "P(H \\mid E) = \\frac{P(E \\mid H) \\cdot P(H)}{P(E)}",
+      "annotation": "Bayes' rule — the bare form",
+      "holdSec": 3.0
+    },
+    {
+      "formula": "\\underbrace{P(H \\mid E)}_{\\text{posterior}} = \\frac{P(E \\mid H) \\cdot P(H)}{P(E)}",
+      "annotation": "What we're solving for: belief in H after seeing evidence E",
+      "holdSec": 3.0
+    },
+    {
+      "formula": "\\underbrace{P(H \\mid E)}_{\\text{posterior}} = \\frac{\\overbrace{P(E \\mid H)}^{\\text{likelihood}} \\cdot \\overbrace{P(H)}^{\\text{prior}}}{P(E)}",
+      "annotation": "Numerator: how well H explains E (likelihood) times how plausible H was to begin with (prior)",
+      "holdSec": 4.0
+    },
+    {
+      "formula": "\\underbrace{P(H \\mid E)}_{\\text{posterior}} = \\frac{\\overbrace{P(E \\mid H)}^{\\text{likelihood}} \\cdot \\overbrace{P(H)}^{\\text{prior}}}{\\underbrace{P(E)}_{\\text{evidence}}}",
+      "annotation": "Denominator: how surprising E is overall — the normalizing constant that keeps posteriors summing to 1",
+      "holdSec": 5.0
+    }
+  ],
+  "source": "Standard exposition · annotation primitive uses KaTeX-native \\underbrace and \\overbrace",
+  "crossfadeSec": 0.6,
+  "fontSize": 52,
+  "display": true
+}
