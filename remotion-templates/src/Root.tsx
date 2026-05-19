@@ -62,6 +62,7 @@ import { BayesianUpdateComposition, BayesianUpdateMultiComposition } from "./tem
 import { DuelingFrameworksComposition } from "./templates/DuelingFrameworks";
 import { StrategicLandscapeComposition } from "./templates/StrategicLandscape";
 import { StatRevealComposition } from "./templates/StatReveal";
+import { MathRevealComposition } from "./templates/MathReveal";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
 import { IsotypeChartComposition } from "./templates/IsotypeChart";
 import { BumpChartComposition } from "./templates/BumpChart";
@@ -283,6 +284,10 @@ export const RemotionRoot: React.FC = () => {
 
       <Folder name="Typography">
         <KineticTypographyComposition />
+      </Folder>
+
+      <Folder name="Math">
+        <MathRevealComposition />
       </Folder>
 
       <Folder name="Diagrams">

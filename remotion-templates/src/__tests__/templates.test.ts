@@ -87,6 +87,8 @@ const COMPOSITIONS = [
   // Typography
   "KineticTypography",
   "TitleTransition",
+  // Math (Phase 1 — math-rendering register, May 18, 2026)
+  "MathReveal",
   // Multi-segment
   "SplitComposition",
   "ProbabilityGauge",
