@@ -1030,6 +1030,110 @@ describe("lint rule: no-bare-zindex-on-global-scale", () => {
   });
 });
 
+// ── M-MATH-FONT (Phase 5) ─────────────────────────────────────────────────
+// Flags `fontFamily` in style props near math rendering components
+// (MathExpression / MathInline / MathCrossfade). The correct override path
+// is src/styles/katex-brand.css.
+
+const lintWithComponentScope = (
+  content: string,
+  filePath = "src/components/SomeHelper.tsx",
+) => lintContent(content, filePath, filePath, "components-too") as Issue[];
+
+describe("lint rule: no-katex-font-override (M-MATH-FONT)", () => {
+  it("errors when fontFamily appears on the same line as MathExpression prop", () => {
+    const issues = lintWithComponentScope(`
+      import { MathExpression } from "../components/MathExpression";
+      export const Foo = () => (
+        <MathExpression formula="x" style={{ fontFamily: "Comic Sans", fontSize: 48 }} />
+      );
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(true);
+  });
+
+  it("errors when fontFamily is set in a multi-line style near MathExpression", () => {
+    const issues = lintWithComponentScope(`
+      import { MathExpression } from "../components/MathExpression";
+      export const Foo = () => {
+        const s = {
+          fontFamily: "sans-serif",
+          fontSize: 48,
+        };
+        return <MathExpression formula="x" style={s} />;
+      };
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(true);
+  });
+
+  it("errors when fontFamily is near MathInline", () => {
+    const issues = lintWithComponentScope(`
+      import { MathInline } from "../components/MathInline";
+      export const Foo = () => (
+        <div style={{ fontFamily: "Arial" }}>
+          <MathInline text="$x$" />
+        </div>
+      );
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(true);
+  });
+
+  it("does NOT fire when fontFamily appears far from any math component (>5 lines)", () => {
+    const issues = lintWithComponentScope(`
+      import { MathExpression } from "../components/MathExpression";
+      const captionStyle = {
+        fontFamily: "IBM Plex Mono",
+        fontSize: 20,
+      };
+      // many lines of other code ...
+      const a = 1;
+      const b = 2;
+      const c = 3;
+      const d = 4;
+      const e = 5;
+      const f = 6;
+      export const Foo = () => (
+        <MathExpression formula="x + y" />
+      );
+    `);
+    // fontFamily is >5 lines away from MathExpression tag — should NOT fire
+    expect(hasRule(issues, "no-katex-font-override")).toBe(false);
+  });
+
+  it("does NOT fire on files that don't use math components", () => {
+    const issues = lintWithComponentScope(`
+      export const Foo = () => (
+        <div style={{ fontFamily: "IBM Plex Mono", fontSize: 32 }}>Hello</div>
+      );
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(false);
+  });
+
+  it("accepts // no-katex-font-override: ok suppression on the same line", () => {
+    const issues = lintWithComponentScope(`
+      import { MathExpression } from "../components/MathExpression";
+      export const Foo = () => (
+        <MathExpression formula="x" style={{ fontFamily: "LM Math", fontSize: 48 }} // no-katex-font-override: ok
+        />
+      );
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(false);
+  });
+
+  it("accepts // no-katex-font-override: ok suppression on the preceding line", () => {
+    const issues = lintWithComponentScope(`
+      import { MathExpression } from "../components/MathExpression";
+      export const Foo = () => (
+        <MathExpression
+          formula="x"
+          // no-katex-font-override: ok
+          style={{ fontFamily: "LM Math", fontSize: 48 }}
+        />
+      );
+    `);
+    expect(hasRule(issues, "no-katex-font-override")).toBe(false);
+  });
+});
+
 describe("rules array integrity", () => {
   it("every rule has id, description, severity", () => {
     // Smoke test that the export shape is consistent — protects against accidental

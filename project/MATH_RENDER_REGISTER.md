@@ -335,8 +335,9 @@ If a step would need > 5s to read, **split it**.
 - **Stale assumptions** — citing an equation without naming its domain. If the equation is famous enough to invoke, the bounded form is usually the editorial move.
 - **Inline math in display contexts** — `<MathInline>` is for prose embedding; full-screen hero equations use `MathReveal`.
 - **Wall of LaTeX** — TeX source longer than ~80 chars per step is hard to author, hard to lint, and usually means the step is doing too much. Refactor into smaller steps.
-- **Mathjax-style alignment** — Parallax doesn't ship `\begin{align}` multi-line alignment yet (Phase 5+ if a real episode needs it). Multi-line work goes in `MathDerivation` steps.
-- **Computer Modern fonts everywhere** — the math uses KaTeX's bundled fonts (CM-derived); surrounding chrome (captions, step counters, source) uses Plex. Don't override KaTeX's font without going through the brand path (`brandMark`-style centralization, Phase 5).
+- **Mathjax-style alignment** — `\begin{aligned}...\end{aligned}` is supported natively by KaTeX. Pass `display={true}` to `MathExpression` / `MathDerivation` to enable display-mode rendering (required for the environment to render at full size). Use it when two derivation lines share an `=` column and the alignment is the editorial point. Multi-step chains that are NOT aligned should still go in `MathDerivation` steps — aligned is NOT a replacement for the step-by-step engine.
+- **fontFamily in style props on math components** — don't set `fontFamily` via the `style` prop on `MathExpression`, `MathInline`, or `MathCrossfade`. The M-MATH-FONT lint rule (lint-conventions.mjs) will block it. The correct override path is `src/styles/katex-brand.css` — that file is the single canonical override channel for KaTeX typography. It currently remaps `\text{}` mode to IBM Plex Mono and contains the Latin Modern Math `@font-face` stub.
+- **Computer Modern fonts everywhere** — `src/styles/katex-brand.css` (Phase 5) overrides `\text{}` / `\textrm{}` mode to IBM Plex Mono (brand annotation register). Full Latin Modern Math font swap requires adding woff2 files to `public/fonts/lm-math/` and un-stubbing the `@font-face` blocks in that file — see the file's header comment for the procedure.
 
 ---
 
@@ -348,16 +349,19 @@ The doctrine above is enforced where possible by automated checks. Live as of Ph
 |---|---|---|
 | **M-MATH-VALID** | TeX formulas in `data/episodes/**/*.json` that don't parse through KaTeX | `scripts/lint-math-formulas.mjs`, wired into `scripts/lint.sh` |
 
-Phase 5+ lints (queued, not yet shipped):
-- **M-MATH-FONT** — inline CSS overrides of `.katex` `fontFamily` that bypass the brand path
-- **M-MATH-LENGTH** — TeX source > 80 chars per step (heuristic for "split this")
-- **M-MATH-COLOR** — `\textcolor{HEX}` calls in TeX with a hex not in the brand palette
+Phase 5 lints (shipped May 18, 2026):
+
+| Rule | What it catches | Severity | Where |
+|---|---|---|---|
+| **M-MATH-FONT** | `fontFamily` in style props near math rendering components — use `katex-brand.css` instead | error (blocking) | `lint-conventions.mjs`, scope: `components-too + catalog` |
+| **M-MATH-LENGTH** | TeX source > 80 chars per step (informational — `\underbrace`/`\overbrace` overhead is structural) | warn (non-blocking) | `lint-math-formulas.mjs` |
+| **M-MATH-COLOR** | `\textcolor{HEX}` with hex not in the brand palette | error (blocking) | `lint-math-formulas.mjs` |
 
 ---
 
 ## Implementation status (May 18, 2026)
 
-All four phases shipped.
+All five phases shipped.
 
 **Phase 1 — Core component + write-on reveal** ([commit](../remotion-templates/src/components/MathExpression.tsx))
 - `<MathExpression>` (KaTeX wrapper + reveal-mask clip-path)
@@ -377,11 +381,19 @@ All four phases shipped.
 - 21 unit tests (parser + render)
 - 2 real fixtures (annotated Bayes, Newton bounded)
 
-**Phase 4 — Doctrine + lint + showcase** (this document)
+**Phase 4 — Doctrine + lint + showcase** ([commit](../remotion-templates/src/catalog/MathRenderShowcase.tsx))
 - This doctrine doc (`project/MATH_RENDER_REGISTER.md`)
 - `M-MATH-VALID` lint (`scripts/lint-math-formulas.mjs`)
 - `catalog-showcase-math-render` visual reference card
 - `visual-spec` skill updated with math chooser table
+
+**Phase 5 — Brand-path CSS + three new lint rules** (May 18, 2026)
+- `src/styles/katex-brand.css` — the canonical override channel for KaTeX typography: text-mode `\text{}` / `\textrm{}` remapped to IBM Plex Mono (brand annotation register); `.katex-display` margin zeroed for absolute-position layout; KaTeX error background suppressed for production renders; Latin Modern Math `@font-face` stub (woff2 files pending — see file header for procedure).
+- `M-MATH-FONT` lint — `lint-conventions.mjs` rule (error/blocking): flags `fontFamily` in style props within ±5 JSX lines of `<MathExpression>` / `<MathInline>` / `<MathCrossfade>`. Suppression: `// no-katex-font-override: ok`.
+- `M-MATH-LENGTH` lint — `lint-math-formulas.mjs` addition (warn/informational, non-blocking): flags formulas > 80 chars as a "consider splitting" hint.
+- `M-MATH-COLOR` lint — `lint-math-formulas.mjs` addition (error/blocking): flags `\textcolor{HEX}` with hex not in the documented brand palette (gold/rust/dustblue/walnut/ink).
+- `\begin{aligned}` support confirmed: works natively in KaTeX; pass `display={true}` to enable.
+- 27 new unit tests for Phase 5 lint logic (`src/__tests__/lint-math-formulas.test.ts`).
 
 ---
 

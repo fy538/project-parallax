@@ -8,13 +8,24 @@
  * and a clip-path reveal that matches the `reveal-mask` primitive in
  * TEXT_ANIMATION_REGISTER.md.
  *
- * Font note (Phase 1 reality): we ship with KaTeX's bundled fonts
- * (Computer-Modern-derived). The "Latin Modern Math swap" called out
- * in the plan's Layer 1 is Phase 2 work — KaTeX's layout engine depends
- * on glyph-specific metrics, so a clean font swap is medium-hard and not
- * the right place to spend Phase 1's day. We get most of the brand-fit
- * via color (ink), surrounding chrome (Plex), and the editorial paper
- * surface; the math itself reads as "good KaTeX" rather than Plex.
+ * Font note (Phase 5): KaTeX ships with Computer-Modern-derived fonts.
+ * `src/styles/katex-brand.css` (imported below) is the canonical override
+ * channel — it remaps text-mode TeX (`\text{}`, `\textrm{}`) to IBM Plex
+ * Mono to match Parallax's annotation register, and stubs the @font-face
+ * declarations needed for the full Latin Modern Math swap (woff2 files
+ * pending, see katex-brand.css for the TO-DO). Do NOT set `fontFamily` in
+ * the `style` prop on this component or its callers — M-MATH-FONT lint
+ * will flag it. All KaTeX font overrides live in katex-brand.css.
+ *
+ * Multi-line alignment note: `\begin{aligned}...\end{aligned}` works
+ * natively in KaTeX. Pass `display={true}` to enable display-mode math
+ * (required for the aligned environment to render at full size). Example:
+ *
+ *   formula={`\\begin{aligned}
+ *     x &= 1 + 2 \\\\
+ *     y &= x^2
+ *   \\end{aligned}`}
+ *   display
  *
  * Usage (in a Remotion composition):
  *
@@ -34,6 +45,10 @@
 import React, { useMemo } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
+// Brand-path override: text-mode font → Plex Mono, display margin fix,
+// baseline alignment correction, LM Math font-face stub. Must come AFTER
+// katex.min.css to win the cascade. See src/styles/katex-brand.css.
+import "../styles/katex-brand.css";
 import { palette } from "../design/theme";
 
 export interface MathExpressionProps {

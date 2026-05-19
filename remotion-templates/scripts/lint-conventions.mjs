@@ -792,6 +792,101 @@ const rules = [
       "stacking that happens to land on a tier number, add the inline pragma " +
       "`// no-bare-zindex-on-global-scale: ok` above the line.",
   },
+
+  // ── M-MATH-FONT: block fontFamily overrides on math rendering components ──
+  // KaTeX's font rendering path is centralized in `src/styles/katex-brand.css`.
+  // Setting `fontFamily` in a `style` prop passed to `<MathExpression>`,
+  // `<MathInline>`, or `<MathCrossfade>` bypasses the brand path — the
+  // override applies to the KaTeX HTML output tree and can break glyph
+  // metric alignment.
+  //
+  // The correct override path:
+  //   · Add CSS rules to `src/styles/katex-brand.css` (imported in
+  //     MathExpression.tsx after katex.min.css so it wins the cascade).
+  //   · For Latin Modern Math font swap: add @font-face stubs in that file
+  //     (see the stub block at the top of katex-brand.css).
+  //
+  // Suppression: `// no-katex-font-override: ok` on the same line as
+  // `fontFamily` or on the immediately preceding line — for the rare
+  // intentional case (e.g. a catalog fixture demonstrating a font comparison).
+  {
+    id: "no-katex-font-override",
+    description:
+      "M-MATH-FONT: `fontFamily` in style prop near a math component overrides KaTeX's brand font path. Use `src/styles/katex-brand.css` instead.",
+    fileLevel: true,
+    scope: ["components-too", "catalog"],
+    check: (content, filePath) => {
+      const basename = path.basename(filePath);
+      if (!basename.endsWith(".tsx") && !basename.endsWith(".ts")) return [];
+      if (basename.includes("schema") || basename.endsWith("types.ts")) return [];
+
+      // Only files that actually render math components need scrutiny.
+      const usesMath =
+        content.includes("MathExpression") ||
+        content.includes("MathInline") ||
+        content.includes("MathCrossfade");
+      if (!usesMath) return [];
+
+      const lines = content.split("\n");
+      const issues = [];
+      const suppressRe = /\/\/\s*no-katex-font-override:\s*ok/;
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        // Only care about `fontFamily` in style-like contexts (not in comments
+        // or import statements).
+        if (!/\bfontFamily\b/.test(line)) continue;
+        if (/^\s*(\/\/|\*|\/\*)/.test(line)) continue;
+        if (/^\s*import\s/.test(line)) continue;
+
+        // Allow same-line suppression.
+        if (suppressRe.test(line)) continue;
+        // Allow above-line suppression.
+        const prev = lines[i - 1] ?? "";
+        if (suppressRe.test(prev)) continue;
+
+        // Check if `fontFamily` is within ±5 lines of a math component JSX
+        // tag (not merely an import line). Import lines are excluded from the
+        // proximity window to avoid false positives like:
+        //
+        //   import { MathExpression } from "...";  // line 1 — import
+        //   const style = { fontFamily: "Plex" };  // line 2 — NOT near JSX
+        //
+        // Without this exclusion, the import on line 1 would trigger the
+        // proximity check for fontFamily on line 2.
+        const windowStart = Math.max(0, i - 5);
+        const windowEnd = Math.min(lines.length - 1, i + 5);
+        const windowLines = lines.slice(windowStart, windowEnd + 1);
+        // Only consider lines that actually open a JSX element — i.e., contain
+        // `<MathExpression`, `<MathInline`, or `<MathCrossfade` (with the `<`).
+        // This excludes import statements, variable references, and type annotations.
+        const nearMath = windowLines.some((wl) =>
+          /<MathExpression|<MathInline|<MathCrossfade/.test(wl),
+        );
+        if (!nearMath) continue;
+
+        // The katex-brand.css itself and MathExpression.tsx's import are the
+        // canonical sites — skip those (checked via file path).
+        if (filePath.includes("katex-brand.css")) continue;
+
+        issues.push({
+          line: i + 1,
+          message:
+            "M-MATH-FONT: `fontFamily` set near a math rendering component. " +
+            "This overrides KaTeX's font metrics. Add CSS overrides to " +
+            "`src/styles/katex-brand.css` instead. " +
+            "Suppress with `// no-katex-font-override: ok` if intentional.",
+        });
+      }
+      return issues;
+    },
+    severity: "error",
+    fix:
+      "Remove `fontFamily` from the style prop. " +
+      "Add the desired font override as a CSS rule in `src/styles/katex-brand.css` " +
+      "(imported in MathExpression.tsx after katex.min.css so it wins the cascade). " +
+      "For Latin Modern Math: add the @font-face stub in that file (woff2 path pending).",
+  },
 ];
 
 // ── Scanner ────────────────────────────────────────────────────────────────

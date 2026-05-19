@@ -1,0 +1,125 @@
+/**
+ * katex-brand.css — Parallax brand-path overrides for KaTeX rendering.
+ *
+ * IMPORT ORDER: this file must be imported AFTER `katex/dist/katex.min.css`
+ * in MathExpression.tsx so these rules win the cascade at equal specificity.
+ *
+ * Purpose
+ * ───────
+ * KaTeX ships with Computer-Modern-derived font files (`KaTeX_Main`,
+ * `KaTeX_Math`, etc.). Its HTML+CSS output uses those font-families directly.
+ * Parallax's brand font is the IBM Plex superfamily; raw KaTeX renders in a
+ * visually distinct typeface that clashes with surrounding Plex chrome.
+ *
+ * This file is the single canonical override point — the "brand path" for
+ * any KaTeX typography change. Authoring rules:
+ *
+ *   · Override here, not via the `style` prop on `<MathExpression>` /
+ *     `<MathInline>` / `<MathCrossfade>`. The M-MATH-FONT lint rule
+ *     (lint-conventions.mjs) blocks fontFamily in style props to enforce this.
+ *   · If you need a new override, add it here with a comment explaining
+ *     which TeX mode/command it applies to.
+ *   · Do NOT add `!important` unless KaTeX's own rules use it — same-
+ *     specificity, later-wins cascade is sufficient and less fragile.
+ *
+ * Latin Modern Math font swap (Phase 5 → Phase 6)
+ * ────────────────────────────────────────────────
+ * The full font swap (replacing KaTeX's CM fonts with Latin Modern Math)
+ * requires woff2 font files to be added to `public/fonts/lm-math/`. Once
+ * those files exist, un-stub the @font-face blocks below. The math glyph
+ * coverage and metric compatibility should be validated against the fixture
+ * compositions (catalog-math-*) before shipping to production.
+ *
+ * To get the files:
+ *   npm install --save-dev @fontsource-variable/latin-modern
+ *   OR download from: https://www.gust.org.pl/projects/e-foundry/lm-math
+ *
+ * STUB — replace with real src paths once woff2 files are in public/fonts/:
+ *
+ * @font-face {
+ *   font-family: 'KaTeX_Math';
+ *   src: url('/fonts/lm-math/LMMathItalic10-Regular.woff2') format('woff2');
+ *   font-weight: normal;
+ *   font-style: italic;
+ * }
+ * @font-face {
+ *   font-family: 'KaTeX_Main';
+ *   src: url('/fonts/lm-math/LMMath10-Regular.woff2') format('woff2');
+ *   font-weight: normal;
+ *   font-style: normal;
+ * }
+ * @font-face {
+ *   font-family: 'KaTeX_Main';
+ *   src: url('/fonts/lm-math/LMMath10-Bold.woff2') format('woff2');
+ *   font-weight: bold;
+ *   font-style: normal;
+ * }
+ */
+
+/* ── 1. Text-mode font → IBM Plex Mono ─────────────────────────────────────
+ *
+ * KaTeX text-mode commands (\text{}, \textrm{}, \textit{}, \textbf{}) produce
+ * spans with class `.textrm` / `.textit` / `.textbf` inside a `.mord.text`
+ * wrapper. In Parallax's visual language, text-mode labels are ANNOTATIONS —
+ * step-counter labels, "posterior", "likelihood", "when v ≪ c" clauses.
+ * Annotations map to the Plex Mono metadata register (same as step counters
+ * and source attributions in MathDerivation.tsx).
+ *
+ * IBM Plex Mono is loaded by the Remotion font preload (fonts.ts). It is
+ * available as a font-family name in the compositor's browser context.
+ */
+
+.katex .textrm,
+.katex .textit,
+.katex .textbf,
+.katex .textsf,
+.katex .texttt,
+.katex .mord.text {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ── 2. Display math: tighten vertical margins for the editorial surface ──
+ *
+ * KaTeX applies `margin: 1em 0` to `.katex-display` for document flow.
+ * In Remotion compositions the layout is absolute-position driven — the
+ * enclosing `<MathDerivation>` / `<MathReveal>` centering already handles
+ * vertical position. The default margin creates asymmetric visual weight
+ * relative to the annotation text below. Zero it out here; layout is owned
+ * by the containing flexbox.
+ */
+
+.katex-display {
+  margin: 0;
+}
+
+/* ── 3. Baseline alignment for inline math ───────────────────────────────────
+ *
+ * `.katex` default is `display: inline`. Inside `<MathInline>` each math
+ * segment is wrapped in `inline-block` with `vertical-align: middle` from
+ * the component. KaTeX's output sometimes has a slight top offset from the
+ * `katex-html` inner span. The `vertical-align: -0.125em` correction below
+ * nudges inline math onto the prose baseline more precisely.
+ *
+ * This is a rendering-environment-specific adjustment — Remotion's headless
+ * Chromium may differ from macOS Chrome. Audit against the MathInline fixture
+ * (catalog-math-inline-demo) if prose baseline alignment looks off.
+ */
+
+.katex .katex-html {
+  vertical-align: -0.125em;
+}
+
+/* ── 4. Suppress the KaTeX error background in production ────────────────────
+ *
+ * `throwOnError: false` makes KaTeX render a red-background error span for
+ * invalid TeX. In Remotion that renders into the video frame. We suppress
+ * the background and keep the red text — visible enough to catch in QA,
+ * not distracting enough to look intentional if it leaks to a render.
+ *
+ * The M-MATH-VALID lint (lint-math-formulas.mjs) catches TeX errors before
+ * publish; this is the last-resort render-time safety net.
+ */
+
+.katex-error {
+  background-color: transparent;
+}
