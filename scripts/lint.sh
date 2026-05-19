@@ -87,6 +87,14 @@ fi
 run "gen:types:check (cross-language schema → .d.ts freshness)" \
   bash -c "cd remotion-templates && npm run gen:types:check --silent"
 
+# ─── Math-formula validation (M-MATH-VALID) ────────────────────────────────
+# Scans every JSON file under remotion-templates/data/episodes/** for
+# math-render data shapes (MathReveal/MathDerivation) and runs each
+# `formula` through KaTeX strict parser. Catches TeX typos before they
+# surface as inline red errors in a render. Doctrine: MATH_RENDER_REGISTER.md.
+run "lint-math-formulas (M-MATH-VALID — KaTeX parse check)" \
+  bash -c "cd remotion-templates && node scripts/lint-math-formulas.mjs"
+
 # ─── Pipeline dashboard HTML fresh ────────────────────────────────────────
 # episodes/PIPELINE.html is auto-generated from pipeline-state.json +
 # per-episode _status.md + project/IDEAS.md. If any source drifts ahead

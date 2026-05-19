@@ -69,6 +69,7 @@ import {
   CatalogMathNewtonBounded,
   CatalogMathInlineDemo,
 } from "./catalog/MathPrimitives";
+import { CatalogMathRenderShowcase } from "./catalog/MathRenderShowcase";
 import { PricingWaterfallComposition } from "./templates/PricingWaterfall";
 import { IsotypeChartComposition } from "./templates/IsotypeChart";
 import { BumpChartComposition } from "./templates/BumpChart";
@@ -299,6 +300,8 @@ export const RemotionRoot: React.FC = () => {
         <CatalogMathAnnotatedBayes />
         <CatalogMathNewtonBounded />
         <CatalogMathInlineDemo />
+        {/* Phase 4 unified visual reference */}
+        <CatalogMathRenderShowcase />
       </Folder>
 
       <Folder name="Diagrams">
