@@ -155,7 +155,11 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const direction = useDirection(data._direction, "breathing");
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
 
-  const dark = data.backgroundVariant === "dark";
+  // `schematic` is a dark register by definition — glowing outlines +
+  // territory fills only read on a near-black field — so it forces
+  // dark-mode token resolution regardless of `backgroundVariant`.
+  const isSchematic = data.aesthetic === "schematic";
+  const dark = data.backgroundVariant === "dark" || isSchematic;
   const framePadding = data.framePadding ?? DEFAULT_FRAME_PADDING;
   const isOrthographic = data.projection === "orthographic";
 
@@ -535,7 +539,9 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   // its own tea-stained tone; not overridden.
   const oceanColor = isVintage
     ? vintage.ocean
-    : (dark ? mapConfig.editorialOcean.dark : mapConfig.editorialOcean.light);
+    : isSchematic
+      ? palette.midnight
+      : (dark ? mapConfig.editorialOcean.dark : mapConfig.editorialOcean.light);
 
   // Per-mount unique SVG filter IDs. We previously derived these from
   // `data.episode`, but `episode` is the SAME slug across multiple
@@ -548,6 +554,8 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
   const reactId = useId().replace(/[^a-zA-Z0-9-]/g, "");
   const grainFilterId = `paper-grain-${reactId}`;
   const vignetteId = `vintage-vignette-${reactId}`;
+  const glowFilterId = `schematic-glow-${reactId}`;
+  const halftonePatternId = `schematic-halftone-${reactId}`;
 
   // ── Stroke scaling — narrower borders when zoomed in ────────────────────
   const borderStroke = BORDER_STROKE_BASE / Math.max(1, Math.sqrt(camera.scale));
@@ -901,7 +909,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
       <AbsoluteFill style={compStyle}>
         {/* Brand chrome */}
         <HeaderStrip
-          metadata={`${data.episode || ""} · atlas`}
+          metadata={`${data.episode || ""} · ${isSchematic ? "schematic" : "atlas"}`}
           mode={dark ? "dark" : "light"}
         />
         <FooterStrip
@@ -959,6 +967,31 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
             </defs>
           )}
 
+          {/* SVG defs for the schematic aesthetic. Glow = a soft bloom
+              merged under the source so bone coastlines and bright
+              territory fills read as neon-on-black; dark land/ocean don't
+              bloom. Halftone = a fine bone dot field screened over the
+              frame for the dithered "operations display" texture. */}
+          {isSchematic && (
+            <defs>
+              <filter id={glowFilterId} x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <pattern
+                id={halftonePatternId}
+                width="6"
+                height="6"
+                patternUnits="userSpaceOnUse"
+              >
+                <circle cx="1.5" cy="1.5" r="0.7" fill={palette.bone} />
+              </pattern>
+            </defs>
+          )}
+
           {/* Ocean rect — atlas plates have a colored "water" background
               behind the land. Fills the frame so countries float on it. */}
           <rect width={layout.width} height={layout.height} fill={oceanColor} />
@@ -1005,6 +1038,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 `resolveCountryFill` which handles the phase-boundary
                 color crossfade (sRGB lerp from prev-phase fill → current
                 over the camera transition window). */}
+            <g filter={isSchematic ? `url(#${glowFilterId})` : undefined}>
             {rotatedCountryPaths.map((c, i) => (
               <path
                 key={c.alpha3 ?? `c${i}`}
@@ -1025,6 +1059,7 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 strokeLinejoin="round"
               />
             ))}
+            </g>
 
             {/* Disputed boundaries — dashed rust lines layered over borders. */}
             {disputedPaths.map(
@@ -1086,6 +1121,19 @@ export const AtlasPlate: React.FC<{ data: AtlasPlateData }> = ({ data }) => {
                 style={{ pointerEvents: "none" }}
               />
             </>
+          )}
+
+          {/* Schematic halftone — fine bone dot field screened over the
+              frame for the dithered "operations display" texture. Screen-
+              fixed (outside the camera transform) so the dots read as a
+              display layer, not part of the geography. */}
+          {isSchematic && (
+            <rect
+              width={layout.width}
+              height={layout.height}
+              fill={`url(#${halftonePatternId})`}
+              style={{ mixBlendMode: "screen", opacity: 0.1, pointerEvents: "none" }}
+            />
           )}
 
           {/* Annotations — projected per-frame so they track the camera.

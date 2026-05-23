@@ -21,11 +21,20 @@ import { ALL_SEA_LABEL_TAGS } from "../../utils/seaLabels";
  * named symbol so `types.ts` can `z.infer` the type from the SAME source
  * the schema validates against. Avoids the silent-drift bug where the
  * hand-typed union and the Zod enum disagree.
+ *
+ * - "atlas" (default) — flat Tufte/Bartholomew editorial register.
+ * - "vintage" — tea-stained period-atlas register (light mode only).
+ * - "atlas-relief" — shaded-relief raster underlay (NatGeo register).
+ * - "schematic" — designed-cartography register: near-black halftone
+ *   field, glowing bone coastlines, glowing brand-token territory fills.
+ *   The brand-adapted answer to the "operations map" idiom (campaign
+ *   routes, territorial threats). Forces dark-mode token resolution.
  */
 export const AtlasAestheticSchema = z.enum([
   "atlas",
   "vintage",
   "atlas-relief",
+  "schematic",
 ]);
 export type AtlasAesthetic = z.infer<typeof AtlasAestheticSchema>;
 

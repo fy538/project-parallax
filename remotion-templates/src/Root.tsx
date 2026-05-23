@@ -15,7 +15,35 @@ import { BACKDROP_MANIFEST } from "./components/EditorialSurface";
 import { layout, sec } from "./design/theme";
 import { ChoroplethMapComposition } from "./templates/ChoroplethMap";
 import { RouteAnimationComposition } from "./templates/RouteAnimation";
+import { CinematicMapComposition } from "./templates/CinematicMap";
+import { TerritoryMapComposition } from "./templates/TerritoryMap";
+import { FlowMapComposition } from "./templates/FlowMap";
+import { CausalLoopDiagramComposition } from "./templates/CausalLoopDiagram";
+import { SpiralTimelineComposition } from "./templates/SpiralTimeline";
+import { PrimarySourceRevealComposition } from "./templates/PrimarySourceReveal";
+import { SmallMultiplesComposition } from "./templates/SmallMultiples";
+import { HandwrittenLetterComposition } from "./templates/HandwrittenLetter";
+import { NewspaperHeadlineRotatorComposition } from "./templates/NewspaperHeadlineRotator";
+import { ArchivalReelComposition } from "./templates/ArchivalReel";
+import { TelegramCableComposition } from "./templates/TelegramCable";
+import { ComparisonPairComposition } from "./templates/ComparisonPair";
+import { SplitFrameComposition } from "./templates/SplitFrame";
+import { VennDiagramComposition } from "./templates/VennDiagram";
+import { ChordDiagramComposition } from "./templates/ChordDiagram";
+import { TreemapComposition } from "./templates/Treemap";
+import { MatrixHeatmapComposition } from "./templates/MatrixHeatmap";
+import { SyllogismComposition } from "./templates/Syllogism";
+import { AxiomListComposition } from "./templates/AxiomList";
+import { DialecticFlowComposition } from "./templates/DialecticFlow";
+import { ConditionalArgumentComposition } from "./templates/ConditionalArgument";
+import { CounterfactualPathComposition } from "./templates/CounterfactualPath";
+import { AnalogyCrossmapComposition } from "./templates/AnalogyCrossmap";
+import { ToulminMapComposition } from "./templates/ToulminMap";
+import { PhilosophicalFamilyTreeComposition } from "./templates/PhilosophicalFamilyTree";
+import { ConceptEvolutionTimelineComposition } from "./templates/ConceptEvolutionTimeline";
+import { MorphTransitionComposition } from "./templates/MorphTransition";
 import { AtlasPlateComposition } from "./templates/AtlasPlate";
+import { RecreationComposition } from "./templates/Recreation";
 import { ProportionalSymbolMapComposition } from "./templates/ProportionalSymbolMap";
 import { CartogramMapComposition } from "./templates/CartogramMap";
 import { DensityMapComposition } from "./templates/DensityMap";
@@ -50,6 +78,8 @@ import { MarimekkoChartComposition } from "./templates/MarimekkoChart";
 import { TernaryPlotComposition } from "./templates/TernaryPlot";
 import { HorizonChartComposition } from "./templates/HorizonChart";
 import { DumbbellPlotComposition } from "./templates/DumbbellPlot";
+import { DivergingBarComposition } from "./templates/DivergingBar";
+import { DotPlotComposition } from "./templates/DotPlot";
 import { TimeSeriesChartComposition } from "./templates/TimeSeriesChart";
 import { SankeyFlowComposition } from "./templates/SankeyFlow";
 import { GameBoardComposition } from "./templates/GameBoard";
@@ -76,7 +106,13 @@ import { BumpChartComposition } from "./templates/BumpChart";
 import { PopulationPyramidComposition } from "./templates/PopulationPyramid";
 import { RadarChartComposition } from "./templates/RadarChart";
 import { RankChangeDotPlotComposition } from "./templates/RankChangeDotPlot";
+import { OrgChartComposition } from "./templates/OrgChart";
 import { AnnotatedImageComposition } from "./templates/AnnotatedImage";
+import { ScrollyRevealComposition } from "./templates/ScrollyReveal";
+import { AnnotatedZoomComposition } from "./templates/AnnotatedZoom";
+import { BubbleMatrixComposition } from "./templates/BubbleMatrix";
+import { BarChartRaceComposition } from "./templates/BarChartRace";
+import { SanctionsNetworkComposition } from "./templates/SanctionsNetwork";
 import { EscalationLadderComposition } from "./templates/EscalationLadder";
 import { HorizontalTimelineComposition, HorizontalTimelineSingleComposition } from "./templates/HorizontalTimeline";
 import {
@@ -125,6 +161,13 @@ import {
   CatalogCartogramEU,
   CatalogDensityFabs,
   CatalogTilegramElectoral,
+  CatalogCinematicKhyberPass,
+  CatalogCinematicTaiwanStrait,
+  CatalogCinematicGlobeRevealMiddleEast,
+  CatalogTerritoryOttomanRetreat,
+  CatalogTerritoryCocomMembership,
+  CatalogFlowMapRussiaOilRerouting,
+  CatalogFlowMapSemiconductorSupply,
   CatalogStatApollo,
   CatalogStatMariana,
   CatalogStatHabitable,
@@ -247,22 +290,39 @@ export const RemotionRoot: React.FC = () => {
       <Folder name="Maps">
         <ChoroplethMapComposition />
         <RouteAnimationComposition />
+        <CinematicMapComposition />
+        <TerritoryMapComposition />
+        <FlowMapComposition />
         <AtlasPlateComposition />
+        <RecreationComposition />
         <ProportionalSymbolMapComposition />
         <CartogramMapComposition />
         <DensityMapComposition />
         <TilegramUSMapComposition />
+        {/* CinematicMap catalog — terrain fly-through + GlobeReveal pattern */}
+        <CatalogCinematicKhyberPass />
+        <CatalogCinematicTaiwanStrait />
+        <CatalogCinematicGlobeRevealMiddleEast />
+        {/* TerritoryMap catalog — animated territorial control */}
+        <CatalogTerritoryOttomanRetreat />
+        <CatalogTerritoryCocomMembership />
+        {/* FlowMap catalog — directional volume flows */}
+        <CatalogFlowMapRussiaOilRerouting />
+        <CatalogFlowMapSemiconductorSupply />
       </Folder>
 
       <Folder name="Timelines">
         <HorizontalTimelineComposition />
         <HorizontalTimelineSingleComposition />
         <EscalationLadderComposition />
+        <SpiralTimelineComposition />
+        <ConceptEvolutionTimelineComposition />
       </Folder>
 
       <Folder name="Data">
         <DataChartComposition />
         <TimeSeriesChartComposition />
+        <SmallMultiplesComposition />
         <SankeyFlowComposition />
         <ProbabilityGaugeComposition />
         <BayesianUpdateComposition />
@@ -272,6 +332,7 @@ export const RemotionRoot: React.FC = () => {
         <PricingWaterfallComposition />
         <IsotypeChartComposition />
         <BumpChartComposition />
+        <BarChartRaceComposition />
         <PopulationPyramidComposition />
         <RankChangeDotPlotComposition />
         <BeeswarmChartComposition />
@@ -283,14 +344,20 @@ export const RemotionRoot: React.FC = () => {
         <TernaryPlotComposition />
         <HorizonChartComposition />
         <DumbbellPlotComposition />
+        <BubbleMatrixComposition />
+        <DivergingBarComposition />
+        <DotPlotComposition />
         <SlopegraphComposition />
         <KPICardComposition />
         <BulletChartComposition />
         <StepLineComposition />
+        <TreemapComposition />
+        <MatrixHeatmapComposition />
       </Folder>
 
       <Folder name="Typography">
         <KineticTypographyComposition />
+        <PrimarySourceRevealComposition />
       </Folder>
 
       <Folder name="Math">
@@ -308,12 +375,20 @@ export const RemotionRoot: React.FC = () => {
         <FrameworkDiagramComposition />
         <DuelingFrameworksComposition />
         <NetworkDiagramComposition />
+        <SanctionsNetworkComposition />
+        <CausalLoopDiagramComposition />
         <ArcDiagramComposition />
+        <PhilosophicalFamilyTreeComposition />
         <SplitCompositionComposition />
+        <SplitFrameComposition />
+        <ComparisonPairComposition />
+        <VennDiagramComposition />
+        <ChordDiagramComposition />
         <StrategicLandscapeComposition />
       </Folder>
 
       <Folder name="Scenarios">
+        <OrgChartComposition />
         <DecisionTreeComposition />
         <DecisionTreeHorizontalComposition />
         <OutcomePartitionComposition />
@@ -329,6 +404,29 @@ export const RemotionRoot: React.FC = () => {
         <ImageCompositeComposition />
         <PhotoMontageComposition />
         <AnnotatedImageComposition />
+        <ScrollyRevealComposition />
+        <AnnotatedZoomComposition />
+      </Folder>
+
+      <Folder name="Motion">
+        <MorphTransitionComposition />
+      </Folder>
+
+      <Folder name="Argument-Primitives">
+        <SyllogismComposition />
+        <AxiomListComposition />
+        <DialecticFlowComposition />
+        <ConditionalArgumentComposition />
+        <CounterfactualPathComposition />
+        <AnalogyCrossmapComposition />
+        <ToulminMapComposition />
+      </Folder>
+
+      <Folder name="Documentary-Archival">
+        <HandwrittenLetterComposition />
+        <NewspaperHeadlineRotatorComposition />
+        <ArchivalReelComposition />
+        <TelegramCableComposition />
       </Folder>
 
       <Folder name="Thumbnails">

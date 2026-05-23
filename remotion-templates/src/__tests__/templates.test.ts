@@ -80,10 +80,13 @@ const COMPOSITIONS = [
   "RouteAnimation",
   "StrategicLandscape",
   "TilegramUSMap",
+  // AtlasPlate "schematic" aesthetic — pure d3-geo/local TopoJSON, no Mapbox.
+  "AtlasPlateSchematic",
   // Cinematic
   "ImageComposite",
   "PhotoMontage",
   "AnnotatedImage",
+  "ScrollyReveal",
   // Typography
   "KineticTypography",
   "TitleTransition",
@@ -116,6 +119,62 @@ const COMPOSITIONS = [
   "KPICard",
   "BulletChart",
   "StepLine",
+
+  // ── Sprint 2026-05-19 — all new templates added to this list ──────────────
+  // Documentary archival register. HandwrittenLetter defaults to typeset mode
+  // (no imageUrl). NewspaperHeadlineRotator uses empty mastheadImageUrl (renders
+  // gracefully without masthead crops). TelegramCable is pure typeset.
+  // ArchivalReel uses sample-historical.png — added to COMPOSITION_ASSET_DEPS.
+  "HandwrittenLetter",
+  "NewspaperHeadlineRotator",
+  "TelegramCable",
+  "ArchivalReel",
+
+  // Argument primitives (pure SVG / CSS layout, no external assets)
+  "Syllogism",
+  "AxiomList",
+  "DialecticFlow",
+  "ConditionalArgument",
+  "CounterfactualPath",   // doctrine fix (dash 12/6 + opacity 0.45) baselined here
+  "AnalogyCrossmap",      // bounded analogy mapping — Argument Primitives Ph.2
+  "ToulminMap",           // Toulmin 6-element argument structure — Argument Primitives Ph.2
+  "PhilosophicalFamilyTree", // ArcDiagram-variant with year-based x-axis (Tier 2)
+  "ConceptEvolutionTimeline", // Foucauldian genealogy timeline with definition panels (Tier 2)
+  // Tier 3 — low-cost chart/diagram additions
+  "DivergingBar",            // centered horizontal bar; positive/negative split
+  "DotPlot",                 // 1D strip chart; named entities on a continuous axis
+  "OrgChart",                // directed authority tree; typed nodes + edges
+
+  // Cross-frame / morph templates
+  "MorphTransition",
+  "ComparisonPair",
+  "SplitFrame",
+
+  // Relationship & composition data templates
+  "VennDiagram",
+  "ChordDiagram",
+  "Treemap",
+  "MatrixHeatmap",        // text-contrast fix (rgba→hex in colorContrast.ts) baselined here
+
+  // Exploratory / timeline / diagram templates added in this sprint
+  "CausalLoopDiagram",
+  "SmallMultiples",
+  "SpiralTimeline",
+
+  // Cinematic terrain map — skipped in generic suite (needs MAPBOX_ACCESS_TOKEN);
+  // listed here so template-coverage meta-test registers it as covered.
+  "CinematicMap",
+
+  // Map extensions (May 20, 2026) — skipped in generic suite (need MAPBOX_ACCESS_TOKEN);
+  // listed here so template-coverage meta-test registers them as covered.
+  "TerritoryMap",
+  "FlowMap",
+
+  // Sprint 2026-05-20 — four new templates
+  "AnnotatedZoom",
+  "BubbleMatrix",
+  "BarChartRace",
+  "SanctionsNetwork",
 ];
 
 // Shorts compositions — IDs match the Root.tsx registrations (note the
@@ -158,6 +217,9 @@ const MAP_COMPOSITIONS = new Set([
   "ChoroplethMap",
   "RouteAnimation",
   "ChoroplethMap-Short",
+  // Terrain fly-through — requires MAPBOX_ACCESS_TOKEN for DEM tiles.
+  // Validated separately via npx remotion still with a real token.
+  "CinematicMap",
 ]);
 
 /** Composition → required asset path (relative to remotion-templates/public). */
@@ -166,6 +228,10 @@ const COMPOSITION_ASSET_DEPS: Record<string, string> = {
   // Listed here so a fresh checkout that's missing the file gets a
   // clear skip message rather than a render-time error.
   ImageComposite: "assets/sample-historical.png",
+  // ArchivalReel default props reference the same sample asset.
+  ArchivalReel: "assets/sample-historical.png",
+  // ScrollyReveal sample data uses sample-historical.png as its base image.
+  ScrollyReveal: "assets/sample-historical.png",
 };
 
 function getSkipReason(compositionId: string): string | null {

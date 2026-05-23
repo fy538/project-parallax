@@ -71,21 +71,64 @@ export const atlasPlateSampleData: AtlasPlateData = {
   ],
 };
 
+// Schematic-aesthetic sample — the brand-adapted "operations map" register
+// (near-black halftone field, glowing bone coastlines, glowing brand-token
+// territory fills). Models the Caesar-campaign idiom: a power center and the
+// theatres it is about to move against.
+export const atlasPlateSchematicSampleData: AtlasPlateData = {
+  episode: "_catalog",
+  title: "Caesar's Upcoming Campaign",
+  subtitle: "44 BC — the war Rome never fought",
+  aesthetic: "schematic",
+  projection: "naturalEarth",
+  graticule: {
+    spacing: 15,
+    opacity: 0.14,
+    emphasize30: false,
+  },
+  phases: [
+    {
+      title: "The theatres",
+      durationSec: 6,
+      countries: [
+        { iso3: "ITA", fill: "#C4A747", label: "Rome" }, // brand gold — power center
+        { iso3: "ROU", fill: "#4A7BA7", label: "Dacia" }, // brand us-blue — target
+        { iso3: "IRN", fill: "#A64D46", label: "Parthian Empire" }, // brand china-red — target
+      ],
+      focus: { center: [27, 41], scaleHint: 2.1 },
+    },
+  ],
+};
+
 function totalDuration(data: AtlasPlateData): number {
   return data.phases.reduce((sum, p) => sum + sec(p.durationSec), 0);
 }
 
 export const AtlasPlateComposition = () => (
-  <Composition
-    id="AtlasPlate"
-    component={AtlasPlate}
-    schema={AtlasPlateSchema}
-    calculateMetadata={({ props }) => ({
-      durationInFrames: totalDuration(props.data as AtlasPlateData),
-      fps: layout.fps,
-      width: layout.width,
-      height: layout.height,
-    })}
-    defaultProps={{ data: atlasPlateSampleData }}
-  />
+  <>
+    <Composition
+      id="AtlasPlate"
+      component={AtlasPlate}
+      schema={AtlasPlateSchema}
+      calculateMetadata={({ props }) => ({
+        durationInFrames: totalDuration(props.data as AtlasPlateData),
+        fps: layout.fps,
+        width: layout.width,
+        height: layout.height,
+      })}
+      defaultProps={{ data: atlasPlateSampleData }}
+    />
+    <Composition
+      id="AtlasPlateSchematic"
+      component={AtlasPlate}
+      schema={AtlasPlateSchema}
+      calculateMetadata={({ props }) => ({
+        durationInFrames: totalDuration(props.data as AtlasPlateData),
+        fps: layout.fps,
+        width: layout.width,
+        height: layout.height,
+      })}
+      defaultProps={{ data: atlasPlateSchematicSampleData }}
+    />
+  </>
 );

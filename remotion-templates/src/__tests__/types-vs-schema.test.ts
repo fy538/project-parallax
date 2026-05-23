@@ -42,11 +42,12 @@ describe("MapGL.types: LightPreset enum membership is locked", () => {
 });
 
 describe("AtlasPlate: aesthetic enum membership is locked", () => {
-  it("contains exactly the v1 register set", () => {
+  it("contains exactly the register set", () => {
     expect(AtlasAestheticSchema.options).toEqual([
       "atlas",
       "vintage",
       "atlas-relief",
+      "schematic",
     ]);
   });
 });

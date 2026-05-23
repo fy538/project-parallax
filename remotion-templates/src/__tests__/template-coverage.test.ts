@@ -134,6 +134,10 @@ const ALLOWLIST_UNCOVERED = new Map<string, string>([
 
   // ── Test fixtures / non-visual ────────────────────────────────────────
   ["AudioPreview", "audio-only composition; no visual baseline applies"],
+  // Route-A 3D spike: @remotion/three skinned-mesh render needs a real GPU;
+  // software WebGL (swangle, used in CI/sandbox) can't render the rig, so a
+  // visual baseline is not reproducible here. Render/validate on GPU.
+  ["Recreation", "3D (@remotion/three) skinned-mesh spike; GPU-only render, no software-WebGL baseline"],
 
   // ── Primitive / wrapper compositions ──────────────────────────────────
   ["ForegroundBackdropFoundation", "primitive; surface tested via dynamic shortcut compositions + catalog"],
