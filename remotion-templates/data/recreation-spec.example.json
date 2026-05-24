@@ -1,0 +1,57 @@
+{
+  "episode": "the-most-famous-killing",
+  "scene": "ides-of-march-senate",
+  "set": { "kind": "procedural", "id": "senate" },
+  "cast": [
+    { "id": "caesar", "asset": "library/caesar.glb" },
+    { "id": "cimber", "asset": "library/senator-a.glb" },
+    { "id": "brutus", "asset": "library/senator-b.glb" }
+  ],
+  "shots": [
+    {
+      "id": "establishing",
+      "durationSec": 5,
+      "mode": "beauty",
+      "camera": { "move": "push", "from": [1.9, 1.7, 6], "target": [0, 0.95, -3] },
+      "actors": [
+        { "ref": "caesar", "at": [0, 0, -10], "facing": 180, "clip": "Idle" }
+      ],
+      "pace": "breathing",
+      "dir": "DIR: hold(stillness)"
+    },
+    {
+      "id": "cimber-approaches",
+      "durationSec": 4,
+      "mode": "beauty",
+      "camera": { "move": "dolly", "from": [-2, 1.6, 3], "target": [0, 1, -4] },
+      "actors": [
+        { "ref": "caesar", "at": [0, 0, -10], "facing": 180, "clip": "Idle" },
+        {
+          "ref": "cimber",
+          "at": [1.2, 0, -6],
+          "facing": 200,
+          "clip": "Walking",
+          "label": "TILLIUS CIMBER"
+        }
+      ]
+    },
+    {
+      "id": "the-strike-photoreal",
+      "durationSec": 3,
+      "mode": "depth-restyle",
+      "camera": { "move": "static", "from": [0.5, 1.5, -7], "target": [0, 1, -10] },
+      "actors": [
+        { "ref": "caesar", "at": [0, 0, -10], "facing": 180 },
+        { "ref": "brutus", "at": [-0.8, 0, -9], "facing": 160 }
+      ],
+      "restyle": {
+        "model": "wan-fun-control",
+        "control": "depth",
+        "prompt": "photoreal ancient Roman senate interior, marble columns, dramatic side light, cinematic, 35mm, shallow depth of field",
+        "strength": 0.72
+      },
+      "pace": "urgent",
+      "dir": "DIR: cut(match-cut)"
+    }
+  ]
+}

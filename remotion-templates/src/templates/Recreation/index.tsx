@@ -3,8 +3,13 @@ import { Recreation, type RecreationData } from "./Recreation";
 import { layout } from "../../design/theme";
 
 export const recreationSampleData: RecreationData = {
-  src: "assets/recreation/soldier.glb",
-  clip: "Walk",
+  // Stand-in rigged character. Swapping in a period-accurate Roman model
+  // (downloaded from Sketchfab / Meshy) is this one field — the template
+  // auto-normalizes scale + position and falls back to the GLB's first clip,
+  // so any rigged humanoid drops in without further changes.
+  src: "assets/recreation/roman-walking.glb",
+  set: "senate",
+  renderMode: "constructivist",
   durationSec: 6,
 };
 
