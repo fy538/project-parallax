@@ -1,0 +1,170 @@
+{
+  "episode": "ai-care-motives",
+  "sourced_at": "2026-10-10",
+  "public_base": "remotion-templates/public/episodes/ai-care-motives/",
+  "assets": [
+    {
+      "id": "arch-kant",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "Kant - SIL14-K001-05a.jpg",
+        "url": "https://commons.wikimedia.org/wiki/File:Kant_-_SIL14-K001-05a.jpg",
+        "license": "Public domain",
+        "credit": "Engraving by J. F. Bause after V. H. Schnorr, 1791",
+        "original": "assets/sourced/arch-kant_wikimedia_bause-1791.jpg",
+        "file": "stills/arch-kant.jpg",
+        "resolution": "1000x1539"
+      },
+      "used_in": [
+        "beat2-seg11a"
+      ],
+      "notes": "Cropped to the plate to remove collection marks."
+    },
+    {
+      "id": "arch-mill",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "John-stuart-mill-sized.jpg",
+        "url": "https://commons.wikimedia.org/wiki/File:John-stuart-mill-sized.jpg",
+        "license": "Public domain",
+        "credit": "Photogravure after a photograph by John Watkins, 1865",
+        "original": "assets/sourced/arch-mill_wikimedia_1865.jpg",
+        "file": "stills/arch-mill.jpg",
+        "resolution": "2723x3548"
+      },
+      "used_in": [
+        "beat3-seg15a"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "arch-plato",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "Plato Silanion Musei Capitolini MC1377.png",
+        "url": "https://commons.wikimedia.org/wiki/File:Plato_Silanion_Musei_Capitolini_MC1377.png",
+        "license": "Public domain",
+        "credit": "Roman copy of a portrait by Silanion, Capitoline Museums. Photo: Marie-Lan Nguyen",
+        "original": "assets/sourced/arch-plato_wikimedia_capitolini-mc1377.png",
+        "file": "stills/arch-plato.png",
+        "resolution": "2400x3600"
+      },
+      "used_in": [
+        "beat5-seg24"
+      ],
+      "notes": "Transparent background."
+    },
+    {
+      "id": "arch-vw-wolfsburg",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "Kraftwerk des Volkswagen-Werk Wolfsburg.jpg",
+        "url": "https://commons.wikimedia.org/wiki/File:Kraftwerk_des_Volkswagen-Werk_Wolfsburg.jpg",
+        "license": "CC BY-SA 4.0",
+        "credit": "Raycer",
+        "original": "assets/sourced/arch-vw-wolfsburg_wikimedia_raycer-2015.jpg",
+        "file": "stills/arch-vw-wolfsburg.jpg",
+        "resolution": "5911x3941"
+      },
+      "used_in": [
+        "beat6-seg29"
+      ],
+      "notes": "Heating power station of the Volkswagen plant, Wolfsburg, Feb 2015. Establishes the company, not the scandal."
+    },
+    {
+      "id": "arch-vw-golf-tdi",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "VW Golf TDI Clean Diesel WAS 2010 8983.JPG",
+        "url": "https://commons.wikimedia.org/wiki/File:VW_Golf_TDI_Clean_Diesel_WAS_2010_8983.JPG",
+        "license": "CC BY-SA 3.0",
+        "credit": "Mariordo (Mario Roberto Duran Ortiz)",
+        "original": "assets/sourced/arch-vw-golf-tdi_wikimedia_mariordo-2010.jpg",
+        "file": "stills/arch-vw-golf-tdi.jpg",
+        "resolution": "1500x864"
+      },
+      "used_in": [
+        "beat6-seg29b"
+      ],
+      "notes": "Golf TDI Clean Diesel, 2010 Washington Auto Show. The EPA notice lists the Golf for model years 2010-2015 (table, p. 5)."
+    },
+    {
+      "id": "arch-pems",
+      "selected": {
+        "source": "wikimedia-commons",
+        "title": "PEMS 14060432190 6bf73237c9 o.jpg",
+        "url": "https://commons.wikimedia.org/wiki/File:PEMS_14060432190_6bf73237c9_o.jpg",
+        "license": "CC BY 2.0",
+        "credit": "California Air Resources Board",
+        "original": "assets/sourced/arch-pems_wikimedia_carb-2014.jpg",
+        "file": "stills/arch-pems.jpg",
+        "resolution": "5184x3456"
+      },
+      "used_in": [
+        "beat6-seg33"
+      ],
+      "notes": "PEMS in a Chevrolet Volt at a CARB display, 2014. Illustrative: not the West Virginia University team's vehicle."
+    },
+    {
+      "id": "stock-dyno",
+      "selected": {
+        "source": "pexels",
+        "source_id": 28722030,
+        "url": "https://www.pexels.com/video/high-speed-car-testing-on-dynamometer-28722030/",
+        "license": "Pexels License (free, no attribution required)",
+        "credit": "Christopher Rodriguez",
+        "original": "assets/sourced/stock-dyno_pexels_28722030.mp4",
+        "file": "clips/stock-dyno.mp4",
+        "resolution": "1920x1080",
+        "duration_sec": 18
+      },
+      "used_in": [
+        "beat6-seg32"
+      ],
+      "notes": "Trimmed to 0:05-0:17.5 of the source; ungraded (the conflict duotone made it too dark)."
+    },
+    {
+      "id": "stock-la-freeway",
+      "selected": {
+        "source": "pexels",
+        "source_id": 5741833,
+        "url": "https://www.pexels.com/video/video-of-cars-on-the-road-5741833/",
+        "license": "Pexels License (free, no attribution required)",
+        "credit": "Saul",
+        "original": "assets/sourced/stock-la-freeway_pexels_5741833.mp4",
+        "file": "clips/stock-la-freeway.mp4",
+        "resolution": "1920x1080",
+        "duration_sec": 14
+      },
+      "used_in": [
+        "beat6-seg33b"
+      ],
+      "notes": "Ungraded."
+    },
+    {
+      "id": "doc-epa-nov",
+      "selected": {
+        "source": "epa.gov",
+        "url": "https://www.epa.gov/sites/default/files/2015-10/documents/vw-nov-caa-09-18-15.pdf",
+        "license": "US government work (public domain)",
+        "credit": "U.S. Environmental Protection Agency",
+        "original": "assets/sourced/doc-epa-nov_epa_2015-09-18.pdf",
+        "file": null
+      },
+      "used_in": [
+        "beat6-seg30"
+      ],
+      "notes": "Read in full; the card quotes p. 3 verbatim with an ellipsis. No page image is used."
+    }
+  ],
+  "credits_for_description_or_end_card": [
+    "Volkswagen plant, Wolfsburg — photo by Raycer, CC BY-SA 4.0, via Wikimedia Commons",
+    "Golf TDI at the 2010 Washington Auto Show — photo by Mariordo (Mario Roberto Duran Ortiz), CC BY-SA 3.0, via Wikimedia Commons",
+    "Portable emissions measurement system — California Air Resources Board, CC BY 2.0, via Wikimedia Commons",
+    "Plato, Capitoline Museums — photo by Marie-Lan Nguyen, public domain, via Wikimedia Commons",
+    "Photo segments licensed CC BY-SA remain under their original licences."
+  ],
+  "still_needed": [
+    "beat7-seg41 and beat7-seg43: 36 + 59 screen capture (Tiger)"
+  ]
+}

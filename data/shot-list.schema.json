@@ -46,9 +46,23 @@
           "description": "Production priority. P1 = hero asset, must be high quality; P2 = supporting, matters but flexible; P3 = ambient/background, generic stock acceptable. Used by render-qa to weight verification effort."
         },
         "treatment": {
-          "type": "string",
-          "enum": ["standard", "conflict", "editorial"],
-          "description": "Brand treatment LUT to apply post-source/post-generation. standard = warm umber→amber default. conflict = ink→rust (tension/adversarial). editorial = desaturated bone tones (historical/archival)."
+          "description": "Brand treatment. Legacy string form is a LUT (standard = warm umber→amber; conflict = ink→rust; editorial = desaturated bone). Object form is the documentary-finish model (May 2026): finish = grain/halation/vignette with color preserved; duotone reserved as an optional accent on dark beats.",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": ["standard", "conflict", "editorial"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "finish": { "type": "string", "enum": ["documentary", "duotone"] },
+                "duotone_accent_candidate": { "type": "boolean" },
+                "strength": { "type": "number" },
+                "note": { "type": "string" }
+              }
+            }
+          ]
         },
         "notes": {
           "type": "string",

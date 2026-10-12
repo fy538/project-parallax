@@ -1,20 +1,37 @@
 {
   "slug": "prisoners-dilemma",
-  "version": "v2",
-  "generated_at": "2026-05-09",
-  "design_doc": "visual-thread-design.md",
+  "version": "v3",
+  "generated_at": "2026-05-22",
+  "design_doc": "development/visual-thread-design.md",
+  "motion_model": {
+    "doctrine": "project/CHAINED_STILL_LESSONS.md \u2014 three-tool model (May 21, 2026)",
+    "summary": "Reframe (camera moves, scene unchanged) -> ken-burns (camera) or live-still (subject), NEVER morph. Transform (scene becomes something else) -> morph, only from a shared base and only between a few large flat shapes.",
+    "techniques": {
+      "ken-burns": "(Family A) Camera move (push/pan/tilt/drift) on a single still. Deterministic, rendered locally via tools/ai-video/render_kenburns.py. Zero AI risk. Needs resolution headroom (source >= output x zoom) \u2014 upscale to stills-4k/ first via tools/ai-video/upscale.py.",
+      "cinemagraph": "(Family B) Masked ambient motion \u2014 one element (smoke, flare, glow, water, flag) animates while the rest holds. Pika masked or NLE. Low risk: mask-defined, not depth. Never leave reflective water/flicker unmasked.",
+      "parallax-2.5d": "(Family C) Manual hand-layered parallax (fore/mid/back at different rates) in After Effects/Photoshop. Deterministic. Premium hero move, hand-labor \u2014 reserve for 1-2 depth shots per episode. Do NOT use auto-depth tools (they fail on flat art).",
+      "live-still": "(Family D) Subtle subject motion on a single still via Pika/Hailuo single-image mode (no end frame). Low risk \u2014 one input, no correspondence problem. Faceless figures forgive it. Keep motion micro.",
+      "morph": "Scene transform A->B via Pika 2.5 start+end frame. High risk unless B is edited from A (shared base) and shapes are large/flat.",
+      "cut": "Hard cut in NLE. No generation.",
+      "match-cut": "Hard cut where motion/composition continues across the seam (e.g. continuing push). NLE.",
+      "cross-dissolve": "Short dissolve in NLE, used for match-on-pattern or cross-register seams."
+    },
+    "blacklist": {
+      "auto-depth-2.5d": "(Family E) LeiaPix/Immersity/CapCut '3D photo'. Monocular depth estimation is trained to IGNORE flat media \u2014 produces near-flat or arbitrary parallax on constructivist art. Do not use.",
+      "ai-3d-camera": "(Family F) AI orbit/fly-through that hallucinates geometry (Stability Virtual Camera, Kling/Runway camera-control on one image). No valid 3D to recover from flat art -> color blocks melt. Do not use.",
+      "doctrine": "project/CHAINED_STILL_LESSONS.md -> 'Single-still animation \u2014 the six-family taxonomy'"
+    }
+  },
   "thread_summary": {
     "A_building": [
       "aigen-01",
       "aigen-01b",
       "aigen-04a",
       "aigen-04",
-      "aigen-04b",
       "aigen-05"
     ],
     "B_institution": [
       "aigen-02",
-      "aigen-02b",
       "aigen-03"
     ],
     "C_capture": [
@@ -51,111 +68,145 @@
       "aigen-forecast-01"
     ]
   },
-  "morph_pairs": [
+  "seams": [
     {
       "from": "aigen-01",
       "to": "aigen-01b",
-      "duration_sec": 6,
-      "tool": "kling",
-      "intent": "dolly-in to grids"
+      "technique": "match-cut",
+      "intent": "room -> table grids (insert cut)",
+      "note": "REWORKED from morph. Validated: development/morph-tests/threadA-01-REWORK-hardcut.mp4"
+    },
+    {
+      "from": "aigen-01b",
+      "to": "aigen-04a",
+      "technique": "cross-dissolve",
+      "intent": "paper grids -> chalkboard grids (match on grid pattern)"
     },
     {
       "from": "aigen-04a",
       "to": "aigen-04",
-      "duration_sec": 6,
-      "tool": "kling",
-      "intent": "pull-back from chalkboard to corridor"
+      "technique": "match-cut",
+      "intent": "chalkboard -> corridor",
+      "note": "REWORKED from morph"
     },
     {
       "from": "aigen-04",
-      "to": "aigen-04b",
-      "duration_sec": 6,
-      "tool": "kling",
-      "intent": "push along corridor toward doorway"
-    },
-    {
-      "from": "aigen-04b",
       "to": "aigen-05",
-      "duration_sec": 6,
-      "tool": "kling",
-      "intent": "push through doorway"
-    },
-    {
-      "from": "aigen-02",
-      "to": "aigen-02b",
-      "duration_sec": 6,
-      "tool": "kling",
-      "intent": "tilt up to sky-rays"
-    },
-    {
-      "from": "aigen-02b",
-      "to": "aigen-03",
-      "duration_sec": 8,
-      "tool": "hailuo",
-      "intent": "rays land on aerial buildings"
+      "technique": "cut",
+      "intent": "figure walks away down corridor -> doorway threshold",
+      "note": "04b retired; the 04 live-still walk carries the forward motion"
     },
     {
       "from": "aigen-06",
       "to": "aigen-06b",
-      "duration_sec": 8,
-      "tool": "kling",
-      "intent": "grid sharpens, table emerges"
+      "technique": "cross-dissolve",
+      "duration_sec": 3,
+      "intent": "grid tightens and the table resolves into view",
+      "note": "Ep1: was a Remotion vector-transform (depended on the GridToTable template, now dropped); simplified to a cross-dissolve for consistency with the other former-morph seams."
     },
     {
       "from": "aigen-06b",
       "to": "aigen-07",
+      "technique": "cut",
+      "tool": "pika",
       "duration_sec": 6,
-      "tool": "hailuo",
-      "intent": "figures arrive into formed table"
+      "shared_base": "recommended",
+      "intent": "figures arrive into formed table",
+      "note": "Ep1: morph dropped - scene change, hard cut."
+    },
+    {
+      "from": "aigen-10",
+      "to": "aigen-11",
+      "technique": "cut",
+      "intent": "sunrise -> forest (different scenes)"
     },
     {
       "from": "aigen-11",
       "to": "aigen-11b",
+      "technique": "cross-dissolve",
+      "tool": "pika",
       "duration_sec": 8,
-      "tool": "kling",
-      "intent": "pursuit resolves to gathering around stag"
+      "shared_base": true,
+      "intent": "pursuit resolves to gathering around stag (same forest)",
+      "note": "Ep1: morph dropped - 'resolves to' reads as a dissolve."
+    },
+    {
+      "from": "aigen-11b",
+      "to": "aigen-12",
+      "technique": "cut",
+      "intent": "forest -> terraces (MG block between)"
     },
     {
       "from": "aigen-12",
       "to": "aigen-12a",
+      "technique": "cross-dissolve",
+      "tool": "pika",
       "duration_sec": 8,
-      "tool": "hailuo",
-      "intent": "terraces transition to alpine pasture"
+      "shared_base": true,
+      "intent": "terraces -> alpine pasture (terrain transform)",
+      "regen": "edit aigen-12a from aigen-12",
+      "note": "Ep1: morph dropped - same-frame terrain state shift via dissolve."
     },
     {
       "from": "aigen-12a",
       "to": "aigen-13",
+      "technique": "cross-dissolve",
+      "tool": "pika",
       "duration_sec": 10,
-      "tool": "hailuo",
-      "intent": "stone walls dissolve to ocean (HERO morph)"
+      "shared_base": "ideal",
+      "intent": "stone walls dissolve to ocean (HERO transform)",
+      "note": "Ep1: morph dropped - hero 'dissolve to ocean' done as an actual dissolve."
     },
     {
       "from": "aigen-14",
       "to": "aigen-14b",
-      "duration_sec": 8,
-      "tool": "kling",
-      "intent": "parallel pedestrians become meeting figures"
+      "technique": "cut",
+      "intent": "parallel flow -> meeting",
+      "note": "REWORKED from morph; 14b is a live-still (handshake animates)"
     },
     {
       "from": "aigen-15",
       "to": "aigen-forecast-01",
+      "technique": "cross-dissolve",
+      "tool": "pika",
       "duration_sec": 6,
-      "tool": "kling",
-      "intent": "diplomatic figures appear on cliff"
+      "shared_base": true,
+      "intent": "figures appear on cliff (sparse frame transform)",
+      "regen": "edit aigen-forecast-01 from aigen-15",
+      "note": "Ep1: morph dropped - figures fade in via dissolve."
+    },
+    {
+      "from": "aigen-forecast-01",
+      "to": "aigen-16",
+      "technique": "cut",
+      "intent": "MG block between"
     },
     {
       "from": "aigen-16",
       "to": "aigen-16a",
-      "duration_sec": 8,
-      "tool": "kling",
-      "intent": "lecture wide to notebook close"
+      "technique": "cut",
+      "intent": "lecture wide -> notebook",
+      "note": "REWORKED from morph: detail-rich zoom would smear (like 01->01b). Ken Burns each + cut."
+    },
+    {
+      "from": "aigen-16a",
+      "to": "arch-reagan-gorbachev",
+      "technique": "cross-dissolve",
+      "intent": "cross-register to archival photo"
     },
     {
       "from": "aigen-17",
       "to": "aigen-17a",
-      "duration_sec": 8,
-      "tool": "kling",
-      "intent": "panorama wide to single mannequin at edge"
+      "technique": "cut",
+      "intent": "panorama -> figure at edge",
+      "note": "REWORKED from morph: reframe zoom. Ken Burns each + cut."
+    },
+    {
+      "from": "aigen-02",
+      "to": "aigen-03",
+      "technique": "cut",
+      "intent": "equation tilt-up -> aerial complex",
+      "note": "02b retired"
     }
   ],
   "assets": [
@@ -167,10 +218,16 @@
       "thread": "A_building",
       "thread_position": 1,
       "status": "existing",
-      "description": "1950s RAND research office — Flood-Dresher experiment",
+      "description": "1950s RAND research office \u2014 Flood-Dresher experiment",
       "duration_sec": 6,
-      "morph_to": "aigen-01b",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "[Truck left, very slow]. Faces hold. Only the writing hand moves slightly; fine dust drifts in the shaft of light. Desk, papers and reels stay still.",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Director"
     },
     {
       "id": "aigen-01b",
@@ -180,14 +237,24 @@
       "thread": "A_building",
       "thread_position": 2,
       "status": "NEW",
-      "description": "RAND office detail — paper grids on table, tally marks of cooperate/defect rounds",
+      "description": "RAND office detail \u2014 paper grids on table, tally marks of cooperate/defect rounds",
       "chatgpt_prompt_id": "shot-18",
       "anchor_frame": "aigen-01",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.18,
+        "focus_x": 0.5,
+        "focus_y": 0.48,
+        "duration_sec": 4
+      }
     },
     {
       "id": "aigen-02",
@@ -196,11 +263,18 @@
       "mode": "metaphor",
       "thread": "B_institution",
       "thread_position": 1,
-      "status": "existing",
-      "description": "Equation radiating sunbeams over silhouetted institutions",
+      "status": "regenerate",
+      "description": "Institutional committee room \u2014 figures study the PD payoff matrix on an easel (the model adopted as doctrine)",
       "duration_sec": 6,
-      "morph_to": "aigen-02b",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "fallback": "ken-burns",
+      "live_still_motion": "[Push in, slow] toward the matrix. Faces hold. One standing figure's arm gestures slightly at a cell; seated figures barely shift. Warm light steady.",
+      "note": "REWRITTEN May 23, 2026 from the tacky 'equation-sun over labeled buildings' poster -> a concrete boardroom-adoption scene (sophistication rules). 02b retired. Threads the real PD matrix motif with 04a + 16.",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Director"
     },
     {
       "id": "aigen-02b",
@@ -209,15 +283,16 @@
       "mode": "metaphor",
       "thread": "B_institution",
       "thread_position": 2,
-      "status": "NEW",
+      "status": "RETIRED",
       "description": "Equation rays straightening into directional beams toward sky",
       "chatgpt_prompt_id": "shot-19",
       "anchor_frame": "aigen-02",
       "register": "atmospheric",
       "realism": "flat",
-      "treatment": "standard",
       "duration_sec": 5,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "retired",
+      "retired_reason": "morph-era bridge; 02\u219202b is a camera tilt (reframe), now folded into the aigen-02 live-still tilt-up. File kept; out of sequence + seams."
     },
     {
       "id": "aigen-03",
@@ -227,9 +302,20 @@
       "thread": "B_institution",
       "thread_position": 3,
       "status": "existing",
-      "description": "Aerial building complex — nations converging",
+      "description": "Aerial building complex \u2014 nations converging",
       "duration_sec": 6,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 5
+      },
+      "treatment": {
+        "finish": "documentary"
+      }
     },
     {
       "id": "aigen-04a",
@@ -239,15 +325,24 @@
       "thread": "A_building",
       "thread_position": 3,
       "status": "NEW",
-      "description": "Chalkboard close-up — hand finishing PD matrix in chalk",
+      "description": "Chalkboard close-up \u2014 hand finishing PD matrix in chalk",
       "chatgpt_prompt_id": "shot-20",
       "anchor_frame": "aigen-04",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
       "type": "ai-generate",
-      "morph_to": "aigen-04"
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.5,
+        "focus_y": 0.45,
+        "duration_sec": 4
+      }
     },
     {
       "id": "aigen-04",
@@ -257,10 +352,17 @@
       "thread": "A_building",
       "thread_position": 4,
       "status": "existing",
-      "description": "RAND institutional corridor — lone figure, chalkboards",
+      "description": "RAND institutional corridor \u2014 lone figure, chalkboards",
       "duration_sec": 6,
-      "morph_to": "aigen-04b",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. A lone figure walks away down the corridor, back to camera, natural stride. Checkerboard floor and chalkboard text stay perfectly still.",
+      "fallback": "ken-burns",
+      "note": "back-view distant walk is safe for live-still despite 'no walking' default \u2014 none of the risk drivers (face, close hands, large scale) are present. Replaces the old 04\u219204b push pair.",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-04b",
@@ -269,16 +371,16 @@
       "mode": "scene",
       "thread": "A_building",
       "thread_position": 5,
-      "status": "NEW",
-      "description": "Corridor end — bright doorway visible at the terminus, figure mid-distance",
+      "status": "RETIRED",
+      "description": "Corridor end \u2014 bright doorway visible at the terminus, figure mid-distance",
       "chatgpt_prompt_id": "shot-21",
       "anchor_frame": "aigen-04",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
       "duration_sec": 5,
       "type": "ai-generate",
-      "morph_to": "aigen-05"
+      "motion_technique": "retired",
+      "retired_reason": "morph-era bridge frame, redundant under the new motion plan. The aigen-04 live-still (figure walks away down the corridor) carries the forward motion; a second corridor frame is not needed. File kept; removed from thread sequence + seams."
     },
     {
       "id": "aigen-05",
@@ -286,11 +388,19 @@
       "priority": "P3",
       "mode": "metaphor",
       "thread": "A_building",
-      "thread_position": 6,
+      "thread_position": 5,
       "status": "existing",
-      "description": "Doorway threshold — escape moment",
+      "description": "Doorway threshold \u2014 escape moment",
       "duration_sec": 6,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "[Push in, slow] through the doorway toward the bright city skyline beyond. Scene holds still; only the soft daylight shifts. Floor reflections stay still.",
+      "status_note": "DONE \u2014 Hailuo I2V-01-Live push-through (assets/clips/aigen-05.mp4). The push exits the glossy interior floor into matte exterior paving before any reflection can warp, so the 2.5D fallback was NOT needed.",
+      "fallback_unused": "parallax-2.5d (AE) \u2014 only if a future re-roll warps the floor",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Director"
     },
     {
       "id": "aigen-permeation-01",
@@ -300,15 +410,25 @@
       "thread": "G_atmospheric_inserts",
       "thread_position": 1,
       "status": "NEW",
-      "description": "Library archive corridor — endless bookshelves, bound journals, papers spilling. '2,000+ articles' made spatial.",
+      "description": "Library archive corridor \u2014 endless bookshelves, bound journals, papers spilling. '2,000+ articles' made spatial.",
       "chatgpt_prompt_id": "shot-22",
       "anchor_frame": null,
       "register": "atmospheric",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
       "type": "ai-generate",
-      "insertion_point": "between Narrowing Framework MG and 2000 Articles KT"
+      "insertion_point": "between Narrowing Framework MG and 2000 Articles KT",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.2,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 5
+      }
     },
     {
       "id": "aigen-06",
@@ -318,10 +438,23 @@
       "thread": "C_capture",
       "thread_position": 1,
       "status": "existing",
-      "description": "Grid projected onto landscape — model reshaping reality",
+      "description": "Grid projected onto landscape \u2014 model reshaping reality",
       "duration_sec": 6,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
       "morph_to": "aigen-06b",
-      "type": "ai-generate"
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true,
+        "note": "dark/menace beat \u2014 optional low-strength duotone accent if extra bleakness wanted"
+      },
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 6
+      }
     },
     {
       "id": "aigen-06b",
@@ -331,15 +464,29 @@
       "thread": "C_capture",
       "thread_position": 2,
       "status": "NEW",
-      "description": "Grid intensifies — at convergence point, gridlines form a stylized table. No figures yet.",
+      "description": "Grid intensifies \u2014 at convergence point, gridlines form a stylized table. No figures yet.",
       "chatgpt_prompt_id": "shot-23",
       "anchor_frame": "aigen-06",
       "register": "atmospheric",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true,
+        "note": "dark/menace beat \u2014 optional low-strength duotone accent if extra bleakness wanted"
+      },
       "duration_sec": 5,
       "type": "ai-generate",
-      "morph_to": "aigen-07"
+      "motion_technique": "ken-burns",
+      "morph_from": "aigen-06",
+      "morph_to": "aigen-07",
+      "regen_note": "generate by EDITING aigen-06 (img2img/inpaint), not from scratch \u2014 shared base for clean morph",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 5
+      }
     },
     {
       "id": "aigen-07",
@@ -349,9 +496,18 @@
       "thread": "C_capture",
       "thread_position": 3,
       "status": "existing",
-      "description": "Negotiation room — two figures approaching table",
+      "description": "Negotiation room \u2014 two figures approaching table",
       "duration_sec": 6,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "morph_from": "aigen-06b",
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true,
+        "note": "dark/menace beat \u2014 optional low-strength duotone accent if extra bleakness wanted"
+      },
+      "hailuo_model": "I2V-01-Live",
+      "live_still_motion": "Static locked camera, tripod. Faces hold. The two figures walk slowly toward the empty table from opposite sides. Table, walls and floor stay perfectly still."
     },
     {
       "id": "aigen-08",
@@ -361,10 +517,17 @@
       "thread": "D_markets_color_thread",
       "thread_position": 1,
       "status": "existing",
-      "description": "Stock exchange floor — Black-Scholes parallel",
+      "description": "Stock exchange floor \u2014 Black-Scholes parallel",
       "duration_sec": 6,
-      "thread_note": "Color thread — palette continuity (rust/amber) with aigen-09, not spatial morph",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "thread_note": "Color thread \u2014 palette continuity (rust/amber) with aigen-09, not spatial morph",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. Trading-floor figures gesture subtly; screens flicker faintly. Floor and signage text stay still.",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-09",
@@ -374,9 +537,15 @@
       "thread": "D_markets_color_thread",
       "thread_position": 2,
       "status": "existing",
-      "description": "Oil infrastructure — OPEC context",
+      "description": "Oil infrastructure \u2014 OPEC context",
       "duration_sec": 6,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "cinemagraph",
+      "cinemagraph_motion": "mask the flare flames only \u2014 slow flicker + faint heat shimmer; pipelines and figures hold static",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      }
     },
     {
       "id": "aigen-10",
@@ -386,9 +555,16 @@
       "thread": "E_cooperation",
       "thread_position": 1,
       "status": "existing",
-      "description": "Sunrise — cooperative figures, tone shift",
+      "description": "Sunrise \u2014 cooperative figures, tone shift",
       "duration_sec": 6,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. Figures work the timber frame with small, slow motions. Dawn light steady; ground and structure stay still.",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-11",
@@ -398,10 +574,17 @@
       "thread": "E_cooperation",
       "thread_position": 2,
       "status": "existing",
-      "description": "Forest stag hunt — converging on stag, one diverging to hare",
+      "description": "Forest stag hunt \u2014 converging on stag, one diverging to hare",
       "duration_sec": 6,
+      "type": "ai-generate",
+      "motion_technique": "live-still",
       "morph_to": "aigen-11b",
-      "type": "ai-generate"
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live",
+      "live_still_motion": "Static locked camera, tripod. The hunters HOLD their forward-leaning, advancing poses; only the shafts of sunlight flicker and fine dust drifts between the trees. Figures, stag and forest stay still.",
+      "fallback": "ken-burns (slow push toward the distant stag) if the held poses warp"
     },
     {
       "id": "aigen-11b",
@@ -411,15 +594,22 @@
       "thread": "E_cooperation",
       "thread_position": 3,
       "status": "NEW",
-      "description": "Forest clearing — hunters together, stag at their feet, dawn light through canopy. Cooperative outcome.",
+      "description": "Forest clearing \u2014 hunters together, stag at their feet, dawn light through canopy. Cooperative outcome.",
       "chatgpt_prompt_id": "shot-24",
       "anchor_frame": "aigen-11",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 6,
       "type": "ai-generate",
-      "insertion_point": "between Split PD vs SH MG and Iterated KT"
+      "insertion_point": "between Split PD vs SH MG and Iterated KT",
+      "motion_technique": "live-still",
+      "morph_from": "aigen-11",
+      "regen_note": "generate by EDITING aigen-11 (same forest, regroup figures); medium-risk morph, cut is the fallback",
+      "hailuo_model": "I2V-01-Live",
+      "live_still_motion": "Static locked camera, tripod. The gathered figures shift subtly; dawn light filters through the trees. Stag, ground and foliage stay still."
     },
     {
       "id": "aigen-12",
@@ -429,10 +619,21 @@
       "thread": "E_cooperation",
       "thread_position": 4,
       "status": "existing",
-      "description": "Terraced farmland — Ostrom commons, irrigation",
+      "description": "Terraced farmland \u2014 Ostrom commons, irrigation",
       "duration_sec": 6,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
       "morph_to": "aigen-12a",
-      "type": "ai-generate"
+      "treatment": {
+        "finish": "documentary"
+      },
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 6
+      }
     },
     {
       "id": "aigen-12a",
@@ -442,16 +643,28 @@
       "thread": "E_cooperation",
       "thread_position": 5,
       "status": "NEW",
-      "description": "Stone-walled alpine pasture — Swiss commons, sheep, stone shelters",
+      "description": "Stone-walled alpine pasture \u2014 Swiss commons, sheep, stone shelters",
       "chatgpt_prompt_id": "shot-25",
       "anchor_frame": "aigen-12",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 6,
       "type": "ai-generate",
       "insertion_point": "between Choropleth Ostrom MG and Ostrom vs PD MG",
-      "morph_to": "aigen-13"
+      "motion_technique": "ken-burns",
+      "morph_from": "aigen-12",
+      "morph_to": "aigen-13",
+      "regen_note": "generate by EDITING aigen-12 (terrain shift to alpine)",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 6
+      }
     },
     {
       "id": "aigen-13",
@@ -461,10 +674,22 @@
       "thread": "E_cooperation",
       "thread_position": 6,
       "status": "existing",
-      "description": "Ocean vastness — boundless, scaling limit",
+      "description": "Ocean vastness \u2014 boundless, scaling limit",
       "duration_sec": 6,
-      "thread_note": "12a → 13 is the HERO morph of the cooperation arc; the contained-to-boundless transition IS the script's argument",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "thread_note": "12a -> 13 is the HERO morph of the cooperation arc; the contained-to-boundless transition IS the script's argument",
+      "motion_technique": "ken-burns",
+      "morph_from": "aigen-12a",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.08,
+        "focus_x": 0.5,
+        "focus_y": 0.45,
+        "duration_sec": 6
+      }
     },
     {
       "id": "aigen-14",
@@ -474,10 +699,16 @@
       "thread": "F_stakes",
       "thread_position": 1,
       "status": "existing",
-      "description": "City street — present day evening, parallel pedestrians",
+      "description": "City street \u2014 present day evening, parallel pedestrians",
       "duration_sec": 4,
-      "morph_to": "aigen-14b",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. A few distant figures walk slowly in parallel along the sidewalk; faint evening haze drifts. Buildings, pavement and light pools stay perfectly still.",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-14b",
@@ -487,14 +718,20 @@
       "thread": "F_stakes",
       "thread_position": 2,
       "status": "NEW",
-      "description": "Same street, lower angle — two figures meeting at center, hands extending. Coordination move visible.",
+      "description": "Same street, lower angle \u2014 two figures meeting at center, hands extending. Coordination move visible.",
       "chatgpt_prompt_id": "shot-26",
       "anchor_frame": "aigen-14",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. Faces hold. Only the two central figures' hands meet in a handshake; faint haze drifts and one distant silhouette walks past. Everything else stays still.",
+      "fallback": "ken-burns",
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-15",
@@ -504,10 +741,22 @@
       "thread": "F_stakes",
       "thread_position": 3,
       "status": "existing",
-      "description": "Horizon — two landmasses, two dots, contemplative",
+      "description": "Horizon \u2014 two landmasses, two dots, contemplative",
       "duration_sec": 4,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.12,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 4
+      },
+      "note": "no water-shimmer live-still \u2014 Pika animates reflective water badly; keep it a slow camera push",
       "morph_to": "aigen-forecast-01",
-      "type": "ai-generate"
+      "treatment": {
+        "finish": "documentary"
+      }
     },
     {
       "id": "aigen-forecast-01",
@@ -517,15 +766,22 @@
       "thread": "F_stakes",
       "thread_position": 4,
       "status": "NEW",
-      "description": "Same horizon — two diplomatic figures on clifftop, walking parallel along the edge. Doubles as Insert H atmospheric breathing.",
+      "description": "Same horizon \u2014 two diplomatic figures on clifftop, walking parallel along the edge. Doubles as Insert H atmospheric breathing.",
       "chatgpt_prompt_id": "shot-27",
       "anchor_frame": "aigen-15",
       "register": "atmospheric",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
       "type": "ai-generate",
-      "insertion_point": "between aigen-15 and Falsification Framework MG"
+      "insertion_point": "between aigen-15 and Falsification Framework MG",
+      "motion_technique": "live-still",
+      "morph_from": "aigen-15",
+      "regen_note": "generate by EDITING aigen-15 (add cliff + figures to same horizon) \u2014 sparse frame, clean morph",
+      "hailuo_model": "I2V-01-Live",
+      "live_still_motion": "Static locked camera, tripod. The two distant figures walk slowly along the clifftop in parallel, backs to camera. Sky, sea and rock stay perfectly still."
     },
     {
       "id": "aigen-16",
@@ -535,10 +791,16 @@
       "thread": "F_stakes",
       "thread_position": 5,
       "status": "existing",
-      "description": "Lecture hall — students facing chalkboard with PD matrices",
+      "description": "Lecture hall \u2014 students facing chalkboard with PD matrices",
       "duration_sec": 5,
-      "morph_to": "aigen-16a",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "live-still",
+      "live_still_motion": "Static locked camera, tripod. Students shift subtly in their seats; the instructor's arm gestures slightly at the board. Board text and seats stay still.",
+      "fallback": "ken-burns",
+      "treatment": {
+        "finish": "documentary"
+      },
+      "hailuo_model": "I2V-01-Live"
     },
     {
       "id": "aigen-16a",
@@ -548,14 +810,25 @@
       "thread": "F_stakes",
       "thread_position": 6,
       "status": "NEW",
-      "description": "Tighter — single student's notebook open to PD matrix sketch, hand mid-writing. Model copied to next generation.",
+      "description": "Tighter \u2014 single student's notebook open to PD matrix sketch, hand mid-writing. Model copied to next generation.",
       "chatgpt_prompt_id": "shot-28",
       "anchor_frame": "aigen-16",
       "register": "grounding",
       "realism": "flat",
-      "treatment": "standard",
+      "treatment": {
+        "finish": "documentary"
+      },
       "duration_sec": 5,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 4
+      },
+      "note": "do NOT morph 16->16a (detail-rich zoom would smear); cut into this Ken Burns"
     },
     {
       "id": "aigen-17",
@@ -565,10 +838,21 @@
       "thread": "F_stakes",
       "thread_position": 7,
       "status": "existing",
-      "description": "Panorama — two cityscapes across game-matrix channel",
+      "description": "Panorama \u2014 two cityscapes across game-matrix channel",
       "duration_sec": 6,
-      "morph_to": "aigen-17a",
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.62,
+        "focus_y": 0.5,
+        "duration_sec": 5
+      },
+      "note": "drift toward the right edge where the 17a figure will be \u2014 sets up the cut",
+      "treatment": {
+        "finish": "documentary"
+      }
     },
     {
       "id": "aigen-17a",
@@ -578,22 +862,59 @@
       "thread": "F_stakes",
       "thread_position": 8,
       "status": "NEW",
-      "description": "Tighter — single mannequin figure at edge of channel, looking across. Conflict palette.",
+      "description": "Tighter \u2014 single mannequin figure at edge of channel, looking across. Conflict palette.",
       "chatgpt_prompt_id": "shot-29",
       "anchor_frame": "aigen-17",
       "register": "atmospheric",
       "realism": "flat",
-      "treatment": "conflict",
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true,
+        "note": "dark/menace beat \u2014 optional low-strength duotone accent if extra bleakness wanted"
+      },
       "duration_sec": 5,
-      "type": "ai-generate"
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.18,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 4
+      },
+      "note": "do NOT morph 17->17a (reframe zoom); cut into this Ken Burns"
     }
   ],
   "summary": {
     "existing_shots": 17,
     "new_shots": 12,
     "total_shots": 29,
-    "morph_pairs": 16,
-    "estimated_runtime_delta_sec": 50,
-    "estimated_generation_cost_usd_ceiling": 11
+    "motion_breakdown": {
+      "ken_burns_shots": 13,
+      "live_still_shots": 13,
+      "cinemagraph_shots": 1,
+      "retired_shots": 2,
+      "note": "Ep1 drops morphs: all motion is single-still (live-still via Hailuo i2v, or ken-burns rendered locally). Treatment is documentary finish (color preserved); duotone reserved as an optional accent on dark beats. aigen-02b + 04b retired."
+    },
+    "seam_breakdown": {
+      "match-cut": 2,
+      "cross-dissolve": 7,
+      "cut": 9
+    },
+    "morphs_before_rework": 16,
+    "morphs_after_rework": 0,
+    "note": "Ep1 defers morphs entirely (see project/CHAINED_STILL_LESSONS.md). The former morph seams became 4 cross-dissolve + 1 cut; former morph-endpoint stills became ken-burns (landscapes) or live-still (figure scenes). Vocabulary: ken-burns (local), live-still (Hailuo single-image), and NLE cut/dissolve seams.",
+    "estimated_generation_cost_usd_ceiling": 5,
+    "treatment_model": {
+      "default": "documentary (grain + halation + vignette, no color remap)",
+      "tool": "tools/brand-treatment/treat_video.py --finish documentary",
+      "duotone_accent_beats": [
+        "aigen-06",
+        "aigen-06b",
+        "aigen-07",
+        "aigen-17a"
+      ],
+      "doctrine": "treatment = finish, not recolor; stills are generated on-palette so the duotone is reserved for deliberately bleak beats"
+    }
   }
 }

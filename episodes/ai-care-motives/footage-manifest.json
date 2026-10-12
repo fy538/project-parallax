@@ -1,0 +1,185 @@
+[
+  {
+    "id": 1,
+    "beat": "Beat 2",
+    "mode": "ARCHIVAL",
+    "priority": "P3",
+    "description": "Immanuel Kant portrait, 18th-century engraving (public domain)",
+    "searchTerms": [
+      "Immanuel Kant portrait engraving",
+      "Kant 1790 portrait Wikimedia Commons"
+    ],
+    "platforms": [
+      "Wikimedia Commons"
+    ],
+    "sourcability": "Easy",
+    "treatment": "standard",
+    "composite": "inset @ 70%",
+    "durationSec": 6,
+    "notes": "Plays before the Kant quote card.",
+    "layeredWith": "kinetic-kant-quote.json",
+    "status": "resolved",
+    "file": "stills/arch-kant.jpg"
+  },
+  {
+    "id": 2,
+    "beat": "Beat 3",
+    "mode": "ARCHIVAL",
+    "priority": "P3",
+    "description": "John Stuart Mill portrait (public domain)",
+    "searchTerms": [
+      "John Stuart Mill portrait 1870",
+      "J. S. Mill Wikimedia Commons"
+    ],
+    "platforms": [
+      "Wikimedia Commons"
+    ],
+    "sourcability": "Easy",
+    "treatment": "standard",
+    "composite": "inset @ 70%",
+    "durationSec": 6,
+    "notes": "Plays before the Mill quote card.",
+    "layeredWith": "kinetic-mill-quote.json",
+    "status": "resolved",
+    "file": "stills/arch-mill.jpg"
+  },
+  {
+    "id": 3,
+    "beat": "Beat 5",
+    "mode": "ARCHIVAL",
+    "priority": "P3",
+    "description": "Plato bust, Roman copy (public domain)",
+    "searchTerms": [
+      "Plato bust Roman copy",
+      "Plato portrait Wikimedia Commons"
+    ],
+    "platforms": [
+      "Wikimedia Commons"
+    ],
+    "sourcability": "Easy",
+    "treatment": "standard",
+    "composite": "full",
+    "durationSec": 5,
+    "notes": "Opens the Glaucon beat.",
+    "status": "resolved",
+    "file": "stills/arch-plato.png"
+  },
+  {
+    "id": 4,
+    "beat": "Beat 6",
+    "mode": "ARCHIVAL",
+    "priority": "P2",
+    "description": "EPA Notice of Violation to Volkswagen, Sept 18 2015 (US government document, public domain). Replaces text placeholder in epa-nov-reveal.json",
+    "searchTerms": [
+      "EPA notice of violation Volkswagen 2015 pdf",
+      "epa.gov VW NOV September 18 2015"
+    ],
+    "platforms": [
+      "epa.gov"
+    ],
+    "sourcability": "Easy",
+    "treatment": "editorial",
+    "composite": "full",
+    "durationSec": 15,
+    "notes": "Manual download needed; save as remotion-templates/public/episodes/ai-care-motives/epa-nov-2015.png. User approval required before download.",
+    "layeredWith": "epa-nov-reveal.json",
+    "status": "resolved",
+    "file": "assets/sourced/doc-epa-nov_epa_2015-09-18.pdf (text quoted in epa-nov-reveal.json)"
+  },
+  {
+    "id": 5,
+    "beat": "Beat 6",
+    "mode": "FOOTAGE",
+    "priority": "P2",
+    "description": "Diesel car driving on road; exhaust/diagnostic equipment",
+    "searchTerms": [
+      "diesel car driving road",
+      "car exhaust tailpipe",
+      "emissions test equipment"
+    ],
+    "platforms": [
+      "Pexels",
+      "Pixabay"
+    ],
+    "sourcability": "Easy",
+    "treatment": "conflict",
+    "composite": "full",
+    "durationSec": 10,
+    "notes": "Illustrates equipment only, not the VW cars. Caption 'Deliberately engineered test detection'; DOJ plea source in small attribution.",
+    "status": "resolved",
+    "file": "clips/stock-dyno.mp4"
+  },
+  {
+    "id": 6,
+    "beat": "Beat 7",
+    "mode": "FOOTAGE",
+    "priority": "P2",
+    "description": "Screen reconstruction of the 36 + 59 example, labelled 'Illustrative reconstruction · Anthropic, 2025'",
+    "searchTerms": [],
+    "platforms": [
+      "manual capture"
+    ],
+    "sourcability": "Manual",
+    "treatment": "standard",
+    "composite": "full",
+    "durationSec": 12,
+    "notes": "User capture. Used again (id 7) for the return shot.",
+    "layeredWith": "carry-the-one.json",
+    "status": "pending (Tiger: screen capture)"
+  },
+  {
+    "id": 7,
+    "beat": "Beat 7",
+    "mode": "FOOTAGE",
+    "priority": "P2",
+    "description": "Return to the labelled reconstruction (reuse id 6 capture)",
+    "searchTerms": [],
+    "platforms": [
+      "manual capture"
+    ],
+    "sourcability": "Manual",
+    "treatment": "standard",
+    "composite": "full",
+    "durationSec": 12,
+    "notes": "Distinguish 'Check the arithmetic' from 'Explain the computation'.",
+    "status": "pending (Tiger: screen capture)"
+  },
+  {
+    "id": 8,
+    "beat": "Beat 6",
+    "mode": "FOOTAGE",
+    "priority": "P2",
+    "description": "Car on the road / portable emissions measurement equipment (replaces the Dan Carder text card)",
+    "searchTerms": [
+      "car on highway portable emissions measurement",
+      "diesel car on-road emissions test equipment",
+      "car driving freeway Los Angeles"
+    ],
+    "platforms": [
+      "Pexels",
+      "Pixabay"
+    ],
+    "sourcability": "Easy",
+    "treatment": "conflict",
+    "composite": "full",
+    "durationSec": 16,
+    "notes": "Names (Dan Carder, West Virginia University) are spoken, not shown. Swap in a confirmed research-team image if one is sourced.",
+    "status": "resolved",
+    "file": "stills/arch-pems.jpg + clips/stock-la-freeway.mp4"
+  },
+  {
+    "id": 9,
+    "beat": "Beat 6",
+    "mode": "ARCHIVAL",
+    "priority": "P2",
+    "description": "Volkswagen photographs for the EPA accusation: Wolfsburg plant power station; Golf TDI Clean Diesel show car",
+    "platforms": [
+      "Wikimedia Commons"
+    ],
+    "sourcability": "Easy",
+    "treatment": "conflict",
+    "durationSec": 15,
+    "status": "resolved",
+    "file": "stills/arch-vw-wolfsburg.jpg + stills/arch-vw-golf-tdi.jpg"
+  }
+]

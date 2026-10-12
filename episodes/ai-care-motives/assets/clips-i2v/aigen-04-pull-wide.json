@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T18:12:36+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12704-24fd-72c1-9d7b-56ec94737773",
+  "still": "episodes/ai-care-motives/assets/keyframes/aigen-04-wide.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The kneeling man in the dark suit stays on his knees on the rocks the whole time and does not stand up. He leans back slowly and pulls on the clasped hands; the man in the water is drawn toward the bank and comes up out of the water to his chest. Their clasped hands stay locked together the whole time. The water moves slightly around him in flat bands. Both faces stay smooth blank planes, exactly as drawn. The rocks, the dry grass, the bare trees and the horizon stay perfectly still. Audio: quiet water lapping against the bank, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> Cinematic 2D illustration in a flat, geometric style with textured surfaces and a muted color palette. A man in a dark suit (S1) kneels on a jagged, rocky bank, reaching out to clasp the hands of another man (S2) who is submerged in dark water. Both characters have smooth, blank facial planes with no defined features. The background features bare, skeletal trees and patches of dry grass under a dark horizon with a thin sliver of orange sunset light. The shot is a static, locked-off tripod view with no camera movement or cuts. Throughout the 5-second duration, S1 remains firmly on his knees on the rocks. He slowly leans his torso back, using his weight to pull on their locked clasped hands. S2 is drawn forward toward the bank, his body rising out of the water until the surface reaches his chest. Their clasped hands remain firmly locked together throughout the entire action. The water around S2 moves only in flat, stylized bands, while the rocks, dry grass, bare trees, and the distant horizon remain perfectly still. The lighting remains consistent and unchanging throughout.\n\noverall_soundscape: The only sound is the quiet, rhythmic lapping of dark water against the rocky bank. There are no voices or other environmental noise sounds.\n\nnon_diegetic_music: N/A.",
+  "timings": {
+    "inference": 3.373423938988708
+  },
+  "wall_seconds": 13,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadd99a/r9Iek2pIFeMrXkP3DAs8q_minimax-h3.mp4"
+}

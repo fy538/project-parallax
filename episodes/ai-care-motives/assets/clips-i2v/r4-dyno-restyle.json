@@ -1,0 +1,16 @@
+{
+  "model": "fal-ai/kling-video/o3/pro/video-to-video/edit",
+  "payload": {
+    "prompt": "Restyle @Video1 as a flat constructivist cut-paper illustration in the exact style of @Image1: faceted flat colour planes, visible paper texture, warm amber light and deep umber shadows, no photographic detail, no lettering. Keep the same camera, the same composition and the same motion as @Video1.",
+    "video_url": "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r4/dyno5.mp4",
+    "image_urls": [
+      "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r4/car-ref.jpg"
+    ],
+    "keep_audio": false
+  },
+  "request_id": "01a12cbb-a620-7363-8476-0c847193508a",
+  "saved": [
+    "dyno-restyle-video.mp4"
+  ],
+  "wall_seconds": 283
+}

@@ -1,0 +1,418 @@
+{
+  "slug": "prisoners-dilemma",
+  "proposals": [
+    {
+      "technique": "live-still",
+      "candidates": [
+        "ken-burns",
+        "live-still"
+      ],
+      "confidence": 0.85,
+      "needs_human_review": false,
+      "flags": [],
+      "treatment": {
+        "finish": "documentary"
+      },
+      "shot_id": "aigen-01",
+      "thread": "A_building"
+    },
+    {
+      "technique": "ken-burns",
+      "candidates": [
+        "ken-burns"
+      ],
+      "confidence": 0.9,
+      "needs_human_review": false,
+      "flags": [
+        "needs upscale before local render (source < 1920w)"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      },
+      "shot_id": "aigen-01b",
+      "thread": "A_building"
+    },
+    {
+      "technique": "ken-burns",
+      "candidates": [
+        "ken-burns",
+        "live-still"
+      ],
+      "confidence": 0.55,
+      "needs_human_review": true,
+      "flags": [
+        "lone hand \u2014 ken-burns (push on the work) vs live-still (hand completes the gesture); beat decides",
+        "needs upscale before local render (source < 1920w)"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      },
+      "shot_id": "aigen-04a",
+      "thread": "A_building"
+    },
+    {
+      "technique": "live-still",
+      "candidates": [
+        "ken-burns",
+        "live-still"
+      ],
+      "confidence": 0.85,
+      "needs_human_review": false,
+      "flags": [],
+      "treatment": {
+        "finish": "documentary"
+      },
+      "shot_id": "aigen-04",
+      "thread": "A_building"
+    },
+    {
+      "technique": "parallax-2.5d",
+      "candidates": [
+        "cinemagraph",
+        "ken-burns",
+        "parallax-2.5d"
+      ],
+      "confidence": 0.6,
+      "needs_human_review": true,
+      "flags": [
+        "contested ['cinemagraph', 'parallax-2.5d'] \u2014 picked parallax-2.5d by beat keywords; confirm",
+        "needs upscale before local render (source < 1920w)"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      },
+      "shot_id": "aigen-05",
+      "thread": "A_building"
+    },
+    {
+      "shot_id": "aigen-02",
+      "thread": "B_institution",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-03",
+      "thread": "B_institution",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-06",
+      "thread": "C_capture",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true
+      }
+    },
+    {
+      "shot_id": "aigen-06b",
+      "thread": "C_capture",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-07",
+      "thread": "C_capture",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-08",
+      "thread": "D_markets_color_thread",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-09",
+      "thread": "D_markets_color_thread",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-10",
+      "thread": "E_cooperation",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-11",
+      "thread": "E_cooperation",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-11b",
+      "thread": "E_cooperation",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-12",
+      "thread": "E_cooperation",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-12a",
+      "thread": "E_cooperation",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-13",
+      "thread": "E_cooperation",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-14",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-14b",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-15",
+      "thread": "F_stakes",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-forecast-01",
+      "thread": "F_stakes",
+      "technique": "morph-endpoint",
+      "candidates": [
+        "morph-endpoint"
+      ],
+      "confidence": 1.0,
+      "needs_human_review": false,
+      "flags": [
+        "authored transform \u2014 respected, not re-decided"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-16",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-16a",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-17",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    },
+    {
+      "shot_id": "aigen-17a",
+      "thread": "F_stakes",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary",
+        "duotone_accent_candidate": true
+      }
+    },
+    {
+      "shot_id": "aigen-permeation-01",
+      "thread": "G_atmospheric_inserts",
+      "technique": null,
+      "candidates": [],
+      "confidence": 0.0,
+      "needs_human_review": true,
+      "flags": [
+        "no perception \u2014 run Phase 2a on this still"
+      ],
+      "treatment": {
+        "finish": "documentary"
+      }
+    }
+  ]
+}

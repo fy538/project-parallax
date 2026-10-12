@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T17:50:14+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a126ef-aa82-7982-ac07-313208afbdaf",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-05-rescued-figure.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The small distant figure in the dark suit, standing with his back to the camera at the upper left, walks slowly away from the camera across the ridge, getting gradually smaller, at a calm steady pace. The dry orange grass in the foreground barely moves. The seated figure in the pale blanket is completely motionless: the blanket and the hair do not move. The rocks, the bare trees and the water stay perfectly still. Audio: quiet open air, faint distant footsteps on gravel, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a 2D illustrated shot with a flat, stylized aesthetic and textured surfaces. The foreground features a seated figure (S1) seen from behind, wrapped in a pale geometric-patterned blanket, sitting on a rocky slope. S1 is motionless, looking out toward a dark body of water. In the upper left, a small distant figure (S2) in a dark suit stands on a ridge, their back to the camera. The background consists of calm dark water, a distant land line, and two skeletal, leafless trees under a deep orange and charcoal sky. The shot is a static, locked-off tripod shot with no camera movement or cuts. Throughout the five seconds, the distant figure (S2) begins to walk slowly away from the camera across the ridge, maintaining a calm and steady pace while becoming gradually smaller as they recede into the distance. The seated figure (S1) remains completely frozen, with no movement in in the pale blanket or their hair. The dry orange grass in the foreground, the rocks, the bare trees, and the water all stay perfectly still. The lighting remains a consistent, warm twilight glow throughout the entire sequence.\n\noverall_soundscape: The sound of quiet, open-air wind fills the space. Faint, rhythmic crunching of distant footsteps on dry gravel is heard as the figure walks away. There are no voices or other mechanical sounds.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.4110924349988636
+  },
+  "wall_seconds": 14,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadd914/V_OEfImOi3IpDvrr8L8Ua_minimax-h3.mp4"
+}

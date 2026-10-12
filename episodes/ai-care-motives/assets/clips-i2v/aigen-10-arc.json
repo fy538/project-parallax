@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T20:13:53+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c99-85e7-7971-8c2a-f88301ac189d",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-10-desk-night.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "One continuous shot, no cuts. The camera moves very slowly to the right in a short, smooth arc around the seated man, keeping him and the laptop in frame, so that the chair and his shoulder slide slightly across the desk and the wall behind them: a gentle parallax move, as on a slider. Keep the image's flat illustrated cut-paper style, textures and colours exactly as they are; the light does not change. The man keeps typing with small movements of his fingers; nothing else in the room moves. His face stays a smooth blank plane. The laptop screen stays blank and bright. Audio: quiet room, soft keystrokes, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a cinematic video in a distinct, flat illustrated cut-paper style. The composition focuses on a man seated at a wooden desk, viewed from a rear-side angle. The scene is characterized by sharp, geometric textures and a muted color palette. The man, wearing a dark textured suit, has a smooth blank plane for a face, lacking features. He sits before a laptop that emits a bright, completely blank white screen. [Shot 1] The camera moves very slowly to the right in a short, smooth arc around the seated man, creating a gentle parallax effect on a slider. As the camera tracks, the chair and the man's shoulder slide incrementally across the desk and the dark wall behind them. Throughout the continuous shot, the man (S1) continues to type with small, rhythmic movements of his fingers on the keyboard. The rest of the room remains perfectly static; the laptop screen remains a constant bright white, and the lighting remains unchanged, preserving the intricate paper-like textures of the environment.\n\noverall_soundscape: The soundscape is dominated by a quiet, muffled room tone. Overlaid on this is the soft, rhythmic clicking of plastic keystrokes as the man types on the laptop. \n\nnon_diegetic_music: N/A.",
+  "timings": {
+    "inference": 3.431580292992294
+  },
+  "wall_seconds": 17,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfe32/LJHw7GbLAmW33dIqBF_V1_minimax-h3.mp4"
+}

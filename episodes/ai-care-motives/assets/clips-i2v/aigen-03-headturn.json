@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T17:50:17+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a126ef-b4e4-7d43-804a-21822a6baf8c",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-03-second-shopkeeper.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. Outside the window, the three small figures in hats and coats keep walking along the street at a slow steady pace, each in the direction they are already heading, passing behind the window bars. Behind the counter, the shopkeeper slowly turns his head away from the window and looks down at the loaf of bread on the counter, small amplitude, slow. His hands stay flat on the counter and his body does not move. His face stays a smooth blank plane, exactly as drawn. The jars, the shelves, the counter and the loaf stay perfectly still. Audio: quiet shop interior, faint muffled footsteps outside, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a 2D-illustrated cinematic shot with a static locked-off tripod composition. The style features flat textures and a warm, muted color palette. In the foreground, a shopkeeper (S1) with dark hair wearing a white apron over a black shirt stands behind a large wooden counter. A single loaf of artisanal bread sits on the counter. To the left, a large window with dark bars overlooks a city street during golden hour. Outside, three small figures in hats and coats walk along the sidewalk at a slow, steady pace, passing behind the window bars in a consistent direction. The lighting remains static throughout the scene. As the shot progresses, S1 slowly turns his head away from the window, looking down at the loaf of bread on the counter with a movement of small amplitude and slow speed. His hands remain flat on the wooden surface and his body stays motionless. His face remains a smooth, blank plane exactly as drawn in the initial frame. The jars on the shelves, the counter, and the bread itself stay perfectly still throughout the five-second duration.\n\noverall_soundscape: The interior is filled with the quiet, ambient atmosphere of a still shop. Outside, the faint, muffled sound of footsteps on the city street is heard through the glass. There are no voices or other mechanical noises.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.4202024177648127
+  },
+  "wall_seconds": 17,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadd914/_tbCDIZbrSbq_MdXQB0AS_minimax-h3.mp4"
+}

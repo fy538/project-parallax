@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T00:30:50+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12d84-c5b5-7c93-aa1f-9319dbf75d54",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-04-river-rescue.png",
+  "end_image": "/Users/feihuyan/project-parallax/episodes/ai-care-motives/assets/keyframes/aigen-04-end-pulled-v2.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The kneeling man in the dark suit does not move at all: his body, his arm and his hand stay exactly where they are. The man in the water rises steadily and smoothly. His head and shoulders stay above the water the whole time and never go under. He comes up out of the water toward the bank until his chest and his free arm rest on the rocks, as in the final image. The two clasped hands stay locked together in the same place the whole time. Both faces stay smooth blank planes, exactly as drawn. The rocks, the dry grass, the bare trees and the horizon stay perfectly still. Audio: quiet water lapping against the bank, no music, no voices.",
+  "expanded_prompt": "How the reference pictures align with the target video \u2014 Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 5.00-second mark of the target video.\n\nintegrated_multimodal_description: [Shot 1] This is a static, locked-off tripod shot in a flat, illustrated style with geometric textures and a muted color palette. The scene opens on <Picture 1>, showing a man in a dark suit (S1) kneeling on a rocky bank, leaning forward to hold the clasped hand of a second man (S2) who is submerged up to his neck in the dark water. Both characters have smooth, blank planes for facial features. The background features dry grass, bare skeletal trees, and a distant horizon with a thin sliver of orange light. Throughout the 5-second duration, S1 remains perfectly motionless, his body and arm locked in the kneeling position. Meanwhile, S2 rises steadily and smoothly out of the water. S2's head and shoulders remain above the surface, never submerging. The two clasped hands between S1 and S2 stay locked together in the same spatial position throughout the movement. As S2 moves upward toward the bank, his chest and free arm eventually come to rest on the jagged rocks, reaching the composition shown in <Picture 2> where S2 is partially out of the water and supported by the shore. The environment, including the water surface and trees, remains perfectly still.\n\noverall_soundscape: The gentle, rhythmic sound of quiet water lapping softly against the rocky bank. There are no voices or environmental animal noises, creating a silent and somber atmosphere.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.6303804240887985
+  },
+  "wall_seconds": 15,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae0438/zIk-9G7wdCPOhEzqVMVEY_minimax-h3.mp4"
+}

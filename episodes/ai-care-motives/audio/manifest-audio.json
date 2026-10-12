@@ -1,0 +1,112 @@
+{
+  "musicBed": {
+    "tracks": [
+      {
+        "id": "shop",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 64.0,
+        "endSec": 114.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 2,
+        "volume": 0.12,
+        "mood": "contemplative",
+        "beat": "beat2"
+      },
+      {
+        "id": "rescue",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 143.0,
+        "endSec": 169.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 2,
+        "volume": 0.12,
+        "mood": "contemplative",
+        "beat": "beat3"
+      },
+      {
+        "id": "ring",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 324.0,
+        "endSec": 358.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 1.5,
+        "volume": 0.11,
+        "mood": "contemplative",
+        "beat": "beat5"
+      },
+      {
+        "id": "return",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 368.2,
+        "endSec": 400.2,
+        "fadeInSec": 0,
+        "fadeOutSec": 4,
+        "volume": 0.11,
+        "mood": "contemplative",
+        "beat": "beat5"
+      },
+      {
+        "id": "car",
+        "file": "audio/music/ai-care-motives/bed-tension.wav",
+        "startSec": 396.2,
+        "endSec": 466.2,
+        "fadeInSec": 4,
+        "fadeOutSec": 0,
+        "volume": 0.13,
+        "mood": "tension",
+        "beat": "beat6"
+      },
+      {
+        "id": "demand",
+        "file": "audio/music/ai-care-motives/bed-resolution.wav",
+        "startSec": 593.6,
+        "endSec": 672.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 8,
+        "volume": 0.12,
+        "mood": "resolution",
+        "beat": "beat8"
+      }
+    ]
+  },
+  "layer2": [
+    {
+      "segment": "beat5-seg28",
+      "type": "section-open",
+      "intensity": "dramatic",
+      "offsetSec": 0
+    },
+    {
+      "segment": "beat6-seg31",
+      "type": "stat-reveal",
+      "intensity": "dramatic",
+      "offsetSec": 4.5
+    },
+    {
+      "segment": "beat6-seg31",
+      "type": "tension-rise",
+      "intensity": "normal",
+      "offsetSec": 2.0
+    },
+    {
+      "segment": "beat8-seg49",
+      "type": "end-stinger",
+      "intensity": "normal",
+      "offsetSec": 6.5
+    }
+  ],
+  "layer3": [
+    {
+      "segment": "beat1-seg01",
+      "type": "card-settle",
+      "offsetSec": 1.5,
+      "volume": 0.15
+    },
+    {
+      "segment": "beat6-seg30",
+      "type": "page-turn",
+      "offsetSec": 0.2,
+      "volume": 0.15
+    }
+  ]
+}

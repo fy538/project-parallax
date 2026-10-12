@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T00:30:51+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12d84-c923-7570-9a58-9a7abdf9a4c7",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-10-desk-night.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "One continuous shot, no cuts. The camera moves very slowly to the left in a short, smooth arc behind the seated man, keeping him and the laptop in frame, so that the chair and his shoulder slide slightly across the desk and the wall behind them: a gentle parallax move, as on a slider. By the end we see a little more of the back of his head and his back. His face stays turned away from the camera the whole time and is never seen from the side or the front. Keep the image's flat illustrated cut-paper style, textures and colours exactly as they are; the light does not change. He keeps typing with small movements of his fingers; nothing else in the room moves. Nothing is added: no new objects appear on the desk or in the room. The laptop screen stays blank and bright. Audio: quiet room, soft keystrokes, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a cinematic 2D illustration in a flat cut-paper style with visible paper textures. The scene depicts a man (S1) seated at a wooden desk, facing away from the camera. He has short brown hair and wears a dark, textured jacket. In front of him is a laptop whose screen is a blank, bright white, casting a soft glow onto his hands. The background consists of a dark wall with simple rectangular window frames. [Shot 1] The camera performs a continuous, slow Arc Shot, moving to the left with small amplitude at a slow speed, gliding behind S1. As the camera moves, a gentle parallax effect causes the chair and the man's shoulder to slide across the desk and the background wall. Throughout the five-second shot, S1 continues typing with small, rhythmic movements of his fingers on the keyboard. His face remains turned away from the camera, ensuring his profile or front is never revealed. The lighting remains static, and no other objects are added to the environment. By the end of the shot, the camera has revealed more of the back of S1's head and torso.\n\noverall_soundscape: The environment is characterized by a quiet, still room tone. The only consistent sound is the soft, rhythmic clicking of plastic keystrophes as S1 types on the laptop.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.3993989629962016
+  },
+  "wall_seconds": 15,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae0438/ftrzel77OCMCNd1a0ts-N_minimax-h3.mp4"
+}

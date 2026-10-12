@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T20:13:54+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c99-87f2-7653-819a-8ccb27f6e7ab",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-04-river-rescue.png",
+  "end_image": "/Users/feihuyan/project-parallax/episodes/ai-care-motives/assets/keyframes/aigen-04-end-pulled.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The kneeling man in the dark suit stays on his knees on the rocks and leans back, pulling on the clasped hands; the man in the water is drawn to the bank and comes half out of the water, ending with his chest and one arm over the rocks, as in the final image. Their clasped hands stay locked together the whole time. Both faces stay smooth blank planes, exactly as drawn. The rocks, the dry grass, the bare trees and the horizon stay perfectly still. Audio: quiet water lapping against the bank, no music, no voices.",
+  "expanded_prompt": "How the reference pictures align with the target video \u2014 Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 5.00-second mark of the target video.\n\nintegrated_multimodal_description: [Shot 1] This is a static, locked-off tripod shot in a flat, illustrated style with geometric textures and muted tones. The scene opens on <Picture 1>, where a man in a dark suit (S1) is kneeling on a rocky bank, leaning back slightly while pulling firmly on the clasped hands of another man (S2) who is partially submerged in the dark water. Both characters have smooth, blank planes for faces, lacking any features. The background features dry grass, bare trees, and a distant landscape under a thin sliver of orange light on the horizon. Throughout the 5-second duration, the camera remains perfectly still with no cuts. S1 maintains his kneeling position, his body tensing as he leans back further, his hands remaining clasped and locked with S2. Simultaneously, S2 is drawn toward the bank, his body rising out of the water until his chest and one arm are hoisted over the jagged rocks. By the end of the shot, S2 has reached the position shown in <Picture 2>, partially up onto the shore while S1 continues to pull him. The environment, including the rocks, grass, and skeletal trees, remains completely still, and the lighting stays constant.\n\noverall_soundscape: The gentle, rhythmic sound of quiet water lapping softly against the rocky bank. There is the faint, heavy sound of fabric stretching and the subtle shifting of stones under weight as the men pull against each other.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 5.742272127999968
+  },
+  "wall_seconds": 18,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfe32/uHwIdiKhzvT4Ox9XV8WO4_minimax-h3.mp4"
+}

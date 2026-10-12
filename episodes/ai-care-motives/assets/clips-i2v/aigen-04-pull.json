@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T17:50:13+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a126ef-a38c-7f71-95b3-4d555111d792",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-04-river-rescue.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The kneeling man in the dark suit leans back slowly and pulls on the clasped hands; the man in the water is drawn toward the bank, his shoulders coming a little further out of the water, small amplitude, slow. Their clasped hands stay locked together the whole time. The water moves slightly around him in flat bands. Both faces stay smooth blank planes, exactly as drawn. The rocks, the dry grass, the bare trees and the horizon stay perfectly still. Audio: quiet water lapping against the bank, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a static, locked-off tripod shot in a flat, illustrated style with geometric textures and a muted color palette. A man in a dark textured suit (S1) kneels on a rocky bank, leaning back as he clasps hands with another man (S2) who is submerged in the dark water. Both characters have smooth, blank planes for faces with no features. The background features dry grass, bare skeletal trees, and a distant horizon under a thin sliver of orange light. Throughout the 5-second duration, the camera remains perfectly still. (S1) slowly leans his weight back, exerting effort as he pulls on the clasped hands of (S2). In response, (S2) is drawn toward the bank, his shoulders rising slightly further out of the water with a small amplitude. Their hands remain firmly locked together throughout the entire action. The water around (S2) moves only in flat, stylized bands, while the rocks, grass, trees, and horizon line remain perfectly static and motionless, maintaining the frozen, illustrative aesthetic of the initial frame.\n\noverall_soundscape: The gentle, rhythmic sound of water lapping softly against the rocky bank creates a quiet atmosphere. There is the faint, subtle sound of fabric tension as the kneeling man leans back.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.368245770019712
+  },
+  "wall_seconds": 13,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadd914/V4tf0x7BdW3k3bMIDU6fU_minimax-h3.mp4"
+}

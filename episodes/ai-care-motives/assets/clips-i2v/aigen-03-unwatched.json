@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T17:50:24+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a126ef-bc6c-7b40-9133-cf400e8ce9bb",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-03-second-shopkeeper.png",
+  "end_image": "episodes/ai-care-motives/assets/keyframes/aigen-03-end-unwatched.png",
+  "duration_requested": 6.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. Outside the window, the three small figures in hats and coats walk on along the street, each in the direction they are already heading, and leave the view one after another, passing behind the window bars. By the end the street outside is empty, as in the final image. The shopkeeper, the counter, the loaf, the jars and the shelves do not move at all. Audio: quiet shop interior, footsteps outside fading to silence, no music, no voices.",
+  "expanded_prompt": "How the reference pictures align with the target video \u2014 Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 6.00-second mark of the target video.\n\nintegrated_multimodal_description: [Shot 1] Cinematic, 2D illustrated style, a static locked-off tripod shot of a warm, rustic bakery interior. In the foreground, a shopkeeper (S1), a man with dark hair wearing a black shirt and a white apron, stands behind a heavy wooden counter, his hands resting on the surface next to a loaf of crusty bread. Behind him, dark wooden shelves stocked with various glass jars remain stationary. To the left, a large paneed window with dark bars overlooks a sun-drenched city street with golden-toned buildings and a leafy tree. Outside the window, three small figures in hats and coats are walking across the street from right to left. As the video progresses, the first figure walks behind the window bars and exits the frame, followed shortly by the second figure at 00:02.000, who also passes behind the bars and disappears. Finally, the third figure passes at 00:04.500, leaving the street outside empty. Throughout the entire shot, the shopkeeper (S1) remains perfectly still, looking out toward the window, while the interior lighting, golden hour shadows, and textured surfaces of the shop remain completely unchanging, converging on the final frame where the street is deserted.\n\noverall_soundscape: The quiet, ambient atmosphere of a still shop interior. Outside, the rhythmic, muffled thud of footsteps on pavement is heard, gradually decreasing in volume and frequency as each figure walks away, eventually fading into total silence as the street becomes empty.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 5.335141954012215
+  },
+  "wall_seconds": 24,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.576,
+  "video_url": "https://v3b.fal.media/files/b/0aadd915/uQT7a-7ctS04LiavCXEFq_minimax-h3.mp4"
+}

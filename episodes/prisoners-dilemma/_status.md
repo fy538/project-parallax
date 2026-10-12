@@ -1,40 +1,63 @@
 # Status — prisoners-dilemma
-> Auto-generated 2026-05-17 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-08 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** RENDER READY · day 8 in state · target 2026-06-01 (+15 days)
+**State:** RENDER READY · day 152 in state · target 2026-06-01 (-129 days)
 **Format:** Philosopher's Lens
 
 ## Progress  ▰▰▰▰▰▰▰▱▱▱  6 of 9 stages
 
 ✓ research (brief + audit)
 ✓ angle-memo
-✓ script-production.md — modified 2026-05-17T00:02
-✗ visual-spec
-✓ assembly-manifest (estimate mode · 121 segments · 893.8s)
+✓ script-production.md — modified 2026-05-24T00:21
+✓ visual-spec
+⚠ assembly-manifest (estimate mode · 121 segments · 893.8s)
 ✓ audio-cue-sheet
-✓ data files (Remotion templates) (48 files)
-✓ assets (17 stills · 17 clips)
+✓ data files (Remotion templates) (49 files)
+✓ assets (31 stills · 4 clips)
 ✗ full-episode render
 ✗ narration recorded
 ✗ thumbnail-spec
 
+## Next actions
+
+1. **Regenerate stale manifest**
+   ```
+   python3 tools/assembly/generate_manifest.py prisoners-dilemma
+   ```
+2. **First full-episode render pending**
+   ```
+   ./scripts/render.sh prisoners-dilemma
+   ```
+3. **Thumbnails missing**
+   ```
+   npm run thumbnails -- --episode=prisoners-dilemma
+   ```
+
 ## Health
+🔴 M-MANIFEST-STALE  script (2026-05-24T00:21) > manifest (drift 3.0 d)
+   → fix: `python3 tools/assembly/generate_manifest.py prisoners-dilemma`
 🟡 Manifest ready but episode never rendered
    → fix: `cd remotion-templates && node scripts/render-episode.mjs --episode=prisoners-dilemma`
+
+## Assets
+  Stills    ▰▰▰▰▰▰▰▰▰▰  33/33  · all present
+  Clips     ▰▰▰▰▰▰▱▱▱▱  16/27  · 11 pending
+  Morphs    ▱▱▱▱▱▱▱▱▱▱  0/0  · all generated
+  Wired     ▰▰▰▰▰▰▰▰▰▰  24/25 footage segments
 
 ## By the numbers
 
 `Duration      `  14.9 min (893.8s)
 `Segments      `  121
-`Data files    `  48
-`Days in state `  8
-`Days to target`  +15
+`Data files    `  49
+`Days in state `  152
+`Days to target`  -129
 
 ## Notes
 
-Launch candidate. Script v3 locked editorially; work remaining is AI-gen fallback for 4 zero-hit shots + first full-episode render + narration + NLE.
+Launch candidate. Script locked editorially; full manifest (121 segments, 50 data files) generated. KNOWN GAP: visual-spec.md missing (asset-source bypassed the canonical visual-spec flow) — validator errors on this until written. Remaining: first full-episode render + narration + NLE.
 
 ---
 

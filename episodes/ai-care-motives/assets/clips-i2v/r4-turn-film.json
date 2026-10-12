@@ -1,0 +1,17 @@
+{
+  "model": "fal-ai/film",
+  "payload": {
+    "start_image_url": "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r4/turn-a.png",
+    "end_image_url": "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r4/turn-b.png",
+    "output_type": "video",
+    "num_frames": 28,
+    "fps": 30,
+    "include_start": true,
+    "include_end": true
+  },
+  "request_id": "01a12cbb-b395-7502-b860-bb210e324c1f",
+  "saved": [
+    "turn-film-video.mp4"
+  ],
+  "wall_seconds": 14
+}

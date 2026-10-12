@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T20:13:50+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c99-7c95-7030-bc63-5369ea158a7b",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-05-rescued-figure.png",
+  "end_image": "/Users/feihuyan/project-parallax/episodes/ai-care-motives/assets/stills/aigen-05-rescued-figure.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are; the light does not change. The river moves slowly in flat horizontal bands. The dry grass at the left sways slightly in a light wind. The seated figure wrapped in the pale blanket, the distant standing man, the rocks, the bare trees and the horizon stay perfectly still. The shot ends exactly as it began. Audio: quiet water, light wind, no music, no voices.",
+  "expanded_prompt": "How the reference pictures align with the target video \u2014 Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 5.00-second mark of the target video.\n\nintegrated_multimodal_description: [Shot 1] This is a static, locked-off tripod shot in a flat illustrated style with visible textures and a muted color palette. The scene opens on <Picture 1>, showing a seated figure (S1) wrapped in a pale, geometrically-folded blanket sitting on a rocky embankment, looking out over a wide river. In the distance, a lone man (S2) stands still on the opposite bank, while two bare, skeletal trees silhouetted against a dark orange and charcoal horizon. The lighting is a consistent, dusky twilight. Throughout the five-second duration, the camera remains perfectly still with no movement. The river water moves in slow, flat horizontal bands, suggesting a gentle current. On the far left, tufts of dry grass sway only slightly in a light, consistent breeze. All other elements\u2014the seated figure, the standing man (S2), the rocks, the trees, and the horizon line\u2014remain completely motionless. The shot concludes exactly as it began, matching <Picture 2> perfectly, maintaining the same composition and atmosphere throughout.\n\noverall_soundscape: The gentle, continuous sound of water flowing steadily creates a peaceful backdrop, accompanied by the soft, intermittent whistle of a light wind moving through the dry grass.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.737052032724023
+  },
+  "wall_seconds": 13,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfe32/T97WLYhddOqsKJrODki5X_minimax-h3.mp4"
+}

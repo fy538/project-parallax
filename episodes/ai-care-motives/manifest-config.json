@@ -1,0 +1,19 @@
+{
+  "_comment": "dataFiles resolved from [ai-care-motives/x.json] refs in script.md. shotIds match substrings of AI-GEN row text.",
+  "dataFiles": {},
+  "shotIds": {
+    "aigen-01": "aigen-01",
+    "shop counter still from Beat 2": "aigen-02",
+    "shop counter, constructivist": "aigen-02",
+    "second shopkeeper alone": "aigen-03",
+    "river, muted": "aigen-04",
+    "rescued figure on the bank": "aigen-05",
+    "same row of cards tiled": "aigen-06",
+    "row of small geometric figures": "aigen-06",
+    "aigen-07": "aigen-07",
+    "aigen-09": "aigen-09",
+    "aigen-10": "aigen-10",
+    "aigen-11": "aigen-11",
+    "aigen-12": "aigen-12"
+  }
+}

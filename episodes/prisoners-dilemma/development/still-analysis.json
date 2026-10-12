@@ -1,0 +1,354 @@
+{
+  "slug": "prisoners-dilemma",
+  "generated": "2026-05-23",
+  "method": "vision-agent perception (Phase 2a) \u2014 Read on each PNG, schema per tools/ai-video/perceive.md",
+  "scope": "Thread A (validation set \u2014 hand decisions known, for backtest)",
+  "stills": [
+    {
+      "shot_id": "aigen-01",
+      "faces": {
+        "count": 2,
+        "max_scale": "close",
+        "orientation": "front"
+      },
+      "figures": {
+        "count": 2,
+        "scale": "close",
+        "implied_action": "seated"
+      },
+      "depth": {
+        "structure": "layered",
+        "clear_layers": [
+          "fg: table with grid papers",
+          "mid: two seated figures",
+          "bg: shelf with reel-to-reel, framed art, window"
+        ]
+      },
+      "reflective_surfaces": [],
+      "repeating_patterns": [
+        "venetian-blind slats (mild, edge of frame)"
+      ],
+      "text_or_marks": [
+        "faint grid + tally marks on the table papers"
+      ],
+      "ambient_elements": [
+        "reel-to-reel tape reels (could spin)",
+        "light through blinds"
+      ],
+      "resolution": {
+        "width": 1672,
+        "needs_upscale_for_kenburns": true
+      },
+      "dominant_subject_region": "center",
+      "palette_on_brand": true,
+      "perception_notes": "two close planar faces (one in glasses) \u2014 face animation is the live risk here"
+    },
+    {
+      "shot_id": "aigen-01b",
+      "faces": {
+        "count": 0,
+        "max_scale": "none",
+        "orientation": "none"
+      },
+      "figures": {
+        "count": 0,
+        "scale": "none",
+        "implied_action": "none"
+      },
+      "depth": {
+        "structure": "flat",
+        "clear_layers": [
+          "single tabletop surface seen from above"
+        ]
+      },
+      "reflective_surfaces": [],
+      "repeating_patterns": [
+        "dense tally-mark field in the C/D grid (high-density small marks)"
+      ],
+      "text_or_marks": [
+        "'C' and 'D' column headers",
+        "~100 tally marks"
+      ],
+      "ambient_elements": [
+        "light bands across the surface"
+      ],
+      "resolution": {
+        "width": 1672,
+        "needs_upscale_for_kenburns": true
+      },
+      "dominant_subject_region": "center",
+      "palette_on_brand": true,
+      "perception_notes": "many small marks with no morph correspondence \u2014 this is the frame that smeared as a morph; safe only as ken-burns/cut"
+    },
+    {
+      "shot_id": "aigen-04a",
+      "faces": {
+        "count": 0,
+        "max_scale": "none",
+        "orientation": "none"
+      },
+      "figures": {
+        "count": 0,
+        "scale": "none",
+        "implied_action": "none"
+      },
+      "hands_or_partial_limbs": {
+        "present": true,
+        "action": "writing"
+      },
+      "depth": {
+        "structure": "flat",
+        "clear_layers": [
+          "chalkboard surface head-on",
+          "second board at left edge"
+        ]
+      },
+      "reflective_surfaces": [],
+      "repeating_patterns": [],
+      "text_or_marks": [
+        "PD payoff matrix (3,3)(0,5)/(5,0)(1,1)",
+        "C/D headers"
+      ],
+      "ambient_elements": [],
+      "resolution": {
+        "width": 1672,
+        "needs_upscale_for_kenburns": true
+      },
+      "dominant_subject_region": "center",
+      "palette_on_brand": true,
+      "perception_notes": "a hand but no face; the matrix is legible text \u2014 blocks morph, warp risk if frame moves"
+    },
+    {
+      "shot_id": "aigen-04",
+      "faces": {
+        "count": 0,
+        "max_scale": "none",
+        "orientation": "back"
+      },
+      "figures": {
+        "count": 1,
+        "scale": "distant",
+        "implied_action": "walking"
+      },
+      "depth": {
+        "structure": "one-point",
+        "clear_layers": [
+          "receding corridor to a central vanishing point"
+        ]
+      },
+      "reflective_surfaces": [],
+      "repeating_patterns": [
+        "checkerboard floor (large area)",
+        "coffered ceiling lights",
+        "repeated doorframes + wall chalkboards"
+      ],
+      "text_or_marks": [
+        "small matrices/diagrams on the wall chalkboards (minor)"
+      ],
+      "ambient_elements": [
+        "lone figure walking away"
+      ],
+      "resolution": {
+        "width": 1672,
+        "needs_upscale_for_kenburns": true
+      },
+      "dominant_subject_region": "center",
+      "palette_on_brand": true,
+      "perception_notes": "distant back-turned walker (no face) = safe to animate; checkerboard floor will crawl unless camera is locked"
+    },
+    {
+      "shot_id": "aigen-05",
+      "faces": {
+        "count": 0,
+        "max_scale": "none",
+        "orientation": "none"
+      },
+      "figures": {
+        "count": 0,
+        "scale": "none",
+        "implied_action": "none"
+      },
+      "depth": {
+        "structure": "layered",
+        "clear_layers": [
+          "fg: dark interior walls + doorway frame",
+          "bg: bright exterior terrace, colonnade, tree, sky"
+        ]
+      },
+      "reflective_surfaces": [
+        "glossy interior floor (clear reflection)"
+      ],
+      "repeating_patterns": [
+        "exterior paving tiles (mild)"
+      ],
+      "text_or_marks": [],
+      "ambient_elements": [
+        "sky/clouds",
+        "tree foliage"
+      ],
+      "resolution": {
+        "width": 1672,
+        "needs_upscale_for_kenburns": true
+      },
+      "dominant_subject_region": "center",
+      "palette_on_brand": true,
+      "perception_notes": "crisp two-layer depth = ideal 2.5D; glossy floor must stay in a static layer"
+    },
+    {
+      "shot_id": "aigen-02",
+      "faces": {
+        "count": 5,
+        "max_scale": "mid",
+        "orientation": "mixed"
+      },
+      "figures": {
+        "count": 5,
+        "scale": "mid",
+        "implied_action": "seated+presenting"
+      },
+      "named_elements": [
+        "standing presenter pointing at projector screen",
+        "2x2 payoff matrix C/D 3,3/0,5/5,0/1,1 on screen",
+        "four seated figures (one back-to-camera fg)",
+        "water glasses",
+        "papers/notebooks on table",
+        "framed abstract art left wall",
+        "window with faint capitol-dome silhouette"
+      ],
+      "dynamic_action": {
+        "present": false,
+        "what": "none"
+      },
+      "style_register": "faceted",
+      "era": "mid-century",
+      "perception_notes": "Register FIXED vs v1: faces modeled in planes (not flat-vector), 5 figures not 8. Prompt matches; Director push-in OK; faces hold."
+    },
+    {
+      "shot_id": "aigen-11",
+      "faces": {
+        "count": 0,
+        "max_scale": "distant",
+        "orientation": "mixed"
+      },
+      "figures": {
+        "count": 6,
+        "scale": "mid",
+        "implied_action": "advancing toward stag; one diverging to hare"
+      },
+      "named_elements": [
+        "five primitive hunters in furs with wooden spears advancing",
+        "one hunter peeling right toward a hare",
+        "stag at far edge in dawn light",
+        "faceted forest terrain",
+        "tall trees",
+        "fallen log fg-right"
+      ],
+      "dynamic_action": {
+        "present": true,
+        "what": "advancing (composed, not a sprint)"
+      },
+      "style_register": "faceted",
+      "era": "primitive",
+      "ambient_elements": [
+        "dawn light shafts",
+        "fine dust"
+      ],
+      "perception_notes": "Register FIXED: constructivist (was realist oil). Primitive hunters + hare + stag present. Held-pose+light is safe; verb softened charging->advancing."
+    },
+    {
+      "shot_id": "aigen-11b",
+      "faces": {
+        "count": 0,
+        "max_scale": "distant",
+        "orientation": "mixed"
+      },
+      "figures": {
+        "count": 6,
+        "scale": "mid",
+        "implied_action": "gathered around felled stag, standing/kneeling"
+      },
+      "named_elements": [
+        "five-six primitive hunters in furs with spears in a loose circle",
+        "one kneeling beside the felled stag",
+        "felled stag centre",
+        "faceted forest",
+        "tall trees",
+        "dawn light",
+        "fallen log"
+      ],
+      "dynamic_action": {
+        "present": false,
+        "what": "none"
+      },
+      "style_register": "faceted",
+      "era": "primitive",
+      "ambient_elements": [
+        "dawn light through trees"
+      ],
+      "perception_notes": "Continuity with 11 FIXED: same primitive hunters, faceted style, forest, dawn light. Standing gathering -> 'shift subtly' safe."
+    },
+    {
+      "shot_id": "aigen-14",
+      "faces": {
+        "count": 0,
+        "max_scale": "distant",
+        "orientation": "back"
+      },
+      "figures": {
+        "count": 3,
+        "scale": "distant",
+        "implied_action": "walking"
+      },
+      "named_elements": [
+        "two-three distant pedestrians walking",
+        "faceted building facades both sides",
+        "empty pavement",
+        "streetlights with amber pools",
+        "hazy distant skyline",
+        "trees right"
+      ],
+      "dynamic_action": {
+        "present": false,
+        "what": "none"
+      },
+      "style_register": "faceted",
+      "era": "contemporary",
+      "ambient_elements": [
+        "evening haze"
+      ],
+      "perception_notes": "Register FIXED + sparser per direction: ~3 distant figures (was ~10), haze, amber pools. Distant/back -> safe."
+    },
+    {
+      "shot_id": "aigen-14b",
+      "faces": {
+        "count": 2,
+        "max_scale": "mid",
+        "orientation": "profile"
+      },
+      "figures": {
+        "count": 3,
+        "scale": "mid",
+        "implied_action": "two shaking hands; one distant walking"
+      },
+      "named_elements": [
+        "two central figures shaking hands in amber light pool",
+        "one distant silhouette far left",
+        "same faceted facades as 14",
+        "streetlights",
+        "empty pavement",
+        "hazy skyline"
+      ],
+      "dynamic_action": {
+        "present": false,
+        "what": "handshake (small gesture)"
+      },
+      "style_register": "faceted",
+      "era": "contemporary",
+      "ambient_elements": [
+        "evening haze"
+      ],
+      "perception_notes": "Continuity with 14 FIXED: same street/facades/light. Crowd stripped -> handshake is the only event. Faces mid -> hold heads, animate hands."
+    }
+  ],
+  "ground_motion_dogfood": "2026-05-24: appended perception records for the 5 regenerated stills (02,11,11b,14,14b). All passed \u2014 register fixed, prompts match, both continuity pairs consistent."
+}

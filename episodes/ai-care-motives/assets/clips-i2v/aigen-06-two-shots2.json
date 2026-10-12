@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T00:30:52+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12d84-c8d2-7943-850a-9478b54e380c",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-06-rating-cards.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Two shots. Shot 1, two seconds: a static wide shot exactly as in the image; nobody moves. CUT. Shot 2, three seconds: a static close-up of the bald man in plain black clothes in the middle, from the chest up, with the shoulders and blank cards of the people on either side just in frame. He faces the camera and does not turn his head. His face is one smooth, flat, blank plane, exactly as in the wide shot: no nose, no mouth, no eyes, no brow, no shading that suggests features. The two people beside him slowly turn their heads a little further toward him. Keep the image's flat illustrated cut-paper style, the flat orange wall, the textures and the colours exactly as they are in both shots. Every face stays a smooth blank plane. Audio: quiet room, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic live-action-style wide shot in a flat illustrated cut-paper style. Ten figures stand in a perfectly horizontal line against a vibrant, flat orange wall. In the center, a bald man in a plain black shirt stands forward, flanked by nine individuals in dark suits. Each person holds a large blank white card in front of them. The lighting is flat with minimal shading, emphasizing the graphic texture. Every figure remains completely frozen and motionless. [Shot 2] At 00:02.000, the camera cuts to a static close-up of the bald man (S1) from the chest up. He is positioned centrally in the frame, facing the camera directly with a rigid, unmoving posture. His face is a completely smooth, flat, blank plane, devoid of a nose, mouth, eyes, brow, or any shading to suggest features. On either side of him, the shoulders and the blank white cards of two adjacent figures are visible in frame. These two figures slowly and deliberately turn their heads a few degrees toward S1. Throughout the shot, the flat cut-paper aesthetic, the textured orange background, and the specific color palette remain consistent. Every face remains a featureless, blank plane.\n\noverall_soundscape: The sound of a heavy, quiet room with ambient stillness. A faint, dry rustle of fabric is heard as the two figures on the side turn their heads.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.4047035500989296
+  },
+  "wall_seconds": 16,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae0438/vdujJYbSgZeeW1DJfQA2-_minimax-h3.mp4"
+}

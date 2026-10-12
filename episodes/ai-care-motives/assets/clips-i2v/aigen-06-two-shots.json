@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T20:13:50+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c99-7fe7-7581-8edb-38377bb46f92",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-06-rating-cards.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Two shots. Shot 1, two seconds: a static wide shot exactly as in the image; nobody moves. CUT. Shot 2, three seconds: a static close-up of the bald man in plain black clothes in the middle, from the chest up, with the shoulders and blank cards of the people on either side just in frame; he slowly turns his head to look at the woman on his left. Keep the image's flat illustrated cut-paper style, the flat orange wall, the textures and the colours exactly as they are in both shots. All faces stay smooth blank planes with no eyes, nose or mouth. Audio: quiet room, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] Cinematic live-action animation in a flat illustrated cut-paper style. A static wide shot captures ten figures standing in a horizontal row against a vibrant, flat orange wall. Each figure is dressed in dark business attire, holding a blank white card in front of their chest. The faces are smooth, blank planes with no eyes, nose, or mouth. The lighting is even, emphasizing the paper-like textures of the characters. Everyone remains perfectly motionless. [Shot 2] At 00:02.000, the camera cuts to a static close-up focused on the bald man (S1) in the center, framed from the chest up. The shoulders and blank white cards of the figures on either side of him are visible at the edges of the frame. S1, wearing a plain black long-sleeved shirt, slowly and deliberately turns his head to the left to look at the woman (S2) standing beside him. The flat aesthetic, solid orange background, and the featureless facial planes remain strictly consistent throughout the movement.\n\noverall_soundscape: The sound of a quiet, dead room with a faint ambient air tone. A very subtle, dry fabric rustle is heard as S1 turns his head and shoulders slightly during the movement.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.4982655190106016
+  },
+  "wall_seconds": 14,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfe32/LSur9MBOBh7C3Pj1ejeUE_minimax-h3.mp4"
+}

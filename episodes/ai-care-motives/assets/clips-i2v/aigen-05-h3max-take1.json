@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-10T17:31:08+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a126de-2c5e-74c0-93f4-c3c90b663b0c",
+  "still": "episodes/ai-care-motives/assets/stills/aigen-05-rescued-figure.png",
+  "end_image": null,
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated style, textures and colours exactly as they are. A light wind blows from the left: the dry orange grass in the foreground sways gently, small amplitude, slow, and the loose lower edge of the pale blanket flutters very slightly. The seated figure, the distant standing figure, the rocks, the bare trees and the water stay perfectly still. The light does not change. Audio: soft wind through dry grass, no music, no voices.",
+  "expanded_prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: <Picture 1> This is a flat, illustrated cinematic shot with a locked-off tripod perspective and no camera movement. The scene features a seated figure (S1) with dark hair, wearing a white geometric-textured blanket, sitting on a rocky embankment looking out over a body of dark water. In the distance, a lone standing figure (S2) is visible on a ridge, and several bare, leafless trees silhouetted against a deep orange sunset horizon under a dark sky. The art style is characterized by clean, angular textures and a muted, earthy color palette. Throughout the 5-second continuous shot, a light wind blows from the left; the dry orange grass in the foreground sways gently with small amplitude at a slow speed. Simultaneously, the loose lower edge of S1's pale blanket flutters very slightly in the breeze. The seated figure S1, the distant standing figure S2, the rocks, the bare trees, and the water remain perfectly still. The lighting is constant and atmospheric, reflecting the fading twilight.\n\noverall_soundscape: A consistent, soft whistling sound of wind blowing through dry, brittle grass is accompanied by the occasional faint, fluttering sound of fabric moving in the breeze. There are no voices or animal sounds.\n\nnon_diegetic_music: N/A",
+  "timings": {
+    "inference": 3.423556974157691
+  },
+  "wall_seconds": 15,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadd8a1/TihsBe4MT9dG2x3cDHFno_minimax-h3.mp4"
+}

@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T18:30:48+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c3b-2a52-7e21-8e77-8ed3a02761c1",
+  "still": "project/visual-identity/2026-10-11/character-motion/02-coins-start.png",
+  "end_image": "project/visual-identity/2026-10-11/character-motion/02-coins-end.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": 41111,
+  "prompt": "Locked camera, one continuous five-second shot. The child moves their waiting palm beneath the shopkeeper's offering hand. The shopkeeper brings that hand slightly toward the child and gently tips exactly TWO solid ochre coins into the child's palm, then withdraws the empty hand. Both coins finish side by side in the child's open palm, matching the supplied end frame; hold briefly. Show continuous hand movement and an actual transfer, with gravity and contact: coins must travel rather than vanish and reappear, multiply, melt or pass through fingers. Fingers and wrists remain coherent and attached to their own arms. The shopkeeper's other hand, painted loaf, counter, window and background people stay still. Preserve the same featureless faceted heads at every instant: no facial anatomy or inner-ear marks, and no nose/lip outline protrusions. Preserve matte painted texture and fixed light. No cut, dissolve, camera move or additional objects.",
+  "expanded_prompt": null,
+  "timings": {
+    "inference": 3.5403006350024953
+  },
+  "wall_seconds": 12,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfbc7/UMbff5s4PtauYAjhc6olz_minimax-h3.mp4"
+}

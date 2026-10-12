@@ -283,7 +283,7 @@
     <div class="brand-mark">∴</div>
     <h1>Parallax Pipeline</h1>
   </div>
-  <div class="snapshot">SNAPSHOT 2026-05-18</div>
+  <div class="snapshot">SNAPSHOT 2026-10-08</div>
 </header>
 
 <nav class="tabs" role="tablist">
@@ -291,6 +291,7 @@
   <button class="tab" role="tab" data-tab="prisoners-dilemma"><span class="dot" style="background: var(--gold);"></span>prisoners-dilemma</button>
   <button class="tab" role="tab" data-tab="silicon-trap"><span class="dot" style="background: var(--dustblue);"></span>silicon-trap</button>
   <button class="tab" role="tab" data-tab="blockades-leak"><span class="dot" style="background: var(--taupe);"></span>blockades-leak</button>
+  <button class="tab" role="tab" data-tab="ai-care-motives"><span class="dot" style="background: var(--sand);"></span>ai-care-motives</button>
   <button class="tab" role="tab" data-tab="spend">Spend</button>
   <button class="tab" role="tab" data-tab="topics">Topics</button>
 </nav>
@@ -305,7 +306,7 @@
     <div class="stage upcoming">Viable</div>
     <div class="stage upcoming">Researching</div>
     <div class="stage upcoming">Research Rdy</div>
-    <div class="stage upcoming">Drafting</div>
+    <div class="stage active">Drafting</div>
     <div class="stage active">Render Rdy</div>
     <div class="stage upcoming">In Post</div>
     <div class="stage upcoming">Published</div>
@@ -318,7 +319,9 @@
     <div class="ep-flag-column"></div>
     <div class="ep-flag-column"></div>
     <div class="ep-flag-column"></div>
-    <div class="ep-flag-column"></div>
+    <div class="ep-flag-column">
+      <span class="ep-flag sand"><span class="ep-dot"></span>ai-care-motives</span>
+    </div>
     <div class="ep-flag-column">
       <span class="ep-flag gold"><span class="ep-dot"></span>prisoners-dilemma</span>
       <span class="ep-flag dustblue"><span class="ep-dot"></span>silicon-trap</span>
@@ -348,13 +351,13 @@
     </div>
     <h3>The Prisoner&#x27;s Dilemma Is Wrong About Almost Everything</h3>
     <div class="state-line">
-      <span class="state">RENDER READY · day 9</span>
+      <span class="state">RENDER READY · day 152</span>
       <span class="progress-fraction">6/9</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width: 66.67%;"></div></div>
     <div class="ep-footer">
       <span><span class="label">Format</span>Philosopher&#x27;s Lens</span>
-      <span><span class="label">Target</span>2026-06-01 (+14d)</span>
+      <span><span class="label">Target</span>2026-06-01 (-129d)</span>
     </div>
   </article>
   <article class="ep-card dustblue">
@@ -363,17 +366,17 @@
         <span class="ep-dot"></span>
         <span>silicon-trap</span>
       </div>
-      <span class="ep-badge version">V5</span>
+      <span class="ep-badge draft">—</span>
     </div>
     <h3>The Silicon Trap</h3>
     <div class="state-line">
-      <span class="state">RENDER READY · day 17</span>
+      <span class="state">RENDER READY · day 160</span>
       <span class="progress-fraction">6/9</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width: 66.67%;"></div></div>
     <div class="ep-footer">
       <span><span class="label">Format</span>Wargamer</span>
-      <span><span class="label">Target</span>2026-05-25 (+7d)</span>
+      <span><span class="label">Target</span>2026-05-25 (-136d)</span>
     </div>
   </article>
   <article class="ep-card taupe">
@@ -382,17 +385,36 @@
         <span class="ep-dot"></span>
         <span>blockades-leak</span>
       </div>
-      <span class="ep-badge version">V1</span>
+      <span class="ep-badge draft">V1</span>
     </div>
     <h3>Why Technological Blockades Always Leak</h3>
     <div class="state-line">
-      <span class="state">INCUBATING · day 61</span>
+      <span class="state">INCUBATING · day 204</span>
       <span class="progress-fraction">1/9</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" style="width: 11.11%;"></div></div>
     <div class="ep-footer">
       <span><span class="label">Format</span>—</span>
       <span><span class="label">Status</span>Viability re-gate</span>
+    </div>
+  </article>
+  <article class="ep-card sand">
+    <div class="ep-meta-row">
+      <div class="ep-slug">
+        <span class="ep-dot"></span>
+        <span>ai-care-motives</span>
+      </div>
+      <span class="ep-badge draft">—</span>
+    </div>
+    <h3>Ai Care Motives</h3>
+    <div class="state-line">
+      <span class="state">DRAFTING · day 1</span>
+      <span class="progress-fraction">5/9</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width: 55.56%;"></div></div>
+    <div class="ep-footer">
+      <span><span class="label">Format</span>Philosopher&#x27;s Lens</span>
+      <span><span class="label">Status</span>—</span>
     </div>
   </article>
 </section>
@@ -403,12 +425,13 @@
   <ol>
     <li class="dustblue"><span class="slug">silicon-trap</span> — close the 21 zero-hit asset gap (<code class="copyable">python3 tools/asset-source/zerohit_fallback.py silicon-trap</code>), then regen manifest + first full render.</li>
     <li class="gold"><span class="slug">prisoners-dilemma</span> — regen stale manifest (<code class="copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code>), then continue.</li>
-    <li class="taupe"><span class="slug">blockades-leak</span> — viability re-gate (day 61 in INCUBATING — likely needs a fresh research scan or to be promoted/killed).</li>
+    <li class="taupe"><span class="slug">blockades-leak</span> — viability re-gate (day 204 in INCUBATING — likely needs a fresh research scan or to be promoted/killed).</li>
+    <li class="sand"><span class="slug">ai-care-motives</span> — continue per <code>episodes/ai-care-motives/_status.md</code>.</li>
   </ol>
   <div class="pills">
     <span class="pill">Buffer: see PIPELINE.md</span>
     <span class="pill">Strategy: prisoners-dilemma is launch candidate</span>
-    <span class="pill">Formats: Philosopher's Lens · Wargamer</span>
+    <span class="pill">Formats: Philosopher's Lens · Wargamer · Philosopher's Lens</span>
   </div>
 </section>
 </div>
@@ -421,7 +444,7 @@
     </div>
     <div class="ep-tab-state">
       <div class="ep-tab-state-pill">RENDER READY</div>
-      <div class="ep-tab-state-meta">day 9 · target 2026-06-01 (+14 days)</div>
+      <div class="ep-tab-state-meta">day 152 · target 2026-06-01 (-129 days)</div>
     </div>
   </header>
   <div class="quick-actions">
@@ -439,12 +462,12 @@
       <ul class="checklist">
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">research (brief + audit)</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">angle-memo</span></li>
-        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — 2026-05-18T13:31</span></li>
-        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">visual-spec</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — 2026-05-24T00:21</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">visual-spec</span></li>
         <li class="check-warn"><span class="check-icon">⚠</span><span class="check-label">assembly-manifest (estimate · 121 seg · 894s)</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">audio-cue-sheet</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">data files (49 files)</span></li>
-        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">assets (17 stills · 17 clips)</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">assets (31 stills · 4 clips)</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">full-episode render</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">narration recorded</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">thumbnail-spec</span></li>
@@ -453,7 +476,7 @@
     <div class="ep-tab-panel">
       <h4>Health</h4>
       <ul class="health-list">
-        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (1.6 d drift) — <code class="copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code></span></li>
+        <li class="health-item"><span class="health-icon">🔴</span><span class="health-msg">Manifest stale (3.0 d drift) — <code class="copyable">python3 tools/assembly/generate_manifest.py prisoners-dilemma</code></span></li>
         <li class="health-item"><span class="health-icon">🟡</span><span class="health-msg">Manifest ready but never rendered — <code class="copyable">cd remotion-templates && node scripts/render-episode.mjs --episode=prisoners-dilemma</code></span></li>
       </ul>
     </div>
@@ -463,20 +486,20 @@
         <div class="metric"><span class="metric-label">Duration</span><span class="metric-value">14.9 min (894s)</span></div>
         <div class="metric"><span class="metric-label">Segments</span><span class="metric-value">121</span></div>
         <div class="metric"><span class="metric-label">Data files</span><span class="metric-value">49 Remotion JSON</span></div>
-        <div class="metric"><span class="metric-label">Assets</span><span class="metric-value">17 stills · 17 clips</span></div>
+        <div class="metric"><span class="metric-label">Assets</span><span class="metric-value">31 stills · 4 clips</span></div>
         <div class="metric"><span class="metric-label">Manifest mode</span><span class="metric-value">estimate</span></div>
       </div>
     </div>
   </div>
   <div class="ep-tab-timeline">
-    <h4>State transitions · 1 event over 9 days</h4>
+    <h4>State transitions · 1 event over 152 days</h4>
     <div class="timeline-track">
     <div class="timeline-node" style="left: 0.00%;" title="2026-05-09 → RENDER READY: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">RENDER READY</div><div class="timeline-date">2026-05-09</div></div>
-    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 9 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+9d</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 152 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-10-08</div><div class="timeline-delta">+152d</div></div>
     </div>
     <div class="timeline-axis">
       <span class="timeline-axis-start">2026-05-09</span>
-      <span class="timeline-axis-end">2026-05-18</span>
+      <span class="timeline-axis-end">2026-10-08</span>
     </div>
   </div>
   <div class="ep-tab-source">
@@ -494,7 +517,7 @@
     </div>
     <div class="ep-tab-state">
       <div class="ep-tab-state-pill">RENDER READY</div>
-      <div class="ep-tab-state-meta">day 17 · target 2026-05-25 (+7 days)</div>
+      <div class="ep-tab-state-meta">day 160 · target 2026-05-25 (-136 days)</div>
     </div>
   </header>
   <div class="quick-actions">
@@ -513,7 +536,7 @@
       <ul class="checklist">
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">research (brief + audit)</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">angle-memo</span></li>
-        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — v5, 2026-05-16T11:08</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — 2026-05-16T11:08</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">visual-spec</span></li>
         <li class="check-warn"><span class="check-icon">⚠</span><span class="check-label">assembly-manifest (estimate · 99 seg · 813s)</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">audio-cue-sheet</span></li>
@@ -543,14 +566,14 @@
     </div>
   </div>
   <div class="ep-tab-timeline">
-    <h4>State transitions · 1 event over 17 days</h4>
+    <h4>State transitions · 1 event over 160 days</h4>
     <div class="timeline-track">
     <div class="timeline-node" style="left: 0.00%;" title="2026-05-01 → RENDER READY: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">RENDER READY</div><div class="timeline-date">2026-05-01</div></div>
-    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 17 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+17d</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 160 in RENDER READY"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-10-08</div><div class="timeline-delta">+160d</div></div>
     </div>
     <div class="timeline-axis">
       <span class="timeline-axis-start">2026-05-01</span>
-      <span class="timeline-axis-end">2026-05-18</span>
+      <span class="timeline-axis-end">2026-10-08</span>
     </div>
   </div>
   <div class="ep-tab-source">
@@ -568,7 +591,7 @@
     </div>
     <div class="ep-tab-state">
       <div class="ep-tab-state-pill">INCUBATING</div>
-      <div class="ep-tab-state-meta">day 61</div>
+      <div class="ep-tab-state-meta">day 204</div>
     </div>
   </header>
   <div class="quick-actions">
@@ -586,7 +609,7 @@
       <ul class="checklist">
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">research (brief + audit)</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">angle-memo</span></li>
-        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — v1, 2026-05-02T01:15</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — 2026-05-02T01:15</span></li>
         <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">visual-spec</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">assembly-manifest</span></li>
         <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">audio-cue-sheet</span></li>
@@ -609,20 +632,76 @@
     </div>
   </div>
   <div class="ep-tab-timeline">
-    <h4>State transitions · 1 event over 61 days</h4>
+    <h4>State transitions · 1 event over 204 days</h4>
     <div class="timeline-track">
     <div class="timeline-node" style="left: 0.00%;" title="2026-03-18 → INCUBATING: bootstrap from pipeline-state.json"><div class="timeline-dot"></div><div class="timeline-label">INCUBATING</div><div class="timeline-date">2026-03-18</div></div>
-    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 61 in INCUBATING"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-05-18</div><div class="timeline-delta">+61d</div></div>
+    <div class="timeline-node timeline-node-now" style="left: 100%;" title="Today · day 204 in INCUBATING"><div class="timeline-dot timeline-dot-open"></div><div class="timeline-label">Now</div><div class="timeline-date">2026-10-08</div><div class="timeline-delta">+204d</div></div>
     </div>
     <div class="timeline-axis">
       <span class="timeline-axis-start">2026-03-18</span>
-      <span class="timeline-axis-end">2026-05-18</span>
+      <span class="timeline-axis-end">2026-10-08</span>
     </div>
   </div>
   <div class="ep-tab-source">
     Source · <code>episodes/blockades-leak/_status.md</code> (auto-generated by
     <code>tools/pipeline_validator.py --write-status</code>) ·
     <code>episodes/blockades-leak/_state-history.jsonl</code> (append-only
+    via <code>tools/state_history.py record</code>)
+  </div>
+</section>
+<section class="ep-tab sand" data-tab-content="ai-care-motives" hidden>
+  <header class="ep-tab-header">
+    <div>
+      <div class="ep-tab-slug">ai-care-motives · Philosopher&#x27;s Lens</div>
+      <h2>Ai Care Motives</h2>
+    </div>
+    <div class="ep-tab-state">
+      <div class="ep-tab-state-pill">DRAFTING</div>
+      <div class="ep-tab-state-meta">day 1</div>
+    </div>
+  </header>
+  <div class="quick-actions">
+    <div class="quick-actions-label">Quick actions · click to copy</div>
+    <div class="quick-actions-row">
+      <button class="quick-action" data-cmd="python3 tools/pipeline_validator.py --write-status ai-care-motives"><span class="quick-action-label">Refresh status</span><code class="quick-action-cmd copyable">python3 tools/pipeline_validator.py --write-status ai-care-motives</code></button>
+      <button class="quick-action" data-cmd="python3 tools/assembly/generate_manifest.py ai-care-motives"><span class="quick-action-label">Generate manifest</span><code class="quick-action-cmd copyable">python3 tools/assembly/generate_manifest.py ai-care-motives</code></button>
+      <button class="quick-action" data-cmd="open episodes/ai-care-motives/_status.md"><span class="quick-action-label">Open _status.md</span><code class="quick-action-cmd copyable">open episodes/ai-care-motives/_status.md</code></button>
+    </div>
+  </div>
+  <div class="ep-tab-grid">
+    <div class="ep-tab-panel">
+      <h4>Progress · 5 of 9 stages</h4>
+      <ul class="checklist">
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">research (brief + audit)</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">angle-memo</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">script-production.md — 2026-10-08T01:18</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">visual-spec</span></li>
+        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">assembly-manifest</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">audio-cue-sheet</span></li>
+        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">data files</span></li>
+        <li class="check-ok"><span class="check-icon">✓</span><span class="check-label">assets (12 stills · 0 clips)</span></li>
+        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">full-episode render</span></li>
+        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">narration recorded</span></li>
+        <li class="check-missing"><span class="check-icon">✗</span><span class="check-label">thumbnail-spec</span></li>
+      </ul>
+    </div>
+    <div class="ep-tab-panel">
+      <h4>Health</h4>
+      <div class="health-clean">🟢 No health issues detected.</div>
+    </div>
+    <div class="ep-tab-panel">
+      <h4>By the numbers</h4>
+      <div class="metrics-grid">
+        <div class="metric"><span class="metric-label">Assets</span><span class="metric-value">12 stills · 0 clips</span></div>
+        <div class="metric"><span class="metric-label">Manifest mode</span><span class="metric-value">missing</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="ep-tab-timeline ep-tab-timeline-empty">Timeline · no <code>_state-history.jsonl</code> yet — run <code class="copyable">python3 tools/state_history.py bootstrap</code></div>
+  <div class="ep-tab-source">
+    Source · <code>episodes/ai-care-motives/_status.md</code> (auto-generated by
+    <code>tools/pipeline_validator.py --write-status</code>) ·
+    <code>episodes/ai-care-motives/_state-history.jsonl</code> (append-only
     via <code>tools/state_history.py record</code>)
   </div>
 </section>
@@ -660,9 +739,9 @@
   <div class="topics-section">
     <h4>Launch sequence (5 episodes)</h4>
     <div class="topics-grid">
-    <div class="topic-card"><div class="topic-ep">Ep 1</div><div class="topic-slug">prisoners-dilemma</div><div class="topic-format">Philosopher&#x27;s Lens</div><div class="topic-arc">Arc 3 (meta-framework for all arcs)</div><div class="topic-state">🔬 Deep Research in progress</div></div>
-    <div class="topic-card"><div class="topic-ep">Ep 2</div><div class="topic-slug">silicon-trap</div><div class="topic-format">Detective</div><div class="topic-arc">Arc 1</div><div class="topic-state">📋 Script v5, shot list, visual assets built — needs narration + stock footage</div></div>
-    <div class="topic-card"><div class="topic-ep">Ep 3</div><div class="topic-slug">blockades-leak</div><div class="topic-format">Philosopher&#x27;s Lens</div><div class="topic-arc">Arc 1</div><div class="topic-state">📋 Script v1, full pipeline run complete — needs production</div></div>
+    <div class="topic-card"><div class="topic-ep">Ep 1</div><div class="topic-slug">prisoners-dilemma</div><div class="topic-format">Philosopher&#x27;s Lens</div><div class="topic-arc">Arc 3 (meta-framework for all arcs)</div><div class="topic-state">🎬 RENDER READY — script locked; needs visual-spec, render, narration</div></div>
+    <div class="topic-card"><div class="topic-ep">Ep 2</div><div class="topic-slug">silicon-trap</div><div class="topic-format">Detective</div><div class="topic-arc">Arc 1</div><div class="topic-state">🎬 RENDER READY — needs narration + stock footage (21 zero-hit slots)</div></div>
+    <div class="topic-card"><div class="topic-ep">Ep 3</div><div class="topic-slug">blockades-leak</div><div class="topic-format">Philosopher&#x27;s Lens</div><div class="topic-arc">Arc 1</div><div class="topic-state">💭 INCUBATING — awaiting viability re-gate (v1 returned CONDITIONAL)</div></div>
     <div class="topic-card"><div class="topic-ep">Ep 4</div><div class="topic-slug">treaty-nobody-believes</div><div class="topic-format">Wargame</div><div class="topic-arc">Arc 3</div><div class="topic-state">🔄 Incubating — New START expiry (Feb 2026) is trigger</div></div>
     <div class="topic-card"><div class="topic-ep">Ep 5</div><div class="topic-slug">industrial-convergence</div><div class="topic-format">Dialectic</div><div class="topic-arc">Arc 1</div><div class="topic-state">📡 Signal — viable concept, needs research</div></div>
     </div>
@@ -694,7 +773,7 @@
 <footer class="source">
   Source: <code>episodes/pipeline-state.json</code> · per-episode <code>_status.md</code> · <code>project/IDEAS.md</code>.
   Auto-generated by <code>tools/pipeline_validator.py --emit-html</code>.
-  Snapshot rendered 2026-05-18.
+  Snapshot rendered 2026-10-08.
 </footer>
 
 <script>

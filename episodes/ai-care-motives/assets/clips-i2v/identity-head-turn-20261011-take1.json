@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T18:30:13+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c3a-a1f1-7723-ba03-c2a1070aa402",
+  "still": "project/visual-identity/2026-10-11/character-motion/01-head-start.png",
+  "end_image": "project/visual-identity/2026-10-11/character-motion/01-head-end.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": 41111,
+  "prompt": "Locked eye-level camera. Over five seconds, the person slowly turns ONLY their head from facing front to a full left-facing profile, matching the supplied end frame, then holds. Shoulders, torso, wall, daylight and framing stay fixed. Hair and unequal painted head planes rotate coherently with the skull. The head is a completely featureless painted volume throughout, with a plain filled outer ear only: no eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth, inner-ear marks or nose/lip outline protrusions. Preserve the drawn matte medium. No speaking, facial expression, camera drift, cut, dissolve or newly appearing detail.",
+  "expanded_prompt": null,
+  "timings": {
+    "inference": 3.6261870230009663
+  },
+  "wall_seconds": 12,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfbc4/_iGmWwSZlm8O0oQTPylyX_minimax-h3.mp4"
+}

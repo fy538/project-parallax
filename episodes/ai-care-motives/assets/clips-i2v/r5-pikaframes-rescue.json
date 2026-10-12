@@ -1,0 +1,27 @@
+{
+  "model": "fal-ai/pika/v2.2/pikaframes",
+  "payload": {
+    "image_urls": [
+      "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r5/kf-alone.jpg",
+      "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r5/kf-grasp.jpg",
+      "@/private/tmp/claude-501/-Users-feihuyan-project-parallax/34bb25f3-5d09-4228-b359-d7baea8d4d6e/scratchpad/r5/kf-pulled.jpg"
+    ],
+    "transitions": [
+      {
+        "duration": 3,
+        "prompt": "A man in a dark suit kneels down on the rocky bank and clasps the swimmer's raised hand. The camera is locked off and does not move. Keep the flat illustrated cut-paper style, the colours and the blank faceted faces exactly as drawn."
+      },
+      {
+        "duration": 3,
+        "prompt": "The kneeling man leans back and pulls; the swimmer comes half out of the water onto the rocks. The camera is locked off and does not move. Keep the flat illustrated cut-paper style, the colours and the blank faceted faces exactly as drawn."
+      }
+    ],
+    "prompt": "A rescue at a river bank, flat illustrated cut-paper style, static camera.",
+    "resolution": "1080p"
+  },
+  "request_id": "01a12d86-785d-7561-9e87-2866b14aba99",
+  "saved": [
+    "pika-video.mp4"
+  ],
+  "wall_seconds": 543
+}

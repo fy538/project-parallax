@@ -1,0 +1,279 @@
+{
+  "version": "1.0",
+  "slug": "silicon-trap",
+  "generated_at": "2026-05-21",
+  "generated_from": "shot-list.json",
+  "assets": [
+    {
+      "id": "beat1-tsmc-aerial",
+      "description": "Opening shot — needs to be cinematic. Desert landscape with massive industrial construction.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat1-tsmc-aerial.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat1-tsmc-aerial-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat1-cleanroom",
+      "description": "Macro footage of wafer handling. Slow, deliberate shots emphasizing precision.",
+      "motionType": "footage",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat1-cleanroom.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat1-cleanroom-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat1-desert-housing",
+      "description": "Contrast with high-tech cleanroom — mundane temporary housing in desert heat.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat1-desert-housing.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat1-desert-housing-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat1-global-network",
+      "description": "Ambient texture under narration about supply chain complexity.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat1-global-network.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat1-global-network-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat2-fdr-1941",
+      "description": "Historical archival. Wikimedia Commons or Library of Congress preferred.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat2-fdr-1941.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat2-fdr-1941-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat2-jake-sullivan",
+      "description": "Background under narration about Sullivan's 2022 speech.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat2-jake-sullivan.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat2-jake-sullivan-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat2-chip-macro",
+      "description": "Generic chip imagery for transitions.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat2-chip-macro.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat2-chip-macro-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-china-rail",
+      "description": "Part of the ballpoint pen contrast sequence. Needs to look impressive/modern.",
+      "motionType": "footage",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-china-rail.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-china-rail-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-space-launch",
+      "description": "Part of the ballpoint pen contrast sequence.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-space-launch.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-space-launch-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-pen-tip",
+      "description": "The visual punchline — tiny pen tip after massive achievements. Needs to be high quality macro.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-pen-tip.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-pen-tip-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-shenzhen",
+      "description": "Ambient establishing shot for China segment.",
+      "motionType": "footage",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-shenzhen.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-shenzhen-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-ai-datacenter",
+      "description": "Transition into DeepSeek section.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-ai-datacenter.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-ai-datacenter-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-deepseek",
+      "description": "DeepSeek R1/R2 discussion. Logo preferred; fallback to generic Chinese AI lab imagery.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-deepseek.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-deepseek-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-wafer-macro",
+      "description": "Ambient closing texture for Beat 3.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-wafer-macro.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-wafer-macro-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat4-world-divided",
+      "description": "Background for bifurcation discussion.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat4-world-divided.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat4-world-divided-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-car-dashboard",
+      "description": "Quick montage element — everyday devices with chips.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-car-dashboard.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-car-dashboard-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-phone-circuit",
+      "description": "Quick montage element.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-phone-circuit.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-phone-circuit-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-hospital-mri",
+      "description": "Quick montage element.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-hospital-mri.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-hospital-mri-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-data-center",
+      "description": "Quick montage element.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-data-center.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-data-center-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-car-shortage",
+      "description": "COVID chip shortage reference — empty lots, shut factories.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-car-shortage.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-car-shortage-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat5-earth-night",
+      "description": "Closing ambient shot — the connected world at risk.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat5-earth-night.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat5-earth-night-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat2-cold-war-bridge",
+      "description": "Visual bridge from modern policy to COCOM history. Breaks 4-MG run in Beat 2.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat2-cold-war-bridge.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat2-cold-war-bridge-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-typewriter",
+      "description": "Typewriter metaphor for SMIC's 34-pass lithography. Breathing room between data charts.",
+      "motionType": "footage",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-typewriter.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-typewriter-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat4-asml-factory",
+      "description": "Ground abstract chess/go metaphor in physical reality. The machines are real, massive, irreplaceable.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat4-asml-factory.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat4-asml-factory-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat4-caught-nations",
+      "description": "Quick footage of caught-in-between nations before ChoroplethMap appears. Grounds the map in real places.",
+      "motionType": "still",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat4-caught-nations.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat4-caught-nations-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "stock-footage"
+    },
+    {
+      "id": "beat3-smic-fab-interior",
+      "description": "Interior of a Chinese semiconductor fabrication facility. Three workers in white bunny suits with reflective polycarbonate face shields, operating FOUP wafer carriers on automated tracks. Figures rendered with simplified planar features — geometric facets, eyes obscured by visor reflection. Yellow lithography lighting casting amber across white surfaces and stainless steel equipment. Bold heiti propaganda typography integrated with the architecture: '微米 · 纳米' (Micron · Nanometer) and '科技自立' (Technological Self-Reliance) in red and gold, vertical column orientation. Atmosphere of disciplined precision under constraint.",
+      "motionType": "standalone",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat3-smic-fab-interior.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat3-smic-fab-interior-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "ai-generate"
+    },
+    {
+      "id": "beat4-trap-encirclement",
+      "description": "An interlocking industrial trap viewed from a low monumentalist angle: massive factory complexes connected by tangled cable bundles and pipe networks forming a closing net or web. Smaller silhouetted figures stand inside the structure, dwarfed by the scale, unaware of the encirclement. Smokestacks belching ribbons of smoke that twist into the cable network above. Low horizon line, heavy contrast between deep ink-black machinery and burnt amber accents on the smoke and pipes.",
+      "motionType": "standalone",
+      "stillPath": "episodes/silicon-trap/assets/stills/beat4-trap-encirclement.png",
+      "videoPath": "remotion-templates/public/episodes/silicon-trap/clips/beat4-trap-encirclement-pika.mp4",
+      "segments": [],
+      "status": "missing",
+      "source": "ai-generate"
+    }
+  ],
+  "morphs": []
+}

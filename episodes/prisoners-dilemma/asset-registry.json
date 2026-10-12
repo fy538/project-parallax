@@ -1,0 +1,315 @@
+{
+  "version": "1.0",
+  "slug": "prisoners-dilemma",
+  "assets": [
+    {
+      "id": "aigen-01",
+      "description": "RAND office interior, 1950s mid-century modernist workspace",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-01-rand-office.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-01.mp4",
+      "segments": [
+        "beat1-seg04",
+        "beat1-seg05"
+      ]
+    },
+    {
+      "id": "aigen-02",
+      "description": "Game-theory equation poster on office wall, close-up",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-02-institution-adoption.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-02.mp4",
+      "segments": [
+        "beat1-seg10"
+      ]
+    },
+    {
+      "id": "aigen-03",
+      "description": "Aerial view of RAND-era research complex, Santa Monica coastline",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-03-aerial-complex.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-03.mp4",
+      "segments": [
+        "beat1-seg12"
+      ]
+    },
+    {
+      "id": "aigen-04",
+      "description": "RAND Corporation corridor, researchers walking, mid-century",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-04-rand-corridor.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-04.mp4",
+      "segments": [
+        "beat2-seg15",
+        "beat2-seg16"
+      ]
+    },
+    {
+      "id": "aigen-05",
+      "description": "Doorway threshold between two rooms, figure pausing at threshold",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-05-doorway-threshold.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-05.mp4",
+      "segments": [
+        "beat2-seg17",
+        "beat2-seg20"
+      ]
+    },
+    {
+      "id": "aigen-06",
+      "description": "Abstract grid landscape from above, strategic territory pattern",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-06-grid-landscape.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-06.mp4",
+      "segments": [
+        "beat3-seg25"
+      ]
+    },
+    {
+      "id": "aigen-07",
+      "description": "Negotiation room with figures seated across a table",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-07-negotiation-room.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-07.mp4",
+      "segments": [
+        "beat3-seg26"
+      ]
+    },
+    {
+      "id": "aigen-08",
+      "description": "1980s stock exchange trading floor, controlled chaos",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-08-stock-exchange.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-08.mp4",
+      "segments": [
+        "beat3-seg30"
+      ]
+    },
+    {
+      "id": "aigen-09",
+      "description": "Oil pipeline infrastructure crossing remote landscape",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-09-oil-infrastructure.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-09.mp4",
+      "segments": [
+        "beat3-seg33"
+      ]
+    },
+    {
+      "id": "aigen-10",
+      "description": "Sunrise over cooperative farmland, warm golden light",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-10-sunrise-cooperative.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-10.mp4",
+      "segments": [
+        "beat4-seg37"
+      ]
+    },
+    {
+      "id": "aigen-11",
+      "description": "Forest stag hunt scene, hunters converging through trees",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-11-forest-stag-hunt.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-11.mp4",
+      "segments": [
+        "beat4-seg38"
+      ]
+    },
+    {
+      "id": "aigen-12",
+      "description": "Terraced farmland on hillside, communal agricultural pattern",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-12-terraced-farmland.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-12.mp4",
+      "segments": [
+        "beat4-seg43",
+        "beat4-seg45"
+      ]
+    },
+    {
+      "id": "aigen-13",
+      "description": "Ocean vastness from above, horizon dissolving into sky",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-13-ocean-vastness.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-13.mp4",
+      "segments": [
+        "beat4-seg48"
+      ]
+    },
+    {
+      "id": "aigen-14",
+      "description": "City street with parallel pedestrians, anonymous urban flow",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-14-city-street.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-14.mp4",
+      "segments": [
+        "beat5-seg49"
+      ]
+    },
+    {
+      "id": "aigen-15",
+      "description": "Horizon with distant landmasses, geopolitical edge-of-frame",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-15-horizon-landmasses.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-15.mp4",
+      "segments": [
+        "beat5-seg52"
+      ]
+    },
+    {
+      "id": "aigen-16",
+      "description": "Lecture hall with speaker at podium, attentive audience",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-16-lecture-hall.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-16.mp4",
+      "segments": [
+        "beat5-seg56"
+      ]
+    },
+    {
+      "id": "aigen-17",
+      "description": "Panoramic cityscape composite, multiple cities visible simultaneously",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-17-panorama-cityscapes.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-17.mp4",
+      "segments": [
+        "beat5-seg57",
+        "beat5-seg60"
+      ]
+    },
+    {
+      "id": "aigen-01b",
+      "description": "RAND office transformed: grid patterns emerge on walls and floor",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-01b-grids-closeup.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-01b.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-04a",
+      "description": "RAND chalkboard close-up with game-theory matrix equations",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-04a-chalkboard.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-04a.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-permeation-01",
+      "description": "Library interior with scholars, atmospheric insert for Beat 2",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-permeation-01-archive.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-permeation-01.mp4",
+      "segments": [
+        "beat2-seg19"
+      ]
+    },
+    {
+      "id": "aigen-06b",
+      "description": "Grid landscape tightens: table structure crystallizing from pattern",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-06b-grid-with-table.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-06b.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-11b",
+      "description": "Forest aftermath: stag brought down, hunters gathered",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-11b-stag-aftermath.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-11b.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-12a",
+      "description": "Alpine pasture with communal grazing, stone boundary walls",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-12a-alpine-commons.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-12a.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-14b",
+      "description": "City street pedestrians converge into a deliberate meeting",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-14b-street-meeting.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-14b.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-forecast-01",
+      "description": "Cliff-edge figures: diplomats at precipice, high-stakes vista",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-forecast-01-cliff-figures.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips/aigen-forecast-01.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-16a",
+      "description": "Notebook close-up: handwritten game-theory notes, pen resting",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-16a-notebook-closeup.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-16a.mp4",
+      "segments": []
+    },
+    {
+      "id": "aigen-17a",
+      "description": "Single mannequin figure standing at the edge of the panoramic cityscape",
+      "motionType": "standalone",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/aigen-17a-single-figure-edge.png",
+      "videoPath": "episodes/prisoners-dilemma/assets/clips-kenburns/aigen-17a.mp4",
+      "segments": []
+    },
+    {
+      "id": "arch-nash",
+      "description": "John Nash portrait, 1950s",
+      "motionType": "archival",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/arch-nash.jpg",
+      "videoPath": null,
+      "segments": [
+        "beat1-seg07",
+        "beat1-seg08"
+      ]
+    },
+    {
+      "id": "arch-rand-hq",
+      "description": "RAND Corporation HQ exterior, Santa Monica ~1950s",
+      "motionType": "archival",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/arch-rand-hq.jpg",
+      "videoPath": null,
+      "segments": []
+    },
+    {
+      "id": "arch-reagan-gorbachev",
+      "description": "Reagan-Gorbachev Reykjavik Summit 1986 or INF Treaty 1987",
+      "motionType": "archival",
+      "stillPath": "episodes/prisoners-dilemma/assets/stills/arch-reagan-gorbachev.jpg",
+      "videoPath": null,
+      "segments": []
+    },
+    {
+      "id": "ostrom-valencia",
+      "description": "Tribunal de las Aguas, Valencia \u2014 for AnnotatedImage",
+      "motionType": "static-template",
+      "stillPath": "remotion-templates/public/episodes/prisoners-dilemma/stills/valencia-tribunal.jpg",
+      "videoPath": null,
+      "segments": []
+    },
+    {
+      "id": "ostrom-torbel",
+      "description": "T\u00f6rbel alpine commons \u2014 for AnnotatedImage",
+      "motionType": "static-template",
+      "stillPath": "remotion-templates/public/episodes/prisoners-dilemma/stills/torbel-alps.jpg",
+      "videoPath": null,
+      "segments": []
+    },
+    {
+      "id": "ostrom-maine",
+      "description": "Maine lobster buoys \u2014 for AnnotatedImage",
+      "motionType": "static-template",
+      "stillPath": "remotion-templates/public/episodes/prisoners-dilemma/stills/maine-buoys.jpg",
+      "videoPath": null,
+      "segments": []
+    }
+  ],
+  "morphs": []
+}

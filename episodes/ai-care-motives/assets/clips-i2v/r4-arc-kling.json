@@ -1,0 +1,14 @@
+{
+  "model": "fal-ai/kling-video/v3/pro/image-to-video",
+  "payload": {
+    "prompt": "One continuous shot, no cuts. The camera moves very slowly to the right in a short, smooth arc around the seated man, keeping him and the laptop in frame, so that the chair and his shoulder slide slightly across the desk and the wall behind them: a gentle parallax move, as on a slider. Keep the image's flat illustrated cut-paper style, textures and colours exactly as they are; the light does not change. The man keeps typing with small movements of his fingers; nothing else in the room moves. His face stays a smooth blank plane. The laptop screen stays blank and bright. Audio: quiet room, soft keystrokes, no music, no voices.",
+    "start_image_url": "@/Users/feihuyan/project-parallax/episodes/ai-care-motives/assets/stills/aigen-10-desk-night.png",
+    "duration": "5",
+    "generate_audio": false
+  },
+  "request_id": "01a12cbb-ac3e-7e41-9491-eeec9d25f2bd",
+  "saved": [
+    "arc-kling-video.mp4"
+  ],
+  "wall_seconds": 83
+}

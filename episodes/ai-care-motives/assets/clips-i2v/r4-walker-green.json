@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-10-11",
+  "model": "minimax/h3-max/image-to-video",
+  "still": "episodes/ai-care-motives/assets/keyframes/r4-walker-green.png",
+  "duration_requested": 5,
+  "resolution": "768P",
+  "prompt": "Static locked-off camera, one continuous shot, no cuts. The man in the hat and long coat walks steadily toward the right but stays in the centre of the frame, as if on a treadmill: his legs and arms swing in an even walking cycle and his body does not drift left or right. The plain flat green background does not change at all and nothing else appears. Keep the flat illustrated cut-paper style, the colours and the blank faceted face exactly as they are. Audio: none.",
+  "price_per_second_usd": 0.048,
+  "estimated_cost_usd": 0.24,
+  "note": "Sidecar written by hand: the tool saved the clip, then failed writing its sidecar because the start image was outside the repo."
+}

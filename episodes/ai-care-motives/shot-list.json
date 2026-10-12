@@ -1,0 +1,450 @@
+{
+  "slug": "ai-care-motives",
+  "version": "v1.1",
+  "generated_at": "2026-10-08",
+  "design_doc": "script.md (v1.5)",
+  "motion_model": {
+    "doctrine": "project/CHAINED_STILL_LESSONS.md; Ep1-style: no morphs. All stills use Ken Burns (rendered locally via tools/ai-video/render_kenburns.py after upscale.py). One optional live-still (aigen-04).",
+    "summary": "Reframe (camera moves, scene unchanged) -> ken-burns. No morph pairs in this episode."
+  },
+  "thread_summary": {
+    "A_trust": [
+      "aigen-01"
+    ],
+    "B_shop": [
+      "aigen-02",
+      "aigen-03"
+    ],
+    "C_rescue": [
+      "aigen-04",
+      "aigen-05"
+    ],
+    "D_street": [
+      "aigen-06"
+    ],
+    "E_ring": [
+      "aigen-07",
+      "aigen-08"
+    ],
+    "F_machine": [
+      "aigen-09",
+      "aigen-10"
+    ],
+    "G_close": [
+      "aigen-11",
+      "aigen-12"
+    ]
+  },
+  "seams": [],
+  "morph_pairs": [],
+  "assets": [
+    {
+      "id": "aigen-01",
+      "beat": 1,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "A_trust",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "Two friends in casual clothes (sweater, cardigan) at a round kitchen table, single lamp, mugs, bread, shelf with books; one listening, one with a hand resting on the table",
+      "chatgpt_prompt_id": "shot-01",
+      "anchor_frame": null,
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 11,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.12,
+        "focus_x": 0.5,
+        "focus_y": 0.55,
+        "duration_sec": 11
+      }
+    },
+    {
+      "id": "aigen-02",
+      "beat": 2,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "B_shop",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "Shop counter, front view: shopkeeper behind, small child figure holding up a coin, one loaf of bread; MOTIF FRAME",
+      "chatgpt_prompt_id": "shot-02",
+      "anchor_frame": null,
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 15,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.2,
+        "duration_sec": 15
+      },
+      "reuse": "Beat 4 (3s, unchanged); Beat 2 SplitFrame panes (ImageComposite); optional inset in Beat 8 motif form 3"
+    },
+    {
+      "id": "aigen-03",
+      "beat": 2,
+      "priority": "P3",
+      "mode": "single",
+      "thread": "B_shop",
+      "thread_position": 2,
+      "status": "existing",
+      "description": "Same shop: shopkeeper alone, glancing toward the window; distant silhouettes pass outside; bread still on the counter",
+      "chatgpt_prompt_id": "shot-03",
+      "anchor_frame": "aigen-02",
+      "camera_move": "pulled back and turned toward the shop window",
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 14,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.12,
+        "focus_x": 0.75,
+        "focus_y": 0.45,
+        "duration_sec": 14
+      }
+    },
+    {
+      "id": "aigen-04",
+      "beat": 3,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "C_rescue",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "River rescue: a figure kneeling on the bank reaching an arm toward a second figure's head and raised arm in the water; flat water planes, no reflections",
+      "chatgpt_prompt_id": "shot-04",
+      "anchor_frame": null,
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "conflict"
+      },
+      "duration_sec": 14,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.4,
+        "focus_y": 0.15,
+        "duration_sec": 14
+      },
+      "motion_optional": {
+        "technique": "live-still",
+        "tool": "Hailuo I2V-01-Live",
+        "note": "reaching arm extends slightly; water planes hold. Only if the Ken Burns version reads flat."
+      }
+    },
+    {
+      "id": "aigen-05",
+      "beat": 3,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "C_rescue",
+      "thread_position": 2,
+      "status": "existing",
+      "description": "Rescued figure sitting upright on the bank, shoulders low, facing the water; rescuer a small back-turned figure at a distance",
+      "chatgpt_prompt_id": "shot-05",
+      "anchor_frame": "aigen-04",
+      "camera_move": "cut to the bank after the rescue, wider and calmer",
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 15,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.45,
+        "focus_y": 0.6,
+        "duration_sec": 15
+      }
+    },
+    {
+      "id": "aigen-06",
+      "beat": 4,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "D_street",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "A row of nine figures each holding a plain blank card, turned toward one assistant figure of the same height standing slightly apart in plain black; flat amber field, walnut band",
+      "chatgpt_prompt_id": "shot-06",
+      "anchor_frame": null,
+      "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 21,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.08,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 21
+      },
+      "reuse": "Beat 4 (7s tiled-facade reuse, Ken Burns on a different crop)"
+    },
+    {
+      "id": "aigen-07",
+      "beat": 5,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "E_ring",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "Shepherd on a low hill seen three-quarter from behind, one hand raised with a flat amber ring; upper body dissolving to an outline; ink sheep shapes in foreground",
+      "chatgpt_prompt_id": "shot-07",
+      "anchor_frame": null,
+      "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 8,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.15,
+        "focus_x": 0.5,
+        "focus_y": 0.4,
+        "duration_sec": 8
+      }
+    },
+    {
+      "id": "aigen-08",
+      "beat": 5,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "E_ring",
+      "thread_position": 2,
+      "status": "existing",
+      "description": "Two identical textured figures on the hillside, each with one flat amber ring on a raised hand; indistinguishable",
+      "chatgpt_prompt_id": "shot-08",
+      "anchor_frame": "aigen-07",
+      "camera_move": "cut to a symmetrical frontal composition on the same hillside, same palette and textured style as the shepherd",
+      "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 7,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.1,
+        "focus_x": 0.5,
+        "focus_y": 0.5,
+        "duration_sec": 7
+      }
+    },
+    {
+      "id": "aigen-09",
+      "beat": 7,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "F_machine",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "Seated figure at a desk in profile, pen over a ledger lying open below the height of a tall screen, face turned outward toward the room",
+      "chatgpt_prompt_id": "shot-09",
+      "anchor_frame": null,
+      "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "conflict"
+      },
+      "duration_sec": 23,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.12,
+        "focus_x": 0.55,
+        "focus_y": 0.2,
+        "duration_sec": 23
+      },
+      "editorial_note": "Illustration of the model’s written account; no independent evidence of motive."
+    },
+    {
+      "id": "aigen-10",
+      "beat": 7,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "F_machine",
+      "thread_position": 2,
+      "status": "existing",
+      "description": "Lone figure from behind at a desk before a bright screen rectangle; dark room behind with three small unlit window shapes",
+      "chatgpt_prompt_id": "shot-10",
+      "anchor_frame": null,
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 20,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.08,
+        "focus_x": 0.5,
+        "focus_y": 0.2,
+        "duration_sec": 20
+      },
+      "reuse": "Beat 3 return to AI; Beat 7 opening and closing. Row budgets include any overlays; retime each use to scratch narration."
+    },
+    {
+      "id": "aigen-11",
+      "beat": 8,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "G_close",
+      "thread_position": 1,
+      "status": "existing",
+      "description": "Tall constructivist facade at night, grid of windows, one window lit amber; no figures",
+      "chatgpt_prompt_id": "shot-11",
+      "anchor_frame": null,
+      "register": "atmospheric",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 16,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.0,
+        "end_scale": 1.12,
+        "focus_x": 0.5,
+        "focus_y": 0.4,
+        "duration_sec": 16
+      }
+    },
+    {
+      "id": "aigen-12",
+      "beat": 8,
+      "priority": "P2",
+      "mode": "single",
+      "thread": "G_close",
+      "thread_position": 2,
+      "status": "existing",
+      "description": "The same desk and figure from behind at dawn; pale light from the left; behind a long glass wall, a row of small silhouetted figures at their own desks",
+      "chatgpt_prompt_id": "shot-12",
+      "anchor_frame": "aigen-10",
+      "camera_move": "same desk, dawn light, with a glass wall and a row of desks added behind",
+      "register": "grounding",
+      "realism": "flat",
+      "text_treatment": "none",
+      "treatment": {
+        "finish": "documentary",
+        "ramp": "standard"
+      },
+      "duration_sec": 11,
+      "type": "ai-generate",
+      "motion_technique": "ken-burns",
+      "ken_burns": {
+        "start_scale": 1.15,
+        "end_scale": 1.0,
+        "focus_x": 0.5,
+        "focus_y": 0.15,
+        "duration_sec": 11
+      },
+      "camera_move_in_edit": "pull-out",
+      "editorial_note": "People checking the system illustrate one source of evidence, not a guarantee of trust."
+    }
+  ],
+  "summary": {
+    "new_shots": 0,
+    "existing_shots": 12,
+    "total_shots": 12,
+    "note": "All AI-GEN stills by decision (Oct 7): no Recraft/ILLUST this episode. Atmospheric-role stills: aigen-06, 07, 08, 09, 11. Reused: aigen-02 (x3), aigen-06, aigen-10 (x3). All 12 stills generated Oct 7-8, 2026 (1672x941). Shots 1, 6 and 8 were regenerated and promoted Oct 8 (aigen-08 renamed aigen-08-two-figures.png); earlier versions are in assets/stills-archive/ as -v1 (and -v2, -v3 for the dinner table). Ken Burns clip durations (Oct 8) are the script row budgets plus about 2s handle; extra uses of reused stills are listed under ken_burns_variants and rendered with the same ffmpeg zoompan recipe. Focus_y lowered on clips where a head sits near the top of frame (02, 04, 09, 10, 12 and two variants) so pushes don't crop hair."
+  },
+  "timing_status": "Provisional still allocations; confirm against scratch narration before rendering. Script row budgets may combine multiple assets.",
+  "ken_burns_variants": {
+    "aigen-02-b4": {
+      "of": "aigen-02",
+      "use": "Beat 4, 3s (motif frame, unchanged)",
+      "duration_sec": 5,
+      "start_scale": 1.0,
+      "end_scale": 1.03,
+      "focus_x": 0.5,
+      "focus_y": 0.2
+    },
+    "aigen-06-b4b": {
+      "of": "aigen-06",
+      "use": "Beat 4, ~18s (second crop of the cards still)",
+      "duration_sec": 20,
+      "start_scale": 1.35,
+      "end_scale": 1.0,
+      "focus_x": 0.1,
+      "focus_y": 0.75
+    },
+    "aigen-10-b7open": {
+      "of": "aigen-10",
+      "use": "Beat 7 opening, 3s (wide hold)",
+      "duration_sec": 5,
+      "start_scale": 1.0,
+      "end_scale": 1.0,
+      "focus_x": 0.5,
+      "focus_y": 0.5
+    },
+    "aigen-10-b7close": {
+      "of": "aigen-10",
+      "use": "Beat 7 close, ~14s (push-in under the VERIFY-style overlay)",
+      "duration_sec": 16,
+      "start_scale": 1.0,
+      "end_scale": 1.25,
+      "focus_x": 0.55,
+      "focus_y": 0.15
+    }
+  }
+}

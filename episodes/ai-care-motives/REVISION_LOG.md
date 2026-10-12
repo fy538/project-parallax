@@ -1,0 +1,50 @@
+# Revision Log — ai-care-motives
+
+> Append-only. Each entry records one meaningful structural change: what changed, why, and what it fixed. This feeds the Editorial Playbook — be specific enough that a future reader can extract a pattern from it.
+>
+> Format: one entry per script version boundary (v1→v2, v2→v3, etc.) or per significant rewrite within a version.
+
+---
+
+## [v1 → v2] [YYYY-MM-DD]
+
+**What changed:**
+[One paragraph describing the structural change — not line edits, but meaningful reorganization, beat dissolution, framing shift, etc.]
+
+**Why:**
+[What problem or audit finding prompted this change.]
+
+**What it fixed:**
+[Observable improvement — pacing issue resolved, weaker beat dissolved, cold open strengthened, etc.]
+
+---
+
+## v1.4 → v1.5 — 2026-10-08
+
+**What changed:** Applied the user's approved six-part edit. Shortened the opening; separated known oversight from measurement of unobserved conduct; defined the Unwatched Test without claiming it guarantees trust; restored the imposed harmful-compliance training objective; distinguished evaluation recognition, behavior change, and model self-report; removed the base-model aside, hint statistic, and extra VW numbers; kept the question of caring open in the ending. Updated visual cues, labels, source notes, shot metadata, and image-prompt narration cues. Existing generated images are preserved.
+
+**Why:** The earlier draft overextended hidden checking into a general theory of trust, compressed away a crucial experimental premise, and overloaded the AI section. Some visuals repeated stronger claims than the narration could support.
+
+**What it fixed:** Narration reduced from 1,792 to 1,390 words. Beat 7 now has three findings with distinct roles. The arithmetic reconstruction is explicitly labelled. Spoken draft v5 matches the canonical narration column. Prior script archived as `drafts/production-script-v1.4-2026-10-07.md`; prior audits retained with revision-scope notes. Timings remain estimates; scratch read and final production validation remain outstanding.
+
+**Verification:** Deterministic script lint: zero findings. All eight beats in the spoken copy match the production narration after stripping claim tags; shot-list JSON parses. Invalidation review flags downstream sourcing metadata only; no sourcing jobs were run because scene compositions and existing images are retained. This is not a timed read, rendered preview, or renewed full editorial audit.
+
+## v1.5 → v1.6 — 2026-10-08
+
+**What changed:** Restored or repaired the items flagged in the critique of v1.5 (spoken draft v5), keeping v5's honest Beat 7 structure and its cuts. (1) Thesis: Beat 5 now carries the pop-quiz / scheduled-exam / "ordinary Tuesday" image and says passing the test "says nothing about whether the helper is good"; Beat 8 opens "You don't need to know whether an AI cares…", restores the behaviorism concession and the Goodhart line. (2) Detail: Glaucon's quote and the fourteen-versus-three percentages are back. (3) Seams: Beat 1 now says what a "test result" is before asking what a good one means; "Could we settle the question…" became "So could we just ask the model why it behaved that way?"; Beat 7's close ties back to what the system does "when it thinks no one is checking"; Beat 4 drops the "known checks still work" sentence. (4) Repetition: Beat 6 no longer says "designed to recognize" twice and "Only then" has an antecedent; Beat 7 no longer restates the notes as a strategy twice; Beat 2's "If that changes your view" returned to "But something you admired just turned into arithmetic."
+
+**Why:** v5 was accurate but flattened the claim (about 13% of declarative sentences carried a qualifier), lost the concrete image and quote, dropped the magnitude of the alignment-faking effect, and left several referent gaps.
+
+**What it fixed:** Restored a committed reading without reintroducing the overreaches v5 removed (no base-model aside, no hint statistic, no second Volkswagen number, the model's notes still labelled as its own account). Visual rows changed: Beat 5 Glaucon card (now a quote-attribution card), Beat 5 definition card (three lines), Beat 7 ConditionalArgument (shows ≈14% / ≈3%). The prior v1.5 narration is preserved as `drafts/spoken-draft-v5-2026-10-08.md`; v1.5 visual rows were edited in place (no separate archive).
+
+**Verification:** Deterministic script lint run after the edit; narration in `script.md` compared with the spoken copy. Not a timed read or a renewed full audit.
+
+## v1.6 → v1.7 — 2026-10-08
+
+**What changed:** Applied eight fact-check and clarity fixes from the independent fact-check and script review of v1.6. (1) Beat 6: West Virginia University is now "Earlier… had put… and driven them on roads across California" (its testing predates the EPA accusation; routes covered more than Los Angeles). (2) Beat 6: the EU line no longer says the scandal "accelerated" road testing; it says work had already begun and testing was required from September 2017 (the first RDE package was adopted in May 2015, before the scandal; verified Oct 8). (3) Beat 4: Kant's word is "prudent"; "Picture the street" marks the street as an illustration. (4) Beat 7: the tracing study is named as Claude 3.5 Haiku. (5) Beat 4: the raters are "part of its training," not "its street," so the street metaphor keeps one meaning. (6) Beat 7: "Could we just ask a model to explain itself?" replaces the bridge that pointed at the wrong experiment. (7) Beat 3: "Neither the help nor the admiration tells you, on its own, what the machine will do next time." (8) Beat 7: "It hadn't worked that out for itself" replaces the jargon.
+
+**Why:** The fact-check found one claim with no source ("accelerated"), two overstated details (routes; Kant's street), and a timing order that implied West Virginia University's testing followed the EPA accusation; the review found referent gaps and one metaphor with two functions.
+
+**What it fixed:** Narration now claims no more than its sources support. Not changed: the committed-claim question raised by the review (the episode never runs the Unwatched Test on a deployed assistant) and the visual/spoken sync items (14%/3% shown before spoken; mood and pace pairings). Beat windows and five row budgets were also recomputed.
+
+**Verification:** Lint, narration comparison with the spoken copy, and prompt-cue check run after the edit. Not a timed read.

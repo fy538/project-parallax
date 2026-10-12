@@ -1,7 +1,7 @@
 {
   "_comment": "Episode pipeline state — machine-readable source of truth for state + dates per episode. Consumed by tools/pipeline_validator.py to compute days-in-state, days-to-target, and to drive the auto-updated Health column in PIPELINE.md plus the per-episode _status.md dashboards. UPDATE THIS FILE when an episode's state changes (don't just edit PIPELINE.md prose). The validator will detect drift if state here doesn't match the at-a-glance table in PIPELINE.md.",
   "version": "1.0",
-  "lastUpdated": "2026-05-17",
+  "lastUpdated": "2026-10-08",
   "episodes": [
     {
       "slug": "prisoners-dilemma",
@@ -10,7 +10,7 @@
       "format": "Philosopher's Lens",
       "targetPublish": "2026-06-01",
       "blockedOn": null,
-      "notes": "Launch candidate. Script v3 locked editorially; work remaining is AI-gen fallback for 4 zero-hit shots + first full-episode render + narration + NLE."
+      "notes": "Launch candidate. Script locked editorially; full manifest (121 segments, 50 data files) generated. KNOWN GAP: visual-spec.md missing (asset-source bypassed the canonical visual-spec flow) — validator errors on this until written. Remaining: first full-episode render + narration + NLE."
     },
     {
       "slug": "silicon-trap",
@@ -29,6 +29,15 @@
       "targetPublish": null,
       "blockedOn": null,
       "notes": "Awaiting viability re-gate. v1 research returned CONDITIONAL on low historical depth."
+    },
+    {
+      "slug": "ai-care-motives",
+      "state": "DRAFTING",
+      "stateEnteredAt": "2026-10-07",
+      "format": "Philosopher's Lens",
+      "targetPublish": null,
+      "blockedOn": null,
+      "notes": "First episode under the Oct 2026 AI alignment/ethics focus (D48). Two-column script v1.7 (spoken draft v7, about 1,500 words, roughly 11 min estimate); visual-concept and script-audit run (earlier versions) with fixes applied; retroactive research-audit CONDITIONAL; independent fact-check of v6 (Oct 8) found no failures; its wording fixes and clarity fixes are applied in v7. All 12 stills generated (Oct 7-8) and upscaled 4x (Real-ESRGAN, stills-4k; local, git-ignored). Visual-spec done (Oct 8-11): 28 Remotion data files and a hand-wired assembly manifest (D49; 53 segments, 11:19 estimate, no placeholders). Its 22 still segments are drawn in Remotion from the full-resolution stills with a framing per use (StillFrame); it also has one AI image-to-video clip and two stock clips. Measured visual QA at 0 fails (npm run qa:episode). Archival photos, the EPA notice and two stock clips sourced Oct 10 (asset-manifest.json). The two 36 + 59 slots are typed reconstruction cards; their wording is a paraphrase until the exact lines are confirmed. Audio plan written Oct 10 and thinned Oct 11 (audio/audio-cue-sheet.md: 6 music cues, 4 transition sounds, 2 texture hits; no audio files sourced yet). Remaining: scratch read-aloud, the exact 36 + 59 lines, audio sourcing, narration (then tools/assembly/retime_manifest.py, not generate_manifest.py), render (picture-only render works via --props noAudio)."
     }
   ],
   "stateLifecycle": [

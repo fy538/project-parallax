@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T00:31:59+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12d85-d75f-7431-a23f-e2e3321b0a44",
+  "still": "episodes/ai-care-motives/assets/keyframes/aigen-06-close-start.png",
+  "end_image": "/Users/feihuyan/project-parallax/episodes/ai-care-motives/assets/keyframes/aigen-06-close-end.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "balanced",
+  "seed": null,
+  "prompt": "Static locked-off tripod shot, one continuous shot, no cuts, no camera movement. Keep the image's flat illustrated cut-paper style, the flat orange wall, the textures and the colours exactly as they are; the light does not change. The bald man in plain black clothes in the middle slowly turns his head to look at the woman beside him, ending exactly as in the final image. Only his head moves; his shoulders and body stay still. The people on either side, their hands and their blank cards do not move at all. Every face stays a smooth blank plane the whole time, exactly as drawn: no eyes, no mouth, no added features. Audio: quiet room, no music, no voices.",
+  "expanded_prompt": "How the reference pictures align with the target video \u2014 Picture 1 (from Shot 1) aligns with the 0.00-second mark of the target video; Picture 2 (from Shot 1) aligns with the 5.00-second mark of the target video.\n\nintegrated_multimodal_description: [Shot 1] Static, locked-off tripod shot in a flat, illustrated cut-paper style. The scene features several stylized figures standing in a row against a solid, vibrant orange wall. In the center, a bald man (S1) in a plain black long-sleeved shirt stands facing forward. To his left and right, other figures in dark suits hold blank white cards. The composition is anchored by <Picture 1>, where all characters' faces are smooth, blank planes with geometric facets, lacking eyes, mouths, or any features. The lighting is flat and consistent, never shifting. Throughout the 5-second duration, S1 slowly and deliberately turns his head to the right to look at the woman (S2) standing beside him. His shoulders and body remain perfectly still. The figures on either side of him remain completely frozen, their hands and the blank white cards showing no movement. The movement concludes with S1's head turned in profile toward S2, exactly matching the composition in <Picture 2>.\n\noverall_soundscape: The soundscape is a quiet, still room tone with absolute silence. There are no sounds of movement, fabric rustling, or diegetic noise.\n\nnon_diegetic_music: N/A.",
+  "timings": {
+    "inference": 3.737601749000305
+  },
+  "wall_seconds": 13,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae043f/cxjuMlg0Rc0sbW0u1sjra_minimax-h3.mp4"
+}
