@@ -971,6 +971,10 @@ class EpisodeStatus:
     # Stage progress
     stage_idx: int                  # position in STATE_ORDER (0-8), -1 off-lifecycle
 
+    # What the episode is waiting on from Tiger (pipeline-state.json `blockedOn`).
+    # Keep it to five short items at most. "—" means nothing.
+    blocked_on: str = "—"
+
     @property
     def stage_total(self) -> int:
         return len(STATE_ORDER)
@@ -1239,6 +1243,7 @@ def compute_episode_status(entry: StateEntry) -> EpisodeStatus:
         target_publish=entry.target_publish,
         format=entry.format,
         notes=entry.notes,
+        blocked_on=entry.blocked_on,
         **artifacts,
         data_files=_count_data_files(data_dir),
         asset_stills=asset_stills,
@@ -1308,6 +1313,8 @@ def _render_header(s: EpisodeStatus) -> list[str]:
     ]
     if s.format:
         lines.append(f"**Format:** {s.format}")
+    if s.blocked_on not in ("—", "", "-"):
+        lines.append(f"**Waiting on:** {s.blocked_on}")
     lines.append("")
     return lines
 
@@ -1455,9 +1462,9 @@ def _render_next_actions(s: EpisodeStatus) -> list[str]:
     for i, (_, label, cmd) in enumerate(actions[:3], 1):
         if cmd:
             lines.append(f"{i}. **{label}**")
-            lines.append(f"   ```")
+            lines.append("   ```")
             lines.append(f"   {cmd}")
-            lines.append(f"   ```")
+            lines.append("   ```")
         else:
             lines.append(f"{i}. **{label}**")
     lines.append("")
@@ -1754,8 +1761,9 @@ def _record_state_transition(slug: str, to_state: str) -> None:
     state_history_py = Path(__file__).resolve().parent / "state_history.py"
     if not state_history_py.exists():
         return
+    import contextlib
     import subprocess as _sp
-    try:
+    with contextlib.suppress(OSError):
         _sp.run(
             [sys.executable, str(state_history_py), "--record", slug, to_state,
              "detected by pipeline_validator --write-status"],
@@ -1763,8 +1771,6 @@ def _record_state_transition(slug: str, to_state: str) -> None:
             capture_output=True,
             check=False,  # non-fatal — audit trail must not block dashboard refresh
         )
-    except OSError:
-        pass
 
 
 def write_status(s: EpisodeStatus) -> Path:
@@ -1933,7 +1939,7 @@ def intake_asset(slug: str, asset_id: str) -> int:
         if asset.get("videoPath"):
             fn = Path(asset["videoPath"]).name
             print(f"  Expected clip:  remotion-templates/public/episodes/{slug}/clips/{fn}")
-        print(f"  Copy the treated file there first, then re-run --intake.")
+        print("  Copy the treated file there first, then re-run --intake.")
         return 1
 
     assert public_path_found is not None
@@ -1951,7 +1957,7 @@ def intake_asset(slug: str, asset_id: str) -> int:
 
     if not segment_ids:
         print(f"{WARN} '{asset_id}' has no segments[] in registry (morph-endpoint only).")
-        print(f"       Manifest unchanged — refreshing _status.md so morph unblocked state updates.")
+        print("       Manifest unchanged — refreshing _status.md so morph unblocked state updates.")
     else:
         all_seg_ids = {s["id"] for s in manifest.get("segments", [])}
         missing_segs = [sid for sid in segment_ids if sid not in all_seg_ids]
@@ -2009,7 +2015,7 @@ def intake_asset(slug: str, asset_id: str) -> int:
             and (m["from"], m["to"]) in was_blocked
         ]
         if newly:
-            print(f"\n  Newly unblocked morphs — open morph-prompts.md to generate:")
+            print("\n  Newly unblocked morphs — open morph-prompts.md to generate:")
             for frm, to, tool, intent in newly:
                 print(f"  · {frm} → {to}  ({tool})  {intent}")
 
@@ -2316,7 +2322,7 @@ def session_brief(episode: str | None = None) -> int:
         print("  Oracle check:")
         oracle_rc = check_oracle(render_ready[0].slug if len(render_ready) == 1 else None)
         if oracle_rc != 0:
-            print(f"  ⚠  Run: python3 tools/pipeline_validator.py --check-oracle")
+            print("  ⚠  Run: python3 tools/pipeline_validator.py --check-oracle")
         print()
 
     return 0

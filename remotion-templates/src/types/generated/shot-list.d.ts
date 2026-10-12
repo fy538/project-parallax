@@ -25,9 +25,16 @@ export type Asset = {
    */
   priority?: "P1" | "P2" | "P3";
   /**
-   * Brand treatment LUT to apply post-source/post-generation. standard = warm umber→amber default. conflict = ink→rust (tension/adversarial). editorial = desaturated bone tones (historical/archival).
+   * Brand treatment. Legacy string form is a LUT (standard = warm umber→amber; conflict = ink→rust; editorial = desaturated bone). Object form is the documentary-finish model (May 2026): finish = grain/halation/vignette with color preserved; duotone reserved as an optional accent on dark beats.
    */
-  treatment?: "standard" | "conflict" | "editorial";
+  treatment?:
+    | ("standard" | "conflict" | "editorial")
+    | {
+        finish?: "documentary" | "duotone";
+        duotone_accent_candidate?: boolean;
+        strength?: number;
+        note?: string;
+      };
   /**
    * Editorial notes for the sourcer or generator — what this asset needs to convey, framing guidance, fallback strategy.
    */

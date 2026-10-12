@@ -1,15 +1,15 @@
 # Status — blockades-leak
-> Auto-generated 2026-10-08 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-12 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** INCUBATING · day 204 in state
+**State:** INCUBATING · day 208 in state
 
 ## Progress  ▰▱▱▱▱▱▱▱▱▱  1 of 9 stages
 
 ✓ research (brief + audit)
 ✓ angle-memo
-✓ script-production.md — modified 2026-05-02T01:15
+✓ script-production.md — modified 2026-10-09T14:20
 ✓ visual-spec
 ✗ assembly-manifest (run `generate_manifest.py`)
 ✗ audio-cue-sheet
@@ -32,7 +32,7 @@
 
 ## By the numbers
 
-`Days in state`  204
+`Days in state`  208
 
 ## Notes
 

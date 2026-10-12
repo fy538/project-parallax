@@ -1,10 +1,11 @@
 # Status — ai-care-motives
-> Auto-generated 2026-10-11 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-12 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** DRAFTING · day 4 in state
+**State:** DRAFTING · day 5 in state
 **Format:** Philosopher's Lens
+**Waiting on:** Tiger: (1) record the scratch read, or say to write the synthetic timing in; (2) paste the four published 36 + 59 lines; (3) does the face rule apply to the existing stills; (4) audio files
 
 ## Progress  ▰▰▰▰▰▰▱▱▱▱  5 of 9 stages
 
@@ -42,11 +43,11 @@
 `Duration     `  11.3 min (678.6s)
 `Segments     `  53
 `Data files   `  8
-`Days in state`  4
+`Days in state`  5
 
 ## Notes
 
-First episode under the Oct 2026 AI alignment/ethics focus (D48). Two-column script v1.7 (spoken draft v7, about 1,500 words, roughly 11 min estimate); visual-concept and script-audit run (earlier versions) with fixes applied; retroactive research-audit CONDITIONAL; independent fact-check of v6 (Oct 8) found no failures; its wording fixes and clarity fixes are applied in v7. All 12 stills generated (Oct 7-8) and upscaled 4x (Real-ESRGAN, stills-4k; local, git-ignored). Visual-spec done (Oct 8-11): 28 Remotion data files and a hand-wired assembly manifest (D49; 53 segments, 11:19 estimate, no placeholders). Its 22 still segments are drawn in Remotion from the full-resolution stills with a framing per use (StillFrame); it also has one AI image-to-video clip and two stock clips. Measured visual QA at 0 fails (npm run qa:episode). Archival photos, the EPA notice and two stock clips sourced Oct 10 (asset-manifest.json). The two 36 + 59 slots are typed reconstruction cards; their wording is a paraphrase until the exact lines are confirmed. Audio plan written Oct 10 and thinned Oct 11 (audio/audio-cue-sheet.md: 6 music cues, 4 transition sounds, 2 texture hits; no audio files sourced yet). Remaining: scratch read-aloud, the exact 36 + 59 lines, audio sourcing, narration (then tools/assembly/retime_manifest.py, not generate_manifest.py), render (picture-only render works via --props noAudio).
+First episode under the Oct 2026 AI alignment/ethics focus (D48). Two-column script v1.7 (spoken draft v7, about 1,500 words, roughly 11 min estimate); visual-concept and script-audit run (earlier versions) with fixes applied; retroactive research-audit CONDITIONAL; independent fact-check of v6 (Oct 8) found no failures; its wording fixes and clarity fixes are applied in v7. All 12 stills generated (Oct 7-8) and upscaled 4x (Real-ESRGAN, stills-4k; local, git-ignored). Visual-spec done (Oct 8-11): 28 Remotion data files and a hand-wired assembly manifest (D49; 53 segments, 11:19 estimate, no placeholders). Its 22 still segments are drawn in Remotion from the full-resolution stills with a framing per use (StillFrame); it also has one AI image-to-video clip and two stock clips. Measured visual QA at 0 fails (npm run qa:episode). Archival photos, the EPA notice and two stock clips sourced Oct 10 (asset-manifest.json). The two 36 + 59 slots are typed reconstruction cards; their wording is a paraphrase until the exact lines are confirmed. Audio plan written Oct 10 and thinned Oct 11 (audio/audio-cue-sheet.md: 6 music cues, 4 transition sounds, 2 texture hits; no audio files sourced yet). A synthetic scratch read (Oct 12; a timing aid only, never in the episode) gave real word timings: the dry-run re-time finds all 51 narration lines and brings the runtime to 11:04 (from 11:19), and a full cut was rendered from the re-timed copy (remotion-templates/out/preview/ai-care-motives/scratch-timed-SYNTHETIC-VOICE.mp4). The live manifest stays in estimate mode until Tiger says to write that timing or records his own read. The exact 36 + 59 exchange is published in Anthropic's paper On the Biology of a Large Language Model (Addition section); the two cards still hold a paraphrase and need those four lines and the label Reconstruction · Anthropic, 2025 (VIS-12). Remaining: Tiger's read (or the synthetic timing written in), the four 36 + 59 lines, audio sourcing, narration (then tools/assembly/retime_manifest.py, not generate_manifest.py), final render.
 
 ---
 

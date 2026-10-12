@@ -8,10 +8,10 @@
 
 | Episode | State | Day | Target | Health |
 |---|---|---|---|---|
-| `prisoners-dilemma` | 🎬 RENDER READY | 152 | 2026-06-01 | ⚠ stale manifest (3.0 d) · ✗ never rendered |
-| `silicon-trap` | 🎬 RENDER READY | 160 | 2026-05-25 | ⚠ stale manifest (4.5 d) · 🔴 21 zero-hit shots · ✗ never rendered |
-| `blockades-leak` | 💭 INCUBATING | 204 | — | ⏸ awaiting promotion |
-| `ai-care-motives` | ✍️ DRAFTING | 1 | — | ✓ clean |
+| `prisoners-dilemma` | 🎬 RENDER READY | 156 | 2026-06-01 | ✗ never rendered |
+| `silicon-trap` | 🎬 RENDER READY | 164 | 2026-05-25 | ⚠ stale manifest (150.6 d) · 🔴 21 zero-hit shots · ✗ never rendered |
+| `blockades-leak` | 💭 INCUBATING | 208 | — | ⏸ awaiting promotion |
+| `ai-care-motives` | ✍️ DRAFTING | 5 | — | 🔴 9 zero-hit shots · ✗ never rendered |
 
 _Health column auto-refreshed by `python3 tools/pipeline_validator.py --update-tracker` (wired into `check-episode.sh` W9 follow-up). State + dates: edit `pipeline-state.json`._
 

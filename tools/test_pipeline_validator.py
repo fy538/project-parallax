@@ -367,6 +367,11 @@ class TestRenderStatusMd:
         assert "▰" in out
         assert "6 of 9 stages" in out
 
+    def test_waiting_on_line_only_when_something_is_waiting(self):
+        assert "**Waiting on:**" not in pv.render_status_md(_make_status())
+        out = pv.render_status_md(_make_status(blocked_on="Tiger: (1) the scratch read"))
+        assert "**Waiting on:** Tiger: (1) the scratch read" in out
+
     def test_zero_hits_fire_health(self):
         out = pv.render_status_md(_make_status(zero_hit_count=4))
         assert "🟡 4 zero-hit shots" in out
