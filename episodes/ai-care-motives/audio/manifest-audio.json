@@ -4,8 +4,8 @@
       {
         "id": "shop",
         "file": "audio/music/ai-care-motives/bed-contemplative.wav",
-        "startSec": 64.0,
-        "endSec": 114.0,
+        "startSec": 62.5333,
+        "endSec": 111.2333,
         "fadeInSec": 0.5,
         "fadeOutSec": 2,
         "volume": 0.12,
@@ -15,8 +15,8 @@
       {
         "id": "rescue",
         "file": "audio/music/ai-care-motives/bed-contemplative.wav",
-        "startSec": 143.0,
-        "endSec": 169.0,
+        "startSec": 139.9667,
+        "endSec": 160.2,
         "fadeInSec": 0.5,
         "fadeOutSec": 2,
         "volume": 0.12,
@@ -26,8 +26,8 @@
       {
         "id": "ring",
         "file": "audio/music/ai-care-motives/bed-contemplative.wav",
-        "startSec": 324.0,
-        "endSec": 358.0,
+        "startSec": 312.0,
+        "endSec": 343.6,
         "fadeInSec": 0.5,
         "fadeOutSec": 1.5,
         "volume": 0.11,
@@ -37,8 +37,8 @@
       {
         "id": "return",
         "file": "audio/music/ai-care-motives/bed-contemplative.wav",
-        "startSec": 368.2,
-        "endSec": 400.2,
+        "startSec": 353.0333,
+        "endSec": 387.2667,
         "fadeInSec": 0,
         "fadeOutSec": 4,
         "volume": 0.11,
@@ -48,8 +48,8 @@
       {
         "id": "car",
         "file": "audio/music/ai-care-motives/bed-tension.wav",
-        "startSec": 396.2,
-        "endSec": 466.2,
+        "startSec": 382.3667,
+        "endSec": 453.2,
         "fadeInSec": 4,
         "fadeOutSec": 0,
         "volume": 0.13,
@@ -59,8 +59,8 @@
       {
         "id": "demand",
         "file": "audio/music/ai-care-motives/bed-resolution.wav",
-        "startSec": 593.6,
-        "endSec": 672.0,
+        "startSec": 583.8667,
+        "endSec": 657.0667,
         "fadeInSec": 0.5,
         "fadeOutSec": 8,
         "volume": 0.12,
@@ -74,19 +74,19 @@
       "segment": "beat5-seg28",
       "type": "section-open",
       "intensity": "dramatic",
-      "offsetSec": 0
+      "offsetSec": 0.0
     },
     {
       "segment": "beat6-seg31",
       "type": "stat-reveal",
       "intensity": "dramatic",
-      "offsetSec": 4.5
+      "offsetSec": 4.41
     },
     {
       "segment": "beat6-seg31",
       "type": "tension-rise",
       "intensity": "normal",
-      "offsetSec": 2.0
+      "offsetSec": 1.96
     },
     {
       "segment": "beat8-seg49",
@@ -99,7 +99,7 @@
     {
       "segment": "beat1-seg01",
       "type": "card-settle",
-      "offsetSec": 1.5,
+      "offsetSec": 1.53,
       "volume": 0.15
     },
     {
