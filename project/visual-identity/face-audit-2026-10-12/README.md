@@ -4,7 +4,7 @@
 >
 > **Question.** Does the face rule apply to episode 1's existing stills, and if so what would it take?
 > **Sheets.** `heads.jpg` (every close head) and `raters.jpg` (the ten figures in `aigen-06`). Images stay out of git; `tools/qa/contact_sheet.sh` remakes the crops.
-> **Status.** Explored. Tiger has not ruled.
+> **Status.** Decided by Tiger on 12 October 2026: fix only the heads that read as a face part; the rule applies in full from the new look onward. The three heads are fixed (see the end of this page).
 
 ## Result
 
@@ -24,3 +24,15 @@ Passes outright: `aigen-06` rater 4 (front view under a fringe).
 - Bringing every head under the rule is a re-illustration of the episode, not a touch-up.
 - The three heads that read as a face part are a small, bounded fix: `aigen-08` (on screen about 12 seconds) and the glasses in `aigen-06` (on screen about 70 seconds).
 - The profile wedge is what the new look's head design has to solve anyway (critique, experiment 1).
+
+## What was fixed (12 October 2026)
+
+| Still | Change | How |
+|---|---|---|
+| `aigen-08-two-figures` | Both faces are now the same set of featureless planes. The eye band and the centre wedge are gone | One edit of the left head, pasted onto both figures so they stay identical, as the script needs ("the two identical ring-wearers") |
+| `aigen-06-rating-cards` | Rater 8 has no glasses and a plain faceted face | One edit of that head, pasted back |
+
+- Three edits through `fal-ai/nano-banana-2/edit` at 1K, about $0.24 in total. Prompts: `episodes/ai-care-motives/prompts/edit/face-fix-aigen-08.txt` and `face-fix-aigen-06-rater8.txt`. The second edit of `aigen-08` (the right head) was not used.
+- Only the head regions changed: about 12,600 of 1.57 million pixels in `aigen-08` and 7,300 in `aigen-06`. The upscaled stills and the JPGs the episode draws were rebuilt with the same regions pasted in.
+- The originals are in `episodes/ai-care-motives/assets/stills-archive/` (`aigen-08-two-figures-v1-eye-band.png`, `aigen-06-rating-cards-v2-glasses.png`).
+- Left as they are, by the decision above: every profile with a nose point, the centre ridges and the ear lines.
