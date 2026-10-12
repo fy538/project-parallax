@@ -1,6 +1,8 @@
 # AGENTS.md — Parallax
 
 > Read this **first**. For Parallax content/pipeline context, read [CLAUDE.md](./CLAUDE.md) after.
+>
+> **Before you generate, edit or accept any picture, AI clip or synthetic voice, read [project/PICTURE_RULES.md](./project/PICTURE_RULES.md).** It is one page: Tiger's binding rules (no facial parts from any angle, anatomically coherent bodies, nothing new into an episode without his go-ahead) and the short list of what has worked.
 
 Parallax is a solo YouTube channel pipeline: **Python tools** (`tools/`) + **Remotion** (React→MP4) video templates (`remotion-templates/`) + **Markdown content** (`episodes/`, `project/`).
 
@@ -100,6 +102,7 @@ Tools are grouped by where they fit in the production pipeline. Most are CLI-run
 ### Narration + audio
 
 - **Scratch-narration pass** (Wendover discipline): `python3 tools/narration/scratch_pass.py <slug> [--wav PATH] [--skip-alignment] [--no-manifest] [-o REPORT] [--stdout]` — record narration EARLY (right after script lock, before visual-spec finalizes timing) and promote the assembly manifest to Whisper-precise mode against the scratch take. Verifies the scratch WAV via `whisper_alignment`, invokes `generate_manifest.py --audio` (600s subprocess timeout), and reports the drift between the 150-wpm estimate and the actual scratch runtime (🟢 within 5% / 🟡 5-10% / 🔴 ≥10%). Default scratch path: `episodes/<slug>/assets/narration-scratch.wav`. Re-run with `--wav narration.wav` once the final take is recorded to update the manifest with final timestamps. Closes the "late narration drift forces visual-spec rework" failure mode that the SOTA research surfaced as one of the highest-leverage borrows from Wendover.
+- **Synthetic scratch read** (timing only, when Tiger has not recorded yet): `python3 tools/narration/synthetic_scratch.py <slug> [--text PATH] [--wpm 140] [--voice Brian] [--yes]` — reads the narration from the newest `drafts/spoken-draft-*.md`, prints the character count and the expected fal cost, and stops unless `--yes` is given. With `--yes` it makes one ElevenLabs request per beat, brings the read to the target pace, and writes `SYNTHETIC-scratch-read.wav`, `.words.json` and a sidecar to `episodes/<slug>/assets/scratch-voice/`. Feed the words file to `retime_manifest.py --words`. The voice never goes into an episode (`project/PICTURE_RULES.md`, rule 8). The scratch read is the gate before visual production: `project/PRODUCTION_PIPELINE.md`, Stage 6b.
 - **Session planner**: `python3 tools/narration/session_planner.py <slug> [--wpm 150] [--overhead 1.8] [--break-every 15] [--json]` — given the script + target WPM + overhead multiplier, outputs estimated wall-clock session time, per-beat duration breakdown, suggested break points at beat boundaries (oversized beats land alone to respect the ~20-min voice-fatigue ceiling), and a warm-up reading order (easiest beat — lowest sayability avg — first so voice settles in before harder passages). Default overhead 1.8 reflects the solo-pickup workflow (no co-host, no producer-driven momentum); scratch-pass workflow can use `--overhead 1.3`. Composes with sayability_lint for the per-beat flag count.
 - **Pickup script generator** (close the re-record loop): `python3 tools/narration/pickup_script.py <slug> --wav PATH | --alignment-json PATH [--merge-window 8] [--labels LABELS.txt] [--json]` — reads an `AlignmentReport` (live from `whisper_alignment` OR a cached JSON), finds each pickup candidate's surrounding script context, and emits a focused pickup-only document with lead-in / pickup-text / trail-out per chunk. Consecutive pickups within `--merge-window` seconds of each other fuse into one chunk (default 8s ≈ adjacent-sentence pickups; 15s+ apart stay separate). `--labels` also writes an Audacity .txt label track for snap-to-pickup editing. Context lookup uses longest-word-overlap matching so common phrases like "the rational actor" bind to the correct sentence, not the first substring hit. Forward-compatible JSON loader filters unknown `AlignmentIssue` fields so cached alignment JSONs survive future schema additions.
 - **Audio QA (pre-mastering pre-flight)**: `python3 tools/narration/audio_qa.py [<slug> | --wav PATH] [--silence-min 2.5] [--strict] [--no-envelope] [--no-noise-floor]` — runs ffmpeg/ffprobe measurement passes against a narration WAV and emits `_audio-qa.md` with structured findings. Checks: LUFS vs YouTube target (-14 ±1), true peak vs -1 dBTP ceiling, channels (mono), sample rate (48 kHz preferred / 44.1 kHz acceptable), codec (PCM/FLAC preferred), silence gaps ≥ `--silence-min`s, RMS envelope std-dev across 5s windows (catches mid-session loudness drift Auphonic can't normalize), noise-floor RMS during detected silences (catches room-tone issues — target ≤ -55 dBFS; > -45 audible; > -35 unsalvageable). Composite **Auphonic-ready** banner gates on errors AND specific warnings that Auphonic can't paper over (wrong channels / lossy source / RMS drift / noisy floor). `--no-envelope` and `--no-noise-floor` skip the slower extra passes when only the cheap pre-flight matters.
@@ -318,6 +321,8 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 - Don't catch with bare `except Exception: pass` in Python.
 - Don't paste hex colors when there's a palette token.
 - Don't expand abbreviations into magic numbers when there's a named constant.
+- Don't run multi-step ffmpeg or image helpers inline in zsh. Put them in a file and run it with `bash`: zsh does not split `$var` into words, reads `$n:layout` as a modifier and `$fc[$i]` as a subscript. Give ffmpeg `-nostdin` in any script fed by a heredoc, or it eats the rest of the script. For contact sheets and enlargements use `tools/qa/contact_sheet.sh` (ffmpeg only).
+- Don't assume `python3` has the project's packages. On Tiger's machine `python3` is Homebrew 3.14 with none of them, and `python3.13` has them all (pytest, ruff, jsonschema, requests, Pillow, numpy, scipy). The pre-commit hook, `scripts/lint.sh` and `scripts/test.sh` pick the right one through `scripts/_python.sh`. In an ad-hoc command, call `python3.13`.
 
 ## Architecture pointers
 
@@ -326,6 +331,8 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 - Production pipeline stages (script → render → publish): [`project/PRODUCTION_PIPELINE.md`](./project/PRODUCTION_PIPELINE.md)
 - Brand system: [`remotion-templates/BRAND.md`](./remotion-templates/BRAND.md) + [`tools/brand-treatment/palette.json`](./tools/brand-treatment/palette.json) (machine-readable source of truth)
 - Decisions log: [`project/DECISIONS.md`](./project/DECISIONS.md)
+- Pictures and AI clips, rules and what works: [`project/PICTURE_RULES.md`](./project/PICTURE_RULES.md)
+- What shipped and when: [`CHANGELOG.md`](./CHANGELOG.md)
 - Lessons learned (Remotion gotchas): [`remotion-templates/LESSONS.md`](./remotion-templates/LESSONS.md)
 
 ## Manual-only tools (not auto-invoked)

@@ -3,7 +3,10 @@
 > Canonical rules for generating AI-GEN stills and morph clips in Parallax episodes.
 > Sibling of `TRANSITION_GRAMMAR.md`, `TEXT_ANIMATION_REGISTER.md`, and `HOLD_MOTION_REGISTER.md`.
 >
-> Last updated: 2026-05-21
+> Last updated: 2026-10-12 (people rules aligned with `PICTURE_RULES.md`; the rest is as of 2026-05-21)
+>
+> **Read [`PICTURE_RULES.md`](PICTURE_RULES.md) first.** It holds the binding rules for pictures of people
+> (no facial parts from any angle; anatomically coherent bodies) and the short list of what has worked.
 
 ---
 
@@ -83,13 +86,19 @@ Style rules that apply to every image:
 - Constructivist editorial illustration — bold color-blocked forms, flat planes,
   no gradients, no soft airbrushed shading, no photorealism
 - NOT a realist tradition: never a naturalistic or painterly oil painting, no
-  realistic anatomy, no rendered/expressive faces, no volumetric or photographic
-  light. Warmth and mood come from PALETTE and light WITHIN this flat constructivist
-  register — never from switching art tradition.
+  rendered/expressive faces, no volumetric or photographic light. Warmth and mood
+  come from PALETTE and light WITHIN this flat constructivist register — never from
+  switching art tradition.
+- Bodies are anatomically coherent underneath the flat rendering: shoulders, elbows,
+  wrists, hands and legs connect believably, and each hand can be traced to its own arm.
 - Palette locked to: ink #1C1814, amber #E5A544, bone #F0E6D0, with grey-green
   and walnut accents where natural. No other hues.
-- Figures: angular, color-blocked silhouettes — no facial features, no skin
-  rendering, no expressive detail. Clothing color-blocked in ink with bone accents.
+- Figures: angular, color-blocked silhouettes — no skin rendering, no expressive
+  detail. Clothing color-blocked in ink with bone accents.
+- Heads have NO facial parts, from any angle: no eyes, eyebrows or eye sockets; no
+  nose, nostrils or nose ridge; no mouth or lips; no lines inside the ear. A head in
+  profile has no nose or lip bump. The same holds for shadows and reflections of heads.
+  A plain filled outer-ear shape is fine.
 - Cultural register: American mid-century institutional (Saul Bass, Fortune
   magazine, Push Pin Studios) — NOT Soviet propaganda unless explicitly requested
 - Format: all images 16:9 wide landscape
@@ -152,7 +161,7 @@ over labeled buildings" was the canonical offender — May 23, 2026).
 7. **No realist-tradition style anchors (the worst register drift).** Never name a realist
    painter or movement in a per-shot prompt to get a "warmer" or "more painterly" look —
    "Thomas Hart Benton / WPA mural / Hudson River / naturalistic / painterly oil" all pull
-   ChatGPT straight to photoreal (volumetric light, real anatomy, rendered faces), violating
+   ChatGPT straight to photoreal (volumetric light, modelled flesh, rendered faces), violating
    the flat constructivist register (the `aigen-11` stag-hunt regen was the canonical offender,
    May 24 2026). Every shot must (a) restate the constructivist register, (b) **explicitly
    forbid realism**, and (c) lock to a constructivist reference image (e.g. `aigen-01`). Warm
@@ -164,8 +173,9 @@ over labeled buildings" was the canonical offender — May 23, 2026).
 - [ ] No Cyrillic text, no watermark; **no fake/decorative math or symbol-salad** (sophistication rule 1)
 - [ ] **No literal symbol-icons or emanation clichés** (god-rays, `$`, crests) — rules 4 + 5
 - [ ] **The frame inhabits a concrete scene, not an allegorical poster** — rule 2
-- [ ] **Flat constructivist register — NOT a naturalistic/painterly oil painting** (no volumetric light, no realistic anatomy/rendered faces) — rule 7
-- [ ] Faces: planar stylized for close figures; silhouettes only for distant/back-turned
+- [ ] **Flat constructivist register — NOT a naturalistic/painterly oil painting** (no volumetric light, no rendered faces) — rule 7
+- [ ] **People, checked with every head and hand contact enlarged** ([PICTURE_RULES.md](PICTURE_RULES.md)): no facial parts from any angle, profiles and shadows included; bodies anatomically coherent, each hand traceable to its arm
+- [ ] Heads: painted planes for close figures; plain shapes for distant or back-turned ones
 - [ ] Bridge/morph stills: frame B edited from frame A (shared base), shift readable at a glance
 - Regenerate if any principle is violated — don't patch in NLE
 

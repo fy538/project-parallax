@@ -91,9 +91,17 @@ _One prompt per shot. Paste in order, one at a time. Wait for image before conti
 
 **Style lock — every shot, no exceptions (ASSET_GENERATION_REGISTER.md sophistication rule 7):**
 Each prompt must (a) restate the **flat constructivist register**, (b) **explicitly forbid
-realism** ("not photorealistic, not a naturalistic / painterly oil painting, no realistic
-anatomy or rendered faces, no volumetric light"), and (c) tell the operator to **lock to a
+realism in the rendering** ("not photorealistic, not a naturalistic / painterly oil painting,
+no rendered faces, no volumetric light"), and (c) tell the operator to **lock to a
 constructivist reference image** (the Tier-1 refs, or a known-good still like `aigen-01`).
+
+**People — read `project/PICTURE_RULES.md` first.** Two rules go into every opening message
+that includes a person. Heads have **no facial parts from any angle**: no eyes, eyebrows or
+eye sockets; no nose, nostrils or nose ridge; no mouth or lips; no lines inside the ear; a
+profile has no nose or lip bump; shadows and reflections follow the same rule. Bodies are
+**anatomically coherent** under the flat rendering: shoulders, elbows, wrists and hands
+connect, and each hand can be traced to its own arm. **Never write "no realistic anatomy".**
+That phrase was in earlier style blocks and contradicts the second rule.
 **Never name a realist painter or tradition** (Benton, WPA mural, Hudson River, academic
 realism, "painterly oil") to get warmth or mood — that drifts ChatGPT straight to photoreal.
 Warm threads (e.g. the cooperation arc) get warmth from **palette and light**, not a different

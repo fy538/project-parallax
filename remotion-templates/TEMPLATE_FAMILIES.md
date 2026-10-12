@@ -204,7 +204,7 @@ The Remotion MG layer has **~69 templates** organized into 9 families plus 3 non
 
 **Status:** complete wayfinding stack. TimelineComparison / DualTimeline is Parallax's signature bounded-analogy form.
 
-**Deleted May 13, 2026:** TimelineComparison, DualTimeline (replaced by current DualTimeline entry), TimelineMorph (absorbed into HorizontalTimeline mode "morph").
+**Deleted May 13, 2026:** TimelineComparison, DualTimeline (replaced by current DualTimeline entry), ~~TimelineMorph~~ (absorbed into HorizontalTimeline mode "morph").
 
 **Selector:** [`TIMELINE_TEMPLATE_SELECTOR.md`](TIMELINE_TEMPLATE_SELECTOR.md) — wall-table with time-structure decision tree, bounded-analogy doctrine ground, sibling disambiguation.
 
@@ -214,7 +214,7 @@ The Remotion MG layer has **~69 templates** organized into 9 families plus 3 non
 
 | Template | Purpose |
 |---|---|
-| HorizontalTimeline | Standard single-axis chronology; mode "morph" absorbs old TimelineMorph |
+| HorizontalTimeline | Standard single-axis chronology; mode "morph" absorbs old ~~TimelineMorph~~ |
 | HorizontalTimelineSingle | Spotlight on one pivotal moment in a chronology |
 | SpiralTimeline | Long-period, cyclical, or geological time; cyclical recurrence |
 | DualTimeline | Two parallel chronologies for bounded historical analogy |

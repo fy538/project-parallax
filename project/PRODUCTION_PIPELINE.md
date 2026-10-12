@@ -28,6 +28,8 @@ Cowork (persona-eval)            Audience Resonance Check       —
 Cowork (review-package)          Review Package + Openers       —
 HUMAN                            Script Review + Rewrite     ~30 min
 Cowork (title workshop)          Title/Hook Workshop          ~5 min
+HUMAN, or synthetic stand-in  6b. Scratch Read (GATE)        ~15 min
+  one rough pass                  (sets timing before any picture is wired)
 Cowork (visual-spec)          7. Visual Spec → JSON+_direction  ~5 min
 Cowork (audio-spec)              Audio Spec → Cue Sheet (DIR-aware) ~5 min
 Python CLI (source.py)           Asset Sourcing                 —
@@ -264,6 +266,26 @@ Script development happens in Cowork with access to the research brief, angle me
 - **persona-eval** — audience resonance check against 5 personas, now with visual engagement scoring and visual tension map (installed in Cowork plugins)
 - **review-package** — cross-audit synthesis into single review document for human checkpoint (installed in Cowork plugins)
 - **thumbnail-concept** — 3 thumbnail composition concepts (Juxtaposition, Data Provocation, Symbolic) with text overlays and A/B variants, used during title/hook workshop (installed in Cowork plugins)
+
+---
+
+## Stage 6b: Scratch Read (gate before visual production)
+
+**Rule:** no picture is wired to a manifest until a read of the locked script exists. Added October 12, 2026, after `ai-care-motives` was specified, wired and rendered against a words-per-minute estimate while its narration waited at the end of the line.
+
+**Why:** the recording is the only step nobody else can do, so it goes first. A rough read turns every duration from a guess into a measurement, and it shows which cards are too short before the pictures are made to fit them. The dry run for `ai-care-motives` moved seven segments by more than a quarter of their length.
+
+**Two ways to pass the gate:**
+
+1. **Tiger reads it (preferred, about 15 minutes).** One pass of the read-aloud draft (`episodes/<slug>/drafts/spoken-draft-*.md`) into a phone, without stopping for mistakes. Quality does not matter. Save it as `episodes/<slug>/assets/narration-scratch.wav`.
+2. **A synthetic stand-in, the same day.** `python3 tools/narration/synthetic_scratch.py <slug>` prints the cost (about $0.05 per 1,000 characters, so about $0.45 for an 11-minute script) and makes the read when run again with `--yes`. The voice is a timing aid only. It is never the narration, it never goes into an episode, and its files are named `SYNTHETIC-…` ([PICTURE_RULES.md](PICTURE_RULES.md), rule 8).
+
+**Then apply the timing:**
+
+- A manifest that does not exist yet, or is still generated: `python3 tools/narration/scratch_pass.py <slug>` (it rebuilds the manifest against the recording).
+- A hand-wired manifest: `python3 tools/assembly/retime_manifest.py <slug> --audio <wav>` or `--words <words.json>`. This is a dry run that writes a report to `remotion-templates/out/retime/<slug>/`. Read the report, then add `--write`.
+
+When the real narration is recorded (Stage 8), the same command re-times the episode to it. Nothing else has to be rebuilt.
 
 ---
 
