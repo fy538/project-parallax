@@ -155,6 +155,13 @@ Before touching the visual column, read the narration column straight through as
 3. Does the pacing hold — no sags, no rushes?
 4. Would someone listening in a car follow the thread?
 
+**Ear and life check (added Oct 2026).** Also run these four passes on the narration, and list the results for Tiger before moving to Phase 3:
+
+1. **Premise audit.** List every sentence that says what the viewer thinks, feels, or does ("you wonder whether it means it"). These are assumptions about the viewer's life, not facts. Output them as a short "Confirm with Tiger" list, one line each. Cut or rewrite any he doesn't recognize. (The first draft of ai-care-motives opened by assuming viewers doubt a mundane AI answer; the real doubt shows up on personal asks like "is my idea good?")
+2. **Concreteness.** Flag sentences whose subject is an idea ("that question," "the structure," "the engine") instead of a person or object. Rewrite with someone doing something: "You can't see inside your doctor's head," not "that question has no answer you could use."
+3. **One idea per sentence, small thing first.** Flag sentences carrying two claims, and any claim that doesn't start from something the listener can nod to.
+4. **Say-it-over-a-drink test.** Flag any line you couldn't say to a friend without sounding like a lecture.
+
 If the narration doesn't pass this test, fix it now. Visuals that compensate for weak narration create a script that breaks at every stage downstream. The visual layer should deepen, not prop up.
 
 ### Phase 3: Visual Production + Direction Column
@@ -266,9 +273,10 @@ DIR: hold(until:"but")                                        # hold this visual
 **Register transition direction.** When switching between visual registers, use `cut()` to specify the transition type from the register grammar (full doctrine: `project/TRANSITION_GRAMMAR.md`). Most within-register seams do NOT need an explicit `cut()` — the implicit-default engine handles them. Use explicit `cut()` only for the cases below:
 - Analytical → Grounding (register shift): `cut(color-wash, ink)` — always include color token
 - Grounding → Atmospheric (soften): `cut(dissolve)` — ~~`cut(blur-through)`~~ is deprecated, use `dissolve`
-- Atmospheric → Analytical (focal rupture, rare): `cut(iris)` — premium register, ≤2 per episode
+- Atmospheric → Analytical: no directive (a cut). Never write `cut(iris)`: retired Oct 10, 2026, it renders as a cut and the script lint warns on it. Seam-by-seam defaults: `project/TRANSITION_GRAMMAR.md` § "By seam type"
 - Historical-analogy seam (same subject, different scale): `cut(match-cut)` or `cut(match-cut-still)`
 - Chapter break / silence beat: `cut(fade)` paired with `DIR: hold(stillness)` on the prior segment
+- Picture → text card about that picture: `DIR: over(previous)` on the card's row (optional `dim:0.6`). The picture is held and dimmed and the type comes on over it. KineticTypography only; the card must directly follow the picture, with no `hold(pre:…)` on the card
 - J/L-cut audio bridge (overlap narration): `DIR: jcut(0.7)` / `DIR: lcut(0.5)` — NLE annotation only
 - **Never emit**: `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom`
 

@@ -161,7 +161,7 @@ Per VIS-09, every episode has three registers (Analytical, Atmospheric, Groundin
 - Do Grounding scenes carry more emotional weight than Analytical-only beats?
 - Does the register-pacing rule (max 3 consecutive same-register, transition grammar) hold up under retention data?
 
-For each register, sum the segment-level retention and compare to episode average. Cross-reference the rhythm map's register sequence to find moments where the register *changed* — those are the points where the transition grammar (color-wash, dissolve, iris — per `project/TRANSITION_GRAMMAR.md`) gets validated or contradicted by retention behavior.
+For each register, sum the segment-level retention and compare to episode average. Cross-reference the rhythm map's register sequence to find moments where the register *changed* — those are the points where the transition grammar (cut, color-wash, dissolve, fade — per `project/TRANSITION_GRAMMAR.md`) gets validated or contradicted by retention behavior.
 
 #### 4c. Treatment × register pairing performance (validates VIS-10)
 
@@ -426,7 +426,7 @@ Produce a comprehensive retrospective report:
 | Grounding (Register 3) | [Xs] | [Y%] | [X]% | [±Y]% |
 
 - **Proportion check:** Did the actual breakdown hit VIS-09's targets (MG 40-55%, ILLUST 5-15%, AI-GEN 5-15%)? If not, did over/under-allocation correlate with retention?
-- **Sequencing check:** Did register transitions follow the prescribed grammar (color-wash, dissolve, iris — per `project/TRANSITION_GRAMMAR.md`)? Did ad-hoc transitions perform worse?
+- **Sequencing check:** Did register transitions follow the prescribed grammar (cut, color-wash, dissolve, fade — per `project/TRANSITION_GRAMMAR.md`)? Did ad-hoc transitions perform worse?
 - **Atmospheric hypothesis:** Atmospheric backgrounds were introduced to replace generic stock-footage wallpaper. Did Register 2 segments outperform stock-footage segments at the same opacity/role?
 - **Grounding hypothesis:** Grounding scenes (mannequin reconstructions) were introduced for unsourceable spaces. Did they carry more retention than Analytical-only equivalents would have?
 

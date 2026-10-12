@@ -26,7 +26,7 @@ Before starting, familiarize yourself with:
 - **`project/TEXT_ANIMATION_REGISTER.md`** — the eight canonical text-animation techniques (Number Ticker, Tracking-In, Reveal Mask, Underline Draw, Typewriter, Backspace, Scramble, Word Cascade) and three composite patterns (Definition Reveal, Stat Caption, Quote Attribution). Use this to pick the `_direction.textAnimation` register for text-bearing templates (KineticTypography, StatReveal). The doctrine doc has per-technique use/avoid rules and a decision matrix.
 - **`project/HOLD_MOTION_REGISTER.md`** — the eight canonical hold-beat motion techniques (Stillness, Editorial, Breathing, Settle, Sway, Documentary Ken Burns, Atmospheric particles, Mood pulse) and the four register decision matrix (A analytical / B editorial-hero / C documentary / D cartographic). Use this to pick the `_direction.driftPreset` for the *post-entrance hold window*. Most segments take their template default and need no override; reach for a per-segment `driftPreset` only when the editorial intent diverges from the template's canonical register (e.g., a memorial moment on a normally-editorial chart wants `none`/stillness). The `catalog-showcase-drift-register` composition is the side-by-side visual reference.
 - **`project/MATH_RENDER_REGISTER.md`** — six canonical math-rendering primitives (Reveal, Step-by-step, Term-highlight, Substitution, Annotation, Inline) plus the composite Bounded form (Parallax's signature analogical move, math edition). Use this whenever a script beat involves an equation, a derivation, a payoff matrix, a Bayesian update, an expected-value calculation, or any moment where words start to feel hand-wavy and a glyph would land harder. Pick the primitive via the doctrine's decision matrix; the `catalog-showcase-math-render` composition is the side-by-side visual reference. Templates: `MathReveal` (single equation) and `MathDerivation` (multi-step). Inline math (math glyphs inside flowing prose, e.g. captions / labels / body text) uses `<MathInline>` with `$...$` markers. Authoring rules: TeX is KaTeX dialect; brand-color highlights via `\textcolor{HEX}{TERM}` using only the documented palette (gold `#C4A747`, rust `#A64D46`, dustblue `#7AA3C9`, walnut `#5C4A3D`); annotations via KaTeX-native `\underbrace{TERM}_{\text{label}}` / `\overbrace{TERM}^{\text{label}}`. The `M-MATH-VALID` lint (Phase 4, wired into `scripts/lint.sh`) validates every `formula` field through KaTeX strict parser before publish — a TeX typo here would surface as an inline red error in render.
-- **`project/TRANSITION_GRAMMAR.md`** — the six canonical segment-to-segment transitions and their editorial claims. Use this to pick the `cut()` directive for each seam between segments. Each transition carries an implicit claim about the editorial relationship — picking the wrong one makes a wrong claim. Decision matrix: **cut** (same thought, next breath — within-beat default), **dissolve** (elaboration, gentler delivery — beat-boundary default), **fade** (new chapter / time-jump / silence beat), **match-cut** (same subject, different scale — historical-analogy seams), **color-wash** (register shift — new editorial mode; always include `washColor` token), **iris** (premium cinematic open/close — reserved for civilizational-rupture moments, ≤2 per episode). Six transitions are deprecated: `wipe-left/right/up`, `blur-through`, `whip-pan`, `spatial-zoom` — never emit these. Consult the `catalog-showcase-transition-grammar` composition to see all six in motion.
+- **`project/TRANSITION_GRAMMAR.md`** — the canonical segment-to-segment transitions and their editorial claims (start with its "By seam type" table; iris was retired Oct 10, 2026 and must not be emitted). Use this to pick the `cut()` directive for each seam between segments. Each transition carries an implicit claim about the editorial relationship — picking the wrong one makes a wrong claim. Decision matrix: **cut** (same thought, next breath — within-beat default), **dissolve** (elaboration, gentler delivery — beat-boundary default), **fade** (new chapter / time-jump / silence beat), **match-cut** (same subject, different scale — historical-analogy seams), **color-wash** (register shift — new editorial mode; always include `washColor` token), **iris** (premium cinematic open/close — reserved for civilizational-rupture moments, ≤2 per episode). Six transitions are deprecated: `wipe-left/right/up`, `blur-through`, `whip-pan`, `spatial-zoom` — never emit these. Consult the `catalog-showcase-transition-grammar` composition to see all six in motion.
 - **`project/FOOTAGE_SOURCING.md`** — what footage is actually available for geopolitics content, organized by sourcability tier. This is the reality check.
 - **`project/SCRIPT_FORMAT.md`** — the visual mode tags (`[FOOTAGE:]`, `[MG:]`, `[LAYERED:]`, `[AI-GEN:]`, `[ILLUST:]`), `DIR:` annotations, and how they work in the two-column format.
 - **`project/AI_VIDEO_PIPELINE.md`** — the fourth visual mode specification: aesthetic philosophy (mannequin faces + realistic environments), tool selection, prompting patterns by use case, and editorial guardrails.
@@ -46,7 +46,7 @@ The templates cover the MG layer of visual needs. Grouped by **family** so the o
 
 The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLATE_FAMILIES.md) cross-references all five plus the per-template dossiers. The long-form prose in `references/template-picker.md` is the deeper-dive reference; the wall-tables are the operating documents.
 
-### Maps — 6 templates · ~25-30% episode share
+### Maps — 7 templates · ~25-30% episode share
 
 **Selector doc:** [`remotion-templates/MAP_TEMPLATE_SELECTOR.md`](../../remotion-templates/MAP_TEMPLATE_SELECTOR.md) (wall-table). Read it before assigning any map beat. The detailed selection table also lives below this section.
 
@@ -60,8 +60,9 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | ProportionalSymbolMap | as needed | Country circles **sized by count data** (fabs, bases, GDP) on Mapbox basemap. Right form when areas mislead — Mercator-fix for ≤12 countries spread across continents. |
 | CartogramMap | as needed | **Dorling cartogram** — country circles de-collided via d3-force. Use for **15+ data points in dense regions** (EU-27, sub-Saharan Africa) where ProportionalSymbolMap overlaps illegibly. |
 | DensityMap | as needed | **deck.gl point-density** (hex / heatmap / grid) on Mapbox basemap. Use for individual facilities / events (100s of points) where the editorial point is *where they cluster*. Supports bivariate `colorWeight` for size+color independence. |
+| CinematicMap | sparingly (max 1–3/episode) | **Pitched moving camera — terrain is the argument.** 3D fly-through for mountain passes, strait chokepoints, siege approaches. Requires `MAPBOX_ACCESS_TOKEN`; render cost ~2–3× a 2D map. **DO NOT use** where a 2D AtlasPlate or ChoroplethMap would work — the render overhead is only justified when the physical terrain IS the editorial claim. Use `keyframes[].altitudeM + pitch` for camera path; `tools/camera_path.py` generates keyframes from place names. See `references/template-research/cinematic-map.md` for altitude table + failure modes. |
 
-### Charts / data visualizations — 6 templates · ~15-20% episode share
+### Charts / data visualizations — 7 templates · ~15-20% episode share
 
 **Selector doc:** [`remotion-templates/PARALLAX_VISUAL_VOCABULARY.md`](../../remotion-templates/PARALLAX_VISUAL_VOCABULARY.md) — the canonical chart chooser. Replaces the older `CHART_TEMPLATE_SELECTOR.md` for chart-form selection. Use the decision-rule table to map editorial intent → template, then check the per-category "When to pick / Avoid when" guidance. Includes the chart-chooser flowchart at the bottom.
 
@@ -83,9 +84,11 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | StatReveal | ⚪ legacy | as needed | Dramatic single-statistic. Prefer KPICard for editorial framing. |
 | PricingWaterfall | 🟢 frame | as needed | Value-chain decomposition. "Where each dollar goes." |
 
+| SmallMultiples | ⚪ legacy | as needed | Trellis / panel chart — same axis, N categories side by side. Use when the editorial point is *how the pattern varies across subgroups* (country × metric, region × year). |
+
 🟢 = Editorial-frame migrated · 🟡 = Editorial-frame native · ⚪ = Legacy chrome (see CHART_MIGRATION_GUIDE.md)
 
-### Diagrams / framework / strategic — 11 templates · ~10-15% episode share
+### Diagrams / framework / strategic — 12 templates · ~10-15% episode share
 
 **Selector doc:** [`remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md`](../../remotion-templates/DIAGRAM_TEMPLATE_SELECTOR.md) (wall-table). Largest family with the heaviest sibling-confusion surface — sibling-disambiguation tables for DecisionTree vs. GameBoard, DecisionTree vs. OutcomePartition, FrameworkDiagram-flow vs. SankeyFlow, comparison vs. matrix vs. DuelingFrameworks, plus the DecisionTree-variant chooser.
 
@@ -104,21 +107,25 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | ~~BifurcationRoute~~ | DELETED May 13 | Was "two paths diverged" form. Migrate to **DuelingFrameworks** (head-to-head scenarios) or **DecisionTree** (branching with probabilities). Do NOT emit BifurcationRoute in new manifests — the template no longer exists. |
 | DuelingFrameworks | as needed | Two opposing frameworks compared side by side. |
 | PricingWaterfall | as needed | Value-chain decomposition ($1 of price → segments of cost). |
+| CausalLoopDiagram | as needed | System-dynamics feedback loops. Use when the editorial point is *circular causation* — arms races, inflation spirals, network effects. Reinforcing (+) vs. balancing (−) loop arrows. |
 
 ### Timelines — 4 templates · ~10-12% episode share
 
-**Selector doc:** [`remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md`](../../remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md) (wall-table). TimelineComparison is Parallax's signature form (bounded analogy rendered as visual structure) — the selector grounds it in `project/CONTENT_IDENTITY.md`.
+**Selector doc:** [`remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md`](../../remotion-templates/TIMELINE_TEMPLATE_SELECTOR.md) (wall-table).
 
-**Audit skill:** `timeline-audit` — 7-lens audit. Especially direct on bounded-analogy mis-routing (HorizontalTimeline used where TimelineComparison is correct dilutes the channel's editorial differentiator).
+**Audit skill:** `timeline-audit` — 7-lens audit.
 
 | Template | Share | Purpose |
 |---|---|---|
-| TimelineComparison | ~8% | Historical parallels, before/after, "this happened, then this happened." |
-| HorizontalTimeline | as needed | Single-axis chronology with phased reveal. |
-| DualTimeline | as needed | Two parallel chronologies in stacked tracks. |
-| ~~TimelineMorph~~ | DELETED May 13 | Was "one timeline morphing into another" (transformation reveal). Migrate to **HorizontalTimeline** with `mode: "morph"`. Do NOT emit TimelineMorph in new manifests — the template no longer exists. |
+| HorizontalTimeline | ~8% | Single-axis chronology with phased reveal. The default for linear event sequences. |
+| HorizontalTimelineSingle | as needed | Single-event spotlight — one event pulled off the axis for a focused, zoomed-in moment. |
+| EscalationLadder | as needed | Vertical event sequence with severity indicators. Use when escalation degree matters. |
+| SpiralTimeline | as needed | Cyclical / recurring patterns (annual rhythms, seasonal cycles). Events placed on a clock-face spiral; repetition is the editorial argument. |
+| ~~TimelineComparison~~ | DELETED May 13 | Migrated to **HorizontalTimeline** dual-track mode. Do NOT emit — template no longer exists. |
+| ~~DualTimeline~~ | DELETED May 13 | Migrated to **HorizontalTimeline** dual-track mode. Do NOT emit — template no longer exists. |
+| ~~TimelineMorph~~ | DELETED May 13 | Migrated to **HorizontalTimeline** `mode: "morph"`. Do NOT emit — template no longer exists. |
 
-### Typography / layout — 6 templates · ~10-15% episode share
+### Typography / layout — 7 templates · ~10-15% episode share
 
 **Selector doc:** [`remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md`](../../remotion-templates/TYPOGRAPHY_TEMPLATE_SELECTOR.md) (wall-table). Grounded in POLISH.md D1-D18 doctrine for TitleTransition chrome rules.
 
@@ -132,6 +139,51 @@ The family-aware index [`TEMPLATE_FAMILIES.md`](../../remotion-templates/TEMPLAT
 | ImageComposite | as needed | Brand-treated photo with overlay text. |
 | PhotoMontage | as needed | Multi-photo grid with reveal animation. |
 | AnnotatedImage | as needed | Image with animated callout labels. |
+| PrimarySourceReveal | as needed | Zoomed-in document / manuscript reveal. Crops, pans, and highlights a primary source (letter, treaty, ledger) as the narrator reads from it. |
+
+### Argument Primitives — 5 templates · rare (~0–2/episode)
+
+These encode **the logical skeleton of the argument** itself — not data, not geography, but the structure of inference. Use them when the script's analytical move is the primary visual content. See `PARALLAX_VISUAL_VOCABULARY.md` § Argument Primitives for decision rules.
+
+| Template | Purpose | When NOT to use |
+|---|---|---|
+| **Syllogism** | Major premise → minor premise → ∴ conclusion. The three-card logical form. | Don't force messy enthymemes into Syllogism; ConditionalArgument is more honest when there's a condition. |
+| **AxiomList** | Numbered foundational claims ("Here are the three structural facts this episode rests on"). | Don't use as a bullet-point substitute — each item must be load-bearing, not illustrative. |
+| **DialecticFlow** | Thesis → Antithesis → Synthesis (Hegelian arc). | Avoid when "synthesis" is just the thesis restated — the template implies genuine dialectical movement. |
+| **ConditionalArgument** | IF \<condition\> → THEN \<true consequence\> / \<false consequence\>. Binary branching on a premise. | Don't use for > 2 branches — use DecisionTree. |
+| **CounterfactualPath** | Actual historical path + one or more branching "what if" alternatives. | Only if the counterfactual passes the Hawthorn test (specific, proximate cause, plausible alternate outcome). See `project/COUNTERFACTUAL_REGISTER.md`. |
+
+### Relationship & Composition — 4 templates · rare (~0–2/episode)
+
+Templates for **set overlap, bilateral flows, hierarchical part-to-whole, and N×M cross-tabulation** — when the editorial argument is about *structure of connection*, not about trend over time or geographic position. See `PARALLAX_VISUAL_VOCABULARY.md` § Relationship & Composition.
+
+| Template | Purpose |
+|---|---|
+| **VennDiagram** | Set overlap — 2 or 3 sets, intersection is the editorial argument. Use for alliances with shared members, ideological common ground, technology overlap. |
+| **ChordDiagram** | Bilateral flows — who trades with / supports / recruits from whom. Arcs sized by magnitude; the thickest chord IS the story. |
+| **Treemap** | Hierarchical part-to-whole — budget allocations, portfolio composition, market share with sub-categories. More honest than pie charts for many subcategories. |
+| **MatrixHeatmap** | N×M cross-tabulation — country × capability, year × policy tier, dimension × actor. Color encodes intensity; diagonal ripple reveal surfaces clusters. |
+
+### Documentary archival — 4 templates · rare (~0–2/episode)
+
+Archival / period templates for **documentary register** moments — when the script cites a primary source, plays archival footage, or needs visual texture that signals "this is real historical record." Each has authentic physical aging built in (paper grain, emulsion, stamp-and-hole punch, film flicker). Do NOT mix these into analytical segments — the register clash reads as tonal whiplash.
+
+| Template | Purpose |
+|---|---|
+| **HandwrittenLetter** | Renders a personal letter or correspondence in dual mode: `photograph` (simulated aged paper photograph of the document) or `typeset` (clean typeset rendering of the text). |
+| **NewspaperHeadlineRotator** | Rotates N front-page headlines with masthead images — the "here's how the world woke up" beat. |
+| **ArchivalReel** | 8mm / 16mm / VHS register with sprocket holes, flicker, and grain. Wraps a still or footage clip in physical film emulation. |
+| **TelegramCable** | Full bureaucratic cable / diplomatic telegram chrome — dateline, classification stamp, routing headers, monospace typeface. For diplomatic-history beats. |
+
+### Cross-frame / morph — 3 templates · occasional (~1–3/episode)
+
+Templates for **side-by-side comparison, temporal morph, and multi-pane layout** — when the editorial move is the juxtaposition itself.
+
+| Template | Purpose |
+|---|---|
+| **ComparisonPair** | Two scaled-down panes showing any two templates side by side. The pane templates share the same axis / scale when possible. Use for before/after, two scenarios, two time periods. |
+| **MorphTransition** | Smooth interpolation between two states of the *same* template (StatReveal A→B, DataChart bar-reorder, TimeSeriesChart extension). The transition IS the reveal. |
+| **SplitFrame** | Two full templates rendered simultaneously in a split screen with a labelled divider. Supports `simultaneous` (both animate in sync) or `sequential` (left completes, then right begins). |
 
 ### Other asset types (not Remotion templates)
 
@@ -145,7 +197,7 @@ These three sit OUTSIDE the Remotion MG layer but are owned by the same visual-s
 
 ### Map template selection — wall-table
 
-Six map templates with overlapping purposes. **Read this table before assigning any map beat.** Full editorial rationale and failure modes live in `remotion-templates/MAP_TEMPLATE_SELECTOR.md` and the per-template dossiers under `remotion-templates/references/template-research/`.
+Seven map templates with overlapping purposes. **Read this table before assigning any map beat.** Full editorial rationale and failure modes live in `remotion-templates/MAP_TEMPLATE_SELECTOR.md` and the per-template dossiers under `remotion-templates/references/template-research/`.
 
 | If the script beat says... | Use template | Notes |
 |---|---|---|
@@ -159,6 +211,8 @@ Six map templates with overlapping purposes. **Read this table before assigning 
 | "From A to B" / supply chain / military campaign | **RouteAnimation** | Phased arc reveal. |
 | "All roads led to Rome" / hub + N destinations | **RouteAnimation** + `radial: { hubIndex }` | Auto-generated segments from hub, bearing-sorted stagger. |
 | "Show the disputed line" (Taiwan, S China Sea, Kashmir, Crimea, W Sahara) | Any of the above + `disputedBoundaries: ["tag"]` | Dashed rust line layered over the base map. Curated tags in `src/utils/disputedBoundaries.ts`. |
+| "Fly through the Khyber Pass / approach from altitude" (terrain IS the argument) | **CinematicMap** | Pitched moving camera; physical terrain and elevation must be visible to make the editorial claim. Max 1–3/episode — render cost ~2–3× a 2D map. Use `tools/camera_path.py` to generate `keyframes` from place names. |
+| "Zoom out to full globe / reveal from space" (cold-open planet shot) | **CinematicMap** + `altitudeM: 9000000, lightPreset: "night"` | GlobeReveal pattern — start at 9M m altitude, zoom in via keyframes. Same template, no separate component. |
 
 **Overlay decisions (apply to any map template):**
 
@@ -253,7 +307,7 @@ Format it as a markdown table:
 | 0:25 | TSMC Arizona fab | MG | Analytical | ChoroplethMap | choropleth-reshoring.json | cam(wide→tight:Taiwan, sync:"single island") reveal(sequential) hold(breathe) cut(color-wash, ink) | US highlighted · P1 |
 | 0:45 | "7% of US demand" | LAYERED | Mixed | Stock + KineticTypo | footage-manifest.json #2 + kinetic-7pct.json | reveal(count-up, sync:"seven percent") | stat over desert footage |
 | 1:10 | Cleanroom interior | AI-GEN | Grounding | Kling 3.0 | ai-brief-fab-walkthrough.json | cam(push-in, over:7s) mood(dense, particles:15) cut(dissolve) | mannequin workers |
-| 1:30 | The trap tightens | ILLUST | Atmospheric | Recraft | illust-dependency-vise.json | mood(dense, dim:0.4) hold(2s) cut(iris) | metaphor mode · conflict |
+| 1:30 | The trap tightens | ILLUST | Atmospheric | Recraft | illust-dependency-vise.json | mood(dense, dim:0.4) hold(2s) | metaphor mode · conflict |
 | ... | ... | ... | ... | ... | ... | ... | ... |
 ```
 
@@ -276,7 +330,7 @@ Check against target ranges from SCRIPT_FORMAT.md: MG 40-55%, FOOTAGE 25-40%, IL
 - ILLUST > 15% → too much atmospheric art, viewer fatigue
 - Either register completely absent → visual texture flattens
 - More than 2 consecutive AI-GEN or ILLUST entries → pacing violation, insert mode switch
-- Register transitions follow the canonical grammar from `project/TRANSITION_GRAMMAR.md` (color-wash, dissolve, match-cut, fade, iris) — `blur-through` is deprecated, never emit it
+- Register transitions follow the canonical grammar from `project/TRANSITION_GRAMMAR.md` (cut, color-wash, dissolve, match-cut, fade; iris is retired) — `blur-through` is deprecated, never emit it
 
 Guidelines for the breakdown:
 - Every beat should start with a section title card (TitleTransition, section variant)
@@ -340,9 +394,10 @@ When a visual segment has `DIR:` annotations in the script, translate them into 
 | `hold()` | `holdAfter`, `holdBehavior`, `preDelay`, `narrationGate` |
 | `cut()` | `transitionOut`, `washColor`, `transitionDuration` |
 | `mood()` | `atmosphere`, `ambientParticles`, `driftPreset`, `globalDim`, `backgroundTint` |
+| `over(previous)` | none — `generate_manifest.py` turns it into `layered.backgroundSegmentId` on the card's manifest segment. Do not set `backgroundVariant` or a transparent ground in the data file; the engine does that at render time. KineticTypography only, title + one sentence |
 
 **Transition selection for `cut()` directives** — the implicit-default engine in `apply_default_transitions()` handles most seams (within-beat → cut; beat-boundary → dissolve; title cards → fade pair). Only emit an explicit `cut()` when the default is editorially wrong. When you do override, match the transition to the editorial relationship per `project/TRANSITION_GRAMMAR.md`:
-- **Seam crosses a civilizational-rupture moment** (rare, ≤2 per episode): `DIR: cut(iris)`
+- **Seam crosses a civilizational-rupture moment**: a cut, or `DIR: cut(fade)` if it is also a chapter break. Never `cut(iris)` (retired Oct 10, 2026)
 - **Register shift** (entering a new editorial mode): `DIR: cut(color-wash, ink)` — always include the color token
 - **Match-cut opportunity** (same subject, different scale — historical-analogy seam): `DIR: cut(match-cut)` or `DIR: cut(match-cut-still)` for composition-locked templates
 - **Chapter / silence beat** (time-jump, memorial, end of act): `DIR: cut(fade)` paired with `DIR: hold(stillness)` on the prior segment
@@ -584,12 +639,12 @@ data/episodes/<slug>/illust-<descriptive-slug>.json
   "narrative_context": "Narration describes how cheap technology creates invisible lock-in",
   "emotional_target": "claustrophobia, inevitability, systemic pressure",
   "transition_in": "dissolve from MG",
-  "transition_out": "iris to next MG",
+  "transition_out": "cut to next MG",
   "_direction": {
     "atmosphere": "dense",
     "globalDim": 0.4,
     "holdAfter": 2.0,
-    "transitionOut": "iris"
+    "transitionOut": "cut"
   }
 }
 ```
@@ -631,7 +686,7 @@ data/episodes/<slug>/illust-<descriptive-slug>.json
 - [ ] Mode matches the visual intention
 - [ ] Treatment matches the emotional register of the accompanying narration
 - [ ] Duration is 4-8 seconds (atmospheric moments don't need long holds)
-- [ ] Transitions respect the canonical grammar (color-wash, dissolve, match-cut, fade, iris) — no deprecated types (`blur-through`, `wipe-*`, `whip-pan`, `spatial-zoom`)
+- [ ] Transitions respect the canonical grammar (cut, color-wash, dissolve, match-cut, fade) — no retired or deprecated types (`iris`, `blur-through`, `wipe-*`, `whip-pan`, `spatial-zoom`)
 - [ ] The illustration adds something footage and MG cannot — if a stock aerial shot would work equally well, use footage instead
 
 ### Batch output

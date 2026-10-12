@@ -22,9 +22,10 @@ You are generating the audio design layer for a bilingual geopolitics video chan
 **Read `project/DIRECTING_LANGUAGE.md` for direction-to-audio integration.** The script's `DIR:` annotations are the single source of truth for timing, transitions, and mood. Three directives directly inform audio cues:
 - **`cut()`** → determines which transition SFX to use at segment boundaries. The canonical transition-type vocabulary (and their audio pairings) is defined in `project/TRANSITION_GRAMMAR.md`. Key mappings:
   - `cut(color-wash)` → `section-open` SFX (color flood = new section)
-  - `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click)
+  - `cut(iris)` → retired Oct 10, 2026 (renders as a cut); assign no SFX for it
   - `cut(fade)` → music silence / thin bed (chapter break / silence beat — see D18)
   - `cut(dissolve)` → no dedicated SFX; music bed continues uninterrupted
+  - `over(previous)` on a card (type over the held picture) → the picture does not change, so no transition SFX at that seam; the card's own template cue still plays
   - `cut(match-cut)` / `cut(match-cut-still)` → optional `card-settle` texture hit at the locked frame
   - ~~`cut(blur-through)`~~ is deprecated — if encountered in old scripts, treat as `cut(dissolve)` (no SFX)
   - Authoritative table: [`project/AUDIO_DESIGN.md`](../../project/AUDIO_DESIGN.md) lines 398-400.
@@ -139,7 +140,7 @@ For each segment:
 
 1. **Does the previous segment have a `DIR: cut()` annotation?** → The cut type determines the transition SFX (authoritative table: `project/AUDIO_DESIGN.md` lines 398-400):
    - `cut(color-wash)` → `section-open` SFX (color flood signals a new section)
-   - `cut(iris)` → `stat-reveal` SFX (circular reveal pairs with the "lock" click)
+   - `cut(iris)` → retired Oct 10, 2026 (renders as a cut); assign no SFX for it
    - `cut(match-cut)` → silent transition (the visual continuity IS the connection — SFX would compete)
    - ~~`cut(blur-through)`~~ → deprecated; treat as `cut(dissolve)` if encountered in old scripts (no dedicated SFX)
    - `cut(dissolve)` → `beat-transition` SFX at subtle intensity

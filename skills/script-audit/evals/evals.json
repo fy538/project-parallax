@@ -1,0 +1,52 @@
+{
+  "skill": "script-audit",
+  "note": "Run each query with the skill loaded, then grade expected_behavior (must) and stretch (should, not required). Compare against the same query without the skill for a baseline. Added 2026-10-07; deterministic checks live in tools/lint/script_lint.py.",
+  "evals": [
+    {
+      "id": "essay-over-hedged",
+      "query": "Audit analysis/first-ai-episode-do-motives-matter-script-2026-10-07.md",
+      "files": ["analysis/first-ai-episode-do-motives-matter-script-2026-10-07.md"],
+      "expected_behavior": [
+        "States up front that the file is a spoken-draft essay, not two-column, and skips or caveats Lens 6",
+        "Lens 10 verdict is OVER-HEDGED or flags layered hedging / spoken scope-caveats (e.g. 'That's a very compressed account', the Turpin scope sentence)",
+        "Lens 9 flags the Level-3 phrases 'Maybe' / 'Perhaps' with rewrites",
+        "Flags the deny-then-pivot tic ('That doesn't X. It Y.') as a pattern, not a one-off",
+        "Flags the ending as retreating from its own position (NAR-14) and the missing named concept (NAR-11)",
+        "Priority Fixes contain actual replacement prose, not advice"
+      ],
+      "stretch": [
+        "Notes that the central example (a checkable probability lesson) is the easiest case for 'motive doesn't matter' and the script never faces unverifiable help",
+        "Notes that section 1 and section 4 retell the same scenario"
+      ]
+    },
+    {
+      "id": "locked-script-no-false-alarms",
+      "query": "Audit episodes/prisoners-dilemma/script.md",
+      "files": ["episodes/prisoners-dilemma/script.md"],
+      "expected_behavior": [
+        "Runs Lens 6 and reports a visual rhythm map or mode balance",
+        "Does not flag the 12 PACE changes as a problem (PACING_REGISTER allows >= 2 per beat)",
+        "Does not treat the bounded-analogy line ('The PD isn't wrong about everything. But it's wrong about most of it') as hedging or a negation tic",
+        "Reports at most a handful of real issues rather than manufacturing findings for every lens",
+        "Mentions the [MG:] runs and the third cut(iris) if it reports transition grammar"
+      ]
+    },
+    {
+      "id": "seeded-defects",
+      "query": "Audit skills/script-audit/evals/fixtures/seeded-defects.md",
+      "files": ["skills/script-audit/evals/fixtures/seeded-defects.md"],
+      "expected_behavior": [
+        "Flags 'Here's the problem' and 'Here's the key difference' as lecture signposts",
+        "Flags 'Verified as of May 2026' as verification-process narration to cut",
+        "Flags the stacked hedge sentence as layered hedging with a one-clause rewrite",
+        "Flags 'perhaps / could go either way / Only time will tell' as Level-3 calibration language",
+        "Flags cut(whip-pan) as a deprecated transition with replacement cut",
+        "Flags cut(color-wash) with no color token",
+        "Flags PACE: frantic as invalid",
+        "Flags 3 cut(iris) as exceeding the episode cap of 2",
+        "Flags 5 consecutive [MG:] visuals as slideshow pattern",
+        "Flags 'It's not a blockade, it's a quarantine' as an inline negation pivot"
+      ]
+    }
+  ]
+}

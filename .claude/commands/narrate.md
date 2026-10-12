@@ -170,13 +170,26 @@ If the operator prefers in-DAW mastering instead, skip both — record clean and
 
 ### Stage 4 — advance the manifest
 
-When the WAV (mastered or raw) is clean and there are no major pickup candidates, refresh the assembly manifest in precise mode so visual timings sync to actual narration:
+When the WAV (mastered or raw) is clean and there are no major pickup candidates, move the assembly manifest onto the real narration timings.
+
+First check whether the episode's manifest is hand-wired: `"handWired": true` near the top of `remotion-templates/data/episodes/$1/assembly-manifest.json` (`ai-care-motives` is).
+
+**Hand-wired manifest (D49).** Re-time it. This keeps every segment and its wiring and moves only time. It is a dry run until `--write`, which keeps the old copies:
+
+```bash
+python3 tools/assembly/retime_manifest.py $1 --audio <path-to-wav>
+python3 tools/assembly/retime_manifest.py $1 --audio <path-to-wav> --write
+```
+
+Read the dry run's report before writing: it lists the graphics whose reveals no longer fit their slot. `generate_manifest.py` refuses to overwrite a hand-wired manifest, so do not run it here.
+
+**Generated manifest (every other episode).** Regenerate in precise mode:
 
 ```bash
 python3 tools/assembly/generate_manifest.py $1 --audio
 ```
 
-This promotes the manifest from `estimate` to `precise` mode (Whisper-aligned timings).
+Either way the manifest moves from `estimate` to `precise` mode (speech-aligned timings).
 
 ## Mode C — both (if user explicitly asks for it)
 

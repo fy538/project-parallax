@@ -68,7 +68,7 @@ Apply the rubric from CONTENT_IDENTITY.md without deep research — this is a vi
 
 1. **Wait, what?** — Is there at least one counterintuitive finding that would stop a scroll?
 2. **Arguable thesis** — Could a smart person disagree with the episode's central claim?
-3. **Two-pillar test** — Does it connect at least 2 of the 3 pillars (historical analogy, philosophical framework, contemporary geopolitics)?
+3. **Two-pillar test** — Does it connect at least 2 of the 3 pillars (historical analogy, philosophical framework, contemporary stakes — geopolitics, or AI alignment/ethics under the Oct 2026 focus)?
 4. **Timely-or-timeless** — Is there search demand now OR will this topic generate views in 2 years?
 5. **Compounding** — Will this episode create concepts or frameworks that future episodes can reference?
 

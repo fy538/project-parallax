@@ -272,7 +272,7 @@ Check the script for:
 4. **Transition grammar compliance.** When the script switches between registers, check that the implied transition makes sense:
    - Analytical → Grounding: color-wash (clean space bleeds into textured world)
    - Grounding → Atmospheric: dissolve (photorealistic dissolves into stylized — ~~blur-through~~ is deprecated)
-   - Atmospheric → Analytical: iris (illustration contracts to focal point, data opens from it)
+   - Atmospheric → Analytical: cut (iris was retired Oct 10, 2026; see `project/TRANSITION_GRAMMAR.md` § "By seam type")
    - Analytical → Atmospheric: dissolve (data fades into mood)
    - Grounding → Analytical: color-wash or cut
    
