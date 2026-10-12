@@ -322,6 +322,7 @@ Episode state lives in [`episodes/PIPELINE.md`](./episodes/PIPELINE.md) — read
 - Don't paste hex colors when there's a palette token.
 - Don't expand abbreviations into magic numbers when there's a named constant.
 - Don't run multi-step ffmpeg or image helpers inline in zsh. Put them in a file and run it with `bash`: zsh does not split `$var` into words, reads `$n:layout` as a modifier and `$fc[$i]` as a subscript. Give ffmpeg `-nostdin` in any script fed by a heredoc, or it eats the rest of the script. For contact sheets and enlargements use `tools/qa/contact_sheet.sh` (ffmpeg only).
+- Don't commit licensed media. The GitHub repository is public by Tiger's choice (Oct 12, 2026). Music beds under `remotion-templates/public/audio/music/` are git-ignored, stock clips are ignored by name, and the pre-commit hook refuses any staged audio file unless `PARALLAX_ALLOW_AUDIO=1` says it is our own work. A licensed sound effect dropped over a tracked placeholder in `public/audio/sfx/` must not be committed.
 - Don't assume `python3` has the project's packages. On Tiger's machine `python3` is Homebrew 3.14 with none of them, and `python3.13` has them all (pytest, ruff, jsonschema, requests, Pillow, numpy, scipy). The pre-commit hook, `scripts/lint.sh` and `scripts/test.sh` pick the right one through `scripts/_python.sh`. In an ad-hoc command, call `python3.13`.
 
 ## Architecture pointers

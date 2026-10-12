@@ -20,6 +20,19 @@ MANIFEST_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E 'da
 CONCEPTS_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^data/concepts\.json$' || true)
 PIPELINE_STATE_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^episodes/pipeline-state\.json$' || true)
 
+# The GitHub repository is public. Licensed music and sound effects may be used in a
+# video but not redistributed, so a staged audio file stops the commit unless it is
+# declared as our own work (the synthesised effects from tools/generate_sfx.py, or a
+# synthetic scratch read).
+AUDIO_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -iE '\.(wav|mp3|m4a|aif|aiff|flac|ogg)$' || true)
+if [ -n "$AUDIO_CHANGED" ] && [ "${PARALLAX_ALLOW_AUDIO:-}" != "1" ]; then
+  echo "✗ Audio files are staged:"
+  echo "$AUDIO_CHANGED" | sed 's/^/    /'
+  echo "  This repository is public. Licensed music or sound effects must not be committed."
+  echo "  If these files are our own work, commit again with PARALLAX_ALLOW_AUDIO=1."
+  exit 1
+fi
+
 if [ -n "$TS_CHANGED" ]; then
   echo "→ TypeScript typecheck (TS files changed)"
   (cd remotion-templates && npx tsc --noEmit)

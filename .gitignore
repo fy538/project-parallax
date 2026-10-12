@@ -102,3 +102,8 @@ remotion-templates/public/episodes/ai-care-motives/clips/aigen-*.mp4
 # repository is public, so they stay local. Sources and IDs are in asset-manifest.json.
 remotion-templates/public/episodes/ai-care-motives/clips/stock-*.mp4
 episodes/ai-care-motives/assets/sourced/stock-*.mp4
+
+# The GitHub repository is public. Music beds are licensed for use in a video, not for
+# redistribution, so they stay on disk only. (Replacing a tracked placeholder effect with a
+# licensed one is caught by the pre-commit hook instead.)
+remotion-templates/public/audio/music/
