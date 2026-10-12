@@ -1,0 +1,85 @@
+{
+  "what": "Synthetic scratch read of spoken draft v7. A timing aid only. It is not the narration and must not appear in the episode.",
+  "source_text": "episodes/ai-care-motives/drafts/spoken-draft-v7-2026-10-08.md",
+  "model": "fal-ai/elevenlabs/tts/turbo-v2.5",
+  "voice": "Brian",
+  "speed": 0.9,
+  "tempo_after": 0.93,
+  "pauses": {
+    "headSec": 0.5,
+    "betweenBeatsSec": 2.5,
+    "tailSec": 2.0
+  },
+  "made": "2026-10-12",
+  "characters_billed": 9486,
+  "cost_usd_estimate": 0.47,
+  "cost_note": "$0.05 per 1,000 characters; includes one 792-character pace test. No receipt returned.",
+  "durationSec": 664.105,
+  "words": 1504,
+  "beats": [
+    {
+      "beat": 1,
+      "startSec": 0.5,
+      "durationSec": 59.497,
+      "words": 140,
+      "request_id": "01a12eb2-016a-7f51-8ff6-3e70894f9d04",
+      "chars": 792
+    },
+    {
+      "beat": 2,
+      "startSec": 62.497,
+      "durationSec": 74.927,
+      "words": 178,
+      "request_id": "01a12eb2-1234-78d3-91e2-ad21aa8407ac",
+      "chars": 988
+    },
+    {
+      "beat": 3,
+      "startSec": 139.924,
+      "durationSec": 72.177,
+      "words": 184,
+      "request_id": "01a12eb2-20a7-7313-8ce8-5c66043cf864",
+      "chars": 968
+    },
+    {
+      "beat": 4,
+      "startSec": 214.6,
+      "durationSec": 94.846,
+      "words": 212,
+      "request_id": "01a12eb2-2f24-7181-9343-87d5d69a01f0",
+      "chars": 1262
+    },
+    {
+      "beat": 5,
+      "startSec": 311.947,
+      "durationSec": 70.575,
+      "words": 161,
+      "request_id": "01a12eb2-3d8b-7980-9a8e-c78a39e79c76",
+      "chars": 898
+    },
+    {
+      "beat": 6,
+      "startSec": 385.022,
+      "durationSec": 66.642,
+      "words": 148,
+      "request_id": "01a12eb2-4c3a-7c81-bd5b-71ba4e602fe2",
+      "chars": 920
+    },
+    {
+      "beat": 7,
+      "startSec": 454.164,
+      "durationSec": 129.307,
+      "words": 295,
+      "request_id": "01a12eb2-6762-7203-a0b5-2516fc568cf8",
+      "chars": 1802
+    },
+    {
+      "beat": 8,
+      "startSec": 585.972,
+      "durationSec": 76.134,
+      "words": 186,
+      "request_id": "01a12eb2-831d-76d3-b30d-9a9ecdfab281",
+      "chars": 1064
+    }
+  ]
+}
