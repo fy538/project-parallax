@@ -64,3 +64,41 @@ skills/*/research-audit-workspace/
 #   2. Add a stub `_status.md` to the new episode dir and let the next
 #      pipeline-state.json edit refresh it.
 episodes/*/_checkpoint.md
+
+# Derived motion-layer artifacts — regenerable, large, do NOT commit.
+# stills-4k/: Real-ESRGAN upscales of base stills (tools/ai-video/upscale.py).
+# clips-kenburns/: ffmpeg Ken Burns renders (tools/ai-video/render_kenburns.py).
+# development/morph-tests/: bakeoff/preview scratch (push-in tests, seam frames).
+# Base stills in assets/stills/ ARE tracked; these are reproducible from them.
+episodes/*/assets/stills-4k/
+episodes/*/assets/clips-kenburns/
+# clips-i2v/: AI image-to-video takes (tools/ai-video/fal_i2v.py). The clips are large and stay
+# out of git; their JSON sidecars ARE tracked, because they are the only record of each
+# clip's prompt, model and cost, and the QA components report reads them to tell an AI clip
+# from a camera move.
+episodes/*/assets/clips-i2v/*
+!episodes/*/assets/clips-i2v/*.json
+episodes/*/development/morph-tests/
+
+# ── Kept out of git on purpose (D50, Oct 11 2026) ─────────────────────────────
+# Test media from the technique exploration and the visual-identity research stays on disk
+# and is backed up outside git. The prompts, sidecars, manifests and code that produced it
+# ARE tracked, so each picture's origin is on record.
+episodes/*/assets/keyframes/
+episodes/*/assets/scratch-voice/*.mp3
+episodes/*/assets/scratch-voice/*.wav
+remotion-templates/public/episodes/*/stills-test/
+project/visual-identity/**/*.png
+project/visual-identity/**/*.jpg
+project/visual-identity/**/*.jpeg
+project/visual-identity/**/*.mp4
+project/visual-identity/**/*.docx
+project/visual-identity/**/.bundle/
+# Ken Burns clips baked for ai-care-motives before its stills were drawn in Remotion
+# (StillFrame, Oct 11). The manifest no longer uses them; render_kenburns.py remakes them.
+remotion-templates/public/episodes/ai-care-motives/clips/aigen-*.mp4
+!remotion-templates/public/episodes/ai-care-motives/clips/aigen-03-unwatched.mp4
+# Stock clips under the Pexels licence, which does not allow passing the files on. This
+# repository is public, so they stay local. Sources and IDs are in asset-manifest.json.
+remotion-templates/public/episodes/ai-care-motives/clips/stock-*.mp4
+episodes/ai-care-motives/assets/sourced/stock-*.mp4
