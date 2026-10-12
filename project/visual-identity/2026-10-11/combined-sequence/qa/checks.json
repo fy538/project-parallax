@@ -1,0 +1,98 @@
+{
+  "assets": [
+    {
+      "file": "../world-objects-overlays/assets/03-painted-object.png",
+      "pass": true,
+      "sha256": "79c40371faa051b61b95cc2d128b42341b041c52d87d8cada8d10785a7c09101"
+    },
+    {
+      "file": "../world-objects-overlays/assets/04-architectural-object.png",
+      "pass": true,
+      "sha256": "24a567b66d4641cecfac5224a45cc9591466e070f0d57b49c63aa3a8b0340ca6"
+    },
+    {
+      "file": "../world-objects-overlays/assets/07-light-background.png",
+      "pass": true,
+      "sha256": "a67c16dfe9e092fc011a5040db47200ec3df83b5ac5ae59b047d70e06bdea43d"
+    }
+  ],
+  "video": {
+    "pass": true,
+    "fullDecodePass": true,
+    "duration": 26,
+    "width": 1920,
+    "height": 1080,
+    "fps": "30/1",
+    "frames": "780",
+    "codec": "h264",
+    "pixelFormat": "yuv420p",
+    "colorSpace": "bt709",
+    "colorTransfer": "bt709",
+    "colorPrimaries": "bt709",
+    "colorRange": "tv",
+    "bytes": 5514554,
+    "audioStreams": 0
+  },
+  "decodedFrames": [
+    {
+      "frame": 105,
+      "pass": true,
+      "meanAbsoluteError": 1.0058047196502058,
+      "sha256": "44017a109ac77911b629d4c3a468b911b047f0bc026dd8c4fa921aaf30bfb3f4"
+    },
+    {
+      "frame": 255,
+      "pass": true,
+      "meanAbsoluteError": 1.0327030285493828,
+      "sha256": "6fd40ae13b38056cded203ffa3bb8b52c94021e650b2d95ca89d6a2f36eb822d"
+    },
+    {
+      "frame": 510,
+      "pass": true,
+      "meanAbsoluteError": 1.0146852494855967,
+      "sha256": "93e903c3ac02e63dd71b8aa053322139e3b7afa7b35fbcd62257c6625720b8c4"
+    },
+    {
+      "frame": 750,
+      "pass": true,
+      "meanAbsoluteError": 0.8953983410493828,
+      "sha256": "7864e9ae54c631ab1e2069806f98383f48324119caf9d2bad58690d572f48cfb"
+    }
+  ],
+  "gallery": {
+    "images": true,
+    "duration": 26,
+    "videoWidth": 1920,
+    "overflow": false,
+    "beats": 4,
+    "navigation": [
+      {
+        "time": 0.574623,
+        "playing": true,
+        "selected": 0
+      },
+      {
+        "time": 6.184092,
+        "playing": true,
+        "selected": 1
+      },
+      {
+        "time": 11.155993,
+        "playing": true,
+        "selected": 2
+      },
+      {
+        "time": 18.175136,
+        "playing": true,
+        "selected": 3
+      }
+    ],
+    "modal": true,
+    "pausedByModal": true,
+    "modalClosed": true,
+    "mobileOverflow": false,
+    "missingLinks": [],
+    "pageErrors": []
+  },
+  "errors": []
+}

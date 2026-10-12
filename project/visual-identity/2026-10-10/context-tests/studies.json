@@ -1,0 +1,145 @@
+{
+  "title": "Parallax scene and texture tests",
+  "date": "2026-10-10",
+  "generation_mode": "Built-in image generation tool",
+  "status": "Four scene and texture tests plus two featureless face refinements saved; motion trials still await explicit approval for fal.ai upload and estimated $1.44 charge.",
+  "gallery": "README.md",
+  "baseline": "../surrealism-variations/s04e-constructivist-shadows-featureless.png",
+  "face_rule": "No eyes, eyebrows, eye sockets, nose, mouth, lips or inner-ear lines; face detail only through broad painted planes and head contours.",
+  "studies": [
+    {
+      "id": "01-desk-rich",
+      "name": "Contemporary desk: rich texture",
+      "file": "01-desk-rich.png",
+      "generation_mode": "Built-in image generation tool",
+      "status": "generated",
+      "prompt": "Use case: illustration-story.\nAsset type: Parallax visual identity study; ONE 16:9 wide landscape illustration.\nInput image 1: STYLE REFERENCE ONLY. Carry its mature constructivist drawing, painted amber/bone planes, ink masses, angular featureless heads, selected clothing/hair/hand detail and rich print-like surface into a NEW contemporary setting. Do not reproduce the bakery, people, bread or independent shadows.\n\nScene: a spare present-day home workspace at night. One adult sits at a simple low-backed chair at a thin desk, using an open unbranded laptop. Three-quarter side view: figure left of center, laptop near center, clear open architectural space on the right. The figure wears a plain dark sweatshirt and contemporary straight trousers, sleeves pushed up. Slight forward lean, one coherent hand resting at the laptop trackpad and the other resting separately on the desk. Visible forearms and hand outlines, no overlapping or merged fingers. Carefully observed collar, cuff seams, two or three folds and grouped hair shapes.\nFace rule: the visible head is a fully FEATURELESS angular ochre/bone form with 3–4 broad painted tonal planes. No eyes, eye sockets, eyebrows, nose, nostrils, mouth, lips or inner-ear marks. Simple uninterrupted face contour without a projecting nose or lip notches. Human presence comes from head angle, posture, hands and clothes.\n\nONE surreal architectural operation: the desktop continues to the RIGHT in an unbroken amber/walnut ribbon, makes a crisp upward fold, then becomes a tall wall plane. The same material and edge visibly connect horizontal desk to vertical architecture. Make this continuity very legible, like a sheet changing orientation. Keep the laptop, chair and person physically coherent. No floating objects, duplicate people, wall-shadow figures or extra surreal devices.\nComposition: confident asymmetry, broad diagonal geometry, substantial negative space in the right upper half, deep ink night background, one narrow dark window cutout with simple bone jamb. The laptop is a flat bone screen with a thin amber edge and no writing. Light is expressed as flat bone/amber shapes, no glow or volumetric beams.\nPalette: ink #1C1814, amber #E5A544, bone #F0E6D0, walnut #5C4A3D; tiny muted grey-green allowed. No blue.\nTexture treatment A: match the reference's RICH handmade surface. Broken dry-brush and printed marks in the desk ribbon, subtle mottling within the dark fields, lightly worked paper on walls, with broad painted facial planes. Maintain crisp main silhouettes and large tonal groups.\nClearly drawn and painted, artsy adult editorial illustration. Objects are graphic painted forms, not realistic cutouts. No photorealism, glossy 3D, cinematic lens effects, vintage decor, period clothes, text, symbols, logos or watermark.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-c8181288-766f-4e66-a667-814b840c068b.png",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/surrealism-variations/s04e-constructivist-shadows-featureless.png",
+          "role": "Style reference for new scene; preserve palette, figure drawing and featureless heads"
+        }
+      ],
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "02-desk-selective",
+      "name": "Contemporary desk: selective texture",
+      "file": "02-desk-selective.png",
+      "generation_mode": "Built-in image generation tool",
+      "status": "generated",
+      "prompt": "Use case: style-transfer.\nAsset type: Parallax texture comparison, ONE 16:9 illustration.\nInput image 1: EDIT TARGET. This is version A of a controlled texture experiment.\nMake version B by changing ONLY the distribution and density of surface texture.\n\nKeep the image's exact composition, crop, person, proportions, pose, hands, sweatshirt seams and folds, grouped hair, laptop, chair, potted plant, window, buildings, light planes, desk geometry, unbroken desk-to-wall fold and ink/amber/bone/walnut palette. Keep the exact same shapes, edges and light/dark masses.\n\nTexture treatment B: much QUIETER, SELECTIVE handmade paint. Remove roughly three quarters of the fine repeated flecks, stipple, grain and mottled pattern from the large dark wall, large bone wall, amber wall-plane, broad desktop and trousers. These large areas should read as broad matte painted color fields with only a few irregular dry-brush breaks. Preserve two or three directional brush strokes along selected edges and the desk fold to show the hand of a painter. Preserve rich grouped hair marks, purposeful cuff/hand contours and existing garment construction. Keep the focal figure detailed; give the surroundings breathing room. No dense mosaic, photographic woodgrain or evenly distributed distressed texture. Retain a little natural paper tooth, never a completely sterile vector fill. Texture should feel chosen rather than spread over everything.\n\nFace is COMPLETELY FEATURELESS, identical to the input: broad painted planes only, no eyes, eyebrows, eye sockets, nose or nose projection, mouth, lips or inner-ear marks. Do not add facial anatomy or a new expression.\nSame mature constructivist illustration. No scene redesign, no new objects, no change in lighting or palette, no new surreal device, no lettering or watermark.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-3b8d5a76-3464-4762-b3c4-39b6ce121557.png",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/context-tests/01-desk-rich.png",
+          "role": "Edit target; change texture density only"
+        }
+      ],
+      "parent_study": "01-desk-rich",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "03-dinner",
+      "name": "Dinner conversation",
+      "file": "03-dinner.png",
+      "generation_mode": "Built-in image generation tool",
+      "status": "generated",
+      "prompt": "Use case: illustration-story.\nAsset type: Parallax visual identity scene test; ONE 16:9 wide illustration.\nInput image 1: STYLE REFERENCE ONLY. Use its contemporary constructivist painted figures, angular featureless head, warm ink/amber/bone/walnut palette, grouped hair strokes, intentional seams and selected surface detail. Create a NEW dinner scene, not another desk scene.\n\nScene: two adult friends having a quiet, difficult conversation at a small plain dining table in a contemporary home at night. Medium-wide three-quarter view, both figures substantial in the frame, waist and forearms visible. On the left, a short-haired adult in a bone sweatshirt leans forward attentively, one forearm on the table with a relaxed open hand. On the right, an adult with tied-back dark hair in an ink cardigan over a plain walnut top sits slightly back, shoulders held, one hand paused just above the tabletop as if deciding what to say. Their other hands rest naturally separately, without merging with the visible hands or props. Convey the difference through the weight of their bodies, shoulder angles, hand spacing and head inclination. Serious, intimate, humane, no theatrical pantomime.\nFaces must remain COMPLETELY FEATURELESS: no eyes, brows, eye sockets, nose or projecting nose contour, mouth, lips or inner-ear lines. Use only 3–4 broad ochre/bone planes and simple uninterrupted angular head contours. Do not sneak facial expressions into shading. Keep clearly human hair, necks, hands and adult proportions.\nObjects: two plain mugs separated from the hands, a shallow plain bowl, one understated pendant lamp above the table. Spare apartment setting with a rectangular dark window and broad wall planes. No bakery, period clothes or decorative memorabilia. No readable marks on props.\nComposition: triangular relationship among heads and hands, strong dark figure masses around a quiet bone/amber tabletop, ample breathing room behind. The hands should be legible at normal viewing size. Flat amber light cuts across the table; no photographic light falloff, halo or volumetric beam.\nPalette: ink #1C1814, amber #E5A544, bone #F0E6D0, walnut #5C4A3D. Very little muted grey-green allowed; no blue.\nTexture: selective matte paint and print marks. Broad calm wall and table fields with a few directional dry-brush breaks; purposeful shirt seams, folded cuffs and grouped hair marks. No evenly distributed gritty pattern, no realistic ceramic or skin rendering, no dense faceted mosaic.\nThis is a quiet human scene with ordinary coherent space; no added surreal device is needed for this test. Mature artsy editorial drawing, visibly handmade, no photorealism, glossy 3D, cartoon faces, text, logos or watermark.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-632f4ab6-c9d4-4a11-88e9-c452fc3c0677.png",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/context-tests/02-desk-selective.png",
+          "role": "Style reference for a new scene; contemporary clothing, featureless figures and selected painted detail"
+        }
+      ],
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "04-river-rescue",
+      "name": "River rescue",
+      "file": "04-river-rescue.png",
+      "generation_mode": "Built-in image generation tool",
+      "status": "generated",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET, the Parallax river-rescue illustration.\nCorrect ONLY the featureless face rule. The swimmer's profile currently has a nose projection and lip/mouth notch. Remove them. Both real faces must have no eyes, brows, eye sockets, nose, mouth, lips or inner-ear lines.\nFor the swimmer at lower right, replace the front edge of the face with a simple uninterrupted angular contour running from forehead to chin, without nose or lip bumps, like the faceless constructivist figures established in this project. Use 3–4 broad ochre/bone painted planes within that blank face; no anatomical feature shadows or drawn marks. Keep the woman's bun, hair, head tilt, neck and jaw proportions. Apply the same completely blank planar face rule to the rescuer at upper left; preserve their short hair and head angle.\nKeep all other areas exactly as shown: both bodies, clothes, hands, clear gripping connection, bank, foliage, flat painted river planes, sky, horizon, texture, color palette and exact framing. The rescue poses and contact must stay the same. No change to objects or lighting. This is the same illustration with two fully featureless head forms, not a redesign.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-4e01ba86-0518-49c8-a50a-b6c6510fed3f.png",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-b1ed4928-3c5f-4dc6-a823-49423e826143.png",
+          "role": "Edit target; remove facial anatomy while preserving the rescue composition"
+        }
+      ],
+      "previous_attempts": [
+        {
+          "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-b1ed4928-3c5f-4dc6-a823-49423e826143.png",
+          "prompt": "Use case: illustration-story.\nAsset type: Parallax visual identity action test; ONE 16:9 wide landscape illustration.\nInput image 1: STYLE REFERENCE ONLY. Carry its mature constructivist painted drawing, anonymous angular heads, warm ink/amber/bone/walnut palette, confident silhouettes and deliberate clothing/hair/hand details into a NEW exterior action scene. No bakery, desk or shadow allegory.\n\nScene: an urgent river rescue at dusk, two contemporary adults, clearly staged physical weight and contact. At LEFT on a low riverbank, a rescuer in a plain dark jacket and trousers braces one knee on the earth with the other foot planted, hips low and torso leaning backward for leverage. Their left hand is planted separately on the bank for support. Their RIGHT arm extends diagonally down toward a second adult at RIGHT, who is in the river close to the bank, shoulders above the surface, left arm reaching up.\nContact is the focal point: the rescuer's RIGHT hand firmly wraps around the swimmer's LEFT forearm just above the wrist. The swimmer's LEFT hand grips the rescuer's RIGHT wrist. ONE clear reciprocal wrist/forearm grip, coherent thumbs and fingers, two separate forearms and visible elbows. No merged hands, extra arms or extra fingers. The swimmer's other arm is visible separately reaching toward the bank. Keep the joined grip against a simple pale grey-green water plane for contrast.\nBoth faces COMPLETELY FEATURELESS: no eyes, eye sockets, eyebrows, nose or projecting nose contour, mouth, lips or inner-ear marks. Use only broad ochre/bone painted planes and uninterrupted angular face outlines. Express urgency through braced legs, bent elbows, body lean and head angle. Adult body proportions, joints and clothing are coherent, drawn in broad angular forms.\nComposition: a strong diagonal bank edge and diagonal chain of shoulders/arms, with both bodies legible and no cropping of the important limbs. Low three-quarter viewpoint. The rescuer occupies the left upper area and the swimmer the right lower area; leave space for the pulling action. Spare far bank with two angular tree silhouettes and one thin amber horizon band. No spectators, boats, ropes, words or extra props.\nWater: flat muted grey-green and ink planes with only two or three broad broken painted strokes near the swimmer to establish displacement. No photographic ripples, reflections, sparkle, glossy spray, mist or lens effects. Dusk is expressed through broad color groups, not cinematic volumetric lighting.\nPalette: ink #1C1814, amber #E5A544, bone #F0E6D0, walnut #5C4A3D plus restrained muted grey-green water. No blue.\nTexture: visible matte paint/print, selective dry-brush around earth and garment edges, calm water and sky fields. Cloth construction and contact matter more than grain. No dense mosaic or realistic skin.\nThe space and action must be physically coherent; add no surreal distortion to the bodies or river. Same artsy adult constructivist identity, no photorealism, 3D, cartoon expressions, text, logo or watermark.",
+          "referenced_images": [
+            {
+              "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/surrealism-variations/s04e-constructivist-shadows-featureless.png",
+              "role": "Style reference for the new river scene"
+            }
+          ],
+          "reason": "Swimmer acquired a nose projection and mouth contour; corrected in selected version."
+        }
+      ],
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "02b-desk-featureless-detail",
+      "name": "Contemporary desk: more painted facial form",
+      "file": "02b-desk-featureless-detail.png",
+      "status": "generated",
+      "generation_mode": "Built-in image generation tool",
+      "intent": "Add a little visible painted detail and tonal structure to the face while keeping all facial parts absent.",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET. Refine ONLY the visible blank face of the seated person in this Parallax desk illustration.\nPrimary request: a little more drawn and painted detail in the face WITHOUT showing any parts of a face. The head must stay entirely featureless and anonymous.\n\nThe current face reads as one nearly uniform amber patch. Replace that uniform patch with about FIVE broad, asymmetric, interlocking painted tonal planes: a narrow pale-ochre edge along the outer contour, a broad warm amber main plane, one lighter angled plane crossing a portion of the blank surface, and two restrained deeper-ochre planes at the hairline and jaw-to-neck transition. Make the change visible at normal viewing size, with deliberate uneven brush edges and a few short dry-brush breaks within the colored planes. Keep the modeling shallow and graphic, using opaque paint. The planes should describe an abstract head's overall volume, never facial anatomy.\nABSOLUTELY NO eyes, eye sockets, eyebrows, nose, projecting nose contour, nostrils, mouth, lips, teeth or inner-ear lines. No grooves, highlights or dark marks placed where those features would be. No impression of a hidden face underneath, no mask holes, no realistic skin, no dense triangular mesh or all-over grain. Retain the existing uninterrupted angular front contour from hairline to chin. Do not add a new nose or mouth notch. Preserve the exact head size, tilt, neck, grouped hair and person identity.\n\nKeep EVERYTHING else unchanged: exact framing and composition, shoulders and sweatshirt, both hands, laptop, chair, plant, window, city silhouettes, desk continuing into the tall wall plane, all lighting geometry, quiet background texture and warm ink/amber/bone/walnut palette. Do not spread the extra detail into the room.\nSame mature handmade constructivist illustration. This is selective painted form within a fully featureless face, not the addition of any facial features. No text or watermark.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-dcfd35d6-dc23-4560-b909-ff4be048c9d0.png",
+      "parent_study": "02-desk-selective",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/context-tests/02-desk-selective.png",
+          "role": "Edit target; refine painted planes in the featureless face only"
+        }
+      ],
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "02c-desk-faceted-face",
+      "name": "Contemporary desk: stronger featureless facial planes",
+      "file": "02c-desk-faceted-face.png",
+      "status": "generated",
+      "generation_mode": "Built-in image generation tool",
+      "intent": "Make the blank face visibly richer through stronger asymmetric painted facets and tonal contrast, without adding facial parts.",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET. Make a visibly stronger refinement of ONLY the seated figure's FEATURELESS FACE. The previous addition of tonal planes was too subtle. Give this blank head a more richly drawn, sculptural constructivist character, with noticeably more internal structure at normal viewing size, without adding any parts of a face.\n\nWithin the existing face outline, use EIGHT TO TEN substantial, irregular hand-painted facets in varied shapes and sizes: broad offset quadrilaterals, tapered wedges and a few small joining planes. Make the planes clearly distinguishable through a purposeful range of bone-ochre highlights, amber midtones and walnut-ochre shadows. Two broad luminous planes and two darker recessed planes should give the blank head depth. Use asymmetrical oblique boundaries and selected broken dry-brush edges, like opaque paint laid down by hand. Avoid a regular triangular grid. Do not rely on tiny grain or speckles for detail. The result must look substantially more worked and dimensional than the current mostly smooth face, while remaining a flat painted illustration.\n\nCRITICAL: this is an abstract faceted HEAD, not a portrait or a mask with suggested anatomy. NO eyes, eye sockets, eyebrows, nose, nostrils, central nose ridge, projecting nose profile, mouth, lips, teeth or inner-ear lines. Do not arrange the planes into those features. No horizontal dark eye/mouth marks or paired socket shapes. Retain the simple uninterrupted angular front contour from forehead to chin. The volume comes only from the abstract painted facets.\nKeep the exact head size and tilt, hair silhouette, neck and pose. Keep every other part of the image unchanged: shirt and hands, laptop, chair, plant, window, city shapes, desk-to-wall fold, composition, crop, lighting and quiet background. Preserve the ink/amber/bone/walnut palette. Same mature handmade constructivist art. No photorealistic skin, 3D render, new objects, lettering or watermark.",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-71461381-5037-4ec1-bef3-0c9f7ede6b65.png",
+      "parent_study": "02b-desk-featureless-detail",
+      "referenced_images": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/context-tests/02b-desk-featureless-detail.png",
+          "role": "Edit target; increase painted facial structure while retaining the featureless head rule"
+        }
+      ],
+      "dimensions": [
+        1672,
+        941
+      ]
+    }
+  ],
+  "motion_trials": "motion/trials.json",
+  "latest_refinement": "02c-desk-faceted-face"
+}

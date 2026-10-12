@@ -1,0 +1,4 @@
+Use case: precise-object-edit.
+Image 1 is the EDIT TARGET. Change only the two heads to comply with the featureless-head design.
+Remove the inner-ear lines and cavities from both ears, leaving plain solid filled outer ear shapes. Smooth both forehead-to-chin face outlines into continuous asymmetric egg-shaped contours with no nose or lip projections or notches. Keep depth through a few unequal ochre painted planes. No eyes, brows, sockets, nose ridge, nose, mouth or lips.
+Retain both hairstyles, head angles, necks, clothes, bodies, all arms and hands, the clasp, boots, ground, palette, painted finish, framing and lighting.

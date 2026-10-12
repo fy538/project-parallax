@@ -1,0 +1,2 @@
+Authored Remotion/SVG brief — not sent to image generation.
+Use source 01-quiet-scenery.png at a fixed camera. Draw a thin ink contour along the bridge, then a leader pointing from the crossing to a readable bone-backed label in the open sky. Add a second leader identifying the near bank. Keep labels descriptive, with no implied measurements or causal claims. Animate strokes and labels from useCurrentFrame with the shared easing and timing constants. Keep the source painting unchanged.

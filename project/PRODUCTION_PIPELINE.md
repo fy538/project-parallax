@@ -478,6 +478,8 @@ The pre-May 4 Claude SVG path documented in SVG_ILLUSTRATION_PIPELINE.md is **de
 
 The assembly pipeline has two stages:
 
+**Hand-wired manifests (Oct 10, 2026).** Once a manifest carries wiring the script cannot reproduce (clip files, split rows, hold-under, per-seam transitions) it is marked `"handWired": true` and becomes the source of truth for that episode: `generate_manifest.py` refuses to overwrite it, and recorded narration is applied with `tools/assembly/retime_manifest.py <slug> --audio <wav>`, which moves timings and leaves the wiring alone (D49).
+
 **Stage 9a — Assembly manifest generation.** `generate_manifest.py` parses the production script's right column — including `DIR:` annotations — and produces `assembly-manifest.json` mapping every second of the video to a visual element (footage, image, template, transition, hold). Direction annotations affect timing: `hold()` extends segment durations, `cut()` overrides default transitions with register-appropriate types (color-wash, dissolve, iris, match-cut — see `project/TRANSITION_GRAMMAR.md`), `cam(sync:"word")` creates sync word anchors for Whisper alignment. Two modes: "estimate" (from word count at 150 WPM, before narration is recorded) and "precise" (from Whisper word-level timestamps after narration).
 
 ```
@@ -517,7 +519,9 @@ The NLE (DaVinci Resolve) is still used for final polish: audio mastering, color
 
 **Shorts extraction:** After publish, run **shorts-adaptation** skill on the full episode script. Produces 3-4 standalone Shorts briefs assigned to series (Framework in 45s, History Rhymes, Both Sides Are Wrong, What Happens Next?, The Market Says, Was I Right?), each with hook, narration, Remotion template spec, and scheduling notes (1-2 pre-release, 1-2 post-release). Skill location: `skills/shorts-adaptation/SKILL.md`.
 
-**Not yet built:** Thumbnail image generation via Remotion compositions, platform-specific reformatting, automated Shorts Remotion rendering from briefs.
+**Thumbnail generation (built May 14, 2026):** `cd remotion-templates && npm run thumbnails -- --episode=<slug>` renders all concepts from `episodes/<slug>/thumbnail-spec.json` to `episodes/<slug>/thumbnails/concept-<id>.png` at 1280×720 via `remotion-templates/scripts/generate-thumbnails.mjs`.
+
+**Shorts rendering (built May 14, 2026):** `cd remotion-templates && npm run shorts -- --episode=<slug>` renders 9:16 clips from `episodes/<slug>/shorts-manifest.json` via `remotion-templates/scripts/render-shorts.mjs`.
 
 **Post-publish learning loop (7-14 days after launch):** Run **publish-retro** skill with YouTube Studio analytics data (retention curve, CTR, demographics, top comments). The skill compares actual viewer behavior against persona-eval predictions and the visual rhythm map, produces a retrospective report identifying which production decisions worked and which didn't, and appends findings to `episodes/LEARNING_LOG.md` for cumulative pattern tracking across episodes. After 3+ episodes, the learning log becomes an evidence-based production playbook.
 

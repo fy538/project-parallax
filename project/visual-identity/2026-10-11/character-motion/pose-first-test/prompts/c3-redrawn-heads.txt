@@ -1,0 +1,4 @@
+Use case: precise-object-edit.
+Image 1 is the EDIT TARGET. Image 2 is a HEAD DESIGN reference only; use its visibly blank angular face volumes, not its person, clothing or setting.
+Redraw both heads in image 1. Make a visibly new featureless painted head shape on each existing neck: one continuous slanted oval face surface, with a smooth forehead-to-chin outer edge and three or four broad unequal ochre planes. Replace the existing nose-shaped outline bumps with this continuous contour. Eliminate both visible ears entirely; let the existing hair shapes meet the sides of the heads. The surfaces have no facial anatomy, marks, eyes, eyebrows, nose, mouth or lips.
+Retain the original two head directions, hairstyles and approximate head sizes. Preserve the scene below the necks, including the arms, hand clasp, clothes, feet and slope. Keep the original matte painted palette and framing.

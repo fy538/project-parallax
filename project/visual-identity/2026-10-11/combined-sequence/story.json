@@ -1,0 +1,22 @@
+{
+  "title": "A painted argument",
+  "composition": "PaintedArgument",
+  "durationSec": 26,
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "audio": "picture only; optional draft narration cues below",
+  "status": "visual research; not production approved",
+  "beats": [
+    {"startSec": 0, "endSec": 6, "title": "The familiar", "frame": 105, "headline": "An act we can see.", "motion": "Ordinary painted cup arrives on a fixed painted field.", "narrationCue": "A helpful act is something we can observe."},
+    {"startSec": 6, "endSec": 11, "title": "The impossible", "frame": 255, "headline": "A reason we infer.", "motion": "A direct cut replaces the cup with an impossible architectural interior, at a comparable size and foot position.", "narrationCue": "Its reason is harder to see. We imagine what might be inside."},
+    {"startSec": 11, "endSec": 18, "title": "The distinction", "frame": 510, "headline": "An imagined interior.", "motion": "The object settles smaller; two drawn leaders separate observation from interpretation.", "narrationCue": "But an imagined interior is an interpretation. The outward act and our explanation are different things."},
+    {"startSec": 18, "endSec": 26, "title": "The explanation", "frame": 750, "headline": "Different reasons. Same act.", "motion": "The cup moves aside and an authored diagram draws two possible reasons toward one visible result.", "narrationCue": "Concern and incentive can both lead to help. Behavior alone leaves the reason open."}
+  ],
+  "interpretationNotes": [
+    "The cup is a conceptual metaphor; no literal AI architecture is depicted.",
+    "Concern and incentive are illustrative possibilities, not exhaustive or mutually exclusive categories.",
+    "The diagram describes a many-to-one possibility, not proof of any particular motive.",
+    "Draft narration is not voiced, aligned to a recording, or adopted into the episode script."
+  ]
+}

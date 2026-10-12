@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document names Parallax's **six canonical visual transitions plus two adjacent treatments** (eight total entries) and matches each to its editorial context. The six visual transitions live as `TransitionType` entries in `Transitions.tsx`; the two adjacent treatments (J/L-cut audio bridges and chapter cards) live at other layers (audio-spec, `TitleTransition` segments) but belong in the register because they're often the right answer for a seam. The doc exists so script-writing and visual-spec skills can select the right transition for a given seam — not by guessing from a 12-option menu, but by picking the one whose *implicit claim* about the relationship between two segments matches the editorial intent.
+This document names Parallax's **five canonical visual transitions plus two adjacent treatments** and matches each to its editorial context (a sixth, the iris, was retired on Oct 10, 2026 — see § 06). The visual transitions live as `TransitionType` entries in `Transitions.tsx`; the two adjacent treatments (J/L-cut audio bridges and chapter cards) live at other layers (audio-spec, `TitleTransition` segments) but belong in the register because they're often the right answer for a seam. The doc exists so script-writing and visual-spec skills can select the right transition for a given seam — not by guessing from a 12-option menu, but by picking the one whose *implicit claim* about the relationship between two segments matches the editorial intent.
 
 **Transitions are the smallest editorial sentence in a video.** Every seam between two segments either says *"same thought, next breath"* (cut), *"same thought, gentler delivery"* (dissolve), *"new chapter"* (fade-to-black), *"same geography, different scale"* (match-cut on a location), or *"new register entirely"* (color-wash). Picking the wrong transition doesn't just look wrong — it makes a *wrong claim* about the relationship.
 
@@ -16,7 +16,8 @@ Created: May 16, 2026
 - **AUDIO_DESIGN.md** — J/L-cut audio bridges live in audio-spec, not the visual transition layer
 - **POLISH.md** — `D21` is the rule-form of this doc (pending)
 - **remotion-templates/references/template-research/transition-grammar.md** — outlet research dossier (NYT VI, FT, Bloomberg, Economist, Reuters, Rex Studio / Cardia case)
-- **remotion-templates/src/components/Transitions.tsx** — `TransitionType` union, `TRANSITION_CATALOG`, and `TransitionWrapper` (the technical surface)
+- **remotion-templates/src/components/Transitions.tsx** — `TransitionType` union, `TRANSITION_CATALOG`, and `TransitionWrapper` (the per-segment surface used by the manifest-driven FullEpisode timeline)
+- **remotion-templates/src/transitions/grammar.tsx** — `@remotion/transitions`-based presentation library (`GrammarTransitionSeries`, `grammarTransition()`) mapping the same six tokens to real two-segment overlap. **Architectural boundary:** use this in SEQUENTIAL contexts (showcase reels, `<Series>`-based multi-beat templates); use `TransitionWrapper` in FullEpisode, where segments are placed at absolute Whisper-aligned frames and a sequential `TransitionSeries` would desync the narration. The two coexist by design; `grammar.tsx` is the canonical visual source (the presentation look + durations from `TRANSITION_CATALOG`).
 - **tools/assembly/generate_manifest.py** → `apply_default_transitions()` — the implicit-default engine that picks a transition when the script doesn't
 
 ---
@@ -34,7 +35,7 @@ The eight transitions below each carry an implicit claim about WHAT KIND OF RELA
 | **Fade-through-black** | "new chapter / time-jump / silence beat" |
 | **Match cut** | "same subject, different scale — continuity across a logical seam" |
 | **Color-wash** | "register shift — we're entering a new editorial mode" |
-| **Iris-in / iris-out** | "cinematic open or close, deliberately theatrical" |
+| ~~Iris-in / iris-out~~ | retired Oct 10, 2026 — reads as a silent-film or cartoon device; renders as a cut |
 | **Audio-bridged cut (J/L)** | "invisible continuity — the sound carries the seam" |
 | **Chapter card / slate** | "this section is named; pause to take it in" |
 
@@ -52,13 +53,35 @@ When the seam's editorial intent matches a transition's implicit claim, the tran
 | 04a | Match cut (zoom) | `match-cut` | 0.4s | ✅ Phase 4 — opt-in via `DIR: cut(match-cut)` |
 | 04b | Match cut (composition-locked) | `match-cut-still` | 0.35s | ✅ Phase 4 — implicit default for same-template AtlasPlate / ChoroplethMap / AnnotatedImage / RouteAnimation / PhotoMontage seams in same beat |
 | 05 | Color-wash | `color-wash` | 0.7s | ✅ rare register-shifts |
-| 06 | Iris-in / Iris-out | `iris` | 0.8s | ✅ rare cinematic moments |
+| 06 | ~~Iris-in / Iris-out~~ | `iris` | — | ❌ retired Oct 10, 2026; resolves to a cut |
 | 07 | Audio-bridged cut | **not a `TransitionType`** — `narrationLeadIn` / `narrationLagOut` fields | 0.5–1.0s overlap | ✅ Phase 7 — default `narrationLeadIn: 0.7` on every hard cut |
 | 08 | Chapter card / slate | **not a `TransitionType`** — `TitleTransition` segment | 1.5–2.5s hold | ✅ via `[TRANSITION:] TitleTransition` |
 
 Six are direct `TransitionType` entries in `Transitions.tsx`. Two (audio-bridged cut, chapter card) are *adjacent register entries* that don't live as visual transitions per se — audio-bridged cut belongs in audio-spec; chapter card is a `TitleTransition` segment with a fade pair on either side. They're named here because they're often the right answer for a given seam, but they're implemented at different layers.
 
-**Deprecated** (off-register; do not reach for): `wipe-left`, `wipe-right`, `wipe-up`, `whip-pan`, `blur-through`, `spatial-zoom`. See "Anti-patterns" section below.
+**Deprecated** (off-register; do not reach for): `iris`, `wipe-left`, `wipe-right`, `wipe-up`, `whip-pan`, `blur-through`, `spatial-zoom`. See "Anti-patterns" section below.
+
+### On the episode timeline (added Oct 10, 2026)
+
+`FullEpisode` places every segment at an absolute start time, and manifest segments never overlap. A transition that needs the outgoing picture underneath the incoming one therefore cannot be drawn by animating each segment's own frames — it would fade up from the paper surface, "cut to blank cream, then fade". So the renderer resolves the manifest token before drawing it (`src/utils/resolveSeams.ts`), and where a real overlap is needed it gives the outgoing segment a short **tail**: extra time on screen, frozen on its last frame, while the incoming segment starts on schedule. Manifest timings do not change.
+
+| Manifest token | Renders as in an episode | Why |
+|---|---|---|
+| `cut` | cut | — |
+| `dissolve` | **real cross-dissolve** when the two segments abut (cut across a gap) | The outgoing segment is held for the length of the dissolve; whichever segment is drawn on top does the fading — a foreground card fades *out* over an incoming picture, otherwise the incoming segment fades *in* over the held one. Default 0.5s |
+| `match-cut`, `match-cut-still` | **cut** | Their paired zoom has not been rebuilt on the overlap yet |
+| `iris` | **cut** | Retired (§ 06) |
+| `fade` | dip through ink | Fade-through-black, as specified in § 03 |
+| `color-wash` | dip through `washColor` | Unchanged; the content now stays opaque under the wash, so the dip no longer goes milky at its midpoint |
+
+Four companion rules:
+
+- **Hold-under: type over the picture.** A foreground card whose `layered.backgroundSegmentId` names the picture segment that ends where the card starts is drawn *over that picture*: the picture is held on its last frame for the whole card, dimmed (`layered.backgroundDim`, default 0.55), and the card renders with a transparent ground, light type and no brand chrome. This is the "stay on the illustration, bring the words on" seam. Supported by `KineticTypography`; other templates still draw their own ground. Script: `DIR: over(previous)` (optional `dim:<0-1>`) on the card's row; `generate_manifest.py` writes the `layered` block. If the card then dissolves into the next segment, the picture is held under it for the length of that dissolve as well.
+- **Dips are symmetric.** If only one side of a seam asks for a dip, the adjoining segment gets the matching half, so the outgoing picture fades into the colour instead of cutting to it.
+- **The seam belongs to the wrapper, not the card.** Inside an episode templates do not fade themselves in or out (`exitFade()` and `useCompositionAnimation()` return 1 — see "Seam ownership" in `src/utils/animation.ts`). A hard cut is a hard cut. Standalone compositions keep their own exit fade.
+- **No flash at beat boundaries by default.** The film-burn `BeatFlash` is not one of the six transitions; it is opt-in per episode via `"beatFlash": true` at the manifest root.
+
+A dip on a seam wins over a dissolve on the same seam. A dissolve between two pictures holds the outgoing one still for its length, so keep it short (0.3–0.5s) unless the stillness is wanted; 1s reads as a deliberate, reflective move. Do not author `iris`: it is retired and both lints warn on it (`M-TRANSITION-IRIS-RETIRED`, `S-DIR-IRIS-RETIRED`).
 
 ---
 
@@ -276,39 +299,13 @@ Used without a `washColor` choice = defaults to amber every time = signature noi
 
 ---
 
-## 06 · Iris-in / Iris-out
+## 06 · Iris-in / Iris-out — retired (Oct 10, 2026)
 
-**Code mapping:** `iris` (0.8s circular reveal from center; or close-to-center on exit)
+**Code mapping:** `iris` still parses, and resolves to a **cut** at render (`src/utils/resolveSeams.ts`). Both lints warn on it.
 
-**Implicit claim:** "Cinematic open or close — deliberately theatrical."
+**Why it was retired.** The iris is a silent-era device that has been used since mainly for ironic or comic effect, and editing texts were already calling wipes and irises out of fashion in the 1950s. From a quote card into an illustration it read as a cartoon gag, and on the episode timeline it also played twice (close on one segment, open on the next). The earlier version of this section cited NYT Op-Docs, The Economist Films and Morris/Herzog as users; those references could not be corroborated and have been removed. Research: `analysis/transitions-research-2026-10-10.md`.
 
-### Use for
-- Episode opening (iris-in from black on the cold-open shot)
-- Episode close (iris-out to black on the end card or last frame)
-- Major reveals where the editorial weight justifies the cinematic gesture (rare)
-- Discovery moments — "the answer is THIS" (paired with an editorial peak)
-
-### Avoid for
-- Within-beat transitions (too theatrical for analytical content)
-- Beat boundaries (use dissolve or fade — iris is a *narrative* gesture, not a *structural* one)
-- More than ~1-2 per episode (it's the rarest punctuation mark)
-
-### Parallax examples
-- Cold-open iris-in on the historical photograph that anchors the episode's analogy.
-- End-card iris-out to black with the channel's `∴` symbol.
-
-### Real-world references
-- **NYT Op-Docs** — iris-in opens many short-form pieces.
-- **The Economist Films** — feature-length pieces use iris pairs at episode open/close.
-- **Documentary tradition** — Errol Morris, Werner Herzog use irises sparingly at editorial peaks.
-
-### Technical brief
-- Data: `_direction.transitionOut: "iris"` (or `transitionIn: "iris"` for an opener).
-- Script: `DIR: cut(iris, origin:center)`.
-- Default duration 0.8s.
-
-### Failure mode
-Used as a generic transition = cheesy / film-school-thesis. Reserve for genuine cinematic moments.
+**Use instead:** a cut; a fade (dip through ink) at a chapter break or into the end card; a dissolve where time or place changes.
 
 ---
 
@@ -392,6 +389,24 @@ Chapter cards without silence = sitcom register. The held silence on the card IS
 
 ## Decision matrix — which transition for which context
 
+### By seam type (added Oct 10, 2026) — start here
+
+The picture track mixes text cards, code-rendered diagrams and full-frame illustrations. What the seam joins decides the default; the contexts below refine it.
+
+| Seam | Do this | Manifest |
+|---|---|---|
+| Any seam, by default | Hard cut on a phrase boundary, narration leading, incoming picture already moving. No whoosh. | nothing (cut) |
+| Text card → illustration | Related: let the card dissolve away over the picture as it starts (about 1s; the paper acts as a scrim, so the words stay readable while the picture arrives). Unrelated: cut. | `out: dissolve` on the card, or nothing |
+| Illustration → text card | Stay on the illustration: hold it, dim it, bring the words on. Cut to a clean card only when the exact wording is the argument. | `layered.backgroundSegmentId` = the illustration (hold-under); script: `DIR: over(previous)` on the card |
+| Illustration → illustration, same scene | Straight cut, on action or a matched composition. A dissolve would claim time has passed. | nothing |
+| Illustration → illustration, new scene or time | Cut with a sound bridge, or a short dissolve (0.3–0.5s). | `in: dissolve` |
+| Card → card, diagram → diagram | Do not transition the frame; change what is on it. | nothing |
+| Diagram ↔ illustration or card | Cut. | nothing |
+| Chapter break | Dip through ink, with a music change or a beat of silence. | `fade` |
+| Never | Iris, wipes, zoom or whip presets; more than three transition types in one episode. | — |
+
+Why: the cut is the measured default of film editing (about 99% of transitions since the 1970s), a seam is hidden by sound and by motion in the incoming shot rather than by an effect, and each non-cut transition makes a claim (dissolve = time or place changed; fade = new chapter). Sources and the frame-level diagnosis that prompted this table: `analysis/transitions-research-2026-10-10.md`.
+
 ### Context A — Within-beat segment-to-segment
 
 Editorial intent: *the argument is moving forward; the segments elaborate one continuous thought*.
@@ -415,11 +430,11 @@ Editorial intent: *we're transitioning from one act to the next*.
 |---|---|
 | New chapter / new argument | Chapter card (with fade pair) |
 | Time-jump across decades | Fade-through-black + optional color-wash on the way out |
-| Same register, new example | Cross-dissolve (current default — keep) |
+| Same register, new example | Hard cut (the generator's default since Oct 10, 2026); a short dissolve only where time or place really changes |
 | Investigation register entry | Color-wash to `ink` or `oxblood` |
 | Editorial-pivot register entry | Color-wash to `amber` |
 
-**Default**: chapter card OR cross-dissolve. The choice between them is editorial — long-form 14-min episode = chapter cards; tighter 8-min piece = dissolves with no cards.
+**Default**: a hard cut. `apply_default_transitions()` no longer hands out a dissolve at a beat boundary (revised Oct 10, 2026), and breathing pace no longer turns cuts into dissolves. Mark a real chapter break with a chapter card or `DIR: cut(fade)` (a dip through ink, with a music change or a beat of silence); ask for a dissolve with `DIR: cut(dissolve)` where time or place changes.
 
 ### Context C — Title card transitions (into and out of)
 
@@ -431,7 +446,7 @@ Editorial intent: *we're entering or leaving a named section / the episode itsel
 | Out of chapter card | Fade-through-black | Music swells AFTER card lands per D18 |
 | Into episode title (cold-open close) | Fade-through-black | Hard silence |
 | Out of episode title (BEAT 1 cold-open) | Fade-through-black | Music begins |
-| Into end card | Iris-out or fade | Music bed wraps |
+| Into end card | Fade | Music bed wraps |
 
 ### Context D — Register-shift segment-to-segment
 
@@ -461,7 +476,7 @@ Editorial intent: *we're changing modes (analytical → atmospheric, present →
 - **Match-cut + dissolve** — match-cut IS the transition; dissolving on top kills the seam clarity. Use one or the other.
 - **Fade-through-black + audio bridging** — the silence is the point; bridging audio across the black contradicts the editorial register.
 - **Multiple dissolves in a row** — dissolve creep. After more than 2 dissolves in sequence the piece feels somnolent. Cut to break the rhythm.
-- **Iris on a chart** — irises are theatrical; charts are analytical. Mismatched register.
+- **Any iris** — retired (§ 06); it renders as a cut.
 
 ---
 
@@ -487,9 +502,9 @@ A signature of motion-graphics-template aesthetics. Match-cut covers the legitim
 
 When every transition is a dissolve, the piece feels somnolent. Cuts within-beat keep the argument moving; reserve dissolves for beat boundaries and same-register elaboration. Watch for: episodes where more than ~30-40% of transitions are dissolves.
 
-### Iris overuse
+### Iris
 
-Iris is the rarest punctuation mark — 1-2 per episode at most. Using it generically devalues every iris in the channel's history. Reserve for genuine cinematic moments.
+Retired on Oct 10, 2026 (§ 06). Do not author it; existing tokens render as cuts.
 
 ### Chapter card spam
 
@@ -559,7 +574,7 @@ When `script-audit` runs, it should:
 
 - Flag use of deprecated transitions (`wipe-*`, `whip-pan`, `blur-through`, `spatial-zoom`) with a "use [recommended-replacement] instead" message.
 - Flag dissolve creep (more than 2 dissolves in a 30-second window).
-- Flag iris overuse (more than 2 per episode).
+- Flag any iris (retired; renders as a cut).
 - Flag color-wash without explicit color token.
 - Flag match-cut on segments without shared visual subject (judgment call — surface for review).
 

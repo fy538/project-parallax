@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-11T18:30:50+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a12c3b-3284-7613-990d-6a2134c71b42",
+  "still": "project/visual-identity/2026-10-11/character-motion/03-pull-start.png",
+  "end_image": "project/visual-identity/2026-10-11/character-motion/03-pull-end.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": 41111,
+  "prompt": "Locked camera, one continuous five-second shot. Keeping their joined forearm grip intact, the helper shifts weight backward over the planted boot and bends the pulling elbow. At the same time, the person at the water's edge pushes through the free palm and brings the near knee onto the dry bank. Their torso rises up and toward the helper, finishing with clear weight on the planted palm and knee while the far shin remains at the water edge, matching the supplied ending pose; hold. Show coordinated bodily effort with bent joints and body weight, not a floating translation or suspended body. Keep both wrists and hands distinct, contact continuous, limbs attached to their own bodies, and both free support hands planted. Preserve clothing, hair, bank contour and distant shore. Only modest painted water ripples and drips. Both heads remain completely featureless throughout, including turned contours: no eyes, nose, mouth, facial anatomy, inner-ear marks or nose/lip protrusions. Preserve matte painted illustration and fixed light. No cut, dissolve, camera move, extra limbs or people.",
+  "expanded_prompt": null,
+  "timings": {
+    "inference": 3.5848718059714884
+  },
+  "wall_seconds": 12,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aadfbc8/UJw40zVkdjXxutblPyWLP_minimax-h3.mp4"
+}

@@ -1,0 +1,24 @@
+{
+  "document": "parallax-visual-research-handoff.docx",
+  "verified_utc": "2026-10-12T02:22:36.350587+00:00",
+  "page_count": 22,
+  "visual_review": "All 22 final page PNGs inspected. No clipped text, overlapping objects, broken tables, blank pages or separated image captions observed. Eight embedded visual plates are navigation aids; full-size assets remain linked.",
+  "tables": 7,
+  "table_repeat_headers": 7,
+  "embedded_images": 8,
+  "unique_hyperlink_targets": 90,
+  "missing_local_hyperlink_targets": [],
+  "decorative_paragraph_borders": 0,
+  "heading_colors": "black",
+  "inventory_files": 472,
+  "inventory_hash_mismatches": [],
+  "conversation_excerpt_turns": 51,
+  "conversation_complete_transcript": false,
+  "artifact_sha256": {
+    "parallax-visual-research-handoff.docx": "c0fd21e499d7d2cdcc5c7fb9ae34f503c75eb56ab960f634e050f4524a939615",
+    "parallax-visual-research-handoff.md": "a4ce97cafdb1a123297a87e2aca24b4aeb13a7d1fe4228c4374a7ea6a16111d5",
+    "inventory.json": "842c06083dd1b7337dc7b9ab818a3ba37d0c60d3c2ef17c37e93d75fdfba8580",
+    "conversation-excerpts.json": "7493f0b66eb38a2d6184dc32dfc78c549ea48049e6c319cf5d93975ca699327c"
+  },
+  "internal_render_directory": "/var/folders/19/wpzhxkh12xq_10dlzq0sx6m00000gn/T/parallax-handoff-docx-qa-4h1ne_uy/renders/final-pages"
+}

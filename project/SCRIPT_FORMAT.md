@@ -367,7 +367,7 @@ The scene spec file template (extends the bakeoff format from `episodes/prisoner
 ## NLE assembly notes
 - Hard cuts between morph clips
 - Color-grade snap to canonical palette
-- Scene-entry transition: <iris | color-wash | dissolve> per script's DIR: cut()
+- Scene-entry transition: <cut | color-wash | dissolve> per script's DIR: cut() (iris is retired)
 - Scene-exit transition: <...>
 ```
 
@@ -435,11 +435,12 @@ When switching between visual registers, use the appropriate transition to maint
 
 - **Analytical → Grounding** (`[MG:]` → `[AI-GEN:]`): `DIR: cut(color-wash, ink)` — always include color token.
 - **Grounding → Atmospheric** (`[AI-GEN:]` → `[ILLUST:]`): `DIR: cut(dissolve)` — softens the register shift. (~~`blur-through`~~ is deprecated — use `dissolve`.)
-- **Atmospheric → Analytical** (`[ILLUST:]` → `[MG:]`): `DIR: cut(iris)` — premium register, ≤2 per episode; omit for routine returns to analytical.
+- **Atmospheric → Analytical** (`[ILLUST:]` → `[MG:]`): no directive (a cut). `cut(iris)` was retired on Oct 10, 2026 and renders as a cut; see TRANSITION_GRAMMAR.md § "By seam type".
 - **Analytical → Atmospheric** (`[MG:]` → `[ILLUST:]`): `DIR: cut(dissolve)` — clean data fades into mood.
 - **Grounding → Analytical** (`[AI-GEN:]` → `[MG:]`): `DIR: cut(color-wash, ink)` or omit (engine picks `cut`).
 - **Same register within beat**: omit — engine uses hard cut. Use `DIR: cut(dissolve)` only for deliberate elaboration.
 - **Chapter break / silence beat**: `DIR: cut(fade)` + `DIR: hold(stillness)` on the prior segment.
+- **Picture → text card about that picture**: `DIR: over(previous)` on the card's row. The picture is held and dimmed and the words come on over it (KineticTypography only; see DIRECTING_LANGUAGE.md § "Over").
 - **Historical-analogy seam**: `DIR: cut(match-cut)` — same subject, different scale or era.
 
 ### Sourcability check

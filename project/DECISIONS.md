@@ -3,7 +3,7 @@
 ## Purpose
 Running log of decisions made (with rationale) and questions still to resolve. Helps future conversations understand what's been decided and what needs work.
 
-Last updated: May 16, 2026 (matches the most recent entry — D45)
+Last updated: October 11, 2026 (matches the most recent entry — D50)
 
 ---
 
@@ -166,6 +166,28 @@ Last updated: May 16, 2026 (matches the most recent entry — D45)
 ### D19: Project memory compounding system (CLAUDE.md + LESSONS.md + BRAND.md)
 **Date:** April 25, 2026
 **Rationale:** Session-to-session knowledge loss was identified as the biggest drag on productivity. Every technical gotcha, design decision, and iteration insight was being re-discovered. Three-layer memory system: CLAUDE.md (project overview and current state), LESSONS.md (technical gotchas), BRAND.md (design system). Skills reference these files. End-of-session consolidation ensures learnings flow back.
+
+### D48: Editorial focus shifts to AI alignment, ethics, and philosophy
+**Date:** October 7, 2026
+**Context:** The channel's stated subject was contemporary geopolitics through historical analogy and philosophy. Tiger is now writing about alignment, ethics, and philosophy, starting with a draft on whether an AI has to "care" to be good (analysis/first-ai-episode-do-motives-matter-script-2026-10-07.md).
+**Decision:** Treat AI alignment/ethics/philosophy as the channel's focus going forward. Voice, doctrine, brand and tooling are unchanged. "Contemporary geopolitics" is relaxed from required third pillar to one option for the contemporary-stakes slot. Audit and viability skills updated to match (script-audit context, topic-viability two-pillar test).
+**Open:** disposition of the geopolitics queue; elevator pitch and title rule wording; default visual vocabulary for argument-driven episodes; updates to PROJECT_VISION / CONTENT_IDENTITY / CHANNEL_POSITIONING.
+**Scope:** `CLAUDE.md` (Focus section), `skills/script-audit/SKILL.md`, `skills/topic-viability/SKILL.md`, this entry.
+
+### D49: A hand-wired manifest is the source of truth; narration re-times it
+**Date:** October 10, 2026
+**Context:** By the end of visual production on `ai-care-motives`, about half of the manifest's 56 segments carried wiring the script cannot express (AI-video clip files, rows split into several shots, hold-under, per-seam transitions). The only path to narration-accurate timing, `generate_manifest.py --audio` (also what `scratch_pass.py` runs), rebuilds the manifest from the script first and would have dropped all of it.
+**Decision:** Once a manifest is hand-wired it is marked `"handWired": true` and is the source of truth for that episode. The generator refuses to overwrite it without `--force`. Recorded narration is applied with `tools/assembly/retime_manifest.py`, which keeps every segment and moves only time. Script directives (`DIR: over(previous)` and the rest) still matter for the first generation of an episode; after that, manifest edits are not mirrored back into the script.
+**Open:** reveal timings inside template data files (stagger, per-row reveals, `durationSec`) are not moved by a re-time; the tool reports the graphics that no longer fit their slot. No speech-alignment library is installed on the production machine yet (`faster-whisper` is the lightest option).
+**Scope:** `tools/assembly/retime_manifest.py` (+ tests), `generate_manifest.py` (`hand_wired_refusal`), `assembly-manifest.schema.json` (`handWired`, plus `preDelay` and `narrationGate`, which the generator already emitted), `AGENTS.md`, `project/PRODUCTION_PIPELINE.md`.
+
+### D50: New picture techniques stay options and are promoted by use
+**Date:** October 11, 2026
+**Context:** Between October 7 and 11 about 70 ways of treating a generated still were explored in five test reels and catalogued in `project/VISUAL_TOOLBOX.md`, alongside new edit and generation scripts (`tools/ai-video/fal_edit.py`, `fal_i2v.py`) and research. Each technique has been seen once, in one take, on one episode's art, with cuts timed to a word-count estimate. The look itself is still under development (`project/visual-identity/`). Every capability this repository has fully shipped as a register took 20 to 43 files. Research and options: `reports/Systemizing Parallax findings and tools.md`.
+**Decision:** Keep every technique as an option in the catalogue, and promote by use. Before the first episode ships, only preserve and point: commit the work, track the clip sidecars, fix stale instructions on the episode's path, add pointers in `CLAUDE.md`. After it ships: give each catalogue row a status, merge the script tables into one chooser, and point the script-stage skills at it. A technique gets code, a typed field or a lint only when a second and a third real episode use it. No stills register, no new `DIR:` directive, no technique enum and no new lint now.
+**Tiger's words:** "I like all of these, we probably need to polish some of these, but i like having all of these options" (October 11, on the first 38 techniques). Wiring any technique into an episode, a skill or a pipeline document still needs his go-ahead each time.
+**Open:** verdicts on the techniques from rounds 4 and 5; the names of the status ladder; which script-stage skills get the pointer; and the rulings the catalogue raises (how often a still may be reused, whether a slow still move should ease, the share of an episode that may be AI illustration, layered parallax).
+**Scope:** `project/VISUAL_TOOLBOX.md`, `CLAUDE.md` (Key documents, status row), `.gitignore` (clip sidecars tracked), `.claude/commands/narrate.md` (re-time path), `episodes/pipeline-state.json` notes.
 
 ---
 
@@ -415,6 +437,19 @@ The positioning matrix confirms the niche is differentiated, but the research do
 **Decision:** Replace the whitelist with `vitest.unit.config.ts` (extends base config; overrides `exclude` to drop the 6 render-heavy suites: `*-real-data.test.ts`, `templates.test.ts`, `catalog-smoke.test.ts`, `full-episode-smoke.test.ts`, `editorialFrame-visual.test.ts`, `filmOverlay-cascade-integration.test.ts`). New unit tests auto-enroll without any package.json edit. `test:unit` timeout tuned to 10 s / 15 s (hook).
 **Result:** 18 → 48 test files; ~500 → 1151 tests included in `npm run test:unit`. Runtime: 6.3 s (was similar — the missing tests are fast).
 **Scope:** `remotion-templates/vitest.unit.config.ts` (NEW), `remotion-templates/package.json` (`test:unit` script, one-liner).
+
+### D46: MathReveal, MathDerivation, HorizontalTimelineSingle promoted to manifest-level
+**Date:** May 20, 2026
+**Context:** MathReveal and MathDerivation were registered in Root.tsx (Studio preview) and had Zod schemas and sample data, but were absent from TEMPLATE_COMPONENTS in FullEpisode.tsx and all downstream manifest infrastructure (assembly-manifest.schema.json component enum, TEMPLATE_SCHEMAS, TEMPLATE_AUDIO_MAP in generate_manifest.py). HorizontalTimelineSingle was used as an alias in episode scripts but had no distinct TEMPLATE_COMPONENTS key — authors had to use HorizontalTimeline and note the single-item variant in JSON data.
+**Decision:** Promote all three to full manifest-level citizens. Added imports and TEMPLATE_COMPONENTS entries in FullEpisode.tsx, schema entries in templateSchemas.ts, component enum entries in assembly-manifest.schema.json, and TEMPLATE_AUDIO_MAP entries in generate_manifest.py. HorizontalTimelineSingle reuses HorizontalTimeline's component and schema (alias pattern) — same React component, distinct manifest key for author explicitness.
+**Rationale:** Templates with schemas, dossiers, sample data, and editorial use cases belong in the manifest-level dispatch table. Keeping them catalog-only prevents script authors from referencing them in episode manifests, which defeats the purpose of building them.
+**Scope:** `src/templates/Episodes/FullEpisode.tsx`, `src/templates/Episodes/templateSchemas.ts`, `data/assembly-manifest.schema.json`, `tools/assembly/generate_manifest.py`.
+
+### D47: CinematicMap editorial constraint — max 1–3 per episode
+**Date:** May 19, 2026
+**Context:** CinematicMap (terrain fly-through via Mapbox FreeCamera API) was built and registered as a full manifest-level template. The tile pre-warmer (`warmTiles()`) adds ~10–30s render startup per composition; each Lambda render is ~2–3× slower than a 2D template; DEM patches appear in ~1–2% of renders (re-render required). The `catalog-showcase-cinematic-map` showreel exercises the Khyber Pass, Taiwan Strait, and globe-reveal fixtures.
+**Decision:** Cap CinematicMap usage at 1–3 segments per episode maximum. Rationale: (1) Render cost compounds — 5+ cinematic segments per episode saturates Lambda budget. (2) Editorial impact diminishes — if every episode opens with a fly-through, the form loses its signal value. (3) Tile pre-warmer adds startup latency that compounds with segment count. The constraint is editorial doctrine, not a technical limit. Enforcement: visual-spec skill carries the rule ("max 1–3 cinematic maps per episode — terrain fly-throughs are reserved for terrain-as-argument shots").
+**Scope:** `project/DECISIONS.md` (this entry), `remotion-templates/references/template-research/cinematic-map.md` (anti-patterns section), `remotion-templates/skills/visual-spec/SKILL.md` (Maps family table, CinematicMap row note).
 
 ---
 

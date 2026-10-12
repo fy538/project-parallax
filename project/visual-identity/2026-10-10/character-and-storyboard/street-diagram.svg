@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+<title id="title">A fact about his street</title>
+<desc id="description">Other customers, neighbors and a competitor connect to the shopkeeper. Lines show the social setting around a fair transaction, rather than knowledge of anyone's motive.</desc>
+<rect width="1600" height="900" fill="#F5F0E8"/>
+<path d="M0 650H1600V900H0Z" fill="#F0E6D0"/>
+<path d="M0 650H1600" stroke="#5C4A3D" stroke-width="5"/>
+<path d="M250 364V448L800 588M800 364V588M1350 364V448L800 588" fill="none" stroke="#8B7355" stroke-width="5"/>
+<g fill="#D9C9B0">
+<path d="M72 220H435L457 364H94Z"/><path d="M620 220H983L1005 364H642Z"/><path d="M1168 220H1531L1553 364H1190Z"/>
+</g>
+<path d="M577 552H994L1023 696H606Z" fill="#1C1814"/>
+<path d="M577 552H994L999 579H582Z" fill="#C4A747"/>
+<g font-family="'IBM Plex Sans',Arial,sans-serif" text-anchor="middle" fill="#1C1814">
+<text x="800" y="103" font-size="49" font-weight="600">A fact about his street.</text>
+<text x="265" y="306" font-size="42">Other customers</text>
+<text x="812" y="306" font-size="42">Neighbors</text>
+<text x="1360" y="306" font-size="42">A competitor</text>
+<text x="800" y="641" fill="#F5F0E8" font-size="46" font-weight="600">Shopkeeper</text>
+<text x="800" y="797" fill="#5C4A3D" font-size="34">People compare notes. Reputation travels.</text>
+</g>
+</svg>

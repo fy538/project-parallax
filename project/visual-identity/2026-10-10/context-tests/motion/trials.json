@@ -1,0 +1,52 @@
+{
+  "provider": "fal.ai",
+  "model": "minimax/h3-max/image-to-video",
+  "duration_requested_seconds": 5,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": 41010,
+  "status": "awaiting_destination_approval",
+  "approval_reason": "Automatic approval review requires explicit user consent to upload the generated project images and prompts to fal.ai and incur a charge.",
+  "pricing": {
+    "checked_date": "2026-10-10",
+    "usd_per_second": 0.096,
+    "estimated_total_usd": 1.44,
+    "source": "https://fal.ai/models/minimax/h3-max/image-to-video",
+    "promotional_rate_ends": "2026-10-15"
+  },
+  "trials": [
+    {
+      "id": "desk-rich",
+      "input": "../01-desk-rich.png",
+      "prompt_file": "prompts/desk-rich.txt",
+      "output": "assets/clips-i2v/desk-rich-take1.mp4",
+      "estimated_cost_usd": 0.48
+    },
+    {
+      "id": "desk-selective",
+      "input": "../02-desk-selective.png",
+      "prompt_file": "prompts/desk-selective.txt",
+      "output": "assets/clips-i2v/desk-selective-take1.mp4",
+      "estimated_cost_usd": 0.48
+    },
+    {
+      "id": "river-rescue",
+      "input": "../04-river-rescue.png",
+      "prompt_file": "prompts/river-rescue.txt",
+      "output": "assets/clips-i2v/river-rescue-take1.mp4",
+      "estimated_cost_usd": 0.48
+    }
+  ],
+  "submission_attempts": [
+    {
+      "trial": "desk-rich",
+      "status": "failed_before_submission",
+      "reason": "Network DNS resolution blocked in sandbox; no request ID received."
+    },
+    {
+      "trial": "desk-rich",
+      "status": "rejected_before_execution",
+      "reason": "Automatic approval review required explicit destination and charge consent."
+    }
+  ]
+}

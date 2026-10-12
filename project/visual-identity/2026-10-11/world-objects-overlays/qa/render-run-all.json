@@ -1,0 +1,74 @@
+[
+  {
+    "id": "WorldStudy1",
+    "stem": "01-quiet-scenery",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 36714
+  },
+  {
+    "id": "WorldStudy2",
+    "stem": "02-architectural-scenery",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 37247
+  },
+  {
+    "id": "WorldStudy3",
+    "stem": "03-painted-object",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 20135
+  },
+  {
+    "id": "WorldStudy4",
+    "stem": "04-architectural-object",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 18227
+  },
+  {
+    "id": "WorldStudy5",
+    "stem": "05-analytical-overlay",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 33626
+  },
+  {
+    "id": "WorldStudy6",
+    "stem": "06-spatial-overlay",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 39681
+  },
+  {
+    "id": "WorldStudy7",
+    "stem": "07-light-background",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 34162
+  },
+  {
+    "id": "WorldStudy8",
+    "stem": "08-dark-background",
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "durationInFrames": 180,
+    "elapsedMs": 86997
+  }
+]

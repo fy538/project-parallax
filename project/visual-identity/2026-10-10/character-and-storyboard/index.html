@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Parallax — Character and episode studies</title>
+<style>
+:root{--ink:#1C1814;--midnight:#2A2520;--walnut:#5C4A3D;--umber:#8B7355;--taupe:#B8A189;--sand:#D9C9B0;--bone:#F0E6D0;--paper:#F5F0E8;--gold:#C4A747;--dustblue:#7AA3C9;--goldText:#786526;--dustblueText:#3C6A95;}*{box-sizing:border-box}
+body{margin:0;color:var(--ink);background:var(--paper);font-family:"IBM Plex Sans",Arial,sans-serif;line-height:1.5}
+main{max-width:1648px;margin:auto;padding:48px 56px 80px}
+a{color:var(--walnut);text-underline-offset:4px}a:hover{color:var(--ink)}
+header{border-top:6px solid var(--ink);padding-top:23px;margin-bottom:42px}
+.eyebrow,.frame-meta,.section-label{font:12px "IBM Plex Mono",monospace;letter-spacing:1.7px}
+.eyebrow{display:flex;justify-content:space-between;color:var(--walnut)}
+h1{font-size:48px;line-height:1.08;letter-spacing:-1.8px;font-weight:600;margin:24px 0 18px;max-width:1000px}
+header p{font-size:18px;max-width:840px;margin:0 0 22px;color:var(--walnut)}
+nav{display:flex;gap:25px;flex-wrap:wrap;font-size:14px}
+h2{font-size:30px;font-weight:500;letter-spacing:-.5px;margin:0 0 12px}
+.section-intro{max-width:840px;color:var(--walnut);font-size:16px;margin:0 0 26px}
+#storyboard-overview{padding:32px 0 24px;background:var(--paper)}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 24px}
+figure{margin:0}.image-button{border:0;padding:0;display:block;width:100%;cursor:zoom-in;background:var(--bone)}
+.frame img{width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;display:block}
+.frame-meta{display:flex;justify-content:space-between;border-top:2px solid var(--ink);margin-top:14px;padding-top:9px;color:var(--walnut)}
+.frame h3{font-size:20px;line-height:1.2;font-weight:500;margin:9px 0 6px}.frame p{font-size:14px;line-height:1.45;color:var(--walnut);margin:0;max-width:95%}
+#characters{margin-top:48px;padding-top:32px;border-top:1px solid var(--taupe)}
+.sheets{display:grid;grid-template-columns:1fr 1fr;gap:24px}.sheets img{width:100%;height:auto;display:block}
+.sheets h3{font-size:20px;font-weight:500;margin:15px 0 7px}.sheets p{font-size:15px;color:var(--walnut);margin:0}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding-top:30px;margin-top:42px;border-top:1px solid var(--taupe)}
+.notes h2{font-size:22px}.notes p{font-size:16px;color:var(--walnut);margin:0}
+footer{margin-top:45px;padding-top:20px;border-top:1px solid var(--taupe);font-size:13px;color:var(--walnut)}
+dialog{border:0;padding:0;background:var(--paper);color:var(--ink);max-width:94vw;max-height:94vh;width:1400px}
+dialog::backdrop{background:rgba(28,24,20,.86)}.dialog-head{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;gap:20px}
+.dialog-head button{border:1px solid var(--walnut);padding:8px 16px;background:var(--paper);font:inherit;cursor:pointer}
+dialog img{width:100%;max-height:80vh;object-fit:contain;display:block}
+@media(max-width:1000px){main{padding:28px}h1{font-size:38px}.board{grid-template-columns:repeat(2,minmax(0,1fr))}.sheets,.notes{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding:20px}.eyebrow{display:block}.eyebrow span{display:block;margin-top:6px}h1{font-size:33px;letter-spacing:-.8px}.board{grid-template-columns:1fr}nav{gap:16px}}
+</style></head><body><main>
+<header><div class="eyebrow">PARALLAX / VISUAL RESEARCH <span>10 OCTOBER 2026</span></div><h1>Character and episode studies.</h1>
+<p>Rich painted planes, featureless people and a quieter surrounding world. A character sheet and six moments from <em>The Unwatched Test</em>.</p>
+<nav aria-label="Gallery navigation"><a href="#episode">Six-frame board</a><a href="#characters">Character sheets</a><a href="README.md">Notes and full images</a><a href="studies.json">Exact prompts</a></nav></header>
+<section id="episode"><div id="storyboard-overview"><h2>Six frames, one visual language.</h2>
+<p class="section-intro">Selected moments from script v1.7, across Beats 2, 4, 5 and 8. Click any image to inspect it. These are exploratory stills, with motion and timing still to test.</p>
+<div class="board"><figure class="frame"><button class="image-button" data-full="03-shop-transaction.png" data-caption="01 · Ordinary help" aria-label="Enlarge Ordinary help"><img src="03-shop-transaction.png" alt="A featureless faceted shopkeeper offers two coins to a child, with a painted loaf on the counter." width="1600" height="900"></button><figcaption><div class="frame-meta">01 <span>BEAT 2</span></div><h3>Ordinary help</h3><p>Usual price. Correct change. One plainly painted exchange.</p></figcaption></figure>
+<figure class="frame"><button class="image-button" data-full="board-02-two-accounts.png" data-caption="02 · Two accounts" aria-label="Enlarge Two accounts"><img src="board-02-two-accounts.png" alt="The exact same transaction repeated under the captions DUTY and PRUDENCE." width="1600" height="900"></button><figcaption><div class="frame-meta">02 <span>BEAT 2</span></div><h3>Two accounts</h3><p>The identical action under duty and prudence.</p></figcaption></figure>
+<figure class="frame"><button class="image-button" data-full="04-street-reveal.png" data-caption="03 · The surrounding street" aria-label="Enlarge The surrounding street"><img src="04-street-reveal.png" alt="A wider cutaway of the same shop encounter reveals neighbors in the street." width="1600" height="900"></button><figcaption><div class="frame-meta">03 <span>BEAT 4</span></div><h3>The surrounding street</h3><p>A wider view reveals the people around the shop.</p></figcaption></figure>
+<figure class="frame"><button class="image-button" data-full="board-04-street-diagram.png" data-caption="04 · A fact about his street" aria-label="Enlarge A fact about his street"><img src="board-04-street-diagram.png" alt="Other customers, neighbors and a competitor connect to the shopkeeper." width="1600" height="900"></button><figcaption><div class="frame-meta">04 <span>BEAT 4</span></div><h3>A fact about his street</h3><p>Painted geometry becomes a precise typeset relationship.</p></figcaption></figure>
+<figure class="frame"><button class="image-button" data-full="05-unwatched-window.png" data-caption="05 · Watching removed" aria-label="Enlarge Watching removed"><img src="05-unwatched-window.png" alt="The same foreground transaction with the people outside the window removed." width="1600" height="900"></button><figcaption><div class="frame-meta">05 <span>BEAT 5</span></div><h3>Watching removed</h3><p>The street empties. The outcome stays unresolved.</p></figcaption></figure>
+<figure class="frame"><button class="image-button" data-full="06-desk-daylight.png" data-caption="06 · Return to the viewer" aria-label="Enlarge Return to the viewer"><img src="06-desk-daylight.png" alt="The featureless adult at a laptop in a spare bone-colored modern workspace." width="1600" height="900"></button><figcaption><div class="frame-meta">06 <span>BEAT 8</span></div><h3>Return to the viewer</h3><p>The same character in a quieter contemporary daylight room.</p></figcaption></figure></div></div></section>
+<section id="characters"><h2>The same person, across views and gestures.</h2><p class="section-intro">Detail comes from asymmetrical tone, hair, hands and posture. The face rule applies at every scale and angle.</p>
+<div class="sheets"><figure><button class="image-button" data-full="01-head-turnaround.png" data-caption="Five head views" aria-label="Enlarge head views"><img src="01-head-turnaround.png" alt="Five richly faceted head views with no eyes, nose or mouth"></button><figcaption><h3>Five head views</h3><p>Front, three-quarter, a more side-on view, looking up and looking down. The top-right view still needs a stricter 90-degree profile.</p></figcaption></figure>
+<figure><button class="image-button" data-full="02-acting-strip.png" data-caption="Three acting poses" aria-label="Enlarge acting poses"><img src="02-acting-strip.png" alt="The same featureless adult leans attentively, withdraws with a paused hand, then stands upright with an open palm"></button><figcaption><h3>Three acting poses</h3><p>Intended readings: listening, hesitation and determination. Compare the gestures before reading the labels; their emotional clarity still needs a viewer check.</p></figcaption></figure></div></section>
+<section class="notes" aria-label="Art direction observations"><div><h2>What looks promising</h2><p>The faceted heads hold together across these settings. The lighter desk opens up the palette, and the graphic frames connect the painted world to the argument. The bread stays within the same drawn medium.</p></div>
+<div><h2>What to refine next</h2><p>The street reveal reads mostly as a cutaway. Its impossible spatial change needs a clearer before-and-after design. Some shop surfaces also remain busier than the daylight wall; selective detail is the stronger direction.</p></div></section>
+<footer>Built-in image generation for the painted studies. Authored HTML/SVG for the comparison and diagram. <a href="studies.json">Prompts, references and retained attempts</a>. Graphics use the canonical palette; this local preview uses the Arial fallback for the intended Plex typography.</footer>
+</main><dialog aria-label="Enlarged study"><div class="dialog-head"><span id="dialog-caption"></span><button id="close-dialog">Close</button></div><img id="dialog-image" alt=""></dialog>
+<script>
+const dialog=document.querySelector("dialog"),fullImage=document.querySelector("#dialog-image"),caption=document.querySelector("#dialog-caption");
+document.querySelectorAll("[data-full]").forEach(button=>button.addEventListener("click",()=>{fullImage.src=button.dataset.full;fullImage.alt=button.dataset.caption;caption.textContent=button.dataset.caption;dialog.showModal()}));
+document.querySelector("#close-dialog").addEventListener("click",()=>dialog.close());
+dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});
+</script></body></html>

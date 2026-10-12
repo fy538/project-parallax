@@ -1,0 +1,41 @@
+[
+  {
+    "id": "head-turn",
+    "file": "clips/01-head-turn.mp4",
+    "width": 1916,
+    "height": 1080,
+    "duration_seconds": 5.184,
+    "fps": "24/1",
+    "frames": "124",
+    "bytes": 5718857,
+    "has_audio": true,
+    "request_id": "01a12c3a-a1f1-7723-ba03-c2a1070aa402",
+    "estimated_cost_usd": 0.48
+  },
+  {
+    "id": "coin-exchange",
+    "file": "clips/02-coin-exchange.mp4",
+    "width": 1916,
+    "height": 1080,
+    "duration_seconds": 5.184,
+    "fps": "24/1",
+    "frames": "124",
+    "bytes": 7189018,
+    "has_audio": true,
+    "request_id": "01a12c3b-2a52-7e21-8e77-8ed3a02761c1",
+    "estimated_cost_usd": 0.48
+  },
+  {
+    "id": "assisted-pull",
+    "file": "clips/03-assisted-pull.mp4",
+    "width": 1916,
+    "height": 1080,
+    "duration_seconds": 5.184,
+    "fps": "24/1",
+    "frames": "124",
+    "bytes": 14941752,
+    "has_audio": true,
+    "request_id": "01a12c3b-3284-7613-990d-6a2134c71b42",
+    "estimated_cost_usd": 0.48
+  }
+]

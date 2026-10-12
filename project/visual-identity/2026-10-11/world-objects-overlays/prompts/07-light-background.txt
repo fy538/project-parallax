@@ -1,0 +1,4 @@
+Use case: productivity-visual.
+Asset: a wide 16:9 painted backdrop beneath a Remotion chart. Paint the background only; no chart or text.
+Create a bone-paper field with a very restrained architectural impression at its outer edges: one broad pale walnut vertical plane along the far left edge, one muted ochre patch near the upper-right corner, and a faint hand-painted shadow band near the bottom. The central 75 percent of the image remains almost uniform light bone, including a large quiet horizontal region for small chart labels.
+Mature editorial gouache with calm asymmetry, subtle dry-brush boundaries and barely visible paper tooth. A few broad shapes, no focal object. Keep all contrast and texture weak enough to sit behind dark typography. No gradients suggesting a spotlight, frame, distressed stains, speckles, triangles, grid, decorative squiggles, handwriting, letters, numbers or diagram.

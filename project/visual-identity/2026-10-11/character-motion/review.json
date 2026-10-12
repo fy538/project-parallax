@@ -1,0 +1,271 @@
+{
+  "title": "Parallax character motion: first-take review",
+  "reviewed_at_utc": "2026-10-11T18:42:38.004235+00:00",
+  "method": {
+    "kind": "Visual inspection of decoded frame sheets and selected full-size frames; browser media/playback verification separately recorded.",
+    "quarter_second_frame_indices": [
+      0,
+      6,
+      12,
+      18,
+      24,
+      30,
+      36,
+      42,
+      48,
+      54,
+      60,
+      66,
+      72,
+      78,
+      84,
+      90,
+      96,
+      102,
+      108,
+      114,
+      120,
+      123
+    ],
+    "sampled_frames_per_clip": 22,
+    "dense_frames": {
+      "head-turn": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60
+      ],
+      "coin-exchange": [
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78,
+        79,
+        80,
+        81,
+        82,
+        83,
+        84,
+        85,
+        86,
+        87,
+        88,
+        89,
+        90
+      ]
+    },
+    "fps": 24,
+    "presentation": "Native HTML/CSS crops of decoded frames; raw video files are unaltered.",
+    "limits": [
+      "No claim of watching the full clips at normal speed for pacing review.",
+      "Pull reviewed at quarter-second intervals; short faults between samples may remain.",
+      "Head and coin consecutive-frame review covers the listed intervals, not all 124 frames.",
+      "One take per scene from one model cannot establish repeatability or comparative suitability.",
+      "No quantitative texture-flicker measurement performed."
+    ]
+  },
+  "overall": {
+    "production_ready": false,
+    "strongest_action_result": "coin-exchange",
+    "identity_observation": "Painted medium, palette and character identity broadly survive meaningful movement. Retain the direction while improving reference and contact control.",
+    "reference_issue": "Inner-ear marks are visible in the original shop and river starting images, as well as the generated clips. Remove those marks before a future trial.",
+    "additional_generations": 0,
+    "still_review_rule": "Before animation, inspect believable anatomy, distinct limb/hand ownership, readable joints and support/force in the source image. Retain featureless heads and painted planes."
+  },
+  "trials": [
+    {
+      "id": "head-turn",
+      "verdict": "Action completes; featureless-face requirement fails.",
+      "action_completion": "observed_pass",
+      "production_ready": false,
+      "criteria": [
+        {
+          "criterion": "Full head turn with fixed front-facing torso",
+          "status": "observed_pass",
+          "evidence": "Head rotates between approximately 1 and 3 s; shoulders and framing remain broadly stable."
+        },
+        {
+          "criterion": "Hair/head identity and coherent turning planes",
+          "status": "partial",
+          "evidence": "Hair silhouette remains recognizable, but central planes simplify and the contour acquires anatomy during rotation."
+        },
+        {
+          "criterion": "No facial parts or inner-ear anatomy",
+          "status": "fail",
+          "evidence": "Inner-ear detail visible near 1.25–1.9 s; nose-like protrusion visible near 1.5–2.5 s. The late profile is cleaner. Consecutive frames 30–60 corroborate the transition."
+        },
+        {
+          "criterion": "Camera/light/paint stability",
+          "status": "observed_pass_with_limits",
+          "evidence": "No gross camera or lighting shift in sampled frames; subtle texture flicker not measured."
+        }
+      ],
+      "evidence": [
+        "qa/head-turn/full.html",
+        "qa/head-turn/detail.html",
+        "qa/head-turn/dense-1.html",
+        "qa/head-turn/dense-2.html"
+      ],
+      "next_variable": "Clean featureless reference and a smooth intermediate turning contour; do not reduce the amount of head movement just to hide the failure."
+    },
+    {
+      "id": "coin-exchange",
+      "verdict": "Strongest action prototype; reference face cleanup and finer hand control remain.",
+      "action_completion": "observed_pass",
+      "production_ready": false,
+      "criteria": [
+        {
+          "criterion": "Exactly two coins transfer to child; adult finishes empty",
+          "status": "observed_pass",
+          "evidence": "Two discs remain readable through contact at roughly 2–3.5 s; both rest in the child palm as the adult withdraws around 3.75–5.125 s."
+        },
+        {
+          "criterion": "Continuous coin travel without disappearance or multiplication",
+          "status": "observed_pass_in_reviewed_frames",
+          "evidence": "Quarter-second samples plus all consecutive frames 42–90 show lowering, wrist roll and placement, without an observed substitution or teleportation."
+        },
+        {
+          "criterion": "Coherent separate hands and fingers",
+          "status": "partial",
+          "evidence": "Arms and hands stay attached and readable. Fine finger geometry softens/rearranges as the adult rolls the wrist; exact anatomy is not fully stable."
+        },
+        {
+          "criterion": "Stable loaf/setting and featureless faces",
+          "status": "partial",
+          "evidence": "Loaf stays painted and broadly fixed. Window figures drift slightly. Inner-ear marks visible in the source persist; no new eyes or mouth observed in sampled full frames."
+        }
+      ],
+      "evidence": [
+        "qa/coin-exchange/full.html",
+        "qa/coin-exchange/detail.html",
+        "qa/coin-exchange/dense-1.html",
+        "qa/coin-exchange/dense-2.html",
+        "qa/coin-exchange/dense-3.html",
+        "qa/coin-exchange/frame-011.png"
+      ],
+      "next_variable": "Remove ear marks in the reference; retain the clear two-disc staging and test finer hand control separately."
+    },
+    {
+      "id": "assisted-pull",
+      "verdict": "Rise is visible, but source arm/hand anatomy is ambiguous and requires rebuilding; supporting palm also slides.",
+      "action_completion": "observed_pass",
+      "production_ready": false,
+      "criteria": [
+        {
+          "criterion": "Right person rises to palm-and-knee support",
+          "status": "observed_pass",
+          "evidence": "Body rises from approximately 1.5–3 s, with a bent knee reaching the bank and the far leg remaining near/in the water."
+        },
+        {
+          "criterion": "Helper weight shift and pulling elbow bend",
+          "status": "partial",
+          "evidence": "Elbow bends and the helper shifts modestly; convincing heavy exertion is less clear than the rising movement."
+        },
+        {
+          "criterion": "Continuous grip and coherent limb ownership",
+          "status": "fail_source_pose_readability",
+          "evidence": "Contact persists through sampled frames, but that does not establish sound anatomy. Enlarged start/end pictures reveal ambiguous palm/finger ownership and an unclear helper forearm in the ending pose; the generated frame at 3 s retains the problem."
+        },
+        {
+          "criterion": "Fixed support without sliding, facial anatomy or restyling",
+          "status": "fail",
+          "evidence": "Free palm moves uphill along the bank during roughly 1.5–3 s without a clear lift/replant. Source ear detail persists. No gross floating body or photographic restyling observed."
+        }
+      ],
+      "evidence": [
+        "qa/assisted-pull/full.html",
+        "qa/assisted-pull/detail.html",
+        "qa/assisted-pull/anatomy.html",
+        "qa/assisted-pull/frame-013.png"
+      ],
+      "next_variable": "Rebuild the starting and ending arm/hand poses from a clearly staged figure reference before another motion test. Make both shoulder–elbow–wrist–palm chains and finger ownership legible, then test contact and counterweight.",
+      "source_pose_status": "requires_rebuild",
+      "source_pose_findings": [
+        "Both submitted key poses compress the two palms, thumbs and wrapping fingers into a hard-to-read shared shape. A distinct hand for each figure cannot be confidently traced.",
+        "The ending pose hides the helper forearm in the dark sleeve; the shoulder-to-elbow-to-wrist chain reads as shortened and cramped.",
+        "The grip does not clearly depict the intended reciprocal forearm hold. Connectivity in the video preserves this source ambiguity.",
+        "The helper posture gives limited visual evidence of counterweight. This is a figure-drawing/readability critique, not a demonstration of a rescue technique."
+      ]
+    }
+  ],
+  "review_revisions": [
+    {
+      "at_utc": "2026-10-11T18:50:54.603670+00:00",
+      "trigger": "User flagged strange arms and hands in the original two-person pull picture.",
+      "correction": "Earlier coherent-limb assessment was too generous: persistent contact was mistaken for anatomically readable contact. Source pose review must precede motion review.",
+      "source_images_modified": false,
+      "new_generations": 0
+    }
+  ],
+  "source_rebuild_followup": {
+    "record": "rebuild.json",
+    "status": "rejected_after_user_review",
+    "start": "03-pull-start-v2.png",
+    "end": "03-pull-end-v3.png",
+    "detail": "qa/assisted-pull/rebuilt-detail.html",
+    "original_video_review_unchanged": true,
+    "accepted_for_animation": false,
+    "research": "qa/assisted-pull/prompting-research.md",
+    "correction": "The rebuilt pair was rejected after closer hand/arm review; original video review remains unchanged."
+  }
+}

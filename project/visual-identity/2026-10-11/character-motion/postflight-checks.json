@@ -1,0 +1,104 @@
+[
+  {
+    "path": "project/visual-identity/2026-10-11/character-motion/clips/01-head-turn.mp4",
+    "bytes": 5718857,
+    "episode": null,
+    "probe": {
+      "available": true,
+      "duration_sec": 5.184,
+      "video_streams": 1,
+      "width": 1916,
+      "height": 1080,
+      "error": null
+    },
+    "checks": [
+      {
+        "name": "bytes-per-second-floor",
+        "ok": true,
+        "detail": "5,718,857 bytes for 5.18s = 1,103,175 B/s (floor: 50,000 B/s \u00d7 5.18s = 259,200 B)",
+        "severity": "error"
+      },
+      {
+        "name": "video-stream-present",
+        "ok": true,
+        "detail": "1 video stream(s) reported by ffprobe",
+        "severity": "error"
+      },
+      {
+        "name": "resolution-match",
+        "ok": true,
+        "detail": "rendered 1916\u00d71080, expected 1916\u00d71080",
+        "severity": "error"
+      }
+    ],
+    "failed": false
+  },
+  {
+    "path": "project/visual-identity/2026-10-11/character-motion/clips/02-coin-exchange.mp4",
+    "bytes": 7189018,
+    "episode": null,
+    "probe": {
+      "available": true,
+      "duration_sec": 5.184,
+      "video_streams": 1,
+      "width": 1916,
+      "height": 1080,
+      "error": null
+    },
+    "checks": [
+      {
+        "name": "bytes-per-second-floor",
+        "ok": true,
+        "detail": "7,189,018 bytes for 5.18s = 1,386,770 B/s (floor: 50,000 B/s \u00d7 5.18s = 259,200 B)",
+        "severity": "error"
+      },
+      {
+        "name": "video-stream-present",
+        "ok": true,
+        "detail": "1 video stream(s) reported by ffprobe",
+        "severity": "error"
+      },
+      {
+        "name": "resolution-match",
+        "ok": true,
+        "detail": "rendered 1916\u00d71080, expected 1916\u00d71080",
+        "severity": "error"
+      }
+    ],
+    "failed": false
+  },
+  {
+    "path": "project/visual-identity/2026-10-11/character-motion/clips/03-assisted-pull.mp4",
+    "bytes": 14941752,
+    "episode": null,
+    "probe": {
+      "available": true,
+      "duration_sec": 5.184,
+      "video_streams": 1,
+      "width": 1916,
+      "height": 1080,
+      "error": null
+    },
+    "checks": [
+      {
+        "name": "bytes-per-second-floor",
+        "ok": true,
+        "detail": "14,941,752 bytes for 5.18s = 2,882,282 B/s (floor: 50,000 B/s \u00d7 5.18s = 259,200 B)",
+        "severity": "error"
+      },
+      {
+        "name": "video-stream-present",
+        "ok": true,
+        "detail": "1 video stream(s) reported by ffprobe",
+        "severity": "error"
+      },
+      {
+        "name": "resolution-match",
+        "ok": true,
+        "detail": "rendered 1916\u00d71080, expected 1916\u00d71080",
+        "severity": "error"
+      }
+    ],
+    "failed": false
+  }
+]

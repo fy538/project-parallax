@@ -1,0 +1,3321 @@
+{
+  "title": "Parallax visual research handoff file inventory",
+  "prepared_local_date": "2026-10-11",
+  "snapshot_utc": "2026-10-12T02:19:57.412285+00:00",
+  "repository": "/Users/feihuyan/project-parallax",
+  "scope": "All files in the two dated research directories and two isolated Remotion research source folders. Excludes .bundle directory contents and .DS_Store. Includes retained failures, QA frames and probes; counts are not unique creative outputs. Handoff files are excluded to avoid a recursive inventory.",
+  "counts_by_family": {
+    "project/visual-identity/2026-10-10": 98,
+    "project/visual-identity/2026-10-11": 363,
+    "remotion-templates/research/world-objects-overlays": 6,
+    "remotion-templates/research/combined-sequence": 5
+  },
+  "total_files": 472,
+  "total_bytes": 495174677,
+  "files": [
+    {
+      "path": "project/visual-identity/2026-10-10/01-modern-woodcut.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3195823,
+      "sha256": "f3bacacadd0ea4a5cc9ad134711699ff53876d98d61854d054a335b0393ccde6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/02-paper-theatre.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2655045,
+      "sha256": "2759ff4aa90c919fd6e8d9419e852eddd555bf0d55b1547ae7cccbce5c4d5591",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/03-charcoal-spot-color.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2923576,
+      "sha256": "df167e08f60ccb7b709b169a3e0ca70dd731c9da11677ce2c95fed8e5cd77174",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/04-editorial-gouache.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2387354,
+      "sha256": "57e68510c1fba40bf91e6b95b9dfccfb9603dc1fe55e6571b22b8e74092bf45f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/05-two-color-risograph.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2878660,
+      "sha256": "afbbcf554700ad973a4795fcfe072f268c13e31572f45ca0f434ab7204c8c880",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/05b-graphic-risograph.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2072620,
+      "sha256": "9d3029fc74d9cee2df212af9f0b494b77d3854cbe51c59f50fc4d3785f42b6ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/06-modernist-cel.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1495959,
+      "sha256": "3c7d6b942ae494126fcc8b5659afde3550936f590d14966ebd87df1082242b36",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/07-conceptual-line.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2082499,
+      "sha256": "930cd40a677c89223207d27f08c78a7e625d7b6397114c1703d21f90a62dc7f6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/08-architectural-surrealism.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2191755,
+      "sha256": "7de7bd29df0d2d4ce6d4ae3cfe3c5d65ef4c31cb4818fd62905dfecc09449e3d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/08b-architectural-surrealism-flat.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2271508,
+      "sha256": "bad2d1deef8000e968e75041c8ecec56671471e813d8ac2decf7abcb98417860",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/09-ink-wash-crisp-figures.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2769635,
+      "sha256": "a29fec1bf2796a89fab77ec0605ef75883eb8ad3677ce4be6dfbe261a3715eff",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/10-drawn-surreal-collage.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2857344,
+      "sha256": "843f25b888c712a3d833788dd2f14d18e91e889e1a118ccae11549500865ab10",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/11-rotoscope-inspired-editorial.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2404972,
+      "sha256": "aa6ef7f04b0fa9f7b7cf2323173f9d9490d2dde1fcccf460ed4eba12755a2ecc",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/12-pinscreen-tonal-world.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2021227,
+      "sha256": "203baa9ed90dba6ff3acac83ae0b17d94fb1fd0da4e8dfc3f0454c1f2f1176eb",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/12b-pinscreen-tonal-world-simplified.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2489198,
+      "sha256": "0659c63791b9f238b22262eec33112aa3fcff7a3c573b1d66c6c6e77a8a8dc97",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/13-paint-on-glass.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2723834,
+      "sha256": "5e795af26828cb0f8618eceee519321c1b764ad0b8832e3bfcc9f94e3ace7f37",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/README.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 9957,
+      "sha256": "87dc8d3f996b10243333efa370d1c6efef5f5016ad01747113d94bdfdd308beb",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/additional-directions.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 12690,
+      "sha256": "e84ad624cc314ff7119b064d7d7cde87e9dc6b277f4c908f33085a0ba58e234c",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/additional-studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 36892,
+      "sha256": "5dd0622aa1c07af14c623b321b2e19d1932e2d98131895ac96aca43fa067ddaa",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/all-directions.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 11603,
+      "sha256": "085bb1f6aaa47d0af92e6670b67b5c698a8eba901dff1d0acf7544dbee25619c",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/01-head-turnaround-v1.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2137744,
+      "sha256": "569d2b78a15c9d8cc0e5775cb906a9a279836026974c2d93897e5f73ce8f6819",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/01-head-turnaround.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1976615,
+      "sha256": "fd1bf6d3dd26fe62ea8d0e73650ccddb68f47a1aea8342052ab5c5de6948e4c9",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/02-acting-strip.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1952144,
+      "sha256": "e73ccbc31f05d2f7505864a2a204700f859a899093f3d226349f5f55bf9a63d5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/03-shop-transaction-v1.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2193549,
+      "sha256": "f9b3f65cb5c16f44732281fd8ea9427dbc6ca3d423d7c16c3c0721998ea826f8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/03-shop-transaction-v2.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1936202,
+      "sha256": "5b054cdd4e3bbfb2c776cbb72c2ac8dbce79477e818e15bb49cb57898c119bf4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/03-shop-transaction.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1830471,
+      "sha256": "c8a9ae970fcc460c7dc2d22df8a722cf33943127fa489c4e17b3bea993d2f939",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/04-street-reveal.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2180113,
+      "sha256": "3081ffbf13d6569df44d97271206407a09a5378bff6d4b50a736fea7550ba27f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/05-unwatched-window.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1840896,
+      "sha256": "236f6cef6a157bf20ad933865e6d6b80596f96691e5b3c0c2d7c21c773b2c6f3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/06-desk-daylight.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1912427,
+      "sha256": "f30d358a4ff72b12983a75666d90eb3e4bd865dd54011c73c5c2ed319f5b9ae3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/README.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 4558,
+      "sha256": "3c1715e9489d2be1a96e2e1951a1f2cb0d601bf7cddde231d33cc912e9dccb77",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/board-02-two-accounts.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 452074,
+      "sha256": "d472c46969d7cdf34b2a52953d20cc2f1a1d7fb21d6e8b75a7873856482b9a94",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/board-04-street-diagram.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 62103,
+      "sha256": "bb4ec0f144f949cd9c4c7ac388967ac03018cf932a973098a43b6680e732e57f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/index.html",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 10088,
+      "sha256": "85e9bb4ad8c2353769d2de6b720e8638078aa0415a6ceb12679c52f64a9ed983",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/preview-checks.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 125,
+      "sha256": "d7685a9364303dbb9756634647ce8236d40f290d9115362f85954fefaa06a991",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/render-preview.cjs",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3190,
+      "sha256": "40575a31b0d4a10cf097f5cf271a7a0d1d1493ddd3041fdb955c9393ce8c8a51",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/storyboard-overview.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1008747,
+      "sha256": "760d97771cd4413649f93cdc259918216940e88c2be88d63df07e97cad9aa050",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/street-diagram.svg",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1419,
+      "sha256": "6210a1c8f0dd28ab0991cb0dc0e164d361948f447a542ce2626ecce995b11f33",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 28075,
+      "sha256": "54e1ebba4573bf0c384976f57393bbe49f1738268a0eeab4ee9a89d41d926224",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/character-and-storyboard/two-accounts.html",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1483,
+      "sha256": "02a2ee23ea7f167e5fc902196c149b011690872519e43b9e37917c794470c362",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/01-desk-rich.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2177023,
+      "sha256": "7cf658802a7d874178dca1345fd2e574d52c4c3e9457966093118db712a64932",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/02-desk-selective.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1932307,
+      "sha256": "eb3f896c4524cb5adf1f23b451b5e59bbc6aa2fb22d84f876934e7bca09378b7",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/02b-desk-featureless-detail.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1733059,
+      "sha256": "758c2f0dbc51949b5aabf1591df41a00cafb382eb9b9f1adb083ee0e23b8c9eb",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/02c-desk-faceted-face.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1755949,
+      "sha256": "a79d9cee27adf4b30558c1b68b1af01d61d3e815e9902d7e26ad062c6dca1631",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/03-dinner.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2161553,
+      "sha256": "37bf914304915382281f428a4aed8566e5ff27c91a0d7ae1a3928e1baba1e92e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/04-river-rescue.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2099458,
+      "sha256": "abf6347fa548d54d5a17cb4df7e0313639ecf5263a68fe72cdcea5b94187662f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/README.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5973,
+      "sha256": "e2e3717a244c6e67ca852c2c564f5272d5bbf48ae1ee89040c0620f7c89e6ebf",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/motion/prompts/desk-rich.txt",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 411,
+      "sha256": "24beee8dddcef1571e575aee901e33273939e7c2705cbcfb3cb22b8071855d60",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/motion/prompts/desk-selective.txt",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 411,
+      "sha256": "24beee8dddcef1571e575aee901e33273939e7c2705cbcfb3cb22b8071855d60",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/motion/prompts/river-rescue.txt",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 462,
+      "sha256": "49e1d68b95069eea988d548241ab9340f03d5ebdd96133fde07b31b06d7f34ce",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/motion/trials.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1685,
+      "sha256": "6915c8a42c4260e252615b95b83d6b8f05c9cd1745327e1b0769995a1a821579",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/context-tests/studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 21777,
+      "sha256": "96c96d440f4479151cd611f151606e39420d83673f5edd5165ae884f0de881e6",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/README.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5248,
+      "sha256": "30bc1402a223fc4ca5a4740fd132baf313610825db619d262a340e5b0715533f",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/a-opening-panel-two-coins.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1916316,
+      "sha256": "8a798165fba1f4ff042ec0b8254270376d6004092aaeadb9ea12cb6f5b1091ce",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/a-opening-panel.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2050904,
+      "sha256": "b73c3837fd8a0d02b5990b37ad392da992f7a0f54fdadd3eab9636879d87350c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/b-continuous-surface.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2065486,
+      "sha256": "abc694bdd8ececa9448d8374f1964483af1643f18b3a96a7b90aab4752892c74",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/before.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1830471,
+      "sha256": "c8a9ae970fcc460c7dc2d22df8a722cf33943127fa489c4e17b3bea993d2f939",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/c-pullback.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2180113,
+      "sha256": "3081ffbf13d6569df44d97271206407a09a5378bff6d4b50a736fea7550ba27f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/comparison-overview.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1104492,
+      "sha256": "b96038ead6000b33d0cf2dccc5e0faa396d82f594050ef8fc4231106cd61d38a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/index.html",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 7147,
+      "sha256": "86fa8b418a1822c7e47c8eefdb2e44cab7284aec2559f4db5ccf355683098de1",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-background.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2053845,
+      "sha256": "abdb9d9e2cce7392ef422dba4dbe9319153e0ee951eba36f7030700b5c70693f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-canvas.js",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5434,
+      "sha256": "353c62f6fa0b8dcd4bf98d8e178d7b7269760117197101bd06e9f806eb72b874",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-contact-sheet.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 741415,
+      "sha256": "dc71621bd9c52cc14c337cd3d311e4e2cae607fa54ec78f913757d3e83e4b978",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-foreground.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 664800,
+      "sha256": "359f1486e802f86eb115bc3eda6f28c062b15e629ea2a75c0551d24e01633f6f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-key-00.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3187053,
+      "sha256": "7f1087baee973c396394a1581403a87533ef23a2e7961c076dad2dcba86c2b60",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-key-04.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3434996,
+      "sha256": "2b0a3167fc9fb812e93fa2225a21bd6c14e5d11746a706d3f5adeb938dea26ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-key-07.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3254705,
+      "sha256": "1bb4e18d83f152c77bc1da5bae1f999d4481b9239e6c2da9c07a0552317dc642",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-key-10.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 105128,
+      "sha256": "50328ecd1d3dc964f780f32f99d261364a8e4ba9ee562cfb66575a70b1b163e0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-key-13.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 132105,
+      "sha256": "f316959b896483f552e75f5b5101cc1bb29e374d826974c60caebce9f1eec820",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-keyframes.html",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 961,
+      "sha256": "8402ad44804961c163d12d046918c23e647a3d23e40b293e97482f974b36fe46",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-page.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 549670,
+      "sha256": "24941f5c73aedf0e8f8474adac251b56350a2765d907f52add6c86c1467e000a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion-poster.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3254705,
+      "sha256": "1bb4e18d83f152c77bc1da5bae1f999d4481b9239e6c2da9c07a0552317dc642",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/motion.html",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 7615,
+      "sha256": "d03ee3122b6fbd2a23e11cf3f200e1a6c87f4328a5feff5606d8c317043fb4b3",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/opening-panel-motion.mp4",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2623762,
+      "sha256": "d6a9f6d20e90edb2d2ed45ddb2164f1ca9313ba55289578d92403654f212777d",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/palette.css",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 289,
+      "sha256": "71b012b3e26bde470c35d106dbcbd90f2fb0eab1ad8d47ab7555ac28f4f33754",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/preview-checks.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 157,
+      "sha256": "0b30b9f5b0b111a36c6eb8b4bf30a58f96a8faf3315b00c835f1575cc74b5e4c",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/record-motion.cjs",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5832,
+      "sha256": "c28dd8f28843ee42e5217efa560217849ec00cb78fd9e78c50bafd20f9c06ae7",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/recorded-key-00.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1913247,
+      "sha256": "9e068ec732a387e4b626c45a80d4f9da43a943a909984a26a84f33d271edb4d0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/recorded-key-04.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2087414,
+      "sha256": "eb5614aef74404b36edcaca1e99ed6192a17c3c23465ebcbf49d926f22289e3d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/recorded-key-07.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2115977,
+      "sha256": "4962257c2094ce4dbe493082b8a2b95183558b3c107d49b8770d41588e7cbe29",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/recorded-key-10.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 131759,
+      "sha256": "7a98716c461b664f7dbbe335f4623f962df852aa243bc098caf8b618f08164c7",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/recorded-key-13.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 201363,
+      "sha256": "720124341f6740eaf912099ff77b5c52bf17ca0c5f1a4dabcbbd4030a8a76076",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/render-study.cjs",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5005,
+      "sha256": "8a2af2bab06a865fa375ad4e638a655bfcee1ebdbae183a3431a600979b02260",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 18505,
+      "sha256": "3609591cabdadb088e0835820f4a32488bbb60821864ca9720702cd7f53237e9",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/reveal-comparisons/video-checks.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 989,
+      "sha256": "faa84a892ff982878c0319976db831b01dfbbc1d0ba70e717fb9bf6efd9eabe0",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 60738,
+      "sha256": "5a095bdd76279be4c7133279c659b0e0109f18713854c7c22c945f083d0a7f7f",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/README.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 5158,
+      "sha256": "a031930131b35f09e546ae7c99d1af3f81cc36da64badfc2f63796137fb55654",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s01-quiet-architecture.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2397057,
+      "sha256": "7f9f0423f736fef20bc01c190234b898b6f0e22048d91f568186d81743568445",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s02-folded-viewpoints.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2882446,
+      "sha256": "4e0d97aa6618008c51d553b5cd546ff7ee133db1a6ebe3d44d3bc9a55af3d180",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s03-monumental-distance.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2383564,
+      "sha256": "b87b9a7c204918c1e1c41e928dc6399636d6c9644da82a50253c84f5f83b6dde",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s04-independent-shadows.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2224527,
+      "sha256": "1ea2a091d49ae27d2d9470695e79eda2ad6cc871bc09f372bfc403a1bdc8b6ec",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s04b-constructivist-shadows.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2361005,
+      "sha256": "58873b7213e95ab1c67560601c195935ccc14e5f9251fdd8ef2a3a6c20f99e70",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s04c-constructivist-shadows-detailed.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2283317,
+      "sha256": "77acd23cdcc7dd31b1f167efb36cc7ce11ec75ecfac640318b2f8660342e360f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s04d-constructivist-shadows-faces-bread.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2077225,
+      "sha256": "b638965945766c80e112588535ace01a2125559611b23aa2af562caaf62525a8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s04e-constructivist-shadows-featureless.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 1973911,
+      "sha256": "09e421fb5395deb5bcfc04baa19f017f59021115977b67a5cf29f19e8b67a031",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/s05-continuous-surfaces.png",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 2737686,
+      "sha256": "e7cd8e7cfaee981f03e4a346867082f51bafebd448e449eedcf287309a51d1e4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/shadow-comparison.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 3440,
+      "sha256": "ad6a11ceb3fa898552fdf86e9adbc1bd3aeda224678f5aeaa2fa433df3b4ec79",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/surrealism-variations/studies.json",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 31113,
+      "sha256": "f833d9c06154823113f00b2402d32c36c5ac4453adab73d484c391cdb69ac87b",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-10/visual-language-research.md",
+      "family": "project/visual-identity/2026-10-10",
+      "bytes": 25431,
+      "sha256": "ee04a7646be9d3ef33813375c2f593168b3a6ef8537285ac038bb82f96380229",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/01-head-end-v1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1720366,
+      "sha256": "235e839cb34c84cca785461826e0997adddef9deb3195be24327e0f7e613e799",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/01-head-end.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1679751,
+      "sha256": "6f7d1f25358a0af1167561dd02ef7e019a2912b8a87e0354f33a15f8b9922abc",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/01-head-start.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1815942,
+      "sha256": "5085451473ac0cea6e5776cf61a32f84d6644f94d174345e18737c219a330c21",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/02-coins-end.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1813662,
+      "sha256": "2f15e00eb30c0bfd8ada935d46b8dbf090aa5f8b1c18c6df1047ba21acb5f0ae",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/02-coins-start.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1830471,
+      "sha256": "c8a9ae970fcc460c7dc2d22df8a722cf33943127fa489c4e17b3bea993d2f939",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-rebuild-v1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2269538,
+      "sha256": "f27772d77b972fc20b90b5d65d9d71a8933853e99425710455de1d68d2e5db92",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-rebuild-v2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2172685,
+      "sha256": "18ebd8c256b83e3385db62706cf3521587c23e803adadf510ed2188c9d9cc48f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-rebuild-v3.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2214872,
+      "sha256": "0dbafb82ce29f6a997769bcaa92562e611b59bbe142c8f1248fea9c65caa0aaa",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-v1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2359563,
+      "sha256": "dc2388b371fd5fdd328d922fac50756eaa41c09a9e3323348f2d09b5623719ed",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-v2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2172685,
+      "sha256": "18ebd8c256b83e3385db62706cf3521587c23e803adadf510ed2188c9d9cc48f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end-v3.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2181368,
+      "sha256": "97ff0ed55fbec8007e3c114568d7fc5c55e7d590ff8308785e8f8622c7ba5c8c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-end.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2272635,
+      "sha256": "d2f7788333cdbd1fe6dd102ef42b0532e2d54bdef739ded6b3290f32c6967f5e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-start-rebuild-v1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2336822,
+      "sha256": "c32f3b2ccf6b074cb292b041a7b0fa61ee3dea1f666fc353cac3ef4a0be4c8a0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-start-rebuild-v2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2257830,
+      "sha256": "9c8cecaa9ad6ae58335daaa2f907fa6db4f09dd31c82401dfaafc3622ee03299",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-start-v2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2100980,
+      "sha256": "17853a8b2979f6d45f2dceed0492aa9f7ceae3fb26011d1865db99642727b4be",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/03-pull-start.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2359824,
+      "sha256": "855bc1130dc6a713b509baf8b299bb8063293fa82e70a4029cd6d863817c1541",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/README.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 11426,
+      "sha256": "5ef1ea0fc6533454e473b8c27f3559a889aa5ccd750da5911fa9dbab2b8bf949",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/01-head-turn.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1371,
+      "sha256": "94d45e09a186a91b4298e847b15db43b4a357ad52cb92c92aa40b6b17b57d667",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/01-head-turn.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 5718857,
+      "sha256": "d7dfd86935e82e51ebbdc5a06b52521bc58051c2637260bef4e656d275ebcce8",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/02-coin-exchange.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1663,
+      "sha256": "c6e87a65e2c256c39a818b79b30703cb3a4992d3a201c3af93e149cf077e927d",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/02-coin-exchange.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 7189018,
+      "sha256": "6fbb4d9a480b9b546ae41c9603987861ba890802960c3acea8e6267b3c46f247",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/03-assisted-pull.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1801,
+      "sha256": "438c07a549358edc6e58b7be5cc875955a4d4aac3c7e1115655eef38c2fe6937",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/clips/03-assisted-pull.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 14941752,
+      "sha256": "0b6dce72a748692afd789f781a5bb4544f34d042b7d2c8f4a761c78e6995c84a",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/gallery-checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1805,
+      "sha256": "0c9f8e6364134d09b8d92ddb9e4ab5b7a2bd467061a065cbad6e9ed85e6eaf9c",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/index.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 12485,
+      "sha256": "1ad51563f2c72c753409b70f37c581c264e1e91a3bbc08f07930c1639858cd95",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/key-pose-overview.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1325002,
+      "sha256": "116392efc5e4c1fe8f68652ea4d3b2bdfda9ab2bf2f8a599976e001eaf578497",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/media-checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 962,
+      "sha256": "a0fb8ae97fb66e0dbce369c0b0f5fa2871f11fe2be2306dd6bfcd4becbab3bda",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/palette.css",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 279,
+      "sha256": "4b38919d8d3cd8feb19baeb706658da4a9130c47333e555b4ce021a06cc3a884",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/README.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 4709,
+      "sha256": "d84b3414d57435bc127e38a38976229433f9b4458bcf50f85b43a32240b04bf2",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/a1-pose-only.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1620881,
+      "sha256": "0418fdd6f925394477991508faa2d5e39c54df0bf8c559b057afac9fac0d723f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/a2-pose-only.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1630574,
+      "sha256": "11b5217f1091e6531b4c485c417ebf6a742a7b9c837d3b75a711af10cf16667c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/b1-whole-pose-reference.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1549881,
+      "sha256": "461333717322b7a080683c288f2cff03e8aa82f9fe9e6891728ab7a717811177",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/b2-whole-pose-reference.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1631892,
+      "sha256": "fc7b7f31d8d6653d31d38fc3e6ab0adc589cc6ccd8635e75c7ee62bd348eb89d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/c1-painted-pose.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2322058,
+      "sha256": "2d460039bebf32f04f46f25476d9283bb16a3a2f30f283d86d71ae5364a45a2c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/c2-head-edit.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2129674,
+      "sha256": "753504445152dafbb4cb1a9599868ef44da73afffbe85c0a1a0c8b3116ccb9ee",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/c3-redrawn-heads.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2023192,
+      "sha256": "8370cb6ff3191c3e03368761ee55c32f9318b8b5e9e03ba5a89fc41709b3b4ec",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/contact-review.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2183,
+      "sha256": "4a82adc2063c7f2ebc09000be763412f42f19b7f1d10a5b88ca4e5c956d983b0",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/contact-review.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1296468,
+      "sha256": "bb75a6926d80aeff966c125c124bc69b0c29f0225956c0d8887fb04759d91869",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/d1-river-context.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2235484,
+      "sha256": "bfc0a362eb4ebf8fc4bad45cc6be4fc4b9614e19f34a10b74b1f3d213f2425f7",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/d2-geometric-heads.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2186591,
+      "sha256": "a5137087a7dfa3196320e28911cfacc1fcaf618d8560adc72a36557a57eb50f0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/enlargement-preview.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1379370,
+      "sha256": "abd5b3b7785709535296fc5a3271e5c6254aaad1e284407dd503d2981645f346",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/gallery-checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1141,
+      "sha256": "926635da3056213fffeb31bff6d46e3441b33dac5bea12c4c2e0a29554e9b009",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/gallery-desktop.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3885387,
+      "sha256": "773197ec06c055538f03d182849963d6793020b069064ea8891410182708b6b8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/gallery-mobile-fold.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 74153,
+      "sha256": "9f68ee1e69b9def6bebfe10b1d37d3ef586afae96abf1fc6cc8b954cfab398f6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/gallery-mobile-record.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 112144,
+      "sha256": "68bf284e7e64f15b79fdc83980a8a8c58a46421fc95bddb5b0e7dc5f316fb33a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/gallery-mobile.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1568753,
+      "sha256": "8dba5fbe92d11c8bdf7e6c75f6af7a5e0d3aa303dcfc6da631e24fb4be61683f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/index.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 16245,
+      "sha256": "ce9320453cb3a06a2ccdf4750772dc02e3618033fa321cb3adf7cc5eeac283d8",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/paint-detail.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 4534,
+      "sha256": "b8c0f58606ce883cc82dec5b8d3f272a501ab5e192754e79fb439189da53f60c",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/paint-detail.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1948634,
+      "sha256": "a7583a5e6f58952d0bc3b0b86f81a9a5807c547f3117a6f18e5be2684d749c66",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/pose-comparison.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1064101,
+      "sha256": "4c9480a0f09dfce79f0424f14fae688996dc4c6cd46efda0a5a28e17ba60b055",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/a-pose-only.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1202,
+      "sha256": "1164e7c793869fddec0d416847b6a94d71871a52ef5ba8480544bb454ff3aebb",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/b-whole-pose-reference.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1356,
+      "sha256": "3b6cf8905831a540e074a9396cd839d484fc25f7b79fe26c6cefba83cbbf23f9",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/c-painted-treatment.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1347,
+      "sha256": "ff2f516ecd90955d19bee9b7062e676c658854f5fed4ae208a751ca8f2f06062",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/c2-featureless-heads.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 631,
+      "sha256": "036c4e5d923dfe2b875815cd33a830320fecc8e614cedab6df54efad90e6bc74",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/c3-redrawn-heads.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 894,
+      "sha256": "2f3fd97c4e91c67eba2cefd5702aaec7e731480626db358f698f0d34321a34a8",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/d-river-context.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1231,
+      "sha256": "33d35b102f61610766666f67a8735163c3640a17352b15276847d828cc7e5a23",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/prompts/d2-geometric-heads.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1117,
+      "sha256": "244d858ab0b3721b464fee5c72030eaa1b345789af5f69722548ff65e30935fe",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/references/old-rag-pose.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1211191,
+      "sha256": "e3266e4340e1bca521d8812c582fee635396e90836c58c481036b2a998c58f9a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/render-gallery.cjs",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 5916,
+      "sha256": "ea6268cbe0cba5ff2f526d2a5d05da5217091d34291b6ddcfe6f57afafcda1b9",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/retained-attempts.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1007596,
+      "sha256": "bcb0b1ddbd34ab78fb8f0b1a46f25df6b850d7b5ee205ae41c1ed582db2dac0d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/river-review.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1674443,
+      "sha256": "baa9ec9719a69fc7557ce6ff81fecbf2b47bc5b08d0f1141a49492f3d4e11787",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/pose-first-test/studies.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 24922,
+      "sha256": "c7ab819fed667ebf307771cf3098ecc07e7a8d46d00705f67750b24688e4107b",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/postflight-checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2710,
+      "sha256": "1bf6ae5dad5df5e2ee3699e303fcdfa7f522609f52da3fe7e969da50ddeaec0f",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/preflight.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2358,
+      "sha256": "ada901aeefd68e6fa2c665b4912ce55b7054529d63486f38d502a3b9e405ce02",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/01-head-turn.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 665,
+      "sha256": "032e4b655ad1c6700881e5bf8e245f46c4a480d47dcd3f6a2edcf507fee8707e",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/02-coin-exchange.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 955,
+      "sha256": "1993db36e1ef366b570762b0cd64c79483ff660aeda51da01a29c2789e400346",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-assisted-pull.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1095,
+      "sha256": "bf000824060be594237739f91ff2be6c84c62500630df39bf66a24f1d574c130",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-end-fixed-grip.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2030,
+      "sha256": "6c0eb48185e32480b516c67924e4ac0f16cf07395f96ddaf2f145ef6996eba86",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-end-grip.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1821,
+      "sha256": "855174eee0411834cd570ad0508bc9181c5ff785917a0d3efc20a852fa916f37",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-end-knee.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1450,
+      "sha256": "fefa22382b4f6bca9c6a3c3b16c0b29bf1d737c742c8a497231403a7798fdd69",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-end-v1.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3002,
+      "sha256": "0fdec1b2adb6b34d442ca38942b1447fb81c0704e9cb330aaadde9ad86bd847f",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-grip-v2.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1935,
+      "sha256": "c3453f4ff9faecd48a428b7c7cd096a8acf93a934b5bf99d4afe9a3658e48766",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-start-ear.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 777,
+      "sha256": "f9fff82b12f24d750de2911a4ddbb9ec05b93e003bf97fcccd80405acf466f64",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/prompts/03-pull-rebuild-start-v1.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3430,
+      "sha256": "a30e6f96a3b274e30a52aebb5e9ab994af29b22f8c16361690cb64bffdfab6e9",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/anatomy.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1787,
+      "sha256": "d36b1b89c6e814cc93406c9d983a527c2bc31e048cf7eff9093293cb1612e101",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/anatomy.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1475822,
+      "sha256": "1d564c4a017ac394b993e70836e762fbbb669da53542d12fb3d5f160e0287cb1",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/detail.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3507,
+      "sha256": "48bdad0be6bcafd6c783c64c2084aa5067af59719eef40fc417dd25a7fbc9dd0",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/detail.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3726516,
+      "sha256": "fe0a89fee067c9b4f24d282828a25051f853e4cfeb82e70e2a783d5389e49c4d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-001.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2096620,
+      "sha256": "fb45094a2183eab2ad534c02c29a1269c70ee2425667c9b3fe44c8a77f40fcea",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-002.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2298416,
+      "sha256": "24edff6985dce494388b130c42d46465874630e8bd1bff3b2d368420a3316da8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-003.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2358582,
+      "sha256": "56a7c6c77961eeb1f027104fc010ef32f6cbab0c7dc756bf6f1ef1e0f5bda1ee",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-004.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2354285,
+      "sha256": "a9855ff168aeb4a6d72c80df704305b936183d7fd01f6946153c996a4a2e17db",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-005.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2348468,
+      "sha256": "a94eedc4f4e6a197769c242b57b3469269affaed3df18f7338949e788d604bdf",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-006.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2342064,
+      "sha256": "515030429d17a74e234cca627dccd4fbae44ae76c2a90b0c4d73a4b2615a4049",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-007.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2345938,
+      "sha256": "a2d552ad2ac65cffb1f16f0cd00439a532080cdf069506e87fd806bce555c7d2",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-008.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2357735,
+      "sha256": "c00518e5e95ac6936199e153247eb2fbc8d630def33074b85625b2247619976d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-009.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2065616,
+      "sha256": "b4ddf9bbc3769518eabee7a3d9a630f69b122b794217846a9b21f7bf3e244d34",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-010.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2191587,
+      "sha256": "417be7aab67cf81d9751251c281836c7a527b7746b5a279dde3b7ce1989e8230",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-011.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2246252,
+      "sha256": "aac916dd649eb7c1cb1a08db9f7d6b2702dcbeecf2afe6a7219eea2924f39f94",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-012.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2265295,
+      "sha256": "638e866eba206a4a7b022415e3df7c0422ba6ac9189cc0e4f8e330549cc6ceaf",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-013.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2277321,
+      "sha256": "3ac6028f14834dc7c8d1f3a948b8480cae50370a75bc2b6882ff762582c5121c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-014.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2324607,
+      "sha256": "91e343d7c8ac1ee65490f3034b9874684e9ed6839ded588439f1be96ed640173",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-015.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2354405,
+      "sha256": "eec02306df9fca8208d495854a3a6f151d55a75f3ad17a738104923b13e26e5f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-016.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2359065,
+      "sha256": "5968bf0175861868366128828e1060e81118073a407cea10fcf2db9f6cffd17e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-017.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2142868,
+      "sha256": "fd2b9386d859311dba1dd86edc3626d0a8def30843588b37c466a8307da22161",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-018.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2222471,
+      "sha256": "0cb0229cba45898a0ebb3a0d10157c2b7d442ee4617dce3834c05597b947fc0a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-019.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2277602,
+      "sha256": "1766829d173aa4b0f2216f2e17a329f5a52d45736327a5850340f24d1b347a57",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-020.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2308515,
+      "sha256": "6604afbdb4f9fa75dfc2efe37d2987689f11637df8a1e2f32ea2c3871924d766",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-021.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2349093,
+      "sha256": "f6def4fd51b42987a2e5776c00b2f7a6a1f887b2fd78daecd5bed3a76c9345c5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/frame-022.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2386030,
+      "sha256": "0292b4781f53d783940863a7d231c05f38f0cf1b5e185d3023bc71208ae367e3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/full.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3391,
+      "sha256": "36a58c1d5cd2186014098616e8bacad8bc2863400e54845f62c871d18c99c6d2",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/full.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3051067,
+      "sha256": "644d20f44ac5c8aa3c38dd99fcd04c5fac0c46aa60e97d2436dec40d6739efe6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/prompting-research.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 13098,
+      "sha256": "31577472b03a3853f5a1b1e6a18bef615123758681d952f0a8a6645efe8e5744",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuild-grips.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1046,
+      "sha256": "84a6ffb583d18ef0c29361cadafd54002a22e7c510a6e326b46054f6630cc6bf",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuild-grips.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 658347,
+      "sha256": "dd1d6e6079699431840185585c7d3ae68044e71766810bacc687b60c43f3b00c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuild.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 4665,
+      "sha256": "0a57be3c41a60af5387e707e002e7f10261029a6e03a602a4db1e4a839953625",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuild.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2114678,
+      "sha256": "08440dd94f498f3570fa8f2ed3ec438eece80640c39822b15362941d6a066b23",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuilt-detail.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2027,
+      "sha256": "8721c778cfe6d0190a1d6d1dace3963ba879ba8964cde3e0361325b860eb11fa",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/assisted-pull/rebuilt-detail.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1423473,
+      "sha256": "01b0995fc5cd1238a230aa9c3ff33c431548f54762ec265b17994ba9ce59f29c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-001.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227067,
+      "sha256": "6546f6d52542f59a9da51d9778a168fe2c63c9b86e63fcac1c15c1cef8a6c1f1",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-002.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226892,
+      "sha256": "b8712452f7b32bf9468976c9419c5bdad75258be2c3c9d3bc5a72bfc16ec3696",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-003.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226833,
+      "sha256": "c5942d4c8ff76d991ec304b275eaa525c9c6d2d9bbfbe878bbae7a58032845da",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-004.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227140,
+      "sha256": "13d7497e3e8cffeee823665417f428ff0081a0ed0180a0d864baf98b1f6ee74f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-005.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227406,
+      "sha256": "b4265c1221441a808ba651aa477eeb862dc8576fdad5d02db1de3287afe4f684",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-006.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227168,
+      "sha256": "8b0105bccfa86ef4739d0407542a4fab208f4c1965098f6e1cd413d5b460106a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-007.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 221208,
+      "sha256": "8c2f9d08c595f639601b6728c214848f19e49878965905cc53857b40f2e78053",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-008.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 221261,
+      "sha256": "324d5b24d89f5296561fbc8fa3272c02d1b2f7a0022c94bc8c61bedb01528a8f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-009.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 221362,
+      "sha256": "0e6258c5f49fe68e23e130160c97b3dc2fd8fa7c0df1252bf15b506d4dbd3f33",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-010.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 222077,
+      "sha256": "b31e34bd77c1ac15ab053991c3b0f4714cc9ecdbb11dfe4cf35a9ba944b84614",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-011.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 222231,
+      "sha256": "a4e267f7a93288572cb18a8b50c282920e6af76f9a4010fc24b65f5679e3ca41",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-012.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 222481,
+      "sha256": "db5b242bb468f2f693bf0903a2efc64435436a3d5a30bd6e1da12eeeac400167",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-013.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 223007,
+      "sha256": "be2c93b0567fb1ea2d12b6a26227a7ef6da4099bdac27a40d39f8b65f74f3738",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-014.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 223653,
+      "sha256": "f2056d603557723fdad583a41f9220f677db4514070ff7b0308579272c9220f1",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-015.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 224260,
+      "sha256": "0552af07435e57926a4e175f3d9dbe7d39ef5cd595a31e1de449f248c4af0213",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-016.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 224624,
+      "sha256": "6a6705e793e132f951074fd36396ba5185e5ba29690f48fa78ac7bdedc902cef",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-017.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 225368,
+      "sha256": "fe4309f5c6dcdd9c677d98376519c63ac31e180c123d47de050b3f9ebac2e51f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-018.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226181,
+      "sha256": "cc36d8cc6a4ce95e4f7cdb0d3d7818fc6eea45deb9e34cc20790b3c7f2e47485",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-019.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 225789,
+      "sha256": "3af597246fac654b1946db1c044790344ec839c61902abe6a7ec56d426d4c06b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-020.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226393,
+      "sha256": "8949bba495bed2f95986be55f45d2867038c0c521d2b93b6f37647119f13b5aa",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-021.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226520,
+      "sha256": "1e745737b65b56528eb0e1f7adcd946c5bd0f5f1d319583c9eefb7ab7881107e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-022.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226870,
+      "sha256": "fc0b4b5f4ef22bbbb649e87928ebbfbdc97b0e370d895a4b0b169de81e2d991f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-023.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226511,
+      "sha256": "173d3cafdb026280a2b7761c48cc16a52454a900e7c31f91d7be24f21ca85ec3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-024.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226744,
+      "sha256": "70b1d7ca248f12ab23a883d0f2a4d2dcb8ac6f974657bf135287c128aa403326",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-025.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226515,
+      "sha256": "1b4bbeefa9936931a3292d3fc86b6642ba6ea41658418b9621ddbb780241f04d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-026.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226686,
+      "sha256": "16e3bdb27c0aaa7d02ec7c7c2bd7f9dbf896ffa0e153238a08bb93e9fbb477ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-027.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226787,
+      "sha256": "ce4c6e0fae39949b893477998853f51d8218990e23bea308b809ce6b155846af",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-028.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226703,
+      "sha256": "a95681a1979d407063151bad9a64205a0d92e7a486bb579b4df6bd77a3dc6103",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-029.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226774,
+      "sha256": "1d2f6110649487ade5a797bbee944a339c7cc46ae2b4cfd86b5942ba492d50e0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-030.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226725,
+      "sha256": "c2323d865a0718d61c008143dea9946ba2c8e18253aa4a918f8493f9916e5e47",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-031.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227378,
+      "sha256": "125217e8027880ad57ede5aa35330623eac2a7b8eadf8fa735ceceb9b7c2afe5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-032.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227362,
+      "sha256": "4d4ca4d3c6c0e7c8699b27230f870e3350e686e43469e5b5d59e3396ac170082",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-033.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227436,
+      "sha256": "98d3c889f660f53d08d4c80e5a2f7f0988d6a3dd5d6249b6d63a129ce80ec7fd",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-034.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227617,
+      "sha256": "cc1e7b761e90d898c82fbb7ff713b53c37ad4c0477e308c537f61336905147dc",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-035.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 228017,
+      "sha256": "2842e42e700a2f686459acb910ae9580d7b5b698d5f24fce7a44fce54844fb95",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-036.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227669,
+      "sha256": "544b5fd5d6adc2ad89416e80fe47903714b4fc1018cdb6c940e79dbc9b657305",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-037.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 228168,
+      "sha256": "42161a5c3ab4fc05846e1d7e4b273554b3c00c86151084329de853a5efc33606",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-038.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 228121,
+      "sha256": "08520088bce9017e1a9d293978e81c5d29e724355f971f96211d45b4a8f61259",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-039.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 228190,
+      "sha256": "86d4b32629e5aa73ce82520ec3bb7d81795a2cb08fa927b0aa881901060ef324",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-040.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227796,
+      "sha256": "7310b7a7b3a10cc821032dfe5fa1e166146ce8a05a4ed8ed2db139285253435a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-041.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227776,
+      "sha256": "989c5a58550743cda2739c99ca6c646969165f2340fb99668f1d59a222ef8df0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-042.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227571,
+      "sha256": "8408bcaa67c1fd18f09f50374df26eabf58db5871f32061942d1cb763edd2346",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-043.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227413,
+      "sha256": "d5e7179687aa0e152c6d576d19771f954d51a0a2c0fc10960f48bcb225b20e1e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-044.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227245,
+      "sha256": "46764dce4609a0c47989ccf093ecf6ea09e2e376269553c478e6b638f5c333ef",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-045.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226811,
+      "sha256": "799b68082e9ba7ca1327b93ea0ee0f00e5758cc30f152db0cfed76dd5f328dee",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-046.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226793,
+      "sha256": "623a68dd672f64d7c65456e60a4bb3392bab7c6c0daec70a89c0c75b2f759e8e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-047.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226764,
+      "sha256": "e3e3f74ce39289e341394dc280bb0354f7a4841dbaa460674fdb8a82fcbeb4d8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-048.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 226969,
+      "sha256": "3127993f50fcb55fb011501a8e505fc8b47fe9303019f928289abaa326c276bc",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense/frame-049.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 227158,
+      "sha256": "16fee0f18798c6f65dbfabc421adb612ea33f19b29ae97f6f8179ddfc4896939",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-1.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3833,
+      "sha256": "79ea5cefb233c6645c091b407c87e15bdf1ac56b1a25d7061f276d1b09a407ab",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2521316,
+      "sha256": "c2dc7744e3340ec75e3f6c1848cf55dc991acf4ea4cc23bc2e78b0be12798c69",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-2.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3833,
+      "sha256": "73ee5092e1bad778b90e78e1b4e42b962c7779dee3e337cfacde1bf7f1af1aa8",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2498780,
+      "sha256": "7ae2aa8c49e318ffbd4a3a1b98f4d513e75ac906a40c805b279d55b1785a5273",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-3.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 820,
+      "sha256": "c216960e41fcf76fedc95bd03a22e34790183f6d2d223f3013fb47755de6a07c",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/dense-3.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 145092,
+      "sha256": "b5980d7cccc055dfc0e791895951bcd6ef0a1959a17bc17a55ae9e82518678b3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/detail.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3501,
+      "sha256": "8badaf6e3741c1ffd122178ee97725782a6cc2504199f5b77a6115dec602e86c",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/detail.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2609057,
+      "sha256": "dab27bf250370b3923e4d8d370579d27c02a508dcd4aa70680e1a90d17615ba8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-001.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1323412,
+      "sha256": "8b9596242332b14ff4a46b53aa60c53e4f6878fb87d9cd55b74d281252823050",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-002.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1627412,
+      "sha256": "84a8798765116747cb7cbf7d94b0473a73af57745aa334b22c42c51c379f7dd4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-003.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1731753,
+      "sha256": "981fc9cdf98c45850ab4be5addeaaa3c9cead1542aaa419814c21a6a7aa94727",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-004.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1779635,
+      "sha256": "a69027aba1ce447698d78dce2ccfcb167db2a17d91d845c3877a8152e502274d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-005.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1841980,
+      "sha256": "6e9af268cf93cd34df395c53d6737c50937c81cadb44e5a98b022ce4b159a336",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-006.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1875548,
+      "sha256": "5006deb1ca822f5072455c062d160485e6244ccd2c1b9705d77de32e58ee1b9b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-007.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1917967,
+      "sha256": "7b5d47299b4436ea465f6f9426ea2122c4de04dbd96f2cf65b12503bd2b3c119",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-008.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1981012,
+      "sha256": "44e6d8cfc1e8ed28bef0f011dddd03b1c3a94020635553f1291435ee56bd78aa",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-009.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1783396,
+      "sha256": "36e662968316f2c76b2f901f43e107fb400d128624d6d081f60d809029d9b72e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-010.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1805153,
+      "sha256": "fe882b880b8b3c7f902fb3884872fc265871c31b3900046c7cf939eee89a9f7f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-011.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1849338,
+      "sha256": "ae1a7957426214c8a1bbc7fb11fe6e9591f605ac6ae4507260b62594133744d5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-012.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1875237,
+      "sha256": "abd24b8f07c4c629a4b3f7c4c55203917ad605b7babb75d42b49ad3ae6662d80",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-013.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1894776,
+      "sha256": "79aa26d185d8a0f5cf413699d15d0fc18549022e6fbeeae3c490a218eccbdf9c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-014.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1919111,
+      "sha256": "2c0a3e09acc50c587de7ce4acc2fd3296dd12b8734f9e8cf354f6f554067bd23",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-015.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1932297,
+      "sha256": "4384d997291ccb1faaa80d923dc920bcd9bad85828f2641448620ac5b3724d12",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-016.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1944480,
+      "sha256": "5148a1157df7df5f7f3ecee58e41017112309d70832c4251f4e19c9c947bfd71",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-017.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1802524,
+      "sha256": "20c9b6ac4d1b639989287478c16f827486ab9dcead475512f78259fb63bedac1",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-018.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1845651,
+      "sha256": "152d029e3f219b848652608a2777525cc946e1522dadce40c9938fa698653161",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-019.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1875693,
+      "sha256": "58603f37b012d7c63f536b96d9427f2dabbf0b77bc9a233331154175c60fe51f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-020.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1898997,
+      "sha256": "282433ad81f6743b3b1d9a1d09b69eaafca544e41187d6fb6cd78c2b3b254dd8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-021.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1929643,
+      "sha256": "a80d65340d526bfce892868306fb15f4e7f49c71604330a0e07eb0e9b300e355",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/frame-022.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1900630,
+      "sha256": "30fd3499c00e525e4eb640569cce908fb98df4edb7bb187bd9a63f6b07f92470",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/full.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3386,
+      "sha256": "dbd2e4820ec055db8ffc8bf961966e0d364f22f842df28d8e5b2e38e683b520b",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/coin-exchange/full.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2763405,
+      "sha256": "35f84493e1614847d0e431580196dc511ebdab808a7c308f6c50c48398747e84",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-001.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101842,
+      "sha256": "79919c912ce0a28465981077d127480b6c60d9991121a5321dd9abd450488f38",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-002.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101922,
+      "sha256": "dfeb7e0949f9994f8315157b9f79bf977c90214655b6a460fec48360251be583",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-003.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101075,
+      "sha256": "59d2db0955815ff2178a87c0f405d49b706e73fe53acf8226a10062ffa9e583f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-004.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100836,
+      "sha256": "49e5fadd26bbab603f346f211b8e76d4ea27dbed11d1ae05cc2612404dcb161e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-005.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100198,
+      "sha256": "1fc549b9696ba1b46fa9a4668f40adef7e495fc2f2e5948a0277947e12870e3e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-006.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98976,
+      "sha256": "e0bebe8fbdceec1930300c9b501ba19331ac7cf3f7989473a4e81112d378486b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-007.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98760,
+      "sha256": "743ee46e71b093d9efa34f05c78768bee88317087353ed1445d665f6d9d19a1d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-008.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 97845,
+      "sha256": "56fc9c22fea14a57aaa0ba9d912cfc1b723b9a1eba2f5c862e56bbfa799d19d4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-009.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98233,
+      "sha256": "ab66a713231f5f7c88c7a8c375fd1aadedd2336189e5453bce639b750fd488e3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-010.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98431,
+      "sha256": "2bbf73b5ad25f7ac8b2ef21fa65113431c89316e1f54a2d5d4680e799337b451",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-011.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98833,
+      "sha256": "4c835a9ac5c2474686bfc48809496d926ecdf1b6b2541e1078f2ba0ee772f372",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-012.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98710,
+      "sha256": "e4697329e3d25b20d4bf518d02f73e43b2a2f09a9cc5adc39f7a03e6c0475140",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-013.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98953,
+      "sha256": "8533ecdf50c24862f51cac1b15f8ebd936b0e766348dcd83e31abfcfa17173e6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-014.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 98861,
+      "sha256": "7654c70d6e0092879dfde3603b703f949487dfaa0df6a5b074798af7b45dcde4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-015.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99645,
+      "sha256": "def9b44bd8dd0c3095a388c98a7900a399e963ea832bf2319fbfbe63e22a968f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-016.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100137,
+      "sha256": "e0a1f6741129a90d391f598a97cc645775b9fd1741de83f9239a663ac9bd9e73",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-017.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100340,
+      "sha256": "09ab300ae6ea64b491a6a40985110f84663a1fc337d33ae1224b284b5c90e9f8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-018.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100394,
+      "sha256": "8d97476a695d02bd0d3312df167ef66680ea17522370d492e1992155327fd6a8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-019.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100029,
+      "sha256": "8c10574b5b6f764b37ddeb4dd0a632b5d05796bb89c33ddd93da6fc2cd310141",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-020.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100021,
+      "sha256": "79423a054ea0cd97c878dd47879506d7d01765e37816eabb839721b7c7d0fc7b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-021.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100359,
+      "sha256": "8ca70f1c4d022a68fe969f7824276028e087337849af80ea7555a9c1a287e5ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-022.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99537,
+      "sha256": "37c1ccb78cde77f93583870aa627f0038982da5bab3565ec14772030c8276a19",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-023.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99712,
+      "sha256": "717921e87c31f3cd9264e586b4b0aa856c886b4ea2bac80f90399c65e397f0b7",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-024.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99860,
+      "sha256": "84de463773b75af0291b3337f1e2682487416b99195bb72fcf6c501d303e1141",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-025.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99928,
+      "sha256": "815a6a763456cce8ddaeae53b1d20f3136441a537ccffe0d4a2ba156ab9bd9ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-026.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100889,
+      "sha256": "6608a09a1610e6486c240a67d21ecadf170873b148d8c81d44d400542389d776",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-027.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101887,
+      "sha256": "b3214502e7724646d7708ea805f0c86d419613c25d3b186f6e1152306c31657a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-028.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 102458,
+      "sha256": "d74f04fba1e3b9f990c62f42285c291c76b6c1561f6794be2b10313cebcca261",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-029.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 102922,
+      "sha256": "4f3201716cca088692cb98f4defaa34e2b25c81f7f0bdbaa5f8141b968e5b024",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-030.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 104250,
+      "sha256": "76cdbbec47730c5409489080555e164ada4b6bb74bbda071abb0741cd6b67e5b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense/frame-031.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 104401,
+      "sha256": "024a68066bce7e4d347084b5c7a1bd938de07808e56aa17fd5cdfd833eaccf7a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense-1.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3841,
+      "sha256": "e8043976624302396dbfc0eede0fe2e9df777359762c697cca328fa06e20fb10",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense-1.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2201317,
+      "sha256": "ed61e92812fdb3e56b5ea7fe93ac077ad5faa8efef11fbe13b2a028d09188e37",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense-2.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1614,
+      "sha256": "cd34f790e80542c86a05308e1ed63dc1e48d78d511c6a74784bb180ac25f5052",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/dense-2.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 687491,
+      "sha256": "7f2e47282e2ecd69d63ce05dea7414ed5b52b6100184ba0eea610d45721b6846",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/detail.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3491,
+      "sha256": "7bdc976048d41cf7c05b714b0298963b8503150da862b87e453b0c0aa2b5e3b1",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/detail.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2563024,
+      "sha256": "d4ba4e6ef7cbd1654b4f1faea9c384cfdfc8496324359af5fd8ab96ddef93246",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-001.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 675133,
+      "sha256": "c67a90a9ab78e91ed726b1b1fb8fc825e2366ca4ba291b4cd3fbbe10a6b22f01",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-002.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 918752,
+      "sha256": "39876820372a7dc3cf5440c374a9aceb15370bf721664873b0883444c946bb1b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-003.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1018426,
+      "sha256": "ad9e1b1766c17b5ea13fdfd7a4c6d4b2f309feda2646a62544bedd91ff09d812",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-004.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1019441,
+      "sha256": "ca2cef50c0cb4ff377779ef18bdf705271ab24f82a465c411ab7560b25b02e5a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-005.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1017899,
+      "sha256": "2e00ad6a2f456ab0ef8726793aefa359518f6623482e9944a7bd68446a68f884",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-006.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 883834,
+      "sha256": "b68855adaf5a457211806fc2fd47ae8e7c0e8ccd39643599b35b00d4c16dbcc7",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-007.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 876586,
+      "sha256": "35f0d441a5ae316329931bbdb822ebb9f7d8723476b34cf0c6a832197160dd18",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-008.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 899801,
+      "sha256": "a0017b11a7a2a5e8b2eb5b5db073cedd892e867231f6b57eb61426d3af8ccca3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-009.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 874238,
+      "sha256": "8cd74834e539c6e79f522f15acc6601939aa8169e5179b4987d665e8250bfd1f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-010.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 883622,
+      "sha256": "f7ebb833a228570a541b67e7dd6ba3f60bc224a6b01fe0274390ba50cc215c38",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-011.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 934476,
+      "sha256": "eb06bbb9d9736b545351ce8e3f5d3baf1a92a45e7bba3c25837dca6f74358ff0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-012.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 971930,
+      "sha256": "d35fe7b21d2f9a2fd5e5f5d4a26135fef0765fa6f5ad9bd1f1552236edde5466",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-013.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 984691,
+      "sha256": "9356979c1aba9d79f651e58ab2282c65a0a72847df3816cb784c4583f5d9c049",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-014.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 987410,
+      "sha256": "0b5c18bfe312e261a3646592aabc54f97080e052e54da4535b657ad250098f20",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-015.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1023787,
+      "sha256": "02cba5d1171d2ea56e385731071de9f09d9194f8eafe277bd1527fe857a3b8fd",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-016.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1055318,
+      "sha256": "36d35ab74ae7f9aa72671621a52b6514ba80af8cb18ff04498a57f210560061d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-017.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1004237,
+      "sha256": "76afd4633a6a97e2c6f72e6e378a4d5d6a300ff03b1fee079cab85723529964f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-018.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1009922,
+      "sha256": "deed5f3b44ba3cd91e63aa91248a7638312dab4419ef7c79f1cf5b7c3ebaa565",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-019.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1029078,
+      "sha256": "5437faeb54425e387939dc7978cdb5a9116b93ed16589a9728a7e634457c8d0f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-020.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1042815,
+      "sha256": "be0a789135562e9070e6f47e681c22a6f837501ac072584eaedbc26045072356",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-021.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1012904,
+      "sha256": "e1eef8b5c3a4096e6791201865103585cdbaebe21aaeb1e1f5c465a0a0350a0d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/frame-022.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 841670,
+      "sha256": "6e4a70a86725ba4048e32b948e37b88ddc1944b36eaa5d9de40893316fbc8fa8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/full.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3375,
+      "sha256": "547c3b375572cb42fd22a2b2918add199e78bb57d236aaabb2ff9d3faec21bd9",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/qa/head-turn/full.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1813216,
+      "sha256": "3314bbc2ae7aaefb91f2661fc6a081c61e4472a61deb1a6faefe2cafd684c879",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/rebuild.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 25277,
+      "sha256": "2e0c8408acedc3c6464e562786a2af5c7750eec3f25b97a6d77a0c234309ba86",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/rebuilt-pose-overview.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 984041,
+      "sha256": "cb2b7d1f9d4e223da01c9048d8c2a916a5bf2db03d3ef3b63e2e71252d7b2baf",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/render-gallery.cjs",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 5728,
+      "sha256": "c17ee77c8b5c84454fc2302c778fccf8c03fd28cdb04747f7e79b031399620d4",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/review.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 10091,
+      "sha256": "6ef95d9f8d8ae48690766907b586faf36b38bff40e273f5f72819bc1654f6d3f",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/studies.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 17004,
+      "sha256": "ec66973b85bd47c2fbbfd493c23eaea1ab2818c5f1c100d45b803ac7390dda5d",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/trials.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 9145,
+      "sha256": "0341c314ac0fc07a5990fa101fa20a51897f76026809ac736e9920114fb4aa25",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/character-motion/video-results.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 625821,
+      "sha256": "db8218be006a198975f4ae9627f125d25bdaccd4f2373e1b3758808c8cfb1a7e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/.gitignore",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 9,
+      "sha256": "22ecb1a29b876612aa8e67bac5ffe8990e34d07c7eacf3ab9a21c8d65a2d4c4e",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/README.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3939,
+      "sha256": "1cfbed7242848ca2cc821b72d732b1d764cd2702060cc2d3d5379870393573df",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/index.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 9734,
+      "sha256": "5d33f6407197dce1761fbd7e36ae52d3868b52b1e73f22f2350789b5595f995f",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/provenance.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 867,
+      "sha256": "f0ca650280d2686b2b93765c2be042029279eb0560f76611c816106c935b0093",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2392,
+      "sha256": "8bedca7ba151c6c406d5e9bcaa523dddcaac1e77cc8ff61f974c80c27ef75228",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/decoded-01.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2113767,
+      "sha256": "8fcb5773cde40d4ca55a594c8c4f83af3c0da635ad171888c4cc1ae7cad5fd3c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/decoded-02.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2246671,
+      "sha256": "fb05f90bf773465c9dcf54e7fc026808bbf80f394035993f98153fe81f45f86d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/decoded-03.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2160938,
+      "sha256": "1b6d97db47d6962d76968e12093fda2ce630be82a34c6dfdbdc4d60a149425a8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/decoded-04.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1946549,
+      "sha256": "644f3dbbbdaf54d8ae02a6d9ff3ce6ae7100e096b93f9a92e4ccfe75dbea5e8e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/gallery-desktop.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1208196,
+      "sha256": "1f12c9bc2cf2867809585b10b2b4bcae1dfc2b377eddfe8610d54bbf8dbd25e8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/gallery-mobile.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 118225,
+      "sha256": "22f747adc3ade208c4932c9e0c8a022fa264d1fa3b353bdeef6c99f577fac487",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/render-run.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 270,
+      "sha256": "903df1f82ef09f51ed65318573dd649e3db86765de536540659445ca3a686ad0",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/render.log",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 344,
+      "sha256": "8b4145710e7ec9eb2e6bb9f22a9201d0b4a0b76052fb76d373c2a5d0388f0296",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/report.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 730,
+      "sha256": "831b1f8b7d8be5e802ca7a737c9a8b234f0e1c938bdaaa773634cd975a1f62c5",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/stills-run.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 260,
+      "sha256": "f3546767a8544d07960cb74436ec0a7aeddfe6b1c08b1ed1b7ab524908bc1613",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/qa/visual-review.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1312,
+      "sha256": "3b9ad668b7fee7671e8e68e8885ea3129727320b4fa96ebd0843552ac9b7ab4c",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-000.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2527603,
+      "sha256": "5515ac5df7cc03355adf1609bf9719dafa9ae0b6fae6cc587b43be78e55439c5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-105.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2869380,
+      "sha256": "04e07ad93f83e521006b1ec8df159bbc3823ccf835aedc6f584933b045fd5077",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-179.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2860355,
+      "sha256": "eaac48bdb09c42d51f45fcb28bb1791717f481a98ec31cf9fe720ee2c1a17082",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-180.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2989302,
+      "sha256": "65805eea18798591227a78cde2031d5831f7cdf3dc583dc912f44af7d56b3c04",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-255.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2998687,
+      "sha256": "98052c4303bbd2098d0e66c422d6eb6f1f0c0f626c9c82e4fb9a501610ee71ab",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-330.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2989302,
+      "sha256": "65805eea18798591227a78cde2031d5831f7cdf3dc583dc912f44af7d56b3c04",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-450.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2911638,
+      "sha256": "1ae2b0efe7a9d8b3b86494bce62d9cbbb9c750228e14285fe6e0d490d338c3b8",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-510.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2928742,
+      "sha256": "fa044625be4aca180028548130d5f3ba55c3357183aca9121225229140e30968",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-540.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2894480,
+      "sha256": "e0c8e367658c78518f31698eb4aa977737fe75dd84dae362fd3acfd9475a5a43",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-600.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2693228,
+      "sha256": "20cd4d80ba10b9707c83e55e5ebb1bc8e64104cfbb7e83b88ef667c1056c897e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-690.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2712106,
+      "sha256": "eb92d7fec4ecd240edb67bbde87180a2b7453ce7804d472c8be725319dac1fd5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-750.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2712807,
+      "sha256": "2f072fd3c6972f0d2a4e9062721ff92091ba53ad92f40b5f8297e12cbf6e3901",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/frame-779.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2712807,
+      "sha256": "2f072fd3c6972f0d2a4e9062721ff92091ba53ad92f40b5f8297e12cbf6e3901",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/renders/painted-argument.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 5514554,
+      "sha256": "f16dcb10e19ea77aac6d61b0d6a81fb8ce76a81f4a4def4d442520c4756c8aa3",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/combined-sequence/story.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1920,
+      "sha256": "9c5157a294731196daa4768ef2923b87cc699422c0badd65c5ea62cb5239dc72",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/.gitignore",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 9,
+      "sha256": "22ecb1a29b876612aa8e67bac5ffe8990e34d07c7eacf3ab9a21c8d65a2d4c4e",
+      "category": "other"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/README.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 5716,
+      "sha256": "58c42fb221fa2dc06602f94bda34d0d351aacec8e20d80b0942ceabd8a9eac07",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/01-quiet-scenery.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2775977,
+      "sha256": "5698c68baf2eae32ac345301251b7746339f97038573a0387e69d51eb0202770",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/02-architectural-scenery.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2519275,
+      "sha256": "82e39ee52ad69f311a71d0693222f739f44b59619d7ec8271e00c425c8496140",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/02b-architectural-scenery.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2049533,
+      "sha256": "dede9d666ff3d5dfc4f9435b68807bb52c1db11b9a22eaaa144d6b6261d6f97c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/03-painted-object.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1592299,
+      "sha256": "79c40371faa051b61b95cc2d128b42341b041c52d87d8cada8d10785a7c09101",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/04-architectural-object.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2197404,
+      "sha256": "24a567b66d4641cecfac5224a45cc9591466e070f0d57b49c63aa3a8b0340ca6",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/07-light-background.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1919649,
+      "sha256": "a67c16dfe9e092fc011a5040db47200ec3df83b5ac5ae59b047d70e06bdea43d",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/assets/08-dark-background.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1930868,
+      "sha256": "a9497bb5c4589eca1708e0448976e1bbffa9dacd39fbae7c71facd6d48984a4b",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/index.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 18935,
+      "sha256": "e47340f788de0fff4dc44800c0937ed6b974c18326fdbc869499a826f6b50e7f",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/01-quiet-scenery.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1147,
+      "sha256": "029730c78a8392b522e4afb9d660454d3f00aa3a6f1f84996403e7f45904dc58",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/02-architectural-scenery.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1014,
+      "sha256": "6711550846cdd6a829a9eaf0b2884ce4c5296ce3d8ac986671be8dc2ffbd6243",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/02b-architectural-scenery.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1243,
+      "sha256": "e08e7b25b4c5908ed2f63a7cd1832d06f266b1eac60b1c89bbda7ac142135b1b",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/03-painted-object.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1026,
+      "sha256": "1bd27cd87aa5ca800e66df90b412c0708d993e767db913e1d9bffe06636c649d",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/04-architectural-object.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1042,
+      "sha256": "6c38f44f7dae7a3b7fabe8ec118271bb33704fff6653d20b5a83b127c700eb54",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/05-analytical-overlay.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 493,
+      "sha256": "b57a5b99500181249475ccafa0b091075bb47a040740a5d554f5de55b5bb9023",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/06-spatial-overlay.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 524,
+      "sha256": "17b7c899b6b36c9e818f06ba5fce2acb390d60ce5ad17bfe28f1cefc7f850715",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/07-light-background.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 906,
+      "sha256": "46226da8939fca8f34ca0bbb1438136da7a88ada2578c709e6069284e2fb797c",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/prompts/08-dark-background.txt",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 822,
+      "sha256": "bafc6defaf0c5896f983d71fad0721de8ad60ca6c4624059e3fe58b7fa8f7df9",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/01-quiet-scenery-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 286763,
+      "sha256": "b82b0cf98a9e0c5b5dee8a2e43c7a5767ebf7f8b74ccf45c47f1864503209fee",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/01-quiet-scenery-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 285644,
+      "sha256": "5918f5b5f2bb7d286956e00d64edd4d97aed3bb1ed2d0f9083c73c24150987c4",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/01-quiet-scenery-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 283211,
+      "sha256": "1935be5538838d95862306aa9adddb1f085f3efadf3bb75b95983b5a852d9769",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/02-architectural-scenery-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101965,
+      "sha256": "be766800cd5404cf784209c4a7d041e49e70d00e35a25cd07069aa455c6bcb20",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/02-architectural-scenery-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 100517,
+      "sha256": "c6594325f472e91b6ac50b5ed55492876bd41a3ceec8127cd090e90448197a4e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/02-architectural-scenery-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 99966,
+      "sha256": "1e6078f3741d3a0f17e0db17e34c0a2c75a4af25f9fae6768421e46afdc52b8c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/03-painted-object-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 57591,
+      "sha256": "35f63bb673ae3c668fa3025983003843016be563c0928264f3a4e38d01bbc626",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/03-painted-object-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 94396,
+      "sha256": "38c6efa00c040e1f01cf2fc3339ebb611749a81a34b5f40056e58bb1943e77af",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/03-painted-object-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 93478,
+      "sha256": "e4aea39692567f9b121b2e229189126e7c72228fa5c61108abc4f4d392c62a73",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/04-architectural-object-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 84336,
+      "sha256": "1752d1b4c08db74a967921d86f1ffa336123b005052ab9958689d24f1eb7c160",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/04-architectural-object-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 135852,
+      "sha256": "512279c559f0c253ca574d7a80146d4bc805ed1871fcb697b8ec0de65f2124e5",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/04-architectural-object-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 134920,
+      "sha256": "b0d76aaf4014fb4fefe068383582130389610ffae8931d2863f45e3ca85c3d5f",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/05-analytical-overlay-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 287142,
+      "sha256": "3db9f8474d7071b0701db0e654fd80e25fbe0f6d86a3486bc544ab0088349dc3",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/05-analytical-overlay-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 294538,
+      "sha256": "843daf56d800e9152e83a3363d6baa6f199fc07983fabddb66b8ced681cba76a",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/05-analytical-overlay-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 294537,
+      "sha256": "bbce940ee143f86bebf533ba291009f4a1ce8397d4a48f9a00e25bf9c136f922",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/06-spatial-overlay-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 250231,
+      "sha256": "5d2da3ea34d0838e385111f7556a772740790417d2153d362300065d78a7d527",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/06-spatial-overlay-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 255208,
+      "sha256": "f2b8f2a5c8273a3c5b3114fc60f14db2a69fb5cf4d6a5aa146c036a9b1b36b24",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/06-spatial-overlay-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 253146,
+      "sha256": "fca884ee12e9d9a7a2f461dd88e555dbda0242b12b5f977785cbf08c629db6e9",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/07-light-background-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 97188,
+      "sha256": "903bd0845def70abec250a2a2f7eae26f159e341c55ee947459e338ebb6ac5fd",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/07-light-background-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 106595,
+      "sha256": "064b742117ac5f2081ec3c0c763d75634e0f6458eac42f3e96b53b8778040bbc",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/07-light-background-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 106602,
+      "sha256": "1634179cdc369413efe2b441c3a327e4c703f7af437ae8c4f9d6fb38b9e27535",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/08-dark-background-early.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 101866,
+      "sha256": "6ec024b8752d7ca81d7dcb17238b25006159c8ddf38fc26d4557c999c194a9ca",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/08-dark-background-late.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 112063,
+      "sha256": "9efcb2da58dd646f6545e882ccc7600df4ae44782b1085e10c5730744c3a579c",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/08-dark-background-settled.jpg",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 112012,
+      "sha256": "38d34c732ea8ccecd4c736eadf6dda1362942001269d34e3b7f2a3ad3c454b09",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/alpha.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 793,
+      "sha256": "750e1702dd31cbd816e759f8f7fc86eea7cb580f8986aac2061f1d201383f0e1",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/alpha.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 372248,
+      "sha256": "20b567452aa88b18128a670323be9eb097a1b14b1745198d317e4c1e09be34ee",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/checks.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 8280,
+      "sha256": "189960f69b7e938b58bae14da34b1c4225ed14e6e81649b543260fb8d8df7c4a",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/color-tag-probe.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 38955,
+      "sha256": "bae6c89075df809350fd0c8c1b4cac3593da8db893ee13ac127319e9a179e4d0",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/color-tag-validation.log",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1026,
+      "sha256": "9d53a805ca238dfcf9150278f476fa7665a0faff861be009b678553a5b302dc0",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/gallery-desktop.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 491799,
+      "sha256": "c25462cae48875d128824ffcb410c43ba2fc521c345c1e6209ee9bd85ab96663",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/gallery-mobile.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 73281,
+      "sha256": "7551c74d8dc984995d380a35bacc09a37adc5bdf243b10104a36d3c20b108049",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/motion-frames.html",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2872,
+      "sha256": "be97a15591d49c6b5a416f46fbdc64cdc9a912de2fabda7c56138fe783d6612e",
+      "category": "source"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/motion-frames.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2334207,
+      "sha256": "6dab77d50cb0849338ed6e079c9f9cf8913c36cdf1700a9b6cb116e582e91c4e",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/render-run-all.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1407,
+      "sha256": "cebc16ce2ad7bd86a28e4aee52aa4eaff275e884b962d0875e173d5190f1c519",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/render-run.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1407,
+      "sha256": "cebc16ce2ad7bd86a28e4aee52aa4eaff275e884b962d0875e173d5190f1c519",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/render.log",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 312,
+      "sha256": "62e97ffc8d9ebc104e3959606740b1b97784481bf2607ddb02e09ebec09e39c5",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/report.md",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3040,
+      "sha256": "b0e9f238b0039c8e834157f01e691a9c55e6cd7b04f4451fe8bc501aeb0da197",
+      "category": "documentation"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/qa/stills.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1394,
+      "sha256": "733d29869cffe54cc8959e17faf165102f9f4390286a07683f5341e47b16d886",
+      "category": "record"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/01-quiet-scenery.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 6508607,
+      "sha256": "da3bb4666d590c05909d93e912b135e73724ca475aeb59d1ac8e27be0c0fa292",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/01-quiet-scenery.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3549920,
+      "sha256": "bfd3fd96b99b3f2237a181ec7600ffdef47900b9887d86426543b3629acd9d38",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/02-architectural-scenery.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3191440,
+      "sha256": "749d1b2e3c0038a3aed8b78404a7266baa3a0949376a5df9ca20e87ccfe8d542",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/02-architectural-scenery.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2709718,
+      "sha256": "f0ddc06b270a2249aa10ad41b4ccdf4c4e45c797d0d285d5552e4805bc6c8510",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/03-painted-object.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 1734199,
+      "sha256": "c7b2a9cef99c61ce75defcef6d78c9ead00c4b5f41fca2611c899e2be6ed047b",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/03-painted-object.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 818338,
+      "sha256": "1b6bbda7131d69243dfd04ab95bc8309bcc2792936c7cbb245308b791cc2aff0",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/04-architectural-object.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3223832,
+      "sha256": "447df02d76e389ee0dde4f0820e5a7decc9e018f8a99bbe0bebcf03a7665cf2c",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/04-architectural-object.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 920895,
+      "sha256": "27ff2d482e99d741e7d91f0cc1da7f5288ab6aa57c4f5fec2ae7d535d0fc6af9",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/05-analytical-overlay.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 772815,
+      "sha256": "cbfcfb6d07eef6c1f5e19504e55e692a6e524f1c213e04456dca41bbaa31660b",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/05-analytical-overlay.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3526317,
+      "sha256": "bf5754315e04ef08b0917052d225a83479bf990db00bdaa45b4164029e6ba775",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/06-spatial-overlay.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 900377,
+      "sha256": "96dacdd9c6b5881436c8a53f8d106e9c72520ce4f23b3dd0f250405881b72a03",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/06-spatial-overlay.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 3360625,
+      "sha256": "cf1408f81ee8f5358720830c80372cee1accab400df4867afcb53a19cc02a1cb",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/07-light-background.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 643948,
+      "sha256": "dab1644b5e2bcf7c034b98107ada944489330c1cce2f83244e627df6d6931d8e",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/07-light-background.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2446650,
+      "sha256": "603aceb6b50b1eefdfcb560e75e2378d32d44f185878180847245bf1595ebe85",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/08-dark-background.mp4",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 637968,
+      "sha256": "72676e26be15379758653337947478b3f9a9af5566867488d38dde7332e97d2a",
+      "category": "video"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/renders/08-dark-background.png",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 2453934,
+      "sha256": "d3439ee4fe995708e6d2921d679ffa0cb698d6433ae4571e997ff919cdb70df1",
+      "category": "image"
+    },
+    {
+      "path": "project/visual-identity/2026-10-11/world-objects-overlays/studies.json",
+      "family": "project/visual-identity/2026-10-11",
+      "bytes": 19283,
+      "sha256": "e2586f959c008be0deb76d84d412b96100657b8a3277d785dc43b10d53ab0fd8",
+      "category": "record"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/color.mjs",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 852,
+      "sha256": "bba7cf8a837181523ff1d8a16fb68499bc8c95d41460b87c6d18ef9ed9406da3",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/entry.tsx",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 8711,
+      "sha256": "65b3d3fd434d75a7b09b6436e09db5b2ea6da4bff8d19afce304cc0fc289bdc7",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/gallery.mjs",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 16755,
+      "sha256": "6f69b0838a8d7a9ca36df3f36e9d6665f53f4c9f566eabaec7a464c1e207f0e0",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/qa.mjs",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 7556,
+      "sha256": "2bbf203939156881df669aab8efcbb23977d5e4ed7d5f234fd595de4f14518c0",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/render.mjs",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 2852,
+      "sha256": "44732bf9c501a22130a8f09dc3a174802a853da06d69bed89b0a729430b1ccdf",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/world-objects-overlays/tsconfig.json",
+      "family": "remotion-templates/research/world-objects-overlays",
+      "bytes": 173,
+      "sha256": "9ff399fc3704ef56df978d2907e8affaf6c314ae63f5b19b4edc4896f72403cf",
+      "category": "record"
+    },
+    {
+      "path": "remotion-templates/research/combined-sequence/entry.tsx",
+      "family": "remotion-templates/research/combined-sequence",
+      "bytes": 8096,
+      "sha256": "297669b23d725af029e0f3e0b1cad23b45256ca6ad37a6d8f9d04641b527f0ac",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/combined-sequence/gallery.mjs",
+      "family": "remotion-templates/research/combined-sequence",
+      "bytes": 10030,
+      "sha256": "0c296370a831341d730964ec87d233c3469f65df9e2cbfeda2845af44868df30",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/combined-sequence/qa.mjs",
+      "family": "remotion-templates/research/combined-sequence",
+      "bytes": 9477,
+      "sha256": "8067a5dc59cd21a918cf825ed1bff959a3d0262e5f944e2e2112dbbf7dd14f08",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/combined-sequence/render.mjs",
+      "family": "remotion-templates/research/combined-sequence",
+      "bytes": 2939,
+      "sha256": "706397be3486a2927ce926ef618245ed6919e182be6eb46ba95fcbc3b15b61ec",
+      "category": "source"
+    },
+    {
+      "path": "remotion-templates/research/combined-sequence/tsconfig.json",
+      "family": "remotion-templates/research/combined-sequence",
+      "bytes": 173,
+      "sha256": "9ff399fc3704ef56df978d2907e8affaf6c314ae63f5b19b4edc4896f72403cf",
+      "category": "record"
+    }
+  ]
+}

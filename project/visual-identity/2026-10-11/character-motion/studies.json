@@ -1,0 +1,126 @@
+{
+  "title": "Three character motion studies",
+  "date": "2026-10-11",
+  "method": "Built-in image_gen.imagegen for painted starting/ending key poses; selected original shop image copied unmodified. Three approved fal.ai Hailuo 3 Max video trials generated; see trials.json and review.json.",
+  "generator_version": "Not exposed by built-in tool",
+  "seed": "Not exposed for painted images",
+  "face_rule": "No eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth, inner-ear marks or nose/lip protrusions in contour. Plain filled outer ears allowed. Detail comes from unequal asymmetric painted planes.",
+  "attempts": [
+    {
+      "id": "head-start",
+      "file": "01-head-start.png",
+      "prompt": "Use case: illustration-story. Asset: starting frame for a five-second head-turn animation, wide 16:9.\nReference image: the approved faceted desk character, used for identity, hair, head proportions and painted medium. Create a single chest-up portrait of that same young adult, centered against a broad quiet bone-colored wall in neutral warm daylight. Ink crew-neck sweatshirt, slim long neck, short tousled dark hair, relaxed level shoulders. Face and torso point directly toward the camera at the start. Hands are outside the frame. Leave generous space around the head for a later turn toward the viewer's left, with the camera at eye level.\n\nThe head is rich in unequal asymmetric painted tonal planes, carrying directional volume and matte texture. All facial anatomy is completely absent. No eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth or inner-ear marks. No nose/lip protrusions in outline. Only a smooth rounded angular head contour and plain outer ear silhouettes. Use broad coherent planes, not an evenly triangulated mesh. Hair has selected drawn strands, collar and shoulders have selected garment folds. Quiet background, minimal texture away from the person. Ink, walnut, warm ochre and bone; clearly drawn/painted adult editorial illustration, not photography, CGI, a glossy mannequin or children's cartoon. One image, no panels, captions, lettering, symbols or extra objects.",
+      "referenced_images": [
+        {
+          "path": "../../2026-10-10/context-tests/02c-desk-faceted-face.png",
+          "role": "Approved identity and medium reference"
+        }
+      ],
+      "status": "selected",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-10707ae7-7985-400e-a4e0-3eb02f45ea7f.png",
+      "observation": "Single front view, broad asymmetric planes with no facial parts; quiet wall and stable shoulder framing."
+    },
+    {
+      "id": "head-end",
+      "file": "01-head-end-v1.png",
+      "prompt": "Use case: identity-preserve. Asset: ending frame for a five-second head-turn animation. Edit the supplied portrait; keep the same 16:9 canvas, camera, crop, torso position, ink shirt, shoulder silhouette, hair identity, quiet bone wall and unchanged daylight.\nChange only the orientation of the head and the naturally twisting neck. Turn this same person's head toward the viewer's LEFT to a genuine 90-degree left-facing profile. The face points horizontally left; the torso and shoulders still face forward. Keep the head's center at the same height and approximately the same position. Repaint the large unequal planes coherently as the head turns rather than stamping a different face onto it. Retain the short tousled dark hair mass and selected strand detail.\n\nThe entire profile contour must be a smooth simple rounded-angular arc from forehead to chin, with absolutely no projecting nose, nose bridge, lips, mouth notch or facial anatomy. A plain outer ear silhouette may remain, without inner-ear marks. No eyes, eyebrows, eyelids, eye sockets, nose, nostrils, mouth, lips, teeth or lines/shadows describing those parts. Rich detail comes only from asymmetric matte painted tone planes, hair, contour and neck volume. Do not rotate the torso, move the camera, change the light, add facial features, add hands or alter the background. One image, not a sheet, no text or symbols. Preserve the visibly painted adult editorial medium.",
+      "referenced_images": [
+        {
+          "path": "01-head-start.png",
+          "role": "Edit target; fixed identity/camera/light"
+        }
+      ],
+      "status": "superseded",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-21162a00-5dc8-4fa7-93b0-e109932c7dcf.png",
+      "observation": "The head turns left without nose or lips, but the ear contains anatomical inner marks; correct before using."
+    },
+    {
+      "id": "head-end-corrected",
+      "file": "01-head-end.png",
+      "prompt": "Use case: precise-object-edit. Edit target: this left-facing featureless painted portrait. Change only the visible ear. Keep its existing outside silhouette, size and attachment, but erase ALL internal ear anatomy and dark marks: no canal, hole, concha, curl, fold or inner contour. Fill the ear's interior with a single quiet opaque warm-ochre paint plane matching the head. The ear is a plain filled outer shape only. Preserve every other part of the portrait unchanged: exact head orientation, hair, facial planes, neck, shirt, shoulder positions, quiet wall, camera, crop and light. No eyes, nose, mouth or facial parts. No text. Same wide 16:9 canvas.",
+      "referenced_images": [
+        {
+          "path": "01-head-end-v1.png",
+          "role": "Edit target; inner-ear marks only"
+        }
+      ],
+      "status": "selected",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-e3d32cba-d9d5-496e-92dd-2df769315d5a.png",
+      "observation": "Ear corrected to a plain filled shape; left-facing contour has no nose or lips. Torso framing retained closely."
+    },
+    {
+      "id": "coins-start",
+      "file": "02-coins-start.png",
+      "source": "../../2026-10-10/character-and-storyboard/03-shop-transaction.png",
+      "method": "Unmodified selected still copy",
+      "status": "selected",
+      "observation": "Exactly two coins in the adult's palm, child waiting below; painted loaf and featureless heads retained."
+    },
+    {
+      "id": "coins-end",
+      "file": "02-coins-end.png",
+      "prompt": "Use case: precise-object-edit. Asset: ending keyframe for a short coin-transfer animation. Edit the supplied wide painted bakery scene; preserve the camera, framing, lighting, window, street passers, counter, painted loaf, clothing, hair, blank faceted heads and all other scene elements closely.\nChange only the exchange to its completed state: exactly TWO separate plain ochre coins now lie side by side, clearly visible in the CHILD'S upward-facing palm. That same child's hand remains in approximately its current position, with a slight natural cup and its normal five fingers. The shopkeeper's previously offering palm is now EMPTY and has withdrawn a short distance toward the shopkeeper, still open and readable. Preserve anatomically coherent wrists and separate hands. The shopkeeper's other hand stays on the counter. There are no coins in the air, on the counter, in the adult's empty palm, or anywhere else. The single painted loaf does not move.\nMaintain matte painted constructive planes and the same adult editorial illustration. Heads have rich asymmetric painted volume with absolutely NO eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth or inner-ear marks. No nose/lip protrusions in silhouette. Plain outer ear silhouettes only. Do not add facial anatomy, extra people, extra fingers, extra coins, captions or symbols. Output one 16:9 frame, same composition.",
+      "referenced_images": [
+        {
+          "path": "02-coins-start.png",
+          "role": "Edit target; transaction endpoint only"
+        }
+      ],
+      "status": "selected",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-f87e2ee1-7419-4b91-90cc-64598fc5ced3.png",
+      "observation": "Two separate coins visible in child's palm; adult offering palm empty. Faces, loaf and composition remain closely matched."
+    },
+    {
+      "id": "pull-start",
+      "file": "03-pull-start.png",
+      "prompt": "Use case: illustration-story. Asset: starting key pose for a five-second two-person assisted-pull animation, wide 16:9.\nInput 1 is the earlier river scene, a composition and cast reference. Input 2 is the approved front portrait, a reference for rich featureless painted head planes and selected hair/garment detail. Develop the river scene into a physically readable starting pose. Same short-haired young adult at LEFT on the bank in an ink jacket and trousers, and same dark-haired adult with a low hair bun at RIGHT in muted walnut clothing. Keep a pale river, quiet far bank, small foliage at left, warm daylight and broad bone sky. Reduce small repeated triangular texture in the environment.\n\nMake the near bank LOW, about knee height above the water, with a sloping ledge extending toward the right person. Show the left helper in a stable low half-kneeling stance: rear knee on solid ground, forward boot firmly planted well back from the edge, free palm visibly planted farther left on the bank. Their other arm reaches toward the right person. The right person is waist-deep close to the bank, with their free palm pressed on the low solid ledge and one knee already braced against its sloping edge. Both bodies have believable weight and visible support.\n\nAt the center, each person clearly grasps the OTHER'S forearm just above the wrist. Show two distinct crossed wrists with normal fingers wrapping the opposite forearm, a clear cuff on each arm and an uninterrupted arm-to-shoulder connection for each person. Hands are not one merged mitten, fingers do not grow from sleeves, and wrists are not twisted. Leave room above the bank for the right person to rise onto it in the ending pose. Camera is fixed at a slightly elevated side view showing contact, bodies and support; no crop through the joined hands or planted boot. This is a held ready-to-pull starting pose, no flying leap or dragging across a high cliff.\n\nRich unequal asymmetric matte planes shape both heads, with NO facial parts at any angle: no eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth or inner-ear marks. No nose/lip protrusions in silhouettes. Outer ears, if seen, are plain filled shapes. Hair, garment folds and hands have selected drawn detail. Painted water and objects, restrained ink/ochre/walnut/bone, adult editorial constructivist illustration rather than photography or CGI. One image, two people only, no panels, arrows, text, diagrams or other symbolic objects.",
+      "referenced_images": [
+        {
+          "path": "../../2026-10-10/context-tests/04-river-rescue.png",
+          "role": "Composition/cast reference; grip and support redesigned"
+        },
+        {
+          "path": "01-head-start.png",
+          "role": "Featureless head and drawing reference"
+        }
+      ],
+      "status": "selected",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-dcfeafaa-aa6e-439b-96ba-c0313ef26231.png",
+      "observation": "Low braced helper, joined wrists and free palms support the action; right person's knee is visible at the bank. Grip continuity remains a high-risk video check."
+    },
+    {
+      "id": "pull-end",
+      "file": "03-pull-end-v1.png",
+      "prompt": "Use case: identity-preserve. Asset: ending key pose of a five-second assisted pull. Edit the supplied river scene. Keep the SAME wide 16:9 camera, river bank contour, foliage, tree, distant shore, sky, palette and light. Preserve the same two people, hair identities, ink and walnut clothing, rolled cuffs and painted medium.\n\nAdvance ONLY the action to a clearly different, supported ending pose. The helper at LEFT has shifted their hips backward over their planted boot, bent the pulling elbow and drawn the joined hands up and left toward their torso. The helper's other palm remains planted on the bank, with normal arms and believable balance. The person at RIGHT has risen up and toward the left: their near KNEE and the palm of their free hand are now visibly planted on the dry sloping bank, bearing their weight; their torso and shoulders are above the water. Their far shin may remain at the water's edge. The pull is completed to a stable supported kneeling position on the low bank, not standing upright or flying. Both people's limbs connect unambiguously to their own bodies. Show natural effort through leaning torsos and bent joints.\n\nKeep the SAME mutual forearm connection continuous: separate coherent hands and wrists, each hand wrapped around the other's forearm above the wrist, no broken contact, fused mitten, extra arms/fingers or impossible wrist twist. No lifting by the neck or sleeves. The person rising also pushes with their free planted palm and knee; they are not suspended from one stretched arm. Small painted drips and a modest ripple may indicate the rise; no huge splash, flying water or additional people.\n\nHeads remain entirely featureless at the changed angles: NO eyes, eyebrows, eyelids, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth, inner-ear marks or nose/lip silhouette protrusions. Plain outer ears only. Warm matte asymmetric painted head planes, selected hair and garment detail, quiet broader environment. No text, arrows, diagrams, extra props, scene change or camera movement. One ending frame, not a before/after collage.",
+      "referenced_images": [
+        {
+          "path": "03-pull-start.png",
+          "role": "Edit target; supported ending pose, fixed cast/camera/background"
+        }
+      ],
+      "status": "superseded",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-d0ebd164-9ddf-49a3-9b48-1319c137c5ab.png",
+      "observation": "Person rises, joined hands pull inward, but the raised near knee's contact with the bank is ambiguous."
+    },
+    {
+      "id": "pull-end-supported",
+      "file": "03-pull-end.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the supplied final river-pull illustration. Correct ONLY the rising person's lower-body support at the bank, keeping the helper, both heads, both torsos, joined arms and hands, free planted hand, scenery, camera and light closely unchanged.\nThe near bent knee of the adult at RIGHT is currently raised above the bank. LOWER that knee onto the DRY solid sloping bank, slightly left and below its current position, so the bent knee visibly presses into the painted soil and carries weight. A small flattened garment fold and tight contact shadow must make knee-to-bank contact unmistakable. The knee is on the same dry side of the water boundary as the already planted free palm. Place the hip above and behind this knee in a supported half-kneeling pose, with the other shin still descending to the water at the right. There must be no air gap beneath the supporting knee, no floating foot, no additional leg and no impossible thigh crossing. Keep the two existing legs anatomically distinct.\nPreserve the completed pull with the same two separated wrists and hands, helper's bent pulling elbow, and the rising person's other palm flat on the bank. Preserve the featureless head contours and unequal painted planes. No facial parts or inner-ear marks, no extra fingers or objects, no text. Same wide 16:9 framing and matte painted medium.",
+      "referenced_images": [
+        {
+          "path": "03-pull-end-v1.png",
+          "role": "Edit target; make knee support unambiguous"
+        }
+      ],
+      "status": "selected",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-662fb60f-d271-4c6f-9ba3-b318f572cc5b.png",
+      "observation": "Near knee is lowered to bank contact and free palm supports weight. Far shin remains at the water edge. Use as a demanding contact/weight test; do not infer successful motion from the still."
+    }
+  ],
+  "trials_file": "trials.json",
+  "limits": "Starting and ending poses are generated close matches, not pixel-identical controlled edits. End frames constrain destinations but cannot establish the physical plausibility of the interpolated movement. One take per scene can expose failures but cannot establish a model-wide reliability rate.",
+  "review_method": "Watch normally, then inspect the entire head turn and the contact/occlusion moments at small frame intervals. Passing a still or a frozen clip is insufficient. Action completion, anatomy, featureless heads, style stability and background/camera stability are judged separately.",
+  "video_trials": "trials.json",
+  "video_review": "review.json",
+  "still_rebuild_followup": "rebuild.json"
+}

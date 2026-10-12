@@ -1,0 +1,38 @@
+{
+  "width": 1920,
+  "height": 1080,
+  "duration": 14,
+  "fps": "24/1",
+  "frames": 336,
+  "color_space": "bt709",
+  "color_transfer": "bt709",
+  "color_primaries": "bt709",
+  "bytes": 2623762,
+  "has_audio": false,
+  "method": "Deterministic native Canvas/SVG frames rendered locally with Playwright and encoded with ffmpeg",
+  "javascript_errors": [],
+  "decoded_keyframe_changes": [
+    {
+      "from_seconds": 0,
+      "to_seconds": 4,
+      "mean_rgb_difference": 0.15007301753005728
+    },
+    {
+      "from_seconds": 4,
+      "to_seconds": 7,
+      "mean_rgb_difference": 0.15801833507322682
+    },
+    {
+      "from_seconds": 7,
+      "to_seconds": 10,
+      "mean_rgb_difference": 0.3563352825183571
+    },
+    {
+      "from_seconds": 10,
+      "to_seconds": 13,
+      "mean_rgb_difference": 0.01121190704934237
+    }
+  ],
+  "motion_phases_differ": true,
+  "postflight_log": "../../../../episodes/ai-care-motives/render-logs/20261010T200237-identity-opening-panel-verified.log"
+}

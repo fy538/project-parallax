@@ -392,7 +392,7 @@ FullEpisode.tsx:
 | PACE: in audio-spec skill | ✅ Documented | Music bed intensity matching guidance |
 | Template-level pace in `useEntrance.ts` | ✅ Built | `timingScale` param scales animation durations per role; `useStaggeredEntrance` scales stagger gap |
 | Pace timing scales in `useDirection.ts` | ✅ Built | `paceTimingScale` (0.7/1.0/1.4) and `paceStaggerScale` (0.6/1.0/1.5) from `PACE_TIMING` constants |
-| Pace-driven transitions (Rule 7) | ✅ Built | urgent: compress duration ×0.6, downgrade dissolve→cut; breathing: stretch ×1.5, upgrade cut→dissolve |
+| Pace-driven transitions (Rule 7) | ✅ Built | urgent: compress duration ×0.6, downgrade dissolve→cut; breathing: stretch ×1.5 (since Oct 10, 2026 it no longer upgrades cut→dissolve: pace sets how long a seam takes, not what it claims) |
 | Beat-boundary pace reset | ✅ Built | Auto-reset to `analytical` at each beat header with warning print |
 | `match_narration` guard | ✅ Built | PACE multiplier skipped when `durationMode == "match_narration"` |
 | Sync anchor cascading guard | ✅ Built | Minimum 0.5s duration for steps squeezed by sync point snapping |

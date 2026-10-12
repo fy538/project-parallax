@@ -1,0 +1,6 @@
+Use case: style-transfer.
+Image 1 is the EDIT TARGET: a monochrome whole-body pose study. Image 2 is a STYLE REFERENCE only, for Parallax's matte painted planes, selected hair and garment detail, and ink/ochre/bone/walnut colors. Do not copy its desk, room or seated pose.
+
+Change the visual treatment of image 1 into mature painted editorial constructivism. Retain its camera, two body positions, connected shoulder–elbow–wrist paths, hand-clasp arrangement, natural finger overlap, boot placements and simple slope. Keep each hand identifiable through broad palm forms and the existing contact boundary. Avoid adding finger marks as decoration.
+The short-haired helper at right wears ink clothes; the tied-back-haired climber at left wears walnut clothes. Skin is modeled with a few unequal opaque ochre planes. Heads have rich asymmetric painted volume but no eyes, brows, sockets, nose, nose ridge, mouth, lips or inner-ear marks. Forehead-to-chin contours have no nose or lip protrusions; any outer ear is a plain filled shape.
+Use grouped hair strokes, selected clothing folds, matte dry-brush edges and quiet paper tooth. Keep the background a broad bone-paper field and the slope one restrained walnut mass. No river or landscape yet. No photographic skin, glossy 3D shading, regular triangular mesh, all-over texture, text or panels.

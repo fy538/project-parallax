@@ -1,0 +1,55 @@
+{
+  "checkedAt": "2026-10-11T19:55:52.412Z",
+  "generationFilesVerified": 9,
+  "exactPromptsVerified": 9,
+  "inputReferenceHashesVerified": true,
+  "uniquePromptFiles": 7,
+  "localLinksChecked": 87,
+  "enlargementOpenedAndClosed": true,
+  "allNineOutputsPresent": true,
+  "pageErrors": [],
+  "results": [
+    {
+      "page": "index.html",
+      "viewport": "desktop",
+      "images": 19,
+      "failed": [],
+      "overflow": false
+    },
+    {
+      "page": "index.html",
+      "viewport": "mobile",
+      "images": 19,
+      "failed": [],
+      "overflow": false
+    },
+    {
+      "page": "contact-review.html",
+      "viewport": "desktop",
+      "images": 8,
+      "failed": [],
+      "overflow": false
+    },
+    {
+      "page": "contact-review.html",
+      "viewport": "mobile",
+      "images": 8,
+      "failed": [],
+      "overflow": false
+    },
+    {
+      "page": "paint-detail.html",
+      "viewport": "desktop",
+      "images": 15,
+      "failed": [],
+      "overflow": false
+    },
+    {
+      "page": "paint-detail.html",
+      "viewport": "mobile",
+      "images": 15,
+      "failed": [],
+      "overflow": false
+    }
+  ]
+}

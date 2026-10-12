@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Parallax — Opening panel motion study</title><script>if(new URLSearchParams(location.search).has('render'))document.documentElement.classList.add('render-mode');</script><link rel="stylesheet" href="palette.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",Arial,sans-serif}
+main{max-width:1400px;margin:auto;padding:28px}h1{font-size:28px;font-weight:500;margin:0 0 16px}
+#stage{aspect-ratio:16/9;position:relative;overflow:hidden;background:var(--ink);isolation:isolate}
+#scene{position:absolute;inset:0;perspective:5000px;perspective-origin:62% 42%;transform-origin:72% 68%;background:var(--bone)}
+.layer,#page{position:absolute;inset:0;width:100%;height:100%}.layer{object-fit:fill;display:block}
+#background{z-index:0}#page{z-index:2;transform-origin:61.75% 40%;will-change:transform}
+#foreground{z-index:3}#page svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#diagram{position:absolute;inset:0;width:100%;height:100%;background:var(--paper);opacity:0}
+#dip{position:absolute;inset:0;background:var(--ink);pointer-events:none;opacity:0}
+.controls{display:flex;gap:16px;align-items:center;margin-top:20px}button{font:inherit;border:1px solid var(--walnut);background:var(--paper);color:var(--ink);padding:8px 18px;cursor:pointer}input{flex:1;accent-color:var(--walnut)}output{font:13px monospace;min-width:110px}
+p{max-width:900px;font-size:15px;color:var(--walnut)}a{color:var(--walnut)}
+.render-mode main{max-width:none;padding:0}.render-mode h1,.render-mode .controls,.render-mode p{display:none}.render-mode #stage{width:100vw;height:100vh;aspect-ratio:auto}
+</style></head><body><main><h1>Opening panel · 14-second motion study</h1>
+<div id="stage" aria-label="An illustrated shop window-wall opens as a painted page, revealing the street; the scene ends in a social-context diagram">
+<div id="scene">
+<img class="layer" id="background" src="motion-background.png" alt="">
+<div id="page"><img class="layer" id="page-front" src="motion-page.png" alt="">
+<svg id="page-back" viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden="true"><path d="M601 0H1033V657L638 777L601 770Z" fill="var(--bone)"/><path d="M601 0H1033V657L830 718Z" fill="var(--sand)" opacity=".35"/></svg>
+<svg viewBox="0 0 1672 941" preserveAspectRatio="none" aria-hidden="true"><path d="M601 0V770L638 777L1033 657V0" fill="none" stroke="var(--walnut)" stroke-width="2"/></svg></div>
+<img class="layer" id="foreground" src="motion-foreground.png" alt="">
+</div>
+<svg id="diagram" viewBox="0 0 1600 900" preserveAspectRatio="none" role="img" aria-label="Other customers, neighbors and a competitor connect to the shopkeeper">
+<rect width="1600" height="900" fill="var(--paper)"/><path d="M0 650H1600V900H0Z" fill="var(--bone)"/><path d="M0 650H1600" stroke="var(--walnut)" stroke-width="5"/>
+<g font-family="'IBM Plex Sans',Arial,sans-serif" text-anchor="middle">
+<text id="diagram-title" x="800" y="103" fill="var(--ink)" font-size="49" font-weight="600">A fact about his street.</text>
+<g id="hub"><path d="M577 552H994L1023 696H606Z" fill="var(--ink)"/><path d="M577 552H994L999 579H582Z" fill="var(--gold)"/><text x="800" y="641" fill="var(--paper)" font-size="46" font-weight="600">Shopkeeper</text></g>
+<g id="node-one"><path id="edge-one" d="M800 552L250 448V364" pathLength="1" fill="none" stroke="var(--umber)" stroke-width="5"/><path d="M72 220H435L457 364H94Z" fill="var(--sand)"/><text x="265" y="306" fill="var(--ink)" font-size="42">Other customers</text></g>
+<g id="node-two"><path id="edge-two" d="M800 552V364" pathLength="1" fill="none" stroke="var(--umber)" stroke-width="5"/><path d="M620 220H983L1005 364H642Z" fill="var(--sand)"/><text x="812" y="306" fill="var(--ink)" font-size="42">Neighbors</text></g>
+<g id="node-three"><path id="edge-three" d="M800 552L1350 448V364" pathLength="1" fill="none" stroke="var(--umber)" stroke-width="5"/><path d="M1168 220H1531L1553 364H1190Z" fill="var(--sand)"/><text x="1360" y="306" fill="var(--ink)" font-size="42">A competitor</text></g>
+<text id="diagram-footer" x="800" y="797" fill="var(--walnut)" font-size="34">People compare notes. Reputation travels.</text>
+</g></svg><div id="dip"></div></div>
+<div class="controls"><button id="play">Play</button><input id="scrub" type="range" min="0" max="14" step=".01" value="0" aria-label="Animation time"><output id="time">0.00 / 14.00</output></div>
+<p>Authored camera and page movement with held painted figures. This tests composition, reveal mechanics and the transition to a diagram. The separately generated layers approximate the still study; this is not an AI image-to-video character-motion test. <a href="index.html">Back to the comparisons</a>.</p>
+</main><script>
+const timeline=Object.freeze({duration:14,moveStart:2,moveEnd:6,revealHoldEnd:8,dipPeak:8.25,dipEnd:8.5,diagramStart:8.35,nodeStarts:[8.8,9.55,10.3],footerStart:11.1});
+const el=id=>document.getElementById(id);
+const clamp=value=>Math.max(0,Math.min(1,value));
+const progress=(t,start,end)=>clamp((t-start)/(end-start));
+const ease=value=>value*value*(3-2*value);
+const nodes=['one','two','three'];
+let current=0,playing=false,lastStamp=0;
+const rendering=new URLSearchParams(location.search).has('render');
+if(rendering)document.body.classList.add('render-mode');
+window.renderAtSeconds=function(t){
+  current=Math.max(0,Math.min(t,timeline.duration));
+  const p=ease(progress(current,timeline.moveStart,timeline.moveEnd)),angle=-155*p;
+  el('scene').style.transform='scale('+(1.42-.42*p)+')';
+  el('page').style.transform='translateY('+(-4*p)+'%) rotateY('+angle+'deg)';
+  el('page-front').style.opacity=angle>-90?'1':'0';
+  el('page-back').style.opacity=angle<=-90?'1':'0';
+  el('scene').style.opacity=String(1-progress(current,timeline.revealHoldEnd,timeline.dipPeak));
+  el('diagram').style.opacity=String(progress(current,timeline.dipPeak,timeline.dipEnd));
+  el('dip').style.opacity=String(current<timeline.dipPeak?progress(current,timeline.revealHoldEnd,timeline.dipPeak):1-progress(current,timeline.dipPeak,timeline.dipEnd));
+  el('diagram-title').style.opacity=String(progress(current,timeline.diagramStart,timeline.diagramStart+.45));
+  el('hub').style.opacity=String(progress(current,timeline.diagramStart,timeline.diagramStart+.45));
+  nodes.forEach((name,index)=>{
+    const q=progress(current,timeline.nodeStarts[index],timeline.nodeStarts[index]+.65);
+    el('node-'+name).style.opacity=String(q);
+    el('edge-'+name).style.strokeDasharray='1';
+    el('edge-'+name).style.strokeDashoffset=String(1-ease(q));
+  });
+  el('diagram-footer').style.opacity=String(progress(current,timeline.footerStart,timeline.footerStart+.5));
+  el('scrub').value=String(current);el('time').textContent=current.toFixed(2)+' / 14.00';
+};
+el('scrub').addEventListener('input',event=>{playing=false;el('play').textContent='Play';window.renderAtSeconds(Number(event.target.value))});
+el('play').addEventListener('click',()=>{if(current>=timeline.duration)window.renderAtSeconds(0);playing=!playing;lastStamp=performance.now();el('play').textContent=playing?'Pause':'Play'});
+function tick(stamp){if(playing){window.renderAtSeconds(current+(stamp-lastStamp)/1000);if(current>=timeline.duration){playing=false;el('play').textContent='Replay'}}lastStamp=stamp;requestAnimationFrame(tick)}
+window.renderAtSeconds(0);if(!rendering)requestAnimationFrame(tick);
+</script><script src="motion-canvas.js"></script></body></html>

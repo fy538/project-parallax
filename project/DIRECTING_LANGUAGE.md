@@ -42,7 +42,7 @@ Every `DIR:` line follows this grammar:
 
 ```
 directive  = "DIR:" SP type "(" params ")"
-type       = "cam" | "reveal" | "hold" | "cut" | "mood"
+type       = "cam" | "reveal" | "hold" | "drift" | "cut" | "over" | "chapter" | "jcut" | "lcut" | "type" | "mood"
 params     = param ("," SP param)*
 param      = keyword ":" value | bare_value
 keyword    = [a-z][a-z_-]*
@@ -318,7 +318,7 @@ DIR: cut(<type>, [origin], [color], [duration])
 
 | Parameter | Values | Maps to |
 |-----------|--------|---------|
-| Type | **Canonical:** `cut`, `fade`, `dissolve`, `match-cut`, `match-cut-still`, `color-wash`, `iris` · **Deprecated (never emit):** `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom` | `transitionOut` in assembly manifest |
+| Type | **Canonical:** `cut`, `fade`, `dissolve`, `match-cut`, `match-cut-still`, `color-wash` · **Retired Oct 10, 2026 (never emit; renders as a cut):** `iris` · **Deprecated (never emit):** `wipe-left`, `wipe-right`, `wipe-up`, `blur-through`, `whip-pan`, `spatial-zoom` | `transitionOut` in assembly manifest |
 | Origin | `origin:center`, `origin:element-<id>`, `origin:[x,y]` | Iris origin point |
 | Duration | `0.5s`, `0.8s`, etc. | Override default transition duration |
 | Color | `ink`, `amber`, `rust`, `bone`, `paper` (for `color-wash` only — required) | `washColor` resolved from palette.json |
@@ -329,7 +329,7 @@ DIR: cut(<type>, [origin], [color], [duration])
 
 **Examples:**
 ```
-DIR: cut(iris, origin:element-3, 0.6s)
+DIR: cut(dissolve, 0.4s)
 DIR: cut(color-wash, ink, 0.7s)
 DIR: cut(dissolve)
 DIR: cut(match-cut)
@@ -355,7 +355,7 @@ The register transition grammar is defined in `project/TRANSITION_GRAMMAR.md`. `
 |--------------------|--------------------|--------------|
 | Analytical → Grounding | `color-wash` (always include color token) | Rarely — boundary is usually correct |
 | Grounding → Atmospheric | `dissolve` | Rarely — natural register shift |
-| Atmospheric → Analytical | `iris` (≤2 per episode) | Override `origin:` to point at the "answer" element |
+| Atmospheric → Analytical | `cut` (default) | `iris` was retired on Oct 10, 2026; see TRANSITION_GRAMMAR.md § "By seam type" |
 | Same register | implicit `cut` (within-beat) or `dissolve` (beat-boundary) | Use `match-cut` for historical-analogy visual rhyme |
 
 **How it generates JSON:**
@@ -368,6 +368,30 @@ The register transition grammar is defined in `project/TRANSITION_GRAMMAR.md`. `
   }
 }
 ```
+
+---
+
+### Over (`over`) — added Oct 10, 2026
+
+Sets a text card over the picture before it instead of cutting to a clean card ("hold-under"; `project/TRANSITION_GRAMMAR.md` § "On the episode timeline"). The picture is held on its last frame and dimmed for the length of the card; the card is drawn with a transparent ground, light type and no brand chrome. Use it when the words are about the picture the viewer is already looking at. Cut to a clean card when the exact wording is the argument.
+
+**Syntax** (on the card's row):
+```
+DIR: over(previous)
+DIR: over(previous, dim:0.6)
+```
+
+| Parameter | Values | Maps to |
+|-----------|--------|---------|
+| Target | `previous` (the only target) | `layered.backgroundSegmentId` = the segment before the card |
+| Dim | `dim:<0-1>` (optional; engine default 0.55) | `layered.backgroundDim` |
+
+**Rules:**
+- The row before the card must be a picture (`[FOOTAGE:]`, `[AI-GEN:]`, `[ILLUST:]`, `[ARCHIVAL:]`), and the card must start where that picture ends: no `hold(pre:…)` on the card. A hold on the picture row is fine.
+- `KineticTypography` only for now. Keep the card to a title and one sentence; type over a picture reads slower than type on paper.
+- In a `THEN` chain the directive applies to the first part, the one that follows the picture.
+- `generate_manifest.py` consumes it; nothing goes into the data file's `_direction`. If the directive cannot be honoured the generator prints a warning and the card renders as a normal clean card.
+- The card can still carry `cut()`. `cut(dissolve)` after it dissolves card and picture together into the next segment.
 
 ---
 
@@ -460,7 +484,7 @@ Direction annotations go in the right column, immediately below the visual spec 
 | That's what makes this a trap —   | **P2** · [ILLUST:] metaphor · "dependency as tightening vise" · 6s |
 | you can't escape what you built.   | DIR: mood(dense, dim:0.4) |
 |                                    | DIR: hold(2s) |
-|                                    | DIR: cut(iris, origin:center) |
+|                                    | DIR: cut(cut) |
 | TSMC's yield hit ninety-two       | **P1** · [MG:] DataChart · yield-comparison.json · 8s |
 | percent.                           | DIR: reveal(stagger:300ms, hero:0, pulse) |
 |                                    | DIR: cam(overview → element:0, sync:"ninety-two") |
@@ -524,7 +548,7 @@ hold(until:"word")                     Gate: don't advance until word
 ### Cut (`cut`)
 ```
 cut(cut|fade|dissolve)                     Basic transitions (default engine handles most seams)
-cut(iris, origin:<element|center>)         Circular reveal — premium, ≤2 per episode
+cut(iris, …)                               RETIRED Oct 10, 2026 — renders as a cut; do not emit
 cut(color-wash, <ink|amber|rust|bone>)     Color flood — color token required
 cut(match-cut)                             Visual rhyme (needs shared subject)
 cut(match-cut-still)                       Composition-locked opacity-only (auto on same-template map/image seams)
@@ -548,6 +572,12 @@ chapter("TITLE", "custom-slug")            Override data-file slug lookup
 ```
 jcut(0.7)   J-cut: narration of next segment starts N seconds before the visual cut
 lcut(0.5)   L-cut: narration of current segment runs N seconds past the visual cut
+```
+
+### Over (`over`)
+```
+over(previous)                         Card sits over the held, dimmed picture before it
+over(previous, dim:<0-1>)              Set how far the picture is darkened (default 0.55)
 ```
 
 ### Mood (`mood`)
@@ -653,6 +683,8 @@ Not every directive works on every template. The visual-spec skill should warn i
 | ProbabilityGauge | ❌ | ✅ count-up | ✅ | ✅ | ✅ |
 | BifurcationRoute | ❌ | ✅ sequential | ✅ | ✅ | ✅ |
 
+`over(previous)` is supported by KineticTypography only; on any other template the generator warns and ignores it.
+
 ### Non-MG Visual Modes
 
 | Visual mode | cam() | reveal() | hold() | cut() | mood() |
@@ -731,6 +763,7 @@ When visual-spec encounters problems in `DIR:` annotations:
 | `reveal()` mode not supported by template | Emit warning. Fall back to closest supported mode (e.g., `draw` on StatReveal → `stagger`). |
 | `sync:"word"` but word not in narration text | Emit warning: `// DIR-WARN: sync word "phrase" not found in segment narration`. Leave sync in place for Whisper to attempt matching post-recording. |
 | Template data conflicts with `_direction` | `_direction` takes precedence. Remove conflicting fields from content data. |
+| `over(previous)` on a card that does not follow a picture, on an unsupported template, or with a gap before it | `generate_manifest.py` prints a warning and drops the directive; the card renders as a clean card. |
 
 ---
 
@@ -761,7 +794,7 @@ Add a shared hook (`useDirection`) that reads the `_direction` block from data J
 
 ### Phase 4b: Audio-spec integration
 `audio-spec` reads `DIR:` annotations from the script to make direction-aware SFX and music decisions:
-- `cut(type)` → determines transition SFX type (e.g., `cut(iris)` → section-open SFX, `cut(color-wash)` → register shift SFX)
+- `cut(type)` → determines transition SFX type (e.g., `cut(fade)` → section-open SFX, `cut(color-wash)` → register shift SFX)
 - `hold(preset)` → silence moments in the cue sheet (breathe = 2s gap, land = 1s, linger = 3s)
 - `mood(tone)` → music bed shift cues (e.g., `mood(tension)` triggers crossfade to tension bed)
 - `reveal(sync:"word")` → SFX timestamp placement anchored to narration words

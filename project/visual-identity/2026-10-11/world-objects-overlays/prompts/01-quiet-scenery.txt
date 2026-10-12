@@ -1,0 +1,5 @@
+Use case: illustration-story.
+Asset: a wide 16:9 painted scenery plate for Parallax, without people.
+Scene: a calm river bend crossed by one modest stone footbridge. The water comes from the distant center-left toward the lower-right foreground. A low walnut bank curves in from the lower left; a few grouped dark reeds mark the near edge. The footbridge occupies the middle distance, connecting the two banks. One small cluster of quiet rectangular buildings sits far beyond it. The upper half is mostly open bone-colored daylight.
+Medium: mature editorial gouache with constructivist composition, broad unequal opaque planes, visible selected brush edges and calm intervals. Use restrained ink, walnut, bone, ochre and a little muted blue-gray water. Let architecture and banks have clear silhouettes, with a few observed details at the bridge. Group vegetation into masses.
+Keep the water surface and sky spacious. Paper tooth is subtle, not an all-over pattern. Believable bridge, shore and water geometry; no fantasy glow, photography, glossy 3D rendering, triangulated surface mesh, tiny decorative flecks, figures, text, labels or borders.

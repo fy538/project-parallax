@@ -23,11 +23,13 @@ The research audit for blockades-leak (May 2, 2026) explicitly notes that its ph
 - Ep 2 → **Share**: high arousal + crisp "wait what" insight ("everyone needs to see this")
 - Ep 3 → **Return visit**: "you showed why the obvious fix also fails — what comes next?"
 
+> **Pipeline State** for committed episodes is canonical in [`episodes/pipeline-state.json`](../episodes/pipeline-state.json) and validated by `tools/pipeline_validator.py --check-sources`. Each committed-episode cell below carries the lifecycle token from that file; edit the JSON, not this column.
+
 | Ep | Slug | Format | Arc | Pipeline State |
 |---|---|---|---|---|
-| 1 | `prisoners-dilemma` | Philosopher's Lens | Arc 3 (meta-framework for all arcs) | 🔬 Deep Research in progress |
-| 2 | `silicon-trap` | Detective | Arc 1 | 📋 Script v5, shot list, visual assets built — needs narration + stock footage |
-| 3 | `blockades-leak` | Philosopher's Lens | Arc 1 | 📋 Script v1, full pipeline run complete — needs production |
+| 1 | `prisoners-dilemma` | Philosopher's Lens | Arc 3 (meta-framework for all arcs) | 🎬 RENDER READY — script locked; needs visual-spec, render, narration |
+| 2 | `silicon-trap` | Detective | Arc 1 | 🎬 RENDER READY — needs narration + stock footage (21 zero-hit slots) |
+| 3 | `blockades-leak` | Philosopher's Lens | Arc 1 | 💭 INCUBATING — awaiting viability re-gate (v1 returned CONDITIONAL) |
 | 4 | `treaty-nobody-believes` | Wargame | Arc 3 | 🔄 Incubating — New START expiry (Feb 2026) is trigger |
 | 5 | `industrial-convergence` | Dialectic | Arc 1 | 📡 Signal — viable concept, needs research |
 
@@ -125,7 +127,7 @@ Patterns and signals being monitored. These aren't episode ideas yet — they're
 
 | Slug | Format | Working Title | Thesis / Hook | State | Last Checked |
 |---|---|---|---|---|---|
-| prisoners-dilemma | Philosopher's Lens | The Prisoner's Dilemma Is Wrong About Almost Everything | What game theory gets right, what it gets wrong, and why international cooperation is harder than the textbook version. | 🔬 RESEARCHING — **Launch episode (Cluster Ep 1).** Deep Research Pass 1 prompt ready (`episodes/prisoners-dilemma/deep-research-prompt.md`). Functions as meta-framework for all arcs — game theory logic (one-shot vs. iterated PD, shadow of the future, Axelrod's tournament) compounds into silicon-trap, blockades-leak, treaty-nobody-believes, industrial-convergence. | May 5 |
+| prisoners-dilemma | Philosopher's Lens | The Prisoner's Dilemma Is Wrong About Almost Everything | What game theory gets right, what it gets wrong, and why international cooperation is harder than the textbook version. | 🎬 RENDER READY — **Launch episode (Cluster Ep 1).** Script locked + full manifest built (121 segments, 50 data files); remaining work is visual-spec.md, first render, narration, NLE. Functions as meta-framework for all arcs — game theory logic (one-shot vs. iterated PD, shadow of the future, Axelrod's tournament) compounds into silicon-trap, blockades-leak, treaty-nobody-believes, industrial-convergence. | May 20 |
 | treaty-nobody-believes | Wargame | The Treaty Nobody Believes | Structured scenario: two powers negotiate an arms control agreement when neither trusts the other. Walk through the decision tree. | 🔄 INCUBATING — **trigger found:** New START expired Feb 2026. No US-Russia arms control treaty for first time in 50 years. Ready for viability check. | May 3 |
 | nixon-china | Detective | Why Did Nixon Go to China? | The counterintuitive logic of engaging your enemy — and what it reveals about the current US-China dynamic. | 📡 SIGNAL — strong hook, needs viability check for fresh angle (well-trodden territory) | Apr 26 |
 | handshake | Translator | How China and the West Read a Handshake Differently | 势 (shi), face, and strategic patience vs. contractual commitment and credible signaling. Same diplomatic event, different analytical lenses. | 📡 SIGNAL — need a specific diplomatic event to anchor this (watching for trigger) | Apr 26 |

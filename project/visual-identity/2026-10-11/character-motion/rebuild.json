@@ -1,0 +1,237 @@
+{
+  "title": "River pull: rebuilt source poses",
+  "date": "2026-10-11",
+  "completed_at_utc": "2026-10-11T19:17:09.656345+00:00",
+  "status": "rejected_after_user_review",
+  "method": "Built-in image generation and targeted edits; source images and original motion trial retained. Native HTML/CSS magnification used for anatomy review.",
+  "model_version": "Not exposed by the built-in image tool",
+  "seed": "Not exposed by the built-in image tool",
+  "selected_start": "03-pull-start-v2.png",
+  "selected_end": "03-pull-end-v3.png",
+  "gallery": "qa/assisted-pull/rebuild.html",
+  "detail_review": "qa/assisted-pull/rebuilt-detail.html",
+  "anatomy_reference": {
+    "id": "grip-photo",
+    "page_url": "https://wholebeinginstitute.com/courageous-act/",
+    "image_url": "https://wholebeinginstitute.com/wp-content/uploads/82562227_m.jpg",
+    "role": "Photographed hand/wrist anatomy input; painted medium comes from the Parallax scene.",
+    "local_input_used": "/private/tmp/parallax-pull-reference/wholebeing-helping-hand.jpg",
+    "sha256": "64e3c24d7f254fb77ad335659aa44dfc56e402eb4a92d1db303b1a01afd6354f",
+    "included_in_delivered_gallery": false
+  },
+  "attempts": [
+    {
+      "id": "start-reconstruction",
+      "file": "03-pull-start-rebuild-v1.png",
+      "prompt_file": "prompts/03-pull-rebuild-start-v1.txt",
+      "prompt": "Use case: identity-preserve, with full pose reconstruction.\nAsset: a rebuilt starting still for Parallax's illustrated two-person river pull, one wide 16:9 frame.\nInput image 1 is the OLD SCENE EDIT TARGET: retain its two adults, cast identities, river setting, ink/walnut clothes and warm daylight. Its arm/hand anatomy is flawed and must be REDRAWN rather than preserved. Input image 2 is a STYLE/HEAD-PLANE reference only; do not copy its ear anatomy.\n\nRebuild the action as an anatomically believable staged figure drawing, then render it in the same matte painted editorial constructivism. Keep a low sloping riverbank, quiet pale blue-grey water and distant trees, bone sky, restrained ochre light. Make the scenery broad and quiet, without dense repeated triangular texture. Keep the short-haired adult on the LEFT dry bank and the adult with a low dark bun on the RIGHT at the water edge.\n\nLEFT HELPER: in a grounded half-kneel, rear knee visibly on dry soil, forward boot planted farther back from the edge, hips behind the forward foot. Free hand rests firmly on the bank to the left. The pulling shoulder, upper arm, bent elbow, exposed forearm, wrist and hand form a continuous, proportionate chain that is easy to trace. Roll the ink sleeve to just below the elbow so a substantial forearm is visible. Leave the pulling elbow visibly separate from the torso against a light patch of background.\n\nRIGHT PERSON: torso low at the river edge, far leg still in shallow water, near knee braced on the low slope, free palm flat on the bank. The reaching arm has a readable elbow and forearm, with the walnut sleeve rolled back below the elbow. This person supports their own body as the helper assists.\n\nREPLACE THE OLD MERGED GRIP with a simple ONE-WAY WRIST HOLD: the helper's ONE hand wraps around the other person's wrist just above that person's hand. The person at the water edge has their own separate relaxed half-open hand extending visibly BEYOND the grip toward upper-left, against the light water/sky. That hand's own palm, thumb and short naturally bent fingers must be identifiable and separate from the helper's grasp. Two people, two separate hands at this connection, two distinct wrists. No handshake, no reciprocal forearm grip, no single merged fist. Normal human hand proportions, plausible finger/knuckle arrangement and natural wrist alignment; show only the fingers visible from this angle, respecting occlusion. Make skin-contact edges and ownership readable without outlines, arrows or instructional labels. Do not hide the helper's forearm inside a sleeve or turn both arms into a straight skin-colored bar. This is the poised beginning of a supported pull, not a suspended body.\n\nHEADS: rich unequal asymmetric ochre painted volume, with entirely absent facial anatomy. No eyes, eyebrows, eyelids, sockets, nose, nose ridge, nostrils, mouth, lips, teeth, or nose/lip protrusions in contour. Cover ears with hair if convenient; any visible outer ear is a plain filled shape with no inner marks or holes. Preserve selected hair strands and garment folds; hands have enough drawn detail to read their actual structure. Matte paint, adult editorial drawing, not photoreal, CGI, glossy mannequins or children's cartoon. Fixed slightly elevated side view, generous room around figures, all support points visible. One frame only, no inset, no panels, no arrows, no lettering, no extra people or props.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-47ab784b-f188-49f2-9f40-230fb39bb532.png",
+      "inputs": [
+        {
+          "reference": "03-pull-start.png",
+          "role": "edit target"
+        },
+        {
+          "reference": "01-head-start.png",
+          "role": "style/head-plane reference"
+        }
+      ],
+      "status": "rejected",
+      "observation": "Exposed forearm improves, but one-way wrist hold produces duplicated/braided finger shapes.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "c32f3b2ccf6b074cb292b041a7b0fa61ee3dea1f666fc353cac3ef4a0be4c8a0"
+    },
+    {
+      "id": "start-photo-grip",
+      "file": "03-pull-start-rebuild-v2.png",
+      "prompt_file": "prompts/03-pull-rebuild-grip-v2.txt",
+      "prompt": "Use case: precise-object-edit.\nInput 1 is the EDIT TARGET: the rebuilt painted river scene. Preserve its camera, figures, exposed forearm lengths, shoulder and elbow positions, braced legs, planted free hands, clothing, hair, background, matte paint and daylight.\nInput 2 is a REAL PHOTOGRAPHIC ANATOMY REFERENCE for the connection between two hands and wrists ONLY. Use its clear mutual wrist grip and natural occlusion to redraw the hands in input 1. Do not copy its photographic medium, skin texture or green background.\n\nReplace the malformed central fingers in input 1 with the actual two-hand arrangement in the reference photo. Each person has ONE normal-sized hand. Each hand grasps the opposite wrist: the helper's hand and the rising person's hand occupy distinct adjacent positions rather than being one fist. Preserve the photo's believable palm-to-wrist transitions, two distinct thumbs on different sides, short curled fingers, knuckles and which fingers are hidden. The broad palm on the upper-left arm and the curved fingers on its underside must be readable as different people's hands. Match the photographed anatomy, scaled and rotated into this scene. Keep both exposed forearms proportional and connected to their own arms. No ladder or braid of fingertips, no extra hands, no extra finger segments, no mittens. Keep this change local to the central wrists and hands, allowing small natural wrist adjustments to fit the correct grip.\n\nAlso fill the visible ear of the right-hand figure with one flat quiet ochre plane: no canal, hole, inner line, curl or ear anatomy. Maintain entirely featureless heads and smooth forehead-to-chin contours: no eyes, eyebrows, nose, lips, mouth or facial parts. The left figure's head remains featureless too.\nOne wide 16:9 illustration, same composition and proportions. Adult painted editorial constructivism, not photography or CGI; no text, panels, diagrams, arrows or inset.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-1bc7e96c-2d3d-4dc3-8d8d-32cc1193f8f4.png",
+      "inputs": [
+        {
+          "reference": "03-pull-start-rebuild-v1.png",
+          "role": "edit target"
+        },
+        {
+          "reference": "grip-photo",
+          "role": "anatomy reference"
+        }
+      ],
+      "status": "intermediate",
+      "observation": "Photo-guided mutual wrist grip is clearer. Right ear retains inner detail and needs cleanup.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "9c8cecaa9ad6ae58335daaa2f907fa6db4f09dd31c82401dfaafc3622ee03299"
+    },
+    {
+      "id": "start-ear-cleanup",
+      "file": "03-pull-start-v2.png",
+      "prompt_file": "prompts/03-pull-rebuild-start-ear.txt",
+      "prompt": "Use case: precise-object-edit. Edit this painted river scene. Change ONLY the little visible ear on the adult at RIGHT with the hair bun: remove every inner-ear line, fold, hole, canal, curl and anatomical shadow. Keep the outside ear silhouette, but fill its whole interior with ONE flat opaque warm ochre plane. The ear must be a plain filled outer shape.\nPreserve all other pixels/scene elements as closely as possible, especially the newly correct two-hand wrist grip, actual fingers, both exposed forearms and elbows, support hands, bodies, clothes, hair, fixed 16:9 camera, bank and river. Both heads stay featureless: no eyes, nose, mouth, lips, eyebrows or facial parts. Do not redesign the grip, change the pose, add fingers, restyle the scene or add text. One image.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-f111468d-0ac6-4a72-91f4-8e416e9d5390.png",
+      "inputs": [
+        {
+          "reference": "03-pull-start-rebuild-v2.png",
+          "role": "edit target"
+        }
+      ],
+      "status": "rejected_after_user_review",
+      "observation": "Plain filled ear; separate hand ownership and exposed forearms retained.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "17853a8b2979f6d45f2dceed0492aa9f7ceae3fb26011d1865db99642727b4be",
+      "previous_status": "selected",
+      "re_review": "Hand ownership remains ambiguous. Earlier selection is superseded; preserve this file as research history only."
+    },
+    {
+      "id": "end-reconstruction",
+      "file": "03-pull-end-rebuild-v1.png",
+      "prompt_file": "prompts/03-pull-rebuild-end-v1.txt",
+      "prompt": "Use case: identity-preserve, advancing the action to a supported ending pose.\nAsset: matching ending still for the rebuilt river pull, a single wide 16:9 painted image.\nInput 1 is the EDIT TARGET and fixed scene/cast reference: the corrected river starting pose. Input 2 is an ANATOMY REFERENCE ONLY for the natural two-hand mutual wrist grip. Retain the correctly drawn grip, not the photo's medium.\n\nKeep the exact camera position, framing, riverbank outline, distant shore, foliage, light and palette closely matched. Same short-haired helper at LEFT in ink clothes and same bun-haired adult at RIGHT in walnut clothes. Advance their bodies to the END of a small coordinated supported pull.\n\nHELPER: stay in the low braced crouch, both boots and the free supporting palm in the same places on dry soil. Shift hips and torso modestly backward toward the left over the supporting legs. Bend the pulling elbow visibly away from the torso; the whole elbow-to-wrist forearm MUST remain exposed and readable, not swallowed into the coat. Keep rolled sleeve below elbow. Move the connected hands a short distance up and left toward the helper, but leave daylight behind the bent elbow and a clear visible length of forearm. Natural proportional upper arm, elbow, forearm, wrist and hand; no shortened arm or joint hidden in the torso.\n\nPERSON RISING: bring torso and hips upward and toward the left to finish in a stable half-kneel. Their near bent KNEE presses onto the DRY sloping bank just upslope/left of their free planted palm, with unmistakable knee-to-soil contact and a small contact shadow. The free palm remains flat in the SAME place as the start, supporting the body through a naturally bent elbow. Far shin stays at the shallow water edge. Weight is shared between palm, near knee and the assisted arm, not hanging from one arm. Keep two coherent legs, natural thigh lengths and hip above/behind the supporting knee. Do not raise the knee in midair or slide the entire person onto the land.\n\nKeep the corrected two-hand connection: one normal hand belonging to each person, each wrapped around the opposite wrist, the same believable thumb/finger arrangement and occlusion as the supplied anatomy photo. Preserve two distinct palms and wrists, actual short curled fingers rather than a stack of fingertips. Keep both people's exposed forearms clear and proportionate as elbows bend. Only small wrist-angle changes required by the pose.\n\nBoth heads remain COMPLETELY featureless with unequal matte painted planes: no eyes, eyebrows, eyelids, sockets, nose, nose ridge, nostrils, lips, mouth, teeth, or nose/lip contour protrusions. A visible ear is one plain filled outer shape without inner anatomy, holes or marks. Keep the corrected plain ear. Preserve hair identities and selected garment detail. Matte painted adult editorial constructivism, painted water and small drips, not photoreal or CGI. No extra fingers/limbs/people, no text, panels, arrows, diagrams or inset. One ending frame.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-d7d7a06c-8377-4a92-b3ff-cf8b3c03a38f.png",
+      "inputs": [
+        {
+          "reference": "03-pull-start-v2.png",
+          "role": "edit target"
+        },
+        {
+          "reference": "grip-photo",
+          "role": "anatomy reference"
+        }
+      ],
+      "status": "rejected",
+      "observation": "Body rises but near knee is elevated and central finger shapes multiply.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "f27772d77b972fc20b90b5d65d9d71a8933853e99425710455de1d68d2e5db92"
+    },
+    {
+      "id": "end-knee-contact",
+      "file": "03-pull-end-rebuild-v2.png",
+      "prompt_file": "prompts/03-pull-rebuild-end-knee.txt",
+      "prompt": "Use case: precise-object-edit. Edit the supplied rebuilt river ending pose. The adult at RIGHT still has the near knee lifted in the air. Redraw ONLY that adult's near thigh/knee/shin into a supported kneeling position; do not change their head, torso, arms or hands, the helper, correct joined wrist grip, scene, camera or light.\n\nLower the currently raised knee down onto the dry bank, immediately to the VIEWER'S RIGHT of the person's free planted hand. The supporting knee should be approximately at 60% of the canvas width and 85% of the canvas height, on the same dry sloping soil as the free palm. The upper thigh runs naturally downward and leftward from the existing hip to this lowered knee. The knee underside visibly compresses the soil at the water's edge, with flattened cloth and a tight contact shadow. The near shin bends back underneath/toward the hip along the edge. Remove the old elevated knee silhouette completely. Keep the far leg descending separately into the water. Two legs only, proportionate anatomy, no floating knee or foot and no stretched thigh. This is a stable supported half-kneel, not a raised step or standing lunge.\n\nPreserve the anatomically readable wrists and hands, long exposed forearms, fixed free support palms, character identities, matte painted style, unequal featureless head planes and plain filled ear. No facial parts, inner-ear anatomy, extra limbs, text, arrows or insets. One wide 16:9 frame.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-7ed6bd76-e856-4242-974a-b91bc2125627.png",
+      "inputs": [
+        {
+          "reference": "03-pull-end-rebuild-v1.png",
+          "role": "edit target"
+        }
+      ],
+      "status": "superseded",
+      "observation": "Knee lowered onto bank; excessive finger shapes remain. Same image also retained at 03-pull-end-v2.png.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "18ebd8c256b83e3385db62706cf3521587c23e803adadf510ed2188c9d9cc48f"
+    },
+    {
+      "id": "end-grip-correction",
+      "file": "03-pull-end-rebuild-v3.png",
+      "prompt_file": "prompts/03-pull-rebuild-end-grip.txt",
+      "prompt": "Use case: precise-object-edit.\nImage 1 is the EDIT TARGET: the rebuilt ending pose on the riverbank. Keep its camera, supported kneeling body, planted free palm, bank, clothes, hair, plain ear and featureless heads unchanged.\nImage 2 is the PHOTOGRAPHED GRIP ANATOMY REFERENCE. Rebuild ONLY the two central hands and their immediate wrist transitions to follow this photograph's actual two-hand arrangement. The current painted ending has too many curled fingers and an unclear palm; DISCARD that hand anatomy.\n\nDraw exactly two human hands, each belonging to its attached forearm. Each hand has one thumb and four fingers in total, with natural overlap hiding some of them. Do not show a row of five fingers plus a thumb. Match the photograph's distinct broad hand surfaces, two separate thumbs, short curled fingers, contact boundaries, knuckles and occluded fingers. Each hand wraps the opposite wrist. Scale and rotate the whole photographed grip into the existing diagonal line between the figures, preserving its anatomy and hand ownership. Allow small local changes to the ends of the forearms to make the wrists natural. The hand on the upper-left arm grasps the lower-right wrist; the hand on the lower-right arm grasps the upper-left wrist. Two adjacent grasps with overlapping forearms, not one combined fist or a skin-colored bar.\n\nRender those correct forms in the existing matte painted ochre medium with selected simple knuckle detail. Do not paste a photographic patch. No extra finger shapes, extra hands, fused palms, braided fingers or huge thumb. Preserve the exposed forearm lengths and visible sleeves. No change to the supported near knee, free planted hand, other limbs or scenery. Both heads remain entirely without eyes, nose, mouth or inner-ear marks. One wide 16:9 painting, no text or inset.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-369f9616-9304-4236-946b-e41aa17ea524.png",
+      "inputs": [
+        {
+          "reference": "03-pull-end-rebuild-v2.png",
+          "role": "edit target"
+        },
+        {
+          "reference": "grip-photo",
+          "role": "anatomy reference"
+        }
+      ],
+      "status": "rejected",
+      "observation": "Local correction is insufficient to make the changed grip convincingly readable. Do not select.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "0dbafb82ce29f6a997769bcaa92562e611b59bbe142c8f1248fea9c65caa0aaa"
+    },
+    {
+      "id": "end-fixed-grip",
+      "file": "03-pull-end-v3.png",
+      "prompt_file": "prompts/03-pull-rebuild-end-fixed-grip.txt",
+      "prompt": "Use case: identity-preserve. Create the matching supported ending pose by editing this corrected starting picture.\nKEEP UNCHANGED: the entire left helper, both exposed forearms at the central connection, and especially the EXACT correctly drawn two-hand wrist grip. Keep the grip's position, orientation, separate palms/thumbs/fingers, and both wrist transitions as they are now. Do not redraw or simplify those hands. Keep the camera, light, river, bank outline and distant scenery closely unchanged.\n\nCHANGE ONLY THE RIGHT PERSON'S BODY into a supported rise around that fixed grip. The helper stays braced as the right person bends their reaching elbow and pushes upward with the free palm. Lift the right person's head and shoulder UP and slightly LEFT toward the connection. Leave their reaching forearm in its existing position: the upper arm rotates at the visible elbow to connect to the now-higher shoulder, forming a natural bend. Preserve arm lengths and limb ownership.\n\nThe right person's free palm remains flat at its current contact spot on the bank. That arm bends naturally to support the higher shoulder. Bring the near knee DOWN onto the dry bank just to the viewer's RIGHT of this planted palm, near 60% canvas width / 85% height. Show knee-to-soil contact, compressed trouser fabric and a small contact shadow. The hip sits above/behind the supporting knee. The near shin folds back toward the hip/edge; the far shin stays separately in the shallow water. The person finishes supported on the bank in a half-kneel, not standing, floating or holding a knee in midair. Keep the same two legs and coherent thigh proportions.\n\nPreserve walnut clothing, bun hair, entirely featureless painted head and plain filled outer ear. No eyes, eyebrows, nose, lips, mouth, inner-ear anatomy or nose/lip contour. Same visibly matte painted adult editorial illustration. The support hands and the central two-hand grip remain exactly as drawn in the input. One wide 16:9 frame, no panels, text, insets or extra people/limbs.",
+      "generator": "built-in image_gen.imagegen",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-1c3cbc3f-96f3-44e5-b943-279f095ed03e.png",
+      "inputs": [
+        {
+          "reference": "03-pull-start-v2.png",
+          "role": "edit target"
+        }
+      ],
+      "status": "rejected_after_user_review",
+      "observation": "Keeps the clearer starting grip in place, bends the right reaching elbow and raises the person into supported kneeling. Helper acts as a fixed braced anchor.",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "sha256": "97ff0ed55fbec8007e3c114568d7fc5c55e7d590ff8308785e8f8622c7ba5c8c",
+      "previous_status": "selected",
+      "re_review": "Hand ownership remains ambiguous. Earlier selection is superseded; preserve this file as research history only."
+    }
+  ],
+  "review": {
+    "hand_ownership": "Rejected: the two central hands remain a similarly colored cluster; palm, thumb, finger and wrist ownership are not convincingly readable.",
+    "arms": "Exposing forearms improves visibility but does not establish coherent anatomy. The ending reaching arm reads compressed; no biomechanical measurement was performed.",
+    "support": "Contact points are visible, while coordinated effort and helper counterweight remain weakly communicated.",
+    "faces": "Featureless heads remain a design requirement; no evidence links that rule to the hand failure.",
+    "style": "Surface finish does not compensate for unclear structure; hand shading is softer than surrounding angular treatment.",
+    "limits": [
+      "Visual critique of saved stills, not an internal model diagnosis.",
+      "The built-in generator does not expose exact model version or seed.",
+      "No controlled prompt/reference comparison has been run.",
+      "Current pair must not be treated as accepted animation source."
+    ]
+  },
+  "motion_generation": {
+    "status": "not_run",
+    "new_fal_requests": 0,
+    "original_trial": "trials.json",
+    "note": "The existing assisted-pull MP4 uses the original submitted frames; it does not show this rebuilt pair."
+  },
+  "review_revisions": [
+    {
+      "date": "2026-10-11",
+      "trigger": "User rejected the rebuilt pair and requested research into the image quality and prompting.",
+      "previous_status": "rebuilt_stills_completed",
+      "previous_review": {
+        "hand_ownership": "Two adjacent mutual wrist grasps with separately readable palms, thumbs and occluded fingers, guided by the photographed anatomy. The selected ending retains the starting grip position and arrangement closely.",
+        "arms": "Both forearms remain exposed. The right person bends the reaching elbow as the torso rises; the helper forearm is no longer hidden inside the coat.",
+        "support": "Helper stays in a crouch with boots and free palm on the bank. Right person rises to free-palm and near-knee support, far leg remaining at the water edge.",
+        "faces": "No eyes, nose or mouth; right outer ear filled as a plain shape.",
+        "style": "Matte painted constructivist scene, selected hand/hair/garment detail; hands have softer shading than broad surrounding planes.",
+        "limits": [
+          "Generated edits are close matches, not pixel-identical composites.",
+          "Helper movement is deliberately held in the final pair; the action comes from the right person bending and pushing upward around the anchored grip.",
+          "Knee contact, fine finger geometry and contact continuity still require inspection during a future motion test.",
+          "This is a staged illustration and visual anatomy review, not instruction in a rescue technique."
+        ]
+      },
+      "correction": "Earlier review overstated readable hand ownership. The central hands and wrists remain ambiguous; preserving the starting grip carried this defect into the ending.",
+      "new_image_generations": 0,
+      "new_video_generations": 0,
+      "research": "qa/assisted-pull/prompting-research.md"
+    }
+  ],
+  "accepted_for_animation": false,
+  "accepted_for_production": false,
+  "research": "qa/assisted-pull/prompting-research.md"
+}

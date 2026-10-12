@@ -1,0 +1,21 @@
+{
+  "method": "Existing generated PNGs composited with authored Remotion typography, SVG leaders and a qualitative diagram.",
+  "newImageGenerationCalls": 0,
+  "newVideoGenerationCalls": 0,
+  "assets": [
+    {
+      "file": "../world-objects-overlays/assets/03-painted-object.png",
+      "sha256": "79c40371faa051b61b95cc2d128b42341b041c52d87d8cada8d10785a7c09101"
+    },
+    {
+      "file": "../world-objects-overlays/assets/04-architectural-object.png",
+      "sha256": "24a567b66d4641cecfac5224a45cc9591466e070f0d57b49c63aa3a8b0340ca6"
+    },
+    {
+      "file": "../world-objects-overlays/assets/07-light-background.png",
+      "sha256": "a67c16dfe9e092fc011a5040db47200ec3df83b5ac5ae59b047d70e06bdea43d"
+    }
+  ],
+  "source": "../../../../remotion-templates/research/combined-sequence/entry.tsx",
+  "originalPrompts": "../world-objects-overlays/studies.json"
+}

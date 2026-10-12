@@ -1,0 +1,79 @@
+{
+  "selected_frames": [
+    {
+      "trial": "head-turn",
+      "role": "start",
+      "file": "01-head-start.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "5085451473ac0cea6e5776cf61a32f84d6644f94d174345e18737c219a330c21"
+    },
+    {
+      "trial": "head-turn",
+      "role": "end",
+      "file": "01-head-end.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "6f7d1f25358a0af1167561dd02ef7e019a2912b8a87e0354f33a15f8b9922abc"
+    },
+    {
+      "trial": "coin-exchange",
+      "role": "start",
+      "file": "02-coins-start.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "c8a9ae970fcc460c7dc2d22df8a722cf33943127fa489c4e17b3bea993d2f939"
+    },
+    {
+      "trial": "coin-exchange",
+      "role": "end",
+      "file": "02-coins-end.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "2f15e00eb30c0bfd8ada935d46b8dbf090aa5f8b1c18c6df1047ba21acb5f0ae"
+    },
+    {
+      "trial": "assisted-pull",
+      "role": "start",
+      "file": "03-pull-start.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "855bc1130dc6a713b509baf8b299bb8063293fa82e70a4029cd6d863817c1541"
+    },
+    {
+      "trial": "assisted-pull",
+      "role": "end",
+      "file": "03-pull-end.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "d2f7788333cdbd1fe6dd102ef42b0532e2d54bdef739ded6b3290f32c6967f5e"
+    }
+  ],
+  "start_end_dimensions_match": true,
+  "videos_generated": true,
+  "submission_approval": "approved",
+  "image_method": "Built-in image generation; original coin starting image copied unchanged",
+  "gallery_checks": "gallery-checks.json",
+  "video_review": "review.json",
+  "postflight_checks": "postflight-checks.json",
+  "raw_video_copies": [
+    {
+      "id": "head-turn",
+      "file": "clips/01-head-turn.mp4",
+      "sha256": "d7dfd86935e82e51ebbdc5a06b52521bc58051c2637260bef4e656d275ebcce8",
+      "identical_to_episode_output": true
+    },
+    {
+      "id": "coin-exchange",
+      "file": "clips/02-coin-exchange.mp4",
+      "sha256": "6fbb4d9a480b9b546ae41c9603987861ba890802960c3acea8e6267b3c46f247",
+      "identical_to_episode_output": true
+    },
+    {
+      "id": "assisted-pull",
+      "file": "clips/03-assisted-pull.mp4",
+      "sha256": "0b6dce72a748692afd789f781a5bb4544f34d042b7d2c8f4a761c78e6995c84a",
+      "identical_to_episode_output": true
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+Authored Remotion/SVG brief — not sent to image generation.
+Use exactly the same source 01-quiet-scenery.png and fixed camera as study 05. Add spare ink and walnut foreground stage wings at the outer edges and a low bottom edge, with a very pale diagonal wash. Let the wings open by a few pixels and the wash change gently across six seconds. These are deliberately theatrical foreground elements; do not describe the source painting as separated scenery layers or the wash as a physically simulated outdoor light source.

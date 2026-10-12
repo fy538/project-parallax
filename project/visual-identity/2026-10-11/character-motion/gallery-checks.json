@@ -1,0 +1,74 @@
+{
+  "selected_key_pose_images": 6,
+  "rebuilt_pose_images": 2,
+  "broken_images": 0,
+  "desktop_overflow": false,
+  "videos": [
+    {
+      "file": "clips/01-head-turn.mp4",
+      "width": 1916,
+      "height": 1080,
+      "duration_seconds": 5.184,
+      "ready_state": 4,
+      "error": null,
+      "muted": true
+    },
+    {
+      "file": "clips/02-coin-exchange.mp4",
+      "width": 1916,
+      "height": 1080,
+      "duration_seconds": 5.184,
+      "ready_state": 4,
+      "error": null,
+      "muted": true
+    },
+    {
+      "file": "clips/03-assisted-pull.mp4",
+      "width": 1916,
+      "height": 1080,
+      "duration_seconds": 5.184,
+      "ready_state": 4,
+      "error": null,
+      "muted": true
+    }
+  ],
+  "video_playback": [
+    {
+      "file": "clips/01-head-turn.mp4",
+      "advanced_to_seconds": 0.400092,
+      "error": null
+    },
+    {
+      "file": "clips/02-coin-exchange.mp4",
+      "advanced_to_seconds": 0.398743,
+      "error": null
+    },
+    {
+      "file": "clips/03-assisted-pull.mp4",
+      "advanced_to_seconds": 0.398752,
+      "error": null
+    }
+  ],
+  "image_zoom": true,
+  "mobile_overflow": false,
+  "qa_contact_sheets": [
+    "qa/head-turn/dense-1.html",
+    "qa/head-turn/dense-2.html",
+    "qa/head-turn/detail.html",
+    "qa/head-turn/full.html",
+    "qa/coin-exchange/dense-1.html",
+    "qa/coin-exchange/dense-2.html",
+    "qa/coin-exchange/dense-3.html",
+    "qa/coin-exchange/detail.html",
+    "qa/coin-exchange/full.html",
+    "qa/assisted-pull/anatomy.html",
+    "qa/assisted-pull/detail.html",
+    "qa/assisted-pull/full.html",
+    "qa/assisted-pull/rebuild-grips.html",
+    "qa/assisted-pull/rebuild.html",
+    "qa/assisted-pull/rebuilt-detail.html"
+  ],
+  "rebuilt_image_zoom": true,
+  "rebuild_mobile_overflow": false,
+  "javascript_errors": []
+}

@@ -1,0 +1,332 @@
+{
+  "title": "Assisted step pose reference test",
+  "date": "2026-10-11",
+  "method": "Built-in image generation and editing",
+  "exposed_model_version": null,
+  "exposed_seed": null,
+  "transparent_background": false,
+  "generation_count": 9,
+  "status": "experiment_complete_no_production_approved_image",
+  "preferred_pose": "B1",
+  "preferred_scene_for_pose_review": "D1",
+  "accepted_for_production": false,
+  "accepted_for_animation": false,
+  "new_video_generations": 0,
+  "comparison_design": {
+    "A": "Two independent samples of the same monochrome prompt; no image reference.",
+    "B": "Two independent samples of the A prompt with only a reference-role prefix and a whole-body photograph added.",
+    "C": "Style transfer B1, then two targeted head revisions.",
+    "D": "River context added to C3, then one final head reference edit.",
+    "limitations": [
+      "No exposed seed or enforced pose/depth control.",
+      "Four pose samples cannot establish a success rate or isolate all stochastic differences.",
+      "Style and context branches are sequential edits, not independent comparisons.",
+      "The scene stage was explored after a partial head correction; enlarged review subsequently confirmed the head constraint still fails.",
+      "Assessments are visual judgments, not measured biomechanical validation."
+    ]
+  },
+  "reference": {
+    "file": "references/old-rag-pose.jpg",
+    "title": "Helping Hand on Old Rag",
+    "credit": "Shenandoah National Park / Katy Cain",
+    "date": "2015-10-26",
+    "source_page": "https://commons.wikimedia.org/wiki/File:Helping_Hand_on_Old_Rag_(22310055090).jpg",
+    "download_url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Helping_Hand_on_Old_Rag_%2822310055090%29.jpg",
+    "license": "CC BY 2.0; Commons also lists US public domain as an NPS work",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "reference_changes": "Downloaded photograph is unmodified. Generated adaptations change clothing, scenery, medium and heads and use its pose as guidance. No endorsement implied.",
+    "dimensions": [
+      1994,
+      1587
+    ],
+    "sha256": "e3266e4340e1bca521d8812c582fee635396e90836c58c481036b2a998c58f9a",
+    "bytes": 1211191
+  },
+  "findings": [
+    "Both text-only samples have extra finger shapes; both whole-pose-reference samples have simpler two-hand arrangements in this small batch.",
+    "Style and context edits retain the overall assisted-step pose, with small changes; fine finger geometry is still provisional.",
+    "Repeated verbal head corrections did not reliably remove naturalistic contours and ear anatomy.",
+    "D1 has visible support points but remains an unapproved pose candidate. Its background needs simplification for the selected identity."
+  ],
+  "review_criteria": [
+    "Trace each shoulder, elbow, forearm and wrist to its own hand.",
+    "Assign visible finger groups and thumb/palm shapes without requiring occluded digits to be visible.",
+    "Read the forward step, supporting boots and helper counterweight at gallery size.",
+    "Recheck contact after every treatment change.",
+    "Keep heads entirely featureless, including inner ears and profile outlines.",
+    "Preserve matte painted treatment and quiet surroundings."
+  ],
+  "studies": [
+    {
+      "id": "A1",
+      "file": "a1-pose-only.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-80fcb920-348c-4388-a253-e949a867f03e.png",
+      "prompt_file": "prompts/a-pose-only.txt",
+      "exact_prompt": "Use case: illustration-story.\nCreate one wide 16:9 monochrome figure study of two clothed adults helping each other up a low sloping bank.\nThe short-haired helper stands on the RIGHT, higher ground, feet apart and knees slightly bent, leaning toward the companion. The adult with tied-back hair is on the LEFT, lower ground, one boot below and the other planted forward on the slope with its knee raised.\nOne hand from each person meets in a straightforward hand clasp between them. Their remaining arms stay separate from this connection. Draw each shoulder, elbow, forearm, wrist and palm as a connected adult limb. Show natural finger overlap and two distinct hand silhouettes at the clasp. The helper counterbalances through the legs while the climber pushes through the raised front leg.\nBoth adults fit fully in the frame, including every boot and support point. Plain rolled-sleeve shirts and trousers; no backpacks. Quiet pale background and one simple ground slope. Matte drawn shapes, broad monochrome planes, no decorative texture.\nHeads are entirely featureless volumes: no eyes, brows, nose, mouth, lips or inner-ear marks, and no nose or lip protrusions. No text, panels or extra people.",
+      "references": [],
+      "status": "rejected_contact",
+      "review": "Arm paths and support are readable; extra finger rows make the clasp unreliable.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "0418fdd6f925394477991508faa2d5e39c54df0bf8c559b057afac9fac0d723f",
+      "bytes": 1620881,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "A2",
+      "file": "a2-pose-only.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-4f198f9e-eade-4473-9d1d-1116bee1fef0.png",
+      "prompt_file": "prompts/a-pose-only.txt",
+      "exact_prompt": "Use case: illustration-story.\nCreate one wide 16:9 monochrome figure study of two clothed adults helping each other up a low sloping bank.\nThe short-haired helper stands on the RIGHT, higher ground, feet apart and knees slightly bent, leaning toward the companion. The adult with tied-back hair is on the LEFT, lower ground, one boot below and the other planted forward on the slope with its knee raised.\nOne hand from each person meets in a straightforward hand clasp between them. Their remaining arms stay separate from this connection. Draw each shoulder, elbow, forearm, wrist and palm as a connected adult limb. Show natural finger overlap and two distinct hand silhouettes at the clasp. The helper counterbalances through the legs while the climber pushes through the raised front leg.\nBoth adults fit fully in the frame, including every boot and support point. Plain rolled-sleeve shirts and trousers; no backpacks. Quiet pale background and one simple ground slope. Matte drawn shapes, broad monochrome planes, no decorative texture.\nHeads are entirely featureless volumes: no eyes, brows, nose, mouth, lips or inner-ear marks, and no nose or lip protrusions. No text, panels or extra people.",
+      "references": [],
+      "status": "rejected_contact",
+      "review": "A second text-only sample again has extra finger shapes beneath the clasp.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "11b5217f1091e6531b4c485c417ebf6a742a7b9c837d3b75a711af10cf16667c",
+      "bytes": 1630574,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "B1",
+      "file": "b1-whole-pose-reference.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-ceadd6f1-0f25-4436-8a32-1845cce4f48c.png",
+      "prompt_file": "prompts/b-whole-pose-reference.txt",
+      "exact_prompt": "Image 1 is the whole-body POSE REFERENCE. Use its camera, body arrangement, hand clasp and footing; replace its clothing and scenery as specified below.\n\nUse case: illustration-story.\nCreate one wide 16:9 monochrome figure study of two clothed adults helping each other up a low sloping bank.\nThe short-haired helper stands on the RIGHT, higher ground, feet apart and knees slightly bent, leaning toward the companion. The adult with tied-back hair is on the LEFT, lower ground, one boot below and the other planted forward on the slope with its knee raised.\nOne hand from each person meets in a straightforward hand clasp between them. Their remaining arms stay separate from this connection. Draw each shoulder, elbow, forearm, wrist and palm as a connected adult limb. Show natural finger overlap and two distinct hand silhouettes at the clasp. The helper counterbalances through the legs while the climber pushes through the raised front leg.\nBoth adults fit fully in the frame, including every boot and support point. Plain rolled-sleeve shirts and trousers; no backpacks. Quiet pale background and one simple ground slope. Matte drawn shapes, broad monochrome planes, no decorative texture.\nHeads are entirely featureless volumes: no eyes, brows, nose, mouth, lips or inner-ear marks, and no nose or lip protrusions. No text, panels or extra people.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/references/old-rag-pose.jpg",
+          "relative_path": "references/old-rag-pose.jpg",
+          "role": "whole-body pose reference",
+          "sha256": "e3266e4340e1bca521d8812c582fee635396e90836c58c481036b2a998c58f9a",
+          "bytes": 1211191
+        }
+      ],
+      "status": "selected_for_style_test",
+      "review": "Two opposed finger groups and visible wrist paths are easier to assign. Provisional pose selection; fine anatomy is not certified. Ear marks fail the head rule.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "461333717322b7a080683c288f2cff03e8aa82f9fe9e6891728ab7a717811177",
+      "bytes": 1549881,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "B2",
+      "file": "b2-whole-pose-reference.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-7a27022b-fa4e-47fd-b9d2-b82e01daa24d.png",
+      "prompt_file": "prompts/b-whole-pose-reference.txt",
+      "exact_prompt": "Image 1 is the whole-body POSE REFERENCE. Use its camera, body arrangement, hand clasp and footing; replace its clothing and scenery as specified below.\n\nUse case: illustration-story.\nCreate one wide 16:9 monochrome figure study of two clothed adults helping each other up a low sloping bank.\nThe short-haired helper stands on the RIGHT, higher ground, feet apart and knees slightly bent, leaning toward the companion. The adult with tied-back hair is on the LEFT, lower ground, one boot below and the other planted forward on the slope with its knee raised.\nOne hand from each person meets in a straightforward hand clasp between them. Their remaining arms stay separate from this connection. Draw each shoulder, elbow, forearm, wrist and palm as a connected adult limb. Show natural finger overlap and two distinct hand silhouettes at the clasp. The helper counterbalances through the legs while the climber pushes through the raised front leg.\nBoth adults fit fully in the frame, including every boot and support point. Plain rolled-sleeve shirts and trousers; no backpacks. Quiet pale background and one simple ground slope. Matte drawn shapes, broad monochrome planes, no decorative texture.\nHeads are entirely featureless volumes: no eyes, brows, nose, mouth, lips or inner-ear marks, and no nose or lip protrusions. No text, panels or extra people.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/references/old-rag-pose.jpg",
+          "relative_path": "references/old-rag-pose.jpg",
+          "role": "whole-body pose reference",
+          "sha256": "e3266e4340e1bca521d8812c582fee635396e90836c58c481036b2a998c58f9a",
+          "bytes": 1211191
+        }
+      ],
+      "status": "alternate_pose",
+      "review": "Simpler clasp and readable support. Not selected for the style branch; ear details remain.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "fc7b7f31d8d6653d31d38fc3e6ab0adc589cc6ccd8635e75c7ee62bd348eb89d",
+      "bytes": 1631892,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "C1",
+      "file": "c1-painted-pose.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-9b9fa4da-7795-48e1-b16e-9c793d364ba5.png",
+      "prompt_file": "prompts/c-painted-treatment.txt",
+      "exact_prompt": "Use case: style-transfer.\nImage 1 is the EDIT TARGET: a monochrome whole-body pose study. Image 2 is a STYLE REFERENCE only, for Parallax's matte painted planes, selected hair and garment detail, and ink/ochre/bone/walnut colors. Do not copy its desk, room or seated pose.\n\nChange the visual treatment of image 1 into mature painted editorial constructivism. Retain its camera, two body positions, connected shoulder–elbow–wrist paths, hand-clasp arrangement, natural finger overlap, boot placements and simple slope. Keep each hand identifiable through broad palm forms and the existing contact boundary. Avoid adding finger marks as decoration.\nThe short-haired helper at right wears ink clothes; the tied-back-haired climber at left wears walnut clothes. Skin is modeled with a few unequal opaque ochre planes. Heads have rich asymmetric painted volume but no eyes, brows, sockets, nose, nose ridge, mouth, lips or inner-ear marks. Forehead-to-chin contours have no nose or lip protrusions; any outer ear is a plain filled shape.\nUse grouped hair strokes, selected clothing folds, matte dry-brush edges and quiet paper tooth. Keep the background a broad bone-paper field and the slope one restrained walnut mass. No river or landscape yet. No photographic skin, glossy 3D shading, regular triangular mesh, all-over texture, text or panels.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/b1-whole-pose-reference.png",
+          "relative_path": "b1-whole-pose-reference.png",
+          "role": "edit target",
+          "sha256": "461333717322b7a080683c288f2cff03e8aa82f9fe9e6891728ab7a717811177",
+          "bytes": 1549881,
+          "dimensions": [
+            1672,
+            941
+          ]
+        },
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/character-and-storyboard/06-desk-daylight.png",
+          "relative_path": "../../../2026-10-10/character-and-storyboard/06-desk-daylight.png",
+          "role": "painted style reference only",
+          "sha256": "f30d358a4ff72b12983a75666d90eb3e4bd865dd54011c73c5c2ed319f5b9ae3",
+          "bytes": 1912427,
+          "dimensions": [
+            1672,
+            941
+          ]
+        }
+      ],
+      "status": "superseded_head_constraint_failure",
+      "review": "Painted medium retains the pose and contact arrangement. Nose-like contours and inner-ear marks remain.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "2d460039bebf32f04f46f25476d9283bb16a3a2f30f283d86d71ae5364a45a2c",
+      "bytes": 2322058,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "C2",
+      "file": "c2-head-edit.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-e03ad8d4-3e00-47e7-9523-2bf7772fed33.png",
+      "prompt_file": "prompts/c2-featureless-heads.txt",
+      "exact_prompt": "Use case: precise-object-edit.\nImage 1 is the EDIT TARGET. Change only the two heads to comply with the featureless-head design.\nRemove the inner-ear lines and cavities from both ears, leaving plain solid filled outer ear shapes. Smooth both forehead-to-chin face outlines into continuous asymmetric egg-shaped contours with no nose or lip projections or notches. Keep depth through a few unequal ochre painted planes. No eyes, brows, sockets, nose ridge, nose, mouth or lips.\nRetain both hairstyles, head angles, necks, clothes, bodies, all arms and hands, the clasp, boots, ground, palette, painted finish, framing and lighting.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/c1-painted-pose.png",
+          "relative_path": "c1-painted-pose.png",
+          "role": "edit target",
+          "sha256": "2d460039bebf32f04f46f25476d9283bb16a3a2f30f283d86d71ae5364a45a2c",
+          "bytes": 2322058,
+          "dimensions": [
+            1672,
+            941
+          ]
+        }
+      ],
+      "status": "failed_targeted_correction",
+      "review": "The requested head cleanup barely changes the head silhouettes or inner ears.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "753504445152dafbb4cb1a9599868ef44da73afffbe85c0a1a0c8b3116ccb9ee",
+      "bytes": 2129674,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "C3",
+      "file": "c3-redrawn-heads.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-6598688d-bb1a-46f5-b249-b13b2c064f3e.png",
+      "prompt_file": "prompts/c3-redrawn-heads.txt",
+      "exact_prompt": "Use case: precise-object-edit.\nImage 1 is the EDIT TARGET. Image 2 is a HEAD DESIGN reference only; use its visibly blank angular face volumes, not its person, clothing or setting.\nRedraw both heads in image 1. Make a visibly new featureless painted head shape on each existing neck: one continuous slanted oval face surface, with a smooth forehead-to-chin outer edge and three or four broad unequal ochre planes. Replace the existing nose-shaped outline bumps with this continuous contour. Eliminate both visible ears entirely; let the existing hair shapes meet the sides of the heads. The surfaces have no facial anatomy, marks, eyes, eyebrows, nose, mouth or lips.\nRetain the original two head directions, hairstyles and approximate head sizes. Preserve the scene below the necks, including the arms, hand clasp, clothes, feet and slope. Keep the original matte painted palette and framing.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/c2-head-edit.png",
+          "relative_path": "c2-head-edit.png",
+          "role": "edit target",
+          "sha256": "753504445152dafbb4cb1a9599868ef44da73afffbe85c0a1a0c8b3116ccb9ee",
+          "bytes": 2129674,
+          "dimensions": [
+            1672,
+            941
+          ]
+        },
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-10/context-tests/02c-desk-faceted-face.png",
+          "relative_path": "../../../2026-10-10/context-tests/02c-desk-faceted-face.png",
+          "role": "head design reference only",
+          "sha256": "a79d9cee27adf4b30558c1b68b1af01d61d3e815e9902d7e26ad062c6dca1631",
+          "bytes": 1755949,
+          "dimensions": [
+            1672,
+            941
+          ]
+        }
+      ],
+      "status": "partial_head_correction",
+      "review": "Head shapes simplify and ear detail softens, but enlarged review still shows ear anatomy and a nose-like break on the helper. Below-neck pose remains close, not pixel-identical.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "8370cb6ff3191c3e03368761ee55c32f9318b8b5e9e03ba5a89fc41709b3b4ec",
+      "bytes": 2023192,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "D1",
+      "file": "d1-river-context.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-0b4ff8c6-cb28-4ae4-b4de-939cc3821654.png",
+      "prompt_file": "prompts/d-river-context.txt",
+      "exact_prompt": "Use case: precise-object-edit.\nImage 1 is the EDIT TARGET. Place this assisted step at a calm river's edge by changing the surroundings.\nKeep the two figures at their existing scale and positions, with the same pose, arms, clasp, clothing and boot placements. The climber at left is stepping up from a low flat stone at the waterline: her rear boot has solid stone beneath it, her raised front boot presses onto the dry bank. The helper at right stands on the higher bank. Shape a low rocky bank around these support points, rising toward the right. Put shallow water in the lower-left foreground around the rear stone, with a few broad painted ripples. Do not hide the boots or their support contacts.\nBeyond them, a restrained pale distant river and one quiet far-shore silhouette sit under broad bone daylight. Keep the background open around the joined hands.\nRetain the matte ink/walnut clothes, unequal ochre head planes, grouped hair strokes and selected garment folds. Both heads remain entirely featureless with smooth uninterrupted face outlines, no facial parts and no ear anatomy. Use broad opaque painted shapes and restrained paper tooth; no photographic water, gloss, dramatic fog, decorative flecks, text or inset.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/c3-redrawn-heads.png",
+          "relative_path": "c3-redrawn-heads.png",
+          "role": "edit target",
+          "sha256": "8370cb6ff3191c3e03368761ee55c32f9318b8b5e9e03ba5a89fc41709b3b4ec",
+          "bytes": 2023192,
+          "dimensions": [
+            1672,
+            941
+          ]
+        }
+      ],
+      "status": "preferred_scene_for_pose_review_only",
+      "review": "Visible rear stone, front boot on bank and braced helper make the assisted step easier to read. Contact stays similar. Face rule still fails; terrain is busier and more naturalistic than the intended identity.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "bfc0a362eb4ebf8fc4bad45cc6be4fc4b9614e19f34a10b74b1f3d213f2425f7",
+      "bytes": 2235484,
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "id": "D2",
+      "file": "d2-geometric-heads.png",
+      "original_generated_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-5bd26d99-d9ac-4263-a88f-9165a439c117.png",
+      "prompt_file": "prompts/d2-geometric-heads.txt",
+      "exact_prompt": "Use case: precise-object-edit.\nImage 1 is the river scene EDIT TARGET. Image 2 is a HEAD GEOMETRY reference only.\nReplace the two naturalistic head silhouettes in image 1 with the explicitly geometric blank head design of image 2. On each head, make the face's front edge one clean diagonal from the forehead hairline down to the chin, like the reference's uninterrupted slanted profile. Use a few large unequal flat ochre polygon planes for the front and side of the head. These are blank painted face volumes: no nose bump, no forehead-to-nose step, no lip notch, no eyes or mouth. Any visible outer ear is one single flat ochre silhouette with no interior line, hole, fold or shadow cavity.\nKeep each head facing its present direction, retain the existing hair and necks, and fit the new geometric heads at the existing sizes. Preserve the entire scene below the necks: both bodies, hands and their clasp, clothing, boots, supporting stone, riverbank, water, backdrop, framing, light and palette. The new heads should read as clearly drawn featureless volumes rather than natural faces with their features erased.",
+      "references": [
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/pose-first-test/d1-river-context.png",
+          "relative_path": "d1-river-context.png",
+          "role": "edit target",
+          "sha256": "bfc0a362eb4ebf8fc4bad45cc6be4fc4b9614e19f34a10b74b1f3d213f2425f7",
+          "bytes": 2235484,
+          "dimensions": [
+            1672,
+            941
+          ]
+        },
+        {
+          "path": "/Users/feihuyan/project-parallax/project/visual-identity/2026-10-11/character-motion/01-head-end.png",
+          "relative_path": "../01-head-end.png",
+          "role": "head geometry reference only",
+          "sha256": "6f7d1f25358a0af1167561dd02ef7e019a2912b8a87e0354f33a15f8b9922abc",
+          "bytes": 1679751,
+          "dimensions": [
+            1672,
+            941
+          ]
+        }
+      ],
+      "status": "failed_targeted_correction",
+      "review": "Larger head planes appear, but nose-like contour breaks and inner-ear anatomy persist or become clearer. Not selected over D1.",
+      "accepted_for_production": false,
+      "accepted_for_animation": false,
+      "sha256": "a5137087a7dfa3196320e28911cfacc1fcaf618d8560adc72a36557a57eb50f0",
+      "bytes": 2186591,
+      "dimensions": [
+        1672,
+        941
+      ]
+    }
+  ]
+}

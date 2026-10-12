@@ -1,0 +1,231 @@
+{
+  "title": "Parallax character and six-frame episode pilot",
+  "date": "2026-10-10",
+  "method": "Built-in image_gen.imagegen; local-reference generation and edits. Graphical frames are authored in SVG/HTML, with no image model.",
+  "generator_version": "Not exposed by the built-in tool",
+  "settings": {
+    "transparent_background": false,
+    "requested_aspect_ratio": "16:9",
+    "other_settings": "No model, seed or quality setting exposed"
+  },
+  "approval_status": "Exploratory studies; not approved as the production identity",
+  "source_script": "episodes/ai-care-motives/script.md (v1.7)",
+  "assets": [
+    {
+      "id": "01-head-turnaround-v1",
+      "file": "01-head-turnaround-v1.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-162074fc-9447-40af-8dc6-18e1888f7af5.png",
+      "prompt": "Use case: stylized-concept.\nAsset type: Parallax character turnaround reference sheet, one wide landscape illustration.\nInput image 1: CHARACTER AND DRAWING REFERENCE ONLY. Extract the same contemporary young adult from the desk image: short thick dark tousled hair, slim adult build, long plain neck, dark ink crew-neck sweatshirt. Preserve the richly modeled, asymmetric hand-painted head planes of the reference. Create a new model sheet, not the desk setting.\n\nLayout: exactly FIVE separate large head-and-shoulder studies of this ONE SAME PERSON on a quiet matte bone-paper field. Three evenly spaced studies across the top row, two centered studies across the bottom row. Consistent head scale, consistent hair length and shape, consistent shoulder proportions and neutral posture. Top row from left to right: straight front view; three-quarter view facing right; exact right-facing profile. Bottom row left: front three-quarter head tilted slightly upward; bottom row right: front three-quarter head tilted slightly downward. Head tilts must be visibly different. Each study fully fits without clipping hair or neck. Clean generous gaps. No panel borders and no text, numbers, arrows or logos.\n\nCRITICAL FACE DESIGN: entirely featureless painted head volumes. No eyes, eyebrows, sockets, eyelids, nose, nose ridge, nostrils, mouth, lips, teeth, or inner-ear detail. Profile forehead-to-chin contour is a single uninterrupted slanted angular edge, WITHOUT a projecting nose, brow shelf, mouth notch or lip bump. A simple plain outer-ear shape is allowed, with no internal marks. Front view must not hide a face through blur: it is deliberately drawn as a blank sculptural head.\nRICHNESS: eight to ten substantial unequal opaque painted facets per visible head, broad offset quadrilaterals and tapered irregular wedges. Clear bone-ochre highlights, amber midtones, deep warm walnut shadow planes; purposeful asymmetry and visible selected brush edges. The planes describe overall head volume without organizing into bilateral eye sockets or a central nose. Preserve considerable detail at normal viewing size, like the reference. No regular triangle mesh, polygon wireframe, mask holes, glossy bevels, realistic skin, or lifeless smooth oval.\n\nDrawing language: mature artsy constructivist editorial painting. Strong geometric masses with observed grouped hair strokes, subtle sweatshirt seams, matte dry-brush edges and restrained paper tooth. Neutral consistent illumination across the sheet: broad light from upper left, no theatrical rim glow. Warm ink, amber, bone and walnut palette from the reference. Calm background, detail concentrated on the heads. Entirely drawn and painted, not photorealistic, not 3D rendered, not children's cartoon style. No desk, laptop, props, extra people, scenery, shadow figures or lettering.",
+      "referenced_images": [
+        {
+          "path": "../context-tests/02c-desk-faceted-face.png",
+          "role": "Character and drawing reference"
+        }
+      ],
+      "status": "superseded",
+      "observation": "The side view remained too similar to the three-quarter view."
+    },
+    {
+      "id": "01-head-turnaround",
+      "file": "01-head-turnaround.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-09a52696-ed53-4fa9-9e5b-5668fe53b194.png",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET, the five-view Parallax head sheet.\nChange ONLY the TOP RIGHT head-and-shoulders study. Its angle is still too similar to the top middle three-quarter view. Redraw this one top-right portrait in a clear EXACT 90-DEGREE RIGHT-FACING SIDE PROFILE: rotate both head and shoulders so the near ear is centered in the side of the cranium and the visible blank front surface becomes a narrow edge. Show the coherent side of the skull and neck, not a front or three-quarter face. Retain the same person, short thick tousled dark hair, head size, long neck and ink crew-neck sweatshirt.\nThe forehead-to-chin front outline MUST be one uninterrupted slanted angular edge without a nose projection, brow ridge, lip bump or mouth notch. Entirely featureless: no eyes, eyebrows, eyelids, sockets, nose, nostrils, mouth, lips, teeth or inner-ear marks. The ear is a plain outer silhouette only. Keep the head rich with substantial asymmetric hand-painted ochre, amber and walnut facets, describing the side volume without facial anatomy. No regular triangle mesh or glossy 3D.\nPreserve ALL other four portraits pixel-for-pixel in their positions, angles, hair, proportions, facets and clothes. Preserve the bone-paper background, spacing, scale, selective brushwork, palette and exact five-study layout. No text, arrows, extra portrait, props or watermark.",
+      "referenced_images": [
+        {
+          "path": "01-head-turnaround-v1.png",
+          "role": "Edit target, revise the top-right side view only"
+        }
+      ],
+      "status": "selected",
+      "observation": "Five featureless faceted head views. The side view is more differentiated but remains an approximate profile study rather than a validated 3D turnaround."
+    },
+    {
+      "id": "02-acting-strip",
+      "file": "02-acting-strip.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-2eba9025-67f5-4123-98df-fe9d1058f254.png",
+      "prompt": "Use case: illustration-story.\nAsset type: Parallax character acting reference strip, one wide landscape image containing THREE distinct acting poses of ONE SAME PERSON.\nInput image 1: CHARACTER MODEL AND DRAWING REFERENCE. Use the same slim young adult, thick short dark tousled hair, long neck, ink crew-neck sweatshirt, warm walnut trousers, amber-ochre skin planes. Carry the head's rich asymmetric opaque painted facets across all three poses. This is a new acting sheet, not more head portraits.\n\nQuiet bone-paper backdrop, three evenly spaced isolated half-body figures from mid-thigh upward with both hands fully visible. No scene background, furniture, explanatory text or borders. Same person, same clothes, same head size and body proportions throughout.\nLEFT — attentive listening: the torso gently leans toward an unseen person to the right; head inclined toward them; shoulders open; one relaxed hand held forward low with palm angled upward, the other resting loosely at the waist. A receptive, human gesture.\nCENTER — hesitation: torso slightly withdrawn and rotated, shoulders a little raised and uneven, head slightly lowered and angled toward an unseen person on the right. One hand paused halfway outward with the fingers softly curled, the other close to the lower torso. Communicate an interrupted gesture, uncertainty, not fatigue or exaggerated fear.\nRIGHT — determination: torso upright with a subtle forward weight shift, shoulders settled, head lifted toward the right. One hand makes a calm decisive open-palm gesture toward the right at chest height, the other naturally lower by the body. Quiet resolve, not aggression, superhero posture or clenched fists.\nVary body lines and hand spacing clearly; do not simply repeat the same posture with different arms. Believable adult anatomy, individual fingers drawn in purposeful broad forms, coherent wrists and elbows, no extra limbs.\n\nFACES ENTIRELY FEATURELESS in all three: no eyes, brows, eyelids, sockets, nose or ridge, nostrils, mouth, lips, teeth or inner-ear marks. No nose/lip bumps in silhouette. A plain outer-ear shape is allowed. Detail the head using 8–10 unequal asymmetric large amber, ochre, bone and walnut painted facets. Not paired socket-like shadows, not central nose modeling. Blank heads are deliberately drawn, never blurred or erased. Preserve lively grouped hair and selected garment folds.\nMature handmade constructivist editorial illustration, matte opaque paint, confident geometric silhouettes, selected broken brush edges and quiet paper tooth. Broad light from upper left. Ink/amber/bone/walnut palette. No photorealistic skin, 3D rendering, dense triangular mesh, all-over distress, cartoon faces, logos, labels or watermark.",
+      "referenced_images": [
+        {
+          "path": "01-head-turnaround.png",
+          "role": "Character model and drawing reference"
+        }
+      ],
+      "status": "selected",
+      "observation": "Three distinct body and hand gestures with consistent hair, clothes and featureless faceted heads. Intended readings are listening, hesitation and determination; audience recognition is untested."
+    },
+    {
+      "id": "03-shop-transaction-v1",
+      "file": "03-shop-transaction-v1.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-91ba5d2c-ae54-4bc4-9188-cd71f18825f9.png",
+      "prompt": "Use case: illustration-story.\nAsset type: frame 1 of a Parallax six-frame visual identity storyboard, ONE wide 16:9 scene.\nInput image 1: CHARACTER AND DRAWING REFERENCE for the adult shopkeeper, including the richly faceted featureless head, dark tousled hair, slim adult proportions, ink crew-neck sweatshirt and selective painted detail. Do not copy the reference sheet layout.\n\nScene: a contemporary small bread shop, quiet ordinary human exchange. A short child in a plain bone jacket stands at the left end of a simple walnut counter. The adult shopkeeper stands behind the counter at right, wearing the same dark sweatshirt with a plain bone apron. The child has a smaller rounder head, a simple dark bob and a slightly different silhouette from the adult. The adult extends an open hand with TWO simple flat ochre coins toward the child's separate waiting hand. The two hands do not overlap, merge or clasp. ONE modest loaf on the counter between them, drawn as a few broad matte ochre shapes with three simple scoring cuts, no realistic crust pores or photographic food texture.\nComposition: medium-wide three-quarter view, both characters large enough for their blank painted head facets to read, quiet negative space in the upper center. Counter runs diagonally across the lower frame, dark ink figure masses against broad bone wall planes. Large plain window on the LEFT wall, behind and above the child, clearly showing three small contemporary adult passers-by in the street outside. The window has simple straight mullions, with a clean opaque wall strip immediately to its right. Passers have distinct hair shapes and body angles but no visible facial anatomy. A single spare shelf high at far right with two plain paper bread bags. No clutter, signs or writing.\nLight: broad flat daylight planes from the window, warmer amber accents only in a selected wall division and the people. Keep roughly half the scene bone and paper tones, with substantial ink and walnut masses. Calm observed moment, no theatrical glow.\nHeads: completely FEATURELESS, yet richly described with 8–10 unequal asymmetric painted facets in amber/ochre/bone/walnut. NO eyes, brows, sockets, nose, nose ridge, nostrils, mouth, lips, inner-ear marks or nose/lip protrusions in profiles or shadows. Simple uninterrupted angular forehead-to-chin contours. Plain outer ear shapes permitted. No hidden faces through shading.\nMedium: adult constructivist editorial painting, confident geometric structure, selected detail in grouped hair, garment construction and purposeful hand shapes. Broad quiet matte wall, counter and window areas; a few irregular dry-brush edges. Objects painted in the same language as people. No photorealism, 3D, regular triangle mesh, nostalgia, period costume, floating objects, independent shadow allegory, text, labels, logo or watermark.",
+      "referenced_images": [
+        {
+          "path": "01-head-turnaround.png",
+          "role": "Character and drawing reference for the adult shopkeeper"
+        }
+      ],
+      "status": "superseded",
+      "observation": "Foreground heads and painted loaf carry the identity; small street profiles introduced nose/lip-like contours."
+    },
+    {
+      "id": "03-shop-transaction-v2",
+      "file": "03-shop-transaction-v2.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-e6e765ff-b914-4ca6-ad4d-9010eb4ff697.png",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET, the Parallax shop transaction.\nCorrect ONLY the three tiny passer-by heads visible outside the LEFT window. They have accidentally acquired nose and lip-like profile contours. Replace each with a deliberate small featureless angular head shape, retaining their individual hair silhouettes, head angles, necks and body positions. Their front outlines must run uninterrupted from forehead to chin, without nose or lip bumps. Use two or three broad matte ochre/bone painted planes in these small heads, with no eyes, brows, sockets, nose, mouth, lips or inner-ear marks. Keep them clearly human through hair, neck and posture. Do not blur, smudge or obscure them with objects. No added marks on their faces.\nKeep EVERYTHING ELSE exactly as shown, including the adult and child foreground people and their faceted blank heads, hair, clothes, apron, separated hands, TWO coins, painted loaf, window and mullions, street trees/buildings, shelf/bags, counter geometry, exact composition/crop, lighting, palette, surface treatment and all other pixels. No new objects or text.",
+      "referenced_images": [
+        {
+          "path": "03-shop-transaction-v1.png",
+          "role": "Edit target, background heads only"
+        }
+      ],
+      "status": "superseded",
+      "observation": "Small background profile contours remained after the first correction."
+    },
+    {
+      "id": "03-shop-transaction",
+      "file": "03-shop-transaction.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-f7fa8f5b-5099-4b09-8f4f-770c618aedd9.png",
+      "prompt": "Use case: precise-object-edit.\nInput image 1: EDIT TARGET.\nChange ONLY the heads of the THREE SMALL PASSERS-BY OUTSIDE THE LEFT WINDOW. Turn all three small heads AWAY FROM THE VIEWER so we see ONLY THE BACK OF THEIR HEADS: each face is on the far side, completely invisible. Render their back-of-head hair shapes as simple dark painted masses, with a plain neck below. No visible skin face plane, cheek, nose, lips, eyes or profile of any kind. One has shoulder-length hair, one short hair, one a small tied-back bun, matching their existing hair identity. Their bodies remain in their exact original positions and outfits. Do not turn the foreground characters away.\nKeep the foreground adult and child, their blank faceted faces, their hair, apron and clothing, both separated hands, two coins, loaf, every prop, architecture, window, trees and street, framing, light, palette and texture EXACTLY unchanged. The ONLY change is that the three background heads now face away and show the back of the hair. No blur or hiding with objects. No text.",
+      "referenced_images": [
+        {
+          "path": "03-shop-transaction-v2.png",
+          "role": "Edit target, background heads only"
+        }
+      ],
+      "status": "selected",
+      "observation": "Foreground heads remain richly featureless. Background heads now face away, avoiding invented small facial parts; two coins and separated hands remain legible."
+    },
+    {
+      "id": "04-street-reveal",
+      "file": "04-street-reveal.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-a7d620f8-836e-484d-a01d-f2044e0aebf6.png",
+      "prompt": "Use case: illustration-story.\nAsset type: frame 3 of a Parallax visual identity storyboard, a wide 16:9 architectural reveal.\nInput image 1: CONTINUITY REFERENCE, the ordinary shop transaction. Preserve the same child, same short-haired faceted adult shopkeeper in ink sweatshirt/bone apron, two coins on the open shopkeeper hand, separated waiting child hand, single stylized loaf, the walnut counter and the light bone shop walls.\n\nCreate a NEW WIDER VIEW of that same moment, pulled back so the transaction occupies the right half and the surrounding street is revealed at left. Keep the recognizable shop interior and foreground people. The critical surreal operation: the large bone wall with its window has become an unmistakably FLAT PAINTED STAGE PANEL, hinged open toward the left like an enormous stiff page. Show its thin edge, visible bottom edge lifted above the ground, and a gap behind it. Behind the opened wall, a continuous broad walnut/ink floor plane leads directly into the street beyond. This single opened panel reveals the context that was outside the original frame. It must read as a deliberately impossible painted architectural cutaway, not as an ordinary open door or conventional window, not as a building collapsing.\nThe revealed street contains THREE contemporary adult neighbors at different depths and with different body attitudes: one leans against a doorway, one pauses with a plain tote, one turns toward another. Keep their heads seen FROM BEHIND, with only dark hair masses and plain necks, no face profiles or facial details. Broad simple apartment and shopfront shapes frame them, with no lettering. They must be substantial enough to read as distinct people and positions, not an anonymous dense crowd.\nArchitecture and people share a few strong oblique painted planes. Most surroundings remain broad calm bone, ink and walnut fields; one restrained amber plane links wall and counter. Much less fine landscape/foliage detail than the starting image. Strong asymmetry, clear human scale and generous negative space.\nForeground heads remain RICHLY FEATURELESS: 8–10 irregular asymmetric broad painted head facets, warm ochre/amber/bone/walnut, no eyes, brows, sockets, nose ridge or projection, mouth, lips or inner-ear marks. Uninterrupted forehead-to-chin contours; plain outer ear silhouettes allowed. Retain identity, adult proportions and observed clothing/hair/hand detail. All objects including loaf are painted, no photorealistic food.\nOne single spatial contradiction, no independent shadows, floating objects, extra hands, new facial parts, multiple copies of the people, lettering or captions. Mature handmade constructivist editorial art, matte opaque paint, selected dry-brush edges, not glossy 3D or photorealistic scenery.",
+      "referenced_images": [
+        {
+          "path": "03-shop-transaction.png",
+          "role": "Continuity reference for the transaction, characters, counter and daylight"
+        }
+      ],
+      "status": "selected",
+      "observation": "Useful wider view revealing the social setting; the panel reads chiefly as an architectural cutaway, so the intended impossible hinged-page reveal is not yet established."
+    },
+    {
+      "id": "05-unwatched-window",
+      "file": "05-unwatched-window.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-cf0eb551-1e38-4c21-9be4-c271ad4f7929.png",
+      "prompt": "Edit the supplied painted shop illustration to produce a closely matched comparison frame. This is an in-place image edit, not a new composition.\n\nPRESERVE the original composition, crop, camera, two foreground people, their exact head shapes and asymmetrical painted facets, all hair, clothing, hands and gestures, two ochre coins, the painted loaf, counter, walls, window mullions and daylight. Keep the foreground transaction suspended at exactly the same moment. No gesture, coin, prop or expression changes.\n\nONLY CHANGE: remove every passer-by or person visible outside the large window at left. Reconstruct the previously occluded street, paving, distant wall, building and foliage in the same broad painted style. The street should be empty, with no distant silhouettes or people, no face-shaped foliage, no reflections of people. The empty window remains a quiet ordinary daylight view.\n\nThe illustration must remain matte and visibly painted. Preserve the rich unequal planes in the foreground heads and the selected detail in hair, sleeves and hands. Every visible head remains completely featureless: no eyes, eyebrows, eye sockets, eyelids, nose, nose ridge, nostrils, mouth, lips or inner-ear marks, and no nose/lip protrusions. Do not add lettering, diagrams, symbols or explanatory effects. This is a changed circumstance, with no depicted outcome. Wide 16:9.",
+      "referenced_images": [
+        {
+          "path": "03-shop-transaction.png",
+          "role": "Matched composition and transaction; remove exterior people only"
+        }
+      ],
+      "status": "selected",
+      "observation": "Street figures removed while foreground action is held; generated edit is a close visual match rather than a pixel-identical alteration."
+    },
+    {
+      "id": "06-desk-daylight",
+      "file": "06-desk-daylight.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-bbb4ea19-662b-4d50-a2df-d00347bfdf08.png",
+      "prompt": "Create a new wide 16:9 editorial illustration for a Parallax visual-identity pilot. Use the FIRST reference as the character identity and painted-head authority. Use the SECOND reference for its adult contemporary desk situation and the relationship of hands, laptop and body; change its lighting, setting and framing substantially.\n\nShow the same slim young adult, short dark tousled hair, long neck, ink crew-neck sweatshirt and walnut trousers, sitting at a contemporary shared workspace in clear neutral daylight. One plain bone laptop, a modest long wooden desk and an angular simple chair. The person is low and off-center in the left third, seen in a readable near three-quarter view; their hands rest separately at the keyboard and desk, relaxed during a thoughtful pause. The person occupies about a third of the frame height to create a different scale from the earlier intimate desk image. Make head and hands large enough to read.\n\nArchitecture carries the wider setting: a tall bone wall, one high broad window, two spare dark vertical structural members, a plain glass partition at far right. The room is recognizably contemporary, with no period costume or ornate decor. No background people, signage, extra laptops, decorative props or plants. Broad flat bone and paper surfaces dominate. A single soft angular band of daylight connects the wall, floor and desk; subtle cooler gray daylight in shadow. Restrained warm ochre in the person and wood. Quiet large surfaces with much less grain and fewer fractured marks than in the night reference.\n\nThe figure should have selected drawn detail in grouped hair, weight-bearing sleeves, neckline, hands and trouser folds. The head is rich in eight to ten UNEQUAL ASYMMETRIC painted ochre, amber, bone and walnut planes describing its turning volume. Absolutely no eyes, eyebrows, eye sockets, eyelids, nose, nose ridge, nostrils, mouth, lips, teeth or inner-ear marks. A plain outer ear shape is allowed. The front contour is uninterrupted and cannot have a nose or lip protrusion. No face-like arrangements of patches. Do not smooth it into a blank oval; retain the strongly modeled painted planar form of reference one.\n\nMatte, hand-painted constructive geometry, purposeful hard and lost edges, adult editorial art. No glossy 3D, low-poly triangle mesh, photorealism, detailed skin, cinematic lens effects, airbrushed gradient face or generic vector clip art. Objects and room belong to the same drawn medium. Coherent ordinary spatial relationships; do not bend the desk into a wall or add an impossible object in this scene. No lettering.",
+      "referenced_images": [
+        {
+          "path": "01-head-turnaround.png",
+          "role": "Character and painted-head identity"
+        },
+        {
+          "path": "../context-tests/02c-desk-faceted-face.png",
+          "role": "Contemporary desk situation and selected drawing detail"
+        }
+      ],
+      "status": "selected",
+      "observation": "Same apparent character in a bone-dominant contemporary room. Large quiet planes add range. Figure is larger than the requested one-third frame height; head has fewer visible planes at this scale."
+    }
+  ],
+  "native_graphics": [
+    {
+      "file": "board-02-two-accounts.png",
+      "source": "two-accounts.html",
+      "method": "HTML layout rendered with Playwright; same selected PNG repeated without modifying its pixels",
+      "copy": {
+        "title": "Same action. Two accounts.",
+        "labels": [
+          "DUTY",
+          "PRUDENCE"
+        ],
+        "reasons": [
+          "Cheating a child is wrong.",
+          "Parents talk."
+        ],
+        "refrain": "Same bread. Same price. Same change."
+      }
+    },
+    {
+      "file": "board-04-street-diagram.png",
+      "source": "street-diagram.svg",
+      "method": "Authored SVG rendered with Playwright",
+      "copy": {
+        "title": "A fact about his street.",
+        "nodes": [
+          "Other customers",
+          "Neighbors",
+          "A competitor",
+          "Shopkeeper"
+        ],
+        "footer": "People compare notes. Reputation travels."
+      },
+      "palette_source": "tools/brand-treatment/palette.json",
+      "font_stack": "IBM Plex Sans, Arial, sans-serif; local render uses Arial fallback"
+    }
+  ],
+  "storyboard": [
+    {
+      "n": "01",
+      "file": "03-shop-transaction.png",
+      "beat": "BEAT 2",
+      "title": "Ordinary help",
+      "desc": "Usual price. Correct change. One plainly painted exchange.",
+      "alt": "A featureless faceted shopkeeper offers two coins to a child, with a painted loaf on the counter."
+    },
+    {
+      "n": "02",
+      "file": "board-02-two-accounts.png",
+      "beat": "BEAT 2",
+      "title": "Two accounts",
+      "desc": "The identical action under duty and prudence.",
+      "alt": "The exact same transaction repeated under the captions DUTY and PRUDENCE."
+    },
+    {
+      "n": "03",
+      "file": "04-street-reveal.png",
+      "beat": "BEAT 4",
+      "title": "The surrounding street",
+      "desc": "A wider view reveals the people around the shop.",
+      "alt": "A wider cutaway of the same shop encounter reveals neighbors in the street."
+    },
+    {
+      "n": "04",
+      "file": "board-04-street-diagram.png",
+      "beat": "BEAT 4",
+      "title": "A fact about his street",
+      "desc": "Painted geometry becomes a precise typeset relationship.",
+      "alt": "Other customers, neighbors and a competitor connect to the shopkeeper."
+    },
+    {
+      "n": "05",
+      "file": "05-unwatched-window.png",
+      "beat": "BEAT 5",
+      "title": "Watching removed",
+      "desc": "The street empties. The outcome stays unresolved.",
+      "alt": "The same foreground transaction with the people outside the window removed."
+    },
+    {
+      "n": "06",
+      "file": "06-desk-daylight.png",
+      "beat": "BEAT 8",
+      "title": "Return to the viewer",
+      "desc": "The same character in a quieter contemporary daylight room.",
+      "alt": "The featureless adult at a laptop in a spare bone-colored modern workspace."
+    }
+  ]
+}

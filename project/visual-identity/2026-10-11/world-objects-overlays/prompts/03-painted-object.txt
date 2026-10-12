@@ -1,0 +1,5 @@
+Use case: illustration-story.
+Asset: one isolated painted object on a genuinely transparent background, for independent animation in Parallax.
+Subject: a single small ceramic teacup, viewed slightly from above in three-quarter view. A round open rim, an oval dark interior, a thick ochre body tapering gently toward a stable foot, and one simple loop handle at the right. Its rim, inner opening, foot and handle have coherent ceramic geometry. No saucer or other objects.
+Medium: mature editorial gouache, matte opaque ochre, bone highlights and walnut/ink shadow planes. Model its volume with a few unequal broad planes and two or three selected brush-edge details. Make the cup feel observed and hand painted, with subtle asymmetry, rather than a perfect icon or a photorealistic product shot. Plain surface, no logo, writing, pattern or ornament.
+Center the full cup with generous transparent margin. No ground plane, cast shadow, backdrop, checkerboard drawn into the image, glossy glaze, reflections or 3D render finish.

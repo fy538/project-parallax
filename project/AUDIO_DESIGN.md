@@ -8,6 +8,8 @@ The core insight: viewers process audio subconsciously. Good sound design doesn'
 
 Created: May 2, 2026
 
+> **Under review (October 10, 2026).** Research for the first alignment episode (`analysis/sound-under-narration-research-2026-10-10.md`) contradicts several rules below: the continuous music bed, "avoid silence longer than 3 seconds", a transition sound at every beat boundary, and the quotas of 15–25 transition sounds and 30–50 texture hits. `ai-care-motives` uses a thinned plan instead: music as cues over about 40% of the runtime, 4 transition sounds, at most 2 texture hits, levels set by loudness (music 16–20 LU under the narration). This document, the `audio-spec` skill and the generator's default cue map have not been rewritten; decide that after the episode has been heard with sound.
+
 **Related docs:**
 - **VISUAL_LANGUAGE.md** — visual mode decisions that pair with audio choices
 - **SCRIPT_FORMAT.md** — where audio cues are annotated in the two-column format

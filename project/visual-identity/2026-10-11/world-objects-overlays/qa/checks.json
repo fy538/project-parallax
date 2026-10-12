@@ -1,0 +1,321 @@
+{
+  "assets": [
+    {
+      "id": "01-quiet-scenery",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "02-architectural-scenery",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "02b-architectural-scenery",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "03-painted-object",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "04-architectural-object",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "07-light-background",
+      "hashAndOriginalCopy": true
+    },
+    {
+      "id": "08-dark-background",
+      "hashAndOriginalCopy": true
+    }
+  ],
+  "clips": [
+    {
+      "id": "WorldStudy1",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 6508607,
+      "decodedFrameHashes": [
+        "b82b0cf98a9e0c5b5dee8a2e43c7a5767ebf7f8b74ccf45c47f1864503209fee",
+        "1935be5538838d95862306aa9adddb1f085f3efadf3bb75b95983b5a852d9769",
+        "5918f5b5f2bb7d286956e00d64edd4d97aed3bb1ed2d0f9083c73c24150987c4"
+      ]
+    },
+    {
+      "id": "WorldStudy2",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 3191440,
+      "decodedFrameHashes": [
+        "be766800cd5404cf784209c4a7d041e49e70d00e35a25cd07069aa455c6bcb20",
+        "1e6078f3741d3a0f17e0db17e34c0a2c75a4af25f9fae6768421e46afdc52b8c",
+        "c6594325f472e91b6ac50b5ed55492876bd41a3ceec8127cd090e90448197a4e"
+      ]
+    },
+    {
+      "id": "WorldStudy3",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 1734199,
+      "decodedFrameHashes": [
+        "35f63bb673ae3c668fa3025983003843016be563c0928264f3a4e38d01bbc626",
+        "e4aea39692567f9b121b2e229189126e7c72228fa5c61108abc4f4d392c62a73",
+        "38c6efa00c040e1f01cf2fc3339ebb611749a81a34b5f40056e58bb1943e77af"
+      ]
+    },
+    {
+      "id": "WorldStudy4",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 3223832,
+      "decodedFrameHashes": [
+        "1752d1b4c08db74a967921d86f1ffa336123b005052ab9958689d24f1eb7c160",
+        "b0d76aaf4014fb4fefe068383582130389610ffae8931d2863f45e3ca85c3d5f",
+        "512279c559f0c253ca574d7a80146d4bc805ed1871fcb697b8ec0de65f2124e5"
+      ]
+    },
+    {
+      "id": "WorldStudy5",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 772815,
+      "decodedFrameHashes": [
+        "3db9f8474d7071b0701db0e654fd80e25fbe0f6d86a3486bc544ab0088349dc3",
+        "bbce940ee143f86bebf533ba291009f4a1ce8397d4a48f9a00e25bf9c136f922",
+        "843daf56d800e9152e83a3363d6baa6f199fc07983fabddb66b8ced681cba76a"
+      ]
+    },
+    {
+      "id": "WorldStudy6",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 900377,
+      "decodedFrameHashes": [
+        "5d2da3ea34d0838e385111f7556a772740790417d2153d362300065d78a7d527",
+        "fca884ee12e9d9a7a2f461dd88e555dbda0242b12b5f977785cbf08c629db6e9",
+        "f2b8f2a5c8273a3c5b3114fc60f14db2a69fb5cf4d6a5aa146c036a9b1b36b24"
+      ]
+    },
+    {
+      "id": "WorldStudy7",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 643948,
+      "decodedFrameHashes": [
+        "903bd0845def70abec250a2a2f7eae26f159e341c55ee947459e338ebb6ac5fd",
+        "1634179cdc369413efe2b441c3a327e4c703f7af437ae8c4f9d6fb38b9e27535",
+        "064b742117ac5f2081ec3c0c763d75634e0f6458eac42f3e96b53b8778040bbc"
+      ]
+    },
+    {
+      "id": "WorldStudy8",
+      "pass": true,
+      "motionPresent": true,
+      "duration": 6,
+      "width": 1920,
+      "height": 1080,
+      "fps": "30/1",
+      "frames": "180",
+      "codec": "h264",
+      "pixelFormat": "yuv420p",
+      "colorSpace": "bt709",
+      "colorTransfer": "bt709",
+      "colorPrimaries": "bt709",
+      "bytes": 637968,
+      "decodedFrameHashes": [
+        "6ec024b8752d7ca81d7dcb17238b25006159c8ddf38fc26d4557c999c194a9ca",
+        "38d34c732ea8ccecd4c736eadf6dda1362942001269d34e3b7f2a3ad3c454b09",
+        "9efcb2da58dd646f6545e882ccc7600df4ae44782b1085e10c5730744c3a579c"
+      ]
+    }
+  ],
+  "gallery": {
+    "images": [
+      {
+        "file": "renders/01-quiet-scenery.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/02-architectural-scenery.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/03-painted-object.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/04-architectural-object.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/05-analytical-overlay.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/06-spatial-overlay.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/07-light-background.png",
+        "loaded": true
+      },
+      {
+        "file": "renders/08-dark-background.png",
+        "loaded": true
+      },
+      {
+        "file": "assets/02-architectural-scenery.png",
+        "loaded": true
+      }
+    ],
+    "videos": [
+      {
+        "file": "renders/01-quiet-scenery.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/02-architectural-scenery.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/03-painted-object.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/04-architectural-object.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/05-analytical-overlay.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/06-spatial-overlay.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/07-light-background.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      },
+      {
+        "file": "renders/08-dark-background.mp4",
+        "width": 1920,
+        "height": 1080,
+        "duration": 6,
+        "error": null
+      }
+    ],
+    "overflow": false,
+    "studies": 8,
+    "playback": [
+      {
+        "time": 0.833618,
+        "paused": false
+      },
+      {
+        "time": 0.833644,
+        "paused": false
+      }
+    ],
+    "paused": true,
+    "stillMode": "stills",
+    "motionMode": "motion",
+    "modal": true,
+    "modalClosed": true,
+    "mobileOverflow": false,
+    "pageErrors": [],
+    "missingLinks": []
+  },
+  "errors": []
+}

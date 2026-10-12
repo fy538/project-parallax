@@ -1,0 +1,22 @@
+{
+  "composition": "PaintedArgument",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "durationInFrames": 780,
+  "frames": [
+    0,
+    105,
+    179,
+    180,
+    255,
+    330,
+    450,
+    510,
+    540,
+    600,
+    690,
+    779
+  ],
+  "elapsedMs": 24957
+}

@@ -1,0 +1,172 @@
+{
+  "title": "Parallax signature-reveal comparison",
+  "date": "2026-10-10",
+  "method": "Built-in image_gen.imagegen for painted edits and transparent layers; authored local HTML/Canvas/SVG animation, with deterministic frames exported by Playwright and encoded by ffmpeg. No external video generation.",
+  "generator_version": "Not exposed by built-in tool",
+  "settings": {
+    "requested_aspect_ratio": "16:9",
+    "seed": "Not exposed",
+    "transparent_background": "true for foreground/page; false for full scenes/backing plate"
+  },
+  "common_before": {
+    "file": "before.png",
+    "source": "../character-and-storyboard/03-shop-transaction.png",
+    "method": "Unmodified file copy"
+  },
+  "comparisons": [
+    {
+      "id": "A",
+      "after": "a-opening-panel-two-coins.png",
+      "operation": "Window-wall opens as a thin painted page",
+      "selection": "Selected for authored motion proof"
+    },
+    {
+      "id": "B",
+      "after": "b-continuous-surface.png",
+      "operation": "Counter becomes a continuous street surface"
+    },
+    {
+      "id": "C",
+      "after": "c-pullback.png",
+      "operation": "Ordinary wider architectural cutaway",
+      "source": "../character-and-storyboard/04-street-reveal.png",
+      "method": "Existing endpoint, unmodified file copy"
+    }
+  ],
+  "assets": [
+    {
+      "id": "a-opening-panel",
+      "file": "a-opening-panel.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-32ecf593-46bb-44e4-a7a1-18fa863a9300.png",
+      "prompt": "Use case: illustration-story. Asset: the AFTER image for a surreal spatial-reveal comparison, wide 16:9.\n\nInput 1 is the original shop transaction and is the authority for the two foreground characters, two coins, painted loaf, clothes, hair, hands, head planes, warm palette and drawing. Input 2 is the wider endpoint and is the authority for the smaller foreground figures at right and the three neighbors in the street at left. Edit input 2, keeping its camera, foreground transaction and street people closely matched.\n\nCHANGE ONE THING: the tall bone window-wall between the transaction and street is a THIN PAINTED SHEET that has opened like a page. Make the impossible material change unmistakable. A large diagonal fold crosses the upper half of the sheet; its top-left corner has folded forward and downward, exposing a broad plain bone reverse side and a thin dark paper edge. The painted window and its mullions bend together across this one crease. The sheet's lower edge is visibly lifted above the floor with a clear triangular gap. The flat painted street continues into real occupied space behind the lifted page. No thick masonry, ordinary doorway, open hinged door or curved room corner: the wall and window are a picture printed on a very thin architectural-scale page. Keep the fold broad, graphic, matte and geometric, not glossy CGI or photoreal paper.\n\nLeave the shopkeeper, child, separated reaching hands, two coins, single painted loaf and right-hand counter untouched in their readable state. The three main neighbors remain differentiated by silhouette and clothes, all heads turned away; do not create additional faces. Retain a quiet bone field, warm ink/umber/walnut forms, rich unequal painted planes in the foreground heads and selected hair/garment/hand detail. Bread remains painted.\n\nAbsolute head constraint at all scales: no eyes, eyebrows, eye sockets, nose, nose ridge, nostrils, mouth, lips, teeth or inner-ear marks, and no nose/lip silhouette protrusions. Plain outer ears allowed. Do not add lettering, symbols, floating props, extra people, independent shadows or another spatial trick. The one change of material should reveal the social setting, without depicting a hidden motive.",
+      "referenced_images": [
+        {
+          "path": "../character-and-storyboard/03-shop-transaction.png",
+          "role": "Original transaction and identity"
+        },
+        {
+          "path": "../character-and-storyboard/04-street-reveal.png",
+          "role": "Wide endpoint edit target and composition"
+        }
+      ],
+      "status": "superseded",
+      "observation": "Large folded thin window-wall gives an explicit material contradiction; foreground remains closely matched. Coin count needs checking."
+    },
+    {
+      "id": "b-continuous-surface",
+      "file": "b-continuous-surface.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-efbdbf08-e614-469e-b2e1-d32d093f5ed1.png",
+      "prompt": "Use case: illustration-story. Asset: AFTER image for a second surreal spatial-reveal comparison, wide 16:9.\n\nInput 1 is the original transaction: identity authority for shopkeeper, child, short dark hair, rich featureless heads, clothing, separated hands, exactly TWO ochre coins and ONE painted loaf. Input 2 is the wide endpoint: edit this composition, keeping the two foreground figures on the right at the same size and positions, three neighbors in the street at left, bone wall and window and warm painted daylight.\n\nCHANGE THE COUNTER INTO A CONTINUOUS SURFACE. At the right, the shopkeeper's counter is ordinary, with the loaf and unchanged hands above it. Its wooden top extends leftward beyond the child in a very broad, clearly outlined ribbon. We can follow ONE UNBROKEN near edge from the foreground counter across the lower middle and into the street at left. As that surface recedes, its broad wood planes become the paving planes beneath the three full-size neighbors' feet. A single large angular bend joins waist-height counter and street-level pavement. The one surface literally belongs to two spaces; the counter and street cannot be separated at a threshold. Show the dark narrow thickness of the ribbon along its near edge and a clear gap below the bend, making the impossible continuity legible. The wooden top gradually becomes matte stone paving, with no cut, pasted picture, fog, dissolving particles or decorative mosaic. This is an architectural perspective contradiction, not a table holding miniature people. Keep people at the same apparent human scale as input 2.\n\nLeave the transaction readable and closely matched, including the adult's two coins, child's waiting palm, painted loaf, hair, clothes and head planes. Keep all three street neighbors, shown from behind so there are no small profile facial features. Walls are broad quiet bone and walnut shapes. The wall and window remain ordinary; do not fold or peel the wall in this version.\n\nMatte hand-painted constructive geometry, unequal broad planes, selected detail in hair, hands and clothes; painted objects rather than photoreal bread. No uniform tiny triangular mesh, CGI or glossy materials. Every visible face must have NO eyes, eyebrows, eye sockets, eyelids, nose, nose ridge, nostrils, mouth, lips, teeth, inner-ear marks or nose/lip protrusions. Outer plain ear silhouettes are allowed. No lettering, diagram nodes, supernatural lighting, extra people, extra coins or second surreal trick. The surface connects the exchange to the people around it, without representing an invisible motive.",
+      "referenced_images": [
+        {
+          "path": "../character-and-storyboard/03-shop-transaction.png",
+          "role": "Transaction identity"
+        },
+        {
+          "path": "../character-and-storyboard/04-street-reveal.png",
+          "role": "Wide endpoint edit target"
+        }
+      ],
+      "status": "candidate",
+      "observation": "The raised ribbon connects the counter to paving beneath the neighbors; quieter than the folded page, though also readable as an unusual raised walkway."
+    },
+    {
+      "id": "a-opening-panel-two-coins",
+      "file": "a-opening-panel-two-coins.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-ab72224f-390f-477a-89eb-b4997b3393bd.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the supplied painted shop scene with a folded paper window-wall. Make ONE SMALL correction only. In the shopkeeper's extended palm, show exactly TWO separate plain ochre coins. Remove any third coin-like disk, and reconstruct that tiny area as the angular painted hand. Both coins should be clearly counted, with one slightly left and the other slightly right, neither obscuring the other. Preserve the hand's existing pose and anatomical silhouette. Everything else must remain unchanged: folded window-wall, diagonal crease and thin paper edge, all street neighbors, camera, foreground characters, rich featureless heads, clothes, child palm, loaf, counter, lighting, color and drawing. No eyes, nose, mouth or facial parts may be added. No text or new objects. Wide 16:9.",
+      "referenced_images": [
+        {
+          "path": "a-opening-panel.png",
+          "role": "Edit target, coin count only"
+        }
+      ],
+      "status": "selected-for-motion",
+      "observation": "Two clearly separated coins restored; the folded thin painted window-wall is the most explicit surreal change of the three stills."
+    },
+    {
+      "id": "motion-background",
+      "file": "motion-background.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-cb205c6a-8f9d-4989-929c-c491c620ada6.png",
+      "prompt": "Use case: precise-object-edit. Asset: opaque full-canvas backing plate for a locally authored animation. Edit the supplied wide painted shop scene. Output the SAME 16:9 composition and dimensions.\n\nREMOVE the entire foreground shopkeeper, child, coins, loaf and counter. REMOVE the tall central bone window-wall panel, its window, mullions and the vertical dark post immediately to its left. Reconstruct the spaces those objects concealed. Keep all THREE street neighbors at left, with their exact relative scale, stance, hair, back-facing heads and clothes. Keep the existing street, buildings and tree closely matched.\n\nBehind where the central window-wall stood, extend the SAME street view coherently: continuous pale paving, a quiet building facade and a small amount of broad painted foliage. No additional people or props. Behind the removed shopkeeper and counter at right, restore the existing broad blank bone shop wall and simple warm wooden floor; retain the two paper bags on their shelf at upper-right. The street on the left and shop floor on the right are openly adjacent in this stage-like space. No window frame, paper page, door or partition anywhere in the central empty region. This backing plate will sit behind separate painted window-wall and foreground layers.\n\nMatte hand-painted constructive geometry and the SAME warm light and palette. Broad quieter empty surfaces. All remaining heads face away, with no profile noses or lips or facial parts. No text, diagrams, extra objects or independent shadows. No transparency for this plate.",
+      "referenced_images": [
+        {
+          "path": "../character-and-storyboard/04-street-reveal.png",
+          "role": "Backing plate edit target"
+        }
+      ],
+      "status": "motion-layer",
+      "observation": "Opaque plate reconstructs the street and shop behind removed foreground and window-wall. Three back-facing neighbors retained."
+    },
+    {
+      "id": "motion-foreground",
+      "file": "motion-foreground.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-e3833c8d-8706-4529-8ec3-0e05e21618cd.png",
+      "prompt": "Use case: background-extraction. Asset: transparent foreground layer for a local painted animation. Edit target: the supplied wide shop illustration.\n\nExtract ONLY the shopkeeper, child, both of their complete visible bodies and hands, exactly two ochre coins on the shopkeeper's palm, one painted loaf, and the entire right-hand wooden counter. Preserve their exact current placement, scale, silhouettes, painted head facets, hair, clothes, poses and all selected drawn detail. Keep the FULL original wide 16:9 canvas and original registration: shopkeeper at upper-right, child lower-center-right, counter occupying lower-right. Do not recenter, crop to content, rearrange or change the view. These pieces will be laid over a backing plate at the same size.\n\nMake EVERYTHING ELSE transparent: all wall, window, mullions, street, tree, shelf and paper bags, neighbors, floor and post. The gaps between hands, between child and shopkeeper, beside heads and under the child arm must truly be transparent. No residual architecture, white matte, colored outline, background glow, cast shadow, checkered drawing or gray stage. The counter and figures must be the only opaque content. Preserve an opaque counter and clothing.\n\nForeground heads remain rich unequal asymmetrical planes WITHOUT eyes, eyebrows, eye sockets, nose, nose ridge, nostrils, mouth, lips or inner-ear marks. No nose/lip silhouette protrusions. Plain outer ear shapes allowed. The two coins must remain two, plainly countable. Do not redraw the foreground into a different style. A transparent PNG with the same original canvas framing.",
+      "referenced_images": [
+        {
+          "path": "../character-and-storyboard/04-street-reveal.png",
+          "role": "Foreground extraction edit target"
+        }
+      ],
+      "status": "motion-layer",
+      "observation": "Transparent foreground keeps the transaction and registration closely matched. Layer is generated rather than an exact segmentation."
+    },
+    {
+      "id": "motion-page",
+      "file": "motion-page.png",
+      "source_path": "/Users/feihuyan/.codex/generated_images/01a126bb-ab38-7011-956c-716c88861642/exec-22a90e4c-fd18-4619-89cf-f85e8e909563.png",
+      "prompt": "Use case: background-extraction. Asset: transparent window-wall layer for a locally authored animation. Edit target: the supplied wide painted shop scene.\n\nExtract ONLY the tall flat bone window-wall in the center of the image. It begins at approximately 35 percent of the canvas width and ends at approximately 62 percent, extends beyond the upper canvas edge, and has a visible straight bottom edge at approximately 82 percent of canvas height. It contains the dark rectangular painted window and the outside tree/street view painted inside that window. Treat the ENTIRE window as an OPAQUE painted picture, not a hole: its depicted street, tree and glass stay opaque together with the bone wall. This flat layer will rotate as one architectural-scale painted page.\n\nPreserve its exact original location and scale in the FULL original wide 16:9 canvas. Reconstruct the small lower-right areas originally hidden by the child, counter and adult hand as plain quiet bone paint so the page has a continuous simple straight right edge and bottom edge. Keep the same bone/warm umber palette and matte drawn medium. Give the left and bottom edge a very thin dark line indicating the paper's edge. The page is FLAT in this extracted starting layer: no curl, fold or perspective change yet.\n\nMake EVERYTHING ELSE fully transparent: shopkeeper, child, all foreground hands, coins, loaf, counter, floor, shelf, paper bags, left street neighbors and the dark vertical structural post just left of the bone page. No people remain anywhere, including in the painted window. No gray background, checkerboard drawing, white matte, halo, lettering, extra wall or added props. Only the single opaque window-wall page, on genuine transparency. Do not crop to its bounding box or recenter it.",
+      "referenced_images": [
+        {
+          "path": "../character-and-storyboard/04-street-reveal.png",
+          "role": "Window-wall extraction edit target"
+        }
+      ],
+      "status": "motion-layer",
+      "observation": "Opaque painted window-wall on a transparent full-size canvas, with no remaining people."
+    }
+  ],
+  "comparison_limits": "A and B share the original and wide-view references; generated edits are close matches, not pixel-identical controlled changes. C is the retained ordinary cutaway. The local motion proof uses separately generated registered layers, not exact segmentation and not a reconstruction of every fold in A.",
+  "face_rule": "No eyes, eyebrows, eye sockets, eyelids, nose, nose ridge, nostrils, mouth, lips, teeth, inner-ear marks or nose/lip silhouette protrusions. Plain outer ear silhouettes may remain.",
+  "motion_proof": {
+    "file": "opening-panel-motion.mp4",
+    "duration_seconds": 14,
+    "fps": 24,
+    "width": 1920,
+    "height": 1080,
+    "audio": false,
+    "scope": "Camera pullback, painted window-wall movement behind held foreground, and a transition to a sequentially revealed street diagram. Tests authored composition and timing; no character movement or AI image-to-video consistency is claimed.",
+    "layer_files": [
+      "motion-background.png",
+      "motion-page.png",
+      "motion-foreground.png"
+    ],
+    "renderer": "motion-canvas.js",
+    "exporter": "record-motion.cjs",
+    "render_log": "../../../../episodes/ai-care-motives/render-logs/20261010T200000-identity-opening-panel-canvas.log",
+    "checks": "video-checks.json",
+    "rendering_note": "Canvas projects the unchanged painted window-wall layer through a perspective mesh. This approximates a hinged page, without reproducing the diagonal crease of still A.",
+    "superseded_render_attempts": [
+      {
+        "log": "20261010T194044-identity-opening-panel.log",
+        "status": "Interrupted: screenshot stream stalled"
+      },
+      {
+        "log": "20261010T194643-identity-opening-panel-v2.log",
+        "status": "Failed: moving CSS layer screenshot timed out"
+      },
+      {
+        "log": "20261010T194939-identity-opening-panel-recording.log",
+        "status": "Superseded: startup frame detected"
+      },
+      {
+        "log": "20261010T195254-identity-opening-panel-final.log",
+        "status": "Rejected in visual QA: browser recording froze on opening frame"
+      }
+    ],
+    "postflight_log": "../../../../episodes/ai-care-motives/render-logs/20261010T200237-identity-opening-panel-verified.log",
+    "verification": "14-second duration, 1920x1080, 24fps, 336 frames, BT.709, no audio; decoded MP4 phases differ; clip postflight and gallery checks pass.",
+    "export_log_note": "The render wrapper compares duration with the full 678.6-second episode. That automatic check is outside this study's scope; the standalone clip postflight passes and exporter checks 14 seconds."
+  }
+}

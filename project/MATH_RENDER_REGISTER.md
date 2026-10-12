@@ -137,6 +137,8 @@ Authored as `\textcolor{HEX}{TERM}` inside any step's TeX. Crossfade engine hand
 | gold | `#C4A747` | primary accent, "look here" |
 | rust | `#A64D46` | china / danger / boundary clause |
 | dustblue | `#7AA3C9` | us / cool semantic |
+| goldText | `#786526` | gold for text on light cards (WCAG 4.5:1; plain gold is ~2:1 on paper) |
+| dustblueText | `#3C6A95` | dustblue for text on light cards (WCAG 4.5:1) |
 | walnut | `#5C4A3D` | secondary emphasis, faded weight |
 | ink | `#1C1814` | body color (default; rarely needed explicitly) |
 
