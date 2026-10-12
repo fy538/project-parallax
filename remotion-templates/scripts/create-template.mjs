@@ -11,7 +11,8 @@
  *   src/templates/MyNewTemplate/
  *   ├── types.ts           — Data interface with standard fields
  *   ├── MyNewTemplate.tsx  — Component with all hooks + conventions pre-wired
- *   └── index.tsx          — Composition wrapper with calculateMetadata
+ *   ├── schema.ts          — Zod schema for Studio and manifest validation
+ *   └── index.tsx          — Composition wrapper with editable defaults
  *
  * All generated code uses:
  *   - useCompositionAnimation() — single source of drift + enter/exit fade (L44, L66)
@@ -23,7 +24,7 @@
  *
  * After generating, you still need to:
  *   1. Add to Root.tsx (import + <Composition /> in appropriate folder)
- *   2. Add to FullEpisode.tsx TEMPLATE_COMPONENTS map
+ *   2. Add to Episodes/templateRegistry.ts and templateSchemas.ts
  *   3. Create a sample JSON data file in data/episodes/
  */
 
@@ -116,6 +117,23 @@ export interface ${templateName}Data {
 }
 `;
 
+// schema.ts — keep fields aligned with types.ts as the template evolves.
+const schemaContent = `import { z } from "zod";
+
+export const ${templateName}Schema = z.object({
+  data: z.object({
+    title: z.string(),
+    titleCn: z.string().optional(),
+    subtitle: z.string().optional(),
+    backgroundVariant: z.enum(["light", "dark"]).optional(),
+    backgroundTint: z.string().optional(),
+    accentColor: z.string().optional(),
+    episode: z.string().optional(),
+    durationSec: z.number().positive().optional(),
+  }),
+});
+`;
+
 // Component.tsx
 const componentContent = `/**
  * ${templateName} — [DESCRIBE YOUR TEMPLATE HERE]
@@ -203,32 +221,33 @@ const indexContent = `import { Composition } from "remotion";
 import { ${templateName} } from "./${templateName}";
 import { layout, sec } from "../../design/theme";
 import type { ${templateName}Data } from "./types";
+import { ${templateName}Schema } from "./schema";
 
 export { ${templateName} } from "./${templateName}";
 export type { ${templateName}Data } from "./types";
+export { ${templateName}Schema } from "./schema";
 
 // TODO: Import sample data JSON once created:
 // import sampleData from "../../../data/episodes/YOUR_EPISODE/YOUR_DATA.json";
-
-const PLACEHOLDER_DATA: ${templateName}Data = {
-  title: "${templateName} Title",
-  subtitle: "Subtitle goes here",
-  backgroundVariant: "${defaultMode}",
-  episode: "episode-slug",
-  durationSec: 10,
-};
 
 export const ${templateName}Composition = () => (
   <Composition
     id="${templateName}"
     component={${templateName}}
+    schema={${templateName}Schema}
     calculateMetadata={({ props }) => ({
       durationInFrames: sec((props.data as ${templateName}Data).durationSec ?? 10),
       fps: layout.fps,
       width: layout.width,
       height: layout.height,
     })}
-    defaultProps={{ data: PLACEHOLDER_DATA as ${templateName}Data }}
+    defaultProps={{ data: {
+      title: "${templateName} Title",
+      subtitle: "Subtitle goes here",
+      backgroundVariant: "${defaultMode}" as const,
+      episode: "episode-slug",
+      durationSec: 10,
+    } }}
   />
 );
 `;
@@ -238,6 +257,7 @@ export const ${templateName}Composition = () => (
 fs.mkdirSync(templateDir, { recursive: true });
 
 fs.writeFileSync(path.join(templateDir, "types.ts"), typesContent);
+fs.writeFileSync(path.join(templateDir, "schema.ts"), schemaContent);
 fs.writeFileSync(
   path.join(templateDir, `${templateName}.tsx`),
   componentContent
@@ -250,19 +270,21 @@ console.log(`
   ${templateDir}/
   ├── types.ts
   ├── ${templateName}.tsx
+  ├── schema.ts
   └── index.tsx
 
 Next steps:
-  1. Edit types.ts — add your data fields
+  1. Edit types.ts and schema.ts together — add your data fields
   2. Edit ${templateName}.tsx — build the visualization
-  3. Create sample JSON in data/episodes/
-  4. Update index.tsx to import the sample data
-  5. Add to Root.tsx:
+  3. Create sample JSON in data/episodes/; update index.tsx defaults if useful
+  4. Add to Root.tsx:
      import { ${templateName}Composition } from "./templates/${templateName}";
      <${templateName}Composition />
-  6. Add to FullEpisode.tsx TEMPLATE_COMPONENTS map:
+  5. For manifest use, add to Episodes/templateRegistry.ts TEMPLATE_COMPONENTS:
      import { ${templateName} } from "../${templateName}/${templateName}";
      ${templateName},
-  7. Run: npx tsc --noEmit
-  8. Preview: npm run snapshot ${templateName}
+  6. Add ${templateName}Schema to Episodes/templateSchemas.ts TEMPLATE_SCHEMAS.
+  7. Add the component name to data/assembly-manifest.schema.json's template enum.
+  8. Run: npm run typecheck && npm run test:unit && npm run lint
+  9. Preview: npm start (or npm run snapshot -- ${templateName})
 `);

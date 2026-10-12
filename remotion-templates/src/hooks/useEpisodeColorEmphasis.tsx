@@ -37,6 +37,14 @@ import {
   EMPHASIS_VALUES,
   getEpisodeColorEmphasis,
 } from "../design/theme";
+import { ensureCjkFonts } from "../design/fonts";
+
+/** Emphases whose display face falls back to a Chinese or Japanese family. */
+const CJK_EMPHASES: ReadonlySet<string> = new Set([
+  "chinese-state",
+  "chinese-traditional",
+  "japanese-showa",
+]);
 
 // ── Pure helpers (testable without React) ──────────────────────────────────
 
@@ -121,7 +129,10 @@ export const EpisodeColorEmphasisProvider: React.FC<EpisodeColorEmphasisProvider
  * template renders get the channel default automatically.
  */
 export function useEpisodeColorEmphasis(): PaletteEmphasis {
-  return useContext(EpisodeColorEmphasisContext).palette;
+  const { name, palette } = useContext(EpisodeColorEmphasisContext);
+  // These emphases name a Chinese or Japanese display face as a fallback.
+  if (CJK_EMPHASES.has(name)) ensureCjkFonts();
+  return palette;
 }
 
 /**

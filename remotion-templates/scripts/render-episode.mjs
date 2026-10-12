@@ -54,15 +54,40 @@ const args = process.argv.slice(2);
 const episode = args.find((a) => !a.startsWith("--"));
 const sequence = episode ? loadSequence(episode) : null;
 if (!episode || !sequence) {
-  console.error(`Usage: node scripts/render-episode.mjs <episode> [--preview] [--concat] [--only=01,02] [--from=16]`);
+  console.error(`Usage: node scripts/render-episode.mjs <episode> [--preview] [--concat] [--only=01,02] [--from=16] [--lang=en|zh]`);
   console.error(`Available episodes: ${availableEpisodes().join(", ") || "(none — add scripts/sequences/<slug>.json)"}`);
   process.exit(1);
 }
 
 const preview = args.includes("--preview");
 const concat = args.includes("--concat");
+const skipPreflight = args.includes("--skip-preflight");
 const onlyArg = args.find((a) => a.startsWith("--only="));
 const fromArg = args.find((a) => a.startsWith("--from="));
+// --lang selects the cut: "en" (default) reads assembly-manifest.json and
+// writes out/<episode>/; "zh" reads assembly-manifest.zh.json and writes
+// out/<episode>/zh/ so the two language cuts never collide. The ZH manifest is
+// produced by `generate_manifest.py --lang zh --audio narration.zh.wav`.
+const langArg = args.find((a) => a.startsWith("--lang="));
+const lang = langArg ? langArg.split("=")[1] : "en";
+if (!["en", "zh"].includes(lang)) {
+  console.error(`Unknown --lang=${lang} (expected en or zh)`);
+  process.exit(1);
+}
+
+// ── Preflight gate ───────────────────────────────────────────────────────────
+// Run python preflight check before any rendering begins. Exits 1 on hard errors.
+// Bypass with --skip-preflight (e.g. when called from render.sh which already ran it).
+if (!skipPreflight) {
+  const { execFileSync } = await import("child_process");
+  const repoRoot = join(ROOT, "..");
+  try {
+    execFileSync("python3", [join(repoRoot, "tools", "preflight.py"), episode], { stdio: "inherit" });
+  } catch {
+    console.error("✗ Preflight failed. Fix errors above before rendering. Use --skip-preflight to bypass.");
+    process.exit(1);
+  }
+}
 const onlySet = onlyArg ? new Set(onlyArg.split("=")[1].split(",")) : null;
 const fromSeq = fromArg ? fromArg.split("=")[1] : null;
 
@@ -113,7 +138,10 @@ if (!browserArg) {
 // (subtract segment.startSec), and inject into data._direction before invoking
 // Remotion. Without this bridge, useBeatSync is dormant on every render.
 const dataDir = join(ROOT, "data", "episodes", episode);
-const manifestPath = join(dataDir, "assembly-manifest.json");
+const manifestPath = join(
+  dataDir,
+  lang === "en" ? "assembly-manifest.json" : `assembly-manifest.${lang}.json`,
+);
 
 function buildSyncPointsLookup() {
   if (!existsSync(manifestPath)) return new Map();
@@ -155,7 +183,7 @@ if (syncPointsByDataFile.size > 0) {
 
 // ─── Render ─────────────────────────────────────────────────────────────────
 
-const outDir = join(ROOT, "out", episode);
+const outDir = lang === "en" ? join(ROOT, "out", episode) : join(ROOT, "out", episode, lang);
 mkdirSync(outDir, { recursive: true });
 
 console.log(`\n${"═".repeat(60)}`);

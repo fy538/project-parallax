@@ -175,6 +175,9 @@ const COMPOSITIONS = [
   "BubbleMatrix",
   "BarChartRace",
   "SanctionsNetwork",
+
+  // 2026-05-24 — generative flow-field hold-beat backdrop
+  "GenerativeBackdrop",
 ];
 
 // Shorts compositions — IDs match the Root.tsx registrations (note the

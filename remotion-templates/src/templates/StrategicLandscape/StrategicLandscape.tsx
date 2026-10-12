@@ -67,6 +67,7 @@ const PLOT_PADDING = 120; // Padding around plot area for labels
 // two blue entries. The shared sequence (us → china → gold → umber →
 // walnut → taupe) is genuinely distinct and reusable across templates.
 import { categorical } from "../../design/theme";
+import { SlugGate } from "../../hooks/useChromeLevel";
 const DEFAULT_ACTOR_COLORS = categorical;
 
 // ── Helper: detect Chinese text ─────────────────────────────────────────────
@@ -559,7 +560,7 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
 
       {/* Episode label */}
       {data.episode && (
-        <div
+        <SlugGate><div
           style={{
             position: "absolute",
             bottom: layout.safeAreaTier.generous.bottom,
@@ -572,7 +573,7 @@ export const StrategicLandscape: React.FC<{ data: StrategicLandscapeData }> = ({
           }}
         >
           {data.episode}
-        </div>
+        </div></SlugGate>
       )}
       </AbsoluteFill>
       {/* Brand strips */}

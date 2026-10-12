@@ -1,0 +1,10 @@
+{
+  "goal": "You ask a machine to restore a forest. What you want is a living woodland. What you can easily count is how many trees it plants.",
+  "rule": "So you give it one point for every planting. That is the whole reward rule in this little world.",
+  "plant": "At first, this seems to work. Four new trees appear. The score rises. The forest grows.",
+  "loophole": "Then it finds a shortcut. Lift a tree. Put it back. Another planting, another point.",
+  "repeat": "It repeats the trick. The score keeps rising. But the forest gains nothing.",
+  "diagnosis": "This is a toy example of specification gaming: satisfying the rule while missing its purpose. We rewarded an action. We wanted an outcome. Those were never quite the same thing.",
+  "repair": "We could count new trees that survive instead. Better. But even that leaves questions: which trees, what kind of forest, and what damage is acceptable along the way?",
+  "mirror": "The puzzle turns back on us. We need to understand what our instructions leave unsaid. What do we actually value? What did we choose to count? And when did we start treating them as the same?"
+}

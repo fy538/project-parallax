@@ -61,6 +61,28 @@ export const FrameworkDiagramDataSchema = z
       subtitle: z.string().optional(),
       variant: z.enum(["comparison", "flow", "matrix"]),
       columns: z.array(ComparisonColumnSchema).optional(),
+      /**
+       * comparison only. "columns" (default) stacks two independent lists.
+       * "paired" lines the two columns up row by row — columns[0].items[i]
+       * beside columns[1].items[i] — at large type, each pair arriving on
+       * its own time. Use it when the argument is in the pairing.
+       */
+      comparisonLayout: z.enum(["columns", "paired"]).optional(),
+      /** paired only. Optional label at the left of each row. */
+      rowLabels: z.array(z.string()).optional(),
+      /**
+       * paired only. When each row arrives, in seconds: one number for the
+       * pair, or [left, right] to land each side on its own phrase.
+       */
+      rowAtSec: z
+        .array(z.union([z.number().min(0), z.tuple([z.number().min(0), z.number().min(0)])]))
+        .optional(),
+      /** paired only. Index of the row that carries the point (gold rail). */
+      keyRow: z.number().int().nonnegative().optional(),
+      /** paired only. "arrow" (default): left is acted on by right. "none": plain comparison. */
+      connector: z.enum(["arrow", "none"]).optional(),
+      /** Source line, bottom right. */
+      source: z.string().optional(),
       protagonist: z.number().int().nonnegative().optional(),
       nodes: z.array(FlowNodeSchema).optional(),
       arrowLabels: z.array(z.string()).optional(),

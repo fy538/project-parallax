@@ -1,0 +1,72 @@
+/**
+ * BubbleMatrix — composition registration + sample data.
+ *
+ * Sample data: Silicon Trap — semiconductor capacity × military R&D.
+ * Countries positioned by semiconductor manufacturing capacity (X) and
+ * military R&D spend as % of GDP (Y). Bubble size = GDP (PPP, $T).
+ * Color = alliance alignment (Five Eyes, Quad, China/Russia, non-aligned).
+ *
+ * Use case: "The countries that can make chips are not the ones spending
+ * most on military R&D — and that asymmetry is the trap."
+ */
+
+import { Composition } from "remotion";
+import { BubbleMatrix } from "./BubbleMatrix";
+import { standardMetadata } from "../../utils/composition";
+import { BubbleMatrixSchema } from "./schema";
+import type { BubbleMatrixData } from "./types";
+
+export const bubbleMatrixSampleData: BubbleMatrixData = {
+  episode: "silicon-trap",
+  title: "SEMICONDUCTOR CAPACITY × MILITARY R&D",
+  subtitle: "Bubble size = GDP (PPP, $T). Color = alliance alignment. 2023 estimates.",
+  source: "SIPRI Military Expenditure Database; SIA Semiconductor Factbook 2023; IMF WEO",
+  durationSec: 14,
+  backgroundVariant: "light",
+  xAxis: {
+    label: "Semiconductor manufacturing capacity (% world total)",
+    min: 0,
+    max: 65,
+    format: "%.0f%%",
+    tickCount: 6,
+  },
+  yAxis: {
+    label: "Military R&D spending (% of GDP)",
+    min: 0,
+    max: 4.5,
+    format: "%.1f%%",
+    tickCount: 5,
+  },
+  sizeLabel: "GDP (PPP, $T)",
+  groups: [
+    { id: "five-eyes", label: "Five Eyes", color: "#4A7BA7" },
+    { id: "quad",      label: "Quad",      color: "#C4A747" },
+    { id: "china-bloc", label: "China / Russia", color: "#A64D46" },
+    { id: "neutral",   label: "Non-aligned", color: "#888780" },
+  ],
+  revealOrder: "by-group",
+  referenceLines: [
+    { axis: "y", value: 2.0, label: "NATO 2% target", style: "dashed" },
+  ],
+  entities: [
+    { id: "usa",         label: "USA",         x: 12,  y: 3.5, size: 25.5, group: "five-eyes", emphasis: "primary" },
+    { id: "taiwan",      label: "Taiwan",       x: 60,  y: 2.8, size: 1.3,  group: "quad",      emphasis: "primary" },
+    { id: "china",       label: "China",        x: 24,  y: 1.7, size: 30.2, group: "china-bloc", emphasis: "primary" },
+    { id: "south-korea", label: "S. Korea",     x: 18,  y: 2.7, size: 2.6,  group: "quad" },
+    { id: "japan",       label: "Japan",        x: 14,  y: 1.0, size: 6.5,  group: "quad" },
+    { id: "germany",     label: "Germany",      x: 4,   y: 1.6, size: 5.3,  group: "five-eyes" },
+    { id: "netherlands", label: "Netherlands",  x: 1,   y: 1.3, size: 1.2,  group: "five-eyes", sublabel: "ASML" },
+    { id: "russia",      label: "Russia",       x: 1,   y: 4.1, size: 5.3,  group: "china-bloc" },
+    { id: "india",       label: "India",        x: 2,   y: 2.5, size: 13.1, group: "neutral" },
+  ],
+};
+
+export const BubbleMatrixComposition = () => (
+  <Composition
+    id="BubbleMatrix"
+    component={BubbleMatrix}
+    schema={BubbleMatrixSchema}
+    calculateMetadata={standardMetadata<BubbleMatrixData>(14)}
+    defaultProps={{ data: bubbleMatrixSampleData as BubbleMatrixData }}
+  />
+);

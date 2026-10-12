@@ -209,13 +209,15 @@ describe("checkFormulaColors — M-MATH-COLOR", () => {
 describe("ALLOWED_TEXTCOLOR_HEXES palette integrity", () => {
   const expectedPalette = [
     "#C4A747", // gold
+    "#786526", // goldText (text on light backgrounds)
+    "#3C6A95", // dustblueText (text on light backgrounds)
     "#A64D46", // rust/china
     "#7AA3C9", // dustblue
     "#5C4A3D", // walnut
     "#1C1814", // ink
   ];
 
-  it("contains exactly the five documented brand hexes", () => {
+  it("contains exactly the seven documented brand hexes", () => {
     expect(ALLOWED_TEXTCOLOR_HEXES.size).toBe(expectedPalette.length);
     for (const hex of expectedPalette) {
       expect(ALLOWED_TEXTCOLOR_HEXES.has(hex)).toBe(true);

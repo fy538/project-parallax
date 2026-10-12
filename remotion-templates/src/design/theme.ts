@@ -17,6 +17,7 @@
 // Python tools (treat.py, treat_video.py, check.py) read the same file.
 // To change a color: edit palette.json → regenerate LUTs → Remotion picks it up automatically.
 
+import { ensureCjkFonts } from "./fonts";
 import paletteData from "../../../tools/brand-treatment/palette.json";
 import videoConfig from "../../../tools/config/video.json";
 
@@ -31,6 +32,13 @@ export const palette = {
   paper: paletteData.palette.paper,
   gold: paletteData.palette.gold,
   dustblue: paletteData.palette.dustblue, // muted us-blue midtone (RdBu diverging midpoint between bone and us)
+  // Text-safe accents for LIGHT backgrounds (paper/bone). gold and dustblue
+  // are fill/rule colours: as text on paper they reach only ~2:1. These keep
+  // the hue and pass WCAG 4.5:1 on paper (5.0:1) and bone (4.6:1). Use them
+  // for accent-coloured text, numerals and labels on light cards; keep
+  // gold/dustblue for fills, rules, dots and text on dark.
+  goldText: paletteData.palette.goldText,
+  dustblueText: paletteData.palette.dustblueText,
   // Legacy aliases — keep for backward compat during migration
   amber: paletteData.palette.gold,
   rust: paletteData.semantic.china,
@@ -379,6 +387,30 @@ export const timing = {
   },
 } as const;
 
+// ── Easing curves ──────────────────────────────────────────────────────────
+// Material-derived cubic-bezier control points. Doctrine: motion is NEVER linear
+// (constant velocity reads as cheap/mechanical) and NEVER bounces/overshoots in
+// this register (reads as playful/tacky). See project/CHAINED_STILL_LESSONS.md
+// ("Organic vs geometric transforms") + REMOTION_MOTION_LAYER_ROADMAP.md.
+//
+// Two forms of each curve:
+//   `easing.<name>`     — [x1,y1,x2,y2] tuple → spread into Remotion's Easing.bezier(...):
+//                         interpolate(f, [a,b], [0,1], { easing: Easing.bezier(...easing.decelerate) })
+//   `easingCss.<name>`  — CSS string for style `transition` / `animationTimingFunction`.
+export const easing = {
+  decelerate: [0, 0, 0.2, 1] as const,   // reveals / snap-into-place — THE workhorse (ease-out)
+  standard: [0.4, 0, 0.2, 1] as const,   // general transitions (asymmetric ease-in-out)
+  accelerate: [0.4, 0, 1, 1] as const,   // exits (ease-in)
+  sharp: [0.4, 0, 0.6, 1] as const,      // on-screen reposition (stays visible)
+} as const;
+
+export const easingCss = {
+  decelerate: "cubic-bezier(0, 0, 0.2, 1)",
+  standard: "cubic-bezier(0.4, 0, 0.2, 1)",
+  accelerate: "cubic-bezier(0.4, 0, 1, 1)",
+  sharp: "cubic-bezier(0.4, 0, 0.6, 1)",
+} as const;
+
 // ── Categorical Palette ────────────────────────────────────────────────────
 // Distinct hues for multi-series charts when data doesn't specify per-element
 // colors. Kept narrow (6 entries) so individual hues remain memorable rather
@@ -503,7 +535,21 @@ export const fonts = {
   // Generic mono — alias for `metadata`. Retained for templates that opt
   // into mono semantically (code-style annotations, terminal-ish moments).
   mono: '"IBM Plex Mono", "JetBrains Mono", Menlo, monospace',
-  chinese: '"Noto Sans SC", "PingFang SC", sans-serif',
+  // Reading this loads the Chinese and Japanese families (design/fonts.ts):
+  // they are fetched only by renders that set such text.
+  get chinese(): string {
+    ensureCjkFonts();
+    return '"Noto Sans SC", "PingFang SC", sans-serif';
+  },
+  // Handwriting — Caveat (modern semi-script). Used by HandwrittenLetter
+  // typeset mode as a fallback when no archival photograph of the letter
+  // exists. Documentary canon prefers the real photograph; this is the
+  // second-best treatment.
+  handwriting: '"Caveat", "Brush Script MT", cursive',
+  // Mechanical typewriter — Special Elite (uneven baseline + ink density).
+  // The pre-1961 typewriter register for TelegramCable bodies. Post-1961
+  // IBM Selectric is cleaner — for that era use `mono` instead.
+  typewriter: '"Special Elite", "Courier Prime", "IBM Plex Mono", monospace',
 } as const;
 
 export const fontSizes = {
@@ -512,6 +558,11 @@ export const fontSizes = {
   h1: 64,
   h2: 48,
   h3: 36,
+  // Smallest size for text the viewer has to read, on a phone or across a
+  // room (analysis/youtube-encoding-research-2026-10-10.md). `body` and
+  // `label` sit below it: use them for dense graphics and secondary lines,
+  // and `readable` wherever a graphic has the room.
+  readable: 28,
   body: 22,
   label: 18,
   caption: 14,
@@ -1061,10 +1112,23 @@ export const shadows = {
   accentGlowMd: (color: string) => `0 0 12px ${color}40`,
   /** Colored halo — tight. Inline badges, small nodes, text emphasis. */
   accentGlowSm: (color: string) => `0 0 8px ${color}40`,
-  /** Text lift on dark backgrounds (POLISH.md V7) */
-  textLift: "0 1px 3px rgba(0,0,0,0.5)",
-  /** Text shadow on light backgrounds — none (no lift needed against light bg) */
-  textLiftLight: "none",
+  /**
+   * Text lift on dark backgrounds (POLISH.md V7).
+   *
+   * Resolved through a CSS variable so the ~135 call sites that apply it
+   * unconditionally follow the surface they sit on: <Background> sets
+   * `--plx-text-lift` to the real shadow on dark / map and to an empty one on
+   * light, where a dark drop under ink type reads as a smudge. Text outside
+   * any <Background> (over footage, over stills) keeps the lift.
+   */
+  textLift: "var(--plx-text-lift, 0 1px 3px rgba(0,0,0,0.5))",
+  /** The lift itself — what `--plx-text-lift` holds on dark surfaces. */
+  textLiftValue: "0 1px 3px rgba(0,0,0,0.5)",
+  /**
+   * Text shadow on light backgrounds — an empty shadow rather than `none`,
+   * so it stays valid inside comma lists (`0 0 24px gold, ${...}`).
+   */
+  textLiftLight: "0 0 0 transparent",
   /**
    * Intensity-scaled glow: intensity ≤ 0 → "none", intensity 1 → max spread.
    * Alpha hex also scales with intensity so half-emphasis reads as a softer halo.

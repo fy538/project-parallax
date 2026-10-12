@@ -56,6 +56,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import { TitleBlock } from "../../components/TitleBlock";
 import type { DualTimelineData, DualTimelineEvent } from "./types";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 // ── Single event card ───────────────────────────────────────────────────────
 
@@ -439,7 +440,7 @@ export const DualTimeline: React.FC<{
 
         {/* ── Episode label — uses zones.footer ─────────────────────── */}
         {data.episode && (
-          <div
+          <SlugGate><div
             style={{
               position: "absolute",
               bottom: zones.footer.rect.bottom,
@@ -453,7 +454,7 @@ export const DualTimeline: React.FC<{
             }}
           >
             {data.episode}
-          </div>
+          </div></SlugGate>
         )}
       </AbsoluteFill>
       {/* Brand strips */}

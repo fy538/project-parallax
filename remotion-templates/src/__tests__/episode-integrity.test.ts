@@ -26,7 +26,7 @@ import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 import Ajv2020 from "ajv/dist/2020";
-import { TEMPLATE_COMPONENTS } from "../templates/Episodes/FullEpisode";
+import { TEMPLATE_COMPONENTS } from "../templates/Episodes/templateRegistry";
 import { TEMPLATE_SCHEMAS } from "../templates/Episodes/templateSchemas";
 
 // ── Paths ─────────────────────────────────────────────────────────────────────
@@ -182,14 +182,14 @@ for (const { slug, manifestPath } of EPISODES) {
         seen.add(comp);
         if (!(comp in TEMPLATE_COMPONENTS)) {
           unknown.push(
-            `  "${comp}"  ← not in TEMPLATE_COMPONENTS (FullEpisode.tsx)`
+            `  "${comp}"  ← not in TEMPLATE_COMPONENTS (templateRegistry.ts)`
           );
         }
       }
       if (unknown.length > 0) {
         throw new Error(
           `\n${unknown.length} unknown component(s) in manifest:\n${unknown.join("\n")}\n` +
-          `Fix: add to TEMPLATE_COMPONENTS in FullEpisode.tsx`
+          `Fix: add to TEMPLATE_COMPONENTS in templateRegistry.ts`
         );
       }
       expect(unknown).toHaveLength(0);

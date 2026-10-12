@@ -132,6 +132,10 @@ interface TransitionWrapperProps {
   washColor?: string;
   /** Accent color for wipe leading edge / iris ring (default: palette.amber) */
   accentColor?: string;
+  /** Exit duration when it differs from the entry (default: durationSec). */
+  outDurationSec?: number;
+  /** Exit wash colour when it differs from the entry (default: washColor). */
+  outWashColor?: string;
 }
 
 // ── Easing presets ───────────────────────────────────────────────────────────
@@ -283,11 +287,11 @@ const computeTransition = (
     }
 
     case "color-wash": {
+      // Dip through the wash colour. The content stays opaque underneath:
+      // fading it as well lets whatever sits below (paper, in an episode)
+      // show through at mid-transition and turns the dip milky.
       state.opacity = 1;
-      // Content fades in/out with a colored overlay
-      const contentOpacity = progress;
       const overlayOpacity = 1 - progress;
-      state.opacity = contentOpacity;
       if (overlayOpacity > 0.01) {
         state.overlay = (
           <AbsoluteFill
@@ -409,9 +413,12 @@ export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({
   durationInFrames,
   washColor = palette.amber,
   accentColor = palette.amber,
+  outDurationSec,
+  outWashColor,
 }) => {
   const frame = useCurrentFrame();
   const transFrames = sec(durationSec);
+  const outFrames = sec(outDurationSec ?? durationSec);
 
   // ── Compute in-transition progress (0→1) ────────────────────────────
   let inProgress = 1;
@@ -429,14 +436,20 @@ export const TransitionWrapper: React.FC<TransitionWrapperProps> = ({
   if (transitionOut !== "cut") {
     outProgress = interpolate(
       frame,
-      [durationInFrames - transFrames, durationInFrames],
+      [durationInFrames - outFrames, durationInFrames],
       [1, 0],
       EASE_IN_CUBIC
     );
   }
 
   const inState = computeTransition(transitionIn, inProgress, "in", washColor, accentColor);
-  const outState = computeTransition(transitionOut, outProgress, "out", washColor, accentColor);
+  const outState = computeTransition(
+    transitionOut,
+    outProgress,
+    "out",
+    outWashColor ?? washColor,
+    accentColor,
+  );
 
   // ── Combine states (multiply opacities, compose transforms) ─────────
   const opacity = inState.opacity * outState.opacity;

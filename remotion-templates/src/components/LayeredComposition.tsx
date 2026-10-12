@@ -141,7 +141,9 @@ export const LayeredComposition: React.FC<LayeredCompositionProps> = ({
       {backgroundDim > 0 && (
         <AbsoluteFill
           style={{
-            backgroundColor: `rgba(0, 0, 0, ${backgroundDim})`,
+            // Ramps with the foreground so the picture darkens as the type
+            // arrives instead of snapping dark on the first frame.
+            backgroundColor: `rgba(0, 0, 0, ${backgroundDim * fgFadeIn})`,
             pointerEvents: "none",
           }}
         />

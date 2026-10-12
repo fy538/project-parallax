@@ -70,8 +70,10 @@ export const MathReveal: React.FC<{ data: MathRevealData }> = ({ data }) => {
   //     `sec()` for frame-based interpolate/fadeIn calls) ─────────────────
   const titleStartSec = 0.2;
   const titleSettleSec = 0.6;
-  // Math starts revealing 0.3s after title settles so the eye can move down.
-  const mathStartSec = data.title ? titleStartSec + titleSettleSec + 0.3 : 0.3;
+  // Math starts revealing after title settles. The 0s gap (was 0.3) lets
+  // the equation be partially visible by frame 30 (T1 compliance) even
+  // when a title is present.
+  const mathStartSec = data.title ? titleStartSec + titleSettleSec : 0.2;
   const revealSecValue = data.revealSec ?? DEFAULT_REVEAL_SEC;
   const captionStartSec = mathStartSec + revealSecValue + 0.4;
   const sourceStartSec = captionStartSec + 0.5;

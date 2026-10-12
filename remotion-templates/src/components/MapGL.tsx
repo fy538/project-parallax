@@ -435,6 +435,17 @@ export interface MapGLProps {
    */
   terrain?: boolean;
   /**
+   * Terrain exaggeration factor — multiplies DEM height values to emphasise
+   * relief. Range 0–3; default **1.5** (editorial emphasis). 1.0 = real-world
+   * scale; 2.0+ = dramatic/schematic. Lower for coastal/maritime shots (flat
+   * water looks wrong at high exaggeration). Only has effect when `terrain`
+   * is `true`. Applied via `map.setTerrain({ source: 'mapbox-dem',
+   * exaggeration: N })` after the style loads. Effective on both Mapbox
+   * Standard and classic styles — on non-Standard styles the DEM `<Source>`
+   * alone is not enough; the explicit `setTerrain()` call is required.
+   */
+  terrainExaggeration?: number;
+  /**
    * Visual register — one of `light`, `dark`, `vintage`, `toner`.
    *
    * Default `"light"`. Replaces the previous mutex booleans (`dark`,
@@ -567,6 +578,7 @@ export const MapGL: React.FC<MapGLProps> = ({
   globe,
   projection,
   terrain = false,
+  terrainExaggeration = 1.5,
   register = "light",
   fogPreset = "editorial",
   lightPreset,
@@ -661,6 +673,44 @@ export const MapGL: React.FC<MapGLProps> = ({
       // fine without fog.
     }
   }, [loaded, fogPreset]);
+
+  // ── Terrain effect — enable DEM hillshading + set exaggeration.
+  //
+  // On non-Standard Mapbox styles (classic dark-v11, toner, vintage) the
+  // DEM <Source id="mapbox-dem"> renders the tile data but hillshading stays
+  // flat until `map.setTerrain({ source: 'mapbox-dem', exaggeration: N })`
+  // is called explicitly. Standard styles apply terrain automatically via
+  // their layer stack; classic styles require the imperative call.
+  //
+  // Mirrors the fogPreset dedup pattern — tracks last applied key in a ref
+  // so we only call setTerrain() on changes, not every re-render. The key
+  // encodes both the on/off state and the exaggeration value so a change to
+  // either dimension triggers a re-apply.
+  //
+  // Setting `terrain: false` calls `setTerrain(null)` to disable it in case
+  // a parent re-mount initially turned it on.
+  const lastTerrainKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!loaded || !mapRef.current) return;
+    const terrainKey = terrain ? `on:${terrainExaggeration}` : "off";
+    if (lastTerrainKeyRef.current === terrainKey) return;
+    const mapInstance = mapRef.current.getMap();
+    if (!mapInstance || typeof mapInstance.setTerrain !== "function") return;
+    try {
+      if (terrain) {
+        mapInstance.setTerrain({
+          source: "mapbox-dem",
+          exaggeration: terrainExaggeration,
+        });
+      } else {
+        mapInstance.setTerrain(null);
+      }
+      lastTerrainKeyRef.current = terrainKey;
+    } catch {
+      // setTerrain() may throw on very old mapbox-gl builds — skip silently.
+      // The DEM source renders without relief; not ideal but non-blocking.
+    }
+  }, [loaded, terrain, terrainExaggeration]);
 
   // ── Light-preset effect — Mapbox Standard `setConfigProperty` for the
   // basemap import's `lightPreset` config. Reactive so a script can

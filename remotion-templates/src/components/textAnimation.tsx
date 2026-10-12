@@ -96,6 +96,13 @@ export interface TypewriterProps {
   /** Cursor color; defaults to style.color or palette.ink. */
   cursorColor?: string;
   /**
+   * Lay the whole text out from the first frame, with the untyped part
+   * transparent, so lines wrap where they will finally wrap. Without it a
+   * centred block re-centres every time a line is added and the word being
+   * typed can hop to the next line mid-word. Default false.
+   */
+  reserveLayout?: boolean;
+  /**
    * Punctuation pause table (frames added after each char). Defaults to the
    * canonical Parallax cadence (commas pause less than periods, etc.).
    */
@@ -172,6 +179,7 @@ export const Typewriter: React.FC<TypewriterProps> = ({
   cps = 22,
   cursor = "blink",
   cursorColor,
+  reserveLayout = false,
   punctuationPauses = DEFAULT_PUNCT_PAUSES,
   style,
   className,
@@ -214,6 +222,29 @@ export const Typewriter: React.FC<TypewriterProps> = ({
     cursorColor ??
     (style?.color as string | undefined) ??
     palette.ink;
+
+  if (reserveLayout) {
+    return (
+      <span style={style} className={className}>
+        {visible}
+        {cursor !== "none" && (
+          // Zero-width cursor: an empty inline whose border is the block and
+          // whose negative margin cancels it, so it neither shifts the text
+          // nor offers the browser a place to break the line mid-word.
+          <span
+            aria-hidden
+            style={{
+              opacity: cursorOpacity,
+              borderLeft: `0.5em solid ${resolvedCursorColor}`,
+              marginLeft: 2,
+              marginRight: "calc(-0.5em - 2px)",
+            }}
+          />
+        )}
+        <span style={{ opacity: 0 }}>{text.slice(visibleCount)}</span>
+      </span>
+    );
+  }
 
   return (
     <span style={style} className={className}>

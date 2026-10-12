@@ -34,6 +34,7 @@ import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TimelineComparisonData, TimelineEvent } from "./types";
 import { warnIf } from "../../utils/dataWarnings";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 // ── Single event card ───────────────────────────────────────────────────────
 
@@ -291,7 +292,7 @@ export const TimelineComparison: React.FC<{
         </div>
 
         {/* ── Episode label — slideIn (no naked fade) ─────────────────── */}
-        <div
+        <SlugGate><div
           style={{
             position: "absolute",
             bottom: safe.bottom,
@@ -305,7 +306,7 @@ export const TimelineComparison: React.FC<{
           }}
         >
           {data.episode}
-        </div>
+        </div></SlugGate>
       </AbsoluteFill>
       {/* Brand strips */}
       <HeaderStrip mode="light" metadata={data.episode} />

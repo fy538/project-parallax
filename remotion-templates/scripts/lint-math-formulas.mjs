@@ -80,6 +80,8 @@ function* extractFormulas(obj, pathPrefix = "$") {
  */
 const ALLOWED_TEXTCOLOR_HEXES = new Set([
   "#C4A747", // gold — primary accent, "look here"
+  "#786526", // goldText — gold for text on light backgrounds (WCAG 4.5:1)
+  "#3C6A95", // dustblueText — dustblue for text on light backgrounds
   "#A64D46", // rust/china — boundary clause / danger
   "#7AA3C9", // dustblue — us / cool semantic
   "#5C4A3D", // walnut — secondary emphasis

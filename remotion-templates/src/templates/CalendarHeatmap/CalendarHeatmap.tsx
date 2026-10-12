@@ -54,6 +54,7 @@ import { useDirection } from "../../hooks/useDirection";
 import { useEpisodeColorEmphasis } from "../../hooks/useEpisodeColorEmphasis";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { warnIf, checkChartDataCommon } from "../../utils/dataWarnings";
+import { lerpHex } from "../../utils/colorUtils";
 import type {
   CalendarHeatmapData,
   CalendarDay,
@@ -130,25 +131,6 @@ const gridColumnCount = (year: number, weekStart: "sunday" | "monday"): number =
 };
 
 // ── Color scale helpers ─────────────────────────────────────────────────
-
-/** Linearly interpolate between two hex (#RRGGBB) colors at progress t. */
-const lerpHex = (a: string, b: string, t: number): string => {
-  const parse = (h: string) => {
-    const s = h.startsWith("#") ? h.slice(1) : h;
-    return [
-      parseInt(s.slice(0, 2), 16),
-      parseInt(s.slice(2, 4), 16),
-      parseInt(s.slice(4, 6), 16),
-    ];
-  };
-  const [ar, ag, ab] = parse(a);
-  const [br, bg, bb] = parse(b);
-  const r = Math.round(ar + (br - ar) * t);
-  const g = Math.round(ag + (bg - ag) * t);
-  const bl = Math.round(ab + (bb - ab) * t);
-  const toHex = (n: number) => n.toString(16).padStart(2, "0");
-  return `#${toHex(r)}${toHex(g)}${toHex(bl)}`;
-};
 
 /** Returns the fill color for a cell value under the configured scale. */
 const cellColor = (

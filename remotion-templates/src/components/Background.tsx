@@ -24,7 +24,8 @@
 
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig, staticFile, random } from "remotion";
-import { dark, light, palette, layout, fonts, fontSizes, zIndex } from "../design/theme";
+import { grainMode } from "../utils/grainMode";
+import { dark, light, palette, layout, fonts, fontSizes, shadows, zIndex } from "../design/theme";
 import {
   motionIdentities,
   DEFAULT_MOTION_IDENTITY,
@@ -317,7 +318,7 @@ export const Background: React.FC<BackgroundProps> = ({
   // can still opt out of grain for a specific composition.
   const motion = motionIdentities[motionIdentity];
   const grainActive =
-    !isTransparent && motion.grain.enabled && !noGrain;
+    !isTransparent && motion.grain.enabled && !noGrain && grainMode() === "default";
   const atmosphereActive =
     !isTransparent &&
     motion.atmosphere.enabled &&
@@ -333,10 +334,13 @@ export const Background: React.FC<BackgroundProps> = ({
   const effectiveBorder =
     border ?? (variant === "light" && !isTransparent);
 
-  // Default atmosphere: normal for dark, subtle for light; none when transparent
+  // Default particles: normal for dark, none for light or transparent.
+  // POLISH.md D20: particle layers on a paper substrate read as game UI (and
+  // as grey specks at delivery bitrate). A light card can still opt in with
+  // an explicit `atmosphere`.
   const effectiveDensity = isTransparent
     ? "none"
-    : atmosphere ?? (isDark ? "normal" : "subtle");
+    : atmosphere ?? (isDark ? "normal" : "none");
 
   // Per-episode color emphasis. The atmospheric tint defaults to the
   // episode's primary accent when (a) no explicit `tint` is passed AND
@@ -375,8 +379,22 @@ export const Background: React.FC<BackgroundProps> = ({
     }
   })();
 
+  // Surface-level defaults every descendant inherits:
+  //   · fontFamily — a text node that forgets its face gets Plex Sans, not
+  //     the browser serif.
+  //   · --plx-text-lift — what `shadows.textLift` resolves to. The dark drop
+  //     that lifts bone type off ink is a smudge under ink type on paper, so
+  //     light surfaces zero it. Transparent leaves the inherited value alone
+  //     (the surface underneath is someone else's).
+  const surfaceDefaults = {
+    fontFamily: fonts.body,
+    ...(isTransparent
+      ? {}
+      : { "--plx-text-lift": isDark ? shadows.textLiftValue : shadows.textLiftLight }),
+  } as React.CSSProperties;
+
   return (
-    <AbsoluteFill style={{ ...bgStyle, overflow: "hidden" }}>
+    <AbsoluteFill style={{ ...bgStyle, ...surfaceDefaults, overflow: "hidden" }}>
       {/* Substrate wobble wrapper — applies sub-pixel jitter to grain,
           atmosphere, vignette, tint, and particles. Content (children) and
           editorial chrome (border, stamp) live OUTSIDE this wrapper so type

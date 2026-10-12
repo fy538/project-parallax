@@ -84,7 +84,7 @@ export const MetadataStrip: React.FC<MetadataStripProps> = ({
   const dateLabel = date ? `FILED ${date}` : null;
 
   return (
-    <AbsoluteFill style={{ opacity, pointerEvents: "none" }}>
+    <AbsoluteFill data-qa-role="chrome" style={{ opacity, pointerEvents: "none" }}>
       {/* ── Header ─────────────────────────────────────────── */}
       {!noHeader && (
         <div

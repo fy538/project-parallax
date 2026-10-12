@@ -93,6 +93,12 @@ export const TimelineEraBracketSchema = z.object({
   startIndex: z.number().int().min(0),
   endIndex: z.number().int().min(0),
   color: z.string().optional(),
+  /**
+   * When the bracket draws in, in seconds. Default 0.2. Set it to the moment
+   * the narration names the span ("four days later") so the bar draws from
+   * the first event to the second on that phrase.
+   */
+  appearAtSec: z.number().min(0).optional(),
 });
 
 // ── Root schema ─────────────────────────────────────────────────────────────

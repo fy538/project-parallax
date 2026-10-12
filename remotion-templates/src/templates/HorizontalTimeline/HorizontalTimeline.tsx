@@ -71,6 +71,7 @@ import type {
   TimelinePairData,
   PhaseAxisConfig,
 } from "./types";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
@@ -271,7 +272,7 @@ const YearMarker: React.FC<{
             ...(position === "above"
               ? { bottom: markerSize + 8 }
               : { top: markerSize + 8 }),
-            fontSize: fontSizes.label,
+            fontSize: 32, // on screen = this × camera zoom; ≥28px at the widest pull-back
             fontFamily: fonts.mono,
             fontWeight: 600,
             color,
@@ -377,7 +378,9 @@ const EventCard: React.FC<{
         {/* Year — Plex Mono small caps in era color */}
         <div
           style={{
-            fontSize: fontSizes.label,
+            // Canvas px × camera zoom (0.86–1.4). 32 keeps the date at 28px or
+            // more on screen even at the widest pull-back; it was 22, then 18.
+            fontSize: 32,
             fontFamily: fonts.mono,
             fontWeight: 600,
             color: accentColor,
@@ -392,7 +395,9 @@ const EventCard: React.FC<{
         {/* Title — Plex Sans semibold, ink (slightly larger when focused) */}
         <div
           style={{
-            fontSize: isFocused ? fontSizes.body + 2 : fontSizes.body,
+            fontSize: isFocused ? 36 : 34, // ≥28px on screen at the widest pull-back
+            // Two even lines instead of a long line and an orphaned word.
+            textWrap: "balance",
             fontFamily: fonts.heading,
             fontWeight: isFocused ? 700 : 600,
             color: theme.text.primary,
@@ -421,12 +426,13 @@ const EventCard: React.FC<{
         {event.description && (
           <div
             style={{
-              fontSize: fontSizes.caption,
+              fontSize: 22, // was 18; 30px on screen at the close-up zoom
+              textWrap: "balance",
               fontFamily: fonts.body,
               fontStyle: "italic",
               color: theme.text.secondary,
               lineHeight: 1.4,
-              opacity: isFocused ? 1 : 0.55,
+              opacity: isFocused ? 1 : 0.85, // was 0.55: 2.5:1 contrast in the overview
               textShadow: shadows.textLift,
               maxWidth: CARD_WIDTH - 20,
               margin: "0 auto",
@@ -865,10 +871,18 @@ export const HorizontalTimeline: React.FC<{
         ? (data.events?.length ?? 0)
         : (data.morphEvents?.length ?? 0);
 
+    // Final pullback fits the whole timeline in frame rather than a fixed
+    // 0.65: short timelines (2–4 events) were being shrunk to ~65% and their
+    // labels fell below phone-legible size. Never smaller than the old 0.65.
+    // A timeline short enough to fit at the close-up zoom never pulls back at
+    // all: two events stay at reading size and the camera only recentres.
+    const FOCUS_ZOOM = 1.4;
+    const span = Math.max(0, eventCount - 1) * EVENT_SPACING + CARD_WIDTH + 120;
+    const fitZoom = Math.min(FOCUS_ZOOM, (CANVAS_WIDTH - 2 * 120) / span);
     return generateDefaultTimelineCameraPath(eventCount, {
       secondsPerEvent: 2.5,
-      zoomLevel: 1.4,
-      pullbackZoom: 0.65,
+      zoomLevel: FOCUS_ZOOM,
+      pullbackZoom: Math.max(0.65, fitZoom),
     });
   }, [data]);
 
@@ -1129,9 +1143,12 @@ export const HorizontalTimeline: React.FC<{
               // so place the bracket well above to avoid card overlap.
               const bracketY = SPINE_Y - 32;
               const tickHeight = 8;
-              const labelY = bracketY - 4;
+              const labelY = bracketY - 8;
               const midX = (xStart + xEnd) / 2;
-              const bracketOpacity = fadeIn(frame, sec(0.2), sec(0.3));
+              const bracketAt = sec(era.appearAtSec ?? 0.2);
+              const bracketOpacity = fadeIn(frame, bracketAt, sec(0.3));
+              // The bar draws from the first event to the second.
+              const barEnd = xStart + (xEnd - xStart) * fadeIn(frame, bracketAt, sec(0.7));
               return (
                 <svg
                   key={`era-bracket-${ei}`}
@@ -1157,7 +1174,7 @@ export const HorizontalTimeline: React.FC<{
                   {/* Horizontal top bar */}
                   <line
                     x1={xStart} y1={bracketY}
-                    x2={xEnd} y2={bracketY}
+                    x2={barEnd} y2={bracketY}
                     stroke={eraColor}
                     strokeWidth={1.5}
                     opacity={0.8}
@@ -1168,7 +1185,7 @@ export const HorizontalTimeline: React.FC<{
                     x2={xEnd} y2={bracketY + tickHeight}
                     stroke={eraColor}
                     strokeWidth={1.5}
-                    opacity={0.8}
+                    opacity={0.8 * fadeIn(frame, bracketAt + sec(0.6), sec(0.2))}
                   />
                   {/* Era label — centered between xStart and xEnd, above bar */}
                   <text
@@ -1176,7 +1193,7 @@ export const HorizontalTimeline: React.FC<{
                     y={labelY}
                     textAnchor="middle"
                     fill={eraColor}
-                    fontSize={10}
+                    fontSize={28} // was 10: unreadable even at the close-up zoom
                     fontFamily={fonts.mono}
                     letterSpacing={2}
                     style={{ textTransform: "uppercase" } as React.CSSProperties}
@@ -1563,7 +1580,7 @@ export const HorizontalTimeline: React.FC<{
 
         {/* ── Episode label ─────────────────────────────────────────── */}
         {data.episode && (
-          <div
+          <SlugGate><div
             style={{
               position: "absolute",
               top:
@@ -1581,7 +1598,7 @@ export const HorizontalTimeline: React.FC<{
             }}
           >
             {data.episode}
-          </div>
+          </div></SlugGate>
         )}
       </AbsoluteFill>
     </Background>

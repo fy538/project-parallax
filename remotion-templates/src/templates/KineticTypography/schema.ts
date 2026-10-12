@@ -18,6 +18,14 @@ export const QuoteDataDataSchema = z
     text: z.string().optional(),
     attribution: z.string().optional(),
     attributionContext: z.string().optional(),
+    /**
+     * quote-attribution only. Typing speed in characters per second
+     * (default 22). Speech runs at about 14, so set that when the narrator
+     * reads the quote aloud and the text should not outrun the voice.
+     */
+    typingCps: z.number().positive().optional(),
+    /** quote-attribution only. Seconds into the card at which typing starts. Default 0. */
+    typingStartSec: z.number().min(0).optional(),
     term: z.string().optional(),
     termPinyin: z.string().optional(),
     termTranslation: z.string().optional(),

@@ -50,6 +50,7 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useThemeMode } from "../../hooks/useThemeMode";
 import { resolveAssetSrc } from "../../utils/assetPath";
+import { Typewriter } from "../../components/textAnimation";
 import type { ImageCompositeData } from "./types";
 
 /**
@@ -72,7 +73,8 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
   const theme = useThemeMode(data.backgroundVariant || "light");
 
   // Duotone ramp selection
-  const duotoneRamp = duotoneRamps[data.duotone || "standard"];
+  const noDuotone = data.duotone === "none";
+  const duotoneRamp = duotoneRamps[data.duotone && data.duotone !== "none" ? data.duotone : "standard"];
 
   // Text animation — spring-based entrance
   const textOpacity = fadeIn(frame, 0, sec(0.4)) * exitFade(frame, totalFrames, sec(0.5));
@@ -146,7 +148,7 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             rotation) now applies uniformly to the whole composition. */}
       <AbsoluteFill
         style={{
-          filter: `url(#${filterId})`,
+          filter: noDuotone ? undefined : `url(#${filterId})`,
         }}
       >
         <Img src={resolveAssetSrc(data.imagePath)} style={{ width: "100%", height: "100%" }} />
@@ -219,10 +221,10 @@ const BackgroundVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => 
             <div
               style={{
                 fontFamily: fonts.body,
-                fontSize: fontSizes.meta,
+                fontSize: fontSizes.readable, // names what the photograph shows; was label (18px), meta (11px) before
                 fontWeight: fontWeights.regular,
                 letterSpacing: letterSpacing.meta,
-                opacity: 0.7,
+                opacity: 0.85,
               }}
             >
               {data.source}
@@ -246,7 +248,8 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const theme = useThemeMode(data.backgroundVariant || "light");
 
-  const duotoneRamp = duotoneRamps[data.duotone || "standard"];
+  const noDuotone = data.duotone === "none";
+  const duotoneRamp = duotoneRamps[data.duotone && data.duotone !== "none" ? data.duotone : "standard"];
   const frameOpacity = fadeIn(frame, 0, sec(0.4));
   const frameScale = scaleReveal(frame, 0, sec(0.7), 1.06, 1.0);
   const isDark = data.backgroundVariant === "dark";
@@ -351,7 +354,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              filter: "url(#imgcomp-inset-duotone)",
+              filter: noDuotone ? undefined : "url(#imgcomp-inset-duotone)",
             }}
           />
         </div>
@@ -389,7 +392,7 @@ const InsetVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
             opacity: frameOpacity,
             color: theme.text.secondary,
             fontFamily: fonts.body,
-            fontSize: fontSizes.caption,
+            fontSize: fontSizes.readable, // was body (22px), caption (14px) before
             fontWeight: fontWeights.regular,
             letterSpacing: letterSpacing.caption,
             lineHeight: 1.4,
@@ -419,7 +422,8 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
   const theme = useThemeMode(data.backgroundVariant || "light");
 
   const totalFrames = sec(data.durationSec || 6);
-  const duotoneRamp = duotoneRamps[data.duotone || "standard"];
+  const noDuotone = data.duotone === "none";
+  const duotoneRamp = duotoneRamps[data.duotone && data.duotone !== "none" ? data.duotone : "standard"];
   const imageOpacity = fadeIn(frame, 0, sec(0.4));
   const imageScale = scaleReveal(frame, 0, sec(0.8), 1.04, 1.0);
   const nameStripOpacity = fadeIn(frame, sec(0.5), sec(0.4));
@@ -428,6 +432,9 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
 
   const imageWidth = (layout.width * 40) / 100; // 40% of frame
   const imageX = 0; // Left side (can be changed to right side if needed)
+  // With quotations the words are the subject; the name steps back to a credit.
+  const quotes = data.quotes ?? [];
+  const hasQuotes = quotes.length > 0;
 
   return (
     <Background
@@ -506,8 +513,8 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
-            filter: "url(#imgcomp-portrait-duotone)",
+            objectFit: data.imageFit ?? "cover",
+            filter: noDuotone ? undefined : "url(#imgcomp-portrait-duotone)",
           }}
         />
 
@@ -550,9 +557,13 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
       <div
         style={{
           position: "absolute",
-          left: imageWidth + layout.spacing.xl,
-          top: layout.safeAreaTier.generous.top,
-          width: layout.width - imageWidth - layout.spacing.xxxl - layout.spacing.xl,
+          left: imageWidth + layout.spacing.xxxl,
+          top: 0,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          width: layout.width - imageWidth - layout.spacing.xxxl * 2,
           opacity: imageOpacity,
           color: theme.text.primary,
           transform: `translateY(${textDriftY}px)`,
@@ -562,12 +573,12 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
           <div
             style={{
               fontFamily: fonts.display,
-              fontSize: fontSizes.title,
+              fontSize: hasQuotes ? 44 : fontSizes.title,
               fontWeight: fontWeights.bold,
               letterSpacing: letterSpacing.h1,
               lineHeight: 1.2,
               maxWidth: textMaxWidth.h1,
-              marginBottom: layout.spacing.md,
+              marginBottom: hasQuotes ? layout.spacing.xs : layout.spacing.md,
             }}
           >
             {data.title}
@@ -576,16 +587,63 @@ const PortraitVariant: React.FC<{ data: ImageCompositeData }> = ({ data }) => {
         {data.subtitle && (
           <div
             style={{
-              fontFamily: fonts.body,
-              fontSize: fontSizes.body,
+              fontFamily: fonts.serifBody,
+              fontStyle: "italic",
+              fontSize: hasQuotes ? 28 : fontSizes.h3, // was body (22px), lost beside a 64px name
               maxWidth: textMaxWidth.body,
               fontWeight: fontWeights.regular,
               letterSpacing: letterSpacing.body,
-              lineHeight: 1.5,
-              marginBottom: layout.spacing.sm,
+              lineHeight: 1.35,
+              marginBottom: hasQuotes ? layout.spacing.xl : layout.spacing.lg,
             }}
           >
             {data.subtitle}
+          </div>
+        )}
+        {/* Quotations — typed in place. The full text is laid out from the
+            first frame (reserveLayout), so nothing shifts as they appear. */}
+        {quotes.map((q, i) => (
+          <div
+            key={`q-${i}`}
+            style={{
+              fontFamily: fonts.display,
+              fontSize: 54,
+              fontWeight: fontWeights.medium,
+              lineHeight: 1.3,
+              letterSpacing: "-0.01em",
+              marginBottom: layout.spacing.lg,
+              // Keep the measure inside the title-safe area.
+              maxWidth: 900,
+            }}
+          >
+            <span style={{ opacity: frame >= sec(q.atSec) ? 1 : 0 }}>&ldquo;</span>
+            <Typewriter
+              text={`${q.text}\u201D`}
+              startFrame={sec(q.atSec)}
+              cps={q.cps ?? 14}
+              cursor="blink"
+              reserveLayout
+              style={{ color: theme.text.primary }}
+            />
+          </div>
+        ))}
+        {data.source && (
+          <div
+            data-qa-role="source"
+            style={{
+              // With quotations the credit sits at the foot of the column, so
+              // the name stands alone until the words arrive.
+              ...(hasQuotes
+                ? { position: "absolute" as const, left: 0, bottom: layout.safeAreaTier.generous.bottom, maxWidth: 900 }
+                : { maxWidth: 900 }), // keep a long credit inside the title-safe area
+              fontFamily: fonts.mono,
+              fontSize: fontSizes.label,
+              color: theme.text.muted,
+              letterSpacing: letterSpacing.meta,
+              lineHeight: 1.4,
+            }}
+          >
+            {data.source}
           </div>
         )}
       </div>

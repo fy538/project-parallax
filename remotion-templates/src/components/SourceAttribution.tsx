@@ -46,12 +46,13 @@ export const SourceAttribution: React.FC<SourceAttributionProps> = React.memo(
 
     return (
       <div
+        data-qa-role="source"
         style={{
           position: "absolute",
           bottom: safe.bottom + bottomOffset,
           right: safe.right,
           fontFamily: fonts.mono,
-          fontSize: fontSizes.meta,
+          fontSize: fontSizes.caption, // was meta (11px): unreadable on phones
           fontWeight: 400,
           color: theme.text.muted,
           letterSpacing: 0.5,

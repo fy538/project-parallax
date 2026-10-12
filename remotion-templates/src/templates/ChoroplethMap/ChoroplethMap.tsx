@@ -41,7 +41,7 @@ import {
   CLAMP_CUBIC_INOUT,
   CLAMP_SINE,
 } from "../../utils/animation";
-import { scaleToZoom, interpolateCamera } from "../../utils/mapUtils";
+import { scaleToZoom, interpolateCamera, lerpHex } from "../../utils/mapUtils";
 import type { CameraState } from "../../utils/mapUtils";
 import {
   computeStepBoundaries,
@@ -204,20 +204,6 @@ function resolveCountryFill(
   }
 
   return base;
-}
-
-function parseHex(hex: string): [number, number, number] {
-  const num = parseInt(hex.replace("#", ""), 16);
-  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
-}
-
-function lerpHex(from: string, to: string, t: number): string {
-  const [fr, fg, fb] = parseHex(from);
-  const [tr, tg, tb] = parseHex(to);
-  const r = Math.round(fr + (tr - fr) * t);
-  const g = Math.round(fg + (tg - fg) * t);
-  const b = Math.round(fb + (tb - fb) * t);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
 // ── Mapbox style expressions for country fills ──────────────────────────────

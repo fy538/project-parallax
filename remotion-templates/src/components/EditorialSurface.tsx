@@ -24,10 +24,12 @@
 
 import React, { type ReactNode } from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
+import { grainMode } from "../utils/grainMode";
 import backdropManifest from "../../data/backdrop-manifest.json";
 import type { BackdropChartFit } from "../utils/backdropChartFit";
 import type { EditorialMode } from "../design/editorialModes";
 import { palette, zIndex } from "../design/theme";
+import type { SoundscapeRegister } from "../design/soundscape";
 
 export interface EditorialSurfaceProps {
   children: ReactNode;
@@ -69,9 +71,11 @@ const GrainLayer = React.memo(({ intensity }: { intensity: number }) => {
   const frame = useCurrentFrame();
   // Update seed every 2 frames (15fps flicker) to simulate film "gate weave" —
   // prevents grain from looking frozen across adjacent frames.
-  const seed = Math.floor(frame / 2);
-  const opacity = Math.min(intensity * 0.12, 0.15);
-  if (opacity === 0) return null;
+  // Test renders can turn the grain off or hold it still (utils/grainMode.ts).
+  const mode = grainMode();
+  const seed = mode === "static" ? 7 : Math.floor(frame / 2);
+  const opacity = Math.min(intensity * 0.12, 0.15) * (mode === "static" ? 2 : 1);
+  if (mode === "off" || opacity === 0) return null;
 
   // 16mm film grain: baseFrequency 0.45 → coarser, warmer texture than
   // FilmOverlay's digital noise (0.65). numOctaves: 3 → softer, less fractal.
@@ -240,6 +244,16 @@ export interface BackdropEntry {
    * preset definitions.
    */
   recommendedPreset?: FilmOverlayPresetName;
+  /**
+   * Soundscape register this backdrop pairs naturally with. Drives the
+   * soundscape cascade resolver in `src/utils/resolveSoundscape.ts` at
+   * level 2 (backdrop hint) — a cinematic dark backdrop auto-populates
+   * `cinematic-dark`; a cartographic paper backdrop gets `editorial-print`.
+   * Omitted → cascade falls through to TEMPLATE_SOUNDSCAPE_DEFAULTS for the
+   * segment's template component. See SOUNDSCAPE_REGISTER.md for the six
+   * canonical registers.
+   */
+  recommendedSoundscape?: SoundscapeRegister;
 }
 
 /** The five canonical FilmOverlay preset names. Sourced from FilmOverlayPresets.ts. */

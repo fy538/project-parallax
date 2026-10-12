@@ -125,12 +125,51 @@ function collectCoveredIds(registered: Set<string>): Set<string> {
  * deliberate exemption — prefer adding a real test when possible.
  */
 const ALLOWLIST_UNCOVERED = new Map<string, string>([
+  // Standalone visual pilots: full videos and representative stills reviewed
+  // manually; dedicated unit tests cover narration timing and event state.
+  // Add automated visual baselines before promoting them to episode templates.
+  [
+    "promise-and-copy",
+    "Visual pilot; manual render review and promise-and-copy.test.ts timing tests; no automated PNG baseline yet",
+  ],
+  [
+    "what-we-count",
+    "Visual pilot; manual render review and what-we-count.test.ts event/timing tests; no automated PNG baseline yet",
+  ],
+  [
+    "philosophy-style-lab",
+    "Static design comparison, manually reviewed at 1920x1080; not a production composition",
+  ],
+  [
+    "philosophy-mark-lab",
+    "Static image-versus-SVG comparison, manually reviewed at 1920x1080; not a production composition",
+  ],
+  [
+    "continuity-record-study",
+    "Short speculative visual study, reviewed as rendered frames and video; not a production composition",
+  ],
+
+  // ── Capability R&D prototypes (src/templates/_proto/) ─────────────────
+  // Throwaway scaffolding that dogfoods the production components/libraries
+  // (GenerativeField, DrawOnPath, transitions/grammar, the trace annotation);
+  // they are Studio reference cards, not production templates, so no visual
+  // baseline applies. See REMOTION_CAPABILITY_MAP.md showcase index.
+  ["proto-reel", "R&D prototype reel; scaffolding, not a production template"],
+  ["proto-brand-transitions", "R&D prototype; dogfoods transitions/grammar"],
+  ["proto-ai-still-composite", "R&D prototype; render-time compositing demo"],
+  ["proto-noise-field", "R&D prototype; dogfoods GenerativeField"],
+  ["proto-geometric-motion", "R&D prototype; dogfoods DrawOnPath"],
+  ["proto-narration-sync", "R&D prototype; media-utils/captions demo"],
+  ["proto-parametric-en", "R&D prototype; calculateMetadata bilingual demo (EN)"],
+  ["proto-parametric-zh", "R&D prototype; calculateMetadata bilingual demo (ZH)"],
+
   // ── Episode-specific compositions (kept tight) ────────────────────────
   // PrisonersDilemmaShowcase is the standalone showcase comp; it isn't yet
   // referenced in any test. (The -full episode IS — full-episode-smoke
   // exercises prisoners-dilemma-full, and silicon-trap variants appear in
   // multiple integrity tests, so those are covered.)
   ["prisoners-dilemma-showcase", "showcase comp; covered indirectly via component tests of inner templates"],
+  ["ai-care-motives-full", "manifest-driven episode comp in development; inner templates covered by their own tests"],
 
   // ── Test fixtures / non-visual ────────────────────────────────────────
   ["AudioPreview", "audio-only composition; no visual baseline applies"],

@@ -33,7 +33,7 @@ import { useThemeMode } from "../../hooks/useThemeMode";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useTemplateLayout } from "../../hooks/useTemplateLayout";
-import { exitFade, fadeIn } from "../../utils/animation";
+import { exitFade, fadeIn, slideIn } from "../../utils/animation";
 import { Background } from "../../components/Background";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
@@ -128,6 +128,9 @@ export const MathDerivation: React.FC<{ data: MathDerivationData }> = ({ data })
             justifyContent: "center",
             gap: layout.spacing.md,
             paddingTop: data.title ? layout.spacing.xxxl * 2 : 0,
+            // The stack rises a few pixels into place as the first step
+            // appears, so the card does not open on a bare cross-fade.
+            transform: `translateY(${slideIn(frame, 0, 14, sec(0.6))}px)`,
           }}
         >
           {showCounter && data.steps.length > 1 && (
@@ -157,7 +160,7 @@ export const MathDerivation: React.FC<{ data: MathDerivationData }> = ({ data })
             <div
               style={{
                 fontFamily: fonts.mono,
-                fontSize: fontSizes.body,
+                fontSize: fontSizes.readable, // was body (22)
                 color: theme.text.muted,
                 letterSpacing: 0.5,
                 textAlign: "center",

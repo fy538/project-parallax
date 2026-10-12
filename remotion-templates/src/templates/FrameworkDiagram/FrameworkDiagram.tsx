@@ -29,6 +29,7 @@
  * silicon-trap use case: Chess vs Go — Western vs Chinese strategic thinking.
  */
 
+import { textAccent } from "../../utils/colorUtils";
 import React, { useMemo } from "react";
 import {
   AbsoluteFill,
@@ -55,6 +56,9 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { useChromeLevel } from "../../hooks/useChromeLevel";
+import { SourceAttribution } from "../../components/SourceAttribution";
+import { PairedComparison } from "./PairedComparison";
 import { Background } from "../../components/Background";
 import {
   analyticalBackgroundBase,
@@ -273,7 +277,7 @@ const ComparisonVariant: React.FC<{
                     style={{
                       fontSize: fontSizes.label,
                       fontFamily: fonts.mono,
-                      color: colColor,
+                      color: textAccent(colColor, theme.isDark),
                       letterSpacing: letterSpacing.meta,
                       fontWeight: 600,
                       width: 32,
@@ -1372,6 +1376,8 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
+  // The slug watermark is briefing chrome; "wordmark" episodes drop it.
+  const showSlugLabel = useChromeLevel() === "briefing";
   // Per-episode color emphasis — pulls primaryAccent for column accents and
   // highlight glow. See remotion-templates/BRAND.md → "Per-Episode Color Emphasis".
   const emphasis = useEpisodeColorEmphasis();
@@ -1400,9 +1406,20 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
         />
 
         {/* Diagram content */}
-        {data.variant === "comparison" && (
-          <ComparisonVariant data={data} frame={frame} />
-        )}
+        {data.variant === "comparison" &&
+          (data.comparisonLayout === "paired" ? (
+            <PairedComparison
+              data={data}
+              frame={frame}
+              isDark={bgVariant === "dark"}
+              textPrimary={theme.text.primary}
+              textMuted={theme.text.secondary}
+              accentColor={emphasis.primaryAccent ?? palette.gold}
+            />
+          ) : (
+            <ComparisonVariant data={data} frame={frame} />
+          ))}
+        {data.source && <SourceAttribution source={data.source} mode={bgVariant} />}
         {data.variant === "flow" && (
           <FlowVariant data={data} frame={frame} />
         )}
@@ -1411,7 +1428,8 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
         )}
 
         {/* Episode label — slideIn (no naked fade) */}
-        <div
+        {showSlugLabel && <div
+          data-qa-role="chrome"
           style={{
             position: "absolute",
             bottom: layout.safeAreaTier.generous.bottom,
@@ -1425,7 +1443,7 @@ export const FrameworkDiagram: React.FC<{ data: FrameworkDiagramData }> = ({
           }}
         >
           {data.episode}
-        </div>
+        </div>}
       </AbsoluteFill>
     </Background>
   );

@@ -35,10 +35,11 @@
  *     18 min @ 1080p30 renders in ~2-5 min, well within the 5 GB file limit.
  */
 
-import React, { useMemo, memo, Component, type ReactNode, type ErrorInfo } from "react";
+import React, { useEffect, useMemo, memo, Component, type ReactNode, type ErrorInfo } from "react";
 import {
   AbsoluteFill,
   Audio,
+  Freeze,
   interpolate,
   OffthreadVideo,
   Sequence,
@@ -46,7 +47,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { layout, palette, semantic } from "../../design/theme";
+import { fonts, layout, palette, semantic } from "../../design/theme";
 import { BrandImage } from "../../components/BrandImage";
 import { SectionIndicator } from "../../components/SectionIndicator";
 import {
@@ -57,6 +58,16 @@ import { LayeredComposition } from "../../components/LayeredComposition";
 import { LowerThird } from "../../components/LowerThird";
 import { FilmOverlay } from "../../components/FilmOverlay";
 import { AudioLayer } from "../../components/AudioLayer";
+import { QaProbe } from "../../components/QaProbe";
+import { isAudioDisabled, isQaMode } from "../../utils/qaMode";
+import { resolveSeams } from "../../utils/resolveSeams";
+import { firstUnresolvedSyncWord, resolvedSyncPrefix } from "../../utils/syncPoints";
+import { StillFrame, type StillFraming } from "../../components/StillFrame";
+import { scaleDataToSlot } from "../../utils/scaleToSlot";
+
+/** Picture-layer assets that are stills, not clips. */
+const STILL_FILE = /\.(jpe?g|png|webp)$/i;
+import { setSeamsOwnedByEpisode } from "../../utils/animation";
 import type { SegmentTimeline } from "../../components/AudioLayer";
 import { EpisodeColorEmphasisProvider } from "../../hooks/useEpisodeColorEmphasis";
 import {
@@ -79,69 +90,16 @@ import {
   EditorialModeProvider,
   modeFromBackdropRegister,
 } from "../../design/editorialModes";
+import { SoundscapeMount } from "../../components/Soundscape";
+import {
+  resolveSoundscape,
+  type SoundscapeConfig,
+} from "../../utils/resolveSoundscape";
 
-// ── Template imports ─��────────────────────────────────────────────────────────
-
-import { TitleTransition } from "../TitleTransition/TitleTransition";
-import { ChoroplethMap } from "../ChoroplethMap/ChoroplethMap";
-import { ProportionalSymbolMap } from "../ProportionalSymbolMap/ProportionalSymbolMap";
-import { KineticTypography } from "../KineticTypography/KineticTypography";
-// TimelineComparison + DualTimeline are @deprecated — replaced by
-// HorizontalTimeline. Removed from TEMPLATE_COMPONENTS dispatch May 18, 2026
-// (engineering audit P0 #8) so manifest authors can't silently pick them.
-// Source kept under src/templates/{TimelineComparison,DualTimeline}/ for
-// historical reference + catalog showreel. Lint rule "no-deprecated-template-
-// dispatch" in scripts/lint-conventions.mjs guards against re-add.
-import { DataChart } from "../DataChart/DataChart";
-import { FrameworkDiagram } from "../FrameworkDiagram/FrameworkDiagram";
-import { RouteAnimation } from "../RouteAnimation/RouteAnimation";
-import { DecisionTree } from "../DecisionTree/DecisionTree";
-import { OutcomePartition } from "../OutcomePartition/OutcomePartition";
-import { SplitComposition } from "../SplitComposition/SplitComposition";
-import { ProbabilityGauge } from "../ProbabilityGauge/ProbabilityGauge";
-import { ImageComposite } from "../ImageComposite/ImageComposite";
-import { PhotoMontage } from "../PhotoMontage/PhotoMontage";
-import { NetworkDiagram } from "../NetworkDiagram/NetworkDiagram";
-import { TimeSeriesChart } from "../TimeSeriesChart/TimeSeriesChart";
-import { SankeyFlow } from "../SankeyFlow/SankeyFlow";
-import { GameBoard } from "../GameBoard/GameBoard";
-import { BayesianUpdate } from "../BayesianUpdate/BayesianUpdate";
-import { StatReveal } from "../StatReveal/StatReveal";
-import { RadarChart } from "../RadarChart/RadarChart";
-import { AnnotatedImage } from "../AnnotatedImage/AnnotatedImage";
-import { EscalationLadder } from "../EscalationLadder/EscalationLadder";
-// DualTimeline @deprecated — see comment above the TimelineComparison import.
-import { HorizontalTimeline } from "../HorizontalTimeline/HorizontalTimeline";
-import { ArcDiagram } from "../ArcDiagram/ArcDiagram";
-import { Slopegraph } from "../Slopegraph/Slopegraph";
-import { KPICard } from "../KPICard/KPICard";
-import { BulletChart } from "../BulletChart/BulletChart";
-import { StepLine } from "../StepLine/StepLine";
-// BifurcationRoute template removed May 13, 2026 (phylogenetic-tree
-// register didn't fit Parallax; no episodes in queue required it).
-import { DuelingFrameworks } from "../DuelingFrameworks/DuelingFrameworks";
-import { StrategicLandscape } from "../StrategicLandscape/StrategicLandscape";
-import { PricingWaterfall } from "../PricingWaterfall/PricingWaterfall";
-// TimelineMorph template deleted May 13, 2026 (its single use case
-// migrated to DuelingFrameworks). Removed from FullEpisode template map.
-import { AtlasPlate } from "../AtlasPlate/AtlasPlate";
-import { BeeswarmChart } from "../BeeswarmChart/BeeswarmChart";
-import { BumpChart } from "../BumpChart/BumpChart";
-import { CalendarHeatmap } from "../CalendarHeatmap/CalendarHeatmap";
-import { CartogramMap } from "../CartogramMap/CartogramMap";
-import { ConnectedScatterplot } from "../ConnectedScatterplot/ConnectedScatterplot";
-import { DensityMap } from "../DensityMap/DensityMap";
-import { DumbbellPlot } from "../DumbbellPlot/DumbbellPlot";
-import { HorizonChart } from "../HorizonChart/HorizonChart";
-import { IsotypeChart } from "../IsotypeChart/IsotypeChart";
-import { MarimekkoChart } from "../MarimekkoChart/MarimekkoChart";
-import { PopulationPyramid } from "../PopulationPyramid/PopulationPyramid";
-import { RankChangeDotPlot } from "../RankChangeDotPlot/RankChangeDotPlot";
-import { RidgelinePlot } from "../RidgelinePlot/RidgelinePlot";
-import { Streamgraph } from "../Streamgraph/Streamgraph";
-import { TernaryPlot } from "../TernaryPlot/TernaryPlot";
-import { TilegramUSMap } from "../TilegramUSMap/TilegramUSMap";
 import { warnIf } from "../../utils/dataWarnings";
+import { TEMPLATE_COMPONENTS, type TemplateComponentName } from "./templateRegistry";
+export { TEMPLATE_COMPONENTS } from "./templateRegistry";
+export type { TemplateComponentName } from "./templateRegistry";
 
 // ── Types ──────���─────────────────────────────��────────────────────────────────
 
@@ -184,6 +142,15 @@ export interface TemplateInfo {
    * fields (see resolveFilmOverlay.ts header comment).
    */
   filmOverlay?: FilmOverlayConfig;
+  /**
+   * Per-segment soundscape override. Each field (ambient / transitionIn /
+   * transitionOut / textures) independently cascades through the 5-tier
+   * resolver in `src/utils/resolveSoundscape.ts`. When absent, the resolver
+   * falls to backdrop hint → template default → episode default → channel default.
+   * Populated by `generate_manifest.py` when an `[AMB: <register>]` script
+   * directive is present on the segment.
+   */
+  soundscape?: SoundscapeConfig;
 }
 
 interface HoldInfo {
@@ -287,6 +254,17 @@ export interface ManifestSegment {
   holdAfter?: number;
   /** NLE metadata: behaviour during the hold (e.g. "freeze", "loop"). */
   holdBehavior?: string;
+  /**
+   * For a still on the picture layer (a FOOTAGE segment whose asset is an
+   * image file): the framing the shot starts and ends on. See StillFrame.
+   */
+  framing?: StillFraming;
+  /**
+   * The slot length this segment's data file was written for, recorded by
+   * retime_manifest.py the first time timings move. Used to scale typed
+   * reveal times for data files that carry no `durationSec` of their own.
+   */
+  authoredDurationSec?: number;
   /** NLE metadata: pacing profile key (e.g. "deliberate", "rapid"). */
   paceProfile?: string;
   /** NLE metadata: narration words that trigger the next cut. */
@@ -355,6 +333,12 @@ export interface AssemblyManifest {
   /** Episode-level music bed (Layer 1 — continuous ambient tracks). */
   musicBed?: MusicBedConfig;
   /**
+   * Opt in to the film-burn flash at every beat boundary. Off by default:
+   * the flash is not one of the six transitions in TRANSITION_GRAMMAR.md and
+   * it hazes whatever seam the manifest asked for at that boundary.
+   */
+  beatFlash?: boolean;
+  /**
    * Episode-level film overlay config. PRESENCE is the activation gate for
    * the per-segment cascade — when absent, no FilmOverlay renders anywhere
    * (preserves dormant behavior for episodes that haven't opted in). When
@@ -366,6 +350,14 @@ export interface AssemblyManifest {
    * `$defs/filmOverlayConfig` in `data/assembly-manifest.schema.json`.
    */
   filmOverlay?: FilmOverlayConfig;
+  /**
+   * Episode-level soundscape default (cascade level 4 of 5). When set, all
+   * segments without an explicit `[AMB:]` override or backdrop hint resolve
+   * to this register. When absent, falls to the channel default
+   * (`DEFAULT_REGISTER = "editorial-print"`). Set by `generate_manifest.py`
+   * from an episode-header `[AMB: register]` directive.
+   */
+  soundscape?: SoundscapeConfig;
   /**
    * Visual motif configuration for the episode. When set, the
    * `useMotifProgress()` hook returns a live value in every template segment,
@@ -451,97 +443,6 @@ const COMPOSITE_DEFAULTS: Record<string, number> = {
   antipode: 0.45,
   raw: 1.0,
 };
-
-/**
- * Manifest-dispatch registry. Keys are referenced as strings from
- * `assembly-manifest.json` segment `template.component` fields; values
- * are the React components themselves.
- *
- * Typing strategy (May 2026 audit #5):
- *
- *  · Value type is `ComponentType<{ data: any }>` rather than
- *    `ComponentType<{ data: unknown }>` because each template component
- *    declares its own specific data type (e.g. `FC<{data: DataChartData}>`).
- *    With `unknown`, assignment would fail (a component that needs
- *    DataChartData can't be assigned to a slot accepting unknown — that
- *    would force every template to validate at the function boundary).
- *    The `any` here is bounded — runtime validation happens upstream via
- *    TEMPLATE_SCHEMAS (Zod) before dispatch.
- *
- *  · `as const satisfies` (rather than the prior loose `Record<string, ...>`
- *    annotation) preserves per-key literal types, which feeds the
- *    `TemplateComponentName` literal union below. Concretely: adding a
- *    typo to the registry now produces a compile error at the consumer
- *    rather than a runtime "Unknown template component" warning.
- *
- *  · Sister registry TEMPLATE_SCHEMAS lives in Episodes/templateSchemas.ts;
- *    a meta-test (src/__tests__/template-registries-aligned.test.ts)
- *    enforces that the two registries' key sets match exactly.
- */
-export const TEMPLATE_COMPONENTS = {
-  TitleTransition,
-  ChoroplethMap,
-  KineticTypography,
-  // TimelineComparison removed (deprecated; see import-block comment).
-  DataChart,
-  FrameworkDiagram,
-  RouteAnimation,
-  DecisionTree,
-  OutcomePartition,
-  SplitComposition,
-  ProbabilityGauge,
-  ImageComposite,
-  PhotoMontage,
-  NetworkDiagram,
-  TimeSeriesChart,
-  SankeyFlow,
-  GameBoard,
-  BayesianUpdate,
-  StatReveal,
-  RadarChart,
-  AnnotatedImage,
-  EscalationLadder,
-  // DualTimeline removed (deprecated; see import-block comment).
-  HorizontalTimeline,
-  DuelingFrameworks,
-  StrategicLandscape,
-  ArcDiagram,
-  ProportionalSymbolMap,
-  Slopegraph,
-  KPICard,
-  BulletChart,
-  StepLine,
-  PricingWaterfall,
-  AtlasPlate,
-  BeeswarmChart,
-  BumpChart,
-  CalendarHeatmap,
-  CartogramMap,
-  ConnectedScatterplot,
-  DensityMap,
-  DumbbellPlot,
-  HorizonChart,
-  IsotypeChart,
-  MarimekkoChart,
-  PopulationPyramid,
-  RankChangeDotPlot,
-  RidgelinePlot,
-  Streamgraph,
-  TernaryPlot,
-  TilegramUSMap,
-} as const satisfies Record<string, React.ComponentType<{ data: any }>>;
-
-/**
- * Literal union of every registered template name. Derived directly from
- * the TEMPLATE_COMPONENTS keys via the `as const` above, so renaming /
- * adding / removing a template propagates here at compile time — no
- * separate hand-maintained enum.
- *
- * Use this type wherever you take a template name from external input
- * (manifest JSON, CLI flag, ...) and want compile-time autocomplete +
- * typo-checking on the downstream lookup.
- */
-export type TemplateComponentName = keyof typeof TEMPLATE_COMPONENTS;
 
 // ── Per-segment FilmOverlay wrapper ──────────────────────────────────────────
 //
@@ -640,6 +541,7 @@ const BackgroundSegment: React.FC<{
   segment: ManifestSegment;
   assetBasePath: string;
 }> = memo(({ segment, assetBasePath }) => {
+  const { fps } = useVideoConfig();
   const { asset, treatment } = segment;
 
   // Determine placeholder style based on asset status
@@ -695,6 +597,20 @@ const BackgroundSegment: React.FC<{
   const ramp = treatment?.ramp || "standard";
   const composite = treatment?.composite || "background";
   const opacity = treatment?.opacity;
+
+  if (segment.type === "FOOTAGE" && STILL_FILE.test(asset.file)) {
+    // A still on the picture layer: drawn from its full-resolution file and
+    // moved by the segment's framing (no pre-rendered clip).
+    return (
+      <AbsoluteFill style={{ opacity: opacity ?? COMPOSITE_DEFAULTS[composite] }}>
+        <StillFrame
+          src={src}
+          framing={segment.framing}
+          durationInFrames={Math.round((segment.endSec - segment.startSec) * fps)}
+        />
+      </AbsoluteFill>
+    );
+  }
 
   if (segment.type === "FOOTAGE") {
     // Video asset: OffthreadVideo for stable sequential rendering.
@@ -815,7 +731,13 @@ const ForegroundSegment: React.FC<{
    * See FilmOverlayProps.grainRampInFrames for the full rationale.
    */
   grainRampInFrames?: number;
-}> = memo(({ segment, templateData, fps, manifest, grainRampInFrames = 0 }) => {
+  /**
+   * Hold-under (resolveSeams rule 6): the card sits over the held picture of
+   * the segment before it, so it renders with a transparent ground, dark-mode
+   * type, and no brand chrome.
+   */
+  overPicture?: boolean;
+}> = memo(({ segment, templateData, fps, manifest, grainRampInFrames = 0, overPicture = false }) => {
   const { template } = segment;
 
   if (!template?.component) {
@@ -833,7 +755,16 @@ const ForegroundSegment: React.FC<{
   }
   const Component = TEMPLATE_COMPONENTS[componentName as TemplateComponentName];
 
-  const data = template.dataFile ? templateData[template.dataFile] : null;
+  const authoredData = template.dataFile ? templateData[template.dataFile] : null;
+  // The data's typed reveal times follow the slot: after a re-time to recorded
+  // narration the slot is no longer the length the data was written for.
+  const data = useMemo(
+    () =>
+      authoredData
+        ? scaleDataToSlot(authoredData, segment.endSec - segment.startSec, segment.authoredDurationSec)
+        : authoredData,
+    [authoredData, segment.endSec, segment.startSec, segment.authoredDurationSec],
+  );
   if (!data && template.dataFile) {
     warnIf(true, "FullEpisode", `Missing template data for "${template.dataFile}" in segment ${segment.id}`);
     // Render placeholder
@@ -874,17 +805,22 @@ const ForegroundSegment: React.FC<{
     const hasSyncPoints = segment.syncPoints && segment.syncPoints.length > 0;
     const hasSegmentDirection =
       segment._direction != null && Object.keys(segment._direction).length > 0;
+    // Cues are positional (syncPoints[i] belongs to element i), so an
+    // unresolved one is not filtered out of the middle: only the resolved
+    // run before it is passed on. See utils/syncPoints.ts.
+    const unresolvedCue = firstUnresolvedSyncWord(segment.syncPoints);
+    warnIf(
+      unresolvedCue !== undefined,
+      "FullEpisode",
+      `Segment ${segment.id}: sync cue "${unresolvedCue}" was not found in the narration; it and the cues after it use the template's own timing.`,
+    );
     const relative = hasSyncPoints
-      ? segment.syncPoints!
-          .filter((p): p is SyncPoint & { timeSec: number; frame: number } =>
-            p.timeSec !== null && p.frame !== null,
-          )
-          .map((p) => ({
-            word: p.word,
-            timeSec: p.timeSec - segment.startSec,
-            frame: p.frame - Math.round(segment.startSec * fps),
-            confidence: p.confidence,
-          }))
+      ? resolvedSyncPrefix(segment.syncPoints).map((p) => ({
+          word: p.word,
+          timeSec: p.timeSec - segment.startSec,
+          frame: p.frame - Math.round(segment.startSec * fps),
+          confidence: p.confidence,
+        }))
       : [];
 
     const moodMult = getAtmosphereIntensityAtTime(manifest, segment.startSec);
@@ -929,11 +865,18 @@ const ForegroundSegment: React.FC<{
   // Templates use opaque light Background by default — paper hides SegmentBackdrop.
   // Punch through for non-title segments when this row has template.backdropId.
   const dataForTemplate =
-    showSegmentBackdrop &&
-    dataWithSync &&
-    template.component !== "TitleTransition"
-      ? { ...dataWithSync, transparentBackground: true as const }
-      : dataWithSync;
+    overPicture && dataWithSync
+      ? {
+          ...dataWithSync,
+          transparentBackground: true as const,
+          overPicture: true as const,
+          backgroundVariant: "dark" as const,
+        }
+      : showSegmentBackdrop &&
+          dataWithSync &&
+          template.component !== "TitleTransition"
+        ? { ...dataWithSync, transparentBackground: true as const }
+        : dataWithSync;
 
   // Editorial mode is FULLY DERIVED from the active backdrop's register
   // (light vs dark), with `light` as the safe default when no backdrop is
@@ -942,6 +885,18 @@ const ForegroundSegment: React.FC<{
   // toggle. See src/design/editorialModes.ts § modeFromBackdropRegister.
   const editorialMode = modeFromBackdropRegister(
     backdropId && backdropKnown ? backdropMeta(backdropId)?.register : undefined,
+  );
+
+  // Resolve soundscape for this segment (5-tier cascade).
+  // Level 2 (backdrop hint): pull recommendedSoundscape from backdrop metadata.
+  const backdropSoundscapeHint = backdropId && backdropKnown
+    ? { recommendedSoundscape: backdropMeta(backdropId)?.recommendedSoundscape }
+    : null;
+  const resolvedSoundscape = resolveSoundscape(
+    template.soundscape ?? null,
+    backdropSoundscapeHint,
+    template.component,
+    manifest.soundscape ?? null,
   );
 
   return (
@@ -977,6 +932,10 @@ const ForegroundSegment: React.FC<{
                 */}
               <Component data={dataForTemplate as never} />
             </AbsoluteFill>
+            {/* Soundscape ambient + SFX — inside Sequence boundary so Remotion
+                clips audio to segment duration; outside FilmOverlay since audio
+                is not visual. See src/utils/resolveSoundscape.ts cascade. */}
+            <SoundscapeMount resolved={resolvedSoundscape} />
           </AbsoluteFill>
         </EditorialModeProvider>
       </SegmentFilmOverlay>
@@ -1029,6 +988,31 @@ const BeatFlash: React.FC<{ durationInFrames: number; hueShift: number }> = ({
 };
 
 // ── Main composition ──────────────────────────────────────────────────────────
+
+// ── Tail hold ────────────────────────────────────────────────────────────────
+
+/**
+ * Keeps a segment on screen for `tailFrames` past its own duration, frozen on
+ * its last frame, so the next segment can dissolve over or under it (see
+ * `tailSec` in utils/resolveSeams). The inner Sequence keeps the segment's own
+ * `durationInFrames` unchanged, so nothing inside re-times itself, and the
+ * freeze means a video clip is never asked for frames past its end.
+ * With no tail this renders its children untouched.
+ */
+const HoldTail: React.FC<{
+  durationFrames: number;
+  tailFrames: number;
+  children: React.ReactNode;
+}> = ({ durationFrames, tailFrames, children }) => {
+  if (tailFrames <= 0) return <>{children}</>;
+  return (
+    <Freeze frame={durationFrames - 1} active={(f) => f >= durationFrames}>
+      <Sequence durationInFrames={durationFrames} layout="none">
+        {children}
+      </Sequence>
+    </Freeze>
+  );
+};
 
 export const FullEpisode: React.FC<FullEpisodeProps> = ({
   manifest,
@@ -1114,9 +1098,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
     // merge) segment objects.
     const claimedBgIds = new Set<string>();
     for (const seg of fgMerged) {
-      if (seg.layered?.backgroundSegmentId) {
-        claimedBgIds.add(seg.layered.backgroundSegmentId);
-      }
+      const bgId = seg.layered?.backgroundSegmentId;
+      if (!bgId) continue;
+      // Hold-under (resolveSeams rule 6): a picture that ends where the card
+      // starts is held beneath it by its own tail, so it stays standalone.
+      const bgSeg = bgMerged.find((b) => b.id === bgId);
+      if (bgSeg && bgSeg.endSec <= seg.startSec + 1 / 30) continue;
+      claimedBgIds.add(bgId);
     }
 
     const standaloneBg = bgMerged.filter((s) => !claimedBgIds.has(s.id));
@@ -1127,6 +1115,22 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       segmentIndex: idx,
     };
   }, [manifest.segments]);
+
+  // Seams between segments belong to TransitionWrapper, so templates must not
+  // also fade themselves in and out (see "Seam ownership" in utils/animation).
+  // Set during render so the first frame already sees it; the effect restores
+  // the standalone behaviour when Studio switches to another composition.
+  setSeamsOwnedByEpisode(true);
+  useEffect(() => {
+    setSeamsOwnedByEpisode(true);
+    return () => setSeamsOwnedByEpisode(false);
+  }, []);
+
+  // What each segment's entry/exit renders as on a timeline without overlap.
+  const seams = useMemo(
+    () => resolveSeams([...backgroundSegs, ...foregroundSegs]),
+    [backgroundSegs, foregroundSegs],
+  );
 
   // Extract audio cues from all segments for AudioLayer
   const segmentAudio = useMemo(() => {
@@ -1153,8 +1157,17 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
       // If a new SegmentType is added without updating SegmentTimeline, this line
       // becomes a compile error — keeping the two unions in sync automatically.
       type: seg.type,
+      // A still or clip with narration over it is not a narrator-free moment.
+      narrated: Boolean(seg.narrationRef?.trim()),
     }));
   }, [manifest.segments]);
+
+  // With recorded narration, the music follows the voice itself: each word's
+  // timing becomes a speech span (AudioLayer joins them into phrases).
+  const speechSpans = useMemo(
+    () => (manifest.narration.words ?? []).map((w) => ({ startSec: w.start, endSec: w.end })),
+    [manifest.narration.words],
+  );
 
   const lowerThirdConfig = manifest.lowerThird;
 
@@ -1167,12 +1180,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         const durationFrames = Math.round((seg.endSec - seg.startSec) * fps);
 
         if (durationFrames <= 0) return null;
+        const tailFrames = Math.round((seams[seg.id]?.tailSec ?? 0) * fps);
 
         return (
           <Sequence
             key={seg.id}
             from={startFrame}
-            durationInFrames={durationFrames}
+            durationInFrames={durationFrames + tailFrames}
             name={`bg-${seg.id}`}
           >
             <SegmentErrorBoundary
@@ -1180,16 +1194,20 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
               componentName={seg.type}
             >
               <TransitionWrapper
-                transitionIn={seg.transition?.in}
-                transitionOut={seg.transition?.out}
-                durationSec={seg.transition?.durationSec}
-                washColor={seg.transition?.washColor}
-                durationInFrames={durationFrames}
+                transitionIn={seams[seg.id]?.transitionIn}
+                transitionOut={seams[seg.id]?.transitionOut}
+                durationSec={seams[seg.id]?.inDurationSec}
+                washColor={seams[seg.id]?.inWashColor}
+                outDurationSec={seams[seg.id]?.outDurationSec}
+                outWashColor={seams[seg.id]?.outWashColor}
+                durationInFrames={durationFrames + tailFrames}
               >
-                <BackgroundSegment
-                  segment={seg}
-                  assetBasePath={assetBasePath}
-                />
+                <HoldTail durationFrames={durationFrames} tailFrames={tailFrames}>
+                  <BackgroundSegment
+                    segment={seg}
+                    assetBasePath={assetBasePath}
+                  />
+                </HoldTail>
               </TransitionWrapper>
             </SegmentErrorBoundary>
           </Sequence>
@@ -1202,12 +1220,17 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         const durationFrames = Math.round((seg.endSec - seg.startSec) * fps);
 
         if (durationFrames <= 0) return null;
+        const tailFrames = Math.round((seams[seg.id]?.tailSec ?? 0) * fps);
+        // Hold-under: the card sits over the previous picture, which its own
+        // tail keeps on screen in the background layer (resolveSeams rule 6).
+        const isHoldUnder = seams[seg.id]?.holdUnder === true;
 
         // Layered mode: foreground template composited over a background segment
         const layeredBgId = seg.layered?.backgroundSegmentId;
-        const layeredBg = layeredBgId ? (segmentIndex[layeredBgId] ?? null) : null;
+        const layeredBg =
+          layeredBgId && !isHoldUnder ? (segmentIndex[layeredBgId] ?? null) : null;
         warnIf(
-          !!layeredBgId && !layeredBg,
+          !!layeredBgId && !layeredBg && !isHoldUnder,
           "FullEpisode",
           `Layered segment ${seg.id} references backgroundSegmentId "${layeredBgId}" which was not found in the manifest.`
         );
@@ -1216,17 +1239,42 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
           <Sequence
             key={seg.id}
             from={startFrame}
-            durationInFrames={durationFrames}
+            durationInFrames={durationFrames + tailFrames}
             name={layeredBg ? `layered-${seg.id}` : `fg-${seg.id}`}
           >
             <TransitionWrapper
-              transitionIn={seg.transition?.in}
-              transitionOut={seg.transition?.out}
-              durationSec={seg.transition?.durationSec}
-              washColor={seg.transition?.washColor}
-              durationInFrames={durationFrames}
+              transitionIn={seams[seg.id]?.transitionIn}
+              transitionOut={seams[seg.id]?.transitionOut}
+              durationSec={seams[seg.id]?.inDurationSec}
+              washColor={seams[seg.id]?.inWashColor}
+              outDurationSec={seams[seg.id]?.outDurationSec}
+              outWashColor={seams[seg.id]?.outWashColor}
+              durationInFrames={durationFrames + tailFrames}
             >
-              {layeredBg ? (
+             <HoldTail durationFrames={durationFrames} tailFrames={tailFrames}>
+              {isHoldUnder ? (
+                <LayeredComposition
+                  position={seg.layered?.position}
+                  blendMode={seg.layered?.blendMode}
+                  foregroundOpacity={seg.layered?.foregroundOpacity ?? 1}
+                  backgroundDim={seg.layered?.backgroundDim ?? 0.55}
+                  foregroundFadeInSec={seg.layered?.foregroundFadeInSec ?? 0.6}
+                  vignette={seg.layered?.vignette}
+                >
+                  {{
+                    background: null,
+                    foreground: (
+                      <ForegroundSegment
+                        segment={seg}
+                        templateData={templateData}
+                        fps={fps}
+                        manifest={manifest}
+                        overPicture
+                      />
+                    ),
+                  }}
+                </LayeredComposition>
+              ) : layeredBg ? (
                 <LayeredComposition
                   position={seg.layered?.position}
                   blendMode={seg.layered?.blendMode}
@@ -1260,8 +1308,8 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                         fps={fps}
                         manifest={manifest}
                         grainRampInFrames={
-                          seg.transition?.in === "color-wash"
-                            ? Math.round((seg.transition?.durationSec ?? 0.7) * fps)
+                          seams[seg.id]?.transitionIn === "color-wash"
+                            ? Math.round((seams[seg.id]?.inDurationSec ?? 0.7) * fps)
                             : 0
                         }
                       />
@@ -1282,12 +1330,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
                     // already fades grain smoothly; the ramp is additive but subtle.
                     // For cut transitions there's no wrapper fade, so this is the
                     // only grain introduction mechanism.
-                    seg.transition?.in === "color-wash"
-                      ? Math.round((seg.transition?.durationSec ?? 0.7) * fps)
+                    seams[seg.id]?.transitionIn === "color-wash"
+                      ? Math.round((seams[seg.id]?.inDurationSec ?? 0.7) * fps)
                       : 0
                   }
                 />
               )}
+             </HoldTail>
             </TransitionWrapper>
           </Sequence>
         );
@@ -1295,7 +1344,12 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
 
       {/* Layer 3: Section indicator (persistent beat label) */}
       {manifest.beats && manifest.beats.length > 0 && (
-        <SectionIndicator beats={manifest.beats} />
+        <SectionIndicator
+          beats={manifest.beats}
+          hiddenRanges={foregroundSegs
+            .filter((s) => s.type === "TEMPLATE")
+            .map((s) => [s.startSec, s.endSec] as [number, number])}
+        />
       )}
 
       {/* Layer 4: Lower-thirds (one per beat, driven by manifest) */}
@@ -1324,10 +1378,10 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         );
       })}
 
-      {/* Layer 4b: Beat-boundary film-burn flash.
+      {/* Layer 4b: Beat-boundary film-burn flash — opt-in via manifest.beatFlash.
           One BeatFlash per beat (skipping the first), 1.0s centered on the beat boundary.
           Hue shifts gently per beat for variety. Pure CSS — no WebGL required. */}
-      {manifest.beats && manifest.beats.slice(1).map((beat, idx) => {
+      {manifest.beatFlash && manifest.beats && manifest.beats.slice(1).map((beat, idx) => {
         const burnDurationSec = 1.0;
         const startFrame = Math.round((beat.startSec - burnDurationSec * 0.3) * fps);
         const durationInFrames = Math.round(burnDurationSec * fps);
@@ -1372,12 +1426,17 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
          * `filmOverlayConfig` is no longer consumed here; kept on the
          * manifest type as the activation gate + cascade fallback layer 4.
          */}
-        {visualLayers}
+        {/* Root default face: a text node that forgets fontFamily inherits
+            Plex Sans instead of falling back to the browser serif. */}
+        <AbsoluteFill style={{ fontFamily: fonts.body }}>{visualLayers}</AbsoluteFill>
+
+        {/* QA mode: measure rendered text; audio is skipped below. */}
+        {isQaMode() && <QaProbe />}
 
         {/* Audio layers (always outside film overlay — audio isn't visual) */}
 
         {/* Layer 5: Narration (dominant — -0dB reference) */}
-        {manifest.narration.audioFile && (
+        {!isAudioDisabled() && manifest.narration.audioFile && (
           <Audio
             src={staticFile(
               `episodes/${manifest.episode.toLowerCase()}/${manifest.narration.audioFile}`
@@ -1386,12 +1445,13 @@ export const FullEpisode: React.FC<FullEpisodeProps> = ({
         )}
 
         {/* Layers 6-8: Music bed + transition SFX + texture hits */}
-        <AudioLayer
+        {!isAudioDisabled() && <AudioLayer
           episode={manifest.episode.toLowerCase()}
           musicBedTracks={manifest.musicBed?.tracks}
           segmentAudio={segmentAudio}
           segmentTimeline={segmentTimeline}
-        />
+          speech={speechSpans}
+        />}
       </EditorialSurface>
     </EpisodeColorEmphasisProvider>
     </EpisodeMotifProvider>

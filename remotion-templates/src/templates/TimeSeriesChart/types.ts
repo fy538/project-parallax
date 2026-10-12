@@ -10,6 +10,7 @@
 
 import type { z } from "zod";
 import type {
+  CounterfactualZoneSchema,
   TimeSeriesAnnotationSchema,
   TimeSeriesChartDataSchema,
   TimeSeriesEraSchema,
@@ -29,4 +30,5 @@ export type TimeSeriesEra = z.infer<typeof TimeSeriesEraSchema>;
 export type TimeSeriesReferenceLine = z.infer<typeof TimeSeriesReferenceLineSchema>;
 export type TimeSeriesReferenceBand = z.infer<typeof TimeSeriesReferenceBandSchema>;
 export type TimeSeriesHeroStat = z.infer<typeof TimeSeriesHeroStatSchema>;
+export type CounterfactualZone = z.infer<typeof CounterfactualZoneSchema>;
 export type TimeSeriesChartData = z.infer<typeof TimeSeriesChartDataSchema>;

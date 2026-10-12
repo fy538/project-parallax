@@ -55,7 +55,6 @@ import {
 } from "../../utils/segmentBackdrop";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
-import { MetadataStrip } from "../../components/MetadataStrip";
 import { AmbientParticles } from "../../components/AmbientParticles";
 import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection } from "../../hooks/useDirection";
@@ -506,12 +505,6 @@ const CinematicSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           )}
         </div>
 
-        <MetadataStrip
-          episodeNumber={data.episode ? parseInt(data.episode.replace(/\D/g, "")) : undefined}
-          episodeTitle={data.title}
-          variant={isDark ? "dark" : "light"}
-          startFrame={60}
-        />
       </AbsoluteFill>
       {/* Brand strips */}
       <HeaderStrip mode={isDark ? "dark" : "light"} metadata={data.episode} />
@@ -866,12 +859,6 @@ const StaticSplitComposition: React.FC<{ data: SplitCompositionData }> = ({
           </div>
         )}
 
-        <MetadataStrip
-          episodeNumber={data.episode ? parseInt(data.episode.replace(/\D/g, "")) : undefined}
-          episodeTitle={data.title}
-          variant={isDark ? "dark" : "light"}
-          startFrame={60}
-        />
       </AbsoluteFill>
       {/* Brand strips */}
       <HeaderStrip mode={isDark ? "dark" : "light"} metadata={data.episode} />

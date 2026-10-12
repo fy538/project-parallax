@@ -6,7 +6,7 @@
  */
 
 import { interpolate, interpolateColors, spring, Easing, random } from "remotion";
-import { layout, durations, sec } from "../design/theme";
+import { layout, durations, easing as easingTokens, sec } from "../design/theme";
 
 // ── Reusable interpolation configs (hoisted to avoid per-frame allocation) ─
 // These are the most common interpolation option shapes. Import and pass directly
@@ -42,15 +42,27 @@ export const CLAMP_CUBIC_INOUT = { ...CLAMP, easing: Easing.inOut(Easing.cubic) 
 /** Clamp + quad ease-in-out (Ken Burns drift). */
 export const CLAMP_QUAD_INOUT = { ...CLAMP, easing: Easing.inOut(Easing.quad) };
 
+/** Clamp + the house decelerate curve (`easing.decelerate` — reveals). */
+export const CLAMP_DECELERATE = {
+  ...CLAMP,
+  easing: Easing.bezier(...easingTokens.decelerate),
+};
+
 // ── Fade helpers ────────────────────────────────────────────────────────────
 
-/** Fade in over a given number of frames, starting at `startFrame`. */
+/**
+ * Fade in over a given number of frames, starting at `startFrame`.
+ *
+ * Eases out on the house decelerate curve. This was linear until Oct 2026,
+ * which put a linear ramp behind ~500 reveals in a system whose rule is that
+ * motion is never linear. Endpoints and monotonicity are unchanged.
+ */
 export const fadeIn = (
   frame: number,
   startFrame: number = 0,
   duration: number = durations.fadeIn
 ): number =>
-  interpolate(frame, [startFrame, startFrame + duration], [0, 1], CLAMP);
+  interpolate(frame, [startFrame, startFrame + duration], [0, 1], CLAMP_DECELERATE);
 
 /** Fade out over a given number of frames, ending at `endFrame`. */
 export const fadeOut = (
@@ -429,21 +441,45 @@ export const focusPull = (
 // ── Exit animations ────────────────────────────────────────────────────────
 
 /**
+ * Seam ownership.
+ *
+ * A standalone composition (catalog card, single-template render) fades itself
+ * out so the clip ends cleanly. Inside FullEpisode the seam between two
+ * segments belongs to TransitionWrapper (project/TRANSITION_GRAMMAR.md): a card
+ * that also fades itself turns every hard cut into "fade to blank paper, then
+ * cut". FullEpisode switches this on for as long as it is mounted; exitFade()
+ * and useCompositionAnimation() then leave opacity at 1.
+ *
+ * Module-level rather than React context because exitFade() is a plain
+ * function called from ~70 sites, many outside hook position. One composition
+ * renders per page, so the flag cannot leak between renders; Studio resets it
+ * when the episode composition unmounts.
+ */
+let seamsOwnedByEpisode = false;
+export const setSeamsOwnedByEpisode = (owned: boolean): void => {
+  seamsOwnedByEpisode = owned;
+};
+export const areSeamsOwnedByEpisode = (): boolean => seamsOwnedByEpisode;
+
+/**
  * Exit fade for the last N frames of a composition.
  * Per POLISH.md A7: last 15-20 frames should fade out.
  * Returns opacity (1 → 0). Apply to key elements, not background.
+ * Returns 1 inside an episode — see "Seam ownership" above.
  */
 export const exitFade = (
   frame: number,
   totalFrames: number,
   exitDuration: number = EXIT_FADE_DURATION
 ): number =>
-  interpolate(
-    frame,
-    [totalFrames - exitDuration, totalFrames],
-    [1, 0],
-    CLAMP_CUBIC_IN
-  );
+  seamsOwnedByEpisode
+    ? 1
+    : interpolate(
+        frame,
+        [totalFrames - exitDuration, totalFrames],
+        [1, 0],
+        CLAMP_CUBIC_IN
+      );
 
 // ── Pulse helper ───────────────────────────────────────────────────────────
 

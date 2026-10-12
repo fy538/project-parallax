@@ -16,13 +16,32 @@
 /**
  * Rec. 709 relative-luminance of a hex color in [0,1].
  *
- * Accepts 3- or 6-digit hex with or without a leading "#". Returns 0.5
- * (mid-gray) as a safe fallback for unparseable strings — callers
- * comparing against this value will see a neutral delta and skip the
- * warning rather than fire a misleading one.
+ * Accepts:
+ *   • 3- or 6-digit hex with or without a leading "#"  ("FFF", "#C4A747")
+ *   • CSS rgba() strings as returned by Remotion's `interpolateColors`
+ *     ("rgba(196, 167, 71, 1)")
+ *
+ * Returns 0.5 (mid-gray) as a safe fallback for unparseable strings —
+ * callers comparing against this value will see a neutral delta and skip
+ * the warning rather than fire a misleading one.
  */
-export const hexToLuminance = (hex: string): number => {
-  const m = hex.replace("#", "");
+export const hexToLuminance = (color: string): number => {
+  // Handle rgba(r, g, b, a) — produced by Remotion's interpolateColors.
+  const rgbaMatch = color.match(
+    /^rgba?\(\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)[\s,)]/ ,
+  );
+  if (rgbaMatch) {
+    const r = parseFloat(rgbaMatch[1]) / 255;
+    const g = parseFloat(rgbaMatch[2]) / 255;
+    const b = parseFloat(rgbaMatch[3]) / 255;
+    if (!Number.isFinite(r) || !Number.isFinite(g) || !Number.isFinite(b)) {
+      return 0.5;
+    }
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  }
+
+  // Handle hex strings.
+  const m = color.replace("#", "");
   if (m.length !== 3 && m.length !== 6) return 0.5;
   const full =
     m.length === 3

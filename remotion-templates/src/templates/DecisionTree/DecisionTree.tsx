@@ -65,6 +65,7 @@ import {
   buildParentMap,
 } from "../../hooks/useTreeCamera";
 import type { DecisionTreeData, TreeNode } from "./types";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 // ── Probability helpers (I6) ───────────────────────────────────────────────
 
@@ -1993,7 +1994,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
         )}
 
         {/* ── Episode label ── */}
-        <div
+        <SlugGate><div
           style={{
             position: "absolute",
             bottom: layout.safeAreaTier.generous.bottom,
@@ -2008,7 +2009,7 @@ export const DecisionTree: React.FC<{ data: DecisionTreeData }> = ({ data }) => 
           }}
         >
           {data.episode}
-        </div>
+        </div></SlugGate>
 
       </AbsoluteFill>
     </Background>

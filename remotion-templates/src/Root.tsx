@@ -14,6 +14,40 @@ import "./design/fonts"; // Preload all Meridian brand fonts
 import { BACKDROP_MANIFEST } from "./components/EditorialSurface";
 import { layout, sec } from "./design/theme";
 import { ChoroplethMapComposition } from "./templates/ChoroplethMap";
+import { BrandTransitions, PROTO_BRAND_TRANSITIONS_DURATION } from "./templates/_proto/BrandTransitions";
+import { GeometricMotion, GEOMETRIC_MOTION_DURATION } from "./templates/_proto/GeometricMotion";
+import { AIStillComposite, AI_STILL_COMPOSITE_DURATION } from "./templates/_proto/AIStillComposite";
+import { NoiseField, NOISE_FIELD_DURATION } from "./templates/_proto/NoiseField";
+import { PromiseAndCopy } from "./pilots/PromiseAndCopy/PromiseAndCopy";
+import { promiseAndCopySchema } from "./pilots/PromiseAndCopy/schema";
+import { promiseAndCopyMetadata } from "./pilots/PromiseAndCopy/timeline";
+import { WhatWeCount } from "./pilots/WhatWeCount/WhatWeCount";
+import { PhilosophyMarkLab, PhilosophyStyleLab } from "./experiments/PhilosophyStyleLab";
+import { CONTINUITY_RECORD_DURATION, ContinuityRecord } from "./experiments/ContinuityRecord";
+import { FIELD_ATLAS_STUDY_DURATION, FieldAtlasStudy } from "./experiments/FieldAtlasStudy";
+import { CLEAN_ILLUSTRATION_STUDY_DURATION, CleanIllustrationStudy } from "./experiments/CleanIllustrationStudy";
+import { TYPOGRAPHY_DIRECTION_STUDY_DURATION, TypographyDirectionStudy, TypographyIllustrationStudy, TypographyUnderstandingStudy } from "./experiments/TypographyDirectionStudy";
+import { IllustrationLanguageBoard, IllustrationOrganicStudy, IllustrationRelationalStudy, IllustrationSystemicStudy } from "./experiments/IllustrationLanguageStudy";
+import { ConstructivistForestStudy } from "./experiments/ConstructivistForestStudy";
+import { FOREST_ARGUMENT_DURATION, ForestArgumentCode, ForestArgumentCutout, ForestArgumentHybrid } from "./experiments/ForestArgumentStudy";
+import { ConstructivistHumanStudy, ConstructivistRangeBoard } from "./experiments/ConstructivistHumanStudy";
+import { STILLS_REEL_DURATION, StillsReel } from "./experiments/StillsReel";
+import { STILLS_REEL_2_DURATION, StillsReel2 } from "./experiments/StillsReel2";
+import { STILLS_REEL_3_DURATION, StillsReel3 } from "./experiments/StillsReel3";
+import { STILLS_REEL_4_DURATION, StillsReel4 } from "./experiments/StillsReel4";
+import { STILLS_REEL_5_DURATION, StillsReel5 } from "./experiments/StillsReel5";
+import { STILLS_REEL_POLISH_DURATION, STILLS_REEL_RETAKES_DURATION, StillsReelPolish, StillsReelRetakes } from "./experiments/StillsReelPolish";
+import { whatWeCountSchema } from "./pilots/WhatWeCount/schema";
+import { whatWeCountMetadata } from "./pilots/WhatWeCount/timeline";
+import { NarrationSync, NARRATION_SYNC_DURATION } from "./templates/_proto/NarrationSync";
+import {
+  ParametricBilingual,
+  ParametricSchema,
+  parametricMetadata,
+  PARAMETRIC_EN_DEFAULTS,
+  PARAMETRIC_ZH_DEFAULTS,
+} from "./templates/_proto/ParametricBilingual";
+import { ProtoReel, PROTO_REEL_DURATION } from "./templates/_proto/ProtoReel";
 import { RouteAnimationComposition } from "./templates/RouteAnimation";
 import { CinematicMapComposition } from "./templates/CinematicMap";
 import { TerritoryMapComposition } from "./templates/TerritoryMap";
@@ -110,6 +144,7 @@ import { OrgChartComposition } from "./templates/OrgChart";
 import { AnnotatedImageComposition } from "./templates/AnnotatedImage";
 import { ScrollyRevealComposition } from "./templates/ScrollyReveal";
 import { AnnotatedZoomComposition } from "./templates/AnnotatedZoom";
+import { GenerativeBackdropComposition } from "./templates/GenerativeBackdrop";
 import { BubbleMatrixComposition } from "./templates/BubbleMatrix";
 import { BarChartRaceComposition } from "./templates/BarChartRace";
 import { SanctionsNetworkComposition } from "./templates/SanctionsNetwork";
@@ -130,6 +165,7 @@ import { FilmOverlayCascadeTestComposition } from "./templates/Episodes/FilmOver
 import { AudioPreviewComposition } from "./templates/AudioPreview";
 import { PrisonersDilemmaShowcaseComposition } from "./templates/Episodes/PrisonersDilemmaShowcase";
 import { PrisonersDilemmaFullComposition } from "./templates/Episodes/PrisonersDilemmaFull";
+import { AiCareMotivesFullComposition } from "./templates/Episodes/AiCareMotivesFull";
 import { ThumbnailComposition } from "./templates/Thumbnail";
 import {
   EditorialFrameHeroTestComposition,
@@ -277,192 +313,197 @@ import {
 export const RemotionRoot: React.FC = () => {
   return (
     <>
-      <Folder name="Episodes">
+      <Folder name="Current">
+        <Composition
+          id="what-we-count"
+          component={WhatWeCount}
+          schema={whatWeCountSchema}
+          calculateMetadata={whatWeCountMetadata}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+          durationInFrames={sec(80)}
+          defaultProps={{"title":"When the score becomes the goal","labels":{"machine":"The machine","goal":"Restore this forest.","reward":"1 point / planting","forest":"The same grove"},"positions":{"machineX":290,"forestX":1430},"pauses":{"goal":1.2,"rule":1.3,"plant":1.3,"loophole":1.6,"repeat":1.1,"diagnosis":1.8,"repair":1.8,"mirror":1.8},"endingHoldSec":3,"narrationVolume":1}}
+        />
+        {/* Inline literals are required for the installed Studio's Save to code. */}
+        <Composition
+          id="promise-and-copy"
+          component={PromiseAndCopy}
+          schema={promiseAndCopySchema}
+          calculateMetadata={promiseAndCopyMetadata}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+          durationInFrames={sec(75)}
+          defaultProps={{"title":"Who inherits a promise?","labels":{"promise":"I will protect this forest.","original":"The first mind","successorA":"Successor A","successorB":"Successor B","forest":"The forest"},"imageSrc":"","positions":{"original":{"x":290,"y":600},"successorA":{"x":810,"y":440},"successorB":{"x":810,"y":740},"forest":{"x":1480,"y":600,"size":460}},"pauses":{"promise":1.2,"copy":1.8,"question":1.8,"possibility":1.5,"human":1.8,"closing":1.8},"endingHoldSec":3,"narrationVolume":1}}
+        />
+      </Folder>
+
+      <Folder name="Legacy-Episodes">
         <SiliconTrapComposition />
         <SiliconTrapFullComposition />
         <PrisonersDilemmaShowcaseComposition />
         <PrisonersDilemmaFullComposition />
-        <AudioPreviewComposition />
-        {/* Test fixture — NOT for production rendering; used by filmOverlay-cascade-integration.test.ts */}
-        <FilmOverlayCascadeTestComposition />
+        <AiCareMotivesFullComposition />
       </Folder>
 
-      <Folder name="Maps">
-        <ChoroplethMapComposition />
-        <RouteAnimationComposition />
-        <CinematicMapComposition />
-        <TerritoryMapComposition />
-        <FlowMapComposition />
-        <AtlasPlateComposition />
-        <RecreationComposition />
-        <ProportionalSymbolMapComposition />
-        <CartogramMapComposition />
-        <DensityMapComposition />
-        <TilegramUSMapComposition />
-        {/* CinematicMap catalog — terrain fly-through + GlobeReveal pattern */}
-        <CatalogCinematicKhyberPass />
-        <CatalogCinematicTaiwanStrait />
-        <CatalogCinematicGlobeRevealMiddleEast />
-        {/* TerritoryMap catalog — animated territorial control */}
-        <CatalogTerritoryOttomanRetreat />
-        <CatalogTerritoryCocomMembership />
-        {/* FlowMap catalog — directional volume flows */}
-        <CatalogFlowMapRussiaOilRerouting />
-        <CatalogFlowMapSemiconductorSupply />
-      </Folder>
-
-      <Folder name="Timelines">
-        <HorizontalTimelineComposition />
-        <HorizontalTimelineSingleComposition />
-        <EscalationLadderComposition />
-        <SpiralTimelineComposition />
-        <ConceptEvolutionTimelineComposition />
-      </Folder>
-
-      <Folder name="Data">
-        <DataChartComposition />
-        <TimeSeriesChartComposition />
-        <SmallMultiplesComposition />
-        <SankeyFlowComposition />
-        <ProbabilityGaugeComposition />
-        <BayesianUpdateComposition />
-        <BayesianUpdateMultiComposition />
-        <StatRevealComposition />
-        <RadarChartComposition />
-        <PricingWaterfallComposition />
-        <IsotypeChartComposition />
-        <BumpChartComposition />
-        <BarChartRaceComposition />
-        <PopulationPyramidComposition />
-        <RankChangeDotPlotComposition />
-        <BeeswarmChartComposition />
-        <CalendarHeatmapComposition />
-        <ConnectedScatterplotComposition />
-        <StreamgraphComposition />
-        <RidgelinePlotComposition />
-        <MarimekkoChartComposition />
-        <TernaryPlotComposition />
-        <HorizonChartComposition />
-        <DumbbellPlotComposition />
-        <BubbleMatrixComposition />
-        <DivergingBarComposition />
-        <DotPlotComposition />
-        <SlopegraphComposition />
-        <KPICardComposition />
-        <BulletChartComposition />
-        <StepLineComposition />
-        <TreemapComposition />
-        <MatrixHeatmapComposition />
-      </Folder>
-
-      <Folder name="Typography">
-        <KineticTypographyComposition />
-        <PrimarySourceRevealComposition />
-      </Folder>
-
-      <Folder name="Math">
-        <MathRevealComposition />
-        <MathDerivationComposition />
-        {/* Phase 3 primitives — bounded + annotation + inline */}
-        <CatalogMathAnnotatedBayes />
-        <CatalogMathNewtonBounded />
-        <CatalogMathInlineDemo />
-        {/* Phase 4 unified visual reference */}
-        <CatalogMathRenderShowcase />
-      </Folder>
-
-      <Folder name="Diagrams">
-        <FrameworkDiagramComposition />
-        <DuelingFrameworksComposition />
-        <NetworkDiagramComposition />
-        <SanctionsNetworkComposition />
-        <CausalLoopDiagramComposition />
-        <ArcDiagramComposition />
-        <PhilosophicalFamilyTreeComposition />
-        <SplitCompositionComposition />
-        <SplitFrameComposition />
-        <ComparisonPairComposition />
-        <VennDiagramComposition />
-        <ChordDiagramComposition />
-        <StrategicLandscapeComposition />
-      </Folder>
-
-      <Folder name="Scenarios">
-        <OrgChartComposition />
-        <DecisionTreeComposition />
-        <DecisionTreeHorizontalComposition />
-        <OutcomePartitionComposition />
-        <GameBoardComposition />
-        {/* BifurcationRouteComposition removed May 13, 2026 — see import comment. */}
-      </Folder>
-
-      <Folder name="Transitions">
-        <TitleTransitionComposition />
-      </Folder>
-
-      <Folder name="Cinematic">
-        <ImageCompositeComposition />
-        <PhotoMontageComposition />
-        <AnnotatedImageComposition />
-        <ScrollyRevealComposition />
-        <AnnotatedZoomComposition />
-      </Folder>
-
-      <Folder name="Motion">
-        <MorphTransitionComposition />
-      </Folder>
-
-      <Folder name="Argument-Primitives">
-        <SyllogismComposition />
-        <AxiomListComposition />
-        <DialecticFlowComposition />
-        <ConditionalArgumentComposition />
-        <CounterfactualPathComposition />
-        <AnalogyCrossmapComposition />
-        <ToulminMapComposition />
-      </Folder>
-
-      <Folder name="Documentary-Archival">
-        <HandwrittenLetterComposition />
-        <NewspaperHeadlineRotatorComposition />
-        <ArchivalReelComposition />
-        <TelegramCableComposition />
-      </Folder>
-
-      <Folder name="Thumbnails">
-        <ThumbnailComposition />
-      </Folder>
-
-      <Folder name="Editorial">
-        <Folder name="Backdrop-foundation">
-          <Composition
-            id="ForegroundBackdropFoundation"
-            component={ForegroundBackdropFoundation}
-            schema={ForegroundBackdropFoundationSchema}
-            width={layout.width}
-            height={layout.height}
-            fps={layout.fps}
-            durationInFrames={sec(12)}
-            defaultProps={{"backdropId":"horizon" as const}}
-          />
-          <ForegroundBackdropShortcutCompositions />
+      <Folder name="Templates">
+        <Folder name="Maps">
+          <ChoroplethMapComposition />
+          <RouteAnimationComposition />
+          <CinematicMapComposition />
+          <TerritoryMapComposition />
+          <FlowMapComposition />
+          <AtlasPlateComposition />
+          <ProportionalSymbolMapComposition />
+          <CartogramMapComposition />
+          <DensityMapComposition />
+          <TilegramUSMapComposition />
         </Folder>
-        <EditorialFrameHeroTestComposition />
-        <EditorialFrameHeroDarkTestComposition />
-        <EditorialFrameHeroFlippedTestComposition />
-        <EditorialFrameAsideTestComposition />
-        <EditorialFrameMinimalTestComposition />
-      </Folder>
 
-      <Folder name="Shorts">
-        <KineticShortComposition />
-        <DataChartShortComposition />
-        <SplitShortComposition />
-        <StatRevealShortComposition />
-        <FrameworkDiagramShortComposition />
-        <ChoroplethMapShortComposition />
-        <SplitCompositionShortComposition />
-        <ProbabilityGaugeShortComposition />
+        <Folder name="Timelines">
+          <HorizontalTimelineComposition />
+          <HorizontalTimelineSingleComposition />
+          <EscalationLadderComposition />
+          <SpiralTimelineComposition />
+          <ConceptEvolutionTimelineComposition />
+        </Folder>
+
+        <Folder name="Data">
+          <DataChartComposition />
+          <TimeSeriesChartComposition />
+          <SmallMultiplesComposition />
+          <SankeyFlowComposition />
+          <ProbabilityGaugeComposition />
+          <BayesianUpdateComposition />
+          <BayesianUpdateMultiComposition />
+          <StatRevealComposition />
+          <RadarChartComposition />
+          <PricingWaterfallComposition />
+          <IsotypeChartComposition />
+          <BumpChartComposition />
+          <BarChartRaceComposition />
+          <PopulationPyramidComposition />
+          <RankChangeDotPlotComposition />
+          <BeeswarmChartComposition />
+          <CalendarHeatmapComposition />
+          <ConnectedScatterplotComposition />
+          <StreamgraphComposition />
+          <RidgelinePlotComposition />
+          <MarimekkoChartComposition />
+          <TernaryPlotComposition />
+          <HorizonChartComposition />
+          <DumbbellPlotComposition />
+          <BubbleMatrixComposition />
+          <DivergingBarComposition />
+          <DotPlotComposition />
+          <SlopegraphComposition />
+          <KPICardComposition />
+          <BulletChartComposition />
+          <StepLineComposition />
+          <TreemapComposition />
+          <MatrixHeatmapComposition />
+        </Folder>
+
+        <Folder name="Typography">
+          <KineticTypographyComposition />
+          <PrimarySourceRevealComposition />
+        </Folder>
+
+        <Folder name="Math">
+          <MathRevealComposition />
+          <MathDerivationComposition />
+        </Folder>
+
+        <Folder name="Diagrams">
+          <FrameworkDiagramComposition />
+          <DuelingFrameworksComposition />
+          <NetworkDiagramComposition />
+          <SanctionsNetworkComposition />
+          <CausalLoopDiagramComposition />
+          <ArcDiagramComposition />
+          <PhilosophicalFamilyTreeComposition />
+          <SplitCompositionComposition />
+          <SplitFrameComposition />
+          <ComparisonPairComposition />
+          <VennDiagramComposition />
+          <ChordDiagramComposition />
+          <StrategicLandscapeComposition />
+        </Folder>
+
+        <Folder name="Scenarios">
+          <OrgChartComposition />
+          <DecisionTreeComposition />
+          <DecisionTreeHorizontalComposition />
+          <OutcomePartitionComposition />
+          <GameBoardComposition />
+          {/* BifurcationRouteComposition removed May 13, 2026 — see import comment. */}
+        </Folder>
+
+        <Folder name="Transitions">
+          <TitleTransitionComposition />
+        </Folder>
+
+        <Folder name="Cinematic">
+          <ImageCompositeComposition />
+          <PhotoMontageComposition />
+          <AnnotatedImageComposition />
+          <ScrollyRevealComposition />
+          <AnnotatedZoomComposition />
+          <GenerativeBackdropComposition />
+        </Folder>
+
+        <Folder name="Motion">
+          <MorphTransitionComposition />
+        </Folder>
+
+        <Folder name="Argument-Primitives">
+          <SyllogismComposition />
+          <AxiomListComposition />
+          <DialecticFlowComposition />
+          <ConditionalArgumentComposition />
+          <CounterfactualPathComposition />
+          <AnalogyCrossmapComposition />
+          <ToulminMapComposition />
+        </Folder>
+
+        <Folder name="Documentary-Archival">
+          <HandwrittenLetterComposition />
+          <NewspaperHeadlineRotatorComposition />
+          <ArchivalReelComposition />
+          <TelegramCableComposition />
+        </Folder>
+
+        <Folder name="Thumbnails">
+          <ThumbnailComposition />
+        </Folder>
+
+        <Folder name="Editorial">
+          <Folder name="Backdrop-foundation">
+            <Composition
+              id="ForegroundBackdropFoundation"
+              component={ForegroundBackdropFoundation}
+              schema={ForegroundBackdropFoundationSchema}
+              width={layout.width}
+              height={layout.height}
+              fps={layout.fps}
+              durationInFrames={sec(12)}
+              defaultProps={{"backdropId":"horizon" as const}}
+            />
+            <ForegroundBackdropShortcutCompositions />
+          </Folder>
+        </Folder>
+
+        <Folder name="Shorts">
+          <KineticShortComposition />
+          <DataChartShortComposition />
+          <SplitShortComposition />
+          <StatRevealShortComposition />
+          <FrameworkDiagramShortComposition />
+          <ChoroplethMapShortComposition />
+          <SplitCompositionShortComposition />
+          <ProbabilityGaugeShortComposition />
+        </Folder>
       </Folder>
 
       {/*
@@ -493,6 +534,20 @@ export const RemotionRoot: React.FC = () => {
           <CatalogCartogramEU />
           <CatalogDensityFabs />
           <CatalogTilegramElectoral />
+          <CatalogCinematicKhyberPass />
+          <CatalogCinematicTaiwanStrait />
+          <CatalogCinematicGlobeRevealMiddleEast />
+          <CatalogTerritoryOttomanRetreat />
+          <CatalogTerritoryCocomMembership />
+          <CatalogFlowMapRussiaOilRerouting />
+          <CatalogFlowMapSemiconductorSupply />
+        </Folder>
+
+        <Folder name="Math">
+          <CatalogMathAnnotatedBayes />
+          <CatalogMathNewtonBounded />
+          <CatalogMathInlineDemo />
+          <CatalogMathRenderShowcase />
         </Folder>
 
         <Folder name="Data">
@@ -613,6 +668,287 @@ export const RemotionRoot: React.FC = () => {
           <CatalogCompositePatternsShowcase />
         </Folder>
       </Folder>
+      <Folder name="Experiments">
+        <Composition
+          id="stills-reel-ai-care"
+          component={StillsReel}
+          durationInFrames={STILLS_REEL_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-2-ai-care"
+          component={StillsReel2}
+          durationInFrames={STILLS_REEL_2_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-3-ai-care"
+          component={StillsReel3}
+          durationInFrames={STILLS_REEL_3_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-4-ai-care"
+          component={StillsReel4}
+          durationInFrames={STILLS_REEL_4_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-5-ai-care"
+          component={StillsReel5}
+          durationInFrames={STILLS_REEL_5_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-polish-ai-care"
+          component={StillsReelPolish}
+          durationInFrames={STILLS_REEL_POLISH_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="stills-reel-retakes-ai-care"
+          component={StillsReelRetakes}
+          durationInFrames={STILLS_REEL_RETAKES_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="forest-argument-cutout"
+          component={ForestArgumentCutout}
+          durationInFrames={FOREST_ARGUMENT_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="forest-argument-hybrid"
+          component={ForestArgumentHybrid}
+          durationInFrames={FOREST_ARGUMENT_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="forest-argument-code"
+          component={ForestArgumentCode}
+          durationInFrames={FOREST_ARGUMENT_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="constructivist-range-board"
+          component={ConstructivistRangeBoard}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={1920}
+          height={660}
+        />
+        <Composition
+          id="constructivist-human-study"
+          component={ConstructivistHumanStudy}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="constructivist-forest-study"
+          component={ConstructivistForestStudy}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="illustration-language-board"
+          component={IllustrationLanguageBoard}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={1920}
+          height={560}
+        />
+        <Composition
+          id="illustration-organic-study"
+          component={IllustrationOrganicStudy}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="illustration-relational-study"
+          component={IllustrationRelationalStudy}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="illustration-systemic-study"
+          component={IllustrationSystemicStudy}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="typography-understanding-study"
+          component={TypographyUnderstandingStudy}
+          durationInFrames={120}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="typography-illustration-study"
+          component={TypographyIllustrationStudy}
+          durationInFrames={120}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="typography-direction-study"
+          component={TypographyDirectionStudy}
+          durationInFrames={TYPOGRAPHY_DIRECTION_STUDY_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="clean-illustration-study"
+          component={CleanIllustrationStudy}
+          durationInFrames={CLEAN_ILLUSTRATION_STUDY_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="field-atlas-study"
+          component={FieldAtlasStudy}
+          durationInFrames={FIELD_ATLAS_STUDY_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="continuity-record-study"
+          component={ContinuityRecord}
+          durationInFrames={CONTINUITY_RECORD_DURATION}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="philosophy-mark-lab"
+          component={PhilosophyMarkLab}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        <Composition
+          id="philosophy-style-lab"
+          component={PhilosophyStyleLab}
+          durationInFrames={1}
+          fps={layout.fps}
+          width={layout.width}
+          height={layout.height}
+        />
+        {/* Capability R&D reel — every prototype back-to-back with slates (REMOTION_CAPABILITY_MAP.md showcase index) */}
+        <Composition
+          id="proto-reel"
+          component={ProtoReel}
+          durationInFrames={PROTO_REEL_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        {/* P1 motion-layer prototype — native branded transitions (REMOTION_MOTION_LAYER_ROADMAP.md) */}
+        <Composition
+          id="proto-brand-transitions"
+          component={BrandTransitions}
+          durationInFrames={PROTO_BRAND_TRANSITIONS_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        <Composition
+          id="proto-ai-still-composite"
+          component={AIStillComposite}
+          durationInFrames={AI_STILL_COMPOSITE_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        <Composition
+          id="proto-noise-field"
+          component={NoiseField}
+          durationInFrames={NOISE_FIELD_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        {/* Geometric vector layer — draw-on (evolvePath) + path morph (interpolatePath) */}
+        <Composition
+          id="proto-geometric-motion"
+          component={GeometricMotion}
+          durationInFrames={GEOMETRIC_MOTION_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        {/* Narration sync — word-timed reveal (captions/whisper) + audio-reactive spectrum (media-utils) */}
+        <Composition
+          id="proto-narration-sync"
+          component={NarrationSync}
+          durationInFrames={NARRATION_SYNC_DURATION}
+          fps={30}
+          width={1920}
+          height={1080}
+        />
+        {/* Parametric bilingual — one component → EN/ZH variants; duration auto-derived from narration WAV */}
+        <Composition
+          id="proto-parametric-en"
+          component={ParametricBilingual}
+          schema={ParametricSchema}
+          calculateMetadata={parametricMetadata}
+          defaultProps={PARAMETRIC_EN_DEFAULTS}
+        />
+        <Composition
+          id="proto-parametric-zh"
+          component={ParametricBilingual}
+          schema={ParametricSchema}
+          calculateMetadata={parametricMetadata}
+          defaultProps={PARAMETRIC_ZH_DEFAULTS}
+        />
+        <RecreationComposition />
+      </Folder>
+
+      <Folder name="Tests">
+        <AudioPreviewComposition />
+        <FilmOverlayCascadeTestComposition />
+        <EditorialFrameHeroTestComposition />
+        <EditorialFrameHeroDarkTestComposition />
+        <EditorialFrameHeroFlippedTestComposition />
+        <EditorialFrameAsideTestComposition />
+        <EditorialFrameMinimalTestComposition />
+      </Folder>
+
     </>
   );
 };

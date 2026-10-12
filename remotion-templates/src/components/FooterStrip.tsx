@@ -17,6 +17,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { fonts, fontSizes, layout, palette, sec, shadows, zIndex } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
+import { useChromeLevel } from "../hooks/useChromeLevel";
 import { fadeIn, slideIn } from "../utils/animation";
 
 export interface FooterStripProps {
@@ -51,9 +52,15 @@ export const FooterStrip: React.FC<FooterStripProps> = React.memo(
     const frame = useCurrentFrame();
     const { fps } = useVideoConfig();
     const theme = useThemeMode(mode);
+    const chromeLevel = useChromeLevel();
     const startFrame = sec(startSec);
     const opacity = fadeIn(frame, startFrame, sec(0.6));
     const slideY = slideIn(frame, startFrame, -6, sec(0.5)); // up from below
+
+    // "wordmark" episodes carry no footer at all: the REC timer restarts on
+    // every card and the FILED date is the render date, neither of which
+    // means anything outside the briefing register.
+    if (chromeLevel !== "briefing") return null;
 
     const runtime = formatRuntime(frame / fps);
     const date = filedDate || formatToday();
@@ -65,6 +72,7 @@ export const FooterStrip: React.FC<FooterStripProps> = React.memo(
 
     return (
       <div
+        data-qa-role="chrome"
         style={{
           position: "absolute",
           bottom: layout.safeArea.bottom,

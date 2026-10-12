@@ -191,4 +191,31 @@ describe("buildDuckingArray", () => {
     // Frames 5–6s: only TEMPLATE (FOOTAGE ends at 4s) → trending toward 1.0
     expect(arr[Math.round(5.5 * FPS)]).toBeLessThan(1.50);
   });
+
+  // ── Narration decides, not the segment type ───────────────────────────────
+
+  it("keeps the music down under a narrated still or clip", () => {
+    const narrated = buildDuckingArray(
+      [{ startSec: 0, endSec: 5, type: "FOOTAGE", narrated: true }],
+      0, 5, FPS,
+    );
+    expect(Math.max(...narrated)).toBeCloseTo(1.0, 5);
+    // The same segment without narration still lifts.
+    const silent = buildDuckingArray([{ startSec: 0, endSec: 5, type: "FOOTAGE" }], 0, 5, FPS);
+    expect(silent[silent.length - 1]).toBeGreaterThan(1.3);
+  });
+
+  it("follows the recorded voice when word timings are given", () => {
+    // Speech 0–4s, a 3s pause, speech 7–10s. Segment types are ignored.
+    const speech = [
+      { startSec: 0, endSec: 2 }, { startSec: 2.3, endSec: 4 },
+      { startSec: 7, endSec: 10 },
+    ];
+    const arr = buildDuckingArray([{ startSec: 0, endSec: 10, type: "FOOTAGE" }], 0, 10, FPS, speech);
+    expect(arr[Math.round(1 * FPS)]).toBeCloseTo(1.0, 2);      // under speech
+    expect(arr[Math.round(3 * FPS)]).toBeCloseTo(1.0, 2);      // the 0.3s gap is not a pause
+    expect(arr[Math.round(6.4 * FPS)]).toBeGreaterThan(1.25);  // lifted in the real pause
+    expect(arr[Math.round(9 * FPS)]).toBeLessThan(1.1);        // back down for the next phrase
+  });
 });
+

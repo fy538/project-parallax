@@ -64,7 +64,12 @@ const AnimatedBar: React.FC<{
   someHighlighted?: boolean;
   /** Render value as plain number (no thousand-separators) — for years, IDs, etc. */
   formatAsYear?: boolean;
-}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false, someHighlighted = false, formatAsYear = false }) => {
+  /**
+   * Renders this bar as a counterfactual projection: dashed outline,
+   * transparent fill, 45% opacity. See: project/COUNTERFACTUAL_REGISTER.md
+   */
+  isCounterfactual?: boolean;
+}> = React.memo(({ value, maxValue, label, sublabel, color, unit, frame, startFrame, barWidth, maxHeight, isHighlighted = false, someHighlighted = false, formatAsYear = false, isCounterfactual = false }) => {
   const theme = useThemeMode("light");
   // Hero/muted hierarchy: when any bar is highlighted, non-highlighted bars
   // render in ink at 30% opacity, regardless of per-data-point color. The
@@ -187,25 +192,32 @@ const AnimatedBar: React.FC<{
           style={{
             width: barWidth * 0.7,
             height: barHeight,
-            background: gradients.barFill(renderColor),
+            // Counterfactual bars: transparent fill + dashed outline.
+            // Solid bars: gradient fill as usual.
+            background: isCounterfactual ? "transparent" : gradients.barFill(renderColor),
             borderRadius: barStyle.borderRadius,
             transition: "none",
-            // Outer shadow + inset right-edge to suggest end-cap volume.
-            // The hero bar previously stacked TWO outer glows (20px + 50px)
-            // on top of shadows.medium, which read as illuminated game-UI
-            // against editorial chrome. Now: shadows.medium + a tight 8px
-            // colored halo — present but restrained.
-            boxShadow: isHighlighted
-              ? `${shadows.medium}, 0 0 8px ${color}33, inset -1px 0 0 rgba(0,0,0,0.18)`
-              : isMuted
-                ? `${shadows.subtle}` // no inset for muted — keep it flat-foil
-                : `${shadows.subtle}, inset -1px 0 0 rgba(0,0,0,0.15)`,
+            // Counterfactual: dashed border in the bar's accent color at 70% opacity.
+            // Standard: shadow + inset edge per editorial hierarchy.
+            ...(isCounterfactual
+              ? {
+                  border: `2px dashed ${color}B3`,
+                  boxShadow: "none",
+                  opacity: 0.45 * growProgress,
+                }
+              : {
+                  boxShadow: isHighlighted
+                    ? `${shadows.medium}, 0 0 8px ${color}33, inset -1px 0 0 rgba(0,0,0,0.18)`
+                    : isMuted
+                      ? `${shadows.subtle}`
+                      : `${shadows.subtle}, inset -1px 0 0 rgba(0,0,0,0.15)`,
+                }),
             transform: `scale(${pulseScale})`,
             transformOrigin: "bottom center",
           }}
         />
-        {/* Specular highlight — thin bright edge at bar top */}
-        {barHeight > 4 && (
+        {/* Specular highlight — thin bright edge at bar top; suppressed for counterfactual bars */}
+        {barHeight > 4 && !isCounterfactual && (
           <div
             style={{
               position: "absolute",
@@ -1259,6 +1271,7 @@ export const DataChart: React.FC<{ data: DataChartData }> = ({ data }) => {
                 isHighlighted={data.highlightIndex === i}
                 someHighlighted={data.highlightIndex !== undefined && data.highlightIndex >= 0}
                 formatAsYear={data.formatAsYear}
+                isCounterfactual={dp.counterfactual ?? false}
               />
             </div>
           ))}

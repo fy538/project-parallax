@@ -25,6 +25,16 @@ export const TimeSeriesLineSchema = z.object({
   areaFill: z.boolean().optional(),
   areaOpacity: z.number().optional(),
   hero: z.boolean().optional(),
+  /**
+   * Mark this series as a counterfactual projection.
+   * Counterfactual lines render at 45% opacity with a wider dash pattern
+   * ("12,6") and no leading-edge dot marker. The glow filter is suppressed.
+   * Implies `dashed: true` — no need to set both.
+   * Editorial discipline: a counterfactual series should always be named via
+   * an annotation or the line label itself ("Without sanctions", "Pre-1989
+   * trajectory"). See: project/COUNTERFACTUAL_REGISTER.md
+   */
+  counterfactual: z.boolean().optional(),
 });
 
 export const TimeSeriesAnnotationSchema = z.object({
@@ -64,6 +74,23 @@ export const TimeSeriesHeroStatSchema = z.object({
   label: z.string(),
 });
 
+/**
+ * Counterfactual zone — a shaded vertical band on the chart marking the
+ * "what-if" region. Renders as a taupe/bone fill + dashed left-edge border
+ * + right-edge label. Use when the editorial argument is "everything in this
+ * zone would have been different if X hadn't happened."
+ *
+ * Example: shade 1991–2001 as "Without WTO accession" to contrast with the
+ * actual post-2001 trajectory. Pair with a counterfactual line in the same
+ * zone for maximum editorial clarity.
+ */
+export const CounterfactualZoneSchema = z.object({
+  fromX: TimeSeriesXValueSchema,
+  toX: TimeSeriesXValueSchema,
+  label: z.string().optional(),
+  color: z.string().optional(),
+});
+
 export const TimeSeriesChartDataSchema = z.object({
   episode: z.string(),
   title: z.string().describe("State the finding, not the topic. Write: 'China semiconductor investment doubled in five years' not 'Semiconductor investment trends'. The title IS the editorial argument."),
@@ -76,6 +103,12 @@ export const TimeSeriesChartDataSchema = z.object({
   eras: z.array(TimeSeriesEraSchema).optional(),
   referenceLines: z.array(TimeSeriesReferenceLineSchema).optional(),
   referenceBands: z.array(TimeSeriesReferenceBandSchema).optional(),
+  /**
+   * A shaded "what-if" zone — spans fromX to toX with a faint fill and a
+   * dashed left border. Pairs with counterfactual lines inside the zone.
+   * See: project/COUNTERFACTUAL_REGISTER.md
+   */
+  counterfactualZone: CounterfactualZoneSchema.optional(),
   xLabel: z.string().optional(),
   yLabel: z.string().optional(),
   yUnit: z.string().optional(),

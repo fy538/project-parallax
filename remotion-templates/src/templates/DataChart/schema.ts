@@ -17,6 +17,16 @@ export const DataPointSchema = z.object({
   value: z.number(),
   color: z.string().optional(),
   sublabel: z.string().optional(),
+  /**
+   * Mark this data point as a counterfactual projection.
+   * Counterfactual bars render with a dashed outline and transparent fill
+   * (45% opacity, no gradient) rather than the standard solid fill.
+   * Editorial discipline: a counterfactual bar should always have a
+   * corresponding annotation or subtitle naming the hypothetical
+   * ("Without sanctions") — otherwise the ghost bar is uninterpretable.
+   * See: project/COUNTERFACTUAL_REGISTER.md
+   */
+  counterfactual: z.boolean().optional(),
 });
 
 export const ComparisonPairSchema = z.object({

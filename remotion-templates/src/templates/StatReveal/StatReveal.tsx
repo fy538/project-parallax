@@ -8,6 +8,7 @@
  * Designed for the visceral "holy shit" number moment.
  */
 
+import { textAccent } from "../../utils/colorUtils";
 import React, { useMemo } from "react";
 import {
   AbsoluteFill,
@@ -70,6 +71,8 @@ interface HeroStatProps {
   value: number;
   prefix?: string;
   suffix?: string;
+  /** Small qualifier set above the number ("up to"). */
+  kicker?: string;
   label: string;
   decimals?: number;
   /** Frame at which the count-up animation begins. */
@@ -93,6 +96,7 @@ const HeroStat: React.FC<HeroStatProps> = ({
   value,
   prefix,
   suffix,
+  kicker,
   label,
   decimals,
   startFrame,
@@ -125,12 +129,30 @@ const HeroStat: React.FC<HeroStatProps> = ({
         justifyContent: "center",
       }}
     >
+      {/* Qualifier above the number — a word like "up to" belongs here, not
+          in `prefix`, where it would be set at the hero size. */}
+      {kicker && (
+        <div
+          style={{
+            fontFamily: fonts.metadata,
+            fontSize: fontSizes.readable,
+            fontWeight: fontWeights.medium,
+            letterSpacing: 4,
+            textTransform: "uppercase",
+            color: theme.text.secondary,
+            marginBottom: 14,
+          }}
+        >
+          {kicker}
+        </div>
+      )}
+
       {/* The big number — cinematic scale-reveal (1.3× → 1.0×) */}
       <div
         style={{
           fontSize: 120,
           fontWeight: fontWeights.bold,
-          color: accentColor,
+          color: textAccent(accentColor, theme.isDark),
           fontFamily: fonts.data,
           textShadow: `0 0 24px ${accentColor}50, ${theme.textShadow}`, // shadows.accentGlow + theme.textShadow composite
           letterSpacing: -2,
@@ -145,13 +167,13 @@ const HeroStat: React.FC<HeroStatProps> = ({
       {/* Label below the number */}
       <div
         style={{
-          fontSize: fontSizes.body,
+          fontSize: fontSizes.readable,
           color: theme.text.secondary,
           fontFamily: fonts.body,
           marginTop: layout.spacing.md,
           textShadow: theme.textShadow,
           textAlign: "center",
-          maxWidth: 500,
+          maxWidth: 640,
         }}
       >
         {label}
@@ -200,10 +222,10 @@ const BarItem: React.FC<BarItemProps> = ({
       {/* Label */}
       <div
         style={{
-          fontSize: fontSizes.label,
+          fontSize: fontSizes.readable, // was body (22), before that label (18)
           color: theme.text.secondary,
           fontFamily: fonts.body,
-          width: 200,
+          width: 260,
           textAlign: "right",
           textShadow: theme.textShadow,
           flexShrink: 0,
@@ -228,7 +250,7 @@ const BarItem: React.FC<BarItemProps> = ({
       {/* Value label */}
       <div
         style={{
-          fontSize: fontSizes.label,
+          fontSize: fontSizes.readable, // was body (22), before that label (18)
           color: theme.text.muted,
           fontFamily: fonts.data,
           textShadow: theme.textShadow,
@@ -399,6 +421,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
             value={data.stat.value}
             prefix={data.stat.prefix}
             suffix={data.stat.suffix}
+            kicker={data.stat.kicker}
             label={data.stat.label}
             decimals={data.stat.decimals}
             startFrame={heroStart}
@@ -450,6 +473,7 @@ export const StatReveal: React.FC<{ data: StatRevealData }> = ({ data }) => {
       {/* Source attribution */}
       {data.source && (
         <div
+          data-qa-role="source"
           style={{
             position: "absolute",
             bottom: zones.footer.rect.bottom,

@@ -27,6 +27,16 @@ export {
   CatalogCartogramEU,
   CatalogDensityFabs,
   CatalogTilegramElectoral,
+  // CinematicMap — terrain fly-through + GlobeReveal pattern (May 18, 2026)
+  CatalogCinematicKhyberPass,
+  CatalogCinematicTaiwanStrait,
+  CatalogCinematicGlobeRevealMiddleEast,
+  // TerritoryMap — animated territorial control (May 20, 2026)
+  CatalogTerritoryOttomanRetreat,
+  CatalogTerritoryCocomMembership,
+  // FlowMap — directional volume flows (May 20, 2026)
+  CatalogFlowMapRussiaOilRerouting,
+  CatalogFlowMapSemiconductorSupply,
 } from "./Maps";
 
 export {

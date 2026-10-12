@@ -1,3 +1,4 @@
+import { palette } from "../design/theme";
 /**
  * Color math utilities — hex parsing, sRGB linear interpolation, darken.
  *
@@ -56,4 +57,19 @@ export function lerpHex(from: string, to: string, t: number): string {
 export function darkenHex(hex: string, amt = 0.05): string {
   const [r, g, b] = parseHex(hex);
   return formatHex(r * (1 - amt), g * (1 - amt), b * (1 - amt));
+}
+
+/**
+ * Text-safe accent: on LIGHT backgrounds, swap the fill accents that fail
+ * WCAG contrast as text (gold ~2:1, dustblue ~2.3:1 on paper) for their
+ * text tokens (goldText / dustblueText, 5.0:1). Other colours, and anything
+ * on dark backgrounds, pass through unchanged. Use for accent-coloured text,
+ * numerals and labels; keep the original colour for fills, rules and dots.
+ */
+export function textAccent(color: string, isDark: boolean): string {
+  if (isDark || !color) return color;
+  const c = color.trim().toUpperCase();
+  if (c === palette.gold.toUpperCase()) return palette.goldText;
+  if (c === palette.dustblue.toUpperCase()) return palette.dustblueText;
+  return color;
 }

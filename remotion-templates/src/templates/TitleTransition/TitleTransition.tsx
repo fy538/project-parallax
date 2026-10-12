@@ -29,6 +29,7 @@ import { Crosshair } from "../../components/Crosshair";
 import { HeaderStrip } from "../../components/HeaderStrip";
 import { FooterStrip } from "../../components/FooterStrip";
 import type { TitleTransitionData } from "./types";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 // ── Smooth bloom: single 3-point curve (no hard seam at peak) ─────────────
 
@@ -644,7 +645,7 @@ const EndCardVariant: React.FC<{
       </div>
 
       {/* Episode label — slideIn (was naked fade) */}
-      <div
+      <SlugGate><div
         style={{
           position: "absolute",
           bottom: layout.safeAreaTier.generous.bottom,
@@ -658,7 +659,7 @@ const EndCardVariant: React.FC<{
         }}
       >
         {data.episode}
-      </div>
+      </div></SlugGate>
     </div>
   );
 };

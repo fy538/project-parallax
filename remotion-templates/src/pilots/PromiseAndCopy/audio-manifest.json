@@ -1,0 +1,44 @@
+{
+  "promise": {
+    "src": "pilots/promise-and-copy/promise.wav",
+    "durationSec": 9.282271,
+    "text": "Imagine a machine that makes a promise: I will protect this forest. For now, the picture seems simple. One promise. One promise-maker.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "copy": {
+    "src": "pilots/promise-and-copy/copy.wav",
+    "durationSec": 9.330625,
+    "text": "Then we copy the machine. Both successors inherit its memories, including the moment it said those words. Each remembers the promise from the inside.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "question": {
+    "src": "pilots/promise-and-copy/question.wav",
+    "durationSec": 10.430521,
+    "text": "Who owes the forest protection now? Both of them? Only one? Each could insist that the other is responsible. Remembering a promise doesn't tell us who has to keep it.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "possibility": {
+    "src": "pilots/promise-and-copy/possibility.wav",
+    "durationSec": 10.913479,
+    "text": "One answer is to let the obligation follow both successors. Another is to assign it to whoever can actually protect the forest. Same past. Different rules for the future.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "human": {
+    "src": "pilots/promise-and-copy/human.wav",
+    "durationSec": 11.707542,
+    "text": "Now turn the question around. Your memories, values, and abilities change too. Yet a promise you made years ago can still matter. What exactly do we think has stayed the same?",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "closing": {
+    "src": "pilots/promise-and-copy/closing.wav",
+    "durationSec": 9.15625,
+    "text": "Copyable minds make an old human puzzle harder to ignore. When a mind changes, what should happen to its commitments? And who gets to decide?",
+    "voice": "Samantha",
+    "rate": 150
+  }
+}

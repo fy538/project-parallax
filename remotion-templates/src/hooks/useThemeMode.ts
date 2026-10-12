@@ -74,7 +74,7 @@ export const useThemeMode = (variant?: Mode | string): ThemeTokens => {
         elevated: tokens.bg.elevated,
       },
       shadow: tokens.shadow,
-      textShadow: shadows.textLift,
+      textShadow: mode === "dark" ? shadows.textLift : shadows.textLiftLight,
       mark: tokens.mark,
     };
   }, [mode]);

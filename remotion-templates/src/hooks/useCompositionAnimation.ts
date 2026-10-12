@@ -26,6 +26,7 @@
 import { useCurrentFrame, useVideoConfig } from "remotion";
 import { interpolate, Easing } from "remotion";
 import { motionBudget } from "../design/theme";
+import { areSeamsOwnedByEpisode } from "../utils/animation";
 
 /**
  * Drift interpolation mode. Each mode produces a different motion character:
@@ -131,14 +132,20 @@ export const useCompositionAnimation = (
     noExit = false,
   } = options;
 
+  // Inside an episode the seam belongs to TransitionWrapper, so the card
+  // neither fades itself in nor out (see "Seam ownership" in utils/animation).
+  const seamsOwned = areSeamsOwnedByEpisode();
+
   // ── Enter fade ──────────────────────────────────────────────────────────
-  const enterOpacity = interpolate(frame, [0, enterFrames], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const enterOpacity = seamsOwned
+    ? 1
+    : interpolate(frame, [0, enterFrames], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
 
   // ── Exit fade (POLISH.md A7) ────────────────────────────────────────────
-  const exitOpacity = noExit
+  const exitOpacity = noExit || seamsOwned
     ? 1
     : interpolate(
         frame,

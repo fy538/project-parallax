@@ -196,6 +196,8 @@ interface NodeRenderProps {
    * textAnchor = "start".
    */
   labelPlacement?: "below" | "right";
+  /** Label size for annotation layouts; larger when the diagram has few nodes. */
+  labelSize?: number;
   /** Hub center in canvas pixels — when provided, satellite leader lines extend away from hub. */
   hubCenter?: { x: number; y: number };
 }
@@ -457,7 +459,9 @@ const DiamondNode: React.FC<NodeRenderProps> = React.memo(
  * HUB_DISC_OPACITY_DEFAULT for callers that omit it.
  */
 const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
-  ({ x, y, label, sublabel, color, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, importance, filterId, hubCenter, fillAlpha }) => {
+  ({ x, y, label, sublabel, color, opacity, scale, blur, stat, textPrimary, textSecondary, textMuted, importance, filterId, hubCenter, fillAlpha, labelSize = fontSizes.label }) => {
+    // Larger labels sit further from the rings by the amount they grew.
+    const labelGrow = labelSize - fontSizes.label;
     const isPrimary = importance === "primary";
 
     if (isPrimary) {
@@ -500,9 +504,9 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           {/* Label below */}
           <text
             x={x}
-            y={y + HUB_LABEL_GAP_BELOW}
+            y={y + HUB_LABEL_GAP_BELOW + labelGrow}
             textAnchor="middle"
-            fontSize={fontSizes.label}
+            fontSize={labelSize}
             fontFamily={fonts.mono}
             fontWeight={600}
             letterSpacing={1}
@@ -515,7 +519,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           {stat && (
             <text
               x={x}
-              y={y + HUB_STAT_LABEL_GAP_BELOW}
+              y={y + HUB_STAT_LABEL_GAP_BELOW + labelGrow * 1.4}
               textAnchor="middle"
               fontSize={fontSizes.caption}
               fontFamily={fonts.mono}
@@ -564,15 +568,15 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
     if (isRightward) {
       textAnchor = "start";
       labelX = leaderEndX + 8;
-      labelY = leaderEndY + fontSizes.label * 0.35;
+      labelY = leaderEndY + labelSize * 0.35;
     } else if (isLeftward) {
       textAnchor = "end";
       labelX = leaderEndX - 8;
-      labelY = leaderEndY + fontSizes.label * 0.35;
+      labelY = leaderEndY + labelSize * 0.35;
     } else if (isUpward) {
       labelY = leaderEndY - 8;
     } else {
-      labelY = leaderEndY + fontSizes.label + 8;
+      labelY = leaderEndY + labelSize + 8;
     }
 
     // Stacked y-positions for sublabel + stat block.
@@ -590,7 +594,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
     // sublabel ended up between the leader endpoint and the dot, crossing
     // the leader line.
     const sublabelY = isUpward
-      ? labelY - fontSizes.label - 4
+      ? labelY - labelSize - 4
       : labelY + fontSizes.caption + 4;
     const statValueY = isUpward
       ? sublabelY - fontSizes.caption - 4
@@ -630,7 +634,7 @@ const AnnotationNode: React.FC<NodeRenderProps> = React.memo(
           y={labelY}
           textAnchor={textAnchor}
           fill={textPrimary}
-          fontSize={fontSizes.label}
+          fontSize={labelSize}
           fontFamily={fonts.mono}
           fontWeight={600}
           letterSpacing={1}
@@ -1074,6 +1078,10 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
           // annotation node aesthetic for ALL nodes regardless of type.
           // Other layouts use the existing shape-per-type mapping.
           const isAnnotationLayout = data.layout === "hub-spoke" || data.layout === "bipartite";
+          // A sparse annotation diagram has room for labels a phone can read;
+          // a dense one keeps the compact label so names do not collide.
+          const annotationLabelSize =
+            isAnnotationLayout && data.nodes.length <= 6 ? fontSizes.readable : fontSizes.label;
           const NodeComponent = isAnnotationLayout
             ? AnnotationNode
             : (() => {
@@ -1110,6 +1118,7 @@ export const NetworkDiagram: React.FC<{ data: NetworkDiagramData }> = ({
                   : (isFocused ? 0.14 : 0.08)
               }
               filterId={filterId}
+              labelSize={annotationLabelSize}
               labelPlacement={data.layout === "vertical-chain" ? "right" : "below"}
               hubCenter={hubCenter}
             />

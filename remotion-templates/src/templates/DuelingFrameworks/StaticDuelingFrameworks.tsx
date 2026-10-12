@@ -42,6 +42,7 @@ import { usePhase } from "../../hooks/usePhase";
 import type { DuelingFrameworksData } from "./types";
 import { getFontFamily, getBodyFont } from "./dueling-utils";
 import { ScoringBar, FrameworkPanel } from "./DuelingPanels";
+import { SlugGate } from "../../hooks/useChromeLevel";
 
 export const StaticDuelingFrameworks: React.FC<{
   data: DuelingFrameworksData;
@@ -245,7 +246,7 @@ export const StaticDuelingFrameworks: React.FC<{
         />
 
         {data.episode && (
-          <div
+          <SlugGate><div
             style={{
               position: "absolute",
               bottom: zones.footer.rect.bottom,
@@ -260,7 +261,7 @@ export const StaticDuelingFrameworks: React.FC<{
             }}
           >
             {data.episode}
-          </div>
+          </div></SlugGate>
         )}
       </AbsoluteFill>
       {/* Brand strips */}

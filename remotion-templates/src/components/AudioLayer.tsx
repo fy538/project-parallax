@@ -23,8 +23,11 @@
  *
  * File resolution:
  *   - Music beds: staticFile(`episodes/${episode}/${track.file}`)
- *   - SFX: staticFile(`audio/sfx/transitions/${type}-${intensity}.wav`)
- *   - Textures: staticFile(`audio/sfx/textures/${type}.wav`)
+ *   - SFX: staticFile(`assets/audio/sfx/${type}-${intensity}.mp3`)
+ *   - Textures: staticFile(`assets/audio/sfx/${type}.mp3`)
+ *
+ * Path canonical: public/assets/audio/sfx/*.mp3 (matches Soundscape.tsx).
+ * DO NOT revert to public/audio/sfx/*.wav — that tree is retired.
  *
  * See AUDIO_DESIGN.md for the editorial framework behind these choices.
  */
@@ -43,6 +46,18 @@ export interface SegmentTimeline {
   startSec: number;
   endSec: number;
   type: "FOOTAGE" | "IMAGE" | "TEMPLATE" | "TRANSITION" | "HOLD";
+  /**
+   * True when narration runs over this segment. The music then stays at its
+   * under-speech level whatever the segment type: a still or a clip with the
+   * narrator talking over it is not a narrator-free moment.
+   */
+  narrated?: boolean;
+}
+
+/** A stretch of the recording in which the narrator is speaking. */
+export interface SpeechSpan {
+  startSec: number;
+  endSec: number;
 }
 
 interface MusicBedTrack {
@@ -73,13 +88,21 @@ interface SoundCue {
 
 interface TextureCue {
   type:
+    // Original 7
     | "dot-click"
     | "card-settle"
     | "line-draw"
     | "region-glow"
     | "bar-grow"
     | "node-pop"
-    | "page-turn";
+    | "page-turn"
+    // Added for documentary-archival + argument-primitive templates (May 2026)
+    | "typewriter-clack"
+    | "pen-stroke"
+    | "stamp-impact"
+    | "chime-soft"
+    | "chime-sharp"
+    | "vinyl-pop";
   offsetSec: number;
   volume?: number;
   label?: string;
@@ -109,6 +132,12 @@ export interface AudioLayerProps {
    * envelope is flat within each bed section (pre-ducking behaviour).
    */
   segmentTimeline?: SegmentTimeline[];
+  /**
+   * Where the narrator is speaking, from the recording's word timings. When
+   * given, the music follows the voice (down under speech, up in real gaps)
+   * and segment types are ignored.
+   */
+  speech?: ReadonlyArray<SpeechSpan>;
 }
 
 // ── Volume constants ─────────────────────────────────────────────────────────
@@ -150,6 +179,31 @@ const DUCKING_MULT: Record<SegmentTimeline["type"], number> = {
 const DUCK_SMOOTH_SEC = 0.8;
 
 /**
+ * With recorded narration: how far the music lifts in a gap between phrases
+ * (about +3 dB; analysis/sound-under-narration-research-2026-10-10.md), how
+ * short a gap is ignored, and how much room is left around each phrase.
+ */
+const SPEECH_GAP_MULT = 1.41;
+const SPEECH_MIN_GAP_SEC = 1.2;
+const SPEECH_PAD_BEFORE_SEC = 0.25;
+const SPEECH_PAD_AFTER_SEC = 0.35;
+
+/** Join phrases separated by less than a real pause. */
+function mergeSpeech(speech: ReadonlyArray<SpeechSpan>): SpeechSpan[] {
+  const sorted = [...speech].sort((a, b) => a.startSec - b.startSec);
+  const out: SpeechSpan[] = [];
+  for (const span of sorted) {
+    const last = out[out.length - 1];
+    if (last && span.startSec - last.endSec < SPEECH_MIN_GAP_SEC) {
+      last.endSec = Math.max(last.endSec, span.endSec);
+    } else {
+      out.push({ ...span });
+    }
+  }
+  return out;
+}
+
+/**
  * Build a per-frame Float32Array of ducking multipliers for one music bed
  * section. Frame 0 = bedStartSec in absolute episode time.
  *
@@ -165,6 +219,7 @@ export function buildDuckingArray(
   bedStartSec: number,
   bedEndSec: number,
   fps: number,
+  speech?: ReadonlyArray<SpeechSpan>,
 ): Float32Array {
   const n = Math.round((bedEndSec - bedStartSec) * fps);
   if (n <= 0) return new Float32Array(0);
@@ -172,11 +227,25 @@ export function buildDuckingArray(
   // Default to TEMPLATE (safest assumption — assume narration is present)
   const raw = new Float32Array(n).fill(DUCKING_MULT.TEMPLATE);
 
-  for (const seg of timeline) {
-    const lo = Math.max(0, Math.round((seg.startSec - bedStartSec) * fps));
-    const hi = Math.min(n,  Math.round((seg.endSec   - bedStartSec) * fps));
-    if (hi <= lo) continue;
-    raw.fill(DUCKING_MULT[seg.type] ?? 1.0, lo, hi);
+  if (speech && speech.length > 0) {
+    // Recorded narration: the voice itself decides. Music lifts only in real
+    // gaps between phrases, and sits at its base level wherever there is
+    // speech, a little before it and a little after.
+    raw.fill(SPEECH_GAP_MULT);
+    for (const span of mergeSpeech(speech)) {
+      const lo = Math.max(0, Math.round((span.startSec - SPEECH_PAD_BEFORE_SEC - bedStartSec) * fps));
+      const hi = Math.min(n, Math.round((span.endSec + SPEECH_PAD_AFTER_SEC - bedStartSec) * fps));
+      if (hi > lo) raw.fill(DUCKING_MULT.TEMPLATE, lo, hi);
+    }
+  } else {
+    for (const seg of timeline) {
+      const lo = Math.max(0, Math.round((seg.startSec - bedStartSec) * fps));
+      const hi = Math.min(n,  Math.round((seg.endSec   - bedStartSec) * fps));
+      if (hi <= lo) continue;
+      // Estimated timings: a narrated segment keeps the music down whatever
+      // its type; only segments with no narration lift it.
+      raw.fill(seg.narrated ? DUCKING_MULT.TEMPLATE : (DUCKING_MULT[seg.type] ?? 1.0), lo, hi);
+    }
   }
 
   // Causal EMA: α controls how quickly the volume tracks segment changes
@@ -206,7 +275,8 @@ const MusicBedLayer: React.FC<{
   tracks: MusicBedTrack[];
   episode: string;
   segmentTimeline?: SegmentTimeline[];
-}> = ({ tracks, episode, segmentTimeline }) => {
+  speech?: ReadonlyArray<SpeechSpan>;
+}> = ({ tracks, episode, segmentTimeline, speech }) => {
   const { fps } = useVideoConfig();
 
   // Pre-compute one ducking array per bed track. Must be in useMemo (not inside
@@ -217,11 +287,11 @@ const MusicBedLayer: React.FC<{
     for (const track of tracks) {
       map.set(
         track.id,
-        buildDuckingArray(segmentTimeline, track.startSec, track.endSec, fps),
+        buildDuckingArray(segmentTimeline, track.startSec, track.endSec, fps, speech),
       );
     }
     return map;
-  }, [tracks, segmentTimeline, fps]);
+  }, [tracks, segmentTimeline, fps, speech]);
 
   return (
     <>
@@ -326,12 +396,12 @@ const TransitionSFXLayer: React.FC<{
       const startFrame = Math.round(absoluteStart * fps);
       const volume = SFX_INTENSITY_VOLUME[intensity] ?? 0.35;
 
-      // File naming: {type}-{intensity}.wav for cues with explicit intensity,
-      // {type}.wav for intensity-less cues (e.g. end-stinger — used once per
-      // episode, no intensity variants). Must match public/audio/sfx/transitions/.
+      // File naming: {type}-{intensity}.mp3 for cues with explicit intensity,
+      // {type}.mp3 for intensity-less cues (e.g. end-stinger — used once per
+      // episode, no intensity variants). Must match public/assets/audio/sfx/.
       const file = cue.intensity
-        ? `audio/sfx/transitions/${cue.type}-${cue.intensity}.wav`
-        : `audio/sfx/transitions/${cue.type}.wav`;
+        ? `assets/audio/sfx/${cue.type}-${cue.intensity}.mp3`
+        : `assets/audio/sfx/${cue.type}.mp3`;
 
       cues.push({
         key: `sfx-${seg.segmentId}-${suffix}`,
@@ -394,8 +464,8 @@ const TextureHitsLayer: React.FC<{
       const startFrame = Math.round(absoluteStart * fps);
       const volume = Math.min(cue.volume ?? DEFAULT_TEXTURE_VOLUME, 0.2);
 
-      // File naming: {type}.wav
-      const file = `audio/sfx/textures/${cue.type}.wav`;
+      // File naming: {type}.mp3 — must match public/assets/audio/sfx/.
+      const file = `assets/audio/sfx/${cue.type}.mp3`;
 
       hits.push({
         key: `texture-${seg.segmentId}-${i}-${cue.type}`,
@@ -431,6 +501,7 @@ export const AudioLayer: React.FC<AudioLayerProps> = ({
   musicBedTracks,
   segmentAudio,
   segmentTimeline,
+  speech,
 }) => {
   // Only render layers that have data
   const hasMusicBed = musicBedTracks && musicBedTracks.length > 0;
@@ -449,6 +520,7 @@ export const AudioLayer: React.FC<AudioLayerProps> = ({
           tracks={musicBedTracks}
           episode={episode}
           segmentTimeline={segmentTimeline}
+          speech={speech}
         />
       )}
 

@@ -19,6 +19,7 @@ import React from "react";
 import { useCurrentFrame } from "remotion";
 import { brandMark, fonts, fontSizes, layout, palette, sec, shadows, zIndex } from "../design/theme";
 import { useThemeMode } from "../hooks/useThemeMode";
+import { useChromeLevel } from "../hooks/useChromeLevel";
 import { fadeIn, slideIn } from "../utils/animation";
 
 export interface HeaderStripProps {
@@ -49,6 +50,8 @@ export const HeaderStrip: React.FC<HeaderStripProps> = React.memo(
   }) => {
     const frame = useCurrentFrame();
     const theme = useThemeMode(mode);
+    // "wordmark" episodes keep the mark and drop the right-hand slug.
+    const showMetadata = useChromeLevel() === "briefing";
     const startFrame = sec(startSec);
     const opacity = fadeIn(frame, startFrame, sec(0.6));
     const slideY = slideIn(frame, startFrame, 6, sec(0.5));
@@ -63,6 +66,7 @@ export const HeaderStrip: React.FC<HeaderStripProps> = React.memo(
 
     return (
       <div
+        data-qa-role="chrome"
         style={{
           position: "absolute",
           top: layout.safeArea.top,
@@ -92,7 +96,7 @@ export const HeaderStrip: React.FC<HeaderStripProps> = React.memo(
           {wordmark}
         </div>
         {/* Metadata — right */}
-        {metadata && (
+        {metadata && showMetadata && (
           <div
             style={{
               fontFamily: fonts.mono,

@@ -1,0 +1,85 @@
+import { Composition } from "remotion";
+import { ScrollyReveal } from "./ScrollyReveal";
+import { standardMetadata } from "../../utils/composition";
+import { ScrollyRevealSchema } from "./schema";
+import type { ScrollyRevealData } from "./types";
+
+// ── Sample data — Taiwan Strait chokepoints ───────────────────────────────
+
+export const scrollyRevealSampleData: ScrollyRevealData = {
+  episode: "silicon-trap",
+  title: "THE CHOKEPOINTS",
+  subtitle: "Three geographic constraints on Taiwan's strategic position.",
+  source: "CSIS Taiwan Strait Analysis, 2024",
+  durationSec: 14,
+  base: {
+    src: "/assets/sample-historical.png",
+    alt: "Taiwan region satellite view",
+    duotoneRamp: "editorial",
+    objectPosition: "center",
+  },
+  steps: [
+    {
+      revealAtSec: 1.5,
+      stepLabel: "TSMC cluster",
+      annotations: [
+        {
+          id: "tsmc",
+          x: 48,
+          y: 42,
+          label: "TSMC Fab Cluster",
+          detail: "92% of leading-edge chips",
+          placement: "right",
+          color: "#C4A747",
+          type: "callout",
+        },
+      ],
+      focus: { centerX: 48, centerY: 42, scale: 1.4, durationSec: 0.7 },
+    },
+    {
+      revealAtSec: 5.0,
+      stepLabel: "Port of Kaohsiung",
+      annotations: [
+        {
+          id: "kaohsiung",
+          x: 44,
+          y: 68,
+          label: "Port of Kaohsiung",
+          detail: "Primary export route",
+          placement: "left",
+          type: "callout",
+        },
+      ],
+      focus: { centerX: 44, centerY: 68, scale: 1.3, durationSec: 0.8 },
+    },
+    {
+      revealAtSec: 9.0,
+      stepLabel: "Strait width",
+      annotations: [
+        {
+          id: "strait",
+          x: 30,
+          y: 50,
+          label: "Taiwan Strait",
+          detail: "180km at widest — naval chokepoint",
+          placement: "top",
+          type: "highlight",
+          color: "#A64D46",
+        },
+      ],
+      focus: { centerX: 50, centerY: 50, scale: 1.0, durationSec: 1.0 },
+    },
+  ],
+  annotationMode: "accumulate",
+  backgroundVariant: "dark",
+};
+
+export const ScrollyRevealComposition = () => (
+  <Composition
+    id="ScrollyReveal"
+    component={ScrollyReveal}
+    schema={ScrollyRevealSchema}
+    calculateMetadata={standardMetadata<ScrollyRevealData>(14)}
+    defaultProps={{ data: scrollyRevealSampleData as ScrollyRevealData }}
+  />
+);

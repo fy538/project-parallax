@@ -41,7 +41,7 @@ import { useThemeMode } from "../hooks/useThemeMode";
 import { useEpisodeColorEmphasis } from "../hooks/useEpisodeColorEmphasis";
 import type { DirectionSyncPoint } from "../hooks/useDirection";
 import { FadeIn } from "./FadeIn";
-import { CLAMP, anticipatoryStartFrame } from "../utils/animation";
+import { areSeamsOwnedByEpisode, CLAMP, anticipatoryStartFrame } from "../utils/animation";
 
 interface TitleBlockProps {
   /** Main title text */
@@ -214,7 +214,8 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
       {subtitle && (
         <div
           style={{
-            fontSize: fontSizes.body,
+            fontFamily: fonts.body,
+            fontSize: fontSizes.readable, // was body (22px): the subtitle is read, not skimmed
             color: theme.text.muted,
             marginTop: layout.spacing.xs,
             marginLeft: align === "top-center" ? "auto" : 0,
@@ -232,7 +233,13 @@ export const TitleBlock: React.FC<TitleBlockProps> = ({
     </div>
   );
 
-  if (noAnimation) {
+  // Inside an episode the seam belongs to the wrapper (see "Seam ownership"
+  // in utils/animation.ts): a cut should land on a card whose title is already
+  // set, and a dissolve brings the whole card up as one. The title animates by
+  // itself only when it is tied to a spoken word or deliberately delayed.
+  const settledInEpisode =
+    areSeamsOwnedByEpisode() && syncPoints?.[0]?.frame === undefined && startFrame === 0;
+  if (noAnimation || settledInEpisode) {
     return content;
   }
 

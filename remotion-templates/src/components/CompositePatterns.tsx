@@ -23,7 +23,7 @@
 
 import React from "react";
 import { useCurrentFrame } from "remotion";
-import { fonts, palette, sec } from "../design/theme";
+import { fonts, fontSizes, palette, sec } from "../design/theme";
 import { formatNumber } from "../utils/numberFormat";
 import {
   useNumberTicker,
@@ -92,6 +92,10 @@ export interface DefinitionRevealProps {
   };
   /** Horizontal alignment. Default "left". */
   align?: "left" | "center";
+  /** Term colour. Default palette.ink (set a light tone on dark grounds). */
+  color?: string;
+  /** Colour of the gloss, pinyin and citation. Default body grey. */
+  secondaryColor?: string;
 }
 
 export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
@@ -104,6 +108,8 @@ export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
   isCallback = false,
   sizes = {},
   align = "left",
+  color = palette.ink,
+  secondaryColor = BODY_GREY,
 }) => {
   const frame = useCurrentFrame();
 
@@ -142,7 +148,7 @@ export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
           fontFamily: fonts.display,
           fontSize: termFontSize,
           fontWeight: 700,
-          color: palette.ink,
+          color,
           // Editorial baseline letter-spacing for display sans at large
           // sizes is roughly -1px. Tracking-in starts above this baseline
           // (loose) and settles to it. We add the animated offset to the
@@ -168,7 +174,7 @@ export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
           style={{
             fontFamily: fonts.mono,
             fontSize: pinyinFontSize,
-            color: BODY_GREY,
+            color: secondaryColor,
             letterSpacing: 1,
             opacity: textFadeIn(frame, PINYIN_START, sec(0.4)),
             marginBottom: 14,
@@ -184,7 +190,7 @@ export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
           fontFamily: fonts.serifBody,
           fontStyle: "italic",
           fontSize: translationFontSize,
-          color: BODY_GREY,
+          color: secondaryColor,
           letterSpacing: -0.2,
           lineHeight: 1.3,
           opacity: textFadeIn(frame, TRANSLATION_START, sec(0.5)),
@@ -199,7 +205,7 @@ export const DefinitionReveal: React.FC<DefinitionRevealProps> = ({
           style={{
             fontFamily: fonts.mono,
             fontSize: citationFontSize,
-            color: BODY_GREY,
+            color: secondaryColor,
             letterSpacing: 1.5,
             marginTop: 20,
             opacity: textFadeIn(frame, CITATION_START, sec(0.4)) * 0.7,
@@ -407,6 +413,10 @@ export interface QuoteAttributionProps {
   /** Quote text color. Default palette.ink. */
   color?: string;
   align?: "left" | "center";
+  /** Measure of the quote block in px. Default 1000. */
+  maxWidth?: number;
+  /** Attribution colour. Default a body grey that suits paper; pass a light tone on dark grounds. */
+  attributionColor?: string;
 }
 
 export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
@@ -419,6 +429,8 @@ export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
   sizes = {},
   color = palette.ink,
   align = "left",
+  maxWidth = 1000,
+  attributionColor = BODY_GREY,
 }) => {
   const frame = useCurrentFrame();
 
@@ -447,7 +459,7 @@ export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
         flexDirection: "column",
         alignItems: align === "center" ? "center" : "flex-start",
         gap: 0,
-        maxWidth: 1000,
+        maxWidth,
       }}
     >
       {/* Quote with typewriter */}
@@ -463,18 +475,24 @@ export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
           textAlign: align,
         }}
       >
-        <span style={{ marginRight: 2 }}>&ldquo;</span>
+        {/* The opening mark waits for the typing to start; otherwise a
+            delayed quote leaves a lone glyph on an empty card. */}
+        <span style={{ marginRight: 2, opacity: frame >= startFrame ? 1 : 0 }}>&ldquo;</span>
+        {/* Closing mark is typed as the final character so it wraps with
+            the last word instead of orphaning onto its own line. */}
         <Typewriter
-          text={text}
+          text={`${text}\u201D`}
           startFrame={startFrame}
           cps={cps}
           cursor="blink"
+          // Lines sit where they will end up, so the centred block does not
+          // jump each time the typing reaches a new line.
+          reserveLayout
           style={{
             fontFamily: archival ? fonts.mono : fonts.display,
             color,
           }}
         />
-        <span style={{ marginLeft: 2 }}>&rdquo;</span>
       </div>
 
       {/* Attribution + optional year */}
@@ -483,7 +501,7 @@ export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
           fontFamily: fonts.serifBody,
           fontStyle: "italic",
           fontSize: attributionFontSize,
-          color: BODY_GREY,
+          color: attributionColor,
           opacity: textFadeIn(frame, ATTRIBUTION_START, sec(0.5)),
           alignSelf: align === "center" ? "center" : "flex-end",
           textAlign: align === "center" ? "center" : "right",
@@ -491,7 +509,7 @@ export const QuoteAttribution: React.FC<QuoteAttributionProps> = ({
       >
         {attribution}
         {year && (
-          <span style={{ marginLeft: 12, fontFamily: fonts.mono, fontStyle: "normal", fontSize: attributionFontSize * 0.85, letterSpacing: 1.5 }}>
+          <span style={{ marginLeft: 12, fontFamily: fonts.mono, fontStyle: "normal", fontSize: Math.max(attributionFontSize * 0.85, fontSizes.readable), letterSpacing: 1.5 }}>
             {year}
           </span>
         )}

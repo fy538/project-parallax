@@ -74,11 +74,85 @@ import { IsotypeChart } from "../templates/IsotypeChart/IsotypeChart";
 // aesthetics ship as DecisionTree variants).
 import { OutcomePartition } from "../templates/OutcomePartition/OutcomePartition";
 import { outcomePartitionSampleData } from "../templates/OutcomePartition";
+// Documentary-Archival library (shipped May 19, 2026)
+import { CausalLoopDiagram } from "../templates/CausalLoopDiagram/CausalLoopDiagram";
+import { causalLoopDiagramSampleData } from "../templates/CausalLoopDiagram";
+import { SpiralTimeline } from "../templates/SpiralTimeline/SpiralTimeline";
+import { spiralTimelineSampleData } from "../templates/SpiralTimeline";
+import { PrimarySourceReveal } from "../templates/PrimarySourceReveal/PrimarySourceReveal";
+import { primarySourceRevealSampleData } from "../templates/PrimarySourceReveal";
+import { SmallMultiples } from "../templates/SmallMultiples/SmallMultiples";
+import { smallMultiplesSampleData } from "../templates/SmallMultiples";
+import { HandwrittenLetter } from "../templates/HandwrittenLetter/HandwrittenLetter";
+import { handwrittenLetterSampleData } from "../templates/HandwrittenLetter";
+import { NewspaperHeadlineRotator } from "../templates/NewspaperHeadlineRotator/NewspaperHeadlineRotator";
+import { newspaperHeadlineRotatorSampleData } from "../templates/NewspaperHeadlineRotator";
+import { ArchivalReel } from "../templates/ArchivalReel/ArchivalReel";
+import { archivalReelSampleData } from "../templates/ArchivalReel";
+import { TelegramCable } from "../templates/TelegramCable/TelegramCable";
+import { telegramCableSampleData } from "../templates/TelegramCable";
+// Argument Primitives library (shipped May 19, 2026)
+import { Syllogism } from "../templates/Syllogism/Syllogism";
+import { syllogismSampleData } from "../templates/Syllogism";
+import { AxiomList } from "../templates/AxiomList/AxiomList";
+import { axiomListSampleData } from "../templates/AxiomList";
+import { DialecticFlow } from "../templates/DialecticFlow/DialecticFlow";
+import { dialecticFlowSampleData } from "../templates/DialecticFlow";
+import { ConditionalArgument } from "../templates/ConditionalArgument/ConditionalArgument";
+import { conditionalArgumentSampleData } from "../templates/ConditionalArgument";
+import { CounterfactualPath } from "../templates/CounterfactualPath/CounterfactualPath";
+import { counterfactualPathSampleData } from "../templates/CounterfactualPath";
+// Relationship & composition library (shipped May 19, 2026)
+import { VennDiagram } from "../templates/VennDiagram/VennDiagram";
+import { vennDiagramSampleData } from "../templates/VennDiagram";
+import { ChordDiagram } from "../templates/ChordDiagram/ChordDiagram";
+import { chordDiagramSampleData } from "../templates/ChordDiagram";
+import { Treemap } from "../templates/Treemap/Treemap";
+import { treemapSampleData } from "../templates/Treemap";
+import { MatrixHeatmap } from "../templates/MatrixHeatmap/MatrixHeatmap";
+import { matrixHeatmapSampleData } from "../templates/MatrixHeatmap";
+// Motion Primitives library (shipped May 19, 2026)
+import { ComparisonPair } from "../templates/ComparisonPair/ComparisonPair";
+import { comparisonPairSampleData } from "../templates/ComparisonPair";
+import { MorphTransition } from "../templates/MorphTransition/MorphTransition";
+import { morphTransitionSampleData } from "../templates/MorphTransition";
+import { SplitFrame } from "../templates/SplitFrame/SplitFrame";
+import { splitFrameSampleData } from "../templates/SplitFrame";
 // Phase 4 editorial-native templates (May 17, 2026)
 import { Slopegraph } from "../templates/Slopegraph/Slopegraph";
 import { KPICard } from "../templates/KPICard/KPICard";
 import { BulletChart } from "../templates/BulletChart/BulletChart";
 import { StepLine } from "../templates/StepLine/StepLine";
+// ── Sprint 2026-05-20 templates ───────────────────────────────────────────
+// Argument Primitives Ph.2
+import { AnalogyCrossmap } from "../templates/AnalogyCrossmap/AnalogyCrossmap";
+import { analogyCrossmapSampleData } from "../templates/AnalogyCrossmap";
+import { ToulminMap } from "../templates/ToulminMap/ToulminMap";
+import { toulminMapSampleData } from "../templates/ToulminMap";
+// Tier 2 diagrams / timelines
+import { PhilosophicalFamilyTree } from "../templates/PhilosophicalFamilyTree/PhilosophicalFamilyTree";
+import { philosophicalFamilyTreeSampleData } from "../templates/PhilosophicalFamilyTree";
+import { ConceptEvolutionTimeline } from "../templates/ConceptEvolutionTimeline/ConceptEvolutionTimeline";
+import { conceptEvolutionTimelineSampleData } from "../templates/ConceptEvolutionTimeline";
+// Tier 3 charts / diagrams
+import { DivergingBar } from "../templates/DivergingBar/DivergingBar";
+import { divergingBarSampleData } from "../templates/DivergingBar";
+import { DotPlot } from "../templates/DotPlot/DotPlot";
+import { dotPlotSampleData } from "../templates/DotPlot";
+import { OrgChart } from "../templates/OrgChart/OrgChart";
+import { orgChartSampleData } from "../templates/OrgChart";
+// New charts + network (May 20 build-out)
+import { BubbleMatrix } from "../templates/BubbleMatrix/BubbleMatrix";
+import { bubbleMatrixSampleData } from "../templates/BubbleMatrix";
+import { BarChartRace } from "../templates/BarChartRace/BarChartRace";
+import { barChartRaceSampleData } from "../templates/BarChartRace";
+import { SanctionsNetwork } from "../templates/SanctionsNetwork/SanctionsNetwork";
+import { sanctionsNetworkSampleData } from "../templates/SanctionsNetwork";
+// Camera-as-rhetoric (progressive annotation / directional zoom)
+import { ScrollyReveal } from "../templates/ScrollyReveal/ScrollyReveal";
+import { scrollyRevealSampleData } from "../templates/ScrollyReveal";
+import { AnnotatedZoom } from "../templates/AnnotatedZoom/AnnotatedZoom";
+import { annotatedZoomSampleData } from "../templates/AnnotatedZoom";
 
 // Catalog data
 import { catalogMapsData } from "./Maps";
@@ -839,6 +913,235 @@ const SHOWREEL_SEGMENTS: ShowreelSegment[] = [
         <StatReveal data={still(catalogDataData.statApollo)} />
       </AbsoluteFill>
     ),
+  },
+
+  // ── Documentary-Archival section ──────────────────────────────────────────
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Documentary-Archival"
+        description="Primary sources, archival media, and analytical feedback loops — the evidentiary register"
+      />
+    ),
+  },
+  slateSegment("Documentary-Archival", "CausalLoopDiagram", "security-dilemma"),
+  {
+    durationSec: causalLoopDiagramSampleData.durationSec ?? 14,
+    render: () => <CausalLoopDiagram data={still(causalLoopDiagramSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "SpiralTimeline", "hegemonic-cycles"),
+  {
+    durationSec: spiralTimelineSampleData.durationSec ?? 16,
+    render: () => <SpiralTimeline data={still(spiralTimelineSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "PrimarySourceReveal", "kennan-long-telegram"),
+  {
+    durationSec: primarySourceRevealSampleData.durationSec ?? 20,
+    render: () => <PrimarySourceReveal data={still(primarySourceRevealSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "SmallMultiples", "democracy-scores"),
+  {
+    durationSec: smallMultiplesSampleData.durationSec ?? 14,
+    render: () => <SmallMultiples data={still(smallMultiplesSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "HandwrittenLetter", "sullivan-ballou"),
+  {
+    durationSec: handwrittenLetterSampleData.durationSec ?? 20,
+    render: () => <HandwrittenLetter data={still(handwrittenLetterSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "NewspaperHeadlineRotator", "berlin-wall-1989"),
+  {
+    durationSec: newspaperHeadlineRotatorSampleData.durationSec ?? 16,
+    render: () => <NewspaperHeadlineRotator data={still(newspaperHeadlineRotatorSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "ArchivalReel", "vietnam-1968"),
+  {
+    durationSec: archivalReelSampleData.durationSec ?? 8,
+    render: () => <ArchivalReel data={still(archivalReelSampleData)} />,
+  },
+  slateSegment("Documentary-Archival", "TelegramCable", "kennan-long-telegram-cable"),
+  {
+    durationSec: telegramCableSampleData.durationSec ?? 22,
+    render: () => <TelegramCable data={still(telegramCableSampleData)} />,
+  },
+
+  // ── Argument Primitives section ────────────────────────────────────────────
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Argument Primitives"
+        description="Syllogisms, axioms, dialectics, conditionals, counterfactuals — the logical register"
+      />
+    ),
+  },
+  slateSegment("Argument Primitives", "Syllogism", "realist-deductions"),
+  {
+    durationSec: syllogismSampleData.durationSec ?? 10,
+    render: () => <Syllogism data={still(syllogismSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "AxiomList", "waltz-structural-realism"),
+  {
+    durationSec: axiomListSampleData.durationSec ?? 16,
+    render: () => <AxiomList data={still(axiomListSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "DialecticFlow", "trade-dialectic"),
+  {
+    durationSec: dialecticFlowSampleData.durationSec ?? 14,
+    render: () => <DialecticFlow data={still(dialecticFlowSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "ConditionalArgument", "taiwan-bifurcation"),
+  {
+    durationSec: conditionalArgumentSampleData.durationSec ?? 12,
+    render: () => <ConditionalArgument data={still(conditionalArgumentSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "CounterfactualPath", "missile-crisis"),
+  {
+    durationSec: counterfactualPathSampleData.durationSec ?? 16,
+    render: () => <CounterfactualPath data={still(counterfactualPathSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "AnalogyCrossmap", "prisoners-nuclear"),
+  {
+    durationSec: analogyCrossmapSampleData.durationSec ?? 12,
+    render: () => <AnalogyCrossmap data={still(analogyCrossmapSampleData)} />,
+  },
+  slateSegment("Argument Primitives", "ToulminMap", "taiwan-semiconductor"),
+  {
+    durationSec: toulminMapSampleData.durationSec ?? 14,
+    render: () => <ToulminMap data={still(toulminMapSampleData)} />,
+  },
+
+  // ── Relationship & Composition section ────────────────────────────────────
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Relationship & Composition"
+        description="VennDiagram, ChordDiagram, Treemap, MatrixHeatmap — overlap, bilateral flow, hierarchy, intensity"
+      />
+    ),
+  },
+  slateSegment("Relationship & Composition", "VennDiagram", "eu-nato-membership"),
+  {
+    durationSec: vennDiagramSampleData.durationSec ?? 14,
+    render: () => <VennDiagram data={still(vennDiagramSampleData)} />,
+  },
+  slateSegment("Relationship & Composition", "ChordDiagram", "g7-trade-flows"),
+  {
+    durationSec: chordDiagramSampleData.durationSec ?? 14,
+    render: () => <ChordDiagram data={still(chordDiagramSampleData)} />,
+  },
+  slateSegment("Relationship & Composition", "Treemap", "us-defense-budget"),
+  {
+    durationSec: treemapSampleData.durationSec ?? 12,
+    render: () => <Treemap data={still(treemapSampleData)} />,
+  },
+  slateSegment("Relationship & Composition", "MatrixHeatmap", "alliance-reliability"),
+  {
+    durationSec: matrixHeatmapSampleData.durationSec ?? 14,
+    render: () => <MatrixHeatmap data={still(matrixHeatmapSampleData)} />,
+  },
+
+  // ── Motion Primitives section ──────────────────────────────────────────────
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Motion Primitives"
+        description="ComparisonPair, MorphTransition, SplitFrame — structural comparison and data evolution"
+      />
+    ),
+  },
+  slateSegment("Motion Primitives", "ComparisonPair", "military-budgets-century"),
+  {
+    durationSec: comparisonPairSampleData.durationSec ?? 12,
+    render: () => <ComparisonPair data={still(comparisonPairSampleData)} />,
+  },
+  slateSegment("Motion Primitives", "MorphTransition", "gdp-rankings-1990-2024"),
+  {
+    durationSec: morphTransitionSampleData.durationSec ?? 14,
+    render: () => <MorphTransition data={still(morphTransitionSampleData)} />,
+  },
+  slateSegment("Motion Primitives", "SplitFrame", "defense-1914-vs-2024"),
+  {
+    durationSec: splitFrameSampleData.durationSec ?? 12,
+    render: () => <SplitFrame data={still(splitFrameSampleData)} />,
+  },
+
+  // ── Charts & Diagrams · Sprint 2026-05-20 ─────────────────────────────────
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Charts & Diagrams · Sprint 2026-05-20"
+        description="DivergingBar · DotPlot · BubbleMatrix · BarChartRace · PhilosophicalFamilyTree · ConceptEvolutionTimeline · OrgChart · SanctionsNetwork"
+      />
+    ),
+  },
+  slateSegment("Charts", "DivergingBar", "semiconductor-trade"),
+  {
+    durationSec: divergingBarSampleData.durationSec ?? 12,
+    render: () => <DivergingBar data={still(divergingBarSampleData)} />,
+  },
+  slateSegment("Charts", "DotPlot", "nato-spending"),
+  {
+    durationSec: dotPlotSampleData.durationSec ?? 12,
+    render: () => <DotPlot data={still(dotPlotSampleData)} />,
+  },
+  slateSegment("Charts", "BubbleMatrix", "semiconductor-capacity"),
+  {
+    durationSec: bubbleMatrixSampleData.durationSec ?? 14,
+    render: () => <BubbleMatrix data={still(bubbleMatrixSampleData)} />,
+  },
+  slateSegment("Charts", "BarChartRace", "great-power-gdp"),
+  {
+    durationSec: barChartRaceSampleData.durationSec ?? 18,
+    render: () => <BarChartRace data={still(barChartRaceSampleData)} />,
+  },
+  slateSegment("Diagrams", "PhilosophicalFamilyTree", "game-theory-genealogy"),
+  {
+    durationSec: philosophicalFamilyTreeSampleData.durationSec ?? 16,
+    render: () => <PhilosophicalFamilyTree data={still(philosophicalFamilyTreeSampleData)} />,
+  },
+  slateSegment("Timelines", "ConceptEvolutionTimeline", "sovereignty-genealogy"),
+  {
+    durationSec: conceptEvolutionTimelineSampleData.durationSec ?? 18,
+    render: () => <ConceptEvolutionTimeline data={still(conceptEvolutionTimelineSampleData)} />,
+  },
+  slateSegment("Diagrams", "OrgChart", "nuclear-command"),
+  {
+    durationSec: orgChartSampleData.durationSec ?? 16,
+    render: () => <OrgChart data={still(orgChartSampleData)} />,
+  },
+  slateSegment("Diagrams", "SanctionsNetwork", "russia-2022"),
+  {
+    durationSec: sanctionsNetworkSampleData.durationSec ?? 20,
+    render: () => <SanctionsNetwork data={still(sanctionsNetworkSampleData)} />,
+  },
+
+  // ── Camera-as-Rhetoric · Sprint 2026-05-20 ────────────────────────────────
+  // ScrollyReveal + AnnotatedZoom drive their motion via image pan/zoom. They
+  // render image-blank under headless `npx remotion still` (sandbox <Img>
+  // limitation) but display correctly in Studio / full render.
+  {
+    durationSec: SECTION_SEC,
+    render: () => (
+      <SectionDivider
+        category="Camera-as-Rhetoric"
+        description="ScrollyReveal · AnnotatedZoom — progressive annotation and directional zoom on image canvases"
+      />
+    ),
+  },
+  slateSegment("Camera-as-Rhetoric", "ScrollyReveal", "taiwan-chokepoints"),
+  {
+    durationSec: scrollyRevealSampleData.durationSec ?? 14,
+    render: () => <ScrollyReveal data={still(scrollyRevealSampleData)} />,
+  },
+  slateSegment("Camera-as-Rhetoric", "AnnotatedZoom", "strait-chokepoint"),
+  {
+    durationSec: annotatedZoomSampleData.durationSec ?? 16,
+    render: () => <AnnotatedZoom data={still(annotatedZoomSampleData)} />,
   },
 
   // Outro

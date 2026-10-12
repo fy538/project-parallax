@@ -2,8 +2,12 @@
  * mapUtils — shared utilities for Mapbox GL map templates.
  *
  * Provides color conversion, camera interpolation presets,
- * and coordinate projection helpers for ChoroplethMap and RouteAnimation
- * after the react-simple-maps → Mapbox GL migration.
+ * and coordinate projection helpers for ChoroplethMap, RouteAnimation,
+ * TerritoryMap, and FlowMap after the react-simple-maps → Mapbox GL migration.
+ *
+ * Color note: `lerpHex` is re-exported from `colorUtils.ts` (the single
+ * source of truth). Import it directly from colorUtils if you don't need the
+ * Mapbox-specific helpers (hexToRgba, hexToRgbaString, interpolateCamera…).
  */
 
 // ── Color conversion ───────────────────────────────────────────────────
@@ -30,6 +34,17 @@ export const hexToRgbaString = (hex: string, alpha: number = 1): string => {
   const [r, g, b] = hexToRgba(hex);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
+
+/**
+ * Linearly interpolate between two hex colors.
+ * Re-exported from `colorUtils.ts` — single source of truth.
+ * t = 0 → from, t = 1 → to. Clamps t to [0,1]; short-circuits when from===to.
+ *
+ * Used by ChoroplethMap (country fill transitions between phases),
+ * TerritoryMap (actor-control crossfades between timesteps), and any other
+ * Mapbox-based template that needs smooth hex-color blending.
+ */
+export { lerpHex } from "./colorUtils";
 
 // ── Scale → Zoom conversion ───────────────────────────────────────────
 // react-simple-maps used d3 geo projection `scale` (e.g., 150 for world).

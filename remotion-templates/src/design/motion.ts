@@ -48,7 +48,8 @@ export interface MotionIdentityConfig {
 /**
  * The three named identities.
  *
- * `briefing` is the channel default — substrate is alive but restrained.
+ * `briefing` is the channel default — substrate is alive but restrained
+ * (grain + sub-pixel wobble; no colour clouds).
  * `still` opts out of substrate motion entirely (technical diagrams, archive
  * frames, or moments that need to feel paused).
  * `documentary` leans into a heavier "found footage" register — more grain,
@@ -58,7 +59,11 @@ export interface MotionIdentityConfig {
 export const motionIdentities: Record<MotionIdentity, MotionIdentityConfig> = {
   briefing: {
     grain: { enabled: true, opacityLight: 0.06, opacityDark: 0.10 },
-    atmosphere: { enabled: true, intensityScale: 1.0 },
+    // Colour clouds are off on the channel default: two blurred low-alpha
+    // gradients on flat paper band into visible rings after 8-bit encode and
+    // read as blotches. Grain alone keeps the substrate alive. `documentary`
+    // still carries them, where heavier grain breaks the banding up.
+    atmosphere: { enabled: false, intensityScale: 0 },
     wobble: { enabled: true, amplitude: 0.4 },
   },
   still: {

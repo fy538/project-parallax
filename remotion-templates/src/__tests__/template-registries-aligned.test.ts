@@ -3,7 +3,7 @@
  * match exactly.
  *
  * Failure mode this catches: you add a new template + register it in
- * FullEpisode.tsx's TEMPLATE_COMPONENTS but forget to add the schema to
+ * templateRegistry.ts's TEMPLATE_COMPONENTS but forget to add the schema to
  * Episodes/templateSchemas.ts (or vice versa). Without this test, the
  * mismatch surfaces only at runtime — the renderer dispatches to the
  * component but no schema validates the data, so a typo'd field in
@@ -17,7 +17,7 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { TEMPLATE_COMPONENTS } from "../templates/Episodes/FullEpisode";
+import { TEMPLATE_COMPONENTS } from "../templates/Episodes/templateRegistry";
 import { TEMPLATE_SCHEMAS } from "../templates/Episodes/templateSchemas";
 
 describe("template registries — TEMPLATE_COMPONENTS ↔ TEMPLATE_SCHEMAS alignment", () => {
@@ -46,7 +46,7 @@ describe("template registries — TEMPLATE_COMPONENTS ↔ TEMPLATE_SCHEMAS align
       throw new Error(
         `${missingFromComponents.length} schema(s) in TEMPLATE_SCHEMAS but no ` +
         `matching component in TEMPLATE_COMPONENTS:\n  - ${missingFromComponents.join("\n  - ")}\n\n` +
-        `Fix: either add the component to TEMPLATE_COMPONENTS in FullEpisode.tsx, ` +
+        `Fix: either add the component to TEMPLATE_COMPONENTS in templateRegistry.ts, ` +
         `or remove the orphaned schema entry. A schema without a dispatch is dead ` +
         `code — it can't validate anything since nothing routes data through it.`,
       );

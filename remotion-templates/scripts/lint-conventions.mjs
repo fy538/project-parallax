@@ -40,7 +40,10 @@ const EXCLUDE_DIRS = ["__tests__"];
 // Episodes/ is excluded from the full template scan (avoids false positives on
 // missing-composition-animation for complex master compositions), but is covered
 // by the targeted "components-too" scan below that includes hardcoded-brand-color.
-const EXCLUDE_DIRS_EPISODES = ["Episodes", "__tests__"];
+// `_proto/` holds capability-R&D prototypes (proto-reel, parametric-bilingual,
+// narration-sync, etc.) — scratch spikes, not production templates, so they are
+// exempt from template conventions (same rationale as Episodes/).
+const EXCLUDE_DIRS_EPISODES = ["Episodes", "_proto", "__tests__"];
 
 /**
  * Long-form templates must use <TitleBlock>; these paths use different title
@@ -1071,7 +1074,7 @@ export function lintRootCompositions(rootContent) {
 
 /**
  * Repo-wide check: templates marked `@deprecated` in their source must NOT
- * appear in either dispatch registry (TEMPLATE_COMPONENTS in FullEpisode.tsx
+ * appear in either dispatch registry (TEMPLATE_COMPONENTS in templateRegistry.ts
  * or TEMPLATE_SCHEMAS in Episodes/templateSchemas.ts). Manifest authors pick
  * templates by name from these registries; a deprecated entry there is a
  * silent-use risk — they can keep selecting it indefinitely without warning.
@@ -1083,7 +1086,7 @@ export function lintRootCompositions(rootContent) {
  */
 export function lintDeprecatedTemplateDispatch(
   templatesDir = TEMPLATES_DIR,
-  fullEpisodePath = path.resolve(__dirname, "../src/templates/Episodes/FullEpisode.tsx"),
+  registryPath = path.resolve(__dirname, "../src/templates/Episodes/templateRegistry.ts"),
   templateSchemasPath = path.resolve(__dirname, "../src/templates/Episodes/templateSchemas.ts"),
 ) {
   if (!fs.existsSync(templatesDir)) return [];
@@ -1109,7 +1112,7 @@ export function lintDeprecatedTemplateDispatch(
 
   // 2. Scan dispatch registries for any deprecated name as an identifier.
   const dispatchFiles = [
-    { path: fullEpisodePath, registry: "TEMPLATE_COMPONENTS" },
+    { path: registryPath, registry: "TEMPLATE_COMPONENTS" },
     { path: templateSchemasPath, registry: "TEMPLATE_SCHEMAS" },
   ];
   for (const { path: filePath, registry } of dispatchFiles) {

@@ -46,9 +46,11 @@ import { useCompositionAnimation } from "../../hooks/useCompositionAnimation";
 import { useDirection, type DirectionSyncPoint } from "../../hooks/useDirection";
 import { useBeatSync } from "../../hooks/useBeatSync";
 import { useThemeMode } from "../../hooks/useThemeMode";
+import { useChromeLevel } from "../../hooks/useChromeLevel";
 import { Background } from "../../components/Background";
 import {
   analyticalBackgroundBase,
+  overPictureRequested,
   resolveAnalyticalBackgroundVariant,
   transparentBackdropRequested,
 } from "../../utils/segmentBackdrop";
@@ -266,7 +268,7 @@ const QuoteVariant: React.FC<{
           {data.attributionContext && (
             <div
               style={{
-                fontSize: fontSizes.body,
+                fontSize: fontSizes.readable, // was body (22px): this line can carry a disclaimer
                 maxWidth: textMaxWidth.body,
                 color: theme.text.muted,
                 marginTop: layout.spacing.xs,
@@ -734,7 +736,7 @@ const StatisticVariant: React.FC<{ data: QuoteData; frame: number }> = ({
 // own render scope and don't pollute the main render with extra hooks.
 // Opt-in via `_direction.textAnimation`.
 
-const QuoteAttributionDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
+const QuoteAttributionDispatch: React.FC<{ data: QuoteData; isDark: boolean }> = ({ data, isDark }) => {
   // Build attribution string from authored fields. `attribution` carries
   // the speaker name; `attributionContext` (optional) adds role + date
   // (e.g. "Founder of TSMC, 2024"). We render the speaker via QuoteAttribution's
@@ -747,6 +749,11 @@ const QuoteAttributionDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
   // matches the doctrine doc's "transcribed historical document" register
   // for figures like Nash (1950), von Neumann, Schelling, FDR.
   const archival = isArchivalAttribution(data.attributionContext);
+  // A quote that is the whole card should fill it: short quotes set large,
+  // long ones step down so they stay within about four lines of a 1400px
+  // measure. (A fixed 44px left a one-sentence quote at ~8% of the frame.)
+  const len = (data.text ?? "").length;
+  const quoteSize = len <= 90 ? 68 : len <= 150 ? 60 : len <= 240 ? 52 : 44;
   return (
     <div
       style={{
@@ -765,6 +772,17 @@ const QuoteAttributionDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
         year={data.attributionContext}
         archival={archival}
         align="center"
+        // Ink on a dark card was unreadable (the composite defaults to ink);
+        // bone on dark, ink on light. Sizes up from the 32/20 defaults so a
+        // full-frame quote reads at phone size.
+        color={isDark ? palette.bone : palette.ink}
+        sizes={{ quote: archival ? Math.round(quoteSize * 0.8) : quoteSize, attribution: 28 }}
+        maxWidth={1400}
+        // The default attribution grey is for paper; on ink or over a
+        // picture it needs a light tone.
+        attributionColor={isDark ? palette.taupe : undefined}
+        cps={data.typingCps}
+        startFrame={sec(data.typingStartSec ?? 0)}
       />
     </div>
   );
@@ -791,7 +809,7 @@ function isArchivalAttribution(context: string | undefined): boolean {
   );
 }
 
-const DefinitionRevealDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
+const DefinitionRevealDispatch: React.FC<{ data: QuoteData; isDark: boolean }> = ({ data, isDark }) => {
   return (
     <div
       style={{
@@ -811,6 +829,9 @@ const DefinitionRevealDispatch: React.FC<{ data: QuoteData }> = ({ data }) => {
         accentColor={data.accentColor}
         isCallback={!!data._direction?.isCallback}
         align="center"
+        // Ink type vanishes on a dark ground or over a dimmed picture.
+        color={isDark ? palette.bone : palette.ink}
+        secondaryColor={isDark ? palette.sand : undefined}
       />
     </div>
   );
@@ -895,6 +916,10 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
   const { style: compStyle } = useCompositionAnimation(direction.driftOptions);
   const bgVariant = data.backgroundVariant || "light";
   const theme = useThemeMode(bgVariant);
+  // Hold-under: rendered over the previous segment's held picture.
+  const overPicture = overPictureRequested(data);
+  // The slug watermark is briefing chrome; "wordmark" episodes drop it.
+  const showSlugLabel = useChromeLevel() === "briefing";
 
   // ── A6 data-quality guards ───────────────────────────────────────────────
   // Guard 1: statistic variant with comparisonBars — use StatReveal instead.
@@ -908,6 +933,7 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
       variant={resolveAnalyticalBackgroundVariant(
         analyticalBackgroundBase(data.backgroundVariant),
         transparentBackdropRequested(data),
+        overPicture,
       )}
       tint={direction.backgroundTint ?? data.backgroundTint}
       atmosphere={direction.atmosphere}
@@ -915,8 +941,9 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
     >
       <AbsoluteFill style={compStyle}>
         {/* Brand strips — intelligence-briefing texture */}
-        <HeaderStrip metadata={data.episode} mode={bgVariant} />
-        <FooterStrip mode={bgVariant} hideRec={data.variant === "quote"} />
+        {/* Over a held picture (hold-under) the card is type only: no chrome. */}
+        {!overPicture && <HeaderStrip metadata={data.episode} mode={bgVariant} />}
+        {!overPicture && <FooterStrip mode={bgVariant} hideRec={data.variant === "quote"} />}
 
         {/* Variant dispatch.
          *
@@ -933,12 +960,12 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
          */}
         {data.variant === "quote" && (
           data._direction?.textAnimation === "quote-attribution"
-            ? <QuoteAttributionDispatch data={data} />
+            ? <QuoteAttributionDispatch data={data} isDark={bgVariant === "dark"} />
             : <QuoteVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "definition" && (
           data._direction?.textAnimation === "definition-reveal"
-            ? <DefinitionRevealDispatch data={data} />
+            ? <DefinitionRevealDispatch data={data} isDark={bgVariant === "dark"} />
             : <DefinitionVariant data={data} frame={frame} syncPoints={direction.syncPoints} />
         )}
         {data.variant === "bilingual" && (
@@ -952,11 +979,13 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
         )}
 
         {/* Episode label — slideIn (was naked fade) */}
-        <div
+        {!overPicture && showSlugLabel && <div
+          data-qa-role="chrome"
           style={{
             position: "absolute",
             bottom: layout.safeAreaTier.generous.bottom,
             left: layout.safeAreaTier.generous.left,
+            fontFamily: fonts.metadata,
             fontSize: fontSizes.label,
             color: theme.text.muted,
             letterSpacing: 2,
@@ -967,7 +996,7 @@ export const KineticTypography: React.FC<{ data: QuoteData }> = ({ data }) => {
           }}
         >
           {data.episode}
-        </div>
+        </div>}
       </AbsoluteFill>
     </Background>
   );

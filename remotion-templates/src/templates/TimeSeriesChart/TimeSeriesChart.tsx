@@ -1420,6 +1420,59 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
             );
           })}
 
+          {/* ── Counterfactual zone — shaded "what-if" band ─────────────────
+              Bone/taupe fill at low opacity + dashed left-edge border +
+              right-edge label. Signals "this region represents a path not
+              taken." Rendered behind gridlines so data remains foreground.
+              See: project/COUNTERFACTUAL_REGISTER.md */}
+          {data.counterfactualZone && (() => {
+            const zone = data.counterfactualZone;
+            const zoneFromX = getXPosition(zone.fromX, xMin, xMax, chartLeft, chartRight);
+            const zoneToX   = getXPosition(zone.toX,   xMin, xMax, chartLeft, chartRight);
+            const zoneColor = zone.color ?? palette.taupe;
+            const zoneOpacity = eraFadeOpacity * 0.12;
+            const borderOpacity = eraFadeOpacity * 0.55;
+            return (
+              <g key="counterfactual-zone">
+                {/* Fill */}
+                <rect
+                  x={zoneFromX}
+                  y={chartTop}
+                  width={zoneToX - zoneFromX}
+                  height={chartHeight}
+                  fill={zoneColor}
+                  opacity={zoneOpacity}
+                />
+                {/* Dashed left boundary — signals "this is where it diverges" */}
+                <line
+                  x1={zoneFromX}
+                  y1={chartTop}
+                  x2={zoneFromX}
+                  y2={chartBottom}
+                  stroke={zoneColor}
+                  strokeWidth={1.5}
+                  strokeDasharray="6 4"
+                  opacity={borderOpacity}
+                />
+                {/* Zone label at top-right of the band */}
+                {zone.label && (
+                  <text
+                    x={zoneToX - 8}
+                    y={chartTop + 18}
+                    textAnchor="end"
+                    fontFamily="var(--font-mono, monospace)"
+                    fontSize={14}
+                    fill={zoneColor}
+                    opacity={borderOpacity * 0.9}
+                    letterSpacing={0.5}
+                  >
+                    {zone.label.toUpperCase()}
+                  </text>
+                )}
+              </g>
+            );
+          })()}
+
           {/* ── Gridlines (5 horizontal) ────────────────────────────────────*/}
           {Array.from({ length: gridlineCount }).map((_, gridIdx) => {
             const gridY = chartTop + (gridIdx / (gridlineCount - 1)) * chartHeight;
@@ -1612,6 +1665,9 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               ? (isHero ? (line.width ?? HERO_STROKE_WIDTH) : (line.width ?? SUPPORTING_STROKE_WIDTH))
               : (line.width ?? SOLO_STROKE_WIDTH);
             const heroOpacity = anyHero && !isHero ? 0.55 : 1;
+            // Counterfactual lines: wider dash ("12,6"), 45% opacity, no glow.
+            // Plain dashed lines: standard dash ("8,4"), full opacity, glow preserved.
+            const isCounterfactual = !!line.counterfactual;
             return (
               <polyline
                 key={`line-${lineIdx}`}
@@ -1621,12 +1677,21 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
                 strokeWidth={heroStroke}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray={line.dashed ? "8,4" : undefined}
+                strokeDasharray={
+                  isCounterfactual ? "12,6" : line.dashed ? "8,4" : undefined
+                }
                 strokeDashoffset={lineStyle.strokeDashoffset as number}
                 opacity={
-                  fadeIn(frame, lineDrawStart_frame, sec(0.2)) * exitOpacity * heroOpacity
+                  fadeIn(frame, lineDrawStart_frame, sec(0.2)) *
+                  exitOpacity *
+                  heroOpacity *
+                  (isCounterfactual ? 0.45 : 1)
                 }
-                style={{ filter: `drop-shadow(0 2px 3px ${line.color}55)` }}
+                style={
+                  isCounterfactual
+                    ? undefined // no glow on projection lines
+                    : { filter: `drop-shadow(0 2px 3px ${line.color}55)` }
+                }
               />
             );
           })}
@@ -1643,6 +1708,10 @@ export const TimeSeriesChart: React.FC<{ data: TimeSeriesChartData }> = ({
               lineDrawDuration,
               easings.structure
             );
+            // Counterfactual lines have no leading-edge dot: the dot signals
+            // "live recording instrument," which would be misleading for a
+            // hypothetical projection. See: project/COUNTERFACTUAL_REGISTER.md
+            if (line.counterfactual) return null;
             // Don't render the dot before the line starts drawing or after
             // it's safely settled. It's only meaningful while in-flight.
             if (lineProgress <= 0.001 || lineProgress >= 1) return null;

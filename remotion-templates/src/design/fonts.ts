@@ -38,6 +38,8 @@ import { loadFont as loadNotoSansSC } from "@remotion/google-fonts/NotoSansSC";
 import { loadFont as loadNotoSerifSC } from "@remotion/google-fonts/NotoSerifSC";
 import { loadFont as loadNotoSansJP } from "@remotion/google-fonts/NotoSansJP";
 import { loadFont as loadOswald } from "@remotion/google-fonts/Oswald";
+import { loadFont as loadCaveat } from "@remotion/google-fonts/Caveat";
+import { loadFont as loadSpecialElite } from "@remotion/google-fonts/SpecialElite";
 
 // Constrain Latin fonts to the weights we actually use in templates. The
 // default "load everything" path triggers dozens of network requests per font
@@ -53,6 +55,20 @@ const { fontFamily: ibmPlexSerif } = loadIBMPlexSerif("normal", {
   subsets: ["latin"],
   ignoreTooManyRequestsWarning: true,
 });
+// Italic faces. Without these every `fontStyle: "italic"` (attributions,
+// glosses, subtitles, framing lines — ~50 call sites) is synthesized by
+// slanting the upright, which is visibly not Plex Italic. Same family names,
+// so nothing else changes; weights limited to what italic text actually uses.
+loadIBMPlexSerif("italic", {
+  weights: ["400", "500", "600"],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
+loadIBMPlexSans("italic", {
+  weights: ["400", "500"],
+  subsets: ["latin"],
+  ignoreTooManyRequestsWarning: true,
+});
 const { fontFamily: ibmPlexMono } = loadIBMPlexMono("normal", {
   weights: [...commonLatinWeights],
   subsets: ["latin"],
@@ -63,29 +79,59 @@ const { fontFamily: jetBrainsMono } = loadJetBrainsMono("normal", {
   subsets: ["latin"],
   ignoreTooManyRequestsWarning: true,
 });
+// ── Chinese and Japanese families: loaded on demand ─────────────────────────
+// Google chunks the CJK glyphs of each of these families across a hundred or
+// so files, and the loader fetches every one before a frame can render: about
+// 650 requests per browser tab, for text most episodes never set. Loading
+// them at import time made every render depend on those fetches succeeding
+// (they time out when the machine is busy). They now load the first time
+// something asks for them: reading `fonts.chinese` in theme.ts, or resolving
+// one of the Chinese / Japanese colour emphases. Calling this again is free.
+//
 // NOTE: Don't pass `subsets` here. Google Fonts now chunks Noto Sans SC's
 // CJK glyphs across many numeric subsets ([4], [5], [21]-[91], [97]-[119], etc.)
 // while still listing "chinese-simplified" as a subset *name* — passing that
 // name throws "weight: 400 subset: chinese-simplified is not available."
 // Letting the loader pull all subsets for the requested weights is the
 // reliable path. ignoreTooManyRequestsWarning suppresses the perf warning.
-const { fontFamily: notoSansSC } = loadNotoSansSC("normal", {
-  weights: ["400", "700"],
-  ignoreTooManyRequestsWarning: true,
-});
-const { fontFamily: notoSerifSC } = loadNotoSerifSC("normal", {
-  weights: ["400", "700"],
-  ignoreTooManyRequestsWarning: true,
-});
-const { fontFamily: notoSansJP } = loadNotoSansJP("normal", {
-  weights: ["400", "700"],
-  ignoreTooManyRequestsWarning: true,
-});
+const notoSansSC = "Noto Sans SC";
+const notoSerifSC = "Noto Serif SC";
+const notoSansJP = "Noto Sans JP";
+let cjkFontsRequested = false;
+export function ensureCjkFonts(): void {
+  if (cjkFontsRequested) return;
+  cjkFontsRequested = true;
+  loadNotoSansSC("normal", { weights: ["400", "700"], ignoreTooManyRequestsWarning: true });
+  loadNotoSerifSC("normal", { weights: ["400", "700"], ignoreTooManyRequestsWarning: true });
+  loadNotoSansJP("normal", { weights: ["400", "700"], ignoreTooManyRequestsWarning: true });
+}
+/** For tests. */
+export function cjkFontsWereRequested(): boolean {
+  return cjkFontsRequested;
+}
 // Oswald ships only a normal-style condensed sans; weight 700 covers the
 // heavy poster voice. Single subset (latin) is enough — used for soviet
 // emphasis display only, not for body/data text.
 const { fontFamily: oswald } = loadOswald("normal", {
   weights: ["500", "700"],
+});
+// Caveat — modern semi-script handwriting face. Used for HandwrittenLetter's
+// typeset fallback mode when an archival photograph of the actual letter
+// isn't available. Documentary canon prefers the real photograph (Burns
+// idiom — the artifact IS the argument); this is the next-best treatment.
+// 400/700 covers the regular + bolder strokes needed for signature emphasis.
+const { fontFamily: caveat } = loadCaveat("normal", {
+  weights: ["400", "700"],
+  subsets: ["latin"],
+});
+// Special Elite — mechanical typewriter with uneven baseline + ink-density
+// variation. The pre-1961 typewriter register for TelegramCable bodies
+// (Zimmermann Telegram, Long Telegram, ExComm cables). Post-1961 IBM Selectric
+// is cleaner — for that era use IBM Plex Mono instead. Special Elite ships
+// regular weight only.
+const { fontFamily: specialElite } = loadSpecialElite("normal", {
+  weights: ["400"],
+  subsets: ["latin"],
 });
 
 /**
@@ -102,4 +148,8 @@ export const loadedFonts = {
   chineseSerif: notoSerifSC,
   japanese: notoSansJP,
   sovietDisplay: oswald,
+  /** Modern semi-script handwriting — HandwrittenLetter typeset mode. */
+  handwriting: caveat,
+  /** Mechanical typewriter w/ uneven baseline — TelegramCable (pre-1961). */
+  typewriter: specialElite,
 } as const;

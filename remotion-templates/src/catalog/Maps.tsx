@@ -37,6 +37,22 @@ import { densityMapSampleData } from "../templates/DensityMap";
 import { TilegramUSMap } from "../templates/TilegramUSMap/TilegramUSMap";
 import { TilegramUSMapSchema } from "../templates/TilegramUSMap/schema";
 import type { TilegramUSMapData, USStateCode } from "../templates/TilegramUSMap/types";
+import { CinematicMap } from "../templates/CinematicMap/CinematicMap";
+import { CinematicMapSchema } from "../templates/CinematicMap/schema";
+import type { CinematicMapData } from "../templates/CinematicMap/types";
+import khyberPassData from "../../data/episodes/catalog/cinematic-khyber-pass.json";
+import taiwanStraitData from "../../data/episodes/catalog/cinematic-taiwan-strait.json";
+import globeRevealData from "../../data/episodes/catalog/cinematic-globe-reveal-middleeast.json";
+import { TerritoryMap } from "../templates/TerritoryMap/TerritoryMap";
+import { TerritoryMapSchema } from "../templates/TerritoryMap/schema";
+import type { TerritoryMapData } from "../templates/TerritoryMap/types";
+import territoryOttomanData from "../../data/episodes/catalog/territory-ottoman-retreat.json";
+import territoryCocomData from "../../data/episodes/catalog/territory-cocom-membership.json";
+import { FlowMap } from "../templates/FlowMap/FlowMap";
+import { FlowMapSchema } from "../templates/FlowMap/schema";
+import type { FlowMapData } from "../templates/FlowMap/types";
+import flowmapRussiaOilData from "../../data/episodes/catalog/flowmap-russia-oil-rerouting.json";
+import flowmapSemiconductorData from "../../data/episodes/catalog/flowmap-semiconductor-supply.json";
 import { layout, mapConfig, palette, sec } from "../design/theme";
 import { CATALOG_EPISODE, catalogId } from "./helpers";
 
@@ -900,6 +916,137 @@ export const CatalogTilegramElectoral = () => (
       height: layout.height,
     })}
     defaultProps={{ data: tilegramElectoral2024 as unknown as TilegramUSMapData }}
+  />
+);
+
+// ─── CinematicMap variants ────────────────────────────────────────────────────
+//
+// Three terrain fly-through fixtures demonstrating the CinematicMap template:
+//   • Khyber Pass approach   — mountain terrain, pitched camera, dusk light
+//   • Taiwan Strait reveal   — sea strait chokepoint, descending reveal
+//   • Globe reveal (Middle East) — planet cold-open → eastern Mediterranean
+//
+// The globe reveal implements the GlobeReveal pattern from the plan: a
+// high-altitude CinematicMap with atmospheric fog + night light. No separate
+// GlobeReveal template is needed — CinematicMap handles all altitudes.
+
+function cinematicDuration(data: CinematicMapData): number {
+  const maxKeySec = data.keyframes.reduce((m, kf) => Math.max(m, kf.sec), 0);
+  const explicitSec = data.durationSec ?? 0;
+  return Math.max(1, sec(Math.max(explicitSec, maxKeySec)));
+}
+
+export const CatalogCinematicKhyberPass = () => (
+  <Composition
+    id={catalogId("CinematicMap", "khyber-pass")}
+    component={CinematicMap}
+    schema={CinematicMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: cinematicDuration(props.data as CinematicMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: khyberPassData as unknown as CinematicMapData }}
+  />
+);
+
+export const CatalogCinematicTaiwanStrait = () => (
+  <Composition
+    id={catalogId("CinematicMap", "taiwan-strait")}
+    component={CinematicMap}
+    schema={CinematicMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: cinematicDuration(props.data as CinematicMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: taiwanStraitData as unknown as CinematicMapData }}
+  />
+);
+
+/** GlobeReveal pattern — planet cold-open using high-altitude CinematicMap. */
+export const CatalogCinematicGlobeRevealMiddleEast = () => (
+  <Composition
+    id={catalogId("CinematicMap", "globe-reveal-middleeast")}
+    component={CinematicMap}
+    schema={CinematicMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: cinematicDuration(props.data as CinematicMapData),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: globeRevealData as unknown as CinematicMapData }}
+  />
+);
+
+// ─── TerritoryMap catalog variants ──────────────────────────────────────────
+
+/** Ottoman territorial retreat 1700–1920 — country mode. */
+export const CatalogTerritoryOttomanRetreat = () => (
+  <Composition
+    id={catalogId("TerritoryMap", "ottoman-retreat")}
+    component={TerritoryMap}
+    schema={TerritoryMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: Math.max(1, sec((props.data as TerritoryMapData).durationSec ?? 10)),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: territoryOttomanData as unknown as TerritoryMapData }}
+  />
+);
+
+/** COCOM membership 1949–1994 — country mode, membership evolution. */
+export const CatalogTerritoryCocomMembership = () => (
+  <Composition
+    id={catalogId("TerritoryMap", "cocom-membership")}
+    component={TerritoryMap}
+    schema={TerritoryMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: Math.max(1, sec((props.data as TerritoryMapData).durationSec ?? 10)),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: territoryCocomData as unknown as TerritoryMapData }}
+  />
+);
+
+// ─── FlowMap catalog variants ────────────────────────────────────────────────
+
+/** Russian oil rerouting 2022–2024 — stagger mode, 4 major flows. */
+export const CatalogFlowMapRussiaOilRerouting = () => (
+  <Composition
+    id={catalogId("FlowMap", "russia-oil-rerouting")}
+    component={FlowMap}
+    schema={FlowMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: Math.max(1, sec((props.data as FlowMapData).durationSec ?? 10)),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: flowmapRussiaOilData as unknown as FlowMapData }}
+  />
+);
+
+/** Semiconductor supply chain — simultaneous mode, 3 actor groups. */
+export const CatalogFlowMapSemiconductorSupply = () => (
+  <Composition
+    id={catalogId("FlowMap", "semiconductor-supply")}
+    component={FlowMap}
+    schema={FlowMapSchema}
+    calculateMetadata={({ props }) => ({
+      durationInFrames: Math.max(1, sec((props.data as FlowMapData).durationSec ?? 10)),
+      fps: layout.fps,
+      width: layout.width,
+      height: layout.height,
+    })}
+    defaultProps={{ data: flowmapSemiconductorData as unknown as FlowMapData }}
   />
 );
 

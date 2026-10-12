@@ -14,6 +14,12 @@ Config.setVideoImageFormat("png");
 // also distribute that master, which we don't.
 Config.setPixelFormat("yuv420p");
 
+// Tag and convert to BT.709. Remotion 4 defaults to BT.601 ("bt470bg" in
+// ffprobe), which YouTube and most players then interpret as 709 anyway —
+// the mismatch shifts the paper and the golds. 709 is the HD standard and
+// becomes the Remotion default in v5.
+Config.setColorSpace("bt709");
+
 Config.setOverwriteOutput(true);
 
 // WebGL renderer for map templates (ChoroplethMap, RouteAnimation, AtlasPlate, etc.).

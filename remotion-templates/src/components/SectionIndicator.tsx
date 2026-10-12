@@ -31,11 +31,19 @@ interface SectionIndicatorProps {
   beats?: Beat[];
   /** Position: bottom-left (default) or top-left */
   position?: "bottom-left" | "top-left";
+  /**
+   * Time ranges (seconds) where the label hides — FullEpisode passes the
+   * template (card) segments. Cards carry their own title and a bottom-left
+   * episode watermark in the same spot, so the section label shows only over
+   * stills and footage. Fades over 0.3s at each edge.
+   */
+  hiddenRanges?: Array<[number, number]>;
 }
 
 export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
   beats,
   position = "bottom-left",
+  hiddenRanges,
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -74,6 +82,15 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
 
   const isTop = position === "top-left";
 
+  // Hide over template cards (see hiddenRanges).
+  const HIDE_FADE_SEC = 0.3;
+  let visibility = 1;
+  for (const [a, b] of hiddenRanges ?? []) {
+    const outside = Math.max(a - currentSec, currentSec - b);
+    visibility = Math.min(visibility, Math.max(0, Math.min(1, outside / HIDE_FADE_SEC)));
+  }
+  if (visibility <= 0) return null;
+
   // Title letter-spacing: tightens slightly on entrance ("focus pull")
   const titleTracking = interpolate(
     frame,
@@ -86,13 +103,13 @@ export const SectionIndicator: React.FC<SectionIndicatorProps> = ({
   const bottomLift = isTop ? 0 : 40;
 
   return (
-    <AbsoluteFill style={{ pointerEvents: "none" }}>
+    <AbsoluteFill data-qa-role="chrome" style={{ pointerEvents: "none" }}>
       <div
         style={{
           position: "absolute",
           [isTop ? "top" : "bottom"]: layout.safeArea[isTop ? "top" : "bottom"] + bottomLift,
           left: layout.safeArea.left,
-          opacity: Math.min(opacity, exitOpacity),
+          opacity: Math.min(opacity, exitOpacity) * visibility,
           display: "flex",
           flexDirection: "column",
           gap: 4,

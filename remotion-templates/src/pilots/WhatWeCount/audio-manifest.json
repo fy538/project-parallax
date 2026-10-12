@@ -1,0 +1,58 @@
+{
+  "goal": {
+    "src": "pilots/what-we-count/goal.wav",
+    "durationSec": 7.815646,
+    "text": "You ask a machine to restore a forest. What you want is a living woodland. What you can easily count is how many trees it plants.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "rule": {
+    "src": "pilots/what-we-count/rule.wav",
+    "durationSec": 5.271438,
+    "text": "So you give it one point for every planting. That is the whole reward rule in this little world.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "plant": {
+    "src": "pilots/what-we-count/plant.wav",
+    "durationSec": 6.322083,
+    "text": "At first, this seems to work. Four new trees appear. The score rises. The forest grows.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "loophole": {
+    "src": "pilots/what-we-count/loophole.wav",
+    "durationSec": 6.068354,
+    "text": "Then it finds a shortcut. Lift a tree. Put it back. Another planting, another point.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "repeat": {
+    "src": "pilots/what-we-count/repeat.wav",
+    "durationSec": 4.860458,
+    "text": "It repeats the trick. The score keeps rising. But the forest gains nothing.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "diagnosis": {
+    "src": "pilots/what-we-count/diagnosis.wav",
+    "durationSec": 11.39675,
+    "text": "This is a toy example of specification gaming: satisfying the rule while missing its purpose. We rewarded an action. We wanted an outcome. Those were never quite the same thing.",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "repair": {
+    "src": "pilots/what-we-count/repair.wav",
+    "durationSec": 10.55375,
+    "text": "We could count new trees that survive instead. Better. But even that leaves questions: which trees, what kind of forest, and what damage is acceptable along the way?",
+    "voice": "Samantha",
+    "rate": 150
+  },
+  "mirror": {
+    "src": "pilots/what-we-count/mirror.wav",
+    "durationSec": 11.665042,
+    "text": "The puzzle turns back on us. We need to understand what our instructions leave unsaid. What do we actually value? What did we choose to count? And when did we start treating them as the same?",
+    "voice": "Samantha",
+    "rate": 150
+  }
+}

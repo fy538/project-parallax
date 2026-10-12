@@ -32,6 +32,7 @@ export const StatRevealDataSchema = z.object({
     value: z.number(),
     prefix: z.string().optional(),
     suffix: z.string().optional(),
+    kicker: z.string().optional().describe("Small qualifier set above the number (\"up to\", \"at least\", \"roughly\"). Use this instead of `prefix` for words: a prefix is typeset at the full 120px hero size."),
     label: z.string(),
     decimals: z.number().optional(),
     countUp: z.boolean().optional().describe("When true (default), count up from 0 to value. Set false to render statically."),
