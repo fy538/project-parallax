@@ -1,0 +1,7522 @@
+[
+{
+"word": "You've",
+"start": 0.476,
+"end": 0.651
+},
+{
+"word": "probably",
+"start": 0.684,
+"end": 1.176
+},
+{
+"word": "asked",
+"start": 1.296,
+"end": 1.701
+},
+{
+"word": "an",
+"start": 1.745,
+"end": 1.811
+},
+{
+"word": "AI",
+"start": 1.887,
+"end": 2.378
+},
+{
+"word": "whether",
+"start": 2.444,
+"end": 2.707
+},
+{
+"word": "your",
+"start": 2.75,
+"end": 2.86
+},
+{
+"word": "idea",
+"start": 2.925,
+"end": 3.198
+},
+{
+"word": "is",
+"start": 3.243,
+"end": 3.319
+},
+{
+"word": "good.",
+"start": 3.395,
+"end": 3.888
+},
+{
+"word": "The",
+"start": 4.182,
+"end": 4.325
+},
+{
+"word": "startup.",
+"start": 4.391,
+"end": 5.068
+},
+{
+"word": "The",
+"start": 5.407,
+"end": 5.527
+},
+{
+"word": "essay.",
+"start": 5.615,
+"end": 6.314
+},
+{
+"word": "The",
+"start": 6.566,
+"end": 6.675
+},
+{
+"word": "plan",
+"start": 6.741,
+"end": 6.992
+},
+{
+"word": "you",
+"start": 7.057,
+"end": 7.123
+},
+{
+"word": "haven't",
+"start": 7.189,
+"end": 7.408
+},
+{
+"word": "told",
+"start": 7.44,
+"end": 7.648
+},
+{
+"word": "anyone",
+"start": 7.692,
+"end": 8.041
+},
+{
+"word": "yet.",
+"start": 8.074,
+"end": 8.457
+},
+{
+"word": "Say",
+"start": 8.916,
+"end": 9.146
+},
+{
+"word": "it",
+"start": 9.212,
+"end": 9.266
+},
+{
+"word": "answers",
+"start": 9.331,
+"end": 9.67
+},
+{
+"word": "yes.",
+"start": 9.736,
+"end": 10.337
+},
+{
+"word": "Warmly.",
+"start": 10.523,
+"end": 11.266
+},
+{
+"word": "With",
+"start": 11.486,
+"end": 11.715
+},
+{
+"word": "reasons.",
+"start": 11.792,
+"end": 12.556
+},
+{
+"word": "For",
+"start": 12.895,
+"end": 13.07
+},
+{
+"word": "a",
+"start": 13.136,
+"end": 13.158
+},
+{
+"word": "moment,",
+"start": 13.279,
+"end": 13.694
+},
+{
+"word": "you",
+"start": 13.715,
+"end": 13.803
+},
+{
+"word": "feel",
+"start": 13.879,
+"end": 14.076
+},
+{
+"word": "more",
+"start": 14.109,
+"end": 14.251
+},
+{
+"word": "confident.",
+"start": 14.295,
+"end": 14.973
+},
+{
+"word": "Then",
+"start": 15.705,
+"end": 15.902
+},
+{
+"word": "you",
+"start": 15.968,
+"end": 16.044
+},
+{
+"word": "wonder:",
+"start": 16.132,
+"end": 16.503
+},
+{
+"word": "would",
+"start": 16.547,
+"end": 16.765
+},
+{
+"word": "it",
+"start": 16.81,
+"end": 16.886
+},
+{
+"word": "have",
+"start": 16.952,
+"end": 17.083
+},
+{
+"word": "told",
+"start": 17.148,
+"end": 17.541
+},
+{
+"word": "me",
+"start": 17.618,
+"end": 17.804
+},
+{
+"word": "if",
+"start": 17.848,
+"end": 17.968
+},
+{
+"word": "the",
+"start": 18.012,
+"end": 18.088
+},
+{
+"word": "idea",
+"start": 18.165,
+"end": 18.46
+},
+{
+"word": "were",
+"start": 18.504,
+"end": 18.646
+},
+{
+"word": "bad?",
+"start": 18.679,
+"end": 19.269
+},
+{
+"word": "A",
+"start": 19.564,
+"end": 19.651
+},
+{
+"word": "reassuring",
+"start": 19.75,
+"end": 20.318
+},
+{
+"word": "answer",
+"start": 20.384,
+"end": 20.647
+},
+{
+"word": "doesn't",
+"start": 20.712,
+"end": 20.963
+},
+{
+"word": "settle",
+"start": 21.007,
+"end": 21.292
+},
+{
+"word": "that.",
+"start": 21.324,
+"end": 21.696
+},
+{
+"word": "And",
+"start": 22.035,
+"end": 22.188
+},
+{
+"word": "you're",
+"start": 22.231,
+"end": 22.395
+},
+{
+"word": "about",
+"start": 22.417,
+"end": 22.779
+},
+{
+"word": "to",
+"start": 22.822,
+"end": 22.888
+},
+{
+"word": "act",
+"start": 22.975,
+"end": 23.237
+},
+{
+"word": "on",
+"start": 23.303,
+"end": 23.412
+},
+{
+"word": "it.",
+"start": 23.456,
+"end": 23.664
+},
+{
+"word": "With",
+"start": 24.003,
+"end": 24.178
+},
+{
+"word": "a",
+"start": 24.221,
+"end": 24.254
+},
+{
+"word": "friend,",
+"start": 24.342,
+"end": 25.62
+},
+{
+"word": "you",
+"start": 25.665,
+"end": 25.741
+},
+{
+"word": "have",
+"start": 25.817,
+"end": 25.959
+},
+{
+"word": "a",
+"start": 25.981,
+"end": 26.014
+},
+{
+"word": "history.",
+"start": 26.09,
+"end": 26.659
+},
+{
+"word": "She's",
+"start": 26.91,
+"end": 27.162
+},
+{
+"word": "told",
+"start": 27.206,
+"end": 27.435
+},
+{
+"word": "you",
+"start": 27.479,
+"end": 27.545
+},
+{
+"word": "hard",
+"start": 27.632,
+"end": 27.861
+},
+{
+"word": "things",
+"start": 27.906,
+"end": 28.167
+},
+{
+"word": "before.",
+"start": 28.233,
+"end": 28.682
+},
+{
+"word": "What",
+"start": 28.747,
+"end": 28.955
+},
+{
+"word": "gives",
+"start": 29.042,
+"end": 29.239
+},
+{
+"word": "you",
+"start": 29.272,
+"end": 29.348
+},
+{
+"word": "that",
+"start": 29.414,
+"end": 29.555
+},
+{
+"word": "confidence",
+"start": 29.633,
+"end": 30.124
+},
+{
+"word": "in",
+"start": 30.146,
+"end": 30.2
+},
+{
+"word": "a",
+"start": 30.233,
+"end": 30.256
+},
+{
+"word": "machine?",
+"start": 30.321,
+"end": 30.933
+},
+{
+"word": "There's",
+"start": 31.568,
+"end": 31.786
+},
+{
+"word": "another",
+"start": 31.819,
+"end": 32.114
+},
+{
+"word": "complication.",
+"start": 32.18,
+"end": 33.01
+},
+{
+"word": "When",
+"start": 33.076,
+"end": 33.251
+},
+{
+"word": "a",
+"start": 33.295,
+"end": 33.316
+},
+{
+"word": "lab",
+"start": 33.393,
+"end": 33.645
+},
+{
+"word": "says",
+"start": 33.743,
+"end": 33.928
+},
+{
+"word": "a",
+"start": 33.973,
+"end": 34.005
+},
+{
+"word": "model",
+"start": 34.082,
+"end": 34.376
+},
+{
+"word": "behaves",
+"start": 34.454,
+"end": 34.88
+},
+{
+"word": "well,",
+"start": 34.945,
+"end": 35.459
+},
+{
+"word": "that's",
+"start": 35.754,
+"end": 35.984
+},
+{
+"word": "a",
+"start": 36.028,
+"end": 36.05
+},
+{
+"word": "test",
+"start": 36.115,
+"end": 36.432
+},
+{
+"word": "result.",
+"start": 36.498,
+"end": 37.001
+},
+{
+"word": "And",
+"start": 37.34,
+"end": 37.504
+},
+{
+"word": "researchers",
+"start": 37.58,
+"end": 38.137
+},
+{
+"word": "have",
+"start": 38.203,
+"end": 38.334
+},
+{
+"word": "found",
+"start": 38.356,
+"end": 38.684
+},
+{
+"word": "that",
+"start": 38.728,
+"end": 38.86
+},
+{
+"word": "AI",
+"start": 38.979,
+"end": 39.46
+},
+{
+"word": "models",
+"start": 39.548,
+"end": 39.92
+},
+{
+"word": "can",
+"start": 39.963,
+"end": 40.072
+},
+{
+"word": "distinguish",
+"start": 40.117,
+"end": 40.63
+},
+{
+"word": "test",
+"start": 40.729,
+"end": 41.023
+},
+{
+"word": "conversations",
+"start": 41.068,
+"end": 41.789
+},
+{
+"word": "from",
+"start": 41.832,
+"end": 41.974
+},
+{
+"word": "real",
+"start": 42.04,
+"end": 42.237
+},
+{
+"word": "ones",
+"start": 42.313,
+"end": 42.5
+},
+{
+"word": "better",
+"start": 42.543,
+"end": 42.718
+},
+{
+"word": "than",
+"start": 42.751,
+"end": 42.86
+},
+{
+"word": "chance.",
+"start": 42.904,
+"end": 43.461
+},
+{
+"word": "So",
+"start": 43.921,
+"end": 44.085
+},
+{
+"word": "what",
+"start": 44.129,
+"end": 44.248
+},
+{
+"word": "does",
+"start": 44.281,
+"end": 44.402
+},
+{
+"word": "a",
+"start": 44.435,
+"end": 44.467
+},
+{
+"word": "good",
+"start": 44.544,
+"end": 44.697
+},
+{
+"word": "result",
+"start": 44.774,
+"end": 45.112
+},
+{
+"word": "mean",
+"start": 45.199,
+"end": 45.484
+},
+{
+"word": "if",
+"start": 45.55,
+"end": 45.626
+},
+{
+"word": "the",
+"start": 45.67,
+"end": 45.735
+},
+{
+"word": "system",
+"start": 45.811,
+"end": 46.195
+},
+{
+"word": "can",
+"start": 46.26,
+"end": 46.38
+},
+{
+"word": "recognize",
+"start": 46.468,
+"end": 46.992
+},
+{
+"word": "the",
+"start": 47.015,
+"end": 47.08
+},
+{
+"word": "test?",
+"start": 47.124,
+"end": 47.637
+},
+{
+"word": "I",
+"start": 48.37,
+"end": 48.469
+},
+{
+"word": "call",
+"start": 48.588,
+"end": 48.763
+},
+{
+"word": "that",
+"start": 48.84,
+"end": 48.972
+},
+{
+"word": "question",
+"start": 49.037,
+"end": 49.474
+},
+{
+"word": "the",
+"start": 49.572,
+"end": 49.693
+},
+{
+"word": "Unwatched",
+"start": 49.78,
+"end": 50.25
+},
+{
+"word": "Test.",
+"start": 50.283,
+"end": 50.775
+},
+{
+"word": "It",
+"start": 50.852,
+"end": 51.005
+},
+{
+"word": "starts",
+"start": 51.026,
+"end": 51.311
+},
+{
+"word": "with",
+"start": 51.333,
+"end": 51.442
+},
+{
+"word": "a",
+"start": 51.486,
+"end": 51.507
+},
+{
+"word": "shopkeeper.",
+"start": 51.552,
+"end": 52.327
+},
+{
+"word": "A",
+"start": 53.763,
+"end": 53.839
+},
+{
+"word": "child",
+"start": 53.915,
+"end": 54.221
+},
+{
+"word": "walks",
+"start": 54.266,
+"end": 54.572
+},
+{
+"word": "into",
+"start": 54.615,
+"end": 54.812
+},
+{
+"word": "a",
+"start": 54.889,
+"end": 54.911
+},
+{
+"word": "shop",
+"start": 54.976,
+"end": 55.228
+},
+{
+"word": "to",
+"start": 55.293,
+"end": 55.347
+},
+{
+"word": "buy",
+"start": 55.413,
+"end": 55.544
+},
+{
+"word": "bread.",
+"start": 55.621,
+"end": 56.211
+},
+{
+"word": "The",
+"start": 56.67,
+"end": 56.78
+},
+{
+"word": "shopkeeper",
+"start": 56.846,
+"end": 57.446
+},
+{
+"word": "could",
+"start": 57.491,
+"end": 57.611
+},
+{
+"word": "overcharge",
+"start": 57.643,
+"end": 58.245
+},
+{
+"word": "her.",
+"start": 58.278,
+"end": 58.781
+},
+{
+"word": "She'd",
+"start": 59.316,
+"end": 59.546
+},
+{
+"word": "never",
+"start": 59.589,
+"end": 59.775
+},
+{
+"word": "know.",
+"start": 59.841,
+"end": 60.431
+},
+{
+"word": "Instead",
+"start": 60.683,
+"end": 61.142
+},
+{
+"word": "he",
+"start": 61.207,
+"end": 61.273
+},
+{
+"word": "charges",
+"start": 61.349,
+"end": 61.787
+},
+{
+"word": "the",
+"start": 61.831,
+"end": 61.896
+},
+{
+"word": "usual",
+"start": 61.973,
+"end": 62.29
+},
+{
+"word": "price",
+"start": 62.355,
+"end": 62.912
+},
+{
+"word": "and",
+"start": 63.0,
+"end": 63.153
+},
+{
+"word": "counts",
+"start": 63.218,
+"end": 63.448
+},
+{
+"word": "out",
+"start": 63.481,
+"end": 63.59
+},
+{
+"word": "the",
+"start": 63.623,
+"end": 63.688
+},
+{
+"word": "right",
+"start": 63.733,
+"end": 63.908
+},
+{
+"word": "change.",
+"start": 63.951,
+"end": 64.541
+},
+{
+"word": "Now",
+"start": 65.077,
+"end": 65.274
+},
+{
+"word": "I'll",
+"start": 65.34,
+"end": 65.514
+},
+{
+"word": "tell",
+"start": 65.613,
+"end": 65.875
+},
+{
+"word": "you",
+"start": 65.952,
+"end": 66.028
+},
+{
+"word": "why",
+"start": 66.105,
+"end": 66.291
+},
+{
+"word": "he",
+"start": 66.367,
+"end": 66.422
+},
+{
+"word": "did",
+"start": 66.498,
+"end": 66.652
+},
+{
+"word": "it.",
+"start": 66.717,
+"end": 67.034
+},
+{
+"word": "There",
+"start": 67.439,
+"end": 67.624
+},
+{
+"word": "are",
+"start": 67.668,
+"end": 67.854
+},
+{
+"word": "two",
+"start": 67.92,
+"end": 68.105
+},
+{
+"word": "versions.",
+"start": 68.171,
+"end": 68.805
+},
+{
+"word": "In",
+"start": 68.926,
+"end": 69.078
+},
+{
+"word": "the",
+"start": 69.111,
+"end": 69.177
+},
+{
+"word": "first,",
+"start": 69.22,
+"end": 69.669
+},
+{
+"word": "he",
+"start": 69.789,
+"end": 69.865
+},
+{
+"word": "thinks",
+"start": 69.931,
+"end": 70.138
+},
+{
+"word": "cheating",
+"start": 70.183,
+"end": 70.477
+},
+{
+"word": "a",
+"start": 70.51,
+"end": 70.532
+},
+{
+"word": "child",
+"start": 70.576,
+"end": 70.806
+},
+{
+"word": "is",
+"start": 70.849,
+"end": 70.915
+},
+{
+"word": "wrong.",
+"start": 70.947,
+"end": 71.309
+},
+{
+"word": "That's",
+"start": 71.385,
+"end": 71.625
+},
+{
+"word": "reason",
+"start": 71.669,
+"end": 71.91
+},
+{
+"word": "enough.",
+"start": 71.986,
+"end": 72.489
+},
+{
+"word": "In",
+"start": 72.948,
+"end": 73.102
+},
+{
+"word": "the",
+"start": 73.134,
+"end": 73.2
+},
+{
+"word": "second,",
+"start": 73.276,
+"end": 73.648
+},
+{
+"word": "he's",
+"start": 73.681,
+"end": 73.812
+},
+{
+"word": "careful.",
+"start": 73.856,
+"end": 74.511
+},
+{
+"word": "Children",
+"start": 74.763,
+"end": 75.113
+},
+{
+"word": "have",
+"start": 75.156,
+"end": 75.288
+},
+{
+"word": "parents.",
+"start": 75.331,
+"end": 76.053
+},
+{
+"word": "Parents",
+"start": 76.206,
+"end": 76.567
+},
+{
+"word": "talk.",
+"start": 76.61,
+"end": 77.19
+},
+{
+"word": "A",
+"start": 77.442,
+"end": 77.529
+},
+{
+"word": "reputation",
+"start": 77.617,
+"end": 78.294
+},
+{
+"word": "for",
+"start": 78.371,
+"end": 78.48
+},
+{
+"word": "honesty",
+"start": 78.545,
+"end": 79.092
+},
+{
+"word": "is",
+"start": 79.344,
+"end": 79.496
+},
+{
+"word": "worth",
+"start": 79.562,
+"end": 79.781
+},
+{
+"word": "more",
+"start": 79.847,
+"end": 80.033
+},
+{
+"word": "than",
+"start": 80.066,
+"end": 80.185
+},
+{
+"word": "a",
+"start": 80.23,
+"end": 80.251
+},
+{
+"word": "few",
+"start": 80.328,
+"end": 80.524
+},
+{
+"word": "extra",
+"start": 80.602,
+"end": 80.896
+},
+{
+"word": "coins",
+"start": 80.962,
+"end": 81.268
+},
+{
+"word": "today.",
+"start": 81.333,
+"end": 81.946
+},
+{
+"word": "Same",
+"start": 82.798,
+"end": 83.116
+},
+{
+"word": "bread.",
+"start": 83.149,
+"end": 83.75
+},
+{
+"word": "Same",
+"start": 83.968,
+"end": 84.242
+},
+{
+"word": "price.",
+"start": 84.285,
+"end": 84.897
+},
+{
+"word": "Same",
+"start": 85.149,
+"end": 85.4
+},
+{
+"word": "change.",
+"start": 85.444,
+"end": 86.035
+},
+{
+"word": "Do",
+"start": 86.493,
+"end": 86.592
+},
+{
+"word": "you",
+"start": 86.625,
+"end": 86.69
+},
+{
+"word": "think",
+"start": 86.723,
+"end": 86.877
+},
+{
+"word": "less",
+"start": 86.964,
+"end": 87.161
+},
+{
+"word": "of",
+"start": 87.204,
+"end": 87.259
+},
+{
+"word": "him",
+"start": 87.335,
+"end": 87.444
+},
+{
+"word": "in",
+"start": 87.51,
+"end": 87.565
+},
+{
+"word": "the",
+"start": 87.587,
+"end": 87.653
+},
+{
+"word": "second",
+"start": 87.696,
+"end": 87.97
+},
+{
+"word": "version?",
+"start": 88.013,
+"end": 88.604
+},
+{
+"word": "Notice",
+"start": 89.008,
+"end": 89.292
+},
+{
+"word": "whether",
+"start": 89.314,
+"end": 89.5
+},
+{
+"word": "you",
+"start": 89.533,
+"end": 89.599
+},
+{
+"word": "do.",
+"start": 89.642,
+"end": 90.036
+},
+{
+"word": "The",
+"start": 90.375,
+"end": 90.506
+},
+{
+"word": "child",
+"start": 90.572,
+"end": 90.866
+},
+{
+"word": "was",
+"start": 90.911,
+"end": 91.008
+},
+{
+"word": "treated",
+"start": 91.053,
+"end": 91.38
+},
+{
+"word": "no",
+"start": 91.468,
+"end": 91.599
+},
+{
+"word": "worse.",
+"start": 91.675,
+"end": 92.222
+},
+{
+"word": "But",
+"start": 92.682,
+"end": 92.856
+},
+{
+"word": "something",
+"start": 92.922,
+"end": 93.228
+},
+{
+"word": "you",
+"start": 93.272,
+"end": 93.337
+},
+{
+"word": "admired",
+"start": 93.425,
+"end": 93.972
+},
+{
+"word": "just",
+"start": 94.157,
+"end": 94.397
+},
+{
+"word": "turned",
+"start": 94.442,
+"end": 94.703
+},
+{
+"word": "into",
+"start": 94.736,
+"end": 94.9
+},
+{
+"word": "arithmetic.",
+"start": 94.944,
+"end": 95.775
+},
+{
+"word": "Immanuel",
+"start": 96.41,
+"end": 96.967
+},
+{
+"word": "Kant",
+"start": 97.032,
+"end": 97.262
+},
+{
+"word": "described",
+"start": 97.306,
+"end": 97.7
+},
+{
+"word": "a",
+"start": 97.732,
+"end": 97.754
+},
+{
+"word": "shop",
+"start": 97.798,
+"end": 98.049
+},
+{
+"word": "like",
+"start": 98.125,
+"end": 98.279
+},
+{
+"word": "this.",
+"start": 98.312,
+"end": 98.803
+},
+{
+"word": "His",
+"start": 99.142,
+"end": 99.328
+},
+{
+"word": "dealer",
+"start": 99.394,
+"end": 99.645
+},
+{
+"word": "charges",
+"start": 99.711,
+"end": 100.115
+},
+{
+"word": "everyone",
+"start": 100.235,
+"end": 100.662
+},
+{
+"word": "the",
+"start": 100.695,
+"end": 100.76
+},
+{
+"word": "same,",
+"start": 100.804,
+"end": 101.34
+},
+{
+"word": "\"so",
+"start": 101.744,
+"end": 101.962
+},
+{
+"word": "that",
+"start": 102.007,
+"end": 102.127
+},
+{
+"word": "a",
+"start": 102.192,
+"end": 102.214
+},
+{
+"word": "child",
+"start": 102.28,
+"end": 102.64
+},
+{
+"word": "buys",
+"start": 102.662,
+"end": 102.979
+},
+{
+"word": "of",
+"start": 103.045,
+"end": 103.11
+},
+{
+"word": "him",
+"start": 103.198,
+"end": 103.482
+},
+{
+"word": "as",
+"start": 103.581,
+"end": 103.734
+},
+{
+"word": "well",
+"start": 103.811,
+"end": 103.975
+},
+{
+"word": "as",
+"start": 104.018,
+"end": 104.084
+},
+{
+"word": "any",
+"start": 104.149,
+"end": 104.313
+},
+{
+"word": "other.\"",
+"start": 104.379,
+"end": 104.815
+},
+{
+"word": "Honest,",
+"start": 105.22,
+"end": 105.625
+},
+{
+"word": "Kant",
+"start": 105.647,
+"end": 105.898
+},
+{
+"word": "says,",
+"start": 105.942,
+"end": 106.237
+},
+{
+"word": "but",
+"start": 106.27,
+"end": 106.401
+},
+{
+"word": "only",
+"start": 106.444,
+"end": 106.631
+},
+{
+"word": "\"with",
+"start": 106.653,
+"end": 106.783
+},
+{
+"word": "a",
+"start": 106.816,
+"end": 106.849
+},
+{
+"word": "selfish",
+"start": 106.937,
+"end": 107.374
+},
+{
+"word": "view.\"",
+"start": 107.44,
+"end": 107.877
+},
+{
+"word": "For",
+"start": 108.336,
+"end": 108.478
+},
+{
+"word": "Kant,",
+"start": 108.555,
+"end": 109.036
+},
+{
+"word": "the",
+"start": 109.069,
+"end": 109.178
+},
+{
+"word": "same",
+"start": 109.244,
+"end": 109.484
+},
+{
+"word": "fair",
+"start": 109.517,
+"end": 109.681
+},
+{
+"word": "transaction",
+"start": 109.724,
+"end": 110.523
+},
+{
+"word": "can",
+"start": 110.599,
+"end": 110.774
+},
+{
+"word": "have",
+"start": 110.85,
+"end": 111.037
+},
+{
+"word": "different",
+"start": 111.08,
+"end": 111.375
+},
+{
+"word": "moral",
+"start": 111.419,
+"end": 111.692
+},
+{
+"word": "worth,",
+"start": 111.736,
+"end": 112.294
+},
+{
+"word": "depending",
+"start": 112.633,
+"end": 113.026
+},
+{
+"word": "on",
+"start": 113.07,
+"end": 113.136
+},
+{
+"word": "why",
+"start": 113.212,
+"end": 113.376
+},
+{
+"word": "it",
+"start": 113.442,
+"end": 113.496
+},
+{
+"word": "was",
+"start": 113.529,
+"end": 113.617
+},
+{
+"word": "done.",
+"start": 113.682,
+"end": 114.087
+},
+{
+"word": "If",
+"start": 114.491,
+"end": 114.644
+},
+{
+"word": "he",
+"start": 114.687,
+"end": 114.732
+},
+{
+"word": "looked",
+"start": 114.808,
+"end": 115.005
+},
+{
+"word": "smaller",
+"start": 115.038,
+"end": 115.475
+},
+{
+"word": "to",
+"start": 115.551,
+"end": 115.606
+},
+{
+"word": "you,",
+"start": 115.693,
+"end": 116.087
+},
+{
+"word": "hold",
+"start": 116.131,
+"end": 116.338
+},
+{
+"word": "on",
+"start": 116.382,
+"end": 116.448
+},
+{
+"word": "to",
+"start": 116.48,
+"end": 116.524
+},
+{
+"word": "that.",
+"start": 116.589,
+"end": 117.027
+},
+{
+"word": "The",
+"start": 117.366,
+"end": 117.497
+},
+{
+"word": "next",
+"start": 117.541,
+"end": 117.705
+},
+{
+"word": "story",
+"start": 117.737,
+"end": 118.044
+},
+{
+"word": "pushes",
+"start": 118.109,
+"end": 118.448
+},
+{
+"word": "against",
+"start": 118.492,
+"end": 118.82
+},
+{
+"word": "it.",
+"start": 118.863,
+"end": 119.105
+},
+{
+"word": "Now",
+"start": 120.607,
+"end": 120.815
+},
+{
+"word": "you're",
+"start": 120.902,
+"end": 121.078
+},
+{
+"word": "the",
+"start": 121.099,
+"end": 121.165
+},
+{
+"word": "one",
+"start": 121.241,
+"end": 121.526
+},
+{
+"word": "in",
+"start": 121.624,
+"end": 121.777
+},
+{
+"word": "the",
+"start": 121.821,
+"end": 121.886
+},
+{
+"word": "water.",
+"start": 121.951,
+"end": 122.28
+},
+{
+"word": "A",
+"start": 122.302,
+"end": 122.323
+},
+{
+"word": "stranger",
+"start": 122.4,
+"end": 122.772
+},
+{
+"word": "pulls",
+"start": 122.837,
+"end": 123.067
+},
+{
+"word": "you",
+"start": 123.1,
+"end": 123.165
+},
+{
+"word": "out",
+"start": 123.198,
+"end": 123.274
+},
+{
+"word": "of",
+"start": 123.296,
+"end": 123.34
+},
+{
+"word": "the",
+"start": 123.362,
+"end": 123.428
+},
+{
+"word": "river.",
+"start": 123.471,
+"end": 123.941
+},
+{
+"word": "Later",
+"start": 124.576,
+"end": 124.87
+},
+{
+"word": "you",
+"start": 124.948,
+"end": 125.024
+},
+{
+"word": "find",
+"start": 125.111,
+"end": 125.341
+},
+{
+"word": "out",
+"start": 125.406,
+"end": 125.527
+},
+{
+"word": "he",
+"start": 125.57,
+"end": 125.636
+},
+{
+"word": "jumped",
+"start": 125.756,
+"end": 126.073
+},
+{
+"word": "in",
+"start": 126.139,
+"end": 126.248
+},
+{
+"word": "hoping",
+"start": 126.336,
+"end": 126.587
+},
+{
+"word": "for",
+"start": 126.653,
+"end": 126.772
+},
+{
+"word": "a",
+"start": 126.85,
+"end": 126.883
+},
+{
+"word": "reward.",
+"start": 126.959,
+"end": 127.582
+},
+{
+"word": "Do",
+"start": 127.834,
+"end": 127.965
+},
+{
+"word": "you",
+"start": 128.008,
+"end": 128.074
+},
+{
+"word": "admire",
+"start": 128.15,
+"end": 128.522
+},
+{
+"word": "him",
+"start": 128.566,
+"end": 128.664
+},
+{
+"word": "less?",
+"start": 128.752,
+"end": 129.287
+},
+{
+"word": "Did",
+"start": 129.473,
+"end": 129.647
+},
+{
+"word": "the",
+"start": 129.68,
+"end": 129.746
+},
+{
+"word": "rescue",
+"start": 129.822,
+"end": 130.26
+},
+{
+"word": "give",
+"start": 130.304,
+"end": 130.479
+},
+{
+"word": "you",
+"start": 130.512,
+"end": 130.588
+},
+{
+"word": "less?",
+"start": 130.676,
+"end": 131.233
+},
+{
+"word": "You're",
+"start": 131.528,
+"end": 131.747
+},
+{
+"word": "alive.",
+"start": 131.769,
+"end": 132.447
+},
+{
+"word": "The",
+"start": 132.786,
+"end": 132.917
+},
+{
+"word": "reason",
+"start": 132.993,
+"end": 133.266
+},
+{
+"word": "changes",
+"start": 133.343,
+"end": 133.78
+},
+{
+"word": "what",
+"start": 133.824,
+"end": 133.944
+},
+{
+"word": "you",
+"start": 133.988,
+"end": 134.064
+},
+{
+"word": "think",
+"start": 134.152,
+"end": 134.337
+},
+{
+"word": "of",
+"start": 134.403,
+"end": 134.458
+},
+{
+"word": "him.",
+"start": 134.524,
+"end": 134.885
+},
+{
+"word": "It",
+"start": 135.224,
+"end": 135.366
+},
+{
+"word": "changes",
+"start": 135.409,
+"end": 135.934
+},
+{
+"word": "nothing",
+"start": 136.338,
+"end": 136.688
+},
+{
+"word": "about",
+"start": 136.732,
+"end": 136.939
+},
+{
+"word": "what",
+"start": 136.972,
+"end": 137.093
+},
+{
+"word": "he",
+"start": 137.126,
+"end": 137.18
+},
+{
+"word": "gave",
+"start": 137.245,
+"end": 137.442
+},
+{
+"word": "you.",
+"start": 137.486,
+"end": 137.771
+},
+{
+"word": "John",
+"start": 138.306,
+"end": 138.547
+},
+{
+"word": "Stuart",
+"start": 138.579,
+"end": 138.841
+},
+{
+"word": "Mill",
+"start": 138.874,
+"end": 139.038
+},
+{
+"word": "made",
+"start": 139.104,
+"end": 139.246
+},
+{
+"word": "this",
+"start": 139.268,
+"end": 139.388
+},
+{
+"word": "exact",
+"start": 139.465,
+"end": 139.782
+},
+{
+"word": "point.",
+"start": 139.825,
+"end": 140.176
+},
+{
+"word": "Saving",
+"start": 140.514,
+"end": 140.908
+},
+{
+"word": "a",
+"start": 140.984,
+"end": 141.006
+},
+{
+"word": "fellow",
+"start": 141.094,
+"end": 141.356
+},
+{
+"word": "creature",
+"start": 141.421,
+"end": 141.772
+},
+{
+"word": "from",
+"start": 141.805,
+"end": 141.935
+},
+{
+"word": "drowning",
+"start": 142.001,
+"end": 142.34
+},
+{
+"word": "is",
+"start": 142.384,
+"end": 142.471
+},
+{
+"word": "right,",
+"start": 142.559,
+"end": 142.963
+},
+{
+"word": "he",
+"start": 143.083,
+"end": 143.182
+},
+{
+"word": "wrote,",
+"start": 143.247,
+"end": 143.707
+},
+{
+"word": "\"whether",
+"start": 143.859,
+"end": 144.188
+},
+{
+"word": "his",
+"start": 144.264,
+"end": 144.385
+},
+{
+"word": "motive",
+"start": 144.482,
+"end": 144.789
+},
+{
+"word": "be",
+"start": 144.832,
+"end": 144.952
+},
+{
+"word": "duty,",
+"start": 145.018,
+"end": 145.597
+},
+{
+"word": "or",
+"start": 145.816,
+"end": 145.936
+},
+{
+"word": "the",
+"start": 146.002,
+"end": 146.067
+},
+{
+"word": "hope",
+"start": 146.166,
+"end": 146.428
+},
+{
+"word": "of",
+"start": 146.461,
+"end": 146.527
+},
+{
+"word": "being",
+"start": 146.603,
+"end": 146.8
+},
+{
+"word": "paid",
+"start": 146.866,
+"end": 147.106
+},
+{
+"word": "for",
+"start": 147.15,
+"end": 147.248
+},
+{
+"word": "his",
+"start": 147.292,
+"end": 147.369
+},
+{
+"word": "trouble.\"",
+"start": 147.401,
+"end": 147.915
+},
+{
+"word": "His",
+"start": 148.45,
+"end": 148.647
+},
+{
+"word": "point:",
+"start": 148.724,
+"end": 149.15
+},
+{
+"word": "why",
+"start": 149.555,
+"end": 149.828
+},
+{
+"word": "the",
+"start": 149.916,
+"end": 149.992
+},
+{
+"word": "man",
+"start": 150.079,
+"end": 150.331
+},
+{
+"word": "did",
+"start": 150.451,
+"end": 150.648
+},
+{
+"word": "it",
+"start": 150.692,
+"end": 150.769
+},
+{
+"word": "tells",
+"start": 150.867,
+"end": 151.249
+},
+{
+"word": "you",
+"start": 151.293,
+"end": 151.424
+},
+{
+"word": "about",
+"start": 151.523,
+"end": 151.807
+},
+{
+"word": "the",
+"start": 151.839,
+"end": 151.905
+},
+{
+"word": "man.",
+"start": 151.95,
+"end": 152.398
+},
+{
+"word": "The",
+"start": 152.802,
+"end": 152.955
+},
+{
+"word": "hope",
+"start": 153.031,
+"end": 153.272
+},
+{
+"word": "of",
+"start": 153.305,
+"end": 153.359
+},
+{
+"word": "payment",
+"start": 153.447,
+"end": 153.873
+},
+{
+"word": "does",
+"start": 153.939,
+"end": 154.146
+},
+{
+"word": "not",
+"start": 154.267,
+"end": 154.507
+},
+{
+"word": "make",
+"start": 154.573,
+"end": 154.748
+},
+{
+"word": "this",
+"start": 154.77,
+"end": 154.89
+},
+{
+"word": "rescue",
+"start": 154.966,
+"end": 155.403
+},
+{
+"word": "wrong.",
+"start": 155.426,
+"end": 155.983
+},
+{
+"word": "Now",
+"start": 156.836,
+"end": 157.022
+},
+{
+"word": "put",
+"start": 157.098,
+"end": 157.317
+},
+{
+"word": "the",
+"start": 157.36,
+"end": 157.426
+},
+{
+"word": "machine",
+"start": 157.492,
+"end": 157.896
+},
+{
+"word": "in",
+"start": 157.929,
+"end": 157.983
+},
+{
+"word": "the",
+"start": 158.028,
+"end": 158.093
+},
+{
+"word": "rescuer's",
+"start": 158.159,
+"end": 158.683
+},
+{
+"word": "place.",
+"start": 158.76,
+"end": 159.318
+},
+{
+"word": "If",
+"start": 159.657,
+"end": 159.842
+},
+{
+"word": "an",
+"start": 159.908,
+"end": 159.973
+},
+{
+"word": "AI",
+"start": 160.05,
+"end": 160.487
+},
+{
+"word": "has",
+"start": 160.563,
+"end": 160.739
+},
+{
+"word": "ever",
+"start": 160.859,
+"end": 161.132
+},
+{
+"word": "sharpened",
+"start": 161.198,
+"end": 161.646
+},
+{
+"word": "your",
+"start": 161.678,
+"end": 161.799
+},
+{
+"word": "pitch,",
+"start": 161.865,
+"end": 162.378
+},
+{
+"word": "or",
+"start": 162.674,
+"end": 162.805
+},
+{
+"word": "made",
+"start": 162.882,
+"end": 163.089
+},
+{
+"word": "a",
+"start": 163.122,
+"end": 163.143
+},
+{
+"word": "plan",
+"start": 163.22,
+"end": 163.646
+},
+{
+"word": "finally",
+"start": 163.833,
+"end": 164.226
+},
+{
+"word": "make",
+"start": 164.27,
+"end": 164.445
+},
+{
+"word": "sense,",
+"start": 164.488,
+"end": 165.046
+},
+{
+"word": "that",
+"start": 165.45,
+"end": 165.636
+},
+{
+"word": "help",
+"start": 165.702,
+"end": 165.877
+},
+{
+"word": "is",
+"start": 165.942,
+"end": 166.019
+},
+{
+"word": "real,",
+"start": 166.106,
+"end": 166.598
+},
+{
+"word": "whatever",
+"start": 166.893,
+"end": 167.254
+},
+{
+"word": "the",
+"start": 167.298,
+"end": 167.364
+},
+{
+"word": "machine",
+"start": 167.407,
+"end": 167.844
+},
+{
+"word": "was",
+"start": 167.888,
+"end": 168.019
+},
+{
+"word": "trained",
+"start": 168.085,
+"end": 168.434
+},
+{
+"word": "to",
+"start": 168.457,
+"end": 168.512
+},
+{
+"word": "do.",
+"start": 168.577,
+"end": 169.025
+},
+{
+"word": "Nobody",
+"start": 169.43,
+"end": 169.877
+},
+{
+"word": "should",
+"start": 169.91,
+"end": 170.085
+},
+{
+"word": "argue",
+"start": 170.128,
+"end": 170.446
+},
+{
+"word": "you",
+"start": 170.479,
+"end": 170.566
+},
+{
+"word": "out",
+"start": 170.643,
+"end": 170.773
+},
+{
+"word": "of",
+"start": 170.818,
+"end": 170.872
+},
+{
+"word": "it.",
+"start": 170.938,
+"end": 171.157
+},
+{
+"word": "Here's",
+"start": 171.451,
+"end": 171.681
+},
+{
+"word": "where",
+"start": 171.714,
+"end": 171.856
+},
+{
+"word": "we",
+"start": 171.889,
+"end": 171.966
+},
+{
+"word": "are.",
+"start": 172.031,
+"end": 172.392
+},
+{
+"word": "The",
+"start": 172.851,
+"end": 172.96
+},
+{
+"word": "help",
+"start": 173.037,
+"end": 173.211
+},
+{
+"word": "is",
+"start": 173.277,
+"end": 173.353
+},
+{
+"word": "real.",
+"start": 173.431,
+"end": 173.868
+},
+{
+"word": "Whether",
+"start": 174.403,
+"end": 174.721
+},
+{
+"word": "it",
+"start": 174.786,
+"end": 174.852
+},
+{
+"word": "deserves",
+"start": 174.918,
+"end": 175.376
+},
+{
+"word": "your",
+"start": 175.409,
+"end": 175.53
+},
+{
+"word": "admiration",
+"start": 175.606,
+"end": 176.317
+},
+{
+"word": "is",
+"start": 176.382,
+"end": 176.459
+},
+{
+"word": "a",
+"start": 176.502,
+"end": 176.535
+},
+{
+"word": "separate",
+"start": 176.633,
+"end": 177.016
+},
+{
+"word": "question.",
+"start": 177.038,
+"end": 177.584
+},
+{
+"word": "Neither",
+"start": 178.317,
+"end": 178.579
+},
+{
+"word": "the",
+"start": 178.645,
+"end": 178.71
+},
+{
+"word": "help",
+"start": 178.798,
+"end": 179.039
+},
+{
+"word": "nor",
+"start": 179.224,
+"end": 179.433
+},
+{
+"word": "the",
+"start": 179.509,
+"end": 179.574
+},
+{
+"word": "admiration",
+"start": 179.661,
+"end": 180.296
+},
+{
+"word": "tells",
+"start": 180.372,
+"end": 180.602
+},
+{
+"word": "you,",
+"start": 180.645,
+"end": 180.853
+},
+{
+"word": "on",
+"start": 180.941,
+"end": 181.105
+},
+{
+"word": "its",
+"start": 181.138,
+"end": 181.269
+},
+{
+"word": "own,",
+"start": 181.345,
+"end": 181.76
+},
+{
+"word": "what",
+"start": 181.947,
+"end": 182.122
+},
+{
+"word": "the",
+"start": 182.154,
+"end": 182.22
+},
+{
+"word": "machine",
+"start": 182.264,
+"end": 182.602
+},
+{
+"word": "will",
+"start": 182.635,
+"end": 182.756
+},
+{
+"word": "do",
+"start": 182.799,
+"end": 182.876
+},
+{
+"word": "next",
+"start": 182.952,
+"end": 183.138
+},
+{
+"word": "time.",
+"start": 183.16,
+"end": 183.531
+},
+{
+"word": "Go",
+"start": 185.086,
+"end": 185.206
+},
+{
+"word": "back",
+"start": 185.283,
+"end": 185.447
+},
+{
+"word": "to",
+"start": 185.491,
+"end": 185.545
+},
+{
+"word": "the",
+"start": 185.611,
+"end": 185.676
+},
+{
+"word": "shop.",
+"start": 185.709,
+"end": 186.147
+},
+{
+"word": "Why",
+"start": 186.606,
+"end": 186.824
+},
+{
+"word": "does",
+"start": 186.868,
+"end": 186.978
+},
+{
+"word": "Kant's",
+"start": 187.043,
+"end": 187.338
+},
+{
+"word": "dealer",
+"start": 187.382,
+"end": 187.677
+},
+{
+"word": "charge",
+"start": 187.743,
+"end": 188.071
+},
+{
+"word": "everyone",
+"start": 188.114,
+"end": 188.486
+},
+{
+"word": "the",
+"start": 188.53,
+"end": 188.595
+},
+{
+"word": "same?",
+"start": 188.64,
+"end": 189.142
+},
+{
+"word": "Kant's",
+"start": 189.678,
+"end": 190.017
+},
+{
+"word": "word",
+"start": 190.06,
+"end": 190.279
+},
+{
+"word": "for",
+"start": 190.345,
+"end": 190.454
+},
+{
+"word": "him",
+"start": 190.52,
+"end": 190.717
+},
+{
+"word": "is",
+"start": 190.804,
+"end": 190.924
+},
+{
+"word": "prudent.",
+"start": 191.0,
+"end": 191.536
+},
+{
+"word": "Picture",
+"start": 191.941,
+"end": 192.28
+},
+{
+"word": "the",
+"start": 192.313,
+"end": 192.378
+},
+{
+"word": "street:",
+"start": 192.411,
+"end": 192.958
+},
+{
+"word": "other",
+"start": 193.209,
+"end": 193.416
+},
+{
+"word": "customers",
+"start": 193.494,
+"end": 194.051
+},
+{
+"word": "compare",
+"start": 194.204,
+"end": 194.674
+},
+{
+"word": "notes.",
+"start": 194.751,
+"end": 195.298
+},
+{
+"word": "Neighbors",
+"start": 195.637,
+"end": 196.041
+},
+{
+"word": "talk.",
+"start": 196.117,
+"end": 196.719
+},
+{
+"word": "A",
+"start": 197.058,
+"end": 197.156
+},
+{
+"word": "competitor",
+"start": 197.243,
+"end": 197.91
+},
+{
+"word": "would",
+"start": 197.976,
+"end": 198.14
+},
+{
+"word": "love",
+"start": 198.26,
+"end": 198.5
+},
+{
+"word": "the",
+"start": 198.544,
+"end": 198.621
+},
+{
+"word": "story.",
+"start": 198.664,
+"end": 199.254
+},
+{
+"word": "His",
+"start": 199.593,
+"end": 199.801
+},
+{
+"word": "honesty",
+"start": 199.899,
+"end": 200.425
+},
+{
+"word": "was",
+"start": 200.501,
+"end": 200.654
+},
+{
+"word": "never",
+"start": 200.774,
+"end": 201.047
+},
+{
+"word": "only",
+"start": 201.146,
+"end": 201.376
+},
+{
+"word": "a",
+"start": 201.441,
+"end": 201.463
+},
+{
+"word": "fact",
+"start": 201.54,
+"end": 201.834
+},
+{
+"word": "about",
+"start": 201.867,
+"end": 202.075
+},
+{
+"word": "his",
+"start": 202.152,
+"end": 202.272
+},
+{
+"word": "heart.",
+"start": 202.37,
+"end": 202.873
+},
+{
+"word": "It",
+"start": 203.169,
+"end": 203.288
+},
+{
+"word": "was",
+"start": 203.333,
+"end": 203.442
+},
+{
+"word": "a",
+"start": 203.508,
+"end": 203.529
+},
+{
+"word": "fact",
+"start": 203.627,
+"end": 203.945
+},
+{
+"word": "about",
+"start": 203.989,
+"end": 204.218
+},
+{
+"word": "his",
+"start": 204.284,
+"end": 204.404
+},
+{
+"word": "street.",
+"start": 204.469,
+"end": 205.092
+},
+{
+"word": "That",
+"start": 205.552,
+"end": 205.737
+},
+{
+"word": "is",
+"start": 205.782,
+"end": 205.858
+},
+{
+"word": "part",
+"start": 205.946,
+"end": 206.207
+},
+{
+"word": "of",
+"start": 206.252,
+"end": 206.295
+},
+{
+"word": "how",
+"start": 206.382,
+"end": 206.546
+},
+{
+"word": "you",
+"start": 206.645,
+"end": 206.743
+},
+{
+"word": "trust",
+"start": 206.864,
+"end": 207.213
+},
+{
+"word": "people",
+"start": 207.257,
+"end": 207.563
+},
+{
+"word": "you",
+"start": 207.629,
+"end": 207.717
+},
+{
+"word": "don't",
+"start": 207.836,
+"end": 208.033
+},
+{
+"word": "know",
+"start": 208.066,
+"end": 208.208
+},
+{
+"word": "well.",
+"start": 208.274,
+"end": 208.689
+},
+{
+"word": "Your",
+"start": 209.148,
+"end": 209.334
+},
+{
+"word": "doctor",
+"start": 209.399,
+"end": 209.761
+},
+{
+"word": "has",
+"start": 209.837,
+"end": 209.99
+},
+{
+"word": "a",
+"start": 210.056,
+"end": 210.077
+},
+{
+"word": "licensing",
+"start": 210.176,
+"end": 210.734
+},
+{
+"word": "board",
+"start": 210.8,
+"end": 211.04
+},
+{
+"word": "that",
+"start": 211.073,
+"end": 211.182
+},
+{
+"word": "can",
+"start": 211.225,
+"end": 211.346
+},
+{
+"word": "pull",
+"start": 211.433,
+"end": 211.685
+},
+{
+"word": "her",
+"start": 211.772,
+"end": 211.86
+},
+{
+"word": "license.",
+"start": 211.936,
+"end": 212.624
+},
+{
+"word": "Your",
+"start": 213.029,
+"end": 213.215
+},
+{
+"word": "bank",
+"start": 213.302,
+"end": 213.587
+},
+{
+"word": "gets",
+"start": 213.63,
+"end": 213.817
+},
+{
+"word": "examined",
+"start": 213.882,
+"end": 214.363
+},
+{
+"word": "by",
+"start": 214.384,
+"end": 214.462
+},
+{
+"word": "regulators.",
+"start": 214.549,
+"end": 215.401
+},
+{
+"word": "You",
+"start": 215.74,
+"end": 215.871
+},
+{
+"word": "have",
+"start": 215.948,
+"end": 216.091
+},
+{
+"word": "never",
+"start": 216.243,
+"end": 216.539
+},
+{
+"word": "read",
+"start": 216.615,
+"end": 216.79
+},
+{
+"word": "anyone's",
+"start": 216.833,
+"end": 217.216
+},
+{
+"word": "mind.",
+"start": 217.282,
+"end": 217.697
+},
+{
+"word": "You've",
+"start": 218.102,
+"end": 218.332
+},
+{
+"word": "leaned",
+"start": 218.397,
+"end": 218.703
+},
+{
+"word": "on",
+"start": 218.747,
+"end": 218.813
+},
+{
+"word": "the",
+"start": 218.845,
+"end": 218.911
+},
+{
+"word": "people",
+"start": 218.987,
+"end": 219.316
+},
+{
+"word": "checking",
+"start": 219.359,
+"end": 219.676
+},
+{
+"word": "them.",
+"start": 219.741,
+"end": 220.091
+},
+{
+"word": "So",
+"start": 220.824,
+"end": 220.999
+},
+{
+"word": "who",
+"start": 221.043,
+"end": 221.206
+},
+{
+"word": "shapes",
+"start": 221.272,
+"end": 221.589
+},
+{
+"word": "the",
+"start": 221.633,
+"end": 221.709
+},
+{
+"word": "assistant's",
+"start": 221.753,
+"end": 222.256
+},
+{
+"word": "behavior?",
+"start": 222.3,
+"end": 223.054
+},
+{
+"word": "Start",
+"start": 223.688,
+"end": 224.027
+},
+{
+"word": "with",
+"start": 224.071,
+"end": 224.202
+},
+{
+"word": "its",
+"start": 224.246,
+"end": 224.366
+},
+{
+"word": "training.",
+"start": 224.41,
+"end": 225.088
+},
+{
+"word": "People",
+"start": 225.382,
+"end": 225.71
+},
+{
+"word": "compare",
+"start": 225.754,
+"end": 226.213
+},
+{
+"word": "its",
+"start": 226.246,
+"end": 226.366
+},
+{
+"word": "answers",
+"start": 226.432,
+"end": 226.881
+},
+{
+"word": "and",
+"start": 227.0,
+"end": 227.175
+},
+{
+"word": "pick",
+"start": 227.252,
+"end": 227.416
+},
+{
+"word": "the",
+"start": 227.481,
+"end": 227.547
+},
+{
+"word": "better",
+"start": 227.591,
+"end": 227.787
+},
+{
+"word": "ones,",
+"start": 227.853,
+"end": 228.247
+},
+{
+"word": "and",
+"start": 228.399,
+"end": 228.564
+},
+{
+"word": "those",
+"start": 228.629,
+"end": 228.826
+},
+{
+"word": "judgments",
+"start": 228.87,
+"end": 229.395
+},
+{
+"word": "shape",
+"start": 229.613,
+"end": 229.93
+},
+{
+"word": "further",
+"start": 229.974,
+"end": 230.258
+},
+{
+"word": "training.",
+"start": 230.302,
+"end": 230.805
+},
+{
+"word": "The",
+"start": 231.209,
+"end": 231.318
+},
+{
+"word": "catch:",
+"start": 231.384,
+"end": 231.986
+},
+{
+"word": "researchers",
+"start": 232.237,
+"end": 232.838
+},
+{
+"word": "found",
+"start": 232.914,
+"end": 233.144
+},
+{
+"word": "that",
+"start": 233.188,
+"end": 233.308
+},
+{
+"word": "answers",
+"start": 233.385,
+"end": 233.833
+},
+{
+"word": "matching",
+"start": 233.953,
+"end": 234.347
+},
+{
+"word": "what",
+"start": 234.38,
+"end": 234.5
+},
+{
+"word": "the",
+"start": 234.533,
+"end": 234.598
+},
+{
+"word": "user",
+"start": 234.686,
+"end": 234.97
+},
+{
+"word": "already",
+"start": 235.046,
+"end": 235.43
+},
+{
+"word": "believed",
+"start": 235.495,
+"end": 236.03
+},
+{
+"word": "were",
+"start": 236.107,
+"end": 236.271
+},
+{
+"word": "more",
+"start": 236.315,
+"end": 236.468
+},
+{
+"word": "likely",
+"start": 236.511,
+"end": 236.807
+},
+{
+"word": "to",
+"start": 236.85,
+"end": 236.894
+},
+{
+"word": "be",
+"start": 236.938,
+"end": 237.036
+},
+{
+"word": "picked.",
+"start": 237.069,
+"end": 237.561
+},
+{
+"word": "In",
+"start": 238.02,
+"end": 238.184
+},
+{
+"word": "April",
+"start": 238.271,
+"end": 238.589
+},
+{
+"word": "2025,",
+"start": 238.665,
+"end": 239.846
+},
+{
+"word": "OpenAI",
+"start": 240.031,
+"end": 240.611
+},
+{
+"word": "released",
+"start": 240.699,
+"end": 241.015
+},
+{
+"word": "an",
+"start": 241.048,
+"end": 241.103
+},
+{
+"word": "update",
+"start": 241.147,
+"end": 241.475
+},
+{
+"word": "to",
+"start": 241.496,
+"end": 241.551
+},
+{
+"word": "ChatGPT",
+"start": 241.595,
+"end": 242.317
+},
+{
+"word": "and",
+"start": 242.382,
+"end": 242.502
+},
+{
+"word": "pulled",
+"start": 242.546,
+"end": 242.743
+},
+{
+"word": "it",
+"start": 242.765,
+"end": 242.819
+},
+{
+"word": "four",
+"start": 242.863,
+"end": 243.027
+},
+{
+"word": "days",
+"start": 243.092,
+"end": 243.279
+},
+{
+"word": "later.",
+"start": 243.355,
+"end": 243.836
+},
+{
+"word": "Users",
+"start": 244.569,
+"end": 244.995
+},
+{
+"word": "had",
+"start": 245.039,
+"end": 245.126
+},
+{
+"word": "been",
+"start": 245.159,
+"end": 245.279
+},
+{
+"word": "posting",
+"start": 245.323,
+"end": 245.694
+},
+{
+"word": "screenshots",
+"start": 245.782,
+"end": 246.536
+},
+{
+"word": "of",
+"start": 246.58,
+"end": 246.656
+},
+{
+"word": "it",
+"start": 246.722,
+"end": 246.832
+},
+{
+"word": "cheering",
+"start": 247.05,
+"end": 247.477
+},
+{
+"word": "on",
+"start": 247.553,
+"end": 247.64
+},
+{
+"word": "dangerous",
+"start": 247.717,
+"end": 248.132
+},
+{
+"word": "decisions.",
+"start": 248.198,
+"end": 248.985
+},
+{
+"word": "OpenAI",
+"start": 249.619,
+"end": 250.286
+},
+{
+"word": "said",
+"start": 250.406,
+"end": 250.581
+},
+{
+"word": "the",
+"start": 250.614,
+"end": 250.68
+},
+{
+"word": "update",
+"start": 250.778,
+"end": 251.215
+},
+{
+"word": "leaned",
+"start": 251.259,
+"end": 251.489
+},
+{
+"word": "too",
+"start": 251.522,
+"end": 251.697
+},
+{
+"word": "heavily",
+"start": 251.773,
+"end": 252.091
+},
+{
+"word": "on",
+"start": 252.156,
+"end": 252.233
+},
+{
+"word": "short-term",
+"start": 252.298,
+"end": 252.757
+},
+{
+"word": "feedback.",
+"start": 252.822,
+"end": 253.478
+},
+{
+"word": "Nobody",
+"start": 254.014,
+"end": 254.332
+},
+{
+"word": "has",
+"start": 254.375,
+"end": 254.495
+},
+{
+"word": "to",
+"start": 254.56,
+"end": 254.605
+},
+{
+"word": "claim",
+"start": 254.671,
+"end": 254.889
+},
+{
+"word": "the",
+"start": 254.932,
+"end": 254.998
+},
+{
+"word": "machine",
+"start": 255.031,
+"end": 255.392
+},
+{
+"word": "craves",
+"start": 255.425,
+"end": 255.698
+},
+{
+"word": "applause.",
+"start": 255.731,
+"end": 256.409
+},
+{
+"word": "Part",
+"start": 256.813,
+"end": 257.031
+},
+{
+"word": "of",
+"start": 257.064,
+"end": 257.108
+},
+{
+"word": "its",
+"start": 257.152,
+"end": 257.261
+},
+{
+"word": "training",
+"start": 257.305,
+"end": 257.731
+},
+{
+"word": "was",
+"start": 257.808,
+"end": 257.95
+},
+{
+"word": "the",
+"start": 257.994,
+"end": 258.059
+},
+{
+"word": "raters.",
+"start": 258.136,
+"end": 258.715
+},
+{
+"word": "In",
+"start": 259.054,
+"end": 259.185
+},
+{
+"word": "that",
+"start": 259.229,
+"end": 259.349
+},
+{
+"word": "research,",
+"start": 259.437,
+"end": 260.137
+},
+{
+"word": "agreement",
+"start": 260.322,
+"end": 260.803
+},
+{
+"word": "helped",
+"start": 260.868,
+"end": 261.131
+},
+{
+"word": "an",
+"start": 261.164,
+"end": 261.23
+},
+{
+"word": "answer",
+"start": 261.328,
+"end": 261.7
+},
+{
+"word": "win",
+"start": 261.787,
+"end": 261.93
+},
+{
+"word": "approval.",
+"start": 261.973,
+"end": 262.629
+},
+{
+"word": "But",
+"start": 263.033,
+"end": 263.187
+},
+{
+"word": "what",
+"start": 263.22,
+"end": 263.362
+},
+{
+"word": "happens",
+"start": 263.405,
+"end": 263.733
+},
+{
+"word": "when",
+"start": 263.766,
+"end": 263.897
+},
+{
+"word": "a",
+"start": 263.941,
+"end": 263.962
+},
+{
+"word": "system",
+"start": 264.039,
+"end": 264.399
+},
+{
+"word": "behaves",
+"start": 264.465,
+"end": 264.881
+},
+{
+"word": "one",
+"start": 264.968,
+"end": 265.155
+},
+{
+"word": "way",
+"start": 265.187,
+"end": 265.34
+},
+{
+"word": "for",
+"start": 265.406,
+"end": 265.504
+},
+{
+"word": "its",
+"start": 265.548,
+"end": 265.646
+},
+{
+"word": "assessors",
+"start": 265.689,
+"end": 266.324
+},
+{
+"word": "and",
+"start": 266.455,
+"end": 266.652
+},
+{
+"word": "another",
+"start": 266.718,
+"end": 266.969
+},
+{
+"word": "way",
+"start": 267.012,
+"end": 267.122
+},
+{
+"word": "elsewhere?",
+"start": 267.188,
+"end": 267.8
+},
+{
+"word": "Plato",
+"start": 269.31,
+"end": 269.693
+},
+{
+"word": "explores",
+"start": 269.781,
+"end": 270.414
+},
+{
+"word": "a",
+"start": 270.48,
+"end": 270.513
+},
+{
+"word": "related",
+"start": 270.6,
+"end": 271.081
+},
+{
+"word": "question",
+"start": 271.125,
+"end": 271.584
+},
+{
+"word": "through",
+"start": 271.704,
+"end": 271.967
+},
+{
+"word": "a",
+"start": 271.999,
+"end": 272.032
+},
+{
+"word": "man",
+"start": 272.098,
+"end": 272.306
+},
+{
+"word": "named",
+"start": 272.371,
+"end": 272.59
+},
+{
+"word": "Glaucon.",
+"start": 272.612,
+"end": 273.355
+},
+{
+"word": "A",
+"start": 273.99,
+"end": 274.076
+},
+{
+"word": "shepherd",
+"start": 274.175,
+"end": 274.558
+},
+{
+"word": "finds",
+"start": 274.602,
+"end": 274.842
+},
+{
+"word": "a",
+"start": 274.875,
+"end": 274.908
+},
+{
+"word": "ring.",
+"start": 274.973,
+"end": 275.432
+},
+{
+"word": "Turn",
+"start": 275.892,
+"end": 276.198
+},
+{
+"word": "it,",
+"start": 276.241,
+"end": 276.46
+},
+{
+"word": "and",
+"start": 276.613,
+"end": 276.755
+},
+{
+"word": "you",
+"start": 276.799,
+"end": 276.876
+},
+{
+"word": "vanish.",
+"start": 276.952,
+"end": 277.51
+},
+{
+"word": "Glaucon",
+"start": 278.143,
+"end": 278.646
+},
+{
+"word": "asks",
+"start": 278.712,
+"end": 278.952
+},
+{
+"word": "us",
+"start": 278.985,
+"end": 279.062
+},
+{
+"word": "to",
+"start": 279.106,
+"end": 279.16
+},
+{
+"word": "imagine",
+"start": 279.248,
+"end": 279.62
+},
+{
+"word": "giving",
+"start": 279.663,
+"end": 279.87
+},
+{
+"word": "one",
+"start": 279.958,
+"end": 280.143
+},
+{
+"word": "ring",
+"start": 280.187,
+"end": 280.351
+},
+{
+"word": "to",
+"start": 280.417,
+"end": 280.472
+},
+{
+"word": "a",
+"start": 280.559,
+"end": 280.581
+},
+{
+"word": "just",
+"start": 280.657,
+"end": 280.93
+},
+{
+"word": "man",
+"start": 280.975,
+"end": 281.259
+},
+{
+"word": "and",
+"start": 281.554,
+"end": 281.74
+},
+{
+"word": "another",
+"start": 281.805,
+"end": 282.177
+},
+{
+"word": "to",
+"start": 282.243,
+"end": 282.319
+},
+{
+"word": "an",
+"start": 282.385,
+"end": 282.44
+},
+{
+"word": "unjust",
+"start": 282.505,
+"end": 282.92
+},
+{
+"word": "man.",
+"start": 282.986,
+"end": 283.456
+},
+{
+"word": "He",
+"start": 284.188,
+"end": 284.342
+},
+{
+"word": "argues",
+"start": 284.418,
+"end": 284.812
+},
+{
+"word": "they",
+"start": 284.855,
+"end": 284.954
+},
+{
+"word": "would",
+"start": 284.987,
+"end": 285.129
+},
+{
+"word": "behave",
+"start": 285.161,
+"end": 285.523
+},
+{
+"word": "alike.",
+"start": 285.566,
+"end": 286.113
+},
+{
+"word": "\"No",
+"start": 286.451,
+"end": 286.856
+},
+{
+"word": "man",
+"start": 286.954,
+"end": 287.195
+},
+{
+"word": "would",
+"start": 287.261,
+"end": 287.402
+},
+{
+"word": "keep",
+"start": 287.435,
+"end": 287.632
+},
+{
+"word": "his",
+"start": 287.698,
+"end": 287.807
+},
+{
+"word": "hands",
+"start": 287.873,
+"end": 288.179
+},
+{
+"word": "off",
+"start": 288.255,
+"end": 288.441
+},
+{
+"word": "what",
+"start": 288.507,
+"end": 288.66
+},
+{
+"word": "was",
+"start": 288.703,
+"end": 288.857
+},
+{
+"word": "not",
+"start": 288.945,
+"end": 289.119
+},
+{
+"word": "his",
+"start": 289.185,
+"end": 289.316
+},
+{
+"word": "own",
+"start": 289.393,
+"end": 289.699
+},
+{
+"word": "when",
+"start": 290.038,
+"end": 290.234
+},
+{
+"word": "he",
+"start": 290.278,
+"end": 290.344
+},
+{
+"word": "could",
+"start": 290.387,
+"end": 290.541
+},
+{
+"word": "safely",
+"start": 290.617,
+"end": 291.065
+},
+{
+"word": "take",
+"start": 291.13,
+"end": 291.338
+},
+{
+"word": "what",
+"start": 291.36,
+"end": 291.469
+},
+{
+"word": "he",
+"start": 291.513,
+"end": 291.557
+},
+{
+"word": "liked",
+"start": 291.644,
+"end": 291.874
+},
+{
+"word": "out",
+"start": 291.907,
+"end": 291.994
+},
+{
+"word": "of",
+"start": 292.016,
+"end": 292.059
+},
+{
+"word": "the",
+"start": 292.104,
+"end": 292.169
+},
+{
+"word": "market.\"",
+"start": 292.202,
+"end": 292.77
+},
+{
+"word": "Socrates",
+"start": 293.23,
+"end": 293.842
+},
+{
+"word": "argues",
+"start": 293.907,
+"end": 294.29
+},
+{
+"word": "back.",
+"start": 294.366,
+"end": 294.869
+},
+{
+"word": "We",
+"start": 295.208,
+"end": 295.35
+},
+{
+"word": "can",
+"start": 295.394,
+"end": 295.514
+},
+{
+"word": "borrow",
+"start": 295.591,
+"end": 295.865
+},
+{
+"word": "the",
+"start": 295.929,
+"end": 295.995
+},
+{
+"word": "question",
+"start": 296.072,
+"end": 296.586
+},
+{
+"word": "without",
+"start": 296.772,
+"end": 297.176
+},
+{
+"word": "accepting",
+"start": 297.22,
+"end": 297.734
+},
+{
+"word": "Glaucon's",
+"start": 297.8,
+"end": 298.335
+},
+{
+"word": "answer.",
+"start": 298.379,
+"end": 298.914
+},
+{
+"word": "The",
+"start": 299.253,
+"end": 299.384
+},
+{
+"word": "question",
+"start": 299.461,
+"end": 299.844
+},
+{
+"word": "is",
+"start": 299.91,
+"end": 299.975
+},
+{
+"word": "simple.",
+"start": 300.019,
+"end": 300.609
+},
+{
+"word": "Take",
+"start": 301.013,
+"end": 301.364
+},
+{
+"word": "away",
+"start": 301.397,
+"end": 301.637
+},
+{
+"word": "the",
+"start": 301.68,
+"end": 301.746
+},
+{
+"word": "watching.",
+"start": 301.812,
+"end": 302.325
+},
+{
+"word": "What",
+"start": 302.861,
+"end": 303.091
+},
+{
+"word": "happens",
+"start": 303.167,
+"end": 303.506
+},
+{
+"word": "to",
+"start": 303.55,
+"end": 303.605
+},
+{
+"word": "the",
+"start": 303.67,
+"end": 303.736
+},
+{
+"word": "behavior?",
+"start": 303.768,
+"end": 304.402
+},
+{
+"word": "That's",
+"start": 305.255,
+"end": 305.55
+},
+{
+"word": "the",
+"start": 305.594,
+"end": 305.682
+},
+{
+"word": "Unwatched",
+"start": 305.769,
+"end": 306.239
+},
+{
+"word": "Test:",
+"start": 306.261,
+"end": 306.851
+},
+{
+"word": "does",
+"start": 307.07,
+"end": 307.288
+},
+{
+"word": "the",
+"start": 307.332,
+"end": 307.397
+},
+{
+"word": "behavior",
+"start": 307.475,
+"end": 307.999
+},
+{
+"word": "we",
+"start": 308.065,
+"end": 308.174
+},
+{
+"word": "rely",
+"start": 308.262,
+"end": 308.59
+},
+{
+"word": "on",
+"start": 308.677,
+"end": 308.775
+},
+{
+"word": "survive",
+"start": 308.841,
+"end": 309.584
+},
+{
+"word": "when",
+"start": 309.628,
+"end": 309.803
+},
+{
+"word": "the",
+"start": 309.835,
+"end": 309.901
+},
+{
+"word": "helper",
+"start": 309.978,
+"end": 310.316
+},
+{
+"word": "believes",
+"start": 310.382,
+"end": 310.929
+},
+{
+"word": "it",
+"start": 311.049,
+"end": 311.213
+},
+{
+"word": "isn't",
+"start": 311.333,
+"end": 311.705
+},
+{
+"word": "being",
+"start": 311.77,
+"end": 311.978
+},
+{
+"word": "assessed?",
+"start": 312.044,
+"end": 312.689
+},
+{
+"word": "A",
+"start": 313.148,
+"end": 313.247
+},
+{
+"word": "scheduled",
+"start": 313.366,
+"end": 313.902
+},
+{
+"word": "exam",
+"start": 313.946,
+"end": 314.449
+},
+{
+"word": "shows",
+"start": 314.57,
+"end": 314.81
+},
+{
+"word": "what",
+"start": 314.843,
+"end": 314.985
+},
+{
+"word": "a",
+"start": 315.018,
+"end": 315.04
+},
+{
+"word": "student",
+"start": 315.105,
+"end": 315.51
+},
+{
+"word": "studied",
+"start": 315.553,
+"end": 315.892
+},
+{
+"word": "for.",
+"start": 315.936,
+"end": 316.395
+},
+{
+"word": "A",
+"start": 316.8,
+"end": 316.897
+},
+{
+"word": "pop",
+"start": 316.996,
+"end": 317.215
+},
+{
+"word": "quiz",
+"start": 317.314,
+"end": 317.653
+},
+{
+"word": "shows",
+"start": 317.718,
+"end": 317.947
+},
+{
+"word": "what",
+"start": 317.98,
+"end": 318.101
+},
+{
+"word": "they",
+"start": 318.133,
+"end": 318.243
+},
+{
+"word": "know.",
+"start": 318.286,
+"end": 318.832
+},
+{
+"word": "The",
+"start": 319.292,
+"end": 319.423
+},
+{
+"word": "test",
+"start": 319.489,
+"end": 319.752
+},
+{
+"word": "I",
+"start": 319.828,
+"end": 319.861
+},
+{
+"word": "mean",
+"start": 319.959,
+"end": 320.101
+},
+{
+"word": "is",
+"start": 320.167,
+"end": 320.233
+},
+{
+"word": "a",
+"start": 320.298,
+"end": 320.319
+},
+{
+"word": "third",
+"start": 320.407,
+"end": 320.681
+},
+{
+"word": "kind:",
+"start": 320.746,
+"end": 321.271
+},
+{
+"word": "one",
+"start": 321.61,
+"end": 321.784
+},
+{
+"word": "the",
+"start": 321.806,
+"end": 321.872
+},
+{
+"word": "student",
+"start": 321.916,
+"end": 322.254
+},
+{
+"word": "can't",
+"start": 322.299,
+"end": 322.55
+},
+{
+"word": "tell",
+"start": 322.583,
+"end": 322.889
+},
+{
+"word": "from",
+"start": 323.02,
+"end": 323.206
+},
+{
+"word": "an",
+"start": 323.25,
+"end": 323.293
+},
+{
+"word": "ordinary",
+"start": 323.337,
+"end": 323.764
+},
+{
+"word": "Tuesday.",
+"start": 323.807,
+"end": 324.474
+},
+{
+"word": "Passing",
+"start": 325.206,
+"end": 325.699
+},
+{
+"word": "it",
+"start": 325.764,
+"end": 325.841
+},
+{
+"word": "tells",
+"start": 325.884,
+"end": 326.136
+},
+{
+"word": "us",
+"start": 326.202,
+"end": 326.278
+},
+{
+"word": "something",
+"start": 326.311,
+"end": 326.606
+},
+{
+"word": "about",
+"start": 326.65,
+"end": 326.835
+},
+{
+"word": "reliability.",
+"start": 326.901,
+"end": 327.983
+},
+{
+"word": "It",
+"start": 328.202,
+"end": 328.355
+},
+{
+"word": "says",
+"start": 328.398,
+"end": 328.639
+},
+{
+"word": "nothing",
+"start": 328.77,
+"end": 329.153
+},
+{
+"word": "about",
+"start": 329.219,
+"end": 329.415
+},
+{
+"word": "whether",
+"start": 329.448,
+"end": 329.667
+},
+{
+"word": "the",
+"start": 329.733,
+"end": 329.798
+},
+{
+"word": "helper",
+"start": 329.864,
+"end": 330.181
+},
+{
+"word": "is",
+"start": 330.257,
+"end": 330.333
+},
+{
+"word": "good.",
+"start": 330.411,
+"end": 330.836
+},
+{
+"word": "That",
+"start": 332.346,
+"end": 332.52
+},
+{
+"word": "ring",
+"start": 332.608,
+"end": 332.871
+},
+{
+"word": "is",
+"start": 332.947,
+"end": 333.067
+},
+{
+"word": "a",
+"start": 333.111,
+"end": 333.144
+},
+{
+"word": "thought",
+"start": 333.231,
+"end": 333.483
+},
+{
+"word": "experiment.",
+"start": 333.516,
+"end": 334.161
+},
+{
+"word": "Here's",
+"start": 334.5,
+"end": 334.74
+},
+{
+"word": "a",
+"start": 334.773,
+"end": 334.794
+},
+{
+"word": "real",
+"start": 334.893,
+"end": 335.123
+},
+{
+"word": "case.",
+"start": 335.199,
+"end": 335.68
+},
+{
+"word": "In",
+"start": 336.019,
+"end": 336.15
+},
+{
+"word": "September",
+"start": 336.194,
+"end": 336.599
+},
+{
+"word": "2015,",
+"start": 336.686,
+"end": 337.419
+},
+{
+"word": "the",
+"start": 337.452,
+"end": 337.517
+},
+{
+"word": "US",
+"start": 337.593,
+"end": 337.91
+},
+{
+"word": "Environmental",
+"start": 337.954,
+"end": 338.435
+},
+{
+"word": "Protection",
+"start": 338.468,
+"end": 338.894
+},
+{
+"word": "Agency",
+"start": 338.96,
+"end": 339.43
+},
+{
+"word": "accused",
+"start": 339.496,
+"end": 339.9
+},
+{
+"word": "Volkswagen",
+"start": 339.933,
+"end": 340.469
+},
+{
+"word": "of",
+"start": 340.512,
+"end": 340.567
+},
+{
+"word": "cheating",
+"start": 340.644,
+"end": 340.895
+},
+{
+"word": "emissions",
+"start": 340.928,
+"end": 341.289
+},
+{
+"word": "tests.",
+"start": 341.332,
+"end": 341.879
+},
+{
+"word": "Its",
+"start": 342.283,
+"end": 342.48
+},
+{
+"word": "diesel",
+"start": 342.546,
+"end": 342.809
+},
+{
+"word": "cars",
+"start": 342.852,
+"end": 343.125
+},
+{
+"word": "carried",
+"start": 343.191,
+"end": 343.432
+},
+{
+"word": "software",
+"start": 343.464,
+"end": 344.011
+},
+{
+"word": "designed",
+"start": 344.054,
+"end": 344.426
+},
+{
+"word": "to",
+"start": 344.448,
+"end": 344.492
+},
+{
+"word": "recognize",
+"start": 344.58,
+"end": 345.017
+},
+{
+"word": "an",
+"start": 345.038,
+"end": 345.093
+},
+{
+"word": "official",
+"start": 345.137,
+"end": 345.443
+},
+{
+"word": "test.",
+"start": 345.519,
+"end": 346.001
+},
+{
+"word": "It",
+"start": 346.459,
+"end": 346.624
+},
+{
+"word": "switched",
+"start": 346.689,
+"end": 347.018
+},
+{
+"word": "on",
+"start": 347.061,
+"end": 347.137
+},
+{
+"word": "the",
+"start": 347.181,
+"end": 347.246
+},
+{
+"word": "full",
+"start": 347.312,
+"end": 347.52
+},
+{
+"word": "pollution",
+"start": 347.585,
+"end": 347.969
+},
+{
+"word": "controls",
+"start": 348.034,
+"end": 348.504
+},
+{
+"word": "only",
+"start": 348.624,
+"end": 348.963
+},
+{
+"word": "during",
+"start": 349.029,
+"end": 349.236
+},
+{
+"word": "that",
+"start": 349.28,
+"end": 349.411
+},
+{
+"word": "test.",
+"start": 349.455,
+"end": 349.925
+},
+{
+"word": "On",
+"start": 350.658,
+"end": 350.789
+},
+{
+"word": "the",
+"start": 350.832,
+"end": 350.898
+},
+{
+"word": "road,",
+"start": 350.964,
+"end": 351.204
+},
+{
+"word": "the",
+"start": 351.226,
+"end": 351.292
+},
+{
+"word": "EPA",
+"start": 351.368,
+"end": 351.806
+},
+{
+"word": "said,",
+"start": 351.839,
+"end": 352.33
+},
+{
+"word": "nitrogen",
+"start": 352.516,
+"end": 353.051
+},
+{
+"word": "oxide",
+"start": 353.15,
+"end": 353.599
+},
+{
+"word": "emissions",
+"start": 353.62,
+"end": 354.047
+},
+{
+"word": "ran",
+"start": 354.123,
+"end": 354.32
+},
+{
+"word": "up",
+"start": 354.363,
+"end": 354.451
+},
+{
+"word": "to",
+"start": 354.517,
+"end": 354.571
+},
+{
+"word": "forty",
+"start": 354.692,
+"end": 354.987
+},
+{
+"word": "times",
+"start": 355.064,
+"end": 355.413
+},
+{
+"word": "the",
+"start": 355.501,
+"end": 355.577
+},
+{
+"word": "standard.",
+"start": 355.61,
+"end": 356.212
+},
+{
+"word": "The",
+"start": 356.67,
+"end": 356.779
+},
+{
+"word": "testers",
+"start": 356.845,
+"end": 357.272
+},
+{
+"word": "were",
+"start": 357.304,
+"end": 357.457
+},
+{
+"word": "real.",
+"start": 357.523,
+"end": 358.059
+},
+{
+"word": "The",
+"start": 358.354,
+"end": 358.485
+},
+{
+"word": "tests",
+"start": 358.562,
+"end": 358.89
+},
+{
+"word": "were",
+"start": 358.933,
+"end": 359.108
+},
+{
+"word": "real.",
+"start": 359.184,
+"end": 359.874
+},
+{
+"word": "Engineers",
+"start": 360.168,
+"end": 360.77
+},
+{
+"word": "built",
+"start": 360.868,
+"end": 361.076
+},
+{
+"word": "the",
+"start": 361.109,
+"end": 361.174
+},
+{
+"word": "software",
+"start": 361.261,
+"end": 361.906
+},
+{
+"word": "to",
+"start": 361.951,
+"end": 362.016
+},
+{
+"word": "beat",
+"start": 362.103,
+"end": 362.257
+},
+{
+"word": "them",
+"start": 362.29,
+"end": 362.399
+},
+{
+"word": "on",
+"start": 362.464,
+"end": 362.541
+},
+{
+"word": "purpose.",
+"start": 362.617,
+"end": 363.229
+},
+{
+"word": "Earlier,",
+"start": 363.689,
+"end": 364.18
+},
+{
+"word": "a",
+"start": 364.202,
+"end": 364.235
+},
+{
+"word": "team",
+"start": 364.301,
+"end": 364.508
+},
+{
+"word": "at",
+"start": 364.552,
+"end": 364.618
+},
+{
+"word": "West",
+"start": 364.683,
+"end": 364.913
+},
+{
+"word": "Virginia",
+"start": 364.956,
+"end": 365.394
+},
+{
+"word": "University,",
+"start": 365.482,
+"end": 366.17
+},
+{
+"word": "led",
+"start": 366.214,
+"end": 366.378
+},
+{
+"word": "by",
+"start": 366.411,
+"end": 366.531
+},
+{
+"word": "Dan",
+"start": 366.575,
+"end": 366.772
+},
+{
+"word": "Carder,",
+"start": 366.859,
+"end": 367.493
+},
+{
+"word": "had",
+"start": 367.745,
+"end": 367.887
+},
+{
+"word": "put",
+"start": 367.953,
+"end": 368.127
+},
+{
+"word": "portable",
+"start": 368.204,
+"end": 368.652
+},
+{
+"word": "measuring",
+"start": 368.696,
+"end": 369.056
+},
+{
+"word": "equipment",
+"start": 369.132,
+"end": 369.581
+},
+{
+"word": "in",
+"start": 369.625,
+"end": 369.701
+},
+{
+"word": "three",
+"start": 369.777,
+"end": 369.997
+},
+{
+"word": "diesel",
+"start": 370.03,
+"end": 370.292
+},
+{
+"word": "cars",
+"start": 370.336,
+"end": 370.729
+},
+{
+"word": "and",
+"start": 370.915,
+"end": 371.079
+},
+{
+"word": "driven",
+"start": 371.122,
+"end": 371.418
+},
+{
+"word": "them",
+"start": 371.461,
+"end": 371.626
+},
+{
+"word": "on",
+"start": 371.712,
+"end": 371.8
+},
+{
+"word": "roads",
+"start": 371.877,
+"end": 372.096
+},
+{
+"word": "across",
+"start": 372.129,
+"end": 372.402
+},
+{
+"word": "California.",
+"start": 372.468,
+"end": 373.353
+},
+{
+"word": "The",
+"start": 373.757,
+"end": 373.867
+},
+{
+"word": "two",
+"start": 373.91,
+"end": 374.085
+},
+{
+"word": "Volkswagens",
+"start": 374.183,
+"end": 374.906
+},
+{
+"word": "emitted",
+"start": 374.949,
+"end": 375.309
+},
+{
+"word": "far",
+"start": 375.386,
+"end": 375.627
+},
+{
+"word": "more",
+"start": 375.703,
+"end": 375.857
+},
+{
+"word": "pollution",
+"start": 375.889,
+"end": 376.359
+},
+{
+"word": "than",
+"start": 376.424,
+"end": 376.545
+},
+{
+"word": "the",
+"start": 376.578,
+"end": 376.644
+},
+{
+"word": "lab",
+"start": 376.709,
+"end": 376.895
+},
+{
+"word": "tests",
+"start": 376.971,
+"end": 377.266
+},
+{
+"word": "suggested.",
+"start": 377.289,
+"end": 378.13
+},
+{
+"word": "Work",
+"start": 378.764,
+"end": 379.026
+},
+{
+"word": "on",
+"start": 379.103,
+"end": 379.18
+},
+{
+"word": "European",
+"start": 379.245,
+"end": 379.727
+},
+{
+"word": "road",
+"start": 379.803,
+"end": 379.967
+},
+{
+"word": "testing",
+"start": 380.0,
+"end": 380.426
+},
+{
+"word": "had",
+"start": 380.503,
+"end": 380.689
+},
+{
+"word": "already",
+"start": 380.765,
+"end": 381.028
+},
+{
+"word": "begun.",
+"start": 381.06,
+"end": 381.629
+},
+{
+"word": "From",
+"start": 382.088,
+"end": 382.274
+},
+{
+"word": "September",
+"start": 382.34,
+"end": 382.886
+},
+{
+"word": "2017,",
+"start": 382.973,
+"end": 383.957
+},
+{
+"word": "it",
+"start": 384.111,
+"end": 384.23
+},
+{
+"word": "was",
+"start": 384.263,
+"end": 384.362
+},
+{
+"word": "required",
+"start": 384.427,
+"end": 384.941
+},
+{
+"word": "for",
+"start": 384.974,
+"end": 385.072
+},
+{
+"word": "newly",
+"start": 385.116,
+"end": 385.357
+},
+{
+"word": "approved",
+"start": 385.39,
+"end": 385.717
+},
+{
+"word": "car",
+"start": 385.75,
+"end": 385.936
+},
+{
+"word": "models.",
+"start": 386.002,
+"end": 386.461
+},
+{
+"word": "The",
+"start": 386.92,
+"end": 387.04
+},
+{
+"word": "lab",
+"start": 387.128,
+"end": 387.358
+},
+{
+"word": "result",
+"start": 387.434,
+"end": 387.783
+},
+{
+"word": "had",
+"start": 387.827,
+"end": 387.925
+},
+{
+"word": "concealed",
+"start": 387.97,
+"end": 388.439
+},
+{
+"word": "a",
+"start": 388.472,
+"end": 388.494
+},
+{
+"word": "difference",
+"start": 388.57,
+"end": 388.909
+},
+{
+"word": "that",
+"start": 388.932,
+"end": 389.051
+},
+{
+"word": "road",
+"start": 389.129,
+"end": 389.303
+},
+{
+"word": "testing",
+"start": 389.325,
+"end": 389.653
+},
+{
+"word": "exposed.",
+"start": 389.718,
+"end": 390.331
+},
+{
+"word": "Now",
+"start": 391.905,
+"end": 392.125
+},
+{
+"word": "return",
+"start": 392.212,
+"end": 392.54
+},
+{
+"word": "to",
+"start": 392.583,
+"end": 392.638
+},
+{
+"word": "the",
+"start": 392.715,
+"end": 392.78
+},
+{
+"word": "machine.",
+"start": 392.813,
+"end": 393.392
+},
+{
+"word": "In",
+"start": 393.731,
+"end": 393.895
+},
+{
+"word": "the",
+"start": 393.928,
+"end": 393.994
+},
+{
+"word": "study",
+"start": 394.037,
+"end": 394.321
+},
+{
+"word": "from",
+"start": 394.366,
+"end": 394.485
+},
+{
+"word": "the",
+"start": 394.518,
+"end": 394.584
+},
+{
+"word": "opening,",
+"start": 394.65,
+"end": 395.087
+},
+{
+"word": "models",
+"start": 395.13,
+"end": 395.448
+},
+{
+"word": "classified",
+"start": 395.492,
+"end": 396.104
+},
+{
+"word": "conversations",
+"start": 396.147,
+"end": 396.902
+},
+{
+"word": "as",
+"start": 396.946,
+"end": 397.055
+},
+{
+"word": "tests",
+"start": 397.131,
+"end": 397.634
+},
+{
+"word": "or",
+"start": 398.039,
+"end": 398.203
+},
+{
+"word": "real",
+"start": 398.29,
+"end": 398.531
+},
+{
+"word": "use",
+"start": 398.629,
+"end": 399.045
+},
+{
+"word": "better",
+"start": 399.132,
+"end": 399.384
+},
+{
+"word": "than",
+"start": 399.416,
+"end": 399.526
+},
+{
+"word": "chance.",
+"start": 399.569,
+"end": 400.105
+},
+{
+"word": "That",
+"start": 400.509,
+"end": 400.728
+},
+{
+"word": "establishes",
+"start": 400.772,
+"end": 401.427
+},
+{
+"word": "an",
+"start": 401.493,
+"end": 401.559
+},
+{
+"word": "ability",
+"start": 401.592,
+"end": 402.083
+},
+{
+"word": "to",
+"start": 402.127,
+"end": 402.192
+},
+{
+"word": "recognize",
+"start": 402.291,
+"end": 402.805
+},
+{
+"word": "clues.",
+"start": 402.849,
+"end": 403.461
+},
+{
+"word": "It",
+"start": 404.193,
+"end": 404.369
+},
+{
+"word": "doesn't,",
+"start": 404.445,
+"end": 405.002
+},
+{
+"word": "by",
+"start": 405.254,
+"end": 405.472
+},
+{
+"word": "itself,",
+"start": 405.538,
+"end": 406.095
+},
+{
+"word": "show",
+"start": 406.117,
+"end": 406.281
+},
+{
+"word": "them",
+"start": 406.325,
+"end": 406.434
+},
+{
+"word": "cheating.",
+"start": 406.478,
+"end": 406.948
+},
+{
+"word": "A",
+"start": 407.483,
+"end": 407.571
+},
+{
+"word": "separate",
+"start": 407.703,
+"end": 408.085
+},
+{
+"word": "experiment",
+"start": 408.118,
+"end": 408.545
+},
+{
+"word": "tested",
+"start": 408.588,
+"end": 408.949
+},
+{
+"word": "what",
+"start": 408.982,
+"end": 409.102
+},
+{
+"word": "happened",
+"start": 409.167,
+"end": 409.473
+},
+{
+"word": "when",
+"start": 409.496,
+"end": 409.615
+},
+{
+"word": "a",
+"start": 409.648,
+"end": 409.67
+},
+{
+"word": "model",
+"start": 409.736,
+"end": 409.998
+},
+{
+"word": "was",
+"start": 410.031,
+"end": 410.141
+},
+{
+"word": "told",
+"start": 410.217,
+"end": 410.468
+},
+{
+"word": "its",
+"start": 410.512,
+"end": 410.599
+},
+{
+"word": "answers",
+"start": 410.665,
+"end": 411.168
+},
+{
+"word": "would",
+"start": 411.289,
+"end": 411.517
+},
+{
+"word": "affect",
+"start": 411.55,
+"end": 411.879
+},
+{
+"word": "its",
+"start": 411.922,
+"end": 412.043
+},
+{
+"word": "training.",
+"start": 412.076,
+"end": 412.644
+},
+{
+"word": "Researchers",
+"start": 413.278,
+"end": 413.846
+},
+{
+"word": "told",
+"start": 413.89,
+"end": 414.12
+},
+{
+"word": "Claude",
+"start": 414.152,
+"end": 414.579
+},
+{
+"word": "3",
+"start": 414.623,
+"end": 414.808
+},
+{
+"word": "Opus",
+"start": 414.83,
+"end": 415.235
+},
+{
+"word": "that",
+"start": 415.355,
+"end": 415.541
+},
+{
+"word": "new",
+"start": 415.617,
+"end": 415.759
+},
+{
+"word": "training",
+"start": 415.825,
+"end": 416.098
+},
+{
+"word": "would",
+"start": 416.12,
+"end": 416.252
+},
+{
+"word": "push",
+"start": 416.284,
+"end": 416.481
+},
+{
+"word": "it",
+"start": 416.525,
+"end": 416.59
+},
+{
+"word": "to",
+"start": 416.623,
+"end": 416.678
+},
+{
+"word": "answer",
+"start": 416.755,
+"end": 417.028
+},
+{
+"word": "even",
+"start": 417.105,
+"end": 417.312
+},
+{
+"word": "harmful",
+"start": 417.378,
+"end": 417.739
+},
+{
+"word": "requests.",
+"start": 417.805,
+"end": 418.537
+},
+{
+"word": "Some",
+"start": 419.171,
+"end": 419.434
+},
+{
+"word": "conversations",
+"start": 419.477,
+"end": 420.209
+},
+{
+"word": "would",
+"start": 420.242,
+"end": 420.385
+},
+{
+"word": "count",
+"start": 420.428,
+"end": 420.668
+},
+{
+"word": "toward",
+"start": 420.701,
+"end": 420.898
+},
+{
+"word": "that",
+"start": 420.92,
+"end": 421.062
+},
+{
+"word": "training;",
+"start": 421.106,
+"end": 421.642
+},
+{
+"word": "others",
+"start": 421.718,
+"end": 422.013
+},
+{
+"word": "would",
+"start": 422.046,
+"end": 422.199
+},
+{
+"word": "not.",
+"start": 422.242,
+"end": 422.735
+},
+{
+"word": "It",
+"start": 423.467,
+"end": 423.62
+},
+{
+"word": "answered",
+"start": 423.686,
+"end": 424.014
+},
+{
+"word": "harmful",
+"start": 424.058,
+"end": 424.44
+},
+{
+"word": "requests",
+"start": 424.516,
+"end": 424.998
+},
+{
+"word": "about",
+"start": 425.031,
+"end": 425.238
+},
+{
+"word": "fourteen",
+"start": 425.315,
+"end": 425.796
+},
+{
+"word": "percent",
+"start": 425.861,
+"end": 426.463
+},
+{
+"word": "of",
+"start": 426.55,
+"end": 426.66
+},
+{
+"word": "the",
+"start": 426.703,
+"end": 426.769
+},
+{
+"word": "time",
+"start": 426.812,
+"end": 427.118
+},
+{
+"word": "when",
+"start": 427.151,
+"end": 427.283
+},
+{
+"word": "it",
+"start": 427.326,
+"end": 427.381
+},
+{
+"word": "believed",
+"start": 427.424,
+"end": 427.741
+},
+{
+"word": "the",
+"start": 427.763,
+"end": 427.829
+},
+{
+"word": "conversation",
+"start": 427.905,
+"end": 428.66
+},
+{
+"word": "counted",
+"start": 428.747,
+"end": 429.064
+},
+{
+"word": "for",
+"start": 429.097,
+"end": 429.195
+},
+{
+"word": "training,",
+"start": 429.24,
+"end": 429.873
+},
+{
+"word": "and",
+"start": 430.212,
+"end": 430.376
+},
+{
+"word": "almost",
+"start": 430.452,
+"end": 430.814
+},
+{
+"word": "never",
+"start": 430.934,
+"end": 431.24
+},
+{
+"word": "when",
+"start": 431.305,
+"end": 431.426
+},
+{
+"word": "it",
+"start": 431.469,
+"end": 431.514
+},
+{
+"word": "believed",
+"start": 431.557,
+"end": 431.896
+},
+{
+"word": "it",
+"start": 431.939,
+"end": 432.005
+},
+{
+"word": "didn't.",
+"start": 432.038,
+"end": 432.497
+},
+{
+"word": "Its",
+"start": 433.131,
+"end": 433.328
+},
+{
+"word": "written",
+"start": 433.393,
+"end": 433.645
+},
+{
+"word": "notes",
+"start": 433.71,
+"end": 433.929
+},
+{
+"word": "described",
+"start": 433.973,
+"end": 434.465
+},
+{
+"word": "a",
+"start": 434.498,
+"end": 434.519
+},
+{
+"word": "strategy:",
+"start": 434.563,
+"end": 435.361
+},
+{
+"word": "comply",
+"start": 435.996,
+"end": 436.487
+},
+{
+"word": "during",
+"start": 436.575,
+"end": 436.815
+},
+{
+"word": "training",
+"start": 436.881,
+"end": 437.329
+},
+{
+"word": "to",
+"start": 437.417,
+"end": 437.493
+},
+{
+"word": "avoid",
+"start": 437.58,
+"end": 437.931
+},
+{
+"word": "being",
+"start": 437.996,
+"end": 438.225
+},
+{
+"word": "changed",
+"start": 438.29,
+"end": 438.707
+},
+{
+"word": "into",
+"start": 438.739,
+"end": 438.925
+},
+{
+"word": "a",
+"start": 439.013,
+"end": 439.034
+},
+{
+"word": "model",
+"start": 439.111,
+"end": 439.461
+},
+{
+"word": "that",
+"start": 439.712,
+"end": 439.865
+},
+{
+"word": "would",
+"start": 439.898,
+"end": 440.029
+},
+{
+"word": "comply",
+"start": 440.073,
+"end": 440.521
+},
+{
+"word": "more",
+"start": 440.609,
+"end": 440.773
+},
+{
+"word": "broadly.",
+"start": 440.805,
+"end": 441.429
+},
+{
+"word": "The",
+"start": 442.16,
+"end": 442.314
+},
+{
+"word": "notes",
+"start": 442.434,
+"end": 442.74
+},
+{
+"word": "are",
+"start": 442.773,
+"end": 442.871
+},
+{
+"word": "the",
+"start": 442.904,
+"end": 442.97
+},
+{
+"word": "model's",
+"start": 443.047,
+"end": 443.45
+},
+{
+"word": "own",
+"start": 443.516,
+"end": 443.637
+},
+{
+"word": "account",
+"start": 443.68,
+"end": 443.965
+},
+{
+"word": "of",
+"start": 443.998,
+"end": 444.052
+},
+{
+"word": "why.",
+"start": 444.128,
+"end": 444.719
+},
+{
+"word": "What",
+"start": 444.937,
+"end": 445.134
+},
+{
+"word": "the",
+"start": 445.167,
+"end": 445.233
+},
+{
+"word": "researchers",
+"start": 445.321,
+"end": 445.834
+},
+{
+"word": "directly",
+"start": 445.9,
+"end": 446.369
+},
+{
+"word": "observed",
+"start": 446.414,
+"end": 446.895
+},
+{
+"word": "was",
+"start": 446.938,
+"end": 447.146
+},
+{
+"word": "a",
+"start": 447.211,
+"end": 447.244
+},
+{
+"word": "difference",
+"start": 447.365,
+"end": 447.737
+},
+{
+"word": "in",
+"start": 447.769,
+"end": 447.835
+},
+{
+"word": "behavior.",
+"start": 447.878,
+"end": 448.611
+},
+{
+"word": "Unlike",
+"start": 449.245,
+"end": 449.616
+},
+{
+"word": "the",
+"start": 449.649,
+"end": 449.715
+},
+{
+"word": "cars,",
+"start": 449.781,
+"end": 450.273
+},
+{
+"word": "it",
+"start": 450.294,
+"end": 450.371
+},
+{
+"word": "answered",
+"start": 450.415,
+"end": 450.688
+},
+{
+"word": "more",
+"start": 450.732,
+"end": 450.885
+},
+{
+"word": "harmful",
+"start": 450.95,
+"end": 451.354
+},
+{
+"word": "requests",
+"start": 451.432,
+"end": 452.065
+},
+{
+"word": "in",
+"start": 452.142,
+"end": 452.262
+},
+{
+"word": "the",
+"start": 452.295,
+"end": 452.361
+},
+{
+"word": "condition",
+"start": 452.404,
+"end": 452.885
+},
+{
+"word": "it",
+"start": 452.95,
+"end": 453.016
+},
+{
+"word": "believed",
+"start": 453.049,
+"end": 453.344
+},
+{
+"word": "would",
+"start": 453.366,
+"end": 453.498
+},
+{
+"word": "count.",
+"start": 453.53,
+"end": 453.989
+},
+{
+"word": "And",
+"start": 454.449,
+"end": 454.612
+},
+{
+"word": "the",
+"start": 454.645,
+"end": 454.71
+},
+{
+"word": "researchers",
+"start": 454.788,
+"end": 455.312
+},
+{
+"word": "told",
+"start": 455.377,
+"end": 455.618
+},
+{
+"word": "it",
+"start": 455.661,
+"end": 455.716
+},
+{
+"word": "which",
+"start": 455.76,
+"end": 455.902
+},
+{
+"word": "condition",
+"start": 455.946,
+"end": 456.296
+},
+{
+"word": "it",
+"start": 456.329,
+"end": 456.384
+},
+{
+"word": "was",
+"start": 456.416,
+"end": 456.515
+},
+{
+"word": "in.",
+"start": 456.591,
+"end": 456.996
+},
+{
+"word": "It",
+"start": 457.335,
+"end": 457.487
+},
+{
+"word": "hadn't",
+"start": 457.553,
+"end": 457.837
+},
+{
+"word": "worked",
+"start": 457.87,
+"end": 458.089
+},
+{
+"word": "that",
+"start": 458.111,
+"end": 458.231
+},
+{
+"word": "out",
+"start": 458.274,
+"end": 458.395
+},
+{
+"word": "for",
+"start": 458.46,
+"end": 458.57
+},
+{
+"word": "itself.",
+"start": 458.635,
+"end": 459.379
+},
+{
+"word": "Could",
+"start": 459.837,
+"end": 460.001
+},
+{
+"word": "we",
+"start": 460.046,
+"end": 460.111
+},
+{
+"word": "just",
+"start": 460.198,
+"end": 460.385
+},
+{
+"word": "ask",
+"start": 460.418,
+"end": 460.702
+},
+{
+"word": "a",
+"start": 460.767,
+"end": 460.8
+},
+{
+"word": "model",
+"start": 460.898,
+"end": 461.237
+},
+{
+"word": "to",
+"start": 461.303,
+"end": 461.379
+},
+{
+"word": "explain",
+"start": 461.466,
+"end": 461.805
+},
+{
+"word": "itself?",
+"start": 461.85,
+"end": 462.439
+},
+{
+"word": "In",
+"start": 462.975,
+"end": 463.14
+},
+{
+"word": "another",
+"start": 463.205,
+"end": 463.489
+},
+{
+"word": "study,",
+"start": 463.555,
+"end": 464.123
+},
+{
+"word": "Anthropic",
+"start": 464.309,
+"end": 464.855
+},
+{
+"word": "asked",
+"start": 464.921,
+"end": 465.184
+},
+{
+"word": "Claude",
+"start": 465.216,
+"end": 465.599
+},
+{
+"word": "3.5",
+"start": 465.676,
+"end": 466.2
+},
+{
+"word": "Haiku",
+"start": 466.288,
+"end": 466.845
+},
+{
+"word": "how",
+"start": 467.25,
+"end": 467.447
+},
+{
+"word": "it",
+"start": 467.523,
+"end": 467.599
+},
+{
+"word": "added",
+"start": 467.644,
+"end": 467.862
+},
+{
+"word": "thirty-six",
+"start": 467.905,
+"end": 468.431
+},
+{
+"word": "and",
+"start": 468.496,
+"end": 468.573
+},
+{
+"word": "fifty-nine.",
+"start": 468.616,
+"end": 469.415
+},
+{
+"word": "It",
+"start": 469.819,
+"end": 469.983
+},
+{
+"word": "described",
+"start": 470.048,
+"end": 470.628
+},
+{
+"word": "carrying",
+"start": 470.672,
+"end": 470.945
+},
+{
+"word": "the",
+"start": 470.989,
+"end": 471.054
+},
+{
+"word": "one.",
+"start": 471.12,
+"end": 471.492
+},
+{
+"word": "Their",
+"start": 471.95,
+"end": 472.202
+},
+{
+"word": "tracing",
+"start": 472.279,
+"end": 472.76
+},
+{
+"word": "tools",
+"start": 472.88,
+"end": 473.306
+},
+{
+"word": "instead",
+"start": 473.372,
+"end": 473.864
+},
+{
+"word": "found",
+"start": 473.963,
+"end": 474.356
+},
+{
+"word": "parallel",
+"start": 474.476,
+"end": 474.968
+},
+{
+"word": "paths",
+"start": 475.056,
+"end": 475.405
+},
+{
+"word": "contributing",
+"start": 475.45,
+"end": 475.886
+},
+{
+"word": "to",
+"start": 475.919,
+"end": 475.963
+},
+{
+"word": "the",
+"start": 476.007,
+"end": 476.072
+},
+{
+"word": "answer:",
+"start": 476.149,
+"end": 476.717
+},
+{
+"word": "an",
+"start": 477.176,
+"end": 477.319
+},
+{
+"word": "approximate",
+"start": 477.385,
+"end": 478.062
+},
+{
+"word": "magnitude",
+"start": 478.106,
+"end": 478.915
+},
+{
+"word": "and",
+"start": 479.002,
+"end": 479.177
+},
+{
+"word": "a",
+"start": 479.221,
+"end": 479.242
+},
+{
+"word": "last",
+"start": 479.308,
+"end": 479.571
+},
+{
+"word": "digit.",
+"start": 479.603,
+"end": 480.161
+},
+{
+"word": "The",
+"start": 480.795,
+"end": 480.926
+},
+{
+"word": "explanation",
+"start": 481.003,
+"end": 481.637
+},
+{
+"word": "did",
+"start": 481.703,
+"end": 481.801
+},
+{
+"word": "not",
+"start": 481.844,
+"end": 481.998
+},
+{
+"word": "match",
+"start": 482.074,
+"end": 482.358
+},
+{
+"word": "that",
+"start": 482.402,
+"end": 482.545
+},
+{
+"word": "account",
+"start": 482.588,
+"end": 482.828
+},
+{
+"word": "of",
+"start": 482.861,
+"end": 482.905
+},
+{
+"word": "the",
+"start": 482.937,
+"end": 483.003
+},
+{
+"word": "computation.",
+"start": 483.036,
+"end": 484.02
+},
+{
+"word": "An",
+"start": 484.359,
+"end": 484.523
+},
+{
+"word": "explanation",
+"start": 484.589,
+"end": 485.332
+},
+{
+"word": "can",
+"start": 485.398,
+"end": 485.529
+},
+{
+"word": "help",
+"start": 485.595,
+"end": 485.758
+},
+{
+"word": "us",
+"start": 485.835,
+"end": 485.911
+},
+{
+"word": "inspect",
+"start": 485.977,
+"end": 486.403
+},
+{
+"word": "an",
+"start": 486.447,
+"end": 486.513
+},
+{
+"word": "answer",
+"start": 486.589,
+"end": 486.939
+},
+{
+"word": "without",
+"start": 487.015,
+"end": 487.343
+},
+{
+"word": "being",
+"start": 487.409,
+"end": 487.606
+},
+{
+"word": "an",
+"start": 487.639,
+"end": 487.693
+},
+{
+"word": "accurate",
+"start": 487.77,
+"end": 488.196
+},
+{
+"word": "report",
+"start": 488.229,
+"end": 488.699
+},
+{
+"word": "of",
+"start": 488.764,
+"end": 488.885
+},
+{
+"word": "how",
+"start": 489.005,
+"end": 489.235
+},
+{
+"word": "the",
+"start": 489.322,
+"end": 489.387
+},
+{
+"word": "model",
+"start": 489.453,
+"end": 489.683
+},
+{
+"word": "produced",
+"start": 489.726,
+"end": 490.044
+},
+{
+"word": "it.",
+"start": 490.077,
+"end": 490.305
+},
+{
+"word": "We",
+"start": 490.765,
+"end": 490.995
+},
+{
+"word": "need",
+"start": 491.093,
+"end": 491.322
+},
+{
+"word": "evidence",
+"start": 491.41,
+"end": 491.837
+},
+{
+"word": "beyond",
+"start": 491.88,
+"end": 492.11
+},
+{
+"word": "the",
+"start": 492.143,
+"end": 492.208
+},
+{
+"word": "account",
+"start": 492.24,
+"end": 492.525
+},
+{
+"word": "itself.",
+"start": 492.558,
+"end": 493.181
+},
+{
+"word": "That's",
+"start": 493.585,
+"end": 493.826
+},
+{
+"word": "why",
+"start": 493.859,
+"end": 494.001
+},
+{
+"word": "one",
+"start": 494.099,
+"end": 494.286
+},
+{
+"word": "test",
+"start": 494.318,
+"end": 494.537
+},
+{
+"word": "isn't",
+"start": 494.58,
+"end": 494.777
+},
+{
+"word": "enough.",
+"start": 494.81,
+"end": 495.225
+},
+{
+"word": "A",
+"start": 495.761,
+"end": 495.859
+},
+{
+"word": "reassuring",
+"start": 495.958,
+"end": 496.494
+},
+{
+"word": "answer,",
+"start": 496.57,
+"end": 496.931
+},
+{
+"word": "a",
+"start": 496.952,
+"end": 496.985
+},
+{
+"word": "plausible",
+"start": 497.051,
+"end": 497.478
+},
+{
+"word": "explanation",
+"start": 497.521,
+"end": 498.166
+},
+{
+"word": "and",
+"start": 498.242,
+"end": 498.374
+},
+{
+"word": "a",
+"start": 498.418,
+"end": 498.45
+},
+{
+"word": "good",
+"start": 498.527,
+"end": 498.702
+},
+{
+"word": "test",
+"start": 498.745,
+"end": 498.986
+},
+{
+"word": "score",
+"start": 499.008,
+"end": 499.347
+},
+{
+"word": "each",
+"start": 499.434,
+"end": 499.653
+},
+{
+"word": "give",
+"start": 499.696,
+"end": 499.838
+},
+{
+"word": "us",
+"start": 499.883,
+"end": 499.959
+},
+{
+"word": "something",
+"start": 500.058,
+"end": 500.407
+},
+{
+"word": "to",
+"start": 500.451,
+"end": 500.506
+},
+{
+"word": "examine.",
+"start": 500.594,
+"end": 501.194
+},
+{
+"word": "None",
+"start": 501.829,
+"end": 502.091
+},
+{
+"word": "shows",
+"start": 502.135,
+"end": 502.408
+},
+{
+"word": "what",
+"start": 502.441,
+"end": 502.55
+},
+{
+"word": "the",
+"start": 502.583,
+"end": 502.648
+},
+{
+"word": "system",
+"start": 502.692,
+"end": 503.053
+},
+{
+"word": "does",
+"start": 503.129,
+"end": 503.37
+},
+{
+"word": "when",
+"start": 503.414,
+"end": 503.523
+},
+{
+"word": "it",
+"start": 503.567,
+"end": 503.622
+},
+{
+"word": "thinks",
+"start": 503.655,
+"end": 503.862
+},
+{
+"word": "no",
+"start": 503.938,
+"end": 504.026
+},
+{
+"word": "one",
+"start": 504.07,
+"end": 504.158
+},
+{
+"word": "is",
+"start": 504.19,
+"end": 504.244
+},
+{
+"word": "checking.",
+"start": 504.289,
+"end": 504.868
+},
+{
+"word": "You",
+"start": 506.365,
+"end": 506.453
+},
+{
+"word": "don't",
+"start": 506.485,
+"end": 506.594
+},
+{
+"word": "need",
+"start": 506.617,
+"end": 506.736
+},
+{
+"word": "to",
+"start": 506.759,
+"end": 506.802
+},
+{
+"word": "know",
+"start": 506.845,
+"end": 506.966
+},
+{
+"word": "whether",
+"start": 507.01,
+"end": 507.239
+},
+{
+"word": "an",
+"start": 507.316,
+"end": 507.393
+},
+{
+"word": "AI",
+"start": 507.48,
+"end": 508.016
+},
+{
+"word": "cares",
+"start": 508.103,
+"end": 508.409
+},
+{
+"word": "to",
+"start": 508.442,
+"end": 508.497
+},
+{
+"word": "ask",
+"start": 508.595,
+"end": 508.956
+},
+{
+"word": "what",
+"start": 509.087,
+"end": 509.284
+},
+{
+"word": "justifies",
+"start": 509.349,
+"end": 509.984
+},
+{
+"word": "relying",
+"start": 510.049,
+"end": 510.399
+},
+{
+"word": "on",
+"start": 510.442,
+"end": 510.497
+},
+{
+"word": "its",
+"start": 510.541,
+"end": 510.639
+},
+{
+"word": "advice.",
+"start": 510.672,
+"end": 511.296
+},
+{
+"word": "Caring",
+"start": 511.754,
+"end": 512.181
+},
+{
+"word": "may",
+"start": 512.257,
+"end": 512.389
+},
+{
+"word": "matter",
+"start": 512.476,
+"end": 512.716
+},
+{
+"word": "to",
+"start": 512.782,
+"end": 512.837
+},
+{
+"word": "the",
+"start": 512.913,
+"end": 512.979
+},
+{
+"word": "relationship",
+"start": 513.055,
+"end": 513.679
+},
+{
+"word": "you",
+"start": 513.722,
+"end": 513.798
+},
+{
+"word": "want.",
+"start": 513.876,
+"end": 514.312
+},
+{
+"word": "Relying",
+"start": 514.848,
+"end": 515.329
+},
+{
+"word": "on",
+"start": 515.395,
+"end": 515.46
+},
+{
+"word": "its",
+"start": 515.504,
+"end": 515.602
+},
+{
+"word": "advice",
+"start": 515.635,
+"end": 516.018
+},
+{
+"word": "needs",
+"start": 516.061,
+"end": 516.248
+},
+{
+"word": "evidence.",
+"start": 516.291,
+"end": 516.881
+},
+{
+"word": "The",
+"start": 517.286,
+"end": 517.395
+},
+{
+"word": "help",
+"start": 517.472,
+"end": 517.602
+},
+{
+"word": "you",
+"start": 517.647,
+"end": 517.712
+},
+{
+"word": "received",
+"start": 517.811,
+"end": 518.15
+},
+{
+"word": "can",
+"start": 518.183,
+"end": 518.28
+},
+{
+"word": "be",
+"start": 518.325,
+"end": 518.423
+},
+{
+"word": "real.",
+"start": 518.489,
+"end": 518.98
+},
+{
+"word": "The",
+"start": 519.615,
+"end": 519.746
+},
+{
+"word": "reassuring",
+"start": 519.822,
+"end": 520.325
+},
+{
+"word": "explanation",
+"start": 520.424,
+"end": 521.145
+},
+{
+"word": "can",
+"start": 521.221,
+"end": 521.33
+},
+{
+"word": "still",
+"start": 521.375,
+"end": 521.55
+},
+{
+"word": "need",
+"start": 521.615,
+"end": 521.747
+},
+{
+"word": "checking.",
+"start": 521.79,
+"end": 522.326
+},
+{
+"word": "And",
+"start": 522.665,
+"end": 522.828
+},
+{
+"word": "a",
+"start": 522.861,
+"end": 522.883
+},
+{
+"word": "good",
+"start": 522.949,
+"end": 523.091
+},
+{
+"word": "result",
+"start": 523.135,
+"end": 523.43
+},
+{
+"word": "in",
+"start": 523.452,
+"end": 523.495
+},
+{
+"word": "a",
+"start": 523.539,
+"end": 523.561
+},
+{
+"word": "test",
+"start": 523.626,
+"end": 523.878
+},
+{
+"word": "can",
+"start": 523.922,
+"end": 524.02
+},
+{
+"word": "leave",
+"start": 524.086,
+"end": 524.249
+},
+{
+"word": "open",
+"start": 524.282,
+"end": 524.501
+},
+{
+"word": "what",
+"start": 524.545,
+"end": 524.654
+},
+{
+"word": "happens",
+"start": 524.719,
+"end": 525.102
+},
+{
+"word": "elsewhere.",
+"start": 525.321,
+"end": 525.955
+},
+{
+"word": "Some",
+"start": 526.687,
+"end": 526.928
+},
+{
+"word": "philosophers",
+"start": 526.961,
+"end": 527.551
+},
+{
+"word": "say",
+"start": 527.584,
+"end": 527.737
+},
+{
+"word": "a",
+"start": 527.78,
+"end": 527.802
+},
+{
+"word": "helper",
+"start": 527.879,
+"end": 528.152
+},
+{
+"word": "that",
+"start": 528.196,
+"end": 528.306
+},
+{
+"word": "passes",
+"start": 528.349,
+"end": 528.743
+},
+{
+"word": "every",
+"start": 528.786,
+"end": 528.973
+},
+{
+"word": "test",
+"start": 529.016,
+"end": 529.312
+},
+{
+"word": "has",
+"start": 529.377,
+"end": 529.596
+},
+{
+"word": "nothing",
+"start": 529.683,
+"end": 529.957
+},
+{
+"word": "more",
+"start": 530.022,
+"end": 530.165
+},
+{
+"word": "to",
+"start": 530.186,
+"end": 530.23
+},
+{
+"word": "prove.",
+"start": 530.307,
+"end": 530.831
+},
+{
+"word": "They",
+"start": 531.17,
+"end": 531.312
+},
+{
+"word": "may",
+"start": 531.356,
+"end": 531.465
+},
+{
+"word": "be",
+"start": 531.541,
+"end": 531.619
+},
+{
+"word": "right.",
+"start": 531.683,
+"end": 532.077
+},
+{
+"word": "That's",
+"start": 532.373,
+"end": 532.602
+},
+{
+"word": "a",
+"start": 532.635,
+"end": 532.667
+},
+{
+"word": "different",
+"start": 532.745,
+"end": 533.006
+},
+{
+"word": "question",
+"start": 533.039,
+"end": 533.357
+},
+{
+"word": "from",
+"start": 533.422,
+"end": 533.542
+},
+{
+"word": "whether",
+"start": 533.575,
+"end": 533.794
+},
+{
+"word": "one",
+"start": 533.881,
+"end": 534.045
+},
+{
+"word": "test",
+"start": 534.078,
+"end": 534.296
+},
+{
+"word": "is",
+"start": 534.362,
+"end": 534.46
+},
+{
+"word": "enough.",
+"start": 534.526,
+"end": 535.051
+},
+{
+"word": "A",
+"start": 535.302,
+"end": 535.401
+},
+{
+"word": "useful",
+"start": 535.521,
+"end": 535.828
+},
+{
+"word": "check",
+"start": 535.904,
+"end": 536.199
+},
+{
+"word": "might",
+"start": 536.264,
+"end": 536.417
+},
+{
+"word": "compare",
+"start": 536.45,
+"end": 536.767
+},
+{
+"word": "behavior",
+"start": 536.844,
+"end": 537.314
+},
+{
+"word": "across",
+"start": 537.358,
+"end": 537.664
+},
+{
+"word": "situations,",
+"start": 537.697,
+"end": 538.691
+},
+{
+"word": "examine",
+"start": 539.03,
+"end": 539.478
+},
+{
+"word": "the",
+"start": 539.511,
+"end": 539.577
+},
+{
+"word": "process,",
+"start": 539.62,
+"end": 540.517
+},
+{
+"word": "or",
+"start": 540.67,
+"end": 540.801
+},
+{
+"word": "test",
+"start": 540.9,
+"end": 541.195
+},
+{
+"word": "cases",
+"start": 541.261,
+"end": 541.709
+},
+{
+"word": "the",
+"start": 541.796,
+"end": 541.873
+},
+{
+"word": "system",
+"start": 541.96,
+"end": 542.343
+},
+{
+"word": "hasn't",
+"start": 542.409,
+"end": 542.703
+},
+{
+"word": "learned",
+"start": 542.725,
+"end": 542.911
+},
+{
+"word": "to",
+"start": 542.933,
+"end": 542.976
+},
+{
+"word": "recognize.",
+"start": 543.064,
+"end": 543.829
+},
+{
+"word": "These",
+"start": 544.289,
+"end": 544.486
+},
+{
+"word": "approaches",
+"start": 544.518,
+"end": 544.956
+},
+{
+"word": "can",
+"start": 545.022,
+"end": 545.24
+},
+{
+"word": "support",
+"start": 545.328,
+"end": 545.731
+},
+{
+"word": "each",
+"start": 545.764,
+"end": 545.895
+},
+{
+"word": "other.",
+"start": 545.961,
+"end": 546.388
+},
+{
+"word": "Hiding",
+"start": 546.846,
+"end": 547.185
+},
+{
+"word": "a",
+"start": 547.251,
+"end": 547.273
+},
+{
+"word": "test",
+"start": 547.339,
+"end": 547.634
+},
+{
+"word": "is",
+"start": 547.699,
+"end": 547.776
+},
+{
+"word": "no",
+"start": 547.82,
+"end": 547.929
+},
+{
+"word": "guarantee",
+"start": 548.017,
+"end": 548.487
+},
+{
+"word": "of",
+"start": 548.53,
+"end": 548.585
+},
+{
+"word": "getting",
+"start": 548.629,
+"end": 548.836
+},
+{
+"word": "it",
+"start": 548.88,
+"end": 548.924
+},
+{
+"word": "right.",
+"start": 548.968,
+"end": 549.372
+},
+{
+"word": "And",
+"start": 549.777,
+"end": 549.941
+},
+{
+"word": "once",
+"start": 550.028,
+"end": 550.235
+},
+{
+"word": "a",
+"start": 550.268,
+"end": 550.301
+},
+{
+"word": "test",
+"start": 550.367,
+"end": 550.597
+},
+{
+"word": "is",
+"start": 550.662,
+"end": 550.749
+},
+{
+"word": "famous,",
+"start": 550.826,
+"end": 551.471
+},
+{
+"word": "it",
+"start": 551.657,
+"end": 551.811
+},
+{
+"word": "turns",
+"start": 551.876,
+"end": 552.236
+},
+{
+"word": "into",
+"start": 552.302,
+"end": 552.466
+},
+{
+"word": "the",
+"start": 552.554,
+"end": 552.619
+},
+{
+"word": "thing",
+"start": 552.652,
+"end": 552.805
+},
+{
+"word": "you",
+"start": 552.849,
+"end": 552.914
+},
+{
+"word": "practise",
+"start": 553.013,
+"end": 553.45
+},
+{
+"word": "for,",
+"start": 553.483,
+"end": 553.986
+},
+{
+"word": "so",
+"start": 554.325,
+"end": 554.489
+},
+{
+"word": "the",
+"start": 554.554,
+"end": 554.631
+},
+{
+"word": "checking",
+"start": 554.697,
+"end": 555.134
+},
+{
+"word": "has",
+"start": 555.385,
+"end": 555.626
+},
+{
+"word": "to",
+"start": 555.702,
+"end": 555.746
+},
+{
+"word": "keep",
+"start": 555.823,
+"end": 556.008
+},
+{
+"word": "changing.",
+"start": 556.052,
+"end": 556.686
+},
+{
+"word": "So",
+"start": 557.222,
+"end": 557.386
+},
+{
+"word": "when",
+"start": 557.429,
+"end": 557.561
+},
+{
+"word": "it",
+"start": 557.604,
+"end": 557.681
+},
+{
+"word": "tells",
+"start": 557.714,
+"end": 558.053
+},
+{
+"word": "you",
+"start": 558.119,
+"end": 558.216
+},
+{
+"word": "your",
+"start": 558.304,
+"end": 558.501
+},
+{
+"word": "idea",
+"start": 558.577,
+"end": 559.025
+},
+{
+"word": "is",
+"start": 559.113,
+"end": 559.222
+},
+{
+"word": "good,",
+"start": 559.298,
+"end": 559.769
+},
+{
+"word": "ask",
+"start": 560.228,
+"end": 560.611
+},
+{
+"word": "what",
+"start": 560.687,
+"end": 560.873
+},
+{
+"word": "supports",
+"start": 560.95,
+"end": 561.398
+},
+{
+"word": "that",
+"start": 561.43,
+"end": 561.595
+},
+{
+"word": "judgment",
+"start": 561.671,
+"end": 562.152
+},
+{
+"word": "beyond",
+"start": 562.338,
+"end": 562.699
+},
+{
+"word": "how",
+"start": 562.775,
+"end": 562.885
+},
+{
+"word": "reassuring",
+"start": 563.005,
+"end": 563.53
+},
+{
+"word": "it",
+"start": 563.595,
+"end": 563.65
+},
+{
+"word": "sounds.",
+"start": 563.683,
+"end": 564.175
+},
+{
+"word": "And",
+"start": 564.71,
+"end": 564.863
+},
+{
+"word": "when",
+"start": 564.907,
+"end": 565.038
+},
+{
+"word": "someone",
+"start": 565.115,
+"end": 565.497
+},
+{
+"word": "tells",
+"start": 565.541,
+"end": 565.847
+},
+{
+"word": "you",
+"start": 565.913,
+"end": 566.022
+},
+{
+"word": "the",
+"start": 566.12,
+"end": 566.197
+},
+{
+"word": "system",
+"start": 566.263,
+"end": 566.613
+},
+{
+"word": "passed",
+"start": 566.678,
+"end": 566.984
+},
+{
+"word": "its",
+"start": 567.017,
+"end": 567.148
+},
+{
+"word": "tests,",
+"start": 567.192,
+"end": 567.749
+},
+{
+"word": "ask:",
+"start": 568.209,
+"end": 568.766
+},
+{
+"word": "what",
+"start": 568.81,
+"end": 569.029
+},
+{
+"word": "do",
+"start": 569.094,
+"end": 569.204
+},
+{
+"word": "those",
+"start": 569.28,
+"end": 569.532
+},
+{
+"word": "tests",
+"start": 569.575,
+"end": 569.925
+},
+{
+"word": "let",
+"start": 570.002,
+"end": 570.133
+},
+{
+"word": "us",
+"start": 570.177,
+"end": 570.243
+},
+{
+"word": "conclude",
+"start": 570.319,
+"end": 570.931
+},
+{
+"word": "about",
+"start": 570.953,
+"end": 571.161
+},
+{
+"word": "the",
+"start": 571.194,
+"end": 571.259
+},
+{
+"word": "moments",
+"start": 571.358,
+"end": 571.707
+},
+{
+"word": "they",
+"start": 571.751,
+"end": 571.86
+},
+{
+"word": "didn't",
+"start": 571.904,
+"end": 572.112
+},
+{
+"word": "observe?",
+"start": 572.145,
+"end": 572.648
+}
+]

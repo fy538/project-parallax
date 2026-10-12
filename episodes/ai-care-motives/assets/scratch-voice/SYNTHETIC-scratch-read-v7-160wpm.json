@@ -1,0 +1,64 @@
+{
+  "what": "Synthetic scratch read, re-paced. A timing aid only: not the narration, never in an episode.",
+  "made_from": "the eight beat recordings of SYNTHETIC-scratch-read-v7 (no new request, no new cost)",
+  "tempo_after": 1.062,
+  "target_wpm": 160,
+  "pauses": {
+    "headSec": 0.4,
+    "betweenBeatsSec": 1.2,
+    "tailSec": 1.5
+  },
+  "made": "2026-10-12",
+  "durationSec": 574.467,
+  "words": 1504,
+  "beats": [
+    {
+      "beat": 1,
+      "startSec": 0.4,
+      "durationSec": 52.13,
+      "words": 140
+    },
+    {
+      "beat": 2,
+      "startSec": 53.73,
+      "durationSec": 65.634,
+      "words": 178
+    },
+    {
+      "beat": 3,
+      "startSec": 120.563,
+      "durationSec": 63.224,
+      "words": 184
+    },
+    {
+      "beat": 4,
+      "startSec": 184.988,
+      "durationSec": 83.079,
+      "words": 212
+    },
+    {
+      "beat": 5,
+      "startSec": 269.267,
+      "durationSec": 61.814,
+      "words": 161
+    },
+    {
+      "beat": 6,
+      "startSec": 332.28,
+      "durationSec": 58.382,
+      "words": 148
+    },
+    {
+      "beat": 7,
+      "startSec": 391.862,
+      "durationSec": 113.237,
+      "words": 295
+    },
+    {
+      "beat": 8,
+      "startSec": 506.299,
+      "durationSec": 66.668,
+      "words": 186
+    }
+  ]
+}
