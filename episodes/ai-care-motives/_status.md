@@ -5,7 +5,7 @@
 
 **State:** DRAFTING · day 5 in state
 **Format:** Philosopher's Lens
-**Waiting on:** Tiger: (1) paste the four published 36 + 59 lines; (2) make the GitHub repo private so the branch can be pushed; (3) audio files; (4) record the narration
+**Waiting on:** Tiger: (1) paste the four published 36 + 59 lines; (2) audio files; (3) record the narration
 
 ## Progress  ▰▰▰▰▰▰▱▱▱▱  5 of 9 stages
 
