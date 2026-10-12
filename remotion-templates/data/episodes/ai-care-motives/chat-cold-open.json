@@ -1,0 +1,19 @@
+{
+  "episode": "ai-care-motives",
+  "source": "",
+  "durationSec": 11.9,
+  "text": "You: Is my idea any good?\n\nAssistant: Yes. Here’s why…",
+  "dialogue": true,
+  "label": "Illustrative exchange · written for this video",
+  "typeOut": true,
+  "fontSize": 64,
+  "paragraphAtSec": [
+    0.3,
+    1.5
+  ],
+  "annotations": [],
+  "serif": false,
+  "paper": "plain",
+  "textFadeInSec": 0.4,
+  "backgroundVariant": "dark"
+}

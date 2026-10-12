@@ -1,0 +1,51 @@
+{
+  "episode": "catalog",
+  "durationSec": 12,
+  "divider": true,
+  "dividerLabel": "→",
+  "backgroundVariant": "dark",
+  "left": {
+    "component": "Syllogism",
+    "label": "DEDUCTIVE",
+    "caption": "Aristotelian syllogism: general → specific → conclusion",
+    "data": {
+      "episode": "catalog",
+      "title": "THE STRUCTURAL ARGUMENT",
+      "source": "Mearsheimer (2014). Why the Ukraine Crisis Is the West's Fault.",
+      "durationSec": 12,
+      "backgroundVariant": "dark",
+      "majorPremise": "All great powers fear loss of regional dominance.",
+      "minorPremise": "Russia is a great power with a claimed regional sphere.",
+      "conclusion": "Russia will resist NATO expansion into its sphere.",
+      "validity": "valid",
+      "argumentAttribution": "Mearsheimer (2014)"
+    }
+  },
+  "right": {
+    "component": "DialecticFlow",
+    "label": "DIALECTICAL",
+    "caption": "Hegelian synthesis: thesis → antithesis → resolution",
+    "data": {
+      "episode": "catalog",
+      "title": "THE LIBERAL COUNTER",
+      "source": "Mearsheimer vs. Ikenberry — the great IR debate",
+      "durationSec": 12,
+      "backgroundVariant": "dark",
+      "thesis": {
+        "label": "REALIST THESIS",
+        "claim": "Great-power competition is the permanent condition of international relations.",
+        "attribution": "Mearsheimer (2001)"
+      },
+      "antithesis": {
+        "label": "LIBERAL ANTITHESIS",
+        "claim": "Institutions and economic interdependence dampen the security dilemma.",
+        "attribution": "Ikenberry (2011)"
+      },
+      "synthesis": {
+        "label": "BOUNDED SYNTHESIS",
+        "claim": "Competition is structural; its intensity varies with institutional embeddedness.",
+        "attribution": "Parallax framework"
+      }
+    }
+  }
+}

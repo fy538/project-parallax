@@ -1,0 +1,30 @@
+{
+  "episode": "catalog",
+  "title": "PRESS FREEDOM INDEX 2024 — SELECTED COUNTRIES",
+  "subtitle": "Reporters Without Borders Press Freedom Index (0=most repressed, 100=most free), selected countries",
+  "source": "Reporters Without Borders, World Press Freedom Index 2024",
+  "durationSec": 12,
+  "backgroundVariant": "light",
+  "axisLabel": "RSF Freedom Score",
+  "axisMin": 0,
+  "axisMax": 100,
+  "axisTickCount": 6,
+  "axisFormat": "%.0f",
+  "revealOrder": "left-to-right",
+  "entities": [
+    { "id": "nok", "label": "Norway",      "value": 92, "emphasis": "primary" },
+    { "id": "dnk", "label": "Denmark",     "value": 90 },
+    { "id": "swe", "label": "Sweden",      "value": 88 },
+    { "id": "fin", "label": "Finland",     "value": 87 },
+    { "id": "nld", "label": "Netherlands", "value": 84 },
+    { "id": "gbr", "label": "UK",          "value": 73 },
+    { "id": "jpn", "label": "Japan",       "value": 70 },
+    { "id": "fra", "label": "France",      "value": 68 },
+    { "id": "usa", "label": "USA",         "value": 66 },
+    { "id": "kor", "label": "South Korea", "value": 62 },
+    { "id": "ind", "label": "India",       "value": 31, "emphasis": "primary" },
+    { "id": "rus", "label": "Russia",      "value": 13, "emphasis": "primary" },
+    { "id": "chn", "label": "China",       "value": 11, "emphasis": "primary" },
+    { "id": "prk", "label": "North Korea", "value": 4,  "emphasis": "primary" }
+  ]
+}

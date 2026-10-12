@@ -1,0 +1,11 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "definition",
+  "backgroundVariant": "light",
+  "durationSec": 12,
+  "term": "THREE CHECKS",
+  "definitionText": "Across situations · Check the process · Unfamiliar tests",
+  "_direction": {
+    "textAnimation": "definition-reveal"
+  }
+}

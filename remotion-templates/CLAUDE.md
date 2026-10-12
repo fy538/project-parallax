@@ -1,14 +1,14 @@
-# Geopolitics Video Templates — Remotion Project
+# Parallax Video Templates — Remotion Project
 
 > Read top-level [`AGENTS.md`](../AGENTS.md) and [`CLAUDE.md`](../CLAUDE.md) first for build commands, dev conventions, and project context. This file is Remotion-specific.
 >
-> Last updated: May 16, 2026
+> Last updated: September 22, 2026
 
 ## What this is
 
-Remotion-based template library for producing educational geopolitics YouTube videos. Templates are React components that render to MP4. Each template is data-driven: feed it a JSON file and it generates the visual segment.
+Remotion-based video workspace for Parallax. Current pilots explore philosophy, AI, and ethics; the earlier geopolitics library remains reusable. Templates are React components that render to MP4, often from JSON data.
 
-- **45 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 7, Charts 19, Diagrams 10, Timelines 3, Typography & visuals 6; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7; canonical TEMPLATE_COMPONENTS registry in `src/templates/Episodes/FullEpisode.tsx`)
+- **~83 core + 9 Shorts + per-episode master sequences** — all built and functional (Maps 9, Charts 26, Diagrams 15, Timelines 6, Typography & visuals 9, Documentary archival 4, Argument Primitives 7, Cross-frame/morph 3, Relationship & Composition 4, Math 2, Exploratory 4; full inventory: `project/PRODUCTION_PIPELINE.md` Stage 7; canonical TEMPLATE_COMPONENTS registry in `src/templates/Episodes/templateRegistry.ts`)
 - All templates use **Zod schemas** for runtime validation and **`calculateMetadata`** for dynamic durations
 - Resolution: **1920×1080 @ 30fps** (1080×1920 for Shorts)
 - TypeScript **strict mode** — don't disable
@@ -17,6 +17,7 @@ Remotion-based template library for producing educational geopolitics YouTube vi
 
 ```
 remotion-templates/
+├── README.md                 # Current Studio navigation, commands, and cleanup
 ├── BRAND.md                  # Canonical design system spec (palette, type, timing)
 ├── IMAGES.md                 # Image treatment pipeline (duotone, grain, compositing)
 ├── LESSONS.md                # Technical gotchas worth remembering (read on errors)
@@ -29,7 +30,7 @@ remotion-templates/
 ├── data/episodes/<slug>/     # Per-episode JSON data + assembly manifest
 ├── public/geo/               # Local TopoJSON (offline fallback)
 └── src/
-    ├── Root.tsx              # Composition registration (45+ templates in <Folder> groups)
+    ├── Root.tsx              # Studio registration: Current, Templates, Catalog, Experiments, Tests
     ├── design/               # theme.ts (BRAND.md in code), fonts.ts (preload)
     ├── components/           # Background, MetadataStrip, Crosshair, TitleBlock, Transitions, etc.
     ├── hooks/                # useCompositionAnimation, useDirection, useEntrance, useThemeMode, ...
@@ -43,10 +44,16 @@ Canonical schemas and field definitions: [`references/template-schemas.md`](./re
 
 Categories:
 
-- **Maps**: **AtlasPlate** (pure SVG, default for editorial work — see `MAP_TEMPLATE_SELECTOR.md`); ChoroplethMap / RouteAnimation / DensityMap (Mapbox via `MapGL`, reserved for atmospheric / terrain-required shots only — no title overlay)
-- **Data**: DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal
-- **Diagrams**: FrameworkDiagram, NetworkDiagram, DecisionTree (5 variants: extensive · ladder · indented · spine · schematic), OutcomePartition (decision-space partition map), EscalationLadder, GameBoard, SankeyFlow
-- **Typography & layout**: KineticTypography, TitleTransition, SplitComposition, ImageComposite, AnnotatedImage, PhotoMontage
+- **Maps**: **AtlasPlate** (pure SVG, default for editorial work — see `MAP_TEMPLATE_SELECTOR.md`); ChoroplethMap / RouteAnimation / DensityMap / ProportionalSymbolMap / CartogramMap / **CinematicMap** (Mapbox via `MapGL`, reserved for atmospheric / terrain-required shots only — no title overlay); **TerritoryMap** (animated territorial control over timesteps — crossfade or snap between actors, SVG timeline strip, `"country"` or `"subnational"` mode); **FlowMap** (directional volume flows — arc width ∝ `sqrt(volume)`, particles, `"simultaneous"` or `"stagger"` mode); CinematicMap = pitched moving camera for terrain fly-throughs + GlobeReveal pattern — see `MAP_TEMPLATE_SELECTOR.md` and dossiers in `references/template-research/`
+- **Data / Charts**: DataChart, TimeSeriesChart, BayesianUpdate, ProbabilityGauge, RadarChart, StatReveal, BeeswarmChart, BumpChart, **BarChartRace** (kinetic rank race — bars animate width+vertical position between periods; FT/Burn-Murdoch register), CalendarHeatmap, ConnectedScatterplot, **BubbleMatrix** (4-variable scatter: X/Y/size/color — Gapminder register; silicon-trap canonical use), DumbbellPlot, HorizonChart, IsotypeChart, MarimekkoChart, PopulationPyramid, RankChangeDotPlot, RidgelinePlot, Streamgraph, StepLine, KPICard, BulletChart, PricingWaterfall, Slopegraph
+- **Diagrams**: FrameworkDiagram, NetworkDiagram, **SanctionsNetwork** (typed sanctions architecture: sanctioner/target/relay/sector/institution nodes; primary-sanction/secondary-threat/evasion-path/formal-exemption edges; evasion-path particle animation), ArcDiagram, **PhilosophicalFamilyTree** (ArcDiagram-variant with year-based x-axis and typed influence edges: borrowed/transformed/critique/parallel), DecisionTree (5 variants: extensive · ladder · indented · spine · schematic), OutcomePartition (decision-space partition map), EscalationLadder, GameBoard, SankeyFlow, CausalLoopDiagram, SmallMultiples, TernaryPlot, TilegramUSMap
+- **Timelines**: HorizontalTimeline / HorizontalTimelineSingle, SpiralTimeline, DuelingFrameworks, StrategicLandscape, **ConceptEvolutionTimeline** (Foucauldian genealogy — per-node definition panels show what a concept meant at each moment; inter-node drift labels name what shifted; use for Sovereignty / Deterrence / Legitimacy genealogies)
+- **Typography & layout**: KineticTypography, TitleTransition, SplitComposition, ImageComposite, AnnotatedImage, **ScrollyReveal** (step-based progressive annotation with per-step pan/zoom focus — the video equivalent of NYT/Reuters scrollytelling; shared `AnnotationSVGLayer` component), **AnnotatedZoom** (pure directional zoom — "look here, then here, then here"; CSS transform IS the argument; no annotation callouts; sibling of ScrollyReveal for camera-as-rhetoric), PhotoMontage, PrimarySourceReveal
+- **Documentary archival** (May 2026): HandwrittenLetter (dual-mode: photograph / typeset), NewspaperHeadlineRotator (front-page mastheads + press-era typography), ArchivalReel (8mm / 16mm / VHS film emulation), TelegramCable (diplomatic cable bureaucratic chrome). All four share `<ArchivalPaper>` base component. Use when you want a primary source to speak rather than describing it.
+- **Argument Primitives** (May 2026): Syllogism, AxiomList, DialecticFlow, ConditionalArgument, CounterfactualPath, **AnalogyCrossmap** (structural mapping between domains + break connections — the "bounded analogy" form), **ToulminMap** (6-element Toulmin structure: Data → Warrant → Claim + Backing/Qualifier/Rebuttal; Warrant is the editorial focal point). The logic-as-visual family — render an argument's formal structure, not just its conclusion. Editorial constraint: each template makes one and only one argument move per segment.
+- **Relationship & Composition** (May 2026): VennDiagram (set-overlap; 2–3 sets with SVG clip-path intersections), ChordDiagram (bilateral flows; pure-trig arcs), Treemap (hierarchical part-to-whole; squarify algorithm), MatrixHeatmap (N×M cross-tabulation; diagonal ripple reveal).
+- **Cross-frame / morph** (May 2026): ComparisonPair (side-by-side scaled panes sharing one canvas), MorphTransition (cross-template interpolation — StatReveal, DataChart, TimeSeriesChart; real underdamped spring ζ=0.6 ω=8), SplitFrame (bespoke multi-pane layout with timed pane reveals).
+- **Math** (May 2026; promoted to manifest-level May 20, 2026): MathReveal (single-equation write-on), MathDerivation (multi-step derivation crossfade). KaTeX rendering; `M-MATH-VALID` lint validates every formula. Doctrine: `project/MATH_RENDER_REGISTER.md`.
 - **Episodes**: `FullEpisode.tsx` (manifest-driven), `SiliconTrap.tsx` (per-episode `<Series>`)
 - **Shorts (9:16)**: KineticShort, DataChartShort, SplitShort, FrameworkDiagramShort
 
@@ -60,6 +67,7 @@ Categories:
 
 - **Source of truth for colors:** [`tools/brand-treatment/palette.json`](../tools/brand-treatment/palette.json) → loaded by `src/design/theme.ts`. Don't hex-hardcode brand colors anywhere.
 - **Animation timing:** import from `src/design/theme.ts` — `timing.entrance.{snap, fast, crisp, medium, slow}`, `timing.exit.*`, `timing.stagger.*`, `timing.hold.*`. Don't reintroduce bare `sec(0.4)` / `sec(0.2)` magic numbers (use `entrance.crisp` and `entrance.snap`).
+- **Easing curves:** `easing.*` (bezier tuples → `Easing.bezier(...easing.decelerate)`) and `easingCss.*` (CSS strings) in `theme.ts`. Motion is **never linear** and **never bounces/overshoots** in this register. Default reveal = `decelerate` (`cubic-bezier(0,0,.2,1)`). Doctrine: `project/CHAINED_STILL_LESSONS.md` → "Organic vs geometric transforms".
 - **Animation defaults:** `KEN_BURNS_MAX_SCALE`, `PAN_DRIFT_MAX_OFFSET`, `EXIT_FADE_DURATION` are exported from `src/utils/animation.ts`. The `kenBurnsDrift`/`panDrift`/`exitFade` functions reference them by default.
 - **POLISH.md** defines the visual quality bar (checkable rules + Editorial Doctrine D1–D21); **BRAND.md** is the human-readable design spec.
 - **`PARALLAX_VISUAL_VOCABULARY.md`** is the chart chooser — given the editorial argument a script beat is making, find the right template. Read this when picking which template to render at the visual-spec stage.
@@ -70,9 +78,9 @@ Categories:
 
 ## How to create a new template
 
-1. Create `src/templates/YourTemplate/` with `types.ts`, `YourTemplate.tsx`, `schema.ts`, `index.tsx`.
+1. Run `node scripts/create-template.mjs YourTemplate` to create `types.ts`, `YourTemplate.tsx`, `schema.ts`, and `index.tsx`.
 2. Register in `src/Root.tsx` inside the appropriate `<Folder>`. Use `calculateMetadata` to derive `durationInFrames` from `data.durationSec`.
-3. Add sample data in `data/episodes/<slug>/`.
+3. Add sample data in `data/episodes/<slug>/`. For manifest dispatch, register the component in `Episodes/templateRegistry.ts` and its schema in `Episodes/templateSchemas.ts`.
 4. Wire `useCompositionAnimation()` for the auto Ken Burns drift + exit fade. Maps need `{ noDrift: true }`; templates with their own exits need `{ noExit: true }`; Shorts need `{ noDrift: true }`.
 
 ```tsx
@@ -119,8 +127,8 @@ Cascade unit tests at `src/__tests__/resolveFilmOverlay.test.ts` lock all 5 prio
 - **Preview:** `npm start` — Remotion Studio at `localhost:3000`.
 - **Single composition:** `npx remotion render src/index.ts ChoroplethMap out/map.mp4`. Override data: `--props='{"data":{...}}'`.
 - **Single still (for QA):** `npx remotion still src/index.ts ChoroplethMap --frame=60 --output=frame.png`.
-- **Episode render:** `node scripts/render-episode.mjs --episode=silicon-trap` (writes props to temp files, supports `--only=05,06` and `--from=16` for partial renders).
-- **Lambda render:** scaffolded but not wired into npm scripts as of May 17, 2026 — see the `_lambda_scaffolded` doc-key in `package.json`. The underlying scripts (`scripts/deploy-lambda.mjs`, `scripts/render-lambda.mjs`) exist; restore real `deploy` / `deploy:teardown` / `render:lambda` npm-script entries when wiring Lambda into CI.
+- **Pilot render:** `npx remotion render src/index.ts what-we-count out/what-we-count/what-we-count.mp4` (or `promise-and-copy`). The legacy `scripts/render-episode.mjs silicon-trap` renders only its configured silicon-trap clip sequence.
+- **Lambda render:** `deploy`, `deploy:teardown`, and `render:lambda` npm scripts exist, but cloud rendering is not wired into CI; see `_lambda_scaffolded` in `package.json`.
 
 Sandbox / headless Chromium: `--browser-executable=$(find ~/.cache/ms-playwright -name "headless_shell" | head -1)`.
 
@@ -147,7 +155,11 @@ Full reference: [`LESSONS.md`](./LESSONS.md). Worth knowing without reading it:
 - Map templates need network access for vector tile CDN — won't render full geography in fully sandboxed environments, but work fine in local Studio and Lambda.
 - `theme.ts` uses `as const` creating readonly tuples — code consuming color ramps must use `readonly string[]` types.
 - `MapGL` (the shared map component) requires the `delayRender` lifecycle — it's wired correctly; don't bypass it when adding new map templates.
-- Brand chrome (`HeaderStrip` + `FooterStrip`) is wired into all 45 templates by default via `<Background>`. Don't double-wrap.
+- **Fonts load from Google at render time.** The Latin families load at import; the Chinese and Japanese families load only when something reads `fonts.chinese` or resolves a Chinese / Japanese emphasis (`ensureCjkFonts()` in `src/design/fonts.ts`). Don't reference those families by a literal string, or they will not be loaded.
+- **Inside an episode a template does not animate its own frame in.** `areSeamsOwnedByEpisode()` (utils/animation.ts) is true under `FullEpisode`: `TitleBlock` and other structure should already be on screen at frame 0 so a cut lands on a set card. Animate only what the narration is about to name.
+- **Reveal times typed in seconds are scaled to the slot** by `src/utils/scaleToSlot.ts` when `FullEpisode` hands data to a template (keys ending `AtSec`, `typingStartSec`, `holdSec`, narration-paced `staggerSec`, and `durationSec`). Name new timing fields accordingly: a start time ends in `AtSec`; a fade length does not.
+- **Stills on the picture layer** are images, not clips: a FOOTAGE segment with an image `asset.file` is drawn by `src/components/StillFrame.tsx` using the segment's `framing`.
+- Brand chrome (`HeaderStrip` + `FooterStrip`) must be explicitly imported and rendered in each template — they are **not** auto-included by `<Background>`. Chart, diagram, and timeline templates should have them; cinematic/full-bleed image templates (ScrollyReveal, AnnotatedZoom, ArchivalReel, etc.) intentionally omit them.
 
 ## Don't
 

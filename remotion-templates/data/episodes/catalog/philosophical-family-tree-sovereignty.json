@@ -1,0 +1,55 @@
+{
+  "data": {
+    "episode": "sovereignty-philosophers",
+    "title": "SOVEREIGNTY'S PHILOSOPHERS",
+    "subtitle": "From Bodin's absolute prince to Kant's perpetual peace — three centuries of contested legitimacy.",
+    "source": "Skinner, *The Foundations of Modern Political Thought* (1978); Tuck, *The Rights of War and Peace* (1999)",
+    "durationSec": 18,
+    "backgroundVariant": "light",
+    "thinkers": [
+      {
+        "id": "bodin",
+        "name": "BODIN",
+        "doctrine": "Sovereignty theory",
+        "year": 1576,
+        "importance": "primary"
+      },
+      {
+        "id": "hobbes",
+        "name": "HOBBES",
+        "doctrine": "Leviathan state",
+        "year": 1651,
+        "importance": "primary"
+      },
+      {
+        "id": "locke",
+        "name": "LOCKE",
+        "doctrine": "Consent theory",
+        "year": 1689,
+        "importance": "primary"
+      },
+      {
+        "id": "rousseau",
+        "name": "ROUSSEAU",
+        "doctrine": "General will",
+        "year": 1762,
+        "importance": "primary"
+      },
+      {
+        "id": "kant",
+        "name": "KANT",
+        "doctrine": "Cosmopolitan law",
+        "year": 1795,
+        "importance": "primary"
+      }
+    ],
+    "influences": [
+      { "from": "bodin", "to": "hobbes", "type": "borrowed", "label": "sovereignty concept" },
+      { "from": "hobbes", "to": "locke", "type": "critique", "label": "absolute power" },
+      { "from": "locke", "to": "rousseau", "type": "transformed", "label": "consent" },
+      { "from": "rousseau", "to": "kant", "type": "transformed", "label": "universal will" },
+      { "from": "hobbes", "to": "kant", "type": "critique", "label": "war state" },
+      { "from": "locke", "to": "kant", "type": "borrowed", "label": "rights" }
+    ]
+  }
+}

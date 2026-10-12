@@ -1,0 +1,35 @@
+{
+  "episode": "ai-care-motives",
+  "title": "A chatbot update, pulled in four days",
+  "subtitle": "Press-reported cause: over-weighting short-term feedback",
+  "source": "OpenAI statement via TechCrunch, Apr 2025",
+  "mode": "single",
+  "events": [
+    {
+      "year": "Apr 25, 2025",
+      "title": "Update released",
+      "weight": 2
+    },
+    {
+      "year": "Apr 29",
+      "title": "Rolled back",
+      "description": "Four days later; cause cited: leaned too heavily on short-term feedback",
+      "weight": 3,
+      "color": "#A64D46"
+    }
+  ],
+  "backgroundVariant": "light",
+  "durationSec": 16,
+  "_direction": {
+    "revealMode": "sequential"
+  },
+  "eras": [
+    {
+      "label": "4 days",
+      "startIndex": 0,
+      "endIndex": 1,
+      "color": "#786526",
+      "appearAtSec": 4.2
+    }
+  ]
+}

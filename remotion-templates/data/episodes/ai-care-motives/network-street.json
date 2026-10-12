@@ -1,0 +1,58 @@
+{
+  "episode": "ai-care-motives",
+  "title": "A fact about his street",
+  "layout": "hub-spoke",
+  "durationSec": 20,
+  "nodes": [
+    {
+      "id": "shop",
+      "label": "the shopkeeper",
+      "type": "actor",
+      "color": "#C4A747",
+      "importance": "primary"
+    },
+    {
+      "id": "cust",
+      "label": "other customers",
+      "type": "actor",
+      "color": "#8B7355",
+      "importance": "secondary"
+    },
+    {
+      "id": "neigh",
+      "label": "neighbors",
+      "type": "actor",
+      "color": "#8B7355",
+      "importance": "secondary"
+    },
+    {
+      "id": "comp",
+      "label": "a competitor",
+      "type": "actor",
+      "color": "#8B7355",
+      "importance": "secondary"
+    }
+  ],
+  "edges": [
+    {
+      "from": "shop",
+      "to": "cust",
+      "style": "solid"
+    },
+    {
+      "from": "shop",
+      "to": "neigh",
+      "style": "solid"
+    },
+    {
+      "from": "shop",
+      "to": "comp",
+      "style": "solid"
+    }
+  ],
+  "callouts": [],
+  "backgroundVariant": "light",
+  "_direction": {
+    "revealMode": "progressive"
+  }
+}

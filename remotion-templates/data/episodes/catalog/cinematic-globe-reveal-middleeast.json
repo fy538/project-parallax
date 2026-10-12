@@ -1,0 +1,36 @@
+{
+  "episode": "catalog",
+  "source": "Mapbox · Natural Earth",
+  "_comment": "GlobeReveal fixture — high-altitude CinematicMap with atmospheric fog + night light. Planet open into the eastern Mediterranean.",
+  "keyframes": [
+    {
+      "sec": 0,
+      "center": [38.0, 30.0],
+      "altitudeM": 9000000,
+      "pitch": 0,
+      "bearing": 0,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 4,
+      "center": [38.0, 30.0],
+      "altitudeM": 1800000,
+      "pitch": 18,
+      "bearing": 5,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 10,
+      "center": [36.0, 33.5],
+      "altitudeM": 300000,
+      "pitch": 38,
+      "bearing": 10,
+      "easing": "ease-in-out"
+    }
+  ],
+  "register": "dark",
+  "fogPreset": "atmospheric",
+  "lightPreset": "night",
+  "terrain": false,
+  "terrainExaggeration": 1.0
+}

@@ -1,0 +1,23 @@
+{
+  "episode": "trade-dialectic",
+  "title": "THE TRADE DIALECTIC",
+  "subtitle": "How modern industrial policy emerged from a contradiction.",
+  "source": "Rodrik, D. (2017). Straight Talk on Trade.",
+  "thesis": {
+    "label": "Free Trade",
+    "body": "Comparative advantage makes everyone better off; protectionism is self-harm.",
+    "attribution": "Ricardo, 1817"
+  },
+  "antithesis": {
+    "label": "Trade Harms",
+    "body": "Workers in displaced industries don't get compensated; aggregate gains mask localised devastation.",
+    "attribution": "Polanyi, 1944"
+  },
+  "synthesis": {
+    "label": "Managed Trade",
+    "body": "Strategic protection of key sectors paired with adjustment assistance — the policy regime most industrial states actually adopt.",
+    "attribution": "Rodrik, 2017"
+  },
+  "tensionLabel": "Contradiction",
+  "durationSec": 14
+}

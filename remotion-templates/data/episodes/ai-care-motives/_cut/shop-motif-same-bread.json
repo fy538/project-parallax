@@ -1,0 +1,36 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 4.0,
+  "syncStrategy": "simultaneous",
+  "left": {
+    "component": "ImageComposite",
+    "label": "DUTY",
+    "caption": "Same bread.",
+    "data": {
+      "episode": "ai-care-motives",
+      "imagePath": "episodes/ai-care-motives/stills/aigen-02-shop-counter.png",
+      "variant": "background",
+      "duotone": "none",
+      "durationSec": 4,
+      "backgroundVariant": "light"
+    },
+    "focusX": 0.47
+  },
+  "right": {
+    "component": "ImageComposite",
+    "label": "PRUDENCE",
+    "caption": "Same price. Same change.",
+    "data": {
+      "episode": "ai-care-motives",
+      "imagePath": "episodes/ai-care-motives/stills/aigen-02-shop-counter.png",
+      "variant": "background",
+      "duotone": "none",
+      "durationSec": 4,
+      "backgroundVariant": "light"
+    },
+    "focusX": 0.47,
+    "labelPosition": "top-left"
+  },
+  "backgroundVariant": "light",
+  "paneFit": "cover"
+}

@@ -1,0 +1,16 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "quote",
+  "text": "No man would keep his hands off what was not his own when he could safely take what he liked out of the market.",
+  "attribution": "Glaucon",
+  "attributionContext": "Plato, Republic II (Jowett translation)",
+  "accentColor": "#8B7355",
+  "backgroundVariant": "light",
+  "durationSec": 17.0,
+  "_direction": {
+    "textAnimation": "quote-attribution",
+    "holdBehavior": "land"
+  },
+  "typingCps": 14,
+  "typingStartSec": 2.2
+}

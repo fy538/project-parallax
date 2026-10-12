@@ -1,0 +1,21 @@
+{
+  "episode": "ai-care-motives",
+  "imagePath": "episodes/ai-care-motives/stills/arch-kant.jpg",
+  "variant": "portrait",
+  "duotone": "none",
+  "title": "Immanuel Kant",
+  "subtitle": "Groundwork of the Metaphysics of Morals, First Section",
+  "durationSec": 29,
+  "backgroundVariant": "light",
+  "source": "Abbott translation · Engraving by J. F. Bause after V. H. Schnorr, 1791",
+  "quotes": [
+    {
+      "text": "so that a child buys of him as well as any other",
+      "atSec": 5.0
+    },
+    {
+      "text": "merely with a selfish view",
+      "atSec": 11.4
+    }
+  ]
+}

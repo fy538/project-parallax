@@ -1,0 +1,16 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "quote",
+  "text": "whether his motive be duty, or the hope of being paid for his trouble",
+  "attribution": "John Stuart Mill",
+  "attributionContext": "Utilitarianism, Ch. II",
+  "accentColor": "#8B7355",
+  "backgroundVariant": "light",
+  "durationSec": 17,
+  "_direction": {
+    "textAnimation": "quote-attribution",
+    "paceProfile": "breathing"
+  },
+  "typingCps": 14,
+  "typingStartSec": 0.6
+}

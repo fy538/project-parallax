@@ -1,0 +1,58 @@
+{
+  "episode": "catalog",
+  "durationSec": 12,
+  "dividerLabel": "vs",
+  "backgroundVariant": "dark",
+  "left": {
+    "component": "StatReveal",
+    "label": "1914",
+    "caption": "U.S. annual defense expenditure at the eve of the Great War",
+    "data": {
+      "episode": "catalog",
+      "title": "U.S. Defense, 1914",
+      "source": "Historical Statistics of the United States (Cambridge UP)",
+      "durationSec": 12,
+      "backgroundVariant": "dark",
+      "stat": {
+        "value": 17,
+        "prefix": "$",
+        "suffix": "B",
+        "label": "U.S. defense budget",
+        "decimals": 0,
+        "countUp": true
+      },
+      "comparisons": [
+        { "label": "Germany", "value": 44, "color": "#888780" },
+        { "label": "UK",      "value": 76, "color": "#888780" },
+        { "label": "U.S.",    "value": 17, "color": "#C4A747" }
+      ],
+      "heroIsMax": false
+    }
+  },
+  "right": {
+    "component": "StatReveal",
+    "label": "2024",
+    "caption": "The largest annual defense appropriation in recorded history",
+    "data": {
+      "episode": "catalog",
+      "title": "U.S. Defense, 2024",
+      "source": "SIPRI Military Expenditure Database (2024)",
+      "durationSec": 12,
+      "backgroundVariant": "dark",
+      "stat": {
+        "value": 886,
+        "prefix": "$",
+        "suffix": "B",
+        "label": "U.S. defense budget",
+        "decimals": 0,
+        "countUp": true
+      },
+      "comparisons": [
+        { "label": "China",  "value": 296, "color": "#A64D46" },
+        { "label": "Russia", "value": 109, "color": "#888780" },
+        { "label": "U.S.",   "value": 886, "color": "#C4A747" }
+      ],
+      "heroIsMax": true
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 6,
+  "branchYear": "Watching removed",
+  "branchEvent": "He believes nobody can check",
+  "preBranchLabel": "Shopkeeper, watched",
+  "actual": {
+    "label": "Watched",
+    "outcome": "Fair change"
+  },
+  "counterfactuals": [
+    {
+      "label": "Unwatched",
+      "outcome": "Fair change?",
+      "direction": "down"
+    }
+  ],
+  "backgroundVariant": "light",
+  "_direction": {
+    "preDelay": 3.0,
+    "holdAfter": 3.0
+  }
+}

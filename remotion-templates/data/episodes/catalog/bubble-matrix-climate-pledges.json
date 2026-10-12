@@ -1,0 +1,45 @@
+{
+  "data": {
+    "episode": "catalog",
+    "title": "CLIMATE PLEDGES: AMBITION VS EMISSIONS",
+    "subtitle": "Bubble size = population (M). Color = income group. 2023 data.",
+    "source": "IEA CO₂ Emissions 2023; UNFCCC NDC Registry; UN Population Division 2023",
+    "durationSec": 14,
+    "backgroundVariant": "light",
+    "xAxis": {
+      "label": "Current CO₂ per capita (t/year)",
+      "min": 0,
+      "max": 22,
+      "format": "%.0f",
+      "tickCount": 5
+    },
+    "yAxis": {
+      "label": "NDC reduction target vs 2005 baseline (%)",
+      "min": 0,
+      "max": 65,
+      "format": "%.0f%%",
+      "tickCount": 5
+    },
+    "sizeLabel": "Population (M)",
+    "groups": [
+      { "id": "high-income",   "label": "High income",   "color": "#4A7BA7" },
+      { "id": "middle-income", "label": "Middle income", "color": "#C4A747" },
+      { "id": "low-income",    "label": "Low income",    "color": "#888780" }
+    ],
+    "revealOrder": "by-group",
+    "referenceLines": [
+      { "axis": "x", "value": 7.0,  "label": "World avg", "style": "dashed" },
+      { "axis": "y", "value": 43.0, "label": "1.5°C path", "style": "dashed" }
+    ],
+    "entities": [
+      { "id": "usa",          "label": "USA",          "x": 14.9, "y": 26, "size": 335,  "group": "high-income",   "emphasis": "primary" },
+      { "id": "eu",           "label": "EU",           "x": 6.8,  "y": 55, "size": 450,  "group": "high-income",   "emphasis": "primary" },
+      { "id": "china",        "label": "China",        "x": 8.1,  "y": 65, "size": 1400, "group": "middle-income", "emphasis": "primary" },
+      { "id": "india",        "label": "India",        "x": 1.9,  "y": 45, "size": 1400, "group": "middle-income", "emphasis": "primary" },
+      { "id": "russia",       "label": "Russia",       "x": 12.4, "y": 25, "size": 144,  "group": "high-income" },
+      { "id": "brazil",       "label": "Brazil",       "x": 2.2,  "y": 43, "size": 215,  "group": "middle-income" },
+      { "id": "saudi-arabia", "label": "Saudi Arabia", "x": 18.4, "y": 18, "size": 35,   "group": "high-income" },
+      { "id": "nigeria",      "label": "Nigeria",      "x": 0.6,  "y": 20, "size": 215,  "group": "low-income" }
+    ]
+  }
+}

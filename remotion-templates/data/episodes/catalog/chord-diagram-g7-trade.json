@@ -1,0 +1,29 @@
+{
+  "episode": "catalog",
+  "title": "G7 TRADE INTERDEPENDENCE",
+  "subtitle": "Bilateral goods trade flows, 2023 (USD billions)",
+  "source": "WTO Statistics Database; IMF Direction of Trade (2023)",
+  "durationSec": 14,
+  "backgroundVariant": "dark",
+  "valueLabel": "USD billions",
+  "entities": [
+    {"id": "us",  "label": "United States", "color": "#4A7BA7"},
+    {"id": "de",  "label": "Germany",       "color": "#C4A747"},
+    {"id": "cn",  "label": "China",         "color": "#A64D46"},
+    {"id": "jp",  "label": "Japan",         "color": "#7AA3C9"},
+    {"id": "uk",  "label": "United Kingdom","color": "#8B7355"},
+    {"id": "fr",  "label": "France",        "color": "#B8A189"}
+  ],
+  "flows": [
+    {"from": "us", "to": "cn", "value": 575, "bidirectional": true},
+    {"from": "us", "to": "de", "value": 298},
+    {"from": "us", "to": "jp", "value": 218},
+    {"from": "us", "to": "uk", "value": 260, "bidirectional": true},
+    {"from": "us", "to": "fr", "value": 130},
+    {"from": "de", "to": "cn", "value": 252},
+    {"from": "de", "to": "fr", "value": 171, "bidirectional": true},
+    {"from": "de", "to": "uk", "value": 120},
+    {"from": "jp", "to": "cn", "value": 318, "bidirectional": true},
+    {"from": "uk", "to": "fr", "value": 68,  "bidirectional": true}
+  ]
+}

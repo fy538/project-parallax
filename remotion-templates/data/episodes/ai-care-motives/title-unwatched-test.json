@@ -1,0 +1,13 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "editorial-title",
+  "title": "THE UNWATCHED TEST",
+  "brandMark": "top-right",
+  "accentColor": "#C4A747",
+  "backgroundVariant": "dark",
+  "durationSec": 7.0,
+  "_direction": {
+    "holdBehavior": "land",
+    "transitionOut": "fade"
+  }
+}

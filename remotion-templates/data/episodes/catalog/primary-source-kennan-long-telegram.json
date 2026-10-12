@@ -1,0 +1,42 @@
+{
+  "episode": "containment-doctrine",
+  "title": "THE LONG TELEGRAM",
+  "subtitle": "George F. Kennan, 22 February 1946 — Moscow to Washington.",
+  "source": "Foreign Relations of the United States, 1946, Vol. VI",
+  "text": "At bottom of Kremlin's neurotic view of world affairs is traditional and instinctive Russian sense of insecurity. Originally, this was insecurity of a peaceful agricultural people trying to live on vast exposed plain in neighborhood of fierce nomadic peoples. To this was added, as Russia came into contact with economically advanced West, fear of more competent, more powerful, more highly organized societies in that area. But this latter type of insecurity was one which afflicted rather Russian rulers than Russian people; for Russian rulers have invariably sensed that their rule was relatively archaic in form, fragile and artificial in its psychological foundation, unable to stand comparison or contact with political systems of Western countries.",
+  "annotations": [
+    {
+      "target": "neurotic view of world affairs",
+      "type": "underline",
+      "appearAtSec": 3
+    },
+    {
+      "target": "traditional and instinctive Russian sense of insecurity",
+      "type": "highlight",
+      "appearAtSec": 5
+    },
+    {
+      "target": "fierce nomadic peoples",
+      "type": "circle",
+      "appearAtSec": 8
+    },
+    {
+      "target": "fierce nomadic peoples",
+      "type": "margin-note",
+      "note": "Kennan's geographic determinism — the open steppe as a recurring source of strategic anxiety.",
+      "appearAtSec": 9.5
+    },
+    {
+      "target": "Russian rulers than Russian people",
+      "type": "underline",
+      "appearAtSec": 13
+    },
+    {
+      "target": "archaic in form, fragile and artificial",
+      "type": "numbered",
+      "note": "Foreshadows the eventual collapse thesis — Kennan believed Soviet legitimacy was structurally unsustainable. He restated this in 1947 ('Sources of Soviet Conduct').",
+      "appearAtSec": 16
+    }
+  ],
+  "durationSec": 22
+}

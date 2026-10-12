@@ -1,0 +1,17 @@
+{
+  "episode": "ai-care-motives",
+  "imagePath": "episodes/ai-care-motives/stills/arch-mill.jpg",
+  "variant": "portrait",
+  "duotone": "none",
+  "title": "John Stuart Mill",
+  "subtitle": "Utilitarianism, Chapter II",
+  "durationSec": 23,
+  "backgroundVariant": "light",
+  "source": "After a photograph by John Watkins, 1865",
+  "quotes": [
+    {
+      "text": "whether his motive be duty, or the hope of being paid for his trouble",
+      "atSec": 6.6
+    }
+  ]
+}

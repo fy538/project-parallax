@@ -1,0 +1,27 @@
+{
+  "episode": "realist-foundations",
+  "title": "THE AXIOMS OF STRUCTURAL REALISM",
+  "subtitle": "The foundational assumptions Kenneth Waltz placed beneath the system.",
+  "source": "Waltz, K. (1979). Theory of International Politics.",
+  "framing": "Realist analysis presupposes four claims about the international system. Each is contestable; none is obvious.",
+  "axioms": [
+    {
+      "text": "The international system is anarchic — no authority stands above states.",
+      "gloss": "The foundational assumption; everything else follows.",
+      "emphasis": "key"
+    },
+    {
+      "text": "States are the principal units; non-state actors operate within state-permitted bounds."
+    },
+    {
+      "text": "States are rational unitary actors maximising security and survival.",
+      "gloss": "Disputed by behavioralists, bureaucratic-politics scholars, and constructivists.",
+      "emphasis": "disputed"
+    },
+    {
+      "text": "States cannot be certain of others' intentions, so capabilities matter more than declared aims."
+    }
+  ],
+  "numbering": "arabic",
+  "durationSec": 16
+}

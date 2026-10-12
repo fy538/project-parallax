@@ -1,0 +1,34 @@
+{
+  "episode": "ai-care-motives",
+  "title": "On the road, up to 40 times the NOx standard",
+  "source": "U.S. EPA, Notice of Violation to Volkswagen, Sept 18, 2015",
+  "durationSec": 7,
+  "stat": {
+    "value": 40,
+    "kicker": "up to",
+    "suffix": "×",
+    "label": "the NOx standard, on the road",
+    "decimals": 0,
+    "countUp": true
+  },
+  "comparisons": [
+    {
+      "label": "Standard",
+      "value": 1,
+      "color": "#888780"
+    },
+    {
+      "label": "VW on the road",
+      "value": 40,
+      "color": "#A64D46",
+      "source": "EPA, 2015"
+    }
+  ],
+  "heroIsMax": true,
+  "backgroundVariant": "light",
+  "_direction": {
+    "paceProfile": "urgent",
+    "revealMode": "count-up",
+    "revealEasing": "pulse"
+  }
+}

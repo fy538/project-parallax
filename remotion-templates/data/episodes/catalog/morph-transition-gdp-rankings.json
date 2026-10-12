@@ -1,0 +1,50 @@
+{
+  "episode": "great-power-rankings",
+  "title": "TOP FIVE ECONOMIES",
+  "subtitle": "GDP rankings shifted dramatically across a generation.",
+  "source": "World Bank, IMF (constant 2024 USD, trillions)",
+  "holdFromSec": 2,
+  "morphSec": 3.5,
+  "holdToSec": 3,
+  "morphEasing": "ease-in-out",
+  "from": {
+    "template": "DataChart",
+    "label": "1990",
+    "data": {
+      "episode": "great-power-rankings",
+      "title": "GDP — top economies, 1990",
+      "variant": "bar",
+      "dataPoints": [
+        { "label": "United States", "value": 5.96 },
+        { "label": "Japan", "value": 3.13 },
+        { "label": "Germany", "value": 1.77 },
+        { "label": "France", "value": 1.27 },
+        { "label": "United Kingdom", "value": 1.09 }
+      ],
+      "unit": "$ trillions",
+      "source": "",
+      "durationSec": 14
+    }
+  },
+  "to": {
+    "template": "DataChart",
+    "label": "2024",
+    "data": {
+      "episode": "great-power-rankings",
+      "title": "GDP — top economies, 2024",
+      "variant": "bar",
+      "dataPoints": [
+        { "label": "United States", "value": 28.78 },
+        { "label": "China", "value": 18.53 },
+        { "label": "Germany", "value": 4.59 },
+        { "label": "Japan", "value": 4.11 },
+        { "label": "India", "value": 3.94 }
+      ],
+      "unit": "$ trillions",
+      "highlightIndex": 1,
+      "source": "",
+      "durationSec": 14
+    }
+  },
+  "durationSec": 14
+}

@@ -1,0 +1,25 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 14.4,
+  "title": "Three kinds of test",
+  "staggerSec": 3.3,
+  "axioms": [
+    {
+      "text": "A scheduled exam",
+      "gloss": "what a student studied for"
+    },
+    {
+      "text": "A pop quiz",
+      "gloss": "what they know"
+    },
+    {
+      "text": "An ordinary Tuesday",
+      "gloss": "what they actually do",
+      "emphasis": "key"
+    }
+  ],
+  "backgroundVariant": "light",
+  "_direction": {
+    "paceProfile": "breathing"
+  }
+}

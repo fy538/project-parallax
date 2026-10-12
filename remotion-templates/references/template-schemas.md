@@ -421,6 +421,77 @@ Point clusters or heatmap density on a Mapbox basemap (deck.gl HexagonLayer / He
 
 ---
 
+## CinematicMap
+
+Terrain fly-through on a Mapbox basemap with a pitched, moving camera (30–75°). No data layers, no title overlay, no phase system. The camera path IS the editorial argument. Designed for terrain-as-argument shots — mountain passes, strait chokepoints, siege geography, alpine borders. Use when the physical landscape must be experienced rather than labeled.
+
+```jsonc
+{
+  "episode": "silicon-trap",
+  "keyframes": [
+    { "sec": 0,  "center": [71.5, 34.4], "altitudeM": 350000, "pitch": 20, "bearing": 320 },
+    { "sec": 4,  "center": [71.3, 34.2], "altitudeM": 40000,  "pitch": 50, "bearing": 325 },
+    { "sec": 10, "center": [71.1, 34.1], "altitudeM": 12000,  "pitch": 68, "bearing": 335 }
+  ],
+  "terrain": true,
+  "terrainExaggeration": 1.5,
+  "fogPreset": "atmospheric",
+  "lightPreset": "dusk",
+  "register": "dark",
+  "annotations": [
+    { "id": "khyber", "type": "label", "coordinates": [71.1, 34.1], "label": "Khyber Pass" }
+  ],
+  "source": "Mapbox Terrain DEM v1"
+}
+```
+
+**Key fields:**
+- `keyframes[]` — ordered array of camera positions, minimum 2. Each entry:
+  - `sec` — time in seconds (converted to frame internally; author in seconds)
+  - `center` — `[lng, lat]` camera ground target
+  - `altitudeM` — camera altitude in metres above sea level (use instead of `zoom` for terrain shots — altitude is stable; zoom fluctuates with terrain)
+  - `zoom` — convenience alternative to `altitudeM` (converted internally; `altitudeM` preferred)
+  - `pitch` — 0–85°; 0 = nadir (overhead), 60–75° = low-angle terrain immersion
+  - `bearing` — compass heading of camera (0 = north)
+  - `lookAt` — `[lng, lat]` off-axis target (camera looks at this point rather than straight ahead)
+  - `easing` — `"linear"` | `"ease-in"` | `"ease-out"` | `"ease-in-out"`
+- `durationSec` — optional explicit clip duration; defaults to `max(keyframes[].sec)`
+- `terrain` — boolean, default `true`. This template's entire point — set `false` only for globe-reveal opens where DEM tiles at 9Mm altitude are unnecessary.
+- `terrainExaggeration` — 0–3, default 1.5. 1.0 = real-world scale; 1.5 = editorial emphasis; 2.0+ = dramatic/schematic. Lower for coastal/maritime shots (flat water looks wrong at high exaggeration).
+- `fogPreset` — `"atmospheric"` (default, haze builds with distance), `"editorial"` (subtle), `"vintage"`, `"none"`
+- `lightPreset` — `"dusk"` (default, warm directional), `"day"`, `"night"`, `"dawn"`
+- `register` — `"dark"` (default), `"light"`, `"satellite"`, `"terrain"` — Mapbox style family
+- `annotations[]` — `MapAnnotation[]` — label overlays pinned to lon/lat (rendered INSIDE the MapGL context so they track the camera)
+- `graticule` — boolean or `GraticuleConfig` — lat/lon grid lines
+- `source` — attribution string (shown in bottom-right chrome)
+- `_direction` — standard direction block
+
+**Altitude reference** (use instead of zoom for terrain shots):
+
+| Altitude | What you see |
+|----------|-------------|
+| 9,000,000 m | Full globe from space |
+| 1,000,000 m | Continental view |
+| 300,000 m | Country-scale |
+| 80,000 m | Large region (~Texas) |
+| 12,000 m | City / valley |
+| 2,000 m | Individual ridgelines |
+| 200 m | Street level |
+
+**GlobeReveal pattern** (not a separate template — use CinematicMap with):
+```jsonc
+{ "terrain": false, "fogPreset": "atmospheric", "lightPreset": "night",
+  "keyframes": [
+    { "sec": 0, "center": [35, 30], "altitudeM": 9000000, "pitch": 0 },
+    { "sec": 4, "center": [35, 30], "altitudeM": 1800000, "pitch": 20 },
+    { "sec": 10, "center": [35, 32], "altitudeM": 300000, "pitch": 45 }
+  ] }
+```
+
+**Authoring tool:** `python3 tools/camera_path.py WAYPOINTS... [--style PRESET]` — generates `keyframes[]` from named places or `lng,lat` coords. See `references/template-research/cinematic-map.md` for full pitch/altitude/light guidance + two-pass render fallback procedure.
+
+---
+
 ## BifurcationRoute
 
 > **⚠ DELETED May 13, 2026.** The template folder no longer exists; rendering will produce a silent null segment. For new work: use **DuelingFrameworks** (two head-to-head scenarios) or **DecisionTree** (branching with probabilities). Schema below kept for archival reference only.
@@ -882,6 +953,8 @@ Conceptual models, comparisons, matrix layouts, process flows.
 
 **Key fields:**
 - `heroStage` — (flow variant) zero-based index of the stage to render in hero mode: enlarged node, accent color, anchored entrance. Use to single out the "punchline" stage in a process flow (the choke point, the value-capture step). Independent from `protagonist`, which highlights a comparison-variant column.
+- `comparisonLayout: "paired"` — (comparison variant, added Oct 10, 2026) lines the two columns up row by row at large type instead of stacking two lists. `columns[0].items[i]` sits beside `columns[1].items[i]`. Companions: `rowLabels[]` (optional label at the left of each row), `rowAtSec[]` (when each row arrives; a number, or `[left, right]` to land each side on its own phrase), `keyRow` (index of the row that carries the point; gold rail), `connector: "arrow" | "none"` (arrow = left is acted on by right). Column colours are ignored in this layout. Use it when the argument is in the pairing.
+- `source` — optional source line, bottom right.
 
 ---
 
@@ -1345,6 +1418,7 @@ Dramatic single-statistic reveal with comparison bars.
 
 **Key fields:**
 - `stat.prefix/suffix` — formatting around the number (e.g., "$280B")
+- `stat.kicker` — optional small qualifier set above the number ("up to", "at least", "roughly"). Use it instead of `prefix` for words: a prefix is typeset at the full hero size, so "up to 40x" becomes one 120px string.
 - `stat.decimals` — decimal places (default: 0)
 - `heroIsMax` — if true (default), hero stat is the largest bar
 
@@ -1458,6 +1532,8 @@ Brand-treated photo with text overlay.
 
 ---
 
+**Portrait with quotations (added Oct 10, 2026):** `quotes: [{ text, atSec, cps? }]` on the `portrait` variant types each quotation beside the portrait at its own time (default 14 cps, the pace of speech). The name is then set smaller, as a credit, and the `source` line moves to the foot of the column. Use it instead of a name plate followed by a separate quote card; give a quotation the narrator reads in two pieces as two entries.
+
 ## PhotoMontage
 
 Multi-photo grid with reveal animation.
@@ -1506,7 +1582,7 @@ Examples:
 
 ## Templates without dedicated schema documentation here
 
-The following 19 live templates render fine and have full Zod schemas in their template directories, but no dedicated section has been authored in this doc yet. **Since May 2026 audit #3, the per-template `schema.ts` derives the TypeScript types directly (`z.infer`), so the schema is now the canonical source-of-truth for field shapes** — that field-level reference no longer needs duplicating here. Read the schema file directly when authoring data files for these templates; the family SELECTORs name when to reach for each, and the dossiers carry the editorial doctrine.
+The following 42 live templates render fine and have full Zod schemas in their template directories, but no dedicated section has been authored in this doc yet. **Since May 2026 audit #3, the per-template `schema.ts` derives the TypeScript types directly (`z.infer`), so the schema is now the canonical source-of-truth for field shapes** — that field-level reference no longer needs duplicating here. Read the schema file directly when authoring data files for these templates; the family SELECTORs name when to reach for each, and the dossiers carry the editorial doctrine.
 
 Adding a template here (vs writing a full `## Name` section) is a deliberate editorial call: the schema + dossier together give an author everything they need. Full sections live above for templates that need extra editorial context (e.g. variant decision trees, complex composition rules) that doesn't fit naturally in either source.
 
@@ -1531,5 +1607,45 @@ Adding a template here (vs writing a full `## Name` section) is a deliberate edi
 | **StepLine** | Charts (Phase 4) | `src/templates/StepLine/schema.ts` | `references/template-research/step-line.md` |
 | **Streamgraph** | Charts | `src/templates/Streamgraph/schema.ts` | `references/template-research/streamgraph.md` |
 | **TernaryPlot** | Charts | `src/templates/TernaryPlot/schema.ts` | `references/template-research/ternary-plot.md` |
+| **AxiomList** | Argument Primitives | `src/templates/AxiomList/schema.ts` | `references/template-research/axiom-list.md` |
+| **DialecticFlow** | Argument Primitives | `src/templates/DialecticFlow/schema.ts` | `references/template-research/dialectic-flow.md` |
+| **ConditionalArgument** | Argument Primitives | `src/templates/ConditionalArgument/schema.ts` | `references/template-research/conditional-argument.md` |
+| **CounterfactualPath** | Argument Primitives | `src/templates/CounterfactualPath/schema.ts` | `references/template-research/counterfactual-path.md` |
+| **MorphTransition** | Cross-frame / morph | `src/templates/MorphTransition/schema.ts` | `references/template-research/morph-transition.md` |
+| **SplitFrame** | Cross-frame / multi-segment | `src/templates/SplitFrame/schema.ts` | `references/template-research/split-frame.md` |
+| **VennDiagram** | Relationship & Composition | `src/templates/VennDiagram/schema.ts` | `references/template-research/venn-diagram.md` |
+| **ChordDiagram** | Relationship & Composition | `src/templates/ChordDiagram/schema.ts` | `references/template-research/chord-diagram.md` |
+| **Treemap** | Relationship & Composition | `src/templates/Treemap/schema.ts` | `references/template-research/treemap.md` |
+| **MatrixHeatmap** | Relationship & Composition | `src/templates/MatrixHeatmap/schema.ts` | `references/template-research/matrix-heatmap.md` |
+| **CausalLoopDiagram** | Diagrams | `src/templates/CausalLoopDiagram/schema.ts` | `references/template-research/causal-loop-diagram.md` |
+| **SpiralTimeline** | Timelines | `src/templates/SpiralTimeline/schema.ts` | `references/template-research/spiral-timeline.md` |
+| **PrimarySourceReveal** | Cinematic | `src/templates/PrimarySourceReveal/schema.ts` | `references/template-research/primary-source-reveal.md` |
+| **SmallMultiples** | Data | `src/templates/SmallMultiples/schema.ts` | `references/template-research/small-multiples.md` |
+| **HandwrittenLetter** | Documentary archival | `src/templates/HandwrittenLetter/schema.ts` | `references/template-research/handwritten-letter.md` |
+| **NewspaperHeadlineRotator** | Documentary archival | `src/templates/NewspaperHeadlineRotator/schema.ts` | `references/template-research/newspaper-headline-rotator.md` |
+| **ArchivalReel** | Documentary archival | `src/templates/ArchivalReel/schema.ts` | `references/template-research/archival-reel.md` |
+| **TelegramCable** | Documentary archival | `src/templates/TelegramCable/schema.ts` | `references/template-research/telegram-cable.md` |
+| **ComparisonPair** | Cross-frame / morph | `src/templates/ComparisonPair/schema.ts` | `references/template-research/comparison-pair.md` |
+| **Syllogism** | Argument Primitives | `src/templates/Syllogism/schema.ts` | `references/template-research/syllogism.md` |
 
-All 15 templates use the shared `_direction` field via `DirectionBlockSchema` (see `src/hooks/directionBlock.schema.ts`) and conform to the same editorial-shell fields documented in `src/templates/_shared/compositionBase.ts` (May 17, 2026). When this doc is expanded inline, follow the per-section pattern used for the existing 30+ entries above.
+| **HorizontalTimelineSingle** | Timelines | `src/templates/HorizontalTimeline/schema.ts` (shared with HorizontalTimeline) | `references/template-research/horizontal-timeline.md` |
+| **MathReveal** | Math (Phase 1) | `src/templates/MathReveal/schema.ts` | `project/MATH_RENDER_REGISTER.md` |
+| **MathDerivation** | Math (Phase 2) | `src/templates/MathDerivation/schema.ts` | `project/MATH_RENDER_REGISTER.md` |
+| **TerritoryMap** | Maps | `src/templates/TerritoryMap/schema.ts` | `references/template-research/territory-map.md` |
+| **FlowMap** | Maps | `src/templates/FlowMap/schema.ts` | `references/template-research/flow-map.md` |
+| **AnalogyCrossmap** | Argument Primitives | `src/templates/AnalogyCrossmap/schema.ts` | `references/template-research/analogy-crossmap.md` |
+| **ToulminMap** | Argument Primitives | `src/templates/ToulminMap/schema.ts` | `references/template-research/toulmin-map.md` |
+
+| **ScrollyReveal** | Typography & visuals | `src/templates/ScrollyReveal/schema.ts` | `references/template-research/scrolly-reveal.md` |
+| **PhilosophicalFamilyTree** | Diagrams | `src/templates/PhilosophicalFamilyTree/schema.ts` | `references/template-research/philosophical-family-tree.md` |
+| **ConceptEvolutionTimeline** | Timelines | `src/templates/ConceptEvolutionTimeline/schema.ts` | `references/template-research/concept-evolution-timeline.md` |
+| **DivergingBar** | Data / Charts | `src/templates/DivergingBar/schema.ts` | — |
+| **DotPlot** | Data / Charts | `src/templates/DotPlot/schema.ts` | — |
+| **OrgChart** | Diagrams | `src/templates/OrgChart/schema.ts` | — |
+| **AnnotatedZoom** | Cinematic | `src/templates/AnnotatedZoom/schema.ts` | — |
+| **BubbleMatrix** | Data / Charts | `src/templates/BubbleMatrix/schema.ts` | — |
+| **BarChartRace** | Data / Charts | `src/templates/BarChartRace/schema.ts` | — |
+| **SanctionsNetwork** | Diagrams | `src/templates/SanctionsNetwork/schema.ts` | — |
+| **GenerativeBackdrop** | Typography & visuals | `src/templates/GenerativeBackdrop/schema.ts` | `project/HOLD_MOTION_REGISTER.md` |
+
+All 56 templates use the shared `_direction` field via `DirectionBlockSchema` (see `src/hooks/directionBlock.schema.ts`) and conform to the same editorial-shell fields documented in `src/templates/_shared/compositionBase.ts` (May 17, 2026). When this doc is expanded inline, follow the per-section pattern used for the existing 30+ entries above.

@@ -1,0 +1,57 @@
+{
+  "episode": "catalog",
+  "source": "Mapbox · USGS · Natural Earth",
+  "keyframes": [
+    {
+      "sec": 0,
+      "center": [121.0, 25.0],
+      "altitudeM": 900000,
+      "pitch": 20,
+      "bearing": 0,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 4,
+      "center": [120.3, 24.5],
+      "altitudeM": 200000,
+      "pitch": 45,
+      "bearing": 355,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 10,
+      "center": [119.5, 24.0],
+      "altitudeM": 55000,
+      "pitch": 60,
+      "bearing": 340,
+      "easing": "ease-in-out"
+    }
+  ],
+  "register": "dark",
+  "fogPreset": "atmospheric",
+  "lightPreset": "dusk",
+  "terrain": true,
+  "terrainExaggeration": 1.2,
+  "annotations": [
+    {
+      "at": [120.3, 24.5],
+      "label": "TAIWAN STRAIT",
+      "sublabel": "180 km wide · 60 m average depth",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "leader": { "dx": 0, "dy": -44 }
+    },
+    {
+      "at": [121.5, 25.0],
+      "label": "TAIWAN",
+      "hierarchy": "secondary",
+      "leader": { "dx": 48, "dy": -20 }
+    },
+    {
+      "at": [118.5, 24.5],
+      "label": "FUJIAN PROVINCE",
+      "hierarchy": "secondary",
+      "leader": { "dx": -56, "dy": -20 }
+    }
+  ]
+}

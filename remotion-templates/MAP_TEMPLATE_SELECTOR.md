@@ -2,9 +2,9 @@
 
 > One page. Pin it. When a script beat needs a map, look here BEFORE writing visual-spec JSON.
 >
-> Last updated: May 13, 2026
+> Last updated: May 2026
 
-Seven map templates (AtlasPlate, ChoroplethMap, RouteAnimation, ProportionalSymbolMap, CartogramMap, DensityMap, TilegramUSMap) with overlapping-but-distinct purposes. Picking wrong wastes hours of render time and produces visuals that mislead. This doc is the canonical "if your data looks like X, use template Y" lookup.
+Eight map templates (AtlasPlate, ChoroplethMap, RouteAnimation, **CinematicMap**, ProportionalSymbolMap, CartogramMap, DensityMap, TilegramUSMap) with overlapping-but-distinct purposes. Picking wrong wastes hours of render time and produces visuals that mislead. This doc is the canonical "if your data looks like X, use template Y" lookup.
 
 > **May 13, 2026 — AtlasPlate is the default for editorial work.**
 > A research pass on canonical outlets (NYT Graphics, FT Visual + Data, Bloomberg Originals, Reuters Graphics, Economist Graphic Detail) found that **all of them use D3 + TopoJSON SVG for static editorial maps** — *not* Mapbox. Mapbox at those outlets lives inside interactive web products with user-manipulated basemaps. AtlasPlate is structurally identical to the canonical D3+TopoJSON stack ported into Remotion. **Treat AtlasPlate as the default for analytical / titled / categorical map work; reserve Mapbox templates for the two narrow cases below.**
@@ -23,7 +23,8 @@ Full editorial rationale, canonical idioms, and failure modes live in the per-te
 - [`cartogram-map.md`](references/template-research/cartogram-map.md)
 - [`density-map.md`](references/template-research/density-map.md)
 - [`tilegram-us-map.md`](references/template-research/tilegram-us-map.md) — US hex-tilegram (population-equal geography for US-only data)
-- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay layer used by all seven
+- [`cinematic-map.md`](references/template-research/cinematic-map.md) — terrain fly-through: altitude reference, fog+light pairs, tile pre-warmer, GlobeReveal pattern
+- [`map-annotations.md`](references/template-research/map-annotations.md) — overlay layer used by all eight
 
 ---
 
@@ -45,6 +46,10 @@ What KIND of data → what GEOGRAPHIC ATTRIBUTE → which TEMPLATE
 | **Categorical in a historical period** | "In 1962, the world looked like…" | **AtlasPlate** + `aesthetic: "vintage"` |
 | **Flow / direction** (A → B, supply chain) | "How things move" | **RouteAnimation** (atmospheric — no overlay title) |
 | **Hub-and-spoke** (one center, N destinations) | "All roads lead to…" | **RouteAnimation** + radial mode |
+| **Terrain as the argument** (mountain pass, strait, valley corridor) | "The geography itself is the claim" | **CinematicMap** — pitched moving camera, 200m–80km altitude, `terrain: true`. Max 1–3/episode. |
+| **Planet cold-open** (Earth → region descent) | "Let me show you where" | **CinematicMap** + high-altitude keyframes (`altitudeM: 9000000` → `300000`) — the GlobeReveal pattern |
+| **Territorial control over time** (who held what, when) | "Control shifted" | **TerritoryMap** — per-timestep region fills with crossfade or snap transitions; SVG timeline strip; `mode: "country"` for ISO codes, `mode: "subnational"` for GeoJSON |
+| **Directional volume flows** (oil, ships, chips — A→B at different magnitudes) | "Volume is the argument" | **FlowMap** — arc width ∝ `sqrt(volume)`, particles show direction; `mode: "simultaneous"` or `"stagger"`. Key distinction from RouteAnimation: width encodes magnitude. |
 | **Cinematic globe** (cold-open, dramatic pivot) | "Here's our planet" | **AtlasPlate** orthographic + rotation |
 | **US-only data, per-state, where geography ≠ population** (electoral, federal funding, demographic patterns) | "Wyoming and California weigh the same in the Senate but a regular US map makes Wyoming dominate visually" | **TilegramUSMap** — hex-grid where each state = 1 (or n) tiles, geographic position approximated. Editorial use cases: Electoral College, Senate composition, per-state federal allocations, demographic patterns where land-area distortion is the failure mode of a standard US choropleth |
 
@@ -74,7 +79,15 @@ What does the script say?
 │
 ├─ "From A to B" / "supply chain" / "campaign"
 │   ├─ Multi-segment phased reveal ─────────────────── RouteAnimation
-│   └─ One hub + N destinations ────────────────────── RouteAnimation + radial
+│   ├─ One hub + N destinations ────────────────────── RouteAnimation + radial
+│   └─ Volume is the argument (A sends 3× more than B) ─ FlowMap (arc width encodes magnitude)
+│
+├─ "Who controlled this territory, and when"
+│   └─ Control changes over discrete timesteps ──────── TerritoryMap
+│
+├─ "The mountain range / strait / valley IS the argument"
+│   ├─ Terrain relief is the editorial claim ─────── CinematicMap (terrain fly-through)
+│   └─ Planet → region descent (cold open) ──────── CinematicMap + high-altitude keyframes
 │
 ├─ "Spinning globe" / "looking at the planet" ────── AtlasPlate orthographic + rotation
 │

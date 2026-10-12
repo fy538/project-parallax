@@ -1,0 +1,170 @@
+{
+  "episode": "catalog",
+  "title": "COCOM Membership, 1949–1994",
+  "source": "Bertsch & Elliott, Controlling East-West Trade (1992); COCOM dissolution records",
+  "center": [15, 45],
+  "zoom": 2.2,
+  "pitch": 0,
+  "bearing": 0,
+  "mode": "country",
+  "durationSec": 10,
+  "register": "dark",
+  "fogPreset": "atmospheric",
+  "backgroundVariant": "dark",
+  "showTimeline": true,
+  "showActorLabels": false,
+  "timesteps": [
+    { "id": "1949", "label": "1949" },
+    { "id": "1955", "label": "1955" },
+    { "id": "1970", "label": "1970" },
+    { "id": "1982", "label": "1982" },
+    { "id": "1994", "label": "1994 (dissolved)" }
+  ],
+  "crossfadeSec": 0.6,
+  "actors": {
+    "member":    { "fill": "#C4A747", "label": "COCOM Member" },
+    "nonmember": { "fill": "#3A3530", "label": "Non-Member" },
+    "joined":    { "fill": "#7AA3C9", "label": "Later Member" },
+    "dissolved": { "fill": "#888780", "label": "Post-Dissolution" }
+  },
+  "regions": [
+    { "id": "USA" },
+    { "id": "GBR" },
+    { "id": "FRA" },
+    { "id": "DEU" },
+    { "id": "ITA" },
+    { "id": "BEL" },
+    { "id": "NLD" },
+    { "id": "LUX" },
+    { "id": "PRT" },
+    { "id": "CAN" },
+    { "id": "JPN" },
+    { "id": "TUR" },
+    { "id": "GRC" },
+    { "id": "NOR" },
+    { "id": "DNK" },
+    { "id": "AUS" },
+    { "id": "NZL" }
+  ],
+  "control": {
+    "USA": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "GBR": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "FRA": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "DEU": {
+      "1949": "nonmember",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "ITA": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "BEL": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "NLD": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "LUX": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "PRT": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "CAN": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "JPN": {
+      "1949": "nonmember",
+      "1955": "joined",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "TUR": {
+      "1949": "nonmember",
+      "1955": "joined",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "GRC": {
+      "1949": "nonmember",
+      "1955": "joined",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "NOR": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "DNK": {
+      "1949": "member",
+      "1955": "member",
+      "1970": "member",
+      "1982": "member",
+      "1994": "dissolved"
+    },
+    "AUS": {
+      "1949": "nonmember",
+      "1955": "nonmember",
+      "1970": "nonmember",
+      "1982": "joined",
+      "1994": "dissolved"
+    },
+    "NZL": {
+      "1949": "nonmember",
+      "1955": "nonmember",
+      "1970": "nonmember",
+      "1982": "joined",
+      "1994": "dissolved"
+    }
+  }
+}

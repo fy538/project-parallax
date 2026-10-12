@@ -1,0 +1,31 @@
+{
+  "episode": "silicon-trap",
+  "title": "THE ARGUMENT MAP",
+  "subtitle": "Why Taiwan's chip dominance is a deterrence asset, not just an economic fact.",
+  "source": "TSMC Annual Report 2024; Chipwar (Miller 2022); CSIS Taiwan Strait Analysis",
+  "data": [
+    {
+      "text": "Taiwan's TSMC produces 92% of the world's most advanced chips.",
+      "attribution": "TSMC Annual Report 2024"
+    }
+  ],
+  "claim": {
+    "text": "Taiwan holds extraordinary strategic deterrence value.",
+    "emphasis": true
+  },
+  "warrant": {
+    "text": "Control over critical chokepoints grants strategic leverage."
+  },
+  "backing": {
+    "text": "Historical precedent — Suez Canal, Panama Canal, Strait of Hormuz."
+  },
+  "qualifier": {
+    "text": "As long as no fab alternative emerges."
+  },
+  "rebuttal": {
+    "text": "Semiconductor autarky succeeds in the US or EU.",
+    "prefix": "UNLESS"
+  },
+  "revealMode": "sequential",
+  "durationSec": 14
+}

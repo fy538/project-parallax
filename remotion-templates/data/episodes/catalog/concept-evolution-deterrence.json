@@ -1,0 +1,38 @@
+{
+  "data": {
+    "episode": "deterrence-genealogy",
+    "concept": "DETERRENCE",
+    "title": "DETERRENCE: THREE REVOLUTIONS IN ONE WORD",
+    "source": "Brodie, *The Absolute Weapon* (1946); Schelling, *Arms and Influence* (1966)",
+    "durationSec": 16,
+    "backgroundVariant": "light",
+    "events": [
+      {
+        "year": "1945",
+        "title": "Atomic",
+        "definition": "Nuclear weapons make war between great powers rationally impossible. Mutual destruction as the deterrent — punishment without defense."
+      },
+      {
+        "year": "1957",
+        "title": "Extended",
+        "definition": "NATO extends nuclear deterrence to conventional attack. The threat must be credible; credibility becomes the central analytical problem.",
+        "keyPassage": "\"The art of commitment is to burn your bridges behind you.\" — Schelling"
+      },
+      {
+        "year": "1979",
+        "title": "Conventional",
+        "definition": "NATO shifts to AirLand Battle doctrine. Conventional deterrence returns as the primary layer; nuclear becomes last resort."
+      },
+      {
+        "year": "2014",
+        "title": "Hybrid",
+        "definition": "Russia's 'little green men' expose deterrence gaps below the NATO Article 5 threshold. Deterrence must now cover gray-zone operations."
+      }
+    ],
+    "drifts": [
+      { "fromIndex": 0, "toIndex": 1, "label": "extended", "emphasis": "shift" },
+      { "fromIndex": 1, "toIndex": 2, "label": "conventionalized", "emphasis": "shift" },
+      { "fromIndex": 2, "toIndex": 3, "label": "fragmented", "emphasis": "rupture" }
+    ]
+  }
+}

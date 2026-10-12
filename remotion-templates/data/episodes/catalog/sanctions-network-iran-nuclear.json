@@ -1,0 +1,172 @@
+{
+  "data": {
+    "episode": "silicon-trap",
+    "title": "IRAN NUCLEAR SANCTIONS NETWORK",
+    "subtitle": "JCPOA architecture + post-2018 maximum pressure campaign",
+    "source": "US Treasury OFAC; IAEA reports; Foundation for Defense of Democracies",
+    "durationSec": 18,
+    "backgroundVariant": "dark",
+    "revealMode": "sequential",
+    "layout": "auto",
+    "sectors": [
+      { "id": "energy", "label": "Crude oil", "color": "#7AA3C9" },
+      { "id": "finance", "label": "Finance / SWIFT", "color": "#C4A747" },
+      { "id": "arms", "label": "Arms / Nuclear", "color": "#A64D46" }
+    ],
+    "nodes": [
+      {
+        "id": "usa",
+        "label": "USA",
+        "sublabel": "Maximum pressure",
+        "type": "sanctioner",
+        "importance": "primary",
+        "revealAtSec": 1.0
+      },
+      {
+        "id": "eu",
+        "label": "EU",
+        "sublabel": "JCPOA signatory",
+        "type": "sanctioner",
+        "revealAtSec": 1.5
+      },
+      {
+        "id": "unsc",
+        "label": "UNSC",
+        "sublabel": "Multilateral",
+        "type": "sanctioner",
+        "revealAtSec": 2.0
+      },
+      {
+        "id": "iran",
+        "label": "IRAN",
+        "sublabel": "Nuclear program",
+        "type": "target",
+        "importance": "primary",
+        "revealAtSec": 3.0
+      },
+      {
+        "id": "iaea",
+        "label": "IAEA",
+        "sublabel": "Inspection body",
+        "type": "institution",
+        "revealAtSec": 3.5
+      },
+      {
+        "id": "swift",
+        "label": "SWIFT",
+        "sublabel": "Interbank network",
+        "type": "institution",
+        "revealAtSec": 4.0
+      },
+      {
+        "id": "china",
+        "label": "China",
+        "sublabel": "Oil buyer",
+        "type": "relay",
+        "importance": "primary",
+        "revealAtSec": 8.0
+      },
+      {
+        "id": "turkey",
+        "label": "Turkey",
+        "sublabel": "Gold-for-gas",
+        "type": "relay",
+        "revealAtSec": 9.0
+      },
+      {
+        "id": "south-korea",
+        "label": "South Korea",
+        "sublabel": "Escrow mechanism",
+        "type": "relay",
+        "revealAtSec": 10.0
+      },
+      {
+        "id": "energy-sector",
+        "label": "Crude oil",
+        "type": "sector",
+        "sector": "energy",
+        "revealAtSec": 5.0
+      },
+      {
+        "id": "finance-sector",
+        "label": "Finance",
+        "type": "sector",
+        "sector": "finance",
+        "revealAtSec": 5.5
+      }
+    ],
+    "edges": [
+      {
+        "from": "usa",
+        "to": "iran",
+        "type": "primary-sanction",
+        "label": "OFAC + ITSR",
+        "sector": "finance",
+        "revealAtSec": 3.5
+      },
+      {
+        "from": "eu",
+        "to": "iran",
+        "type": "primary-sanction",
+        "label": "JCPOA violation (post-2019)",
+        "sector": "energy",
+        "revealAtSec": 4.0
+      },
+      {
+        "from": "unsc",
+        "to": "iran",
+        "type": "primary-sanction",
+        "label": "Res. 2231 + arms embargo",
+        "sector": "arms",
+        "revealAtSec": 4.5
+      },
+      {
+        "from": "usa",
+        "to": "swift",
+        "type": "primary-sanction",
+        "label": "SWIFT exclusion",
+        "sector": "finance",
+        "revealAtSec": 5.0
+      },
+      {
+        "from": "usa",
+        "to": "china",
+        "type": "secondary-threat",
+        "label": "CAATSA + oil waivers",
+        "revealAtSec": 7.5
+      },
+      {
+        "from": "usa",
+        "to": "turkey",
+        "type": "secondary-threat",
+        "label": "Halkbank indictment",
+        "revealAtSec": 7.8
+      },
+      {
+        "from": "iran",
+        "to": "china",
+        "type": "evasion-path",
+        "label": "Crude oil (dark tankers)",
+        "sector": "energy",
+        "animated": true,
+        "revealAtSec": 8.5
+      },
+      {
+        "from": "iran",
+        "to": "turkey",
+        "type": "evasion-path",
+        "label": "Financial intermediation",
+        "sector": "finance",
+        "animated": true,
+        "revealAtSec": 9.5
+      },
+      {
+        "from": "iaea",
+        "to": "iran",
+        "type": "formal-exemption",
+        "label": "JCPOA monitoring (2015–2018)",
+        "revealAtSec": 6.0
+      }
+    ]
+  }
+}

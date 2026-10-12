@@ -869,3 +869,202 @@ Uses ANGLE-backed GPU for headless Chromium rather than software swiftshader. Sw
 **Fix:** After ANY edit to `remotion-templates/.env`, fully stop `npm start` (Ctrl+C) and restart. Browser refresh / page reload / "Re-render" buttons are NOT sufficient. For Lambda renders the env is captured at deploy time — re-run `npm run deploy` to refresh.
 **Why this hasn't been fixed:** moving the env reads to per-component runtime would force `MapGL` to re-validate the token + restyle on every prop change. The module-init pattern is correct for the production render path; the gotcha only bites during local Studio iteration. Documented rather than fixed.
 **Diagnostic:** `cd remotion-templates && node -e "console.log(process.env.MAPBOX_STYLE_TONER_URL)"` tells you what the next-started Studio session would see. Compare against what's in `.env`.
+
+---
+
+## May 2026 sprint bugs — post-ship close-out (May 20, 2026)
+
+### L104: `interpolateColors` returns `rgba()` strings, not hex — `hexToLuminance` will silently fail
+**Template:** MatrixHeatmap
+**Symptom:** Cell text was invisible on the generated heatmap because text color (computed via `hexToLuminance` to pick black vs white) always returned white, even on near-white cells.
+**Root cause:** `interpolateColors` (Remotion's built-in color interpolator) returns `rgba(r, g, b, a)` strings, not hex. `hexToLuminance` was written expecting hex (`#RRGGBB`) and silently failed to parse `rgba(...)`, returning 0 (which reads as "dark background" → pick white text). On a near-white heatmap cell, this produced invisible white-on-white text.
+**Fix:** Added `rgbaToHex(str: string)` helper that parses `rgba(r, g, b, a)` format and converts to `#RRGGBB`. Applied before passing the interpolated color to `hexToLuminance`.
+**Rule:** Never assume that a Remotion color-interpolation output is hex. Always handle both `#RRGGBB` and `rgba(r, g, b, a)` formats. Wrap with a converter before feeding to any hex-expecting function.
+
+### L105: Underdamped spring easing must NOT be clamped to [0, 1]
+**Template:** MorphTransition
+**Symptom:** The `spring` easing in `interpolate.ts` was documented as "underdamped — oscillates past 1.0 then settles." The original implementation clamped the output: `Math.min(1, Math.max(0, springValue))`. This killed the overshoot entirely — the spring behaved like a constrained ease-in-out, losing the distinctive rebound that differentiates the spring preset.
+**Fix:** Removed the clamp. The `ease()` function now returns values > 1.0 for `kind === "spring"` during the overshoot window (roughly t = 0.3–0.6 for ζ=0.6, ω=8). Callers that lerp between two scalar values will overshoot the target then settle — which is the intended visual effect. Callers that pass the result to an opacity or scale interpolation must do their own domain-specific clamping if needed.
+**Rule:** Spring easings are only meaningful if their output is allowed to exceed [0, 1]. Clamping removes the spring physics. Always check whether a clamp was accidentally added when implementing spring presets.
+
+### L106: `warmTiles()` must have a `.catch()` — missing catch leaks `delayRender` forever
+**Template:** CinematicMap
+**Symptom:** In pathological cases (Mapbox API unreachable, invalid access token, map initialization failure), `warmTiles()` — which kicks off a sequence of `map.jumpTo()` calls to pre-fetch terrain DEM tiles — could throw or reject without a handler. Because `warmTiles` is called inside the `onMapReady` callback which already holds a `delayRender` handle, an unhandled rejection caused the handle to never be released. The composition hung indefinitely with a blank frame.
+**Fix:** Added `.catch((err) => { console.warn("warmTiles failed:", err); continueRender(handle); })` so that any failure path releases the handle and lets the render proceed (with possibly missing DEM tiles — acceptable fallback).
+**Rule:** Any `async` function called inside a `delayRender` callback MUST have a `.catch()` that calls `continueRender(handle)`. Missing catch = guaranteed hang on the error path. This is the same failure mode as the MapGL `'idle'` listener pattern (L102) — apply the same defensive pattern: always pair `delayRender` with a `.catch(continueRender)` on every async code path.
+
+### L108: `strokeDashoffset` draw-in requires `strokeDasharray` — solid lines must set dasharray explicitly
+**Templates affected:** BubbleMatrix (reference lines), any SVG line draw-in animation
+**Symptom:** A reference line that should "grow" from origin to endpoint via `strokeDashoffset` animation had no visible animation when `ref.style === "solid"`. The code correctly set `strokeDashoffset={lineLen * (1 - progress)}` but `strokeDasharray` was `undefined` for solid lines — so the browser treats the path as a solid opaque line with no dashes, and `strokeDashoffset` has no effect whatsoever.
+**Fix:** For solid draw-in lines, set `strokeDasharray={\`${lineLen} ${lineLen}\`}` (one dash = full length, one gap = full length). Now at `strokeDashoffset=lineLen`, the dash starts at the far end and is invisible; at `strokeDashoffset=0`, the full dash is drawn. For x-axis reference lines (vertical), `lineLen = plotBottom - plotTop`.
+**Rule:** SVG `strokeDashoffset` only works when `strokeDasharray` is set. Never use `strokeDashoffset` without `strokeDasharray`. For draw-in: `dashArray = "${len} ${len}"`, `dashOffset = len * (1 - progress)`.
+
+### L109: `useThemeMode` defaults to "light" tokens when passed `undefined` — always supply a fallback for dark-default templates
+**Template:** SanctionsNetwork (and any template where the default visual register is dark)
+**Symptom:** `useThemeMode(data.backgroundVariant)` — when `backgroundVariant` is omitted from the data JSON, `data.backgroundVariant` is `undefined`, which `useThemeMode` interprets as "light". The `<Background>` tag uses `data.backgroundVariant ?? "dark"` so the background renders dark, but the text colors come from light-mode tokens (dark ink on dark background) → invisible text.
+**Fix:** `useThemeMode(data.backgroundVariant ?? "dark")` — the theme-mode hook and the Background tag must use the same fallback.
+**Rule:** Any template whose default visual register is dark MUST supply `?? "dark"` to both `useThemeMode()` AND the Background `variant` prop. They must be in sync or text becomes invisible.
+
+### L110: `warnIf()` in the render body fires 30×/s — always call from `useMemo`
+**Template:** BarChartRace (loop over `data.periods`)
+**Symptom:** `data.periods.forEach((p, i) => { warnIf(...) })` in the render body — `warnIf` does not self-throttle; it emits on every call. At 30fps this produces ~900 console warns per 30-second composition and measurably slows render hot path.
+**Fix:** Wrap in `useMemo(() => { data.periods.forEach(warnIf) }, [data.periods])`. Now re-evaluates only when data changes.
+**Rule:** Any `warnIf` inside a loop MUST be in `useMemo`. The single-call form (`warnIf(condition, ...)` without a loop) is acceptable bare in the render body since it executes once per frame but is O(1). Loop-based `warnIf` is O(n) per frame — always memoize.
+
+### L107: `SplitFrame` duration — `standardMetadata(N)` cannot compute duration from props; use `calculateMetadata`
+**Template:** SplitFrame
+**Symptom:** `SplitFrame` renders multiple panes sequentially, each with a `durationSec` defined in the schema. The total composition duration is the sum of all pane durations. Using `standardMetadata(10)` (the convenience wrapper that returns a fixed 10-second duration) worked for Studio preview but produced a fixed-duration composition that ignored the actual pane data. Manifests with varying pane counts rendered with cut-off or padded endings.
+**Fix:** Replaced `standardMetadata(10)` with a custom `calculateMetadata` function:
+```ts
+export const calculateMetadata: CalculateMetadataFunction<SplitFrameData> = ({ props }) => {
+  // eslint-disable-next-line no-bare-durationSec
+  const totalSec = props.data?.panes?.reduce((s, p) => s + (p.durationSec ?? 3), 0) ?? 10;
+  return { durationInFrames: sec(totalSec) };
+};
+```
+The `// eslint-disable-next-line no-bare-durationSec` suppression is required because `calculateMetadata` is the one legitimate site where `durationSec` is read directly from props (it's computing the composition's own duration, not using `sec()` on a data value). This is the documented exception in `lint-conventions.mjs`.
+**Rule:** Any template whose duration depends on a variable-length data array (panes, phases, keyframes, steps) MUST use `calculateMetadata` with a null-guard + fallback. `standardMetadata(N)` is only appropriate for templates with a fixed editorial duration that never varies by data.
+
+## L111 — Brand chrome is NEVER auto-included by `<Background>` (May 20, 2026)
+
+`<HeaderStrip>` and `<FooterStrip>` must be explicitly imported and rendered in every chart/diagram/timeline template. They are NOT part of `<Background>` — it's purely the canvas backdrop. Cinematic/full-bleed image templates (ScrollyReveal, AnnotatedZoom, ArchivalReel, etc.) intentionally omit them; all others must include them.
+
+Symptom of missing chrome: visual regression still shows blank header/footer strips; Studio preview lacks episode coordinates in top-right corner.
+
+Pattern:
+```tsx
+import { HeaderStrip } from "../../components/HeaderStrip";
+import { FooterStrip } from "../../components/FooterStrip";
+// Inside <AbsoluteFill style={compStyle}>:
+<HeaderStrip metadata={data.episode} mode={mode} />
+{/* ...template content... */}
+<FooterStrip mode={mode} />
+```
+
+## L112 — POLISH.md D1 "no floating card chrome": remove background fills and boxShadow from content panels (May 20, 2026)
+
+Content panels in diagram/argument templates must NOT have `background` fills or `boxShadow`. These are card chrome (D1 violation). Keep only border/borderLeft accent lines.
+
+Bad:
+```tsx
+background: theme.bg.surface,
+boxShadow: `0 2px 16px ${palette.ink}1F`,
+borderTop: `3px solid ${accentColor}`,
+```
+
+Good:
+```tsx
+borderTop: `3px solid ${accentColor}`,
+```
+
+The audit found this in DialecticFlow (DialecticPanelView), ConditionalArgument (BranchPanel), AnalogyCrossmap (ElementCard + BreakNoteBox), and ToulminMap (ArgumentBox). All fixed May 20, 2026.
+
+## L113 — POLISH.md T1 compliance: content must settle by frame 30 (May 20, 2026)
+
+`T1` rule: "entrance settled by frame 30." At 30fps, frame 30 = t=1.0s. Any `START_SEC` or similar reveal constant > 1.0 means frame 30 shows no content — a T1 violation.
+
+Common offenders found in the May 2026 sprint:
+- AxiomList: `AXIOMS_START_SEC = 1.2` → changed to `0.5`
+- BubbleMatrix: `BUBBLES_START = 50` (frames) → changed to `25`
+- DotPlot: `DOT_START = 40` (frames) → changed to `25`
+- SpiralTimeline: `SPIRAL_DRAW_SEC = 1.2` → changed to `0.6`; `TICK_FADE_SEC = 0.4` → `0.2`
+- MathReveal: math start delayed 0.3s after title settle → reduced to 0s gap
+
+Rule: subtract the reveal timing from frame 30 (1.0s). If the result ≤ 0, the content isn't visible at f30. Budget at least 0.3s of reveal progress by f30.
+
+## L114 — `<ThreeCanvas>` async assets: use `delayRender`/`continueRender`, NOT React `<Suspense>` (May 23, 2026)
+
+**Template:** ShaderTransition (and any future `@remotion/three` template that loads textures/models).
+
+**Symptom:** A WebGL composition rendered a **pure-ink black frame** (~34 KB PNG instead of ~3 MB). The full-screen quad and shader were correct — a hardcoded `gl_FragColor = vec4(vUv,0,1)` gradient rendered perfectly — but the textured version was black.
+
+**Root cause:** The component loaded textures with drei's `useTexture([...])` inside a `<React.Suspense fallback={null}>` boundary. **Remotion does not block frame capture on React Suspense.** When `useTexture` suspends, Suspense renders the `null` fallback and Remotion grabs that empty frame. Suspense is a *render-time* mechanism; Remotion's still/video capture only waits on outstanding `delayRender()` handles.
+
+**Fix:** Load assets imperatively via `THREE.TextureLoader` wrapped in the `delayRender`/`continueRender` lifecycle, and render the quad only once the textures resolve:
+```tsx
+const useDelayedTextures = (urls: string[]): THREE.Texture[] | null => {
+  const [textures, setTextures] = React.useState<THREE.Texture[] | null>(null);
+  const key = urls.join("|");
+  React.useEffect(() => {
+    const handle = delayRender(`textures: ${key}`);
+    const loader = new THREE.TextureLoader();
+    let cancelled = false;
+    Promise.all(urls.map((u) => loader.loadAsync(u)))
+      .then((texs) => {
+        if (cancelled) return;
+        texs.forEach((t) => { t.colorSpace = THREE.SRGBColorSpace; });
+        setTextures(texs);
+        continueRender(handle);   // ← unblocks Remotion ONLY after load
+      })
+      .catch(() => continueRender(handle));  // never leak the handle (cf. L106 warmTiles)
+    return () => { cancelled = true; };
+  }, [key]);
+  return textures;
+};
+// ...
+{textures ? <Quad from={textures[0]} to={textures[1]} .../> : null}
+```
+
+**Two sub-gotchas worth keeping:**
+- A camera-ignoring vertex shader (`gl_Position = vec4(position.xy, 0.0, 1.0)`) makes three.js frustum-cull the mesh because its bounds appear off-camera. Set `frustumCulled={false}` on the `<mesh>`.
+- Always `.catch(() => continueRender(handle))` — a rejected load otherwise leaks the handle and hangs the render forever (same failure class as L106's `warmTiles`).
+
+**Rule:** Inside `<ThreeCanvas>`, any async resource (texture, GLTF, font, image) must gate on `delayRender`/`continueRender`. Treat drei's Suspense-based loaders as Studio-preview conveniences only — they will silently produce black/empty frames in headless render.
+
+## L115 — `npx remotion still` caches the webpack bundle; a stuck output across edits means stale build (May 23, 2026)
+
+**Symptom:** While iterating on DepthParallax's texture loader, three *substantively different* implementations all produced a **byte-identical** broken frame 0 (44075 bytes every time). It looked like the bug was immune to fixes.
+
+**Root cause:** The bundle wasn't rebuilding — outputs were served from a stale webpack/Remotion cache. The edits never compiled. (The tell was byte-for-byte identical output: a real code change essentially never produces an identical PNG.)
+
+**Fix / diagnostic:** When an output looks frozen across edits, force a rebuild — make a *visible* probe change (e.g. set the background to `#FF0000`) and confirm it shows. If it doesn't, clear the cache: `rm -rf node_modules/.cache/webpack node_modules/.cache/.remotion`. Also: `gl.initTexture()` (forcing GPU upload) **throws** in this `@remotion/three` environment and silently breaks rendering (mesh → solid background) — don't use it; it isn't needed.
+
+## L116 — `useCompositionAnimation` enter fade makes frame 0 invisible — override `opacity:1` for full-bleed motion templates (May 23, 2026)
+
+**Template:** DepthParallax (any full-bleed `@remotion/three` template where the camera/shader owns the motion).
+
+**Symptom:** Frame 0 rendered **white** (the default page), frame 1 faint, frames 8+ full. Looked exactly like a texture-load race — and I burned a long time chasing it as one. It was not.
+
+**Root cause:** `useCompositionAnimation()` always applies an **enter fade**: `enterOpacity = interpolate(frame, [0, enterFrames=8], [0, 1])`. At frame 0 that's `opacity: 0`, so the entire `<AbsoluteFill>` (ink background included) is invisible and the white composition background shows through. There is no `noEnter` option, and `enterFrames: 0/1` still yields 0 at frame 0. For a full-bleed image/3D template this also means the clip fades in *from white*, which looks broken.
+
+**Fix:** Keep the hook call (the `missing-composition-animation` lint requires it) but force opacity on the wrapper:
+```tsx
+const { style: compStyle } = useCompositionAnimation({ noDrift: true, noExit: true });
+// ...
+<AbsoluteFill style={{ backgroundColor: palette.ink, ...compStyle, opacity: 1 }}>
+```
+`opacity: 1` (placed after the spread) cancels the enter fade; with `noDrift`+`noExit` the rest of `compStyle` is identity. The camera move is the only motion.
+
+**Debugging lesson:** when "early frames blank" appears on a template that loads assets, check the **composition opacity** before assuming a texture/delayRender race. A blank that is *white* (not the template's background color) means the wrapper isn't painting at all — an opacity/transform problem, not an asset problem.
+
+## L117 — `@remotion/layout-utils` `measureText`/`fitText` race async font load in offline render — auto-fit is nondeterministic (May 23, 2026)
+
+**Context:** Attempted an "overflow retrofit" — a shared `<FitText>` that shrinks a single-line value (StatReveal's 120px hero number) to fit a width budget via `measureText` (measure at design size → scale down, the same approach `TitleBlock` already uses for titles).
+
+**Symptom:** Nondeterministic. The *same* string + font shrank correctly on some still frames and not at all on others. A standalone probe composition printed `measureText("$1,234,567,890,123", fonts.data, 120) = {width: 1655.98}` (correct!) and its `<FitText>` fit a 600px box perfectly — yet the StatReveal adoption left the number at full 120px (overflowing) on a different frame.
+
+**Root cause:** `measureText`/`fitText` measure via the DOM, which **races the async web-font load** (`@remotion/google-fonts` `loadFont`). When the measure runs before the font is applied, it returns a narrow *fallback*-font width → `scale = min(1, budget/measured)` resolves to 1 → no shrink. When fonts are ready, it measures correctly → shrinks. Each still mounts fresh, so whether the `useMemo` measurement wins the race is luck.
+
+**Consequence:** `TitleBlock`'s existing `measureText`-based title scaling is **also** subject to this — it's masked because titles use `maxWidth` + text *wrapping* (multi-line), so a no-shrink measurement still doesn't overflow. Single-line values (hero numbers) have `whiteSpace: nowrap` and *do* overflow when the measurement loses the race.
+
+**Takeaway:** A reliable auto-fit needs **font-load coordination** — `delayRender()` until `waitUntilDone()` resolves for the measured font, *then* measure. That is real infra, not the "cheap retrofit" it looks like. Until then: budget single-line values by data discipline (cap formatted-number length) and rely on `maxWidth`+wrapping for multi-line text. Reverted the FitText attempt rather than ship a flaky guard (intermittent overflow is worse than none).
+
+## L118 — On the FullEpisode timeline only cuts and colour dips render as designed (Oct 10, 2026)
+
+**Symptom:** In `ai-care-motives`, every `dissolve` and `fade` cut to blank cream paper and then faded up; every "hard cut" out of a card was preceded by the card fading to blank; an amber haze sat over each beat boundary.
+
+**Root cause:** Three things stacked. (1) `FullEpisode` puts each segment in its own `<Sequence>` at an absolute start and segments never overlap, so `TransitionWrapper` can only fade a segment against the paper underneath, never against its neighbour. (2) Templates fade themselves out over their last 15 frames (`useCompositionAnimation`, plus ~70 direct `exitFade()` calls), which is right for a standalone clip and wrong before a cut. (3) `BeatFlash` rendered unconditionally at every beat.
+
+**Fix:** `src/utils/resolveSeams.ts` resolves manifest tokens before render — overlap-only tokens (`dissolve`, `iris`, `match-cut`, `match-cut-still`) become cuts, `fade` becomes a dip through ink, one-sided dips are completed on the neighbour. `setSeamsOwnedByEpisode()` in `utils/animation.ts` switches off template self-fades for as long as `FullEpisode` is mounted. `BeatFlash` is opt-in (`"beatFlash": true`). Doctrine: `project/TRANSITION_GRAMMAR.md` § "On the episode timeline".
+
+**Takeaway:** A nested `<Sequence>` cannot lengthen a segment — Remotion clamps a child's duration to its parent's — and half the templates take their length from `data.durationSec` rather than `useVideoConfig()`, so there is no single "pretend the segment is longer" trick. True dissolves need the outgoing segment mounted past its end (extend its Sequence, fade whichever layer is on top); nobody has built that yet.
+
+## L119 — `shadows.textLift` is a CSS variable; `<Background>` decides what it resolves to (Oct 10, 2026)
+
+**Symptom:** A dark smudge under ink-coloured type on every light card.
+
+**Root cause:** `useThemeMode` returned the dark-mode lift (`0 1px 3px rgba(0,0,0,.5)`) for both modes, and ~135 call sites apply `shadows.textLift` unconditionally.
+
+**Fix:** `shadows.textLift` is now `var(--plx-text-lift, <dark lift>)`. `<Background>` sets the variable to the real lift on `dark` / `map` and to an empty shadow on `light`; `transparent` leaves the inherited value alone. Text outside any `<Background>` (over footage or a full-bleed photo) keeps the lift. `shadows.textLiftLight` is `0 0 0 transparent`, not `none`, so it stays valid inside comma lists like `0 0 24px gold, ${theme.textShadow}`.
+
+**Takeaway:** Don't string-match or parse `shadows.textLift`; and a dark panel drawn *inside* a light `<Background>` needs its own `"--plx-text-lift"` (or an explicit `shadows.textLiftValue`) if its type should lift. `<Background>` also sets a default `fontFamily` now, so a node that forgets its face falls back to Plex Sans instead of Times.

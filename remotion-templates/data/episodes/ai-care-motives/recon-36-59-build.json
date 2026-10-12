@@ -1,0 +1,28 @@
+{
+  "episode": "ai-care-motives",
+  "source": "After Anthropic, “Tracing the thoughts of a large language model” (2025) · Claude 3.5 Haiku",
+  "title": "Asked how it got the answer",
+  "durationSec": 12,
+  "text": "User: What is 36 + 59? One word.\n\nClaude 3.5 Haiku: 95\n\nUser: In brief, how did you work that out?\n\nClaude 3.5 Haiku: I summed the ones (6 + 9 = 15), carried the 1, then summed the tens (3 + 5 + 1 = 9), which gives 95.",
+  "fontSize": 46,
+  "paragraphAtSec": [
+    0.7,
+    2.1,
+    4.0,
+    6.4
+  ],
+  "annotations": [
+    {
+      "target": "carried the 1",
+      "type": "highlight",
+      "appearAtSec": 9.8
+    }
+  ],
+  "serif": false,
+  "paper": "plain",
+  "textFadeInSec": 0.6,
+  "backgroundVariant": "dark",
+  "dialogue": true,
+  "label": "Illustrative reconstruction · Anthropic, 2025",
+  "typeOut": true
+}

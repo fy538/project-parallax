@@ -1,0 +1,54 @@
+{
+  "episode": "ai-care-motives",
+  "title": "Models tell tests from real use better than chance",
+  "subtitle": "Chat setting, AUC (not accuracy). Recognition alone ≠ deception",
+  "source": "Needham et al. 2025, arXiv:2505.23836",
+  "durationSec": 14,
+  "backgroundVariant": "light",
+  "axisLabel": "AUC",
+  "axisMin": 0.5,
+  "axisMax": 0.85,
+  "axisTickCount": 8,
+  "axisFormat": "%.2f",
+  "revealOrder": "left-to-right",
+  "entities": [
+    {
+      "id": "gemini",
+      "label": "Gemini 2.5 Pro",
+      "value": 0.71,
+      "emphasis": "primary",
+      "valueLabel": "0.71",
+      "atSec": 2.0
+    },
+    {
+      "id": "gpt41",
+      "label": "GPT-4.1",
+      "value": 0.77,
+      "emphasis": "primary",
+      "valueLabel": "0.77",
+      "atSec": 3.0
+    },
+    {
+      "id": "human",
+      "label": "Human raters",
+      "value": 0.81,
+      "emphasis": "secondary",
+      "valueLabel": "0.81",
+      "atSec": 8.0
+    }
+  ],
+  "referenceLines": [
+    {
+      "value": 0.5,
+      "label": "Chance 0.50",
+      "style": "dashed",
+      "color": "#888780"
+    }
+  ],
+  "labelScale": "large",
+  "span": {
+    "from": 0.5,
+    "label": "better than chance →",
+    "atSec": 5.2
+  }
+}

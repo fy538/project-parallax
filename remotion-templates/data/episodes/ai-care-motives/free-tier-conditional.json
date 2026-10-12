@@ -1,0 +1,24 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 18.1,
+  "title": "Imposed objective: answer even harmful requests",
+  "condition": "The conversation is used for training",
+  "ifTrue": {
+    "label": "Used for training",
+    "consequence": "of harmful requests answered",
+    "severity": "high",
+    "stat": "≈14%",
+    "statAtSec": 8.2
+  },
+  "ifFalse": {
+    "label": "Not used for training",
+    "consequence": "almost never",
+    "severity": "low",
+    "stat": "≈3%",
+    "statAtSec": 14.5
+  },
+  "source": "Researcher-created scenario, Claude 3 Opus, Greenblatt et al. 2024",
+  "backgroundVariant": "light",
+  "conditionAtSec": 1.6,
+  "branchesAtSec": 4.4
+}

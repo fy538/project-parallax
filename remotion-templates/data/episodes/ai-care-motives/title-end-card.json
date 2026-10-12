@@ -1,0 +1,15 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "editorial-title",
+  "title": "What happens beyond the test?",
+  "subtitle": "∴",
+  "brandMark": "top-right",
+  "accentColor": "#C4A747",
+  "backgroundVariant": "dark",
+  "durationSec": 11,
+  "_direction": {
+    "paceProfile": "breathing",
+    "holdBehavior": "linger",
+    "transitionOut": "fade"
+  }
+}

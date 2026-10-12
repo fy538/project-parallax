@@ -1,0 +1,52 @@
+{
+  "episode": "sanctions-cycle",
+  "title": "THE SANCTIONS SPIRAL",
+  "subtitle": "Why measured pressure rarely stays measured",
+  "nodes": [
+    {
+      "id": "sanctions",
+      "label": "Sanctions\nimposed",
+      "position": { "x": 22, "y": 28 },
+      "emphasis": "primary"
+    },
+    {
+      "id": "domestic-rally",
+      "label": "Domestic rally\nbehind regime",
+      "position": { "x": 78, "y": 28 }
+    },
+    {
+      "id": "regime-defiance",
+      "label": "Regime\ndefiance",
+      "position": { "x": 78, "y": 72 }
+    },
+    {
+      "id": "pressure-to-escalate",
+      "label": "Pressure to\nescalate",
+      "position": { "x": 22, "y": 72 }
+    },
+    {
+      "id": "off-ramp",
+      "label": "Diplomatic\noff-ramp",
+      "position": { "x": 50, "y": 50 }
+    }
+  ],
+  "edges": [
+    { "from": "sanctions", "to": "domestic-rally", "polarity": "+", "curve": "right" },
+    { "from": "domestic-rally", "to": "regime-defiance", "polarity": "+", "delay": true, "curve": "right" },
+    { "from": "regime-defiance", "to": "pressure-to-escalate", "polarity": "+", "curve": "right" },
+    { "from": "pressure-to-escalate", "to": "sanctions", "polarity": "+", "curve": "right" },
+    { "from": "off-ramp", "to": "regime-defiance", "polarity": "-", "label": "if engaged" },
+    { "from": "off-ramp", "to": "pressure-to-escalate", "polarity": "-", "label": "if engaged" }
+  ],
+  "loops": [
+    {
+      "id": "R1",
+      "nodeIds": ["sanctions", "domestic-rally", "regime-defiance", "pressure-to-escalate"],
+      "type": "R",
+      "label": "Escalation spiral",
+      "rotation": "cw"
+    }
+  ],
+  "source": "Pape 1997; Drezner 2011",
+  "durationSec": 14
+}

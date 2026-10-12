@@ -1,0 +1,15 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "quote",
+  "text": "so that a child buys of him as well as any other … merely with a selfish view",
+  "attribution": "Immanuel Kant",
+  "attributionContext": "Groundwork, First Section (Abbott translation)",
+  "accentColor": "#8B7355",
+  "backgroundVariant": "light",
+  "durationSec": 23,
+  "_direction": {
+    "textAnimation": "quote-attribution",
+    "paceProfile": "breathing"
+  },
+  "typingCps": 14
+}

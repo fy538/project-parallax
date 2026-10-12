@@ -1,0 +1,17 @@
+{
+  "episode": "vietnam-credibility-gap",
+  "stock": "16mm",
+  "imageUrl": "/assets/sample-historical.png",
+  "intensity": 0.55,
+  "nativeFootage": true,
+  "gateWeave": true,
+  "caption": {
+    "text": "Search-and-clear operation",
+    "dateline": "1968",
+    "source": "US National Archives"
+  },
+  "title": "VIETNAM, 1968",
+  "subtitle": "The credibility gap widens.",
+  "source": "US National Archives (public domain)",
+  "durationSec": 8
+}

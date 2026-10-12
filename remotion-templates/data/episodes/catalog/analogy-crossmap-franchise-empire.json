@@ -1,0 +1,102 @@
+{
+  "episode": "imperial-overstretch",
+  "title": "FRANCHISE OR EMPIRE?",
+  "subtitle": "The structural resonances — and the crucial difference — between corporate franchising and imperial patron-client systems.",
+  "source": "Doyle, M. (1986). Empires; Gallagher, J. & Robinson, R. (1953). The Imperialism of Free Trade.",
+  "durationSec": 14,
+  "sourceDomain": {
+    "label": "Franchise System",
+    "subtitle": "Modern corporate model"
+  },
+  "targetDomain": {
+    "label": "Imperial Patron-Client",
+    "subtitle": "Historical hegemonic order"
+  },
+  "sourceElements": [
+    {
+      "id": "franchisee-capital",
+      "label": "Franchisee Invests Own Capital",
+      "description": "Local operator bears financial risk; parent extracts royalties."
+    },
+    {
+      "id": "standardized-rules",
+      "label": "Standardized Product Rules",
+      "description": "Brand dictates quality, pricing, and operational norms."
+    },
+    {
+      "id": "franchisor-brand",
+      "label": "Franchisor Owns the Brand",
+      "description": "Intellectual property and ultimate identity stay at the top."
+    },
+    {
+      "id": "profit-margin",
+      "label": "Franchisee Keeps Some Margin",
+      "description": "Local operator retains a negotiated share of revenue."
+    },
+    {
+      "id": "brand-risk-pooling",
+      "label": "Brand-Level Risk Pooling",
+      "description": "One operator's failure can damage all franchisees' reputations."
+    }
+  ],
+  "targetElements": [
+    {
+      "id": "client-resources",
+      "label": "Client Provides Soldiers/Resources",
+      "description": "Periphery contributes manpower and tribute to the imperial center."
+    },
+    {
+      "id": "imperial-norms",
+      "label": "Imperial Norms Enforced",
+      "description": "Hegemon dictates legal, monetary, and military standards."
+    },
+    {
+      "id": "hegemon-strategy",
+      "label": "Hegemon Controls Strategy",
+      "description": "Core power retains monopoly on grand-strategic decisions."
+    },
+    {
+      "id": "domestic-governance",
+      "label": "Client Retains Domestic Governance",
+      "description": "Local rulers manage internal affairs within hegemon-set limits."
+    },
+    {
+      "id": "collective-security",
+      "label": "Collective Security Umbrella",
+      "description": "Alliance credibility depends on perceived willingness to defend any member."
+    }
+  ],
+  "mappings": [
+    {
+      "sourceId": "franchisee-capital",
+      "targetId": "client-resources",
+      "strength": "strong",
+      "label": "Maps to"
+    },
+    {
+      "sourceId": "standardized-rules",
+      "targetId": "imperial-norms",
+      "strength": "strong",
+      "label": "Maps to"
+    },
+    {
+      "sourceId": "franchisor-brand",
+      "targetId": "hegemon-strategy",
+      "strength": "strong",
+      "label": "Maps to"
+    },
+    {
+      "sourceId": "profit-margin",
+      "targetId": "domestic-governance",
+      "strength": "weak",
+      "label": "Partial"
+    },
+    {
+      "sourceId": "brand-risk-pooling",
+      "targetId": "collective-security",
+      "strength": "break",
+      "label": "Breaks here"
+    }
+  ],
+  "breakNote": "The analogy breaks at voluntariness and exit. Franchise contracts are entered voluntarily, precisely specified, and terminable by either party with legal recourse. Imperial patron-client relationships are typically not: client states rarely negotiate from a position of symmetry, and exit from the imperial orbit — defection, non-alignment, regime change — is met with coercion or military intervention, not contract litigation. The franchise metaphor illuminates the extraction logic and norm-setting architecture; it obscures the coercive foundation that makes the system sticky."
+}

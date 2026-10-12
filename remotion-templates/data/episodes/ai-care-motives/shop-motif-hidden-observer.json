@@ -1,0 +1,16 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 24,
+  "condition": "The helper can recognize the test",
+  "ifTrue": {
+    "label": "Good result under test",
+    "consequence": "Evidence for these conditions",
+    "severity": "medium"
+  },
+  "ifFalse": {
+    "label": "Other conditions",
+    "consequence": "What about other conditions?",
+    "severity": "medium"
+  },
+  "backgroundVariant": "light"
+}

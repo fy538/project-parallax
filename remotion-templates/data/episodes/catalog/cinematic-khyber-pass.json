@@ -1,0 +1,45 @@
+{
+  "episode": "catalog",
+  "source": "Mapbox · USGS · Natural Earth",
+  "keyframes": [
+    {
+      "sec": 0,
+      "center": [69.5, 34.5],
+      "altitudeM": 350000,
+      "pitch": 30,
+      "bearing": 15,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 4,
+      "center": [71.1, 34.1],
+      "altitudeM": 40000,
+      "pitch": 62,
+      "bearing": 120,
+      "easing": "ease-in-out"
+    },
+    {
+      "sec": 10,
+      "center": [71.5, 34.0],
+      "altitudeM": 12000,
+      "pitch": 70,
+      "bearing": 135,
+      "easing": "ease-in-out"
+    }
+  ],
+  "register": "dark",
+  "fogPreset": "atmospheric",
+  "lightPreset": "dusk",
+  "terrain": true,
+  "terrainExaggeration": 1.5,
+  "annotations": [
+    {
+      "at": [71.1, 34.1],
+      "label": "KHYBER PASS",
+      "sublabel": "1,070 m · 53 km",
+      "hierarchy": "primary",
+      "emphasis": "accent",
+      "leader": { "dx": 0, "dy": -40 }
+    }
+  ]
+}

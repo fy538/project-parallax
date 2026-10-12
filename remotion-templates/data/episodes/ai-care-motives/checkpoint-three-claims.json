@@ -1,0 +1,24 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 14.0,
+  "title": "Where we are",
+  "axioms": [
+    {
+      "text": "The help is real.",
+      "atSec": 1.2
+    },
+    {
+      "text": "Does it deserve admiration? A separate question.",
+      "atSec": 2.8
+    },
+    {
+      "text": "Will the help last? Still open.",
+      "emphasis": "key",
+      "atSec": 6.4
+    }
+  ],
+  "backgroundVariant": "light",
+  "_direction": {
+    "paceProfile": "breathing"
+  }
+}

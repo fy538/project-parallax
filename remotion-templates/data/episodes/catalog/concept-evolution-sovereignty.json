@@ -1,0 +1,41 @@
+{
+  "data": {
+    "episode": "sovereignty-genealogy",
+    "concept": "SOVEREIGNTY",
+    "title": "HOW SOVEREIGNTY CHANGED ITS MEANING",
+    "subtitle": "The same word — four different political realities across four centuries.",
+    "source": "Krasner, *Sovereignty: Organized Hypocrisy* (1999); Evans & Sahnoun, *The Responsibility to Protect* (2001)",
+    "durationSec": 18,
+    "backgroundVariant": "light",
+    "events": [
+      {
+        "year": "1648",
+        "title": "Westphalian",
+        "definition": "The prince is sovereign within his borders. External powers have no legitimate authority inside another's territory. Sovereignty as territorial exclusivity.",
+        "keyPassage": "\"Cuius regio, eius religio\" — whose realm, his religion."
+      },
+      {
+        "year": "1919",
+        "title": "Self-determination",
+        "definition": "Sovereignty flows from the people, not the prince. Nations have the right to determine their own political status. Wilson's Fourteen Points fracture dynastic sovereignty.",
+        "keyPassage": "\"Self-determination is not a mere phrase. It is an imperative principle.\" — Wilson"
+      },
+      {
+        "year": "1945",
+        "title": "Non-interference",
+        "definition": "UN Charter Article 2(7): sovereignty as a shield against intervention. The great powers agreed to disagree — sovereignty as procedural equality between states."
+      },
+      {
+        "year": "2005",
+        "title": "Conditional",
+        "definition": "Responsibility to Protect (R2P) reframes sovereignty as conditional: states that fail to protect their populations forfeit the norm's protection. Sovereignty as responsibility, not right.",
+        "keyPassage": "\"Sovereignty implies responsibility.\" — ICISS Report"
+      }
+    ],
+    "drifts": [
+      { "fromIndex": 0, "toIndex": 1, "label": "democratized", "emphasis": "rupture" },
+      { "fromIndex": 1, "toIndex": 2, "label": "formalized", "emphasis": "shift" },
+      { "fromIndex": 2, "toIndex": 3, "label": "conditioned", "emphasis": "rupture" }
+    ]
+  }
+}

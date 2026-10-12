@@ -1,0 +1,46 @@
+{
+  "episode": "ai-care-motives",
+  "durationSec": 25,
+  "syncStrategy": "simultaneous",
+  "left": {
+    "component": "ImageComposite",
+    "label": "DUTY",
+    "caption": "“Cheating a child is wrong.”",
+    "data": {
+      "episode": "ai-care-motives",
+      "imagePath": "episodes/ai-care-motives/stills/aigen-02-shop-counter.png",
+      "variant": "background",
+      "duotone": "none",
+      "durationSec": 25,
+      "backgroundVariant": "light"
+    },
+    "focusX": 0.47,
+    "revealAtSec": 4.6,
+    "captionSwap": {
+      "text": "Same bread.",
+      "atSec": 21.2
+    }
+  },
+  "right": {
+    "component": "ImageComposite",
+    "label": "PRUDENCE",
+    "caption": "“Parents talk.”",
+    "data": {
+      "episode": "ai-care-motives",
+      "imagePath": "episodes/ai-care-motives/stills/aigen-02-shop-counter.png",
+      "variant": "background",
+      "duotone": "none",
+      "durationSec": 25,
+      "backgroundVariant": "light"
+    },
+    "focusX": 0.47,
+    "labelPosition": "top-left",
+    "revealAtSec": 10.4,
+    "captionSwap": {
+      "text": "Same price. Same change.",
+      "atSec": 22.0
+    }
+  },
+  "backgroundVariant": "light",
+  "paneFit": "cover"
+}

@@ -1,0 +1,30 @@
+{
+  "episode": "financial-cycles",
+  "title": "THE SEVENTY-YEAR PANIC",
+  "subtitle": "Systemic banking crises appear to cluster on a generational cycle.",
+  "cycleYears": 70,
+  "startYear": 1700,
+  "endYear": 2025,
+  "categories": [
+    { "id": "sovereign", "label": "Sovereign default", "color": "#A64D46", "glyph": "diamond" },
+    { "id": "bank-run", "label": "Banking panic", "color": "#C4A747", "glyph": "circle" },
+    { "id": "asset-crash", "label": "Asset crash", "color": "#7AA3C9", "glyph": "square" }
+  ],
+  "events": [
+    { "year": 1720, "label": "South Sea Bubble", "category": "asset-crash", "emphasis": "primary" },
+    { "year": 1772, "label": "Credit crisis", "category": "bank-run" },
+    { "year": 1788, "label": "Pre-Revolution debt crisis", "category": "sovereign" },
+    { "year": 1825, "label": "Panic of 1825", "category": "bank-run" },
+    { "year": 1837, "label": "US Panic", "category": "bank-run" },
+    { "year": 1873, "label": "Long Depression", "category": "asset-crash", "emphasis": "primary" },
+    { "year": 1893, "label": "Panic of 1893", "category": "bank-run" },
+    { "year": 1907, "label": "Bank Panic", "category": "bank-run" },
+    { "year": 1929, "label": "Wall Street crash", "category": "asset-crash", "emphasis": "primary" },
+    { "year": 1982, "label": "Latin American debt", "category": "sovereign" },
+    { "year": 1997, "label": "Asian crisis", "category": "sovereign" },
+    { "year": 2008, "label": "Subprime crash", "category": "asset-crash", "emphasis": "primary" },
+    { "year": 2023, "label": "SVB / Credit Suisse", "category": "bank-run" }
+  ],
+  "source": "Reinhart & Rogoff 2009; Bordo & Eichengreen",
+  "durationSec": 18
+}

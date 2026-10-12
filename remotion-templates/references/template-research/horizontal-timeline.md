@@ -170,3 +170,9 @@ Use it when:
 ---
 
 Last updated: May 15, 2026
+
+## Short timelines and span brackets (Oct 10, 2026)
+
+- **No pull-back when the timeline fits at the close-up zoom.** The default camera path visits each event at 1.4× and then pulls back to show the whole line. For two or three events the whole line already fits at the close-up zoom, so the final step now only recentres: both events stay at reading size instead of shrinking to 27px titles for the rest of the hold. Four or more events pull back as before.
+- **Draw the span the title names.** `eras[]` (single mode) draws a bracket between two events with a label. It takes `appearAtSec`, so the bar can draw from the first event to the second on the phrase that names the gap ("four days later"), and its label is 20px (it was 10px, unreadable even zoomed). If the title states an interval, the interval should be on the card.
+

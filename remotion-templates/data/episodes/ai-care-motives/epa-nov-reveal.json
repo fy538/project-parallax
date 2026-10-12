@@ -1,0 +1,36 @@
+{
+  "episode": "ai-care-motives",
+  "source": "U.S. EPA to Volkswagen, September 18, 2015, page 3",
+  "title": "EPA NOTICE OF VIOLATION",
+  "text": "Specifically, VW manufactured and installed software in the electronic control module (ECM) of these vehicles that sensed when the vehicle was being tested for compliance with EPA emission standards.",
+  "annotations": [],
+  "durationSec": 9.5,
+  "textFadeInSec": 0.6,
+  "serif": true,
+  "paper": "paper",
+  "backgroundVariant": "light",
+  "_direction": {
+    "paceProfile": "urgent"
+  },
+  "image": {
+    "src": "episodes/ai-care-motives/stills/doc-epa-nov-p3.png",
+    "width": 2230,
+    "height": 980,
+    "highlights": [
+      {
+        "x": 77.65,
+        "y": 53.2,
+        "w": 15.2,
+        "h": 4.8,
+        "appearAtSec": 3.2
+      },
+      {
+        "x": 5.39,
+        "y": 58.9,
+        "w": 64.1,
+        "h": 5.0,
+        "appearAtSec": 3.65
+      }
+    ]
+  }
+}

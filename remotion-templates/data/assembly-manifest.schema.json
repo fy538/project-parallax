@@ -33,6 +33,15 @@
       "enum": ["estimate", "precise"],
       "description": "How timing was derived. 'estimate' = from script hints and word count. 'precise' = from Whisper narration timestamps."
     },
+    "handWired": {
+      "type": "boolean",
+      "description": "True once the manifest carries wiring the script cannot reproduce (clip files, split rows, hold-under, per-seam transitions). generate_manifest.py refuses to overwrite it without --force; move its timings with tools/assembly/retime_manifest.py instead."
+    },
+    "language": {
+      "type": "string",
+      "enum": ["en", "zh"],
+      "description": "Narration language for this cut. 'en' (default) or 'zh' for the separate Mandarin narration + render (WhisperX runs once per language; ZH requires a translated script + ZH narration WAV). Set by generate_manifest.py --lang."
+    },
     "pacing": {
       "type": "object",
       "description": "PACE: annotation summary emitted by generate_manifest.py. Records which pacing profiles were applied and any net timing delta.",
@@ -110,9 +119,17 @@
         }
       }
     },
+    "beatFlash": {
+      "type": "boolean",
+      "description": "Opt in to the film-burn flash at every beat boundary. Off by default: the flash is not one of the six transitions in TRANSITION_GRAMMAR.md and it hazes whatever seam the manifest asked for at that boundary."
+    },
     "filmOverlay": {
       "$ref": "#/$defs/filmOverlayConfig",
       "description": "Episode-level film overlay config. Presence of this field is the ACTIVATION GATE for the entire FilmOverlay system — when absent, no FilmOverlay renders anywhere (per-segment cascade is skipped too). When present (even as `{}`), each segment resolves its preset/effects/intensity via the cascade in `src/utils/resolveFilmOverlay.ts`: per-segment override → backdrop `recommendedPreset` → TEMPLATE_PRESET_MAP → episode-level field on this object → `documentary` default."
+    },
+    "soundscape": {
+      "$ref": "#/$defs/soundscapeConfig",
+      "description": "Episode-level soundscape config. Sibling of filmOverlay (visual register) — this is the audio register. Resolved per-segment via cascade in `src/utils/resolveSoundscape.ts`: per-segment override → backdrop `recommendedSoundscape` → TEMPLATE_SOUNDSCAPE_DEFAULTS → episode-level field on this object → 'editorial-print' (channel default). Doctrine: project/SOUNDSCAPE_REGISTER.md. Unlike filmOverlay, soundscape does NOT require explicit activation — the cascade resolves a register for every segment by default (the channel default 'editorial-print' ensures every segment has SOME ambient register). Set ambient: 'silence' explicitly to opt a segment out entirely."
     },
     "episodeMotif": {
       "$ref": "#/$defs/episodeMotif",
@@ -216,6 +233,17 @@
     }
   },
   "$defs": {
+    "stillFraming": {
+      "type": "object",
+      "description": "Where the frame sits on a still: its centre as fractions of the image, and the zoom.",
+      "additionalProperties": false,
+      "required": ["cx", "cy", "zoom"],
+      "properties": {
+        "cx": { "type": "number", "minimum": 0, "maximum": 1 },
+        "cy": { "type": "number", "minimum": 0, "maximum": 1 },
+        "zoom": { "type": "number", "minimum": 1, "maximum": 4 }
+      }
+    },
     "episodeMotif": {
       "type": "object",
       "description": "Visual motif configuration — a recurring geometric element that evolves across the episode, giving the central concept a visual identity that deepens as the argument builds. TS-SIDE SIBLING: EpisodeMotif in src/hooks/useMotifProgress.tsx.",
@@ -267,6 +295,46 @@
           "minimum": 0,
           "maximum": 1,
           "description": "Overall intensity (0-1). When set, replaces whatever intensity the cascade-resolved preset would provide."
+        }
+      }
+    },
+    "soundscapeConfig": {
+      "type": "object",
+      "description": "Soundscape configuration shape. Used at episode level (manifest.soundscape) and per-segment (segment.template.soundscape). Audio sibling of filmOverlayConfig — same per-field cascade pattern. TS-SIDE SIBLING: `SoundscapeConfig` in `src/utils/resolveSoundscape.ts` is the TypeScript source of truth. Doctrine: project/SOUNDSCAPE_REGISTER.md. Both must be kept in sync by hand when adding fields.",
+      "additionalProperties": false,
+      "properties": {
+        "ambient": {
+          "type": "string",
+          "enum": ["archive-room", "editorial-print", "atmospheric-outdoor", "cinematic-dark", "cyclical-drone", "silence"],
+          "description": "Ambient-bed register. Resolved per-segment via 5-tier cascade: segment override → backdrop.recommendedSoundscape → TEMPLATE_SOUNDSCAPE_DEFAULTS[component] → episode default → 'editorial-print' (channel default)."
+        },
+        "transitionIn": {
+          "type": "string",
+          "description": "Transition SFX cue name fired at the start of this segment (or episode-wide default). Names come from AUDIO_DESIGN.md transition palette — beat-transition, section-open, quote-bell, stat-reveal, map-whoosh, tension-rise, tension-resolve, end-stinger."
+        },
+        "transitionOut": {
+          "type": "string",
+          "description": "Transition SFX cue name fired at the end of this segment. Rare — usually the next segment's transitionIn carries the boundary."
+        },
+        "textures": {
+          "type": "array",
+          "description": "One-shot micro-SFX scheduled within this segment. Each entry pairs a cue type (from AUDIO_DESIGN.md texture palette) with the second at which it fires.",
+          "items": {
+            "type": "object",
+            "required": ["type", "atSec"],
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "Texture cue name — typewriter-clack / pen-stroke / page-turn / stamp-impact / chime-soft / dot-click / card-settle / line-draw / region-glow / bar-grow / node-pop / chime-sharp / vinyl-pop."
+              },
+              "atSec": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Second within the segment at which the cue fires."
+              }
+            }
+          }
         }
       }
     },
@@ -405,6 +473,7 @@
                 "ImageComposite",
                 "PhotoMontage",
                 "NetworkDiagram",
+                "SanctionsNetwork",
                 "TimeSeriesChart",
                 "SankeyFlow",
                 "GameBoard",
@@ -412,6 +481,9 @@
                 "StatReveal",
                 "RadarChart",
                 "AnnotatedImage",
+                "ScrollyReveal",
+                "AnnotatedZoom",
+                "GenerativeBackdrop",
                 "EscalationLadder",
                 "HorizontalTimeline",
                 "DuelingFrameworks",
@@ -426,11 +498,13 @@
                 "AtlasPlate",
                 "BeeswarmChart",
                 "BumpChart",
+                "BarChartRace",
                 "CalendarHeatmap",
                 "CartogramMap",
                 "ConnectedScatterplot",
                 "DensityMap",
                 "DumbbellPlot",
+                "BubbleMatrix",
                 "HorizonChart",
                 "IsotypeChart",
                 "MarimekkoChart",
@@ -439,7 +513,40 @@
                 "RidgelinePlot",
                 "Streamgraph",
                 "TernaryPlot",
-                "TilegramUSMap"
+                "TilegramUSMap",
+                "CinematicMap",
+                "TerritoryMap",
+                "FlowMap",
+                "CausalLoopDiagram",
+                "SpiralTimeline",
+                "PrimarySourceReveal",
+                "SmallMultiples",
+                "HandwrittenLetter",
+                "NewspaperHeadlineRotator",
+                "ArchivalReel",
+                "TelegramCable",
+                "ComparisonPair",
+                "Syllogism",
+                "AxiomList",
+                "DialecticFlow",
+                "ConditionalArgument",
+                "CounterfactualPath",
+                "AnalogyCrossmap",
+                "ToulminMap",
+                "MorphTransition",
+                "SplitFrame",
+                "VennDiagram",
+                "ChordDiagram",
+                "Treemap",
+                "MatrixHeatmap",
+                "HorizontalTimelineSingle",
+                "MathReveal",
+                "MathDerivation",
+                "PhilosophicalFamilyTree",
+                "ConceptEvolutionTimeline",
+                "DivergingBar",
+                "DotPlot",
+                "OrgChart"
               ],
               "description": "Remotion template component name."
             },
@@ -454,6 +561,10 @@
             "filmOverlay": {
               "$ref": "#/$defs/filmOverlayConfig",
               "description": "Per-segment FilmOverlay override. Each field cascades independently — set just `preset` to override the auto-resolved choice for this segment, or just `intensity` to crank/dampen without changing preset. Resolution order (most-specific wins per field): segment field → backdrop `recommendedPreset` (for `preset` field only) → TEMPLATE_PRESET_MAP[component] → episode `manifest.filmOverlay` → `documentary`. Resolved at render time by `resolveFilmOverlay()`. The whole cascade is GATED on `manifest.filmOverlay` being present; when episode-level is unset, this field is ignored too."
+            },
+            "soundscape": {
+              "$ref": "#/$defs/soundscapeConfig",
+              "description": "Per-segment soundscape override. Audio sibling of filmOverlay — same per-field cascade semantics. Most segments DON'T need this; the cascade auto-resolves from TEMPLATE_SOUNDSCAPE_DEFAULTS via componentName. Set `ambient: 'silence'` to suppress ambient for a specific segment; set `textures: [{type, atSec}]` to schedule one-shot micro-SFX. Doctrine: project/SOUNDSCAPE_REGISTER.md."
             },
             "props": {
               "type": "object",
@@ -554,6 +665,34 @@
         "holdAfter": {
           "type": "number",
           "description": "Extra seconds to hold this segment after narration ends. Emitted from DIR: hold annotations in the script."
+        },
+        "preDelay": {
+          "type": "number",
+          "description": "Seconds between the segment's start and the start of its narration. Emitted from DIR: hold(pre:Ns); recomputed from the recording by retime_manifest.py."
+        },
+        "authoredDurationSec": {
+          "type": "number",
+          "description": "The slot length this segment's data file was written for. Written by retime_manifest.py the first time timings move; FullEpisode scales typed reveal times by slot ÷ this for data files with no durationSec of their own."
+        },
+        "framing": {
+          "type": "object",
+          "description": "For a still on the picture layer (a FOOTAGE segment whose asset.file is an image): the framing the shot starts and ends on. cx/cy are the frame's centre as fractions of the image; zoom 1 shows the whole image. Drawn by src/components/StillFrame.tsx.",
+          "additionalProperties": false,
+          "required": ["from", "to"],
+          "properties": {
+            "from": { "$ref": "#/$defs/stillFraming" },
+            "to": { "$ref": "#/$defs/stillFraming" },
+            "ease": { "type": "string", "enum": ["linear", "settle", "glide"], "default": "linear" }
+          }
+        },
+        "narrationGate": {
+          "type": "object",
+          "description": "Do not advance to the next segment until this word is spoken. Emitted from DIR: hold(until:\"word\").",
+          "additionalProperties": false,
+          "properties": {
+            "word": { "type": "string" }
+          },
+          "required": ["word"]
         },
         "holdBehavior": {
           "type": "string",

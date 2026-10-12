@@ -1,0 +1,81 @@
+{
+  "data": {
+    "episode": "silicon-trap",
+    "title": "TSMC GOVERNANCE STRUCTURE",
+    "subtitle": "Major shareholders and board composition — the institutional structure behind the world's most critical factory",
+    "source": "TSMC Annual Report 2023; Taiwan Securities Exchange",
+    "durationSec": 14,
+    "backgroundVariant": "light",
+    "rootId": "board",
+    "revealMode": "top-down",
+    "nodes": [
+      {
+        "id": "board",
+        "label": "BOARD OF DIRECTORS",
+        "type": "committee",
+        "emphasis": "primary"
+      },
+      {
+        "id": "morris-chang",
+        "label": "MORRIS CHANG",
+        "sublabel": "Founder / Chair Emeritus",
+        "type": "person",
+        "emphasis": "secondary"
+      },
+      {
+        "id": "cc-wei",
+        "label": "C.C. WEI",
+        "sublabel": "Chairman & CEO",
+        "type": "person",
+        "emphasis": "primary"
+      },
+      {
+        "id": "govt-taiwan",
+        "label": "TAIWAN GOVT.",
+        "sublabel": "6.4% via NSDF",
+        "type": "role"
+      },
+      {
+        "id": "tsmc-ops",
+        "label": "TSMC OPERATIONS",
+        "sublabel": "Fab network — 24 fabs",
+        "type": "role"
+      },
+      {
+        "id": "r-and-d",
+        "label": "R&D DIVISION",
+        "sublabel": "8.5% of revenue",
+        "type": "role"
+      },
+      {
+        "id": "az-fab",
+        "label": "ARIZONA FABS",
+        "sublabel": "TSMC America",
+        "type": "role"
+      },
+      {
+        "id": "japan-fab",
+        "label": "JAPAN FAB",
+        "sublabel": "JASM JV",
+        "type": "role"
+      },
+      {
+        "id": "de-fab",
+        "label": "DRESDEN FAB",
+        "sublabel": "ESMC JV — 2027 est.",
+        "type": "role"
+      }
+    ],
+    "edges": [
+      { "from": "board", "to": "cc-wei", "style": "solid" },
+      { "from": "morris-chang", "to": "board", "style": "dashed", "label": "founder emeritus" },
+      { "from": "govt-taiwan", "to": "board", "style": "dashed", "label": "state interest" },
+      { "from": "cc-wei", "to": "tsmc-ops", "style": "solid" },
+      { "from": "tsmc-ops", "to": "az-fab", "style": "solid" },
+      { "from": "tsmc-ops", "to": "japan-fab", "style": "solid" },
+      { "from": "tsmc-ops", "to": "de-fab", "style": "solid" },
+      { "from": "tsmc-ops", "to": "r-and-d", "style": "solid" }
+    ],
+    "highlightChain": ["board", "cc-wei", "tsmc-ops"]
+  }
+}

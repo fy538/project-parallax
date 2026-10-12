@@ -1,0 +1,42 @@
+{
+  "episode": "ai-care-motives",
+  "title": "Two systems, two different setups",
+  "variant": "comparison",
+  "comparisonLayout": "paired",
+  "connector": "none",
+  "columns": [
+    {
+      "title": "The diesel cars",
+      "color": "#888780",
+      "items": [
+        "Cleaner under the recognized test",
+        "Software recognized the official test"
+      ]
+    },
+    {
+      "title": "Claude 3 Opus, in the study",
+      "color": "#888780",
+      "items": [
+        "Answered more harmful requests when it believed the conversation counted",
+        "Told which conversations would count toward training"
+      ]
+    }
+  ],
+  "rowLabels": [
+    "What changed",
+    "How it knew"
+  ],
+  "rowAtSec": [
+    [
+      2.0,
+      7.6
+    ],
+    [
+      13.6,
+      14.6
+    ]
+  ],
+  "source": "Greenblatt et al., 2024 · EPA Notice of Violation, 2015",
+  "durationSec": 21,
+  "backgroundVariant": "light"
+}

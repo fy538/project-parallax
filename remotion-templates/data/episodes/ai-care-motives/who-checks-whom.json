@@ -1,0 +1,44 @@
+{
+  "episode": "ai-care-motives",
+  "title": "Who checks the helper",
+  "variant": "comparison",
+  "durationSec": 24,
+  "columns": [
+    {
+      "title": "Helper",
+      "color": "#C4A747",
+      "items": [
+        "Doctor",
+        "Bank",
+        "Shopkeeper"
+      ]
+    },
+    {
+      "title": "Who checks them",
+      "color": "#4A7BA7",
+      "items": [
+        "Licensing board",
+        "Regulators",
+        "The street"
+      ]
+    }
+  ],
+  "backgroundVariant": "light",
+  "comparisonLayout": "paired",
+  "connector": "arrow",
+  "keyRow": 2,
+  "rowAtSec": [
+    [
+      4.6,
+      5.4
+    ],
+    [
+      9.0,
+      9.8
+    ],
+    [
+      12.2,
+      13.2
+    ]
+  ]
+}

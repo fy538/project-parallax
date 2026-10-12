@@ -57,6 +57,8 @@ These are the canonical palette keys exported from `theme.ts` via `palette.<key>
 | `paper` | `#F5F0E8` | Light mode bg base; card backgrounds |
 | `gold` | `#C4A747` | **Channel accent** — crosshairs, hero labels, highlights, emphasis (replaces the old saturated `amber`) |
 | `dustblue` | `#7AA3C9` | Muted us-blue midtone (RdBu diverging midpoint between `bone` and `semantic.us`) |
+| `goldText` | `#786526` | Gold for **text** on light backgrounds. `gold` is a fill/rule colour: as text on paper it reaches ~2:1. Same hue, 5.0:1 on paper, 4.6:1 on bone. Templates apply it via `textAccent()` in `utils/colorUtils.ts`. |
+| `dustblueText` | `#3C6A95` | Dustblue for text on light backgrounds (5.0:1 on paper). Same rule as `goldText`. |
 
 ### Semantic Colors (Geopolitical)
 
@@ -176,8 +178,9 @@ The Plex superfamily (Sans + Serif + Mono, all by Mike Abbink for Bold Monday / 
 | `h1` | 64px | 700 | 2px | 1.1 | Episode titles |
 | `h2` | 48px | 700 | 2px | 1.1 | Section titles |
 | `h3` | 36px | 600 | 1.5px | 1.2 | Chart titles, subsections |
-| `body` | 22px | 400 | 0 | 1.5 | Descriptions, narration text |
-| `label` | 18px | 500 | 1px | 1.2 | Data labels, axis labels |
+| `readable` | 28px | — | — | — | Floor for text the viewer must read on a phone or TV (added Oct 10, 2026). Use for labels, captions and subtitles wherever the graphic has room |
+| `body` | 22px | 400 | 0 | 1.5 | Descriptions in dense graphics; below the reading floor |
+| `label` | 18px | 500 | 1px | 1.2 | Data labels in dense graphics only; about half the reading floor |
 | `caption` | 14px | 400 | 0.5px | 1.4 | Sources, footnotes |
 | `meta` | 11px | 400 | 2-3px | 1.0 | Coordinate strings, file codes (IBM Plex Mono) |
 
@@ -293,28 +296,42 @@ Templates set their drift via `_direction: { driftPreset: "<name>" }`. The defau
 
 ## Image Treatment Pipeline
 
-Every image — archival photograph, satellite imagery, technical photography, AI generation — passes through the same 4-step pipeline before entering any composition. The pipeline IS the brand. No exceptions.
+Treatment depends on the **source's color state**, not a single universal pipeline (revised May 23, 2026). There are **two paths**, and the choice is determined by whether the image already carries the brand palette:
 
-### Step 1: Desaturate
+| Source | Color state | Path | Why |
+|---|---|---|---|
+| **AI-generated stills** (ChatGPT constructivist illustration) | already on-palette (ink/amber/bone locked at generation via prompts + refs) | **Documentary finish** — color preserved | the duotone would *re-impose* a palette that's already there and crush the generated color; redundant at best, destructive at worst |
+| **Real footage** (archival photo, satellite, technical/stock) | full native color that needs unifying | **Duotone grade** — recolor onto the brand ramp | this is the duotone's actual job: collapse mismatched real-world color into one coherent palette |
 
-Reduce saturation to 20-30% of original. Strip the image's native color identity so it becomes a neutral grayscale base.
+> The earlier doctrine ("every image passes through desaturate → duotone, no exceptions") was written before the channel generated its own on-palette stills. For palette-locked AI art, **treatment = finish, not recolor.** The duotone is reserved for footage that has color to unify, or for a deliberately bleak beat where crushing color is the editorial point.
 
-### Step 2: Duotone Remap
+### Path A — Documentary finish (default for AI-generated stills)
 
-Map the desaturated image to a two-color ramp from the brand palette:
+No color remap. The generated color stands; treatment adds film character only:
+- **Film grain:** ~6% temporal noise — "captured, not generated."
+- **Halation / bloom:** soft glow screen-blended on the highlights (~0.18) — filmic warmth without recolor.
+- **Vignette:** gentle edge darkening (~0.10).
+
+Command: `tools/brand-treatment/treat_video.py <clip> --finish documentary`.
+
+### Path B — Duotone grade (real footage, or deliberate dark beats)
+
+**Step 1 — Desaturate** to 20–30% of original (neutral grayscale base).
+**Step 2 — Duotone remap** onto a two-color ramp from the brand palette:
 
 | Ramp name | Shadows | Midtones | Highlights | When to use |
 |-----------|---------|----------|------------|-------------|
-| **Standard** | `ink` #1C1814 | `umber` #8B7355 | `gold` #C4A747 | Default for most content |
+| **Standard** | `ink` #1C1814 | `umber` #8B7355 | `gold` #C4A747 | Default for footage |
 | **Conflict** | `ink` #1C1814 | `#7A2E1A` (deep brick) | `china` #A64D46 | China, conflict, danger |
-| **Editorial** | `taupe` #B8A189 | `bone` #F0E6D0 | `paper` #F5F0E8 | Light mode images, documents, archival |
+| **Editorial** | `taupe` #B8A189 | `bone` #F0E6D0 | `paper` #F5F0E8 | Light-mode images, documents, archival |
 
-### Step 3: Grain & Vignette
+**Step 3 — Grain & vignette** (8–12% grain, 15–20% vignette).
 
-- **Film grain:** 8-12% opacity, monochromatic noise overlay. Makes the image feel captured, not generated.
-- **Vignette:** Edges darken 15-20% (radial gradient, transparent center → semi-opaque edge). Focuses attention on center-frame content.
+Command: `treat_video.py <clip> --finish duotone [-r standard|conflict|editorial] [--strength 0–1]`. `--strength < 1` blends the duotone back over the original so colorful footage keeps some hue (use ~0.25–0.4 for a colorful payoff, full 1.0 for bleak beats).
 
-### Step 4: Composite
+Doctrine + failure modes: `project/CHAINED_STILL_LESSONS.md` → treatment section.
+
+### Composite (both paths)
 
 Place the treated image into the layout grid according to one of three placement modes:
 

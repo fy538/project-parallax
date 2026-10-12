@@ -1,0 +1,13 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "definition",
+  "term": "THE UNWATCHED TEST",
+  "definitionText": "Does the behavior persist when assessment seems absent?",
+  "accentColor": "#C4A747",
+  "backgroundVariant": "light",
+  "durationSec": 8.8,
+  "_direction": {
+    "textAnimation": "definition-reveal",
+    "paceProfile": "breathing"
+  }
+}

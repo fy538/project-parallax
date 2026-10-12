@@ -1,0 +1,26 @@
+{
+  "episode": "ai-care-motives",
+  "title": "What the model says vs. what the tracing shows",
+  "subtitle": "Simplified schematic · partial tracing method",
+  "source": "Claude 3.5 Haiku, Anthropic 2025 · simplified schematic of a partial tracing result",
+  "steps": [
+    {
+      "formula": "36 + 59 = 95",
+      "holdSec": 2.5,
+      "annotation": "Simplified schematic · partial tracing method"
+    },
+    {
+      "formula": "\\underbrace{6 + 9 = 15 \\to \\text{carry the } \\textcolor{#A64D46}{1}}_{\\text{What the model says it did}}",
+      "holdSec": 3.5
+    },
+    {
+      "formula": "\\underbrace{\\textcolor{#3C6A95}{\\text{magnitude}}}_{\\text{approximate}} + \\underbrace{\\textcolor{#786526}{\\text{last digit}}}_{\\text{exact}} \\to 95",
+      "holdSec": 6.0
+    }
+  ],
+  "crossfadeSec": 0.6,
+  "fontSize": 64,
+  "display": true,
+  "backgroundVariant": "light",
+  "showStepCounter": false
+}

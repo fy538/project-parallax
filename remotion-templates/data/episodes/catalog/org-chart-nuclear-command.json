@@ -1,0 +1,69 @@
+{
+  "data": {
+    "episode": "nuclear-command",
+    "title": "US NUCLEAR COMMAND AUTHORITY",
+    "subtitle": "Formal chain of command, strategic nuclear forces",
+    "source": "Doctrine for Joint Nuclear Operations (JP 3-72); DoD Nuclear Posture Review 2022",
+    "durationSec": 16,
+    "backgroundVariant": "light",
+    "rootId": "president",
+    "revealMode": "top-down",
+    "nodes": [
+      {
+        "id": "president",
+        "label": "PRESIDENT",
+        "sublabel": "National Command Authority",
+        "type": "role",
+        "emphasis": "primary"
+      },
+      {
+        "id": "secdef",
+        "label": "SEC. OF DEFENSE",
+        "sublabel": "NCA co-authority",
+        "type": "role",
+        "emphasis": "primary"
+      },
+      {
+        "id": "jcs",
+        "label": "JOINT CHIEFS",
+        "sublabel": "Advisory (not in chain)",
+        "type": "committee",
+        "emphasis": "secondary"
+      },
+      {
+        "id": "stratcom",
+        "label": "US STRATCOM",
+        "sublabel": "CDRUSSTRATCOM",
+        "type": "role"
+      },
+      {
+        "id": "navsub",
+        "label": "SSBN FORCE",
+        "sublabel": "Sub-launched ballistic",
+        "type": "role"
+      },
+      {
+        "id": "afgsc",
+        "label": "AIR FORCE GSC",
+        "sublabel": "ICBM + bomber",
+        "type": "role"
+      },
+      {
+        "id": "navy",
+        "label": "SECRETARY OF NAVY",
+        "sublabel": "Administrative chain",
+        "type": "role",
+        "emphasis": "muted"
+      }
+    ],
+    "edges": [
+      { "from": "president", "to": "secdef", "style": "solid" },
+      { "from": "president", "to": "jcs", "style": "dashed", "label": "advises" },
+      { "from": "secdef", "to": "stratcom", "style": "solid" },
+      { "from": "stratcom", "to": "navsub", "style": "solid" },
+      { "from": "stratcom", "to": "afgsc", "style": "solid" },
+      { "from": "navy", "to": "navsub", "style": "dashed", "label": "admin." }
+    ],
+    "highlightChain": ["president", "secdef", "stratcom"]
+  }
+}

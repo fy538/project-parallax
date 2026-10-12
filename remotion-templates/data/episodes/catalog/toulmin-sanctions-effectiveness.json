@@ -1,0 +1,36 @@
+{
+  "episode": "sanctions-logic",
+  "title": "THE SANCTIONS ARGUMENT",
+  "subtitle": "Mapping the logical structure of the Western sanctions case against Russia.",
+  "source": "IMF World Economic Outlook 2023; CREA Energy Institute; KSE Institute Russia sanctions tracker",
+  "data": [
+    {
+      "text": "Russia's GDP contracted 2.1% in 2022 despite record energy revenues.",
+      "attribution": "IMF World Economic Outlook 2023"
+    },
+    {
+      "text": "Capital flight exceeded $250B in the first six months of the war.",
+      "attribution": "CREA Energy Institute; Central Bank of Russia"
+    }
+  ],
+  "claim": {
+    "text": "Western sanctions have imposed significant economic costs on Russia.",
+    "emphasis": true
+  },
+  "warrant": {
+    "text": "Economic contraction and capital flight indicate sanctions are creating measurable pressure on the target state."
+  },
+  "backing": {
+    "text": "Historical precedent: Iran sanctions (2012), South Africa apartheid-era sanctions (1980s), Iraq sanctions regime (1990s)."
+  },
+  "qualifier": {
+    "text": "Though not sufficient to change Russia's war calculus in the near term.",
+    "label": "QUALIFIER"
+  },
+  "rebuttal": {
+    "text": "Russia fully reorients trade to non-sanctioning economies — which it is actively attempting via China, India, and the Gulf.",
+    "prefix": "UNLESS"
+  },
+  "revealMode": "sequential",
+  "durationSec": 14
+}

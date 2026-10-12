@@ -1,0 +1,50 @@
+{
+  "data": {
+    "episode": "prisoners-dilemma",
+    "title": "THE KHYBER PASS — THREE STRATEGIC ANGLES",
+    "subtitle": "Geography of Central Asia's most fought-over 53km",
+    "source": "US Army History Center; Imperial War Museum",
+    "durationSec": 18,
+    "backgroundVariant": "dark",
+    "base": {
+      "src": "assets/sample-historical.png",
+      "alt": "Khyber Pass terrain overview",
+      "duotoneRamp": "conflict"
+    },
+    "regions": [
+      {
+        "revealAtSec": 1.5,
+        "centerX": 50,
+        "centerY": 50,
+        "scale": 1.0,
+        "label": "Full Khyber region context"
+      },
+      {
+        "revealAtSec": 4.5,
+        "centerX": 45,
+        "centerY": 30,
+        "scale": 2.5,
+        "transitionSec": 0.8,
+        "label": "Torkham Gate — the Afghanistan border crossing"
+      },
+      {
+        "revealAtSec": 8.5,
+        "centerX": 60,
+        "centerY": 65,
+        "scale": 2.8,
+        "transitionSec": 0.9,
+        "label": "Ali Masjid Fort — the tactical choke",
+        "showCrosshair": true
+      },
+      {
+        "revealAtSec": 12.5,
+        "centerX": 50,
+        "centerY": 50,
+        "scale": 1.0,
+        "transitionSec": 1.2,
+        "label": "Terrain context — 900m altitude drop over 53km"
+      }
+    ],
+    "holdAtLastRegion": true
+  }
+}

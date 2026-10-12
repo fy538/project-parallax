@@ -1,0 +1,85 @@
+{
+  "episode": "blockades-leak",
+  "title": "THE BYPASS ANATOMY",
+  "subtitle": "How Russia's sanctions evasion network assembled step by step.",
+  "source": "CREA, OFAC Enforcement, Atlantic Council, 2023–2024",
+  "durationSec": 16,
+  "base": {
+    "src": "/geo/russia-europe-placeholder.jpg",
+    "alt": "Russia–Europe trade corridor map",
+    "duotoneRamp": "conflict",
+    "objectPosition": "center"
+  },
+  "steps": [
+    {
+      "revealAtSec": 1.5,
+      "stepLabel": "Energy revenue cutoff",
+      "annotations": [
+        {
+          "id": "energy-cutoff",
+          "x": 55,
+          "y": 32,
+          "label": "Pipeline Revenue Blocked",
+          "detail": "EU embargo on seaborne crude, Dec 2022",
+          "placement": "right",
+          "color": "#A64D46",
+          "type": "callout"
+        }
+      ],
+      "focus": { "centerX": 55, "centerY": 32, "scale": 1.3, "durationSec": 0.7 }
+    },
+    {
+      "revealAtSec": 5.0,
+      "stepLabel": "SWIFT exclusion",
+      "annotations": [
+        {
+          "id": "swift",
+          "x": 42,
+          "y": 48,
+          "label": "SWIFT Exclusion",
+          "detail": "7 Russian banks cut from messaging network",
+          "placement": "left",
+          "color": "#A64D46",
+          "type": "callout"
+        }
+      ],
+      "focus": { "centerX": 48, "centerY": 40, "scale": 1.2, "durationSec": 0.8 }
+    },
+    {
+      "revealAtSec": 9.0,
+      "stepLabel": "Price cap mechanism",
+      "annotations": [
+        {
+          "id": "price-cap",
+          "x": 62,
+          "y": 60,
+          "label": "G7 Price Cap",
+          "detail": "$60/barrel ceiling on Russian crude",
+          "placement": "right",
+          "color": "#C4A747",
+          "type": "callout"
+        }
+      ],
+      "focus": { "centerX": 62, "centerY": 60, "scale": 1.25, "durationSec": 0.9 }
+    },
+    {
+      "revealAtSec": 13.0,
+      "stepLabel": "Bypass routes",
+      "annotations": [
+        {
+          "id": "bypass",
+          "x": 70,
+          "y": 52,
+          "label": "Shadow Fleet Corridor",
+          "detail": "Turkey · UAE · India re-export routes",
+          "placement": "top",
+          "type": "highlight",
+          "color": "#8B7355"
+        }
+      ],
+      "focus": { "centerX": 55, "centerY": 50, "scale": 1.0, "durationSec": 1.2 }
+    }
+  ],
+  "annotationMode": "accumulate",
+  "backgroundVariant": "dark"
+}

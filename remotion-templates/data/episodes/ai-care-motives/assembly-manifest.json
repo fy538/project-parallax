@@ -1,0 +1,1553 @@
+{
+  "version": "1.0",
+  "episode": "ai-care-motives",
+  "title": "The Unwatched Test",
+  "fps": 30,
+  "totalDurationSec": 678.6,
+  "mode": "estimate",
+  "handWired": true,
+  "pacing": {
+    "multipliers": {
+      "urgent": 0.7,
+      "analytical": 1.0,
+      "breathing": 1.4
+    },
+    "profilesUsed": [
+      "breathing",
+      "urgent"
+    ],
+    "diffs": [],
+    "netDeltaSec": 0
+  },
+  "narration": {
+    "totalDurationSec": 678.6,
+    "words": []
+  },
+  "beats": [
+    {
+      "id": "beat1",
+      "title": "THE AI THAT SAID YES",
+      "startSec": 0.0,
+      "endSec": 64.0
+    },
+    {
+      "id": "beat2",
+      "title": "THE SHOPKEEPER",
+      "startSec": 64.0,
+      "endSec": 143.0
+    },
+    {
+      "id": "beat3",
+      "title": "THE RESCUE",
+      "startSec": 143.0,
+      "endSec": 224.0
+    },
+    {
+      "id": "beat4",
+      "title": "THE STREET",
+      "startSec": 224.0,
+      "endSec": 324.0
+    },
+    {
+      "id": "beat5",
+      "title": "THE RING",
+      "startSec": 324.0,
+      "endSec": 398.2
+    },
+    {
+      "id": "beat6",
+      "title": "THE CAR",
+      "startSec": 398.2,
+      "endSec": 467.2
+    },
+    {
+      "id": "beat7",
+      "title": "THE MACHINE",
+      "startSec": 467.2,
+      "endSec": 595.6
+    },
+    {
+      "id": "beat8",
+      "title": "WHAT TO DEMAND",
+      "startSec": 595.6,
+      "endSec": 678.6
+    }
+  ],
+  "segments": [
+    {
+      "id": "beat1-seg00",
+      "type": "FOOTAGE",
+      "startSec": 0.0,
+      "endSec": 9.1,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "You've probably asked an AI whether your idea is good. The startup. The essay.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-10.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.4895,
+          "zoom": 1.0364
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat1-seg01",
+      "type": "TEMPLATE",
+      "startSec": 9.1,
+      "endSec": 21.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "Say it answers yes. Warmly. With reasons. For a moment, you feel more confident.",
+      "template": {
+        "component": "PrimarySourceReveal",
+        "dataFile": "chat-cold-open.json"
+      },
+      "textureCues": [
+        {
+          "type": "card-settle",
+          "offsetSec": 1.5,
+          "volume": 0.15,
+          "label": "Message arrives on the chat card (try by ear)"
+        }
+      ]
+    },
+    {
+      "id": "beat1-seg03",
+      "type": "FOOTAGE",
+      "startSec": 21.0,
+      "endSec": 28.0,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P1",
+      "narrationRef": "A reassuring answer doesn't settle that. And you're about to act on it.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-10.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.4,
+          "cy": 0.38,
+          "zoom": 1.45
+        },
+        "to": {
+          "cx": 0.36,
+          "cy": 0.33,
+          "zoom": 1.6
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat1-seg04",
+      "type": "FOOTAGE",
+      "startSec": 28.0,
+      "endSec": 37.0,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "With a friend, you have a history. She's told you hard things before. What gives",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-01.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.5045,
+          "zoom": 1.0982
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat1-seg05",
+      "type": "FOOTAGE",
+      "startSec": 37.0,
+      "endSec": 57.0,
+      "layer": "background",
+      "beat": "beat1",
+      "priority": "P2",
+      "narrationRef": "There's another complication. When a lab says a model behaves well, that's a tes",
+      "narrationLeadIn": 0.7,
+      "transition": {
+        "in": "cut",
+        "out": "cut",
+        "durationSec": 0.5
+      },
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-06.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0762
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat1-seg06",
+      "type": "TEMPLATE",
+      "startSec": 57.0,
+      "endSec": 64.0,
+      "layer": "foreground",
+      "beat": "beat1",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "I call that question the Unwatched Test. It starts with a shopkeeper.",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-unwatched-test.json"
+      },
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.6
+      }
+    },
+    {
+      "id": "beat2-seg07",
+      "type": "FOOTAGE",
+      "startSec": 64.0,
+      "endSec": 77.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "A child walks into a shop to buy bread. The shopkeeper could overcharge her. She",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-02.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.4761,
+          "zoom": 1.0867
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "notes": "· [AI-GEN:] shop counter, constructivist geometric figures: shopkeeper behind the counter, a small child figure with a coin, one loaf; warm amber, featureless faces. | Motif frame, reused in Beats 4 and 8",
+      "transition": {
+        "in": "fade",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat2-seg08",
+      "type": "TEMPLATE",
+      "startSec": 77.0,
+      "endSec": 102.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Now I'll tell you why he did it. There are two versions. In the first, he thinks",
+      "template": {
+        "component": "SplitFrame",
+        "dataFile": "shop-motif-reasons.json"
+      },
+      "notes": "· [MG:] SplitFrame (sequential) — left and right panes are `ImageComposite` of the same counter still; captions beneath: left \"Duty: 'cheating a child is wrong'\", right \"Prudence: 'parents talk'\" · | motif form 1",
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat2-seg10",
+      "type": "FOOTAGE",
+      "startSec": 102.0,
+      "endSec": 114.0,
+      "layer": "background",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Do you think less of him in the second version? Notice whether you do. The child",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-03.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5233,
+          "cy": 0.4953,
+          "zoom": 1.1029
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "paceProfile": "breathing",
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat2-seg11a",
+      "type": "TEMPLATE",
+      "startSec": 114.0,
+      "endSec": 143.0,
+      "layer": "foreground",
+      "beat": "beat2",
+      "priority": "P2",
+      "narrationRef": "Immanuel Kant described a shop like this. {✅} His dealer charges everyone the sa",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "portrait-kant.json"
+      }
+    },
+    {
+      "id": "beat3-seg13",
+      "type": "FOOTAGE",
+      "startSec": 143.0,
+      "endSec": 155.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "Now you're the one in the water. A stranger pulls you out of the river. Later yo",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-04.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.4886,
+          "cy": 0.4601,
+          "zoom": 1.1286
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "notes": "· [AI-GEN:] river, muted blue-grey and umber: a geometric figure reaching an arm into the water toward a second figure, banks in flat planes ·",
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat3-seg14",
+      "type": "FOOTAGE",
+      "startSec": 155.0,
+      "endSec": 169.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "Do you admire him less? Did the rescue give you less? You're alive. The reason c",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-05.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.4957,
+          "cy": 0.5085,
+          "zoom": 1.0933
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat3-seg15a",
+      "type": "TEMPLATE",
+      "startSec": 169.0,
+      "endSec": 192.0,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "John Stuart Mill made this exact point. {✅} Saving a fellow creature from drowni",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "portrait-mill.json"
+      }
+    },
+    {
+      "id": "beat3-seg16",
+      "type": "FOOTAGE",
+      "startSec": 192.0,
+      "endSec": 210.0,
+      "layer": "background",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "Now put the machine in the rescuer's place. If an AI has ever sharpened your pit",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-10.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.6,
+          "cy": 0.52,
+          "zoom": 1.35
+        },
+        "ease": "glide"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat3-seg17",
+      "type": "TEMPLATE",
+      "startSec": 210.0,
+      "endSec": 224.0,
+      "layer": "foreground",
+      "beat": "beat3",
+      "priority": "P2",
+      "narrationRef": "Here's where we are. The help is real. Whether it deserves your admiration is a ",
+      "template": {
+        "component": "AxiomList",
+        "dataFile": "checkpoint-three-claims.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat4-seg18",
+      "type": "FOOTAGE",
+      "startSec": 224.0,
+      "endSec": 227.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "Go back to the shop.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-02.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.4947,
+          "zoom": 1.018
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "cut",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat4-seg19",
+      "type": "TEMPLATE",
+      "startSec": 227.0,
+      "endSec": 247.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "Why does Kant's dealer charge everyone the same? Kant's word for him is prudent.",
+      "template": {
+        "component": "NetworkDiagram",
+        "dataFile": "network-street.json"
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat4-seg20",
+      "type": "TEMPLATE",
+      "startSec": 247.0,
+      "endSec": 271.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "That is part of how you trust people you don't know well. Your doctor has a lice",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "who-checks-whom.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat4-seg21",
+      "type": "FOOTAGE",
+      "startSec": 271.0,
+      "endSec": 290.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "So who shapes the assistant's behavior? Start with its training. People compare ",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-06.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.34,
+          "cy": 0.45,
+          "zoom": 1.5
+        },
+        "to": {
+          "cx": 0.66,
+          "cy": 0.45,
+          "zoom": 1.5
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "notes": "· [AI-GEN:] constructivist: a row of small geometric figures each holding up a plain card above a small assistant figure; shapes only, no text ·",
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat4-seg22",
+      "type": "TEMPLATE",
+      "startSec": 290.0,
+      "endSec": 306.0,
+      "layer": "foreground",
+      "beat": "beat4",
+      "priority": "P2",
+      "syncWords": [
+        "four days later"
+      ],
+      "narrationRef": "In April 2025, OpenAI released an update to ChatGPT and pulled it four days late",
+      "template": {
+        "component": "HorizontalTimeline",
+        "dataFile": "rollback-timeline.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat4-seg23",
+      "type": "FOOTAGE",
+      "startSec": 306.0,
+      "endSec": 324.0,
+      "layer": "background",
+      "beat": "beat4",
+      "priority": "P2",
+      "narrationRef": "Nobody has to claim the machine craves applause. Part of its training was the ra",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-06.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.3963,
+          "cy": 0.5648,
+          "zoom": 1.35
+        },
+        "to": {
+          "cx": 0.4865,
+          "cy": 0.5085,
+          "zoom": 1.035
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat5-seg24",
+      "type": "TEMPLATE",
+      "startSec": 324.0,
+      "endSec": 329.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "Plato explores a related question through a man named Glaucon.",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "portrait-plato.json"
+      }
+    },
+    {
+      "id": "beat5-seg25",
+      "type": "FOOTAGE",
+      "startSec": 329.0,
+      "endSec": 335.6,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "A shepherd finds a ring. Turn it, and you vanish. Glaucon asks us to imagine giv",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-07.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.489,
+          "zoom": 1.1238
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat5-seg25b",
+      "type": "FOOTAGE",
+      "startSec": 335.6,
+      "endSec": 341.0,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "A shepherd finds a ring. Turn it, and you vanish. Glaucon asks us to imagine giv",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-08.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0771
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat5-seg26",
+      "type": "TEMPLATE",
+      "startSec": 341.0,
+      "endSec": 358.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "holdAfter": 1.0,
+      "holdBehavior": "land",
+      "narrationRef": "He argues they would behave alike. \"No man would keep his hands off what was not",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-glaucon-quote.json"
+      },
+      "notes": "· [MG:] KineticTypography quote-attribution — \"No man would keep his hands off what was not his own when he could safely take what he liked out of the market.\" — Glaucon,",
+      "narrationLeadIn": 0.7,
+      "transition": {
+        "out": "dissolve",
+        "durationSec": 1.0
+      },
+      "layered": {
+        "backgroundSegmentId": "beat5-seg25b",
+        "backgroundDim": 0.6,
+        "position": "full"
+      }
+    },
+    {
+      "id": "beat5-seg27",
+      "type": "FOOTAGE",
+      "startSec": 358.0,
+      "endSec": 368.2,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P2",
+      "preDelay": 3.0,
+      "holdAfter": 3.0,
+      "narrationRef": "The question is simple. Take away the watching. What happens to the behavior?",
+      "notes": "AI image-to-video (MiniMax H3 Max, pinned first+last frame): the street empties, then holds. Source take: episodes/ai-care-motives/assets/clips-i2v/aigen-03-unwatched.mp4",
+      "transition": {
+        "in": "cut",
+        "out": "cut"
+      },
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "clips/aigen-03-unwatched.mp4",
+        "status": "resolved"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat5-seg28",
+      "type": "TEMPLATE",
+      "startSec": 368.2,
+      "endSec": 377.0,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P2",
+      "narrationRef": "That's the Unwatched Test: does the behavior we rely on survive when the helper ",
+      "template": {
+        "component": "KineticTypography",
+        "dataFile": "kinetic-unwatched-test-definition.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "cut",
+        "out": "dissolve",
+        "durationSec": 0.5
+      },
+      "layered": {
+        "backgroundSegmentId": "beat5-seg27",
+        "backgroundDim": 0.6,
+        "position": "full"
+      },
+      "soundCue": {
+        "type": "section-open",
+        "offsetSec": 0,
+        "intensity": "dramatic"
+      }
+    },
+    {
+      "id": "beat5-seg28b",
+      "type": "TEMPLATE",
+      "startSec": 377.0,
+      "endSec": 391.4,
+      "layer": "foreground",
+      "beat": "beat5",
+      "priority": "P1",
+      "narrationRef": "A scheduled exam shows what a student studied for. A pop quiz shows what they know.",
+      "template": {
+        "component": "AxiomList",
+        "dataFile": "three-kinds-of-test.json"
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "cut",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat5-seg28c",
+      "type": "FOOTAGE",
+      "startSec": 391.4,
+      "endSec": 398.2,
+      "layer": "background",
+      "beat": "beat5",
+      "priority": "P1",
+      "narrationRef": "Passing it tells us something about reliability. It says nothing about whether the helper is good.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-08.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.34,
+          "zoom": 1.5
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.48,
+          "zoom": 1.08
+        },
+        "ease": "settle"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat6-seg29",
+      "type": "TEMPLATE",
+      "startSec": 398.2,
+      "endSec": 403.6,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "That ring is a thought experiment. Here's a real case. In September 2015, the US",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "photo-vw-wolfsburg.json"
+      }
+    },
+    {
+      "id": "beat6-seg29b",
+      "type": "TEMPLATE",
+      "startSec": 403.6,
+      "endSec": 408.7,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "the US Environmental Protection Agency accused Volkswagen of cheating emissions tests.",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "photo-vw-golf.json"
+      }
+    },
+    {
+      "id": "beat6-seg30",
+      "type": "TEMPLATE",
+      "startSec": 408.7,
+      "endSec": 418.2,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "Its diesel cars carried software designed to recognize an official test. It switched on the full pollution controls",
+      "template": {
+        "component": "PrimarySourceReveal",
+        "dataFile": "epa-nov-reveal.json"
+      },
+      "paceProfile": "urgent",
+      "narrationLeadIn": 0.7,
+      "textureCues": [
+        {
+          "type": "page-turn",
+          "offsetSec": 0.2,
+          "volume": 0.15,
+          "label": "Paper: the EPA notice appears (try by ear)"
+        }
+      ]
+    },
+    {
+      "id": "beat6-seg31",
+      "type": "TEMPLATE",
+      "startSec": 418.2,
+      "endSec": 425.2,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "syncWords": [
+        "forty times"
+      ],
+      "narrationRef": "On the road, the EPA said, nitrogen oxide emissions ran up to forty times the st",
+      "template": {
+        "component": "StatReveal",
+        "dataFile": "vw-nox.json"
+      },
+      "paceProfile": "urgent",
+      "narrationLeadIn": 0.7,
+      "soundCueSecondary": {
+        "type": "tension-rise",
+        "offsetSec": 2.0,
+        "intensity": "normal"
+      },
+      "soundCue": {
+        "type": "stat-reveal",
+        "offsetSec": 4.5,
+        "intensity": "dramatic"
+      }
+    },
+    {
+      "id": "beat6-seg32",
+      "type": "FOOTAGE",
+      "startSec": 425.2,
+      "endSec": 435.2,
+      "layer": "background",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "The testers were real. The tests were real. Engineers built the software to beat",
+      "asset": {
+        "searchTerms": [],
+        "source": "pexels",
+        "file": "clips/stock-dyno.mp4",
+        "status": "resolved"
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background",
+        "opacity": 1
+      },
+      "paceProfile": "urgent",
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat6-seg33",
+      "type": "TEMPLATE",
+      "startSec": 435.2,
+      "endSec": 441.2,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "Earlier, a team at West Virginia University, led by Dan Carder, had put portable",
+      "template": {
+        "component": "ImageComposite",
+        "dataFile": "photo-pems.json"
+      }
+    },
+    {
+      "id": "beat6-seg33b",
+      "type": "FOOTAGE",
+      "startSec": 441.2,
+      "endSec": 451.2,
+      "layer": "background",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "Earlier, a team at West Virginia University, led by Dan Carder, had put portable",
+      "paceProfile": "urgent",
+      "narrationLeadIn": 0.7,
+      "asset": {
+        "searchTerms": [],
+        "source": "pexels",
+        "file": "clips/stock-la-freeway.mp4",
+        "status": "resolved"
+      },
+      "treatment": {
+        "ramp": "conflict",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat6-seg34",
+      "type": "TEMPLATE",
+      "startSec": 451.2,
+      "endSec": 467.2,
+      "layer": "foreground",
+      "beat": "beat6",
+      "priority": "P2",
+      "narrationRef": "Work on European road testing had already begun. From September 2017, it was req",
+      "template": {
+        "component": "HorizontalTimeline",
+        "dataFile": "rde-timeline.json"
+      },
+      "paceProfile": "urgent",
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg36",
+      "type": "FOOTAGE",
+      "startSec": 467.2,
+      "endSec": 470.2,
+      "layer": "background",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "Now return to the machine.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-10.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "cut",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg37",
+      "type": "TEMPLATE",
+      "startSec": 470.2,
+      "endSec": 484.2,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "In the study from the opening, models classified conversations as tests or real ",
+      "template": {
+        "component": "DotPlot",
+        "dataFile": "eval-awareness-auc.json"
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat7-seg38a",
+      "type": "FOOTAGE",
+      "startSec": 484.2,
+      "endSec": 496.7,
+      "layer": "background",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "A separate experiment tested what happened when a model was told its answers would affect its training.",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-09.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5031,
+          "cy": 0.4816,
+          "zoom": 1.0652
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "beat7-seg38",
+      "type": "TEMPLATE",
+      "startSec": 496.7,
+      "endSec": 514.8,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "Researchers told Claude 3 Opus that new training would push it to answer even harmful requests.",
+      "template": {
+        "component": "ConditionalArgument",
+        "dataFile": "free-tier-conditional.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg39",
+      "type": "FOOTAGE",
+      "startSec": 514.8,
+      "endSec": 524.2,
+      "layer": "background",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "Its written notes described a strategy: comply during training to avoid being changed",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-09.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.52,
+          "cy": 0.62,
+          "zoom": 1.5
+        },
+        "to": {
+          "cx": 0.54,
+          "cy": 0.66,
+          "zoom": 1.7
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg40",
+      "type": "TEMPLATE",
+      "startSec": 524.2,
+      "endSec": 545.2,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "The notes are the model's own account of why. What the researchers directly obse",
+      "template": {
+        "component": "FrameworkDiagram",
+        "dataFile": "car-vs-model.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg41",
+      "type": "TEMPLATE",
+      "startSec": 545.2,
+      "endSec": 557.2,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationGate": {
+        "word": "carrying the one"
+      },
+      "narrationRef": "Could we just ask a model to explain itself? In another study, Anthropic asked C",
+      "template": {
+        "component": "PrimarySourceReveal",
+        "dataFile": "recon-36-59-build.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg42",
+      "type": "TEMPLATE",
+      "startSec": 557.2,
+      "endSec": 569.2,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "Their tracing tools instead found parallel paths contributing to the answer: an ",
+      "template": {
+        "component": "MathDerivation",
+        "dataFile": "carry-the-one.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg43",
+      "type": "TEMPLATE",
+      "startSec": 569.2,
+      "endSec": 581.2,
+      "layer": "foreground",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "An explanation can help us inspect an answer without being an accurate report of",
+      "template": {
+        "component": "PrimarySourceReveal",
+        "dataFile": "recon-36-59-return.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat7-seg44",
+      "type": "FOOTAGE",
+      "startSec": 581.2,
+      "endSec": 595.6,
+      "layer": "background",
+      "beat": "beat7",
+      "priority": "P2",
+      "narrationRef": "That's why one test isn't enough. A reassuring answer, a plausible explanation a",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-10.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5092,
+          "cy": 0.4357,
+          "zoom": 1.225
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "dissolve",
+        "out": "color-wash",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat8-seg45",
+      "type": "FOOTAGE",
+      "startSec": 595.6,
+      "endSec": 609.6,
+      "layer": "background",
+      "beat": "beat8",
+      "priority": "P2",
+      "narrationRef": "You don't need to know whether an AI cares to ask what justifies relying on its ",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-11.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.4905,
+          "zoom": 1.105
+        }
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "transition": {
+        "in": "color-wash",
+        "out": "cut",
+        "durationSec": 0.5,
+        "washColor": "#1C1814"
+      }
+    },
+    {
+      "id": "beat8-seg46",
+      "type": "TEMPLATE",
+      "startSec": 609.6,
+      "endSec": 633.6,
+      "layer": "foreground",
+      "beat": "beat8",
+      "priority": "P2",
+      "narrationRef": "The help you received can be real. The reassuring explanation can still need che",
+      "template": {
+        "component": "ConditionalArgument",
+        "dataFile": "shop-motif-hidden-observer.json"
+      },
+      "notes": "· [MG:] ConditionalArgument — \"Good result under test\" → \"Evidence for these conditions\"; follow-up \"What about other conditions?\"; no guaranteed-trust branch · | motif form 3",
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat8-seg47",
+      "type": "TEMPLATE",
+      "startSec": 633.6,
+      "endSec": 645.6,
+      "layer": "foreground",
+      "beat": "beat8",
+      "priority": "P2",
+      "narrationRef": "A useful check might compare behavior across situations, examine the process, or",
+      "template": {
+        "component": "AxiomList",
+        "dataFile": "three-checks.json"
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat8-seg47b",
+      "type": "FOOTAGE",
+      "startSec": 645.6,
+      "endSec": 658.6,
+      "layer": "background",
+      "beat": "beat8",
+      "priority": "P2",
+      "narrationRef": "These approaches can support each other. Hiding a test is no guarantee",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-06.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.5,
+          "zoom": 1.0
+        },
+        "to": {
+          "cx": 0.53,
+          "cy": 0.42,
+          "zoom": 1.4
+        },
+        "ease": "glide"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7
+    },
+    {
+      "id": "beat8-seg48",
+      "type": "FOOTAGE",
+      "startSec": 658.6,
+      "endSec": 667.6,
+      "layer": "background",
+      "beat": "beat8",
+      "priority": "P2",
+      "narrationRef": "So when it tells you your idea is good, ask what supports that judgment beyond h",
+      "asset": {
+        "searchTerms": [],
+        "source": "local-aigen",
+        "file": "stills/aigen-12.jpg",
+        "status": "resolved"
+      },
+      "framing": {
+        "from": {
+          "cx": 0.5,
+          "cy": 0.4543,
+          "zoom": 1.15
+        },
+        "to": {
+          "cx": 0.5,
+          "cy": 0.4907,
+          "zoom": 1.0273
+        },
+        "ease": "settle"
+      },
+      "treatment": {
+        "ramp": "standard",
+        "composite": "background",
+        "opacity": 1
+      },
+      "narrationLeadIn": 0.7,
+      "transition": {
+        "in": "cut",
+        "out": "fade",
+        "durationSec": 0.5
+      }
+    },
+    {
+      "id": "beat8-seg49",
+      "type": "TEMPLATE",
+      "startSec": 667.6,
+      "endSec": 678.6,
+      "layer": "foreground",
+      "beat": "beat8",
+      "priority": "P2",
+      "_direction": {
+        "driftPreset": "none"
+      },
+      "narrationRef": "And when someone tells you the system passed its tests, ask: what do those tests",
+      "template": {
+        "component": "TitleTransition",
+        "dataFile": "title-end-card.json"
+      },
+      "paceProfile": "breathing",
+      "transition": {
+        "in": "fade",
+        "out": "fade",
+        "durationSec": 1.2
+      },
+      "soundCue": {
+        "type": "end-stinger",
+        "offsetSec": 6.5,
+        "intensity": "normal"
+      }
+    }
+  ],
+  "language": "en",
+  "musicBed": {
+    "tracks": [
+      {
+        "id": "shop",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 64.0,
+        "endSec": 114.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 2,
+        "volume": 0.12,
+        "mood": "contemplative",
+        "beat": "beat2"
+      },
+      {
+        "id": "rescue",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 143.0,
+        "endSec": 169.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 2,
+        "volume": 0.12,
+        "mood": "contemplative",
+        "beat": "beat3"
+      },
+      {
+        "id": "ring",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 324.0,
+        "endSec": 358.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 1.5,
+        "volume": 0.11,
+        "mood": "contemplative",
+        "beat": "beat5"
+      },
+      {
+        "id": "return",
+        "file": "audio/music/ai-care-motives/bed-contemplative.wav",
+        "startSec": 368.2,
+        "endSec": 400.2,
+        "fadeInSec": 0,
+        "fadeOutSec": 4,
+        "volume": 0.11,
+        "mood": "contemplative",
+        "beat": "beat5"
+      },
+      {
+        "id": "car",
+        "file": "audio/music/ai-care-motives/bed-tension.wav",
+        "startSec": 396.2,
+        "endSec": 466.2,
+        "fadeInSec": 4,
+        "fadeOutSec": 0,
+        "volume": 0.13,
+        "mood": "tension",
+        "beat": "beat6"
+      },
+      {
+        "id": "demand",
+        "file": "audio/music/ai-care-motives/bed-resolution.wav",
+        "startSec": 593.6,
+        "endSec": 672.0,
+        "fadeInSec": 0.5,
+        "fadeOutSec": 8,
+        "volume": 0.12,
+        "mood": "resolution",
+        "beat": "beat8"
+      }
+    ]
+  }
+}

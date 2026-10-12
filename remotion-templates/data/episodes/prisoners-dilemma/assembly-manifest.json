@@ -215,7 +215,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "The question this episode is about \u2014 how a framework that failed on day one conq",
+      "narrationRef": "The question this episode is about — how a framework that failed on day one conq",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-model-conquers.json"
@@ -282,7 +282,7 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "The subjects \u2014 an economist named Armen Alchian and a mathematician named John W",
+      "narrationRef": "The subjects — an economist named Armen Alchian and a mathematician named John W",
       "asset": {
         "searchTerms": [],
         "source": "local-aigen",
@@ -317,7 +317,7 @@
         "sixty percent",
         "sixty"
       ],
-      "narrationRef": "They cooperated sixty percent of the time. {\u2705}",
+      "narrationRef": "They cooperated sixty percent of the time. {✅}",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-flood-dresher.json",
@@ -353,10 +353,12 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "Mutual defection \u2014 the only outcome the model predicted \u2014 happened fourteen time",
+      "narrationRef": "Mutual defection — the only outcome the model predicted — happened fourteen time",
       "asset": {
-        "searchTerms": [],
-        "source": null
+        "file": "stills/arch-nash.jpg",
+        "status": "resolved",
+        "source": "wikimedia-commons",
+        "searchTerms": []
       },
       "treatment": {
         "ramp": "standard",
@@ -386,10 +388,12 @@
       "layer": "background",
       "beat": "beat1",
       "priority": "P2",
-      "narrationRef": "John Nash \u2014 the man whose equilibrium concept the experiment was testing \u2014 read ",
+      "narrationRef": "John Nash — the man whose equilibrium concept the experiment was testing — read ",
       "asset": {
-        "searchTerms": [],
-        "source": "wikimedia-commons"
+        "file": "stills/arch-nash.jpg",
+        "status": "resolved",
+        "source": "wikimedia-commons",
+        "searchTerms": []
       },
       "treatment": {
         "ramp": "standard",
@@ -453,10 +457,10 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "That response \u2014 blame the players, not the model \u2014 set a template. The most infl",
+      "narrationRef": "That response — blame the players, not the model — set a template. The most infl",
       "asset": {
         "searchTerms": [
-          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions \u2014 university, military headquarters, stock exchange \u2014 all turning toward the equation as if worshipping it"
+          "Constructivist propaganda poster: a mathematical equation radiating outward like sunbeams over silhouetted institutions — university, military headquarters, stock exchange — all turning toward the equation as if worshipping it"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-02",
@@ -654,7 +658,7 @@
       "syncWords": [
         "two thousand"
       ],
-      "narrationRef": "By 1975 \u2014 twenty-five years after it failed that first experiment \u2014 there were over two thousand scholarly articles on the Prisoner's Dilemma.",
+      "narrationRef": "By 1975 — twenty-five years after it failed that first experiment — there were over two thousand scholarly articles on the Prisoner's Dilemma.",
       "template": {
         "component": "DataChart",
         "dataFile": "chart-diffusion.json",
@@ -703,7 +707,9 @@
       "narrationRef": "A model that couldn't predict two people in a room was explaining everything fro",
       "asset": {
         "searchTerms": [],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-04-rand-corridor.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -721,7 +727,9 @@
       "narrationRef": "How? Because of where it was born.",
       "asset": {
         "searchTerms": [],
-        "source": "wikimedia-commons"
+        "source": "local-aigen",
+        "file": "clips/aigen-04-rand-corridor.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -743,7 +751,7 @@
         ],
         "source": "local-aigen",
         "shotListId": "aigen-04",
-        "file": "clips/aigen-04-rand-corridor.mp4",
+        "file": "clips/aigen-05-doorway-threshold.mp4",
         "status": "resolved"
       },
       "treatment": {
@@ -772,7 +780,7 @@
       "layer": "foreground",
       "beat": "beat2",
       "priority": "P2",
-      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {\u2705} T",
+      "narrationRef": "Game theory had a special status there. John von Neumann was a consultant. {✅} T",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-nuclear.json",
@@ -1040,7 +1048,7 @@
       "narrationRef": "A model that failed its first experiment, applied to everything, still spreading",
       "asset": {
         "searchTerms": [
-          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines \u2014 mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
+          "Constructivist composition: a geometric grid projected from a spotlight onto a landscape, the landscape reshaping itself to match the grid's lines — mountains becoming rectangles, rivers becoming straight channels, color-blocked in amber and ink"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-06",
@@ -1075,7 +1083,7 @@
       "layer": "background",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "You walk into a negotiation. You've been trained \u2014 explicitly or implicitly, thr",
+      "narrationRef": "You walk into a negotiation. You've been trained — explicitly or implicitly, thr",
       "asset": {
         "searchTerms": [
           "Constructivist negotiation: two angular figures in dark suits entering from opposite sides of a stark room, long table as geometric plane between them, overhead lighting as sharp triangular beams casting hard shadows, color-blocked in grey and amber"
@@ -1118,7 +1126,7 @@
       "syncWords": [
         "defect"
       ],
-      "narrationRef": "So you defect. And your counterpart \u2014 trained by the same textbooks, shaped by t",
+      "narrationRef": "So you defect. And your counterpart — trained by the same textbooks, shaped by t",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-trap-mechanism.json",
@@ -1389,7 +1397,7 @@
       "layer": "foreground",
       "beat": "beat3",
       "priority": "P2",
-      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  \u2014 the game we assume",
+      "narrationRef": "What I'm arguing is that the Prisoner's Dilemma became the  — the game we assume",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-cycle-vs-question.json",
@@ -1432,7 +1440,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong \u2014 but that it's the wrong",
+      "narrationRef": "That's The Wrong Game. Not that the PD is always wrong — but that it's the wrong",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-wrong-game-real.json"
@@ -1474,7 +1482,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Checkpoint. This isn't conspiracy \u2014 nobody sat in a room and decided to mislead ",
+      "narrationRef": "Checkpoint. This isn't conspiracy — nobody sat in a room and decided to mislead ",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-checkpoint-beat3.json"
@@ -1542,7 +1550,7 @@
       "narrationRef": "But here's the relief. There was always another game available. And we have proo",
       "asset": {
         "searchTerms": [
-          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures \u2014 some carrying logs together, others building a structure \u2014 color-blocked in warm palette"
+          "Constructivist sunrise composition: geometric sun rays in amber and bone breaking through dark angular clouds, silhouetted landscape below with tiny cooperative figures — some carrying logs together, others building a structure — color-blocked in warm palette"
         ],
         "source": "local-aigen",
         "shotListId": "aigen-10",
@@ -1568,7 +1576,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {\u2705} A group of hunters face a cho",
+      "narrationRef": "In 1755, Jean-Jacques Rousseau told a parable. {✅} A group of hunters face a cho",
       "asset": {
         "searchTerms": [
           "Constructivist forest hunt: geometric trees as vertical columns, angular hunters with spears converging on a stylized stag in center, one hunter at edge turning toward a small hare, dawn light as amber rays through canopy, color-blocked in bone and ink"
@@ -1611,7 +1619,7 @@
       "syncWords": [
         "fundamentally"
       ],
-      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma \u2014 but it is fundamentally different.",
+      "narrationRef": "This is the stag hunt. And it looks like the Prisoner's Dilemma — but it is fundamentally different.",
       "template": {
         "component": "GameBoard",
         "dataFile": "gameboard-staghunt.json",
@@ -1696,7 +1704,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {\u2705} An iterated Prison",
+      "narrationRef": "The philosopher Brian Skyrms proved something remarkable. {✅} An iterated Prison",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-iterated-equiv.json",
@@ -1890,10 +1898,12 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "Spanish irrigation cooperatives in Valencia \u2014 still operating after six hundred ",
+      "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
       "asset": {
         "searchTerms": [],
-        "source": null
+        "source": "local-aigen",
+        "file": "clips/aigen-12-terraced-farmland.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",
@@ -1908,7 +1918,9 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "syncWords": ["Valencia"],
+      "syncWords": [
+        "Valencia"
+      ],
       "narrationRef": "Spanish irrigation cooperatives in Valencia — still operating after six hundred ",
       "template": {
         "component": "AnnotatedImage",
@@ -1928,7 +1940,9 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "syncWords": ["Swiss alpine"],
+      "syncWords": [
+        "Swiss alpine"
+      ],
       "narrationRef": "Swiss alpine grazing commons with charters from the thirteenth century.",
       "template": {
         "component": "AnnotatedImage",
@@ -1957,7 +1971,9 @@
       "layer": "foreground",
       "beat": "beat4",
       "priority": "P1",
-      "syncWords": ["Maine lobster"],
+      "syncWords": [
+        "Maine lobster"
+      ],
       "narrationRef": "Maine lobster fisheries — color-coded buoys, graduated sanctions, since the 1880s.",
       "template": {
         "component": "AnnotatedImage",
@@ -1988,7 +2004,7 @@
       "priority": "P2",
       "holdAfter": 2.0,
       "holdBehavior": "breathe",
-      "narrationRef": "Ostrom documented what they shared: eight design principles. {\u2705} Clear boundarie",
+      "narrationRef": "Ostrom documented what they shared: eight design principles. {✅} Clear boundarie",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-ostrom-vs-pd.json",
@@ -2075,7 +2091,7 @@
       "layer": "background",
       "beat": "beat4",
       "priority": "P2",
-      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale \u2014 identifiable p",
+      "narrationRef": "One important caveat. Ostrom's cases are mostly community-scale — identifiable p",
       "asset": {
         "searchTerms": [
           "Constructivist ocean vastness: endless geometric waves as repeating angular forms stretching to horizon, no boundaries visible, tiny boat as single dot, overwhelming scale, color-blocked in ink and bone with grey-blue tint"
@@ -2176,7 +2192,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Most of the major negotiations happening right now \u2014 US-China AI governance, cli",
+      "narrationRef": "Most of the major negotiations happening right now — US-China AI governance, cli",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-motif-beat5.json",
@@ -2225,7 +2241,7 @@
       "priority": "P2",
       "holdAfter": 3.0,
       "holdBehavior": "linger",
-      "narrationRef": "And the question the stag hunt asks \u2014 \"can we coordinate on the outcome we both ",
+      "narrationRef": "And the question the stag hunt asks — \"can we coordinate on the outcome we both ",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-motif-final.json",
@@ -2308,7 +2324,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Here's what would change my mind. If a major actor \u2014 say, the US or China in the",
+      "narrationRef": "Here's what would change my mind. If a major actor — say, the US or China in the",
       "template": {
         "component": "FrameworkDiagram",
         "dataFile": "framework-falsification.json",
@@ -2351,7 +2367,7 @@
       "priority": "P2",
       "holdAfter": 1.0,
       "holdBehavior": "land",
-      "narrationRef": "I put the probability of a US-China joint AI safety communiqu\u00e9 with shared techn",
+      "narrationRef": "I put the probability of a US-China joint AI safety communiqué with shared techn",
       "template": {
         "component": "ProbabilityGauge",
         "dataFile": "forecast-pd-cooperation.json",
@@ -2392,7 +2408,7 @@
       "layer": "foreground",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Watch for the signals. The NPT Review Conference language \u2014 are they talking abo",
+      "narrationRef": "Watch for the signals. The NPT Review Conference language — are they talking abo",
       "template": {
         "component": "KineticTypography",
         "dataFile": "kinetic-watch-signals.json",
@@ -2433,7 +2449,7 @@
       "layer": "background",
       "beat": "beat5",
       "priority": "P2",
-      "narrationRef": "Games can be changed. It's not easy \u2014 seventy-five years of institutional moment",
+      "narrationRef": "Games can be changed. It's not easy — seventy-five years of institutional moment",
       "asset": {
         "searchTerms": [
           "Constructivist lecture hall: rows of geometric student figures facing a chalkboard covered in game matrices, angular professor silhouette at podium, overhead fluorescent strips, color-blocked in bone and grey with amber chalkboard highlights"
@@ -2476,7 +2492,9 @@
       "narrationRef": "But it has been done before. In 1986, Reagan and Gorbachev walked into a summit ",
       "asset": {
         "searchTerms": [],
-        "source": "wikimedia-commons"
+        "source": "local-aigen",
+        "file": "clips/aigen-17-panorama-cityscapes.mp4",
+        "status": "resolved"
       },
       "treatment": {
         "ramp": "standard",

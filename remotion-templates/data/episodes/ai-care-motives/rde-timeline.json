@@ -1,0 +1,35 @@
+{
+  "episode": "ai-care-motives",
+  "title": "Road testing was already coming",
+  "subtitle": "EU real-driving emissions (RDE) testing",
+  "source": "European Commission",
+  "mode": "single",
+  "events": [
+    {
+      "year": "Jan 2011",
+      "title": "Working group set up",
+      "weight": 2
+    },
+    {
+      "year": "May 2015",
+      "title": "First RDE package adopted",
+      "weight": 2
+    },
+    {
+      "year": "Sept 2015",
+      "title": "Scandal breaks",
+      "weight": 2,
+      "color": "#A64D46"
+    },
+    {
+      "year": "Sept 2017",
+      "title": "Required for new types",
+      "weight": 3
+    }
+  ],
+  "backgroundVariant": "light",
+  "durationSec": 16,
+  "_direction": {
+    "paceProfile": "urgent"
+  }
+}

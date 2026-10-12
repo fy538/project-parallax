@@ -1,0 +1,11 @@
+{
+  "episode": "ai-care-motives",
+  "variant": "quote",
+  "text": "A lab result. A different result on the road.",
+  "accentColor": "#C4A747",
+  "backgroundVariant": "dark",
+  "durationSec": 5,
+  "_direction": {
+    "holdBehavior": "land"
+  }
+}

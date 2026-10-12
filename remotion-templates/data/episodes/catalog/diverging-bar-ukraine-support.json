@@ -1,0 +1,28 @@
+{
+  "data": {
+    "episode": "catalog",
+    "title": "EUROPEAN MILITARY AID TO UKRAINE (% GDP)",
+    "subtitle": "Bilateral military commitments as share of donor GDP, Jan 2022–Sep 2024; relative to EU average",
+    "source": "Kiel Institute for the World Economy, Ukraine Support Tracker",
+    "durationSec": 12,
+    "backgroundVariant": "light",
+    "sortOrder": "value-desc",
+    "positiveLabel": "Higher commitment",
+    "negativeLabel": "Lower commitment",
+    "zeroLabel": "EU average",
+    "axisLabel": "Deviation from EU average (% GDP)",
+    "items": [
+      { "label": "Estonia", "value": 3.4, "sublabel": "Highest per-GDP donor" },
+      { "label": "Latvia", "value": 2.1 },
+      { "label": "Lithuania", "value": 1.8 },
+      { "label": "Denmark", "value": 1.6 },
+      { "label": "Poland", "value": 1.3 },
+      { "label": "Netherlands", "value": 0.8 },
+      { "label": "UK", "value": 0.6 },
+      { "label": "Germany", "value": 0.3 },
+      { "label": "France", "value": 0.1 },
+      { "label": "Italy", "value": -0.2 },
+      { "label": "Hungary", "value": -0.8, "sublabel": "Below EU average" }
+    ]
+  }
+}

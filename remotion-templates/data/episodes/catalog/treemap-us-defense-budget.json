@@ -1,0 +1,22 @@
+{
+  "episode": "catalog",
+  "title": "WHERE THE $886 BILLION GOES",
+  "subtitle": "U.S. defense budget by service branch, 2024",
+  "source": "Office of the Undersecretary of Defense (Comptroller) FY2024",
+  "durationSec": 12,
+  "backgroundVariant": "dark",
+  "valuePrefix": "$",
+  "valueSuffix": "B",
+  "showValues": true,
+  "highlightLabel": "Army",
+  "items": [
+    {"label": "Army",        "value": 185, "sublabel": "Land forces, readiness"},
+    {"label": "Navy",        "value": 215, "sublabel": "Fleet, submarines, Marines"},
+    {"label": "Air Force",   "value": 198, "sublabel": "Airpower, space systems"},
+    {"label": "Defense-Wide","value": 164, "sublabel": "Intelligence, logistics, cyber"},
+    {"label": "R&D",         "value": 145, "sublabel": "Next-gen weapons, DARPA"},
+    {"label": "MILCON",      "value": 17,  "sublabel": "Military construction"},
+    {"label": "Revolving",   "value": 4,   "sublabel": "Working capital funds"},
+    {"label": "Other",       "value": 8,   "sublabel": "Misc. programs"}
+  ]
+}

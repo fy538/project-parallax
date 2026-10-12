@@ -1,0 +1,70 @@
+{
+  "episode": "catalog",
+  "title": "Semiconductor Supply Chain",
+  "source": "TSMC / SIA, 2024",
+  "flows": [
+    {
+      "id": "tw-us",
+      "from": [121, 24],
+      "to": [-95, 37],
+      "volume": 220,
+      "label": "USA",
+      "actor": "chip"
+    },
+    {
+      "id": "tw-kr",
+      "from": [121, 24],
+      "to": [127, 37],
+      "volume": 180,
+      "label": "South Korea",
+      "actor": "chip"
+    },
+    {
+      "id": "tw-jp",
+      "from": [121, 24],
+      "to": [139, 35],
+      "volume": 120,
+      "label": "Japan",
+      "actor": "chip"
+    },
+    {
+      "id": "tw-eu",
+      "from": [121, 24],
+      "to": [10, 51],
+      "volume": 90,
+      "label": "Europe",
+      "actor": "chip"
+    },
+    {
+      "id": "nl-tw",
+      "from": [4.9, 52.4],
+      "to": [121, 24],
+      "volume": 100,
+      "label": "ASML EUV",
+      "actor": "equipment"
+    },
+    {
+      "id": "us-tw",
+      "from": [-95, 37],
+      "to": [121, 24],
+      "volume": 150,
+      "label": "EDA Software",
+      "actor": "ip"
+    }
+  ],
+  "actors": {
+    "chip": { "fill": "#C4A747", "label": "Finished Chips" },
+    "equipment": { "fill": "#A64D46", "label": "Fab Equipment" },
+    "ip": { "fill": "#7AA3C9", "label": "Design IP" }
+  },
+  "mode": "simultaneous",
+  "showParticles": true,
+  "center": [80, 30],
+  "zoom": 2.2,
+  "pitch": 25,
+  "register": "dark",
+  "fogPreset": "editorial",
+  "durationSec": 10,
+  "showLegend": true,
+  "backgroundVariant": "dark"
+}

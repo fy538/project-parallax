@@ -1,0 +1,77 @@
+{
+  "data": {
+    "episode": "great-power-competition",
+    "title": "MILITARY SPENDING RACE",
+    "subtitle": "Defense expenditure ($B, constant 2022 USD)",
+    "source": "SIPRI Military Expenditure Database 2024",
+    "durationSec": 18,
+    "backgroundVariant": "light",
+    "durationPerPeriod": 1.5,
+    "topN": 8,
+    "valueFormat": "$%.0fB",
+    "periodLabelPosition": "bottom-right",
+    "defaultPalette": [
+      "#4A7BA7",
+      "#A64D46",
+      "#C4A747",
+      "#888780",
+      "#8B7355",
+      "#7AA3C9",
+      "#5C4A3D",
+      "#B8A189"
+    ],
+    "periods": [
+      {
+        "label": "1990",
+        "values": [
+          { "id": "usa",     "label": "USA",     "value": 388 },
+          { "id": "ussr",    "label": "USSR",    "value": 290 },
+          { "id": "france",  "label": "France",  "value": 55  },
+          { "id": "uk",      "label": "UK",      "value": 52  },
+          { "id": "germany", "label": "Germany", "value": 48  },
+          { "id": "japan",   "label": "Japan",   "value": 43  },
+          { "id": "china",   "label": "China",   "value": 20  }
+        ]
+      },
+      {
+        "label": "2000",
+        "values": [
+          { "id": "usa",     "label": "USA",     "value": 410 },
+          { "id": "russia",  "label": "Russia",  "value": 28  },
+          { "id": "france",  "label": "France",  "value": 50  },
+          { "id": "uk",      "label": "UK",      "value": 55  },
+          { "id": "germany", "label": "Germany", "value": 43  },
+          { "id": "japan",   "label": "Japan",   "value": 48  },
+          { "id": "china",   "label": "China",   "value": 40  }
+        ]
+      },
+      {
+        "label": "2010",
+        "values": [
+          { "id": "usa",          "label": "USA",          "value": 756 },
+          { "id": "china",        "label": "China",        "value": 130 },
+          { "id": "uk",           "label": "UK",           "value": 68  },
+          { "id": "france",       "label": "France",       "value": 62  },
+          { "id": "russia",       "label": "Russia",       "value": 58  },
+          { "id": "japan",        "label": "Japan",        "value": 54  },
+          { "id": "germany",      "label": "Germany",      "value": 47  },
+          { "id": "saudi_arabia", "label": "Saudi Arabia", "value": 38  }
+        ]
+      },
+      {
+        "label": "2024",
+        "values": [
+          { "id": "usa",          "label": "USA",          "value": 916 },
+          { "id": "china",        "label": "China",        "value": 296 },
+          { "id": "russia",       "label": "Russia",       "value": 109 },
+          { "id": "india",        "label": "India",        "value": 83  },
+          { "id": "saudi_arabia", "label": "Saudi Arabia", "value": 75  },
+          { "id": "uk",           "label": "UK",           "value": 74  },
+          { "id": "germany",      "label": "Germany",      "value": 66  },
+          { "id": "ukraine",      "label": "Ukraine",      "value": 64  },
+          { "id": "france",       "label": "France",       "value": 57  }
+        ]
+      }
+    ]
+  }
+}

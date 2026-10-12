@@ -1,0 +1,28 @@
+{
+  "episode": "civil-war-correspondence",
+  "source": "Library of Congress, Sullivan Ballou Papers",
+  "mode": "typeset",
+  "dateline": "Camp Clark, Washington · July 14, 1861",
+  "salutation": "My very dear Sarah,",
+  "signature": "Yours, ever yours,\nSullivan",
+  "paragraphs": [
+    {
+      "text": "The indications are very strong that we shall move in a few days — perhaps tomorrow. Lest I should not be able to write you again, I feel impelled to write lines that may fall under your eye when I shall be no more.",
+      "appearAtSec": 1
+    },
+    {
+      "text": "I have no misgivings about, or lack of confidence in, the cause in which I am engaged, and my courage does not halt or falter.",
+      "appearAtSec": 5
+    },
+    {
+      "text": "Sarah, my love for you is deathless. It seems to bind me with mighty cables that nothing but Omnipotence could break.",
+      "appearAtSec": 9,
+      "emphasis": "key"
+    },
+    {
+      "text": "If I do not return, my dear Sarah, never forget how much I love you. And when my last breath escapes me on the battlefield, it will whisper your name.",
+      "appearAtSec": 14
+    }
+  ],
+  "durationSec": 20
+}
