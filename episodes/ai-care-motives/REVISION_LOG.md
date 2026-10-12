@@ -48,3 +48,14 @@
 **What it fixed:** Narration now claims no more than its sources support. Not changed: the committed-claim question raised by the review (the episode never runs the Unwatched Test on a deployed assistant) and the visual/spoken sync items (14%/3% shown before spoken; mood and pace pairings). Beat windows and five row budgets were also recomputed.
 
 **Verification:** Lint, narration comparison with the spoken copy, and prompt-cue check run after the edit. Not a timed read.
+
+## v1.7, visual column only — 2026-10-12
+
+**What changed:** The two Beat 7 cards for the 36 + 59 example are no longer set as an exchange. Each is now a statement in our own words, subtitled "Our summary of a published example · Anthropic, 2025": the first says what was asked and what the model described; the second sets out the method it described and marks the sums ("the sums are right") apart from the claim about how it computed ("a separate question"). Data files renamed from `recon-36-59-*` to `summary-36-59-*`. Narration is unchanged.
+
+**Why:** The exchange cards held a paraphrase under the label "Illustrative reconstruction". VIS-12 allows a reconstruction only when it is word for word, and the published wording was not typed in. Tiger chose a plain statement over pasting the lines.
+
+**What it fixed:** Nothing on screen now reads as the model's own words unless it is. The cost is that the viewer no longer sees the model's explanation as an exchange.
+
+**Verification:** Both segments rendered from the live manifest and checked frame by frame; data validation, type-check and the measured visual QA run after the edit.
+

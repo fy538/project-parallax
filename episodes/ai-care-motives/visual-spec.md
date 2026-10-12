@@ -92,7 +92,7 @@ Nine files downloaded to `assets/sourced/` (originals) with working copies in `r
 - **Beat 6:** Wolfsburg plant → "Clean Diesel" Golf (conflict duotone) → EPA card (now a verbatim excerpt from the notice, p. 3) → vw-nox → dynamometer clip → emissions equipment photo (natural tones, captioned as illustrative) → Los Angeles freeway clip.
 - **Stock clips are ungraded.** The conflict duotone LUT made both too dark to read.
 - **ImageComposite changes:** `duotone: "none"`, `imageFit`, readable caption and source sizes, centred portrait text with a credit line.
-- **36 + 59 slots filled (Oct 11):** beat7-seg41 and beat7-seg43 are typeset reconstruction cards (PrimarySourceReveal, `recon-36-59-build.json` and `recon-36-59-return.json`), not screen captures. Ids and timings unchanged; the manifest has no placeholders left. The card wording is a paraphrase labelled "Illustrative reconstruction" until Tiger confirms the exact four lines. Reasoning: `analysis/screen-capture-research-2026-10-11.md`.
+- **36 + 59 cards (Oct 12):** beat7-seg41 and beat7-seg43 are statement cards in our own words (PrimarySourceReveal as a plain passage, `summary-36-59-build.json` and `summary-36-59-return.json`), each subtitled "Our summary of a published example · Anthropic, 2025". They replaced the typeset exchange of Oct 11, whose lines were a paraphrase and so could not carry the "Reconstruction" label (VIS-12). Ids and slots unchanged; reveal times follow the word timings of the scratch read.
 - **Credits** for the three CC-licensed photos must appear in the video description or on the end card (lines in `asset-manifest.json`).
 
 ## 8. Hold and timing fixes (Oct 10, 2026)

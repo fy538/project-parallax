@@ -17,8 +17,8 @@ import dPortraitKant from "../../../data/episodes/ai-care-motives/portrait-kant.
 import dPortraitMill from "../../../data/episodes/ai-care-motives/portrait-mill.json";
 import dPortraitPlato from "../../../data/episodes/ai-care-motives/portrait-plato.json";
 import dRdeTimeline from "../../../data/episodes/ai-care-motives/rde-timeline.json";
-import dRecon3659Build from "../../../data/episodes/ai-care-motives/recon-36-59-build.json";
-import dRecon3659Return from "../../../data/episodes/ai-care-motives/recon-36-59-return.json";
+import dSummary3659Build from "../../../data/episodes/ai-care-motives/summary-36-59-build.json";
+import dSummary3659Return from "../../../data/episodes/ai-care-motives/summary-36-59-return.json";
 import dRollbackTimeline from "../../../data/episodes/ai-care-motives/rollback-timeline.json";
 import dShopMotifHiddenObserver from "../../../data/episodes/ai-care-motives/shop-motif-hidden-observer.json";
 import dShopMotifReasons from "../../../data/episodes/ai-care-motives/shop-motif-reasons.json";
@@ -47,8 +47,8 @@ export const TEMPLATE_DATA: Record<string, unknown> = {
   "portrait-mill.json": dPortraitMill,
   "portrait-plato.json": dPortraitPlato,
   "rde-timeline.json": dRdeTimeline,
-  "recon-36-59-build.json": dRecon3659Build,
-  "recon-36-59-return.json": dRecon3659Return,
+  "summary-36-59-build.json": dSummary3659Build,
+  "summary-36-59-return.json": dSummary3659Return,
   "rollback-timeline.json": dRollbackTimeline,
   "shop-motif-hidden-observer.json": dShopMotifHiddenObserver,
   "shop-motif-reasons.json": dShopMotifReasons,

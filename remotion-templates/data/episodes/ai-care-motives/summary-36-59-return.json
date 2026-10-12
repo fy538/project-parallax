@@ -1,0 +1,48 @@
+{
+  "episode": "ai-care-motives",
+  "source": "Summarised from Anthropic, “Tracing the thoughts of a large language model” (2025) · Claude 3.5 Haiku",
+  "title": "Checking the answer is not explaining the method",
+  "subtitle": "Our summary of a published example · Anthropic, 2025",
+  "durationSec": 12,
+  "text": "How the model said it got 95:\n\n6 + 9 = 15, carry the 1.\n\n3 + 5 + 1 = 9.",
+  "fontSize": 46,
+  "paragraphAtSec": [
+    0.23,
+    0.57,
+    0.91
+  ],
+  "annotations": [
+    {
+      "target": "6 + 9 = 15",
+      "type": "highlight",
+      "appearAtSec": 2.05
+    },
+    {
+      "target": "3 + 5 + 1 = 9",
+      "type": "highlight",
+      "appearAtSec": 2.39
+    },
+    {
+      "target": "How the model said it got 95",
+      "type": "underline",
+      "appearAtSec": 4.44,
+      "color": "#7AA3C9"
+    }
+  ],
+  "legend": [
+    {
+      "label": "Check the arithmetic: the sums are right",
+      "color": "#C4A747",
+      "appearAtSec": 2.05
+    },
+    {
+      "label": "Explain the computation: a separate question",
+      "color": "#7AA3C9",
+      "appearAtSec": 4.44
+    }
+  ],
+  "serif": false,
+  "paper": "plain",
+  "textFadeInSec": 0.6,
+  "backgroundVariant": "dark"
+}

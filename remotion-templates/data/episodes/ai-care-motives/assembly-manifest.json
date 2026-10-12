@@ -8791,7 +8791,7 @@
       "narrationRef": "Could we just ask a model to explain itself? In another study, Anthropic asked C",
       "template": {
         "component": "PrimarySourceReveal",
-        "dataFile": "recon-36-59-build.json"
+        "dataFile": "summary-36-59-build.json"
       },
       "narrationLeadIn": 0.7,
       "authoredDurationSec": 12.0
@@ -8823,7 +8823,7 @@
       "narrationRef": "An explanation can help us inspect an answer without being an accurate report of",
       "template": {
         "component": "PrimarySourceReveal",
-        "dataFile": "recon-36-59-return.json"
+        "dataFile": "summary-36-59-return.json"
       },
       "narrationLeadIn": 0.7,
       "authoredDurationSec": 12.0
