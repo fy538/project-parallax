@@ -21,7 +21,7 @@ import treat_video as tv
 def test_filter_chain_default_includes_lut_grain_vignette(tmp_path):
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080)
     assert "lut3d" in chain
     assert "noise" in chain
     assert "vignette" in chain
@@ -30,7 +30,7 @@ def test_filter_chain_default_includes_lut_grain_vignette(tmp_path):
 def test_filter_chain_lut_only_skips_grain_vignette(tmp_path):
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, lut_only=True)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, lut_only=True)
     assert "lut3d" in chain
     assert "noise" not in chain
     assert "vignette" not in chain
@@ -40,7 +40,7 @@ def test_filter_chain_grain_uses_0_to_100_scale(tmp_path):
     """The fix in this sprint: ffmpeg's noise filter uses 0–100, not 0–255."""
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=0.50)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=0.50)
     # 0.50 × 100 = 50 (correct). Old buggy code would have produced 127 (out of range).
     assert "alls=50" in chain
 
@@ -49,21 +49,21 @@ def test_filter_chain_grain_clamps_to_100_max(tmp_path):
     """High grain values should be clamped, not silently passed through."""
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=2.0)  # > 1.0
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=2.0)  # > 1.0
     assert "alls=100" in chain
 
 
 def test_filter_chain_grain_clamps_to_0_min(tmp_path):
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=-0.5)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=-0.5)
     assert "alls=0" in chain
 
 
 def test_filter_chain_grain_zero_yields_zero(tmp_path):
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=0.0)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, grain_intensity=0.0)
     assert "alls=0" in chain
 
 
@@ -73,7 +73,7 @@ def test_filter_chain_default_grain_matches_palette_setting(tmp_path):
     with a code fallback of 0.25 if missing."""
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080)
     expected = max(0, min(100, int(tv.DEFAULT_GRAIN_INTENSITY * 100)))
     assert f"alls={expected}" in chain
 
@@ -82,14 +82,14 @@ def test_filter_chain_temporal_noise_flag(tmp_path):
     """Noise should be temporal (allf=t) for live grain effect."""
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080)
     assert "allf=t" in chain
 
 
 def test_filter_chain_vignette_uses_strength_param(tmp_path):
     lut = tmp_path / "test.cube"
     lut.write_text("# fake LUT\n")
-    chain = tv.build_filter_chain(lut, 1920, 1080, vignette_strength=0.30)
+    chain, _ = tv.build_filter_chain(lut, 1920, 1080, vignette_strength=0.30)
     assert "vignette" in chain
     # Vignette angle formula: PI/5 + strength * PI/3
     assert "0.3" in chain or "0.30" in chain

@@ -311,8 +311,8 @@ def treat_video(
         # Only process first 5 seconds for quick preview
         cmd.extend(["-t", "5"])
 
-    cmd.extend((["-filter_complex", filter_chain, "-map", "[out]"]
-                if is_complex else ["-vf", filter_chain]))
+    cmd.extend(["-filter_complex", filter_chain, "-map", "[out]"]
+               if is_complex else ["-vf", filter_chain])
     cmd.extend([
         "-c:v", "libx264",
         "-preset", "medium",
@@ -349,7 +349,9 @@ def treat_video_preview(
     """Create a side-by-side comparison video (original | treated)."""
     info = get_video_info(input_path)
 
-    filter_chain = build_filter_chain(
+    # build_filter_chain returns (graph, is_complex); the default duotone finish at
+    # full strength is a plain chain, which is what the split below expects.
+    filter_chain, _ = build_filter_chain(
         lut_path, info["width"], info["height"],
         grain_intensity, vignette_strength
     )

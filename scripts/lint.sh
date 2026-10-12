@@ -12,6 +12,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Use a Python that has the project's packages (see scripts/_python.sh).
+# shellcheck source=scripts/_python.sh
+. scripts/_python.sh
+
 # Tally failures rather than failing fast, so an operator running this
 # locally sees all problems in one pass instead of fix-rerun-fix-rerun.
 failures=0

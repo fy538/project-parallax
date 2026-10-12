@@ -6,6 +6,10 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Use a Python that has the project's packages (see scripts/_python.sh).
+# shellcheck source=scripts/_python.sh
+. scripts/_python.sh
+
 # Bootstrap sanity check — the documented pre-commit gates only fire when
 # git core.hooksPath points at .githooks/. Default-config clones silently
 # skip every check. Warn loudly here (cheap, non-blocking) so the test
