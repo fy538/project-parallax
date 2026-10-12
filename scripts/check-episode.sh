@@ -25,6 +25,10 @@
 #   W8. Zero-hit stock shots needing AI-gen fallback      (zerohit_fallback.py --count)
 #   W9. Doc consistency (templates/palette/npm/personas)  (check_docs.py)
 #  W10. Narration audio QA (LUFS / peaks / silence)       (narration/audio_qa.py — only if narration.wav exists)
+#  W11. Oracle track (prediction entries in concepts.json) (pipeline_validator.py --check-oracle)
+#  W12. Anchor-bridge lint (visual anchor per beat)        (lint/check_anchor_bridge.py — only if script exists)
+#  W13. Signal-watch staleness (>8 days since last run)    (signal_monitor.py --check-staleness)
+#  W14. Cost-log reminder (RENDER READY+ with no entries)  (pipeline_validator.py cost-log check)
 #
 # Usage:
 #   ./scripts/check-episode.sh silicon-trap
@@ -97,11 +101,20 @@ if [[ $# -eq 0 ]]; then
 fi
 
 if [[ "$1" == "--list" ]]; then
-  echo "Known episode slugs (have assembly-manifest.json):"
-  for d in "$DATA_EPISODES"/*/; do
-    slug="$(basename "$d")"
-    [[ -f "$d/assembly-manifest.json" ]] && echo "  $slug"
-  done
+  # Read from pipeline-state.json (single source of truth) rather than
+  # scanning the Remotion data dir (which misses pre-manifest episodes).
+  echo "Known episode slugs (from episodes/pipeline-state.json):"
+  PIPELINE_STATE="$ROOT/episodes/pipeline-state.json"
+  if [[ -f "$PIPELINE_STATE" ]]; then
+    python3 -c "
+import json, sys
+data = json.load(open('$PIPELINE_STATE'))
+for ep in data.get('episodes', []):
+    print(f'  {ep[\"slug\"]:40}  {ep[\"state\"]}')
+"
+  else
+    echo "  (episodes/pipeline-state.json not found)"
+  fi
   exit 0
 fi
 
@@ -244,6 +257,60 @@ if [[ -f "$ROOT/episodes/$SLUG/assets/narration.wav" ]]; then
   run_soft "Narration audio QA (LUFS / peaks / silence / format)" \
     python3 "$TOOLS/narration/audio_qa.py" "$SLUG"
 fi
+
+# W11. Oracle track gate — verifies that this episode has at least one
+# prediction entry (type: "prediction") in data/concepts.json. Only fires for
+# RENDER READY+ episodes (pre-publish, the prediction must be committed).
+# Soft check: missing predictions are a warning, not a hard error, since early
+# episodes (INCUBATING → RESEARCHING) haven't locked their oracle claims yet.
+run_soft "Oracle track (prediction entries in concepts.json)" \
+  python3 "$TOOLS/pipeline_validator.py" --check-oracle "$SLUG"
+
+# W12. Anchor-bridge lint — Johnny Harris visual-credibility discipline.
+# Classifies every visual cell as ANCHOR (footage/archival/AI-gen/chart/map)
+# vs TEXT-HEAVY (KineticTypography/Quote/Definition). Flags beats with no
+# anchor (🔴) and wall-of-typography runs >60% text-heavy (🟡). The anchor
+# supplies the "this is real" credibility signal; walls of typography make the
+# viewer read what they're already hearing. Only fires when the script exists.
+if [[ -f "$ROOT/episodes/$SLUG/script.md" ]] || \
+   [[ -f "$ROOT/episodes/$SLUG/script-production.md" ]]; then
+  run_soft "Anchor-bridge lint (visual anchor coverage per beat)" \
+    python3 "$TOOLS/lint/check_anchor_bridge.py" "$SLUG"
+fi
+
+# W13. Signal-watch staleness — warns when the weekly signal digest hasn't
+# been run in >8 days. The signal monitor is the top-of-funnel for new topic
+# discovery; a stale feed means the IDEAS.md watch list is aging unnoticed.
+# Network-free: --check-staleness reads the state file only (no RSS fetching).
+run_soft "Signal-watch staleness (>8 days since last run)" \
+  python3 "$TOOLS/topic/signal_monitor.py" --check-staleness 8
+
+# W14. Cost-log reminder — warns when a RENDER READY+ episode has no entries
+# in COST_LOG.md. Not a hard gate (costs might be logged later), but surfaces
+# the gap before publish so the operator doesn't forget entirely.
+run_soft "Cost-log reminder (RENDER READY+ should have COST_LOG.md entries)" \
+  python3 - "$SLUG" "$ROOT/episodes/pipeline-state.json" "$ROOT/episodes/COST_LOG.md" <<'PYEOF'
+import json, sys
+slug, state_path, cost_path = sys.argv[1], sys.argv[2], sys.argv[3]
+GATED = {"RENDER READY", "IN POST", "PUBLISHED", "RETROED"}
+import pathlib
+try:
+    data = json.loads(pathlib.Path(state_path).read_text())
+    ep = next((e for e in data.get("episodes", []) if e["slug"] == slug), None)
+    state = ep["state"] if ep else ""
+except Exception:
+    state = ""
+if state not in GATED:
+    sys.exit(0)  # pre-RENDER READY — no expectation yet
+cost_log = pathlib.Path(cost_path)
+if not cost_log.exists():
+    print(f"  COST_LOG.md not found — log costs with: python3 tools/cost_tracker.py add ...")
+    sys.exit(1)
+if f"| {slug} |" not in cost_log.read_text():
+    print(f"  no entries for '{slug}' in COST_LOG.md")
+    print(f"  → python3 tools/cost_tracker.py add --episode {slug} --service claude --amount <X> --note '...'")
+    sys.exit(1)
+PYEOF
 
 # ── Post-check: refresh the pipeline tracker for THIS episode ────────────────
 # After all checks complete, regenerate the per-episode _status.md dashboard

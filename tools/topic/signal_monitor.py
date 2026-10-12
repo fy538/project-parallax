@@ -442,10 +442,54 @@ def main() -> int:
     parser.add_argument("--json", action="store_true", help="Emit JSON.")
     parser.add_argument("--stdout", action="store_true", help="Print to stdout.")
     parser.add_argument("-o", "--output", help="Write to file.")
+    parser.add_argument(
+        "--check-staleness",
+        metavar="DAYS",
+        type=int,
+        nargs="?",
+        const=8,
+        help=(
+            "Exit 1 if the signal monitor hasn't been run in more than DAYS days "
+            "(default: 8). Uses last_run from the state file. Exits 0 if the state "
+            "file doesn't exist yet (first run). Combine with --state to target a "
+            "non-default state file. This flag skips feed fetching entirely — safe "
+            "to use in check-episode.sh without incurring network calls."
+        ),
+    )
     args = parser.parse_args()
 
     config_path = Path(args.config).resolve()
     state_path = Path(args.state).resolve()
+
+    # ── --check-staleness: exit 1 if last_run > N days ago; skip feed fetch ────
+    if args.check_staleness is not None:
+        max_days = args.check_staleness
+        if not state_path.exists():
+            print(f"  (signal-watch state not found at {state_path.name} — first run, not stale)")
+            return 0
+        try:
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            print(f"✗ Could not read state file: {state_path}", file=sys.stderr)
+            return 2
+        last_run_str = state.get("last_run")
+        if not last_run_str:
+            print("  (signal-watch state exists but has no last_run — not stale)")
+            return 0
+        try:
+            last_run_date = datetime.date.fromisoformat(last_run_str[:10])
+        except ValueError:
+            print(f"✗ Unreadable last_run value in state: {last_run_str!r}", file=sys.stderr)
+            return 2
+        days_since = (datetime.date.today() - last_run_date).days
+        if days_since > max_days:
+            print(
+                f"✗ Signal watch is stale: last run {days_since} days ago "
+                f"(threshold: {max_days}). Run: python3 tools/topic/signal_monitor.py"
+            )
+            return 1
+        print(f"  ✓ Signal watch current: last run {days_since} day(s) ago (threshold: {max_days})")
+        return 0
 
     try:
         report = run_digest(

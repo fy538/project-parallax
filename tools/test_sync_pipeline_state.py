@@ -175,6 +175,12 @@ def _run_helper(repo: Path, *args: str) -> subprocess.CompletedProcess:
         "m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)\n"
         f"m.ROOT = pathlib.Path(r'{repo}')\n"
         f"m.PIPELINE_STATE_JSON = pathlib.Path(r'{repo}') / 'episodes' / 'pipeline-state.json'\n"
+        # sync imports state_history (for the append-only audit trail). Redirect
+        # its module-level paths at the tmp repo too, or it would write history
+        # into the REAL repo's episodes/ dir.
+        "import state_history as sh\n"
+        f"sh.EPISODES_DIR = pathlib.Path(r'{repo}') / 'episodes'\n"
+        "sh.PIPELINE_STATE_JSON = sh.EPISODES_DIR / 'pipeline-state.json'\n"
         "sys.argv = ['sync_pipeline_state.py'] + " + repr(list(args)) + "\n"
         "sys.exit(m.main())\n"
     )
@@ -210,6 +216,54 @@ def test_end_to_end_bumps_date_on_state_change(tmp_path):
 
     new_data = json.loads(path.read_text())
     assert new_data["episodes"][0]["stateEnteredAt"] == datetime.date.today().isoformat()
+
+
+def test_end_to_end_records_state_history(tmp_path):
+    """A state change must be appended to the episode's _state-history.jsonl
+    audit trail (the wiring that was previously missing)."""
+    initial = json.dumps(
+        {"episodes": [{"slug": "alpha", "state": "DRAFTING",
+                       "stateEnteredAt": "2026-01-01"}]},
+        indent=2,
+    ) + "\n"
+    path = _init_repo_with_state(tmp_path, initial)
+
+    edited = json.loads(initial)
+    edited["episodes"][0]["state"] = "RENDER READY"
+    path.write_text(json.dumps(edited, indent=2) + "\n")
+    subprocess.run(["git", "add", "episodes/pipeline-state.json"], cwd=tmp_path, check=True)
+
+    result = _run_helper(tmp_path)
+    assert result.returncode == 0, result.stderr
+
+    hist = tmp_path / "episodes" / "alpha" / "_state-history.jsonl"
+    assert hist.is_file(), "history file should have been created"
+    lines = [json.loads(ln) for ln in hist.read_text().splitlines() if ln.strip()]
+    assert lines, "history should have at least one transition"
+    last = lines[-1]
+    assert last["from"] == "DRAFTING"
+    assert last["to"] == "RENDER READY"
+    assert last["date"] == datetime.date.today().isoformat()
+
+
+def test_end_to_end_check_mode_records_no_history(tmp_path):
+    """--check is a dry run: it must NOT append to the history trail."""
+    initial = json.dumps(
+        {"episodes": [{"slug": "alpha", "state": "DRAFTING",
+                       "stateEnteredAt": "2026-01-01"}]},
+        indent=2,
+    ) + "\n"
+    path = _init_repo_with_state(tmp_path, initial)
+
+    edited = json.loads(initial)
+    edited["episodes"][0]["state"] = "RENDER READY"
+    path.write_text(json.dumps(edited, indent=2) + "\n")
+    subprocess.run(["git", "add", "episodes/pipeline-state.json"], cwd=tmp_path, check=True)
+
+    result = _run_helper(tmp_path, "--check")
+    assert result.returncode == 1
+    hist = tmp_path / "episodes" / "alpha" / "_state-history.jsonl"
+    assert not hist.exists(), "--check must not write history"
 
 
 def test_end_to_end_no_state_change_silent_success(tmp_path):

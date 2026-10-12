@@ -1,37 +1,70 @@
 #!/usr/bin/env bash
-# Wipe regenerable build artifacts. None of this affects git-tracked work.
-#
-# Removes:
-#   remotion-templates/out/            (rendered MP4s, ~100M+)
-#   remotion-templates/.cache/         (Remotion bundler cache)
-#   remotion-templates/.vite/          (Vite cache)
-#   remotion-templates/dist/           (TS build output)
-#   .coverage / coverage.xml / htmlcov (Python coverage artifacts)
-#   __pycache__/ + *.pyc               (Python bytecode)
-#
-# Use when: disk fills up, render cache is stale, or you want a clean rebuild.
+# Remove selected, regenerable artifacts. No arguments only prints help.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-bytes_before=$(du -sk remotion-templates/out remotion-templates/.cache remotion-templates/.vite remotion-templates/dist 2>/dev/null | awk '{sum+=$1} END {print sum+0}')
+tests=false
+cache=false
+renders=false
+dry_run=false
+usage() {
+  cat <<'HELP'
+Usage: ./scripts/clean.sh [--tests] [--cache] [--renders] [--all] [--dry-run]
 
-echo "→ removing render output (remotion-templates/out/)"
-rm -rf remotion-templates/out
+  --tests    Remove temporary test renders; keep visual baselines.
+  --cache    Remove build caches, Python bytecode, and coverage output.
+  --renders  Remove finished files under remotion-templates/out/.
+  --all      Select all three groups (including finished renders).
+  --dry-run  Show the selected paths without removing them.
 
-echo "→ removing build caches (.cache, .vite, dist)"
-rm -rf remotion-templates/.cache remotion-templates/.vite remotion-templates/dist
+No-argument invocation only shows this help. Select --renders explicitly before
+removing finished episode or pilot videos.
+HELP
+}
 
-echo "→ removing Python coverage artifacts"
-rm -f .coverage coverage.xml
-rm -rf htmlcov
+if (($# == 0)); then usage; exit 0; fi
+for arg in "$@"; do
+  case "$arg" in
+    --tests) tests=true ;;
+    --cache) cache=true ;;
+    --renders) renders=true ;;
+    --all) tests=true; cache=true; renders=true ;;
+    --dry-run) dry_run=true ;;
+    -h|--help) usage; exit 0 ;;
+    *) printf 'Unknown option: %s\n' "$arg" >&2; usage >&2; exit 2 ;;
+  esac
+done
+if ! $tests && ! $cache && ! $renders; then usage; exit 0; fi
 
-echo "→ removing Python bytecode"
-find tools -name __pycache__ -type d -exec rm -rf {} + 2>/dev/null || true
-find tools -name "*.pyc" -delete 2>/dev/null || true
+paths=()
+if $tests; then
+  paths+=(remotion-templates/src/__tests__/.temp-renders
+          remotion-templates/src/__tests__/.temp-renders-catalog)
+fi
+if $cache; then
+  paths+=(remotion-templates/.cache remotion-templates/.vite remotion-templates/dist
+          .coverage coverage.xml htmlcov)
+fi
+if $renders; then paths+=(remotion-templates/out); fi
 
-mb_freed=$(awk "BEGIN { printf \"%.1f\", ${bytes_before:-0}/1024 }")
-echo ""
-echo "✓ Cleaned. ~${mb_freed} MB freed."
-echo "  Re-render with: cd remotion-templates && node scripts/render-episode.mjs --episode=<slug>"
+printf 'Selected paths:\n'
+for item in "${paths[@]}"; do
+  if [[ -e "$item" ]]; then
+    du -sh "$item"
+  else
+    printf '  absent  %s\n' "$item"
+  fi
+done
+if $cache; then
+  printf '  Python bytecode under tools/\n'
+fi
+if $dry_run; then printf 'Dry run; nothing removed.\n'; exit 0; fi
+
+for item in "${paths[@]}"; do rm -rf -- "$item"; done
+if $cache; then
+  find tools -type d -name __pycache__ -prune -exec rm -rf -- {} +
+  find tools -type f -name '*.pyc' -delete
+fi
+printf 'Cleanup complete.\n'

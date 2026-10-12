@@ -36,6 +36,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+# state_history lives alongside this script in tools/; sys.path[0] is the
+# script dir under `python3 tools/sync_pipeline_state.py`, so a bare import works.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from state_history import append_transition  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 PIPELINE_STATE_JSON = ROOT / "episodes" / "pipeline-state.json"
 
@@ -132,6 +137,21 @@ def main() -> int:
         return 1
 
     update_state_entered_at(changed_slugs)
+
+    # Append each transition to the per-episode append-only audit trail
+    # (_state-history.jsonl). This is the wiring state_history.py's docstring
+    # specifies but that was previously missing — without it the history
+    # silently stopped at the bootstrap entry and the dashboard timeline froze.
+    head = _state_map(head_content) if head_content else {}
+    working = _state_map(working_content)
+    for slug in changed_slugs:
+        append_transition(
+            slug,
+            working[slug],
+            from_state=head.get(slug),
+            reason="auto-recorded by sync_pipeline_state on commit",
+        )
+
     # Print one slug per line so shell can capture + re-stage cleanly
     for slug in changed_slugs:
         print(slug)

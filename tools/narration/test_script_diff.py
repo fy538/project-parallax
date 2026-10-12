@@ -132,17 +132,27 @@ class TestRenderDiffMd:
 class TestRealScripts:
     @pytest.fixture(scope="class")
     def v5_path(self) -> Path:
-        p = REPO_ROOT / "episodes" / "prisoners-dilemma" / "script-v5-production.md"
-        if not p.is_file():
-            pytest.skip("v5 script not present")
-        return p
+        # v5 moved to drafts/ after EPISODE_STRUCTURE.md restructure
+        ep = REPO_ROOT / "episodes" / "prisoners-dilemma"
+        for candidate in (
+            ep / "drafts" / "script-v5-production.md",
+            ep / "script-v5-production.md",
+        ):
+            if candidate.is_file():
+                return candidate
+        pytest.skip("v5 script not present")
 
     @pytest.fixture(scope="class")
     def v6_path(self) -> Path:
-        p = REPO_ROOT / "episodes" / "prisoners-dilemma" / "script-v6-production.md"
-        if not p.is_file():
-            pytest.skip("v6 script not present")
-        return p
+        # v6 renamed to script.md (new canonical) after EPISODE_STRUCTURE.md restructure
+        ep = REPO_ROOT / "episodes" / "prisoners-dilemma"
+        for candidate in (
+            ep / "script.md",
+            ep / "script-v6-production.md",
+        ):
+            if candidate.is_file():
+                return candidate
+        pytest.skip("v6 script not present")
 
     def test_v5_v6_diff_produces_some_significant_deltas(self, v5_path, v6_path):
         a = em.compute_engagement_metrics(v5_path)

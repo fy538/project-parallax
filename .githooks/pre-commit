@@ -72,18 +72,45 @@ if [ -n "$PIPELINE_STATE_CHANGED" ]; then
   if [ -n "$CHANGED_SLUGS" ]; then
     echo "  state advanced for: $(echo "$CHANGED_SLUGS" | tr '\n' ' ')"
     git add episodes/pipeline-state.json
+    # sync_pipeline_state also appended to each changed episode's append-only
+    # _state-history.jsonl audit trail — stage those too.
+    find episodes -maxdepth 2 -name '_state-history.jsonl' -print0 | xargs -0 -r git add
   fi
-  # 2. Regenerate per-episode _status.md dashboards + refresh At-a-glance
-  #    Health column in PIPELINE.md, then re-stage the touched files.
+  # 2. Enforce source-of-truth consistency. CLAUDE.md + project/IDEAS.md mirror
+  #    pipeline-state.json but are hand-maintained (can't be auto-derived
+  #    safely), so a mismatch BLOCKS the commit with a clear fix message —
+  #    `set -e` aborts here on non-zero exit.
+  python3 tools/pipeline_validator.py --check-sources
+  # 3. Regenerate ALL derived dashboards (PIPELINE.md At-a-glance + Topics,
+  #    per-episode _status.md, AND PIPELINE.html) then re-stage them so the
+  #    committed snapshot matches the new state. HTML is tracked + lint-gated,
+  #    so it must be refreshed here too (was previously left stale).
   python3 tools/pipeline_validator.py --write-status --update-tracker >/dev/null
-  git add episodes/PIPELINE.md
+  python3 tools/pipeline_validator.py --emit-html >/dev/null
+  git add episodes/PIPELINE.md episodes/PIPELINE.html
   # _status.md files only exist for episodes that have a folder; glob may
   # not match anything, so use find + xargs to stay quiet.
   find episodes -maxdepth 2 -name '_status.md' -print0 | xargs -0 -r git add
 fi
 
-if [ -z "$TS_CHANGED" ] && [ -z "$TEMPLATE_TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ] && [ -z "$PIPELINE_STATE_CHANGED" ]; then
-  echo "  (no .ts/.tsx/.py/.json changes, skipping checks)"
+# Manifest staleness informational pass: when episode-level source files
+# (script, shot-list, narration WAV, etc.) change, run invalidate.py --soft
+# to surface any downstream artifacts that are now stale. Non-blocking
+# (--soft exits 0 always) — operator decides whether to act before shipping.
+# Derive affected slugs from staged episode paths (episodes/<slug>/...).
+EPISODE_FILES_CHANGED=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '^episodes/[^/]+/(script|shot-list|visual-spec|audio|narration)' || true)
+if [ -n "$EPISODE_FILES_CHANGED" ]; then
+  AFFECTED_SLUGS=$(echo "$EPISODE_FILES_CHANGED" \
+    | sed -E 's|^episodes/([^/]+)/.*|\1|' | sort -u)
+  for slug in $AFFECTED_SLUGS; do
+    echo "→ Manifest staleness check (episode files changed: $slug)"
+    python3 tools/assembly/invalidate.py --soft --episode="$slug" || true
+  done
+fi
+
+if [ -z "$TS_CHANGED" ] && [ -z "$TEMPLATE_TS_CHANGED" ] && [ -z "$PY_CHANGED" ] && [ -z "$JSON_CHANGED" ] && [ -z "$MANIFEST_CHANGED" ] && [ -z "$CONCEPTS_CHANGED" ] && [ -z "$PIPELINE_STATE_CHANGED" ] && [ -z "$EPISODE_FILES_CHANGED" ]; then
+  echo "  (no .ts/.tsx/.py/.json/episode changes, skipping checks)"
 fi
 
 echo "✓ pre-commit checks passed"

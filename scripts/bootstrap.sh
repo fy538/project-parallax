@@ -60,7 +60,15 @@ else
   echo "  ✓ core Python deps importable"
 fi
 
-# ─── 3. Node deps spot-check (informational only) ──────────────────────────
+# ─── 3. openai-whisper spot-check ─────────────────────────────────────────
+echo "→ bootstrap: checking openai-whisper"
+if python3 -c "import whisper" 2>/dev/null; then
+  echo "  ✓ openai-whisper installed"
+else
+  echo "  ! openai-whisper not found — run: pip install openai-whisper"
+fi
+
+# ─── 4. Node deps spot-check (informational only) ──────────────────────────
 if [ ! -d "remotion-templates/node_modules" ]; then
   echo "  ! remotion-templates/node_modules missing — run:  cd remotion-templates && npm install"
 fi

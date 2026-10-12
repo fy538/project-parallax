@@ -203,13 +203,23 @@ def _count_words(text: str) -> int:
 
 
 def find_script(slug: str) -> Path | None:
-    """Canonical script-production.md, then highest versioned."""
+    """Find canonical production script (EPISODE_STRUCTURE.md resolution order)."""
     ep_dir = EPISODES_DIR / slug
+    plain = ep_dir / "script.md"
+    if plain.is_file():
+        return plain
     canonical = ep_dir / "script-production.md"
     if canonical.is_file():
         return canonical
     versioned = sorted(ep_dir.glob("script-v*-production.md"))
-    return versioned[-1] if versioned else None
+    if versioned:
+        return versioned[-1]
+    drafts_dir = ep_dir / "drafts"
+    if drafts_dir.is_dir():
+        dv = sorted(drafts_dir.glob("script-v*.md"))
+        if dv:
+            return dv[-1]
+    return None
 
 
 def extract_claims(script_path: Path) -> list[ClaimEntry]:

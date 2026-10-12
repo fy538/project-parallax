@@ -229,42 +229,56 @@ def build_filter_chain(
     grain_intensity: float = DEFAULT_GRAIN_INTENSITY,
     vignette_strength: float = DEFAULT_VIGNETTE_STRENGTH,
     lut_only: bool = False,
-) -> str:
-    """Build the ffmpeg filter chain for the full brand treatment.
+    strength: float = 1.0,
+    finish: str = "duotone",
+    halation: float = 0.0,
+) -> tuple[str, bool]:
+    """Build the ffmpeg filter graph for the treatment. Returns (graph, is_complex).
 
-    The chain applies:
-    1. 3D LUT (desaturation + duotone — baked into the .cube file)
-    2. Film grain (noise filter, monochromatic)
-    3. Radial vignette (darkens edges)
+    Two finishes:
 
-    The grain and vignette parameters match treat.py exactly so that
-    treated video and treated photos look identical.
+    • **duotone** (default, the legacy brand grade): 3D LUT (desaturate + remap
+      onto the amber ramp) + grain + vignette. `strength` (0–1) controls how much
+      of the duotone is applied; <1 blends it back over the original to keep color.
+      The LUT REPLACES hue, so it's for unifying messy footage or deliberately
+      bleak beats.
+
+    • **documentary** (finish, not recolor): NO color remap — the original
+      (already on-palette) color is kept. Grain + optional halation/bloom +
+      vignette only. This is the default look for palette-locked AI stills, which
+      don't need the duotone to be brand-coherent.
     """
-    filters = []
+    noise_strength = max(0, min(100, int(grain_intensity * 100)))
+    grain_f = f"noise=alls={noise_strength}:allf=t"
+    vig_f = f"vignette=angle=PI/5+{vignette_strength}*PI/3:mode=forward"
 
-    # Step 1+2: Apply the 3D LUT (desaturation + duotone combined)
-    filters.append(f"lut3d='{lut_path}'")
+    # ── documentary finish: color preserved, texture only ──
+    if finish == "documentary":
+        post = ",".join([grain_f, vig_f])
+        if halation and halation > 0:
+            # Bloom/halation: screen-blend a blurred copy over the original at
+            # low opacity → soft filmic glow concentrated in the highlights.
+            graph = (
+                f"[0:v]split=2[a][b];"
+                f"[b]gblur=sigma=18[blur];"
+                f"[a][blur]blend=all_mode=screen:all_opacity={halation}[bloom];"
+                f"[bloom]{post},format=yuv420p[out]"
+            )
+            return graph, True
+        return post, False  # simple -vf: grain + vignette, no color change
 
-    if not lut_only:
-        # Step 3: Film grain.
-        # ffmpeg's `noise` filter uses a 0–100 strength scale. We accept
-        # grain_intensity on a normalized 0–1 scale and rescale here.
-        # `allf=t` = temporal (per-frame) noise, which reads as live grain.
-        noise_strength = max(0, min(100, int(grain_intensity * 100)))
-        filters.append(
-            f"noise=alls={noise_strength}:allf=t"
-        )
-
-        # Step 4: Vignette
-        # ffmpeg's vignette filter uses angle parameter (PI/5 default)
-        # Higher angle = stronger vignette. Map our 0-1 strength to angle.
-        # treat.py at 0.18 ≈ vignette angle of PI/4
-        vignette_angle = f"PI/5+{vignette_strength}*PI/3"
-        filters.append(
-            f"vignette=angle={vignette_angle}:mode=forward"
-        )
-
-    return ",".join(filters)
+    # ── duotone finish (legacy) ──
+    post_str = "" if lut_only else ",".join([grain_f, vig_f])
+    if strength >= 1.0:
+        chain = f"lut3d='{lut_path}'" + (f",{post_str}" if post_str else "")
+        return chain, False
+    graph = (
+        f"[0:v]split=2[base][g];"
+        f"[g]lut3d='{lut_path}'[lut];"
+        f"[base][lut]blend=all_mode=normal:all_opacity={strength}[mix];"
+        f"[mix]{post_str + ',' if post_str else ''}format=yuv420p[out]"
+    )
+    return graph, True
 
 
 def treat_video(
@@ -275,6 +289,9 @@ def treat_video(
     vignette_strength: float = DEFAULT_VIGNETTE_STRENGTH,
     lut_only: bool = False,
     preview: bool = False,
+    strength: float = 1.0,
+    finish: str = "duotone",
+    halation: float = 0.0,
 ) -> bool:
     """Apply brand treatment to a video file.
 
@@ -282,9 +299,10 @@ def treat_video(
     """
     info = get_video_info(input_path)
 
-    filter_chain = build_filter_chain(
+    filter_chain, is_complex = build_filter_chain(
         lut_path, info["width"], info["height"],
-        grain_intensity, vignette_strength, lut_only
+        grain_intensity, vignette_strength, lut_only, strength,
+        finish, halation,
     )
 
     cmd = ["ffmpeg", "-y", "-i", str(input_path)]
@@ -293,8 +311,9 @@ def treat_video(
         # Only process first 5 seconds for quick preview
         cmd.extend(["-t", "5"])
 
+    cmd.extend((["-filter_complex", filter_chain, "-map", "[out]"]
+                if is_complex else ["-vf", filter_chain]))
     cmd.extend([
-        "-vf", filter_chain,
         "-c:v", "libx264",
         "-preset", "medium",
         "-crf", "18",          # High quality
@@ -390,10 +409,20 @@ and Final Cut Pro — import them for manual color grading workflows.
                         help="Output directory (default: same dir as input)")
     parser.add_argument("--saturation", type=float, default=DEFAULT_SATURATION,
                         help=f"Desaturation level (default: {DEFAULT_SATURATION})")
-    parser.add_argument("--grain", type=float, default=DEFAULT_GRAIN_INTENSITY,
-                        help=f"Grain intensity (default: {DEFAULT_GRAIN_INTENSITY})")
-    parser.add_argument("--vignette", type=float, default=DEFAULT_VIGNETTE_STRENGTH,
-                        help=f"Vignette strength (default: {DEFAULT_VIGNETTE_STRENGTH})")
+    parser.add_argument("--finish", choices=["duotone", "documentary"], default="duotone",
+                        help="duotone = legacy brand color grade (LUT). "
+                             "documentary = keep original color, apply grain + halation + vignette only "
+                             "(the right finish for palette-locked AI stills).")
+    parser.add_argument("--halation", type=float, default=None,
+                        help="Bloom/halation strength 0-1 (documentary finish; default 0.18). 0 = off.")
+    parser.add_argument("--grain", type=float, default=None,
+                        help=f"Grain intensity (default: {DEFAULT_GRAIN_INTENSITY} duotone / 0.06 documentary)")
+    parser.add_argument("--vignette", type=float, default=None,
+                        help=f"Vignette strength (default: {DEFAULT_VIGNETTE_STRENGTH} duotone / 0.10 documentary)")
+    parser.add_argument("--strength", type=float, default=1.0,
+                        help="Duotone LUT strength 0-1 (default: 1.0 = full duotone). "
+                             "Use <1 for colorful shots so original hue survives "
+                             "(e.g. 0.25 keeps most color + a brand tint).")
     parser.add_argument("--preview", action="store_true",
                         help="Generate side-by-side comparison (first 5s)")
     parser.add_argument("--lut-only", action="store_true",
@@ -433,10 +462,25 @@ and Final Cut Pro — import them for manual color grading workflows.
         print("✗ ffmpeg not found. Install it: brew install ffmpeg (macOS) or apt install ffmpeg (Linux)", file=sys.stderr)
         sys.exit(1)
 
-    # Generate LUT in a temp directory (or output dir if specified)
-    lut_dir = out_dir or Path(tempfile.mkdtemp(prefix="parallax_lut_"))
-    lut_path = save_lut(args.ramp, lut_dir, args.saturation)
-    print(f"Generated LUT: {lut_path}")
+    # Resolve finish-aware defaults for grain / vignette / halation.
+    if args.finish == "documentary":
+        grain = args.grain if args.grain is not None else 0.06
+        vignette = args.vignette if args.vignette is not None else 0.10
+        halation = args.halation if args.halation is not None else 0.18
+    else:
+        grain = args.grain if args.grain is not None else DEFAULT_GRAIN_INTENSITY
+        vignette = args.vignette if args.vignette is not None else DEFAULT_VIGNETTE_STRENGTH
+        halation = 0.0
+
+    # The duotone LUT is only needed for the duotone finish.
+    if args.finish == "duotone":
+        lut_dir = out_dir or Path(tempfile.mkdtemp(prefix="parallax_lut_"))
+        lut_path = save_lut(args.ramp, lut_dir, args.saturation)
+        print(f"Generated LUT: {lut_path}")
+    else:
+        lut_path = None
+        print("Finish: documentary — original color preserved (no LUT); "
+              f"grain={grain}, halation={halation}, vignette={vignette}")
 
     success = 0
     total = 0
@@ -463,8 +507,11 @@ and Final Cut Pro — import them for manual color grading workflows.
             out_path = target_dir / f"{input_path.stem}{args.suffix}.mp4"
             ok = treat_video(
                 input_path, out_path, lut_path,
-                args.grain, args.vignette,
+                grain, vignette,
                 lut_only=args.lut_only_treatment,
+                strength=args.strength,
+                finish=args.finish,
+                halation=halation,
             )
 
         if ok:
@@ -475,8 +522,8 @@ and Final Cut Pro — import them for manual color grading workflows.
 
     print(f"\nDone. {success}/{total} videos treated.")
 
-    # Also save the LUT alongside outputs for NLE import
-    if out_dir and not (out_dir / lut_path.name).exists():
+    # Also save the LUT alongside outputs for NLE import (duotone finish only)
+    if lut_path and out_dir and not (out_dir / lut_path.name).exists():
         final_lut = out_dir / lut_path.name
         final_lut.write_text(lut_path.read_text())
         print(f"LUT also saved to: {final_lut} (for NLE import)")

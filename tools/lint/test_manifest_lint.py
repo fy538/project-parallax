@@ -776,6 +776,42 @@ def _manifest_from_segs(segs: list[dict]) -> dict:
     }
 
 
+def _gen_seg(seg_id: str, component: str = "GenerativeBackdrop") -> dict:
+    return {
+        "id": seg_id,
+        "type": "TEMPLATE",
+        "layer": "foreground",
+        "startSec": 0,
+        "endSec": 5,
+        "template": {"component": component, "dataFile": "d.json"},
+    }
+
+
+class TestGenerativeOveruse:
+    def _rules(self, segs: list[dict]) -> set[str]:
+        return {
+            v.rule
+            for v in manifest_lint.check_generative_overuse(_manifest_from_segs(segs), Path("."))
+        }
+
+    def test_two_fields_fire_warning(self):
+        rules = self._rules([_gen_seg("a"), _gen_seg("b")])
+        assert "M-GENERATIVE-OVERUSE" in rules
+
+    def test_one_field_ok(self):
+        assert self._rules([_gen_seg("a"), _gen_seg("b", "DataChart")]) == set()
+
+    def test_zero_fields_ok(self):
+        assert self._rules([_gen_seg("a", "DataChart")]) == set()
+
+    def test_warning_lists_segment_ids(self):
+        vs = manifest_lint.check_generative_overuse(
+            _manifest_from_segs([_gen_seg("intro"), _gen_seg("outro")]), Path(".")
+        )
+        assert vs and vs[0].severity == "warning"
+        assert "intro" in vs[0].message and "outro" in vs[0].message
+
+
 class TestTransitionGrammar:
     # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -1124,6 +1160,17 @@ class TestCrossfadeRule:
         assert len(vs) == 1
         assert vs[0].rule == "M-CROSSFADE"
         assert vs[0].severity == "warning"
+
+    def test_separate_cues_with_silence_between_are_not_a_crossfade(self):
+        """Music that leaves and returns later has no crossfade to align."""
+        m = {
+            "musicBed": {"tracks": [
+                {"startSec": 0, "endSec": 20},
+                {"startSec": 45, "endSec": 90},
+            ]},
+            "beats": [{"startSec": 0, "endSec": 30}, {"startSec": 30, "endSec": 60}],
+        }
+        assert self._run(m) == []
 
 
 # ─── M-OVERLAP: foreground segments overlap without a declared transition ─────

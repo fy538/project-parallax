@@ -70,21 +70,40 @@ def _relpath(p: Path) -> str:
 
 
 def find_script(slug: str) -> Path | None:
-    """Match the lookup used by check_script_manifest.py — pick the highest
-    versioned `script-v<N>-production.md` if no plain `script-production.md`.
+    """Find the canonical production script for an episode.
+
+    Search order (most-canonical-first):
+      1. script.md at root (new canonical name)
+      2. script-production.md at root (legacy canonical)
+      3. Highest-versioned script-v<N>-production.md at root (legacy versioned)
+      4. Highest-versioned script in drafts/ subfolder (fallback)
     """
     episode_dir = EPISODES_ROOT / slug
     if not episode_dir.is_dir():
         return None
-    canonical = episode_dir / "script-production.md"
-    if canonical.is_file():
-        return canonical
+    # New canonical name
+    plain = episode_dir / "script.md"
+    if plain.is_file():
+        return plain
+    # Legacy canonical
+    legacy = episode_dir / "script-production.md"
+    if legacy.is_file():
+        return legacy
+    # Legacy versioned (highest wins)
     versioned = sorted(
         episode_dir.glob("script-v*-production.md"),
         key=lambda p: int(re.search(r"v(\d+)", p.name).group(1)) if re.search(r"v(\d+)", p.name) else 0,
         reverse=True,
     )
-    return versioned[0] if versioned else None
+    if versioned:
+        return versioned[0]
+    # Drafts fallback
+    drafts_versioned = sorted(
+        (episode_dir / "drafts").glob("script-v*.md") if (episode_dir / "drafts").is_dir() else [],
+        key=lambda p: int(re.search(r"v(\d+)", p.name).group(1)) if re.search(r"v(\d+)", p.name) else 0,
+        reverse=True,
+    )
+    return drafts_versioned[0] if drafts_versioned else None
 
 
 def strip_diacritics(s: str) -> str:

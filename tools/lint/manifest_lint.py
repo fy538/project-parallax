@@ -18,8 +18,10 @@ for violations of editorial doctrine that aren't structurally enforced by
   - M-TRANSITION-IRIS-CHART: iris transition on a chart-category template (no focal point)
   - M-TRANSITION-DISSOLVE-CREEP: >2 consecutive dissolve-in segments (rhythm suppression)
   - M-TRANSITION-IRIS-OVERUSE: >2 iris-in transitions episode-wide (premium register overuse)
+  - M-TRANSITION-IRIS-RETIRED: any iris transition (retired Oct 10 2026; renders as a cut)
   - M-TRANSITION-COLOR-WASH-TOKEN: color-wash without washColor (renders as transparent)
                  (Phase 9 transition-grammar integration — see TRANSITION_GRAMMAR.md)
+  - M-GENERATIVE-OVERUSE: >1 GenerativeBackdrop segment episode-wide (atmospheric rationing)
   - M-BGMODE: foreground TEMPLATE segments within the same beat mix backgroundVariant
               (light/dark) — warns on unintentional mode switches within a narrative beat
 
@@ -200,8 +202,13 @@ def check_crossfade_beat_alignment(manifest: dict, _: str) -> list[Violation]:
     if last_beat_end is not None:
         beat_boundaries.append(last_beat_end)
     TOLERANCE_SEC = 5.0
+    CUE_GAP_SEC = 0.5
     for i in range(len(tracks) - 1):
         a, b = tracks[i], tracks[i + 1]
+        # Two cues with silence between them do not crossfade: music may leave
+        # before a key line and return later (cues, not a continuous bed).
+        if b.get("startSec", 0) - a.get("endSec", 0) > CUE_GAP_SEC:
+            continue
         # Crossfade midpoint: where track A is fading out and B is fading in.
         # Treat the midpoint as the average of A.endSec and B.startSec.
         midpoint = (a.get("endSec", 0) + b.get("startSec", 0)) / 2.0
@@ -909,6 +916,7 @@ def check_drift_register(manifest: dict, _manifest_path: Path) -> list[Violation
 #   M-TRANSITION-IRIS-CHART     error   — iris on a chart-category template
 #   M-TRANSITION-DISSOLVE-CREEP warning — >2 consecutive dissolve-in segments
 #   M-TRANSITION-IRIS-OVERUSE   warning — >2 iris-in occurrences episode-wide
+#   M-TRANSITION-IRIS-RETIRED   warning — any iris (retired; resolves to a cut at render)
 #   M-TRANSITION-COLOR-WASH-TOKEN warning — color-wash without washColor field
 
 # Transitions retired from the canonical vocabulary. Keys are the deprecated
@@ -1009,6 +1017,23 @@ def check_transition_grammar(manifest: dict, _manifest_path: Path) -> list[Viola
         if trans_in == "iris":
             iris_in_count += 1
 
+        # ── M-TRANSITION-IRIS-RETIRED ────────────────────────────────────────
+        # Warning, not error: older manifests still carry the token and the
+        # renderer resolves it to a cut (remotion-templates/src/utils/resolveSeams.ts).
+        for side, tv in (("in", trans_in), ("out", trans_out)):
+            if tv == "iris":
+                violations.append(Violation(
+                    rule="M-TRANSITION-IRIS-RETIRED",
+                    file="",
+                    pointer=f"{pointer}.{side}",
+                    message=(
+                        f"Iris transition in segment \"{seg_id}\" (.{side}) is retired "
+                        f"and renders as a cut. Use \"cut\", or \"fade\" at a chapter "
+                        f"break. See TRANSITION_GRAMMAR.md § \"Retired forms\"."
+                    ),
+                    severity="warning",
+                ))
+
         # ── M-TRANSITION-DISSOLVE-CREEP ──────────────────────────────────────
         if trans_in == "dissolve":
             consecutive_dissolves += 1
@@ -1065,6 +1090,37 @@ def check_transition_grammar(manifest: dict, _manifest_path: Path) -> list[Viola
         ))
 
     return violations
+
+
+# ─── Rule: M-GENERATIVE-OVERUSE (atmospheric backdrop rationing) ─────────────
+# GenerativeBackdrop (the generative flow field) is an atmospheric hold-beat
+# element — diffusion / contagion / "the idea permeates" moments. Like the iris
+# transition and CinematicMap, its impact comes from rarity. On every hold beat
+# it reads as a screensaver and dilutes the one moment where generative motion
+# is the argument. Threshold: ≤1 per episode (warning, may be intentional).
+def check_generative_overuse(manifest: dict, _manifest_path: Path) -> list[Violation]:
+    """M-GENERATIVE-OVERUSE — >1 GenerativeBackdrop segment episode-wide."""
+    segments = manifest.get("segments", [])
+    gen_ids = [
+        seg.get("id", str(i))
+        for i, seg in enumerate(segments)
+        if (seg.get("template") or {}).get("component", "") == "GenerativeBackdrop"
+    ]
+    if len(gen_ids) <= 1:
+        return []
+    return [Violation(
+        rule="M-GENERATIVE-OVERUSE",
+        file="",
+        pointer="segments",
+        message=(
+            f"Episode uses {len(gen_ids)} GenerativeBackdrop segments "
+            f"({', '.join(gen_ids)}) — threshold: ≤1. The generative field is an "
+            f"atmospheric register reserved for a single diffusion/contagion beat; "
+            f"overuse reads as a screensaver and dilutes the impact. "
+            f"See GenerativeField.tsx editorial note + HOLD_MOTION_REGISTER.md."
+        ),
+        severity="warning",
+    )]
 
 
 # ─── Rule: M-BGMODE (background mode consistency within a beat) ──────────────
@@ -1240,6 +1296,7 @@ ALL_RULES: list[Callable[[dict, Path], list[Violation]]] = [
     check_sync_coverage,             # needs the path (reads dataFile contents)
     check_drift_register,            # reads segment._direction.driftPreset
     check_transition_grammar,        # reads segment.transition.{in,out,...}
+    check_generative_overuse,        # counts GenerativeBackdrop segments (≤1/episode)
     check_bgmode_consistency,        # reads dataFile.backgroundVariant per beat
     check_manifest_staleness,        # reads mtime(script) vs mtime(manifest)
 ]

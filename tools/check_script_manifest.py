@@ -69,15 +69,22 @@ def datafile_refs_in_script(script_text: str, slug: str) -> set[str]:
 def find_script(slug: str) -> Path | None:
     """Pick the canonical production script for an episode.
 
-    Convention: `script-production.md` (prisoners-dilemma) OR
-    `script-v<N>-production.md` (silicon-trap had v3/v4/v5). When versions
-    are present, return the highest-numbered one.
+    Resolution order (EPISODE_STRUCTURE.md):
+      1. script.md (new canonical name)
+      2. script-production.md (legacy canonical)
+      3. Highest script-v<N>-production.md at root (legacy versioned)
+      4. Highest script-v*.md in drafts/ (fallback)
     """
     episode_dir = EPISODES_ROOT / slug
     if not episode_dir.is_dir():
         return None
 
-    # Single canonical name first
+    # New canonical name (EPISODE_STRUCTURE.md)
+    plain = episode_dir / "script.md"
+    if plain.is_file():
+        return plain
+
+    # Legacy canonical name
     canonical = episode_dir / "script-production.md"
     if canonical.is_file():
         return canonical
@@ -90,6 +97,16 @@ def find_script(slug: str) -> Path | None:
     )
     if versioned:
         return versioned[0]
+    # Drafts fallback
+    drafts_dir = episode_dir / "drafts"
+    if drafts_dir.is_dir():
+        drafts_v = sorted(
+            drafts_dir.glob("script-v*.md"),
+            key=lambda p: int(re.search(r"v(\d+)", p.name).group(1)) if re.search(r"v(\d+)", p.name) else 0,
+            reverse=True,
+        )
+        if drafts_v:
+            return drafts_v[0]
     return None
 
 

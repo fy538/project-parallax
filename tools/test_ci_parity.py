@@ -128,6 +128,21 @@ COVERAGE_CONTRACT: list[dict[str, str]] = [
         "pattern": r"narration/audio_qa\.py",
         "covered_by": "tools/narration/test_audio_qa.py — 36 tests covering parsers (loudnorm JSON, silencedetect line pairing), per-check finders (loudness/format/silences), CLI smoke, and ffmpeg-backed integration tests against synthesized WAVs. Wired into check-episode.sh as W10 (skipped if narration.wav absent).",
     },
+    {
+        "name": "lint/check_anchor_bridge.py",
+        "pattern": r"lint/check_anchor_bridge\.py",
+        "covered_by": "tools/lint/test_check_anchor_bridge.py — unit tests covering anchor/text-heavy classification, beat-level flag logic (no-anchor + wall-of-typography), skip guards, and real-episode regression. Wired into check-episode.sh as W12 (skipped if no script exists).",
+    },
+    {
+        "name": "topic/signal_monitor.py",
+        "pattern": r"topic/signal_monitor\.py",
+        "covered_by": "tools/topic/test_signal_monitor.py (if it exists) + the --check-staleness flag is a read-only state-file check (no network) exercised informally each check-episode.sh run. Wired as W13.",
+    },
+    {
+        "name": "cost_tracker.py",
+        "pattern": r"cost_tracker\.py",
+        "covered_by": "Referenced in check-episode.sh W14 hint text (not directly invoked — the W14 check is an inline Python heredoc). No dedicated test yet; cost_tracker.py is a data-entry CLI with minimal logic.",
+    },
 ]
 
 

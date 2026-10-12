@@ -382,7 +382,7 @@ class TestCliSmoke:
         """Smoke against the launch-candidate script. Should run cleanly."""
         script_dir = REPO_ROOT / "episodes" / "prisoners-dilemma"
         if not (
-            (script_dir / "script-production.md").is_file()
+            (script_dir / "script.md").is_file() or (script_dir / "script-production.md").is_file()
             or list(script_dir.glob("script-v*-production.md"))
         ):
             pytest.skip("prisoners-dilemma script not present in this checkout")

@@ -28,6 +28,7 @@ Usage:
 """
 
 import argparse
+import copy
 import json
 import re
 import sys
@@ -95,6 +96,22 @@ def valid_backdrop_ids() -> frozenset[str]:
 # Matches: DIR: type(params)
 DIR_LINE_RE = re.compile(r"^\s*DIR:\s*(\w+)\((.+?)\)\s*$")
 
+# ── AMB: annotation parsing ───────────────────────────────────────────────
+# Matches `[AMB: archive-room]` or `AMB: archive-room` (with or without brackets)
+# Used in the visual column to override the ambient soundscape register for a segment.
+AMB_LINE_RE = re.compile(r"^\[?AMB:\s*([a-z-]+)\]?\s*$", re.IGNORECASE)
+
+# Valid ambient soundscape registers (must stay in sync with
+# remotion-templates/src/audio/soundscapeRegistry.ts SoundscapeRegister enum).
+VALID_SOUNDSCAPE_REGISTERS = frozenset({
+    "archive-room",
+    "editorial-print",
+    "atmospheric-outdoor",
+    "cinematic-dark",
+    "cyclical-drone",
+    "silence",
+})
+
 # Hold presets → (holdAfter, holdBehavior)
 HOLD_PRESETS = {
     "breathe": (2.0, "breathe"),
@@ -142,6 +159,9 @@ MATCH_CUT_STILL_TEMPLATES = {
     "AnnotatedImage",
     "RouteAnimation",
     "PhotoMontage",
+    "CinematicMap",    # consecutive terrain shots lock to composition (same camera space)
+    "TerritoryMap",    # consecutive territory segments share the same map canvas
+    "FlowMap",         # consecutive flow maps share the same basemap
 }
 
 # Deprecated transitions per Phase 3 of TRANSITION_GRAMMAR.md. Each entry
@@ -192,6 +212,11 @@ VALID_TEXT_ANIMATIONS = {
     "stat-caption",
     "quote-attribution",
 }
+
+# Templates that can be drawn over a held picture (DIR: over(previous) —
+# hold-under, TRANSITION_GRAMMAR.md § "On the episode timeline"). Mirrors the
+# `overPicture` support in remotion-templates/src/templates; extend both together.
+OVER_PICTURE_TEMPLATES = {"KineticTypography"}
 
 # ── PACE: annotation parsing ─────────────────────────────────────────────
 # Matches: PACE: profile
@@ -321,13 +346,49 @@ COMPOSITE_RE = re.compile(
 #   - FullEpisode TEMPLATE_COMPONENTS map
 #   - assembly-manifest.schema.json segment.template.component enum
 ALL_TEMPLATES = [
-    "TitleTransition", "KineticTypography", "DataChart", "TimelineComparison",
+    # ── Core (original) ──────────────────────────────────────────────────────
+    "TitleTransition", "KineticTypography", "DataChart",
     "FrameworkDiagram", "ChoroplethMap", "RouteAnimation", "DecisionTree",
     "SplitComposition", "ProbabilityGauge", "ImageComposite", "PhotoMontage",
     "NetworkDiagram", "TimeSeriesChart", "SankeyFlow", "GameBoard",
-    "BayesianUpdate", "StatReveal", "RadarChart", "AnnotatedImage",
-    "EscalationLadder", "HorizontalTimeline", "BifurcationRoute",
-    "DualTimeline", "DuelingFrameworks", "StrategicLandscape", "TimelineMorph",
+    "BayesianUpdate", "StatReveal", "RadarChart", "AnnotatedImage", "ScrollyReveal",
+    "EscalationLadder", "HorizontalTimeline", "HorizontalTimelineSingle",
+    "DuelingFrameworks", "StrategicLandscape",
+    # ── Audit #5 backfill (May 2026) — expanded chart/diagram library ────────
+    "ArcDiagram", "ProportionalSymbolMap", "Slopegraph", "KPICard",
+    "BulletChart", "StepLine", "OutcomePartition", "PricingWaterfall",
+    "AtlasPlate", "BeeswarmChart", "BumpChart", "CalendarHeatmap",
+    "CartogramMap", "ConnectedScatterplot", "DensityMap", "DumbbellPlot",
+    "HorizonChart", "IsotypeChart", "MarimekkoChart", "PopulationPyramid",
+    "RankChangeDotPlot", "RidgelinePlot", "Streamgraph", "TernaryPlot",
+    "TilegramUSMap",
+    # ── May 2026 sprint — new template families ───────────────────────────────
+    "CinematicMap",          # 3D terrain fly-through (Mapbox FreeCamera)
+    "TerritoryMap",          # animated territorial control over timesteps
+    "FlowMap",               # directional volume flows (arc width = magnitude)
+    "CausalLoopDiagram", "SpiralTimeline", "PrimarySourceReveal", "SmallMultiples",
+    "HandwrittenLetter", "NewspaperHeadlineRotator", "ArchivalReel", "TelegramCable",
+    "Syllogism", "AxiomList", "DialecticFlow", "ConditionalArgument", "CounterfactualPath",
+    "AnalogyCrossmap", "ToulminMap",
+    "PhilosophicalFamilyTree",  # ArcDiagram-variant with year-based x-axis
+    "ConceptEvolutionTimeline", # HorizontalTimeline-variant with per-node definition panels
+    "DivergingBar",             # centered horizontal bar (positive right / negative left)
+    "DotPlot",                  # 1D strip chart: named entities along a continuous axis
+    "OrgChart",                 # directed authority tree (NCA, ORBAT, procurement chains)
+    "AnnotatedZoom",            # cinematic zoom regions on a 2D image/map canvas
+    "BubbleMatrix",             # 4-variable scatter (X/Y/size/color) — Gapminder register
+    "BarChartRace",             # animated rank race: bars animate width + vertical position
+    "SanctionsNetwork",         # typed sanctions architecture: sanctioner/target/relay/sector nodes
+    "ComparisonPair", "MorphTransition", "SplitFrame",
+    "VennDiagram", "ChordDiagram", "Treemap", "MatrixHeatmap",
+    "MathReveal", "MathDerivation",
+    # ── DEPRECATED — kept for regex-matching old scripts during migration ─────
+    # Do NOT use these in new episode manifests. They will not resolve in
+    # FullEpisode TEMPLATE_COMPONENTS and will fail at render time.
+    "TimelineComparison",    # deprecated May 2026 — use HorizontalTimeline
+    "BifurcationRoute",      # deprecated — use RouteAnimation with radial: {} field
+    "DualTimeline",          # deprecated May 2026 — use HorizontalTimeline
+    "TimelineMorph",         # deprecated — use MorphTransition
 ]
 _TEMPLATE_NAMES = "|".join(ALL_TEMPLATES)
 
@@ -562,7 +623,8 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
 
     Returns dict with keys: holdAfter, holdBehavior, preDelay, transitionOut,
     transitionDuration, washColor, narrationGate, syncWords, textAnimation,
-    isCallback, narrationLeadIn (jcut), narrationLagOut (lcut).
+    isCallback, narrationLeadIn (jcut), narrationLagOut (lcut),
+    overPrevious / overDim (over).
     """
     result = {}
 
@@ -745,6 +807,22 @@ def parse_dir_lines(dir_lines: list[str]) -> dict:
                     chapter["slug"] = _slugify_chapter_title(chapter["title"])
                 result["chapter"] = chapter
 
+        elif dtype == "over":
+            # Parse over(previous) — hold-under (TRANSITION_GRAMMAR.md § "On
+            # the episode timeline"). This card is set over the picture before
+            # it: the picture is held on its last frame and dimmed for the
+            # length of the card. `previous` is the only target.
+            # Grammar:
+            #   over(previous)
+            #   over(previous, dim:0.6)   — how far the picture is darkened (0–1)
+            tokens = [t.strip() for t in re.split(r",\s*", params_str)]
+            if tokens and tokens[0].lower() == "previous":
+                result["overPrevious"] = True
+                for token in tokens[1:]:
+                    dim_m = re.match(r"^dim:\s*(\d*\.?\d+)$", token)
+                    if dim_m:
+                        result["overDim"] = min(1.0, float(dim_m.group(1)))
+
         elif dtype == "jcut":
             # Parse jcut(N) — J-cut audio bridge (TRANSITION_GRAMMAR.md §07).
             # Sets narrationLeadIn: the narrator's audio for THIS segment begins
@@ -814,7 +892,7 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
 
     for line in lines:
         # Stop at ASSET SUMMARY — everything below is metadata, not narration
-        if re.match(r"^##\s+ASSET\s+SUMMARY", line, re.IGNORECASE):
+        if re.match(r"^##\s+(ASSET\s+SUMMARY|CLAIM\s+VERIFICATION)", line, re.IGNORECASE):
             break
 
         # Also stop at PRODUCTION NOTES
@@ -874,16 +952,48 @@ def parse_script(script_path: str) -> tuple[list[Beat], list[dict]]:
                               f"(valid: {', '.join(PACE_MULTIPLIERS.keys())})")
                     continue
 
+            # Check if this is an AMB: continuation line (empty narration, AMB: in visual)
+            if not narr:
+                amb_m = AMB_LINE_RE.match(vis.strip())
+                if amb_m:
+                    register = amb_m.group(1).lower()
+                    if register in VALID_SOUNDSCAPE_REGISTERS:
+                        if rows:
+                            rows[-1]["amb_register"] = register
+                    else:
+                        print(f"  Warning: unknown AMB register '{register}' "
+                              f"(valid: {', '.join(sorted(VALID_SOUNDSCAPE_REGISTERS))})")
+                    continue
+
+            # Extract any inline [AMB: register] tag from the visual cell.
+            # Handles the case where AMB: appears on the same row as the visual
+            # spec, e.g. "[MG:] StatReveal  [AMB: silence]". The tag is stripped
+            # conceptually; parse_visual_spec receives the full string but the
+            # [AMB:] bracket form is not a recognized visual token so it is
+            # silently ignored by the parser, which is the correct behavior.
+            amb_register_inline = None
+            amb_inline_m = re.search(r"\[AMB:\s*([a-z-]+)\]", vis, re.IGNORECASE)
+            if amb_inline_m:
+                candidate = amb_inline_m.group(1).lower()
+                if candidate in VALID_SOUNDSCAPE_REGISTERS:
+                    amb_register_inline = candidate
+                else:
+                    print(f"  Warning: unknown AMB register '{candidate}' in visual spec "
+                          f"(valid: {', '.join(sorted(VALID_SOUNDSCAPE_REGISTERS))})")
+
             parsed = parse_visual_spec(vis)
 
-            rows.append({
+            row_entry: dict = {
                 "beat": current_beat.id if current_beat else "opening",
                 "narration": narr,
                 "visual_raw": vis,
                 "parsed": parsed,
                 "dir_lines": [],
                 "pace": current_pace,
-            })
+            }
+            if amb_register_inline:
+                row_entry["amb_register"] = amb_register_inline
+            rows.append(row_entry)
 
             # Also check if the visual cell itself contains DIR: (inline)
             if "DIR:" in vis and not vis.strip().startswith("DIR:"):
@@ -980,9 +1090,27 @@ def resolve_shot_id(search_terms: list[str], shot_ids: dict = None) -> str | Non
     return None
 
 
-def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict | None = None) -> str | None:
-    """Try to resolve which Remotion data file a template segment references."""
+def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, data_files: dict | None = None) -> str | list[str] | None:
+    """Try to resolve which Remotion data file(s) a template segment references.
+
+    Returns a string for a single data file, or a LIST of filenames when the
+    spec uses brace-expansion notation `[slug/prefix-{a,b,c}.json]` (e.g. an
+    AnnotatedImage triptych). The list is later split into N sequential cards
+    by expand_brace_segments().
+    """
     vis_lower = vis_raw.lower()
+
+    # Brace-expansion form: [slug/prefix-{a,b,c}.json] → [prefix-a.json, prefix-b.json, ...]
+    # Used for triptychs / multi-card sequences declared in one script row.
+    brace_m = re.search(
+        r'\[(?:[a-z0-9-]+/)?([a-z0-9-]*)\{([a-z0-9,\-\s]+)\}([a-z0-9-]*\.json)\]',
+        vis_raw,
+    )
+    if brace_m:
+        prefix, items, suffix = brace_m.group(1), brace_m.group(2), brace_m.group(3)
+        expanded = [f"{prefix}{it.strip()}{suffix}" for it in items.split(",") if it.strip()]
+        if expanded:
+            return expanded
 
     # Direct extraction: [episode-slug/filename.json] or [filename.json] in spec
     bracket_m = re.search(r'\[(?:[a-z0-9-]+/)?([a-z0-9-]+\.json)\]', vis_raw)
@@ -1052,11 +1180,82 @@ def resolve_data_file(component: str, search_terms: list[str], vis_raw: str, dat
         ("bifurcation", None),  # route-chip-supply variant — not yet built
     ]
 
-    for keyword, data_file in heuristics:
-        if keyword.lower() in vis_lower:
-            return data_file
+    # These keyword heuristics are silicon-trap-specific. Apply them ONLY in
+    # silicon-trap default mode (data_files is None). For config-driven episodes
+    # (data_files is a dict), they must NOT run — otherwise stray matches like
+    # "the trap" leak in and emit silicon-trap files (e.g. title-section-trap.json)
+    # that don't exist in the other episode's data dir (broken refs).
+    if data_files is None:
+        for keyword, data_file in heuristics:
+            if keyword.lower() in vis_lower:
+                return data_file
 
     return None
+
+
+def apply_over_previous(seg: dict, prev: dict | None, direction: dict) -> None:
+    """DIR: over(previous) — set this card over the held, dimmed picture before it.
+
+    Writes `layered.backgroundSegmentId` on the card. FullEpisode's seam
+    resolver (resolveSeams.ts, rule 6) then keeps that picture on its last
+    frame for the whole card and draws the card with a transparent ground,
+    light type and no chrome. The directive is dropped, with a warning, when
+    the engine could not honour it.
+    """
+    if not direction.get("overPrevious"):
+        return
+    comp = (seg.get("template") or {}).get("component")
+    problem = None
+    if prev is None or prev.get("layer") != "background":
+        problem = "the segment before it is not a picture (footage, still or AI-GEN)"
+    elif comp not in OVER_PICTURE_TEMPLATES:
+        supported = ", ".join(sorted(OVER_PICTURE_TEMPLATES))
+        problem = f"{comp or seg.get('type')} cannot be drawn over a picture ({supported} only)"
+    elif abs(seg["startSec"] - prev["endSec"]) > 1 / FPS:
+        problem = "the card does not start where the picture ends (drop hold(pre:…) from the card)"
+    if problem:
+        print(f"⚠  DIR: over(previous) ignored on {seg['id']} — {problem}.", file=sys.stderr)
+        return
+    layered = {"backgroundSegmentId": prev["id"], "position": "full"}
+    if "overDim" in direction:
+        layered["backgroundDim"] = direction["overDim"]
+    seg["layered"] = layered
+
+
+def expand_brace_segments(segments: list[dict]) -> list[dict]:
+    """Expand any segment carrying `_braceDataFiles` into N sequential cards.
+
+    A script row like:
+        [MG:] AnnotatedImage TRIPTYCH … [slug/annotated-image-{valencia,torbel,maine}.json] · 12.8s
+    builds ONE segment whose resolve_data_file() returned a list. Here we split
+    that segment into N cards that evenly subdivide its [startSec, endSec] window
+    (so total episode timing is unchanged), each carrying one data file and an
+    id suffixed a/b/c…. Segments without the marker pass through untouched.
+    """
+    out: list[dict] = []
+    for seg in segments:
+        files = seg.pop("_braceDataFiles", None)
+        if not files:
+            out.append(seg)
+            continue
+        if len(files) == 1:
+            seg["template"]["dataFile"] = files[0]
+            out.append(seg)
+            continue
+        start = seg.get("startSec", 0.0)
+        end = seg.get("endSec", start)
+        span = (end - start) / len(files)
+        for k, fname in enumerate(files):
+            card = copy.deepcopy(seg)
+            card["id"] = f"{seg['id']}{chr(ord('a') + k)}"
+            card["startSec"] = round(start + k * span, 2)
+            card["endSec"] = round(start + (k + 1) * span, 2)
+            if k > 0:
+                # Only the first card follows the picture it is set over.
+                card.pop("layered", None)
+            card["template"]["dataFile"] = fname
+            out.append(card)
+    return out
 
 
 def apply_default_transitions(segments: list[dict]) -> list[dict]:
@@ -1065,10 +1264,12 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
 
     Transition design rules (Layer 3 — Cross-clip Pacing):
 
-    1. BEAT BOUNDARIES: When consecutive segments belong to different beats,
-       use dissolve (0.5s) to signal a structural shift. This is the most
-       important transition — viewers unconsciously register beat changes
-       through the visual rhythm shift.
+    1. BEAT BOUNDARIES: a cut, like every other seam (revised Oct 10, 2026;
+       this used to hand out a 0.5s dissolve). A dissolve claims that time or
+       place has changed, and a beat boundary usually changes neither. Mark a
+       real chapter break in the script with `DIR: cut(fade)` (a dip through
+       ink) or a chapter card; ask for a dissolve with `DIR: cut(dissolve)`.
+       See TRANSITION_GRAMMAR.md § "By seam type".
 
     2. TITLE CARDS: TitleTransition segments (section headers, episode
        title, end card) always fade in/out (0.6s). They're structural
@@ -1161,10 +1362,9 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
             if prev.get("_dirTransitionDuration"):
                 dur = prev["_dirTransitionDuration"]
 
-        # Rule 1: Beat boundaries → dissolve
-        if beat_changed and not is_title and not (prev and prev.get("_dirTransitionOut")):
-            trans_in = "dissolve"
-            dur = 0.5
+        # Rule 1: Beat boundaries → cut (the default already). Until Oct 10,
+        # 2026 this assigned a 0.5s dissolve; see the docstring. A dissolve
+        # or a chapter dip now only comes from a DIR directive (Rule 0).
 
         # Rule 2: Title cards → fade
         if is_title:
@@ -1224,12 +1424,10 @@ def apply_default_transitions(segments: list[dict]) -> list[dict]:
                     trans_in = "cut"
                     dur = 0
             elif seg_pace == "breathing":
-                # Breathing: stretch transitions, upgrade cuts to dissolves
-                dur = round(dur * 1.5, 2)  # e.g. 0.5s → 0.75s
-                # Upgrade within-beat cuts to soft dissolves (let it breathe)
-                if trans_in == "cut" and not is_title and not beat_changed:
-                    trans_in = "dissolve"
-                    dur = 0.4
+                # Breathing: stretch whatever transition is already there.
+                # It no longer turns cuts into dissolves (revised Oct 10,
+                # 2026): pace sets how long a seam takes, not what it claims.
+                dur = round(dur * 1.5, 2)  # e.g. 0.6s title fade → 0.9s
 
         # Phase 7: J-cut audio bridge default (TRANSITION_GRAMMAR.md §07)
         # Every hard cut gets narrationLeadIn: 0.7 so the NLE editor has
@@ -1288,10 +1486,78 @@ TEMPLATE_AUDIO_MAP = {
     "StatReveal": (None, None, "stat-reveal", "dramatic"),
     "RadarChart": ("beat-transition", "normal", None, None),
     "AnnotatedImage": (None, None, None, None),
+    "ScrollyReveal": (None, None, None, None),
+    "GenerativeBackdrop": (None, None, None, None),
     "EscalationLadder": ("tension-rise", "normal", None, None),
     "StrategicLandscape": ("beat-transition", "normal", None, None),
     "DuelingFrameworks": ("beat-transition", "normal", "tension-resolve", "normal"),
     "DualTimeline": ("beat-transition", "normal", None, None),
+
+    # Documentary-Archival templates (shipped May 19, 2026)
+    "CausalLoopDiagram": ("beat-transition", "normal", None, None),
+    "SpiralTimeline": ("beat-transition", "normal", None, None),
+    "PrimarySourceReveal": (None, None, None, None),    # silence — document-of-record; no SFX intro
+    "SmallMultiples": (None, None, "stat-reveal", "subtle"),
+    "HandwrittenLetter": (None, None, None, None),       # silence — intimate; no SFX
+    "NewspaperHeadlineRotator": ("beat-transition", "subtle", None, None),
+    "ArchivalReel": (None, None, None, None),             # native footage — no SFX overlay
+    "TelegramCable": (None, None, None, None),            # silence — document-of-record
+
+    # Argument Primitives templates (shipped May 19, 2026)
+    "Syllogism": (None, None, None, None),                # silence — pure logic; SFX would trivialize
+    "AxiomList": (None, None, None, None),                # silence — foundational claims; no SFX
+    "DialecticFlow": ("beat-transition", "subtle", "tension-resolve", "subtle"),
+    "ConditionalArgument": ("beat-transition", "normal", None, None),
+    "CounterfactualPath": ("tension-rise", "normal", "tension-resolve", "subtle"),
+    "AnalogyCrossmap": ("beat-transition", "normal", None, None),
+    "ToulminMap": ("beat-transition", "normal", None, None),
+
+    # Tier 2 + Tier 3 templates (shipped May 20, 2026)
+    "PhilosophicalFamilyTree": ("beat-transition", "normal", None, None),
+    "ConceptEvolutionTimeline": ("beat-transition", "subtle", None, None),
+    "DivergingBar": ("stat-reveal", "normal", None, None),   # bar-out animation = data stat reveal
+    "DotPlot": ("beat-transition", "subtle", None, None),    # dots appear quietly; argument is position
+    "OrgChart": ("section-open", "subtle", None, None),      # hierarchy reveal = section-establishing
+
+    # Sprint 2026-05-20 — four new templates (AnnotatedZoom, BubbleMatrix, BarChartRace, SanctionsNetwork)
+    "AnnotatedZoom": (None, None, None, None),              # zoom IS the motion; no ambient cue
+    "BubbleMatrix": ("beat-transition", "subtle", None, None),  # Gapminder scatter; quiet reveal
+    "BarChartRace": ("stat-reveal", "normal", None, None),  # rank-race arrival = stat moment
+    "SanctionsNetwork": ("section-open", "subtle", None, None), # network architecture = section-establishing
+
+    # Motion Primitives templates (shipped May 19, 2026)
+    "ComparisonPair": ("beat-transition", "normal", None, None),
+    "MorphTransition": ("stat-reveal", "normal", None, None),
+    # Composition primitive (shipped May 19, 2026)
+    # SplitFrame: quiet section-open cue at entrance; pane templates fire their own cues.
+    "SplitFrame": ("section-open", "subtle", None, None),
+
+    # Relationship / composition templates (shipped May 19, 2026)
+    "VennDiagram": ("beat-transition", "subtle", None, None),
+    "ChordDiagram": ("beat-transition", "normal", None, None),
+    "Treemap": ("section-open", "subtle", None, None),
+    "MatrixHeatmap": ("beat-transition", "subtle", None, None),
+
+    # Terrain fly-through (shipped May 19, 2026)
+    # Subtle map-whoosh marks entering cinematic map space; no data stat cue
+    # (the camera path IS the argument — no discrete data event to punctuate).
+    "CinematicMap": ("map-whoosh", "subtle", None, None),
+
+    # Map extensions (shipped May 20, 2026)
+    # TerritoryMap: map-whoosh on entry; timestep transitions driven by the
+    # timeline strip not discrete audio events (no data-stat cue).
+    "TerritoryMap": ("map-whoosh", "normal", None, None),
+    # FlowMap: map-whoosh on entry; arc reveal cues in stagger mode would need
+    # per-flow timing which is not yet supported — leave as None for now.
+    "FlowMap": ("map-whoosh", "normal", None, None),
+
+    # Math templates — promoted to manifest-level May 20, 2026.
+    # Quiet analytical register: beat-transition (subtle) marks the equation
+    # appearing; no data-stat cue (no countable bar/number to punctuate).
+    "MathReveal": ("beat-transition", "subtle", None, None),
+    "MathDerivation": ("beat-transition", "subtle", None, None),
+    # HorizontalTimelineSingle: same register as HorizontalTimeline.
+    "HorizontalTimelineSingle": ("beat-transition", "subtle", None, None),
 }
 
 # Template → texture hit patterns
@@ -1318,6 +1584,24 @@ TEMPLATE_TEXTURE_MAP = {
     "StrategicLandscape": [("node-pop", 0.25, 0.08), ("node-pop", 0.45, 0.06)],
     "KineticTypography": [("card-settle", 0.25, 0.06)],  # quote/bilingual only
     "PhotoMontage": [("page-turn", 0.50, 0.06)],
+
+    # Documentary-Archival templates (shipped May 19, 2026)
+    "CausalLoopDiagram": [("node-pop", 0.20, 0.06), ("line-draw", 0.40, 0.06)],
+    "SpiralTimeline": [("dot-click", 0.20, 0.06), ("dot-click", 0.45, 0.06)],
+    "NewspaperHeadlineRotator": [("page-turn", 0.33, 0.06), ("page-turn", 0.66, 0.06)],
+
+    # Argument Primitives templates (shipped May 19, 2026)
+    "DialecticFlow": [("card-settle", 0.30, 0.06), ("card-settle", 0.60, 0.06)],
+    "CounterfactualPath": [("line-draw", 0.30, 0.06), ("line-draw", 0.60, 0.06)],
+
+    # Motion Primitives templates (shipped May 19, 2026)
+    "MorphTransition": [("bar-grow", 0.55, 0.08)],
+
+    # Relationship / composition templates (shipped May 19, 2026)
+    "VennDiagram": [("node-pop", 0.25, 0.08), ("node-pop", 0.50, 0.06)],
+    "ChordDiagram": [("line-draw", 0.30, 0.08), ("line-draw", 0.55, 0.06)],
+    "Treemap": [("card-settle", 0.30, 0.06), ("card-settle", 0.55, 0.06)],
+    "MatrixHeatmap": [("region-glow", 0.35, 0.08), ("region-glow", 0.60, 0.06)],
 }
 
 # Mood mapping for beats based on common keywords/patterns
@@ -1424,8 +1708,18 @@ def apply_audio_cues(segments: list[dict]) -> list[dict]:
         entrance_type, entrance_int, key_type, key_int = audio
         dur = seg["endSec"] - seg["startSec"]
 
+        # Guard: if the segment already has a soundscape.transitionIn authored
+        # (e.g. via an explicit script directive), skip the soundCue assignment
+        # entirely to prevent double-fire (AudioLayer + SoundscapeMount both
+        # playing the same cue at frame 0). Soundscape.tsx takes precedence.
+        has_soundscape_transition_in = bool(
+            seg.get("template", {})
+               .get("soundscape", {})
+               .get("transitionIn")
+        )
+
         # Apply entrance soundCue
-        if entrance_type:
+        if entrance_type and not has_soundscape_transition_in:
             seg["soundCue"] = {
                 "type": entrance_type,
                 "offsetSec": 0,
@@ -1435,13 +1729,13 @@ def apply_audio_cues(segments: list[dict]) -> list[dict]:
         # Apply key moment as secondary soundCue
         if key_type:
             offset = round(dur * 0.6, 1)  # key moment typically at ~60% of duration
-            if entrance_type:
+            if entrance_type and not has_soundscape_transition_in:
                 seg["soundCueSecondary"] = {
                     "type": key_type,
                     "offsetSec": offset,
                     "intensity": key_int,
                 }
-            else:
+            elif not has_soundscape_transition_in:
                 seg["soundCue"] = {
                     "type": key_type,
                     "offsetSec": offset,
@@ -1506,6 +1800,9 @@ def build_estimate_manifest(
 
         # Parse direction annotations for this row
         direction = parse_dir_lines(dir_lines) if dir_lines else {}
+
+        # Soundscape override: [AMB: register] directive from script
+        amb_register = row.get("amb_register")
 
         # Clean narration text for word-count estimation
         clean_narr = ""
@@ -1630,6 +1927,10 @@ def build_estimate_manifest(
                     data_files=data_files, shot_ids=shot_ids,
                     direction=part_direction,
                 )
+                # over(previous) belongs to the first part — the one that
+                # follows the picture.
+                if i == 0:
+                    apply_over_previous(seg, segments[-1] if segments else None, direction)
                 # Stash direction transition on the last part of a THEN chain
                 if is_last_part and direction.get("transitionOut"):
                     seg["_dirTransitionOut"] = direction["transitionOut"]
@@ -1641,6 +1942,9 @@ def build_estimate_manifest(
                     seg["paceProfile"] = row["pace"]
                 if _pace_applied:
                     seg["_paceApplied"] = True
+                # AMB: soundscape override — apply to TEMPLATE/TRANSITION segments only
+                if amb_register and seg.get("type") in ("TEMPLATE", "TRANSITION"):
+                    seg.setdefault("template", {})["soundscape"] = {"ambient": amb_register}
                 segments.append(seg)
                 sub_cursor += sub_dur
         else:
@@ -1651,6 +1955,7 @@ def build_estimate_manifest(
                 data_files=data_files, shot_ids=shot_ids,
                 direction=direction,
             )
+            apply_over_previous(seg, segments[-1] if segments else None, direction)
 
             # Stash direction transition info for apply_default_transitions
             if direction.get("transitionOut"):
@@ -1666,12 +1971,20 @@ def build_estimate_manifest(
             if _pace_applied:
                 seg["_paceApplied"] = True
 
+            # AMB: soundscape override — apply to TEMPLATE/TRANSITION segments only
+            if amb_register and seg.get("type") in ("TEMPLATE", "TRANSITION"):
+                seg.setdefault("template", {})["soundscape"] = {"ambient": amb_register}
+
             segments.append(seg)
 
         # Advance cursor by row duration + holdAfter (direction extends segment
         # but also pushes all subsequent timing forward)
         hold_extra = direction.get("holdAfter", 0)
         cursor += row_dur + hold_extra
+
+    # Expand brace-notation data refs (triptychs etc.) into N cards before
+    # transitions are computed, so dissolves are applied between the cards too.
+    segments = expand_brace_segments(segments)
 
     # Apply default transitions based on context (direction overrides take priority)
     segments = apply_default_transitions(segments)
@@ -1748,6 +2061,11 @@ def build_estimate_manifest(
             for b in beats
         ],
         "segments": segments,
+        # Episode-level soundscape default (manifest.soundscape) is NOT set here —
+        # per-segment [AMB:] directives set segment.template.soundscape.ambient.
+        # A future `[AMB: register]` in the script HEADER (before any beat) would
+        # set the episode default; that's a Phase 2 feature. For now, the cascade
+        # falls to TEMPLATE_SOUNDSCAPE_DEFAULTS (level 3) then channel default (level 5).
     }
 
     return manifest, rows
@@ -2094,7 +2412,15 @@ def _build_segment(
         seg["template"] = {
             "component": parsed["component"],
         }
-        if data_file:
+        if isinstance(data_file, list):
+            # Brace-expanded ref (e.g. annotated-image-{a,b,c}.json). Record the
+            # first card's data file now and stash the full list; the seg is
+            # split into N sequential cards by expand_brace_segments() after the
+            # build loop, so the per-row caller logic stays untouched.
+            if data_file:
+                seg["template"]["dataFile"] = data_file[0]
+                seg["_braceDataFiles"] = data_file
+        elif data_file:
             seg["template"]["dataFile"] = data_file
 
         # Phase 6 chapter sugar — inline title metadata. When the segment
@@ -2267,7 +2593,9 @@ def get_audio_duration(audio_path: str) -> float:
         return 0.0
 
 
-def transcribe_whisperx(audio_path: str, hf_token: str | None = None) -> tuple[float, list[dict]]:
+def transcribe_whisperx(
+    audio_path: str, hf_token: str | None = None, language: str = "en"
+) -> tuple[float, list[dict]]:
     """
     Run WhisperX on narration audio for phoneme-level word timestamps.
 
@@ -2275,6 +2603,12 @@ def transcribe_whisperx(audio_path: str, hf_token: str | None = None) -> tuple[f
       1. Transcribe with Whisper (fast, but coarse timestamps)
       2. Force-align with wav2vec2 (phoneme-level precision, ±50ms)
       3. Return word-level timestamps
+
+    `language` selects the model + alignment model:
+      "en" → English-only "base.en" model (fastest, default)
+      "zh" → multilingual "base" model with forced language="zh"; WhisperX
+             loads a Mandarin wav2vec2 alignment model. Used for the separate
+             ZH narration + render cut (one full pipeline pass per language).
 
     Returns: (total_duration_sec, [{"word": str, "start": float, "end": float}, ...])
     """
@@ -2296,18 +2630,26 @@ def transcribe_whisperx(audio_path: str, hf_token: str | None = None) -> tuple[f
     compute_type = "float16" if device == "cuda" else "int8"
     hf_token = hf_token or os.environ.get("HF_TOKEN")
 
+    # English-only model is faster; any other language needs the multilingual base.
+    model_name = "base.en" if language == "en" else "base"
+
     # Step 1: Transcribe with Whisper (coarse timestamps)
-    print(f"  Loading WhisperX model (base.en) on {device}...")
-    model = whisperx.load_model("base.en", device, compute_type=compute_type)
+    print(f"  Loading WhisperX model ({model_name}, lang={language}) on {device}...")
+    model = whisperx.load_model(model_name, device, compute_type=compute_type)
 
     print(f"  Transcribing {audio_path}...")
     audio = whisperx.load_audio(audio_path)
-    result = model.transcribe(audio, batch_size=16)
+    # base.en ignores the language hint; multilingual models need it forced so
+    # the transcriber doesn't mis-detect (e.g. short ZH clips read as Japanese).
+    transcribe_kwargs = {"batch_size": 16}
+    if model_name != "base.en":
+        transcribe_kwargs["language"] = language
+    result = model.transcribe(audio, **transcribe_kwargs)
 
     # Step 2: Force-align with wav2vec2 (phoneme-level precision)
     print("  Running phoneme-level forced alignment...")
     align_model, metadata = whisperx.load_align_model(
-        language_code="en", device=device
+        language_code=language, device=device
     )
     result = whisperx.align(
         result["segments"], align_model, metadata, audio, device,
@@ -2400,10 +2742,17 @@ def fuzzy_match_segment(
     return None
 
 
-def align_to_narration(manifest: dict, audio_path: str, hf_token: str | None = None) -> dict:
+def align_to_narration(
+    manifest: dict, audio_path: str, hf_token: str | None = None, language: str = "en"
+) -> dict:
     """
     Upgrade an estimate-mode manifest to precise mode by aligning
     segment boundaries to WhisperX word timestamps + SileroVAD pauses.
+
+    `language` ("en" | "zh") selects the WhisperX transcription/alignment models
+    so the same pipeline produces a fully native ZH cut from a translated script
+    + ZH narration WAV (the segments' narrationRef must be in that language for
+    fuzzy-matching to work).
 
     Pipeline:
       1. Detect dramatic pauses with SileroVAD → insert HOLD segments
@@ -2415,7 +2764,7 @@ def align_to_narration(manifest: dict, audio_path: str, hf_token: str | None = N
     pauses = detect_pauses(audio_path)
 
     # Step 2: Transcribe
-    total_dur, words = transcribe_whisperx(audio_path, hf_token)
+    total_dur, words = transcribe_whisperx(audio_path, hf_token, language=language)
 
     # Update manifest metadata
     manifest["mode"] = "precise"
@@ -2513,16 +2862,26 @@ def resolve_all_sync_points(segments: list[dict], words: list[dict]) -> None:
         seg_end = seg["endSec"]
         sync_points = []
 
+        # Cues are positional and written in narration order, so each one is
+        # searched after the one before it: a repeated word resolves to the
+        # occurrence the cue means, not always the first.
+        after = None
         for sw in sync_words:
-            match = _find_sync_word(sw, words, seg_start, seg_end)
+            match = _find_sync_word(sw, words, seg_start, seg_end, after=after)
             if match:
+                # How sure the transcriber was of the word (WhisperX calls it
+                # `score`, faster-whisper `probability`), times how exact the
+                # phrase match was.
+                heard = match.get("confidence", match.get("probability", match.get("score")))
+                heard = 1.0 if heard is None or heard < 0 else heard
                 sync_points.append({
                     "word": sw,
                     "timeSec": round(match["start"], 3),
                     "frame": round(match["start"] * FPS),
-                    "confidence": round(match.get("confidence", 1.0), 2),
+                    "confidence": round(heard * match["_score"], 2),
                 })
                 resolved_count += 1
+                after = match["start"] + 0.01
             else:
                 # Word not found in this segment's range — keep as unresolved
                 sync_points.append({
@@ -2539,48 +2898,133 @@ def resolve_all_sync_points(segments: list[dict], words: list[dict]) -> None:
         print(f"  Resolved {resolved_count} sync words to frame-accurate timestamps")
 
 
+_ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+         "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+         "eighteen", "nineteen"]
+_TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]
+
+# A fuzzy hit must be at least this similar, and the cue at least this long:
+# short words are where near-misses are wrong words ("our" inside "four").
+SYNC_FUZZY_RATIO = 0.88
+SYNC_FUZZY_MIN_CHARS = 5
+# How far outside its segment a cue word may fall (boundaries are themselves aligned).
+SYNC_RANGE_SLACK_SEC = 0.25
+
+
+def _int_words(n: int) -> list[str]:
+    """123 → ["one", "hundred", "twenty", "three"] (no "and")."""
+    if n < 20:
+        return [_ONES[n]]
+    if n < 100:
+        return [_TENS[n // 10]] + ([_ONES[n % 10]] if n % 10 else [])
+    if n < 1000:
+        return [_ONES[n // 100], "hundred"] + (_int_words(n % 100) if n % 100 else [])
+    if n < 1_000_000:
+        return _int_words(n // 1000) + ["thousand"] + (_int_words(n % 1000) if n % 1000 else [])
+    return [str(n)]
+
+
+def _sync_tokens(text: str) -> list[str]:
+    """Words as they are compared for sync cues: lower-case, no punctuation or
+    possessive, and numerals spelled out, so "40 times", "40x" and "forty
+    times" are the same three ways of writing one thing a narrator says."""
+    out: list[str] = []
+    for raw in re.split(r"[\s\-–—]+", text.lower().replace("’", "'")):
+        raw = re.sub(r"'s$", "", raw.strip(".,;:!?\"'()[]"))
+        if not raw:
+            continue
+        m = re.match(r"^\$?(\d[\d,]*)(?:\.(\d+))?(%|x|×)?$", raw)
+        if m:
+            out += _int_words(int(m.group(1).replace(",", "")))
+            if m.group(2):
+                out += ["point"] + [_ONES[int(d)] for d in m.group(2)]
+            if m.group(3):
+                out.append("percent" if m.group(3) == "%" else "times")
+            continue
+        raw = re.sub(r"[^\w]", "", raw)
+        if raw and not (raw == "and" and out and out[-1] in ("hundred", "thousand")):
+            out.append(raw)
+    return out
+
+
 def _find_sync_word(
-    sync_word: str, words: list[dict], seg_start: float, seg_end: float
+    sync_word: str, words: list[dict], seg_start: float, seg_end: float,
+    after: float | None = None,
 ) -> dict | None:
     """
-    Find a sync word in the WhisperX word stream within a segment's time range.
-    Uses case-insensitive matching with tolerance for hyphenated/compound words.
+    Find a sync cue in the word stream within a segment's time range.
+
+    The cue and the transcript are compared as spelled-out, punctuation-free
+    words (`_sync_tokens`), so numerals and possessives do not break a match.
+    An exact phrase match wins; otherwise the closest phrase is accepted only
+    when it is very close and the cue is long enough for that to mean something.
+    There is no "one string contains the other" fallback: it resolved cues to
+    unrelated short words.
+
+    `after` restricts the search to words starting at or after that time, so
+    the cues of one segment resolve in narration order.
+
+    Returns the transcript word the cue starts on, with `_score` (1.0 for an
+    exact match, the similarity for a fuzzy one), or None.
     """
-    sw_lower = sync_word.lower().strip()
+    cue = _sync_tokens(sync_word)
+    if not cue:
+        return None
+    lo = seg_start - SYNC_RANGE_SLACK_SEC
+    if after is not None:
+        lo = max(lo, after)
+    hi = seg_end + SYNC_RANGE_SLACK_SEC
 
-    # Try exact single-word match first
-    for w in words:
-        if w["start"] < seg_start - 0.5 or w["start"] > seg_end + 0.5:
+    # Flatten the in-range words to (token, word) pairs; one written word can
+    # be several spoken ones ("36" → thirty, six).
+    stream = [(tok, w) for w in words if lo <= w["start"] <= hi for tok in _sync_tokens(w["word"])]
+    n = len(cue)
+    for i in range(len(stream) - n + 1):
+        if [tok for tok, _ in stream[i:i + n]] == cue:
+            return {**stream[i][1], "_score": 1.0}
+
+    phrase = " ".join(cue)
+    if len(phrase) < SYNC_FUZZY_MIN_CHARS:
+        return None
+    from difflib import SequenceMatcher
+    best, best_ratio = None, 0.0
+    for i in range(len(stream) - n + 1):
+        window = [tok for tok, _ in stream[i:i + n]]
+        if window[0][:1] != cue[0][:1]:
             continue
-        if w["word"].strip().lower() == sw_lower:
-            return w
-
-    # Try multi-word match (sync word might be "ninety-two" or "single island")
-    sw_parts = re.split(r"[\s-]+", sw_lower)
-    if len(sw_parts) > 1:
-        # Sliding window over words in range
-        range_words = [
-            w for w in words
-            if seg_start - 0.5 <= w["start"] <= seg_end + 0.5
-        ]
-        for i in range(len(range_words) - len(sw_parts) + 1):
-            window = [range_words[i + j]["word"].strip().lower() for j in range(len(sw_parts))]
-            if window == sw_parts:
-                return range_words[i]
-
-    # Try partial/fuzzy match as fallback
-    for w in words:
-        if w["start"] < seg_start - 0.5 or w["start"] > seg_end + 0.5:
-            continue
-        w_lower = w["word"].strip().lower()
-        # Partial containment (e.g. sync "Taiwan" matches whisper "taiwan's")
-        if sw_lower in w_lower or w_lower in sw_lower:
-            return w
-
+        ratio = SequenceMatcher(None, phrase, " ".join(window)).ratio()
+        if ratio > best_ratio:
+            best, best_ratio = stream[i][1], ratio
+    if best is not None and best_ratio >= SYNC_FUZZY_RATIO:
+        return {**best, "_score": round(best_ratio, 3)}
     return None
 
 
 # ── CLI ────────────────────────────────────────────────────────────────────
+
+def hand_wired_refusal(out_path: Path, force: bool = False) -> str | None:
+    """Why this output must not be regenerated, or None if it may be.
+
+    A manifest marked `handWired` carries wiring the script cannot reproduce
+    (clip files, split rows, hold-under, per-seam transitions). Regenerating
+    would silently drop it, so the generator stops unless --force is given.
+    """
+    if force or not out_path.exists():
+        return None
+    try:
+        existing = json.loads(out_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    if not (isinstance(existing, dict) and existing.get("handWired")):
+        return None
+    return (
+        f"Refusing to overwrite {out_path}: it is marked handWired, and regenerating "
+        "from the script would drop its hand wiring.\n"
+        "  To move its timings to recorded narration: "
+        "python3 tools/assembly/retime_manifest.py <slug> --audio <wav>\n"
+        "  To regenerate anyway: add --force, or write to a different --output."
+    )
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -2607,6 +3051,12 @@ def main():
         help="HuggingFace token for WhisperX alignment models (or set HF_TOKEN env var)",
     )
     parser.add_argument(
+        "--lang", default="en", choices=["en", "zh"],
+        help="Narration language for WhisperX transcription/alignment (default: en). "
+             "Use 'zh' with a translated script + ZH narration WAV for the separate "
+             "Mandarin cut (one full pipeline pass per language).",
+    )
+    parser.add_argument(
         "--output", "-o", required=True,
         help="Output path for assembly manifest JSON",
     )
@@ -2622,8 +3072,16 @@ def main():
         "--pace-map", action="store_true",
         help="Print ASCII pacing curve after manifest generation",
     )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Overwrite an output manifest marked handWired (its hand wiring is lost)",
+    )
 
     args = parser.parse_args()
+
+    refusal = hand_wired_refusal(Path(args.output), args.force)
+    if refusal:
+        sys.exit(refusal)
 
     # Load per-episode config if provided
     ep_data_files = None
@@ -2650,11 +3108,14 @@ def main():
     print(f"  Found {len(manifest['beats'])} beats, {len(manifest['segments'])} segments")
     print(f"  Estimated duration: {manifest['totalDurationSec']:.1f}s ({manifest['totalDurationSec']/60:.1f} min)")
 
+    # Tag the manifest language so render scripts / templates can pick the cut.
+    manifest["language"] = args.lang
+
     # Upgrade to precise mode if audio provided
     if args.audio:
-        print(f"\nAligning to narration audio: {args.audio}")
+        print(f"\nAligning to narration audio ({args.lang}): {args.audio}")
         print("  Pipeline: SileroVAD (pause detection) → WhisperX (transcription + alignment) → RapidFuzz (matching)")
-        manifest = align_to_narration(manifest, args.audio, hf_token=args.hf_token)
+        manifest = align_to_narration(manifest, args.audio, hf_token=args.hf_token, language=args.lang)
         print(f"  Precise duration: {manifest['totalDurationSec']:.1f}s")
 
     # Write output

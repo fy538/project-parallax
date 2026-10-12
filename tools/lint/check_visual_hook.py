@@ -130,8 +130,20 @@ def _load_pipeline_state() -> dict[str, str]:
 
 
 def _find_viability_doc(ep_dir: Path) -> Path | None:
-    """Episodes use either viability.md or viability-check.md — accept either."""
-    for name in ("viability.md", "viability-check.md"):
+    """Episodes use either viability.md or viability-check.md — accept either.
+
+    Resolution order (new canonical structure first, legacy paths second):
+      1. development/viability.md   — canonical since EPISODE_STRUCTURE.md
+      2. viability.md               — legacy root location
+      3. development/viability-check.md
+      4. viability-check.md         — legacy root location (blockades-leak era)
+    """
+    for name in (
+        "development/viability.md",
+        "viability.md",
+        "development/viability-check.md",
+        "viability-check.md",
+    ):
         p = ep_dir / name
         if p.is_file():
             return p

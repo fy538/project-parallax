@@ -1,5 +1,7 @@
 # Parallax — AI Image/Video Generation Workflow
 
+> **24 September 2026 review:** the provider selections, prices, and consistency claims below are historical and should not be used as current guarantees. In particular, the “95% identity lock” and “3D anchor” claims were not substantiated by the current documentation reviewed. Consult [current illustration-to-video research](../../analysis/illustration-to-video-workflows-2026-09-24.md) before selecting a model or planning a new shot. This note preserves the old workflow for reference; it does not change running tools.
+
 > Created: May 4, 2026
 > Companion to: tools/ai-video/PROMPT_SYSTEM.md (prompt-engineering specifics)
 > Related: AI_VIDEO_PIPELINE.md (aesthetic spec), PROMPT_PREAMBLES.md (preamble architecture), TYPOGRAPHY_TRADITIONS.md (per-scene typography), tools/ai-video/style-references/PROMPTS.md (canonical reference library)

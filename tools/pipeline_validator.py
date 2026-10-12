@@ -58,6 +58,15 @@ PIPELINE_MD   = ROOT / "episodes" / "PIPELINE.md"
 EPISODES_DIR  = ROOT / "episodes"
 REMOTION_DATA = ROOT / "remotion-templates" / "data" / "episodes"
 
+# Secondary docs that mirror episode state in human-readable tables. These are
+# NOT sources of truth — pipeline-state.json is — but they must AGREE with it.
+# check_source_consistency() validates that each committed episode's lifecycle
+# token appears in these tables; the gate is wired into scripts/lint.sh.
+CLAUDE_MD         = ROOT / "CLAUDE.md"
+IDEAS_MD          = ROOT / "project" / "IDEAS.md"
+CONCEPTS_JSON     = ROOT / "data" / "concepts.json"
+PUBLISH_ORDER_JSON = ROOT / "episodes" / "publish-order.json"
+
 # ── Thresholds ────────────────────────────────────────────────────────────────
 
 STALL_WARN_DAYS  = 7    # warn if days in state exceeds this
@@ -108,9 +117,12 @@ class ArtifactSpec:
     glob: str                 # glob pattern that also counts (versioned drafts)
     label: str                # human-readable label for output
     canonical_only_warn: bool = True  # warn if only glob matches, not canonical
+    warn_only: bool = False   # emit warn (not error) if missing — soft requirement
 
 
-# Required artifacts per state. Missing any = ERROR.
+# Required or recommended artifacts per state.
+# Entries with warn_only=False (default): missing = ERROR.
+# Entries with warn_only=True: missing = WARN (soft requirement).
 STATE_REQUIRED: dict[str, list[ArtifactSpec]] = {
     "VIABLE": [
         ArtifactSpec("viability.md", "viability-check.md", "viability check"),
@@ -125,13 +137,36 @@ STATE_REQUIRED: dict[str, list[ArtifactSpec]] = {
     ],
     "DRAFTING": [
         ArtifactSpec("angle-memo.md", "angle-memo.md", "angle memo", canonical_only_warn=False),
-        ArtifactSpec("script-production.md", "script-v*-production.md", "production script"),
+        # Canonical name is script.md (once promoted from draft); legacy episodes
+        # may still have script-production.md or script-v*-production.md.
+        ArtifactSpec("script.md", "script-*production*.md", "production script"),
     ],
     "RENDER READY": [
-        ArtifactSpec("script-production.md", "script-v*-production.md", "production script"),
-        ArtifactSpec("script-audit.md", "script-audit*.md", "script audit"),
+        # script.md is the canonical production script name (promoted from versioned
+        # draft). Glob fallback covers legacy script-production.md and
+        # script-v6.3-production.md naming; canonical_only_warn=True (default)
+        # nudges old-naming episodes to rename to script.md.
+        ArtifactSpec("script.md", "script-*production*.md", "production script"),
+        # script-audit.md is canonical at episode root; episodes that completed the
+        # skill before the naming convention was settled may have it in development/.
+        # Glob ** traversal finds development/script-audit.md and versioned copies.
+        ArtifactSpec("script-audit.md", "**/script-audit*.md", "script audit"),
         ArtifactSpec("visual-spec.md", "visual-spec.md", "visual spec", canonical_only_warn=False),
         ArtifactSpec("shot-list.json", "shot-list.json", "shot list", canonical_only_warn=False),
+        # Sourcing brief is recommended (not hard-required) at RENDER READY.
+        # Missing = warn, not error: a RENDER READY episode without a sourcing
+        # doc is unusual but valid if assets were gathered manually.
+        # canonical: development/sourcing-brief.md
+        # glob fallback: publish/sources*.md (matches publish/sources.md too —
+        #   the wildcard is required for file_exists() to treat it as a glob
+        #   rather than a literal ep_dir / "publish/sources.md" path check).
+        ArtifactSpec(
+            "development/sourcing-brief.md",
+            "publish/sources*.md",
+            "sourcing brief",
+            canonical_only_warn=False,
+            warn_only=True,
+        ),
     ],
     "IN POST": [
         ArtifactSpec("visual-spec.md", "visual-spec.md", "visual spec", canonical_only_warn=False),
@@ -146,8 +181,10 @@ FORWARD_EVIDENCE = [
     ("assembly-manifest.json",      "RENDER READY",    "remotion_data"),  # checked in data dir
     ("visual-spec.md",              "RENDER READY",    "episode"),
     ("shot-list.json",              "RENDER READY",    "episode"),
+    ("script.md",                    "DRAFTING",        "episode"),
     ("script-audit.md",             "DRAFTING",        "episode"),
     ("script-audit*.md",            "DRAFTING",        "episode"),
+    ("**/script-audit*.md",         "DRAFTING",        "episode"),
     ("script-v*-production.md",     "DRAFTING",        "episode"),
     ("script-production.md",        "DRAFTING",        "episode"),
     ("angle-memo.md",               "RESEARCH READY",  "episode"),
@@ -169,11 +206,13 @@ CANONICAL_FIXES: list[tuple[str, str]] = [
 ]
 
 
-def fix_naming_drift(ep_dir: Path) -> list[str]:
+def fix_naming_drift(ep_dir: Path, dry_run: bool = False) -> list[str]:
     """Promote the latest versioned draft to canonical for any missing canonical files.
 
     Does NOT delete intermediate versions — human decides materiality.
     Returns a list of human-readable rename messages (empty if nothing to fix).
+
+    With dry_run=True, prints the planned renames without executing them.
     """
     renames: list[str] = []
     for canonical, versioned_glob in CANONICAL_FIXES:
@@ -184,8 +223,10 @@ def fix_naming_drift(ep_dir: Path) -> list[str]:
         if not hits:
             continue  # no versioned copies either — genuine gap, not drift
         latest = hits[-1]
-        latest.rename(canon_path)
-        renames.append(f"  {latest.name}  →  {canonical}")
+        if not dry_run:
+            latest.rename(canon_path)
+        dry_tag = " (dry-run — not moved)" if dry_run else ""
+        renames.append(f"  {latest.name}  →  {canonical}{dry_tag}")
     return renames
 
 
@@ -313,9 +354,11 @@ def validate_episode(row: EpisodeRow) -> EpisodeReport:
             else:
                 add(Finding("ok", f"{spec.label} ({names})"))
         else:
-            add(Finding("error",
+            level = "warn" if spec.warn_only else "error"
+            qualifier = "recommended" if spec.warn_only else "required"
+            add(Finding(level,
                 f"{spec.label} missing — expected {spec.canonical!r} "
-                f"(required for {row.state})"))
+                f"({qualifier} for {row.state})"))
 
     # ── Remotion data directory checks ───────────────────────────────────────
     if row.state in ("RENDER READY", "IN POST", "PUBLISHED", "RETROED"):
@@ -481,10 +524,12 @@ def build_checkpoint_stages(
     # ── Research ──────────────────────────────────────────────────────────────
     research: list[StageCheck] = []
 
-    viability = _first_match(ep_dir, "viability.md", "viability-check.md")
+    viability = _first_match(
+        ep_dir, "development/viability.md", "viability.md", "viability-check.md"
+    )
     research.append(StageCheck(
         "Viability check", bool(viability),
-        detail=viability.name if viability else "viability.md missing",
+        detail=viability.relative_to(ep_dir).as_posix() if viability else "development/viability.md missing",
     ))
 
     brief = ep_dir / "brief.md"
@@ -506,48 +551,48 @@ def build_checkpoint_stages(
     # ── Script ────────────────────────────────────────────────────────────────
     script: list[StageCheck] = []
 
-    angle = ep_dir / "angle-memo.md"
+    angle = _first_match(ep_dir, "development/angle-memo.md", "angle-memo.md")
     script.append(StageCheck(
-        "Angle Memo", angle.exists(),
-        detail="angle-memo.md" if angle.exists() else "angle-memo.md missing",
+        "Angle Memo", bool(angle),
+        detail=angle.relative_to(ep_dir).as_posix() if angle else "development/angle-memo.md missing",
     ))
 
-    canonical_script = ep_dir / "script-production.md"
-    versioned_scripts = _all_matches(ep_dir, "script-v*-production.md")
-    if canonical_script.exists():
-        script.append(StageCheck("Script Draft", True, detail="script-production.md"))
+    canonical_script = _first_match(ep_dir, "script.md", "script-production.md")
+    versioned_scripts = _all_matches(ep_dir, "script-v*-production.md", "drafts/script-v*.md")
+    if canonical_script:
+        script.append(StageCheck("Script Draft", True, detail=canonical_script.name))
     elif versioned_scripts:
         latest = versioned_scripts[-1].name
         script.append(StageCheck(
             "Script Draft", True, detail=latest,
-            warn=f"no canonical script-production.md — rename {latest} once gate passes",
+            warn=f"no canonical script.md — rename {latest} to script.md once gate passes",
         ))
     else:
-        script.append(StageCheck("Script Draft", False, detail="no script file found"))
+        script.append(StageCheck("Script Draft", False, detail="script.md missing"))
 
-    for stage, canonical, glob in [
-        ("Script Audit",     "script-audit.md",          "script-audit-v*.md"),
-        ("Persona Eval",     "persona-eval.md",           "persona-eval-v*.md"),
-        ("Visual Concept",   "visual-concept-audit.md",   "visual-concept-audit-v*.md"),
-        ("Review Package",   "review-package.md",         "review-package-v*.md"),
+    for stage, canonical, alt_prefix, glob in [
+        ("Script Audit",   "script-audit.md",        "development/", "script-audit-v*.md"),
+        ("Persona Eval",   "persona-eval.md",         "development/", "persona-eval-v*.md"),
+        ("Visual Concept", "visual-concept-audit.md", "development/", "visual-concept-audit-v*.md"),
+        ("Review Package", "review-package.md",       "development/", "review-package-v*.md"),
     ]:
-        canon_p = ep_dir / canonical
+        found = _first_match(ep_dir, f"{alt_prefix}{canonical}", canonical)
         versioned = _all_matches(ep_dir, glob)
-        if canon_p.exists():
-            script.append(StageCheck(stage, True, detail=canonical))
+        if found:
+            script.append(StageCheck(stage, True, detail=found.relative_to(ep_dir).as_posix()))
         elif versioned:
             latest = versioned[-1].name
             script.append(StageCheck(
                 stage, True, detail=latest,
-                warn=f"no canonical {canonical}",
+                warn=f"no canonical {alt_prefix}{canonical}",
             ))
         else:
-            script.append(StageCheck(stage, False, detail=f"{canonical} missing"))
+            script.append(StageCheck(stage, False, detail=f"{alt_prefix}{canonical} missing"))
 
-    thumb = ep_dir / "thumbnail-concepts.md"
+    thumb = _first_match(ep_dir, "publish/thumbnail-concepts.md", "thumbnail-concepts.md")
     script.append(StageCheck(
-        "Title/Hook + Thumbnails", thumb.exists(),
-        detail="thumbnail-concepts.md" if thumb.exists() else "thumbnail-concepts.md missing",
+        "Title/Hook + Thumbnails", bool(thumb),
+        detail=thumb.relative_to(ep_dir).as_posix() if thumb else "publish/thumbnail-concepts.md missing",
     ))
 
     groups.append(("Script", script))
@@ -561,10 +606,14 @@ def build_checkpoint_stages(
         detail="visual-spec.md" if vspec.exists() else "visual-spec.md missing — run visual-spec skill",
     ))
 
-    audio = _first_match(ep_dir, "audio-cue-sheet.md", "audio-spec.md", "audio-*.md")
+    audio = _first_match(
+        ep_dir,
+        "audio/audio-cue-sheet.md", "audio-cue-sheet.md",
+        "audio-spec.md", "audio-*.md",
+    )
     prep.append(StageCheck(
         "Audio Spec", bool(audio),
-        detail=audio.name if audio else "audio-cue-sheet.md missing — run audio-spec skill",
+        detail=audio.relative_to(ep_dir).as_posix() if audio else "audio/audio-cue-sheet.md missing — run audio-spec skill",
     ))
 
     shots = ep_dir / "shot-list.json"
@@ -742,6 +791,130 @@ def load_pipeline_state() -> list[StateEntry]:
             notes=e.get("notes", ""),
         ))
     return out
+
+
+# ── Source consistency gate ───────────────────────────────────────────────────
+# pipeline-state.json is the single source of truth for episode lifecycle state.
+# Two human-facing docs mirror it: the CLAUDE.md "Status" table and the IDEAS.md
+# "Launch sequence" table. Historically these drifted freely and contradicted
+# the JSON (and each other). This gate re-reads those tables and fails if any
+# committed episode's canonical token is missing from the row that mentions it.
+
+# All recognized lifecycle + failure tokens, longest-first so "RESEARCH READY"
+# is matched before "RESEARCHING" when scanning a cell for what it claims.
+_ALL_STATE_TOKENS = sorted(
+    set(STATE_ORDER) | set(STATE_BADGES.keys()),
+    key=len,
+    reverse=True,
+)
+
+
+def _detected_state_tokens(rows: list[str]) -> list[str]:
+    """Return the lifecycle tokens that appear in any of the given table rows."""
+    found: list[str] = []
+    joined = " ".join(rows)
+    for tok in _ALL_STATE_TOKENS:
+        if tok in joined and tok not in found:
+            found.append(tok)
+    return found
+
+
+def check_source_consistency() -> list[str]:
+    """Verify CLAUDE.md + IDEAS.md + publish-order.json agree with
+    pipeline-state.json on each committed episode's lifecycle state.
+
+    For every episode in pipeline-state.json, scan each secondary doc for the
+    markdown table row(s) that mention its slug (in backticks). If the doc
+    tracks that slug at all, the canonical state token MUST appear in one of
+    those rows. Returns a list of mismatch strings (empty = fully consistent).
+
+    Robust to surrounding prose: we only require the canonical token to be
+    present in the slug's row, not that the whole cell equals it.
+
+    publish-order.json checks:
+      1. Coverage: every slug in pipeline-state.json must appear in
+         publish-order.json (either queue or published). Orphan = missing entry.
+      2. Published consistency: if pipeline-state says PUBLISHED or RETROED,
+         publish-order.json must also show "published" or "retroed" — the only
+         hard drift that matters in production. RENDER READY still showing "draft"
+         in publish-order.json is expected (it's a separate editorial queue).
+    """
+    entries = load_pipeline_state()
+    if not entries:
+        return []
+    canonical = {e.slug: e.state for e in entries}
+    problems: list[str] = []
+
+    # ── CLAUDE.md + IDEAS.md markdown-table checks ────────────────────────────
+    for label, path in (("CLAUDE.md", CLAUDE_MD), ("project/IDEAS.md", IDEAS_MD)):
+        if not path.is_file():
+            problems.append(f"{label}: file not found (cannot verify state consistency)")
+            continue
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for slug, state in canonical.items():
+            rows = [
+                ln for ln in lines
+                if ln.lstrip().startswith("|") and f"`{slug}`" in ln
+            ]
+            if not rows:
+                continue  # this doc doesn't track the slug — not a drift
+            if not any(state in ln for ln in rows):
+                found = _detected_state_tokens(rows)
+                shows = ", ".join(found) if found else "no recognized lifecycle token"
+                problems.append(
+                    f"{label}: '{slug}' should be '{state}' "
+                    f"(per pipeline-state.json) but the table shows {shows}"
+                )
+
+    # ── publish-order.json coverage + published-state consistency ─────────────
+    if PUBLISH_ORDER_JSON.is_file():
+        try:
+            po = json.loads(PUBLISH_ORDER_JSON.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            problems.append(f"publish-order.json: JSON parse error — {exc}")
+            return problems
+
+        po_slugs: dict[str, str] = {}  # slug → publish-order state
+        for entry in po.get("published", []):
+            po_slugs[entry["slug"]] = entry.get("state", "published")
+        for entry in po.get("queue", []):
+            po_slugs[entry["slug"]] = entry.get("state", "draft")
+
+        # Coverage: every pipeline-state slug must appear in publish-order.json
+        for slug in canonical:
+            if slug not in po_slugs:
+                problems.append(
+                    f"publish-order.json: '{slug}' is in pipeline-state.json "
+                    f"but has no entry in publish-order.json (add it to 'queue')"
+                )
+
+        # Reverse coverage: every publish-order slug must be in pipeline-state.json
+        for slug in po_slugs:
+            if slug not in canonical:
+                problems.append(
+                    f"publish-order.json: '{slug}' has a publish-order entry "
+                    f"but is not in pipeline-state.json (orphaned queue entry)"
+                )
+
+        # State floor: PUBLISHED/RETROED in pipeline-state must match publish-order
+        FINAL_STATES = {"PUBLISHED", "RETROED"}
+        PO_FINAL_STATES = {"published", "retroed"}
+        for slug, state in canonical.items():
+            if state in FINAL_STATES and slug in po_slugs:
+                po_state = po_slugs[slug]
+                if po_state not in PO_FINAL_STATES:
+                    problems.append(
+                        f"publish-order.json: '{slug}' is '{state}' in "
+                        f"pipeline-state.json but publish-order shows '{po_state}' "
+                        f"— update publish-order.json to 'published' or 'retroed'"
+                    )
+    else:
+        problems.append(
+            "publish-order.json: file not found at episodes/publish-order.json "
+            "(required for publish-queue tracking)"
+        )
+
+    return problems
 
 
 # ── compute_episode_status ────────────────────────────────────────────────────
@@ -968,12 +1141,18 @@ def _gather_artifacts(ep_dir: Path, data_dir: Path, slug: str) -> dict:
     """File-presence checks. Returns {has_research, has_script, has_manifest, …}."""
     out_dir = ROOT / "remotion-templates" / "out"
     return {
-        "has_research":       (ep_dir / "brief.md").is_file(),
-        "has_angle_memo":     (ep_dir / "angle-memo.md").is_file(),
-        "has_script":         bool(_first_match(ep_dir, "script-v*-production.md",
-                                                "script-production.md", "script.md")),
+        # brief.md lives in research/ (canonical) or root (legacy)
+        "has_research":       bool(_first_match(ep_dir, "research/brief.md", "brief.md")),
+        # angle-memo lives in development/ (canonical) or root (legacy)
+        "has_angle_memo":     bool(_first_match(ep_dir, "development/angle-memo.md", "angle-memo.md")),
+        # script.md (canonical) or old versioned/production names
+        "has_script":         bool(_first_match(ep_dir, "script.md",
+                                                "script-v*-production.md", "script-production.md")),
         "has_visual_spec":    (ep_dir / "visual-spec.md").is_file(),
-        "has_audio_cue_sheet": (ep_dir / "audio-cue-sheet.md").is_file(),
+        # audio-cue-sheet lives in audio/ (canonical) or root (legacy)
+        "has_audio_cue_sheet": bool(_first_match(
+            ep_dir, "audio/audio-cue-sheet.md", "audio-cue-sheet.md", "audio-spec.md",
+        )),
         "has_manifest":       (data_dir / "assembly-manifest.json").is_file(),
         "has_narration":      (ep_dir / "assets" / "narration.wav").is_file(),
         "has_render":         bool(list(out_dir.glob(f"{slug}-full*.mp4"))) if out_dir.is_dir() else False,
@@ -1214,6 +1393,77 @@ def _render_health(s: EpisodeStatus) -> list[str]:
     return lines
 
 
+def _compute_next_actions(s: EpisodeStatus) -> list[tuple[int, str, str]]:
+    """Return an ordered list of (priority, label, command) next actions.
+
+    Priority 0 = hard blocker (renders/narration impossible until resolved).
+    Priority 1 = important but not immediately blocking.
+    Priority 2 = next phase not yet started.
+
+    Callers typically take the first 3 items for display.
+    """
+    actions: list[tuple[int, str, str]] = []
+
+    # Hard blockers ────────────────────────────────────────────────────────────
+    if s.manifest_stale:
+        actions.append((0, "Regenerate stale manifest",
+                        f"python3 tools/assembly/generate_manifest.py {s.slug}"))
+    if s.zero_hit_count > 0:
+        actions.append((0,
+                        f"Resolve {s.zero_hit_count} zero-hit shot{'s' if s.zero_hit_count != 1 else ''}",
+                        f"python3 tools/asset-source/zerohit_fallback.py {s.slug}"))
+
+    # Missing stage artifacts ──────────────────────────────────────────────────
+    if not s.has_research:
+        actions.append((1, "Research brief missing — run `research` skill", ""))
+    if not s.has_angle_memo and s.has_research:
+        actions.append((1, "Angle memo missing — run `angle-memo` skill", ""))
+    if not s.has_script and s.has_angle_memo:
+        actions.append((1, "Script missing — run `script-draft` skill", ""))
+    if not s.has_visual_spec and s.has_script:
+        actions.append((1, "Visual spec missing — run `visual-spec` skill", ""))
+    if not s.has_manifest and s.has_visual_spec:
+        actions.append((1, "Assembly manifest missing",
+                        f"python3 tools/assembly/generate_manifest.py {s.slug}"))
+    if not s.has_audio_cue_sheet and s.has_script:
+        actions.append((2, "Audio cue sheet missing — run `audio-spec` skill", ""))
+
+    # Render-ready but unrendered ──────────────────────────────────────────────
+    if s.has_manifest and not s.has_render:
+        actions.append((1, "First full-episode render pending",
+                        f"./scripts/render.sh {s.slug}"))
+
+    # Post-render ──────────────────────────────────────────────────────────────
+    if s.has_render and not s.has_narration:
+        actions.append((1, "Narration not yet recorded — prepare booth session",
+                        f"./scripts/narration-prep.sh {s.slug}"))
+    if not s.has_thumbnails and s.stage_idx >= STATE_ORDER.index("RENDER READY"):
+        actions.append((2, "Thumbnails missing",
+                        f"npm run thumbnails -- --episode={s.slug}"))
+
+    # Sort by priority (stable sort preserves editorial ordering within tier)
+    actions.sort(key=lambda x: x[0])
+    return actions
+
+
+def _render_next_actions(s: EpisodeStatus) -> list[str]:
+    """Next-actions panel: top 3 concrete steps, with exact commands."""
+    actions = _compute_next_actions(s)
+    if not actions:
+        return ["## Next actions", "", "✓ No blockers — episode is on track.", ""]
+    lines = ["## Next actions", ""]
+    for i, (_, label, cmd) in enumerate(actions[:3], 1):
+        if cmd:
+            lines.append(f"{i}. **{label}**")
+            lines.append(f"   ```")
+            lines.append(f"   {cmd}")
+            lines.append(f"   ```")
+        else:
+            lines.append(f"{i}. **{label}**")
+    lines.append("")
+    return lines
+
+
 def _render_numbers(s: EpisodeStatus) -> list[str]:
     """By the numbers panel — only includes rows with non-default values."""
     lines = ["## By the numbers", ""]
@@ -1263,7 +1513,9 @@ def render_status_md(s: EpisodeStatus) -> str:
         _render_header(s),
         _render_progress(s),
         _render_checklist(s),
+        _render_next_actions(s),
         _render_health(s),
+        _render_asset_registry(s.slug),
         _render_numbers(s),
         _render_notes(s),
         _render_footer(s),
@@ -1302,8 +1554,11 @@ def _format_tracker_row(s: EpisodeStatus) -> str:
     return f"| `{s.slug}` | {badge} | {s.days_in_state} | {target} | {s.health_summary} |"
 
 
-def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
+def update_tracker_health(statuses: list[EpisodeStatus], check: bool = False) -> bool:
     """Update the At-a-glance table in PIPELINE.md in place. Returns True if changed.
+
+    With check=True, computes the would-be result and returns whether a
+    change is pending WITHOUT writing (freshness-gate dry run).
 
     Preserves the trailing blank line between the table and the next
     section so the auto-refresh doesn't keep collapsing whitespace.
@@ -1320,7 +1575,8 @@ def update_tracker_health(statuses: list[EpisodeStatus]) -> bool:
     new_body = "\n".join(_format_tracker_row(s) for s in statuses) + "\n"
     new_text = text.replace(m.group(0), header + new_body + trailing, 1)
     if new_text != text:
-        PIPELINE_MD.write_text(new_text, encoding="utf-8")
+        if not check:
+            PIPELINE_MD.write_text(new_text, encoding="utf-8")
         return True
     return False
 
@@ -1398,9 +1654,12 @@ def _render_topics_markdown_block() -> str | None:
     return "\n".join(parts)
 
 
-def update_tracker_topics() -> bool:
+def update_tracker_topics(check: bool = False) -> bool:
     """Refresh the auto-managed Topics block in PIPELINE.md. Returns True
     if changed.
+
+    With check=True, returns whether a change is pending WITHOUT writing
+    (freshness-gate dry run).
 
     Behavior:
       · IDEAS.md missing or empty → remove existing block (no-op if absent)
@@ -1419,7 +1678,8 @@ def update_tracker_topics() -> bool:
         # Nothing to render — strip an existing stale block if present.
         if existing:
             new_text = TOPICS_BLOCK_RE.sub("", text).rstrip() + "\n"
-            PIPELINE_MD.write_text(new_text, encoding="utf-8")
+            if not check:
+                PIPELINE_MD.write_text(new_text, encoding="utf-8")
             return True
         return False
 
@@ -1430,7 +1690,8 @@ def update_tracker_topics() -> bool:
         new_text = text.rstrip() + "\n\n" + block + "\n"
 
     if new_text != text:
-        PIPELINE_MD.write_text(new_text, encoding="utf-8")
+        if not check:
+            PIPELINE_MD.write_text(new_text, encoding="utf-8")
         return True
     return False
 
@@ -1483,16 +1744,583 @@ def suggest_state_promotion(
     return None
 
 
+def _record_state_transition(slug: str, to_state: str) -> None:
+    """Append a state transition to episodes/<slug>/_state-history.jsonl.
+
+    Non-fatal: if state_history.py is missing or fails, we warn but continue.
+    Called from write_status() when a state change is detected by comparing
+    the new EpisodeStatus against the previous **State:** line in _status.md.
+    """
+    state_history_py = Path(__file__).resolve().parent / "state_history.py"
+    if not state_history_py.exists():
+        return
+    import subprocess as _sp
+    try:
+        _sp.run(
+            [sys.executable, str(state_history_py), "--record", slug, to_state,
+             "detected by pipeline_validator --write-status"],
+            cwd=str(ROOT),
+            capture_output=True,
+            check=False,  # non-fatal — audit trail must not block dashboard refresh
+        )
+    except OSError:
+        pass
+
+
 def write_status(s: EpisodeStatus) -> Path:
-    """Write _status.md for one episode. Returns the path."""
+    """Write _status.md for one episode. Returns the path.
+
+    If the episode already has a _status.md from a prior run, the previous
+    state is extracted from the ``**State:**`` header line. When the state
+    differs from s.state, a transition is appended to _state-history.jsonl
+    via state_history.py --record (non-fatal: audit trail must not block
+    dashboard refresh).
+    """
     ep_dir = EPISODES_DIR / s.slug
     ep_dir.mkdir(parents=True, exist_ok=True)
     out_path = ep_dir / "_status.md"
+
+    # Detect state change by reading previous _status.md header.
+    prev_state: str | None = None
+    if out_path.exists():
+        for line in out_path.read_text(encoding="utf-8").splitlines():
+            if line.startswith("**State:**"):
+                # Format: **State:** RENDER READY · day 3 in state ...
+                tail = line[len("**State:**"):].strip()
+                prev_state = tail.split("·")[0].strip() or None
+                break
+
     out_path.write_text(render_status_md(s), encoding="utf-8")
+
+    # Wire state_history: record transition when state changes.
+    if prev_state and prev_state != s.state:
+        _record_state_transition(s.slug, s.state)
+
     return out_path
 
 
+# ── asset registry ────────────────────────────────────────────────────────────
+
+PUBLIC_DIR = ROOT / "remotion-templates" / "public"
+
+def compute_asset_status(slug: str) -> dict | None:
+    """Read asset-registry.json for slug, scan disk, return computed status.
+    Returns None if no registry exists for this episode."""
+    registry_path = EPISODES_DIR / slug / "asset-registry.json"
+    if not registry_path.exists():
+        return None
+
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    assets = registry.get("assets", [])
+    morphs = registry.get("morphs", [])
+
+    # Compute per-asset status from disk
+    asset_status: dict[str, dict] = {}
+    for a in assets:
+        aid = a["id"]
+        sp = a.get("stillPath")
+        vp = a.get("videoPath")
+        still_exists = (ROOT / sp).exists() if sp else None
+        video_exists = (ROOT / vp).exists() if vp else None
+        asset_status[aid] = {
+            "still_exists": still_exists,
+            "video_exists": video_exists,
+            "motionType": a.get("motionType", "standalone"),
+            "segments": a.get("segments", []),
+        }
+
+    # Compute per-morph status
+    morph_status = []
+    for m in morphs:
+        from_still = asset_status.get(m["from"], {}).get("still_exists", False)
+        to_still   = asset_status.get(m["to"],   {}).get("still_exists", False)
+        vp = m.get("videoPath")
+        video_exists = (ROOT / vp).exists() if vp else False
+        morph_status.append({
+            "from": m["from"],
+            "to":   m["to"],
+            "tool": m.get("tool", "?"),
+            "intent": m.get("intent", ""),
+            "unblocked": bool(from_still and to_still),
+            "video_exists": video_exists,
+        })
+
+    # Compute wired status from assembly-manifest
+    manifest_path = ROOT / "remotion-templates" / "data" / "episodes" / slug / "assembly-manifest.json"
+    wired_segments: set[str] = set()
+    total_footage = 0
+    if manifest_path.exists():
+        mdata = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for seg in mdata.get("segments", []):
+            if seg.get("type") == "FOOTAGE":
+                total_footage += 1
+                if seg.get("asset", {}).get("file"):
+                    wired_segments.add(seg["id"])
+
+    return {
+        "slug": slug,
+        "assets": asset_status,
+        "morphs": morph_status,
+        "wired_segments": wired_segments,
+        "total_footage_segments": total_footage,
+    }
+
+
+def intake_asset(slug: str, asset_id: str) -> int:
+    """Wire an approved asset from public/ into assembly-manifest.json, refresh _status.md.
+
+    Workflow:
+      1. Look up `asset_id` in `episodes/{slug}/asset-registry.json`.
+      2. Find the approved file in `public/episodes/{slug}/stills/` or `clips/`.
+      3. Derive the `asset.file` value (relative to assetBasePath = "episodes/{slug}").
+      4. Patch all FOOTAGE segments listed in asset["segments"] in assembly-manifest.json.
+      5. Refresh _status.md so newly unblocked morphs appear immediately.
+      6. Report any morphs that are now unblocked by this intake.
+
+    Returns exit code: 0 = success, 1 = file not found in public/, 2 = missing data.
+    """
+    # ── 1. Load registry ──────────────────────────────────────────────────────
+    registry_path = EPISODES_DIR / slug / "asset-registry.json"
+    if not registry_path.is_file():
+        print(f"{ERROR} No asset-registry.json found for episode '{slug}'", file=sys.stderr)
+        return 2
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+
+    # ── 2. Find asset ─────────────────────────────────────────────────────────
+    asset = next((a for a in registry.get("assets", []) if a["id"] == asset_id), None)
+    if asset is None:
+        ids = ", ".join(a["id"] for a in registry.get("assets", []))
+        print(f"{ERROR} Asset '{asset_id}' not found in registry for '{slug}'", file=sys.stderr)
+        print(f"  Available IDs: {ids}")
+        return 2
+
+    # ── 3. Find approved file in public/ ──────────────────────────────────────
+    public_ep = PUBLIC_DIR / "episodes" / slug
+    asset_file: str | None = None
+    public_path_found: Path | None = None
+
+    # Primary: stillPath → extract filename → check public/stills/
+    if asset.get("stillPath"):
+        filename = Path(asset["stillPath"]).name
+        candidate = public_ep / "stills" / filename
+        if candidate.is_file():
+            asset_file = f"stills/{filename}"
+            public_path_found = candidate
+
+    # Primary: videoPath → already points into public/ tree
+    if asset.get("videoPath") and asset_file is None:
+        vp = ROOT / asset["videoPath"]
+        if vp.is_file():
+            asset_file = f"clips/{vp.name}"
+            public_path_found = vp
+
+    # Fallback: scan public/{stills,clips}/ for any file whose name contains asset_id
+    if asset_file is None:
+        for subdir in ("stills", "clips"):
+            scan_dir = public_ep / subdir
+            if scan_dir.is_dir():
+                matches = sorted(f for f in scan_dir.iterdir() if asset_id in f.name)
+                if matches:
+                    asset_file = f"{subdir}/{matches[0].name}"
+                    public_path_found = matches[0]
+                    break
+
+    if asset_file is None:
+        print(f"{ERROR} No approved file found in public/episodes/{slug}/ for '{asset_id}'")
+        if asset.get("stillPath"):
+            fn = Path(asset["stillPath"]).name
+            print(f"  Expected still: remotion-templates/public/episodes/{slug}/stills/{fn}")
+        if asset.get("videoPath"):
+            fn = Path(asset["videoPath"]).name
+            print(f"  Expected clip:  remotion-templates/public/episodes/{slug}/clips/{fn}")
+        print(f"  Copy the treated file there first, then re-run --intake.")
+        return 1
+
+    assert public_path_found is not None
+    print(f"{OK} Found: {public_path_found.relative_to(ROOT)}")
+
+    # ── 4. Patch assembly-manifest.json ──────────────────────────────────────
+    manifest_path = REMOTION_DATA / slug / "assembly-manifest.json"
+    if not manifest_path.is_file():
+        print(f"{ERROR} assembly-manifest.json not found for '{slug}'", file=sys.stderr)
+        return 2
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    segment_ids: list[str] = asset.get("segments", [])
+    motion_type: str = asset.get("motionType", "standalone")
+
+    if not segment_ids:
+        print(f"{WARN} '{asset_id}' has no segments[] in registry (morph-endpoint only).")
+        print(f"       Manifest unchanged — refreshing _status.md so morph unblocked state updates.")
+    else:
+        all_seg_ids = {s["id"] for s in manifest.get("segments", [])}
+        missing_segs = [sid for sid in segment_ids if sid not in all_seg_ids]
+        if missing_segs:
+            print(f"{WARN} Segment IDs not found in manifest (registry may be out of sync): "
+                  f"{', '.join(missing_segs)}")
+
+        patched = 0
+        for seg in manifest.get("segments", []):
+            if seg["id"] in segment_ids:
+                if "asset" not in seg:
+                    seg["asset"] = {}
+                seg["asset"]["file"] = asset_file
+                seg["asset"]["status"] = "resolved"
+                if not seg["asset"].get("source"):
+                    seg["asset"]["source"] = (
+                        "wikimedia-commons" if motion_type == "archival" else "local-aigen"
+                    )
+                patched += 1
+
+        if patched > 0:
+            manifest_path.write_text(
+                json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            print(f"{OK} Patched {patched} manifest segment(s): {', '.join(segment_ids)}")
+
+    # ── 5. Capture morph state before refresh (for newly-unblocked detection) ─
+    status_before = compute_asset_status(slug)
+    was_blocked: set[tuple[str, str]] = set()
+    if status_before:
+        was_blocked = {
+            (m["from"], m["to"])
+            for m in status_before["morphs"]
+            if not m["unblocked"] and not m["video_exists"]
+        }
+
+    # ── 6. Refresh _status.md ─────────────────────────────────────────────────
+    all_entries = load_pipeline_state()
+    entry = next((e for e in all_entries if e.slug == slug), None)
+    if entry:
+        s = compute_episode_status(entry)
+        path = write_status(s)
+        print(f"{OK} Refreshed {path.relative_to(ROOT)}")
+    else:
+        print(f"{WARN} '{slug}' not found in pipeline-state.json — _status.md not refreshed.")
+
+    # ── 7. Report newly unblocked morphs ─────────────────────────────────────
+    status_after = compute_asset_status(slug)
+    if status_after and was_blocked:
+        newly = [
+            (m["from"], m["to"], m["tool"], m["intent"])
+            for m in status_after["morphs"]
+            if m["unblocked"] and not m["video_exists"]
+            and (m["from"], m["to"]) in was_blocked
+        ]
+        if newly:
+            print(f"\n  Newly unblocked morphs — open morph-prompts.md to generate:")
+            for frm, to, tool, intent in newly:
+                print(f"  · {frm} → {to}  ({tool})  {intent}")
+
+    return 0
+
+
+def _render_asset_registry(slug: str) -> list[str]:
+    """Detailed asset-registry block for _status.md.
+
+    Shows specific missing still IDs grouped by phase, all unblocked morphs,
+    all blocked morphs with the specific still(s) they're waiting on, and the
+    generation sequence so a new agent session can act without opening any
+    additional files.  Returns [] if no registry exists for this episode.
+    """
+    status = compute_asset_status(slug)
+    if status is None:
+        return []
+
+    # Re-read registry for motionType grouping (compute_asset_status strips it)
+    registry_path = EPISODES_DIR / slug / "asset-registry.json"
+    registry = json.loads(registry_path.read_text(encoding="utf-8"))
+    motion_type_by_id = {a["id"]: a.get("motionType", "standalone") for a in registry.get("assets", [])}
+
+    assets = status["assets"]
+    morphs = status["morphs"]
+
+    # ── Stills ────────────────────────────────────────────────────────────────
+    # still_exists is None for static-template assets (no stillPath) — exclude those
+    stills_with_path = {aid: a for aid, a in assets.items() if a["still_exists"] is not None}
+    stills_present_ids = [aid for aid, a in stills_with_path.items() if a["still_exists"]]
+    stills_missing_ids = [aid for aid, a in stills_with_path.items() if not a["still_exists"]]
+
+    # Group missing stills by phase
+    archival_missing  = [aid for aid in stills_missing_ids if motion_type_by_id.get(aid) == "archival"]
+    bridge_missing    = [aid for aid in stills_missing_ids if motion_type_by_id.get(aid) in
+                         ("morph-anchor", "morph-target", "morph-chain")]
+    standalone_missing = [aid for aid in stills_missing_ids if motion_type_by_id.get(aid) == "standalone"]
+
+    # ── Clips (standalone single-image-to-video) ───────────────────────────────
+    videos_needed  = [a for a in assets.values() if a["video_exists"] is not None]
+    videos_present = [a for a in videos_needed if a["video_exists"]]
+
+    # ── Morphs ────────────────────────────────────────────────────────────────
+    morphs_done      = [m for m in morphs if m["video_exists"]]
+    morphs_unblocked = [m for m in morphs if m["unblocked"] and not m["video_exists"]]
+    morphs_blocked   = [m for m in morphs if not m["unblocked"] and not m["video_exists"]]
+
+    # ── Wired ─────────────────────────────────────────────────────────────────
+    wired        = len(status["wired_segments"])
+    total_footage = status["total_footage_segments"]
+
+    lines = ["## Assets"]
+
+    # Progress bars
+    n_still_needed = len(stills_with_path)
+    n_still_present = len(stills_present_ids)
+    lines.append(
+        f"  Stills    {_progress_bar(n_still_present, n_still_needed)}  "
+        f"{n_still_present}/{n_still_needed}"
+        + (f"  · {n_still_needed - n_still_present} missing" if stills_missing_ids else "  · all present")
+    )
+    lines.append(
+        f"  Clips     {_progress_bar(len(videos_present), len(videos_needed))}  "
+        f"{len(videos_present)}/{len(videos_needed)}"
+        + (f"  · {len(videos_needed) - len(videos_present)} pending" if len(videos_present) < len(videos_needed) else "  · all ready")
+    )
+    lines.append(
+        f"  Morphs    {_progress_bar(len(morphs_done), len(morphs))}  "
+        f"{len(morphs_done)}/{len(morphs)}"
+        + (f"  · {len(morphs_unblocked)} unblocked now" if morphs_unblocked else
+           ("  · all generated" if len(morphs_done) == len(morphs) else ""))
+    )
+    lines.append(
+        f"  Wired     {_progress_bar(wired, total_footage)}  "
+        f"{wired}/{total_footage} footage segments"
+    )
+
+    # ── Segment → priority lookup (P1/P2/P3 from manifest timing) ──────────────
+    # P1 = first third of episode, P2 = middle third, P3 = final third.
+    # Used to surface which missing assets block early-episode renders first.
+    seg_priority: dict[str, str] = {}   # segment_id → "P1" | "P2" | "P3"
+    manifest_path_pri = ROOT / "remotion-templates" / "data" / "episodes" / slug / "assembly-manifest.json"
+    if manifest_path_pri.exists():
+        try:
+            _mdata = json.loads(manifest_path_pri.read_text(encoding="utf-8"))
+            _total_dur = float(_mdata.get("totalDurationSec") or 0)
+            if _total_dur > 0:
+                for _seg in _mdata.get("segments", []):
+                    _start = float(_seg.get("startSec") or _seg.get("startTime") or 0)
+                    _frac = _start / _total_dur
+                    seg_priority[_seg["id"]] = "P1" if _frac < 0.34 else ("P2" if _frac < 0.67 else "P3")
+        except (json.JSONDecodeError, KeyError, ValueError):
+            pass  # non-fatal — priority tags are enhancement only
+
+    def _asset_priority(aid: str) -> str:
+        """Return the highest-priority (lowest number) tag across all segments for this asset."""
+        asset_segs = registry.get("assets", [])
+        seg_ids = next((a.get("segments", []) for a in asset_segs if a["id"] == aid), [])
+        tags = [seg_priority.get(sid, "") for sid in seg_ids if seg_priority.get(sid)]
+        if not tags:
+            return ""
+        for tag in ("P1", "P2", "P3"):
+            if tag in tags:
+                return tag
+        return ""
+
+    # ── Generation sequence (shown when work remains) ──────────────────────────
+    work_remains = stills_missing_ids or morphs_unblocked or morphs_blocked
+    if work_remains:
+        lines.append("")
+        lines.append("  **Generation sequence:**")
+        step = 1
+        if archival_missing:
+            lines.append(f"  {step}. Archival stills — Wikimedia search (fastest, no queue):")
+            for aid in archival_missing:
+                tag = _asset_priority(aid)
+                pri = f" [{tag}]" if tag else ""
+                lines.append(f"       · {aid}{pri}")
+            step += 1
+        if bridge_missing or standalone_missing:
+            lines.append(f"  {step}. AI-GEN stills — ChatGPT (`prompts/chatgpt-prompts.md`):")
+            for aid in bridge_missing + standalone_missing:
+                tag = _asset_priority(aid)
+                pri = f" [{tag}]" if tag else ""
+                lines.append(f"       · {aid}{pri}")
+            step += 1
+        if morphs_unblocked or morphs_blocked:
+            lines.append(f"  {step}. Morph clips — Kling/Hailuo (`prompts/morph-prompts.md`):")
+            step += 1
+        lines.append(f"  {step}. After each new file in public/: run `pipeline_validator.py --write-status {slug}`")
+
+    # ── Unblocked morphs (ready to generate now) ────────────────────────────────
+    if morphs_unblocked:
+        lines.append("")
+        lines.append("  **Unblocked — generate now:**")
+        for m in morphs_unblocked:
+            lines.append(f"  · {m['from']} → {m['to']}  ({m['tool']})  {m['intent']}")
+
+    # ── Blocked morphs with specific blockers ────────────────────────────────────
+    if morphs_blocked:
+        lines.append("")
+        lines.append("  **Blocked morphs (waiting on stills):**")
+        for m in morphs_blocked:
+            blockers = []
+            from_info = assets.get(m["from"], {})
+            to_info   = assets.get(m["to"],   {})
+            if from_info.get("still_exists") is False:
+                blockers.append(m["from"])
+            if to_info.get("still_exists") is False:
+                blockers.append(m["to"])
+            blocker_str = " + ".join(blockers) if blockers else "?"
+            lines.append(
+                f"  · {m['from']} → {m['to']}  ({m['tool']})  "
+                f"needs: {blocker_str}"
+            )
+
+    lines.append("")
+    return lines
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
+
+def check_oracle(slug: str | None = None) -> int:
+    """Verify that every RENDER READY+ episode has at least one prediction entry
+    in data/concepts.json (type: "prediction", introduced.episode == slug).
+
+    This is the oracle-track gate: Parallax's brand commitment to timestamped,
+    falsifiable predictions means every episode must commit at least one before
+    publish. Without this gate, the commitment is aspirational prose only.
+
+    Exit codes: 0 = all good, 1 = missing predictions on gated episodes.
+    """
+    if not CONCEPTS_JSON.is_file():
+        print(f"✗ {CONCEPTS_JSON} not found", file=sys.stderr)
+        return 2
+
+    data = json.loads(CONCEPTS_JSON.read_text(encoding="utf-8"))
+    concepts = data.get("concepts", [])
+
+    # Build a map: episode_slug → count of prediction entries
+    pred_counts: dict[str, int] = {}
+    for c in concepts:
+        if c.get("type") != "prediction":
+            continue
+        ep = (c.get("introduced") or {}).get("episode")
+        if ep:
+            pred_counts[ep] = pred_counts.get(ep, 0) + 1
+        # Also count any appearances entries
+        for app in c.get("appearances", []):
+            ep2 = app.get("episode")
+            if ep2:
+                pred_counts[ep2] = pred_counts.get(ep2, 0) + 1
+
+    # States that require an oracle entry before publishing
+    ORACLE_REQUIRED_IDX = STATE_ORDER.index("RENDER READY")
+
+    entries = load_pipeline_state()
+    if not entries:
+        print("✗ pipeline-state.json not found or empty", file=sys.stderr)
+        return 2
+
+    if slug:
+        entries = [e for e in entries if e.slug == slug]
+        if not entries:
+            print(f"✗ episode '{slug}' not found in pipeline-state.json", file=sys.stderr)
+            return 2
+
+    problems: list[str] = []
+    all_ok: list[str] = []
+    skipped: list[str] = []
+
+    for e in entries:
+        idx = _stage_idx_for(e.state)
+        if idx < ORACLE_REQUIRED_IDX:
+            skipped.append(e.slug)
+            continue
+        count = pred_counts.get(e.slug, 0)
+        if count == 0:
+            problems.append(
+                f"  {ERROR} {e.slug} ({e.state}) — no prediction entries in "
+                f"data/concepts.json  (type: 'prediction', introduced.episode: '{e.slug}')"
+            )
+        else:
+            all_ok.append(
+                f"  {OK} {e.slug} ({e.state}) — {count} prediction "
+                f"{'entry' if count == 1 else 'entries'}"
+            )
+
+    if not problems:
+        for line in all_ok:
+            print(line)
+        if skipped:
+            print(f"\n  (skipped: {', '.join(skipped)} — pre-RENDER READY state)")
+        print(f"\n{OK} Oracle track: all RENDER READY+ episodes have prediction entries.")
+        return 0
+
+    print(f"\n{ERROR} Oracle track gate — missing prediction entries:\n")
+    for line in problems:
+        print(line)
+    for line in all_ok:
+        print(line)
+    print(
+        "\n  Fix: add an entry to data/concepts.json with:\n"
+        "       \"type\": \"prediction\", "
+        "\"introduced\": {\"episode\": \"<slug>\", ...}\n"
+        "  Predictions are the oracle track — Parallax's core brand commitment."
+    )
+    return 1
+
+
+def session_brief(episode: str | None = None) -> int:
+    """Print a compact session-start digest: at-a-glance table + top 3 next
+    actions per active episode. Designed to orient the operator in <10 seconds.
+
+    Covers all non-RETROED episodes (or just one if episode is specified).
+    """
+    entries = load_pipeline_state()
+    if not entries:
+        print("✗ pipeline-state.json not found or empty", file=sys.stderr)
+        return 2
+
+    if episode:
+        entries = [e for e in entries if e.slug == episode]
+        if not entries:
+            print(f"✗ episode '{episode}' not found in pipeline-state.json", file=sys.stderr)
+            return 2
+
+    statuses = [compute_episode_status(e) for e in entries]
+
+    # ── At-a-glance table ────────────────────────────────────────────────────
+    today = datetime.date.today().isoformat()
+    print(f"\n{'═' * 62}")
+    print(f"  Parallax — Session Brief                    {today}")
+    print(f"{'═' * 62}\n")
+    print(f"{'Episode':<30}  {'State':<20}  {'Health'}")
+    print(f"{'─' * 30}  {'─' * 20}  {'─' * 30}")
+    for s in statuses:
+        badge = STATE_BADGES.get(s.state, s.state)
+        print(f"{s.slug:<30}  {badge:<20}  {s.health_summary}")
+    print()
+
+    # ── Per-episode next actions (skip RETROED/PUBLISHED) ───────────────────
+    active = [s for s in statuses if s.state not in ("RETROED", "PUBLISHED")]
+    if not active:
+        print("All episodes shipped. Nothing left to do.\n")
+        return 0
+
+    for s in active:
+        print(f"── {s.slug} ({s.state}) {'─' * max(0, 54 - len(s.slug) - len(s.state))}")
+        actions = _compute_next_actions(s)
+        if not actions:
+            print("  ✓ No blockers — episode is clean.\n")
+            continue
+        for i, (_, label, cmd) in enumerate(actions[:3], 1):
+            print(f"  {i}. {label}")
+            if cmd:
+                print(f"     $ {cmd}")
+        print()
+
+    # ── Oracle track reminder for RENDER READY+ ──────────────────────────────
+    render_ready = [s for s in active if s.stage_idx >= STATE_ORDER.index("RENDER READY")]
+    if render_ready:
+        print("─" * 62)
+        print("  Oracle check:")
+        oracle_rc = check_oracle(render_ready[0].slug if len(render_ready) == 1 else None)
+        if oracle_rc != 0:
+            print(f"  ⚠  Run: python3 tools/pipeline_validator.py --check-oracle")
+        print()
+
+    return 0
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(
@@ -1524,6 +2352,15 @@ def main() -> int:
         ),
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        dest="dry_run",
+        help=(
+            "With --fix: print the renames that would be performed without "
+            "executing them. Has no effect on other flags."
+        ),
+    )
+    parser.add_argument(
         "--write-status",
         action="store_true",
         help=(
@@ -1549,6 +2386,16 @@ def main() -> int:
             "--update-tracker would do. Prints a per-episode summary and exits "
             "1 if any episode has health warnings (manifest-stale, zero-hits, "
             "never-rendered, etc.)."
+        ),
+    )
+    parser.add_argument(
+        "--check-sources",
+        action="store_true",
+        help=(
+            "Verify CLAUDE.md + project/IDEAS.md state tables agree with "
+            "pipeline-state.json (the single source of truth). Read-only; "
+            "exits 1 on any drift. Wired into scripts/lint.sh so the two "
+            "human-facing tables can never silently contradict the JSON."
         ),
     )
     parser.add_argument(
@@ -1585,9 +2432,10 @@ def main() -> int:
         "--check",
         action="store_true",
         help=(
-            "With --emit-html: don't write, compare instead. Exit 1 if the "
-            "committed HTML differs from what would be generated now. Wired "
-            "into scripts/lint.sh as the gen:pipeline-html freshness gate."
+            "Freshness dry-run (don't write, compare instead; exit 1 if stale). "
+            "With --emit-html: compares PIPELINE.html. With --update-tracker: "
+            "compares the PIPELINE.md At-a-glance table + Topics block. Both are "
+            "wired into scripts/lint.sh as freshness gates."
         ),
     )
     parser.add_argument(
@@ -1601,7 +2449,72 @@ def main() -> int:
             "Incompatible with --check."
         ),
     )
+    parser.add_argument(
+        "--intake",
+        nargs=2,
+        metavar=("SLUG", "ASSET_ID"),
+        help=(
+            "Wire an approved asset into assembly-manifest.json and refresh _status.md. "
+            "Copy the treated file to public/episodes/{slug}/stills/ or clips/ first. "
+            "Example: --intake prisoners-dilemma arch-rand-hq"
+        ),
+    )
+    parser.add_argument(
+        "--check-oracle",
+        action="store_true",
+        help=(
+            "Verify that every RENDER READY+ episode has at least one prediction "
+            "entry (type: 'prediction') in data/concepts.json. The oracle track is "
+            "Parallax's core brand commitment — timestamped falsifiable predictions "
+            "before publish. Read-only; exits 1 when any gated episode is missing "
+            "predictions. Pair with an episode slug to check only that episode."
+        ),
+    )
+    parser.add_argument(
+        "--session-brief",
+        action="store_true",
+        help=(
+            "Print a compact session-start digest: at-a-glance table + top 3 "
+            "next actions per active episode. Designed to orient the operator in "
+            "under 10 seconds without opening any files. Read-only; always exits 0."
+        ),
+    )
     args = parser.parse_args()
+
+    # ── --intake path ────────────────────────────────────────────────────────
+    # Wire one approved asset into assembly-manifest.json + refresh _status.md.
+    # Standalone path — does not run the validation or write-status flows.
+    if args.intake:
+        return intake_asset(args.intake[0], args.intake[1])
+
+    # ── --session-brief path ─────────────────────────────────────────────────
+    # Compact session-start digest: at-a-glance table + top 3 next actions per
+    # active episode. Run this at the start of every production session.
+    if args.session_brief:
+        return session_brief(args.episode)
+
+    # ── --check-oracle path ──────────────────────────────────────────────────
+    # Oracle-track gate: verify RENDER READY+ episodes have prediction entries.
+    # Enforces the brand commitment to falsifiable, timestamped predictions.
+    if args.check_oracle:
+        return check_oracle(args.episode)
+
+    # ── --check-sources path ─────────────────────────────────────────────────
+    # Standalone consistency gate: CLAUDE.md + IDEAS.md state tables vs
+    # pipeline-state.json. Read-only; exit 1 on drift. Used by scripts/lint.sh.
+    if args.check_sources:
+        problems = check_source_consistency()
+        if problems:
+            print(f"{ERROR} Source-of-truth drift — secondary state tables disagree "
+                  "with episodes/pipeline-state.json:\n")
+            for p in problems:
+                print(f"  {ERROR} {p}")
+            print("\n  Fix: edit pipeline-state.json (canonical), then update the "
+                  "CLAUDE.md / IDEAS.md rows to carry the same lifecycle token.")
+            return 1
+        print(f"{OK} Source consistency: CLAUDE.md + project/IDEAS.md + publish-order.json "
+              "agree with pipeline-state.json on every episode's state.")
+        return 0
 
     # ── --suggest-states path ────────────────────────────────────────────────
     # Walks every episode and surfaces ready-to-promote candidates by
@@ -1680,16 +2593,71 @@ def main() -> int:
         else:
             targeted = all_statuses
 
+        # ── --update-tracker --check: PIPELINE.md freshness gate ──────────────
+        # Dry-run: detect whether the At-a-glance table or Topics block would
+        # change if regenerated. Mirrors the --emit-html --check HTML gate so
+        # the Markdown dashboard can't silently age between manual runs.
+        if args.update_tracker and args.check:
+            health_pending = update_tracker_health(all_statuses, check=True)
+            topics_pending = update_tracker_topics(check=True)
+            if health_pending or topics_pending:
+                bits = []
+                if health_pending:
+                    bits.append("At-a-glance Health/day columns")
+                if topics_pending:
+                    bits.append("Topics auto-summary block")
+                print(f"{ERROR} PIPELINE.md is STALE — {' + '.join(bits)} "
+                      "would change if regenerated.")
+                print("  Fix: python3 tools/pipeline_validator.py "
+                      "--write-status --update-tracker")
+                return 1
+            print(f"{OK} PIPELINE.md At-a-glance + Topics block are fresh.")
+            return 0
+
         if args.check_only:
-            # Dry-run mode: print summary, return 1 if any health issues.
+            # Dry-run mode: print health summary AND run full per-episode
+            # validation (required-artifact errors + stale-state detection that
+            # the health chips alone miss) AND the source-consistency gate.
             print("\nPipeline status summary (--check-only; no files written):\n")
             any_warnings = False
             for s in targeted:
                 print(f"  {s.slug:<30} {STATE_BADGES.get(s.state, s.state):<20} {s.health_summary}")
                 if s.health_summary not in ("✓ clean", "✓ shipped", "⏸ awaiting promotion"):
                     any_warnings = True
+
+            # Full validation for the targeted episodes (read-only).
+            targeted_slugs = {s.slug for s in targeted}
+            val_reports = [
+                validate_episode(r) for r in parse_pipeline_md()
+                if r.slug in targeted_slugs
+            ]
+            val_errors = [(r.slug, f.msg) for r in val_reports for f in r.errors]
+            if val_errors:
+                print("\n  Validation errors (required artifacts / state):")
+                for slug, msg in val_errors:
+                    print(f"    {ERROR} {slug}: {msg}")
+
+            # Stale-state warnings (declared state behind on-disk evidence).
+            stale_findings = [
+                (r.slug, f.msg) for r in val_reports for f in r.findings
+                if "STALE" in f.msg
+            ]
+            if stale_findings:
+                print("\n  Stale state (declared state behind artifacts):")
+                for slug, msg in stale_findings:
+                    first_line = msg.splitlines()[0]
+                    print(f"    {WARN} {slug}: {first_line}")
+                any_warnings = True
+
+            # Source-of-truth consistency (full run only).
+            src_problems = [] if args.episode else check_source_consistency()
+            if src_problems:
+                print("\n  Source drift:")
+                for p in src_problems:
+                    print(f"    {ERROR} {p}")
+
             print()
-            return 1 if any_warnings else 0
+            return 1 if (any_warnings or val_errors or src_problems) else 0
 
         if args.write_status:
             for s in targeted:
@@ -1722,19 +2690,24 @@ def main() -> int:
 
     # ── --fix: promote versioned drafts to canonical before validation ─────────
     if args.fix:
+        if args.dry_run:
+            print("\n── Naming drift (dry-run — no files moved) " + "─" * 23)
         fix_summary: list[str] = []
         for row in rows:
             ep_dir = EPISODES_DIR / row.slug
             if not ep_dir.is_dir():
                 continue
-            renames = fix_naming_drift(ep_dir)
+            renames = fix_naming_drift(ep_dir, dry_run=args.dry_run)
             if renames:
                 fix_summary.append(f"\n  {row.slug}:")
                 fix_summary.extend(renames)
         if fix_summary:
-            print("\n── Naming drift fixes " + "─" * 35)
+            if not args.dry_run:
+                print("\n── Naming drift fixes " + "─" * 35)
             for line in fix_summary:
                 print(line)
+            if args.dry_run:
+                print("\n  (dry-run — re-run without --dry-run to apply)")
             print()
         else:
             print("\n  ✓ No naming drift to fix — all canonical files present.\n")
@@ -1759,13 +2732,26 @@ def main() -> int:
     stale          = [r.slug for r in reports
                       if any("STALE" in f.msg for f in r.findings)]
 
+    # Source-of-truth consistency (only on a full run — a single-episode run
+    # shouldn't fail on drift in OTHER episodes' rows). Counts as error(s).
+    source_problems: list[str] = []
+    if not args.episode:
+        source_problems = check_source_consistency()
+        if source_problems:
+            print("\n── Source consistency " + "─" * 35)
+            for p in source_problems:
+                print(f"  {ERROR} {p}")
+            total_errors += len(source_problems)
+
     print("\n── Summary " + "─" * 46)
     print(f"  {len(reports)} episode(s) checked  "
           f"· {total_errors} error(s)  · {total_warnings} warning(s)")
     if stale:
         print(f"  Stale state detected: {', '.join(stale)}")
+    if source_problems:
+        print(f"  Source drift: {len(source_problems)} table(s) disagree with pipeline-state.json")
     if total_errors == 0 and total_warnings == 0:
-        print("  ✓ All checks passed — PIPELINE.md is consistent with artifacts.")
+        print("  ✓ All checks passed — PIPELINE.md + state tables consistent with artifacts.")
     if checkpoints_written:
         print("  Checkpoints written: "
               + ", ".join(f"episodes/{s}/_checkpoint.md" for s in checkpoints_written))

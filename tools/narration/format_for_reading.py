@@ -130,16 +130,32 @@ class Beat:
 def find_script(slug: str) -> Path | None:
     """Return the canonical or latest versioned production script for `slug`.
 
-    Resolution order matches what `pipeline_validator._detect_script_version`
-    does: canonical `script-production.md` first, then the highest
-    `script-vN-production.md`. Returns None if nothing matches.
+    Resolution order (most-canonical-first):
+      1. script.md (new canonical name — EPISODE_STRUCTURE.md)
+      2. script-production.md (legacy canonical)
+      3. Highest script-vN-production.md at root (legacy versioned)
+      4. Highest script-vN*.md in drafts/ subfolder (fallback)
     """
     ep_dir = EPISODES_DIR / slug
-    canonical = ep_dir / "script-production.md"
-    if canonical.is_file():
-        return canonical
+    # New canonical name
+    plain = ep_dir / "script.md"
+    if plain.is_file():
+        return plain
+    # Legacy canonical
+    legacy = ep_dir / "script-production.md"
+    if legacy.is_file():
+        return legacy
+    # Legacy versioned
     versioned = sorted(ep_dir.glob("script-v*-production.md"))
-    return versioned[-1] if versioned else None
+    if versioned:
+        return versioned[-1]
+    # Drafts fallback
+    drafts_dir = ep_dir / "drafts"
+    if drafts_dir.is_dir():
+        drafts_versioned = sorted(drafts_dir.glob("script-v*.md"))
+        if drafts_versioned:
+            return drafts_versioned[-1]
+    return None
 
 
 # ── Parsing ──────────────────────────────────────────────────────────────────

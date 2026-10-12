@@ -228,17 +228,27 @@ class TestRealScripts:
 
     @pytest.fixture(scope="class")
     def v5_metrics(self) -> em.EngagementMetrics:
-        path = REPO_ROOT / "episodes" / "prisoners-dilemma" / "script-v5-production.md"
-        if not path.is_file():
-            pytest.skip("script-v5-production.md not present")
-        return em.compute_engagement_metrics(path)
+        # v5 moved to drafts/ after EPISODE_STRUCTURE.md restructure
+        ep = REPO_ROOT / "episodes" / "prisoners-dilemma"
+        for candidate in (
+            ep / "drafts" / "script-v5-production.md",
+            ep / "script-v5-production.md",
+        ):
+            if candidate.is_file():
+                return em.compute_engagement_metrics(candidate)
+        pytest.skip("script-v5-production.md not present")
 
     @pytest.fixture(scope="class")
     def v6_metrics(self) -> em.EngagementMetrics:
-        path = REPO_ROOT / "episodes" / "prisoners-dilemma" / "script-v6-production.md"
-        if not path.is_file():
-            pytest.skip("script-v6-production.md not present")
-        return em.compute_engagement_metrics(path)
+        # v6 renamed to script.md (new canonical) after EPISODE_STRUCTURE.md restructure
+        ep = REPO_ROOT / "episodes" / "prisoners-dilemma"
+        for candidate in (
+            ep / "script.md",
+            ep / "script-v6-production.md",
+        ):
+            if candidate.is_file():
+                return em.compute_engagement_metrics(candidate)
+        pytest.skip("script-v6-production.md not present")
 
     def test_v6_detects_pivot(self, v6_metrics):
         assert v6_metrics.has_pivot_signal

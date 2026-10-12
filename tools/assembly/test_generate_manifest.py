@@ -21,6 +21,9 @@ from generate_manifest import (
     lint_mg_streaks,
     _find_sync_word,
     _build_segment,
+    apply_over_previous,
+    expand_brace_segments,
+    hand_wired_refusal,
     resolve_all_sync_points,
     FPS,
 )
@@ -533,6 +536,92 @@ def test_parse_dir_drift_and_sync_independent():
     assert result["syncWords"] == ["chokepoint"]
 
 
+# ── over(previous): hold-under ──────────────────────────────────────────────
+
+
+def _picture(seg_id="beat5-seg27", end=10.0):
+    return {"id": seg_id, "type": "FOOTAGE", "startSec": 0.0, "endSec": end,
+            "layer": "background", "beat": "beat5"}
+
+
+def _card(seg_id="beat5-seg28", start=10.0, component="KineticTypography"):
+    return {"id": seg_id, "type": "TEMPLATE", "startSec": start, "endSec": start + 8.0,
+            "layer": "foreground", "beat": "beat5",
+            "template": {"component": component}}
+
+
+def test_parse_dir_over_previous():
+    result = parse_dir_lines(["DIR: over(previous)"])
+    assert result["overPrevious"] is True
+    assert "overDim" not in result
+
+
+def test_parse_dir_over_previous_with_dim():
+    result = parse_dir_lines(["DIR: over(previous, dim:0.6)"])
+    assert result["overPrevious"] is True
+    assert result["overDim"] == 0.6
+
+
+def test_parse_dir_over_unknown_target_ignored():
+    assert "overPrevious" not in parse_dir_lines(["DIR: over(next)"])
+
+
+def test_over_previous_wires_card_to_picture():
+    card = _card()
+    apply_over_previous(card, _picture(), {"overPrevious": True, "overDim": 0.6})
+    assert card["layered"] == {
+        "backgroundSegmentId": "beat5-seg27",
+        "position": "full",
+        "backgroundDim": 0.6,
+    }
+
+
+def test_over_previous_without_dim_leaves_engine_default():
+    card = _card()
+    apply_over_previous(card, _picture(), {"overPrevious": True})
+    assert card["layered"] == {"backgroundSegmentId": "beat5-seg27", "position": "full"}
+
+
+def test_over_previous_absent_directive_does_nothing():
+    card = _card()
+    apply_over_previous(card, _picture(), {})
+    assert "layered" not in card
+
+
+def test_over_previous_needs_a_picture_before_it(capsys):
+    card = _card()
+    apply_over_previous(card, _card("beat5-seg27", start=2.0), {"overPrevious": True})
+    assert "layered" not in card
+    assert "not a picture" in capsys.readouterr().err
+    first = _card()
+    apply_over_previous(first, None, {"overPrevious": True})
+    assert "layered" not in first
+
+
+def test_over_previous_only_on_supported_templates(capsys):
+    card = _card(component="AxiomList")
+    apply_over_previous(card, _picture(), {"overPrevious": True})
+    assert "layered" not in card
+    assert "AxiomList cannot be drawn over a picture" in capsys.readouterr().err
+
+
+def test_over_previous_needs_card_to_abut_picture(capsys):
+    card = _card(start=11.0)  # e.g. hold(pre:1s) on the card
+    apply_over_previous(card, _picture(end=10.0), {"overPrevious": True})
+    assert "layered" not in card
+    assert "does not start where the picture ends" in capsys.readouterr().err
+
+
+def test_over_previous_kept_on_first_brace_card_only():
+    card = _card()
+    card["template"]["dataFile"] = None
+    card["layered"] = {"backgroundSegmentId": "beat5-seg27", "position": "full"}
+    card["_braceDataFiles"] = ["a.json", "b.json"]
+    first, second = expand_brace_segments([card])
+    assert first["layered"]["backgroundSegmentId"] == "beat5-seg27"
+    assert "layered" not in second
+
+
 def test_parse_dir_multiple_lines_combined():
     result = parse_dir_lines([
         "DIR: hold(breathe)",
@@ -582,14 +671,26 @@ def test_transitions_single_no_transition():
     assert "transition" not in result[0]
 
 
-def test_transitions_beat_boundary_dissolve():
+def test_transitions_beat_boundary_is_a_cut():
+    """Revised Oct 10, 2026: a beat boundary no longer gets an implicit
+    dissolve. It is a cut unless the script asks otherwise."""
     segs = [
         _make_seg("s1", "FOOTAGE", "beat1"),
         _make_seg("s2", "FOOTAGE", "beat2"),
     ]
     result = apply_default_transitions(segs)
+    assert "transition" not in result[1]
+
+
+def test_transitions_beat_boundary_dissolve_via_dir():
+    """A dissolve at a beat boundary still works when the script asks for it."""
+    segs = [
+        {**_make_seg("s1", "FOOTAGE", "beat1"), "_dirTransitionOut": "dissolve"},
+        _make_seg("s2", "FOOTAGE", "beat2"),
+    ]
+    result = apply_default_transitions(segs)
+    assert result[0]["transition"]["out"] == "dissolve"
     assert result[1]["transition"]["in"] == "dissolve"
-    assert result[1]["transition"]["durationSec"] == 0.5
 
 
 def test_transitions_title_card_fade():
@@ -700,15 +801,14 @@ def test_transitions_different_templates_in_match_cut_set_fall_back_to_cut():
 
 
 def test_transitions_match_cut_still_does_not_fire_at_beat_boundary():
-    """Beat-boundary AtlasPlate→AtlasPlate stays on Rule 1 (dissolve 0.5s)
-    — match-cut-still is for within-beat continuation only."""
+    """Beat-boundary AtlasPlate→AtlasPlate is a plain cut (Rule 1) —
+    match-cut-still is for within-beat continuation only."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="AtlasPlate"),
         _make_seg("s2", "TEMPLATE", "beat2", component="AtlasPlate"),
     ]
     result = apply_default_transitions(segs)
-    assert result[1]["transition"]["in"] == "dissolve"
-    assert result[1]["transition"]["durationSec"] == 0.5
+    assert "transition" not in result[1]
 
 
 def test_transitions_match_cut_still_is_overridden_by_dir():
@@ -984,15 +1084,23 @@ def test_explicit_jcut_wins_over_default():
     assert result[1]["narrationLeadIn"] == 0.4
 
 
-def test_beat_boundary_dissolve_no_narration_lead_in():
-    """Phase 7: beat-boundary dissolve (not a hard cut) skips the J-cut default."""
+def test_beat_boundary_cut_gets_narration_lead_in():
+    """A beat boundary is a hard cut now, so it gets the J-cut default like
+    any other cut; an authored dissolve there still skips it."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1"),
         _make_seg("s2", "TEMPLATE", "beat2"),
     ]
     result = apply_default_transitions(segs)
-    # Rule 1 assigns dissolve — trans_in != "cut" → no narrationLeadIn
-    assert result[1].get("transition", {}).get("in") == "dissolve"
+    assert "transition" not in result[1]
+    assert result[1]["narrationLeadIn"] == 0.7
+
+    authored = [
+        {**_make_seg("s1", "TEMPLATE", "beat1"), "_dirTransitionOut": "dissolve"},
+        _make_seg("s2", "TEMPLATE", "beat2"),
+    ]
+    result = apply_default_transitions(authored)
+    assert result[1]["transition"]["in"] == "dissolve"
     assert "narrationLeadIn" not in result[1]
 
 
@@ -1077,6 +1185,12 @@ def test_match_cut_still_templates_set_is_canonical():
         "AnnotatedImage",
         "RouteAnimation",
         "PhotoMontage",
+        # Map templates added in the May-20 sprint — consecutive segments share
+        # the same map canvas / camera space, so they match-cut-still like the
+        # other full-bleed map/image templates above.
+        "CinematicMap",
+        "TerritoryMap",
+        "FlowMap",
     } == MATCH_CUT_STILL_TEMPLATES
 
 
@@ -1095,36 +1209,35 @@ def test_transitions_dir_override_beats_rule1():
 def test_transitions_urgent_pace_compresses_duration():
     segs = [
         _make_seg("s1", "FOOTAGE", "beat1"),
-        {**_make_seg("s2", "FOOTAGE", "beat2"), "paceProfile": "urgent"},
+        {**_make_seg("s2", "TRANSITION", "beat1", component="TitleTransition"), "paceProfile": "urgent"},
+        _make_seg("s3", "FOOTAGE", "beat1"),
     ]
     result = apply_default_transitions(segs)
-    # Beat boundary would normally be 0.5s dissolve — urgent compresses by 0.6x
-    trans = result[1].get("transition", {})
-    if trans:
-        assert trans["durationSec"] < 0.5
+    # A title fade is 0.6s — urgent compresses it by 0.6x
+    assert result[1]["transition"]["in"] == "fade"
+    assert result[1]["transition"]["durationSec"] == 0.36
 
 
-def test_transitions_breathing_pace_stretches_cuts_to_dissolves():
-    """Phase 5: same-beat template→template now cuts by default. Rule 7's
-    breathing-pace upgrade then promotes cut→dissolve (0.4s), which is the
-    doctrinal escalation criterion — breathing pace IS the editorial signal
-    that justifies same-data dissolve treatment."""
+def test_transitions_breathing_pace_keeps_cuts_as_cuts():
+    """Revised Oct 10, 2026: breathing pace stretches a transition that is
+    already there; it no longer turns a cut into a dissolve. Pace sets how
+    long a seam takes, not what it claims."""
     segs = [
         _make_seg("s1", "TEMPLATE", "beat1", component="DataChart"),
         {**_make_seg("s2", "TEMPLATE", "beat1", component="KineticTypography"),
          "paceProfile": "breathing"},
     ]
     result = apply_default_transitions(segs)
-    trans = result[1].get("transition", {})
-    assert trans, "breathing pace should upgrade the default cut to a dissolve"
-    assert trans["in"] == "dissolve"
-    assert trans["durationSec"] == 0.4
-    # The breathing-pace upgrade fires BEFORE the J-cut default check, so by
-    # the time the J-cut logic runs, trans_in is already "dissolve" — which
-    # correctly skips the narrationLeadIn injection (J-cuts are for hard cuts only).
-    assert "narrationLeadIn" not in result[1], (
-        "breathing-pace dissolve upgrade should suppress the J-cut default"
-    )
+    assert "transition" not in result[1]
+    assert result[1]["narrationLeadIn"] == 0.7
+
+    title = [
+        _make_seg("s1", "FOOTAGE", "beat1"),
+        {**_make_seg("s2", "TRANSITION", "beat1", component="TitleTransition"), "paceProfile": "breathing"},
+        _make_seg("s3", "FOOTAGE", "beat1"),
+    ]
+    result = apply_default_transitions(title)
+    assert result[1]["transition"]["durationSec"] == 0.9  # 0.6s fade × 1.5
 
 
 # ── infer_music_mood ───────────────────────────────────────────────────────
@@ -1452,6 +1565,50 @@ def test_find_sync_word_multiword():
     assert result["word"] == "semiconductor"
 
 
+def test_find_sync_word_numeral_in_transcript_matches_spelled_cue():
+    """The cue says "forty times"; the transcriber wrote "40 times"."""
+    words = _make_words(["up", "to", "40", "times", "the", "limit"])
+    result = _find_sync_word("forty times", words, 0.0, 5.0)
+    assert result is not None and result["word"] == "40"
+    assert _find_sync_word("forty times", _make_words(["up", "to", "40x", "the"]), 0.0, 5.0)["word"] == "40x"
+    assert _find_sync_word("fourteen percent", _make_words(["about", "14%", "of"]), 0.0, 5.0)["word"] == "14%"
+    assert _find_sync_word("thirty-six", _make_words(["add", "36", "and", "59"]), 0.0, 5.0)["word"] == "36"
+
+
+def test_find_sync_word_never_lands_on_a_word_merely_contained_in_the_cue():
+    """Old fallback: "our" is inside "four days later", so the cue resolved to "Our"."""
+    words = _make_words(["Our", "results", "came", "back", "4", "days", "later,"])
+    result = _find_sync_word("four days later", words, 0.0, 5.0)
+    assert result is not None and result["word"] == "4"
+    # And with the phrase absent there is no hit at all, not a wrong one.
+    assert _find_sync_word("four days later", _make_words(["Our", "results", "came", "back"]), 0.0, 5.0) is None
+    assert _find_sync_word("forty times", _make_words(["many", "times", "over"]), 0.0, 5.0) is None
+
+
+def test_find_sync_word_tolerates_a_near_spelling_but_not_a_short_lookalike():
+    assert _find_sync_word("judgment", _make_words(["a", "judgement", "call"]), 0.0, 5.0)["_score"] < 1.0
+    assert _find_sync_word("four", _make_words(["our", "turn"]), 0.0, 5.0) is None
+
+
+def test_resolve_sync_points_repeated_word_resolves_in_order():
+    """Two cues on the same word take the first and then the second occurrence."""
+    segments = [{"id": "s1", "startSec": 0.0, "endSec": 10.0, "syncWords": ["test", "test"]}]
+    words = _words_at([("test", 2.0), ("the", 2.5), ("test", 6.0)])
+    resolve_all_sync_points(segments, words)
+    assert [p["timeSec"] for p in segments[0]["syncPoints"]] == [2.0, 6.0]
+
+
+def test_resolve_sync_points_confidence_reads_the_transcribers_own_field():
+    """faster-whisper supplies `probability`, WhisperX `score`; a fuzzy hit lowers it further."""
+    segments = [{"id": "s1", "startSec": 0.0, "endSec": 10.0, "syncWords": ["Taiwan", "judgment"]}]
+    words = [{"word": "Taiwan", "start": 1.0, "end": 1.3, "probability": 0.62},
+             {"word": "judgement", "start": 4.0, "end": 4.4, "score": 0.9}]
+    resolve_all_sync_points(segments, words)
+    first, second = segments[0]["syncPoints"]
+    assert first["confidence"] == 0.62
+    assert 0 < second["confidence"] < 0.9
+
+
 # ── parse_dir_lines · type() directive (text-animation register) ───────────
 # Phase 3 text-animation integration: DIR: type(<technique>) populates
 # _direction.textAnimation. Used by visual-spec and template dispatch
@@ -1680,3 +1837,80 @@ def test_resolve_sync_points_dir_to_resolved_pipeline():
     assert [p["frame"] for p in sp] == [round(32.0 * FPS), round(36.5 * FPS), round(41.0 * FPS)]
     # All resolved with confidence > 0
     assert all(p["confidence"] > 0 for p in sp)
+
+
+# ── Brace-expansion data refs (triptych etc.) ────────────────────────────────
+
+def test_resolve_data_file_expands_brace_notation():
+    """[slug/prefix-{a,b,c}.json] resolves to a list of N filenames."""
+    from generate_manifest import resolve_data_file
+    vis = '[MG:] AnnotatedImage TRIPTYCH … [prisoners-dilemma/annotated-image-{valencia,torbel,maine}.json] · 12.8s'
+    out = resolve_data_file("AnnotatedImage", [], vis, data_files={})
+    assert out == [
+        "annotated-image-valencia.json",
+        "annotated-image-torbel.json",
+        "annotated-image-maine.json",
+    ]
+
+
+def test_resolve_data_file_single_ref_unchanged():
+    """A normal single [slug/file.json] still returns a string."""
+    from generate_manifest import resolve_data_file
+    out = resolve_data_file("GameBoard", [], "[prisoners-dilemma/gameboard-staghunt.json]", data_files={})
+    assert out == "gameboard-staghunt.json"
+
+
+def test_expand_brace_segments_splits_into_n_cards():
+    """A segment carrying _braceDataFiles becomes N evenly-timed cards."""
+    from generate_manifest import expand_brace_segments
+    seg = {
+        "id": "beat4-seg20", "type": "TEMPLATE", "startSec": 100.0, "endSec": 112.0,
+        "template": {"component": "AnnotatedImage", "dataFile": "annotated-image-valencia.json"},
+        "_braceDataFiles": [
+            "annotated-image-valencia.json",
+            "annotated-image-torbel.json",
+            "annotated-image-maine.json",
+        ],
+    }
+    out = expand_brace_segments([seg])
+    assert len(out) == 3
+    assert [s["id"] for s in out] == ["beat4-seg20a", "beat4-seg20b", "beat4-seg20c"]
+    assert [s["template"]["dataFile"] for s in out] == [
+        "annotated-image-valencia.json",
+        "annotated-image-torbel.json",
+        "annotated-image-maine.json",
+    ]
+    assert out[0]["startSec"] == 100.0 and out[-1]["endSec"] == 112.0
+    assert all("_braceDataFiles" not in s for s in out)
+
+
+def test_resolve_data_file_heuristics_gated_for_config_episodes():
+    """Silicon-trap keyword heuristics must NOT fire when a custom config
+    (data_files dict) is supplied — prevents cross-episode broken refs like
+    title-section-trap.json leaking into prisoners-dilemma."""
+    from generate_manifest import resolve_data_file
+    # "the trap" would match the silicon-trap heuristic in default mode…
+    assert resolve_data_file("TitleTransition", [], "the trap", data_files=None) == "title-section-trap.json"
+    # …but NOT when a config dict is provided.
+    assert resolve_data_file("TitleTransition", [], "the trap", data_files={"x": "y.json"}) is None
+
+
+# ── handWired lock ───────────────────────────────────────────────────────────
+
+
+def test_hand_wired_manifest_is_not_overwritten(tmp_path):
+    out = tmp_path / "assembly-manifest.json"
+    out.write_text('{"handWired": true, "segments": []}', encoding="utf-8")
+    message = hand_wired_refusal(out)
+    assert message and "handWired" in message and "retime_manifest.py" in message
+    assert hand_wired_refusal(out, force=True) is None
+
+
+def test_ordinary_or_missing_manifest_may_be_regenerated(tmp_path):
+    out = tmp_path / "assembly-manifest.json"
+    assert hand_wired_refusal(out) is None  # nothing there yet
+    out.write_text('{"mode": "estimate", "segments": []}', encoding="utf-8")
+    assert hand_wired_refusal(out) is None
+    out.write_text("not json", encoding="utf-8")
+    assert hand_wired_refusal(out) is None
+

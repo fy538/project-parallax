@@ -145,10 +145,20 @@ class TestCheckOnlyFlag:
         state_path = tmp_path / "episodes" / "pipeline-state.json"
         state_path.parent.mkdir(parents=True)
         state_path.write_text(json.dumps({"episodes": episodes}), encoding="utf-8")
+        # publish-order.json must contain every slug from pipeline-state.json so
+        # the coverage check doesn't fire on synthetic slugs that aren't in the
+        # real publish-order.json.
+        publish_order = tmp_path / "episodes" / "publish-order.json"
+        slugs = [ep["slug"] for ep in episodes]
+        publish_order.write_text(json.dumps({
+            "published": [],
+            "queue": [{"slug": s, "title": s, "state": "draft"} for s in slugs],
+        }), encoding="utf-8")
         monkeypatch.setattr(pv, "ROOT", tmp_path)
         monkeypatch.setattr(pv, "EPISODES_DIR", tmp_path / "episodes")
         monkeypatch.setattr(pv, "REMOTION_DATA", tmp_path / "remotion-templates" / "data" / "episodes")
         monkeypatch.setattr(pv, "PIPELINE_STATE_JSON", state_path)
+        monkeypatch.setattr(pv, "PUBLISH_ORDER_JSON", publish_order)
 
     def test_clean_state_returns_0(self, tmp_path, monkeypatch, capsys):
         self._setup(tmp_path, monkeypatch, [
@@ -156,6 +166,10 @@ class TestCheckOnlyFlag:
              "stateEnteredAt": "2026-05-01",
              "format": None, "targetPublish": None},
         ])
+        # A genuinely clean INCUBATING episode has its folder on disk but no
+        # forward artifacts. --check-only now runs full validation, so the
+        # episode directory must exist (a missing folder is a real error).
+        (tmp_path / "episodes" / "x").mkdir(parents=True, exist_ok=True)
         # incubating with no manifest → health_summary = "⏸ awaiting promotion"
         # which is considered passing (not a warning)
         monkeypatch.setattr(sys, "argv", ["pipeline_validator.py", "--check-only"])
@@ -799,3 +813,80 @@ class TestSuggestStatePromotion:
         self._setup_ep(tmp_path, monkeypatch, "alpha")
         status = _make_status(slug="alpha", state="BLOCKED")
         assert pv.suggest_state_promotion(self._entry("alpha", "BLOCKED"), status) is None
+
+
+# ── Source-of-truth consistency gate (check_source_consistency) ───────────────
+
+class TestSourceConsistency:
+    """check_source_consistency() verifies CLAUDE.md + IDEAS.md state tables
+    agree with pipeline-state.json (the canonical source)."""
+
+    def _setup(self, tmp_path, monkeypatch, *, json_state, claude_state, ideas_state):
+        state_path = tmp_path / "episodes" / "pipeline-state.json"
+        state_path.parent.mkdir(parents=True)
+        state_path.write_text(json.dumps({"episodes": [
+            {"slug": "ep-a", "state": json_state,
+             "stateEnteredAt": "2026-05-01",
+             "format": None, "targetPublish": None},
+        ]}), encoding="utf-8")
+        claude = tmp_path / "CLAUDE.md"
+        claude.write_text(
+            "## Status\n\n"
+            "| Slug | State | Notes |\n|---|---|---|\n"
+            f"| `ep-a` | {claude_state} | some notes |\n",
+            encoding="utf-8",
+        )
+        ideas = tmp_path / "project" / "IDEAS.md"
+        ideas.parent.mkdir(parents=True)
+        ideas.write_text(
+            "| Ep | Slug | Format | Arc | Pipeline State |\n|---|---|---|---|---|\n"
+            f"| 1 | `ep-a` | X | Y | {ideas_state} |\n",
+            encoding="utf-8",
+        )
+        # publish-order.json must list all slugs from pipeline-state.json so
+        # the coverage check doesn't fire in tests that aren't testing it.
+        publish_order = tmp_path / "episodes" / "publish-order.json"
+        publish_order.write_text(json.dumps({
+            "published": [],
+            "queue": [{"slug": "ep-a", "title": "Test Episode", "state": "draft"}],
+        }), encoding="utf-8")
+        monkeypatch.setattr(pv, "ROOT", tmp_path)
+        monkeypatch.setattr(pv, "PIPELINE_STATE_JSON", state_path)
+        monkeypatch.setattr(pv, "CLAUDE_MD", claude)
+        monkeypatch.setattr(pv, "IDEAS_MD", ideas)
+        monkeypatch.setattr(pv, "PUBLISH_ORDER_JSON", publish_order)
+
+    def test_aligned_returns_no_problems(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch,
+                    json_state="RENDER READY",
+                    claude_state="RENDER READY",
+                    ideas_state="🎬 RENDER READY — needs render")
+        assert pv.check_source_consistency() == []
+
+    def test_claude_drift_detected(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch,
+                    json_state="RENDER READY",
+                    claude_state="INCUBATING",   # wrong
+                    ideas_state="🎬 RENDER READY")
+        problems = pv.check_source_consistency()
+        assert any("CLAUDE.md" in p and "ep-a" in p for p in problems)
+        assert not any("IDEAS.md" in p for p in problems)
+
+    def test_ideas_drift_detected(self, tmp_path, monkeypatch):
+        self._setup(tmp_path, monkeypatch,
+                    json_state="RENDER READY",
+                    claude_state="RENDER READY",
+                    ideas_state="🔬 RESEARCHING — deep research")  # wrong
+        problems = pv.check_source_consistency()
+        assert any("IDEAS.md" in p and "ep-a" in p for p in problems)
+        assert not any("CLAUDE.md" in p for p in problems)
+
+    def test_slug_absent_from_doc_is_not_drift(self, tmp_path, monkeypatch):
+        # IDEAS.md doesn't list ep-a at all → not a drift (doc simply doesn't track it).
+        self._setup(tmp_path, monkeypatch,
+                    json_state="RENDER READY",
+                    claude_state="RENDER READY",
+                    ideas_state="🎬 RENDER READY")
+        ideas = tmp_path / "project" / "IDEAS.md"
+        ideas.write_text("# IDEAS\n\nNo episode tables here.\n", encoding="utf-8")
+        assert pv.check_source_consistency() == []

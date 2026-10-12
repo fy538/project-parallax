@@ -27,6 +27,20 @@ run() {
   fi
 }
 
+# ─── Dev hook installation guard (advisory, non-blocking) ──────────────────
+# The pipeline auto-sync (stateEnteredAt stamping + dashboard refresh + the
+# source-consistency gate) lives in .githooks/pre-commit and only fires when
+# core.hooksPath points at .githooks. A fresh clone defaults to .git/hooks and
+# silently skips it, so the "automatic" tracking is dormant. Warn rather than
+# fail — CI runs this script directly and never commits.
+HOOKS_PATH="$(git config --get core.hooksPath || echo '')"
+if [ "$HOOKS_PATH" != ".githooks" ]; then
+  echo ""
+  echo "  ! git hooks NOT installed (core.hooksPath='${HOOKS_PATH:-<default>}', expected '.githooks')."
+  echo "    Pipeline auto-sync + dashboard refresh on commit are DORMANT. Activate with:"
+  echo "      ./scripts/bootstrap.sh"
+fi
+
 # ─── Python ────────────────────────────────────────────────────────────────
 # ruff baseline is zero — anything new should fail this. Per pyproject.toml.
 if python3 -m ruff --version >/dev/null 2>&1; then
@@ -67,6 +81,17 @@ run "check_brand_mark.py (no hardcoded `∴` in tools/)" \
 run "check_status_emoji.py (no hardcoded 🟢/🟡/🔴 in tools/)" \
   python3 tools/lint/check_status_emoji.py
 
+# ─── Script-stage lint (per-episode, errors only) ──────────────────────────
+# script_lint.py exits non-zero only on error-severity rules (deprecated cut()
+# types, invalid PACE:, verification-process narration); warnings print but pass.
+shopt -s nullglob
+scripts=(episodes/*/script.md)
+shopt -u nullglob
+for sc in "${scripts[@]}"; do
+  case "$sc" in *EPISODE_TEMPLATE*) continue;; esac
+  run "script_lint.py ($sc)" python3 tools/lint/script_lint.py "$sc"
+done
+
 # ─── Assembly-manifest doctrine lint (per-episode) ─────────────────────────
 # manifest_lint expects file path args. Find all current assembly manifests.
 shopt -s nullglob
@@ -103,6 +128,21 @@ run "lint-math-formulas (M-MATH-VALID — KaTeX parse check)" \
 # + Markdown surfaces stay together.)
 run "pipeline_validator --emit-html --check (dashboard HTML freshness)" \
   python3 tools/pipeline_validator.py --emit-html --check
+
+# ─── Pipeline dashboard Markdown fresh ────────────────────────────────────
+# Same freshness contract for episodes/PIPELINE.md: the At-a-glance table
+# (days-in-state + Health column) and the auto-Topics block must match what
+# regeneration would produce. Catches the "committed table silently ages
+# between manual check-episode.sh runs" failure mode.
+run "pipeline_validator --update-tracker --check (dashboard MD freshness)" \
+  python3 tools/pipeline_validator.py --update-tracker --check
+
+# ─── Episode state source-of-truth consistency ────────────────────────────
+# pipeline-state.json is canonical. The CLAUDE.md Status table and the
+# IDEAS.md Launch-sequence table mirror it; this gate fails if either drifts
+# so the three surfaces can never silently contradict each other again.
+run "pipeline_validator --check-sources (state table consistency)" \
+  python3 tools/pipeline_validator.py --check-sources
 
 # ─── Doc-link sanity (cheap; checks cross-references) ──────────────────────
 if [ -x ./scripts/check-docs.sh ]; then

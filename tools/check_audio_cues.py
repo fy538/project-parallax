@@ -85,8 +85,16 @@ CANONICAL_CUE_TYPES = CANONICAL_SFX_TYPES | CANONICAL_TEXTURE_TYPES
 
 
 def find_cue_sheet(slug: str) -> Path | None:
-    p = EPISODES_ROOT / slug / "audio-cue-sheet.md"
-    return p if p.is_file() else None
+    """Find audio-cue-sheet.md in the canonical location (audio/ subfolder)
+    or legacy root location (backward-compat)."""
+    ep_dir = EPISODES_ROOT / slug
+    for candidate in (
+        ep_dir / "audio" / "audio-cue-sheet.md",  # canonical (new structure)
+        ep_dir / "audio-cue-sheet.md",             # legacy (root)
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
 
 
 # Match every mood word in the music bed table column. The cue sheet uses
