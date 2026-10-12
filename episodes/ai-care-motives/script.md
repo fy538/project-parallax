@@ -53,8 +53,8 @@
 
 | NARRATION | VISUAL PRODUCTION |
 |-----------|-------------------|
-| Now you're the one in the water. A stranger pulls you out of the river. Later you find out he jumped in hoping for a reward. | **P2** · [AI-GEN:] river, muted blue-grey and umber: a geometric figure reaching an arm into the water toward a second figure, banks in flat planes · *Register 3* · ~12s budget |
-| Do you admire him less? Did the rescue give you less? You're alive. The reason changes what you think of him. It changes nothing about what he gave you. | **P2** · [AI-GEN:] the rescued figure on the bank, a second figure walking away; hold on the rescued figure, not a new diagram · ~13s budget |
+| Now you're the one in the water. A stranger pulls you out of the river. Later you find out he jumped in hoping for a reward. | **P2** · [AI-GEN:] river, muted blue-grey and umber. A clip made from three edited keyframes of the river still (alone in the water, the clasp, the pull) plays under the first two sentences, so the pull lands on "pulls you out"; cut to the rescuer in close framing on "hoping for a reward" · *Register 3* · [clips/aigen-04-rescue-3kf.mp4] · ~7s |
+| Do you admire him less? Did the rescue give you less? You're alive. The reason changes what you think of him. It changes nothing about what he gave you. | **P2** · [AI-GEN:] the rescued figure on the bank, a second figure walking away: a short clip of the wide view on the first two questions, then three framings of the still (the rescued figure on "You're alive", the distant figure on "what you think of him", the blanket and hands on "what he gave you"); not a new diagram · [clips/aigen-05-walkaway.mp4] · ~10s |
 |  | PACE: breathing |
 |  | DIR: hold(land) |
 | John Stuart Mill made this exact point. {✅} Saving a fellow creature from drowning is right, he wrote, "whether his motive be duty, or the hope of being paid for his trouble." His point: why the man did it tells you about the man. The hope of payment does not make this rescue wrong. | **P2** · [ARCHIVAL:] John Stuart Mill portrait — photogravure after John Watkins's 1865 photograph (Wikimedia Commons, public domain; portrait card `portrait-mill.json`, natural tones); the portrait stays while the quotation types beside it on "he wrote" — "whether his motive be duty, or the hope of being paid for his trouble" — Mill, *Utilitarianism*, Ch. II · one card · [ai-care-motives/portrait-mill.json] · ~23s budget |
@@ -200,7 +200,7 @@ Wikimedia Commons: Kant, Mill and Plato portraits; photographs of the 2015 scand
 Twelve distinct stills, several reused; timings and narration cues updated in the shot list and prompts:
 - Scenes (grounding role): dinner table; shop counter (motif frame, reused in Beats 4 and 8); second shopkeeper at window; river rescue; rescued figure on the bank; desk at night (first used in Beat 3, then Beat 7 opening and close); desk at dawn with figures behind glass.
 - Atmospheric role: rating cards above an assistant (reused as street facades in Beat 4); shepherd and ring; two identical ring-wearing figures; private notes behind a screen; lit window in a dark facade.
-Motion: Ken Burns by default; consider a single-still clip only for the river rescue (reaching arm). Pacing check: no more than two consecutive AI-GEN rows in any beat.
+Motion (updated Oct 12): no still is held longer than about seven seconds; a long line is covered by two to five framings of its still, cut on sentence boundaries (the wiring is in the manifest). Clips are used where the script has action: the street emptying, the river pull, the walk away. Pacing check: no more than two consecutive AI-GEN rows in any beat.
 
 ## PRODUCTION NOTES
 

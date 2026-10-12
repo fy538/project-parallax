@@ -2,7 +2,7 @@
   "episode": "ai-care-motives",
   "source": "Summarised from Anthropic, “Tracing the thoughts of a large language model” (2025) · Claude 3.5 Haiku",
   "title": "Checking the answer is not explaining the method",
-  "subtitle": "Our summary of a published example · Anthropic, 2025",
+  "subtitle": "Our summary · Anthropic, 2025",
   "durationSec": 12,
   "text": "How the model said it got 95:\n\n6 + 9 = 15, carry the 1.\n\n3 + 5 + 1 = 9.",
   "fontSize": 46,

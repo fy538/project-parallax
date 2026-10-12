@@ -59,3 +59,13 @@
 
 **Verification:** Both segments rendered from the live manifest and checked frame by frame; data validation, type-check and the measured visual QA run after the edit.
 
+## v1.7, pace and cutting — 2026-10-12
+
+**What changed:** After watching the first full draft Tiger found the narration a little slow and the picture thin on generated imagery. The synthetic timing read was re-paced from 140 to 160 words a minute with shorter pauses (11:04 to 9:36). Eighteen still segments were cut into two to five framings each on sentence boundaries, two clips already made during the toolbox exploration were placed where the script has action (the river pull, the walk away), the VW statistic card was moved to start with its subject, and the two two-second stills were given the pause before their line. 53 segments became 89. Narration is unchanged.
+
+**Why:** In the first draft there was one cut every 12.5 seconds, sixteen stills were held longer than 8 seconds (the rating-cards still for about 19 seconds, three times), and only one generated clip was in the cut while eleven more sat unused.
+
+**What it fixed:** One cut every 6.5 seconds; no still held longer than 7. The statistic card is empty for under a second instead of three. Not fixed: text-heavy cards have less reading time at the faster pace, and the laptop close-up recurs five times.
+
+**Verification:** Built on a copy of the manifest first; a frame from each of the 57 new or changed shots was checked; Tiger compared the two full renders and adopted the second.
+

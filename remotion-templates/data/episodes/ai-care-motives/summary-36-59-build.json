@@ -2,7 +2,7 @@
   "episode": "ai-care-motives",
   "source": "Summarised from Anthropic, “Tracing the thoughts of a large language model” (2025) · Claude 3.5 Haiku",
   "title": "Asked how it got the answer",
-  "subtitle": "Our summary of a published example · Anthropic, 2025",
+  "subtitle": "Our summary · Anthropic, 2025",
   "durationSec": 12,
   "text": "Anthropic asked Claude 3.5 Haiku to add 36 and 59.\n\nIt answered 95. Then it was asked how it got that.\n\nIt described carrying the 1, the method taught in school.",
   "fontSize": 46,
