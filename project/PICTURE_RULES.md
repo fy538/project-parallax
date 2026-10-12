@@ -19,7 +19,7 @@ Rules 1, 2, 3 and 7 are recorded in the [visual-identity handoff](visual-identit
 
 ## Not decided yet
 
-- Whether rule 1 applies to the stills episode 1 already has. Some raters in `aigen-06-rating-cards.png` stand in profile with a nose, and one wears glasses.
+- Whether rule 1 applies to the stills episode 1 already has. An audit on October 12 found a breach in eleven of the twelve: three heads read as a face part (the two figures in `aigen-08`, and the glasses in `aigen-06`), about fifteen profiles carry a nose point, and most ears have an inner line. Bringing all of them under the rule would be a re-illustration. See [the audit](visual-identity/face-audit-2026-10-12/README.md).
 - The palette of the new look: evening amber or daylight.
 - The look itself. "Painted constructivism" is a direction under test, not the channel's identity. See the [critique](visual-identity/handoff-2026-10-11/critique-2026-10-11.md).
 
