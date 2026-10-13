@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T18:30:23+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a13161-23d6-7750-bf4a-15f06a77f1df",
+  "still": "episodes/ai-care-motives/assets/keyframes/clip-02-change-start.png",
+  "end_image": "episodes/ai-care-motives/assets/keyframes/clip-02-change-end.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": null,
+  "prompt": "The child lowers her hand and places the coin flat on the counter. The shopkeeper's hand slides the loaf of bread a little toward her and comes to rest on it. Slow, small, deliberate movements.\n\nNothing else moves. The camera is locked off: no zoom, no pan. Flat painted illustration; the style, texture and colours do not change.",
+  "expanded_prompt": null,
+  "timings": {
+    "inference": 3.6840390292927623
+  },
+  "wall_seconds": 15,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae1d85/G2KXhnUfGmzZWXGQCw9c__minimax-h3.mp4"
+}

@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-10-12T18:30:38+00:00",
+  "model": "minimax/h3-max/image-to-video",
+  "request_id": "01a13161-5c4b-7ce3-b60b-581a4222ee9c",
+  "still": "episodes/ai-care-motives/assets/keyframes/clip-10-typing-start.png",
+  "end_image": "episodes/ai-care-motives/assets/keyframes/clip-10-typing-start.png",
+  "duration_requested": 5.0,
+  "resolution": "1080P",
+  "prompt_expansion_mode": "disabled",
+  "seed": null,
+  "prompt": "The two hands type on the laptop keyboard: small, quick finger movements on the keys, the wrists and sleeves almost still. The light from the screen does not change.\n\nNothing else moves. The camera is locked off: no zoom, no pan. Flat painted illustration; the style, texture and colours do not change.",
+  "expanded_prompt": null,
+  "timings": {
+    "inference": 3.6002951550035505
+  },
+  "wall_seconds": 14,
+  "price_per_second_usd": 0.096,
+  "estimated_cost_usd": 0.48,
+  "video_url": "https://v3b.fal.media/files/b/0aae1d86/nc8qEZK6UNhs7cm5-6n3W_minimax-h3.mp4"
+}

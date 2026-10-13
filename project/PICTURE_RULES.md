@@ -47,6 +47,10 @@ Rules 1, 2, 3 and 7 are recorded in the [visual-identity handoff](visual-identit
 11. No turning head has passed rule 1 yet. With only the two ends pinned, the profile in between grew a nose. Do not plan a shot that needs one until a test with a pinned middle frame passes. (Handoff section 10; critique, experiment 1.)
 12. Three pinned frames in one clip carried a whole action from pose to pose. (Toolbox reel 5, 0:02.)
 
+14. A change of state can be a dissolve in Remotion instead of a clip: edit the still, paste back only the changed part, and cross-dissolve the two pictures under one continuing framing. People leaving a scene, a figure fading to an outline and a window lighting up each cost one edit ($0.12) or nothing. (`ai-care-motives` tier 2, Oct 12.)
+15. A clip pinned to the same picture at both ends gives small natural motion, such as hands typing, but the model filled a blank laptop screen with an invented web page. Lay the start frame back over any area that must not change. (Same.)
+16. A head at the edge of a clip grew an eyelash-like mark mid-clip although both pinned frames were clean. Crop heads out of a clip when the action is in the hands. (Same.)
+
 **Reviewing**
 
 13. Enlarge every head and every hand contact before accepting a picture with a person in it. At thumbnail size we passed a nose and a grip nobody could trace. `tools/qa/contact_sheet.sh --crop X,Y,W,H out.jpg in.png` enlarges a region, and the same script tiles pictures into a sheet. (Handoff section 10; critique section 9.)
