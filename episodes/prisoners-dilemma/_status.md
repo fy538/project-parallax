@@ -1,9 +1,9 @@
 # Status — prisoners-dilemma
-> Auto-generated 2026-10-12 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-13 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** RENDER READY · day 156 in state · target 2026-06-01 (-133 days)
+**State:** RENDER READY · day 157 in state · target 2026-06-01 (-134 days)
 **Format:** Philosopher's Lens
 
 ## Progress  ▰▰▰▰▰▰▰▱▱▱  6 of 9 stages
@@ -46,8 +46,8 @@
 `Duration      `  14.9 min (893.8s)
 `Segments      `  121
 `Data files    `  49
-`Days in state `  156
-`Days to target`  -133
+`Days in state `  157
+`Days to target`  -134
 
 ## Notes
 

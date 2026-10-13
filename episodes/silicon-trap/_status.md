@@ -1,9 +1,9 @@
 # Status — silicon-trap
-> Auto-generated 2026-10-12 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-13 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** RENDER READY · day 164 in state · target 2026-05-25 (-140 days)
+**State:** RENDER READY · day 165 in state · target 2026-05-25 (-141 days)
 **Format:** Wargamer
 
 ## Progress  ▰▰▰▰▰▰▰▱▱▱  6 of 9 stages
@@ -57,8 +57,8 @@
 `Duration      `  13.5 min (812.8s)
 `Segments      `  99
 `Data files    `  28
-`Days in state `  164
-`Days to target`  -140
+`Days in state `  165
+`Days to target`  -141
 
 ## Notes
 

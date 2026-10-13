@@ -100,6 +100,8 @@ remotion-templates/public/episodes/ai-care-motives/clips/aigen-*.mp4
 !remotion-templates/public/episodes/ai-care-motives/clips/aigen-03-unwatched.mp4
 !remotion-templates/public/episodes/ai-care-motives/clips/aigen-04-rescue-3kf.mp4
 !remotion-templates/public/episodes/ai-care-motives/clips/aigen-05-walkaway.mp4
+!remotion-templates/public/episodes/ai-care-motives/clips/aigen-02-change.mp4
+!remotion-templates/public/episodes/ai-care-motives/clips/aigen-10-typing.mp4
 # Stock clips under the Pexels licence, which does not allow passing the files on. This
 # repository is public, so they stay local. Sources and IDs are in asset-manifest.json.
 remotion-templates/public/episodes/ai-care-motives/clips/stock-*.mp4

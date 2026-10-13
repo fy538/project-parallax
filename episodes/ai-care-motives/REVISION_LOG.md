@@ -69,3 +69,13 @@
 
 **Verification:** Built on a copy of the manifest first; a frame from each of the 57 new or changed shots was checked; Tiger compared the two full renders and adopted the second.
 
+## v1.7, changed states and two clips — 2026-10-13
+
+**What changed:** Six moments gained motion or a change in the picture. Four use an edited state of an existing still: the assessors dissolve away on "and another way elsewhere", the shepherd dissolves to his outline on "you vanish", the window lights on "cares", and the desk is empty on "when it thinks no one is checking". Two use new five-second clips pinned at both ends: the coin going down on the counter, and the hands typing. 89 segments became 92. Narration is unchanged.
+
+**Why:** Tiger wanted more generated picture and motion in the cut. The rating-cards still and the desk still each appear four or five times, and a repeat with a change in it reads as a new picture.
+
+**What it fixed:** Seven generated clip shots (28 s) where there were three, and four state changes that land on the word they illustrate. Not fixed: the empty desk's chair sits in a different place from the shot with the man in it, so it is used as its own wide shot, not a dissolve.
+
+**Verification:** Built on a copy; frames before, during and after each change were checked, then frames from the full render; Tiger compared it with the adopted cut and adopted it. Cost about $1.44 on fal.
+

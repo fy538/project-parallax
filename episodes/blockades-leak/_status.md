@@ -1,9 +1,9 @@
 # Status — blockades-leak
-> Auto-generated 2026-10-12 by `tools/pipeline_validator.py --write-status`.
+> Auto-generated 2026-10-13 by `tools/pipeline_validator.py --write-status`.
 > **Do not edit by hand.** Re-run the tool to refresh.
 > Hand-edit `episodes/PIPELINE.md` for state changes (the narrative + at-a-glance table).
 
-**State:** INCUBATING · day 208 in state
+**State:** INCUBATING · day 209 in state
 
 ## Progress  ▰▱▱▱▱▱▱▱▱▱  1 of 9 stages
 
@@ -32,7 +32,7 @@
 
 ## By the numbers
 
-`Days in state`  208
+`Days in state`  209
 
 ## Notes
 
